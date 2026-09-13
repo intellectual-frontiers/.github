@@ -148,7 +148,7 @@ pass, and the ASD-STE100 switch for procedures — is
 | Rights and licensing material | IP lockup | Use Deep Ink for asset status, rights categories, and controlled highlights. |
 | Books and publishing | Press lockup | Use oxblood for imprint identification; typography and content carry the page. |
 | Venture architecture and company building | Studios lockup | Use teal for experiments, design-partner work, paid proof, and independence milestones. |
-| Human capital work and search theses | Corporate lockup with Network named in copy | Network has no approved lockup yet; the book has not been revised for it. |
+| Human capital work and search theses | Network lockup | See [Logo files](#logo-files) below — the Network lockup is now official. |
 | Social avatar and favicon | Core graphic | Use the approved four-color SVG or a tested raster derivative. |
 | Program or portfolio material | Relevant unit lockup | Keep the program or company identity separate and show endorsement in copy. |
 
@@ -161,6 +161,46 @@ pass, and the ASD-STE100 switch for procedures — is
 - Preserve transparent backgrounds and adequate resolution.
 - Do not edit master artwork inside presentation, social media, or page
   layout tools.
+
+### Logo files
+
+> **Status: canonical.** Six standalone SVG lockups live in
+> [`assets/logos/`](../assets/logos/): one corporate mark and one per unit.
+> Each was cut from `Intellectual Frontiers Five-Logo System 2026-08-31.svg`
+> (2026-08-31), the source file that shipped five approved lockups —
+> corporate, IP, Capital, Studios, Press — as one 2200×2400 canvas of five
+> stacked 480px bands. Each file below is one band, self-contained, at
+> `viewBox="0 0 2200 480"`.
+
+| File | Lockup |
+| --- | --- |
+| `intellectual-frontiers-corporate.svg` | Corporate: "Intellectual Frontiers," both lines Deep Ink. |
+| `intellectual-frontiers-ip.svg` | "Intellectual Frontiers IP" — IP's assigned color is Deep Ink, so the unit name reads the same as the rest of the wordmark. |
+| `intellectual-frontiers-capital.svg` | "Intellectual Frontiers Capital" — "Capital" set in Frontier Blue. |
+| `intellectual-frontiers-studios.svg` | "Intellectual Frontiers Studios" — "Studios" set in Signal Teal. |
+| `intellectual-frontiers-press.svg` | "Intellectual Frontiers Press" — "Press" set in Editorial Oxblood. |
+| `intellectual-frontiers-network.svg` | "Intellectual Frontiers Network" — "Network" set in Network Indigo. Official; see note below. |
+
+Every file uses the same four-color core graphic, unchanged from the source
+— color lives in that mark and, on the wordmark, only in the unit name
+following "Frontiers," per the naming-architecture rule above. Two things
+worth knowing about how these were produced:
+
+- **The source file's wordmark was entirely Deep Ink**, including the unit
+  name — it didn't yet match the "in its assigned color" rule above. These
+  six files fix that: the unit name in each is recolored to its assigned
+  color; "Intellectual" and "Frontiers" stay Deep Ink in every file, as
+  before.
+- **The Network lockup has no vector-traced letterforms for "Network" in
+  the source artwork** — the source file predates Network and never drew
+  those glyphs. `intellectual-frontiers-network.svg` reuses the source's
+  vector-outlined "Frontiers" unchanged, then sets "Network" as a live SVG
+  `<text>` element (`font-family: 'Nimbus Sans', Arial, sans-serif`,
+  weight 700, size 176px, Network Indigo) positioned to match the others'
+  spacing. It is the official lockup, but it is the one file here that
+  isn't pixel-identical outlined artwork like the rest — treat it as due
+  for a proper vector redraw whenever whoever holds the original font or
+  design file revisits the mark.
 
 ## Release checklist
 
