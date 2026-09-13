@@ -13,8 +13,9 @@ measurable success criteria — sourced entirely from the constitution and
 > This spec was written first, before any template existed. Its shape was
 > then extracted into [`spec-kit/templates/spec-template.md`](../../templates/spec-template.md)
 > for every spec that follows — starting with
-> [`0002-if-ip`](../0002-if-ip/spec.md) and
-> [`0003-if-press`](../0003-if-press/spec.md), with three units still to
+> [`0002-if-ip`](../0002-if-ip/spec.md),
+> [`0003-if-press`](../0003-if-press/spec.md), and
+> [`0004-if-capital`](../0004-if-capital/spec.md), with two units still to
 > come.
 
 ## Why this document exists
