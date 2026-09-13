@@ -56,7 +56,7 @@ spec-kit/
   memory/
     constitution.md    the Founder's Doctrine, as governing text
 assets/
-  logos/               corporate + 5 unit lockups, one SVG each — see context/brand.md
+  logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
 ```
 
 ## Editing this repository

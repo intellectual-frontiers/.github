@@ -164,15 +164,18 @@ pass, and the ASD-STE100 switch for procedures — is
 
 ### Logo files
 
-> **Status: canonical.** Six standalone SVG lockups live in
-> [`assets/logos/`](../assets/logos/): one corporate mark and one per unit.
-> Each was cut from `Intellectual Frontiers Five-Logo System 2026-08-31.svg`
-> (2026-08-31), the source file that shipped five approved lockups —
-> corporate, IP, Capital, Studios, Press — as one 2200×2400 canvas of five
-> stacked 480px bands. Each file below is one band, self-contained, at
-> `viewBox="0 0 2200 480"`.
+> **Status: canonical.** Seven standalone SVGs live in
+> [`assets/logos/`](../assets/logos/): one corporate lockup, one per unit,
+> and the core graphic alone. The six lockups were each cut from
+> `Intellectual Frontiers Five-Logo System 2026-08-31.svg` (2026-08-31), the
+> source file that shipped five approved lockups — corporate, IP, Capital,
+> Studios, Press — as one 2200×2400 canvas of five stacked 480px bands. Each
+> lockup file is one band, self-contained, at `viewBox="0 0 2200 480"`. None
+> of the seven files has a background element — every one renders on a
+> transparent ground, checked directly by compositing each over a
+> checkerboard before it shipped.
 
-| File | Lockup |
+| File | Contents |
 | --- | --- |
 | `intellectual-frontiers-corporate.svg` | Corporate: "Intellectual Frontiers," both lines Deep Ink. |
 | `intellectual-frontiers-ip.svg` | "Intellectual Frontiers IP" — IP's assigned color is Deep Ink, so the unit name reads the same as the rest of the wordmark. |
@@ -180,6 +183,7 @@ pass, and the ASD-STE100 switch for procedures — is
 | `intellectual-frontiers-studios.svg` | "Intellectual Frontiers Studios" — "Studios" set in Signal Teal. |
 | `intellectual-frontiers-press.svg` | "Intellectual Frontiers Press" — "Press" set in Editorial Oxblood. |
 | `intellectual-frontiers-network.svg` | "Intellectual Frontiers Network" — "Network" set in Network Indigo. Official; see note below. |
+| `intellectual-frontiers-core-graphic.svg` | The four-dot mark alone, no wordmark — cropped to the mark's own bounds plus the 24px digital clear space this book already specifies above, nothing more. For the avatar, favicon, and any use the Channels table above marks "Core graphic." |
 
 Every file uses the same four-color core graphic, unchanged from the source
 — color lives in that mark and, on the wordmark, only in the unit name
