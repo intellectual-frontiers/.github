@@ -12,7 +12,9 @@ This repository is three things at once:
 3. **The home of the shared SpecKit constitution.** [`spec-kit/`](spec-kit/)
    holds the governing doctrine that any Intellectual Frontiers repository's
    own spec-kit setup (`specify init`, `/specify`, `/plan`, `/tasks`) should
-   inherit from.
+   inherit from, plus [`spec-kit/specs/0001-intellectual-frontiers/spec.md`](spec-kit/specs/0001-intellectual-frontiers/spec.md)
+   — the company itself, written as a spec-kit spec: testable requirements
+   and measurable success criteria, not another statement of principles.
 
 ## Canonical source, going forward
 
@@ -55,6 +57,10 @@ context/
 spec-kit/
   memory/
     constitution.md    the Founder's Doctrine, as governing text
+  specs/
+    0001-intellectual-frontiers/
+      spec.md            the company itself, specified: testable requirements,
+                          success criteria, and open questions — not a plan
 assets/
   logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
 ```
