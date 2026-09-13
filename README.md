@@ -72,6 +72,8 @@ spec-kit/
       spec.md            IF Capital, deepened from context/units/capital.md the same way
     0005-if-studios/
       spec.md            IF Studios, deepened from context/units/studios.md the same way
+    0006-if-network/
+      spec.md            IF Network, deepened from context/units/network.md the same way
 assets/
   logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
 ```

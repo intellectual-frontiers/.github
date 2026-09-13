@@ -12,12 +12,13 @@ measurable success criteria — sourced entirely from the constitution and
 
 > This spec was written first, before any template existed. Its shape was
 > then extracted into [`spec-kit/templates/spec-template.md`](../../templates/spec-template.md)
-> for every spec that follows — starting with
+> for every spec that follows:
 > [`0002-if-ip`](../0002-if-ip/spec.md),
 > [`0003-if-press`](../0003-if-press/spec.md),
-> [`0004-if-capital`](../0004-if-capital/spec.md), and
-> [`0005-if-studios`](../0005-if-studios/spec.md), with one unit still to
-> come.
+> [`0004-if-capital`](../0004-if-capital/spec.md),
+> [`0005-if-studios`](../0005-if-studios/spec.md), and
+> [`0006-if-network`](../0006-if-network/spec.md) — all five units now
+> specified.
 
 ## Why this document exists
 
