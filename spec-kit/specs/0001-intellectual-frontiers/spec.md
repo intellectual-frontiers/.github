@@ -10,6 +10,11 @@ shape — what the company is and does, as testable requirements and
 measurable success criteria — sourced entirely from the constitution and
 `context/` already in this repository. No new policy invented here.
 
+> This spec was written first, before any template existed. Its shape was
+> then extracted into [`spec-kit/templates/spec-template.md`](../../templates/spec-template.md)
+> for every spec that follows, including the five unit specs still to be
+> written.
+
 ## Why this document exists
 
 `spec-kit/memory/constitution.md` states the principles: what Intellectual

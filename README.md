@@ -57,6 +57,9 @@ context/
 spec-kit/
   memory/
     constitution.md    the Founder's Doctrine, as governing text
+  templates/
+    spec-template.md   how to write the next spec — extracted from 0001,
+                        not designed in the abstract before one existed
   specs/
     0001-intellectual-frontiers/
       spec.md            the company itself, specified: testable requirements,
@@ -82,3 +85,6 @@ assets/
   active voice for corporate ones, with an audit pass before it ships.
 - Amendments to `spec-kit/memory/constitution.md` follow the amendment
   process at the bottom of that file.
+- A new spec starts from [`spec-kit/templates/spec-template.md`](spec-kit/templates/spec-template.md),
+  saved to `spec-kit/specs/NNNN-kebab-case-slug/spec.md` at the next unused
+  number.
