@@ -3,9 +3,9 @@
 **Spec ID:** 0002-if-ip
 **Status:** Draft — first pass
 **Created:** 2026-09-13
-**Decision authority:** Shahid N. Shah. No individual IF IP unit lead is
-named anywhere in the doctrine yet, distinct from the founder himself —
-see OQ-1.
+**Decision authority:** Shahid N. Shah, for the company-wide reason
+tracked as OQ-5 on `0001-intellectual-frontiers` — no unit, IP included,
+has a named individual lead distinct from the founder yet.
 **Input:** Specify IF IP in spec-kit's spec shape, deepening
 `context/units/ip.md` and `context/registers.md` into testable
 requirements, the way `0001-intellectual-frontiers` deepened the
@@ -184,11 +184,10 @@ possibility.
 
 ## Open questions
 
-- **OQ-1**: No individual is named as IF IP's unit lead anywhere in the
-  doctrine, distinct from Shahid N. Shah himself — unlike the general
-  delegation rule's expectation that every recurring responsibility have a
-  named owner (0001 FR-017). Until this is named, this spec's decision
-  authority defaults to Shahid N. Shah.
+- **OQ-1**: No individual IF IP lead is named, distinct from Shahid N.
+  Shah. This is now tracked company-wide as OQ-5 on
+  `0001-intellectual-frontiers` rather than as an IF IP-specific question —
+  it applies identically to every unit, not just this one.
 - **OQ-2**: No rule resolves which research pillar owns the disposition
   decision when two pillars produce overlapping findings.
 

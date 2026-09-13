@@ -291,6 +291,18 @@ above (FR-007, FR-014, FR-018). One remains open:
   of the [SDAT entity search](https://egov.maryland.gov/BusinessExpress/EntitySearch)
   by someone with network access to it, or Shahid supplying the values
   directly — not a decision this spec can make on its own.
+- **OQ-5**: No unit — IP, Press, Capital, Studios, or Network — has a named
+  individual lead distinct from Shahid N. Shah himself, anywhere in the
+  doctrine. FR-017 requires that "every other recurring responsibility
+  MUST have a named owner, written authority, a measurable output, and a
+  defined escalation point"; as written, no unit currently satisfies that
+  requirement. Every spec in `spec-kit/specs/` defaults its decision
+  authority to Shahid N. Shah for exactly this reason — first surfaced
+  while writing `0002-if-ip`'s own OQ-1, and general enough to belong here
+  rather than be re-discovered once per unit. This is a gap against an
+  existing MUST, not a missing rule — FR-017 does not need to change; the
+  company needs to either name owners or decide the gap is acceptable for
+  now.
 
 ## Review & acceptance checklist
 
