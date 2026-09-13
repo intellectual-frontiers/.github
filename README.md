@@ -66,6 +66,8 @@ spec-kit/
                           success criteria, and open questions — not a plan
     0002-if-ip/
       spec.md            IF IP, deepened from context/units/ip.md the same way
+    0003-if-press/
+      spec.md            IF Press, deepened from context/units/press.md the same way
 assets/
   logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
 ```
