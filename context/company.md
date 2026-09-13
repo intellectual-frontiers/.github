@@ -38,9 +38,9 @@ preference for keeping decisions and rights in house while renting execution.
 | Jurisdiction | Maryland, United States | — |
 | Location | Silver Spring, Maryland, United States | — |
 | Website | [intellectualfrontiers.com](https://www.intellectualfrontiers.com/) | — |
-| Formation date | *Not yet verified* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
-| Maryland Department ID | *Not yet verified* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
-| Maryland standing | *Not yet verified* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
+| Formation date | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
+| Maryland Department ID | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
+| Maryland standing | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
 | Federal EIN | Provided to counterparties on request | There is no public IRS lookup for a private LLC, so it is not published here. |
 
 ## Provenance

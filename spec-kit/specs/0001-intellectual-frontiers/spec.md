@@ -1,7 +1,7 @@
 # Feature Specification: Intellectual Frontiers LLC
 
 **Spec ID:** 0001-intellectual-frontiers
-**Status:** Draft — first pass
+**Status:** Draft — clarified 2026-09-13
 **Created:** 2026-09-13
 **Decision authority:** Shahid N. Shah, per the delegation rule in
 [`spec-kit/memory/constitution.md`](../../memory/constitution.md#7-a-small-core-a-flexible-bench)
@@ -24,6 +24,32 @@ can be checked rather than just agreed with.
 
 This is not an implementation plan. It says what must be true, not how any
 unit's day-to-day work gets done, what tools it uses, or how it is staffed.
+
+## Clarifications
+
+### Session 2026-09-13
+
+- **Q: A protectable research finding had no deadline for its disposition
+  (patent / defensive disclosure / trade secret / no action). Should one
+  exist?** → **A: Yes — tied to a trigger event**, not a calendar. The
+  decision is now due no later than whichever comes first: a paper or note
+  describing the finding going out, or a related patent application's
+  priority-date deadline. See FR-007.
+- **Q: Should the Studios independence test become a scored checklist
+  instead of a single yes/no judgment call?** → **A: No — it stays
+  binary.** One holistic test, deliberately not decomposed into a
+  scorecard. See FR-014.
+- **Q: Should "steady" and "strategically important" work, in the hiring
+  rule, get numeric thresholds?** → **A: No — they stay qualitative.**
+  The 18-month runway figure remains the only hard number; the rest stays
+  a judgment call for whoever holds delegated authority over that
+  decision. See FR-018.
+- **Q: How should the three unverified Maryland registry facts in
+  `context/company.md` (formation date, Department ID, standing) get
+  resolved?** → **A: Attempted an online lookup against Maryland's SDAT
+  business entity search; this environment's network policy blocks it**
+  (same policy that blocked a direct fetch of `intellectualfrontiers.com`
+  earlier in this repository's history). Still open — see OQ-4.
 
 ## Primary scenario
 
@@ -110,9 +136,10 @@ resolved here.
   that the underlying record does not support.
 - **FR-007**: IF IP MUST give every protectable research finding an
   explicit disposition — patent, defensive disclosure, trade secret, or no
-  action — rather than leaving it undecided indefinitely.
-  `[NEEDS CLARIFICATION: no timebox or review cadence for this decision is
-  stated anywhere in the doctrine yet]`
+  action — no later than whichever comes first: a paper or note describing
+  the finding being published, or the priority-date deadline of any
+  related patent application. It MUST NOT leave a finding undecided past
+  either trigger.
 - **FR-008**: The patent register MUST be generated from the USPTO record
   rather than entered by hand, so published counts follow the filings.
 
@@ -142,9 +169,10 @@ resolved here.
 - **FR-014**: IF Studios MUST verify the independence test — that a
   qualified founder, board, investor, or replacement provider could
   continue the venture tomorrow on company-controlled records, rights,
-  systems, and relationships — before calling a venture independent.
-  `[NEEDS CLARIFICATION: independence is stated as a yes/no test, not a
-  scored checklist; whether Studios wants it scored is undecided]`
+  systems, and relationships — before calling a venture independent. This
+  MUST remain a single holistic judgment call; it MUST NOT be decomposed
+  into a scored checklist that could pass on average while failing on one
+  disqualifying component.
 
 **IF Network**
 
@@ -161,10 +189,10 @@ resolved here.
   escalation point.
 - **FR-018**: The company MUST NOT hire full-time for work that is not
   steady, strategically important, financially sound, and supported by at
-  least 18 months of runway.
-  `[NEEDS CLARIFICATION: "steady" and "strategically important" are
-  qualitative; no numeric threshold is defined beyond the 18-month runway
-  figure]`
+  least 18 months of runway. "Steady" and "strategically important" are
+  deliberately not numerically defined beyond the 18-month runway figure;
+  that judgment stays with whoever holds delegated authority over the
+  decision.
 - **FR-019**: Every cross-unit handoff MUST name the legal party,
   beneficial owner, decision-maker, rights, economics, evidence, and
   conflict process before work proceeds, regardless of common ownership or
@@ -247,20 +275,16 @@ whose case for existing rests on AI itself. Full rationale for each:
 
 ## Open questions
 
-Collected from the `[NEEDS CLARIFICATION]` markers above, for scanning in
-one place:
+OQ-1 through OQ-3 were resolved in the 2026-09-13 clarification session
+above (FR-007, FR-014, FR-018). One remains open:
 
-- **OQ-1** (FR-007): No timebox or review cadence governs how long a
-  protectable research finding may sit without a disposition decision.
-- **OQ-2** (FR-014): "Independence" is a yes/no test, not a scored
-  checklist. Whether Studios wants a scored version is undecided.
-- **OQ-3** (FR-018): "Steady" and "strategically important" work, for
-  hiring purposes, have no numeric threshold beyond the 18-month runway
-  figure.
 - **OQ-4**: `context/company.md` carries unverified placeholders (formation
-  date, Maryland Department ID, standing). This spec inherits that gap
-  rather than resolving it — resolving it means checking the Maryland
-  SDAT record, not deciding anything here.
+  date, Maryland Department ID, standing). An online lookup against
+  Maryland's SDAT business entity search was attempted and blocked by this
+  environment's network policy. Resolving this needs either a manual check
+  of the [SDAT entity search](https://egov.maryland.gov/BusinessExpress/EntitySearch)
+  by someone with network access to it, or Shahid supplying the values
+  directly — not a decision this spec can make on its own.
 
 ## Review & acceptance checklist
 
