@@ -64,6 +64,8 @@ spec-kit/
     0001-intellectual-frontiers/
       spec.md            the company itself, specified: testable requirements,
                           success criteria, and open questions — not a plan
+    0002-if-ip/
+      spec.md            IF IP, deepened from context/units/ip.md the same way
 assets/
   logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
 ```
