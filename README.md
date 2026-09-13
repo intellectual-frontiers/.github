@@ -28,11 +28,13 @@ authorities, because that pipeline — not this repository — is closest to the
 primary source. [`context/registers.md`](context/registers.md) explains
 exactly where that line sits and links out rather than duplicating numbers.
 
-Everything in this repository was originally distilled from the Lovable
-repo's typed content (`src/content/doctrine.ts`, `corporate.ts`, `brand.ts`)
-as it stood on 2026-09-13. Each file here says so in its own header, along
-with the source commit. That note is about where the text came from, not
-about who is authoritative now — this repo is.
+Most of this repository was originally distilled from the Lovable repo's
+typed content (`src/content/doctrine.ts`, `corporate.ts`, `brand.ts`) as it
+stood on 2026-09-13. Each such file says so in its own header, along with
+the source commit. That note is about where the text came from, not about
+who is authoritative now — this repo is. `context/writing-guide.md` is the
+exception: it was authored directly here, with no earlier copy anywhere
+else.
 
 ## Layout
 
@@ -42,6 +44,7 @@ profile/
 context/
   company.md          legal facts, provenance, verification links, claims standard
   brand.md             the Identity and Brand Book: colors, naming, voice, do-nots
+  writing-guide.md      the full writing guide: point of view, banned words, ASD-STE100
   registers.md          what each public register is, and the rule for citing one
   units/
     ip.md               Intellectual Frontiers IP
@@ -65,8 +68,9 @@ spec-kit/
   an observable fact should be verifiable, and a claim doesn't become true
   because this repository states it. Numbers sourced from an external
   registry (USPTO, Maryland SDAT) are linked, not restated.
-- Follow the voice rules in [`context/brand.md`](context/brand.md) — evidence
-  led, practical, skeptical, plain — for any new prose, including prose
-  drafted by an AI agent.
+- Follow [`context/writing-guide.md`](context/writing-guide.md) for any new
+  prose, including prose drafted by an AI agent: evidence-led, practical,
+  skeptical, plain, in first person for personal pieces or third-person
+  active voice for corporate ones, with an audit pass before it ships.
 - Amendments to `spec-kit/memory/constitution.md` follow the amendment
   process at the bottom of that file.

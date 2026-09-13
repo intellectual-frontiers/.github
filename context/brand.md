@@ -126,6 +126,11 @@
 This applies to any AI-assisted drafting done in this repository or on
 Intellectual Frontiers' behalf, not only human-written copy.
 
+The four principles above are the summary. The full writing guide —
+first-person vs. corporate point of view, banned vocabulary, the audit
+pass, and the ASD-STE100 switch for procedures — is
+[`context/writing-guide.md`](writing-guide.md).
+
 **Questions any brand-facing material should be able to answer:**
 1. What unusual advantage is already present?
 2. Why does this person or organization have it?
