@@ -126,6 +126,25 @@ valuation, compliance — goes to independent parties.
   LP authority over an independent partner (for example, Sinbad Capital)
   that it does not actually hold.
 
+**Fund-specific rules**
+
+- **FR-013**: A company MUST contribute to a better end-to-end patient and
+  caregiver experience to qualify for a care-delivery fund; this is a
+  qualifying condition, not a preference to weigh against others.
+- **FR-014**: Before a company is incorporated under a fund's "build"
+  mode, its operating model, target buyer, contract chassis, and unit
+  economics MUST be settled. If they cannot be settled, the build MUST
+  NOT start.
+- **FR-015**: A care-delivery fund MUST NOT operate as a traditional
+  venture capital fund, private equity fund, accelerator, incubator,
+  consulting firm, or short-term financial buyer, and MUST NOT force a
+  common holding period, financing structure, or exit schedule onto every
+  company it holds.
+- **FR-016**: A fund's job MUST stay scoped to what it was built to prove.
+  A fund proving that a set of reimagined pieces work together MUST NOT
+  be treated as also responsible for carrying a company past that point —
+  that is a different fund's job.
+
 ## Key entities
 
 - **Underwriting judgment** — demand, distribution, governance, reserves,
@@ -141,6 +160,12 @@ valuation, compliance — goes to independent parties.
   commingling with the parent or other vehicles.
 - **Sinbad Capital** — an independent early fund and operating partner;
   Capital has no allocation or LP authority over it.
+- **Care Delivery Fund I** — proves that a set of reimagined care-delivery
+  pieces work together; not this spec's place to state its current size
+  or roster (see `context/units/capital.md`).
+- **Care Delivery Fund II** — in formation; backs clinician-led
+  care-delivery companies through one of three modes (invest, take
+  selective control, build).
 
 ## Success criteria
 
@@ -155,6 +180,11 @@ valuation, compliance — goes to independent parties.
   from parties independent of Capital's own underwriting team.
 - **SC-005**: Capital's public description of itself never claims tenure
   beyond its actual formation date as a formal platform.
+- **SC-006**: No care-delivery fund company is missing a settled operating
+  model, target buyer, contract chassis, and unit economics at the point
+  it is incorporated under "build" mode.
+- **SC-007**: No care-delivery fund forces a uniform holding period,
+  financing structure, or exit schedule across its portfolio.
 
 ## Out of scope
 
@@ -164,6 +194,10 @@ valuation, compliance — goes to independent parties.
   operational detail.
 - Sinbad Capital's or any other independent partner's own governance is
   outside Capital's authority entirely, and outside this spec.
+- The funds' current size and portfolio roster are point-in-time business
+  facts, not operating doctrine — deliberately left to the live site
+  rather than restated here (see `context/units/capital.md`'s header
+  note).
 
 ## Open questions
 
@@ -198,4 +232,5 @@ valuation, compliance — goes to independent parties.
 | FR-010 | `context/units/capital.md` ("Why it's worth the risk"); `spec-kit/memory/constitution.md` §11 |
 | FR-011 | `0001-intellectual-frontiers/spec.md` FR-019 |
 | FR-012 | `spec-kit/memory/constitution.md` §7 (Sinbad Capital boundary) |
-| SC-001 – SC-005 | Derived directly from FR-001 – FR-012 above |
+| FR-013 – FR-016 | `context/units/capital.md` ("The funds") |
+| SC-001 – SC-007 | Derived directly from FR-001 – FR-016 above |

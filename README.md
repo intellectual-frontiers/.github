@@ -32,11 +32,20 @@ exactly where that line sits and links out rather than duplicating numbers.
 
 Most of this repository was originally distilled from the Lovable repo's
 typed content (`src/content/doctrine.ts`, `corporate.ts`, `brand.ts`) as it
-stood on 2026-09-13. Each such file says so in its own header, along with
-the source commit. That note is about where the text came from, not about
-who is authoritative now — this repo is. `context/writing-guide.md` is the
-exception: it was authored directly here, with no earlier copy anywhere
-else.
+stood on 2026-09-13, then deepened from the fuller content on the live
+site itself (`src/content/network.ts`, `iplg.ts`, `books.ts`,
+`care-delivery.ts`, and more) as of commit `adf0aef` on 2026-09-14. Each
+file says so in its own header, along with the source commit. That note is
+about where the text came from, not about who is authoritative now — this
+repo is. `context/writing-guide.md` is the exception: it was authored
+directly here, with no earlier copy anywhere else.
+
+Some real content on the live site is deliberately low-visibility —
+unlinked from navigation, marked noindex — rather than secret. Where that
+material (like the IPLG framework) is summarized here, it's kept at the
+same doctrine-level depth as everything else rather than fully reproduced,
+and fund-specific figures or a portfolio roster are treated like patent
+counts: named and described, not restated as numbers that can go stale.
 
 ## Layout
 

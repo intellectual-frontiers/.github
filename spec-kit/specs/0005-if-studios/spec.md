@@ -157,6 +157,25 @@ custom consulting engagement.
   anyone else, as justification for a Capital investment decision by
   itself. (Restates 0001 FR-002.)
 
+**Portfolio categories**
+
+- **FR-015**: A company in the portfolio classified as a venture MUST have
+  its own entity, its own operator, a licensed rights position, and a
+  written closure condition before its first hire.
+- **FR-016**: A piece of software in the portfolio MUST record its license
+  and current status rather than imply one; it MUST NOT be required to
+  have an entity or an operator the way a venture must.
+- **FR-017**: When internally built software turns out to be worth more
+  outside the firm, it MUST be spun out rather than kept as an internal
+  tool indefinitely.
+- **FR-018**: A shared service still at the ideation stage (not yet
+  running) MUST be described as being at that stage wherever it's
+  mentioned, not presented as an operating service.
+- **FR-019**: A tool or piece of content Studios builds to make its work
+  directly usable (per IPLG) MUST be evaluated against the Native Alpha
+  test the same as anything else; the AI underneath it MUST NOT be
+  presented as the advantage by itself.
+
 ## Key entities
 
 - **Venture Architecture** — the work of deciding what should exist and
@@ -172,6 +191,14 @@ custom consulting engagement.
   connected by a defined handoff gate.
 - **AI First / AI Augmented / AI Workforce** — naming tiers tied to how
   much human production work a service still requires.
+- **A venture** vs. **software** vs. **a shared service** — the three
+  portfolio categories, each with its own obligations, per "Two kinds of
+  company" in `context/units/studios.md`.
+- **Companion Executable Source Code Repositories** — the reproducible
+  science shared service; ideation-stage, not yet running.
+- **IPLG (Intellectual Product-Led Growth)** — the framework for making
+  Studios' work directly usable, shared with IF IP and summarized in
+  `context/units/studios.md`.
 
 ## Success criteria
 
@@ -188,6 +215,11 @@ custom consulting engagement.
   perform most of its production work.
 - **SC-006**: A failed Demand Engineering test is recorded as a completed,
   valid result, with a date and an outcome — not silently retried.
+- **SC-007**: Every portfolio entry is classified as a venture, software,
+  or a shared service, with the obligations that category requires
+  satisfied — no entry sits unclassified.
+- **SC-008**: No ideation-stage shared service is described as though it
+  were already running.
 
 ## Out of scope
 
@@ -195,6 +227,9 @@ custom consulting engagement.
   use are operational detail, not spec-level.
 - Compensation, cap table, or equity terms for a venture belong to Capital
   and to legal formation work, not to this spec.
+- IPLG's own tooling and website mechanics are implementation detail, kept
+  summarized here rather than fully reproduced, the same as in
+  `0002-if-ip`.
 - The historical roster of past ventures (Physia, simplifyMD, Citus
   Health, and others) is provenance, already stated in
   `context/units/studios.md`; this spec governs current practice, not the
@@ -233,4 +268,7 @@ custom consulting engagement.
 | FR-009 | `0001-intellectual-frontiers/spec.md` FR-013, FR-014 |
 | FR-010 – FR-013 | `context/units/studios.md` (Shared services) |
 | FR-014 | `0001-intellectual-frontiers/spec.md` FR-002 |
-| SC-001 – SC-006 | Derived directly from FR-001 – FR-014 above |
+| FR-015 – FR-017 | `context/units/studios.md` ("Two kinds of company") |
+| FR-018 | `context/units/studios.md` (Shared services; Companion Executable Source Code Repositories) |
+| FR-019 | `context/units/studios.md` (Shared services; IPLG) |
+| SC-001 – SC-008 | Derived directly from FR-001 – FR-019 above |

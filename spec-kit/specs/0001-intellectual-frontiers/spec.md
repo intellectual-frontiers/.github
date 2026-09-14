@@ -220,6 +220,9 @@ resolved here.
 - **FR-022**: Prose written for Intellectual Frontiers, including
   AI-drafted prose, MUST follow `context/writing-guide.md` and pass its
   audit step before publication.
+- **FR-023**: The company MUST NOT publish its resident agent, a street
+  address, a telephone number, headcount, revenue, financing details, or
+  ownership percentages.
 
 ## Key entities
 
@@ -336,5 +339,6 @@ above (FR-007, FR-014, FR-018). One remains open:
 | FR-020 | `spec-kit/memory/constitution.md` §8 |
 | FR-021 | `context/registers.md`; `README.md` |
 | FR-022 | `context/writing-guide.md` |
+| FR-023 | `context/company.md` ("What this company deliberately does not publish") |
 | SC-001 – SC-008 | `spec-kit/memory/constitution.md` §9 |
 | Out of scope | `spec-kit/memory/constitution.md` §11 |

@@ -1,8 +1,17 @@
 # Intellectual Frontiers Studios
 
-> **Status: canonical.** Distilled from `doctrine.ts` (`studios`),
-> `corporate.ts` (`unitQuestions`), and `brand.ts` (`brandUnits`) at commit
-> `6260a3b` of the Lovable-managed web repo (2026-09-13).
+> **Status: canonical.** The job, color, question, purpose, "Where the
+> practice comes from," "Disciplines," "Lifecycle," "Steps," "What counts
+> as a design partner," "What counts as evidence," and the independence
+> test below are distilled from `doctrine.ts` (`studios`), `corporate.ts`
+> (`unitQuestions`), and `brand.ts` (`brandUnits`) at commit `6260a3b` of
+> the Lovable-managed web repo (2026-09-13). "Two kinds of company" and the
+> additions to "Shared services" below were added from
+> `src/routes/studios/index.tsx`, `src/routes/studios/software.tsx`,
+> `src/routes/studios/ventures.tsx`, and a summary-level pass over the
+> IPLG framework (`src/content/iplg.ts`) at commit `adf0aef` (2026-09-14).
+> IPLG itself lives on a deliberately low-visibility part of the site; it's
+> summarized here, not reproduced.
 
 **Job:** Build the companies that should exist.
 
@@ -101,6 +110,26 @@ replacement provider continue this company tomorrow using company-controlled
 records, rights, systems, and relationships? If not, the company is not
 independent yet.
 
+## Two kinds of company
+
+Studios' portfolio holds two different kinds of thing, each with its own
+obligations, plus a third category shared services sit in.
+
+**A venture** is chartered as a company, not a project: its own entity,
+its own operator, a licensed rights position, and a closure condition
+written down before the first hire.
+
+**Software** is code as a work, not a company: some of it is open source
+and public, some stays inside a venture, and each entry records its
+license and status rather than implying one. There's no entity or
+operator requirement — the obligation is transparency about license and
+status. When something built for internal use turns out to be worth more
+outside, it gets spun out rather than kept as an internal tool.
+
+A **shared service** sits between the two: built to stand alone, usable
+by every venture in the portfolio, and spun out if outside demand for it
+is strong enough.
+
 ## Shared services
 
 Studios also runs shared services across the portfolio, so a company does
@@ -116,12 +145,30 @@ rebuilt. If they do not hold up, that is a result too, and it is cheaper to
 learn there than in a pipeline that never converts.
 
 Both run on a small human core with an AI harness, and a service is named for
-the outcome it owns. If humans still do most of the work, or several
-developers have to stay in the daily production loop, it is called AI First
-or AI Augmented rather than an AI Workforce.
+the outcome it owns. Demand Engineering and Revenue Engineering are each
+trademarked as an "AI Workforce" product, and that name is a claim, not a
+label: if humans still do most of the work, or several developers have to
+stay in the daily production loop, the service is called AI First or AI
+Augmented instead — regardless of how it's branded.
 
 Reproducible science work sits alongside them, keeping the research and the
-code that supports it verifiable by someone outside the firm.
+code that supports it verifiable by someone outside the firm. Its concrete
+form is the **Companion Executable Source Code Repositories** service:
+pairing a published paper with a containerized code, data, and
+documentation repository that keeps updating — a complement to peer
+review, not a replacement for it. As of this writing it is at the ideation
+stage, not a running service yet, and should be described as such
+wherever it's mentioned.
+
+IPLG (Intellectual Product-Led Growth) is the framework behind how these
+services, and Studios' other output, turn into something a visitor can
+use directly rather than only read about — the same framework
+`context/units/ip.md` describes for IF IP's research. Studios' own
+version of it names the "executable actions" a visitor can take per unit
+(for IF Studios, things like turning a page into a Venture Architecture
+exercise, or becoming a design partner). Like everywhere else, it's held
+to the Native Alpha test: the AI underneath it is not the advantage; the
+compounding system built around it might be.
 
 ## Evidence Studios produces
 

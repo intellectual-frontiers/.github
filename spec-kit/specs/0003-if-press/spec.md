@@ -122,6 +122,26 @@ the work is aimed at that company eventually not needing Press at all.
   understanding and helps somebody make a better decision — not by
   whether it fills a content calendar.
 
+**Corrections and sourcing**
+
+- **FR-011**: When a published claim or number turns out to be wrong,
+  Press MUST run the correction with the same prominence as the original
+  claim, in place, and MUST credit whoever caught the error unless they
+  ask otherwise.
+- **FR-012**: A published piece MUST carry the evidence for its claims —
+  named systems, dated numbers, and the constraint that made the problem
+  hard — and MUST be organized by the market it addresses.
+- **FR-013**: A recurring editorial argument (for example, framing AI by
+  which new work becomes possible rather than hours saved) MUST still
+  satisfy FR-002 and FR-003 — using a thread deliberately to make a case
+  does not exempt it from being evidence-based and honest about the
+  advantage's limits.
+- **FR-014**: Press MUST format a piece to match how its intended audience
+  actually consumes material (for example, a patent summary written so a
+  licensee or procurement officer can judge a family's coverage without
+  hiring counsel first) rather than defaulting to one format for every
+  audience.
+
 ## Key entities
 
 - **A piece** — a book, essay, field guide, case study, documentation,
@@ -136,6 +156,13 @@ the work is aimed at that company eventually not needing Press at all.
   defined in `context/company.md`.
 - **The voice principles** — evidence-led, practical, skeptical, plain,
   defined in `context/brand.md`.
+- **A Fieldbook** — one of the four named books carrying the Intellectual
+  Frontiers Press imprint, each with its own thesis and named frameworks.
+- **Founder writing** — Shahid Shah's own writing, published externally
+  and curated into the portfolio by type (Contrarian Brief, Design
+  Pattern, Working Theory, Practitioner Journalist) and optional series.
+- **An owned channel** — one of Press's six directly owned publications,
+  chosen over depending solely on an outside platform.
 
 ## Success criteria
 
@@ -150,6 +177,12 @@ the work is aimed at that company eventually not needing Press at all.
 - **SC-004**: A reader of a given piece can state a decision they're able
   to make differently having read it. Volume or publishing cadence is not
   a measure of Press's work.
+- **SC-005**: A correction to a published claim carries the same
+  prominence as the original claim and appears in place, not buried or
+  omitted.
+- **SC-006**: Every published piece names its evidence (systems, dated
+  numbers, the constraint that made the problem hard) and states which
+  market it addresses.
 
 ## Out of scope
 
@@ -160,6 +193,10 @@ the work is aimed at that company eventually not needing Press at all.
 - Outside-coverage strategy (which journalists, which outlets) is
   operational detail; this spec only requires that Press's own account
   never depend on it.
+- The substantive content of any Fieldbook or founder-writing piece is
+  Press's editorial work, not this spec's to govern — this spec only
+  requires that the finished piece satisfy the claims standard and voice
+  principles.
 
 ## Open questions
 
@@ -196,4 +233,7 @@ the work is aimed at that company eventually not needing Press at all.
 | FR-008 | `context/units/press.md` (Levels table) |
 | FR-009 | `context/units/press.md` ("Why Press exists") |
 | FR-010 | `context/units/press.md` ("Why Press exists") |
-| SC-001 – SC-004 | Derived directly from FR-001 – FR-010 above |
+| FR-011, FR-012 | `context/units/press.md` ("Owned channels") |
+| FR-013 | `context/units/press.md` ("Founder writing") |
+| FR-014 | `context/units/press.md` ("What Press has published") |
+| SC-001 – SC-006 | Derived directly from FR-001 – FR-014 above |

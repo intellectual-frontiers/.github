@@ -43,6 +43,12 @@ preference for keeping decisions and rights in house while renting execution.
 | Maryland standing | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
 | Federal EIN | Provided to counterparties on request | There is no public IRS lookup for a private LLC, so it is not published here. |
 
+**What this company deliberately does not publish:** its resident agent,
+a street address, a telephone number, headcount, revenue, financing
+details, or ownership percentages. That's a stated policy, from the
+corporate fact sheet at commit `adf0aef` (2026-09-14) of the Lovable-managed
+web repo — not an oversight in this file.
+
 ## Provenance
 
 Intellectual Frontiers acquired all Netspective Communications LLC patents in
