@@ -138,6 +138,13 @@ including a failure — is recorded so the next hunt starts further along.
   that finding to the relevant unit rather than treating it as
   irrelevant to the search it was asked to run.
 
+**Shared services**
+
+- **FR-015**: Network MUST route its own legal, finance, compliance, and
+  general operations needs through the company-wide shared-services
+  layer, rather than building its own internal team for one of these
+  functions. (Restates 0001 FR-028.)
+
 ## Key entities
 
 - **A hunt** — a search with a written thesis, the Native Alpha it's
@@ -174,6 +181,9 @@ including a failure — is recorded so the next hunt starts further along.
 - **SC-007**: A finding that someone outside the firm already pursues an
   evaluated thesis is recorded and routed to the relevant unit, not
   dropped because it fell outside the original search request.
+- **SC-008**: Network has no internal legal, finance, or compliance team
+  of its own — those functions are rented, shared with the other four
+  units.
 
 ## Out of scope
 
@@ -219,5 +229,6 @@ including a failure — is recorded so the next hunt starts further along.
 | FR-008 | `0001-intellectual-frontiers/spec.md` FR-016 |
 | FR-009 | `0001-intellectual-frontiers/spec.md` FR-015 |
 | FR-012, FR-014 | `context/units/network.md` ("Network runs through the whole system"); `spec-kit/memory/constitution.md` §6 |
+| FR-015 | `0001-intellectual-frontiers/spec.md` FR-028 |
 | FR-013 | `context/units/network.md` ("Network runs through the whole system"); `context/units/capital.md` ("Capital sources") |
-| SC-001 – SC-007 | Derived directly from FR-001 – FR-014 above |
+| SC-001 – SC-008 | Derived directly from FR-001 – FR-015 above |

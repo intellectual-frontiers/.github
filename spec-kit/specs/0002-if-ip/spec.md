@@ -173,6 +173,13 @@ possibility.
   for patentability) — never as proof that a customer, licensee, or
   market cares.
 
+**Shared services**
+
+- **FR-021**: IF IP MUST route its legal, finance, compliance, and general
+  operations needs through the company-wide shared-services layer rather
+  than building its own internal team for one of these functions.
+  (Restates 0001 FR-028.)
+
 ## Key entities
 
 - **Research area** — groups related work; the top of the chain.
@@ -219,6 +226,8 @@ possibility.
   confidential material is reviewed rather than deleted.
 - **SC-007**: No AI-amplified tool or content is presented as Native Alpha
   on the strength of the AI capability alone.
+- **SC-008**: IF IP has no internal legal, finance, or compliance team of
+  its own — those functions are rented, shared with the other four units.
 
 ## Out of scope
 
@@ -271,4 +280,5 @@ possibility.
 | FR-015, FR-016 | `context/units/ip.md` ("Handling outside disclosures") |
 | FR-017, FR-018 | `context/units/ip.md` ("Where AI stops") |
 | FR-019, FR-020 | `context/units/ip.md` ("IP's real output") |
-| SC-001 – SC-007 | Derived directly from FR-001 – FR-020 above |
+| FR-021 | `0001-intellectual-frontiers/spec.md` FR-028 |
+| SC-001 – SC-008 | Derived directly from FR-001 – FR-021 above |

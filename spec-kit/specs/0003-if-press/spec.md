@@ -151,6 +151,13 @@ the work is aimed at that company eventually not needing Press at all.
 - **FR-016**: Press MUST NOT treat the absence of criticism or argument as
   confirmation of a claim; unopposed does not mean validated.
 
+**Shared services**
+
+- **FR-017**: Press MUST route its legal, finance, compliance, and general
+  operations needs through the company-wide shared-services layer rather
+  than building its own internal team for one of these functions.
+  (Restates 0001 FR-028.)
+
 ## Key entities
 
 - **A piece** — a book, essay, field guide, case study, documentation,
@@ -198,6 +205,8 @@ the work is aimed at that company eventually not needing Press at all.
 - **SC-007**: A piece's reception (argument, adoption, willingness to pay)
   is recorded somewhere and read back against the thesis it was meant to
   test — not published and then never revisited.
+- **SC-008**: Press has no internal legal, finance, or compliance team of
+  its own — those functions are rented, shared with the other four units.
 
 ## Out of scope
 
@@ -252,4 +261,5 @@ the work is aimed at that company eventually not needing Press at all.
 | FR-013 | `context/units/press.md` ("Founder writing") |
 | FR-014 | `context/units/press.md` ("What Press has published") |
 | FR-015, FR-016 | `context/units/press.md` ("Publishing as experimentation") |
-| SC-001 – SC-007 | Derived directly from FR-001 – FR-016 above |
+| FR-017 | `0001-intellectual-frontiers/spec.md` FR-028 |
+| SC-001 – SC-008 | Derived directly from FR-001 – FR-017 above |

@@ -14,9 +14,11 @@
 > **Amended 2026-09-14**, directly by Shahid N. Shah rather than distilled
 > from any website content: §6 gained the search-before-build sequencing,
 > the circulating-system rule, the evidence taxonomy, and the decision
-> checkpoint; §11 gained a new entry; §12 gained a closing statement. This
-> amendment is recorded here per the amendment process at the bottom of
-> this file, not as a separate changelog.
+> checkpoint; §11 gained a new entry; §12 gained a closing statement. §7
+> later gained the same day's second amendment: "one shared-services layer,
+> not five," resolving `0001-intellectual-frontiers/spec.md`'s OQ-6. Both
+> are recorded here per the amendment process at the bottom of this file,
+> not as a separate changelog.
 
 ## Preface
 
@@ -266,6 +268,16 @@ sales execution, administration, fund operations, legal, tax, audit,
 valuation, specialized regulation, and other repeatable work should stay
 outside the core until steady use, strategic value, decision sensitivity,
 economics, and runway justify a full-time hire.
+
+**One shared-services layer, not five:** legal, finance and accounting,
+compliance, and general operations are routed to independent, specialized
+providers the same way for every unit — the pattern Capital already runs
+for fund administration, legal, tax, audit, and valuation is not a
+Capital-specific arrangement, it is what every unit does. No unit builds
+its own internal legal, finance, or compliance team while another unit
+rents the same function. A function graduates to an internal hire only
+when the hiring rule below is met for that function specifically, not
+because one unit happened to reach for it first.
 
 **Hiring rule:** do not turn temporary work into permanent payroll. Hire
 full-time only when the work is steady, strategically important, financially

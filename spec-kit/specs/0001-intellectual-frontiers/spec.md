@@ -61,6 +61,16 @@ unit's day-to-day work gets done, what tools it uses, or how it is staffed.
   (same policy that blocked a direct fetch of `intellectualfrontiers.com`
   earlier in this repository's history). Still open — see OQ-4.
 
+### Session 2026-09-14
+
+- **Q: Should legal, finance, compliance, and general operations become a
+  single shared-services layer used by all five units the same way, or
+  stay a per-unit decision?** → **A: One shared layer, not five.** Every
+  unit routes these functions to independent, specialized providers the
+  same way Capital already does; a function moves in-house only when the
+  hiring rule is met for that function specifically. Resolves OQ-6. See
+  FR-028 and `spec-kit/memory/constitution.md` §7.
+
 ## Primary scenario
 
 As a signal — a patent, a workflow observation, a research finding, a
@@ -255,6 +265,18 @@ resolved here.
   unit's prior assumption. No unit's output MAY be treated as a one-way
   handoff that a later unit cannot send evidence back against.
 
+**Shared services**
+
+- **FR-028**: Legal, finance and accounting, compliance, and general
+  operations MUST be routed to independent, specialized providers the
+  same way for every unit — one shared layer, not a separate arrangement
+  per unit. A unit MUST NOT build its own internal team for one of these
+  functions while another unit rents the same function elsewhere.
+- **FR-029**: A shared function MUST NOT move in-house for one unit's
+  convenience alone; it moves in-house only when the hiring rule (steady,
+  strategically important, financially sound, 18+ months of runway) is
+  met for that function specifically, company-wide.
+
 ## Key entities
 
 - **Intellectual Frontiers LLC** — the parent: brand owner, unit
@@ -292,6 +314,9 @@ resolved here.
   before "build it ourselves."
 - **Capital sources** — the firm's own balance sheet, and LPs and
   investors brought in through IF Network.
+- **Shared services** — legal, finance and accounting, compliance, and
+  general operations, routed to independent providers the same way for
+  every unit, per `context/company.md`.
 
 ## Success criteria
 
@@ -334,7 +359,8 @@ rationale for each:
 ## Open questions
 
 OQ-1 through OQ-3 were resolved in the 2026-09-13 clarification session
-above (FR-007, FR-014, FR-018). One remains open:
+above (FR-007, FR-014, FR-018). OQ-6 was resolved in the 2026-09-14
+session (FR-028, FR-029). Two remain open:
 
 - **OQ-4**: `context/company.md` carries unverified placeholders (formation
   date, Maryland Department ID, standing). An online lookup against
@@ -355,15 +381,10 @@ above (FR-007, FR-014, FR-018). One remains open:
   existing MUST, not a missing rule — FR-017 does not need to change; the
   company needs to either name owners or decide the gap is acceptable for
   now.
-- **OQ-6**: The founder's own `native-alpha-to-market-reality.png` diagram
-  names "shared services" (legal, finance, compliance, operations
-  supporting all five units) as a gap still to make explicit. Unlike the
-  other three gaps that diagram names, this one isn't resolved by the
-  2026-09-14 doctrine addition — the constitution's "small core, a
-  flexible bench" (§7) already routes specific functions (fund
-  administration, legal, tax, audit) to independent parties for Capital
-  specifically, but no rule yet states which functions every unit shares
-  versus which stay unit-specific. Left open rather than answered here.
+~~**OQ-6**: shared services.~~ **Resolved 2026-09-14** — see the
+Clarifications session above, `spec-kit/memory/constitution.md` §7 ("One
+shared-services layer, not five"), and `context/company.md` ("Shared
+services").
 
 ## Review & acceptance checklist
 
@@ -395,5 +416,6 @@ above (FR-007, FR-014, FR-018). One remains open:
 | FR-022 | `context/writing-guide.md` |
 | FR-023 | `context/company.md` ("What this company deliberately does not publish") |
 | FR-024 – FR-027 | `spec-kit/memory/constitution.md` §6 (search before build; the system circulates) |
+| FR-028, FR-029 | `spec-kit/memory/constitution.md` §7 (one shared-services layer); `context/company.md` ("Shared services") |
 | SC-001 – SC-008 | `spec-kit/memory/constitution.md` §9 |
 | Out of scope | `spec-kit/memory/constitution.md` §11 |

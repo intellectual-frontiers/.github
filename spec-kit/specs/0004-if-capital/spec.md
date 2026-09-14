@@ -104,7 +104,9 @@ valuation, compliance — goes to independent parties.
 
 - **FR-006**: Capital MUST route fund administration, legal, tax, audit,
   valuation, and compliance to independent parties rather than performing
-  them itself. (Restates 0001 FR-012.)
+  them itself. (Restates 0001 FR-012. As of 2026-09-14 this is no longer
+  a Capital-specific arrangement — it's the company-wide shared-services
+  pattern, per 0001 FR-028, that every unit now follows the same way.)
 - **FR-007**: Capital MUST route specialist diligence and licensed
   opinions to independent specialists rather than substituting its own
   judgment for licensed expertise.
@@ -254,7 +256,7 @@ valuation, compliance — goes to independent parties.
 | --- | --- |
 | FR-001, FR-003 – FR-005 | `context/units/capital.md` ("Where Capital's judgment comes from") |
 | FR-002 | `0001-intellectual-frontiers/spec.md` FR-011; `context/units/capital.md` ("The rule") |
-| FR-006, FR-007 | `0001-intellectual-frontiers/spec.md` FR-012; `context/units/capital.md` (division-of-labor table) |
+| FR-006, FR-007 | `0001-intellectual-frontiers/spec.md` FR-012, FR-028; `context/units/capital.md` (division-of-labor table) |
 | FR-008 | `context/units/capital.md` (division-of-labor table) |
 | FR-009 | `0001-intellectual-frontiers/spec.md` FR-017 |
 | FR-010 | `context/units/capital.md` ("Why it's worth the risk"); `spec-kit/memory/constitution.md` §11 |

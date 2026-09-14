@@ -197,6 +197,14 @@ custom consulting engagement.
   building) MUST NOT be treated as evidence that building it was worth
   the time spent.
 
+**Back-office shared services**
+
+- **FR-024**: Studios MUST route its own legal, finance, compliance, and
+  general operations needs (distinct from the portfolio-facing shared
+  services above) through the company-wide back-office shared-services
+  layer, rather than building its own internal team for one of these
+  functions. (Restates 0001 FR-028.)
+
 ## Key entities
 
 - **Venture Architecture** — the work of deciding what should exist and
@@ -250,6 +258,9 @@ custom consulting engagement.
   after an experiment, the resulting decision is a hand-off (invest,
   partner, license, merge, or spin out), not continued ownership
   defended on the grounds that Studios built it first.
+- **SC-011**: Studios has no internal legal, finance, or compliance team
+  of its own — those back-office functions are rented, shared with the
+  other four units.
 
 ## Out of scope
 
@@ -302,4 +313,5 @@ custom consulting engagement.
 | FR-018 | `context/units/studios.md` (Shared services; Companion Executable Source Code Repositories) |
 | FR-019 | `context/units/studios.md` (Shared services; IPLG) |
 | FR-020 – FR-023 | `context/units/studios.md` ("Studios is a last-mile capability"); `spec-kit/memory/constitution.md` §6 |
-| SC-001 – SC-010 | Derived directly from FR-001 – FR-023 above |
+| FR-024 | `0001-intellectual-frontiers/spec.md` FR-028 |
+| SC-001 – SC-011 | Derived directly from FR-001 – FR-024 above |

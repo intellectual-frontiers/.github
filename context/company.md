@@ -82,6 +82,26 @@ Full unit charters live in [`context/units/`](units/).
 - Studio activity does not justify investment.
 - Investment does not prove product-market fit.
 
+## Shared services
+
+Not to be confused with IF Studios' own portfolio-facing shared services
+(Demand Engineering, Revenue Engineering — see `context/units/studios.md`).
+This is the company's back office: legal, finance and accounting,
+compliance, and general operations are one shared layer, not five
+separate ones. Every unit routes these functions to
+independent, specialized providers the same way — the pattern IF Capital
+already runs for fund administration, legal, tax, audit, and valuation is
+the company-wide pattern, not a Capital-specific arrangement. A function
+moves in-house only when the hiring rule is met for that function
+specifically (steady, strategically important, financially sound, and
+supported by at least 18 months of runway) — not because one unit reached
+for a hire before the others needed the same thing.
+
+Added directly by Shahid N. Shah on 2026-09-14, resolving what his own
+`native-alpha-to-market-reality.png` diagram named as a gap still to make
+explicit. See [`spec-kit/memory/constitution.md`](../spec-kit/memory/constitution.md)
+§7.
+
 ## Native Alpha, in one line
 
 We look for advantages that already exist rather than manufacturing stories
