@@ -1,15 +1,23 @@
 # Intellectual Frontiers — Constitution
 
+**Constitution version:** 1.2.0 · **Last amended:** 2026-09-14 · full
+history at the bottom of this file, under Amendment process.
+
 > **Status: canonical.** This document is the source of truth for Intellectual
 > Frontiers' governing doctrine. `intellectualfrontiers.com` and its
 > Lovable-managed content repository should treat this file as upstream and
-> sync from it; it is not a mirror of anything published there.
+> sync from it; it is not a mirror of anything published there. A spec built
+> against this constitution should note the version it was written against
+> — see [`spec-kit/AGENTS.md`](../AGENTS.md).
 >
 > Distilled from Shahid N. Shah's Founder's Doctrine, Version 1.1 (September
 > 2026), as held in `src/content/doctrine.ts` at commit `6260a3b` of
 > `intellectual-frontiers/www.intellectualfrontiers.com-aiw-lovable`
 > (2026-09-13). That version is the last point this text was copied from; this
-> file is the one to edit going forward.
+> file is the one to edit going forward. Note the two version numbers are
+> independent: "Founder's Doctrine v1.1" names the source text on the
+> website; "Constitution version 1.2.0" (above) tracks this file's own
+> history since, including amendments the website copy doesn't have yet.
 >
 > **Amended 2026-09-14**, directly by Shahid N. Shah rather than distilled
 > from any website content: §6 gained the search-before-build sequencing,
@@ -410,5 +418,16 @@ change: on evidence, openly, with the reasoning recorded.
 2. Shahid N. Shah holds final decision authority over this document, per
    §7 (`The parent owns... the Native Alpha method, thesis history, and
    decision standards`).
-3. Once merged, this file — not any downstream copy — is the record. Update
-   the version note at the top of this file, not a separate changelog.
+3. Once merged, this file — not any downstream copy — is the record. Bump
+   the version at the top of this file (below) rather than keeping a
+   separate changelog: patch for a wording fix that changes no rule,
+   minor for a new or changed principle, major only if a downstream spec
+   would need to re-derive requirements from scratch to stay consistent.
+
+### Version history
+
+| Version | Date | What changed |
+| --- | --- | --- |
+| 1.0.0 | 2026-09-13 | Initial distillation from Founder's Doctrine v1.1. |
+| 1.1.0 | 2026-09-14 | §6: search-before-build, the circulating-system rule, the evidence taxonomy, the decision checkpoint. §11: added "a capital deployment machine." §12: added the closing mission statement. |
+| 1.2.0 | 2026-09-14 | §7: "One shared-services layer, not five" — resolved `0001-intellectual-frontiers/spec.md` OQ-6. |

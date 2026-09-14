@@ -1,6 +1,7 @@
 # Feature Specification: Intellectual Frontiers LLC
 
 **Spec ID:** 0001-intellectual-frontiers
+**Constitution version:** 1.2.0
 **Status:** Draft — clarified 2026-09-13
 **Created:** 2026-09-13
 **Decision authority:** Shahid N. Shah, per the delegation rule in

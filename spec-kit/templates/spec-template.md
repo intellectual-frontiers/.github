@@ -29,6 +29,8 @@ deviating from it.
 # Feature Specification: [SPEC NAME]
 
 **Spec ID:** [NNNN-kebab-case-slug]
+**Constitution version:** [the version at the top of
+`spec-kit/memory/constitution.md` as of today — check it, don't guess]
 **Status:** Draft — first pass
 **Created:** [YYYY-MM-DD]
 **Decision authority:** [who has final say over this spec's contents —

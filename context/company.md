@@ -79,7 +79,10 @@ below.
 | Intellectual Frontiers Studios | `/studios` | What venture should we create to exploit this advantage, and what is the cheapest credible path to proving whether it deserves to exist? |
 | Intellectual Frontiers Network | `/network` | Who has unusual knowledge, capabilities, relationships, reputation, experience, or access relevant to an opportunity, and how do we find them when needed without building another static resume database? |
 
-Full unit charters live in [`context/units/`](units/).
+Full unit charters live in [`context/units/`](units/). Terms used across
+this file and the unit charters (Native Alpha, the decision checkpoint,
+IPLG, a hunt, and the rest) are defined once in
+[`context/glossary.md`](glossary.md).
 
 ## Unit boundaries
 

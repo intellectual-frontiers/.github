@@ -1,6 +1,7 @@
 # Feature Specification: Intellectual Frontiers Capital
 
 **Spec ID:** 0004-if-capital
+**Constitution version:** 1.2.0
 **Status:** Draft — first pass
 **Created:** 2026-09-13
 **Decision authority:** Shahid N. Shah, for the company-wide reason
