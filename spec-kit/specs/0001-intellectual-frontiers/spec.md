@@ -70,6 +70,15 @@ unit's day-to-day work gets done, what tools it uses, or how it is staffed.
   same way Capital already does; a function moves in-house only when the
   hiring rule is met for that function specifically. Resolves OQ-6. See
   FR-028 and `spec-kit/memory/constitution.md` §7.
+- **Q: How should the three unverified Maryland registry facts (OQ-4) get
+  resolved, given this environment's network policy blocks the SDAT
+  lookup?** → **A: Shahid ran the SDAT search himself and supplied the
+  record directly.** `context/company.md` now states the formation date
+  (September 5, 2023), Maryland Department ID (W24347692), and standing
+  (active, in good standing) as of a 2026-09-14 check. The record also
+  named a resident agent and a principal office address; neither is
+  published here, per FR-023's non-disclosure rule — OQ-4 is resolved
+  only for the three facts it actually asked about. Resolves OQ-4.
 
 ## Primary scenario
 
@@ -359,16 +368,12 @@ rationale for each:
 ## Open questions
 
 OQ-1 through OQ-3 were resolved in the 2026-09-13 clarification session
-above (FR-007, FR-014, FR-018). OQ-6 was resolved in the 2026-09-14
-session (FR-028, FR-029). Two remain open:
+above (FR-007, FR-014, FR-018). OQ-4 and OQ-6 were resolved in the
+2026-09-14 session above (FR-028, FR-029 for OQ-6). One remains open:
 
-- **OQ-4**: `context/company.md` carries unverified placeholders (formation
-  date, Maryland Department ID, standing). An online lookup against
-  Maryland's SDAT business entity search was attempted and blocked by this
-  environment's network policy. Resolving this needs either a manual check
-  of the [SDAT entity search](https://egov.maryland.gov/BusinessExpress/EntitySearch)
-  by someone with network access to it, or Shahid supplying the values
-  directly — not a decision this spec can make on its own.
+- ~~**OQ-4**: unverified Maryland registry facts.~~ **Resolved 2026-09-14**
+  — Shahid supplied the SDAT record directly; see the Clarifications
+  session above and `context/company.md`'s Corporate facts table.
 - **OQ-5**: No unit — IP, Press, Capital, Studios, or Network — has a named
   individual lead distinct from Shahid N. Shah himself, anywhere in the
   doctrine. FR-017 requires that "every other recurring responsibility

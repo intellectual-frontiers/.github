@@ -4,12 +4,18 @@
 > truth for how Intellectual Frontiers describes itself. `intellectualfrontiers.com`
 > should sync from it, not the reverse.
 >
-> **Not canonical for registry facts.** A small number of rows below (formation
-> date, Maryland Department ID, standing) point at the Maryland Department of
-> Assessments and Taxation rather than asserting a value. That is deliberate,
-> not an oversight — a state business registry is the actual source of truth
-> for those specific facts, and this repository does not duplicate it. See
-> the claims standard at the bottom of this file.
+> **Not canonical for registry facts.** The formation date, Maryland
+> Department ID, and standing below are stated as of a 2026-09-14 manual
+> check of the Maryland Department of Assessments and Taxation's business
+> entity search — they can drift out of date, and that search is the
+> actual source of truth for them, not this file. Re-check the source
+> before relying on these for anything time-sensitive. See the claims
+> standard at the bottom of this file.
+>
+> **What this file leaves out on purpose:** the SDAT record also lists a
+> resident agent and a principal office street address. Per the
+> non-disclosure policy below, neither is repeated here even though both
+> are a matter of public record at SDAT.
 >
 > Distilled from `src/content/corporate.ts` at commit `6260a3b` of
 > `intellectual-frontiers/www.intellectualfrontiers.com-aiw-lovable`
@@ -38,9 +44,9 @@ preference for keeping decisions and rights in house while renting execution.
 | Jurisdiction | Maryland, United States | — |
 | Location | Silver Spring, Maryland, United States | — |
 | Website | [intellectualfrontiers.com](https://www.intellectualfrontiers.com/) | — |
-| Formation date | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
-| Maryland Department ID | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
-| Maryland standing | *Not yet verified — lookup attempted 2026-09-13, blocked by tooling* | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch) |
+| Formation date | September 5, 2023 | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch), checked 2026-09-14 |
+| Maryland Department ID | W24347692 | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch), checked 2026-09-14 |
+| Maryland standing | Active; in good standing | [Maryland Department of Assessments and Taxation](https://egov.maryland.gov/BusinessExpress/EntitySearch), checked 2026-09-14 |
 | Federal EIN | Provided to counterparties on request | There is no public IRS lookup for a private LLC, so it is not published here. |
 
 **What this company deliberately does not publish:** its resident agent,
