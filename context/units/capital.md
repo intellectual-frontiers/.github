@@ -33,10 +33,9 @@ boards, making product and payroll decisions, and working through
 acquisitions, mergers, stalled companies, weak distribution, and capital
 constraints.
 
-Private-company investments have included Hybrent, SD858, Goomzee, Poliwogg,
-Buddie (Teleport), Sen-Jam Pharmaceutical, Alvarez Dubey Trading Company, and
-others. Some worked and some did not. Both taught how good products lose to
-weak distribution, governance, reserves, timing, or an incomplete thesis.
+Private-company investments span more than a decade, some successful and
+some not. Both outcomes taught how good products lose to weak
+distribution, governance, reserves, timing, or an incomplete thesis.
 
 The operator's side matters too: starting with incomplete products,
 recruiting teams, facing customers, building regulated systems, working
