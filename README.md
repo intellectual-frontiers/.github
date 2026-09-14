@@ -47,6 +47,14 @@ same doctrine-level depth as everything else rather than fully reproduced,
 and fund-specific figures or a portfolio roster are treated like patent
 counts: named and described, not restated as numbers that can go stale.
 
+On 2026-09-14, Shahid N. Shah also amended `spec-kit/memory/constitution.md`
+directly — not distilled from the website — adding the search-before-build
+sequencing, the circulating-system rule, the evidence taxonomy, and the
+decision checkpoint to §6, plus a new §11 entry and a closing statement.
+Every unit's context file and spec was updated to match, and three system
+diagrams he provided live in [`assets/diagrams/`](assets/diagrams/),
+referenced from `0001-intellectual-frontiers/spec.md`.
+
 ## Layout
 
 ```
@@ -85,6 +93,7 @@ spec-kit/
       spec.md            IF Network, deepened from context/units/network.md the same way
 assets/
   logos/               corporate + 5 unit lockups + the core graphic alone, all transparent — see context/brand.md
+  diagrams/            3 system diagrams — see spec-kit/specs/0001-intellectual-frontiers/spec.md
 ```
 
 ## Editing this repository

@@ -108,6 +108,18 @@ and evidence named at every handoff.
   bar stands on its own — satisfying Studios' evidence table does not
   satisfy Capital's underwriting standard, and vice versa.
 
+## System diagrams
+
+Three diagrams, provided directly by Shahid N. Shah on 2026-09-14, show
+this spec's primary scenario visually rather than in prose. They live in
+[`assets/diagrams/`](../../../assets/diagrams):
+
+| Diagram | What it shows |
+| --- | --- |
+| [`native-alpha-to-market-reality.png`](../../../assets/diagrams/native-alpha-to-market-reality.png) | The five units arranged around Native Alpha, each producing evidence the others amplify — plus the founder's own "Gaps to Make Explicit" (customer proof, stage gates, shared services, metrics and kill criteria), one of which (shared services) is carried into Open Questions below rather than resolved here. |
+| [`explained-simply.png`](../../../assets/diagrams/explained-simply.png) | The plain-English version of the same five-unit loop, for a reader who wants the shape of the thing before the detail. |
+| [`how-thought-moves-through-the-system.png`](../../../assets/diagrams/how-thought-moves-through-the-system.png) | The fuller version: what each unit outputs, which other units support that output, and the two capital sources (the firm's own balance sheet, and LPs and investors brought in through IF Network). |
+
 ## Requirements
 
 Each requirement below is testable against a specific decision or
@@ -224,6 +236,25 @@ resolved here.
   address, a telephone number, headcount, revenue, financing details, or
   ownership percentages.
 
+**Search before build, and how the system moves**
+
+- **FR-024**: The company MUST NOT ask what company or product should be
+  built from a signal before first asking whether the signal is Native
+  Alpha. "What should we build" is a later question, not the first one.
+- **FR-025**: Before IF Studios builds toward a thesis, the company MUST
+  check whether an existing founder or company — surfaced through IF
+  Network or the broader market — is already pursuing that thesis
+  credibly. IF Studios MUST NOT be the default response to a promising
+  thesis.
+- **FR-026**: When backing an external party and building internally are
+  both viable responses to the same thesis, the company MUST evaluate
+  backing the external party first. A thesis originating inside the
+  company MUST NOT, by itself, be treated as a reason to build it
+  internally rather than back a better-positioned outside founder.
+- **FR-027**: A discovery made by any unit MUST be able to revise another
+  unit's prior assumption. No unit's output MAY be treated as a one-way
+  handoff that a later unit cannot send evidence back against.
+
 ## Key entities
 
 - **Intellectual Frontiers LLC** — the parent: brand owner, unit
@@ -249,6 +280,18 @@ resolved here.
   nonprofit, never subsidized commercial R&D), Sinbad Capital (an
   independent fund and operating partner, with no implied investment
   authority over it).
+- **The evidence taxonomy** — what each unit's activity produces: a patent
+  produces IP evidence, a publication produces audience evidence, a
+  customer experiment produces demand evidence, a product produces
+  behavioral evidence, a sale produces economic evidence, an LP
+  conversation produces capital-market evidence, a founder search produces
+  human-capital evidence, a partnership produces distribution evidence.
+  All of it feeds back into the same Native Alpha thesis.
+- **The decision checkpoint** — continue, change the thesis, back someone
+  else, build it ourselves, or stop, with "back someone else" checked
+  before "build it ourselves."
+- **Capital sources** — the firm's own balance sheet, and LPs and
+  investors brought in through IF Network.
 
 ## Success criteria
 
@@ -283,7 +326,9 @@ holding company; a promotional house organ; a claim of institutional
 tenure it has not earned; a conventional venture studio that collects
 permanent service relationships; a clean-sheet philosophy that discards
 earned trust and history; a consulting conglomerate; a rolodex; a company
-whose case for existing rests on AI itself. Full rationale for each:
+whose case for existing rests on AI itself; a capital deployment machine
+measured by dollars placed rather than judgment about evidence. Full
+rationale for each:
 [`spec-kit/memory/constitution.md`](../../memory/constitution.md#11-what-we-will-not-become).
 
 ## Open questions
@@ -310,6 +355,15 @@ above (FR-007, FR-014, FR-018). One remains open:
   existing MUST, not a missing rule — FR-017 does not need to change; the
   company needs to either name owners or decide the gap is acceptable for
   now.
+- **OQ-6**: The founder's own `native-alpha-to-market-reality.png` diagram
+  names "shared services" (legal, finance, compliance, operations
+  supporting all five units) as a gap still to make explicit. Unlike the
+  other three gaps that diagram names, this one isn't resolved by the
+  2026-09-14 doctrine addition — the constitution's "small core, a
+  flexible bench" (§7) already routes specific functions (fund
+  administration, legal, tax, audit) to independent parties for Capital
+  specifically, but no rule yet states which functions every unit shares
+  versus which stay unit-specific. Left open rather than answered here.
 
 ## Review & acceptance checklist
 
@@ -340,5 +394,6 @@ above (FR-007, FR-014, FR-018). One remains open:
 | FR-021 | `context/registers.md`; `README.md` |
 | FR-022 | `context/writing-guide.md` |
 | FR-023 | `context/company.md` ("What this company deliberately does not publish") |
+| FR-024 – FR-027 | `spec-kit/memory/constitution.md` §6 (search before build; the system circulates) |
 | SC-001 – SC-008 | `spec-kit/memory/constitution.md` §9 |
 | Out of scope | `spec-kit/memory/constitution.md` §11 |

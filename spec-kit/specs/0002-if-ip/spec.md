@@ -161,6 +161,18 @@ possibility.
   is real, the claim follows the value it protects, and the resulting
   right would change a commercial choice.
 
+**IP's real output**
+
+- **FR-019**: IF IP's primary output MUST be treated as a sharpened
+  question, thesis, or insight — not "intellectual property." A patent,
+  defensive disclosure, or trademark is a byproduct that sometimes
+  follows once a thesis is worth protecting, not the goal research was
+  aimed at from the start.
+- **FR-020**: A patent grant MUST be treated as one signal among others
+  (an independent examiner's conclusion that something met the legal test
+  for patentability) — never as proof that a customer, licensee, or
+  market cares.
+
 ## Key entities
 
 - **Research area** — groups related work; the top of the chain.
@@ -258,4 +270,5 @@ possibility.
 | FR-013, FR-014 | `context/units/ip.md` ("Turning research into something usable") |
 | FR-015, FR-016 | `context/units/ip.md` ("Handling outside disclosures") |
 | FR-017, FR-018 | `context/units/ip.md` ("Where AI stops") |
-| SC-001 – SC-007 | Derived directly from FR-001 – FR-018 above |
+| FR-019, FR-020 | `context/units/ip.md` ("IP's real output") |
+| SC-001 – SC-007 | Derived directly from FR-001 – FR-020 above |

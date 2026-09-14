@@ -145,6 +145,28 @@ valuation, compliance — goes to independent parties.
   be treated as also responsible for carrying a company past that point —
   that is a different fund's job.
 
+**Capital as a search function**
+
+- **FR-017**: Before funding an internally originated venture, Capital
+  MUST check whether an existing founder or company — sourced through IF
+  Network or the broader market — already pursues the same thesis
+  credibly. A thesis originating inside the firm MUST NOT, by itself,
+  earn a pass on this check.
+- **FR-018**: Where an external founder's evidence for the same thesis is
+  as strong as or stronger than the firm's own, Capital MUST treat backing
+  that founder as a live alternative to financing a competing internal
+  build, not a fallback considered only after internal options are
+  exhausted.
+- **FR-019**: Capital MUST NOT measure itself by the amount of capital
+  deployed; deployment volume is not evidence of good judgment.
+
+**Capital sources**
+
+- **FR-020**: Every dollar Capital deploys MUST be traceable to one of its
+  two named sources — the firm's own balance sheet, or an LP or investor
+  brought in through IF Network — or to an explicitly documented new
+  source; a funding source MUST NOT go unnamed.
+
 ## Key entities
 
 - **Underwriting judgment** — demand, distribution, governance, reserves,
@@ -166,6 +188,8 @@ valuation, compliance — goes to independent parties.
 - **Care Delivery Fund II** — in formation; backs clinician-led
   care-delivery companies through one of three modes (invest, take
   selective control, build).
+- **Capital sources** — the firm's own balance sheet, and LPs and
+  investors brought in through IF Network.
 
 ## Success criteria
 
@@ -185,6 +209,10 @@ valuation, compliance — goes to independent parties.
   it is incorporated under "build" mode.
 - **SC-007**: No care-delivery fund forces a uniform holding period,
   financing structure, or exit schedule across its portfolio.
+- **SC-008**: For a thesis with a live external candidate, a documented
+  comparison against backing that candidate exists before Capital funds a
+  competing internal build.
+- **SC-009**: Every dollar Capital deploys traces to a named source.
 
 ## Out of scope
 
@@ -233,4 +261,7 @@ valuation, compliance — goes to independent parties.
 | FR-011 | `0001-intellectual-frontiers/spec.md` FR-019 |
 | FR-012 | `spec-kit/memory/constitution.md` §7 (Sinbad Capital boundary) |
 | FR-013 – FR-016 | `context/units/capital.md` ("The funds") |
-| SC-001 – SC-007 | Derived directly from FR-001 – FR-016 above |
+| FR-017, FR-018 | `context/units/capital.md` ("Capital as a search function"); `spec-kit/memory/constitution.md` §6 |
+| FR-019 | `spec-kit/memory/constitution.md` §11 (capital deployment machine) |
+| FR-020 | `context/units/capital.md` ("Capital sources") |
+| SC-001 – SC-009 | Derived directly from FR-001 – FR-020 above |

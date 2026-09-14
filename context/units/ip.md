@@ -11,7 +11,9 @@
 > content that exists on the live site beyond the original doctrine-only
 > distillation. IPLG itself lives on a deliberately low-visibility part of
 > the site (unlinked, noindexed); it's summarized here at the same level as
-> everything else in this file, not reproduced in full.
+> everything else in this file, not reproduced in full. "IP's real output"
+> below was added directly by Shahid N. Shah on 2026-09-14, not distilled
+> from any website content — see the constitution's amendment note.
 
 **Job:** Run the research and protect and commercialize what it produces.
 
@@ -21,6 +23,27 @@ unit it identifies.
 
 **The question IP asks:** What do we know, own, control, or have rights to
 that may create unusual advantage?
+
+## IP's real output
+
+Despite the name, IF IP is not simply a patent operation. It is where an
+observation becomes a hypothesis. Research covers strange corners of
+markets — technologies, workflows, IP, regulations, economics, operating
+experience, and the things everyone else takes for granted — and it's as
+interested in anomalies (why is this expensive, why does everyone do it
+this way, why did this patent get awarded, why does this customer tolerate
+this problem) as it is in first-principles reasoning.
+
+A patent award means an independent examiner concluded something met the
+legal tests for patentability. That's a real signal, worth paying
+attention to — and still only a signal. A patent does not prove that
+anybody cares.
+
+So the useful output of IF IP is not "intellectual property." It's a
+better question, a stronger thesis, a potentially defensible insight, or
+something worth testing. A patent, disclosure, or trademark is what
+sometimes follows once that thesis is worth protecting — not the goal
+research was aimed at from the start.
 
 ## How the work runs
 

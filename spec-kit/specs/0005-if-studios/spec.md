@@ -176,6 +176,27 @@ custom consulting engagement.
   test the same as anything else; the AI underneath it MUST NOT be
   presented as the advantage by itself.
 
+**Studios as a last-mile capability**
+
+- **FR-020**: Studios MUST NOT be treated as the default response to a
+  promising thesis. It is invoked only once a search for an existing
+  founder or company (run through IF Capital and IF Network) has failed
+  to find one credibly pursuing the same thesis, and the evidence still
+  justifies self-building.
+- **FR-021**: A venture MUST NOT be chartered as its own entity before at
+  least one experiment (a prototype, a small piece of software, a
+  manually delivered service, a design partnership, an open source
+  project, or a paid proof of concept) has produced evidence for the
+  thesis. Entity formation follows evidence; it does not substitute for
+  it.
+- **FR-022**: When a better-positioned operator is found during or after
+  a Studios experiment, Studios MUST hand off — invest, partner, license,
+  merge, or spin out — rather than retain ownership of the implementation
+  to preserve its own authorship of the work.
+- **FR-023**: The ease of building something (including AI-accelerated
+  building) MUST NOT be treated as evidence that building it was worth
+  the time spent.
+
 ## Key entities
 
 - **Venture Architecture** — the work of deciding what should exist and
@@ -199,6 +220,9 @@ custom consulting engagement.
 - **IPLG (Intellectual Product-Led Growth)** — the framework for making
   Studios' work directly usable, shared with IF IP and summarized in
   `context/units/studios.md`.
+- **An experiment** — a prototype, small piece of software, manually
+  delivered service, design partnership, open source project, or paid
+  proof of concept; what Studios builds before it builds a company.
 
 ## Success criteria
 
@@ -220,6 +244,12 @@ custom consulting engagement.
   satisfied — no entry sits unclassified.
 - **SC-008**: No ideation-stage shared service is described as though it
   were already running.
+- **SC-009**: No venture is chartered as its own entity without a
+  preceding experiment's evidence on record.
+- **SC-010**: When a better-positioned operator is identified during or
+  after an experiment, the resulting decision is a hand-off (invest,
+  partner, license, merge, or spin out), not continued ownership
+  defended on the grounds that Studios built it first.
 
 ## Out of scope
 
@@ -271,4 +301,5 @@ custom consulting engagement.
 | FR-015 – FR-017 | `context/units/studios.md` ("Two kinds of company") |
 | FR-018 | `context/units/studios.md` (Shared services; Companion Executable Source Code Repositories) |
 | FR-019 | `context/units/studios.md` (Shared services; IPLG) |
-| SC-001 – SC-008 | Derived directly from FR-001 – FR-019 above |
+| FR-020 – FR-023 | `context/units/studios.md` ("Studios is a last-mile capability"); `spec-kit/memory/constitution.md` §6 |
+| SC-001 – SC-010 | Derived directly from FR-001 – FR-023 above |

@@ -126,6 +126,18 @@ including a failure — is recorded so the next hunt starts further along.
 - **FR-008**: Network MUST NOT treat an introduction as a reference, or a
   reference as evidence. (Restates 0001 FR-016.)
 
+**Network runs through the whole system**
+
+- **FR-012**: Network MUST NOT be treated as a stage a signal passes
+  through once; any unit MUST be able to draw on Network at the point it
+  needs a person, not only when a pipeline reaches a "find people" step.
+- **FR-013**: Network's search remit MUST include sourcing LPs and
+  investors for IF Capital, not only operators, founders, and specialists.
+- **FR-014**: When a hunt surfaces that someone outside the firm is
+  already pursuing a thesis the firm is evaluating, Network MUST report
+  that finding to the relevant unit rather than treating it as
+  irrelevant to the search it was asked to run.
+
 ## Key entities
 
 - **A hunt** — a search with a written thesis, the Native Alpha it's
@@ -140,6 +152,10 @@ including a failure — is recorded so the next hunt starts further along.
   → Experiment → Outcome → Learning.
 - **Relationship memory** — the compounding record of who did what and
   how it turned out, queried in plain language through Ask Network.
+- **The intelligence layer** — Network's role relative to the internet:
+  the internet is the database of public information about people; Network
+  is what knows whom to find, when, and why they matter to a specific
+  thesis.
 
 ## Success criteria
 
@@ -155,6 +171,9 @@ including a failure — is recorded so the next hunt starts further along.
   correction to its original thesis.
 - **SC-006**: No illustrative hunt or packet is published without an
   explicit illustrative or composite label.
+- **SC-007**: A finding that someone outside the firm already pursues an
+  evaluated thesis is recorded and routed to the relevant unit, not
+  dropped because it fell outside the original search request.
 
 ## Out of scope
 
@@ -199,4 +218,6 @@ including a failure — is recorded so the next hunt starts further along.
 | FR-007 | `context/units/network.md` (How a search runs, stages 11–12) |
 | FR-008 | `0001-intellectual-frontiers/spec.md` FR-016 |
 | FR-009 | `0001-intellectual-frontiers/spec.md` FR-015 |
-| SC-001 – SC-006 | Derived directly from FR-001 – FR-011 above |
+| FR-012, FR-014 | `context/units/network.md` ("Network runs through the whole system"); `spec-kit/memory/constitution.md` §6 |
+| FR-013 | `context/units/network.md` ("Network runs through the whole system"); `context/units/capital.md` ("Capital sources") |
+| SC-001 – SC-007 | Derived directly from FR-001 – FR-014 above |

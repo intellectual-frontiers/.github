@@ -9,7 +9,9 @@
 > `src/content/books.ts`, `src/content/founder-writing.ts`, and
 > `src/content/founder-writing-types.ts` at commit `adf0aef` (2026-09-14) —
 > the fuller Press content on the live site beyond the original
-> doctrine-only distillation.
+> doctrine-only distillation. "Publishing as experimentation" below was
+> added directly by Shahid N. Shah on 2026-09-14, not distilled from any
+> website content — see the constitution's amendment note.
 
 **Job:** Understand markets and explain the truth clearly.
 
@@ -68,6 +70,25 @@ behavior, and durable assets.
 unit-boundary rule. See also [`context/brand.md`](../brand.md) for the voice
 principles (evidence-led, practical, skeptical, plain) every piece Press
 publishes should hold to.
+
+## Publishing as experimentation
+
+Writing is useful before it's ever published, because fuzzy thinking
+becomes obvious the moment it has to go into plain language. Research
+pillars, essays, books, and frameworks make an argument inspectable — and
+that's why publishing isn't marketing for Intellectual Frontiers. It's
+another form of experimentation, with its own evidence ladder:
+
+- If a serious idea attracts no serious attention, that's evidence.
+- If people argue with it, that's stronger evidence.
+- If executives start using the terminology, asking for workshops,
+  forwarding the research, or applying the framework, that's stronger
+  still.
+- If someone is willing to pay to understand or use the idea, that's the
+  strongest evidence publishing can produce.
+
+Good publishing makes thinking durable. It also exposes that thinking to
+the market, on purpose.
 
 ## What Press has published
 

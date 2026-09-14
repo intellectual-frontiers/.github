@@ -142,6 +142,15 @@ the work is aimed at that company eventually not needing Press at all.
   hiring counsel first) rather than defaulting to one format for every
   audience.
 
+**Publishing as experimentation**
+
+- **FR-015**: Press MUST treat publication as an experiment, not only as
+  output: the reception a piece gets (silence, argument, adoption of its
+  terminology, willingness to pay to use the idea) MUST be read as
+  evidence about the underlying thesis, in ascending order of strength.
+- **FR-016**: Press MUST NOT treat the absence of criticism or argument as
+  confirmation of a claim; unopposed does not mean validated.
+
 ## Key entities
 
 - **A piece** — a book, essay, field guide, case study, documentation,
@@ -163,6 +172,9 @@ the work is aimed at that company eventually not needing Press at all.
   Pattern, Working Theory, Practitioner Journalist) and optional series.
 - **An owned channel** — one of Press's six directly owned publications,
   chosen over depending solely on an outside platform.
+- **The publishing evidence ladder** — silence, argument, adoption of
+  terminology, and willingness to pay, in ascending order of how strongly
+  each confirms the underlying thesis.
 
 ## Success criteria
 
@@ -183,6 +195,9 @@ the work is aimed at that company eventually not needing Press at all.
 - **SC-006**: Every published piece names its evidence (systems, dated
   numbers, the constraint that made the problem hard) and states which
   market it addresses.
+- **SC-007**: A piece's reception (argument, adoption, willingness to pay)
+  is recorded somewhere and read back against the thesis it was meant to
+  test — not published and then never revisited.
 
 ## Out of scope
 
@@ -236,4 +251,5 @@ the work is aimed at that company eventually not needing Press at all.
 | FR-011, FR-012 | `context/units/press.md` ("Owned channels") |
 | FR-013 | `context/units/press.md` ("Founder writing") |
 | FR-014 | `context/units/press.md` ("What Press has published") |
-| SC-001 – SC-006 | Derived directly from FR-001 – FR-014 above |
+| FR-015, FR-016 | `context/units/press.md` ("Publishing as experimentation") |
+| SC-001 – SC-007 | Derived directly from FR-001 – FR-016 above |

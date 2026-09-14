@@ -10,6 +10,13 @@
 > `intellectual-frontiers/www.intellectualfrontiers.com-aiw-lovable`
 > (2026-09-13). That version is the last point this text was copied from; this
 > file is the one to edit going forward.
+>
+> **Amended 2026-09-14**, directly by Shahid N. Shah rather than distilled
+> from any website content: §6 gained the search-before-build sequencing,
+> the circulating-system rule, the evidence taxonomy, and the decision
+> checkpoint; §11 gained a new entry; §12 gained a closing statement. This
+> amendment is recorded here per the amendment process at the bottom of
+> this file, not as a separate changelog.
 
 ## Preface
 
@@ -206,6 +213,43 @@ proof.
 decision-maker, rights, economics, evidence, and conflict process. Trust and
 common ownership do not remove that work.
 
+**Search before build:** the question after a promising thesis is never
+"what company should we build." It is whether someone else — a founder
+Network surfaces, or a company already in the market — is already pursuing
+this thesis credibly. If their evidence is as strong as ours or stronger,
+backing them is a better use of Capital than building a competitor
+ourselves. Studios is a last-mile capability: it exists for when that
+search comes up empty and the evidence still justifies spending our own
+money and time to find out whether we are right. A thesis originating
+inside Intellectual Frontiers earns us nothing by itself — if a better
+founder already exists, backing them is the more intelligent expression of
+our own thesis.
+
+**The system circulates, it does not assemble:** IP does not hand
+something to Press, which hands it to Capital, which hands it to Studios.
+A customer conversation inside Studios can destroy an assumption IP made.
+A Press publication can surface a customer segment nobody was looking for.
+An LP conversation can reveal the venture structure is wrong. A founder
+search can reveal that the real bottleneck is rarer talent, not weaker
+technology — or that someone else is already better positioned than we
+are. Every discovery, from any unit, can revise what another unit already
+believed. Nothing here is a one-way handoff.
+
+**Evidence, not product, is what moves:** a patent produces IP evidence. A
+publication produces audience evidence. A customer experiment produces
+demand evidence. A product produces behavioral evidence. A sale produces
+economic evidence. An LP conversation produces capital-market evidence. A
+founder search produces human-capital evidence. A partnership produces
+distribution evidence. Even a properly designed failure produces evidence.
+All of it feeds back into the same Native Alpha thesis — nothing our units
+produce is the end of the line.
+
+**The decision checkpoint:** at every stage, the honest options are the
+same five: continue, change the thesis, back someone else, build it
+ourselves, or stop. Back someone else is checked before build it
+ourselves, not after — never because it is our only remaining option, but
+because it is usually the cheaper way to compound the same Native Alpha.
+
 ## 7. A small core, a flexible bench
 
 **The parent owns:**
@@ -313,6 +357,7 @@ Keeping a weak idea alive to protect pride is failure.
 | A consulting conglomerate | Outside partners perform bounded work. The parent owns judgment, rights stewardship, allocation, and governance |
 | A rolodex | Network's output is evidence about people, not a list of names or a favor economy |
 | An AI story | AI amplifies real advantages. It is not the reason a company deserves to win |
+| A capital deployment machine | Capital's job is judgment about evidence, not a target for dollars placed |
 
 ## 12. Closing
 
@@ -328,6 +373,11 @@ I have been operating in founder mode for most of my career. Intellectual
 Frontiers is where that experience becomes a company-building and investment
 system. I want the people who come after me to make it better, but I do not
 want them to make it vague.
+
+Intellectual Frontiers turns unusual thoughts into evidence, and evidence
+into decisions. We do not need every thought to become a company. We do not
+even need every good company to be one we started. We need every good
+thought to find its best possible form.
 
 **Final test:** Native Alpha is real only when it changes what we choose to
 do.

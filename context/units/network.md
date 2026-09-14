@@ -17,6 +17,10 @@
 > composites written to demonstrate the format." Nothing below describes a
 > real person, a real hunt, or real counts — it shows the shape Network's
 > work takes, not a record of who Network has actually found.
+>
+> "Network runs through the whole system" below was added directly by
+> Shahid N. Shah on 2026-09-14, not distilled from any website content —
+> see the constitution's amendment note.
 
 **Job:** Find and prove the people who can carry the work.
 
@@ -63,6 +67,33 @@ relationship memory, and acted-on introductions.
 **What Network must never become:** a rolodex. Its output is evidence about
 people, not a list of names or a favor economy — see the constitution's
 "what we will not become" section.
+
+## Network runs through the whole system
+
+Network is intentionally different from the other four units because
+people are not a stage in a pipeline — they're everywhere. A researcher
+might introduce an observation. An operator might reveal a market
+problem. A founder might recognize an opportunity. A customer might
+become a design partner. A specialist might invalidate an assumption. An
+investor might expose an economic flaw. So Network isn't primarily a
+database of résumés — the internet already holds enormous amounts of
+information about people. The harder, more valuable capability is knowing
+whom to find, when, why they matter, and how they connect to whatever the
+rest of the firm is trying to learn or accomplish. The internet is the
+database; Network is the intelligence layer on top of it.
+
+That reach extends to capital, not only to operators and founders:
+Network is also how LPs and other investors get introduced to IF Capital,
+alongside the firm's own balance sheet — see `context/units/capital.md`'s
+"Capital sources."
+
+One of the most valuable things Network can tell the rest of the firm is
+that someone else is already doing the work a thesis called for. That can
+save years. If they're good, IF Capital can fund them. If they're close,
+Studios or Capital can partner with them. If they're wrong in an
+interesting way, that's still something to learn from. And if a search
+turns up nobody, that absence is itself evidence — see the constitution's
+search-before-build principle.
 
 ## How a search runs
 

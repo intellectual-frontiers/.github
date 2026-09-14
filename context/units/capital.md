@@ -15,6 +15,11 @@
 > already applies to patent counts. This file states what the funds are
 > and the rules they run on; the live site is where their current size and
 > roster belong.
+>
+> "Capital as a search function," "Capital sources," and the addition to
+> "The rule" below were added directly by Shahid N. Shah on 2026-09-14, not
+> distilled from any website content — see the constitution's amendment
+> note.
 
 **Job:** Put money behind evidence with discipline.
 
@@ -64,7 +69,9 @@ formalizing practical judgment into a disciplined investment system.
 ## The rule
 
 A Studio, patent, publication, relationship, or prototype does not obligate
-Capital to invest.
+Capital to invest. A company does not deserve capital just because
+Intellectual Frontiers created it, either — self-origination earns no
+pass on the underwriting standard.
 
 **Evidence Capital produces:** underwriting, economics, committed capital,
 governance, and learning.
@@ -72,6 +79,33 @@ governance, and learning.
 **Boundary:** Studio activity does not justify investment, and investment
 does not prove product-market fit — see the constitution's unit-boundary
 rule.
+
+## Capital as a search function
+
+Capital is not simply downstream of Studios, waiting for a venture to
+fund. It's also a search function in its own right: form a thesis, then
+look for founders and companies — sourced through IF Network or the
+broader market — who are already pursuing it. If their thesis is strong,
+their Native Alpha is credible, and their evidence is better than ours,
+there's no need to build a competing company. Backing them is a better
+use of Capital than building just because we can.
+
+That reframes what "evidence" means for Capital before it ever writes a
+check: talking to a founder is evidence. Comparing their assumptions to
+ours is evidence. Seeing how much traction they've already earned is
+evidence. If someone else has better customer access, better
+distribution, better talent, or has simply been thinking about the
+problem longer, backing them is a feature of good judgment, not a failure
+of originality. Studios becomes especially important only once this
+search comes up empty and the evidence still holds — see the
+constitution's search-before-build principle.
+
+## Capital sources
+
+Capital runs on two sources: the firm's own balance sheet, and LPs and
+investors brought in through IF Network. Sourcing capital relationships is
+part of what Network does — it isn't limited to sourcing operators and
+founders.
 
 ## The funds
 

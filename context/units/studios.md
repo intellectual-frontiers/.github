@@ -12,6 +12,10 @@
 > IPLG framework (`src/content/iplg.ts`) at commit `adf0aef` (2026-09-14).
 > IPLG itself lives on a deliberately low-visibility part of the site; it's
 > summarized here, not reproduced.
+>
+> "Studios is a last-mile capability" below was added directly by Shahid N.
+> Shah on 2026-09-14, not distilled from any website content — see the
+> constitution's amendment note.
 
 **Job:** Build the companies that should exist.
 
@@ -45,6 +49,35 @@ Customer-led engineering and forward-deployed work keep Studios close to
 reality. A Studio must not become a custom consulting shop: the discipline is
 to observe the real workflow, find the narrow repeated problem, and learn
 which part can become a product or a scalable service.
+
+## Studios is a last-mile capability
+
+Building companies is expensive, distracting, and full of execution risk.
+Studios is not the default answer to a promising thesis — it's what gets
+used when a search for an existing founder or company (run through IF
+Capital and IF Network) comes up empty, and the evidence still justifies
+finding out whether the thesis is right by spending our own time and
+money. If a credible founder or company already exists, backing them is
+usually the better move; see the constitution's search-before-build
+principle.
+
+Even then, "build a company" isn't the first instruction. The first thing
+Studios usually builds is an experiment — a prototype, a small piece of
+software, a manually delivered service, a design partnership, an open
+source project, or a paid proof of concept — not an entity. Modern AI
+makes building software dramatically cheaper, which makes the judgment
+about whether something deserves to exist more important, not less: being
+able to build something in a week is not evidence that the week was worth
+spending. Customers provide better evidence than code. Usage beats a
+demonstration. Payment beats a compliment. A renewal beats a first
+payment. Repeatable economics beat all of them.
+
+Studios can also produce the evidence that makes Studios unnecessary. If
+an experiment proves the market exists and a better-positioned operator
+turns up along the way, the job is to hand off — invest, partner,
+license, merge, or spin out — not defend ownership of what got built. The
+goal is compounding Native Alpha, not preserving whoever happened to build
+the prototype.
 
 ## Disciplines
 
