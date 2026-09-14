@@ -386,10 +386,19 @@ above (FR-007, FR-014, FR-018). OQ-4 and OQ-6 were resolved in the
   existing MUST, not a missing rule — FR-017 does not need to change; the
   company needs to either name owners or decide the gap is acceptable for
   now.
-~~**OQ-6**: shared services.~~ **Resolved 2026-09-14** — see the
-Clarifications session above, `spec-kit/memory/constitution.md` §7 ("One
-shared-services layer, not five"), and `context/company.md` ("Shared
-services").
+
+  **Intended resolution path, noted 2026-09-14, not yet run:** Shahid's
+  stated intent is to close this by running an actual IF Network hunt for
+  each unit lead — a written thesis on what would have to be true of the
+  person, evidence-based candidates, human judgment on who to contact —
+  the same discipline `0006-if-network`'s spec already requires of any
+  other search, rather than simply appointing someone. This is a decision
+  to make later, not a resolution; OQ-5 stays open until a hunt actually
+  runs.
+- ~~**OQ-6**: shared services.~~ **Resolved 2026-09-14** — see the
+  Clarifications session above, `spec-kit/memory/constitution.md` §7 ("One
+  shared-services layer, not five"), and `context/company.md` ("Shared
+  services").
 
 ## Review & acceptance checklist
 
