@@ -61,6 +61,17 @@ it actually satisfies, rather than which ones it merely cites.
    and the templates a unit-specific or venture-specific SpecKit builds
    from — see "How it fits together" below.
 
+## This repository is an Eidolon
+
+Shahid N. Shah's research names this exact repository "Intellectual
+Frontiers' own Eidolon": a working digital reflection of the company,
+meant for an AI agent to read rather than treated as a live one, at the
+public tier of the tiered model (public, internal, confidential, highly
+restricted) that research defines. The full argument is at
+[intellectualfrontiers.com/research/eidolons](https://www.intellectualfrontiers.com/research/eidolons);
+see [`spec-kit/AGENTS.md`](spec-kit/AGENTS.md) for what that means for an
+AI agent working in this repository specifically.
+
 ## How it fits together
 
 - **The constitution** is governing doctrine, not testable requirements —

@@ -81,6 +81,20 @@ unit's day-to-day work gets done, what tools it uses, or how it is staffed.
   published here, per FR-023's non-disclosure rule — OQ-4 is resolved
   only for the three facts it actually asked about. Resolves OQ-4.
 
+### Session 2026-09-17
+
+- **Q: Shahid's published research at
+  intellectualfrontiers.com/research/eidolons names this repository
+  directly as "Intellectual Frontiers' own Eidolon." Should that framing
+  be reflected here?** → **A: Yes.** `spec-kit/AGENTS.md` and the root
+  `README.md` now state plainly that this repository is the company's
+  Eidolon: a working digital reflection of the company, read reference
+  rather than a live agent, public tier only of that research's
+  public/internal/confidential/highly-restricted model, and link to the
+  research page for the full argument rather than restating it, per this
+  repository's own citation practice. No new requirement was needed;
+  this is a framing addition, not a change to what the company does.
+
 ## Primary scenario
 
 As a signal — a patent, a workflow observation, a research finding, a
