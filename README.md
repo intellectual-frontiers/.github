@@ -64,10 +64,12 @@ it actually satisfies, rather than which ones it merely cites.
 ## This repository is an Eidolon
 
 Shahid N. Shah's research names this exact repository "Intellectual
-Frontiers' own Eidolon": a working digital reflection of the company,
-meant for an AI agent to read rather than treated as a live one, at the
-public tier of the tiered model (public, internal, confidential, highly
-restricted) that research defines. The full argument is at
+Frontiers' own Eidolon," alongside a parallel one for Shahid himself at
+[github.com/shah/shah](https://github.com/shah/shah): a working digital
+reflection of the company, expressed as a readable specification rather
+than a live agent or a vendor's proprietary memory, at the public layer
+of the tiered model (public, internal, confidential, highly restricted)
+that research defines. The full argument is at
 [intellectualfrontiers.com/research/eidolons](https://www.intellectualfrontiers.com/research/eidolons);
 see [`spec-kit/AGENTS.md`](spec-kit/AGENTS.md) for what that means for an
 AI agent working in this repository specifically.

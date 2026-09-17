@@ -9,22 +9,27 @@ see the root [`README.md`](../README.md) for that.
 ## This repository is Intellectual Frontiers' own Eidolon
 
 Shahid N. Shah's research names this exact repository "Intellectual
-Frontiers' own Eidolon." An Eidolon, in that research, is a working
-digital reflection of a person, company, customer, product, or system:
-read reference material an AI agent consults, not a live agent that acts
-on its own. The full argument lives at
+Frontiers' own Eidolon," alongside a parallel Eidolon for Shahid himself
+at [github.com/shah/shah](https://github.com/shah/shah). An Eidolon, in
+that research, is a working digital reflection of a person, company,
+customer, product, or system: not a replica, but enough grounded
+evidence for an AI to reason about the real thing accurately and
+flexibly. It's meant to be a readable specification an AI agent reads,
+not memory trapped inside one AI vendor's proprietary system, and never
+a live agent pretending to be the person or company it reflects. The
+full argument lives at
 [intellectualfrontiers.com/research/eidolons](https://www.intellectualfrontiers.com/research/eidolons);
 read it there rather than here, the same way this repository cites a
 source instead of restating it everywhere else (see the root README's
 "Canonical source, going forward").
 
-That research describes an Eidolon as existing at different tiers:
-public, internal, confidential, and highly restricted. This repository
-is the public tier only. Everything under `context/` and `spec-kit/` is
-written for the audience that can read a public GitHub repository;
-nothing internal, confidential, or highly restricted belongs here, the
-same boundary the root README's "Editing this repository" section
-already draws, for the same reason.
+That research describes an Eidolon as exposing different depth for
+different work, at public, internal, confidential, and highly
+restricted layers. This repository is the public layer only. Everything
+under `context/` and `spec-kit/` is written for the audience that can
+read a public GitHub repository; nothing internal, confidential, or
+highly restricted belongs here, the same boundary the root README's
+"Editing this repository" section already draws, for the same reason.
 
 ## Read in this order
 

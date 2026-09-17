@@ -94,6 +94,18 @@ unit's day-to-day work gets done, what tools it uses, or how it is staffed.
   research page for the full argument rather than restating it, per this
   repository's own citation practice. No new requirement was needed;
   this is a framing addition, not a change to what the company does.
+- **Q: The research page was blocked by this environment's network
+  policy, so the framing above was written from Shahid's own paraphrase
+  of it. Shahid then supplied the page's actual text directly. Does the
+  framing change?** → **A: Tightened, not rewritten.** The paraphrase
+  held up; three things from the actual text got added because they
+  were missing, not because anything was wrong: an Eidolon is explicitly
+  "not a replica," it's meant to be a readable specification rather than
+  memory trapped in one AI vendor's proprietary system, and the page
+  names a parallel Eidolon for Shahid himself at
+  [github.com/shah/shah](https://github.com/shah/shah), now
+  cross-referenced from both `spec-kit/AGENTS.md` and the root
+  `README.md`.
 
 ## Primary scenario
 
