@@ -11,7 +11,12 @@
 > the fuller Press content on the live site beyond the original
 > doctrine-only distillation. "Publishing as experimentation" below was
 > added directly by Shahid N. Shah on 2026-09-14, not distilled from any
-> website content — see the constitution's amendment note.
+> website content — see the constitution's amendment note. "Books as
+> working AI, not just pages" below was added directly by Shahid N.
+> Shah on 2026-09-18, drafted by Claude working in `if-press-prime`
+> (Press's private production repo) at his direction, for the same
+> reason: not distilled from website content, a genuinely new
+> commitment recorded here first.
 
 **Job:** Understand markets and explain the truth clearly.
 
@@ -89,6 +94,31 @@ another form of experimentation, with its own evidence ladder:
 
 Good publishing makes thinking durable. It also exposes that thinking to
 the market, on purpose.
+
+## Books as working AI, not just pages
+
+A Fieldbook teaches a reader to build an AI Workforce for a specific
+outcome: a SpecKit that states intent, a harness that carries it out,
+agents that hold a role, skills that do one job, and MCPs that connect
+them to a reader's own tools and data. That pattern already builds
+Press's own books; naming it and shipping it as something a reader can
+reuse is the same discipline the rest of this page already requires:
+make the advantage legible and durable, not visible once and then
+gone.
+
+Native Alpha, turned on a reader's own work instead of a market, finds
+the parts of it that already have a name, a method, and a result,
+ready to become Labor as Code: a skill that carries a person's
+knowledge, judgment, taste, and skill in durable, inspectable,
+versioned form.
+
+A book still has to be read. The judgment behind a method lives in
+prose; a skill executes the method faithfully once a reader already
+has that judgment; it does not replace building it. Where a Fieldbook
+teaches something actionable, Press ships it two ways: as pages, and
+as a skill or MCP a reader's own AI can run. "Try this with AI" is the
+seed of this inside a book's own pages; a skill or MCP is the same
+relationship, carried the rest of the way.
 
 ## What Press has published
 

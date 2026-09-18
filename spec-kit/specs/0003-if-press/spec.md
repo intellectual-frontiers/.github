@@ -159,6 +159,27 @@ the work is aimed at that company eventually not needing Press at all.
   than building its own internal team for one of these functions.
   (Restates 0001 FR-028.)
 
+**Books as working AI**
+
+- **FR-018**: A Fieldbook that teaches an actionable method MUST make
+  that method available to a reader's own AI, as a skill, an MCP tool,
+  or both, not only as prose. Production mechanics for this (where a
+  skill's source lives, how it's built, how it's reviewed) are
+  operational detail for Press's own production repo, not this spec.
+- **FR-019**: A skill or MCP tool Press ships MUST execute the method a
+  Fieldbook teaches faithfully. It MUST NOT make the judgment,
+  decision, or interpretation the book teaches a reader to make for
+  themselves, the same discipline FR-003 already requires Press itself
+  to hold: legible and useful, never a substitute for the reader's own
+  judgment.
+- **FR-020**: "AI Workforce" and "Labor as Code" MUST be used as
+  defined, consistent terms across every piece Press produces that
+  uses them, the same way "Native Alpha" already is. The working
+  definitions live in Press's own production repo (`voice/glossary.md`
+  in `if-press-prime`); this spec requires the consistency, not the
+  wording itself, the same boundary FR-005 already draws for prose
+  generally.
+
 ## Key entities
 
 - **A piece** — a book, essay, field guide, case study, documentation,
@@ -183,6 +204,14 @@ the work is aimed at that company eventually not needing Press at all.
 - **The publishing evidence ladder** — silence, argument, adoption of
   terminology, and willingness to pay, in ascending order of how strongly
   each confirms the underlying thesis.
+- **An AI Workforce** — a SpecKit, a harness, agents, skills, and MCPs,
+  assembled toward one outcome and a defined set of deliverables; the
+  pattern every Fieldbook teaches a reader to build, per "Books as
+  working AI, not just pages" in `context/units/press.md`.
+- **Labor as Code** — a skill that encapsulates a person's knowledge,
+  judgment, taste, and skill in durable, inspectable, versioned form;
+  what a reader's own Native Alpha, applied inward rather than at a
+  market, finds ready to become.
 
 ## Success criteria
 
@@ -208,11 +237,20 @@ the work is aimed at that company eventually not needing Press at all.
   test — not published and then never revisited.
 - **SC-008**: Press has no internal legal, finance, or compliance team of
   its own — those functions are rented, shared with the other four units.
+- **SC-009**: A Fieldbook that teaches an actionable method has a
+  companion skill or MCP tool realizing it, not only prose describing
+  it.
+- **SC-010**: No skill or MCP tool Press ships makes a judgment call its
+  own Fieldbook teaches the reader to make.
+- **SC-011**: "AI Workforce" and "Labor as Code" carry the same meaning
+  everywhere they appear across Press's output; no piece redefines them
+  locally.
 
 ## Out of scope
 
 - Production mechanics for any given medium (how a book gets edited, how
-  a podcast gets recorded) are operational detail, not spec-level.
+  a podcast gets recorded, how a companion skill or MCP tool is built,
+  stored, and reviewed) are operational detail, not spec-level.
 - The commercial terms of a Press engagement with an IF Capital company
   are a Capital-side decision, not Press's to set.
 - Outside-coverage strategy (which journalists, which outlets) is
@@ -263,4 +301,6 @@ the work is aimed at that company eventually not needing Press at all.
 | FR-014 | `context/units/press.md` ("What Press has published") |
 | FR-015, FR-016 | `context/units/press.md` ("Publishing as experimentation") |
 | FR-017 | `0001-intellectual-frontiers/spec.md` FR-028 |
+| FR-018 – FR-020 | `context/units/press.md`, "Books as working AI, not just pages"; operational half in `if-press-prime`'s `spec-kit/spec.md` FR-027 – FR-031 |
 | SC-001 – SC-008 | Derived directly from FR-001 – FR-017 above |
+| SC-009 – SC-011 | Derived directly from FR-018 – FR-020 above |
