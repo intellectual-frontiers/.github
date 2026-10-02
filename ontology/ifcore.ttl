@@ -80,6 +80,12 @@ ifcore:FrontiersNature a ifcore:DesignSystem ;
     rdfs:comment "At design-systems/frontiers-nature/. Carried over from a prior, now-superseded attempt at this repository (.github-q326's design-system/, its own spec 0007-design-system); named for the 'natural-frontier' visual identity its own tokens document (Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:FrontiersConsole a ifcore:DesignSystem ;
+    rdfs:label "Frontiers Console"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    rdfs:comment "At design-systems/frontiers-console/, governed by 0018-frontiers-console FR-001. The operator (admin) and documentation counterpart to ifcore:FrontiersNature: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components, and a browser-based assurance harness (0014-design-systems FR-015). Written from scratch (0018-frontiers-console FR-005); shares a palette and typefaces with frontiers-nature but is a distinct system (0018-frontiers-console FR-003)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
 
 ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;

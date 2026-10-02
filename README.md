@@ -171,6 +171,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0015](spec-kit/specs/0015-work-packages/spec.md) | Work packages: how a Substantial Work is held |
 | [0016](spec-kit/specs/0016-press-production/spec.md) | Press production: books and series as work packages |
 | [0017](spec-kit/specs/0017-spoken-and-research-works/spec.md) | Spoken works and research records |
+| [0018](spec-kit/specs/0018-frontiers-console/spec.md) | Frontiers Console design system: operator and documentation surfaces |
 
 ### Editing the ontology
 
@@ -218,6 +219,9 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 [`design-systems/frontiers-nature/`](design-systems/frontiers-nature/) is the
 canonical, public design system: tokens, CSS, fonts, logos (light and dark),
 the hero and diagram images, favicon, and share card.
+[`design-systems/frontiers-console/`](design-systems/frontiers-console/) is the
+draft design system for operator (admin) and documentation surfaces. Every
+design system carries an `assurance/` harness: open its `index.html` in a browser.
 
 - Logos: `design-systems/frontiers-nature/logos/` (PNG masters; WebP in
   `logos/web/`). Use the `-dark-` variants on dark backgrounds.
