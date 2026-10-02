@@ -1,0 +1,74 @@
+/*
+ * Frontiers Console design tokens. The visual model follows the structure of well-known documentation
+ * themes (neutral surfaces, one accent, hairline borders, small radii) but every value here is
+ * Intellectual Frontiers' own: Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper.
+ * Mirrors tokens.json; this file is the source of truth. Light theme only for now; names are
+ * semantic (not "light-*") so a dark theme can be added later by redefining them under a selector.
+ */
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    /* surfaces */
+    --fc-background: #ffffff;
+    --fc-foreground: #121820;
+    --fc-muted: #f4f4f2;
+    --fc-muted-foreground: #5b6270;
+    --fc-card: #f8f7f4;
+    --fc-popover: #ffffff;
+    --fc-border: #e2e0da;
+    --fc-border-strong: #c9c6bd;
+    --fc-input-border: #8a8f99;      /* form-control boundary: 3:1 against the background (WCAG 1.4.11) */
+    --fc-accent: #eeece5;
+    --fc-accent-foreground: #121820;
+
+    /* brand */
+    --fc-primary: #214ea2;
+    --fc-primary-foreground: #ffffff;
+    --fc-primary-tint: #e8eef9;
+    --fc-ring: #214ea2;
+
+    /* status: foreground and its tint (tint is the background of badges and callouts) */
+    --fc-success: #1f7775;
+    --fc-success-tint: #e2f1f0;
+    --fc-warning: #8a5a24;
+    --fc-warning-tint: #f7ecdc;
+    --fc-danger: #8a3147;
+    --fc-danger-tint: #f8e6ea;
+    --fc-info: #4a4a8c;
+    --fc-info-tint: #ececf7;
+
+    /* terminal block */
+    --fc-terminal-bg: #121820;
+    --fc-terminal-fg: #e6e8ec;
+    --fc-terminal-muted: #a7adb8;
+
+    /* type */
+    --fc-font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+    --fc-font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    /* shape */
+    --fc-radius: 0.5rem;
+    --fc-radius-sm: 0.375rem;
+    --fc-radius-lg: 0.75rem;
+
+    /* layout: these drive the grid in layout.css */
+    --fc-nav-height: 3.5rem;
+    --fc-sidebar-width: 17rem;
+    --fc-toc-width: 14.5rem;
+    --fc-layout-width: 90rem;
+    --fc-article-width: 50rem;
+    --fc-gutter: 1.25rem;
+
+    /* breakpoints, documented here because custom properties can't be used in @media:
+       drawer below 64rem (1024px); table of contents from 80rem (1280px). */
+
+    /* motion */
+    --fc-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --fc-fast: 150ms;
+
+    /* elevation */
+    --fc-shadow: 0 1px 2px rgb(18 24 32 / 6%), 0 4px 16px rgb(18 24 32 / 8%);
+    --fc-shadow-lg: 0 8px 32px rgb(18 24 32 / 16%);
+  }
+}

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin surfaces · Frontiers Console assurance fixture</title>
+<link rel="icon" href="../../images/favicon.png">
+<link rel="stylesheet" href="../../css/fonts.css">
+<link rel="stylesheet" href="../../css/reset.css">
+<link rel="stylesheet" href="../../css/tokens.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/layout.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/prose.css">
+<link rel="stylesheet" href="../../css/admin.css">
+<script src="../../js/console.js" defer></script>
+</head>
+<body>
+<a class="fc-skip" href="#main">Skip to content</a>
+<fc-shell data-layout="notebook">
+<header class="fc-nav">
+<button class="fc-btn fc-nav__toggle" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-toggle aria-controls="fc-sidebar" aria-expanded="false" aria-label="Open navigation">☰</button>
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<nav class="fc-nav__links" aria-label="Primary"><a class="fc-nav__link" href="docs.html">Overview</a><a class="fc-nav__link" href="components.html">Components</a><a class="fc-nav__link" href="admin.html" aria-current="page">Admin surfaces</a></nav>
+<span class="fc-nav__spacer"></span>
+<div class="fc-nav__actions"><a class="fc-btn" data-variant="primary" data-size="sm" href="admin.html">Open console</a></div>
+</header>
+<aside class="fc-sidebar" id="fc-sidebar" aria-label="Sidebar">
+<div class="fc-sidebar__head">
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<button class="fc-btn fc-sidebar__collapse" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true">‹</button>
+</div>
+<div class="fc-sidebar__tools">
+<fc-search placeholder="Search…" label="Search documentation"><script type="application/json">[{"title": "Overview", "description": "Reading pages with the docs layout", "href": "docs.html", "section": "Start", "keywords": ["docs", "layout", "sidebar"]}, {"title": "Components", "description": "Callouts, cards, tabs, steps, accordion, files", "href": "components.html", "section": "Reference", "keywords": ["callout", "tabs", "cards", "steps"]}, {"title": "Admin surfaces", "description": "Data tables, forms, stats, run logs", "href": "admin.html", "section": "Reference", "keywords": ["table", "form", "terminal", "badge"]}, {"title": "Notebook layout", "description": "Top navigation bar with a sidebar below", "href": "notebook.html", "section": "Layouts", "keywords": ["navbar", "notebook"]}, {"title": "Home layout", "description": "Landing page without a sidebar", "href": "home.html", "section": "Layouts", "keywords": ["landing", "home"]}, {"title": "Search", "description": "Command-palette search over a JSON index", "href": "components.html#search", "section": "Reference", "keywords": ["command", "palette", "index"]}]</script></fc-search>
+<details class="fc-menu"><summary>Documentation</summary><div class="fc-menu__panel">
+<a class="fc-menu__item" href="docs.html" aria-current="true">Documentation<small>Guides and reference</small></a>
+<a class="fc-menu__item" href="admin.html">Admin<small>Operate the site</small></a>
+</div></details>
+</div>
+<div class="fc-sidebar__scroll">
+<nav class="fc-tree" aria-label="Documentation">
+<ul>
+<li class="fc-tree__label">Start</li>
+<li><a class="fc-tree__link" href="docs.html">Overview</a></li>
+<li><a class="fc-tree__link" href="components.html">Components</a></li>
+<li><a class="fc-tree__link" href="admin.html" aria-current="page">Admin surfaces</a></li>
+<li class="fc-tree__label">Layouts</li>
+<li><a class="fc-tree__link" href="notebook.html">Notebook layout</a></li>
+<li><a class="fc-tree__link" href="home.html">Home layout</a></li>
+<li class="fc-tree__label">Guides</li>
+<li><details open><summary>Operating</summary><ul>
+<li><a class="fc-tree__link" href="docs.html#health">Health checks</a></li>
+<li><a class="fc-tree__link" href="docs.html#tasks">Running tasks <span class="fc-badge fc-tree__badge" data-tone="warning">dev</span></a></li>
+</ul></details></li>
+</ul>
+</nav>
+</div>
+<div class="fc-sidebar__foot"><span>Frontiers Console</span><span class="fc-badge">v0.1</span></div>
+</aside>
+<button class="fc-btn fc-sidebar-expand" type="button" data-size="icon" data-fc-sidebar-collapse aria-label="Expand sidebar" aria-expanded="false">›</button>
+<div class="fc-page" id="page">
+<main class="fc-article" id="main" style="max-inline-size:60rem">
+<nav class="fc-crumbs" aria-label="Breadcrumb"><ol><li><a href="home.html">Console</a></li><li><span aria-current="page">Admin surfaces</span></li></ol></nav>
+<header class="fc-article__head"><h1 class="fc-title">Admin surfaces</h1>
+<p class="fc-description">Data tables, forms, stats, run logs and empty states for operator pages.</p></header>
+<div class="fc-prose">
+<h2 id="overview"><a class="fc-anchor" href="#overview">Overview</a></h2>
+<div class="fc-stats">
+<div class="fc-stat"><div class="fc-stat__label">Documents</div><div class="fc-stat__value">5</div><div class="fc-stat__note">in content/</div></div>
+<div class="fc-stat" data-tone="success"><div class="fc-stat__label">Passing</div><div class="fc-stat__value">3</div></div>
+<div class="fc-stat" data-tone="warning"><div class="fc-stat__label">Warnings</div><div class="fc-stat__value">1</div></div>
+<div class="fc-stat" data-tone="danger"><div class="fc-stat__label">Failing</div><div class="fc-stat__value">1</div></div>
+</div>
+<h2 id="documents"><a class="fc-anchor" href="#documents">Documents</a></h2>
+<div class="fc-toolbar"><label class="fc-sr-only" for="doc-filter">Filter documents</label><input class="fc-input" id="doc-filter" type="search" placeholder="Filter…" style="max-inline-size:16rem"><span class="fc-toolbar__count" id="doc-count" aria-live="polite"></span><span class="fc-toolbar__spacer"></span><button class="fc-btn" type="button" data-size="sm">Export</button></div>
+<fc-table filter="#doc-filter" count="#doc-count" id="doc-table"><table><caption class="fc-sr-only">Content documents</caption>
+<thead><tr><th data-sort>Document</th><th data-sort>Kind</th><th data-sort>Status</th><th data-sort="number" data-numeric>Links</th><th data-sort>Updated</th></tr></thead>
+<tbody><tr><td><a href="#">Home page</a></td><td>content</td><td data-value="ok"><span class="fc-badge" data-tone="success" data-dot>Passing</span></td><td data-numeric data-value="1">1</td><td>2026-10-01</td></tr><tr><td><a href="#">Journal: Eidolons</a></td><td>content</td><td data-value="ok"><span class="fc-badge" data-tone="success" data-dot>Passing</span></td><td data-numeric data-value="4">4</td><td>2026-09-30</td></tr><tr><td><a href="#">Specs index</a></td><td>console</td><td data-value="warn"><span class="fc-badge" data-tone="warning" data-dot>Warning</span></td><td data-numeric data-value="12">12</td><td>2026-10-02</td></tr><tr><td><a href="#">Ontology</a></td><td>console</td><td data-value="ok"><span class="fc-badge" data-tone="success" data-dot>Passing</span></td><td data-numeric data-value="230">230</td><td>2026-10-02</td></tr><tr><td><a href="#">Legacy redirect</a></td><td>content</td><td data-value="fail"><span class="fc-badge" data-tone="danger" data-dot>Failing</span></td><td data-numeric data-value="0">0</td><td>2026-09-12</td></tr></tbody></table></fc-table>
+<h2 id="settings"><a class="fc-anchor" href="#settings">Settings</a></h2>
+<form class="fc-form" onsubmit="return false">
+<div class="fc-field"><label class="fc-label" for="site-name">Site name</label><input class="fc-input" id="site-name" value="Intellectual Frontiers"><p class="fc-hint">Shown in the page title.</p></div>
+<div class="fc-field"><label class="fc-label" for="mode">Deployment mode</label><select class="fc-select" id="mode"><option>Development</option><option>Production</option></select></div>
+<div class="fc-field"><label class="fc-label" for="admins">Operators</label><input class="fc-input" id="admins" aria-invalid="true" aria-describedby="admins-error" value=""><p class="fc-error" id="admins-error">At least one operator is required.</p></div>
+<label class="fc-check"><input type="checkbox" checked> Send a weekly health summary</label>
+<label class="fc-switch"><input type="checkbox" role="switch"> Maintenance mode</label>
+<div class="fc-form__actions"><button class="fc-btn" data-variant="primary" type="submit">Save</button><button class="fc-btn" type="reset">Cancel</button></div>
+</form>
+<h2 id="run"><a class="fc-anchor" href="#run">Run log</a></h2>
+<fc-terminal id="run-log" title="cargo task check" status="running"><pre>$ cargo task check
+spec-history … ok</pre></fc-terminal>
+<h2 id="empty"><a class="fc-anchor" href="#empty">Empty state</a></h2>
+<div class="fc-empty"><p class="fc-empty__title">No backlog items</p><p class="fc-empty__text">Everything the specs require is implemented. New findings appear here.</p><button class="fc-btn" type="button" data-size="sm">Refresh</button></div>
+</div>
+<footer class="fc-footer"><span>© Intellectual Frontiers</span><span>Last updated 2 October 2026</span></footer>
+</main>
+<aside class="fc-toc" aria-label="On this page"><p class="fc-toc__title">On this page</p><fc-toc><ol><li><a href="#overview" data-depth="2">Overview</a></li><li><a href="#documents" data-depth="2">Documents</a></li><li><a href="#settings" data-depth="2">Settings</a></li><li><a href="#run" data-depth="2">Run log</a></li><li><a href="#empty" data-depth="2">Empty state</a></li></ol></fc-toc></aside>
+</div>
+</fc-shell>
+</body>
+</html>

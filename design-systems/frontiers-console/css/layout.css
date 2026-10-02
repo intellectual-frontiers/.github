@@ -1,0 +1,217 @@
+/*
+ * Shell, navbar, sidebar, page grid and table of contents.
+ * <fc-shell data-layout="docs|notebook|home"> is a CSS grid. The layout is chosen by that one
+ * attribute; changing it at runtime reflows the page. State attributes set by js/console.js:
+ *   data-sidebar-open        mobile drawer open
+ *   data-sidebar-collapsed   desktop sidebar collapsed
+ * Breakpoints: drawer below 64rem; table of contents column from 80rem.
+ */
+@layer layout {
+  fc-shell {
+    --fc-top: 0px;
+    --fc-sidebar-w: var(--fc-sidebar-width);
+    display: grid;
+    min-block-size: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "nav" "page";
+  }
+  fc-shell[data-layout="notebook"] { --fc-top: var(--fc-nav-height); }
+
+  /* ───── Navbar ───── */
+  .fc-nav {
+    grid-area: nav;
+    position: sticky; inset-block-start: 0; z-index: 30;
+    block-size: var(--fc-nav-height);
+    display: flex; align-items: center; gap: 0.75rem;
+    padding-inline: var(--fc-gutter);
+    background: color-mix(in srgb, var(--fc-background) 85%, transparent);
+    backdrop-filter: blur(12px);
+    border-block-end: 1px solid var(--fc-border);
+  }
+  .fc-brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; letter-spacing: -0.01em; }
+  .fc-brand img { block-size: 1.5rem; inline-size: auto; }
+  .fc-brand__name { font-size: 0.9375rem; color: var(--fc-foreground); }
+  .fc-nav__links { display: none; align-items: center; gap: 0.25rem; margin-inline-start: 1rem; }
+  .fc-nav__link {
+    padding: 0.375rem 0.75rem; border-radius: var(--fc-radius-sm);
+    font-size: 0.875rem; color: var(--fc-muted-foreground);
+    transition: color var(--fc-fast) var(--fc-ease), background var(--fc-fast) var(--fc-ease);
+  }
+  .fc-nav__link:hover { color: var(--fc-foreground); background: var(--fc-accent); }
+  .fc-nav__link[aria-current] { color: var(--fc-foreground); font-weight: 500; }
+  .fc-nav__spacer { flex: 1; }
+  .fc-nav__actions { display: flex; align-items: center; gap: 0.5rem; }
+  @media (min-width: 40rem) { .fc-nav__links { display: flex; } }
+
+  /* docs layout: the navbar exists only where the sidebar is a drawer */
+  @media (min-width: 64rem) {
+    fc-shell[data-layout="docs"] .fc-nav { display: none; }
+  }
+
+  /* ───── Sidebar ───── */
+  .fc-sidebar {
+    grid-area: sidebar;
+    display: flex; flex-direction: column;
+    background: var(--fc-card);
+    border-inline-end: 1px solid var(--fc-border);
+    min-block-size: 0;
+  }
+  .fc-sidebar__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    padding: 0.875rem 0.875rem 0.5rem 1rem;
+  }
+  /* the notebook navbar already carries the brand */
+  fc-shell[data-layout="notebook"] .fc-sidebar__head { justify-content: flex-end; padding-block: 0.5rem 0; }
+  fc-shell[data-layout="notebook"] .fc-sidebar__head .fc-brand { display: none; }
+  .fc-sidebar__tools { display: grid; gap: 0.5rem; padding: 0.5rem 0.875rem; }
+  .fc-sidebar__scroll { flex: 1; min-block-size: 0; overflow-y: auto; padding: 0.5rem 0.625rem 1.5rem; overscroll-behavior: contain; }
+  .fc-sidebar__foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    padding: 0.625rem 0.875rem; border-block-start: 1px solid var(--fc-border);
+    font-size: 0.8125rem; color: var(--fc-muted-foreground);
+  }
+
+  /* mobile: drawer */
+  @media (max-width: 63.999rem) {
+    .fc-sidebar {
+      position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 50;
+      inline-size: min(20rem, 86vw);
+      transform: translateX(-100%); visibility: hidden;
+      transition: transform 200ms var(--fc-ease), visibility 0s linear 200ms;
+      box-shadow: none;
+    }
+    fc-shell[data-sidebar-open] .fc-sidebar {
+      transform: none; visibility: visible; transition-delay: 0s; box-shadow: var(--fc-shadow-lg);
+    }
+  }
+  .fc-backdrop {
+    position: fixed; inset: 0; z-index: 40; background: rgb(18 24 32 / 40%);
+    opacity: 0; pointer-events: none; transition: opacity 200ms var(--fc-ease);
+  }
+  fc-shell[data-sidebar-open] .fc-backdrop { opacity: 1; pointer-events: auto; }
+
+  /* desktop: persistent sidebar */
+  @media (min-width: 64rem) {
+    fc-shell[data-layout="docs"] {
+      grid-template-columns: var(--fc-sidebar-w) minmax(0, 1fr);
+      grid-template-rows: 1fr;
+      grid-template-areas: "sidebar page";
+    }
+    fc-shell[data-layout="notebook"] {
+      grid-template-columns: var(--fc-sidebar-w) minmax(0, 1fr);
+      grid-template-areas: "nav nav" "sidebar page";
+    }
+    fc-shell:is([data-layout="docs"], [data-layout="notebook"]) .fc-sidebar {
+      position: sticky; inset-block-start: var(--fc-top);
+      block-size: calc(100dvh - var(--fc-top));
+      align-self: start;
+    }
+    fc-shell[data-sidebar-collapsed] { --fc-sidebar-w: 0px; }
+    fc-shell[data-sidebar-collapsed] .fc-sidebar { visibility: hidden; overflow: hidden; border-inline-end-width: 0; }
+    .fc-backdrop { display: none; }
+  }
+  fc-shell[data-layout="home"] .fc-sidebar,
+  fc-shell[data-layout="home"] .fc-backdrop { display: none; }
+
+  /* visibility of the expand button is in components.css (it must follow .fc-btn) */
+  .fc-sidebar-expand {
+    position: fixed; z-index: 35;
+    inset-block-start: calc(var(--fc-top) + 0.75rem); inset-inline-start: 0.75rem;
+  }
+
+  /* ───── Sidebar tree ───── */
+  .fc-tree { font-size: 0.875rem; }
+  .fc-tree ul { display: grid; gap: 0.125rem; }
+  .fc-tree__label {
+    margin-block: 1rem 0.375rem; padding-inline: 0.75rem;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--fc-muted-foreground);
+  }
+  .fc-tree__label:first-child { margin-block-start: 0.25rem; }
+  .fc-tree__link, .fc-tree summary {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4375rem 0.75rem; border-radius: var(--fc-radius-sm);
+    color: var(--fc-muted-foreground);
+    transition: color var(--fc-fast) var(--fc-ease), background var(--fc-fast) var(--fc-ease);
+  }
+  .fc-tree__link:hover, .fc-tree summary:hover { background: var(--fc-accent); color: var(--fc-accent-foreground); }
+  .fc-tree__link[aria-current="page"] { background: var(--fc-primary-tint); color: var(--fc-primary); font-weight: 500; }
+  .fc-tree summary { list-style: none; justify-content: space-between; font-weight: 500; color: var(--fc-foreground); }
+  .fc-tree summary::-webkit-details-marker { display: none; }
+  .fc-tree summary::after {
+    content: ""; inline-size: 0.4375rem; block-size: 0.4375rem; flex: none;
+    border-inline-end: 1.5px solid currentColor; border-block-end: 1.5px solid currentColor;
+    transform: rotate(-45deg); transition: transform var(--fc-fast) var(--fc-ease); opacity: 0.6;
+  }
+  .fc-tree details[open] > summary::after { transform: rotate(45deg); }
+  .fc-tree details > ul { margin-inline-start: 1rem; margin-block: 0.125rem 0.25rem; padding-inline-start: 0.5rem; border-inline-start: 1px solid var(--fc-border); }
+  .fc-tree__badge { margin-inline-start: auto; }
+
+  /* ───── Page and article ───── */
+  .fc-page {
+    grid-area: page; min-inline-size: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr); justify-content: center; align-content: start;
+    padding: 1.5rem var(--fc-gutter) 4rem;
+  }
+  .fc-article { min-inline-size: 0; max-inline-size: var(--fc-article-width); inline-size: 100%; margin-inline: auto; }
+  fc-shell[data-layout="home"] .fc-page { max-inline-size: var(--fc-layout-width); inline-size: 100%; margin-inline: auto; padding-block-start: 3rem; }
+  fc-shell[data-layout="home"] .fc-article { max-inline-size: none; }
+  @media (min-width: 64rem) {
+    .fc-page { padding-block-start: 2.5rem; padding-inline: 2.5rem; }
+  }
+  @media (min-width: 80rem) {
+    .fc-page:has(.fc-toc) { grid-template-columns: minmax(0, var(--fc-article-width)) var(--fc-toc-width); column-gap: 3.5rem; }
+    .fc-page:has(.fc-toc) .fc-article { margin-inline: 0; }
+  }
+
+  .fc-article__head { margin-block-end: 1.5rem; }
+  .fc-title { font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+  .fc-description { margin-block-start: 0.5rem; font-size: 1.0625rem; color: var(--fc-muted-foreground); text-wrap: pretty; }
+  .fc-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 1rem; }
+
+  /* ───── Table of contents ───── */
+  .fc-toc { display: none; }
+  @media (min-width: 80rem) {
+    .fc-toc {
+      display: block; position: sticky; align-self: start;
+      inset-block-start: calc(var(--fc-top) + 2.5rem);
+      max-block-size: calc(100dvh - var(--fc-top) - 5rem); overflow-y: auto; font-size: 0.8125rem;
+    }
+    .fc-toc-mobile { display: none; }
+  }
+  .fc-toc__title {
+    display: flex; align-items: center; gap: 0.5rem; margin-block-end: 0.75rem;
+    font-size: 0.8125rem; font-weight: 600; color: var(--fc-foreground);
+  }
+  .fc-toc ol, .fc-toc-mobile ol { display: grid; border-inline-start: 1px solid var(--fc-border); }
+  .fc-toc a, .fc-toc-mobile a {
+    display: block; padding: 0.3125rem 0.75rem; margin-inline-start: -1px;
+    border-inline-start: 1px solid transparent; color: var(--fc-muted-foreground); line-height: 1.4;
+    transition: color var(--fc-fast) var(--fc-ease);
+  }
+  .fc-toc a:hover, .fc-toc-mobile a:hover { color: var(--fc-foreground); }
+  .fc-toc a[data-depth="3"], .fc-toc-mobile a[data-depth="3"] { padding-inline-start: 1.5rem; }
+  .fc-toc a[data-depth="4"], .fc-toc-mobile a[data-depth="4"] { padding-inline-start: 2.25rem; }
+  .fc-toc a[aria-current="true"], .fc-toc-mobile a[aria-current="true"] { color: var(--fc-primary); border-inline-start-color: var(--fc-primary); font-weight: 500; }
+
+  .fc-toc-mobile {
+    margin-block-end: 1.25rem; border: 1px solid var(--fc-border); border-radius: var(--fc-radius);
+    background: var(--fc-card); font-size: 0.875rem;
+  }
+  .fc-toc-mobile > summary { display: flex; align-items: center; justify-content: space-between; padding: 0.625rem 0.875rem; font-weight: 500; list-style: none; }
+  .fc-toc-mobile > summary::-webkit-details-marker { display: none; }
+  .fc-toc-mobile > summary::after {
+    content: ""; inline-size: 0.4375rem; block-size: 0.4375rem;
+    border-inline-end: 1.5px solid currentColor; border-block-end: 1.5px solid currentColor; transform: rotate(45deg); opacity: 0.6;
+  }
+  .fc-toc-mobile[open] > summary::after { transform: rotate(-135deg); }
+  .fc-toc-mobile ol { margin: 0 0.875rem 0.75rem; }
+
+  /* ───── Footer ───── */
+  .fc-footer {
+    margin-block-start: 3rem; padding-block-start: 1.5rem; border-block-start: 1px solid var(--fc-border);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem;
+    font-size: 0.8125rem; color: var(--fc-muted-foreground);
+  }
+}

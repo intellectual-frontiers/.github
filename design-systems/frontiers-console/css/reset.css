@@ -1,0 +1,20 @@
+/*
+ * Frontiers Console: cascade layer order. This declaration MUST stay the first statement that
+ * declares layers, so every later file lands in its intended layer regardless of load timing.
+ * assurance/ checks this line against bundle.txt.
+ */
+@layer reset, tokens, base, layout, prose, components, admin;
+
+@layer reset {
+  *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid; }
+  :where(ul, ol) { list-style: none; }
+  :where(img, svg, video) { display: block; max-inline-size: 100%; }
+  :where(img) { block-size: auto; }
+  :where(a) { color: inherit; text-decoration: inherit; }
+  :where(button, input, select, textarea) { font: inherit; color: inherit; }
+  :where(button) { background: none; cursor: pointer; }
+  :where(h1, h2, h3, h4, h5, h6) { font-size: inherit; font-weight: inherit; text-wrap: balance; }
+  :where(table) { border-collapse: collapse; }
+  :where(summary) { cursor: pointer; }
+  :where([hidden]:not([hidden="until-found"])) { display: none; }
+}

@@ -1,0 +1,181 @@
+{
+  "$comment": "Extracted from src/components/site-chrome.tsx and src/lib/breadcrumbs.ts (static pages only) in the Lovable repo. Dynamic record trails (patents, notes, works) are ported per area as each area is built.",
+  "primary": [
+    { "to": "/portfolio", "label": "Portfolio" },
+    { "to": "/ip", "label": "Research" },
+    { "to": "/capital", "label": "Capital" },
+    { "to": "/press", "label": "Press" },
+    { "to": "/studios", "label": "Studios" },
+    { "to": "/network", "label": "Network" }
+  ],
+  "sections": [
+    {
+      "label": "Portfolio",
+      "prefixes": ["/portfolio"],
+      "items": [
+        { "to": "/patents", "label": "Patent register" },
+        { "to": "/capital", "label": "Funds" },
+        { "to": "/studios", "label": "Ventures" },
+        { "to": "/press", "label": "Publishing" }
+      ]
+    },
+    {
+      "label": "The firm",
+      "prefixes": ["/about", "/faq", "/contact"],
+      "items": [
+        { "to": "/faq", "label": "Questions" },
+        { "to": "/contact", "label": "Contact" }
+      ]
+    },
+    {
+      "label": "Native Alpha™",
+      "prefixes": ["/native-alpha"],
+      "items": [
+        { "to": "/topics", "label": "Topics" },
+        { "to": "/use-cases", "label": "Use cases" },
+        { "to": "/market-potential", "label": "Market potential" }
+      ]
+    },
+    {
+      "label": "Research",
+      "prefixes": [
+        "/ip", "/patents", "/patent-summaries", "/defensive-disclosures",
+        "/submit-a-disclosure", "/research", "/research-notes", "/research-papers",
+        "/topics", "/trademarks"
+      ],
+      "items": [
+        { "to": "/research", "label": "Research" },
+        { "to": "/topics", "label": "Research areas" },
+        { "to": "/research-papers", "label": "Research papers" },
+        { "to": "/research-notes", "label": "Research notes" },
+        { "to": "/patents", "label": "Patent register" },
+        { "to": "/patent-summaries", "label": "Patent summaries" },
+        { "to": "/trademarks", "label": "Trademarks" },
+        { "to": "/defensive-disclosures", "label": "Defensive disclosures" },
+        { "to": "/submit-a-disclosure", "label": "Submit a disclosure" }
+      ]
+    },
+    {
+      "label": "Capital",
+      "prefixes": [
+        "/capital", "/capital/seed-readiness", "/capital/care-delivery-fund-i",
+        "/capital/care-delivery-fund-ii", "/market-potential"
+      ],
+      "items": [
+        { "to": "/capital/seed-readiness", "label": "Seed readiness" },
+        { "to": "/capital/care-delivery-fund-i", "label": "Care Delivery Fund I" },
+        { "to": "/capital/care-delivery-fund-ii", "label": "Care Delivery Fund II" },
+        { "to": "/market-potential", "label": "Market potential" },
+        { "to": "/use-cases", "label": "Use cases" },
+        { "to": "/contact", "label": "Contact" }
+      ]
+    },
+    {
+      "label": "Press",
+      "prefixes": ["/press", "/blogs"],
+      "items": [
+        { "to": "/press", "label": "Books & works" },
+        { "to": "/press/about", "label": "About IF Press" },
+        { "to": "/blogs", "label": "Writing" },
+        { "to": "/patent-summaries", "label": "Patent summaries" },
+        { "to": "/press/ai-slop-check", "label": "AI Slop Check" },
+        { "to": "/contact", "label": "Contact" }
+      ]
+    },
+    {
+      "label": "Network",
+      "prefixes": ["/network"],
+      "items": [
+        { "to": "/network/how-it-works", "label": "How it works" },
+        { "to": "/network/hunts", "label": "Current hunts" },
+        { "to": "/network/ask", "label": "Ask Network" },
+        { "to": "/contact", "label": "Contact" }
+      ]
+    },
+    {
+      "label": "Studios",
+      "prefixes": ["/studios", "/use-cases"],
+      "items": [
+        { "to": "/studios", "label": "Ventures & companies" },
+        { "to": "/studios/about", "label": "About IF Studios" },
+        { "to": "/studios/ventures", "label": "Ventures" },
+        { "to": "/studios/software", "label": "Software" },
+        { "to": "/use-cases", "label": "Use cases" },
+        { "to": "/submit-a-disclosure", "label": "Submit a disclosure" },
+        { "to": "/contact", "label": "Contact" }
+      ]
+    }
+  ],
+  "staticPages": {
+    "/about": { "label": "The firm" },
+    "/faq": { "label": "Questions", "parent": "/about" },
+    "/contact": { "label": "Contact", "parent": "/about" },
+    "/native-alpha": { "label": "Native Alpha™" },
+    "/portfolio": { "label": "Portfolio" },
+    "/whats-new": { "label": "What's new" },
+    "/ip": { "label": "Research & IP" },
+    "/research": { "label": "Research", "parent": "/ip" },
+    "/topics": { "label": "Research areas", "parent": "/research" },
+    "/research-notes": { "label": "Research notes", "parent": "/research" },
+    "/research-papers": { "label": "Research papers", "parent": "/ip" },
+    "/patents": { "label": "Patent register", "parent": "/ip" },
+    "/patent-summaries": { "label": "Patent summaries", "parent": "/ip" },
+    "/trademarks": { "label": "Trademarks", "parent": "/ip" },
+    "/defensive-disclosures": { "label": "Defensive disclosures", "parent": "/ip" },
+    "/submit-a-disclosure": { "label": "Submit a disclosure", "parent": "/ip" },
+    "/press": { "label": "Press" },
+    "/press/about": { "label": "About IF Press", "parent": "/press" },
+    "/blogs": { "label": "Writing", "parent": "/press" },
+    "/press/ai-slop-check": { "label": "AI Slop Check", "parent": "/press" },
+    "/capital": { "label": "Capital" },
+    "/capital/seed-readiness": { "label": "Seed readiness", "parent": "/capital" },
+    "/market-potential": { "label": "Market potential", "parent": "/capital" },
+    "/capital/care-delivery-fund-i": { "label": "Care Delivery Fund I", "parent": "/capital" },
+    "/capital/care-delivery-fund-ii": { "label": "Care Delivery Fund II", "parent": "/capital" },
+    "/studios": { "label": "Studios" },
+    "/studios/about": { "label": "About IF Studios", "parent": "/studios" },
+    "/studios/software": { "label": "Software", "parent": "/studios" },
+    "/studios/ventures": { "label": "Ventures", "parent": "/studios" },
+    "/use-cases": { "label": "Use cases", "parent": "/studios" },
+    "/network": { "label": "Network" },
+    "/network/how-it-works": { "label": "How it works", "parent": "/network" },
+    "/network/hunts": { "label": "Current hunts", "parent": "/network" },
+    "/network/ask": { "label": "Ask Network", "parent": "/network" }
+  },
+  "footer": {
+    "partners": {
+      "heading": "Ecosystem & Partners",
+      "items": [
+        { "href": "https://netspective.com", "label": "Netspective Communications LLC", "note": "(Studios)" },
+        { "href": "https://netspective.foundation", "label": "Netspective Foundation Inc.", "note": "(Non-Profit)" },
+        { "href": "https://shahidshah.com", "label": "ShahidShah.com", "note": "(Founder)" }
+      ]
+    },
+    "units": {
+      "heading": "Business Units",
+      "items": [
+        { "to": "/ip", "prefix": "IF", "label": "Research & IP" },
+        { "to": "/capital", "prefix": "IF", "label": "Capital" },
+        { "to": "/press", "prefix": "IF", "label": "Press" },
+        { "to": "/studios", "prefix": "IF", "label": "Studios" },
+        { "to": "/network", "prefix": "IF", "label": "Network" }
+      ]
+    },
+    "quick": {
+      "heading": "QUICK REFERENCE",
+      "items": [
+        { "to": "/about", "label": "About Us" },
+        { "to": "/native-alpha", "label": "Native Alpha" },
+        { "to": "/patents", "label": "Patent register" },
+        { "to": "/defensive-disclosures", "label": "Defensive disclosures" },
+        { "to": "/submit-a-disclosure", "label": "Submit a disclosure" },
+        { "to": "/faq", "label": "Questions" },
+        { "to": "/contact", "label": "Contact" },
+        { "href": "https://www.linkedin.com/company/intellectual-frontiers", "label": "LinkedIn" }
+      ]
+    },
+    "legal": "Intellectual Frontiers LLC. All rights reserved.",
+    "copyrightFrom": 2016,
+    "feed": { "to": "/whats-new", "label": "What's new", "feedHref": "/whats-new.xml" }
+  }
+}
