@@ -60,28 +60,36 @@ vault and register data, not restated here.
 - **FR-012**: An investor or LP introduced through Network and funded by
   Capital MUST be recorded as `ifcore:NetworkSourcedCapital`, per
   0010-capital FR-012 — not left as an unnamed source.
-- **FR-013**: A Network-sourced candidate or introduction MUST NOT be
+- **FR-013**: Where Network's search found the founder or operator of a
+  company that becomes a portfolio entity under Studios or Capital, that
+  person MUST be linked to the hunt and evidence packet that found them.
+  A portfolio company's founder or operator MUST NOT be presented as
+  Network-sourced without that record.
+- **FR-014**: A Network-sourced candidate or introduction MUST NOT be
   treated as sufficient proof for another unit's hiring, partnering, or
   funding decision by itself — the unit-boundary rule in
-  0003-intellectual-frontiers FR-003 applies here by name.
+  0003-intellectual-frontiers FR-003 applies here by name, FR-013's
+  traceability requirement notwithstanding: recording who found a
+  founder is not the same as that finding justifying the decision to
+  back them.
 
 ## Relationship memory and confidentiality
 
-- **FR-014**: Nothing learned in a private conversation MUST appear on a
+- **FR-015**: Nothing learned in a private conversation MUST appear on a
   public-facing page without the speaker's consent.
-- **FR-015**: Network MUST NOT publish a public directory of people it has
+- **FR-016**: Network MUST NOT publish a public directory of people it has
   found or holds relationship memory about.
-- **FR-016**: A relationship path to a candidate, where recorded, MUST
+- **FR-017**: A relationship path to a candidate, where recorded, MUST
   carry the audience it is visible to explicitly, per
   0001-eidolon-architecture FR-011 — never left implicit from being
   recorded at all.
 
 ## What Network is measured by
 
-- **FR-017**: Network MUST NOT be evaluated, or report its own
+- **FR-018**: Network MUST NOT be evaluated, or report its own
   performance, by profiles created, registrations, page views, or
   messages sent.
-- **FR-018**: Network MUST be evaluated by hunts with a recorded thesis,
+- **FR-019**: Network MUST be evaluated by hunts with a recorded thesis,
   candidates a person judged worth contacting, conversations that revised
   a thesis, experiments started, and outcomes — including a failed one.
 
@@ -116,6 +124,9 @@ vault and register data, not restated here.
   a profile.
 - **Relationship memory** — the compounding record of who did what and
   how it turned out; carries its own audience, never implicitly public.
+- **A portfolio company's founder or operator** — where Network found
+  them, a fact traceable to the hunt and evidence packet responsible,
+  never asserted as a bare claim of credit.
 
 ## Success criteria
 
@@ -129,9 +140,11 @@ vault and register data, not restated here.
   is assumed rather than recorded.
 - **SC-005**: No investor or LP introduced through Network is left as an
   unnamed capital source.
-- **SC-006**: No private conversation content appears on a public page
+- **SC-006**: No portfolio company's founder or operator is presented as
+  Network-sourced without a traceable hunt and evidence packet.
+- **SC-007**: No private conversation content appears on a public page
   without consent; no public person directory exists.
-- **SC-007**: Network's own reporting cites hunts, judged candidates,
+- **SC-008**: Network's own reporting cites hunts, judged candidates,
   thesis-revising conversations, and outcomes — never activity counts like
   profile or page-view totals.
 
