@@ -61,6 +61,25 @@ ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en ;
 ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
     ifcore:hasAudience ifcore:Everyone .
 
+# ───────────────────────── Design systems (0014-design-systems) ─────────────────────────
+
+ifcore:DesignSystem a owl:Class ; rdfs:label "Design system"@en ;
+    rdfs:comment "A self-contained, versionable set of visual and front-end assets at design-systems/<slug>/, per 0014-design-systems FR-001, FR-010."@en .
+
+ifcore:designSystemStatus a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystemStatus ;
+    rdfs:comment "The one record of whether a design system is active, draft, or retired (0014-design-systems FR-010, FR-011) — never its own README."@en .
+
+ifcore:DesignSystemStatus a owl:Class ; rdfs:label "Design system status"@en .
+ifcore:ActiveDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Active"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:DraftDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Draft"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:RetiredDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Retired"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:FrontiersNature a ifcore:DesignSystem ;
+    rdfs:label "Frontiers Nature"@en ;
+    ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
+    rdfs:comment "At design-systems/frontiers-nature/. Carried over from a prior, now-superseded attempt at this repository (.github-q326's design-system/, its own spec 0007-design-system); named for the 'natural-frontier' visual identity its own tokens document (Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
 
 ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;

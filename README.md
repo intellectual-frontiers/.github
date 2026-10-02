@@ -17,6 +17,11 @@ ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace) — empty until
                     a spec establishes content shapes
+design-systems/
+  README.md         what a design system is, engineering stance, how to
+                     use any one of them
+  <slug>/           one self-contained design system per directory, each
+                     registered in ifcore.ttl (0014-design-systems)
 ```
 
 ## Working order
