@@ -31,33 +31,38 @@ ontology, and carrying its own confidentiality declaration per
 - **FR-007**: A content kind MUST exist in the ontology — per
   0001-eidolon-architecture FR-037 — before any document may declare that
   `@type`. A document MUST NOT invent a type the ontology does not define.
+- **FR-008**: A content document's `<title>` and `<meta name="description">`
+  (FR-004) MUST be derived from the same fact(s) its JSON-LD block asserts.
+  Neither MAY be independently authored text that could drift from it —
+  0001-eidolon-architecture FR-019's single-source-of-truth rule applies to
+  a document's own metadata, not only to business facts.
 
 ## Confidentiality
 
-- **FR-008**: A content document is a Fact under 0001-eidolon-architecture
+- **FR-009**: A content document is a Fact under 0001-eidolon-architecture
   and MUST declare its audience via `ifcore:hasAudience` in its JSON-LD
   block, per that spec's FR-011 through FR-014.
-- **FR-009**: A content document MUST NOT resolve a `RestrictedDataReference`
+- **FR-010**: A content document MUST NOT resolve a `RestrictedDataReference`
   value into its body, per 0001-eidolon-architecture FR-027. It MAY state
   that the fact exists and how to request it.
-- **FR-010**: A content document that displays a resolved
+- **FR-011**: A content document that displays a resolved
   `ExternalRecordReference` value MUST display the date it was resolved as
   of, visibly, per 0001-eidolon-architecture FR-026.
 
 ## Body
 
-- **FR-011**: `<body>` MUST contain only an explicit allowlist of elements
+- **FR-012**: `<body>` MUST contain only an explicit allowlist of elements
   and attributes. Inline `<script>`, inline `<style>`, a `style` attribute,
   an event-handler attribute, and `<iframe>` are forbidden.
-- **FR-012**: Every `<img>` MUST carry `alt`, `width`, and `height`.
-- **FR-013**: Every link with `target="_blank"` MUST also carry
+- **FR-013**: Every `<img>` MUST carry `alt`, `width`, and `height`.
+- **FR-014**: Every link with `target="_blank"` MUST also carry
   `rel="noopener"`.
-- **FR-014**: A URL anywhere in a content document MUST use one of: a
+- **FR-015**: A URL anywhere in a content document MUST use one of: a
   site-relative path, a fragment, `https:`, `http:`, or `mailto:`.
 
 ## Authoring
 
-- **FR-015**: Content MUST be authored directly as HTML5. Markdown,
+- **FR-016**: Content MUST be authored directly as HTML5. Markdown,
   AsciiDoc, or any other markup language MUST NOT be used as an authoring
   format for content documents.
 
@@ -96,6 +101,8 @@ ontology, and carrying its own confidentiality declaration per
   value into its body.
 - **SC-004**: Every content document rendering a cached
   `ExternalRecordReference` value shows its resolved-as-of date.
+- **SC-005**: No content document's `<title>` or `<meta name="description">`
+  states a fact its own JSON-LD block doesn't also assert.
 
 ## Review & acceptance checklist
 
