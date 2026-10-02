@@ -109,3 +109,59 @@ ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range
 ifcore:defaultDecisionAuthority a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Person ;
     rdfs:comment "The person holding authority over every domain not explicitly delegated elsewhere."@en .
 ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNehalShah .
+
+# ───────────────────────── Units (0003-intellectual-frontiers FR-001) ─────────────────────────
+
+ifcore:Unit a owl:Class ; rdfs:label "Unit"@en ;
+    rdfs:comment "A part of the company with exactly one job and one question."@en .
+ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:string ;
+    rdfs:comment "The one job a unit exists to do."@en .
+ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "The one question a unit, or a method stage, exists to answer."@en .
+
+ifcore:hasUnit a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Unit .
+ifcore:unitOf a owl:ObjectProperty ; owl:inverseOf ifcore:hasUnit .
+
+ifcore:ResearchAndIp a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Research & IP"@en ;
+    ifcore:job "Run the research and protect and commercialize what it produces"@en ;
+    ifcore:question "What do we know, own, control, or have rights to that may create unusual advantage?"@en .
+ifcore:Press a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Press"@en ;
+    ifcore:job "Understand markets and explain the truth clearly"@en ;
+    ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en .
+ifcore:Capital a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Capital"@en ;
+    ifcore:job "Put money behind evidence with discipline"@en ;
+    ifcore:question "What advantage is strong enough that scarce capital should be placed behind it?"@en .
+ifcore:Studios a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Studios"@en ;
+    ifcore:job "Build the companies that should exist"@en ;
+    ifcore:question "What venture should we create to exploit this advantage, and what is the cheapest credible path to proving whether it deserves to exist?"@en .
+ifcore:Network a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Network"@en ;
+    ifcore:job "Find and prove the people who can carry the work"@en ;
+    ifcore:question "Who has unusual knowledge, capabilities, relationships, reputation, experience, or access relevant to an opportunity, and how do we find them when needed?"@en .
+
+ifcore:IntellectualFrontiersLLC ifcore:hasUnit
+    ifcore:ResearchAndIp, ifcore:Press, ifcore:Capital, ifcore:Studios, ifcore:Network .
+
+# ───────────────────────── Native Alpha (0003-intellectual-frontiers FR-005, FR-006) ─────────────────────────
+
+ifcore:NativeAlpha a owl:Class ; rdfs:label "Native Alpha"@en ;
+    skos:definition "An unusual and disproportionate advantage that already exists and is strong enough to change a real decision."@en .
+
+# ───────────────────────── The method (0003-intellectual-frontiers FR-007, FR-008) ─────────────────────────
+
+ifcore:MethodStage a owl:Class ; rdfs:label "Method stage"@en ;
+    rdfs:comment "One step in the ordered sequence an opportunity moves through before it is treated as proven."@en .
+ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; rdfs:range xsd:integer .
+
+ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
+    ifcore:question "What is unusually true here?"@en .
+ifcore:Prove a ifcore:MethodStage ; rdfs:label "Prove"@en ; ifcore:sequenceOrder 2 ;
+    ifcore:question "What small hard thing earns a scarce commitment?"@en .
+ifcore:Decide a ifcore:MethodStage ; rdfs:label "Decide"@en ; ifcore:sequenceOrder 3 ;
+    ifcore:question "What will we do now?"@en .
+ifcore:Compound a ifcore:MethodStage ; rdfs:label "Compound"@en ; ifcore:sequenceOrder 4 ;
+    ifcore:question "How does use make the advantage stronger?"@en .
