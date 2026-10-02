@@ -265,6 +265,14 @@
       t.equal((await picked).title, "Admin");
       t.equal(el.querySelector("dialog").open, false, "dialog closes after a cancelled selection");
     });
+    s.test("fc-search: an exact title ranks first, then prefix matches, shorter titles before longer ones", async (t) => {
+      const index = ["Design pattern writing", "Design system status", "Design", "Design system", "About design"].map((title) => ({ title, href: "#" }));
+      const el = mount(`<fc-search><script type="application/json">${JSON.stringify(index)}</script></fc-search>`);
+      await el.open();
+      el.querySelector("input").value = "design"; el.querySelector("input").dispatchEvent(new Event("input"));
+      t.deepEqual([...el.querySelectorAll("[role=option] strong")].map((r) => r.textContent),
+        ["Design", "Design system", "Design system status", "Design pattern writing", "About design"]);
+    });
     s.test("fc-search: Ctrl+K and / open it, but / is ignored while typing in a field", async (t) => {
       const el = mount('<fc-search><script type="application/json">[]</script></fc-search>');
       const dialog = el.querySelector("dialog");

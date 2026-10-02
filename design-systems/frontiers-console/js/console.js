@@ -315,12 +315,14 @@
       const title = item.title.toLowerCase(), rest = `${item.description || ""} ${(item.keywords || []).join(" ")} ${item.section || ""}`.toLowerCase();
       let score = 0;
       for (const term of terms) {
-        if (title.startsWith(term)) score += 6;
+        if (title === term) score += 10;
+        else if (title.startsWith(term)) score += 6;
         else if (title.includes(term)) score += 4;
         else if (rest.includes(term)) score += 1;
         else return 0;
       }
-      return score;
+      // among equals the shorter title is the closer match; the penalty is always below one point
+      return score - Math.min(title.length, 100) / 1000;
     }
     #render() {
       const terms = this._input.value.toLowerCase().split(/\s+/).filter(Boolean);
