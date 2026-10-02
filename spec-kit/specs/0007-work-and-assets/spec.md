@@ -99,6 +99,17 @@ assets.
   that artifact MUST be related to the concept by `schema:isBasedOn` rather
   than conflated with it.
 
+## Where content lives
+
+- **FR-016**: A creative work whose primary, authoritative text
+  Intellectual Frontiers itself publishes MUST have that text represented
+  as a content document in the Eidolon's own content root, per
+  0002-content-format and 0004-addressing FR-004. A creative work whose
+  primary, authoritative text is published elsewhere — by the founder on
+  his own site, for instance — MUST NOT be duplicated into a content
+  document; the Eidolon MUST hold only a reference to it (`schema:url`),
+  never a copy of the text itself.
+
 ## Out of scope
 
 - Equity interests, securities, and other financial assets are Capital's to
@@ -130,6 +141,10 @@ assets.
   and its subtypes), related to the concept it's about by `schema:about`
   and, where it's an adaptation of a prior work, to that work by
   `schema:isBasedOn`.
+- **A content document's origin** — whether Intellectual Frontiers itself
+  is the primary publisher (the text lives in the Eidolon) or merely
+  describes a work published elsewhere (the Eidolon holds a reference,
+  never a copy).
 
 ## Success criteria
 
@@ -145,6 +160,10 @@ assets.
   works, trademark, or copyright) has those facts left unrepresented.
 - **SC-006**: Every `Right` individual states a rights-holder; where its
   creator differs from its rights-holder, both are stated, not just one.
+- **SC-007**: No content document duplicates the primary text of a work
+  whose authoritative source is published elsewhere; no work Intellectual
+  Frontiers itself primarily publishes is left as a bare reference with no
+  content document.
 
 ## Review & acceptance checklist
 
