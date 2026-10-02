@@ -37,10 +37,11 @@ is ontology data, not restated here.
 
 ## Registers
 
-- **FR-008**: The patent register, and any other register generated from a
-  primary external source, MUST be represented as an
-  `ExternalRecordReference` per 0001-eidolon-architecture FR-022, not
-  hand-typed as a literal.
+- **FR-008**: Each patent family's status and filing data MUST be
+  represented as its own `ExternalRecordReference`, per
+  0001-eidolon-architecture FR-022 and 0007-work-and-assets FR-008 — never
+  hand-typed as a literal, and never aggregated into one reference for the
+  register as a whole.
 - **FR-009**: A specific count from any register, when it appears outside
   the live register itself, MUST carry the date it was resolved as of, per
   0001-eidolon-architecture FR-026.
