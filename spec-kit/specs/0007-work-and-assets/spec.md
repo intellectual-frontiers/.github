@@ -75,6 +75,29 @@ assets.
   sole canonical source for a right's final disposition (granted,
   registered, abandoned, refused). No statement elsewhere in the Eidolon,
   however confident, overrides what the registry's own record says.
+- **FR-013**: A copyrightable work significant enough to track MAY be
+  represented as a `Copyright`, a kind of `IntellectualProperty` per FR-007,
+  distinct from any trademark protecting a name used in connection with it.
+  Copyright is not required for every piece of writing — the same
+  materiality judgment in FR-004 applies.
+
+## Attribution
+
+- **FR-014**: A `Right`'s creator MAY be a specific named person,
+  independent of who holds the rights. Its rights-holder, absent a specific
+  agreement stated otherwise, MUST default to Intellectual Frontiers LLC.
+  Creator and rights-holder MUST be represented as `dcterms:creator` and
+  `dcterms:rightsHolder` respectively, not a new property.
+
+## Concepts that are also authored research
+
+- **FR-015**: A concept that is also independently authored research —
+  carrying its own creative works, a trademark, or a copyright — MUST have
+  those facts represented explicitly, on the concept itself or on a
+  dedicated individual it is linked to, never left implicit. Where the
+  company also builds or operates something distinct based on the concept,
+  that artifact MUST be related to the concept by `schema:isBasedOn` rather
+  than conflated with it.
 
 ## Out of scope
 
@@ -103,6 +126,10 @@ assets.
   tracked Fact only once it crosses the FR-004 threshold.
 - **An asset** — something owned that has potential or actual value,
   categorized as tangible, intangible, or financial.
+- **A creative work** — a book, article, or similar (`schema:CreativeWork`
+  and its subtypes), related to the concept it's about by `schema:about`
+  and, where it's an adaptation of a prior work, to that work by
+  `schema:isBasedOn`.
 
 ## Success criteria
 
@@ -114,13 +141,17 @@ assets.
   within a larger digital property.
 - **SC-004**: No trade secret's public representation states what the
   secret actually is.
+- **SC-005**: No concept that is also authored research (its own creative
+  works, trademark, or copyright) has those facts left unrepresented.
+- **SC-006**: Every `Right` individual states a rights-holder; where its
+  creator differs from its rights-holder, both are stated, not just one.
 
 ## Review & acceptance checklist
 
 - [x] Every requirement is testable (MUST / MUST NOT), not aspirational
 - [x] No novel vocabulary invented where an established term already fits —
       PROV-O for work and its outputs, standard asset categories for what
-      is owned
+      is owned, Dublin Core for attribution, schema.org for creative works
 - [x] Every open item is marked, not silently decided
 - [x] Public-safe: no confidential information, no unverified number stated
       as settled fact
