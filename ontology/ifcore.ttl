@@ -753,6 +753,28 @@ ifcore:CareDeliveryFundI ifcore:portfolioCompany
     ifcore:PatientTeamCom, ifcore:Neuvist, ifcore:Symvion, ifcore:RevenueAccelerationLLC,
     ifcore:AmbientBiomarkersReferenceLab, ifcore:ContinuousCareOS .
 
+ifcore:HIRS a ifcore:Organization ;
+    rdfs:label "HIRS"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    schema:url "https://www.hirshealth.com"^^xsd:anyURI ;
+    rdfs:comment "A chronic care management and obesity management company operating in the Kingdom of Saudi Arabia, incubated by Studios. Its own site (Hirs Health Solutions, Riyadh) states its mission as to 'innovate using science and state of the art technologies to help people be better informed, make better health decisions, and maintain healthier lives,' through an AI-driven wellness-profile, digital-health, and predictive-health-modeling platform (hirshealth.com, fetched 2026-10-02, not otherwise re-verified). Not yet linked to any specific Capital fund."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Handova a ifcore:Organization ;
+    rdfs:label "Handova"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A code name for a company Studios is incubating; not yet a confirmed final name. Fuller detail — its own Eidolon content — is pending from the founder and has not been supplied as of this writing."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:NyNikaTMcFadden a ifcore:Person ;
+    ifcore:legalName "Ny'Nika T. McFadden"@en ;
+    rdfs:comment "Dr. Ny'Nika T. McFadden, co-founder of ifcore:Handova; Texas State University."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Handova schema:founder ifcore:NyNikaTMcFadden .
+
 # ───────────────────────── Network (0012-network) ─────────────────────────
 
 ifcore:SearchStage a owl:Class ; rdfs:label "Search stage"@en ;
