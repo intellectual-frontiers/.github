@@ -1,0 +1,19 @@
+@prefix ifweb:   <https://www.intellectualfrontiers.com/ontology/web#> .
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# Intellectual Frontiers — web content ontology (PUBLIC).
+#
+# Intentionally empty. No spec yet establishes a content format or page
+# shapes for a web property. Per this repository's working order (specs
+# before ontology before everything else — 0001-eidolon-architecture
+# FR-037), shapes are added here only once a spec defines them.
+
+<https://www.intellectualfrontiers.com/ontology/web>
+    a owl:Ontology ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://www.intellectualfrontiers.com/ontology/core> ;
+    dcterms:title "Intellectual Frontiers web content ontology"@en ;
+    rdfs:comment "Content shapes for web properties. Empty until a spec establishes them."@en .

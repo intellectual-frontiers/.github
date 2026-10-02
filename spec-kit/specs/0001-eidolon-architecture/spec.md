@@ -167,6 +167,9 @@ reference model, and governance representation.
   discretionary. Any credential or secret that may have been exposed by the
   improper commit MUST also be rotated — a history rewrite alone does not undo
   exposure to anyone who already held a copy before the rewrite.
+- **FR-037**: A new capability or concept MUST be established in a spec before it is
+  represented in the ontology, and in the ontology before it is implemented anywhere
+  else — code, content, or process. Work MUST NOT proceed out of this order.
 
 ## Key entities
 

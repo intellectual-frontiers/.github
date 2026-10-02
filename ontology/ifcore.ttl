@@ -1,0 +1,111 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# Intellectual Frontiers — core ontology (PUBLIC).
+#
+# Implements 0001-eidolon-architecture. Every class, property, and individual
+# here traces to a requirement in that spec; nothing is asserted ahead of it
+# (FR-037). A private ontology imports this and adds its own individuals; it
+# must not redefine or remove anything declared here (FR-003).
+
+<https://www.intellectualfrontiers.com/ontology/core>
+    a owl:Ontology ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:title "Intellectual Frontiers core ontology"@en ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0001-eidolon-architecture/spec.md> ;
+    rdfs:comment "The company, the Eidolon's own repositories, audiences, references, and governance, per 0001-eidolon-architecture."@en .
+
+# ───────────────────────── Organization ─────────────────────────
+
+ifcore:Organization a owl:Class ; rdfs:label "Organization"@en .
+ifcore:Company a owl:Class ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Company"@en .
+ifcore:Person a owl:Class ; rdfs:label "Person"@en .
+
+ifcore:legalName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+    rdfs:comment "A person's full legal name, as it would appear on a signed document."@en .
+ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+    rdfs:comment "The name a person is known by in ordinary prose and branding."@en .
+
+ifcore:IntellectualFrontiersLLC a ifcore:Company ;
+    rdfs:label "Intellectual Frontiers LLC"@en .
+
+ifcore:ShahidNehalShah a ifcore:Person ;
+    ifcore:legalName "Shahid Nehal Shah"@en ;
+    ifcore:displayName "Shahid N. Shah"@en .
+
+# ───────────────────────── The Eidolon's own repositories (FR-001) ─────────────────────────
+
+ifcore:EidolonComponent a owl:Class ; rdfs:label "Eidolon component"@en ;
+    rdfs:comment "One of the Eidolon's three repositories."@en .
+
+ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en .
+ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en .
+ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en .
+
+# ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
+
+ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;
+    rdfs:comment "Anything asserted in the Eidolon. Every fact MUST declare its audience."@en .
+
+ifcore:Audience a owl:Class ; rdfs:label "Audience"@en ;
+    rdfs:comment "A named permission to see a fact."@en .
+ifcore:Everyone a ifcore:Audience ; rdfs:label "Everyone"@en .
+ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en .
+ifcore:Agreement a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named agreement"@en .
+ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named role or group"@en .
+
+ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:Audience ;
+    rdfs:comment "Disjunctive: a viewer satisfying any one listed audience may see the fact."@en .
+
+# ───────────────────────── References (FR-015, FR-022 – FR-027) ─────────────────────────
+
+ifcore:Reference a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Reference"@en ;
+    rdfs:comment "A fact that points at a value held elsewhere rather than storing it."@en .
+ifcore:describes a owl:ObjectProperty ; rdfs:domain ifcore:Reference ;
+    rdfs:comment "The fact or subject this reference is about."@en .
+
+ifcore:ExternalRecordReference a owl:Class ; rdfs:subClassOf ifcore:Reference ;
+    rdfs:label "External record reference"@en ;
+    rdfs:comment "Points at a fact Intellectual Frontiers does not author or control."@en .
+ifcore:primarySource a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:anyURI .
+ifcore:cachedValue a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ;
+    rdfs:comment "Optional. If present, resolvedAt MUST also be present."@en .
+ifcore:resolvedAt a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:date ;
+    rdfs:comment "Required for any static or non-live rendering of cachedValue."@en .
+ifcore:verificationCadence a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:duration ;
+    rdfs:comment "How often this reference's cached value must be re-verified."@en .
+ifcore:verificationMethod a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:string ;
+    rdfs:comment "\"automated\" or \"manual\"."@en .
+
+ifcore:RestrictedDataReference a owl:Class ; rdfs:subClassOf ifcore:Reference ;
+    rdfs:label "Restricted data reference"@en ;
+    rdfs:comment "Points at a sensitive fact Intellectual Frontiers authors but excludes from every Eidolon repository. Deliberately carries no property capable of holding the fact's actual value."@en .
+ifcore:heldIn a owl:DatatypeProperty ; rdfs:domain ifcore:RestrictedDataReference ; rdfs:range xsd:string ;
+    rdfs:comment "The external system that holds the real data."@en .
+ifcore:accessInstructions a owl:DatatypeProperty ; rdfs:domain ifcore:RestrictedDataReference ; rdfs:range xsd:string ;
+    rdfs:comment "How a properly authorized person obtains access. MUST NOT be, or contain, a credential."@en .
+
+# ───────────────────────── Governance (FR-028 – FR-033) ─────────────────────────
+
+ifcore:DecisionOutcome a owl:Class ; rdfs:label "Decision outcome"@en ;
+    rdfs:comment "One of the five decision-checkpoint outcomes."@en .
+ifcore:Continue a ifcore:DecisionOutcome ; rdfs:label "Continue"@en .
+ifcore:Change a ifcore:DecisionOutcome ; rdfs:label "Change"@en .
+ifcore:BackSomeoneElse a ifcore:DecisionOutcome ; rdfs:label "Back someone else"@en .
+ifcore:BuildIt a ifcore:DecisionOutcome ; rdfs:label "Build it"@en .
+ifcore:Stop a ifcore:DecisionOutcome ; rdfs:label "Stop"@en .
+
+ifcore:Decision a owl:Class ; rdfs:label "Decision"@en ;
+    rdfs:comment "A recorded decision at the decision checkpoint. Routine operational activity is not a Decision."@en .
+ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome .
+ifcore:decidedAt a owl:DatatypeProperty ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
+    rdfs:comment "A decision is checked against the authority in effect on this date, not the date of later review."@en .
+ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person .
+
+ifcore:defaultDecisionAuthority a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Person ;
+    rdfs:comment "The person holding authority over every domain not explicitly delegated elsewhere."@en .
+ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNehalShah .
