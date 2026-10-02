@@ -41,6 +41,7 @@ ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:ran
 
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
     rdfs:label "Intellectual Frontiers LLC"@en ;
+    schema:slogan "A think tank that builds useful things."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
 ifcore:ShahidNehalShah a ifcore:Person ;
@@ -266,6 +267,25 @@ ifcore:ResearchArea a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Rese
 ifcore:ResearchPillar a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research pillar"@en ;
     rdfs:comment "A standing line of inquiry under a research area, carrying its own question (0006 FR-002). Related to its area by dcterms:isPartOf, not a custom property. An individual pillar MAY additionally be typed prov:Plan where that fits (0007-work-and-assets FR-001); a bounded piece of work under it is a prov:Activity, related to the pillar the same way, by dcterms:isPartOf."@en .
 
+ifcore:AiNativeSystemsArea a ifcore:ResearchArea ;
+    rdfs:label "AI-Native Systems for the Firm"@en ;
+    rdfs:comment "The firm's own operating model and public presence as research subjects in their own right, not only as business infrastructure."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:EidolonPillar a ifcore:ResearchPillar, prov:Plan ;
+    rdfs:label "Eidolons"@en ;
+    dcterms:isPartOf ifcore:AiNativeSystemsArea ;
+    schema:about ifcore:Eidolon ;
+    ifcore:question "How much of a company, person, or system can an AI reason about accurately from a grounded digital representation, and what does that representation need to contain?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:IplgPillar a ifcore:ResearchPillar, prov:Plan ;
+    rdfs:label "Intellectual Product-Led Growth"@en ;
+    dcterms:isPartOf ifcore:AiNativeSystemsArea ;
+    schema:about ifcore:IPLG ;
+    ifcore:question "How does a knowledge-heavy organization turn its research, frameworks, and expertise into something a visitor can use directly, before any commercial ask?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
 ifcore:NoteType a owl:Class ; rdfs:label "Note type"@en .
 ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Everyone .
@@ -430,7 +450,7 @@ ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
 
 ifcore:ChasingNativeAlpha schema:publisher ifcore:Press .
 
-# ───────────────────────── Owned channels (0009-press FR-024) ─────────────────────────
+# ───────────────────────── Owned channels (0009-press FR-028) ─────────────────────────
 
 ifcore:HealthcareGuyCom a ifcore:DigitalAsset ;
     rdfs:label "HealthcareGuy.com"@en ;
@@ -484,6 +504,39 @@ ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     dcterms:created "2018"^^xsd:gYear ;
     rdfs:comment "The record of what systems actually do in the field versus what they are documented to do."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+# ───────────────────────── The Journal (0009-press FR-020 – FR-023) ─────────────────────────
+
+ifcore:JournalOfIntellectualFrontiers a schema:Periodical ;
+    rdfs:label "Journal of Intellectual Frontiers"@en ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020). No short-form abbreviation is asserted here: 'JIF' is already the trademarked abbreviation for Clarivate's Journal Impact Factor, a term of art throughout academic publishing, and reusing it would both confuse readers and risk the mark — a deliberate omission pending a cleared alternative, not an oversight."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:EidolonJournalArticle a schema:Article ;
+    rdfs:label "Eidolons: A Working Digital Reflection"@en ;
+    schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
+    schema:about ifcore:Eidolon ;
+    prov:wasDerivedFrom ifcore:EidolonPillar ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:claimKind ifcore:Framework ;
+    rdfs:comment "Native-origin work, per 0007-work-and-assets FR-016: Intellectual Frontiers is this piece's primary publisher, so its full text is a content document in this repository's content root, not merely referenced — unlike ifcore:NativeAlphaArticle, whose primary text lives on shahidshah.com."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:IplgJournalArticle a schema:Article ;
+    rdfs:label "Intellectual Product-Led Growth"@en ;
+    schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
+    schema:about ifcore:IPLG ;
+    prov:wasDerivedFrom ifcore:IplgPillar ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:claimKind ifcore:Framework ;
+    rdfs:comment "Native-origin work, per 0007-work-and-assets FR-016: its full text is a content document in this repository's content root. Draws on the firm's own prior IPLG strategy work, already partly implemented across the public site's executable-content pattern."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;

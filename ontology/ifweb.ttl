@@ -101,7 +101,16 @@ ifweb:BookPage a owl:Class, sh:NodeShape ;
     sh:property [ sh:path schema:about ; sh:class schema:Book ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Copyright ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-# ───────────────────────── The portfolio index (0013 FR-009 – FR-010) ─────────────────────────
+ifweb:JournalArticlePage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Journal article page"@en ;
+    rdfs:comment "The one content kind that may carry text Intellectual Frontiers itself originates rather than only render an existing fact, per 0007-work-and-assets FR-016 (0013 FR-009)."@en ;
+    ifweb:contentKind "JournalArticlePage" ;
+    sh:targetClass ifweb:JournalArticlePage ;
+    sh:property [ sh:path schema:isPartOf ; sh:class schema:Periodical ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+# ───────────────────────── The portfolio index (0013 FR-010 – FR-011) ─────────────────────────
 
 ifweb:featuresWork a owl:ObjectProperty ;
     rdfs:domain ifweb:PortfolioIndexPage ;
