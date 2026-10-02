@@ -260,6 +260,60 @@ ifcore:DigitalAsset a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:
     rdfs:comment "A distinct, separately-valuable digital property — a domain and its deployment, a distinct software product, a distinct dataset. Not created for an individual page or file within a larger property (0007 FR-007)."@en .
 ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Goodwill"@en .
 
+# ───────────────────────── Substantial works (0007-work-and-assets FR-017 – FR-021) ─────────────────────────
+
+ifcore:SubstantialWork a owl:Class ; rdfs:label "Substantial work"@en ;
+    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing."@en .
+
+ifcore:lifecycleOwner a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The one unit accountable for a Substantial Work's progress (FR-021). Defaults to Research & IP while disposition is unsure, Press otherwise; any unit may claim it explicitly, overriding the default."@en .
+ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
+    rdfs:comment "The stage a Substantial Work currently occupies."@en .
+
+ifcore:WorkLifecycleStage a owl:Class ; rdfs:label "Work lifecycle stage"@en ;
+    rdfs:comment "One stage in a Substantial Work's ordered progress (FR-018). Reuses ifcore:sequenceOrder, already declared for ifcore:MethodStage and its siblings, rather than redeclaring it."@en .
+ifcore:Intake a ifcore:WorkLifecycleStage ; rdfs:label "Intake"@en ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Research a ifcore:WorkLifecycleStage ; rdfs:label "Research"@en ; ifcore:sequenceOrder 2 ;
+    rdfs:comment "A stage a Substantial Work occupies — distinct from ifcore:ResearchAndIp (the unit) and ifcore:ResearchArea/ResearchPillar (the research chain's own structure), which this individual does not replace or alias."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:Review a ifcore:WorkLifecycleStage ; rdfs:label "Review"@en ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Prep a ifcore:WorkLifecycleStage ; rdfs:label "Prep"@en ; ifcore:sequenceOrder 4 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Deploy a ifcore:WorkLifecycleStage ; rdfs:label "Deploy"@en ; ifcore:sequenceOrder 5 ;
+    rdfs:comment "For a patent, this is the filing moment — the point past which the registry becomes the canonical authority for status, per FR-020 and FR-012."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:Distribute a ifcore:WorkLifecycleStage ; rdfs:label "Distribute"@en ; ifcore:sequenceOrder 6 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Commercialize a ifcore:WorkLifecycleStage ; rdfs:label "Commercialize"@en ; ifcore:sequenceOrder 7 ;
+    rdfs:comment "Decomposes into its own substages (ifcore:CommercializationSubstage) rather than resolving as a single gate, per FR-019."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:CommercializationSubstage a owl:Class ; rdfs:label "Commercialization substage"@en ;
+    rdfs:comment "One concurrent decision inside the Commercialize stage (FR-019). Unlike a top-level ifcore:WorkLifecycleStage, these are not strictly sequential gates — pricing and licensing commonly proceed together, and revenue operations is ongoing rather than a one-time step."@en .
+ifcore:Pricing a ifcore:CommercializationSubstage ; rdfs:label "Pricing"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Licensing a ifcore:CommercializationSubstage ; rdfs:label "Licensing"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 2 ;
+    rdfs:comment "Where a specific ifcore:License individual (0006-research-and-ip) is negotiated — this substage is the activity, License is its resulting record."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:GoToMarket a ifcore:CommercializationSubstage ; rdfs:label "Go-to-market"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:RevenueOperations a ifcore:CommercializationSubstage ; rdfs:label "Revenue operations"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 4 ;
+    rdfs:comment "Ongoing once reached, not a one-time gate — renewals, collections, and revenue recognition continue for as long as the work is commercialized."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+# Existing individuals retyped as Substantial Work, now that the class exists.
+# Declared here rather than editing each individual's own declaration, to
+# keep this addition's diff self-contained.
+ifcore:ChasingNativeAlpha a ifcore:SubstantialWork ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Press .
+ifcore:DemandEngineering a ifcore:SubstantialWork, schema:SoftwareApplication ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Studios .
+ifcore:RevenueEngineering a ifcore:SubstantialWork, schema:SoftwareApplication ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Studios .
+ifcore:CompanionExecutableSourceCodeRepositories a ifcore:SubstantialWork, schema:SoftwareSourceCode ;
+    ifcore:workLifecycleStage ifcore:Intake ;
+    ifcore:lifecycleOwner ifcore:Studios ;
+    rdfs:comment "At the ideation stage per its own operationalStatus — squarely Intake, not yet Research, since the shared service itself has not begun being built."@en .
+
 # ───────────────────────── Research & IP (0006-research-and-ip) ─────────────────────────
 
 ifcore:ResearchArea a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research area"@en ;
