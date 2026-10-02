@@ -115,12 +115,27 @@ ifcore:BackSomeoneElse a ifcore:DecisionOutcome ; rdfs:label "Back someone else"
 ifcore:BuildIt a ifcore:DecisionOutcome ; rdfs:label "Build it"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:Stop a ifcore:DecisionOutcome ; rdfs:label "Stop"@en ; ifcore:hasAudience ifcore:Everyone .
 
-ifcore:Decision a owl:Class ; rdfs:label "Decision"@en ;
-    rdfs:comment "A recorded decision at the decision checkpoint. Routine operational activity is not a Decision. An actual Decision individual is itself a Fact and MUST carry its own ifcore:hasAudience when recorded — it is not necessarily Everyone."@en .
-ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome .
+ifcore:Decision a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Decision"@en ;
+    rdfs:comment "One coherent recorded choice (0008-decision-records FR-003). Routine operational activity is not a Decision. MUST carry its own ifcore:hasAudience when recorded — not necessarily Everyone — and MUST carry decidedBy (0008 FR-002)."@en .
+ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome ;
+    rdfs:comment "Required only for a decision resolving a Native Alpha thesis question (0001 FR-031, 0008 FR-004). Not a measure of whether the record is still current — see dcterms:isReplacedBy."@en .
 ifcore:decidedAt a owl:DatatypeProperty ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
     rdfs:comment "A decision is checked against the authority in effect on this date, not the date of later review."@en .
-ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person .
+ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person ;
+    rdfs:comment "Required on every Decision (0008-decision-records FR-002)."@en .
+ifcore:consideredEvidence a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Fact ;
+    rdfs:comment "A tracked fact that informed the decision (0008 FR-005). Not prov:used: PROV-O declares Entity and Activity disjoint, Decision is a prov:Entity, and used's domain is Activity — reusing it directly on a Decision would conflict. Where no tracked fact exists, use dcterms:description for a plain-text rationale instead."@en .
+
+ifcore:Alternative a owl:Class ; rdfs:label "Alternative"@en ;
+    rdfs:comment "An option considered and rejected when making a decision (0008-decision-records FR-006)."@en .
+ifcore:consideredAlternative a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Alternative .
+ifcore:rejectionReason a owl:DatatypeProperty ; rdfs:domain ifcore:Alternative ; rdfs:range xsd:string .
+
+# dcterms:isReplacedBy (reused, not redeclared) states whether a Decision is still
+# current, independent of its hasOutcome (0008 FR-008). A Decision's own
+# prov:wasGeneratedBy MAY point at the activity that produced it, when that
+# activity is tracked; nothing it caused afterward needs restating here — that
+# fact's own prov:wasGeneratedBy points back at this Decision instead (0008 FR-007).
 
 ifcore:defaultDecisionAuthority a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Person ;
     rdfs:comment "The person holding authority over every domain not explicitly delegated elsewhere."@en .
