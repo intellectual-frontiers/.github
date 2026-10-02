@@ -666,7 +666,7 @@ ifcore:operatesSharedService a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rd
 
 ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
     skos:definition "Intellectual Product-Led Growth: the framework for turning a unit's output into something a visitor can use directly — one useful action completed before any commercial ask — rather than only read about."@en ;
-    rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013) and 0011-studios (FR-020); neither unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
+    rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013), 0009-press (FR-016, FR-017 — a Fieldbook's executable content is IPLG applied to a book; promotion and diffusion of an intellectual product is Press's own territory), and 0011-studios (FR-020); no unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
 # ───────────────────────── Studios portfolio (0011-studios FR-014 – FR-016; 0010-capital) ─────────────────────────
