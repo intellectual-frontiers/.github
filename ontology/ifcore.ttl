@@ -5,6 +5,7 @@
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
 
 # Intellectual Frontiers — core ontology (PUBLIC).
 #
@@ -186,19 +187,35 @@ ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range 
 ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
     rdfs:comment "Optional. Absent means open-ended; present means the grant stops counting after this date (0005 FR-004)."@en .
 
+# ───────────────────────── Work and assets (0007-work-and-assets) ─────────────────────────
+
+ifcore:Asset a owl:Class ; rdfs:label "Asset"@en ;
+    rdfs:comment "An item, thing, or entity that has potential or actual value to the organization (ISO 55000's definition)."@en .
+ifcore:TangibleAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Tangible asset"@en .
+ifcore:IntangibleAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Intangible asset"@en .
+ifcore:FinancialAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Financial asset"@en ;
+    rdfs:comment "Investments, securities, and similar holdings. Left unpopulated; Capital's own future spec establishes what belongs here."@en .
+
+ifcore:RealProperty a owl:Class ; rdfs:subClassOf ifcore:TangibleAsset ; rdfs:label "Real property"@en .
+ifcore:Equipment a owl:Class ; rdfs:subClassOf ifcore:TangibleAsset ; rdfs:label "Equipment"@en .
+
+ifcore:IntellectualProperty a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Intellectual property"@en .
+ifcore:DigitalAsset a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Digital asset"@en ;
+    rdfs:comment "A distinct, separately-valuable digital property — a domain and its deployment, a distinct software product, a distinct dataset. Not created for an individual page or file within a larger property (0007 FR-007)."@en .
+ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Goodwill"@en .
+
 # ───────────────────────── Research & IP (0006-research-and-ip) ─────────────────────────
 
 ifcore:ResearchArea a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research area"@en ;
     rdfs:comment "Groups related work; the top of the research chain (0006 FR-001)."@en .
 ifcore:ResearchPillar a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research pillar"@en ;
-    rdfs:comment "A standing line of inquiry under a research area, carrying its own question (0006 FR-002)."@en .
-ifcore:partOfArea a owl:ObjectProperty ; rdfs:domain ifcore:ResearchPillar ; rdfs:range ifcore:ResearchArea .
+    rdfs:comment "A standing line of inquiry under a research area, carrying its own question (0006 FR-002). Related to its area by dcterms:isPartOf, not a custom property. An individual pillar MAY additionally be typed prov:Plan where that fits (0007-work-and-assets FR-001); a bounded piece of work under it is a prov:Activity, related to the pillar the same way, by dcterms:isPartOf."@en .
 
 ifcore:NoteType a owl:Class ; rdfs:label "Note type"@en .
 ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Everyone .
-ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Note or paper"@en ;
-    rdfs:comment "Where a finding is recorded (0006 FR-003). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
+ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Note or paper"@en ;
+    rdfs:comment "Where a finding is recorded (0006 FR-003), and the entity a research activity generates via prov:wasGeneratedBy (0007-work-and-assets FR-002). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
 ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
 ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
 
@@ -210,15 +227,23 @@ ifcore:DispositionTradeSecret a ifcore:Disposition ; rdfs:label "Trade secret"@e
 ifcore:DispositionNoAction a ifcore:Disposition ; rdfs:label "No action"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:hasDisposition a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:Disposition .
 
-ifcore:Right a owl:Class ; rdfs:label "Right"@en ;
-    rdfs:comment "A kind of protection a finding's disposition can produce."@en .
+ifcore:Right a owl:Class ; rdfs:subClassOf ifcore:IntellectualProperty, prov:Entity ; rdfs:label "Right"@en ;
+    rdfs:comment "A kind of protection a finding's disposition can produce; a kind of intellectual property (0007-work-and-assets FR-007) and a thing with provenance (0007 FR-002)."@en .
 ifcore:PatentFamily a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent family"@en .
 ifcore:DefensiveDisclosure a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Defensive disclosure"@en .
 ifcore:Trademark a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trademark"@en .
-ifcore:TradeSecret a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trade secret"@en .
+ifcore:TradeSecret a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trade secret"@en ;
+    rdfs:comment "Its substantive content is sensitive by default (0007 FR-010) — see ifcore:RestrictedDataReference."@en .
 ifcore:License a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "License"@en ;
     rdfs:comment "What a counterparty can take on a right this unit holds."@en .
 ifcore:licenses a owl:ObjectProperty ; rdfs:domain ifcore:License ; rdfs:range ifcore:Right .
+
+ifcore:continuationOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Shares the parent's specification and priority date; new claims (0007-work-and-assets FR-011)."@en .
+ifcore:divisionalOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Claims split out from a parent application that covered more than one invention (0007 FR-011)."@en .
+ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Adds new matter to a parent application; partial priority (0007 FR-011)."@en .
 
 ifcore:WorkGroup a owl:Class ; rdfs:label "Work group"@en ;
     rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
