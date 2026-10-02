@@ -430,6 +430,62 @@ ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
 
 ifcore:ChasingNativeAlpha schema:publisher ifcore:Press .
 
+# ───────────────────────── Owned channels (0009-press FR-024) ─────────────────────────
+
+ifcore:HealthcareGuyCom a ifcore:DigitalAsset ;
+    rdfs:label "HealthcareGuy.com"@en ;
+    schema:url "https://healthcareguy.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2005"^^xsd:gYear ;
+    rdfs:comment "A personal site publishing health IT arguments, field observations, and invention sketches since 2005 — the firm's longest continuous publishing record."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:HealthcareGuysCom a ifcore:DigitalAsset ;
+    rdfs:label "HealthcareGuys.com"@en ;
+    schema:url "https://healthcareguys.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2008"^^xsd:gYear ;
+    rdfs:comment "A healthcare media network of news, interviews, and vendor coverage written for buyers and operators of health technology."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:MedigyCom a ifcore:DigitalAsset ;
+    rdfs:label "Medigy.com"@en ;
+    schema:url "https://medigy.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2017"^^xsd:gYear ;
+    rdfs:comment "A health innovation discovery platform: crowd-curated technology, use cases, and market signal."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:GovConIC a ifcore:DigitalAsset ;
+    rdfs:label "GovConIC.com"@en ;
+    schema:url "https://govconic.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2015"^^xsd:gYear ;
+    rdfs:comment "GovCon Intelligence Center: how public agencies buy, modernize, and evaluate technology."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:CompliantInSecurityCom a ifcore:DigitalAsset ;
+    rdfs:label "CompliantInSecurity.com"@en ;
+    schema:url "https://compliantinsecurity.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2016"^^xsd:gYear ;
+    rdfs:comment "The standing argument that passing an audit is not the same as being secure, for the people who own both obligations."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
+    rdfs:label "OperationalTruth.org"@en ;
+    schema:url "https://operationaltruth.org"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2018"^^xsd:gYear ;
+    rdfs:comment "The record of what systems actually do in the field versus what they are documented to do."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
     ifcore:question "What is unusually true here?"@en ;
     ifcore:hasAudience ifcore:Everyone .
@@ -559,6 +615,90 @@ ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
     skos:definition "Intellectual Product-Led Growth: the framework for turning a unit's output into something a visitor can use directly — one useful action completed before any commercial ask — rather than only read about."@en ;
     rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013) and 0011-studios (FR-020); neither unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
     ifcore:hasAudience ifcore:Everyone .
+
+# ───────────────────────── Studios portfolio (0011-studios FR-014 – FR-016; 0010-capital) ─────────────────────────
+
+ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:PortfolioCategory ;
+    rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization is classified as."@en .
+ifcore:builtBy a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The unit that built this organization as a venture or shared service, per 0011-studios FR-017: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
+ifcore:portfolioCompany a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:Organization ;
+    rdfs:comment "A company or shared service this fund holds. A fund's portfolio roster is point-in-time business data, not operating doctrine (0010-capital, Out of scope) — the same reasoning already applied to patent counts."@en .
+
+ifcore:OurHakeem a ifcore:Organization ;
+    rdfs:label "OurHakeem"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Verified practitioner consults delivered online, with an operating stack behind the booking screen: intake, a longitudinal care record, agents that carry routine work, a clinician copilot, and the compliance apparatus a regulated consult requires."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Payshent a ifcore:Organization ;
+    rdfs:label "Payshent"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An HSA card that pays patients a data dividend for consented, de-identified health data, built on HIPAA Expert Determination de-identification, transparent revocable consent, and IRB oversight for research partnerships."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:MedigyOpportunityAtlas a ifcore:Organization ;
+    rdfs:label "Medigy Opportunity Atlas"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Finds reimbursed demand in healthcare and states it as a claims-defined cohort, geography, CMS signal, reimbursement codes, and revenue at stake — a shared service to every other Fund I venture and the intelligence spine of Fund II."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:MedigyDemandIntelligence a ifcore:Organization ;
+    rdfs:label "Medigy Demand Intelligence"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A governed evaluation platform for hospitals and health systems: structured vendor evaluation by vetted evidence against internal need, in place of an unranked procurement queue."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:PatientTeamCom a ifcore:Organization ;
+    rdfs:label "PatientTeam.com"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An execution layer turning the Microsoft 365 or Google Workspace a provider already pays for into a working digital front door, serving the portfolio as a shared front-door capability."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Neuvist a ifcore:Organization ;
+    rdfs:label "Neuvist"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A healthcare growth and care-access capability: AI-driven demand intelligence, orchestration, and routing that fills real provider capacity, serving the portfolio as a shared demand-and-access engine."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Symvion a ifcore:Organization ;
+    rdfs:label "Symvion"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A continuous clinical research infrastructure platform reading signals across consented health transaction data for earlier detection and continuous research; Payshent is its funding and consent layer."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:RevenueAccelerationLLC a ifcore:Organization ;
+    rdfs:label "Revenue Acceleration LLC"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Revenue operations for post-acute care: durable medical equipment, home health, home infusion, home respiratory, and hospice."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:AmbientBiomarkersReferenceLab a ifcore:Organization ;
+    rdfs:label "Ambient Biomarkers Reference Lab"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A reference lab for biomarkers captured passively from ordinary sensors (voice, gait, respiration, facial expression, wearable and metabolic signals), standardized into panels and governed by an integrated review board and clinician network."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:ContinuousCareOS a ifcore:Organization ;
+    rdfs:label "Continuous Care OS"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An operating system for supervising an accountable digital care operation: a clinical leader reviews decisions, evidence, and billing as a queue of work with owners and dates."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:CareDeliveryFundI ifcore:portfolioCompany
+    ifcore:OurHakeem, ifcore:Payshent, ifcore:MedigyOpportunityAtlas, ifcore:MedigyDemandIntelligence,
+    ifcore:PatientTeamCom, ifcore:Neuvist, ifcore:Symvion, ifcore:RevenueAccelerationLLC,
+    ifcore:AmbientBiomarkersReferenceLab, ifcore:ContinuousCareOS .
 
 # ───────────────────────── Network (0012-network) ─────────────────────────
 
