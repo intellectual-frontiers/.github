@@ -177,6 +177,15 @@ ifcore:MethodStage a owl:Class ; rdfs:label "Method stage"@en ;
     rdfs:comment "One step in the ordered sequence an opportunity moves through before it is treated as proven."@en .
 ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; rdfs:range xsd:integer .
 
+ifcore:Grant a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Grant"@en ;
+    rdfs:comment "An explicit, time-bounded link between an identified agent and a specific audience (0005-authentication FR-003). Actual Grant individuals are rarely Public; they are expected to live in the private vault, declaring whatever audience is appropriate to their own sensitivity."@en .
+ifcore:grantedTo a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Person .
+ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Audience .
+ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+    rdfs:comment "Required. A grant with no start date is not valid (0005 FR-003)."@en .
+ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+    rdfs:comment "Optional. Absent means open-ended; present means the grant stops counting after this date (0005 FR-004)."@en .
+
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
     ifcore:question "What is unusually true here?"@en ;
     ifcore:hasAudience ifcore:Everyone .
