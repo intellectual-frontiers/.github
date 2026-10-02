@@ -674,7 +674,7 @@ ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
 ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:PortfolioCategory ;
     rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization is classified as."@en .
 ifcore:builtBy a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Unit ;
-    rdfs:comment "The unit that built this organization as a venture or shared service, per 0011-studios FR-017: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
+    rdfs:comment "The unit that built this organization as a venture or shared service, per 0011-studios FR-019: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
 ifcore:portfolioCompany a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:Organization ;
     rdfs:comment "A company or shared service this fund holds. A fund's portfolio roster is point-in-time business data, not operating doctrine (0010-capital, Out of scope) — the same reasoning already applied to patent counts."@en .
 
@@ -773,7 +773,7 @@ ifcore:NyNikaTMcFadden a ifcore:Person ;
     rdfs:comment "Dr. Ny'Nika T. McFadden, co-founder of ifcore:Handova; Texas State University."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
-ifcore:Handova schema:founder ifcore:NyNikaTMcFadden .
+ifcore:Handova schema:founder ifcore:NyNikaTMcFadden, ifcore:ShahidNehalShah .
 
 # ───────────────────────── Network (0012-network) ─────────────────────────
 
