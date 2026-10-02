@@ -106,7 +106,13 @@
     #build() {
       const list = document.createElement("ol");
       for (const heading of this._headings) {
-        if (!heading.id) heading.id = slug(heading.textContent);
+        if (!heading.id) {
+          // generated ids must be unique: two "Overview" headings become overview and overview-2
+          const base = slug(heading.textContent);
+          let id = base, n = 2;
+          while (document.getElementById(id)) id = `${base}-${n++}`;
+          heading.id = id;
+        }
         const item = document.createElement("li");
         const link = document.createElement("a");
         link.href = `#${heading.id}`;

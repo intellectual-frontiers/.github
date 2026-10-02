@@ -232,6 +232,11 @@
       t.deepEqual(links.map((a) => a.dataset.depth), ["2", "3", "2"]);
       t.ok(el.querySelector("#alpha-beta"), "generated id was written back to the heading");
     });
+    s.test("fc-toc: generated ids are unique when headings repeat", (t) => {
+      const el = mount('<div><main id="u-main"><h2>Same</h2><h2>Same</h2><h3>Same</h3></main><fc-toc scope="#u-main"></fc-toc></div>');
+      t.deepEqual([...el.querySelectorAll("fc-toc a")].map((a) => a.getAttribute("href")), ["#same", "#same-2", "#same-3"]);
+      t.deepEqual([...el.querySelectorAll("main > *")].map((h) => h.id), ["same", "same-2", "same-3"]);
+    });
     s.test("fc-toc: mark() sets aria-current on exactly one link", (t) => {
       const el = mount('<div><main id="u-main"><h2 id="a">A</h2><h2 id="b">B</h2></main><fc-toc scope="#u-main"></fc-toc></div>');
       const toc = el.querySelector("fc-toc");
