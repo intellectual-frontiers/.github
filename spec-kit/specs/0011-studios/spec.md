@@ -100,7 +100,14 @@ restated here.
   planning material held there is not a content document under
   0002-content-format; it MAY be authored in whatever format is
   practical until and unless it is deliberately published as one.
-- **FR-020**: A company's `ventures/<company>/` directory MUST be
+- **FR-020**: Within a company's `ventures/<company>/` directory, raw
+  material supplied from outside — a founder's prompt, an external
+  document, anything given rather than produced here — MUST be kept
+  under `content/intake/`, distinct from the material actually prepared
+  for use by the company and its staff. `docs/`, where used, is
+  reserved for explaining how to operate the Eidolon repositories
+  themselves, never for the company's own working material.
+- **FR-021**: A company's `ventures/<company>/` directory MUST be
   removed from Intellectual Frontiers' own Eidolon once its content has
   transferred to its own Eidolon per FR-018 — not kept as a stale
   duplicate indefinitely. A company already operating as its own
@@ -110,27 +117,27 @@ restated here.
 
 ## Studios as a last-mile capability
 
-- **FR-021**: Before Studios charters a venture, 0003-intellectual-frontiers
+- **FR-022**: Before Studios charters a venture, 0003-intellectual-frontiers
   FR-011's search-before-build rule MUST be applied, and even once it is,
   Studios MUST have at least one experiment's evidence on record before
   forming the venture as its own entity. Entity formation follows
   evidence; it does not substitute for it.
-- **FR-022**: When a better-positioned operator is found during or after a
+- **FR-023**: When a better-positioned operator is found during or after a
   Studios experiment, Studios MUST hand off — invest, partner, license,
   merge, or spin out — rather than retain ownership of the implementation
   to preserve its own authorship.
-- **FR-023**: The ease of building something MUST NOT be treated as
+- **FR-024**: The ease of building something MUST NOT be treated as
   evidence that building it was worth the time spent.
 
 ## IPLG
 
-- **FR-024**: A tool or piece of content Studios builds to make its work
+- **FR-025**: A tool or piece of content Studios builds to make its work
   directly usable MUST be evaluated against the Native Alpha test
   (0003-intellectual-frontiers FR-005, FR-006) the same as anything else.
 
 ## Boundary
 
-- **FR-025**: Studios activity MUST NOT be cited, by Studios or by anyone
+- **FR-026**: Studios activity MUST NOT be cited, by Studios or by anyone
   else, as justification for a Capital investment decision by itself —
   the unit-boundary rule in 0003-intellectual-frontiers FR-003 applies
   here by name.
@@ -181,7 +188,10 @@ restated here.
   to one company and private by default, where it lives inside
   Intellectual Frontiers' own Eidolon before its own Eidolon exists; not
   a content document, and not present at all once the company is its
-  own independent institution.
+  own independent institution. Raw material supplied from outside lives
+  under its `content/intake/`, distinct from `docs/` (operating the
+  Eidolon repositories themselves) and from the material actually
+  prepared for the company's own use.
 
 ## Success criteria
 
@@ -210,6 +220,9 @@ restated here.
 - **SC-010**: No company's `ventures/` directory lives in the public root
   without a deliberate Public classification; no such directory survives
   here once that company is its own independent institution.
+- **SC-011**: No raw material supplied from outside sits in a company's
+  `docs/`; no company's own working material sits in its
+  `content/intake/` once it has actually been prepared for use.
 
 ## Review & acceptance checklist
 
