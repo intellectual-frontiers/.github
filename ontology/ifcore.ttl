@@ -170,6 +170,7 @@ ifcore:Capital a ifcore:Unit ;
     ifcore:job "Put money behind evidence with discipline"@en ;
     ifcore:question "What advantage is strong enough that scarce capital should be placed behind it?"@en ;
     ifcore:hasAudience ifcore:Everyone .
+ifcore:operates a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:Fund .
 ifcore:Studios a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Studios"@en ;
     ifcore:job "Build the companies that should exist"@en ;
@@ -323,6 +324,53 @@ ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"
     rdfs:comment "Precision education and training, rating aggregation, and rewardable content delivery."@en ;
     ifcore:hasAudience ifcore:Everyone .
 ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
+
+# ───────────────────────── Capital (0010-capital) ─────────────────────────
+
+ifcore:Fund a owl:Class ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Fund"@en ;
+    rdfs:comment "A distinct investment vehicle with its own thesis and qualifying condition. An Organization, not an Asset itself — it holds assets, it is not one (0010-capital)."@en .
+ifcore:thesis a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "The thesis a fund, or any other individual that has one, runs on."@en .
+ifcore:qualifyingCondition a owl:DatatypeProperty ; rdfs:domain ifcore:Fund ; rdfs:range xsd:string ;
+    rdfs:comment "A binary condition a company must meet to be funded under this vehicle, not a factor weighed against others (0010 FR-013)."@en .
+
+ifcore:FundMode a owl:Class ; rdfs:label "Fund mode"@en .
+ifcore:InvestMode a ifcore:FundMode ; rdfs:label "Invest"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:TakeSelectiveControlMode a ifcore:FundMode ; rdfs:label "Take selective control"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:BuildMode a ifcore:FundMode ; rdfs:label "Build"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:hasMode a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:FundMode .
+
+ifcore:OwnershipMode a owl:Class ; rdfs:label "Ownership mode"@en ;
+    rdfs:comment "Chosen on the merits for a given company, not a fixed exit schedule (0010 FR-016)."@en .
+ifcore:CreateMode a ifcore:OwnershipMode ; rdfs:label "Create"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:AcquireAndGrowMode a ifcore:OwnershipMode ; rdfs:label "Acquire and grow"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:OwnLongTermMode a ifcore:OwnershipMode ; rdfs:label "Own for the long term"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:SellOrSpinOutMode a ifcore:OwnershipMode ; rdfs:label "Sell or spin out"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:CareDeliveryFundI a ifcore:Fund ;
+    rdfs:label "Care Delivery Fund I"@en ;
+    ifcore:thesis "Holds a portfolio of ventures and shared services built to stand alone, to prove that these reimagined pieces work together. Carrying a company further than that is Fund II's job, not Fund I's."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:CareDeliveryFundII a ifcore:Fund ;
+    rdfs:label "Care Delivery Fund II"@en ;
+    rdfs:comment "In formation. Its build-mode clock is 90 to 180 days: design partners approached in the first 60, the first clinical workflow live by 120, first revenue in sight by 180, with a clinician CEO paired in rather than recruited afterward."@en ;
+    ifcore:thesis "Backs clinician-led care-delivery companies that own their reimagined care model, not vendors selling a tool into someone else's model."@en ;
+    ifcore:qualifyingCondition "Contributes to a better end-to-end patient and caregiver experience."@en ;
+    ifcore:hasMode ifcore:InvestMode, ifcore:TakeSelectiveControlMode, ifcore:BuildMode ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Capital ifcore:operates ifcore:CareDeliveryFundI, ifcore:CareDeliveryFundII .
+
+ifcore:CapitalSource a owl:Class ; rdfs:label "Capital source"@en ;
+    rdfs:comment "Where a dollar Capital deploys traces back to (0010 FR-012)."@en .
+ifcore:BalanceSheet a ifcore:CapitalSource ; rdfs:label "The firm's own balance sheet"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:NetworkSourcedCapital a ifcore:CapitalSource ; rdfs:label "An LP or investor brought in through IF Network"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:SinbadCapital a ifcore:Organization ;
+    rdfs:label "Sinbad Capital"@en ;
+    rdfs:comment "An independent early fund and operating partner. Intellectual Frontiers Capital has no allocation or LP authority over it (0010-capital FR-010)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 # ───────────────────────── Press (0009-press) ─────────────────────────
 
