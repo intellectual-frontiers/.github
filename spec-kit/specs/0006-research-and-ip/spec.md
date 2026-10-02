@@ -28,7 +28,11 @@ is ontology data, not restated here.
 - **FR-005**: This unit MUST give every protectable finding an explicit
   disposition — patent, defensive disclosure, trade secret, or no action —
   no later than whichever comes first: a related paper or note publishing,
-  or a related patent application's priority-date deadline.
+  or a related patent application's priority-date deadline. A finding
+  dispositioned toward a patent not yet filed MUST be tracked as a
+  Substantial Work on its own Note through filing, per
+  0007-work-and-assets FR-020 — the registry becomes canonical only once
+  it is actually filed.
 - **FR-006**: A defensive disclosure MUST be a deliberate choice made on its
   own terms, never a fallback taken because a patent filing deadline was
   missed.
