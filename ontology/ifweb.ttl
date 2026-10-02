@@ -4,6 +4,7 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:      <http://www.w3.org/ns/shacl#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <https://schema.org/> .
 
 # Intellectual Frontiers — web content ontology (PUBLIC).
 #
@@ -32,3 +33,98 @@ ifweb:Page a owl:Class, sh:NodeShape ;
     rdfs:label "Page"@en ;
     rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008)."@en ;
     ifweb:contentKind "Page" .
+
+# ───────────────────────── Content kinds backed by one existing individual (0013-web-content-kinds) ─────────────────────────
+
+ifweb:UnitPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Unit page"@en ;
+    rdfs:comment "Renders one ifcore:Unit individual; asserts no new fact about it (0013 FR-001)."@en ;
+    ifweb:contentKind "UnitPage" ;
+    sh:targetClass ifweb:UnitPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Unit ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:ResearchPillarPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Research pillar page"@en ;
+    rdfs:comment "Renders one ifcore:ResearchPillar individual (0013 FR-002)."@en ;
+    ifweb:contentKind "ResearchPillarPage" ;
+    sh:targetClass ifweb:ResearchPillarPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:ResearchPillar ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:ResearchNotePage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Research note page"@en ;
+    rdfs:comment "Renders one ifcore:Note individual (0013 FR-003)."@en ;
+    ifweb:contentKind "ResearchNotePage" ;
+    sh:targetClass ifweb:ResearchNotePage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Note ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:PatentFamilyPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Patent family page"@en ;
+    rdfs:comment "Renders one ifcore:PatentFamily individual. Any status or filing-data value it displays must be a resolved ExternalRecordReference, never a hand-typed literal (0013 FR-004, 0006-research-and-ip FR-008)."@en ;
+    ifweb:contentKind "PatentFamilyPage" ;
+    sh:targetClass ifweb:PatentFamilyPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:PatentFamily ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:TrademarkPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Trademark page"@en ;
+    rdfs:comment "Renders one ifcore:Trademark individual, under the same ExternalRecordReference discipline as ifweb:PatentFamilyPage (0013 FR-005)."@en ;
+    ifweb:contentKind "TrademarkPage" ;
+    sh:targetClass ifweb:TrademarkPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Trademark ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:DefensiveDisclosurePage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Defensive disclosure page"@en ;
+    rdfs:comment "Renders one ifcore:DefensiveDisclosure individual (0013 FR-006)."@en ;
+    ifweb:contentKind "DefensiveDisclosurePage" ;
+    sh:targetClass ifweb:DefensiveDisclosurePage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:DefensiveDisclosure ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:FundPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Fund page"@en ;
+    rdfs:comment "Renders one ifcore:Fund individual (0013 FR-007)."@en ;
+    ifweb:contentKind "FundPage" ;
+    sh:targetClass ifweb:FundPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Fund ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:BookPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Book page"@en ;
+    rdfs:comment "Renders one individual that is both a schema:Book and an ifcore:Copyright, per 0007-work-and-assets FR-013 (0013 FR-008)."@en ;
+    ifweb:contentKind "BookPage" ;
+    sh:targetClass ifweb:BookPage ;
+    sh:property [ sh:path schema:about ; sh:class schema:Book ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Copyright ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+# ───────────────────────── The portfolio index (0013 FR-009 – FR-010) ─────────────────────────
+
+ifweb:featuresWork a owl:ObjectProperty ;
+    rdfs:domain ifweb:PortfolioIndexPage ;
+    rdfs:comment "Lists an individual already declared elsewhere in the ontology; asserts no new fact about it (0013 FR-009)."@en .
+
+ifweb:PortfolioIndexPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Portfolio index page"@en ;
+    rdfs:comment "A view over existing individuals, never a new fact type (0013 FR-009). A work kind with no existing ontology class MUST NOT be listed here until its own governing spec establishes it (FR-010)."@en ;
+    ifweb:contentKind "PortfolioIndexPage" ;
+    sh:targetClass ifweb:PortfolioIndexPage ;
+    sh:property [
+        sh:path ifweb:featuresWork ;
+        sh:minCount 0 ;
+        sh:or (
+            [ sh:class ifcore:PatentFamily ]
+            [ sh:class ifcore:Trademark ]
+            [ sh:class ifcore:DefensiveDisclosure ]
+            [ sh:class ifcore:Fund ]
+            [ sh:class schema:Book ]
+            [ sh:class ifcore:ResearchPillar ]
+            [ sh:class ifcore:VentureCategory ]
+            [ sh:class ifcore:SoftwareCategory ]
+            [ sh:class ifcore:SharedServiceCategory ]
+        )
+    ] .
