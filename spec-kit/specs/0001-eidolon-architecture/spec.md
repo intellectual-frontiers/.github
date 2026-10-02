@@ -173,6 +173,12 @@ reference model, and governance representation.
 
 ## Key entities
 
+- **A fact** — anything asserted in the Eidolon that carries factual
+  content: a label naming a real thing, a definition, a value, a job, a
+  question. An ontology class or property declaration is vocabulary, not a
+  fact, and does not require an audience declaration under FR-011 — only an
+  individual asserting factual content does, explicitly, every time, never
+  left implicit from the repository it happens to live in.
 - **The Eidolon** — the three-repository system (`.github`, `eidolon`,
   `www.intellectualfrontiers.com`) that models and serves everything Intellectual
   Frontiers knows about itself.

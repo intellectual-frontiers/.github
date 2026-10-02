@@ -3,6 +3,7 @@
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 
 # Intellectual Frontiers — core ontology (PUBLIC).
@@ -11,6 +12,12 @@
 # here traces to a requirement in that spec; nothing is asserted ahead of it
 # (FR-037). A private ontology imports this and adds its own individuals; it
 # must not redefine or remove anything declared here (FR-003).
+#
+# Every individual that carries asserted factual content (a label naming a
+# real thing, a definition, a job, a question) declares ifcore:hasAudience
+# explicitly, per FR-011 — never left implicit from being in a public
+# repository. A class or property declaration (the vocabulary itself) is not
+# a fact and does not carry one.
 
 <https://www.intellectualfrontiers.com/ontology/core>
     a owl:Ontology ;
@@ -31,30 +38,37 @@ ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:ran
     rdfs:comment "The name a person is known by in ordinary prose and branding."@en .
 
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
-    rdfs:label "Intellectual Frontiers LLC"@en .
+    rdfs:label "Intellectual Frontiers LLC"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 ifcore:ShahidNehalShah a ifcore:Person ;
     ifcore:legalName "Shahid Nehal Shah"@en ;
-    ifcore:displayName "Shahid N. Shah"@en .
+    ifcore:displayName "Shahid N. Shah"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 # ───────────────────────── The Eidolon's own repositories (FR-001) ─────────────────────────
 
 ifcore:EidolonComponent a owl:Class ; rdfs:label "Eidolon component"@en ;
     rdfs:comment "One of the Eidolon's three repositories."@en .
 
-ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en .
-ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en .
-ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en .
+ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
 
 ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;
-    rdfs:comment "Anything asserted in the Eidolon. Every fact MUST declare its audience."@en .
+    rdfs:comment "Anything asserted in the Eidolon that carries factual content. Every fact MUST declare its audience explicitly (FR-011); a class or property declaration is vocabulary, not a fact, and does not need one."@en .
 
 ifcore:Audience a owl:Class ; rdfs:label "Audience"@en ;
     rdfs:comment "A named permission to see a fact."@en .
-ifcore:Everyone a ifcore:Audience ; rdfs:label "Everyone"@en .
-ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en .
+ifcore:Everyone a ifcore:Audience ; rdfs:label "Everyone"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Agreement a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named agreement"@en .
 ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named role or group"@en .
 
@@ -93,14 +107,14 @@ ifcore:accessInstructions a owl:DatatypeProperty ; rdfs:domain ifcore:Restricted
 
 ifcore:DecisionOutcome a owl:Class ; rdfs:label "Decision outcome"@en ;
     rdfs:comment "One of the five decision-checkpoint outcomes."@en .
-ifcore:Continue a ifcore:DecisionOutcome ; rdfs:label "Continue"@en .
-ifcore:Change a ifcore:DecisionOutcome ; rdfs:label "Change"@en .
-ifcore:BackSomeoneElse a ifcore:DecisionOutcome ; rdfs:label "Back someone else"@en .
-ifcore:BuildIt a ifcore:DecisionOutcome ; rdfs:label "Build it"@en .
-ifcore:Stop a ifcore:DecisionOutcome ; rdfs:label "Stop"@en .
+ifcore:Continue a ifcore:DecisionOutcome ; rdfs:label "Continue"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Change a ifcore:DecisionOutcome ; rdfs:label "Change"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:BackSomeoneElse a ifcore:DecisionOutcome ; rdfs:label "Back someone else"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:BuildIt a ifcore:DecisionOutcome ; rdfs:label "Build it"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Stop a ifcore:DecisionOutcome ; rdfs:label "Stop"@en ; ifcore:hasAudience ifcore:Everyone .
 
 ifcore:Decision a owl:Class ; rdfs:label "Decision"@en ;
-    rdfs:comment "A recorded decision at the decision checkpoint. Routine operational activity is not a Decision."@en .
+    rdfs:comment "A recorded decision at the decision checkpoint. Routine operational activity is not a Decision. An actual Decision individual is itself a Fact and MUST carry its own ifcore:hasAudience when recorded — it is not necessarily Everyone."@en .
 ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome .
 ifcore:decidedAt a owl:DatatypeProperty ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
     rdfs:comment "A decision is checked against the authority in effect on this date, not the date of later review."@en .
@@ -125,23 +139,28 @@ ifcore:unitOf a owl:ObjectProperty ; owl:inverseOf ifcore:hasUnit .
 ifcore:ResearchAndIp a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Research & IP"@en ;
     ifcore:job "Run the research and protect and commercialize what it produces"@en ;
-    ifcore:question "What do we know, own, control, or have rights to that may create unusual advantage?"@en .
+    ifcore:question "What do we know, own, control, or have rights to that may create unusual advantage?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Press a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Press"@en ;
     ifcore:job "Understand markets and explain the truth clearly"@en ;
-    ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en .
+    ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Capital a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Capital"@en ;
     ifcore:job "Put money behind evidence with discipline"@en ;
-    ifcore:question "What advantage is strong enough that scarce capital should be placed behind it?"@en .
+    ifcore:question "What advantage is strong enough that scarce capital should be placed behind it?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Studios a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Studios"@en ;
     ifcore:job "Build the companies that should exist"@en ;
-    ifcore:question "What venture should we create to exploit this advantage, and what is the cheapest credible path to proving whether it deserves to exist?"@en .
+    ifcore:question "What venture should we create to exploit this advantage, and what is the cheapest credible path to proving whether it deserves to exist?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Network a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Network"@en ;
     ifcore:job "Find and prove the people who can carry the work"@en ;
-    ifcore:question "Who has unusual knowledge, capabilities, relationships, reputation, experience, or access relevant to an opportunity, and how do we find them when needed?"@en .
+    ifcore:question "Who has unusual knowledge, capabilities, relationships, reputation, experience, or access relevant to an opportunity, and how do we find them when needed?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 ifcore:IntellectualFrontiersLLC ifcore:hasUnit
     ifcore:ResearchAndIp, ifcore:Press, ifcore:Capital, ifcore:Studios, ifcore:Network .
@@ -149,7 +168,8 @@ ifcore:IntellectualFrontiersLLC ifcore:hasUnit
 # ───────────────────────── Native Alpha (0003-intellectual-frontiers FR-005, FR-006) ─────────────────────────
 
 ifcore:NativeAlpha a owl:Class ; rdfs:label "Native Alpha"@en ;
-    skos:definition "An unusual and disproportionate advantage that already exists and is strong enough to change a real decision."@en .
+    skos:definition "An unusual and disproportionate advantage that already exists and is strong enough to change a real decision."@en ;
+    ifcore:hasAudience ifcore:Everyone .
 
 # ───────────────────────── The method (0003-intellectual-frontiers FR-007, FR-008) ─────────────────────────
 
@@ -158,10 +178,14 @@ ifcore:MethodStage a owl:Class ; rdfs:label "Method stage"@en ;
 ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; rdfs:range xsd:integer .
 
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
-    ifcore:question "What is unusually true here?"@en .
+    ifcore:question "What is unusually true here?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Prove a ifcore:MethodStage ; rdfs:label "Prove"@en ; ifcore:sequenceOrder 2 ;
-    ifcore:question "What small hard thing earns a scarce commitment?"@en .
+    ifcore:question "What small hard thing earns a scarce commitment?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Decide a ifcore:MethodStage ; rdfs:label "Decide"@en ; ifcore:sequenceOrder 3 ;
-    ifcore:question "What will we do now?"@en .
+    ifcore:question "What will we do now?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
 ifcore:Compound a ifcore:MethodStage ; rdfs:label "Compound"@en ; ifcore:sequenceOrder 4 ;
-    ifcore:question "How does use make the advantage stronger?"@en .
+    ifcore:question "How does use make the advantage stronger?"@en ;
+    ifcore:hasAudience ifcore:Everyone .
