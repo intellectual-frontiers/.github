@@ -442,3 +442,120 @@ ifcore:Decide a ifcore:MethodStage ; rdfs:label "Decide"@en ; ifcore:sequenceOrd
 ifcore:Compound a ifcore:MethodStage ; rdfs:label "Compound"@en ; ifcore:sequenceOrder 4 ;
     ifcore:question "How does use make the advantage stronger?"@en ;
     ifcore:hasAudience ifcore:Everyone .
+
+# ───────────────────────── Studios (0011-studios) ─────────────────────────
+
+ifcore:VentureLifecycleStage a owl:Class ; rdfs:label "Venture lifecycle stage"@en ;
+    rdfs:comment "One stage in the ordered path a venture moves through on the way to being proven or stopped (0011-studios FR-003, FR-004). Reuses ifcore:sequenceOrder and ifcore:question, already declared for ifcore:MethodStage, rather than redeclaring either."@en .
+ifcore:Observe a ifcore:VentureLifecycleStage ; rdfs:label "Observe"@en ; ifcore:sequenceOrder 1 ;
+    ifcore:question "What real asymmetry already exists?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Frame a ifcore:VentureLifecycleStage ; rdfs:label "Frame"@en ; ifcore:sequenceOrder 2 ;
+    ifcore:question "What is the Native Alpha thesis, stated in plain language (0011 FR-002)?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Validate a ifcore:VentureLifecycleStage ; rdfs:label "Validate"@en ; ifcore:sequenceOrder 3 ;
+    ifcore:question "Does a real buyer and workflow actually exist?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Experiment a ifcore:VentureLifecycleStage ; rdfs:label "Experiment"@en ; ifcore:sequenceOrder 4 ;
+    ifcore:question "What is the smallest credible test, and what are its continue and stop conditions, written before the result is seen (0011 FR-004)?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:PaidProof a ifcore:VentureLifecycleStage ; rdfs:label "Paid proof"@en ; ifcore:sequenceOrder 5 ;
+    ifcore:question "Will someone pay for this against a real budget line?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Repeat a ifcore:VentureLifecycleStage ; rdfs:label "Repeat"@en ; ifcore:sequenceOrder 6 ;
+    ifcore:question "Do the delivery and economics hold up more than once?"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Independence a ifcore:VentureLifecycleStage ; rdfs:label "Independence"@en ; ifcore:sequenceOrder 7 ;
+    ifcore:question "Could a qualified replacement continue this company tomorrow (0011 FR-008)?"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:DesignPartnerRequirement a owl:Class ; rdfs:label "Design partner requirement"@en ;
+    rdfs:comment "A contact missing even one of these is not yet a design partner (0011-studios FR-006)."@en .
+ifcore:WorkflowAccess a ifcore:DesignPartnerRequirement ; rdfs:label "Workflow access"@en ;
+    rdfs:comment "People can observe the real work."@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:ExecutiveSponsor a ifcore:DesignPartnerRequirement ; rdfs:label "Executive sponsor"@en ;
+    rdfs:comment "Someone can authorize change."@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:CustomerContribution a ifcore:DesignPartnerRequirement ; rdfs:label "Customer contribution"@en ;
+    rdfs:comment "A real operating partner contributes something scarce."@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:RealDataOrImplementation a ifcore:DesignPartnerRequirement ; rdfs:label "Real data or implementation"@en ;
+    rdfs:comment "The environment is real, not a demo."@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:CommercialPath a ifcore:DesignPartnerRequirement ; rdfs:label "Commercial path"@en ;
+    rdfs:comment "There is a credible route to a commercial yes."@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:VentureEvidenceKind a owl:Class ; rdfs:label "Venture evidence kind"@en ;
+    rdfs:comment "Evidence MUST NOT be treated as proof of anything beyond what its own kind states it shows (0011-studios FR-007)."@en .
+ifcore:shows a owl:DatatypeProperty ; rdfs:domain ifcore:VentureEvidenceKind ; rdfs:range xsd:string ;
+    rdfs:comment "What this evidence kind actually demonstrates."@en .
+ifcore:notProofOf a owl:DatatypeProperty ; rdfs:domain ifcore:VentureEvidenceKind ; rdfs:range xsd:string ;
+    rdfs:comment "What this evidence kind is not yet proof of, named explicitly so it is not assumed."@en .
+ifcore:WorkflowAccessEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Workflow access"@en ;
+    ifcore:shows "We can see the real task, handoffs, constraints, and exceptions."@en ;
+    ifcore:notProofOf "A right to reuse confidential know-how or data."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:ExecutiveSponsorEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Executive sponsor"@en ;
+    ifcore:shows "Someone can authorize staff time, security review, and change."@en ;
+    ifcore:notProofOf "A buyer or budget by itself."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:DataCommitmentEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Data commitment"@en ;
+    ifcore:shows "We can test with representative data under defined rules."@en ;
+    ifcore:notProofOf "Ownership or permission to train unrelated models."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:PaidProofEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Paid proof"@en ;
+    ifcore:shows "The customer assigns money to a bounded result."@en ;
+    ifcore:notProofOf "Repeatable revenue or product-market fit."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:ReferenceBehaviorEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Reference behavior"@en ;
+    ifcore:shows "The customer will stake reputation on the result."@en ;
+    ifcore:notProofOf "Renewal, margin, or scalable delivery."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:IndependenceTest a owl:Class ; rdfs:label "Independence test"@en ;
+    skos:definition "Could a qualified founder, board, investor, or replacement provider continue this company tomorrow using company-controlled records, rights, systems, and relationships? A single binary judgment, never a scored checklist (0011-studios FR-008)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:PortfolioCategory a owl:Class ; rdfs:label "Portfolio category"@en ;
+    rdfs:comment "Every portfolio entry is classified as exactly one of these, each with its own obligations (0011-studios FR-014 – FR-016)."@en .
+ifcore:VentureCategory a ifcore:PortfolioCategory ; rdfs:label "Venture"@en ;
+    rdfs:comment "Chartered as a company: its own entity, its own operator, a licensed rights position, and a written closure condition before the first hire (0011 FR-014)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:SoftwareCategory a ifcore:PortfolioCategory ; rdfs:label "Software"@en ;
+    rdfs:comment "Code as a work, not a company: records its license and current status rather than implying one; no entity or operator requirement (0011 FR-015)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:SharedServiceCategory a ifcore:PortfolioCategory ; rdfs:label "Shared service"@en ;
+    rdfs:comment "Built to stand alone, usable by every venture in the portfolio; see ifcore:SharedService for the class actual shared services are typed as."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:OperatingCompanyCategory a ifcore:PortfolioCategory ; rdfs:label "Operating company"@en ;
+    rdfs:comment "An established firm Studios draws on for delivery, regulated engineering, or revenue operations — not a chartered venture."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:AIFirst a owl:Class ; rdfs:label "AI First"@en ;
+    skos:definition "A shared service where an AI harness leads production but developers still remain in the daily production loop."@en ;
+    rdfs:comment "0011-studios FR-011: a shared service not meeting ifcore:AIWorkforce's bar is called this or ifcore:AIAugmented instead, regardless of branding or trademark."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:AIAugmented a owl:Class ; rdfs:label "AI Augmented"@en ;
+    skos:definition "A shared service where humans still do most of the production work, with AI assisting it."@en ;
+    rdfs:comment "0011-studios FR-011: a shared service not meeting ifcore:AIWorkforce's bar is called this or ifcore:AIFirst instead, regardless of branding or trademark."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:SharedService a owl:Class ; rdfs:label "Shared service"@en ;
+    rdfs:comment "A repeated, undifferentiated capability run once across the portfolio rather than rebuilt inside each company (0011-studios FR-009). Named for the outcome it owns, and typed ifcore:AIWorkforce, ifcore:AIFirst, or ifcore:AIAugmented on its merits (FR-011) — never by branding alone."@en .
+ifcore:operationalStatus a owl:DatatypeProperty ; rdfs:domain ifcore:SharedService ; rdfs:range xsd:string ;
+    rdfs:comment "A shared service not yet running MUST state that here rather than being presented as operating (0011-studios FR-013)."@en .
+
+ifcore:DemandEngineering a ifcore:SharedService, ifcore:AIWorkforce ;
+    rdfs:label "Demand Engineering"@en ;
+    rdfs:comment "Runs when there is no proven audience yet; its outcome is a named audience, a claim that survives contact with them, and a first step they will actually take. Claimed as an AI Workforce product (0011-studios FR-011); a trademark filing has not been independently verified via USPTO TSDR as of this writing, so no ifcore:Trademark individual is asserted for it yet (0007-work-and-assets FR-012)."@en ;
+    ifcore:operationalStatus "operating"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:RevenueEngineering a ifcore:SharedService, ifcore:AIWorkforce ;
+    rdfs:label "Revenue Engineering"@en ;
+    rdfs:comment "Runs after Demand Engineering, as a closed loop from market definition through the human sales handoff and back into learning. Claimed as an AI Workforce product (0011-studios FR-011); a trademark filing has not been independently verified via USPTO TSDR as of this writing, so no ifcore:Trademark individual is asserted for it yet (0007-work-and-assets FR-012). The handoff from Demand Engineering to this service is a defined gate, per 0011 FR-010."@en ;
+    ifcore:operationalStatus "operating"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:CompanionExecutableSourceCodeRepositories a ifcore:SharedService ;
+    rdfs:label "Companion Executable Source Code Repositories"@en ;
+    rdfs:comment "Pairs a published paper with a containerized code, data, and documentation repository that keeps updating — a complement to peer review, not a replacement for it. Not yet typed ifcore:AIWorkforce, ifcore:AIFirst, or ifcore:AIAugmented: at the ideation stage, not a running service (0011-studios FR-013), so no AI-maturity tier is asserted."@en ;
+    ifcore:operationalStatus "ideation"@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:Studios ifcore:operatesSharedService ifcore:DemandEngineering, ifcore:RevenueEngineering,
+    ifcore:CompanionExecutableSourceCodeRepositories .
+ifcore:operatesSharedService a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:SharedService .
+
+ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
+    skos:definition "Intellectual Product-Led Growth: the framework for turning a unit's output into something a visitor can use directly — one useful action completed before any commercial ask — rather than only read about."@en ;
+    rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013) and 0011-studios (FR-020); neither unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
+    ifcore:hasAudience ifcore:Everyone .
