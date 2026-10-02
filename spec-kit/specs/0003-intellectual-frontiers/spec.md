@@ -70,6 +70,14 @@ not restated here.
   (`ifcore:DecisionOutcome`). This spec MUST NOT define a second, parallel
   decision model.
 
+## Public naming
+
+- **FR-013**: A unit's formal name MUST be used in specs and governance
+  contexts. A unit MAY declare one or more public-facing alternate names
+  (`schema:alternateName`) for contexts where its formal name risks being
+  misread. An alternate name MUST NOT redefine the unit's job or question —
+  only how it is labeled.
+
 ## Open questions
 
 - **OQ-1**: No individual unit lead is named, distinct from the founder.
@@ -83,6 +91,9 @@ not restated here.
 - **A method stage** — one step in the ordered sequence an opportunity moves
   through before being treated as proven; the stages are ontology
   individuals, held in sequence.
+- **A public-facing alternate name** — a unit's own name stated plainly, used
+  where the formal name alone would mislead a reader about what the unit
+  does.
 
 ## Review & acceptance checklist
 
