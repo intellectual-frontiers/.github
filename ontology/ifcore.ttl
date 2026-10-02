@@ -160,6 +160,8 @@ ifcore:ResearchAndIp a ifcore:Unit ;
     ifcore:hasAudience ifcore:Everyone .
 ifcore:Press a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Press"@en ;
+    schema:alternateName "Intellectual Frontiers Publications"@en, "IF Publications"@en ;
+    rdfs:comment "The formal name governs specs and the ontology. The alternate name is for public-facing contexts (a website, a byline) where 'Press' risks being read as a press-and-media destination rather than the unit that creates books, spoken works, and research reports (0003-intellectual-frontiers FR-013)."@en ;
     ifcore:job "Understand markets and explain the truth clearly"@en ;
     ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en ;
     ifcore:hasAudience ifcore:Everyone .
