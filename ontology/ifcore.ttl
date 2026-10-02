@@ -399,6 +399,43 @@ ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"
     ifcore:hasAudience ifcore:Everyone .
 ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
 
+ifcore:USPatent10643208 a ifcore:PatentFamily ;
+    rdfs:label "Digital payment system (US10643208B2)"@en ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    rdfs:comment "Covers pre-consent capture, data-valuation logic, and a payment engine offsetting a service charge against computed data value, over banking or blockchain rails. Originally assigned to Netspective Communications LLC, reassigned to Intellectual Frontiers LLC in 2023 — consistent with the company-wide 2023 Netspective patent acquisition already in context/company.md."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:USPatent10643208StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10643208 ;
+    ifcore:primarySource "https://patents.google.com/patent/US10643208B2"^^xsd:anyURI ;
+    ifcore:cachedValue "Granted May 5, 2020; filed February 24, 2019."@en ;
+    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Expiration date deliberately not cached: sources disagree on the related continuation's expiration (see USPatent11568401StatusReference) and neither figure for either patent has been checked directly against USPTO Patent Center."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:USPatent11568401 a ifcore:PatentFamily ;
+    rdfs:label "Digital payment system (US11568401B2)"@en ;
+    ifcore:continuationOf ifcore:USPatent10643208 ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    rdfs:comment "Continuation of US10643208B2: adds a cloud-based central controller, a dedicated buyer subsystem, third-party payer integration, and ETL processing for standardizing health data from diverse sources."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:USPatent11568401StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11568401 ;
+    ifcore:primarySource "https://patents.google.com/patent/US11568401B2"^^xsd:anyURI ;
+    ifcore:cachedValue "Granted January 31, 2023; filed March 30, 2020; priority date February 24, 2019."@en ;
+    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Expiration date deliberately not cached: the source site states November 2040, an independent search states March 16, 2040 — these disagree and neither has been checked directly against USPTO Patent Center. Resolve via an authoritative lookup before asserting either, per 0007-work-and-assets FR-012."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
 # ───────────────────────── Capital (0010-capital) ─────────────────────────
 
 ifcore:Fund a owl:Class ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Fund"@en ;
@@ -780,6 +817,10 @@ ifcore:Symvion a ifcore:Organization ;
     ifcore:builtBy ifcore:Studios ;
     rdfs:comment "A continuous clinical research infrastructure platform reading signals across consented health transaction data for earlier detection and continuous research; Payshent is its funding and consent layer."@en ;
     ifcore:hasAudience ifcore:Everyone .
+
+ifcore:suppliesDataFor a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Organization ;
+    rdfs:comment "One portfolio organization provides data or infrastructure another's own product or research depends on — reused for any future case like it, not specific to this pair."@en .
+ifcore:Payshent ifcore:suppliesDataFor ifcore:Symvion .
 
 ifcore:RevenueAccelerationLLC a ifcore:Organization ;
     rdfs:label "Revenue Acceleration LLC"@en ;
