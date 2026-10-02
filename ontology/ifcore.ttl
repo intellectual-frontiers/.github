@@ -799,11 +799,11 @@ ifcore:confidenceLevel a owl:ObjectProperty ; rdfs:domain ifcore:EvidencePacket 
 
 ifcore:RelationshipMemory a owl:Class ; rdfs:label "Relationship memory"@en ;
     skos:definition "The compounding record of who did what and how it turned out, so the next search starts further along than the last one."@en ;
-    rdfs:comment "Sensitive by default, the same posture as ifcore:TradeSecret (0007-work-and-assets FR-010): nothing learned in a private conversation appears on a public page without consent, and no individual relationship-memory record is public merely by existing (0012-network FR-014, FR-015, FR-016). An actual record's own ifcore:hasAudience states who it is visible to; none is asserted here."@en ;
+    rdfs:comment "Sensitive by default, the same posture as ifcore:TradeSecret (0007-work-and-assets FR-010): nothing learned in a private conversation appears on a public page without consent, and no individual relationship-memory record is public merely by existing (0012-network FR-015, FR-016, FR-017). An actual record's own ifcore:hasAudience states who it is visible to; none is asserted here."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
 ifcore:NetworkMeasure a owl:Class ; rdfs:label "Network measure"@en ;
-    rdfs:comment "What Network is evaluated by, in place of activity counts like profiles created or page views (0012-network FR-017, FR-018)."@en .
+    rdfs:comment "What Network is evaluated by, in place of activity counts like profiles created or page views (0012-network FR-018, FR-019)."@en .
 ifcore:HuntWithThesis a ifcore:NetworkMeasure ; rdfs:label "A hunt with a recorded thesis"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:CandidateJudgedWorthContacting a ifcore:NetworkMeasure ; rdfs:label "A candidate a person judged worth contacting"@en ; ifcore:hasAudience ifcore:Everyone .
 ifcore:ThesisRevisingConversation a ifcore:NetworkMeasure ; rdfs:label "A conversation that revised a thesis"@en ; ifcore:hasAudience ifcore:Everyone .
