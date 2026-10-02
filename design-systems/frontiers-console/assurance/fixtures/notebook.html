@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notebook layout · Frontiers Console assurance fixture</title>
+<link rel="icon" href="../../images/favicon.png">
+<link rel="stylesheet" href="../../css/fonts.css">
+<link rel="stylesheet" href="../../css/reset.css">
+<link rel="stylesheet" href="../../css/tokens.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/layout.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/prose.css">
+<link rel="stylesheet" href="../../css/admin.css">
+<script src="../../js/console.js" defer></script>
+</head>
+<body>
+<a class="fc-skip" href="#main">Skip to content</a>
+<fc-shell data-layout="notebook">
+<header class="fc-nav">
+<button class="fc-btn fc-nav__toggle" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-toggle aria-controls="fc-sidebar" aria-expanded="false" aria-label="Open navigation">☰</button>
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<nav class="fc-nav__links" aria-label="Primary"><a class="fc-nav__link" href="docs.html">Overview</a><a class="fc-nav__link" href="components.html">Components</a><a class="fc-nav__link" href="admin.html">Admin surfaces</a></nav>
+<span class="fc-nav__spacer"></span>
+<div class="fc-nav__actions"><a class="fc-btn" data-variant="primary" data-size="sm" href="admin.html">Open console</a></div>
+</header>
+<aside class="fc-sidebar" id="fc-sidebar" aria-label="Sidebar">
+<div class="fc-sidebar__head">
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<button class="fc-btn fc-sidebar__collapse" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true">‹</button>
+</div>
+<div class="fc-sidebar__tools">
+<fc-search placeholder="Search…" label="Search documentation"><script type="application/json">[{"title": "Overview", "description": "Reading pages with the docs layout", "href": "docs.html", "section": "Start", "keywords": ["docs", "layout", "sidebar"]}, {"title": "Components", "description": "Callouts, cards, tabs, steps, accordion, files", "href": "components.html", "section": "Reference", "keywords": ["callout", "tabs", "cards", "steps"]}, {"title": "Admin surfaces", "description": "Data tables, forms, stats, run logs", "href": "admin.html", "section": "Reference", "keywords": ["table", "form", "terminal", "badge"]}, {"title": "Notebook layout", "description": "Top navigation bar with a sidebar below", "href": "notebook.html", "section": "Layouts", "keywords": ["navbar", "notebook"]}, {"title": "Home layout", "description": "Landing page without a sidebar", "href": "home.html", "section": "Layouts", "keywords": ["landing", "home"]}, {"title": "Search", "description": "Command-palette search over a JSON index", "href": "components.html#search", "section": "Reference", "keywords": ["command", "palette", "index"]}]</script></fc-search>
+<details class="fc-menu"><summary>Documentation</summary><div class="fc-menu__panel">
+<a class="fc-menu__item" href="docs.html" aria-current="true">Documentation<small>Guides and reference</small></a>
+<a class="fc-menu__item" href="admin.html">Admin<small>Operate the site</small></a>
+</div></details>
+</div>
+<div class="fc-sidebar__scroll">
+<nav class="fc-tree" aria-label="Documentation">
+<ul>
+<li class="fc-tree__label">Start</li>
+<li><a class="fc-tree__link" href="docs.html">Overview</a></li>
+<li><a class="fc-tree__link" href="components.html">Components</a></li>
+<li><a class="fc-tree__link" href="admin.html">Admin surfaces</a></li>
+<li class="fc-tree__label">Layouts</li>
+<li><a class="fc-tree__link" href="notebook.html" aria-current="page">Notebook layout</a></li>
+<li><a class="fc-tree__link" href="home.html">Home layout</a></li>
+<li class="fc-tree__label">Guides</li>
+<li><details open><summary>Operating</summary><ul>
+<li><a class="fc-tree__link" href="docs.html#health">Health checks</a></li>
+<li><a class="fc-tree__link" href="docs.html#tasks">Running tasks <span class="fc-badge fc-tree__badge" data-tone="warning">dev</span></a></li>
+</ul></details></li>
+</ul>
+</nav>
+</div>
+<div class="fc-sidebar__foot"><span>Frontiers Console</span><span class="fc-badge">v0.1</span></div>
+</aside>
+<button class="fc-btn fc-sidebar-expand" type="button" data-size="icon" data-fc-sidebar-collapse aria-label="Expand sidebar" aria-expanded="false">›</button>
+<div class="fc-page" id="page">
+<main class="fc-article" id="main">
+<nav class="fc-crumbs" aria-label="Breadcrumb"><ol><li><a href="home.html">Documentation</a></li><li><span aria-current="page">Notebook layout</span></li></ol></nav>
+<header class="fc-article__head"><h1 class="fc-title">Notebook layout</h1>
+<p class="fc-description">A full-width top navigation bar with the sidebar beneath it.</p></header>
+<details class="fc-toc-mobile"><summary>On this page</summary><fc-toc><ol><li><a href="#intro" data-depth="2">Introduction</a></li><li><a href="#differences" data-depth="2">What differs</a></li></ol></fc-toc></details>
+<div class="fc-prose">
+<h2 id="intro"><a class="fc-anchor" href="#intro">Introduction</a></h2>
+<p>Same markup as the docs layout; only <code>data-layout</code> differs.</p>
+<h2 id="differences"><a class="fc-anchor" href="#differences">What differs</a></h2>
+<ul><li>The navbar is visible at every width.</li><li>The sidebar starts below the navbar.</li></ul>
+</div>
+<nav class="fc-pager" aria-label="Pagination"><a href="admin.html" rel="prev"><small>Previous</small><span>Admin surfaces</span></a><a href="home.html" rel="next"><small>Next</small><span>Home layout</span></a></nav>
+<footer class="fc-footer"><span>© Intellectual Frontiers</span><span>Last updated 2 October 2026</span></footer>
+</main>
+<aside class="fc-toc" aria-label="On this page"><p class="fc-toc__title">On this page</p><fc-toc><ol><li><a href="#intro" data-depth="2">Introduction</a></li><li><a href="#differences" data-depth="2">What differs</a></li></ol></fc-toc></aside>
+</div>
+</fc-shell>
+</body>
+</html>

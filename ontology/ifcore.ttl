@@ -1,0 +1,1040 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+# Intellectual Frontiers — core ontology (PUBLIC).
+#
+# Implements 0001-eidolon-architecture. Every class, property, and individual
+# here traces to a requirement in that spec; nothing is asserted ahead of it
+# (FR-037). A private ontology imports this and adds its own individuals; it
+# must not redefine or remove anything declared here (FR-003).
+#
+# Every individual that carries asserted factual content (a label naming a
+# real thing, a definition, a job, a question) declares ifcore:hasAudience
+# explicitly, per FR-011 — never left implicit from being in a public
+# repository. A class or property declaration (the vocabulary itself) is not
+# a fact and does not carry one.
+
+<https://www.intellectualfrontiers.com/ontology/core>
+    a owl:Ontology ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:title "Intellectual Frontiers core ontology"@en ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0001-eidolon-architecture/spec.md> ;
+    rdfs:comment "The company, the Eidolon's own repositories, audiences, references, and governance, per 0001-eidolon-architecture."@en .
+
+# ───────────────────────── Organization ─────────────────────────
+
+ifcore:Organization a owl:Class ; rdfs:label "Organization"@en .
+ifcore:Company a owl:Class ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Company"@en .
+ifcore:Person a owl:Class ; rdfs:label "Person"@en .
+
+ifcore:legalName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+    rdfs:comment "A person's full legal name, as it would appear on a signed document."@en .
+ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+    rdfs:comment "The name a person is known by in ordinary prose and branding."@en .
+
+ifcore:IntellectualFrontiersLLC a ifcore:Company ;
+    rdfs:label "Intellectual Frontiers LLC"@en ;
+    schema:slogan "A think tank that builds useful things."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShahidNehalShah a ifcore:Person ;
+    ifcore:legalName "Shahid Nehal Shah"@en ;
+    ifcore:displayName "Shahid N. Shah"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── The Eidolon's own repositories (FR-001) ─────────────────────────
+
+ifcore:EidolonComponent a owl:Class ; rdfs:label "Eidolon component"@en ;
+    rdfs:comment "One of the Eidolon's three repositories."@en .
+
+ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Design systems (0014-design-systems) ─────────────────────────
+
+ifcore:DesignSystem a owl:Class ; rdfs:label "Design system"@en ;
+    rdfs:comment "A self-contained, versionable set of visual and front-end assets at design-systems/<slug>/, per 0014-design-systems FR-001, FR-010."@en .
+
+ifcore:designSystemStatus a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystemStatus ;
+    rdfs:comment "The one record of whether a design system is active, draft, or retired (0014-design-systems FR-010, FR-011) — never its own README."@en .
+
+ifcore:DesignSystemStatus a owl:Class ; rdfs:label "Design system status"@en .
+ifcore:ActiveDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Active"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DraftDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Draft"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RetiredDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Retired"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersNature a ifcore:DesignSystem ;
+    rdfs:label "Frontiers Nature"@en ;
+    ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
+    rdfs:comment "At design-systems/frontiers-nature/. Carried over from a prior, now-superseded attempt at this repository (.github-q326's design-system/, its own spec 0007-design-system); named for the 'natural-frontier' visual identity its own tokens document (Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersConsole a ifcore:DesignSystem ;
+    rdfs:label "Frontiers Console"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    rdfs:comment "At design-systems/frontiers-console/, governed by 0018-frontiers-console FR-001. The operator (admin) and documentation counterpart to ifcore:FrontiersNature: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components, and a browser-based assurance harness (0014-design-systems FR-015). Written from scratch (0018-frontiers-console FR-005); shares a palette and typefaces with frontiers-nature but is a distinct system (0018-frontiers-console FR-003)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
+
+ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;
+    rdfs:comment "Anything asserted in the Eidolon that carries factual content. Every fact MUST declare its audience explicitly (FR-011); a class or property declaration is vocabulary, not a fact, and does not need one."@en .
+
+ifcore:Audience a owl:Class ; rdfs:label "Audience"@en ;
+    rdfs:comment "A named permission to see a fact."@en .
+ifcore:Public a ifcore:Audience ; rdfs:label "Public"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Agreement a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named agreement"@en .
+ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named role or group"@en .
+
+ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:Audience ;
+    rdfs:comment "Disjunctive: a viewer satisfying any one listed audience may see the fact."@en .
+
+# ───────────────────────── References (FR-015, FR-022 – FR-027) ─────────────────────────
+
+ifcore:Reference a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Reference"@en ;
+    rdfs:comment "A fact that points at a value held elsewhere rather than storing it."@en .
+ifcore:describes a owl:ObjectProperty ; rdfs:domain ifcore:Reference ;
+    rdfs:comment "The fact or subject this reference is about."@en .
+
+ifcore:ExternalRecordReference a owl:Class ; rdfs:subClassOf ifcore:Reference ;
+    rdfs:label "External record reference"@en ;
+    rdfs:comment "Points at a fact Intellectual Frontiers does not author or control."@en .
+ifcore:primarySource a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:anyURI .
+ifcore:cachedValue a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ;
+    rdfs:comment "Optional. If present, resolvedAt MUST also be present."@en .
+ifcore:resolvedAt a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:date ;
+    rdfs:comment "Required for any static or non-live rendering of cachedValue."@en .
+ifcore:verificationCadence a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:duration ;
+    rdfs:comment "How often this reference's cached value must be re-verified."@en .
+ifcore:verificationMethod a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:string ;
+    rdfs:comment "\"automated\" or \"manual\"."@en .
+
+ifcore:RestrictedDataReference a owl:Class ; rdfs:subClassOf ifcore:Reference ;
+    rdfs:label "Restricted data reference"@en ;
+    rdfs:comment "Points at a sensitive fact Intellectual Frontiers authors but excludes from every Eidolon repository. Deliberately carries no property capable of holding the fact's actual value."@en .
+ifcore:heldIn a owl:DatatypeProperty ; rdfs:domain ifcore:RestrictedDataReference ; rdfs:range xsd:string ;
+    rdfs:comment "The external system that holds the real data."@en .
+ifcore:accessInstructions a owl:DatatypeProperty ; rdfs:domain ifcore:RestrictedDataReference ; rdfs:range xsd:string ;
+    rdfs:comment "How a properly authorized person obtains access. MUST NOT be, or contain, a credential."@en .
+
+# ───────────────────────── Governance (FR-028 – FR-033) ─────────────────────────
+
+ifcore:DecisionOutcome a owl:Class ; rdfs:label "Decision outcome"@en ;
+    rdfs:comment "One of the five decision-checkpoint outcomes."@en .
+ifcore:Continue a ifcore:DecisionOutcome ; rdfs:label "Continue"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Change a ifcore:DecisionOutcome ; rdfs:label "Change"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BackSomeoneElse a ifcore:DecisionOutcome ; rdfs:label "Back someone else"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BuildIt a ifcore:DecisionOutcome ; rdfs:label "Build it"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Stop a ifcore:DecisionOutcome ; rdfs:label "Stop"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:Decision a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Decision"@en ;
+    rdfs:comment "One coherent recorded choice (0008-decision-records FR-003). Routine operational activity is not a Decision. MUST carry its own ifcore:hasAudience when recorded — not necessarily Public — and MUST carry decidedBy (0008 FR-002)."@en .
+ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome ;
+    rdfs:comment "Required only for a decision resolving a Native Alpha thesis question (0001 FR-031, 0008 FR-004). Not a measure of whether the record is still current — see dcterms:isReplacedBy."@en .
+ifcore:decidedAt a owl:DatatypeProperty ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
+    rdfs:comment "A decision is checked against the authority in effect on this date, not the date of later review."@en .
+ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person ;
+    rdfs:comment "Required on every Decision (0008-decision-records FR-002)."@en .
+ifcore:consideredEvidence a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Fact ;
+    rdfs:comment "A tracked fact that informed the decision (0008 FR-005). Not prov:used: PROV-O declares Entity and Activity disjoint, Decision is a prov:Entity, and used's domain is Activity — reusing it directly on a Decision would conflict. Where no tracked fact exists, use dcterms:description for a plain-text rationale instead."@en .
+
+ifcore:Alternative a owl:Class ; rdfs:label "Alternative"@en ;
+    rdfs:comment "An option considered and rejected when making a decision (0008-decision-records FR-006)."@en .
+ifcore:consideredAlternative a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Alternative .
+ifcore:rejectionReason a owl:DatatypeProperty ; rdfs:domain ifcore:Alternative ; rdfs:range xsd:string .
+
+# dcterms:isReplacedBy (reused, not redeclared) states whether a Decision is still
+# current, independent of its hasOutcome (0008 FR-008). A Decision's own
+# prov:wasGeneratedBy MAY point at the activity that produced it, when that
+# activity is tracked; nothing it caused afterward needs restating here — that
+# fact's own prov:wasGeneratedBy points back at this Decision instead (0008 FR-007).
+
+ifcore:defaultDecisionAuthority a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Person ;
+    rdfs:comment "The person holding authority over every domain not explicitly delegated elsewhere."@en .
+ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNehalShah .
+
+# ───────────────────────── Units (0003-intellectual-frontiers FR-001) ─────────────────────────
+
+ifcore:Unit a owl:Class ; rdfs:label "Unit"@en ;
+    rdfs:comment "A part of the company with exactly one job and one question."@en .
+ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:string ;
+    rdfs:comment "The one job a unit exists to do."@en .
+ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "The one question a unit, or a method stage, exists to answer."@en .
+
+ifcore:hasUnit a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Unit .
+ifcore:unitOf a owl:ObjectProperty ; owl:inverseOf ifcore:hasUnit .
+
+ifcore:ResearchAndIp a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Research & IP"@en ;
+    ifcore:job "Run the research and protect and commercialize what it produces"@en ;
+    ifcore:question "What do we know, own, control, or have rights to that may create unusual advantage?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Press a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Press"@en ;
+    schema:alternateName "Intellectual Frontiers Publications"@en, "IF Publications"@en ;
+    rdfs:comment "The formal name governs specs and the ontology. The alternate name is for public-facing contexts (a website, a byline) where 'Press' risks being read as a press-and-media destination rather than the unit that creates books, spoken works, and research reports (0003-intellectual-frontiers FR-013)."@en ;
+    ifcore:job "Understand markets and explain the truth clearly"@en ;
+    ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Capital a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Capital"@en ;
+    ifcore:job "Put money behind evidence with discipline"@en ;
+    ifcore:question "What advantage is strong enough that scarce capital should be placed behind it?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:operates a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:Fund .
+ifcore:Studios a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Studios"@en ;
+    ifcore:job "Build the companies that should exist"@en ;
+    ifcore:question "What venture should we create to exploit this advantage, and what is the cheapest credible path to proving whether it deserves to exist?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Network a ifcore:Unit ;
+    rdfs:label "Intellectual Frontiers Network"@en ;
+    ifcore:job "Find and prove the people who can carry the work"@en ;
+    ifcore:question "Who has unusual knowledge, capabilities, relationships, reputation, experience, or access relevant to an opportunity, and how do we find them when needed?"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntellectualFrontiersLLC ifcore:hasUnit
+    ifcore:ResearchAndIp, ifcore:Press, ifcore:Capital, ifcore:Studios, ifcore:Network .
+
+# ───────────────────────── Native Alpha (0003-intellectual-frontiers FR-005, FR-006; 0007-work-and-assets FR-015) ─────────────────────────
+
+ifcore:NativeAlpha a owl:Class ; rdfs:label "Native Alpha"@en ;
+    skos:definition "An unusual and disproportionate advantage that already exists and is strong enough to change a real decision."@en ;
+    rdfs:comment "Originates as Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC, with its own creative works and a filed (not yet granted) trademark application — see ifcore:NativeAlphaTrademark and the works that carry schema:about this concept. 0003-intellectual-frontiers FR-005 and FR-006 are the company's own application of it, not a separate thing; no second individual is minted for that application because it names no artifact distinct from the concept itself, unlike ifcore:Eidolon below."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NativeAlphaTrademark a ifcore:Trademark ;
+    rdfs:label "Native Alpha (trademark application)"@en ;
+    schema:about ifcore:NativeAlpha ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Filing confirmed by the founder; serial number, filing date, and current status not independently verified via USPTO TSDR as of this writing. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012) — this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ChasingNativeAlpha a schema:Book, ifcore:Copyright ;
+    rdfs:label "Chasing Native Alpha"@en ;
+    schema:about ifcore:NativeAlpha ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NativeAlphaArticle a schema:Article ;
+    rdfs:label "Native Alpha (shahidshah.com)"@en ;
+    schema:about ifcore:NativeAlpha ;
+    schema:url "https://www.shahidshah.com/writing/native-alpha"^^xsd:anyURI ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:NativeAlpha .
+
+# ───────────────────────── Eidolon, the concept (0007-work-and-assets FR-015) ─────────────────────────
+
+ifcore:Eidolon a owl:Class ; rdfs:label "Eidolon"@en ;
+    skos:definition "A working digital reflection of a person, company, customer, product, or system: not a replica, but enough grounded evidence for an AI to reason about the real thing accurately and flexibly."@en ;
+    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:Eidolon .
+
+# ───────────────────────── The method (0003-intellectual-frontiers FR-007, FR-008) ─────────────────────────
+
+ifcore:MethodStage a owl:Class ; rdfs:label "Method stage"@en ;
+    rdfs:comment "One step in the ordered sequence an opportunity moves through before it is treated as proven."@en .
+ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; rdfs:range xsd:integer .
+
+ifcore:Grant a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Grant"@en ;
+    rdfs:comment "An explicit, time-bounded link between an identified agent and a specific audience (0005-authentication FR-003). Actual Grant individuals are rarely Public; they are expected to live in the private vault, declaring whatever audience is appropriate to their own sensitivity."@en .
+ifcore:grantedTo a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Person .
+ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Audience .
+ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+    rdfs:comment "Required. A grant with no start date is not valid (0005 FR-003)."@en .
+ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+    rdfs:comment "Optional. Absent means open-ended; present means the grant stops counting after this date (0005 FR-004)."@en .
+
+# ───────────────────────── Work and assets (0007-work-and-assets) ─────────────────────────
+
+ifcore:Asset a owl:Class ; rdfs:label "Asset"@en ;
+    rdfs:comment "An item, thing, or entity that has potential or actual value to the organization (ISO 55000's definition)."@en .
+ifcore:TangibleAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Tangible asset"@en .
+ifcore:IntangibleAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Intangible asset"@en .
+ifcore:FinancialAsset a owl:Class ; rdfs:subClassOf ifcore:Asset ; rdfs:label "Financial asset"@en ;
+    rdfs:comment "Investments, securities, and similar holdings. Left unpopulated; Capital's own future spec establishes what belongs here."@en .
+
+ifcore:RealProperty a owl:Class ; rdfs:subClassOf ifcore:TangibleAsset ; rdfs:label "Real property"@en .
+ifcore:Equipment a owl:Class ; rdfs:subClassOf ifcore:TangibleAsset ; rdfs:label "Equipment"@en .
+
+ifcore:IntellectualProperty a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Intellectual property"@en .
+ifcore:DigitalAsset a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Digital asset"@en ;
+    rdfs:comment "A distinct, separately-valuable digital property — a domain and its deployment, a distinct software product, a distinct dataset. Not created for an individual page or file within a larger property (0007 FR-007)."@en .
+ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Goodwill"@en .
+
+# ───────────────────────── Substantial works (0007-work-and-assets FR-017 – FR-021) ─────────────────────────
+
+ifcore:SubstantialWork a owl:Class ; rdfs:label "Substantial work"@en ;
+    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing."@en .
+
+ifcore:lifecycleOwner a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The one unit accountable for a Substantial Work's progress (FR-021). Defaults to Research & IP while disposition is unsure, Press otherwise; any unit may claim it explicitly, overriding the default."@en .
+ifcore:WorkKind a owl:Class ; rdfs:label "Work kind"@en ;
+    rdfs:comment "A family of works that share a source format and a set of rules; names the <kind> segment of a work package's path (0015-work-packages FR-004, FR-005). An individual MUST be declared before any work package of that kind exists."@en .
+ifcore:BookKind a ifcore:WorkKind ; rdfs:label "Book"@en ; dcterms:identifier "book" ;
+    rdfs:comment "A book: AsciiDoc manuscript, jacket data, figures, and a book bible (0016-press-production FR-004)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookSeriesKind a ifcore:WorkKind ; rdfs:label "Book series"@en ; dcterms:identifier "book-series" ;
+    rdfs:comment "A serial series: a series bible and volume map, no manuscript; each volume is its own book work (0016-press-production FR-008)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SkillKind a ifcore:WorkKind ; rdfs:label "Skill"@en ; dcterms:identifier "skill" ;
+    rdfs:comment "A skill carrying a book's or record's method for a reader's own AI (0016-press-production FR-040)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebsiteKind a ifcore:WorkKind ; rdfs:label "Website"@en ; dcterms:identifier "website" ;
+    rdfs:comment "The written public-facing content of a web property; text lives as content documents (0016-press-production FR-042)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:identifier "spoken" ;
+    rdfs:comment "A spoken-first work whose source is an AsciiDoc script (0017-spoken-and-research-works FR-001, FR-004)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterms:identifier "research" ;
+    rdfs:comment "An area, pillar, note, paper, publication, disclosure, trademark record, or patent draft (0017-spoken-and-research-works FR-017)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
+    rdfs:comment "The stage a Substantial Work currently occupies."@en .
+
+ifcore:WorkLifecycleStage a owl:Class ; rdfs:label "Work lifecycle stage"@en ;
+    rdfs:comment "One stage in a Substantial Work's ordered progress (FR-018). Reuses ifcore:sequenceOrder, already declared for ifcore:MethodStage and its siblings, rather than redeclaring it."@en .
+ifcore:Intake a ifcore:WorkLifecycleStage ; rdfs:label "Intake"@en ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Public .
+ifcore:Research a ifcore:WorkLifecycleStage ; rdfs:label "Research"@en ; ifcore:sequenceOrder 2 ;
+    rdfs:comment "A stage a Substantial Work occupies — distinct from ifcore:ResearchAndIp (the unit) and ifcore:ResearchArea/ResearchPillar (the research chain's own structure), which this individual does not replace or alias."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Review a ifcore:WorkLifecycleStage ; rdfs:label "Review"@en ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Public .
+ifcore:Prep a ifcore:WorkLifecycleStage ; rdfs:label "Prep"@en ; ifcore:sequenceOrder 4 ; ifcore:hasAudience ifcore:Public .
+ifcore:Deploy a ifcore:WorkLifecycleStage ; rdfs:label "Deploy"@en ; ifcore:sequenceOrder 5 ;
+    rdfs:comment "For a patent, this is the filing moment — the point past which the registry becomes the canonical authority for status, per FR-020 and FR-012."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Distribute a ifcore:WorkLifecycleStage ; rdfs:label "Distribute"@en ; ifcore:sequenceOrder 6 ; ifcore:hasAudience ifcore:Public .
+ifcore:Commercialize a ifcore:WorkLifecycleStage ; rdfs:label "Commercialize"@en ; ifcore:sequenceOrder 7 ;
+    rdfs:comment "Decomposes into its own substages (ifcore:CommercializationSubstage) rather than resolving as a single gate, per FR-019."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CommercializationSubstage a owl:Class ; rdfs:label "Commercialization substage"@en ;
+    rdfs:comment "One concurrent decision inside the Commercialize stage (FR-019). Unlike a top-level ifcore:WorkLifecycleStage, these are not strictly sequential gates — pricing and licensing commonly proceed together, and revenue operations is ongoing rather than a one-time step."@en .
+ifcore:Pricing a ifcore:CommercializationSubstage ; rdfs:label "Pricing"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Public .
+ifcore:Licensing a ifcore:CommercializationSubstage ; rdfs:label "Licensing"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 2 ;
+    rdfs:comment "Where a specific ifcore:License individual (0006-research-and-ip) is negotiated — this substage is the activity, License is its resulting record."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GoToMarket a ifcore:CommercializationSubstage ; rdfs:label "Go-to-market"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Public .
+ifcore:RevenueOperations a ifcore:CommercializationSubstage ; rdfs:label "Revenue operations"@en ; dcterms:isPartOf ifcore:Commercialize ; ifcore:sequenceOrder 4 ;
+    rdfs:comment "Ongoing once reached, not a one-time gate — renewals, collections, and revenue recognition continue for as long as the work is commercialized."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# Existing individuals retyped as Substantial Work, now that the class exists.
+# Declared here rather than editing each individual's own declaration, to
+# keep this addition's diff self-contained.
+ifcore:ChasingNativeAlpha a ifcore:SubstantialWork ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Press .
+ifcore:DemandEngineering a ifcore:SubstantialWork, schema:SoftwareApplication ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Studios .
+ifcore:RevenueEngineering a ifcore:SubstantialWork, schema:SoftwareApplication ;
+    ifcore:workLifecycleStage ifcore:Commercialize ;
+    ifcore:lifecycleOwner ifcore:Studios .
+ifcore:CompanionExecutableSourceCodeRepositories a ifcore:SubstantialWork, schema:SoftwareSourceCode ;
+    ifcore:workLifecycleStage ifcore:Intake ;
+    ifcore:lifecycleOwner ifcore:Studios ;
+    rdfs:comment "At the ideation stage per its own operationalStatus — squarely Intake, not yet Research, since the shared service itself has not begun being built."@en .
+
+# ───────────────────────── Research & IP (0006-research-and-ip) ─────────────────────────
+
+ifcore:ResearchArea a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research area"@en ;
+    rdfs:comment "Groups related work; the top of the research chain (0006 FR-001)."@en .
+ifcore:ResearchPillar a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research pillar"@en ;
+    rdfs:comment "A standing line of inquiry under a research area, carrying its own question (0006 FR-002). Related to its area by dcterms:isPartOf, not a custom property. An individual pillar MAY additionally be typed prov:Plan where that fits (0007-work-and-assets FR-001); a bounded piece of work under it is a prov:Activity, related to the pillar the same way, by dcterms:isPartOf."@en .
+
+ifcore:AiNativeSystemsArea a ifcore:ResearchArea ;
+    rdfs:label "AI-Native Systems for the Firm"@en ;
+    rdfs:comment "The firm's own operating model and public presence as research subjects in their own right, not only as business infrastructure."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EidolonPillar a ifcore:ResearchPillar, prov:Plan ;
+    rdfs:label "Eidolons"@en ;
+    dcterms:isPartOf ifcore:AiNativeSystemsArea ;
+    schema:about ifcore:Eidolon ;
+    ifcore:question "How much of a company, person, or system can an AI reason about accurately from a grounded digital representation, and what does that representation need to contain?"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IplgPillar a ifcore:ResearchPillar, prov:Plan ;
+    rdfs:label "Intellectual Product-Led Growth"@en ;
+    dcterms:isPartOf ifcore:AiNativeSystemsArea ;
+    schema:about ifcore:IPLG ;
+    ifcore:question "How does a knowledge-heavy organization turn its research, frameworks, and expertise into something a visitor can use directly, before any commercial ask?"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NoteType a owl:Class ; rdfs:label "Note type"@en .
+ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Note or paper"@en ;
+    rdfs:comment "Where a finding is recorded (0006 FR-003), and the entity a research activity generates via prov:wasGeneratedBy (0007-work-and-assets FR-002). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
+ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
+ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
+
+ifcore:Disposition a owl:Class ; rdfs:label "Disposition"@en ;
+    rdfs:comment "The explicit outcome a protectable finding receives (0006 FR-005)."@en .
+ifcore:DispositionPatent a ifcore:Disposition ; rdfs:label "Patent"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DispositionDefensiveDisclosure a ifcore:Disposition ; rdfs:label "Defensive disclosure"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DispositionTradeSecret a ifcore:Disposition ; rdfs:label "Trade secret"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DispositionNoAction a ifcore:Disposition ; rdfs:label "No action"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:hasDisposition a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:Disposition .
+
+ifcore:Right a owl:Class ; rdfs:subClassOf ifcore:IntellectualProperty, prov:Entity ; rdfs:label "Right"@en ;
+    rdfs:comment "A kind of protection a finding's disposition can produce; a kind of intellectual property (0007-work-and-assets FR-007) and a thing with provenance (0007 FR-002)."@en .
+ifcore:PatentFamily a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent family"@en .
+ifcore:DefensiveDisclosure a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Defensive disclosure"@en .
+ifcore:Trademark a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trademark"@en .
+ifcore:TradeSecret a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trade secret"@en ;
+    rdfs:comment "Its substantive content is sensitive by default (0007 FR-010) — see ifcore:RestrictedDataReference."@en .
+ifcore:Copyright a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Copyright"@en ;
+    rdfs:comment "A copyrightable expression significant enough to track (0007-work-and-assets FR-013) — distinct from any trademark protecting a name used in connection with it."@en .
+ifcore:License a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "License"@en ;
+    rdfs:comment "What a counterparty can take on a right this unit holds."@en .
+ifcore:licenses a owl:ObjectProperty ; rdfs:domain ifcore:License ; rdfs:range ifcore:Right .
+
+# dcterms:creator and dcterms:rightsHolder (reused, not redeclared) carry a Right's
+# attribution: creator MAY be a specific named person; rightsHolder defaults to
+# Intellectual Frontiers LLC absent a stated agreement otherwise (0007 FR-014).
+
+ifcore:continuationOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Shares the parent's specification and priority date; new claims (0007-work-and-assets FR-011)."@en .
+ifcore:divisionalOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Claims split out from a parent application that covered more than one invention (0007 FR-011)."@en .
+ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
+    rdfs:comment "Adds new matter to a parent application; partial priority (0007 FR-011)."@en .
+
+ifcore:WorkGroup a owl:Class ; rdfs:label "Work group"@en ;
+    rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
+ifcore:MarketplacesAndPayments a ifcore:WorkGroup ; rdfs:label "Marketplaces and payments"@en ;
+    rdfs:comment "Computer-controlled marketplace networks, digital payments, and related continuations."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EvidenceAndDecisions a ifcore:WorkGroup ; rdfs:label "Evidence and decisions"@en ;
+    rdfs:comment "Traceable metric queues, task scheduling, service-delivery evidence, initiative tracking, document review, case response, decision lifecycles, and risk systems."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareDelivery a ifcore:WorkGroup ; rdfs:label "Healthcare delivery"@en ;
+    rdfs:comment "Medical-device control, patient navigation, longitudinal profiles, team-based tele-diagnostics, smart referrals, and digital-native trials."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TrustedDataAndAuthorization a ifcore:WorkGroup ; rdfs:label "Trusted data and authorization"@en ;
+    rdfs:comment "Self-controlled digital authorization, device-driven blockchain integrity, blockchain natural-language processing, and multi-source data integration."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"@en ;
+    rdfs:comment "Precision education and training, rating aggregation, and rewardable content delivery."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
+
+ifcore:USPatent10643208 a ifcore:PatentFamily ;
+    rdfs:label "Digital payment system (US10643208B2)"@en ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    rdfs:comment "Covers pre-consent capture, data-valuation logic, and a payment engine offsetting a service charge against computed data value, over banking or blockchain rails. Originally assigned to Netspective Communications LLC, reassigned to Intellectual Frontiers LLC in 2023 — consistent with the company-wide 2023 Netspective patent acquisition already in context/company.md."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10643208StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10643208 ;
+    ifcore:primarySource "https://patents.google.com/patent/US10643208B2"^^xsd:anyURI ;
+    ifcore:cachedValue "Granted May 5, 2020; filed February 24, 2019."@en ;
+    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Expiration date deliberately not cached: sources disagree on the related continuation's expiration (see USPatent11568401StatusReference) and neither figure for either patent has been checked directly against USPTO Patent Center."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11568401 a ifcore:PatentFamily ;
+    rdfs:label "Digital payment system (US11568401B2)"@en ;
+    ifcore:continuationOf ifcore:USPatent10643208 ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    rdfs:comment "Continuation of US10643208B2: adds a cloud-based central controller, a dedicated buyer subsystem, third-party payer integration, and ETL processing for standardizing health data from diverse sources."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11568401StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11568401 ;
+    ifcore:primarySource "https://patents.google.com/patent/US11568401B2"^^xsd:anyURI ;
+    ifcore:cachedValue "Granted January 31, 2023; filed March 30, 2020; priority date February 24, 2019."@en ;
+    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Expiration date deliberately not cached: the source site states November 2040, an independent search states March 16, 2040 — these disagree and neither has been checked directly against USPTO Patent Center. Resolve via an authoritative lookup before asserting either, per 0007-work-and-assets FR-012."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Capital (0010-capital) ─────────────────────────
+
+ifcore:Fund a owl:Class ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Fund"@en ;
+    rdfs:comment "A distinct investment vehicle with its own thesis and qualifying condition. An Organization, not an Asset itself — it holds assets, it is not one (0010-capital)."@en .
+ifcore:thesis a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "The thesis a fund, or any other individual that has one, runs on."@en .
+ifcore:qualifyingCondition a owl:DatatypeProperty ; rdfs:domain ifcore:Fund ; rdfs:range xsd:string ;
+    rdfs:comment "A binary condition a company must meet to be funded under this vehicle, not a factor weighed against others (0010 FR-013)."@en .
+
+ifcore:FundMode a owl:Class ; rdfs:label "Fund mode"@en .
+ifcore:InvestMode a ifcore:FundMode ; rdfs:label "Invest"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TakeSelectiveControlMode a ifcore:FundMode ; rdfs:label "Take selective control"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BuildMode a ifcore:FundMode ; rdfs:label "Build"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:hasMode a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:FundMode .
+
+ifcore:OwnershipMode a owl:Class ; rdfs:label "Ownership mode"@en ;
+    rdfs:comment "Chosen on the merits for a given company, not a fixed exit schedule (0010 FR-016)."@en .
+ifcore:CreateMode a ifcore:OwnershipMode ; rdfs:label "Create"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AcquireAndGrowMode a ifcore:OwnershipMode ; rdfs:label "Acquire and grow"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OwnLongTermMode a ifcore:OwnershipMode ; rdfs:label "Own for the long term"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SellOrSpinOutMode a ifcore:OwnershipMode ; rdfs:label "Sell or spin out"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:CareDeliveryFundI a ifcore:Fund ;
+    rdfs:label "Care Delivery Fund I"@en ;
+    ifcore:thesis "Holds a portfolio of ventures and shared services built to stand alone, to prove that these reimagined pieces work together. Carrying a company further than that is Fund II's job, not Fund I's."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CareDeliveryFundII a ifcore:Fund ;
+    rdfs:label "Care Delivery Fund II"@en ;
+    rdfs:comment "In formation. Its build-mode clock is 90 to 180 days: design partners approached in the first 60, the first clinical workflow live by 120, first revenue in sight by 180, with a clinician CEO paired in rather than recruited afterward."@en ;
+    ifcore:thesis "Backs clinician-led care-delivery companies that own their reimagined care model, not vendors selling a tool into someone else's model."@en ;
+    ifcore:qualifyingCondition "Contributes to a better end-to-end patient and caregiver experience."@en ;
+    ifcore:hasMode ifcore:InvestMode, ifcore:TakeSelectiveControlMode, ifcore:BuildMode ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Capital ifcore:operates ifcore:CareDeliveryFundI, ifcore:CareDeliveryFundII .
+
+ifcore:CapitalSource a owl:Class ; rdfs:label "Capital source"@en ;
+    rdfs:comment "Where a dollar Capital deploys traces back to (0010 FR-012)."@en .
+ifcore:BalanceSheet a ifcore:CapitalSource ; rdfs:label "The firm's own balance sheet"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NetworkSourcedCapital a ifcore:CapitalSource ; rdfs:label "An LP or investor brought in through IF Network"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:SinbadCapital a ifcore:Organization ;
+    rdfs:label "Sinbad Capital"@en ;
+    rdfs:comment "An independent early fund and operating partner. Intellectual Frontiers Capital has no allocation or LP authority over it (0010-capital FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Press (0009-press) ─────────────────────────
+
+ifcore:ClaimKind a owl:Class ; rdfs:label "Claim kind"@en ;
+    rdfs:comment "The epistemic status a published claim carries (0009-press FR-001)."@en .
+ifcore:ObservableFact a ifcore:ClaimKind ; rdfs:label "Observable fact"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Opinion a ifcore:ClaimKind ; rdfs:label "Opinion"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Framework a ifcore:ClaimKind ; rdfs:label "Framework"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Illustration a ifcore:ClaimKind ; rdfs:label "Illustration"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:claimKind a owl:ObjectProperty ; rdfs:range ifcore:ClaimKind ;
+    rdfs:comment "What kind of claim a published fact or creative work is making."@en .
+
+ifcore:VoicePrinciple a owl:Class ; rdfs:label "Voice principle"@en .
+ifcore:EvidenceLed a ifcore:VoicePrinciple ; rdfs:label "Evidence-led"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Practical a ifcore:VoicePrinciple ; rdfs:label "Practical"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Skeptical a ifcore:VoicePrinciple ; rdfs:label "Skeptical"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Plain a ifcore:VoicePrinciple ; rdfs:label "Plain"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:EvidenceLadderStage a owl:Class ; rdfs:label "Evidence ladder stage"@en ;
+    rdfs:comment "A publication's reception, read as evidence about its thesis, in ascending order of strength (0009-press FR-014)."@en .
+ifcore:Silence a ifcore:EvidenceLadderStage ; rdfs:label "Silence"@en ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Public .
+ifcore:Argument a ifcore:EvidenceLadderStage ; rdfs:label "Argument"@en ; ifcore:sequenceOrder 2 ; ifcore:hasAudience ifcore:Public .
+ifcore:AdoptionOfTerminology a ifcore:EvidenceLadderStage ; rdfs:label "Adoption of terminology"@en ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Public .
+ifcore:WillingnessToPay a ifcore:EvidenceLadderStage ; rdfs:label "Willingness to pay"@en ; ifcore:sequenceOrder 4 ; ifcore:hasAudience ifcore:Public .
+
+ifcore:PressLevel a owl:Class ; rdfs:label "Press level"@en ;
+    rdfs:comment "One of five scopes a piece can be written at (0009-press FR-007)."@en .
+ifcore:covers a owl:DatatypeProperty ; rdfs:domain ifcore:PressLevel ; rdfs:range xsd:string .
+ifcore:TheFirmLevel a ifcore:PressLevel ; rdfs:label "Intellectual Frontiers"@en ;
+    ifcore:covers "Why the firm exists, how Native Alpha governs decisions, and what the record supports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BusinessUnitLevel a ifcore:PressLevel ; rdfs:label "Business units"@en ;
+    ifcore:covers "What each unit does, and where their boundaries remain."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:StudiosCompanyLevel a ifcore:PressLevel ; rdfs:label "Studios companies"@en ;
+    ifcore:covers "Market thesis, customer evidence, category language, Native Alpha, and a company-owned voice."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CapitalCompanyLevel a ifcore:PressLevel ; rdfs:label "IF Capital companies"@en ;
+    ifcore:covers "Optional help with research, launches, education, and direct channels without editorial control."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NetworkLevel a ifcore:PressLevel ; rdfs:label "IF Network"@en ;
+    ifcore:covers "What the search found and what the evidence supports, written so a hiring decision can rest on it."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FounderWritingType a owl:Class ; rdfs:label "Founder writing type"@en .
+ifcore:ContrarianBrief a ifcore:FounderWritingType ; rdfs:label "Contrarian Brief"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DesignPatternWriting a ifcore:FounderWritingType ; rdfs:label "Design Pattern"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:WorkingTheory a ifcore:FounderWritingType ; rdfs:label "Working Theory"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PractitionerJournalist a ifcore:FounderWritingType ; rdfs:label "Practitioner Journalist"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:AIWorkforce a owl:Class ; rdfs:label "AI Workforce"@en ;
+    skos:definition "A SpecKit that states intent, a harness that carries it out, agents that hold a role, skills that do one job, and MCPs that connect them to a reader's own tools and data — what a Fieldbook teaches a reader to build (0009-press FR-016, FR-018)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
+    skos:definition "A skill that carries a person's knowledge, judgment, taste, and skill in durable, inspectable, versioned form — what a reader's own work, once named and made durable, is ready to become (0009-press FR-018)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ChasingNativeAlpha schema:publisher ifcore:Press .
+
+# ───────────────────────── Owned channels (0009-press FR-028) ─────────────────────────
+
+ifcore:HealthcareGuyCom a ifcore:DigitalAsset ;
+    rdfs:label "HealthcareGuy.com"@en ;
+    schema:url "https://healthcareguy.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2005"^^xsd:gYear ;
+    rdfs:comment "A personal site publishing health IT arguments, field observations, and invention sketches since 2005 — the firm's longest continuous publishing record."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthcareGuysCom a ifcore:DigitalAsset ;
+    rdfs:label "HealthcareGuys.com"@en ;
+    schema:url "https://healthcareguys.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2008"^^xsd:gYear ;
+    rdfs:comment "A healthcare media network of news, interviews, and vendor coverage written for buyers and operators of health technology."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:MedigyCom a ifcore:DigitalAsset ;
+    rdfs:label "Medigy.com"@en ;
+    schema:url "https://medigy.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2017"^^xsd:gYear ;
+    rdfs:comment "A health innovation discovery platform: crowd-curated technology, use cases, and market signal."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:GovConIC a ifcore:DigitalAsset ;
+    rdfs:label "GovConIC.com"@en ;
+    schema:url "https://govconic.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2015"^^xsd:gYear ;
+    rdfs:comment "GovCon Intelligence Center: how public agencies buy, modernize, and evaluate technology."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CompliantInSecurityCom a ifcore:DigitalAsset ;
+    rdfs:label "CompliantInSecurity.com"@en ;
+    schema:url "https://compliantinsecurity.com"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2016"^^xsd:gYear ;
+    rdfs:comment "The standing argument that passing an audit is not the same as being secure, for the people who own both obligations."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
+    rdfs:label "OperationalTruth.org"@en ;
+    schema:url "https://operationaltruth.org"^^xsd:anyURI ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:created "2018"^^xsd:gYear ;
+    rdfs:comment "The record of what systems actually do in the field versus what they are documented to do."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Renditions and delivery (0015-work-packages FR-013 – FR-018) ─────────────────────────
+
+ifcore:DeliveryRecord a owl:Class ; rdfs:subClassOf ifcore:Reference ; rdfs:label "Delivery record"@en ;
+    rdfs:comment "Records where a delivered binary rendition lives, from which source commit, with its checksum, carrying its own audience (0015 FR-017). The work it renders is named by ifcore:describes. Its audience MUST NOT be broader than its work's. The rendition itself is never tracked in Git (0015 FR-014)."@en .
+ifcore:deliveredTo a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:anyURI ;
+    rdfs:comment "Where the rendition lives. MUST NOT hold, or embed, a credential, a password, an access secret, or a signed or expiring address (0015 FR-017)."@en .
+ifcore:sourceCommit a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:string ;
+    rdfs:comment "The full commit hash of the source the rendition was built from (0015 FR-015)."@en .
+ifcore:deliveredOn a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:date .
+ifcore:checksum a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:string ;
+    rdfs:comment "The SHA-256 of the delivered file, as lowercase hexadecimal."@en .
+
+ifcore:CutKind a owl:Class ; rdfs:label "Cut kind"@en ;
+    rdfs:comment "Whether a delivered rendition is a review cut or a final cut (0016-press-production FR-025)."@en .
+ifcore:ReviewCut a ifcore:CutKind ; rdfs:label "Review cut"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FinalCut a ifcore:CutKind ; rdfs:label "Final cut"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:cutKind a owl:ObjectProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range ifcore:CutKind ;
+    rdfs:comment "Present when the rendition is a review or final cut. Edition and printing are not restated here: the manuscript at sourceCommit is their one source (0016 FR-024)."@en .
+
+# ───────────────────────── Book formats and series (0016-press-production FR-008, FR-049; 0017 FR-011) ─────────────────────────
+
+ifcore:Fieldbook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Fieldbook"@en ;
+    rdfs:comment "A book that teaches a person to do a kind of work better (0016 FR-049)."@en .
+ifcore:Rolebook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Rolebook"@en ;
+    rdfs:comment "A short book for a profession or job function whose job has changed structurally; it answers five questions and is not padded to a length range (0016 FR-049)."@en .
+[] a owl:AllDisjointClasses ; owl:members ( ifcore:Fieldbook ifcore:Rolebook ) .
+
+ifcore:SerialSeries a owl:Class ; rdfs:subClassOf schema:BookSeries, ifcore:SubstantialWork ; rdfs:label "Serial series"@en ;
+    rdfs:comment "A set of books meant to be read together in order, kept coherent by one series bible; each volume is its own book work related to it by schema:isPartOf (0016 FR-008 – FR-011)."@en .
+ifcore:Anthology a owl:Class ; rdfs:subClassOf ifcore:SerialSeries ; rdfs:label "Anthology"@en ;
+    rdfs:comment "A serial series made from another work's released items, one chapter per item, one volume per calendar year; a chapter is related to the item it adapts by schema:isBasedOn (0017 FR-011, FR-012)."@en .
+
+# ───────────────────────── Named tools, provenance, and promotion (0016-press-production FR-041, FR-046) ─────────────────────────
+
+ifcore:NamedTool a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Named tool"@en ;
+    rdfs:comment "A named tool, test, or framework a work teaches and expects a reader to reuse (0016 FR-041). Every individual carries explicit provenance (ifcore:sourceFile, ifcore:sourceLocation) and an audience."@en .
+ifcore:definedIn a owl:ObjectProperty ; rdfs:domain skos:Concept ; rdfs:range schema:CreativeWork ;
+    rdfs:comment "The work, chapter, or section that gives a concept its definition."@en .
+ifcore:sourceFile a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Provenance: the repository-relative path an extracted individual was taken from (0016 FR-041)."@en .
+ifcore:sourceLocation a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Provenance: the exact heading, identifier, or line within ifcore:sourceFile an extracted individual was taken from, specific enough for a person to find the passage."@en .
+
+ifcore:PromotionBrief a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Promotion brief"@en ;
+    rdfs:comment "A work's supporting record of its reader, promise, claims kept, keywords, surfaces, comparables, and decisions owed. Never the work itself (0016 FR-046)."@en .
+ifcore:briefOf a owl:ObjectProperty ; rdfs:domain ifcore:PromotionBrief ; rdfs:range ifcore:SubstantialWork .
+
+# ───────────────────────── The Journal (0009-press FR-020 – FR-023) ─────────────────────────
+
+ifcore:JournalOfIntellectualFrontiers a schema:Periodical ;
+    rdfs:label "Journal of Intellectual Frontiers"@en ;
+    schema:publisher ifcore:Press ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020). No short-form abbreviation is asserted here: 'JIF' is already the trademarked abbreviation for Clarivate's Journal Impact Factor, a term of art throughout academic publishing, and reusing it would both confuse readers and risk the mark — a deliberate omission pending a cleared alternative, not an oversight."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EidolonJournalArticle a schema:Article ;
+    rdfs:label "Eidolons: A Working Digital Reflection"@en ;
+    schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
+    schema:about ifcore:Eidolon ;
+    prov:wasDerivedFrom ifcore:EidolonPillar ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:claimKind ifcore:Framework ;
+    rdfs:comment "Native-origin work, per 0007-work-and-assets FR-016: Intellectual Frontiers is this piece's primary publisher, so its full text is a content document in this repository's content root, not merely referenced — unlike ifcore:NativeAlphaArticle, whose primary text lives on shahidshah.com."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IplgJournalArticle a schema:Article ;
+    rdfs:label "Intellectual Product-Led Growth"@en ;
+    schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
+    schema:about ifcore:IPLG ;
+    prov:wasDerivedFrom ifcore:IplgPillar ;
+    schema:author ifcore:ShahidNehalShah ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:claimKind ifcore:Framework ;
+    rdfs:comment "Native-origin work, per 0007-work-and-assets FR-016: its full text is a content document in this repository's content root. Draws on the firm's own prior IPLG strategy work, already partly implemented across the public site's executable-content pattern."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
+    ifcore:question "What is unusually true here?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Prove a ifcore:MethodStage ; rdfs:label "Prove"@en ; ifcore:sequenceOrder 2 ;
+    ifcore:question "What small hard thing earns a scarce commitment?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Decide a ifcore:MethodStage ; rdfs:label "Decide"@en ; ifcore:sequenceOrder 3 ;
+    ifcore:question "What will we do now?"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Compound a ifcore:MethodStage ; rdfs:label "Compound"@en ; ifcore:sequenceOrder 4 ;
+    ifcore:question "How does use make the advantage stronger?"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Studios (0011-studios) ─────────────────────────
+
+ifcore:VentureLifecycleStage a owl:Class ; rdfs:label "Venture lifecycle stage"@en ;
+    rdfs:comment "One stage in the ordered path a venture moves through on the way to being proven or stopped (0011-studios FR-003, FR-004). Reuses ifcore:sequenceOrder and ifcore:question, already declared for ifcore:MethodStage, rather than redeclaring either."@en .
+ifcore:Observe a ifcore:VentureLifecycleStage ; rdfs:label "Observe"@en ; ifcore:sequenceOrder 1 ;
+    ifcore:question "What real asymmetry already exists?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Frame a ifcore:VentureLifecycleStage ; rdfs:label "Frame"@en ; ifcore:sequenceOrder 2 ;
+    ifcore:question "What is the Native Alpha thesis, stated in plain language (0011 FR-002)?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Validate a ifcore:VentureLifecycleStage ; rdfs:label "Validate"@en ; ifcore:sequenceOrder 3 ;
+    ifcore:question "Does a real buyer and workflow actually exist?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Experiment a ifcore:VentureLifecycleStage ; rdfs:label "Experiment"@en ; ifcore:sequenceOrder 4 ;
+    ifcore:question "What is the smallest credible test, and what are its continue and stop conditions, written before the result is seen (0011 FR-004)?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PaidProof a ifcore:VentureLifecycleStage ; rdfs:label "Paid proof"@en ; ifcore:sequenceOrder 5 ;
+    ifcore:question "Will someone pay for this against a real budget line?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Repeat a ifcore:VentureLifecycleStage ; rdfs:label "Repeat"@en ; ifcore:sequenceOrder 6 ;
+    ifcore:question "Do the delivery and economics hold up more than once?"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Independence a ifcore:VentureLifecycleStage ; rdfs:label "Independence"@en ; ifcore:sequenceOrder 7 ;
+    ifcore:question "Could a qualified replacement continue this company tomorrow (0011 FR-008)?"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:DesignPartnerRequirement a owl:Class ; rdfs:label "Design partner requirement"@en ;
+    rdfs:comment "A contact missing even one of these is not yet a design partner (0011-studios FR-006)."@en .
+ifcore:WorkflowAccess a ifcore:DesignPartnerRequirement ; rdfs:label "Workflow access"@en ;
+    rdfs:comment "People can observe the real work."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExecutiveSponsor a ifcore:DesignPartnerRequirement ; rdfs:label "Executive sponsor"@en ;
+    rdfs:comment "Someone can authorize change."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CustomerContribution a ifcore:DesignPartnerRequirement ; rdfs:label "Customer contribution"@en ;
+    rdfs:comment "A real operating partner contributes something scarce."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RealDataOrImplementation a ifcore:DesignPartnerRequirement ; rdfs:label "Real data or implementation"@en ;
+    rdfs:comment "The environment is real, not a demo."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CommercialPath a ifcore:DesignPartnerRequirement ; rdfs:label "Commercial path"@en ;
+    rdfs:comment "There is a credible route to a commercial yes."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:VentureEvidenceKind a owl:Class ; rdfs:label "Venture evidence kind"@en ;
+    rdfs:comment "Evidence MUST NOT be treated as proof of anything beyond what its own kind states it shows (0011-studios FR-007)."@en .
+ifcore:shows a owl:DatatypeProperty ; rdfs:domain ifcore:VentureEvidenceKind ; rdfs:range xsd:string ;
+    rdfs:comment "What this evidence kind actually demonstrates."@en .
+ifcore:notProofOf a owl:DatatypeProperty ; rdfs:domain ifcore:VentureEvidenceKind ; rdfs:range xsd:string ;
+    rdfs:comment "What this evidence kind is not yet proof of, named explicitly so it is not assumed."@en .
+ifcore:WorkflowAccessEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Workflow access"@en ;
+    ifcore:shows "We can see the real task, handoffs, constraints, and exceptions."@en ;
+    ifcore:notProofOf "A right to reuse confidential know-how or data."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ExecutiveSponsorEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Executive sponsor"@en ;
+    ifcore:shows "Someone can authorize staff time, security review, and change."@en ;
+    ifcore:notProofOf "A buyer or budget by itself."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DataCommitmentEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Data commitment"@en ;
+    ifcore:shows "We can test with representative data under defined rules."@en ;
+    ifcore:notProofOf "Ownership or permission to train unrelated models."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PaidProofEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Paid proof"@en ;
+    ifcore:shows "The customer assigns money to a bounded result."@en ;
+    ifcore:notProofOf "Repeatable revenue or product-market fit."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ReferenceBehaviorEvidence a ifcore:VentureEvidenceKind ; rdfs:label "Reference behavior"@en ;
+    ifcore:shows "The customer will stake reputation on the result."@en ;
+    ifcore:notProofOf "Renewal, margin, or scalable delivery."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IndependenceTest a owl:Class ; rdfs:label "Independence test"@en ;
+    skos:definition "Could a qualified founder, board, investor, or replacement provider continue this company tomorrow using company-controlled records, rights, systems, and relationships? A single binary judgment, never a scored checklist (0011-studios FR-008)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PortfolioCategory a owl:Class ; rdfs:label "Portfolio category"@en ;
+    rdfs:comment "Every portfolio entry is classified as exactly one of these, each with its own obligations (0011-studios FR-014 – FR-016)."@en .
+ifcore:VentureCategory a ifcore:PortfolioCategory ; rdfs:label "Venture"@en ;
+    rdfs:comment "Chartered as a company: its own entity, its own operator, a licensed rights position, and a written closure condition before the first hire (0011 FR-014)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SoftwareCategory a ifcore:PortfolioCategory ; rdfs:label "Software"@en ;
+    rdfs:comment "Code as a work, not a company: records its license and current status rather than implying one; no entity or operator requirement (0011 FR-015)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SharedServiceCategory a ifcore:PortfolioCategory ; rdfs:label "Shared service"@en ;
+    rdfs:comment "Built to stand alone, usable by every venture in the portfolio; see ifcore:SharedService for the class actual shared services are typed as."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OperatingCompanyCategory a ifcore:PortfolioCategory ; rdfs:label "Operating company"@en ;
+    rdfs:comment "An established firm Studios draws on for delivery, regulated engineering, or revenue operations — not a chartered venture."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AIFirst a owl:Class ; rdfs:label "AI First"@en ;
+    skos:definition "A shared service where an AI harness leads production but developers still remain in the daily production loop."@en ;
+    rdfs:comment "0011-studios FR-011: a shared service not meeting ifcore:AIWorkforce's bar is called this or ifcore:AIAugmented instead, regardless of branding or trademark."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AIAugmented a owl:Class ; rdfs:label "AI Augmented"@en ;
+    skos:definition "A shared service where humans still do most of the production work, with AI assisting it."@en ;
+    rdfs:comment "0011-studios FR-011: a shared service not meeting ifcore:AIWorkforce's bar is called this or ifcore:AIFirst instead, regardless of branding or trademark."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:SharedService a owl:Class ; rdfs:label "Shared service"@en ;
+    rdfs:comment "A repeated, undifferentiated capability run once across the portfolio rather than rebuilt inside each company (0011-studios FR-009). Named for the outcome it owns, and typed ifcore:AIWorkforce, ifcore:AIFirst, or ifcore:AIAugmented on its merits (FR-011) — never by branding alone."@en .
+ifcore:operationalStatus a owl:DatatypeProperty ; rdfs:domain ifcore:SharedService ; rdfs:range xsd:string ;
+    rdfs:comment "A shared service not yet running MUST state that here rather than being presented as operating (0011-studios FR-013)."@en .
+
+ifcore:DemandEngineering a ifcore:SharedService, ifcore:AIWorkforce ;
+    rdfs:label "Demand Engineering"@en ;
+    rdfs:comment "Runs when there is no proven audience yet; its outcome is a named audience, a claim that survives contact with them, and a first step they will actually take. Claimed as an AI Workforce product (0011-studios FR-011); a trademark filing has not been independently verified via USPTO TSDR as of this writing, so no ifcore:Trademark individual is asserted for it yet (0007-work-and-assets FR-012)."@en ;
+    ifcore:operationalStatus "operating"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RevenueEngineering a ifcore:SharedService, ifcore:AIWorkforce ;
+    rdfs:label "Revenue Engineering"@en ;
+    rdfs:comment "Runs after Demand Engineering, as a closed loop from market definition through the human sales handoff and back into learning. Claimed as an AI Workforce product (0011-studios FR-011); a trademark filing has not been independently verified via USPTO TSDR as of this writing, so no ifcore:Trademark individual is asserted for it yet (0007-work-and-assets FR-012). The handoff from Demand Engineering to this service is a defined gate, per 0011 FR-010."@en ;
+    ifcore:operationalStatus "operating"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompanionExecutableSourceCodeRepositories a ifcore:SharedService ;
+    rdfs:label "Companion Executable Source Code Repositories"@en ;
+    rdfs:comment "Pairs a published paper with a containerized code, data, and documentation repository that keeps updating — a complement to peer review, not a replacement for it. Not yet typed ifcore:AIWorkforce, ifcore:AIFirst, or ifcore:AIAugmented: at the ideation stage, not a running service (0011-studios FR-013), so no AI-maturity tier is asserted."@en ;
+    ifcore:operationalStatus "ideation"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Studios ifcore:operatesSharedService ifcore:DemandEngineering, ifcore:RevenueEngineering,
+    ifcore:CompanionExecutableSourceCodeRepositories .
+ifcore:operatesSharedService a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:SharedService .
+
+ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
+    skos:definition "Intellectual Product-Led Growth: the framework for turning a unit's output into something a visitor can use directly — one useful action completed before any commercial ask — rather than only read about."@en ;
+    rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013), 0009-press (FR-016, FR-017 — a Fieldbook's executable content is IPLG applied to a book; promotion and diffusion of an intellectual product is Press's own territory), and 0011-studios (FR-020); no unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Studios portfolio (0011-studios FR-014 – FR-016; 0010-capital) ─────────────────────────
+
+ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:PortfolioCategory ;
+    rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization is classified as."@en .
+ifcore:builtBy a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The unit that built this organization as a venture or shared service, per 0011-studios FR-022: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
+ifcore:portfolioCompany a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:Organization ;
+    rdfs:comment "A company or shared service this fund holds. A fund's portfolio roster is point-in-time business data, not operating doctrine (0010-capital, Out of scope) — the same reasoning already applied to patent counts."@en .
+
+ifcore:OurHakeem a ifcore:Organization ;
+    rdfs:label "OurHakeem"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Verified practitioner consults delivered online, with an operating stack behind the booking screen: intake, a longitudinal care record, agents that carry routine work, a clinician copilot, and the compliance apparatus a regulated consult requires."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Payshent a ifcore:Organization ;
+    rdfs:label "Payshent"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An HSA card that pays patients a data dividend for consented, de-identified health data, built on HIPAA Expert Determination de-identification, transparent revocable consent, and IRB oversight for research partnerships."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:MedigyOpportunityAtlas a ifcore:Organization ;
+    rdfs:label "Medigy Opportunity Atlas"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Finds reimbursed demand in healthcare and states it as a claims-defined cohort, geography, CMS signal, reimbursement codes, and revenue at stake — a shared service to every other Fund I venture and the intelligence spine of Fund II."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:MedigyDemandIntelligence a ifcore:Organization ;
+    rdfs:label "Medigy Demand Intelligence"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A governed evaluation platform for hospitals and health systems: structured vendor evaluation by vetted evidence against internal need, in place of an unranked procurement queue."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PatientTeamCom a ifcore:Organization ;
+    rdfs:label "PatientTeam.com"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An execution layer turning the Microsoft 365 or Google Workspace a provider already pays for into a working digital front door, serving the portfolio as a shared front-door capability."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Neuvist a ifcore:Organization ;
+    rdfs:label "Neuvist"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A healthcare growth and care-access capability: AI-driven demand intelligence, orchestration, and routing that fills real provider capacity, serving the portfolio as a shared demand-and-access engine."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Symvion a ifcore:Organization ;
+    rdfs:label "Symvion"@en ;
+    ifcore:portfolioCategory ifcore:SharedServiceCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A continuous clinical research infrastructure platform reading signals across consented health transaction data for earlier detection and continuous research; Payshent is its funding and consent layer."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:suppliesDataFor a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Organization ;
+    rdfs:comment "One portfolio organization provides data or infrastructure another's own product or research depends on — reused for any future case like it, not specific to this pair."@en .
+ifcore:Payshent ifcore:suppliesDataFor ifcore:Symvion .
+
+ifcore:RevenueAccelerationLLC a ifcore:Organization ;
+    rdfs:label "Revenue Acceleration LLC"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "Revenue operations for post-acute care: durable medical equipment, home health, home infusion, home respiratory, and hospice."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AmbientBiomarkersReferenceLab a ifcore:Organization ;
+    rdfs:label "Ambient Biomarkers Reference Lab"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A reference lab for biomarkers captured passively from ordinary sensors (voice, gait, respiration, facial expression, wearable and metabolic signals), standardized into panels and governed by an integrated review board and clinician network."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ContinuousCareOS a ifcore:Organization ;
+    rdfs:label "Continuous Care OS"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "An operating system for supervising an accountable digital care operation: a clinical leader reviews decisions, evidence, and billing as a queue of work with owners and dates."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CareDeliveryFundI ifcore:portfolioCompany
+    ifcore:OurHakeem, ifcore:Payshent, ifcore:MedigyOpportunityAtlas, ifcore:MedigyDemandIntelligence,
+    ifcore:PatientTeamCom, ifcore:Neuvist, ifcore:Symvion, ifcore:RevenueAccelerationLLC,
+    ifcore:AmbientBiomarkersReferenceLab, ifcore:ContinuousCareOS .
+
+ifcore:HIRS a ifcore:Organization ;
+    rdfs:label "HIRS"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    schema:url "https://www.hirshealth.com"^^xsd:anyURI ;
+    rdfs:comment "A chronic care management and obesity management company operating in the Kingdom of Saudi Arabia, incubated by Studios. Its own site (Hirs Health Solutions, Riyadh) states its mission as to 'innovate using science and state of the art technologies to help people be better informed, make better health decisions, and maintain healthier lives,' through an AI-driven wellness-profile, digital-health, and predictive-health-modeling platform (hirshealth.com, fetched 2026-10-02, not otherwise re-verified). Not yet linked to any specific Capital fund."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Handova a ifcore:Organization ;
+    rdfs:label "Handova"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    rdfs:comment "A code name for a company Studios is incubating; not yet a confirmed final name. Fuller detail — its own Eidolon content — is pending from the founder and has not been supplied as of this writing."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NyNikaTMcFadden a ifcore:Person ;
+    ifcore:legalName "Ny'Nika T. McFadden"@en ;
+    rdfs:comment "Dr. Ny'Nika T. McFadden, co-founder of ifcore:Handova; Texas State University."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Handova schema:founder ifcore:NyNikaTMcFadden, ifcore:ShahidNehalShah .
+
+ifcore:UnblockHealth a ifcore:Organization ;
+    rdfs:label "Unblock Health"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    schema:url "https://www.unblock.health/"^^xsd:anyURI ;
+    rdfs:comment "A FHIR-native digital platform replacing the manual, fragmented patient medical-record-access and record-correction request workflow with a centralized, trackable one, serving patient advocates and hospital Health Information Management (HIM) professionals; offers Individual Access Services (IAS). Co-founded at HIT Expo 2018 in New Orleans (unblock.health, fetched 2026-10-02, not otherwise re-verified)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:GraceCordovano a ifcore:Person ;
+    ifcore:legalName "Grace Cordovano"@en ;
+    rdfs:comment "Grace Cordovano, PhD, BCPA (Board Certified Patient Advocate); co-founder of ifcore:UnblockHealth alongside ifcore:ShahidNehalShah, and separately runs her own independent practice, Enlightening Results. Over 20 years of patient-advocacy experience, oncology-space specialization; contributor to the U.S. Core Data for Interoperability Taskforce and the HITAC Interoperability Standards Work Group (public LinkedIn and press sources, not independently verified beyond that)."@en ;
+    schema:sameAs <https://www.linkedin.com/in/gcordovano/> ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:UnblockHealth schema:founder ifcore:GraceCordovano, ifcore:ShahidNehalShah .
+
+# ───────────────────────── Network (0012-network) ─────────────────────────
+
+ifcore:SearchStage a owl:Class ; rdfs:label "Search stage"@en ;
+    rdfs:comment "One step in the ordered sequence a hunt moves through (0012-network FR-003). Reuses ifcore:sequenceOrder, already declared for ifcore:MethodStage and ifcore:VentureLifecycleStage, rather than redeclaring it."@en .
+ifcore:Thesis a ifcore:SearchStage ; rdfs:label "Thesis"@en ; ifcore:sequenceOrder 1 ;
+    rdfs:comment "Someone writes down who would have to exist for a piece of work to succeed, and what would make that person unusual (0012 FR-001)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Discovery a ifcore:SearchStage ; rdfs:label "Discovery"@en ; ifcore:sequenceOrder 2 ;
+    rdfs:comment "Network looks outward at what is already public. The internet is the database; it is not copied into one."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Surfaced a ifcore:SearchStage ; rdfs:label "Surfaced"@en ; ifcore:sequenceOrder 3 ;
+    rdfs:comment "A small set of candidates comes back, each attached to the thesis it answers."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Evidence a ifcore:SearchStage ; rdfs:label "Evidence"@en ; ifcore:sequenceOrder 4 ;
+    rdfs:comment "Every candidate gets a packet: what was found, where it came from, and what is still unknown (0012 FR-007, FR-008)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HumanJudgment a ifcore:SearchStage ; rdfs:label "Human judgment"@en ; ifcore:sequenceOrder 5 ;
+    rdfs:comment "A person reads the packet and decides whether to reach out. No score decides this (0012 FR-004)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Contact a ifcore:SearchStage ; rdfs:label "Contact"@en ; ifcore:sequenceOrder 6 ;
+    rdfs:comment "One specific message about one specific thing, sent by a person who can act on the answer."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Conversation a ifcore:SearchStage ; rdfs:label "Conversation"@en ; ifcore:sequenceOrder 7 ;
+    rdfs:comment "What is learned in the conversation is written down — the part the internet doesn't have."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Validation a ifcore:SearchStage ; rdfs:label "Validation"@en ; ifcore:sequenceOrder 8 ;
+    rdfs:comment "The hypothesis about what this person is unusually good at either holds up or it does not."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Match a ifcore:SearchStage ; rdfs:label "Match"@en ; ifcore:sequenceOrder 9 ;
+    rdfs:comment "The person is connected to the hunt, venture, fund, or editorial project that needed them."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SearchExperiment a ifcore:SearchStage ; rdfs:label "Experiment"@en ; ifcore:sequenceOrder 10 ;
+    rdfs:comment "The match starts as a small, bounded piece of real work, not a title. Named ifcore:SearchExperiment, distinct from ifcore:Experiment (0011-studios' venture lifecycle stage), to avoid conflating the two sequences."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Outcome a ifcore:SearchStage ; rdfs:label "Outcome"@en ; ifcore:sequenceOrder 11 ;
+    rdfs:comment "The experiment produced something or it did not, and Network records which."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Learning a ifcore:SearchStage ; rdfs:label "Learning"@en ; ifcore:sequenceOrder 12 ;
+    rdfs:comment "The thesis is corrected with what actually happened; the next search starts from what this one got wrong (0012 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:Hunt a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Activity ; rdfs:label "Hunt"@en ;
+    rdfs:comment "A search with a written thesis (0012-network FR-001), bounded work that generates evidence packets via prov:wasGeneratedBy, the same reuse already established for research activities and ifcore:Note (0007-work-and-assets FR-002)."@en .
+ifcore:searchesFor a owl:ObjectProperty ; rdfs:domain ifcore:Hunt ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The unit or opportunity a hunt searches for (0012 FR-002)."@en .
+
+ifcore:EvidencePacket a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Evidence packet"@en ;
+    rdfs:comment "What a candidate becomes through cited signals, not a profile (0012-network FR-007, FR-008). Generated by a Hunt via prov:wasGeneratedBy; its subject candidate is named via schema:about (reused, range ifcore:Person); a claim's own source is carried by the existing Reference model (ifcore:ExternalRecordReference or ifcore:RestrictedDataReference per the signal's sensitivity), not a new citation property."@en .
+ifcore:namedUnknown a owl:DatatypeProperty ; rdfs:domain ifcore:EvidencePacket ; rdfs:range xsd:string ;
+    rdfs:comment "What is explicitly not yet known about a candidate, stated rather than dropped once the candidate looks promising (0012 FR-008)."@en .
+ifcore:ConfidenceLevel a owl:Class ; rdfs:label "Confidence level"@en .
+ifcore:Low a ifcore:ConfidenceLevel ; rdfs:label "Low"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:Medium a ifcore:ConfidenceLevel ; rdfs:label "Medium"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:High a ifcore:ConfidenceLevel ; rdfs:label "High"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:confidenceLevel a owl:ObjectProperty ; rdfs:domain ifcore:EvidencePacket ; rdfs:range ifcore:ConfidenceLevel .
+
+ifcore:RelationshipMemory a owl:Class ; rdfs:label "Relationship memory"@en ;
+    skos:definition "The compounding record of who did what and how it turned out, so the next search starts further along than the last one."@en ;
+    rdfs:comment "Sensitive by default, the same posture as ifcore:TradeSecret (0007-work-and-assets FR-010): nothing learned in a private conversation appears on a public page without consent, and no individual relationship-memory record is public merely by existing (0012-network FR-015, FR-016, FR-017). An actual record's own ifcore:hasAudience states who it is visible to; none is asserted here."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NetworkMeasure a owl:Class ; rdfs:label "Network measure"@en ;
+    rdfs:comment "What Network is evaluated by, in place of activity counts like profiles created or page views (0012-network FR-018, FR-019)."@en .
+ifcore:HuntWithThesis a ifcore:NetworkMeasure ; rdfs:label "A hunt with a recorded thesis"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CandidateJudgedWorthContacting a ifcore:NetworkMeasure ; rdfs:label "A candidate a person judged worth contacting"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ThesisRevisingConversation a ifcore:NetworkMeasure ; rdfs:label "A conversation that revised a thesis"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExperimentStarted a ifcore:NetworkMeasure ; rdfs:label "An experiment started"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RecordedOutcome a ifcore:NetworkMeasure ; rdfs:label "A recorded outcome, including a failed one"@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:measuredBy a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:NetworkMeasure .
+ifcore:Network ifcore:measuredBy ifcore:HuntWithThesis, ifcore:CandidateJudgedWorthContacting,
+    ifcore:ThesisRevisingConversation, ifcore:ExperimentStarted, ifcore:RecordedOutcome .

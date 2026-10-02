@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home layout · Frontiers Console assurance fixture</title>
+<link rel="icon" href="../../images/favicon.png">
+<link rel="stylesheet" href="../../css/fonts.css">
+<link rel="stylesheet" href="../../css/reset.css">
+<link rel="stylesheet" href="../../css/tokens.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/layout.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/prose.css">
+<link rel="stylesheet" href="../../css/admin.css">
+<script src="../../js/console.js" defer></script>
+</head>
+<body>
+<a class="fc-skip" href="#main">Skip to content</a>
+<fc-shell data-layout="home">
+<header class="fc-nav">
+
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<nav class="fc-nav__links" aria-label="Primary"><a class="fc-nav__link" href="docs.html">Overview</a><a class="fc-nav__link" href="components.html">Components</a><a class="fc-nav__link" href="admin.html">Admin surfaces</a></nav>
+<span class="fc-nav__spacer"></span>
+<div class="fc-nav__actions"><a class="fc-btn" data-variant="primary" data-size="sm" href="admin.html">Open console</a></div>
+</header>
+<div class="fc-page" id="page">
+<main class="fc-article" id="main">
+<header class="fc-article__head" style="text-align:center;padding-block:2rem">
+<h1 class="fc-title" style="font-size:clamp(2rem,1.2rem + 3vw,3.25rem)">Run and document the site</h1>
+<p class="fc-description" style="max-inline-size:40rem;margin-inline:auto">Frontiers Console is the shared interface for operator and documentation surfaces.</p>
+<div class="fc-actions" style="justify-content:center"><a class="fc-btn" data-variant="primary" href="docs.html">Read the docs</a><a class="fc-btn" href="admin.html">Open the console</a></div>
+</header>
+<div class="fc-cards">
+<a class="fc-card" href="docs.html"><div class="fc-card__icon" aria-hidden="true">D</div><div class="fc-card__title">Documentation</div><p class="fc-card__text">Guides, specs and reference.</p></a>
+<a class="fc-card" href="admin.html"><div class="fc-card__icon" aria-hidden="true">A</div><div class="fc-card__title">Admin</div><p class="fc-card__text">Health, content and tasks.</p></a>
+<a class="fc-card" href="components.html"><div class="fc-card__icon" aria-hidden="true">C</div><div class="fc-card__title">Components</div><p class="fc-card__text">Everything you can build with.</p></a>
+</div>
+<footer class="fc-footer"><span>© Intellectual Frontiers</span><span>Last updated 2 October 2026</span></footer>
+</main>
+</div>
+</fc-shell>
+</body>
+</html>
