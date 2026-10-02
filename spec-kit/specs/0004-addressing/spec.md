@@ -19,9 +19,13 @@ network-mounted source (0001-eidolon-architecture FR-005).
   private vault combined, MAY map to the same URL path.
 - **FR-004**: A repository's content root MUST be a directory named
   `content/` at that repository's root — `content/` in the public root for
-  Public content, `content/` in the private vault for Confidential
-  content. No other directory in either repository MAY hold a content
-  document.
+  content whose audience is Public, `content/` in the private vault for
+  all other content, including the content of every work whose package the
+  vault holds. No other directory in either repository MAY hold a content
+  document. A work package's source files are not content documents
+  (0015-work-packages). The vault's content root MAY hold a document whose
+  audience is Everyone; such a document is resolved and served exactly as
+  a public-root document is, under FR-005 through FR-008.
 
 ## Resolving a request
 
@@ -40,6 +44,22 @@ network-mounted source (0001-eidolon-architecture FR-005).
   the response MUST be the same as FR-007's — one not-found response, not
   two different ones a requester could use to tell "doesn't exist" apart
   from "exists but you may not see it."
+
+## Consumers
+
+- **FR-009**: A web property that serves Eidolon content MUST obtain it
+  from the content roots of both repositories, vendoring it at the
+  property's own build time, and MUST apply FR-005 through FR-008 to
+  everything it serves. A consumer MUST NOT serve a file from a work
+  package (0015-work-packages) except as a content document or as a
+  delivered rendition under FR-010.
+- **FR-010**: A consumer that serves a delivered rendition (0015-work-packages)
+  MUST apply the audience declared on that rendition's own delivery
+  record, per 0001-eidolon-architecture FR-011 through FR-015, and MUST
+  NOT serve it to a requester who does not satisfy that audience. Where a
+  consumer retrieves renditions from storage outside both repositories,
+  and when it retrieves them, is the consumer's own decision and is
+  recorded in the consumer's own spec, not here.
 
 ## Out of scope
 
@@ -63,6 +83,9 @@ network-mounted source (0001-eidolon-architecture FR-005).
 
 - **A URL path** — the public address a content document resolves to,
   derived deterministically from its file path, never assigned separately.
+- **A consumer** — a web property that vendors content from both
+  repositories at its own build time and applies the resolution and
+  audience rules of this spec to what it serves.
 - **A not-found response** — the single response shape for both "no
   document here" and "a document is here but you may not see it."
 
@@ -75,6 +98,10 @@ network-mounted source (0001-eidolon-architecture FR-005).
   indistinguishable from outside.
 - **SC-003**: No two content documents across both repositories ever
   resolve to the same URL.
+
+- **SC-004**: No consumer serves a document or a delivered rendition
+  without the audience check; no consumer serves a work package's source
+  file directly.
 
 ## Review & acceptance checklist
 
