@@ -17,22 +17,27 @@ network-mounted source (0001-eidolon-architecture FR-005).
   containing directory, not to a path ending in `/index`.
 - **FR-003**: No two content documents, across the public root and the
   private vault combined, MAY map to the same URL path.
+- **FR-004**: A repository's content root MUST be a directory named
+  `content/` at that repository's root — `content/` in the public root for
+  Public content, `content/` in the private vault for Confidential
+  content. No other directory in either repository MAY hold a content
+  document.
 
 ## Resolving a request
 
-- **FR-004**: A request for a URL path MUST be resolved against the public
+- **FR-005**: A request for a URL path MUST be resolved against the public
   root's content. If no document matches there, it MUST then be resolved
   against the private vault's content.
-- **FR-005**: Resolution MUST apply the same audience check
+- **FR-006**: Resolution MUST apply the same audience check
   (0001-eidolon-architecture FR-011 – FR-014) to a matched document
   regardless of which repository it came from. No matched document is
   served to a requester without this check.
-- **FR-006**: A requester who does not satisfy any audience listed on a
+- **FR-007**: A requester who does not satisfy any audience listed on a
   matched document MUST receive a response indistinguishable from no
   document existing at that URL. The response MUST NOT reveal that a
   restricted document exists there.
-- **FR-007**: If no document matches a requested URL in either repository,
-  the response MUST be the same as FR-006's — one not-found response, not
+- **FR-008**: If no document matches a requested URL in either repository,
+  the response MUST be the same as FR-007's — one not-found response, not
   two different ones a requester could use to tell "doesn't exist" apart
   from "exists but you may not see it."
 
@@ -51,7 +56,7 @@ network-mounted source (0001-eidolon-architecture FR-005).
 ## Open questions
 
 - **OQ-1**: No mechanism yet exists for actually authenticating a requester
-  against an audience. FR-005 and FR-006 describe what must happen once
+  against an audience. FR-006 and FR-007 describe what must happen once
   that mechanism exists, not how to build it.
 
 ## Key entities
