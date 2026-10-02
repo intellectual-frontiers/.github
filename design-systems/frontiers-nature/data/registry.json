@@ -1,0 +1,24 @@
+{
+  "$comment": "Inherited reference, not an adopted spec in this repository (see templating.md and 0014-design-systems' Out of scope): every app-*, data-app-* and if-* name content may use under that optional vocabulary. 'server' names are consumed during rendering and never reach a browser; 'client' names are web components shipped with chrome.js.",
+  "elements": [
+    { "name": "app-units",   "side": "server", "attrs": [] },
+    { "name": "app-records", "side": "server", "attrs": ["kind"] },
+    { "name": "app-field",   "side": "server", "attrs": ["name", "of"] },
+    { "name": "app-each",    "side": "server", "attrs": ["kind", "where", "sort", "limit"] },
+    { "name": "app-include", "side": "server", "attrs": ["src"] },
+    { "name": "if-shelf",    "side": "client", "attrs": [] }
+  ],
+  "attributes": [
+    { "name": "data-app-layout", "on": ["body"], "values": "layouts" },
+    { "name": "data-app-chrome", "on": ["body"], "values": ["no-breadcrumbs", "no-header", "no-footer"], "list": true, "requires": { "data-app-layout": "default" } },
+    { "name": "data-app-as",     "on": ["body"], "values": ["fragment", "document"] },
+    { "name": "data-app-if",     "on": ["*"], "values": "condition" },
+    { "name": "data-app-bind-href",     "on": ["a"],    "values": "property" },
+    { "name": "data-app-bind-src",      "on": ["img"],  "values": "property" },
+    { "name": "data-app-bind-alt",      "on": ["img"],  "values": "property" },
+    { "name": "data-app-bind-title",    "on": ["*"],    "values": "property" },
+    { "name": "data-app-bind-datetime", "on": ["time"], "values": "property" },
+    { "name": "data-app-bind-width",    "on": ["img"],  "values": "property" },
+    { "name": "data-app-bind-height",   "on": ["img"],  "values": "property" }
+  ]
+}
