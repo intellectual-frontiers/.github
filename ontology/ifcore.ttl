@@ -322,6 +322,64 @@ ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"
     ifcore:hasAudience ifcore:Everyone .
 ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
 
+# ───────────────────────── Press (0009-press) ─────────────────────────
+
+ifcore:ClaimKind a owl:Class ; rdfs:label "Claim kind"@en ;
+    rdfs:comment "The epistemic status a published claim carries (0009-press FR-001)."@en .
+ifcore:ObservableFact a ifcore:ClaimKind ; rdfs:label "Observable fact"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Opinion a ifcore:ClaimKind ; rdfs:label "Opinion"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Framework a ifcore:ClaimKind ; rdfs:label "Framework"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Illustration a ifcore:ClaimKind ; rdfs:label "Illustration"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:claimKind a owl:ObjectProperty ; rdfs:range ifcore:ClaimKind ;
+    rdfs:comment "What kind of claim a published fact or creative work is making."@en .
+
+ifcore:VoicePrinciple a owl:Class ; rdfs:label "Voice principle"@en .
+ifcore:EvidenceLed a ifcore:VoicePrinciple ; rdfs:label "Evidence-led"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Practical a ifcore:VoicePrinciple ; rdfs:label "Practical"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Skeptical a ifcore:VoicePrinciple ; rdfs:label "Skeptical"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Plain a ifcore:VoicePrinciple ; rdfs:label "Plain"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:EvidenceLadderStage a owl:Class ; rdfs:label "Evidence ladder stage"@en ;
+    rdfs:comment "A publication's reception, read as evidence about its thesis, in ascending order of strength (0009-press FR-014)."@en .
+ifcore:Silence a ifcore:EvidenceLadderStage ; rdfs:label "Silence"@en ; ifcore:sequenceOrder 1 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Argument a ifcore:EvidenceLadderStage ; rdfs:label "Argument"@en ; ifcore:sequenceOrder 2 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:AdoptionOfTerminology a ifcore:EvidenceLadderStage ; rdfs:label "Adoption of terminology"@en ; ifcore:sequenceOrder 3 ; ifcore:hasAudience ifcore:Everyone .
+ifcore:WillingnessToPay a ifcore:EvidenceLadderStage ; rdfs:label "Willingness to pay"@en ; ifcore:sequenceOrder 4 ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:PressLevel a owl:Class ; rdfs:label "Press level"@en ;
+    rdfs:comment "One of five scopes a piece can be written at (0009-press FR-007)."@en .
+ifcore:covers a owl:DatatypeProperty ; rdfs:domain ifcore:PressLevel ; rdfs:range xsd:string .
+ifcore:TheFirmLevel a ifcore:PressLevel ; rdfs:label "Intellectual Frontiers"@en ;
+    ifcore:covers "Why the firm exists, how Native Alpha governs decisions, and what the record supports."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:BusinessUnitLevel a ifcore:PressLevel ; rdfs:label "Business units"@en ;
+    ifcore:covers "What each unit does, and where their boundaries remain."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:StudiosCompanyLevel a ifcore:PressLevel ; rdfs:label "Studios companies"@en ;
+    ifcore:covers "Market thesis, customer evidence, category language, Native Alpha, and a company-owned voice."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:CapitalCompanyLevel a ifcore:PressLevel ; rdfs:label "IF Capital companies"@en ;
+    ifcore:covers "Optional help with research, launches, education, and direct channels without editorial control."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:NetworkLevel a ifcore:PressLevel ; rdfs:label "IF Network"@en ;
+    ifcore:covers "What the search found and what the evidence supports, written so a hiring decision can rest on it."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:FounderWritingType a owl:Class ; rdfs:label "Founder writing type"@en .
+ifcore:ContrarianBrief a ifcore:FounderWritingType ; rdfs:label "Contrarian Brief"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:DesignPatternWriting a ifcore:FounderWritingType ; rdfs:label "Design Pattern"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:WorkingTheory a ifcore:FounderWritingType ; rdfs:label "Working Theory"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:PractitionerJournalist a ifcore:FounderWritingType ; rdfs:label "Practitioner Journalist"@en ; ifcore:hasAudience ifcore:Everyone .
+
+ifcore:AIWorkforce a owl:Class ; rdfs:label "AI Workforce"@en ;
+    skos:definition "A SpecKit that states intent, a harness that carries it out, agents that hold a role, skills that do one job, and MCPs that connect them to a reader's own tools and data — what a Fieldbook teaches a reader to build (0009-press FR-016, FR-018)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
+    skos:definition "A skill that carries a person's knowledge, judgment, taste, and skill in durable, inspectable, versioned form — what a reader's own work, once named and made durable, is ready to become (0009-press FR-018)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:ChasingNativeAlpha schema:publisher ifcore:Press .
+
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
     ifcore:question "What is unusually true here?"@en ;
     ifcore:hasAudience ifcore:Everyone .
