@@ -99,7 +99,12 @@ restated here.
   classified Public. A company's own raw research, strategy, or
   planning material held there is not a content document under
   0002-content-format; it MAY be authored in whatever format is
-  practical until and unless it is deliberately published as one.
+  practical until and unless it is deliberately published as one. A
+  `content/` directory nested under `ventures/<company>/` is distinct
+  from a repository's own content root (0004-addressing FR-004) — the
+  same word names two different things, and nothing under the nested
+  one is subject to 0002-content-format's rules, 0002 FR-016's
+  HTML5-only authoring rule included, merely for sharing the name.
 - **FR-020**: Within a company's `ventures/<company>/` directory, raw
   material supplied from outside — a founder's prompt, an external
   document, anything given rather than produced here — MUST be kept
@@ -223,6 +228,10 @@ restated here.
 - **SC-011**: No raw material supplied from outside sits in a company's
   `docs/`; no company's own working material sits in its
   `content/intake/` once it has actually been prepared for use.
+- **SC-012**: No document under a company's `ventures/<company>/content/`
+  is mistaken for, or held to the rules of, a document under a
+  repository's own content root — the two are never conflated on the
+  strength of sharing a directory name.
 
 ## Review & acceptance checklist
 
