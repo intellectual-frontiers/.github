@@ -100,6 +100,7 @@ An empty `<fc-toc scope="main" depth="3">` builds itself from the headings. `ari
 | --- | --- |
 | Data table | `fc-table[filter=#input][count=#el] > table`; sortable headers `th[data-sort][=number]`; numeric cells `td[data-numeric]` with optional `data-value` for sorting |
 | Toolbar | `.fc-toolbar` with `.fc-toolbar__count` and `.fc-toolbar__spacer` |
+| Inline controls | `.fc-inline` around buttons or one-button `form`s that belong on one line |
 | Stats | `.fc-stats > .fc-stat[data-tone] > .fc-stat__label + .fc-stat__value + .fc-stat__note` |
 | Form | `.fc-form > .fc-field > label.fc-label + .fc-input\|.fc-select\|.fc-textarea + .fc-hint\|.fc-error`; `.fc-check`, `.fc-switch`; invalid controls set `aria-invalid="true"` and point `aria-describedby` at the `.fc-error` |
 | Empty state | `.fc-empty > .fc-empty__title + .fc-empty__text + action` |
