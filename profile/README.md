@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-<h3 align="center">We find unusual advantages, prove them cheaply, and build what survives.</h3>
+<h3 align="center">A think tank that builds useful things.</h3>
 
 <p align="center">
   <img alt="How contrarian but practical observations move through Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature/images/how-contrarian-but-practical-observations-move-through-intellectual-frontiers-836.webp" width="836">
