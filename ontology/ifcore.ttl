@@ -288,6 +288,24 @@ ifcore:lifecycleOwner a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork 
     rdfs:comment "The one unit accountable for a Substantial Work's progress (FR-021). Defaults to Research & IP while disposition is unsure, Press otherwise; any unit may claim it explicitly, overriding the default."@en .
 ifcore:WorkKind a owl:Class ; rdfs:label "Work kind"@en ;
     rdfs:comment "A family of works that share a source format and a set of rules; names the <kind> segment of a work package's path (0015-work-packages FR-004, FR-005). An individual MUST be declared before any work package of that kind exists."@en .
+ifcore:BookKind a ifcore:WorkKind ; rdfs:label "Book"@en ; dcterms:identifier "book" ;
+    rdfs:comment "A book: AsciiDoc manuscript, jacket data, figures, and a book bible (0016-press-production FR-004)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookSeriesKind a ifcore:WorkKind ; rdfs:label "Book series"@en ; dcterms:identifier "book-series" ;
+    rdfs:comment "A serial series: a series bible and volume map, no manuscript; each volume is its own book work (0016-press-production FR-008)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SkillKind a ifcore:WorkKind ; rdfs:label "Skill"@en ; dcterms:identifier "skill" ;
+    rdfs:comment "A skill carrying a book's or record's method for a reader's own AI (0016-press-production FR-040)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebsiteKind a ifcore:WorkKind ; rdfs:label "Website"@en ; dcterms:identifier "website" ;
+    rdfs:comment "The written public-facing content of a web property; text lives as content documents (0016-press-production FR-042)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:identifier "spoken" ;
+    rdfs:comment "A spoken-first work whose source is an AsciiDoc script (0017-spoken-and-research-works FR-001, FR-004)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterms:identifier "research" ;
+    rdfs:comment "An area, pillar, note, paper, publication, disclosure, trademark record, or patent draft (0017-spoken-and-research-works FR-017)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
     rdfs:comment "The stage a Substantial Work currently occupies."@en .
 
