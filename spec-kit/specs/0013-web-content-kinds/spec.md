@@ -8,9 +8,12 @@
 document MUST declare in its JSON-LD block to be valid under that kind.
 This spec covers only content kinds whose underlying business concept
 already has a settled ontology class elsewhere — a content document for
-one of them renders facts that already exist, never asserts a new one. A
-content kind for a business concept not yet established anywhere else is
-out of scope here, per 0002-content-format FR-007.
+one of them renders facts that already exist, never asserts a new one,
+with one exception: a Journal article, which per 0007-work-and-assets
+FR-016 may itself be the primary place Intellectual Frontiers' own
+originated text lives. A content kind for a business concept not yet
+established anywhere else is out of scope here, per 0002-content-format
+FR-007.
 
 ## Content kinds backed by one existing individual
 
@@ -35,16 +38,22 @@ out of scope here, per 0002-content-format FR-007.
 - **FR-008**: `ifweb:BookPage` MUST declare `schema:about` naming exactly
   one individual that is both a `schema:Book` and an `ifcore:Copyright`,
   per 0007-work-and-assets FR-013.
+- **FR-009**: `ifweb:JournalArticlePage` MUST declare `schema:isPartOf`
+  naming the Journal `schema:Periodical` individual (0009-press FR-020)
+  and `schema:about` naming the concept the article covers. Where the
+  article is derived from the firm's own tracked research, it MUST also
+  declare `prov:wasDerivedFrom` naming the `Note` or `ResearchPillar` it
+  was drawn from, per 0007-work-and-assets FR-016 and 0009-press FR-022.
 
 ## The portfolio index
 
-- **FR-009**: `ifweb:PortfolioIndexPage` MUST NOT assert any fact about a
+- **FR-010**: `ifweb:PortfolioIndexPage` MUST NOT assert any fact about a
   specific work. It MAY list any number of individuals already declared
   elsewhere in the ontology, of any combination of: `ifcore:PatentFamily`,
   `ifcore:Trademark`, `ifcore:DefensiveDisclosure`, `ifcore:Fund`,
   `schema:Book`, `ifcore:ResearchPillar`, `ifcore:VentureCategory`,
   `ifcore:SoftwareCategory`, or `ifcore:SharedServiceCategory`.
-- **FR-010**: A work kind with no existing ontology class — standalone
+- **FR-011**: A work kind with no existing ontology class — standalone
   software, a dataset, a method, a study — MUST be established, in
   whichever spec actually governs that business concept, before
   `ifweb:PortfolioIndexPage` may list an individual of that kind. This
@@ -77,7 +86,7 @@ out of scope here, per 0002-content-format FR-007.
   standing editorial decision, not resolved here.
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own
-  governing spec before FR-010 is satisfied for it.
+  governing spec before FR-011 is satisfied for it.
 
 ## Key entities
 
@@ -86,18 +95,24 @@ out of scope here, per 0002-content-format FR-007.
   individual the page is about via `schema:about`.
 - **The portfolio index** — a page that lists existing individuals from
   across several ontology classes; it is a view, not a new fact type.
+- **A Journal article page** — the one content kind here that may carry
+  content Intellectual Frontiers itself originates rather than only
+  render an existing fact, per 0007-work-and-assets FR-016.
 
 ## Success criteria
 
 - **SC-001**: Every content document declaring one of FR-001 through
   FR-008's kinds names exactly one real, already-declared ontology
-  individual via `schema:about`, of the class that kind requires.
+  individual via `schema:about`.
 - **SC-002**: No `ifweb:PortfolioIndexPage` asserts a new fact about a
   work — every entry it lists already exists as its own individual
   elsewhere.
 - **SC-003**: No content document declares a content kind this spec does
   not establish, for a business concept not established anywhere else,
   per 0002-content-format FR-007.
+- **SC-004**: Every `ifweb:JournalArticlePage` names the Journal via
+  `schema:isPartOf`; one derived from the firm's own research also names
+  that research via `prov:wasDerivedFrom`.
 
 ## Review & acceptance checklist
 
