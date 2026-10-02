@@ -186,6 +186,59 @@ ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range 
 ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
     rdfs:comment "Optional. Absent means open-ended; present means the grant stops counting after this date (0005 FR-004)."@en .
 
+# ───────────────────────── Research & IP (0006-research-and-ip) ─────────────────────────
+
+ifcore:ResearchArea a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research area"@en ;
+    rdfs:comment "Groups related work; the top of the research chain (0006 FR-001)."@en .
+ifcore:ResearchPillar a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Research pillar"@en ;
+    rdfs:comment "A standing line of inquiry under a research area, carrying its own question (0006 FR-002)."@en .
+ifcore:partOfArea a owl:ObjectProperty ; rdfs:domain ifcore:ResearchPillar ; rdfs:range ifcore:ResearchArea .
+
+ifcore:NoteType a owl:Class ; rdfs:label "Note type"@en .
+ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Note or paper"@en ;
+    rdfs:comment "Where a finding is recorded (0006 FR-003). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
+ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
+ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
+
+ifcore:Disposition a owl:Class ; rdfs:label "Disposition"@en ;
+    rdfs:comment "The explicit outcome a protectable finding receives (0006 FR-005)."@en .
+ifcore:DispositionPatent a ifcore:Disposition ; rdfs:label "Patent"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:DispositionDefensiveDisclosure a ifcore:Disposition ; rdfs:label "Defensive disclosure"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:DispositionTradeSecret a ifcore:Disposition ; rdfs:label "Trade secret"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:DispositionNoAction a ifcore:Disposition ; rdfs:label "No action"@en ; ifcore:hasAudience ifcore:Everyone .
+ifcore:hasDisposition a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:Disposition .
+
+ifcore:Right a owl:Class ; rdfs:label "Right"@en ;
+    rdfs:comment "A kind of protection a finding's disposition can produce."@en .
+ifcore:PatentFamily a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent family"@en .
+ifcore:DefensiveDisclosure a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Defensive disclosure"@en .
+ifcore:Trademark a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trademark"@en .
+ifcore:TradeSecret a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trade secret"@en .
+ifcore:License a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "License"@en ;
+    rdfs:comment "What a counterparty can take on a right this unit holds."@en .
+ifcore:licenses a owl:ObjectProperty ; rdfs:domain ifcore:License ; rdfs:range ifcore:Right .
+
+ifcore:WorkGroup a owl:Class ; rdfs:label "Work group"@en ;
+    rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
+ifcore:MarketplacesAndPayments a ifcore:WorkGroup ; rdfs:label "Marketplaces and payments"@en ;
+    rdfs:comment "Computer-controlled marketplace networks, digital payments, and related continuations."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:EvidenceAndDecisions a ifcore:WorkGroup ; rdfs:label "Evidence and decisions"@en ;
+    rdfs:comment "Traceable metric queues, task scheduling, service-delivery evidence, initiative tracking, document review, case response, decision lifecycles, and risk systems."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:HealthcareDelivery a ifcore:WorkGroup ; rdfs:label "Healthcare delivery"@en ;
+    rdfs:comment "Medical-device control, patient navigation, longitudinal profiles, team-based tele-diagnostics, smart referrals, and digital-native trials."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:TrustedDataAndAuthorization a ifcore:WorkGroup ; rdfs:label "Trusted data and authorization"@en ;
+    rdfs:comment "Self-controlled digital authorization, device-driven blockchain integrity, blockchain natural-language processing, and multi-source data integration."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"@en ;
+    rdfs:comment "Precision education and training, rating aggregation, and rewardable content delivery."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
+
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;
     ifcore:question "What is unusually true here?"@en ;
     ifcore:hasAudience ifcore:Everyone .
