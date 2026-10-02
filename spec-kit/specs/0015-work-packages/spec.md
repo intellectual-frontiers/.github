@@ -127,7 +127,7 @@ property fetches them are decisions outside this spec.
 - **FR-024**: A work's audience MUST default to the most restrictive
   available audience until a publication decision records otherwise, per
   0001-eidolon-architecture FR-012.
-- **FR-025**: Broadening a work's audience to Everyone MUST be its own
+- **FR-025**: Broadening a work's audience to Public MUST be its own
   `Decision`, made by the decision authority in effect
   (0001-eidolon-architecture FR-029) and recorded before any consumer
   serves the work, one of its generated content documents, or one of its

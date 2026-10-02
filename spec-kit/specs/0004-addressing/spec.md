@@ -24,7 +24,7 @@ network-mounted source (0001-eidolon-architecture FR-005).
   vault holds. No other directory in either repository MAY hold a content
   document. A work package's source files are not content documents
   (0015-work-packages). The vault's content root MAY hold a document whose
-  audience is Everyone; such a document is resolved and served exactly as
+  audience is Public; such a document is resolved and served exactly as
   a public-root document is, under FR-005 through FR-008.
 
 ## Resolving a request
