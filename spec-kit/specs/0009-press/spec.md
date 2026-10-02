@@ -95,9 +95,30 @@ ontology data and registers, not restated here.
   FR-003 the same way regardless of format. Format does not change the
   evidence standard.
 
+## The Journal
+
+- **FR-020**: A standing periodical Press publishes MUST be represented
+  as a `schema:Periodical`, distinct from a one-off work like a book —
+  its own current roster of issues and articles is ontology and register
+  data, not restated here.
+- **FR-021**: An article the Journal publishes MUST satisfy FR-001
+  through FR-004 the same as any other Press output. A standing
+  publication earns no exemption from claim-kind labeling, the evidence
+  standard, or the four voice principles.
+- **FR-022**: An article derived from the firm's own tracked research (a
+  `Note` or `ResearchPillar`, per 0006-research-and-ip) MUST be related
+  to it by `prov:wasDerivedFrom`, per 0007-work-and-assets FR-016. The
+  article is the publication; the Note or pillar it was drawn from
+  remains the primary research record.
+- **FR-023**: A concept with research behind it that originates outside
+  Intellectual Frontiers — authored by the founder elsewhere, for
+  instance — MUST be referenced from the Journal article rather than
+  republished as if the Journal were its primary source, per
+  0007-work-and-assets FR-016.
+
 ## Events and partnerships
 
-- **FR-020**: Press MUST NOT build its own event arm. Where a concept
+- **FR-024**: Press MUST NOT build its own event arm. Where a concept
   earns a stage, Press MUST partner with an operator who owns the venue,
   ticketing, and logistics, and MUST hold a talk to the same editorial
   bar as print — no slide goes in front of an audience that would not
@@ -105,22 +126,22 @@ ontology data and registers, not restated here.
 
 ## Written public-facing surfaces
 
-- **FR-021**: Press MUST be responsible for the accuracy, voice, audit
+- **FR-025**: Press MUST be responsible for the accuracy, voice, audit
   step, and change-disclosure of every written public-facing content on
   a web property the company operates. Code, design, and infrastructure
   remain engineering's, not Press's.
-- **FR-022**: Press MUST be responsible for the same standard on a
+- **FR-026**: Press MUST be responsible for the same standard on a
   third-party supplier or vendor registry profile. Unlike a channel it
   owns outright, a registry profile's platform and fields belong to the
   registry — Press owns only the words entered into it.
-- **FR-023**: Press MUST review every surface FR-021 and FR-022 cover
+- **FR-027**: Press MUST review every surface FR-025 and FR-026 cover
   against the current record on a quarterly cadence, and additionally
   within ten business days of any fact a surface states changing. Each
   review MUST be dated and recorded as passed or found-stale.
 
 ## Owned channels
 
-- **FR-024**: A publication Press owns outright MUST be represented as a
+- **FR-028**: A publication Press owns outright MUST be represented as a
   `DigitalAsset`, per 0007-work-and-assets FR-007 — not merely named in
   prose.
 
@@ -160,6 +181,9 @@ ontology data and registers, not restated here.
 - **AI Workforce** and **Labor as Code** — defined terms naming the
   pattern a Fieldbook teaches a reader to build, and what a reader's own
   work can become once named and made durable.
+- **The Journal** — a standing periodical, distinct from a one-off book;
+  an article it publishes is related to the research it was drawn from
+  by `prov:wasDerivedFrom`, never presented as the primary record.
 
 ## Success criteria
 
@@ -179,6 +203,10 @@ ontology data and registers, not restated here.
   everywhere they appear; no piece redefines them locally.
 - **SC-008**: No owned channel's accuracy is reviewed less often than
   quarterly, and no stale fact survives ten business days unreviewed.
+- **SC-009**: No Journal article derived from the firm's own tracked
+  research omits `prov:wasDerivedFrom`; no article republishes an
+  externally-originated concept as if the Journal were its primary
+  source.
 
 ## Review & acceptance checklist
 
