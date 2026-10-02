@@ -135,10 +135,13 @@ reference model, and governance representation.
 - **FR-030**: A decision MUST be checked against the authority in effect at the time
   the decision was made, not the authority in effect when the decision is later
   reviewed.
-- **FR-031**: A recorded decision MUST correspond to one of the five
-  decision-checkpoint outcomes: continue, change, back someone else, build it, or
-  stop. Routine operational activity MUST NOT require a recorded decision
-  individual.
+- **FR-031**: A decision resolving a Native Alpha thesis question MUST
+  correspond to one of the five decision-checkpoint outcomes: continue,
+  change, back someone else, build it, or stop. A significant decision
+  outside that shape (legal, operational, or personnel, for instance) MAY be
+  recorded without one, per 0008-decision-records FR-004. Routine
+  operational activity MUST NOT require a recorded decision individual
+  either way.
 - **FR-032**: Decision-recording practice MUST be sized for a single-member LLC:
   lightweight, useful to the founder, without formal multi-stakeholder process
   overhead. This MUST be revisited if the company's structure changes.
