@@ -870,6 +870,22 @@ ifcore:NyNikaTMcFadden a ifcore:Person ;
 
 ifcore:Handova schema:founder ifcore:NyNikaTMcFadden, ifcore:ShahidNehalShah .
 
+ifcore:UnblockHealth a ifcore:Organization ;
+    rdfs:label "Unblock Health"@en ;
+    ifcore:portfolioCategory ifcore:VentureCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    schema:url "https://www.unblock.health/"^^xsd:anyURI ;
+    rdfs:comment "A FHIR-native digital platform replacing the manual, fragmented patient medical-record-access and record-correction request workflow with a centralized, trackable one, serving patient advocates and hospital Health Information Management (HIM) professionals; offers Individual Access Services (IAS). Co-founded at HIT Expo 2018 in New Orleans (unblock.health, fetched 2026-10-02, not otherwise re-verified)."@en ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:GraceCordovano a ifcore:Person ;
+    ifcore:legalName "Grace Cordovano"@en ;
+    rdfs:comment "Grace Cordovano, PhD, BCPA (Board Certified Patient Advocate); co-founder of ifcore:UnblockHealth alongside ifcore:ShahidNehalShah, and separately runs her own independent practice, Enlightening Results. Over 20 years of patient-advocacy experience, oncology-space specialization; contributor to the U.S. Core Data for Interoperability Taskforce and the HITAC Interoperability Standards Work Group (public LinkedIn and press sources, not independently verified beyond that)."@en ;
+    schema:sameAs <https://www.linkedin.com/in/gcordovano/> ;
+    ifcore:hasAudience ifcore:Everyone .
+
+ifcore:UnblockHealth schema:founder ifcore:GraceCordovano, ifcore:ShahidNehalShah .
+
 # ───────────────────────── Network (0012-network) ─────────────────────────
 
 ifcore:SearchStage a owl:Class ; rdfs:label "Search stage"@en ;
