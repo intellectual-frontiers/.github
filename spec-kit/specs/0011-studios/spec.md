@@ -76,29 +76,44 @@ restated here.
   outside the firm, it MUST be spun out rather than kept as an internal
   tool indefinitely.
 
+## Each company's own Eidolon
+
+- **FR-017**: A company Studios incubates MUST receive its own Eidolon —
+  a public root and, where it holds anything Confidential, a private
+  vault — the same separation 0001-eidolon-architecture FR-004 already
+  requires for a fund, so an AI reasoning about that company's own work
+  has a grounded representation of it to manage work against, not only
+  prose about it.
+- **FR-018**: Until a company's own Eidolon exists, Studios MUST
+  represent it as individuals within Intellectual Frontiers' own
+  Eidolon. That representation MUST transfer to the company's own
+  Eidolon once it exists, per 0001-eidolon-architecture FR-019's
+  single-source-of-truth rule — not be duplicated and left to drift in
+  both places.
+
 ## Studios as a last-mile capability
 
-- **FR-017**: Before Studios charters a venture, 0003-intellectual-frontiers
+- **FR-019**: Before Studios charters a venture, 0003-intellectual-frontiers
   FR-011's search-before-build rule MUST be applied, and even once it is,
   Studios MUST have at least one experiment's evidence on record before
   forming the venture as its own entity. Entity formation follows
   evidence; it does not substitute for it.
-- **FR-018**: When a better-positioned operator is found during or after a
+- **FR-020**: When a better-positioned operator is found during or after a
   Studios experiment, Studios MUST hand off — invest, partner, license,
   merge, or spin out — rather than retain ownership of the implementation
   to preserve its own authorship.
-- **FR-019**: The ease of building something MUST NOT be treated as
+- **FR-021**: The ease of building something MUST NOT be treated as
   evidence that building it was worth the time spent.
 
 ## IPLG
 
-- **FR-020**: A tool or piece of content Studios builds to make its work
+- **FR-022**: A tool or piece of content Studios builds to make its work
   directly usable MUST be evaluated against the Native Alpha test
   (0003-intellectual-frontiers FR-005, FR-006) the same as anything else.
 
 ## Boundary
 
-- **FR-021**: Studios activity MUST NOT be cited, by Studios or by anyone
+- **FR-023**: Studios activity MUST NOT be cited, by Studios or by anyone
   else, as justification for a Capital investment decision by itself —
   the unit-boundary rule in 0003-intellectual-frontiers FR-003 applies
   here by name.
@@ -113,6 +128,10 @@ restated here.
   doctrine — this spec governs current practice, not history.
 - Which specific ventures, software, and shared services currently exist
   is ontology and register population, not this spec.
+- How a company's own Eidolon is actually provisioned — repository
+  creation, access setup, migration tooling — is an implementation plan,
+  not this spec. FR-017 and FR-018 establish that it must exist and that
+  representation transfers to it; they do not establish how.
 
 ## Open questions
 
@@ -137,6 +156,10 @@ restated here.
   operating company, each with its own obligations.
 - **IPLG** — the framework for turning Studios' work into something a
   visitor can use directly, shared with 0006-research-and-ip.
+- **A company's own Eidolon** — the public root (and private vault, where
+  needed) a Studios-incubated company gets once it exists, so an AI can
+  reason about and help manage its work directly, the same separation
+  0001-eidolon-architecture FR-004 requires for a fund.
 
 ## Success criteria
 
@@ -158,6 +181,10 @@ restated here.
 - **SC-008**: When a better-positioned operator is identified, the
   resulting decision is a hand-off, not continued ownership defended on
   the grounds that Studios built it first.
+- **SC-009**: Every company Studios incubates either has its own Eidolon
+  or is represented as individuals within Intellectual Frontiers' own
+  Eidolon — never left unrepresented in either, and never duplicated in
+  both once its own Eidolon exists.
 
 ## Review & acceptance checklist
 
