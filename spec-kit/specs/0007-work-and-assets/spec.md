@@ -68,6 +68,14 @@ assets.
   continuation, divisional, or continuation-in-part — not left as an
   unrelated filing or collapsed into a generic derivation.
 
+## Canonical authority
+
+- **FR-012**: The relevant registry — the USPTO for a U.S. patent or
+  trademark, the corresponding authority elsewhere — MUST be treated as the
+  sole canonical source for a right's final disposition (granted,
+  registered, abandoned, refused). No statement elsewhere in the Eidolon,
+  however confident, overrides what the registry's own record says.
+
 ## Out of scope
 
 - Equity interests, securities, and other financial assets are Capital's to
