@@ -32,8 +32,9 @@ ifweb:contentKind a owl:DatatypeProperty ;
 ifweb:Page a owl:Class, sh:NodeShape ;
     rdfs:subClassOf ifcore:Fact ;
     rdfs:label "Page"@en ;
-    rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008)."@en ;
-    ifweb:contentKind "Page" .
+    rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008) and, where it is generated from a work package's source, its provenance (0002 FR-017)."@en ;
+    ifweb:contentKind "Page" ;
+    sh:property [ sh:path prov:wasDerivedFrom ; sh:maxCount 1 ] .
 
 # ───────────────────────── Content kinds backed by one existing individual (0013-web-content-kinds) ─────────────────────────
 

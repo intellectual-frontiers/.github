@@ -294,6 +294,27 @@ is not stated here.
   the release. A discoverability check is a necessary condition and MUST NOT
   be presented as a promise of visibility.
 
+## Book formats and shared terms
+
+- **FR-049**: A Fieldbook is a book that teaches a person to do a kind of work
+  better. A Rolebook is a book for a profession or job function whose job has
+  changed structurally: it tells an experienced person that the work itself is
+  different and what to do on Monday morning. A Rolebook MUST answer five
+  questions — what changed around the role, which old work is disappearing or
+  commoditizing, which work stays valuable, what the person is now responsible
+  for, and what the person does differently on Monday — and it is short by
+  design, so no length range applies to it and it MUST NOT be padded to reach
+  one. A chapter that bears on none of the five answers SHOULD be cut or moved
+  to the companion. A format's series kicker MUST NOT be applied to a book of
+  the other format.
+- **FR-050**: A term that more than one Press work uses MUST be defined once, in
+  the ontology, and every work MUST use it as defined and MUST NOT redefine it
+  locally. A term that only one work coins is defined in that work's book bible
+  (FR-005). A human-readable glossary MAY be generated from the ontology and
+  MUST NOT be authored by hand. A work that appears to define a shared term
+  differently MUST be flagged for a person's decision, never silently
+  reconciled.
+
 ## Out of scope
 
 - Voice principles beyond those in 0009-press, and the audit checklist's own
@@ -329,6 +350,11 @@ is not stated here.
   points to, authored in AsciiDoc in the package.
 - **A skill** — a Substantial Work of kind `skill` that carries a book's
   method for a reader's own AI.
+- **A Fieldbook and a Rolebook** — the two book formats FR-049 distinguishes:
+  teaching a person to do a kind of work better, and telling a person whose job
+  has changed structurally what to do about it.
+- **A shared term** — a term more than one Press work uses, defined once in the
+  ontology and used as defined everywhere.
 - **A promotion brief** — the supporting record that keeps promotion tied to
   what a work actually keeps, never a copy of the work.
 
@@ -352,6 +378,9 @@ is not stated here.
   skill or MCP tool; none ships before the book's publication decision.
 - **SC-009**: No work's source contains promotion; no promotion record
   claims more than its work keeps.
+- **SC-010**: No Rolebook lacks an answer to any of its five questions or is
+  padded to a length range; no shared term is defined by hand anywhere but the
+  ontology, and none is redefined by a work.
 
 ## Review & acceptance checklist
 

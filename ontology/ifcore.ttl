@@ -636,6 +636,53 @@ ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
     rdfs:comment "The record of what systems actually do in the field versus what they are documented to do."@en ;
     ifcore:hasAudience ifcore:Public .
 
+# ───────────────────────── Renditions and delivery (0015-work-packages FR-013 – FR-018) ─────────────────────────
+
+ifcore:DeliveryRecord a owl:Class ; rdfs:subClassOf ifcore:Reference ; rdfs:label "Delivery record"@en ;
+    rdfs:comment "Records where a delivered binary rendition lives, from which source commit, with its checksum, carrying its own audience (0015 FR-017). The work it renders is named by ifcore:describes. Its audience MUST NOT be broader than its work's. The rendition itself is never tracked in Git (0015 FR-014)."@en .
+ifcore:deliveredTo a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:anyURI ;
+    rdfs:comment "Where the rendition lives. MUST NOT hold, or embed, a credential, a password, an access secret, or a signed or expiring address (0015 FR-017)."@en .
+ifcore:sourceCommit a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:string ;
+    rdfs:comment "The full commit hash of the source the rendition was built from (0015 FR-015)."@en .
+ifcore:deliveredOn a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:date .
+ifcore:checksum a owl:DatatypeProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range xsd:string ;
+    rdfs:comment "The SHA-256 of the delivered file, as lowercase hexadecimal."@en .
+
+ifcore:CutKind a owl:Class ; rdfs:label "Cut kind"@en ;
+    rdfs:comment "Whether a delivered rendition is a review cut or a final cut (0016-press-production FR-025)."@en .
+ifcore:ReviewCut a ifcore:CutKind ; rdfs:label "Review cut"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FinalCut a ifcore:CutKind ; rdfs:label "Final cut"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:cutKind a owl:ObjectProperty ; rdfs:domain ifcore:DeliveryRecord ; rdfs:range ifcore:CutKind ;
+    rdfs:comment "Present when the rendition is a review or final cut. Edition and printing are not restated here: the manuscript at sourceCommit is their one source (0016 FR-024)."@en .
+
+# ───────────────────────── Book formats and series (0016-press-production FR-008, FR-049; 0017 FR-011) ─────────────────────────
+
+ifcore:Fieldbook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Fieldbook"@en ;
+    rdfs:comment "A book that teaches a person to do a kind of work better (0016 FR-049)."@en .
+ifcore:Rolebook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Rolebook"@en ;
+    rdfs:comment "A short book for a profession or job function whose job has changed structurally; it answers five questions and is not padded to a length range (0016 FR-049)."@en .
+[] a owl:AllDisjointClasses ; owl:members ( ifcore:Fieldbook ifcore:Rolebook ) .
+
+ifcore:SerialSeries a owl:Class ; rdfs:subClassOf schema:BookSeries, ifcore:SubstantialWork ; rdfs:label "Serial series"@en ;
+    rdfs:comment "A set of books meant to be read together in order, kept coherent by one series bible; each volume is its own book work related to it by schema:isPartOf (0016 FR-008 – FR-011)."@en .
+ifcore:Anthology a owl:Class ; rdfs:subClassOf ifcore:SerialSeries ; rdfs:label "Anthology"@en ;
+    rdfs:comment "A serial series made from another work's released items, one chapter per item, one volume per calendar year; a chapter is related to the item it adapts by schema:isBasedOn (0017 FR-011, FR-012)."@en .
+
+# ───────────────────────── Named tools, provenance, and promotion (0016-press-production FR-041, FR-046) ─────────────────────────
+
+ifcore:NamedTool a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Named tool"@en ;
+    rdfs:comment "A named tool, test, or framework a work teaches and expects a reader to reuse (0016 FR-041). Every individual carries explicit provenance (ifcore:sourceFile, ifcore:sourceLocation) and an audience."@en .
+ifcore:definedIn a owl:ObjectProperty ; rdfs:domain skos:Concept ; rdfs:range schema:CreativeWork ;
+    rdfs:comment "The work, chapter, or section that gives a concept its definition."@en .
+ifcore:sourceFile a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Provenance: the repository-relative path an extracted individual was taken from (0016 FR-041)."@en .
+ifcore:sourceLocation a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Provenance: the exact heading, identifier, or line within ifcore:sourceFile an extracted individual was taken from, specific enough for a person to find the passage."@en .
+
+ifcore:PromotionBrief a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Promotion brief"@en ;
+    rdfs:comment "A work's supporting record of its reader, promise, claims kept, keywords, surfaces, comparables, and decisions owed. Never the work itself (0016 FR-046)."@en .
+ifcore:briefOf a owl:ObjectProperty ; rdfs:domain ifcore:PromotionBrief ; rdfs:range ifcore:SubstantialWork .
+
 # ───────────────────────── The Journal (0009-press FR-020 – FR-023) ─────────────────────────
 
 ifcore:JournalOfIntellectualFrontiers a schema:Periodical ;
