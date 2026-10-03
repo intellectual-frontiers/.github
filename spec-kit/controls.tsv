@@ -1,0 +1,48 @@
+# Which control each requirement in this repository's specs addresses (0027-compliance-controls FR-005, FR-006).
+# control: <catalog notation>:<control notation>, as the ontology's ControlCatalogs declare them. A row says the
+# requirement's rule addresses the control, in full or in part; whether a boundary meets the control is the
+# assessor's judgment (0027 Assumptions). One row per requirement and control; the specs are never restated per framework.
+requirement	control	note
+0001-eidolon-architecture FR-002	cmmc-l1:AC.L1-b.1.iv	only Public-tier facts in the publicly readable repository
+0001-eidolon-architecture FR-002	soc2:C1.1	confidential facts kept out of the public root
+0001-eidolon-architecture FR-008	soc2:CC6.1	repository access limited to a named circle
+0001-eidolon-architecture FR-008	cmmc-l1:AC.L1-b.1.i	repository access limited to authorized users
+0001-eidolon-architecture FR-009	soc2:CC6.1	everyone else reaches the vault only through an authenticated, mediated interface
+0001-eidolon-architecture FR-009	cmmc-l1:AC.L1-b.1.ii	outside parties are limited to what the mediated interface serves them
+0001-eidolon-architecture FR-011	soc2:C1.1	every fact declares who may see it
+0001-eidolon-architecture FR-012	soc2:C1.1	an undeclared audience defaults to the most restrictive
+0001-eidolon-architecture FR-021	soc2:C1.1	a sensitive fact is never a literal
+0001-eidolon-architecture FR-023	soc2:CC6.1	no credential in any repository
+0001-eidolon-architecture FR-029	soc2:CC1.3	a named decision authority, delegated explicitly
+0001-eidolon-architecture FR-035	soc2:CC8.1	every change to a spec or the ontology says what changed and why
+0001-eidolon-architecture FR-036	soc2:CC7.4	exposure of a secret is removed from history and the secret rotated
+0001-eidolon-architecture FR-037	soc2:CC8.1	a change is specified before it is built
+0005-authentication FR-001	soc2:CC6.1	every non-public request is bound to an identified agent
+0005-authentication FR-001	cmmc-l1:IA.L1-b.1.v	users identified before evaluation
+0005-authentication FR-003	soc2:CC6.2	access beyond Public only by an explicit, dated grant
+0005-authentication FR-003	cmmc-l1:AC.L1-b.1.i	access limited to granted users
+0005-authentication FR-004	soc2:CC6.2	an ended grant stops counting
+0005-authentication FR-005	soc2:CC6.1	grants checked on every request, so revocation takes effect at once
+0005-authentication FR-008	soc2:CC6.1	every session expires
+0005-authentication FR-009	soc2:CC6.1	no authentication credential in any repository
+0005-authentication FR-010	soc2:CC7.2	access beyond Public is logged
+0020-spec-format FR-011	soc2:CC4.1	every requirement names what tests it
+0020-spec-format FR-015	soc2:CC4.1	the specs and register are checked on every push
+0022-domain-names FR-014	soc2:CC6.1	registrar and DNS accounts held only by reference, no credential
+0022-domain-names FR-018	soc2:CC6.1	the domain inventory reconciled against the accounts
+0023-domain-security FR-013	soc2:CC6.7	HTTPS with HSTS on every web domain
+0023-domain-security FR-011	soc2:CC6.7	mail transport security enforced on receiving domains
+0023-domain-security FR-015	soc2:CC6.1	multi-factor sign-in and scoped, expiring tokens on registrar and DNS accounts
+0023-domain-security FR-015	soc2:CC6.2	access to registrar and DNS accounts reviewed every ninety days
+0023-domain-security FR-015	cmmc-l1:IA.L1-b.1.vi	authentication before access to registrar and DNS accounts
+0023-domain-security FR-017	soc2:CC7.1	configuration checked automatically against the baseline
+0023-domain-security FR-018	soc2:CC4.2	each failure reported to the decision authority
+0023-domain-security FR-019	soc2:CC8.1	a DNS change that breaks the baseline is refused before deployment
+0023-domain-security FR-022	soc2:CC2.3	a published contact for reporting weaknesses
+0023-domain-security FR-023	soc2:CC7.2	certificate issuance watched for anomalies
+0027-compliance-controls FR-012	soc2:CC3.2	every departure from a control is a decided, lapsing risk record
+0027-compliance-controls FR-014	soc2:CC4.1	each run that shows a control operated is recorded
+0027-compliance-controls FR-015	soc2:CC4.1	the evidence ledger is tamper-evident
+0027-compliance-controls FR-019	soc2:C1.1	contract-protected information never enters any repository
+0027-compliance-controls FR-022	soc2:CC6.2	an assessor's access is granted for the engagement and ends
+0027-compliance-controls FR-025	soc2:CC4.2	gaps and lapsing dispositions reported weekly

@@ -1844,3 +1844,221 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
     skos:definition "An issue of a periodical, such as a quarterly Journal issue, in an online or a print edition (0009-press FR-033)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Compliance controls (0027-compliance-controls) ─────────────────────────
+# NIST OSCAL's model, reused rather than invented (0019-controlled-vocabulary FR-001): a framework is a
+# ControlCatalog (an OSCAL catalog) whose concepts are its controls, keyed by the framework's own identifier
+# in skos:notation (FR-001); a level or category is a skos:Collection (an OSCAL profile, FR-004); a legal
+# entity's ComplianceBoundary (the system an OSCAL SSP describes) names its provider by schema:provider, its
+# baseline by dcterms:conformsTo, and its systems by dcterms:hasPart (FR-009). Which spec requirement addresses
+# which control is the control map, spec-kit/controls.tsv, not ontology data (FR-005). A departure is a
+# Decision naming the boundary and the control by schema:about, typed by a disposition, lapsing on its
+# dcterms:valid (FR-012). AICPA's criteria are named by identifier only (FR-002). Boundaries are vault data.
+
+ifcore:ControlCatalog a owl:Class ; rdfs:subClassOf skos:ConceptScheme ; rdfs:label "Control catalog"@en ;
+    skos:definition "One compliance framework's controls (criteria, requirements, or practices), one SKOS concept each, keyed by the framework's own identifier (0027-compliance-controls FR-001)."@en ;
+    skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/control/catalog/> ;
+    rdfs:comment "Specializes skos:ConceptScheme (0019 FR-002); an OSCAL catalog. Its skos:notation is the short code a control map row uses before the colon (FR-005); each control's skos:notation is the framework's identifier. dcterms:source names the authoritative publication (FR-002); one ExternalRecordReference that ifcore:describes it tracks the publisher's current revision (FR-003). dcterms:type ifcore:NoPlanOfActionAllowed when the framework forbids an open plan of action (FR-013). A level or category selecting part of it is a skos:Collection that is dcterms:isPartOf it (FR-004)."@en .
+
+ifcore:ComplianceBoundary a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Compliance boundary"@en ;
+    skos:definition "One legal entity's systems and the controls they must meet (0027-compliance-controls FR-009)."@en ;
+    skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/implementation/ssp/> ;
+    rdfs:comment "The system an OSCAL system security plan describes. Names exactly one legal entity by schema:provider, its baseline (ControlCatalogs or skos:Collections) by dcterms:conformsTo, and its systems by dcterms:hasPart. Its plan is generated, never kept as a separate document (FR-010); creating, retiring, or rebaselining it is a Decision (FR-011). Held in the vault (0001-eidolon-architecture FR-003)."@en .
+
+ifcore:ControlDispositionScheme a skos:ConceptScheme ; rdfs:label "Control disposition"@en ;
+    rdfs:comment "Why a boundary departs from a control in its baseline: the dcterms:type of a Decision that names the boundary and the control by schema:about and lapses on its dcterms:valid, no more than a year after it is decided (0027-compliance-controls FR-012)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NotApplicableDisposition a skos:Concept ; skos:inScheme ifcore:ControlDispositionScheme ; skos:prefLabel "Not applicable"@en ;
+    skos:definition "The control cannot apply within the boundary; the Decision says why."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AcceptedRiskDisposition a skos:Concept ; skos:inScheme ifcore:ControlDispositionScheme ; skos:prefLabel "Accepted risk"@en ;
+    skos:definition "The control applies and is not met, and the decision authority accepts the risk until the Decision lapses."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PlannedRemediationDisposition a skos:Concept ; skos:inScheme ifcore:ControlDispositionScheme ; skos:prefLabel "Planned remediation"@en ;
+    skos:definition "The control applies and is not yet met; it is to be met by the Decision's lapse date."@en ;
+    skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/poam/> ; ifcore:hasAudience ifcore:Public .
+
+ifcore:ControlBaselineRuleScheme a skos:ConceptScheme ; rdfs:label "Control baseline rule"@en ;
+    rdfs:comment "A rule a framework places on how its controls may be departed from; the dcterms:type of a ControlCatalog or collection (0027-compliance-controls FR-013)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoPlanOfActionAllowed a skos:Concept ; skos:inScheme ifcore:ControlBaselineRuleScheme ; skos:prefLabel "No plan of action allowed"@en ;
+    skos:definition "Every control the framework selects must be met; no accepted-risk or planned-remediation disposition may cover one (FR-013)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:AssessmentKindScheme a skos:ConceptScheme ; rdfs:label "Assessment kind"@en ;
+    rdfs:comment "What an external party's assessment of a boundary is: the dcterms:type of the ExternalRecordReference that ifcore:describes the boundary and states by dcterms:valid when it stops being current; the report is never committed (0027-compliance-controls FR-023). An assessment a government system records is a registration instead (0028-government-registrations)."@en ;
+    skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/assessment-results/> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SOC2Type1Report a skos:Concept ; skos:inScheme ifcore:AssessmentKindScheme ; skos:prefLabel "SOC 2 Type 1 report"@en ;
+    skos:definition "A service auditor's report on the design of a boundary's controls as of a date."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SOC2Type2Report a skos:Concept ; skos:inScheme ifcore:AssessmentKindScheme ; skos:prefLabel "SOC 2 Type 2 report"@en ;
+    skos:definition "A service auditor's report on the design and operating effectiveness of a boundary's controls over a period."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:TrustServicesCriteria a ifcore:ControlCatalog ; rdfs:label "AICPA Trust Services Criteria (SOC 2)"@en ;
+    skos:notation "soc2" ;
+    dcterms:source <https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022> ;
+    rdfs:comment "The criteria a SOC 2 examination reports against. AICPA holds copyright in their text, so each control here is its identifier alone (0027-compliance-controls FR-002); read the text at the source. The categories are collections (FR-004): Security is in every SOC 2 examination, and which others a boundary includes is 0027 OQ-2."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TrustServicesCriteriaRevision a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:TrustServicesCriteria ;
+    ifcore:primarySource "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"^^xsd:anyURI ;
+    ifcore:cachedValue "2017 Trust Services Criteria, with revised points of focus (2022)."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CMMCLevel1 a ifcore:ControlCatalog ; rdfs:label "CMMC Level 1 (FAR 52.204-21 basic safeguarding)"@en ;
+    skos:notation "cmmc-l1" ;
+    dcterms:source <https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170> , <https://www.acquisition.gov/far/52.204-21> ;
+    dcterms:type ifcore:NoPlanOfActionAllowed ;
+    rdfs:comment "The fifteen basic safeguarding requirements of FAR 52.204-21(b)(1)(i)-(xv), which 32 CFR 170.14(c)(2) makes CMMC Level 1, keyed by the identifiers 32 CFR 170.15(c)(1)(ii) uses. Each definition is the FAR's own text, a US Government work (0027-compliance-controls FR-002). Level 1 allows no plan of action (FR-013). Their NIST SP 800-171 identifiers are 0027 OQ-6."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CMMCLevel1Revision a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:CMMCLevel1 ;
+    ifcore:primarySource "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170"^^xsd:anyURI ;
+    ifcore:cachedValue "32 CFR part 170 as amended 2024-12-16."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CMMC-AC-L1-b-1-i a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "AC.L1-b.1.i" ; skos:prefLabel "AC.L1-b.1.i"@en ;
+    skos:definition "Limit information system access to authorized users, processes acting on behalf of authorized users, or devices (including other information systems)."@en ; dcterms:source "FAR 52.204-21(b)(1)(i)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-AC-L1-b-1-ii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "AC.L1-b.1.ii" ; skos:prefLabel "AC.L1-b.1.ii"@en ;
+    skos:definition "Limit information system access to the types of transactions and functions that authorized users are permitted to execute."@en ; dcterms:source "FAR 52.204-21(b)(1)(ii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-AC-L1-b-1-iii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "AC.L1-b.1.iii" ; skos:prefLabel "AC.L1-b.1.iii"@en ;
+    skos:definition "Verify and control/limit connections to and use of external information systems."@en ; dcterms:source "FAR 52.204-21(b)(1)(iii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-AC-L1-b-1-iv a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "AC.L1-b.1.iv" ; skos:prefLabel "AC.L1-b.1.iv"@en ;
+    skos:definition "Control information posted or processed on publicly accessible information systems."@en ; dcterms:source "FAR 52.204-21(b)(1)(iv)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-IA-L1-b-1-v a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "IA.L1-b.1.v" ; skos:prefLabel "IA.L1-b.1.v"@en ;
+    skos:definition "Identify information system users, processes acting on behalf of users, or devices."@en ; dcterms:source "FAR 52.204-21(b)(1)(v)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-IA-L1-b-1-vi a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "IA.L1-b.1.vi" ; skos:prefLabel "IA.L1-b.1.vi"@en ;
+    skos:definition "Authenticate (or verify) the identities of those users, processes, or devices, as a prerequisite to allowing access to organizational information systems."@en ; dcterms:source "FAR 52.204-21(b)(1)(vi)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-MP-L1-b-1-vii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "MP.L1-b.1.vii" ; skos:prefLabel "MP.L1-b.1.vii"@en ;
+    skos:definition "Sanitize or destroy information system media containing Federal Contract Information before disposal or release for reuse."@en ; dcterms:source "FAR 52.204-21(b)(1)(vii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-PE-L1-b-1-viii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "PE.L1-b.1.viii" ; skos:prefLabel "PE.L1-b.1.viii"@en ;
+    skos:definition "Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals."@en ; dcterms:source "FAR 52.204-21(b)(1)(viii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-PE-L1-b-1-ix a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "PE.L1-b.1.ix" ; skos:prefLabel "PE.L1-b.1.ix"@en ;
+    skos:definition "Escort visitors and monitor visitor activity; maintain audit logs of physical access; and control and manage physical access devices."@en ; dcterms:source "FAR 52.204-21(b)(1)(ix)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SC-L1-b-1-x a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SC.L1-b.1.x" ; skos:prefLabel "SC.L1-b.1.x"@en ;
+    skos:definition "Monitor, control, and protect organizational communications (i.e., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems."@en ; dcterms:source "FAR 52.204-21(b)(1)(x)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SC-L1-b-1-xi a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SC.L1-b.1.xi" ; skos:prefLabel "SC.L1-b.1.xi"@en ;
+    skos:definition "Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks."@en ; dcterms:source "FAR 52.204-21(b)(1)(xi)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SI-L1-b-1-xii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SI.L1-b.1.xii" ; skos:prefLabel "SI.L1-b.1.xii"@en ;
+    skos:definition "Identify, report, and correct information and information system flaws in a timely manner."@en ; dcterms:source "FAR 52.204-21(b)(1)(xii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SI-L1-b-1-xiii a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SI.L1-b.1.xiii" ; skos:prefLabel "SI.L1-b.1.xiii"@en ;
+    skos:definition "Provide protection from malicious code at appropriate locations within organizational information systems."@en ; dcterms:source "FAR 52.204-21(b)(1)(xiii)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SI-L1-b-1-xiv a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SI.L1-b.1.xiv" ; skos:prefLabel "SI.L1-b.1.xiv"@en ;
+    skos:definition "Update malicious code protection mechanisms when new releases are available."@en ; dcterms:source "FAR 52.204-21(b)(1)(xiv)" ; ifcore:hasAudience ifcore:Public .
+ifcore:CMMC-SI-L1-b-1-xv a skos:Concept ; skos:inScheme ifcore:CMMCLevel1 ; skos:notation "SI.L1-b.1.xv" ; skos:prefLabel "SI.L1-b.1.xv"@en ;
+    skos:definition "Perform periodic scans of the information system and real-time scans of files from external sources as files are downloaded, opened, or executed."@en ; dcterms:source "FAR 52.204-21(b)(1)(xv)" ; ifcore:hasAudience ifcore:Public .
+
+ifcore:TSC-CC1-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC1.1" ; skos:prefLabel "CC1.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC1-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC1.2" ; skos:prefLabel "CC1.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC1-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC1.3" ; skos:prefLabel "CC1.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC1-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC1.4" ; skos:prefLabel "CC1.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC1-5 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC1.5" ; skos:prefLabel "CC1.5"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC2-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC2.1" ; skos:prefLabel "CC2.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC2-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC2.2" ; skos:prefLabel "CC2.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC2-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC2.3" ; skos:prefLabel "CC2.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC3-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC3.1" ; skos:prefLabel "CC3.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC3-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC3.2" ; skos:prefLabel "CC3.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC3-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC3.3" ; skos:prefLabel "CC3.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC3-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC3.4" ; skos:prefLabel "CC3.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC4-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC4.1" ; skos:prefLabel "CC4.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC4-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC4.2" ; skos:prefLabel "CC4.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC5-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC5.1" ; skos:prefLabel "CC5.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC5-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC5.2" ; skos:prefLabel "CC5.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC5-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC5.3" ; skos:prefLabel "CC5.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.1" ; skos:prefLabel "CC6.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.2" ; skos:prefLabel "CC6.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.3" ; skos:prefLabel "CC6.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.4" ; skos:prefLabel "CC6.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-5 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.5" ; skos:prefLabel "CC6.5"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-6 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.6" ; skos:prefLabel "CC6.6"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-7 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.7" ; skos:prefLabel "CC6.7"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC6-8 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC6.8" ; skos:prefLabel "CC6.8"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC7-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC7.1" ; skos:prefLabel "CC7.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC7-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC7.2" ; skos:prefLabel "CC7.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC7-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC7.3" ; skos:prefLabel "CC7.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC7-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC7.4" ; skos:prefLabel "CC7.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC7-5 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC7.5" ; skos:prefLabel "CC7.5"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC8-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC8.1" ; skos:prefLabel "CC8.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC9-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC9.1" ; skos:prefLabel "CC9.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-CC9-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "CC9.2" ; skos:prefLabel "CC9.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSCSecurityCategory a skos:Collection ; skos:notation "security" ; skos:prefLabel "SOC 2 security category"@en ;
+    dcterms:isPartOf ifcore:TrustServicesCriteria ;
+    skos:member ifcore:TSC-CC1-1, ifcore:TSC-CC1-2, ifcore:TSC-CC1-3, ifcore:TSC-CC1-4, ifcore:TSC-CC1-5, ifcore:TSC-CC2-1, ifcore:TSC-CC2-2, ifcore:TSC-CC2-3, ifcore:TSC-CC3-1, ifcore:TSC-CC3-2, ifcore:TSC-CC3-3, ifcore:TSC-CC3-4, ifcore:TSC-CC4-1, ifcore:TSC-CC4-2, ifcore:TSC-CC5-1, ifcore:TSC-CC5-2, ifcore:TSC-CC5-3, ifcore:TSC-CC6-1, ifcore:TSC-CC6-2, ifcore:TSC-CC6-3, ifcore:TSC-CC6-4, ifcore:TSC-CC6-5, ifcore:TSC-CC6-6, ifcore:TSC-CC6-7, ifcore:TSC-CC6-8, ifcore:TSC-CC7-1, ifcore:TSC-CC7-2, ifcore:TSC-CC7-3, ifcore:TSC-CC7-4, ifcore:TSC-CC7-5, ifcore:TSC-CC8-1, ifcore:TSC-CC9-1, ifcore:TSC-CC9-2 ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TSC-A1-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "A1.1" ; skos:prefLabel "A1.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-A1-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "A1.2" ; skos:prefLabel "A1.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-A1-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "A1.3" ; skos:prefLabel "A1.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSCAvailabilityCategory a skos:Collection ; skos:notation "availability" ; skos:prefLabel "SOC 2 availability category"@en ;
+    dcterms:isPartOf ifcore:TrustServicesCriteria ;
+    skos:member ifcore:TSC-A1-1, ifcore:TSC-A1-2, ifcore:TSC-A1-3 ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TSC-PI1-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "PI1.1" ; skos:prefLabel "PI1.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-PI1-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "PI1.2" ; skos:prefLabel "PI1.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-PI1-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "PI1.3" ; skos:prefLabel "PI1.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-PI1-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "PI1.4" ; skos:prefLabel "PI1.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-PI1-5 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "PI1.5" ; skos:prefLabel "PI1.5"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSCProcessingIntegrityCategory a skos:Collection ; skos:notation "processing-integrity" ; skos:prefLabel "SOC 2 processing integrity category"@en ;
+    dcterms:isPartOf ifcore:TrustServicesCriteria ;
+    skos:member ifcore:TSC-PI1-1, ifcore:TSC-PI1-2, ifcore:TSC-PI1-3, ifcore:TSC-PI1-4, ifcore:TSC-PI1-5 ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TSC-C1-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "C1.1" ; skos:prefLabel "C1.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-C1-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "C1.2" ; skos:prefLabel "C1.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSCConfidentialityCategory a skos:Collection ; skos:notation "confidentiality" ; skos:prefLabel "SOC 2 confidentiality category"@en ;
+    dcterms:isPartOf ifcore:TrustServicesCriteria ;
+    skos:member ifcore:TSC-C1-1, ifcore:TSC-C1-2 ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TSC-P1-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P1.1" ; skos:prefLabel "P1.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P2-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P2.1" ; skos:prefLabel "P2.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P3-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P3.1" ; skos:prefLabel "P3.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P3-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P3.2" ; skos:prefLabel "P3.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P4-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P4.1" ; skos:prefLabel "P4.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P4-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P4.2" ; skos:prefLabel "P4.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P4-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P4.3" ; skos:prefLabel "P4.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P5-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P5.1" ; skos:prefLabel "P5.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P5-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P5.2" ; skos:prefLabel "P5.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.1" ; skos:prefLabel "P6.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-2 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.2" ; skos:prefLabel "P6.2"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-3 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.3" ; skos:prefLabel "P6.3"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-4 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.4" ; skos:prefLabel "P6.4"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-5 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.5" ; skos:prefLabel "P6.5"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-6 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.6" ; skos:prefLabel "P6.6"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P6-7 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P6.7" ; skos:prefLabel "P6.7"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P7-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P7.1" ; skos:prefLabel "P7.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSC-P8-1 a skos:Concept ; skos:inScheme ifcore:TrustServicesCriteria ; skos:notation "P8.1" ; skos:prefLabel "P8.1"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:prefLabel "SOC 2 privacy category"@en ;
+    dcterms:isPartOf ifcore:TrustServicesCriteria ;
+    skos:member ifcore:TSC-P1-1, ifcore:TSC-P2-1, ifcore:TSC-P3-1, ifcore:TSC-P3-2, ifcore:TSC-P4-1, ifcore:TSC-P4-2, ifcore:TSC-P4-3, ifcore:TSC-P5-1, ifcore:TSC-P5-2, ifcore:TSC-P6-1, ifcore:TSC-P6-2, ifcore:TSC-P6-3, ifcore:TSC-P6-4, ifcore:TSC-P6-5, ifcore:TSC-P6-6, ifcore:TSC-P6-7, ifcore:TSC-P7-1, ifcore:TSC-P8-1 ;
+    ifcore:hasAudience ifcore:Public .
+
+
+# ───────────────────────── Government registrations (0028-government-registrations) ─────────────────────────
+# A registration is one ExternalRecordReference per entity per registration (FR-001), typed by a concept below,
+# describing the Organization that holds it, or the ComplianceBoundary an assessment or affirmation covers
+# (FR-003). The date it lapses, or the next filing is due, is its dcterms:valid, part of its cached value
+# (FR-004, FR-005). An affirmation names what it affirms by dcterms:conformsTo (FR-012). Registrations are
+# vault data.
+
+ifcore:RegistrationKindScheme a skos:ConceptScheme ; rdfs:label "Registration kind"@en ;
+    rdfs:comment "What a government registration or recurring filing is; the dcterms:type of its ExternalRecordReference (0028-government-registrations FR-001)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FederalAwardRegistration a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Federal award registration"@en ;
+    skos:definition "An entity's registration to do business with the US federal government in the System for Award Management, with the identifiers it assigns, its industry codes, and its representations and certifications; renewed yearly."@en ;
+    rdfs:seeAlso <https://sam.gov/> ; ifcore:hasAudience ifcore:Public .
+ifcore:CybersecurityAffirmation a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Cybersecurity assessment and affirmation"@en ;
+    skos:definition "A cybersecurity assessment result, and the affirming official's affirmation of it, recorded in the US Department of Defense's Supplier Performance Risk System for one boundary; describes that boundary and names what it affirms by dcterms:conformsTo (0028 FR-003, FR-012)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TaxExemptionDetermination a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Tax exemption determination"@en ;
+    skos:definition "A tax authority's determination that an organization is exempt from income tax; it does not lapse by date, so it carries no dcterms:valid (0028 FR-004)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AnnualInformationReturn a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Annual information return"@en ;
+    skos:definition "An exempt organization's annual return to the tax authority; dcterms:valid is the date the next one is due (0028 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:StateAnnualReport a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "State annual report"@en ;
+    skos:definition "A state's registration of an entity formed or qualified to do business there, kept in good standing by a periodic report; dcterms:valid is the date the next one is due (0028 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CharitableSolicitationRegistration a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Charitable solicitation registration"@en ;
+    skos:definition "A state's registration of an organization that asks the public there for charitable contributions; dcterms:valid is the date it lapses unless renewed."@en ; ifcore:hasAudience ifcore:Public .
