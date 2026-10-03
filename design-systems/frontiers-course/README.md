@@ -8,10 +8,17 @@ platform. Its rules are [`spec.md`](spec.md); governed by
 | Path | What it is |
 | --- | --- |
 | `course.py` | `python3 course.py check COURSE_DIR` reports every rule a course breaks; `python3 course.py model COURSE_DIR` prints the model every delivery target is built from. Standard library only. |
+| `build.py` | `python3 build.py web COURSE_DIR -o DIR`, `olx COURSE_DIR -o OUT.tar.gz --org ORG`, `cmi5 COURSE_DIR -o OUT.zip --iri https://...`; each takes `--brand SLUG`. |
+| `web/`, `web.json` | The web edition's stylesheet, in-browser grading (`quiz.js`), cmi5 runtime (`cmi5.js`), fonts, and its theme roles. |
 | `schema/course.schema.json` | The model, as JSON Schema 2020-12. |
 | `limits.json` | Outcome verbs, lesson types and their minutes, item types, and the pacing and accessibility limits. |
-| `assurance/` | `python3 assurance/run.py`: a fixture course that must pass, and edits of it that must fail. |
+| `assurance/` | `python3 assurance/run.py`: a fixture course that must pass, edits of it that must fail, and every target built under every brand and checked (`js.test.mjs` in Node for the scripts, cmi5's XSD with lxml); `node assurance/run.mjs --brand SLUG`: the web edition in Chromium. |
 
 See `assurance/fixtures/pass/fermi-estimation/` for a course: two units, every lesson type (reading, video,
 exercise, discussion) and every item type (multiple choice, multiple response, numeric, text match). `course.py`
 docstring gives the source format.
+
+Which target for which place: the **OLX export** for Open edX (the graded run; import it in Studio, Tools →
+Import), the **cmi5 package** for any LMS that takes cmi5, and the **web edition** for anyone to read, its
+practice graded in the browser. Open edX's look comes from the platform's brand package, not from this
+design system.

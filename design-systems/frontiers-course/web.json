@@ -1,0 +1,23 @@
+{
+  "$description": "The web edition's theme (spec FR-014): each course role as a brand role or a mix of two (a!N!b is N% of a in b), the pairs that must meet min_contrast, and the lockup's display width.",
+  "roles": {
+    "text": "text",
+    "surface": "surface",
+    "muted": "text!72!surface",
+    "rule": "text!20!surface",
+    "panel": "text!4!surface",
+    "link": "link",
+    "accent": "primary",
+    "on-accent": "surface",
+    "correct": "success",
+    "incorrect": "danger"
+  },
+  "pairs": [
+    ["text", "surface"], ["muted", "surface"], ["link", "surface"], ["correct", "surface"], ["incorrect", "surface"],
+    ["text", "panel"], ["link", "panel"], ["correct", "panel"], ["incorrect", "panel"], ["on-accent", "accent"]
+  ],
+  "min_contrast": 4.5,
+  "fallback_sans": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+  "lockup_width": 160,
+  "mastery": 0.8
+}
