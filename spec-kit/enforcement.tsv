@@ -507,3 +507,15 @@ frontiers-nature-web FR-020	none	-	registry contents not checked
 0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
 0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
+0022-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
+0022-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
+0022-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
+0022-tooling-environment FR-004	none	-	no check scans tools for installs at run time
+0022-tooling-environment FR-005	none	-	names the environment; nothing tests it
+0022-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet (OQ-1, OQ-2)
+0022-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
+0022-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin file exists and holds one flake reference at a full commit
+0022-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet (OQ-2)
+0022-tooling-environment FR-010	none	-	no CI job yet (OQ-2)
+0022-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
+0022-tooling-environment FR-012	none	-	no check scans tools for the environment's name
