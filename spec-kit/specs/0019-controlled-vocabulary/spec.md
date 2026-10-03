@@ -1,6 +1,6 @@
 # Feature Specification: Controlled vocabulary
 
-**Spec ID:** 0015-controlled-vocabulary
+**Spec ID:** 0019-controlled-vocabulary
 **Status:** Draft
 
 **Input:** How a new ontology term earns its place: reusing an established
