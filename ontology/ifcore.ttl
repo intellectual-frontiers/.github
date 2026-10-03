@@ -870,6 +870,36 @@ ifcore:ReservedDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme
 ifcore:ParkedDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Parked"@en ;
     skos:definition "Held with no current use."@en ; ifcore:hasAudience ifcore:Public .
 
+ifcore:DomainSecurityControlScheme a skos:ConceptScheme ; rdfs:label "Domain security control"@en ;
+    rdfs:comment "The controls every domain name is checked against (0023-domain-security FR-001). An exception is a Decision naming a DomainName and one of these by schema:about, lapsing on its dcterms:valid date (FR-002). Each concept's skos:notation is the code a check or report uses. Which controls apply to a domain follows from its role and its published records, as 0023 states; no property here restates that."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TransferLockControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Transfer lock"@en ;
+    skos:notation "transfer-lock" ; skos:definition "The registrar transfer lock is on (FR-004)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AutoRenewControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Automatic renewal"@en ;
+    skos:notation "auto-renew" ; skos:definition "Automatic renewal is on (FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DNSSECControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "DNSSEC"@en ;
+    skos:notation "dnssec" ; skos:definition "The zone is signed and its delegation signer record is published at the registry (FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RegistrantPrivacyControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Registrant privacy"@en ;
+    skos:notation "registrant-privacy" ; skos:definition "The registry record discloses no registrant personal contact details (FR-007)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DelegationControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Delegation"@en ;
+    skos:notation "delegation" ; skos:definition "The domain is delegated only to its DNS-as-code provider's nameservers (FR-008)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NoMailControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "No-mail posture"@en ;
+    skos:notation "no-mail" ; skos:definition "A null MX, a fail-all sender policy, and a reject DMARC policy, for a domain that neither sends nor receives email (FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SendingAuthenticationControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Sending authentication"@en ;
+    skos:notation "sending-authentication" ; skos:definition "SPF, DKIM, and a DMARC policy of quarantine or reject with company-held reporting, for a domain that sends email (FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReceivingTransportControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Receiving transport security"@en ;
+    skos:notation "receiving-transport" ; skos:definition "MTA-STS in enforce mode and a TLS-RPT address, for a domain that receives email (FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CAAControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Certificate authority authorization"@en ;
+    skos:notation "caa" ; skos:definition "CAA records naming only the company's certificate authorities, or permitting none for a domain with no web content (FR-012)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HTTPSControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "HTTPS and HSTS"@en ;
+    skos:notation "https" ; skos:definition "A valid certificate, HTTP redirected to HTTPS, and HSTS of at least one year, for a primary or redirect domain (FR-013)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NoDanglingRecordsControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "No dangling records"@en ;
+    skos:notation "no-dangling-records" ; skos:definition "No record points at a host, service, or address the company no longer controls (FR-014)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AccountMFAControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Account access"@en ;
+    skos:notation "account-mfa" ; skos:definition "Multi-factor sign-in, scoped expiring tokens, and access reviewed every ninety days, for each registrar and DNS provider account (FR-015)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AccountRecoveryControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Account recovery"@en ;
+    skos:notation "account-recovery" ; skos:definition "Account recovery does not depend solely on a domain in the same account (FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+
 ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
     rdfs:label "Cloudflare account"@en ;
     ifcore:describes ifcore:IntellectualFrontiersLLC ;

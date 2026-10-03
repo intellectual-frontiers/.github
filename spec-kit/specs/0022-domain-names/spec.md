@@ -132,9 +132,10 @@ FR-016 through FR-025 to domain names.
 - How DNS records are written, reviewed, and deployed, and which tool
   does so. That belongs to the DNS-as-code source and to whoever operates
   it; OQ-1 records what this spec still needs to know about it.
-- Certificates, email authentication policy, and hosting. They are
-  configuration of what a domain serves, not facts about the domain as an
-  asset.
+- The security settings a domain must carry (DNSSEC, transfer lock,
+  email authentication, certificates). They are 0023-domain-security's.
+- Hosting. It is configuration of what a domain serves, not a fact about
+  the domain as an asset.
 - What a domain name is worth. Valuation is Capital's financial-asset
   territory, per 0007-work-and-assets.
 
@@ -191,8 +192,6 @@ FR-016 through FR-025 to domain names.
 - **OQ-3**: No rule says whether a `DomainName` that has lapsed or been
   transferred away stays in the catalog, or what marks it as no longer
   held.
-- **OQ-4**: No rule says whether a domain's delegation must be signed
-  (DNSSEC), or whether its registrar transfer lock must be on.
 
 ## Key entities
 

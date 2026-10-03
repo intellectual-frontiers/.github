@@ -575,3 +575,24 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0022-domain-names FR-018	none	-	registrar reconciliation not yet built
 0022-domain-names FR-019	none	-	permission boundary on a tool not yet built
 0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
+0023-domain-security FR-001	none	-	no check yet reads the control scheme
+0023-domain-security FR-002	none	-	no check on exception Decisions
+0023-domain-security FR-003	none	-	domain security check not yet built
+0023-domain-security FR-004	none	-	domain security check not yet built
+0023-domain-security FR-005	none	-	domain security check not yet built
+0023-domain-security FR-006	none	-	domain security check not yet built
+0023-domain-security FR-007	none	-	domain security check not yet built
+0023-domain-security FR-008	none	-	domain security check not yet built
+0023-domain-security FR-009	none	-	domain security check not yet built
+0023-domain-security FR-010	none	-	domain security check not yet built
+0023-domain-security FR-011	none	-	domain security check not yet built
+0023-domain-security FR-012	none	-	domain security check not yet built
+0023-domain-security FR-013	none	-	domain security check not yet built
+0023-domain-security FR-014	none	-	domain security check not yet built
+0023-domain-security FR-015	none	-	account review not yet established
+0023-domain-security FR-016	none	-	no check on account recovery
+0023-domain-security FR-017	none	-	domain security check not yet built
+0023-domain-security FR-018	none	-	domain security check not yet built
+0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
+0023-domain-security FR-020	none	-	domain security check not yet built
+0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
