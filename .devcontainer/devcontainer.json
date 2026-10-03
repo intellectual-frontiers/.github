@@ -3,7 +3,7 @@
   "name": "Intellectual Frontiers .github",
   // The reference environment's press image (0025-tooling-environment FR-005, 0026-workspaces FR-004): the design
   // systems' print harnesses need TeX. Its tag must match tools/reference-environment (0025 FR-008).
-  "image": "ghcr.io/intellectual-frontiers/workspaces-host-v3-press:sha-49a8e13",
+  "image": "ghcr.io/intellectual-frontiers/workspaces-host-v3-press:sha-516c77c",
   "remoteUser": "root",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteEnv": {

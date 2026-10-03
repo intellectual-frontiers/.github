@@ -15,9 +15,9 @@ polos, caps, mugs, tumblers, pens and totes. Its rules are [`spec.md`](spec.md);
 ## Using it
 
 This design system is themed by a brand's **decoration kit** (0014-design-systems FR-047): a
-one-color vector lockup and icon, each with its finest detail, and the spot-color and thread match
-of each color role allowed on goods. It holds no artwork or color of its own. A brand without a kit
-cannot theme it; `frontiers-brand` does not have one yet (spec OQ-1).
+one-color vector lockup and icon, and optionally a wordmark for small goods, each with its finest
+detail, and the spot-color and thread match of each color role allowed on goods. It holds no artwork
+or color of its own. A brand without a kit cannot theme it.
 
 Write a decoration job:
 

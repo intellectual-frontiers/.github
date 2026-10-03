@@ -64,24 +64,38 @@ roles, and the light variations a figure may take, themed by any brand.
   the kit's rightward marker oriented `auto-start-reverse`; no label MAY carry an em dash or a
   straight quote.
 - **FR-010**: Its figure types MUST be those its layouts draw: a process diagram, a comparison, a
-  cycle diagram, a layer diagram, a relationship diagram, a decision flowchart and a hierarchy
-  diagram. A figure of another type MAY be drawn on the kit's primitives and MUST still meet every
-  rule here.
+  cycle diagram, a layer diagram, a relationship diagram, a decision flowchart, a hierarchy diagram,
+  a bar chart, a line chart and a timeline. A figure of another type MAY be drawn on the kit's
+  primitives and MUST still meet every rule here.
+
+## Charts
+
+- **FR-012**: A chart drawn from data MUST label every series and value directly (a line named at
+  its last point, a bar with its value), never by color alone and never with a separate legend
+  (WCAG 2.2 1.4.1), and MUST start its value axis at zero. Its series MUST take the roles
+  `series-1` to `series-4` in order, at most four to a chart; in every variant each MUST meet 3:1
+  against the surface, and in the color variants every two MUST stay at least 12 CIEDE2000 apart
+  to normal, protan, deutan and tritan vision (simulated as Machado, Oliveira and Fernandes 2009,
+  at full severity), and at least 8 apart in grayscale, where the direct labels carry the
+  difference. A sequential scale MUST take `seq-1` (least) to `seq-5` (most), ordered by lightness,
+  each step at least 8 CIEDE2000 from the next. A single-series chart MAY mark one item with the
+  emphasis role.
 
 ## Assurance
 
 - **FR-011**: `assurance/run.py` MUST, under every brand beside this design system, draw a figure of
   every type on both canvases and check it passes `figcheck.py` measured in the brand's `font-sans`;
   check every fixture in `assurance/fixtures/fail/` fails with the problem
-  `assurance/fixtures/expected.json` names; check every variant's contrast per FR-004 and that a
+  `assurance/fixtures/expected.json` names; check every variant's contrast per FR-004 and its chart
+  palette per FR-012, and that a
   themed figure parses; and, where `rsvg-convert` is installed, that a themed figure renders with
   the brand's sans embedded and no other family.
 
 ## Out of scope
 
 - Any work's figures, their captions and where they sit in a work: the work's own record.
-- Charts drawn from data (bar charts, timelines) beyond what the kit's primitives draw: drawn on the
-  primitives, under every rule here.
+- Charts beyond the bar, line and timeline layouts (a scatter plot, a map): drawn on the kit's
+  primitives with the chart roles, under every rule here and FR-012.
 - Raster figures (a screenshot, a photograph): a work's own asset, not drawn here.
 
 ## Edge cases

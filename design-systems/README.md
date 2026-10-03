@@ -34,6 +34,9 @@ Each kind has a profile in
 | print | `print` | How a book, paper or cover is set | Typesetting style files and their data |
 | merchandise | `merchandise` | How the brand goes on physical goods: method, placement, ink | Decoration methods and products data |
 | figure | `figures` | How every figure is drawn, in every medium | Figure roles and the drawing kit |
+| email | `email` | The messages the house sends by email | Layout data, and the tool that builds and checks a message |
+| media | `media` | The images that package a work for a platform | Asset formats, and the tool that lays out and renders them |
+| slides | `slides` | How a talk, lecture, workshop or briefing is presented on a screen | A slide stylesheet, and the builder and checker for decks |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
 
@@ -130,6 +133,11 @@ slides. A figure's source names its colors by figure role (`f-primary`, `s-line`
 or font; the same brand that themes the page themes the figure, in a default, on-dark or grayscale
 variant, on a standard or compact canvas. Each web and print design system names the figure design
 system its pages use (`ifcore:drawsFiguresWith`).
+
+A **written-voice** design system states how the house writes, as the house's voice and never one
+person's, with the patterns its sweep refuses (`frontiers-written-voice`); a **spoken-voice** one
+derives from it and adds what changes for the ear (`frontiers-spoken-voice`). Writing samples,
+instructions written for a named author and audit prompts stay with the consumer.
 
 That is how white-labeling works: a company that wants a web or print design system in its own
 colors, logo and imagery supplies a brand, and the design system is used unchanged. A brand that is not yet public

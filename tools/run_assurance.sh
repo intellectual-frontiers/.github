@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Runs every design system's assurance harness headlessly (0014-design-systems FR-015, FR-017): each web design
-# system once under every brand here (FR-039) in a browser, each print and merchandise design system under every
-# brand here in Python (its run.py does the brand loop), every other design system once. Fails if any run fails or any design system has
-# no harness.
+# Runs every design system's assurance harness headlessly (0014-design-systems FR-015, FR-017): every browser
+# harness (assurance/run.mjs) of a design system a brand themes once under every brand here (FR-039), a brand's own
+# once, and every Python harness (assurance/run.py) once, its own brand loop inside it. A design system may have
+# both. Fails if any run fails or any design system has no harness.
 #
 #   tools/run_assurance.sh            everything
 #   tools/run_assurance.sh --browser  only the browser harnesses (needs Node, Playwright and Chromium)
@@ -26,22 +26,29 @@ if [[ -z "$only" || "$only" == "--images" ]]; then
 fi
 for dir in design-systems/*/; do
   slug=$(basename "$dir")
+  ran=0
   if [[ -f "$dir/assurance/run.py" ]]; then
-    [[ "$only" == "--browser" || "$only" == "--images" ]] && continue
-    echo "── $slug, themed by every brand"
-    python3 "$dir/assurance/run.py" || status=1
-  elif [[ -f "$dir/assurance/run.mjs" ]]; then
-    [[ "$only" == "--tex" ]] && continue
-    if [[ -f "$dir/css/bundle.txt" ]]; then
-      for brand in "${brands[@]}"; do
-        echo "── $slug, themed by $brand"
-        node "$dir/assurance/run.mjs" --brand "$brand" || status=1
-      done
-    else
-      echo "── $slug"
-      node "$dir/assurance/run.mjs" || status=1
+    ran=1
+    if [[ "$only" != "--browser" ]]; then
+      echo "── $slug, themed by every brand"
+      python3 "$dir/assurance/run.py" || status=1
     fi
-  else
+  fi
+  if [[ -f "$dir/assurance/run.mjs" ]]; then
+    ran=1
+    if [[ "$only" != "--tex" ]]; then
+      if [[ -f "$dir/brand.css" ]]; then
+        echo "── $slug"
+        node "$dir/assurance/run.mjs" || status=1
+      else
+        for brand in "${brands[@]}"; do
+          echo "── $slug, themed by $brand"
+          node "$dir/assurance/run.mjs" --brand "$brand" || status=1
+        done
+      fi
+    fi
+  fi
+  if [[ $ran == 0 ]]; then
     echo "❎ $slug has no assurance harness, assurance/run.mjs or assurance/run.py (0014-design-systems FR-015)"
     status=1
   fi

@@ -1,0 +1,12 @@
+{
+  "$description": "Shared terms the house writes exactly as the ontology names them (spec FR-016): each term's IRI in ontology/ifcore.ttl, the label to use, and variants a reader has seen and the sweep fails, matched with case. A term's definition is the ontology's, never this file's. A consumer adds its own shared terms in a file of the same shape (sweep.py --terms).",
+  "terms": [
+    {"iri": "ifcore:IntellectualFrontiersLLC", "term": "Intellectual Frontiers", "avoid": ["Intellectual Frontier ", "IntellectualFrontiers", "Intellectual frontiers"]},
+    {"iri": "ifcore:Press", "term": "Intellectual Frontiers Press", "avoid": ["IF Press", "Intellectual Frontiers press"]},
+    {"iri": "ifcore:ResearchAndIp", "term": "Intellectual Frontiers Research & IP", "avoid": ["IF Research", "Research and IP unit"]},
+    {"iri": "ifcore:Capital", "term": "Intellectual Frontiers Capital", "avoid": ["IF Capital"]},
+    {"iri": "ifcore:Studios", "term": "Intellectual Frontiers Studios", "avoid": ["IF Studios"]},
+    {"iri": "ifcore:Network", "term": "Intellectual Frontiers Network", "avoid": ["IF Network"]},
+    {"iri": "ifcore:NativeAlpha", "term": "Native Alpha", "avoid": ["native alpha", "Native-Alpha", "native-alpha", "NativeAlpha"]}
+  ]
+}

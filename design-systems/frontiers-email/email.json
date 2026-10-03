@@ -1,0 +1,21 @@
+{
+  "$description": "frontiers-email's data (spec FR-004 to FR-010): its message types, layout width, the roles each tone uses, and the limits a message keeps to. Read by mail.py; spec.md is the source.",
+  "types": {
+    "newsletter": {"name": "newsletter", "unsubscribe": true},
+    "announcement": {"name": "announcement", "unsubscribe": true},
+    "invitation": {"name": "invitation", "unsubscribe": true},
+    "notification": {"name": "notification", "unsubscribe": false}
+  },
+  "width": 600,
+  "lockup_width": 160,
+  "fallback_sans": "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  "tones": {
+    "light": {"background": "surface", "text": "text", "muted": "text!68!surface", "link": "link", "button": "primary", "button_text": "surface", "rule": "text!18!surface"},
+    "dark": {"background": "text", "text": "surface", "muted": "surface!72!text", "link": "primary!40!surface", "button": "primary!40!surface", "button_text": "text", "rule": "surface!24!text"}
+  },
+  "subject_max": 60,
+  "preheader": [40, 130],
+  "max_words": 400,
+  "max_bytes": 100000,
+  "min_contrast": 4.5
+}

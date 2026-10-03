@@ -1,0 +1,140 @@
+/*
+ * frontiers-slides (spec FR-003 to FR-009): a 1920x1080 slide canvas, its layouts and its type, colored only by the
+ * brand's theme roles (0014-design-systems FR-044). Load the brand's brand.css first, then this file.
+ * Faces: Inter (weights 400-800) and Source Serif 4, SIL OFL 1.1, in ../fonts/.
+ */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: block;
+  src: url("../fonts/inter-variable-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: block;
+  src: url("../fonts/source-serif-4-variable-latin.woff2") format("woff2");
+}
+
+@layer slides {
+  :root {
+    --slide-width: 1920px;
+    --slide-height: 1080px;
+    --slide-pad-x: 128px;
+    --slide-pad-y: 104px;
+    --t-display: 800 112px/1.04 var(--brand-font-sans), system-ui, sans-serif;
+    --t-statement: 750 88px/1.08 var(--brand-font-sans), system-ui, sans-serif;
+    --t-headline: 700 64px/1.1 var(--brand-font-sans), system-ui, sans-serif;
+    --t-body: 400 40px/1.35 var(--brand-font-sans), system-ui, sans-serif;
+    --t-quote: 400 64px/1.25 var(--brand-font-serif), Georgia, serif;
+    --t-small: 400 28px/1.3 var(--brand-font-sans), system-ui, sans-serif;
+    --t-footer: 500 24px/1.2 var(--brand-font-sans), system-ui, sans-serif;
+  }
+
+  .slide {
+    --slide-fg: var(--brand-text);
+    --slide-bg: var(--brand-surface);
+    --slide-muted: color-mix(in oklab, var(--brand-text) 72%, var(--brand-surface));
+    --slide-accent: var(--brand-primary);
+    --slide-rule: color-mix(in oklab, var(--brand-text) 20%, var(--brand-surface));
+    position: relative;
+    box-sizing: border-box;
+    width: var(--slide-width);
+    height: var(--slide-height);
+    padding: var(--slide-pad-y) var(--slide-pad-x);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    color: var(--slide-fg);
+    background: var(--slide-bg);
+    font: var(--t-body);
+    font-optical-sizing: auto;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide[data-tone="dark"] {
+    --slide-fg: var(--brand-surface);
+    --slide-bg: var(--brand-text);
+    --slide-muted: color-mix(in oklab, var(--brand-surface) 74%, var(--brand-text));
+    --slide-accent: color-mix(in oklab, var(--brand-primary) 45%, var(--brand-surface));
+    --slide-rule: color-mix(in oklab, var(--brand-surface) 28%, var(--brand-text));
+  }
+  .slide * { box-sizing: border-box; margin: 0; }
+
+  .slide h1 { font: var(--t-headline); letter-spacing: -0.01em; max-width: 30ch; text-wrap: balance; }
+  .slide p, .slide li { font: var(--t-body); max-width: 40ch; }
+  .slide ul, .slide ol { padding-inline-start: 1.1em; display: grid; gap: 20px; }
+  .slide li::marker { color: var(--slide-accent); }
+  .slide strong { font-weight: 700; }
+  .slide em { font-style: normal; color: var(--slide-accent); }
+  .slide code { font: 500 0.9em/1 ui-monospace, monospace; }
+  .slide .source { font: var(--t-small); color: var(--slide-muted); margin-block-start: auto; }
+
+  /* Title: the deck's claim, who and when, and the brand's lockup. */
+  .slide[data-layout="title"] { justify-content: flex-end; gap: 32px; }
+  .slide[data-layout="title"] h1 { font: var(--t-display); letter-spacing: -0.02em; max-width: 22ch; }
+  .slide[data-layout="title"] .deck-meta { font: var(--t-small); color: var(--slide-muted); }
+  .slide[data-layout="title"] .lockup, .slide[data-layout="end"] .lockup { position: absolute; top: var(--slide-pad-y); left: var(--slide-pad-x); height: 96px; width: auto; }
+
+  /* Section: a part's number and its claim, on the dark tone unless set otherwise. */
+  .slide[data-layout="section"] { justify-content: center; }
+  .slide[data-layout="section"] .section-number { font: var(--t-small); font-weight: 600; color: var(--slide-accent); }
+  .slide[data-layout="section"] h1 { font: var(--t-display); max-width: 24ch; }
+
+  /* Statement: one claim, large, nothing else. */
+  .slide[data-layout="statement"] { justify-content: center; }
+  .slide[data-layout="statement"] h1 { font: var(--t-statement); letter-spacing: -0.015em; max-width: 26ch; }
+
+  /* Content: a headline and at most five points or a short paragraph. */
+  .slide[data-layout="content"] h1 { margin-block-end: 8px; }
+
+  /* Figure: a headline and one figure filling the rest of the slide. */
+  .slide[data-layout="figure"] .figure { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+  .slide[data-layout="figure"] .figure > svg, .slide[data-layout="figure"] .figure > img { max-width: 100%; max-height: 100%; width: auto; height: 100%; }
+
+  /* Two columns: a headline over two equal columns. */
+  .slide[data-layout="two-column"] .columns { flex: 1 1 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; }
+  .slide[data-layout="two-column"] .columns > div { display: grid; align-content: start; gap: 24px; }
+  .slide[data-layout="two-column"] .columns p, .slide[data-layout="two-column"] .columns li { max-width: none; font-size: 36px; }
+
+  /* Quote: someone else's words, in the serif, with who said them. */
+  .slide[data-layout="quote"] { justify-content: center; }
+  .slide[data-layout="quote"] blockquote { font: var(--t-quote); max-width: 30ch; border-inline-start: 8px solid var(--slide-accent); padding-inline-start: 56px; }
+  .slide[data-layout="quote"] blockquote p { font: inherit; max-width: none; }
+  .slide[data-layout="quote"] .attribution { font: var(--t-small); color: var(--slide-muted); padding-inline-start: 64px; }
+
+  /* End: what to do next and how to reach the speaker. */
+  .slide[data-layout="end"] { justify-content: flex-end; }
+  .slide[data-layout="end"] h1 { font: var(--t-statement); max-width: 24ch; }
+
+  /* The footer: the deck's short title and the slide's number, on every slide but the title and the end. */
+  .slide .footer {
+    position: absolute; inset-inline: var(--slide-pad-x); bottom: 40px;
+    display: flex; justify-content: space-between; font: var(--t-footer); color: var(--slide-muted);
+    border-block-start: 2px solid var(--slide-rule); padding-block-start: 16px;
+  }
+  .slide[data-layout="title"] .footer, .slide[data-layout="end"] .footer { display: none; }
+
+  /* Speaker notes: never on the slide; shown beside it in the notes view. */
+  .slide .notes { display: none; }
+}
+
+/* Viewing: each slide scaled to the window, one at a time (deck.js); printed, one slide a page. */
+html.deck, html.deck body { margin: 0; background: var(--brand-text); }
+html.deck .slide { transform-origin: 0 0; }
+html.deck.present .slide { position: absolute; left: var(--slide-left, 0); top: var(--slide-top, 0); transform: scale(var(--slide-scale, 1)); visibility: hidden; }
+html.deck.present .slide[aria-current="true"] { visibility: visible; }
+#deck-notes {
+  display: none; position: fixed; inset: auto 0 0 0; max-height: 32vh; overflow: auto; padding: 16px 24px;
+  background: var(--brand-surface); color: var(--brand-text); font: 400 18px/1.45 var(--brand-font-sans), system-ui, sans-serif;
+  border-block-start: 2px solid var(--brand-primary);
+}
+html.deck.notes #deck-notes { display: block; }
+@page { size: 1920px 1080px; margin: 0; }
+@media print {
+  html.deck, html.deck body { background: none; }
+  html.deck.present .slide { position: static; transform: none; visibility: visible; }
+}

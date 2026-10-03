@@ -1,0 +1,43 @@
+{
+  "$description": "The machine form of frontiers-written-voice's rules (spec FR-008 to FR-013): what sweep.py looks for. Matching ignores case and treats curly quotes as straight. A phrase of one word in hedges or throat_clearing warns; a longer one fails. spec.md is the source; this file must agree with it.",
+  "fail_words": [
+    "delve", "unlock", "unlocking", "transformative", "multifaceted", "holistic", "paradigm", "synergy", "synergies",
+    "game-changer", "game changer", "game-changing", "load-bearing", "materially", "value proposition",
+    "strategic imperative", "stakeholder alignment", "objective function", "enormously valuable",
+    "genuinely useful to know", "reasonably happy", "it's worth noting", "it is worth noting", "revolutionary"
+  ],
+  "warn_words": [
+    "leverage", "leveraging", "landscape", "ecosystem", "hygiene", "journey", "disruptive", "robust", "powerful",
+    "essential", "critical"
+  ],
+  "plain_words": {
+    "utilize": "use", "utilise": "use", "demonstrate": "show", "demonstrates": "shows",
+    "sufficient": "enough", "commence": "start", "facilitate": "help", "in order to": "to"
+  },
+  "hedges": [
+    "it is important to note", "it is worth mentioning", "one could argue", "it may be helpful to consider",
+    "in many ways", "to some extent", "generally speaking", "there are several factors", "the answer is nuanced",
+    "only time will tell"
+  ],
+  "throat_clearing": [
+    "in today's rapidly evolving landscape", "as we navigate an increasingly complex world", "at its core",
+    "the purpose of this document is", "this section explores", "let us begin by", "before diving in",
+    "in conclusion", "ultimately", "the key takeaway is"
+  ],
+  "fail_announcements": [
+    "here's the part", "here is the part", "this is the part", "here is the whole rule", "here's the thing",
+    "in this chapter we", "in this chapter, we", "this chapter will", "this chapter explores", "this section will",
+    "this piece will", "this article will", "let's dive", "let us dive", "to summarize", "in summary"
+  ],
+  "warn_announcements": [],
+  "fail_contains": [
+    "deserves the same courtesy", "wearing a different hat", "without ceremony"
+  ],
+  "fail_labels": [],
+  "max_seesaws": 1,
+  "warn_not_fragments": 3,
+  "procedure": {
+    "max_instruction_words": 20,
+    "max_descriptive_words": 25
+  }
+}

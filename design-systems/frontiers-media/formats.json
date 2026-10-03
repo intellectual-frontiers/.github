@@ -1,0 +1,19 @@
+{
+  "$description": "Every media asset frontiers-media makes (spec FR-004 to FR-008): its pixel size, safe margin (a share of the shorter side), title size range in px, the most title lines and words, whether it carries a piece of the imagery pool and the brand's lockup, any area it keeps clear, and whether it is transparent. Read by media.py; spec.md is the source.",
+  "formats": {
+    "podcast-cover": {"name": "podcast cover art", "size": [1400, 1400], "safe": 0.07, "title_px": [96, 150], "max_lines": 3, "max_title_words": 6, "imagery": true, "lockup": false, "byline_px": 48},
+    "episode-art": {"name": "episode art", "size": [1400, 1400], "safe": 0.07, "title_px": [80, 120], "max_lines": 4, "max_title_words": 10, "imagery": true, "lockup": false, "byline_px": 44, "kicker_px": 52},
+    "video-thumbnail": {"name": "video thumbnail", "size": [1280, 720], "safe": 0.06, "title_px": [64, 104], "max_lines": 3, "max_title_words": 7, "imagery": true, "lockup": false, "kicker_px": 36, "keep_clear": [1040, 630, 1280, 720]},
+    "title-card": {"name": "title card", "size": [1920, 1080], "safe": 0.1, "title_px": [72, 112], "max_lines": 3, "max_title_words": 12, "imagery": false, "lockup": true, "byline_px": 36, "kicker_px": 36},
+    "lower-third": {"name": "lower third", "size": [1920, 1080], "safe": 0.1, "title_px": [48, 56], "max_lines": 1, "max_title_words": 6, "imagery": false, "lockup": false, "byline_px": 32, "transparent": true},
+    "social-square": {"name": "social card, square", "size": [1080, 1080], "safe": 0.08, "title_px": [56, 88], "max_lines": 4, "max_title_words": 14, "imagery": true, "lockup": true, "kicker_px": 32},
+    "social-portrait": {"name": "social card, portrait", "size": [1080, 1350], "safe": 0.08, "title_px": [56, 96], "max_lines": 5, "max_title_words": 16, "imagery": true, "lockup": true, "kicker_px": 32},
+    "social-story": {"name": "social card, story", "size": [1080, 1920], "safe": 0.12, "title_px": [64, 104], "max_lines": 5, "max_title_words": 16, "imagery": true, "lockup": true, "kicker_px": 36}
+  },
+  "tones": {
+    "light": {"background": "surface", "text": "text", "kicker": "primary", "byline": "text!72!surface"},
+    "dark": {"background": "text", "text": "surface", "kicker": "primary!45!surface", "byline": "surface!74!text"}
+  },
+  "min_text_px": 24,
+  "min_contrast": 4.5
+}

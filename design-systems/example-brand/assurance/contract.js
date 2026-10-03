@@ -77,7 +77,7 @@
 
   suite("Logo files", {
     group: "Unit", needs: "http",
-    description: "tokens.json lists lockups for light and for dark backgrounds, an icon-only mark, a favicon and a share card, and every file it lists loads at exactly its stated size.",
+    description: "tokens.json lists lockups for light and for dark backgrounds, an icon-only mark, a favicon and a share card, and any app icons, and every file it lists loads at exactly its stated size.",
   }, (s) => {
     const size = (path) => new Promise((resolve, reject) => {
       const img = new Image(); img.onload = () => resolve([img.naturalWidth, img.naturalHeight]);
@@ -92,22 +92,46 @@
     });
     s.test("every listed file loads at its stated size", async (t) => {
       const l = logo(await tokens());
-      for (const f of [...l.lockup.files, ...l.icon.files, l.favicon, l["share-card"]]) {
+      for (const f of [...l.lockup.files, ...l.icon.files, l.favicon, l["share-card"], ...(l["app-icons"]?.files || [])]) {
         const [w, h] = await size(f.file);
         t.equal(`${w}x${h}`, `${f.width}x${f.height}`, f.file);
       }
     });
   });
 
+  suite("Unit marks", {
+    group: "Unit", needs: "http",
+    description: "A brand that lists unit marks has one for every unit it colors, each one-color SVG in currentColor, so it is placed in its unit's color or the text color. A brand without them passes.",
+  }, (s) => {
+    s.test("one one-color mark per unit", async (t) => {
+      const all = await tokens();
+      const units = logo(all).units;
+      if (!units) return t.skip("no unit marks");
+      const colored = Object.keys(all.unit || {}).filter((k) => !k.startsWith("$"));
+      t.deepEqual(Object.keys(units).filter((k) => !k.startsWith("$")).sort(), colored.sort(), "a mark for every unit color");
+      for (const [unit, mark] of Object.entries(units)) {
+        if (unit.startsWith("$")) continue;
+        const res = await fetch(new URL(mark.file, base));
+        t.ok(res.ok, `${mark.file} loads`);
+        const svg = new DOMParser().parseFromString(await res.text(), "image/svg+xml").documentElement;
+        t.equal(svg.nodeName, "svg", `${mark.file} is SVG`);
+        for (const el of svg.querySelectorAll("[fill], [stroke]")) for (const attr of ["fill", "stroke"]) {
+          const v = el.getAttribute(attr);
+          if (v !== null) t.ok(v === "currentColor" || v === "none", `${mark.file}: ${attr}="${v}"`);
+        }
+      }
+    });
+  });
+
   suite("Decoration kit", {
     group: "Unit", needs: "http",
-    description: "A brand that supplies a decoration kit (0014-design-systems FR-047) has a one-color vector lockup and icon, drawn only in currentColor so a decorator chooses the ink, each with its finest detail, and a spot-color and a thread match for each color role it lists. A brand without one passes and themes no merchandise design system.",
+    description: "A brand that supplies a decoration kit (0014-design-systems FR-047) has a one-color vector lockup and icon, and may add a wordmark, drawn only in currentColor so a decorator chooses the ink, each with its finest detail, and a spot-color and a thread match for each color role it lists. A brand without one passes and themes no merchandise design system.",
   }, (s) => {
     const kit = async () => (await tokens()).$extensions["com.intellectualfrontiers.decoration"];
-    s.test("the lockup and icon are one-color SVG in currentColor", async (t) => {
+    s.test("the lockup, icon and any wordmark are one-color SVG in currentColor", async (t) => {
       const k = await kit();
       if (!k) return t.skip("no decoration kit");
-      for (const part of ["lockup", "icon"]) {
+      for (const part of ["lockup", "icon", "wordmark"].filter((p) => p !== "wordmark" || k.wordmark)) {
         const res = await fetch(new URL(k[part].file, base));
         t.ok(res.ok, `${k[part].file} loads`);
         const svg = new DOMParser().parseFromString(await res.text(), "image/svg+xml").documentElement;

@@ -301,6 +301,7 @@ def check_design_systems(root: Path) -> list[Finding]:
     for slug in sorted(registered - dirs):
         findings.append(Finding("error", "ontology/ifcore.ttl", f"design system {slug} is registered but design-systems/{slug}/ does not exist (0014-design-systems FR-010)"))
     findings += _check_web_classification(ttl.read_text(encoding="utf-8") if ttl.is_file() else "")
+    findings += _check_derivation(ttl.read_text(encoding="utf-8") if ttl.is_file() else "")
     for d in sorted(p for p in ds.iterdir() if p.is_dir()):
         if d.name not in registered:
             findings.append(Finding("error", str(d.relative_to(root)), "is not registered in ifcore.ttl as an ifcore:DesignSystem with this dcterms:identifier (0014-design-systems FR-010)"))
@@ -375,10 +376,16 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             continue
         where = f"ontology/ifcore.ttl ({m.group(1)})"
         named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "EmailDesignSystemKind" in named and not named & _concepts(ttl, "EmailTypeScheme"):
+            findings.append(Finding("error", where, "an email design system names no email type (0014-design-systems FR-051)"))
+        if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
+            findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
+        if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
+            findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:
             findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
-        if named & {"WebDesignSystemKind", "PrintDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
-            findings.append(Finding("error", where, "a web or print design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web, print or slides design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
     methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
     for block in re.split(r"\n\s*\n", ttl):
         m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
@@ -390,6 +397,42 @@ def _check_web_classification(ttl: str) -> list[Finding]:
                 findings.append(Finding("error", where, "a merchandise design system names no decoration method (0014-design-systems FR-046)"))
             if not named & categories:
                 findings.append(Finding("error", where, "a merchandise design system names no product category (0014-design-systems FR-046)"))
+    return findings
+
+
+def _check_derivation(ttl: str) -> list[Finding]:
+    """0014-design-systems FR-020 and FR-034: a design system derives (prov:wasDerivedFrom) only from registered
+    design systems, never from a brand and never in a cycle, and every spoken-voice design system derives from a
+    written-voice one."""
+    findings: list[Finding] = []
+    kinds: dict[str, set[str]] = {}
+    parents: dict[str, list[str]] = {}
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r"^ifcore:(\w+) a ifcore:DesignSystem ;", block, re.M)
+        if not m:
+            continue
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        kinds[m.group(1)] = set(re.findall(r"ifcore:(\w+)", types.group(1))) if types else set()
+        derived = re.search(r"prov:wasDerivedFrom ([^;]+);", block)
+        parents[m.group(1)] = re.findall(r"ifcore:(\w+)", derived.group(1)) if derived else []
+    for ds, ps in parents.items():
+        where = f"ontology/ifcore.ttl: ifcore:{ds}"
+        for p in ps:
+            if p not in kinds:
+                findings.append(Finding("error", where, f"derives from ifcore:{p}, which is not a registered design system (0014-design-systems FR-020)"))
+            elif "BrandDesignSystemKind" in kinds[p]:
+                findings.append(Finding("error", where, f"derives from the brand ifcore:{p}; a brand themes a design system, nothing derives from one (0014-design-systems FR-020)"))
+        if "SpokenVoiceDesignSystemKind" in kinds[ds] and not any("WrittenVoiceDesignSystemKind" in kinds.get(p, set()) for p in ps):
+            findings.append(Finding("error", where, "a spoken-voice design system must derive from a written-voice one (0014-design-systems FR-034)"))
+        seen, stack = set(), list(ps)
+        while stack:
+            p = stack.pop()
+            if p == ds:
+                findings.append(Finding("error", where, "its derivation forms a cycle (0014-design-systems FR-020)"))
+                break
+            if p not in seen:
+                seen.add(p)
+                stack += parents.get(p, [])
     return findings
 
 
