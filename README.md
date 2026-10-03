@@ -199,6 +199,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
 | [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
+| [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
