@@ -287,15 +287,16 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 ### Brand assets and design systems
 
 [`design-systems/frontiers-brand/`](design-systems/frontiers-brand/) holds the
-palette, unit colors, typefaces, logo (light and dark), icon and favicon.
-[`design-systems/frontiers-nature-web/`](design-systems/frontiers-nature-web/) is the
-public, editorial web design system: tokens, CSS, fonts, the hero and diagram
-images, and share card.
-[`design-systems/frontiers-console-web/`](design-systems/frontiers-console-web/) is the
-web design system for operator (admin) and documentation surfaces. Both web
-systems derive from `frontiers-brand`; every public house rule about how Intellectual
-Frontiers looks, reads or sounds (print, figures, written and spoken voice)
-belongs in a design system of its kind here too (0014). Every design system
+palette, unit colors, typefaces, logo (light and dark), icon, app icons, unit marks,
+the imagery pool, the share card and the decoration kit; it themes every other design
+system. The others, one directory each and listed with their kinds in
+[`design-systems/README.md`](design-systems/README.md): the web
+(`frontiers-nature-web`, `frontiers-console-web`), print (`frontiers-print`,
+`frontiers-signage-print`), figures (`frontiers-figures`), slides (`frontiers-slides`),
+media (`frontiers-media`), email (`frontiers-email`), merchandise
+(`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
+`frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
+looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system
 carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
 runs it on every push that touches `design-systems/`.
 
