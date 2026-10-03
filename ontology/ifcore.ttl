@@ -109,20 +109,79 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:WebInteractionModelScheme a skos:ConceptScheme ; rdfs:label "Web interaction model"@en ;
+    rdfs:comment "What a web design system's pages are for (0014-design-systems FR-041): a read-mostly content site or a read-write web application, and the kinds of each. A web design system names every one it serves, by dcterms:type."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ContentSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:prefLabel "content site"@en ;
+    skos:definition "A read-mostly site: people come to read, compare and decide."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MarketingSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "marketing site"@en ;
+    skos:definition "Pages that present an offer and lead to one action: landing pages, product pages."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EditorialSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "editorial site"@en ;
+    skos:definition "Long-form reading: articles, essays, issues of a publication."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DocumentationSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "documentation"@en ;
+    skos:definition "Tutorials, how-to guides, reference and explanation, as the Diataxis framework divides them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebApplication a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:prefLabel "web application"@en ;
+    skos:definition "A read-write application: people come to create, change and act on records."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProductApplication a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "product application"@en ;
+    skos:definition "The application a product sells to its customers (software as a service)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BackOffice a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "back office"@en ;
+    skos:definition "Internal tools for the people who operate a business."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Dashboard a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "dashboard"@en ;
+    skos:definition "Monitoring and reporting at a glance: figures, status, trends."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TransactionalService a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "transactional service"@en ;
+    skos:definition "A multi-step task completed once: sign-up, checkout, an application (GOV.UK names these transactional services)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DesignExpressionScheme a skos:ConceptScheme ; rdfs:label "Design expression"@en ;
+    rdfs:comment "How much a web design system's type and motion assert themselves (0014-design-systems FR-041), as IBM's Carbon design system names the two ends. A web design system is exactly one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProductiveExpression a skos:Concept ; skos:inScheme ifcore:DesignExpressionScheme ; skos:prefLabel "productive"@en ;
+    skos:definition "Calm, dense, efficient type and motion that keep attention on the task."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ExpressiveExpression a skos:Concept ; skos:inScheme ifcore:DesignExpressionScheme ; skos:prefLabel "expressive"@en ;
+    skos:definition "Larger type, more motion and imagery, for marketing and editorial moments."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DesignDensityScheme a skos:ConceptScheme ; rdfs:label "Design density"@en ;
+    rdfs:comment "How much a web design system fits in a space (0014-design-systems FR-041), as Material Design names the steps. A web design system names every density it supports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DefaultDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "default"@en ;
+    skos:definition "The standard spacing of controls and rows."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComfortableDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "comfortable"@en ;
+    skos:definition "Tighter than default, for screens people scan often."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompactDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "compact"@en ;
+    skos:definition "The tightest spacing, for data-dense tables and tools."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersBrand a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-brand" ;
     rdfs:label "Frontiers Brand"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:BrandDesignSystemKind ;
-    rdfs:comment "At design-systems/frontiers-brand/; its house rules are design-systems/frontiers-brand/spec.md. The palette, unit colors, typefaces, logo, icon and imagery identity every visual design system derives from (0014-design-systems FR-028)."@en ;
+    rdfs:comment "At design-systems/frontiers-brand/; its house rules are design-systems/frontiers-brand/spec.md. Intellectual Frontiers' own identity: palette, theme roles, unit colors, typefaces, logo, icon and imagery (0014-design-systems FR-028). It themes the Intellectual Frontiers web design systems (FR-038)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ExampleBrand a ifcore:DesignSystem ;
+    dcterms:identifier "example-brand" ;
+    rdfs:label "Example Brand"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:BrandDesignSystemKind ;
+    rdfs:comment "At design-systems/example-brand/; its house rules are design-systems/example-brand/spec.md. A test brand, deliberately not Intellectual Frontiers', that every web design system is run themed by, to prove it can be themed by any brand (0014-design-systems FR-039). Never used to publish."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-nature-web" ;
     rdfs:label "Frontiers Nature Web"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
-    dcterms:type ifcore:WebDesignSystemKind ;
-    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    dcterms:type ifcore:WebDesignSystemKind , ifcore:EditorialSite , ifcore:MarketingSite , ifcore:ExpressiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-nature-web/; its house rules are design-systems/frontiers-nature-web/spec.md. Intellectual Frontiers' public, editorial web presentation."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -130,8 +189,7 @@ ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-console-web" ;
     rdfs:label "Frontiers Console Web"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:WebDesignSystemKind ;
-    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    dcterms:type ifcore:WebDesignSystemKind , ifcore:DocumentationSite , ifcore:BackOffice , ifcore:Dashboard , ifcore:ProductiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-console-web/; its house rules are design-systems/frontiers-console-web/spec.md. Operator (admin) and documentation web surfaces: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components."@en ;
     ifcore:hasAudience ifcore:Public .
 

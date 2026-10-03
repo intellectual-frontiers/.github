@@ -3,7 +3,7 @@
  * declares layers, so every later file lands in its intended layer regardless of load timing.
  * assurance/ checks this line against bundle.txt.
  */
-@layer reset, tokens, base, layout, prose, components, admin;
+@layer theme, reset, tokens, base, layout, prose, components, admin;
 
 @layer reset {
   *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid; }

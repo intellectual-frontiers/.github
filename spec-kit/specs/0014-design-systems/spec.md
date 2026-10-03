@@ -82,9 +82,10 @@ any number of each kind.
 ## Derivation
 
 - **FR-020**: A design system MAY derive from one or more other design
-  systems, of its own kind or another (a web design system from a brand
-  one; a spoken-voice design system from a written-voice one). Derivation
-  MUST be recorded in the ontology (FR-010) and MUST NOT form a cycle.
+  systems, of its own kind or another (a spoken-voice design system from a
+  written-voice one). Derivation MUST be recorded in the ontology (FR-010)
+  and MUST NOT form a cycle. Nothing derives from a brand design system: a
+  brand themes a design system (FR-038), which is a different relation.
 - **FR-021**: A derived design system inherits every rule of what it derives
   from. It MUST hold a vendored copy of whatever inherited value its own
   files use (a color, a typeface, a banned word), and its harness MUST check
@@ -92,6 +93,47 @@ any number of each kind.
   narrow inherited ones. It MUST NOT contradict an inherited rule except by
   a requirement of its own that cites the inherited one (`<slug> FR-NNN`)
   and states the override.
+
+## Tokens and theming
+
+- **FR-036**: Design tokens MUST be organized in three tiers: *primitive*
+  tokens, a brand's own named values (a color, a typeface); *semantic*
+  tokens, a design system's named purposes (body text, the action color),
+  each referring to a primitive or theme role; and *component* tokens,
+  referring to semantic ones. Every `tokens.json` MUST use the Design
+  Tokens Community Group format (`$value`, `$type`, and `{group.token}` for
+  a token that refers to another).
+- **FR-037**: Every brand MUST supply these theme roles, each in
+  `tokens.json` under `role` and as a `--brand-<role>` custom property in
+  `brand.css`: the colors `text`, `surface`, `primary`, `secondary`,
+  `tertiary`, `success`, `warning`, `danger` and `info`, and the font
+  families `font-sans` and `font-serif`. Under `logo` in `tokens.json`, it
+  MUST list its lockup files for light and for dark backgrounds, each with
+  its pixel size, its icon-only mark, and its favicon. A brand MAY supply
+  further roles that a design system it themes requires (FR-038).
+- **FR-038**: A web design system MUST take every brand value it uses (a
+  color a theme role supplies, a font family, a logo, the favicon) from the
+  theme by reference, as `var(--brand-<role>)` or, for files, from the
+  brand's `tokens.json`, and never as a literal or a copy. Its cascade
+  layer order MUST begin with `theme`. Its spec MUST name every role it
+  requires beyond FR-037 and the font families it ships. Pairing a design
+  system with a brand is a *theme*: it MAY change only the values FR-037
+  and those named roles supply, and the font families only among those the
+  design system ships; it MUST NOT change layout, spacing, components,
+  motion or accessibility behaviour. A web design system MUST NOT be used
+  without a theme.
+- **FR-039**: A web design system's harness MUST run under any brand
+  vendored beside it, chosen when it runs, and MUST fail when that brand
+  lacks a role the system requires, names a font family the system does
+  not ship, or makes a text pairing fall below WCAG 2.2 AA. This
+  repository's CI MUST run every web design system here under every brand
+  here. A brand outside this repository is proven against a web design
+  system by running that system's harness under it where both are
+  vendored.
+- **FR-040**: A page MUST be rendered with exactly one web design system
+  and one theme. A channel MAY use several, each for an area of it (a path
+  prefix, a host), and MUST state which design system and which brand each
+  area uses (FR-012).
 
 ## Rules
 
@@ -128,7 +170,8 @@ any number of each kind.
   `ifcore:DesignSystem` individual, carrying at minimum its slug
   (`dcterms:identifier`), a label, a status
   (`ifcore:ActiveDesignSystem` or `ifcore:DraftDesignSystem`), its kind (`dcterms:type`, a concept in
-  `ifcore:DesignSystemKindScheme`), each design system it derives from
+  `ifcore:DesignSystemKindScheme`) and, for a web design system, its
+  classification (FR-041), each design system it derives from
   (`prov:wasDerivedFrom`), and a comment naming its directory.
   This is the one register of which design systems exist; nothing elsewhere
   (a separate index file, a wiki page, a status column) duplicates it.
@@ -195,21 +238,28 @@ any number of each kind.
 
 ## Kind profile: brand
 
-- **FR-028**: A brand design system governs the identity every other
-  kind draws on: the palette, the typeface families, the logo and its
-  lockups, and the imagery identity. Its machine-readable form is a token
-  file (`tokens.json`) naming each value once. Its harness checks its token
-  file against its rules and contrast of its documented color pairings. Its
-  consumers are other design systems, which derive from it (FR-020).
+- **FR-028**: A brand design system governs one identity: its palette, the
+  theme roles it supplies (FR-037), its typeface families, its logo and
+  lockups, its favicon, and its imagery. Its machine-readable form is
+  `tokens.json` (FR-036) and `brand.css`, which declares its theme roles as
+  CSS custom properties prefixed `--brand-`, inside the `theme` cascade
+  layer, and nothing else. Its harness checks that the two agree, that it
+  supplies every role of FR-037, the contrast of its role pairings, and its
+  logo files. Its consumers are the design systems it themes and the
+  channels that pair it with them. A brand that is not yet public MUST live,
+  with the same layout and harness, in a repository that may hold
+  confidential material, never in this one (0001-eidolon-architecture
+  FR-002).
 
 ## Kind profile: web presentation
 
 - **FR-029**: A web design system governs how a web page looks and the DOM
   shape its interactive chrome expects. Its machine-readable form is its CSS
   custom properties, mirrored in `tokens.json`; it holds `css/` (with a
-  `css/bundle.txt` naming the cascade order), `fonts/`, `images/`, `logos/`,
-  `js/`, and a markup contract (`chrome.md`), unless the system's own
-  nature requires otherwise. Its consumers are web properties.
+  `css/bundle.txt` naming the cascade order), `fonts/`, `js/`, and a markup
+  contract (`chrome.md`), unless the system's own nature requires
+  otherwise, and never a brand's logo or favicon (FR-038). Its consumers
+  are channels, each pairing it with a brand (FR-038, FR-040).
 - **FR-007**: A web design system's client-side implementation MUST prefer
   plain HTML, modern CSS and light vanilla JavaScript with native web
   components over any front-end framework. A framework or non-trivial
@@ -239,6 +289,22 @@ any number of each kind.
   framework); the markup contract on its fixtures; and its responsive
   behaviour. A system with interactive components MUST also cover each
   component's keyboard and ARIA behaviour.
+
+- **FR-041**: Every web design system MUST be classified in the ontology,
+  by `dcterms:type`, with concepts from three schemes, each named as the
+  industry names it:
+  - one or more **interaction models** it serves: under *content site*
+    (read-mostly), *marketing site*, *editorial site* and *documentation*;
+    under *web application* (read-write), *product application*, *back
+    office*, *dashboard* and *transactional service*;
+  - exactly one **expression**: *productive* (calm, dense, task-focused
+    type and motion) or *expressive* (larger type, more motion and
+    imagery, for marketing and editorial), as IBM's Carbon design system
+    names them;
+  - one or more **densities** it supports: *default*, *comfortable* or
+    *compact*, as Material Design names them.
+  A design system's slug MUST NOT encode these; they are facts in the
+  ontology, and a system MAY serve several interaction models.
 
 ## Kind profile: print
 
@@ -307,9 +373,9 @@ any number of each kind.
   it is copied into each system rather than shared, and nothing but
   design systems and the top-level `README.md` sits in `design-systems/`,
   per FR-003, FR-005 and FR-017.
-- A value two design systems both use, such as a brand color: one system
-  owns it and the other derives from it and carries a checked copy, per
-  FR-020 and FR-021; neither states it independently.
+- A brand color a web design system uses: the brand supplies it as a theme
+  role and the web design system references it, never copies it, per
+  FR-037 and FR-038.
 - A derived system that needs to depart from an inherited rule: it states an
   override requirement citing the inherited one, per FR-021.
 - A house rule that is replaced: its requirement number stays retired and
@@ -320,6 +386,15 @@ any number of each kind.
 - A design system created for a new kind of output from an existing one,
   such as a print counterpart of a web system: it is a new design system
   with its own slug, per FR-003 and FR-018.
+- A Studios company that wants an Intellectual Frontiers web design system
+  in its own colors and logo: it supplies a brand, which themes the web
+  design system unchanged, per FR-037 and FR-038; until the company is
+  public its brand lives outside this repository, per FR-028.
+- A brand without a role a web design system requires, or whose colors fail
+  contrast in that system: the pairing fails that system's harness and is
+  not a usable theme, per FR-039.
+- A channel with a public site and an operator console: each area uses its
+  own web design system and theme, and no page mixes them, per FR-040.
 - A design system no longer used: its directory and ontology individual are
   removed together once nothing derives from it, per FR-035.
 - A written-voice rule drawn from a named person's writing: it is stated as
@@ -375,6 +450,12 @@ None.
   requirements in 0020-spec-format, at `design-systems/<slug>/spec.md`.
 - **Derivation** — one design system inheriting another's rules and
   carrying checked copies of the values it uses.
+- **Theme** — a brand paired with a design system, supplying the theme
+  roles that system takes by reference.
+- **Theme role** — one value every brand supplies under a fixed name
+  (`primary`, `surface`, `font-sans`, ...).
+- **Interaction model, expression, density** — how a web design system is
+  classified, in the industry's own terms.
 - **A consumer** — any channel (a web property), production pipeline or
   tool, internal or external, that vendors a design system's directory to
   make presentations; this spec does not
@@ -409,6 +490,9 @@ None.
   code.
 - **SC-008**: No value inherited through derivation differs between a
   derived design system and its source.
+- **SC-009**: Every web design system here passes its harness under every
+  brand here, and no web design system's stylesheets contain a brand's
+  color as a literal.
 
 ## Review & acceptance checklist
 

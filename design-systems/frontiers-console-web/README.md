@@ -2,10 +2,10 @@
 
 > **Canonical and public.** Governed by
 > [`spec.md`](spec.md) and
-> [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), and derives from
-> [`frontiers-brand`](../frontiers-brand/README.md); see [the design systems README](../README.md)
-> for what a design system is. Consumers vendor a pinned copy of this directory, with
-> `frontiers-brand` beside it, and never edit either. Built as **Bare Metal
+> [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), and is themed by a
+> brand such as [`frontiers-brand`](../frontiers-brand/README.md); see [the design systems
+> README](../README.md) for what a design system is. Consumers vendor a pinned copy of this
+> directory, with a brand beside it, and never edit either. Built as **Bare Metal
 > Software**: strict HTML5, modern CSS in cascade layers, and a few native web components in one
 > classic script. No framework, no utility-class system, no build step, **no runtime dependencies**.
 
@@ -13,7 +13,7 @@ Frontiers Console is the interface for **operator (admin) and documentation** su
 navbar, page and table-of-contents shell in three selectable layouts, a set of documentation
 components, and the data-dense pieces an admin console needs. It is deliberately a different system
 from [`frontiers-nature-web`](../frontiers-nature-web/README.md), which is the public, editorial face of the
-organization; both derive their palette, typefaces and logo from `frontiers-brand`, and share no purpose.
+organization; both take their colors, typefaces and logo from the theme, and share no purpose.
 
 ## Provenance
 
@@ -44,7 +44,6 @@ other project is a dependency. The only third-party files are the fonts below.
 | `js/console.js` | The only script. Defines `fc-shell`, `fc-toc`, `fc-tabs`, `fc-codeblock`, `fc-search`, `fc-table`, `fc-terminal` and `FcToast`. |
 | `tokens.json` | Machine-readable mirror of `tokens.css`, kept exact by `assurance/`. |
 | `chrome.md` | **The markup contract**: anatomy, classes and attributes for every layout and component. |
-| `logos/`, `images/` | Copies of `frontiers-brand`'s logo files and favicon, checked by `assurance/inherited.js`. |
 | `assurance/` | The test harness, report and live documentation. See below. |
 
 ## Three layouts, one attribute
@@ -65,7 +64,9 @@ above the article below 80 rem. On desktop the sidebar can be collapsed (the cho
 2. Link the stylesheets in `css/bundle.txt` order (or concatenate them in that order). Cascade layers, not
    file boundaries, make the order matter; `reset.css` must come before any other layered file.
    Rewrite the `../fonts/` paths in `fonts.css` if you serve fonts elsewhere.
-3. Serve `fonts/`, `logos/`, `images/` and `js/` as static assets, and load `js/console.js` with `defer`.
+3. Serve `fonts/` and `js/` as static assets, and the brand's logo and favicon files as its
+   `tokens.json` lists them; load the brand's `brand.css` before this system's stylesheets, and
+   `js/console.js` with `defer`.
 4. Write your markup to `chrome.md`. No backend, template language or content format is assumed.
 5. Open `assurance/index.html` (over http, ideally) against your vendored copy to confirm nothing broke.
 
