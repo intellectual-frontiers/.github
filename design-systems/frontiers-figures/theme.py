@@ -9,7 +9,8 @@
 
 A figure's source names its colors by class (f-<role>, s-<role>, c-<role>) and its type by size,
 weight and style only; this resolves each role through roles.json to the brand's own value or a
-mix of two of its roles, and names the brand's font-sans for every label. Standard library only.
+mix of two of its roles, names the brand's font-sans for every label, and sets every nominal type size at
+that family's optical size. Standard library only.
 """
 from __future__ import annotations
 
@@ -67,10 +68,24 @@ def css(brand: Path, variant: str = "default") -> str:
     return "".join(rules)
 
 
+def optical(brand: Path) -> float:
+    """The factor a figure's nominal type sizes are set at in the brand's sans: its x-height brought to the
+    reference (roles.json "type"; spec FR-007)."""
+    family = font_family(brand)
+    families = ROLES["type"]["families"]
+    if family not in families:
+        raise SystemExit(f"frontiers-figures does not ship the brand's sans, {family}; it ships {', '.join(families)}")
+    return ROLES["type"]["reference-x-height"] / families[family]["x-height"]
+
+
 def apply(svg: str, brand: Path, variant: str = "default") -> str:
-    """The figure with the theme's stylesheet as the first child of its <svg>."""
+    """The figure with the theme's stylesheet as the first child of its <svg>, and every nominal type size set
+    at the brand's sans's optical size (spec FR-007)."""
+    if 'data-theme="' in svg:
+        raise ValueError("this figure is already themed; theme its source")
     style = f'<style data-theme="{brand.name}" data-variant="{variant}">{css(brand, variant)}</style>'
-    svg = re.sub(r'<style data-theme="[^"]*" data-variant="[^"]*">.*?</style>', "", svg, flags=re.S)
+    k = optical(brand)
+    svg = re.sub(r'(<(?:text|tspan)\b[^>]*?\bfont-size=")([\d.]+)(")', lambda m: f"{m.group(1)}{float(m.group(2)) * k:.4g}{m.group(3)}", svg)
     return re.sub(r"(<svg\b[^>]*>)", lambda m: m.group(1) + "\n  " + style, svg, count=1)
 
 

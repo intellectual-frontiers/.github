@@ -6,9 +6,12 @@ name: theme.py adds both from a brand when a consumer renders it, in any medium.
 the theme's sans (the brand's font-sans, among the families in fonts/) so a box is sized for the
 type it will be set in.
 
-Type and spacing follow the house rules: nothing under MIN_FONT_PX (20px on the 1040px standard
-canvas, about 6.9pt in print), body text 21px, line height 1.3x the size, box padding of 18px or
-more. SVG.text() refuses anything smaller, so a figure built on this kit cannot regress.
+Type sizes are optical: a size here is nominal, stated for a face whose x-height is REF_X_HEIGHT
+(0.486 em). Measured, and set by theme.py, in the theme's family, a nominal size is scaled so the
+x-height matches (Inter, whose x-height is 0.546 em, at 0.89x), the way CSS font-size-adjust does;
+a label therefore reads the same size whatever the brand's sans. The house rules: nothing under
+MIN_FONT_PX nominal (20px on the 1040px standard canvas, about 6.9pt in print), body text 21px,
+line height 1.3x the size, box padding of 18px or more. SVG.text() refuses anything smaller.
 Requires Pillow.
 """
 from __future__ import annotations
@@ -21,8 +24,11 @@ from PIL import ImageFont
 
 HERE = Path(__file__).resolve().parent
 FONTS_DIR = HERE / "fonts"
-# The families this design system ships, by the name a brand gives them: file stem (spec FR-006).
-FAMILIES = {"Inter": "Inter"}
+# The families this design system ships, by the name a brand gives them, and the reference x-height type sizes
+# are stated for (roles.json "type"; spec FR-006, FR-007).
+_TYPE = json.loads((HERE / "roles.json").read_text(encoding="utf-8"))["type"]
+FAMILIES = {name: {"stem": f["stem"], "x_height": f["x-height"]} for name, f in _TYPE["families"].items()}
+REF_X_HEIGHT = _TYPE["reference-x-height"]
 CANVAS = {name: v["canvas"] for name, v in json.loads((HERE / "roles.json").read_text(encoding="utf-8"))["layout-variants"].items()}
 
 MIN_FONT_PX = 20
@@ -55,17 +61,23 @@ def use_brand(brand: str | os.PathLike) -> None:
     use_family(value)
 
 
+def optical(family: str | None = None) -> float:
+    """The factor a nominal size is set at in a family, so its x-height matches the reference."""
+    return REF_X_HEIGHT / FAMILIES[family or _family]["x_height"]
+
+
 def _font(bold: bool, italic: bool):
     style = {(False, False): "Regular", (True, False): "Bold", (False, True): "Italic", (True, True): "BoldItalic"}[(bold, italic)]
     if style not in _fonts:
-        _fonts[style] = ImageFont.truetype(str(FONTS_DIR / f"{FAMILIES[_family]}-{style}.otf"), 100)
+        _fonts[style] = ImageFont.truetype(str(FONTS_DIR / f"{FAMILIES[_family]['stem']}-{style}.otf"), 100)
     return _fonts[style]
 
 
 def text_width(s: str, size: float, bold: bool = False, italic: bool = False, tracking: float = 0.0) -> float:
-    """Width of s set at size px, with tracking in em between letters."""
+    """Width of s at nominal size px in the theme's family (set at its optical size), with tracking in em."""
+    actual = size * optical()
     bbox = _font(bold, italic).getbbox(s)
-    return (bbox[2] - bbox[0]) * (size / 100.0) + tracking * size * max(len(s) - 1, 0)
+    return (bbox[2] - bbox[0]) * (actual / 100.0) + tracking * actual * max(len(s) - 1, 0)
 
 
 def wrap(s, size, max_width, bold=False, italic=False):

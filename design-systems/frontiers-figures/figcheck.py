@@ -10,8 +10,8 @@ For every figure (every *.svg under a directory):
     name of its own, so a theme supplies both;
   - no label is smaller than 20px, or tracked tighter than -0.02em;
   - no label has an em dash or a straight quote;
-  - every label fits: inside the box it is centred in, and on the canvas, measured in the theme's
-    sans (the brand's font-sans with --brand, else Inter).
+  - every label fits: inside the box it sits in, on the canvas, and under no shape drawn after it,
+    measured in the theme's sans at its optical size (the brand's font-sans with --brand, else Inter).
 
 Exits non-zero if any figure fails. Requires Pillow.
 """
@@ -90,11 +90,22 @@ def check(path) -> list[str]:
     if width not in svgkit.CANVAS.values():
         problems.append(f"canvas is {width:g}px wide, not one of {sorted(svgkit.CANVAS.values())}")
     problems += semantic_problems(root)
+    # Boxes are outlined rectangles; a fill-only band or quadrant is a background a label may cross.
     rects = []
     for r in root.iter(NS + "rect"):
         w = r.get("width") or ""
-        if w and not w.endswith("%"):
+        outlined = any(c.startswith("s-") for c in (r.get("class") or "").split()) or r.get("stroke") not in (None, "none")
+        if w and not w.endswith("%") and outlined:
             rects.append((num(r.get("x")), num(r.get("y")), num(w), num(r.get("height"))))
+    # For each label, the filled rectangles drawn after it, in document order.
+    order = list(root.iter())
+    filled = [(i, (num(e.get("x")), num(e.get("y")), num(e.get("width")), num(e.get("height"))))
+              for i, e in enumerate(order) if e.tag == NS + "rect" and (e.get("width") or "")[-1:] != "%"
+              and e.get("fill") != "none" and any(c.startswith("f-") for c in (e.get("class") or "").split())]
+    shapes_after = {}
+    for i, e in enumerate(order):
+        if e.tag == NS + "text":
+            shapes_after[e] = [g for j, g in filled if j > i]
     items = []
     walk(root, {}, items)
     for s, a, el in items:
@@ -119,7 +130,15 @@ def check(path) -> list[str]:
         left = x - (w / 2 if anchor == "middle" else w if anchor == "end" else 0)
         if left < -1 or left + w > width + 1:
             problems.append(f"runs off the canvas: {label[:60]!r}")
-        elif anchor == "middle":
+        else:
+            # A shape drawn after a label must not cover part of it (a table's next cell, a neighbouring box).
+            top, bottom = y - size * 0.75, y + size * 0.2
+            for later in shapes_after.get(el, []):
+                lx, ly, lw, lh = later
+                if lx < left + w - 0.5 and left + 0.5 < lx + lw and ly < bottom and top < ly + lh and not (lx <= left and left + w <= lx + lw):
+                    problems.append(f"runs under a shape drawn after it: {label[:60]!r}")
+                    break
+            # The box a label starts, ends or is centred in: the smallest outlined box around its anchor.
             boxes = [r for r in rects if r[0] <= x <= r[0] + r[2] and r[1] <= y - size * 0.35 <= r[1] + r[3] and r[2] < width - 1]
             if boxes:
                 bx, _, bw, _ = min(boxes, key=lambda r: r[2] * r[3])

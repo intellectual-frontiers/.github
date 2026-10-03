@@ -118,5 +118,15 @@
       "canvas": 720,
       "use": "a figure in a narrow slot (a sidebar, one column of two, a slide half) so its type still prints at the minimum"
     }
+  },
+  "type": {
+    "$description": "Type sizes are nominal, stated for a face whose x-height is reference-x-height (em). Each family this design system ships is set at reference-x-height / its x-height, so a label's x-height matches whatever the brand's sans (spec FR-007).",
+    "reference-x-height": 0.486,
+    "families": {
+      "Inter": {
+        "stem": "Inter",
+        "x-height": 0.5459
+      }
+    }
   }
 }
