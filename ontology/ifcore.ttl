@@ -1191,6 +1191,22 @@ ifcore:HealthtechspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
     ifcore:verificationMethod "automated"@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:RevenueHealthDomain a ifcore:DomainName ;
+    rdfs:label "revenue.health"@en ;
+    dcterms:identifier "revenue.health" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:RevenueAccelerationLLC ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RevenueHealthDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:RevenueHealthDomain ;
+    ifcore:primarySource "https://rdap.nic.health/domain/revenue.health"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2018-05-07; expires 2027-05-07; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
 # ───────────────────────── Renditions and delivery (0015-work-packages FR-013 – FR-018) ─────────────────────────
 
 ifcore:DeliveryRecord a owl:Class ; rdfs:subClassOf ifcore:Reference ; rdfs:label "Delivery record"@en ;
