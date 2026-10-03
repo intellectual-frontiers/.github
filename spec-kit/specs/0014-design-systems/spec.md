@@ -494,8 +494,8 @@ any number of each kind.
   delivery targets are themed by a brand (FR-038, FR-044). Its harness
   checks a fixture course that must pass and edits of it that must fail. It
   MUST be classified in the ontology, by `dcterms:type`, with every
-  **course format** it supports and every **assessment item type** it
-  grades. Its consumers are works, their courses, and the platforms
+  **course format** it supports, every **assessment item type** it
+  grades, and every **delivery target** it compiles to. Its consumers are works, their courses, and the platforms
   courses are delivered on.
 
 ## Kind profile: written voice

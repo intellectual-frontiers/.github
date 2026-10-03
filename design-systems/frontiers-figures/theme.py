@@ -115,7 +115,7 @@ def font_faces(svg: str, brand: Path) -> str:
         used.setdefault((bold, italic), set()).update(body)
     rules = []
     for (bold, italic), chars in sorted(used.items()):
-        font = TTFont(FONTS_DIR / f"{stem}-{STYLES[(bold, italic)]}.otf")
+        font = TTFont(FONTS_DIR / f"{stem}-{STYLES[(bold, italic)]}.otf", recalcTimestamp=False)
         opts = subset.Options()
         opts.flavor, opts.layout_features, opts.name_IDs, opts.notdef_outline = "woff", ["kern", "liga", "calt"], [0, 1, 2, 13, 14], True
         sub = subset.Subsetter(opts)

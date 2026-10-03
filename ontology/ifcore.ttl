@@ -335,6 +335,20 @@ ifcore:TextMatchItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeSch
     skos:definition "An item answered with a short text, accepted if it matches one of the stated answers."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:CourseDeliveryTargetScheme a skos:ConceptScheme ; rdfs:label "Course delivery target"@en ;
+    skos:definition "The forms a course design system compiles a course to, each for a place courses are delivered (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:StaticWebEdition a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "static web edition"@en ;
+    skos:definition "A course as a static web site anyone can read, its practice graded in the browser."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpenEdxOlxExport a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "Open edX OLX export"@en ;
+    skos:altLabel "OLX"@en ;
+    skos:definition "A course as an Open edX course export (Open Learning XML) that Studio imports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Cmi5Package a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "cmi5 package"@en ;
+    skos:definition "A course as a cmi5 course package an LMS imports, its pages reporting to the LMS by xAPI."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -455,8 +469,8 @@ ifcore:FrontiersCourse a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-course" ;
     rdfs:label "Frontiers Course"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:CourseDesignSystemKind , ifcore:SelfPacedCourse , ifcore:InstructorPacedCourse , ifcore:MultipleChoiceItem , ifcore:MultipleResponseItem , ifcore:NumericResponseItem , ifcore:TextMatchItem ;
-    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of Markdown, read by course.py into a model schema/course.schema.json describes, and checked for outcome alignment, pacing, assessment and accessibility (0014-design-systems FR-052)."@en ;
+    dcterms:type ifcore:CourseDesignSystemKind , ifcore:SelfPacedCourse , ifcore:InstructorPacedCourse , ifcore:MultipleChoiceItem , ifcore:MultipleResponseItem , ifcore:NumericResponseItem , ifcore:TextMatchItem , ifcore:StaticWebEdition , ifcore:OpenEdxOlxExport , ifcore:Cmi5Package ;
+    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of Markdown, read by course.py into a model schema/course.schema.json describes, checked for outcome alignment, pacing, assessment and accessibility, and compiled by build.py to a static web edition, an Open edX OLX export and a cmi5 package, themed by a brand (0014-design-systems FR-052)."@en ;
     ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 

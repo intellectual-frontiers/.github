@@ -312,7 +312,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
 0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
 0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
-0014-design-systems FR-052	check	.github: python3 tools/spec_check.py	a course design system names a course format and an assessment item type and its figure design system; its harness checks the rest
+0014-design-systems FR-052	check	.github: python3 tools/spec_check.py	a course design system names a course format, an assessment item type, a delivery target and its figure design system; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -699,7 +699,7 @@ frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/ass
 frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
 frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
 frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats and item types; run.py checks the classification and drawsFiguresWith
+frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats, item types and delivery targets; run.py checks the classification and drawsFiguresWith
 frontiers-course FR-002	none	-	directory contents; no check
 frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; unreadable sources and misplaced videos are refused
 frontiers-course FR-004	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
@@ -711,6 +711,12 @@ frontiers-course FR-009	check	.github: python3 design-systems/frontiers-course/a
 frontiers-course FR-010	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check sweeps text under written voice and transcripts under spoken voice
 frontiers-course FR-011	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check runs figcheck over a lesson's SVG figures
 frontiers-course FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-course FR-013	check	.github: python3 design-systems/frontiers-course/assurance/run.py	each target is refused for a failing course and is byte-identical across two builds
+frontiers-course FR-014	check	.github: python3 design-systems/frontiers-course/assurance/run.py; node design-systems/frontiers-course/assurance/run.mjs	run.py: no color literal, role contrast under every brand, lang, one h1, alternative text, links resolve; run.mjs: phone and desktop width, rendered contrast, fonts, skip link
+frontiers-course FR-015	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs grades every fixture item right and wrong; run.mjs answers every item by its key in Chromium
+frontiers-course FR-016	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs runs cmi5.js against a mock LMS; cmi5.xml validated against CourseStructure.xsd; every AU's page and objectives
+frontiers-course FR-017	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the tarball's structure, every url_name, static file, transcript, problem type and the grading policy
+frontiers-course FR-018	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, and run.mjs under every brand
 frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
 frontiers-email FR-002	none	-	directory contents; no check
 frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
