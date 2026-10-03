@@ -178,7 +178,7 @@ def targets(check) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         bad = Path(tmp) / BASE.name
         shutil.copytree(BASE, bad)
-        (bad / "course.md").write_text((bad / "course.md").read_text(encoding="utf-8").replace("O2: Justify", "O2: Understand"), encoding="utf-8")
+        (bad / "course.adoc").write_text((bad / "course.adoc").read_text(encoding="utf-8").replace("O2:: Justify", "O2:: Understand"), encoding="utf-8")
         for target in ("web", "olx", "cmi5"):
             try:
                 {"web": lambda: build.web(bad, Path(tmp) / "w", brands[0]),
