@@ -180,6 +180,13 @@ requirement	mechanism	by	note
 0009-press FR-028	none	-	rule of judgment; no check or defined review covers it
 0009-press FR-029	none	-	rule of judgment; no check or defined review covers it
 0009-press FR-030	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-031	none	-	one journal is ontology data; nothing counts journals
+0009-press FR-032	none	-	outcome reporting is editorial judgment
+0009-press FR-033	none	-	no issue records exist yet
+0009-press FR-034	none	-	section names are not checked
+0009-press FR-035	none	-	no printed issue exists yet
+0009-press FR-036	none	-	no issue draws on a news record yet
+0009-press FR-037	none	-	PromotionPost shape covers only 0021 FR-023's link; claims are unchecked
 0010-capital FR-001	none	-	rule of judgment; no check possible
 0010-capital FR-002	none	-	rule of judgment; no check possible
 0010-capital FR-003	none	-	rule of judgment; no check possible
@@ -445,3 +452,7 @@ requirement	mechanism	by	note
 0021-works-and-presentations FR-019	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-020	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-021	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-022	none	-	stages are asserted per record; nothing compares them
+0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
+0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
+0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment

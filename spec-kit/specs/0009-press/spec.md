@@ -129,6 +129,31 @@ ontology data and registers, not restated here.
   instance — MUST be referenced from the Journal article rather than
   republished as if the Journal were its primary source, per
   0007-work-and-assets FR-016.
+- **FR-031**: Press MUST publish one standing journal until a recorded
+  Decision adds another. Its name, short form, and cadence are ontology
+  data, not restated here.
+- **FR-032**: The Journal MUST report outcomes: what the firm's works
+  found, made, or proved since the previous issue, including the
+  decisions they changed and the evidence for each. Company or unit news
+  MUST NOT be its subject; that is a promotional post
+  (0021-works-and-presentations FR-023), which points to the Journal.
+- **FR-033**: An issue MUST be a presentation (0021-works-and-presentations
+  FR-004) that gathers articles, each naming the work it presents. An
+  issue's online and print editions MUST be two presentations of the same
+  issue, carrying the same articles.
+- **FR-034**: The Journal's sections MUST be organized by the market or
+  reader problem they address (FR-011), never by unit
+  (0021-works-and-presentations FR-014).
+- **FR-035**: A correction to an article MUST be made in place online,
+  per FR-010, and MUST run in the next printed issue with the same
+  prominence as the original, naming the issue it corrects.
+- **FR-036**: Where an issue reports what changed in a book, it MUST draw
+  on the book's news record (0016-press-production FR-035) rather than a
+  second account of the change.
+- **FR-037**: Press MAY publish promotional posts for search, answer
+  engines, and other promotion, alongside the Journal. Each MUST satisfy
+  FR-001 through FR-004 and 0021-works-and-presentations FR-023 through
+  FR-025.
 
 ## Events and partnerships
 
@@ -258,6 +283,10 @@ ontology data and registers, not restated here.
   source.
 - **SC-010**: Every piece presenting Native Alpha names the source of its
   discovery, and no latent claim is labeled an observable fact.
+- **SC-011**: No Journal issue has company or unit news as its subject,
+  and no section is named for a unit.
+- **SC-012**: Every correction to a printed article appears in the next
+  printed issue.
 
 ## Review & acceptance checklist
 

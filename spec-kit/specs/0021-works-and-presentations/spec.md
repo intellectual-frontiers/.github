@@ -20,7 +20,8 @@ schema.org's `workExample` and `exampleOfWork`.
   Alpha claim (0003-intellectual-frontiers FR-014 through FR-016),
   evidence, and rights MUST be asserted on the work, once, per
   0001-eidolon-architecture FR-019, and never restated on a presentation
-  of it.
+  of it. A presentation's own production stage, owner, audience, and
+  rights, where it has them, are its own facts, per FR-022.
 - **FR-003**: A work MUST NOT be identified by, or exist only as, one of
   its presentations. Retiring a presentation MUST NOT retire the work.
 
@@ -76,7 +77,8 @@ schema.org's `workExample` and `exampleOfWork`.
 - **FR-014**: The principal subject (`schema:about` or `schema:mainEntity`)
   of a public presentation MUST be a work, a result of a work, or the
   reader's problem that a work addresses. It MUST NOT be a unit or another
-  part of how the company is organized.
+  part of how the company is organized. A promotional post is the one
+  exception, under FR-023.
 - **FR-015**: A public presentation of the firm itself (an organization
   profile, a home or about page) MUST lead with what the firm's works have
   found, made, or proved. It MAY describe the units after that, as the
@@ -98,7 +100,9 @@ schema.org's `workExample` and `exampleOfWork`.
   packages, `works/<kind>/<slug>/` (0015-work-packages FR-004) MUST be
   read with `<kind>` naming the work's primary presentation form, and the
   `ifcore:SubstantialWork` individual for the package MUST be treated as
-  the work under FR-001 and FR-002.
+  the work under FR-001 and FR-002, unless a separate record of the work
+  exists. Where one does, the package's individual MUST be typed a
+  presentation of that work and name it under FR-005.
 - **FR-020**: A package that presents another package's work (a skill that
   carries the method a Fieldbook teaches, per 0009-press FR-016, or a
   book's companion pages) MUST name that work under FR-005 rather than
@@ -107,6 +111,31 @@ schema.org's `workExample` and `exampleOfWork`.
 - **FR-021**: The `website` work kind MUST be treated as the editorial
   record of a channel's own copy, under FR-011, until that copy is
   represented as presentations of works and of the firm.
+
+## Stages of works and presentations
+
+- **FR-022**: A work and each presentation of it that is produced through
+  stages MUST each carry their own lifecycle stage. The work's stage is
+  how far the idea has matured and been commercialized; a presentation's
+  stage is how far its production has gone. Neither implies the other: a
+  work MAY be at Commercialize while a book presenting it is at Review,
+  and a presentation's stage MUST NOT be read as, or restated as, its
+  work's.
+
+## Promotion
+
+- **FR-023**: A promotional post (company or unit news, a launch note, an
+  article written for search or answer engines) MAY have the firm or a
+  unit as its principal subject, as the one exception to FR-014. It MUST
+  be a promotion record under 0016-press-production FR-045, MUST name at
+  least one work, presentation, or Journal issue it promotes, and MUST NOT
+  be the authoritative record of any result; the work, or the Journal
+  article that reports it, is.
+- **FR-024**: A promotional post MUST declare a content kind of its own,
+  distinct from every presentation kind, so the content check can apply
+  FR-014 to every other public page (FR-018).
+- **FR-025**: A promotional post MUST meet 0016-press-production FR-047:
+  it MUST NOT claim more than the work or article it promotes keeps.
 
 ## Out of scope
 
@@ -131,6 +160,12 @@ schema.org's `workExample` and `exampleOfWork`.
 - A careers or contact page whose natural subject is the company's
   structure: it presents the firm itself, so FR-015 requires it to lead
   with results, and OQ-2 holds whether any page is exempt.
+- A post announcing what is new at a unit, written for search: it is a
+  promotional post, which may have the unit as its subject under FR-023
+  and must name what it promotes.
+- An idea at Commercialize whose book is still at Review: each carries its
+  own stage, per FR-022, and the book's stage says nothing about the
+  idea's.
 - A talk the founder gives on a work whose authoritative text is
   published elsewhere: the talk names the work under FR-005, and the
   Eidolon holds a reference to the outside text, per
@@ -149,10 +184,6 @@ schema.org's `workExample` and `exampleOfWork`.
 
 ## Open questions
 
-- **OQ-1**: Which of the work lifecycle stages (`ifcore:WorkLifecycleStage`)
-  belong to the work and which to a presentation is not decided. Research
-  and Review read as work-level; Prep, Deploy, and Distribute read as
-  presentation-level.
 - **OQ-2**: Whether any public page (a legal notice, a contact page) is
   exempt from FR-015 is not stated.
 - **OQ-3**: Whether a presentation built for one audience may be re-cut
@@ -170,6 +201,9 @@ schema.org's `workExample` and `exampleOfWork`.
 - **A rendition** — a file generated from a presentation (0015).
 - **A company a work led to** — an organization, neither the work nor a
   presentation of it.
+- **A promotional post** — company or unit news written for search,
+  answer engines, or promotion; it points to the work or Journal article
+  that is the record.
 
 ## Success criteria
 
@@ -182,6 +216,8 @@ schema.org's `workExample` and `exampleOfWork`.
   works before it describes its units.
 - **SC-005**: A correction to a work's claim appears in every published
   presentation that states the claim.
+- **SC-006**: Every public page with a unit as its subject is a
+  promotional post that names what it promotes.
 
 ## Review & acceptance checklist
 
