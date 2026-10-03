@@ -264,13 +264,13 @@ requirement	mechanism	by	note
 0013-web-content-kinds FR-013	check	eidolon: make check-content	shape checks both point to a SubstantialWork, not that they name the same one
 0014-design-systems FR-001	none	-	definition; nothing to test
 0014-design-systems FR-002	none	-	permission; nothing to test
-0014-design-systems FR-003	none	-	no check of design-systems/ layout; .github has no CI
+0014-design-systems FR-003	check	.github: python3 tools/spec_check.py	slug must end with a kind code read from ifcore.ttl; directory contents not checked
 0014-design-systems FR-004	none	-	check-content scans content/ only, by construction; no check
-0014-design-systems FR-005	none	-	console-assurance covers only the vendored frontiers-console copy
+0014-design-systems FR-005	none	-	console-assurance covers only the vendored frontiers-console-web copy
 0014-design-systems FR-006	none	-	no check that each system has README.md, rules.md and assurance/
 0014-design-systems FR-007	none	-	rule of judgment; no check possible
 0014-design-systems FR-008	none	-	no check that Datastar is opt-in per page
-0014-design-systems FR-009	none	-	frontiers-console harness tests this for one system; frontiers-nature is not run
+0014-design-systems FR-009	none	-	frontiers-console-web harness tests this for one system; frontiers-nature-web is not run
 0014-design-systems FR-010	none	-	check-ontology does not validate ifcore:DesignSystem individuals, their kind or derivation
 0014-design-systems FR-011	none	-	no check that a README omits status
 0014-design-systems FR-012	none	-	scoping statement; nothing to test
@@ -279,17 +279,16 @@ requirement	mechanism	by	note
 0014-design-systems FR-015	none	-	no make target or CI runs any harness; eidolon console-assurance covers one vendored copy, by hand
 0014-design-systems FR-016	none	-	no check of a web harness coverage
 0014-design-systems FR-017	none	-	completion rule; no check runs every harness
-0014-design-systems FR-018	none	-	no check that a registered kind has a profile
+0014-design-systems FR-018	none	-	no check that a registered kind has a profile, or that a kind never changes
 0014-design-systems FR-019	none	-	what a profile states is a judgment; no check
 0014-design-systems FR-020	none	-	no check of derivation records or cycles
 0014-design-systems FR-021	none	-	no harness checks inherited copies; no system derives yet
-0014-design-systems FR-022	none	-	no check of rules.md identifiers; no system has rules.md yet
-0014-design-systems FR-023	none	-	no check that each rule names an enforcement mechanism
-0014-design-systems FR-024	none	-	commit-message and Decision discipline; no check
+0014-design-systems FR-022	none	-	spec_check checks each design system spec against 0020, but a missing spec.md only warns
+0014-design-systems FR-023	none	-	spec-amendment discipline; no check
 0014-design-systems FR-025	none	-	no check of what a design system directory holds
 0014-design-systems FR-026	none	-	consumers record pins (www VENDORED.txt, eidolon console/vendor/PIN) in two formats; no check
 0014-design-systems FR-027	none	-	no check of harness coverage of check rules
-0014-design-systems FR-028	none	-	foundation profile; no system of this kind yet
+0014-design-systems FR-028	none	-	brand profile; no system of this kind yet
 0014-design-systems FR-029	none	-	web layout; no check
 0014-design-systems FR-030	none	-	web harness runtime; no check runs it
 0014-design-systems FR-031	none	-	print profile; no system of this kind yet
@@ -403,25 +402,25 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-029	none	-	skill labeling and study-kit results are not checked
 0017-spoken-and-research-works FR-030	none	-	paper-build.sh labels a working paper by construction; no check
 0017-spoken-and-research-works FR-031	check	eidolon: make research-check	fails a published paper with no promotion brief
-0018-frontiers-console FR-001	none	-	registration and README status not checked
-0018-frontiers-console FR-002	none	-	rule of judgment; no check possible
-0018-frontiers-console FR-003	none	-	rule of judgment; no check possible
-0018-frontiers-console FR-004	check	eidolon: make console-assurance	harness: no @import, remote URL, framework; classic script; runs on vendored copy
-0018-frontiers-console FR-005	none	-	provenance of code; no check possible
-0018-frontiers-console FR-006	check	eidolon: make console-assurance	harness checks layer order declared once in reset.css and one layer per file
-0018-frontiers-console FR-007	check	eidolon: make console-assurance	harness checks required --fc- tokens and tokens.json mirror; semantic naming unchecked
-0018-frontiers-console FR-008	check	eidolon: make console-assurance	harness Layouts suite checks each layout and runtime reflow
-0018-frontiers-console FR-009	check	eidolon: make console-assurance	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
-0018-frontiers-console FR-010	check	eidolon: make console-assurance	harness checks changing --fc-sidebar-width moves the page
-0018-frontiers-console FR-011	check	eidolon: make console-assurance	partial: tabs, sync, TOC, copy, toast, accordion tested; not every component
-0018-frontiers-console FR-012	check	eidolon: make console-assurance	partial: table sort/filter/count/empty, stats, badges, hints, run log tested
-0018-frontiers-console FR-013	check	eidolon: make console-assurance	harness tests Ctrl+K, /, arrows, cancelable selection
-0018-frontiers-console FR-014	none	-	no test that a badge carries text
-0018-frontiers-console FR-015	check	eidolon: make console-assurance	harness tests token and rendered contrast, ring 3:1, icon-button names
-0018-frontiers-console FR-016	check	eidolon: make console-assurance	partial: single classic script tested; no-script degradation untested
-0018-frontiers-console FR-017	none	-	documentation completeness; no check possible
-0018-frontiers-console FR-018	none	-	harness runs, but nothing checks which suites it covers
-0018-frontiers-console FR-019	none	-	no check
+frontiers-console-web FR-001	none	-	registration and README status not checked
+frontiers-console-web FR-002	none	-	rule of judgment; no check possible
+frontiers-console-web FR-003	none	-	rule of judgment; no check possible
+frontiers-console-web FR-004	check	eidolon: make console-assurance	harness: no @import, remote URL, framework; classic script; runs on vendored copy
+frontiers-console-web FR-005	none	-	provenance of code; no check possible
+frontiers-console-web FR-006	check	eidolon: make console-assurance	harness checks layer order declared once in reset.css and one layer per file
+frontiers-console-web FR-007	check	eidolon: make console-assurance	harness checks required --fc- tokens and tokens.json mirror; semantic naming unchecked
+frontiers-console-web FR-008	check	eidolon: make console-assurance	harness Layouts suite checks each layout and runtime reflow
+frontiers-console-web FR-009	check	eidolon: make console-assurance	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
+frontiers-console-web FR-010	check	eidolon: make console-assurance	harness checks changing --fc-sidebar-width moves the page
+frontiers-console-web FR-011	check	eidolon: make console-assurance	partial: tabs, sync, TOC, copy, toast, accordion tested; not every component
+frontiers-console-web FR-012	check	eidolon: make console-assurance	partial: table sort/filter/count/empty, stats, badges, hints, run log tested
+frontiers-console-web FR-013	check	eidolon: make console-assurance	harness tests Ctrl+K, /, arrows, cancelable selection
+frontiers-console-web FR-014	none	-	no test that a badge carries text
+frontiers-console-web FR-015	check	eidolon: make console-assurance	harness tests token and rendered contrast, ring 3:1, icon-button names
+frontiers-console-web FR-016	check	eidolon: make console-assurance	partial: single classic script tested; no-script degradation untested
+frontiers-console-web FR-017	none	-	documentation completeness; no check possible
+frontiers-console-web FR-018	none	-	harness runs, but nothing checks which suites it covers
+frontiers-console-web FR-019	none	-	no check
 0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
 0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
 0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent
@@ -448,6 +447,7 @@ requirement	mechanism	by	note
 0020-spec-format FR-015	check	.github: .github/workflows/spec-check.yml	runs on every push and pull request
 0020-spec-format FR-016	check	eidolon: make check-specs	loads the public root's tools/spec_check.py
 0020-spec-format FR-017	check	.github: python3 tools/spec_check.py	exit status is non-zero on any listed breach
+0020-spec-format FR-018	check	.github: python3 tools/spec_check.py	Spec ID must match its directory, numbered or design system
 0021-works-and-presentations FR-001	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-002	none	-	draft; ontology terms not yet written
 0021-works-and-presentations FR-003	none	-	draft; nothing checks it yet

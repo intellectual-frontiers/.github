@@ -27,19 +27,25 @@ govern, what its machine-readable form is, and what its harness runs on.
 Each kind has a profile in
 [`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md):
 
-| Kind | Governs | Machine-readable form |
-| --- | --- | --- |
-| foundation | Palette, typeface families, logo, imagery identity | `tokens.json` |
-| web presentation | How a web page looks; the DOM its chrome expects | CSS custom properties, `tokens.json` |
-| print | How a book, paper or cover is set | Typesetting style files and their data |
-| figure | How a work's figures are drawn | Figure palette and layout data |
-| written voice | How the house writes | Patterns a mechanical sweep looks for |
-| spoken voice | How the voice changes for the ear | As written voice, over scripts |
+| Kind | Code | Governs | Machine-readable form |
+| --- | --- | --- | --- |
+| brand | `brand` | Palette, typeface families, logo, imagery identity | `tokens.json` |
+| web presentation | `web` | How a web page looks; the DOM its chrome expects | CSS custom properties, `tokens.json` |
+| print | `print` | How a book, paper or cover is set | Typesetting style files and their data |
+| figure | `figures` | How a work's figures are drawn | Figure palette and layout data |
+| written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
+| spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
 
-Kinds are recorded in the ontology (`ifcore:DesignSystemKindScheme`), not
-in directory names: `design-systems/` stays flat. A new kind (motion,
-slides, sonic) is added by writing its profile in the spec and adding its
-concept to the scheme. Nothing else moves.
+Kinds are recorded in the ontology (`ifcore:DesignSystemKindScheme`), and
+`design-systems/` stays flat. A design system's slug is
+`<identity>-<code>`: the identity it expresses, then its kind's code, so
+the medium is visible wherever the name appears (`frontiers-nature-web`,
+`frontiers-console-web`). The code comes from the ontology
+(`skos:notation`) and the spec check enforces it. A system never changes
+kind; a print counterpart of a web system is a new system with its own
+slug. A new kind (motion, slides, sonic) is added by writing its profile
+in the spec and adding its concept, with a code, to the scheme. Nothing
+else moves.
 
 ## Why there's more than one of these
 
@@ -54,41 +60,44 @@ design systems exist and what their status is.
 
 The design systems here today:
 
-- [`frontiers-nature/`](frontiers-nature/README.md) (web presentation):
+- [`frontiers-nature-web/`](frontiers-nature-web/README.md) (web presentation):
   Intellectual Frontiers' own "natural-frontier" visual identity: deep
   ink, frontier blue, signal teal, editorial oxblood, warm paper. The
   public, editorial face.
-- [`frontiers-console/`](frontiers-console/README.md) (web presentation):
+- [`frontiers-console-web/`](frontiers-console-web/README.md) (web presentation):
   operator (admin) and documentation surfaces: sidebar, navbar and
   table-of-contents shell in three selectable layouts, documentation
   components, and the data-dense pieces an admin console needs. Governed
-  by [`0018-frontiers-console`](../spec-kit/specs/0018-frontiers-console/spec.md).
+  by its own [`spec.md`](frontiers-console-web/spec.md).
 
 ## Rules, and how they change
 
-Every design system states its house rules in its own `rules.md`, each
-under a permanent identifier (`R-001`, `R-002`, ...) cited from elsewhere
-as `<slug> R-NNN`. An identifier is never renumbered or reused; a rule
-that no longer applies is marked retired and keeps its number. Each rule
-says how it is enforced: a `check` (and which harness test), a `gate`, a
-`review` (and who reviews), or `none`. A guide or markup contract in the
-same directory explains rules; it never states one that `rules.md` does
-not.
+Every design system states its house rules as a spec, `spec.md` in its
+own directory, in the same format as every other spec in this repository
+([`0020-spec-format`](../spec-kit/specs/0020-spec-format/spec.md)). Its
+Spec ID is its slug, and its rules are requirements cited from elsewhere
+as `<slug> FR-NNN` (for example `frontiers-console-web FR-013`). That
+gives house rules everything specs already have: numbers that are never
+reused, a row in the enforcement register saying what catches a breach,
+a Draft or Adopted status that only the authority in effect moves, and
+the spec check on every push. A guide or markup contract in the same
+directory explains the rules; it never states one the spec does not. A
+long list a rule depends on (banned words, a palette) lives in the
+machine-readable form and the requirement cites it.
 
-A rule change is committed with a message saying what changed and why,
-and is recorded as a decision when it is a significant one. A lesson
-learned from a piece of work becomes part of the house rules by being
-adopted into a rule with an identifier.
+Changing a house rule is amending that spec, with a commit message saying
+what changed and why. A lesson learned from a piece of work becomes a
+house rule by being written into the spec as a requirement.
 
 ## Derivation
 
 A design system may **derive from** others: a web design system from a
-foundation one, a spoken-voice system from a written-voice one. It
+brand one, a spoken-voice system from a written-voice one. It
 inherits every rule of what it derives from, keeps its own copy of any
 inherited value it uses (a color, a typeface, a banned word) so it stays
 self-contained, and its harness checks that copy still agrees with the
 source. It may add or tighten rules; it contradicts an inherited rule only
-with a rule of its own that names the inherited rule's identifier. A
+with a requirement of its own that cites the inherited one. A
 consumer of a derived system vendors every system in its chain.
 
 ## Engineering stance
@@ -114,7 +123,7 @@ Every web design system under this directory holds to the same stance
   (toggling a menu, animating a transition) is reaching too far — a web
   component or a few lines of vanilla JavaScript already covers that.
 - Styling lives in CSS custom properties and cascade layers
-  (`reset, tokens, base, chrome, components` in `frontiers-nature`'s
+  (`reset, tokens, base, chrome, components` in `frontiers-nature-web`'s
   case), not in inline styles or a utility-class soup. Changing a token
   means editing the design system's own source, never overriding it from
   a consumer.
@@ -163,14 +172,14 @@ system from this directory:
    `fonts/` directory.
 4. Serve its `fonts/`, `logos/`, `images/` and `js/` directories as
    static assets.
-5. Load its first-party script (e.g. `frontiers-nature`'s `js/chrome.js`, `frontiers-console`'s `js/console.js`)
+5. Load its first-party script (e.g. `frontiers-nature-web`'s `js/chrome.js`, `frontiers-console-web`'s `js/console.js`)
    on every page. Load its Datastar bundle only on pages that actually
    need server-driven interactivity, per the engineering stance above.
 6. Build your page markup to the contract described in its `chrome.md` —
    the header, breadcrumb band, menu and footer structure it expects.
    You don't need any particular backend or templating language to do
    this: a design system's markup contract is just HTML and class names.
-   Some design systems (today, `frontiers-nature`) also carry reference
+   Some design systems (today, `frontiers-nature-web`) also carry reference
    documentation for an *optional* server-side template vocabulary their
    own markup happened to be designed against — that's a convenience if
    you're building something similar, never a requirement for using the
@@ -178,16 +187,18 @@ system from this directory:
 
 ## Adding a new design system
 
-1. Create `design-systems/<slug>/` with whatever assets the system
+1. Create `design-systems/<slug>/`, where `<slug>` ends with its kind's
+   code (see Kinds above), with whatever assets the system
    actually needs; document its real layout in its own `README.md` (see
-   `frontiers-nature/README.md` for the shape that's worked so far, not
+   `frontiers-nature-web/README.md` for the shape that's worked so far, not
    as a rigid template).
 2. Add an `assurance/` harness per 0014-design-systems FR-015 and its
    kind's profile. For a web system: copy
    `runner.js`, `boot.js` and `run.mjs` from an existing system, write
    `fixtures/`, `unit.js`, `integration.js` and an `index.html`, and make it pass.
-3. Write its `rules.md`, each rule with an identifier and an enforcement
-   mechanism, per 0014-design-systems FR-022 and FR-023.
+3. Write its `spec.md` (Spec ID: its slug) per 0014-design-systems FR-022
+   and 0020-spec-format, and add a row for each requirement to
+   `spec-kit/enforcement.tsv`. Run `python3 tools/spec_check.py`.
 4. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
    a status, a kind (`dcterms:type`) and anything it derives from
    (`prov:wasDerivedFrom`), per 0014-design-systems FR-010. Its kind must

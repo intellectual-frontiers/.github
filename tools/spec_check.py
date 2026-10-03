@@ -16,11 +16,32 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-SPEC_DIR = re.compile(r"^\d{4}-[a-z][a-z0-9-]*$")
+NUMBERED = r"\d{4}-[a-z][a-z0-9-]*"
+SPEC_DIR = re.compile(rf"^{NUMBERED}$")
+KIND_CODE = re.compile(
+    r"^ifcore:\w+ a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme\b[^\n]*\n\s*skos:notation \"([a-z][a-z0-9-]*)\"",
+    re.M,
+)
+
+
+def kind_codes(root: Path) -> list[str]:
+    """The design system kind codes (0014-design-systems FR-018) declared in root's ifcore.ttl, longest first."""
+    ttl = root / "ontology" / "ifcore.ttl"
+    codes = KIND_CODE.findall(ttl.read_text(encoding="utf-8")) if ttl.is_file() else []
+    return sorted(set(codes), key=len, reverse=True)
+
+
+# The public root's kind codes. This file always lives in the public root; the vault imports it
+# from there (0020 FR-016), so the codes are the public root's even when checking the vault.
+CODES = kind_codes(Path(__file__).resolve().parent.parent)
+SLUG = rf"[a-z][a-z0-9-]*-(?:{'|'.join(map(re.escape, CODES))})" if CODES else None
+# A spec's name: NNNN-slug, or a design system's slug (0020 FR-018).
+SPEC_NAME = rf"(?:{NUMBERED}|{SLUG})" if SLUG else NUMBERED
+DS_DIR = re.compile(rf"^{SLUG}$") if SLUG else None
 ID_LINE = re.compile(r"^\*\*Spec ID:\*\*\s*(\S+)\s*$", re.M)
 STATUS_LINE = re.compile(r"^\*\*Status:\*\*\s*(.+?)\s*$", re.M)
 INPUT_LINE = re.compile(r"^\*\*Input:\*\*\s*\S", re.M)
-STATUS = re.compile(r"^(Draft|Adopted|Superseded by (\d{4}-[a-z][a-z0-9-]*))$")
+STATUS = re.compile(rf"^(Draft|Adopted|Superseded by ({SPEC_NAME}))$")
 ITEM = re.compile(r"^- \*\*((?:FR|SC)-\d{3}|OQ-\d+)\*\*:", re.M)
 HEADING = re.compile(r"^## (.+?)\s*$", re.M)
 DATED = re.compile(r"\b20\d\d-\d\d-\d\d\b")
@@ -31,7 +52,7 @@ NARRATION = re.compile(
 )
 # A spec name, optionally "(`.github`)", then ids joined by ",", "and", "through", "–" or "-".
 REF = re.compile(
-    r"(?P<spec>\d{4}-[a-z][a-z0-9-]*)\s*(?:\(`?\.?github`?\)\s*)?"
+    rf"(?P<spec>{SPEC_NAME})\s*(?:\(`?\.?github`?\)\s*)?"
     r"(?P<ids>(?:FR|SC)-\d{3}(?:\s*(?:,|and|through|–|-|to)\s*(?:(?:FR|SC)-\d{3}|(?<![\d-])\d{3}(?![\d-])))*)"
 )
 ID_IN = re.compile(r"(FR|SC)-(\d{3})")
@@ -49,7 +70,7 @@ CLOSING = [
 OPTIONAL = {"Out of scope"}
 
 MECHANISMS = {"check", "gate", "review", "none"}  # 0020 FR-012
-REQ = re.compile(r"^(?P<spec>\d{4}-[a-z][a-z0-9-]*) (?P<id>FR-\d{3})$")
+REQ = re.compile(rf"^(?P<spec>{SPEC_NAME}) (?P<id>FR-\d{{3}})$")
 COMMAND = re.compile(r"^(\.github|eidolon): \S")
 REGISTER = Path("spec-kit") / "enforcement.tsv"
 
@@ -65,8 +86,15 @@ class Finding:
 
 
 def spec_files(root: Path) -> list[Path]:
+    """Numbered specs, then design system specs (0020 FR-018)."""
     d = root / "spec-kit" / "specs"
-    return sorted(d.glob("[0-9][0-9][0-9][0-9]-*/spec.md")) if d.is_dir() else []
+    numbered = sorted(d.glob("[0-9][0-9][0-9][0-9]-*/spec.md")) if d.is_dir() else []
+    ds = root / "design-systems"
+    return numbered + (sorted(ds.glob("*/spec.md")) if ds.is_dir() else [])
+
+
+def _is_design_system(f: Path) -> bool:
+    return f.parent.parent.name == "design-systems"
 
 
 def _strip_code(text: str) -> str:
@@ -123,7 +151,7 @@ def check_shape(root: Path, public: Path | None = None) -> list[Finding]:
         else:
             sm = STATUS.match(s.group(1))
             if not sm:
-                findings.append(Finding("error", rel, f"status {s.group(1)!r} is not Draft, Adopted, or 'Superseded by NNNN-slug' (0020 FR-009)"))
+                findings.append(Finding("error", rel, f"status {s.group(1)!r} is not Draft, Adopted, or 'Superseded by <spec>' (0020 FR-009)"))
             elif sm.group(2) and sm.group(2) not in names:
                 findings.append(Finding("error", rel, f"superseded by {sm.group(2)}, which does not exist (0020 FR-009)"))
         findings += _check_sections(rel, text)
@@ -139,8 +167,11 @@ def check_format(root: Path, public: Path | None = None, cross_refs: bool = True
         rel = str(f.relative_to(root))
         text = f.read_text(encoding="utf-8")
         name = f.parent.name
-        if not SPEC_DIR.match(name):
-            findings.append(Finding("error", rel, "spec directory must be NNNN-slug"))
+        if _is_design_system(f):
+            if not (DS_DIR and DS_DIR.match(name)):
+                findings.append(Finding("error", rel, f"design system slug must end with its kind's code, one of {CODES} (0014-design-systems FR-003)"))
+        elif not SPEC_DIR.match(name):
+            findings.append(Finding("error", rel, "spec directory must be NNNN-slug (0020 FR-018)"))
         m = ID_LINE.search(text)
         if not m:
             findings.append(Finding("error", rel, "missing **Spec ID:** line"))
@@ -227,7 +258,7 @@ def check_register(root: Path, public: Path | None = None) -> tuple[list[Finding
         req, mech, by = cols[0].strip(), cols[1].strip(), cols[2].strip()
         m = REQ.match(req)
         if not m:
-            findings.append(Finding("error", where, f"{req!r} is not 'NNNN-slug FR-NNN'"))
+            findings.append(Finding("error", where, f"{req!r} is not '<spec> FR-NNN' (0020 FR-018)"))
             continue
         if m.group("id") not in own.get(m.group("spec"), set()):
             findings.append(Finding("error", where, f"{req} does not exist in this repository's specs (0020 FR-011)"))
@@ -254,6 +285,19 @@ def check_register(root: Path, public: Path | None = None) -> tuple[list[Finding
     return findings, nones, counts
 
 
+def check_design_systems(root: Path) -> list[Finding]:
+    """0014-design-systems FR-003 and FR-022: each design system's slug ends with a kind code, and it has a spec."""
+    findings: list[Finding] = []
+    ds = root / "design-systems"
+    for d in sorted(p for p in ds.iterdir() if p.is_dir()) if ds.is_dir() else []:
+        rel = str(d.relative_to(root))
+        if not (DS_DIR and DS_DIR.match(d.name)):
+            findings.append(Finding("error", rel, f"design system slug must end with its kind's code, one of {CODES} (0014-design-systems FR-003)"))
+        if not (d / "spec.md").is_file():
+            findings.append(Finding("warning", rel, "has no spec.md stating its house rules (0014-design-systems FR-022)"))
+    return findings
+
+
 def check_prefixes(root: Path) -> list[Finding]:
     """0001 FR-007: no ontology file uses a bare if: prefix."""
     findings: list[Finding] = []
@@ -273,7 +317,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     root = args.root.resolve()
     public = args.public.resolve() if args.public else None
-    findings = check_format(root, public) + check_prefixes(root)
+    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root)
     reg, nones, counts = check_register(root, public)
     findings += reg
     for f in findings:
