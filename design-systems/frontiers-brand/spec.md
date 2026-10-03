@@ -13,9 +13,10 @@ restating them.
 
 - **FR-001**: `frontiers-brand` MUST live at `design-systems/frontiers-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
-  and hold `tokens.json`, `brand.css`, `logos/`, `images/favicon.png`, a `README.md`, this spec and
-  an `assurance/` harness. It MUST be the theme of every web page Intellectual Frontiers publishes
-  under its own name (0014-design-systems FR-038, FR-040).
+  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`, a
+  `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
+  every printed work Intellectual Frontiers publishes under its own name (0014-design-systems
+  FR-038, FR-040).
 
 ## Color
 
@@ -35,7 +36,7 @@ restating them.
   Signal Teal, `warning` amber, `danger` Editorial Oxblood, `info` violet, `font-sans` Inter and
   `font-serif` Source Serif 4; and, for `frontiers-nature-web` (frontiers-nature-web FR-004),
   `paper` Warm Paper and `unit-capital`, `unit-ip`, `unit-press`, `unit-studios` and `unit-network`
-  each its unit's color. `brand.css` MUST declare exactly these roles.
+  each its unit's color. `brand.css` and `brand.tex` MUST declare exactly these roles.
 
 ## Typefaces
 
