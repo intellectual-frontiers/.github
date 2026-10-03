@@ -87,6 +87,17 @@ def build_fixtures(out: Path, canvas: int) -> list[Path]:
                                            "Does the evidence hold?", "Ship it", "Go back and test", width=w),
         "hierarchy": lambda p: layouts.tree(p, "A hierarchy diagram", "One root, its children.",
                                             "The firm", ["Research", "Press"] if w < 1040 else ["Research", "Press", "Capital"], width=w),
+        "bar-chart": lambda p: layouts.bar_chart(p, "A bar chart", "One value per category, labelled.",
+                                                 [("The date passed", 18), ("The metric missed", 12), ("No next test", 7)],
+                                                 highlight=0, source="A fixture", width=w),
+        "line-chart": lambda p: layouts.line_chart(p, "A line chart", "Four series, each named at its end.",
+                                                   ["2022", "2023", "2024", "2025"],
+                                                   [("First", [120, 95, 80, 62]), ("Second", [180, 175, 190, 170]),
+                                                    ("Third", [150, 150, 148, 152]), ("Fourth", [70, 60, 52, 40])],
+                                                   unit="k", source="A fixture", width=w),
+        "timeline": lambda p: layouts.timeline(p, "A timeline", "Events in order, each with its date.",
+                                               [("Week 0", "The sponsor signs the metric, the date and the threshold."),
+                                                ("Week 6", "The date arrives and the pilot stops.")], width=w),
     }
     out.mkdir(parents=True, exist_ok=True)
     paths = []
@@ -97,12 +108,90 @@ def build_fixtures(out: Path, canvas: int) -> list[Path]:
     return paths
 
 
+# Machado, Oliveira and Fernandes (2009) at full severity, on linear RGB: how a color looks to protan, deutan and
+# tritan vision. The series must stay apart to each (spec FR-012).
+CVD = {"protan": [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
+       "deutan": [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
+       "tritan": [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.303900]]}
+SERIES_APART = {"color": 12.0, "grayscale": 8.0}  # least CIEDE2000 between two series
+SEQUENTIAL_STEP = 8.0  # least CIEDE2000 between neighbouring steps of a sequential scale
+
+
+def _linear(h: str) -> list[float]:
+    return [(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4) for c in (int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))]
+
+
+def _simulate(h: str, kind: str) -> list[float]:
+    rgb = _linear(h)
+    if kind == "normal":
+        return rgb
+    return [min(1.0, max(0.0, sum(CVD[kind][r][k] * rgb[k] for k in range(3)))) for r in range(3)]
+
+
+def _lab(rgb: list[float]) -> tuple[float, float, float]:
+    r, g, b = rgb
+    x = (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047
+    y = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    z = (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883
+    f = lambda t: t ** (1 / 3) if t > 216 / 24389 else (24389 / 27 * t + 16) / 116  # noqa: E731
+    return 116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))
+
+
+def ciede2000(c1, c2) -> float:
+    import math
+    (l1, a1, b1), (l2, a2, b2) = c1, c2
+    cbar = (math.hypot(a1, b1) + math.hypot(a2, b2)) / 2
+    g = 0.5 * (1 - math.sqrt(cbar ** 7 / (cbar ** 7 + 25 ** 7)))
+    a1p, a2p = a1 * (1 + g), a2 * (1 + g)
+    c1p, c2p = math.hypot(a1p, b1), math.hypot(a2p, b2)
+    h1p = math.degrees(math.atan2(b1, a1p)) % 360 if c1p else 0.0
+    h2p = math.degrees(math.atan2(b2, a2p)) % 360 if c2p else 0.0
+    dl, dc = l2 - l1, c2p - c1p
+    dh = 0.0 if c1p * c2p == 0 else (h2p - h1p if abs(h2p - h1p) <= 180 else h2p - h1p - 360 * math.copysign(1, h2p - h1p))
+    dH = 2 * math.sqrt(c1p * c2p) * math.sin(math.radians(dh / 2))
+    lbar, cbarp = (l1 + l2) / 2, (c1p + c2p) / 2
+    if c1p * c2p == 0:
+        hbar = h1p + h2p
+    elif abs(h1p - h2p) <= 180:
+        hbar = (h1p + h2p) / 2
+    else:
+        hbar = (h1p + h2p + 360) / 2 if h1p + h2p < 360 else (h1p + h2p - 360) / 2
+    t = (1 - 0.17 * math.cos(math.radians(hbar - 30)) + 0.24 * math.cos(math.radians(2 * hbar))
+         + 0.32 * math.cos(math.radians(3 * hbar + 6)) - 0.20 * math.cos(math.radians(4 * hbar - 63)))
+    sl = 1 + 0.015 * (lbar - 50) ** 2 / math.sqrt(20 + (lbar - 50) ** 2)
+    sc, sh = 1 + 0.045 * cbarp, 1 + 0.015 * cbarp * t
+    rt = -2 * math.sqrt(cbarp ** 7 / (cbarp ** 7 + 25 ** 7)) * math.sin(math.radians(60 * math.exp(-(((hbar - 275) / 25) ** 2))))
+    return math.sqrt((dl / sl) ** 2 + (dc / sc) ** 2 + (dH / sh) ** 2 + rt * (dc / sc) * (dH / sh))
+
+
+def check_chart_palette(r: Result, brand: Path, variant: str, pal: dict) -> None:
+    """spec FR-012: every series 3:1 on the surface and apart from every other, to color-blind vision too in the color
+    variants; every sequential scale ordered from light to dark (dark to light on dark) with steps apart."""
+    import itertools
+    series, steps = theme.ROLES["series"], theme.ROLES["sequential"]
+    for role in series:
+        c = contrast(pal[role], pal["surface"])
+        r.check(c >= 3, f"{variant}: {role} on surface is {c:.2f}:1 under {brand.name}, below 3:1")
+    kinds = ("normal",) if variant == "grayscale" else ("normal", "protan", "deutan", "tritan")
+    least = SERIES_APART["grayscale" if variant == "grayscale" else "color"]
+    for kind in kinds:
+        for a, b in itertools.combinations(series, 2):
+            d = ciede2000(_lab(_simulate(pal[a], kind)), _lab(_simulate(pal[b], kind)))
+            r.check(d >= least, f"{variant}: {a} and {b} are {d:.1f} apart to {kind} vision under {brand.name}, under {least}")
+    lum = [luminance(pal[s]) for s in steps]
+    toward = all(x > y for x, y in zip(lum, lum[1:])) or all(x < y for x, y in zip(lum, lum[1:]))
+    r.check(toward, f"{variant}: the sequential steps are not in order of lightness under {brand.name}")
+    for a, b in zip(steps, steps[1:]):
+        d = ciede2000(_lab(_linear(pal[a])), _lab(_linear(pal[b])))
+        r.check(d >= SEQUENTIAL_STEP, f"{variant}: {a} and {b} are {d:.1f} apart under {brand.name}, under {SEQUENTIAL_STEP}")
+
+
 def check_data(r: Result) -> None:
     roles = theme.ROLES
     names = set(roles["roles"])
     for v, spec in roles["variants"].items():
         r.check(set(spec["map"]) == names, f"roles.json: variant {v} maps {sorted(set(spec['map']) ^ names)} differently from the role list")
-    for group in ("foreground", "background", "graphics"):
+    for group in ("foreground", "background", "graphics", "series", "sequential"):
         r.check(set(roles[group]) <= names, f"roles.json: {group} names a role that is not listed")
     r.check(set(svgkit.CANVAS.values()) == {1040, 720}, "roles.json: the layout variants are not the 1040px standard and 720px compact canvases")
 
@@ -131,6 +220,7 @@ def run(brand: Path, keep: Path | None) -> Result:
                 for bg in theme.ROLES["background"]:
                     c = contrast(pal[fg], pal[bg])
                     r.check(c >= 4.5, f"{variant}: {fg} on {bg} is {c:.2f}:1 under {brand.name}, below 4.5:1")
+            check_chart_palette(r, brand, variant, pal)
             for g in theme.ROLES["graphics"]:
                 for bg in theme.ROLES["background"]:
                     c = contrast(pal[g], pal[bg])

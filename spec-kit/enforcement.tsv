@@ -450,6 +450,7 @@ frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures
 frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
 frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
 frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-figures FR-012	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	series contrast, color-blind and grayscale distinctness, sequential order and steps; direct labels by the layouts
 frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
 frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
