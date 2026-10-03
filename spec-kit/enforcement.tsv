@@ -769,3 +769,10 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0026-workspaces FR-012	none	-	no check inspects the image manifest
 0026-workspaces FR-013	none	-	no check
 0026-workspaces FR-014	none	-	no check
+0027-course-works FR-001	none	-	whether a work teaches at length is judgment
+0027-course-works FR-002	check	eidolon: eid check works	works.py fails a course package without course/course.adoc
+0027-course-works FR-003	check	eidolon: eid check works	works.py fails a course package without course-bible.md
+0027-course-works FR-004	check	eidolon: eid check works	works.py fails a :derived-from: that names no work in the vault; that lessons are not pasted prose is the audit's
+0027-course-works FR-005	check	eidolon: eid check works	works.py runs course.py check on a course at Prep or later and fails it on any problem
+0027-course-works FR-006	check	eidolon: eid check works	build/ is ignored; 0015 FR-014's check fails a tracked rendition; where grades are kept is review
+0027-course-works FR-007	none	-	a run is recorded as a Decision on the work; nothing checks that a source names no platform
