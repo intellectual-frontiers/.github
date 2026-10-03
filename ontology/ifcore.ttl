@@ -53,13 +53,14 @@ ifcore:ShahidNehalShah a ifcore:Person ;
 # ───────────────────────── The Eidolon's own repositories (FR-001) ─────────────────────────
 
 ifcore:EidolonComponent a owl:Class ; rdfs:label "Eidolon component"@en ;
-    rdfs:comment "One of the Eidolon's three repositories."@en .
+    rdfs:comment "One of the Eidolon's three repositories: the public Eidolon, the private Eidolon where works are made, and one presentation channel for them (FR-001)."@en .
 
 ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
+    rdfs:comment "A channel through which presentations of works reach an audience. It holds no work of its own (FR-001; 0021-works-and-presentations FR-011)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Design systems (0014-design-systems) ─────────────────────────
@@ -171,7 +172,7 @@ ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNeh
 # ───────────────────────── Units (0003-intellectual-frontiers FR-001) ─────────────────────────
 
 ifcore:Unit a owl:Class ; rdfs:subClassOf org:OrganizationalUnit ; rdfs:label "Unit"@en ;
-    rdfs:comment "A part of the company with exactly one job and one question — the W3C Organization Ontology's org:OrganizationalUnit, specialized to that one constraint (0019-controlled-vocabulary FR-002)."@en .
+    rdfs:comment "A part of the company with exactly one job and one question — the W3C Organization Ontology's org:OrganizationalUnit, specialized to that one constraint (0019-controlled-vocabulary FR-002). A unit is known, but never the subject of a public presentation: it appears there only as provenance, such as a byline or imprint (0021-works-and-presentations FR-014, FR-016, FR-017)."@en .
 ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:string ;
     rdfs:comment "The one job a unit exists to do."@en .
 ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
@@ -291,12 +292,12 @@ ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:labe
 # ───────────────────────── Substantial works (0007-work-and-assets FR-017 – FR-021) ─────────────────────────
 
 ifcore:SubstantialWork a owl:Class ; rdfs:label "Substantial work"@en ;
-    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing."@en .
+    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing. Treated as the work itself, apart from any of its presentations, while work packages keep their current layout (0021-works-and-presentations FR-019); a form-specific type such as schema:Book is carried until its presentations are populated as ifcore:Presentation individuals."@en .
 
 ifcore:lifecycleOwner a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:Unit ;
     rdfs:comment "The one unit accountable for a Substantial Work's progress (FR-021). Defaults to Research & IP while disposition is unsure, Press otherwise; any unit may claim it explicitly, overriding the default."@en .
 ifcore:WorkKind a owl:Class ; rdfs:label "Work kind"@en ;
-    rdfs:comment "A family of works that share a source format and a set of rules; names the <kind> segment of a work package's path (0015-work-packages FR-004, FR-005). An individual MUST be declared before any work package of that kind exists."@en .
+    rdfs:comment "A family of works that share a source format and a set of rules; names the <kind> segment of a work package's path (0015-work-packages FR-004, FR-005). An individual MUST be declared before any work package of that kind exists. It names the work's primary presentation form, not the work itself (0021-works-and-presentations FR-019)."@en .
 ifcore:BookKind a ifcore:WorkKind ; rdfs:label "Book"@en ; dcterms:identifier "book" ;
     rdfs:comment "A book: AsciiDoc manuscript, jacket data, figures, and a book bible (0016-press-production FR-004)."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -307,7 +308,7 @@ ifcore:SkillKind a ifcore:WorkKind ; rdfs:label "Skill"@en ; dcterms:identifier 
     rdfs:comment "A skill carrying a book's or record's method for a reader's own AI (0016-press-production FR-040)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:WebsiteKind a ifcore:WorkKind ; rdfs:label "Website"@en ; dcterms:identifier "website" ;
-    rdfs:comment "The written public-facing content of a web property; text lives as content documents (0016-press-production FR-042)."@en ;
+    rdfs:comment "The written public-facing content of a web property; text lives as content documents (0016-press-production FR-042). The editorial record of a channel's own copy, not a work, until that copy is represented as presentations of works and of the firm (0021-works-and-presentations FR-011, FR-021)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:identifier "spoken" ;
     rdfs:comment "A spoken-first work whose source is an AsciiDoc script (0017-spoken-and-research-works FR-001, FR-004)."@en ;
@@ -1073,3 +1074,32 @@ ifcore:ReviewEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechan
 ifcore:NoEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechanismScheme ; skos:prefLabel "none"@en ;
     skos:definition "Nothing catches a breach of the requirement."@en ;
     ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Works and presentations (0021-works-and-presentations) ─────────────────────────
+# A work is the deliverable itself; a presentation is one form of it. Links reuse schema.org
+# (schema:workExample, schema:exampleOfWork), PROV (prov:wasDerivedFrom, prov:wasAttributedTo), and
+# Dublin Core (dcterms:format) rather than declaring new properties (0019-controlled-vocabulary FR-001).
+
+ifcore:Presentation a owl:Class ; rdfs:subClassOf schema:CreativeWork ; rdfs:label "Presentation"@en ;
+    skos:definition "One form of one work, made for an audience through a channel: a book edition, a set of web pages, a journal article, an audio or video episode, a talk, a course, or a skill or tool."@en ;
+    skos:closeMatch <http://iflastandards.info/ns/lrm/lrmoo/F3_Manifestation> ;
+    rdfs:comment "Specializes schema:CreativeWork (0019 FR-002); close to the IFLA LRM manifestation, but also covers live forms with no rendition, such as a talk (0021 FR-004). It names its work by schema:exampleOfWork, and the work lists it by schema:workExample (FR-005). One made from another presentation of the same work records prov:wasDerivedFrom (FR-006). Its presenter, a person, a partner, or the person who approved an AI-assisted conversion, is prov:wasAttributedTo (FR-008); the work's lifecycle owner is unchanged. Its form is dcterms:format, a concept in ifcore:PresentationFormScheme. Its ifcore:hasAudience is never broader than its work's (FR-007). Stage, owner, audience, claims, and rights stay on the work and are never restated here (FR-002). A rendition is a file generated from a presentation, not a presentation (FR-010). A company a venture's work led to is an organization related to the work by prov:wasDerivedFrom, never a presentation (FR-013)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PresentationFormScheme a skos:ConceptScheme ; rdfs:label "Presentation form"@en ;
+    rdfs:comment "The forms a presentation takes, each reached through a channel; the value of a presentation's dcterms:format (0021-works-and-presentations FR-004, FR-012)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookEditionForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Book edition"@en ;
+    skos:definition "An edition of a printed or digital book."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:WebPagesForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Web pages"@en ;
+    skos:definition "One or more pages on a web property."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ArticleForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Article"@en ;
+    skos:definition "An article in a periodical, such as a journal issue."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EpisodeForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Audio or video episode"@en ;
+    skos:definition "A recorded episode, such as a podcast or a video."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TalkForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Talk"@en ;
+    skos:definition "A keynote, talk, or panel given live, recorded or not."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CourseForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Course"@en ;
+    skos:definition "A class, seminar, or course, delivered online or in person."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
+    skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
