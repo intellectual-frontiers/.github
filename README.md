@@ -172,6 +172,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0016](spec-kit/specs/0016-press-production/spec.md) | Press production: books and series as work packages |
 | [0017](spec-kit/specs/0017-spoken-and-research-works/spec.md) | Spoken works and research records |
 | [0018](spec-kit/specs/0018-frontiers-console/spec.md) | Frontiers Console design system: operator and documentation surfaces |
+| [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
 
 ### Editing the ontology
 
