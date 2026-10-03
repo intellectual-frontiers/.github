@@ -90,8 +90,9 @@ themed by a brand so that the same design can be set in another brand's colors, 
   the `iflayout.def` the class reads. The default layout MUST be `two-column`.
 - **FR-008**: An article's typeface set MUST come from `latex/typefaces.json`. A set marked
   `license-required` MUST be used only where its files are in the directory `IF_FONTS_LICENSED`
-  names; otherwise the layout's own set is used, with a note. Every set MUST fall back to the house
-  fonts and STIX Two Math for a character its own fonts lack.
+  names; otherwise the layout's own set is used, with a note. Every open-license set that pairs a
+  serif with a sans MUST pair it with Inter, the house sans (frontiers-brand FR-004). Every set MUST
+  fall back to Source Serif 4, Inter and STIX Two Math for a character its own fonts lack.
 
 ## Assurance
 

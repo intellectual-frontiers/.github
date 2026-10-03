@@ -164,4 +164,4 @@ Three 2.28 in text columns, 8.7/10.5 pt, 0.51 in margins. The densest page set.
 ## Open points
 
 - Exact HBR, NEJM, and JAMA print specifications are not published; this file is built from their set pages. If the publications supply design specifications under any licence, replace the measurements with them.
-- Typefaces: the references use licensed families (Quadraat, Harding, Guardian). The house uses Source Serif 4 and Source Sans 3 (open licence); nothing here changes that.
+- Typefaces: the references use licensed families (Quadraat, Harding, Guardian). The house uses Source Serif 4 and Inter (open licence); nothing here changes that.
