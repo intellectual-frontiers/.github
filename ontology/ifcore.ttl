@@ -1169,3 +1169,17 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
     skos:definition "An issue of a periodical, such as a quarterly Journal issue, in an online or a print edition (0009-press FR-033)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Tooling environment (0022-tooling-environment) ─────────────────────────
+# Which environment every tool is guaranteed to run in. The repository is reused as
+# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
+# guaranteed against is not a fact here but its tools/reference-environment pin (0022 FR-008).
+
+ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
+    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0022-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+
+ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
+    dcterms:identifier "workspaces-host-v3" ;
+    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
+    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools on Linux, macOS, WSL, a container, or a cloud agent session. Its base profile, with no persona, is the reference environment (0022-tooling-environment FR-005)."@en ;
+    ifcore:hasAudience ifcore:Public .

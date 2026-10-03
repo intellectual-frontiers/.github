@@ -311,6 +311,23 @@ def check_design_systems(root: Path) -> list[Finding]:
     return findings
 
 
+PIN = re.compile(r"^github:[\w.-]+/[\w.-]+/[0-9a-f]{40}$")
+
+
+def check_reference_environment(root: Path) -> list[Finding]:
+    """0022-tooling-environment FR-008: tools/reference-environment pins the reference environment as one
+    flake reference at a full commit."""
+    pin = root / "tools" / "reference-environment"
+    if not (root / "tools").is_dir():
+        return []
+    if not pin.is_file():
+        return [Finding("error", "tools/reference-environment", "is missing; pin the reference environment (0022-tooling-environment FR-008)")]
+    lines = [l for l in pin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    if len(lines) != 1 or not PIN.match(lines[0].strip()):
+        return [Finding("error", "tools/reference-environment", "must hold one line, github:<owner>/<repo>/<40-hex commit> (0022-tooling-environment FR-008)")]
+    return []
+
+
 def check_prefixes(root: Path) -> list[Finding]:
     """0001 FR-007: no ontology file uses a bare if: prefix."""
     findings: list[Finding] = []
@@ -330,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     root = args.root.resolve()
     public = args.public.resolve() if args.public else None
-    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root)
+    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root) + check_reference_environment(root)
     reg, nones, counts = check_register(root, public)
     findings += reg
     for f in findings:
