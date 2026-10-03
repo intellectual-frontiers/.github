@@ -461,6 +461,22 @@ any number of each kind.
   named as the platforms name them. Its consumers are spoken and video
   works, their publishers, and the tools that publish them.
 
+## Kind profile: email
+
+- **FR-051**: An email design system governs the messages the house sends
+  by email: their layout, type, color, logo, footer and plain-text
+  alternative, within what mail clients render (tables, inline styles, no
+  custom properties, external stylesheets or scripts, hosted images). Its
+  machine-readable form is its layout data and the tool that builds a
+  message from a short source and checks it. It is themed (FR-038, FR-044):
+  its source names colors by brand theme role and the built message
+  carries them resolved, in a light and a dark tone; its text is checked
+  against the house voice. Its harness builds messages under every brand
+  here and checks their structure, contrast and limits, and runs its
+  checker over messages that must fail. It MUST be classified in the
+  ontology, by `dcterms:type`, with every **email type** it sends. Its
+  consumers are the tools and people that send the house's email.
+
 ## Kind profile: written voice
 
 - **FR-033**: A written-voice design system governs how the house writes:
