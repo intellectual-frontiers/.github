@@ -1,0 +1,11 @@
+{
+  "expect": "uses no ink",
+  "job": {
+    "product": "ballpoint-pen",
+    "location": "barrel",
+    "method": "laser-engraving",
+    "artwork": "lockup",
+    "ink": "text",
+    "width_in": 1.05
+  }
+}

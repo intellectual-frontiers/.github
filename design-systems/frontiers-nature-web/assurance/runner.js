@@ -18,6 +18,64 @@
   const base = new URL("../", document.baseURI).href; // design system root
 
   class Skip extends Error {}
+
+  /*
+   * The theme (0014-design-systems FR-038, FR-039): the brand a web design system is rendered with. A page names
+   * its default with <link rel="stylesheet" data-theme="<brand>" href=".../<brand>/brand.css">; ?brand=<slug>
+   * overrides it for this run. applyTheme points that link, every img[data-theme-logo], every
+   * img[data-theme-imagery] (a piece of the brand's imagery pool: the one whose id it names, else the first) and
+   * every link[data-theme-favicon] in a document at the chosen brand, vendored beside this design system.
+   */
+  const THEME = new URLSearchParams(location.search).get("brand") || document.querySelector("link[data-theme]")?.dataset.theme || null;
+  let brandTokens;
+  async function themeTokens() {
+    if (!brandTokens) {
+      const response = await fetch(new URL(`../${THEME}/tokens.json`, base));
+      if (!response.ok) throw new Error(`the theme ${THEME} is not vendored beside this design system (../${THEME}/tokens.json: HTTP ${response.status})`);
+      brandTokens = await response.json();
+    }
+    return brandTokens;
+  }
+  /** The lockup for `background` ("light" or "dark") best fitting `width` CSS pixels: WebP first, then the smallest at least that wide. */
+  function pickLockup(tokens, background, width) {
+    const files = tokens.$extensions["com.intellectualfrontiers.logo"].lockup.files.filter((f) => f.background === background);
+    const rank = (f) => [f.file.endsWith(".webp") ? 0 : 1, f.width >= width ? f.width : 1e6 - f.width];
+    return files.sort((a, b) => { const [x, y] = [rank(a), rank(b)]; return x[0] - y[0] || x[1] - y[1]; })[0];
+  }
+  async function applyTheme(doc) {
+    const link = doc.querySelector("link[data-theme]");
+    if (!THEME || !link || IS_FILE) return;
+    const href = new URL(`../${THEME}/brand.css`, base).href;
+    if (link.href !== href) {
+      const loaded = new Promise((resolve) => { link.onload = link.onerror = resolve; });
+      link.href = href; link.dataset.theme = THEME;
+      // Some Chromium builds never fire load on a stylesheet link whose href changes; the new sheet itself is the signal.
+      await Promise.race([loaded, waitFor(() => link.sheet?.href === href, { timeout: 10000 }).catch(() => {})]);
+    }
+    const tokens = await themeTokens();
+    for (const img of doc.querySelectorAll("img[data-theme-logo]")) {
+      const want = Number(img.dataset.width || img.getAttribute("width"));
+      const f = pickLockup(tokens, img.dataset.themeLogo, want);
+      img.src = new URL(`../${THEME}/${f.file}`, base).href;
+      img.width = want; img.height = Math.round((want * f.height) / f.width);
+    }
+    const pictures = [...doc.querySelectorAll("img[data-theme-imagery]")];
+    if (pictures.length) {
+      const response = await fetch(new URL(`../${THEME}/imagery/catalog.json`, base));
+      if (!response.ok) throw new Error(`the theme ${THEME} has no imagery pool (../${THEME}/imagery/catalog.json: HTTP ${response.status})`);
+      const { pieces } = await response.json();
+      for (const img of pictures) {
+        const piece = pieces.find((p) => p.id === img.dataset.themeImagery) || pieces[0];
+        const widest = piece.web.reduce((a, b) => (b.width > a.width ? b : a));
+        img.src = new URL(`../${THEME}/imagery/${widest.file}`, base).href;
+        img.srcset = piece.web.map((w) => `${new URL(`../${THEME}/imagery/${w.file}`, base).href} ${w.width}w`).join(", ");
+        img.width = widest.width; img.height = widest.height;
+      }
+    }
+    const favicon = tokens.$extensions["com.intellectualfrontiers.logo"].favicon.file;
+    for (const l of doc.querySelectorAll("link[data-theme-favicon]")) l.href = new URL(`../${THEME}/${favicon}`, base).href;
+    await Promise.all([...doc.querySelectorAll("img[data-theme-logo], img[data-theme-imagery]")].map((img) => img.decode().catch(() => {})));
+  }
   class Failure extends Error {}
 
   const fmt = (v) => { try { return typeof v === "string" ? JSON.stringify(v) : JSON.stringify(v) ?? String(v); } catch { return String(v); } };
@@ -53,7 +111,7 @@
   }
 
   const Assurance = {
-    base, IS_FILE, sleep, waitFor, Skip, Failure,
+    base, IS_FILE, THEME, sleep, waitFor, Skip, Failure, themeTokens,
     suite(name, options, define) {
       const suite = { name, description: options.description || "", needs: options.needs || null, tests: [], group: options.group || "Unit" };
       define({ test(title, fn, testOptions = {}) { suite.tests.push({ title, fn, needs: testOptions.needs || suite.needs }); } });
@@ -85,6 +143,7 @@
       document.body.append(iframe);
       await loaded;
       const win = iframe.contentWindow;
+      await applyTheme(win.document);
       await waitFor(() => win.customElements?.get("fc-shell") || !win.document.querySelector("fc-shell"), { message: `${path}: console.js did not define its elements` });
       await win.document.fonts?.ready;
       await sleep(30);
@@ -118,6 +177,16 @@
       if (srgb) {
         const parts = srgb[1].split(/[\s/]+/).filter(Boolean).map(Number);
         return { r: parts[0] * 255, g: parts[1] * 255, b: parts[2] * 255, a: parts[3] ?? 1 };
+      }
+      const ok = value.match(/okl(ab|ch)\(([^)]+)\)/);
+      if (ok) {
+        const parts = ok[2].split(/[\s/]+/).filter(Boolean).map((p) => p.endsWith("%") ? parseFloat(p) / 100 : Number(p));
+        let [L, a, b] = parts;
+        if (ok[1] === "ch") { const [C, h] = [parts[1], (parts[2] * Math.PI) / 180]; [a, b] = [C * Math.cos(h), C * Math.sin(h)]; }
+        const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3, m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3, s3 = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+        const lin = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s3, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s3, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s3];
+        const [r, g, bl] = lin.map((c) => 255 * Math.min(1, Math.max(0, c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)));
+        return { r, g, b: bl, a: parts[3] ?? 1 };
       }
       throw new Failure(`cannot parse colour ${value}`);
     },
@@ -186,6 +255,7 @@
     results.suites = []; results.passed = results.failed = results.skipped = 0; results.done = false;
     const summary = document.getElementById("assurance-summary");
     if (summary) summary.textContent = "Running…";
+    await themed;
     for (const suite of suites) {
       if (only && !suite.name.toLowerCase().includes(only.toLowerCase())) continue;
       const outcome = { name: suite.name, tests: [] };
@@ -207,5 +277,7 @@
 
   /** Suites, for rendering the live documentation of what is guarded. */
   Assurance.suites = suites;
+  // Theme the harness page itself as soon as it loads, so a reader sees the brand being tested.
+  const themed = applyTheme(document).catch((e) => console.warn(e.message));
   window.Assurance = Assurance;
 })();

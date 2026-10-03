@@ -1,0 +1,12 @@
+{
+  "$description": "Each must-fail fixture and the problem figcheck.py must report for it.",
+  "literal-color.svg": "name the color by a figure-role class",
+  "font-family.svg": "family comes from the theme",
+  "small-text.svg": "min 20",
+  "box-overflow.svg": "overflows its 200px box",
+  "unknown-class.svg": "is not a figure-role class",
+  "wrong-canvas.svg": "canvas is 900px wide",
+  "em-dash.svg": "em dash",
+  "kept-style.svg": "holds a <style>",
+  "covered-label.svg": "runs under a shape drawn after it"
+}

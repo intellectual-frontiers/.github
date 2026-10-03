@@ -1,0 +1,280 @@
+% frontiers-print: the book interior and book cover design (spec.md), on XeLaTeX.
+%
+% Load with \input{<this directory>/preamble} inside \documentclass{book}, after defining \iffontdir (this
+% design system's fonts/) and \branddir (the directory of the brand that themes it), both as absolute paths.
+% The theme comes first: every brand value here (colors, the text and cover families, logos) is the brand's,
+% from its brand.tex (0014-design-systems FR-038).
+\providecommand{\iffontdir}{fonts/}
+\providecommand{\branddir}{../../frontiers-brand}
+\usepackage{xcolor}
+\input{\branddir/brand.tex}
+
+% The families this design system ships, by the name a brand gives them (spec FR-004): file stem and extension.
+% A theme's font-serif sets the text; its font-sans sets headings, running heads, captions, boxes and the cover.
+% Any other family stops the build.
+\usepackage{etoolbox}
+\csdef{ifserif@Source Serif 4}{SourceSerif4}
+\csdef{ifserif@Spectral}{Spectral}
+\csdef{ifserif@PT Serif}{PTSerif}
+\csdef{ifserif@Gelasio}{Gelasio}
+\csdef{ifserif@Charis SIL}{CharisSIL}
+\csdef{ifsansfamily@Inter}{Inter}
+\ifcsdef{ifserif@\brandfontserif}{}{\errmessage{frontiers-print: the theme's font-serif, \brandfontserif, is not a family this design system ships}}
+\ifcsdef{ifsansfamily@\brandfontsans}{}{\errmessage{frontiers-print: the theme's font-sans, \brandfontsans, is not a family this design system ships}}
+\edef\ifserifstem{\csuse{ifserif@\brandfontserif}}
+\edef\ifsansstem{\csuse{ifsansfamily@\brandfontsans}}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{english}
+
+\usepackage[
+  paperwidth=7in, paperheight=9.19in,
+  inner=0.9in, outer=0.7in, top=0.85in, bottom=0.85in,
+  twoside
+]{geometry}
+
+\setmainfont{\ifserifstem}[
+  Path=\iffontdir,
+  Extension=.ttf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+]
+\newfontfamily\ifsans{\ifsansstem}[
+  Path=\iffontdir,
+  Extension=.otf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+]
+\newfontfamily\ifmono{SourceCodePro}[
+  Path=\iffontdir,
+  Extension=.ttf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+]
+\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular]
+\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium]
+\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold]
+\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold]
+\newfontfamily\iffjallaone{FjallaOne}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular]
+\newfontfamily\ifjacketsans{RobotoCondensed}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]
+\newfontfamily\iftryaimono{MartianMonoCondensed}[
+  Path=\iffontdir,
+  Extension=.ttf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+]
+\setmonofont{SourceCodePro}[
+  Path=\iffontdir,
+  Extension=.ttf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+  Scale=0.92,
+]
+
+\renewcommand{\normalsize}{\fontsize{10.5pt}{14.7pt}\selectfont}
+\normalsize
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45\baselineskip plus 2pt minus 1pt}
+
+\raggedbottom
+
+\usepackage[stretch=20, shrink=20]{microtype}
+
+% Every color is a theme role or a mix of roles; none is a literal (0014-design-systems FR-044).
+\colorlet{ifink}{brand-text}
+\colorlet{ifgray}{brand-text!72!brand-surface}
+\colorlet{iflabel}{brand-text!50!brand-surface}
+\colorlet{ifrule}{brand-text!15!brand-surface}
+\colorlet{iftint}{brand-text!4!brand-surface}
+\colorlet{ifaccent}{brand-accent}
+\colorlet{iflink}{brand-link}
+\colorlet{ifsubtitle}{brand-tertiary}
+\colorlet{ifseries}{brand-primary}
+
+\color{ifink}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable, skins}
+\usepackage{needspace}
+\emergencystretch=3em
+\usepackage{fvextra}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{fancyhdr}
+\usepackage[hidelinks, colorlinks=false, breaklinks=true]{hyperref}
+
+\usepackage[absolute,overlay]{textpos}
+\textblockorigin{0pt}{0pt}
+
+\usepackage{contour}
+\contourlength{0.14em}
+\contournumber{48}
+
+\setlist{itemsep=0.35\baselineskip, topsep=0pt, parsep=0pt}
+
+\hypersetup{urlcolor=iflink, linkcolor=iflink, citecolor=iflink}
+
+\newcommand{\ifnohyph}{\hyphenpenalty=10000\exhyphenpenalty=10000\relax}
+\titleformat{\part}[display]
+  {\centering\ifsans\bfseries\color{ifaccent}}
+  {\Large\MakeUppercase{\partname\ \thepart}}
+  {1em}
+  {\Huge\MakeUppercase}
+\titlespacing*{\part}{0pt}{200pt}{80pt}
+
+\titleformat{\chapter}[display]
+  {\raggedleft\ifnohyph\ifsans\bfseries\color{ifaccent}}
+  {\large\MakeUppercase{\chaptertitlename\ \thechapter}}
+  {2pt}
+  {\huge\color{ifink}}
+\titlespacing*{\chapter}{0pt}{14pt}{34pt}
+
+\titleformat{name=\chapter, numberless}[display]
+  {\raggedleft\ifnohyph\ifsans\bfseries\color{ifink}}
+  {}
+  {0pt}
+  {\huge}
+\titlespacing*{name=\chapter, numberless}{0pt}{14pt}{34pt}
+
+\titleformat{\section}
+  {\raggedright\ifnohyph\ifsans\bfseries\color{ifaccent}\fontsize{14pt}{17pt}\selectfont}
+  {}
+  {0pt}
+  {}
+\titlespacing*{\section}{0pt}{1.1\baselineskip}{0pt}
+
+\titleformat{\subsection}
+  {\raggedright\ifnohyph\ifsans\bfseries\itshape\fontsize{11.5pt}{14pt}\selectfont}
+  {}
+  {0pt}
+  {}
+\titlespacing*{\subsection}{0pt}{0.9\baselineskip}{0pt}
+
+\titleformat{\subsubsection}
+  {\raggedright\ifnohyph\ifsans\bfseries\itshape\fontsize{10.5pt}{13pt}\selectfont}
+  {}
+  {0pt}
+  {}
+\titlespacing*{\subsubsection}{0pt}{0.8\baselineskip}{0pt}
+
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{2}
+
+\makeatletter
+\renewcommand{\@pnumwidth}{2.4em}
+\renewcommand{\@tocrmarg}{3.4em plus 1fil}
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth \@plus 1fil
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfill
+      \nobreak\hb@xt@\@pnumwidth{\hss #2%
+                                 \kern-\p@\kern\p@}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi}
+\makeatother
+\let\iforigtableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{\begingroup\ifnohyph\iforigtableofcontents\endgroup}
+
+\newcommand{\ifdoctitle}{}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\ifsans\small\color{ifgray}\ifdoctitle}
+\fancyhead[RO]{\ifsans\small\color{ifgray}\nouppercase{\rightmark}}
+\fancyfoot[LE]{\ifsans\small\color{ifgray}\thepage}
+\fancyfoot[RO]{\ifsans\small\color{ifgray}\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\color{ifrule}\hrule height\headrulewidth}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\footrule}{\color{ifrule}\hrule width\headwidth height\footrulewidth}
+\fancypagestyle{plain}{\pagestyle{fancy}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+\renewcommand{\chaptermark}[1]{\markright{#1}}
+
+\newenvironment{ifadmonition}[2]{%
+  \par\addvspace{0.6\baselineskip}
+  \begin{tcolorbox}[blanker, breakable, borderline west={2pt}{0pt}{#1},
+    left=12pt, top=2pt, bottom=2pt, before skip=0pt, after skip=0pt]
+  \noindent{\ifsans\bfseries\color{#1}\MakeUppercase{#2}}\par\smallskip
+}{%
+  \end{tcolorbox}
+  \addvspace{0.6\baselineskip}
+}
+\colorlet{ifnote}{brand-info}
+\colorlet{iftip}{brand-success}
+\colorlet{ifimportant}{brand-warning}
+\colorlet{ifwarning}{brand-danger}
+\colorlet{ifcaution}{brand-danger}
+
+\newtcolorbox{ifsidebar}[1]{
+  enhanced, breakable, colback=iftint, colframe=ifrule, boxrule=0.5pt,
+  arc=2pt, colbacktitle=iftint, coltitle=ifaccent,
+  fonttitle=\ifsans\bfseries\raggedright\ifnohyph, titlerule=0pt, attach title to upper={\par\smallskip\noindent},
+  title={\MakeUppercase{#1}},
+  top=10pt, bottom=10pt, left=14pt, right=14pt,
+}
+
+\colorlet{iftryaibg}{brand-link!8!brand-surface}
+\colorlet{iftryairule}{brand-link!30!brand-surface}
+\newtcolorbox{iftryai}[1]{
+  enhanced, breakable, colback=iftryaibg, colframe=iftryairule, boxrule=0.5pt,
+  arc=2pt, colbacktitle=iftryaibg, coltitle=iflink,
+  fonttitle=\ifsans\bfseries\raggedright\ifnohyph, titlerule=0pt, attach title to upper={\par\smallskip\noindent},
+  title={\MakeUppercase{#1}},
+  top=10pt, bottom=10pt, left=14pt, right=14pt,
+  fontupper=\iftryaimono\fontsize{7.8pt}{10.2pt}\selectfont\raggedright
+    \setlength{\parskip}{0.45\baselineskip plus 2pt minus 1pt},
+}
+
+\newenvironment{ifquote}{%
+  \par\addvspace{0.6\baselineskip}
+  \begin{tcolorbox}[blanker, breakable, borderline west={3pt}{0pt}{ifrule},
+    left=18pt, before skip=0pt, after skip=0pt]
+  \itshape\color{ifgray!80!ifink}
+}{%
+  \end{tcolorbox}
+  \addvspace{0.6\baselineskip}
+}
+\newcommand{\ifquotecite}[1]{\par\normalfont\upshape\small\color{ifgray}\textemdash\ #1}
+
+\renewcommand{\arraystretch}{1.15}
+\newcommand{\iftablecaption}[1]{\par\Needspace{8\baselineskip}\vspace{0.5\baselineskip}\noindent{\raggedright\ifsans\small\itshape\color{ifgray} #1\par}\smallskip}
+
+\newcommand{\iffigcaption}[1]{\par\noindent{\raggedright\ifsans\small\itshape\color{ifgray} #1\par}}
+
+\fvset{breaklines=true, breaksymbolleft={}, fontsize=\fontsize{8.8pt}{11.4pt}\selectfont}
+\newtcolorbox{ifcode}{
+  breakable, colback=iftint, colframe=ifrule, boxrule=0.5pt, arc=2pt,
+  top=8pt, bottom=8pt, left=10pt, right=10pt,
+  fontupper=\ifmono\fontsize{8.8pt}{11.4pt}\selectfont,
+}
+\newcommand{\ifcodespan}[1]{{\setlength{\fboxsep}{1.2pt}\colorbox{iftint}{\vphantom{Xyj}\iftryaimono\fontsize{9pt}{1em}\selectfont #1}}}
+
+\newcommand{\iftitlepage}[3]{%
+  \thispagestyle{empty}
+  \null\vfill
+  \begin{center}
+    {\ifsans\bfseries\fontsize{28pt}{32pt}\selectfont #1\par}
+    \vspace{12pt}
+    {\ifsans\fontsize{15pt}{19pt}\selectfont\color{ifgray} #2\par}
+    \vspace{48pt}
+    {\ifsans\fontsize{13pt}{16pt}\selectfont #3\par}
+  \end{center}
+  \vfill\vfill
+  \clearpage
+}

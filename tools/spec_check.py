@@ -300,6 +300,7 @@ def check_design_systems(root: Path) -> list[Finding]:
     dirs = {p.name for p in ds.iterdir() if p.is_dir()}
     for slug in sorted(registered - dirs):
         findings.append(Finding("error", "ontology/ifcore.ttl", f"design system {slug} is registered but design-systems/{slug}/ does not exist (0014-design-systems FR-010)"))
+    findings += _check_web_classification(ttl.read_text(encoding="utf-8") if ttl.is_file() else "")
     for d in sorted(p for p in ds.iterdir() if p.is_dir()):
         if d.name not in registered:
             findings.append(Finding("error", str(d.relative_to(root)), "is not registered in ifcore.ttl as an ifcore:DesignSystem with this dcterms:identifier (0014-design-systems FR-010)"))
@@ -315,17 +316,75 @@ PIN = re.compile(r"^github:[\w.-]+/[\w.-]+/[0-9a-f]{40}$")
 
 
 def check_reference_environment(root: Path) -> list[Finding]:
-    """0022-tooling-environment FR-008: tools/reference-environment pins the reference environment as one
+    """0024-tooling-environment FR-008: tools/reference-environment pins the reference environment as one
     flake reference at a full commit."""
     pin = root / "tools" / "reference-environment"
     if not (root / "tools").is_dir():
         return []
     if not pin.is_file():
-        return [Finding("error", "tools/reference-environment", "is missing; pin the reference environment (0022-tooling-environment FR-008)")]
+        return [Finding("error", "tools/reference-environment", "is missing; pin the reference environment (0024-tooling-environment FR-008)")]
     lines = [l for l in pin.read_text(encoding="utf-8").splitlines() if l.strip()]
     if len(lines) != 1 or not PIN.match(lines[0].strip()):
-        return [Finding("error", "tools/reference-environment", "must hold one line, github:<owner>/<repo>/<40-hex commit> (0022-tooling-environment FR-008)")]
+        return [Finding("error", "tools/reference-environment", "must hold one line, github:<owner>/<repo>/<40-hex commit> (0024-tooling-environment FR-008)")]
     return []
+
+
+def _concepts(ttl: str, scheme: str) -> set[str]:
+    """Local names of the skos:Concepts in `scheme`."""
+    return set(re.findall(rf"^ifcore:(\w+) a skos:Concept ; skos:inScheme ifcore:{scheme}\b", ttl, re.M))
+
+
+def _check_web_classification(ttl: str) -> list[Finding]:
+    """0014-design-systems FR-041, FR-042 and FR-046: every web design system names one or more interaction models, exactly
+    one expression and one or more densities, every print design system one or more print document types, and every
+    merchandise design system one or more decoration methods and product categories, every figure design system
+    one or more figure types, by dcterms:type; and every web and print design system names its figure design system
+    (FR-048)."""
+    findings: list[Finding] = []
+    models, expressions, densities = (_concepts(ttl, s) for s in ("WebInteractionModelScheme", "DesignExpressionScheme", "DesignDensityScheme"))
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if not m or not types or "ifcore:WebDesignSystemKind" not in types.group(1):
+            continue
+        named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        where = f"ontology/ifcore.ttl ({m.group(1)})"
+        if not named & models:
+            findings.append(Finding("error", where, "a web design system names no interaction model (0014-design-systems FR-041)"))
+        if len(named & expressions) != 1:
+            findings.append(Finding("error", where, "a web design system names exactly one expression, productive or expressive (0014-design-systems FR-041)"))
+        if not named & densities:
+            findings.append(Finding("error", where, "a web design system names no density (0014-design-systems FR-041)"))
+    doc_types = _concepts(ttl, "PrintDocumentTypeScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if m and types and "ifcore:PrintDesignSystemKind" in types.group(1) and not set(re.findall(r"ifcore:(\w+)", types.group(1))) & doc_types:
+            findings.append(Finding("error", f"ontology/ifcore.ttl ({m.group(1)})", "a print design system names no print document type (0014-design-systems FR-042)"))
+    figure_types = _concepts(ttl, "FigureTypeScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if not (m and types):
+            continue
+        where = f"ontology/ifcore.ttl ({m.group(1)})"
+        named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "FigureDesignSystemKind" in named and not named & figure_types:
+            findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web or print design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
+    methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if m and types and "ifcore:MerchandiseDesignSystemKind" in types.group(1):
+            named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+            where = f"ontology/ifcore.ttl ({m.group(1)})"
+            if not named & methods:
+                findings.append(Finding("error", where, "a merchandise design system names no decoration method (0014-design-systems FR-046)"))
+            if not named & categories:
+                findings.append(Finding("error", where, "a merchandise design system names no product category (0014-design-systems FR-046)"))
+    return findings
 
 
 def check_prefixes(root: Path) -> list[Finding]:

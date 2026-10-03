@@ -1,0 +1,1340 @@
+{
+  "$description": "frontiers-brand's imagery pool (0014-design-systems FR-043; frontiers-brand FR-015): every approved piece of artwork a design system it themes may choose from, what each shows and can stand for, and its files. Which work uses which piece is that work's own record, never this file's. Checked by tools/brand_imagery.py check.",
+  "fields": {
+    "id": "stable slug, environment first and then the anchor; the master's file name without .png",
+    "name": "a short human name",
+    "file": "the master: <id>.png, the approved file byte for byte, with real transparency",
+    "environment": "one of `environments`",
+    "description": "what is drawn, foreground to horizon",
+    "visual_anchor": "the one built thing the eye lands on",
+    "route": "how people move through the scene",
+    "built_structures": "every human-made thing in the scene",
+    "infrastructure_type": "the kind of system the structures form (bridge, railway, dam, observatory, ...)",
+    "colored_elements": "what carries color: human intervention, plus water when present",
+    "water": "present: true/false, and its form",
+    "metaphors": "what the piece can stand for",
+    "suggested_subjects": "subjects the metaphors suit; a starting point, not a rule",
+    "source": "where the approved piece came from",
+    "pixel_size": "[width, height] of the master",
+    "content_box": "[left, top, right, bottom] pixel bounds of the drawn art (alpha > 16); a renderer that needs the art alone trims to it",
+    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by tools/brand_imagery.py build"
+  },
+  "environments": [
+    "mountain-alpine",
+    "forest",
+    "desert-canyon",
+    "badlands-plains",
+    "maritime-coastal",
+    "volcanic",
+    "subterranean"
+  ],
+  "pieces": [
+    {
+      "id": "fog-coast-lighthouse-footbridge",
+      "name": "Fog Coast Lighthouse and Footbridge",
+      "file": "fog-coast-lighthouse-footbridge.png",
+      "environment": "maritime-coastal",
+      "description": "A lit lighthouse and red-roofed keeper's cottage stand on a forested headland above a surf-battered, fog-bound coast with sea stacks. A roped fence and trail climb from the foreground across a timber footbridge on a stone pier to the light.",
+      "visual_anchor": "lighthouse on a fog-bound headland",
+      "route": "roped foot trail crossing a timber footbridge up to the headland",
+      "built_structures": [
+        "lighthouse",
+        "keeper's cottage",
+        "timber footbridge on stone pier",
+        "roped fence"
+      ],
+      "infrastructure_type": [
+        "navigation aid",
+        "footbridge",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence posts",
+        "footbridge",
+        "lighthouse lamp",
+        "keeper's cottage roof and door",
+        "sea"
+      ],
+      "water": {
+        "present": true,
+        "form": "ocean surf, sea stacks, and tide pools"
+      },
+      "metaphors": [
+        "guidance through fog",
+        "warning of hazards others cannot see",
+        "the keeper's standing duty",
+        "knowledge that keeps others safe"
+      ],
+      "suggested_subjects": [
+        "governance",
+        "risk and safety-critical work",
+        "advisory roles",
+        "compliance"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        6,
+        3,
+        1445,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/fog-coast-lighthouse-footbridge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/fog-coast-lighthouse-footbridge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "glacier-lake-cairn-trail",
+      "name": "Glacier Lake Cairn Trail",
+      "file": "glacier-lake-cairn-trail.png",
+      "environment": "mountain-alpine",
+      "description": "A trail crosses a small timber footbridge over a cascading stream, passes a stone cairn topped with a red pennant, and climbs toward a hut on a rise. A glacier descends from the peaks behind into a blue lake.",
+      "visual_anchor": "red-flagged cairn beside a trail below a glacier",
+      "route": "foot trail over a footbridge, marked by a cairn and pennant, climbing to a hut",
+      "built_structures": [
+        "stone cairn with red pennant",
+        "timber footbridge",
+        "mountain hut"
+      ],
+      "infrastructure_type": [
+        "trail marker",
+        "footbridge",
+        "shelter"
+      ],
+      "colored_elements": [
+        "trail",
+        "footbridge",
+        "pennant",
+        "hut",
+        "glacial lake",
+        "stream"
+      ],
+      "water": {
+        "present": true,
+        "form": "glacial lake and cascading stream"
+      },
+      "metaphors": [
+        "marking the route for those who follow",
+        "wayfinding",
+        "incremental progress",
+        "leaving markers where others will need them"
+      ],
+      "suggested_subjects": [
+        "method and playbooks",
+        "onboarding",
+        "documentation",
+        "mentorship"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        8,
+        18,
+        1442,
+        1083
+      ],
+      "web": [
+        {
+          "file": "web/glacier-lake-cairn-trail-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/glacier-lake-cairn-trail-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "volcanic-caldera-lookout",
+      "name": "Volcanic Caldera Lookout",
+      "file": "volcanic-caldera-lookout.png",
+      "environment": "volcanic",
+      "description": "An observation lookout with an antenna mast stands on a rocky summit above a caldera lake, facing a smoking volcano. A fenced switchback trail with a signpost climbs from a timber footbridge over a cascading stream to the lookout.",
+      "visual_anchor": "summit lookout facing a smoking volcano over a caldera lake",
+      "route": "fenced switchback trail from a footbridge up to a summit lookout",
+      "built_structures": [
+        "observation lookout with antenna mast",
+        "timber footbridge",
+        "signpost",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "observatory",
+        "trail",
+        "footbridge"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "signpost",
+        "footbridge",
+        "lookout",
+        "caldera lake",
+        "stream"
+      ],
+      "water": {
+        "present": true,
+        "form": "caldera lake and cascading stream"
+      },
+      "metaphors": [
+        "watching a volatile system",
+        "monitoring and early warning",
+        "observation from a vantage point",
+        "living beside disruption"
+      ],
+      "suggested_subjects": [
+        "risk monitoring",
+        "forecasting",
+        "scientific observation",
+        "technological disruption"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        4,
+        17,
+        1444,
+        1080
+      ],
+      "web": [
+        {
+          "file": "web/volcanic-caldera-lookout-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/volcanic-caldera-lookout-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "river-gorge-rope-bridge",
+      "name": "River Gorge Rope Bridge",
+      "file": "river-gorge-rope-bridge.png",
+      "environment": "forest",
+      "description": "A trail with a signpost leads to a rope suspension footbridge slung across a whitewater river between granite walls and dark conifers. On the far bank a lit cabin sits above a small landing with steps down to the water.",
+      "visual_anchor": "rope footbridge across a whitewater gorge",
+      "route": "foot trail with a signpost, crossing the river on a rope suspension footbridge to a cabin",
+      "built_structures": [
+        "rope suspension footbridge",
+        "cabin with lit windows",
+        "landing and steps",
+        "signpost",
+        "stone retaining wall"
+      ],
+      "infrastructure_type": [
+        "footbridge",
+        "dwelling",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "signpost",
+        "rope bridge",
+        "cabin",
+        "landing",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "whitewater river through a gorge"
+      },
+      "metaphors": [
+        "crossing the gap between two banks",
+        "nobody falls between the two sides",
+        "a handoff that holds",
+        "continuity across a seam"
+      ],
+      "suggested_subjects": [
+        "coordination across roles",
+        "handoffs",
+        "education and care transitions",
+        "organizational seams"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        3,
+        3,
+        1448,
+        1085
+      ],
+      "web": [
+        {
+          "file": "web/river-gorge-rope-bridge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/river-gorge-rope-bridge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-stream-watermill",
+      "name": "Mountain Stream Watermill",
+      "file": "mountain-stream-watermill.png",
+      "environment": "forest",
+      "description": "A timber watermill with a turning wheel sits on a stone foundation where a mountain stream drops through falls. A footbridge crosses to it, a lantern post marks the approach, and a fenced trail zigzags up the forested slope toward snow peaks.",
+      "visual_anchor": "watermill wheel turning beside mountain falls",
+      "route": "fenced trail with a lantern post, crossing a footbridge to the mill, zigzagging up the slope behind",
+      "built_structures": [
+        "watermill with wheel",
+        "stone foundation",
+        "timber footbridge",
+        "lantern post",
+        "split-rail fence"
+      ],
+      "infrastructure_type": [
+        "mill",
+        "footbridge",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "lantern",
+        "footbridge",
+        "mill",
+        "water wheel",
+        "stream and falls"
+      ],
+      "water": {
+        "present": true,
+        "form": "mountain stream and falls driving the wheel"
+      },
+      "metaphors": [
+        "turning abundant natural force into steady useful work",
+        "craft",
+        "a well-built machine that runs itself",
+        "disciplined throughput"
+      ],
+      "suggested_subjects": [
+        "building engineering teams",
+        "operations",
+        "productivity and automation",
+        "craft and discipline"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        0,
+        0,
+        1446,
+        1085
+      ],
+      "web": [
+        {
+          "file": "web/mountain-stream-watermill-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-stream-watermill-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "sea-cliff-lighthouse-trail",
+      "name": "Sea Cliff Lighthouse Trail",
+      "file": "sea-cliff-lighthouse-trail.png",
+      "environment": "maritime-coastal",
+      "description": "A lit lighthouse and keeper's house stand on a cliff above heavy surf and sea stacks. A fenced trail winds up the rocks from the foreground, crossing a timber footbridge on a stone pier.",
+      "visual_anchor": "lighthouse on a sea cliff above breaking surf",
+      "route": "fenced foot trail with a footbridge, winding up the cliff to the lighthouse",
+      "built_structures": [
+        "lighthouse",
+        "keeper's house",
+        "timber footbridge on stone pier",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "navigation aid",
+        "footbridge",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "footbridge",
+        "lighthouse lamp",
+        "keeper's house roof",
+        "sea"
+      ],
+      "water": {
+        "present": true,
+        "form": "ocean with breaking waves and sea stacks"
+      },
+      "metaphors": [
+        "steady guidance in rough water",
+        "a trusted keeper",
+        "seeing hazards before others do",
+        "leadership others navigate by"
+      ],
+      "suggested_subjects": [
+        "leadership",
+        "hiring senior roles",
+        "governance",
+        "advisory relationships"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        6,
+        5,
+        1444,
+        1080
+      ],
+      "web": [
+        {
+          "file": "web/sea-cliff-lighthouse-trail-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/sea-cliff-lighthouse-trail-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "desert-canyon-outpost",
+      "name": "Desert Canyon Outpost",
+      "file": "desert-canyon-outpost.png",
+      "environment": "desert-canyon",
+      "description": "A trail with a blue-marked signpost crosses cactus and yucca country to an outpost on a canyon rim: timber buildings, a windmill, a water tower, a tethered horse. A river with small falls runs below; mesas and buttes stand beyond.",
+      "visual_anchor": "windmill and water tower at a canyon-rim outpost",
+      "route": "foot trail with a signpost, crossing desert scrub to the outpost on the rim",
+      "built_structures": [
+        "outpost buildings",
+        "windmill",
+        "water tower",
+        "hitching rail",
+        "signpost"
+      ],
+      "infrastructure_type": [
+        "outpost",
+        "water supply",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "signpost",
+        "outpost buildings",
+        "windmill",
+        "water tower",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "desert river with small falls"
+      },
+      "metaphors": [
+        "self-sufficiency far from supply lines",
+        "building what you need where you are",
+        "holding a forward position",
+        "the people on the ground equipping themselves"
+      ],
+      "suggested_subjects": [
+        "field operations",
+        "defense and forward units",
+        "decentralized capability",
+        "end users building their own tools"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        10,
+        13,
+        1445,
+        1084
+      ],
+      "web": [
+        {
+          "file": "web/desert-canyon-outpost-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/desert-canyon-outpost-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "cavern-survey-camp",
+      "name": "Cavern Survey Camp",
+      "file": "cavern-survey-camp.png",
+      "environment": "subterranean",
+      "description": "Inside a vast limestone cavern, a lantern-lit stone stairway with a rope rail climbs to a ledge camp: a canvas tent, supply crates, a hanging lantern, and a survey instrument on a tripod. An underground river falls into a luminous pool beneath stalactites.",
+      "visual_anchor": "lantern-lit survey camp inside a cavern",
+      "route": "rope-railed stone stairway lit by lanterns, climbing to the camp ledge",
+      "built_structures": [
+        "expedition tent",
+        "survey instrument on tripod",
+        "lantern posts",
+        "rope-railed stairway",
+        "timber frame",
+        "supply crates"
+      ],
+      "infrastructure_type": [
+        "field station",
+        "survey instrument",
+        "stairway"
+      ],
+      "colored_elements": [
+        "lanterns",
+        "stairway rail posts",
+        "tent",
+        "survey instrument",
+        "crates",
+        "underground river and pool"
+      ],
+      "water": {
+        "present": true,
+        "form": "underground river, cascades, and pool"
+      },
+      "metaphors": [
+        "making the hidden legible",
+        "surveying what others cannot see",
+        "reducing uncertainty with light and measurement",
+        "scientific inquiry"
+      ],
+      "suggested_subjects": [
+        "research and science",
+        "information asymmetry",
+        "due diligence",
+        "discovery"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        11,
+        4,
+        1444,
+        1079
+      ],
+      "web": [
+        {
+          "file": "web/cavern-survey-camp-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/cavern-survey-camp-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-railway-trestle-station",
+      "name": "Mountain Railway Trestle and Station",
+      "file": "mountain-railway-trestle-station.png",
+      "environment": "mountain-alpine",
+      "description": "A steam train crosses a timber-and-iron trestle arch high over a waterfall gorge, leaving a mountain station with a signal flag and lantern. A fenced foot trail climbs from the foreground to the station platform.",
+      "visual_anchor": "steam train on a trestle arch over a gorge",
+      "route": "fenced foot trail up to the station; the railway crosses the gorge on a trestle arch",
+      "built_structures": [
+        "railway station",
+        "trestle arch bridge",
+        "masonry piers",
+        "steam train",
+        "signal flag",
+        "lantern"
+      ],
+      "infrastructure_type": [
+        "railway",
+        "bridge",
+        "station"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "station",
+        "trestle bridge",
+        "train",
+        "signal flag",
+        "waterfall and river"
+      ],
+      "water": {
+        "present": true,
+        "form": "waterfall and gorge river"
+      },
+      "metaphors": [
+        "scheduled, reliable throughput",
+        "a system that carries load across hard terrain",
+        "integration of many parts into one route",
+        "supply lines"
+      ],
+      "suggested_subjects": [
+        "systems architecture",
+        "platforms",
+        "logistics",
+        "scaling"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        7,
+        67,
+        1442,
+        1076
+      ],
+      "web": [
+        {
+          "file": "web/mountain-railway-trestle-station-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-railway-trestle-station-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "canyon-suspension-bridge",
+      "name": "Canyon Suspension Bridge",
+      "file": "canyon-suspension-bridge.png",
+      "environment": "desert-canyon",
+      "description": "A long timber suspension bridge with lanterns on its towers spans a deep desert canyon between two rims. A fenced trail leads onto it from the foreground; a lit cabin and pennant wait on the far rim; a river runs far below.",
+      "visual_anchor": "suspension bridge spanning a desert canyon",
+      "route": "fenced foot trail leading onto a suspension bridge across the canyon",
+      "built_structures": [
+        "suspension bridge with timber towers",
+        "cables and deck",
+        "lanterns",
+        "cabin",
+        "pennant",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "bridge",
+        "trail",
+        "shelter"
+      ],
+      "colored_elements": [
+        "bridge towers",
+        "cables and deck",
+        "lanterns",
+        "fence",
+        "trail",
+        "cabin",
+        "pennant",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "river at the canyon floor"
+      },
+      "metaphors": [
+        "spanning a gap that looked impassable",
+        "linking two sides with no natural connection",
+        "the missing path from value to the one who pays",
+        "building the crossing yourself"
+      ],
+      "suggested_subjects": [
+        "business models",
+        "go-to-market",
+        "bridging disciplines",
+        "partnerships"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        7,
+        47,
+        1442,
+        1075
+      ],
+      "web": [
+        {
+          "file": "web/canyon-suspension-bridge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/canyon-suspension-bridge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "coastal-road-tunnel-arch-bridge",
+      "name": "Coastal Road Tunnel and Arch Bridge",
+      "file": "coastal-road-tunnel-arch-bridge.png",
+      "environment": "maritime-coastal",
+      "description": "A cliffside road on a stone retaining wall runs from a lit tunnel portal straight across an iron arch bridge over a sea inlet studded with stacks. A stepped, fenced trail climbs to it past a small timber hut and lamps.",
+      "visual_anchor": "road emerging from a tunnel onto an arch bridge over the sea",
+      "route": "stepped fenced trail joining a road that runs through a tunnel and over an arch bridge",
+      "built_structures": [
+        "tunnel portal",
+        "iron arch bridge",
+        "stone retaining wall",
+        "road",
+        "timber hut",
+        "lamps",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "tunnel",
+        "bridge",
+        "road"
+      ],
+      "colored_elements": [
+        "road and trail",
+        "fence",
+        "tunnel lights",
+        "arch bridge",
+        "hut",
+        "lamps",
+        "sea"
+      ],
+      "water": {
+        "present": true,
+        "form": "sea inlet with sea stacks"
+      },
+      "metaphors": [
+        "going straight through rather than around",
+        "removing detours",
+        "direct access to what you need",
+        "the shortest sound route"
+      ],
+      "suggested_subjects": [
+        "simplification",
+        "first principles",
+        "removing layers",
+        "protocol-level engineering"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        0,
+        1,
+        1448,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/coastal-road-tunnel-arch-bridge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/coastal-road-tunnel-arch-bridge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "cliffside-funicular",
+      "name": "Cliffside Funicular",
+      "file": "cliffside-funicular.png",
+      "environment": "mountain-alpine",
+      "description": "A red funicular car climbs a steep timber-trestle incline from a lit lower station beside a fenced trail to an upper station with a pennant on a cliff top. A tall waterfall drops through the gorge beside it.",
+      "visual_anchor": "funicular car climbing a cliff beside a waterfall",
+      "route": "fenced trail to a lower station; a funicular incline climbs directly to the top station",
+      "built_structures": [
+        "lower station",
+        "upper station",
+        "funicular incline",
+        "funicular car",
+        "timber trestle",
+        "lantern",
+        "pennant"
+      ],
+      "infrastructure_type": [
+        "incline railway",
+        "station",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "stations",
+        "funicular car",
+        "trestle",
+        "lantern",
+        "pennant",
+        "waterfall"
+      ],
+      "water": {
+        "present": true,
+        "form": "tall waterfall and gorge river"
+      },
+      "metaphors": [
+        "a direct line from the ground floor to the top",
+        "shortening the climb",
+        "removing intermediaries",
+        "access for those who used to be kept at the bottom"
+      ],
+      "suggested_subjects": [
+        "shortening organizational chains",
+        "direct communication",
+        "users building their own tools",
+        "access"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        15,
+        32,
+        1435,
+        1078
+      ],
+      "web": [
+        {
+          "file": "web/cliffside-funicular-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/cliffside-funicular-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "alpine-cable-car-gorge",
+      "name": "Alpine Cable Car Gorge",
+      "file": "alpine-cable-car-gorge.png",
+      "environment": "mountain-alpine",
+      "description": "Red gondolas travel an aerial cableway across a deep river gorge between a lit mountain station on timber towers and a smaller station on the far cliffs. A fenced stepped trail climbs to the near station past a small hut.",
+      "visual_anchor": "red gondolas crossing a gorge on a cableway",
+      "route": "fenced stepped trail to a cableway station; gondolas cross the gorge overhead",
+      "built_structures": [
+        "cableway stations",
+        "timber towers",
+        "cable",
+        "gondolas",
+        "hut",
+        "pennants"
+      ],
+      "infrastructure_type": [
+        "cable system",
+        "station",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "stations",
+        "towers",
+        "gondolas",
+        "hut",
+        "pennants",
+        "river and waterfall"
+      ],
+      "water": {
+        "present": true,
+        "form": "gorge river and waterfall"
+      },
+      "metaphors": [
+        "light, fast transit over terrain that once took days",
+        "small cars carrying the load",
+        "spanning without heavy construction",
+        "lean operation"
+      ],
+      "suggested_subjects": [
+        "lightweight process",
+        "lean teams",
+        "operating models",
+        "speed of execution"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        12,
+        60,
+        1435,
+        1070
+      ],
+      "web": [
+        {
+          "file": "web/alpine-cable-car-gorge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/alpine-cable-car-gorge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "canyon-canal-locks-aqueduct",
+      "name": "Canyon Canal Locks and Aqueduct",
+      "file": "canyon-canal-locks-aqueduct.png",
+      "environment": "desert-canyon",
+      "description": "A canal steps down a canyon wall through a flight of stone locks with timber gates and winch wheels, feeding an arched aqueduct across the gorge. A lockkeeper's stone house with a lantern post stands above; a fenced trail and stair follow the locks down.",
+      "visual_anchor": "flight of canal locks descending into a canyon",
+      "route": "fenced trail and stair following the flight of locks down the canyon wall",
+      "built_structures": [
+        "canal locks",
+        "timber lock gates with winches",
+        "stone channels",
+        "arched aqueduct",
+        "lockkeeper's house",
+        "lantern post"
+      ],
+      "infrastructure_type": [
+        "canal",
+        "water control",
+        "aqueduct"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "lantern",
+        "lockkeeper's house",
+        "lock gates",
+        "canal water",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "canal, locks, and canyon river"
+      },
+      "metaphors": [
+        "moving between levels in controlled steps",
+        "regulated flow",
+        "stage gates built into the structure",
+        "governance done by the system itself"
+      ],
+      "suggested_subjects": [
+        "project discipline",
+        "stage gates",
+        "regulation",
+        "change management"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        7,
+        72,
+        1443,
+        1079
+      ],
+      "web": [
+        {
+          "file": "web/canyon-canal-locks-aqueduct-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/canyon-canal-locks-aqueduct-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-pipeline-trestle",
+      "name": "Mountain Pipeline Trestle",
+      "file": "mountain-pipeline-trestle.png",
+      "environment": "mountain-alpine",
+      "description": "A red pipeline on timber trestles crosses a gorge from a mountain reservoir and waterfall to a lit pump house with a lamp tower and valves. A fenced trail climbs to the pump house through snow-dusted boulders and conifers.",
+      "visual_anchor": "red pipeline on trestles crossing a gorge",
+      "route": "fenced foot trail climbing to the pump house; the pipeline crosses the gorge on trestles",
+      "built_structures": [
+        "pipeline",
+        "timber trestles",
+        "pump house",
+        "valves and fittings",
+        "lamp tower",
+        "signal lamps",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "pipeline",
+        "pumping station",
+        "trestle"
+      ],
+      "colored_elements": [
+        "pipeline",
+        "trestles",
+        "pump house",
+        "lamps",
+        "trail",
+        "fence",
+        "reservoir",
+        "waterfall and river"
+      ],
+      "water": {
+        "present": true,
+        "form": "reservoir, waterfall, and river"
+      },
+      "metaphors": [
+        "flow through a long system where every leak matters",
+        "maintenance",
+        "monitoring throughput",
+        "finding where value escapes"
+      ],
+      "suggested_subjects": [
+        "operations performance",
+        "leakage and loss",
+        "process improvement",
+        "supply chains"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        14,
+        23,
+        1435,
+        1074
+      ],
+      "web": [
+        {
+          "file": "web/mountain-pipeline-trestle-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-pipeline-trestle-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-telegraph-line",
+      "name": "Mountain Telegraph Line",
+      "file": "mountain-telegraph-line.png",
+      "environment": "mountain-alpine",
+      "description": "A line of telegraph poles with glass insulators and lanterns carries wires from a stone cabin down across a gorge and up the far ridge. A timber trestle bridge crosses the rapids beside the line; a trail descends from the cabin.",
+      "visual_anchor": "telegraph line crossing a mountain gorge",
+      "route": "foot trail from the cabin down to a trestle bridge; the telegraph line crosses the gorge and continues along the ridge",
+      "built_structures": [
+        "telegraph poles",
+        "glass insulators",
+        "wires",
+        "lanterns",
+        "timber trestle bridge",
+        "stone cabin"
+      ],
+      "infrastructure_type": [
+        "telegraph / utility line",
+        "bridge",
+        "station"
+      ],
+      "colored_elements": [
+        "poles",
+        "insulators",
+        "wires",
+        "lanterns",
+        "bridge",
+        "cabin",
+        "trail",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "whitewater rapids through a gorge"
+      },
+      "metaphors": [
+        "a signal carried across wild terrain",
+        "reporting back from the field",
+        "connecting remote stations",
+        "communication infrastructure"
+      ],
+      "suggested_subjects": [
+        "connectivity",
+        "interoperability",
+        "telemetry and data",
+        "communications"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        6,
+        27,
+        1445,
+        1080
+      ],
+      "web": [
+        {
+          "file": "web/mountain-telegraph-line-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-telegraph-line-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "canyon-mine-headframe-flume",
+      "name": "Canyon Mine Headframe and Flume",
+      "file": "canyon-mine-headframe-flume.png",
+      "environment": "desert-canyon",
+      "description": "A timber mine headframe with an ore bucket rises over mine buildings on a canyon ledge, fed by a water flume on tall trestles. A lantern-lit stairway trail climbs to it through desert scrub; ladders and a small hut cling to the cliff; a river runs below.",
+      "visual_anchor": "mine headframe on a canyon ledge",
+      "route": "lantern-lit stairway trail climbing to the mine; the flume carries water across the canyon",
+      "built_structures": [
+        "mine headframe with ore bucket",
+        "mine buildings",
+        "water flume on trestles",
+        "sluice",
+        "ladders",
+        "lanterns"
+      ],
+      "infrastructure_type": [
+        "mine",
+        "flume",
+        "trestle"
+      ],
+      "colored_elements": [
+        "headframe",
+        "flume",
+        "trestles",
+        "mine buildings",
+        "stairs and rails",
+        "lanterns",
+        "flume water",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "flume channel and canyon river"
+      },
+      "metaphors": [
+        "finding value already in the ground",
+        "prospecting",
+        "extraction by disciplined work",
+        "investment before return"
+      ],
+      "suggested_subjects": [
+        "competitive advantage",
+        "strategy",
+        "finding hidden assets",
+        "R&D"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        14,
+        48,
+        1432,
+        1072
+      ],
+      "web": [
+        {
+          "file": "web/canyon-mine-headframe-flume-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/canyon-mine-headframe-flume-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-dam-sluice-gates",
+      "name": "Mountain Dam and Sluice Gates",
+      "file": "mountain-dam-sluice-gates.png",
+      "environment": "mountain-alpine",
+      "description": "A masonry dam with timber sluice gates and winch wheels holds a mountain reservoir, releasing controlled torrents into the gorge below. A gatehouse with lamps stands at one end; a fenced stone stairway trail climbs to it.",
+      "visual_anchor": "sluice gates releasing water from a mountain dam",
+      "route": "fenced stone stairway trail climbing to the gatehouse and dam walkway",
+      "built_structures": [
+        "masonry dam",
+        "timber sluice gates with winches",
+        "gatehouse",
+        "dam walkway",
+        "lamp posts",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "dam",
+        "water control",
+        "gatehouse"
+      ],
+      "colored_elements": [
+        "sluice gates",
+        "winches",
+        "walkway",
+        "gatehouse",
+        "lamps",
+        "trail",
+        "fence",
+        "reservoir",
+        "released water"
+      ],
+      "water": {
+        "present": true,
+        "form": "reservoir and controlled spillway releases"
+      },
+      "metaphors": [
+        "holding a resource that already exists and releasing it deliberately",
+        "control of flow",
+        "stored capacity put to use",
+        "the operation that turns a supply into a yield"
+      ],
+      "suggested_subjects": [
+        "revenue capture",
+        "capacity planning",
+        "finance and cash flow",
+        "governance of resources"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        4,
+        32,
+        1445,
+        1083
+      ],
+      "web": [
+        {
+          "file": "web/mountain-dam-sluice-gates-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-dam-sluice-gates-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "expect": "below the brand",
+  "job": {
+    "product": "ceramic-mug",
+    "location": "front",
+    "method": "screen-printing",
+    "artwork": "lockup",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 0.8
+  }
+}

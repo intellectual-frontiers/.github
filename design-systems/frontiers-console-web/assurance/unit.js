@@ -3,6 +3,8 @@
   const { suite, color, sleep, waitFor, fetchText } = window.Assurance;
 
   const LAYERS = ["reset", "tokens", "base", "layout", "prose", "components", "admin"];
+  // The theme layer comes first and is filled by the brand's brand.css, not by a file here (0014-design-systems FR-038).
+  const ORDER = ["theme", ...LAYERS];
   const FIXTURES = ["docs", "components", "notebook", "home", "admin"].map((n) => `assurance/fixtures/${n}.html`);
   Assurance.FIXTURES = FIXTURES;
 
@@ -19,7 +21,7 @@
   /* ───────────────────────── tokens ───────────────────────── */
   suite("Design tokens", {
     group: "Unit",
-    description: "Every token the design system promises exists and resolves; tokens.json mirrors tokens.css exactly; and every text/background pairing the system relies on meets WCAG AA.",
+    description: "Every token the design system promises exists and resolves; and every text/background pairing the system relies on meets WCAG AA.",
   }, (s) => {
     const REQUIRED = [
       "--fc-background", "--fc-foreground", "--fc-muted", "--fc-muted-foreground", "--fc-card", "--fc-popover", "--fc-border", "--fc-border-strong",
@@ -33,17 +35,6 @@
       t.ok(missing.length === 0, `missing tokens: ${missing.join(", ")}`);
     });
 
-    s.test("tokens.json is an exact mirror of tokens.css", async (t) => {
-      const css = await fetchText("css/tokens.css");
-      const fromCss = {};
-      for (const [, name, value] of css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/(--fc-[\w-]+)\s*:\s*([^;]+);/g)) fromCss[name] = value.trim().replace(/\s+/g, " ");
-      const json = JSON.parse(await fetchText("tokens.json")).tokens;
-      const onlyCss = Object.keys(fromCss).filter((k) => !(k in json));
-      const onlyJson = Object.keys(json).filter((k) => !(k in fromCss));
-      const differing = Object.keys(fromCss).filter((k) => k in json && json[k] !== fromCss[k]);
-      t.ok(!onlyCss.length && !onlyJson.length && !differing.length,
-        `css-only: [${onlyCss}] json-only: [${onlyJson}] differing: [${differing.map((k) => `${k} css=${fromCss[k]} json=${json[k]}`)}]`);
-    }, { needs: "http" });
 
     const TEXT = [
       ["foreground on background", "--fc-foreground", "--fc-background"],
@@ -100,7 +91,7 @@
       await load();
       const m = files["reset.css"].replace(/\/\*[\s\S]*?\*\//g, "").match(/@layer\s+([\w\s,-]+);/);
       t.ok(m, "no @layer statement in reset.css");
-      t.deepEqual(m[1].split(",").map((x) => x.trim()), LAYERS);
+      t.deepEqual(m[1].split(",").map((x) => x.trim()), ORDER);
     });
     s.test("no other file declares layer order", async (t) => {
       await load();

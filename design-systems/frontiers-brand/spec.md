@@ -5,37 +5,46 @@
 **Governed by:** 0014-design-systems
 
 **Input:** The brand identity every other Intellectual Frontiers design system draws on: the
-palette, the unit colors, the typefaces, the logo and icon, and the imagery identity, stated once
-so that web, print, figure and any later design system derive from it instead of each restating
-it.
+palette, the theme roles, the unit colors, the typefaces, the logo and icon, and the imagery
+identity, stated once so that every design system it themes takes them by reference instead of
+restating them.
 
 ## Identity and scope
 
 - **FR-001**: `frontiers-brand` MUST live at `design-systems/frontiers-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
-  and hold `tokens.json`, `logos/`, `images/favicon.png`, a `README.md`, this spec and an
-  `assurance/` harness. Every visual design system MUST derive from it (0014-design-systems
-  FR-020) and carry checked copies of what it uses (0014-design-systems FR-021).
+  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`,
+  `images/share-card.png`, `imagery/`, a `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
+  every printed work Intellectual Frontiers publishes under its own name (0014-design-systems
+  FR-038, FR-040).
 
 ## Color
 
 - **FR-002**: The brand colors MUST be Deep Ink `#121820`, Frontier Blue `#214ea2`, Signal Teal
   `#1f7775`, Editorial Oxblood `#8a3147` and Warm Paper `#f3f0e8`, with white `#ffffff` as the
-  plain background, stated once in `tokens.json` under `color`. Deep Ink is the primary text
-  color and the wordmark's color; Editorial Oxblood is the secondary text color for subtitles and
-  editorial emphasis; Frontier Blue and Signal Teal are accents.
+  plain background and two status colors, amber `#8a5a24` and violet `#4a4a8c`, stated once in
+  `tokens.json` under `color`. Deep Ink is the primary text color and the wordmark's color;
+  Editorial Oxblood is the secondary text color for subtitles and editorial emphasis; Frontier Blue
+  and Signal Teal are accents.
 - **FR-003**: Each business unit MUST have one identifying color, stated in `tokens.json` under
   `unit`: Capital Frontier Blue, IP Deep Ink, Press Editorial Oxblood, Studios Signal Teal, and
-  Network `#4a4a8c`. A unit color identifies a unit; it MUST NOT be used as a decorative fill.
-- **FR-005**: Every text pairing `tokens.json` lists, and every unit color on white and on Warm
-  Paper, MUST meet WCAG 2.2 AA for body text (4.5:1).
+  Network violet. A unit color identifies a unit; it MUST NOT be used as a decorative fill.
+- **FR-005**: Every palette color but white and Warm Paper, and every unit color, MUST meet WCAG
+  2.2 AA for body text (4.5:1) on white and on Warm Paper.
+- **FR-014**: Its theme roles (0014-design-systems FR-037) MUST be: `text` Deep Ink, `surface`
+  white, `primary` Frontier Blue, `secondary` Signal Teal, `tertiary` Editorial Oxblood, `success`
+  Signal Teal, `warning` amber, `danger` Editorial Oxblood, `info` violet, `accent`
+  Editorial Oxblood, `link` Frontier Blue, `font-sans` Inter and
+  `font-serif` Source Serif 4; and, for `frontiers-nature-web` (frontiers-nature-web FR-004),
+  `paper` Warm Paper and `unit-capital`, `unit-ip`, `unit-press`, `unit-studios` and `unit-network`
+  each its unit's color. `brand.css` and `brand.tex` MUST declare exactly these roles.
 
 ## Typefaces
 
 - **FR-004**: The house sans MUST be Inter and the house serif Source Serif 4, both under the SIL
   Open Font License, stated in `tokens.json` under `typeface`. The wordmark, and the name
-  "Intellectual Frontiers" wherever it is set in running type, MUST be Inter Bold. A derived
-  design system MAY add a family its medium needs (a monospace, a print heading face) and MUST
+  "Intellectual Frontiers" wherever it is set in running type, MUST be Inter Bold. A design
+  system it themes MAY add a family its medium needs (a monospace, a print heading face) and MUST
   NOT replace either house family except by a requirement citing this one.
 
 ## Logo
@@ -75,13 +84,25 @@ it.
   bulbs, brains, books, neural networks, circuit imagery, generic AI symbols, compasses, arrows,
   badges, circular mountain emblems, saturated scenic color, sunset gradients, neon, or
   photographic realism.
+- **FR-015**: Its imagery pool (0014-design-systems FR-043) MUST be `imagery/`: each piece a
+  hand-drawn pen-and-ink engraving of one hard natural place, whose land, trees, sky, snow and fog
+  are grayscale and whose built things (a trail, a bridge, a railway, a dam, a lighthouse) and
+  water alone carry restrained, naturalistic color, with a visible route and one dominant built
+  anchor, on a real transparent background with irregular edges, about 4:3, and with no text,
+  lettering, numbers or arrows anywhere. Its environment MUST be one `imagery/catalog.json` lists,
+  and its colored share of the drawn art SHOULD fall between 5% and 30%. A piece MUST NOT be
+  retouched, flattened, recolored or cropped after approval, MUST NOT show or be generated from a
+  finished cover or the logo, and MUST NOT be a near-duplicate of a piece already in the pool. How
+  a piece is made and approved is in `imagery/README.md`.
+- **FR-016**: Its share card MUST be `images/share-card.png`, 1200×630, the light lockup centered
+  on the surface role, written by `tools/brand_imagery.py build`.
 
 ## Out of scope
 
-- Typeface files. Each derived design system ships the files of the families it uses, in the
+- Typeface files. Each design system it themes ships the files of the families it uses, in the
   format its medium needs.
-- Cover artwork and its library: per-work facts held by the production pipeline that uses them
-  (0014-design-systems FR-025, FR-031).
+- Which work uses which piece of the imagery pool: a fact about that work, held by its production
+  pipeline (0014-design-systems FR-025).
 
 ## Edge cases
 
@@ -89,11 +110,14 @@ it.
   per FR-007, at no less than its minimum size, per FR-008.
 - A dark page background: the dark lockup is used, never an inverted or recolored light one, per
   FR-006 and FR-009.
-- A derived design system whose medium needs a monospace or a print heading face: it adds the
+- A design system it themes whose medium needs a monospace or a print heading face: it adds the
   family itself, per FR-004.
-- A color a derived system needs that is not a brand color (a warning amber, a tint): the derived
-  system states it; it is not a brand color unless this spec adds it, per FR-002.
+- A color a design system it themes needs that is not a brand color (a tint, a neutral grey): that
+  system mixes it from a theme role or states it as its own; it is not a brand color unless this
+  spec adds it, per FR-002 and FR-014.
 - A size between two shipped files: the nearest larger file is scaled down, per FR-008.
+- A work with no good match in the imagery pool: a new piece is made and approved per FR-015; a
+  piece is never adapted for one work.
 
 ## Assumptions
 
@@ -109,13 +133,15 @@ None.
 - **Unit color** — the one color identifying a business unit.
 - **Lockup** — the landscape and two-line wordmark as one fixed image, light or dark.
 - **Icon-only mark** — the landscape cropped from the master, without the wordmark.
+- **Imagery pool** — the approved pieces of frontier artwork every design system it themes chooses
+  from: a cover, a web page's hero.
 
 ## Success criteria
 
 - **SC-001**: `node assurance/run.mjs` exits zero, and every logo file `tokens.json` lists loads
   at its stated size.
-- **SC-002**: No derived design system's copy of a brand value differs from `tokens.json` or from
-  the file here.
+- **SC-002**: Every web design system here passes its harness themed by this brand, and none holds
+  one of its colors as a literal.
 
 ## Review & acceptance checklist
 

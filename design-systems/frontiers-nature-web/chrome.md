@@ -14,8 +14,8 @@ container used inside the header and footer.
 
 ## Header (sticky, one unit)
 `header.site-header` is `position: sticky; top: 0; z-index: 40`, translucent `--shell` with blur.
-1. `.wrap.site-header__bar`: `a.brand > img.brand__logo` (150px, 180px from 40rem, `srcset` of the
-   five WebP sizes) and `nav.nav-primary.label` of `{primary}` links. The link whose section is
+1. `.wrap.site-header__bar`: `a.brand > img.brand__logo` (150px, 180px from 40rem): the theme's lockup for light
+   backgrounds, chosen from the brand's `tokens.json`, with a `srcset` of its WebP sizes; then `nav.nav-primary.label` of `{primary}` links. The link whose section is
    active carries `data-active`; an exact path match carries `aria-current="page"`.
 2. `.crumbband` (absent on home) > `.wrap.crumbband__inner`:
    - `.crumbband__trail` holds `nav.crumbs[aria-label=Breadcrumb] > ol > li` and the BreadcrumbList
@@ -40,14 +40,14 @@ Anchor names `--menu-section` and `--menu-crumbs`; the panel is `position: fixed
 button with `anchor()`. Outside click and Escape close it natively. The chevron rotates via `:has(:popover-open)`.
 
 ## Super footer
-`footer.site-footer`: `.wrap.site-footer__grid` (4 columns from 48rem: logo and tagline, then three
+`footer.site-footer`: `.wrap.site-footer__grid` (4 columns from 48rem: the theme's lockup for dark backgrounds and the tagline, then three
 `.site-footer__col` with a `.label` heading), then `.site-footer__legal`: `© {copyrightFrom}–{year}
 {legal}`, What's new link and the Atom feed link.
 
 ## Page header and blocks
 `.t-title` (page title), `.t-lede`, `.label` eyebrow; `.t-section` headings; `.heading-row` for a
 heading with an "All …" link; `.rows` ruled lists; `.cols--2|3|split` grids; `.hero` with
-`.hero__media`, `.hero__scrim`, `.hero__body`; `if-shelf` (web component) around `.shelf__track` with `.book` cards; `.updates`.
+`.hero__body` holding the text (`h1.t-display`, `.hero__lede`, `.hero__actions`) and `img.hero__art`, one piece of the theme's imagery (spec FR-021); `if-shelf` (web component) around `.shelf__track` with `.book` cards; `.updates`.
 
 ## Content classes
 A page's own markup may use only the class names this CSS defines; a consumer enforces this with

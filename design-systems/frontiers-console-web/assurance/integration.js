@@ -46,7 +46,7 @@
         for (const b of f.$$("button")) t.ok((b.textContent.trim().length > 2) || b.getAttribute("aria-label"), `icon-only button without aria-label: ${b.outerHTML.slice(0, 80)}`);
         for (const el of f.$$("script[src], link[href], img[src], source[src]")) {
           const url = el.getAttribute("src") || el.getAttribute("href");
-          t.ok(!/^(https?:)?\/\//.test(url), `external resource: ${url}`);
+          t.equal(new URL(url, f.doc.baseURI).origin, f.win.location.origin, `external resource: ${url}`);
         }
       }));
     }
