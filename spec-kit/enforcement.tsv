@@ -474,11 +474,11 @@ frontiers-nature-web FR-021	check	.github: tools/run_assurance.sh	Hero suite und
 frontiers-print FR-001	none	-	registration and classification; spec_check checks the slug, registration and classification only
 frontiers-print FR-002	none	-	directory contents; no check
 frontiers-print FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: every named color reaches each build as its role or mix of roles, logos placed, no color literal in a style file
-frontiers-print FR-004	check	.github: python3 design-systems/frontiers-print/assurance/run.py	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; LICENSES.md coverage not checked
-frontiers-print FR-005	check	.github: python3 design-systems/frontiers-print/assurance/run.py	book page size 7 x 9.19 in; margins and heading faces not checked
+frontiers-print FR-004	check	.github: python3 design-systems/frontiers-print/assurance/run.py	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; the book sets the sans in Regular, Bold, Italic and Bold Italic; LICENSES.md coverage not checked
+frontiers-print FR-005	check	.github: python3 design-systems/frontiers-print/assurance/run.py	book page size 7 x 9.19 in; the book's sans styles are the theme's font-sans; margins not checked
 frontiers-print FR-006	none	-	the cover fixture sets the title in the theme sans; Fjalla One and Roboto Condensed use is not checked
 frontiers-print FR-007	check	.github: python3 design-systems/frontiers-print/assurance/run.py	article builds on LuaLaTeX in the default layout at US Letter
-frontiers-print FR-008	none	-	licensed-set fallback is not exercised by the harness
+frontiers-print FR-008	check	.github: python3 design-systems/frontiers-print/assurance/run.py	the default set's sans is Inter in the article PDF; licensed-set fallback is not exercised by the harness
 frontiers-print FR-009	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any of its checks
 frontiers-print FR-010	review	frontiers-print FR-010	cover structure and reading order are judged at cover review; the pipeline's covercheck checks type overlaps
 frontiers-print FR-011	none	-	lockup placement is the renderer's; not checked
