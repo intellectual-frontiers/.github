@@ -590,6 +590,12 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0022-domain-names FR-018	check	eidolon: make domain-security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
 0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
 0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
+0022-domain-names FR-021	check	eidolon: make check-domains	the namespace's domain and the web property's domain must be marked crown jewels
+0022-domain-names FR-022	check	eidolon: make check-domains	a crown jewel under a two-letter top-level domain fails
+0022-domain-names FR-023	review	0022-domain-names FR-023	defines the country-code review
+0022-domain-names FR-024	none	-	what depends on a domain is recorded by hand; completeness is unchecked
+0022-domain-names FR-025	check	eidolon: make check-domains	a lapse Decision for a domain something requires or a published address uses fails
+0022-domain-names FR-026	check	eidolon: make check-domains	warns for each Public brand with no defensive-registration Decision
 0023-domain-security FR-001	check	eidolon: make domain-security	evaluates every domain against every control
 0023-domain-security FR-002	check	eidolon: make check-domains	an exception names a DomainName and lapses by dcterms:valid within a year
 0023-domain-security FR-003	none	-	domain security check not yet built
@@ -611,3 +617,21 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
 0023-domain-security FR-020	check	eidolon: make domain-security	a new domain is checked within the week
 0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
+0023-domain-security FR-022	check	eidolon: make domain-security	security.txt with a Contact and an unexpired Expires on each primary domain
+0023-domain-security FR-023	check	eidolon: make domain-security	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
+0023-domain-security FR-024	check	eidolon: make domain-security	registered look-alikes of Public primary domains, report only
+0023-domain-security FR-025	check	eidolon: make domain-security	crown jewel expiry at least two years out, from RDAP
+0023-domain-security FR-026	check	eidolon: make domain-security	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
+0023-domain-security FR-027	none	-	billing review is a person's, with FR-015's
+0023-domain-security FR-028	none	-	which subdomain sends bulk mail is not observable
+0024-persistent-addresses FR-001	none	-	definition; the checks below find published addresses by it
+0024-persistent-addresses FR-002	check	eidolon: make domain-security	every published address answers below 400 after redirects
+0024-persistent-addresses FR-003	check	eidolon: make check-domains	no lapse Decision for a domain carrying a published address (0022 FR-025)
+0024-persistent-addresses FR-004	check	eidolon: make domain-security	weekly in the vault's domain-security workflow
+0024-persistent-addresses FR-005	check	eidolon: make domain-security	each public namespace answers 200 with Turtle
+0024-persistent-addresses FR-006	check	eidolon: make domain-security	the private namespace answers 404
+0024-persistent-addresses FR-007	none	-	a namespace address change is caught only by FR-005's check
+0024-persistent-addresses FR-008	check	eidolon: make check-domains	see 0022 FR-021
+0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
+0024-persistent-addresses FR-010	none	-	consent is a person's; nothing checks it
+0024-persistent-addresses FR-011	none	-	no organization identifier held yet (OQ-3)
