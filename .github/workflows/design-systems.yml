@@ -1,6 +1,6 @@
 # Runs every design system's assurance harness on every push and pull request that touches a design system
-# (0014-design-systems FR-015, FR-017, FR-039): the browser harnesses (web and brand design systems) in one job,
-# the Python harnesses (print, merchandise and figure design systems) in another, each under every brand here, and each brand's imagery
+# (0014-design-systems FR-015, FR-017, FR-039): the browser harnesses (web, slides and brand design systems) in one job,
+# the Python harnesses (print, merchandise, figure, slides and voice design systems) in another, each under every brand here, and each brand's imagery
 # pool and share card in a third.
 name: design-systems
 

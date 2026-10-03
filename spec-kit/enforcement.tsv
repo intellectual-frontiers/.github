@@ -309,6 +309,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
 0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
 0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
+0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -664,3 +665,18 @@ frontiers-spoken-voice FR-007	check	.github: python3 design-systems/frontiers-sp
 frontiers-spoken-voice FR-008	none	-	humor and performance punctuation; a human read
 frontiers-spoken-voice FR-009	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
 frontiers-spoken-voice FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-slides FR-001	check	.github: python3 tools/spec_check.py	registration, deck types and figure design system
+frontiers-slides FR-002	none	-	directory contents; no check
+frontiers-slides FR-003	check	.github: tools/run_assurance.sh --browser	Canvas and layouts: every slide 1920x1080, nothing outside its slide or under its footer
+frontiers-slides FR-004	check	.github: tools/run_assurance.sh --browser	Stylesheet discipline: no color literal; deck.py check refuses a color in a slide's text
+frontiers-slides FR-005	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: known layout, title first, quote attribution; the browser harness checks every layout renders
+frontiers-slides FR-006	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: headline present and within its word limit; that it states a claim is a human read
+frontiers-slides FR-007	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check refuses an SVG that is not frontiers-figures' semantic SVG
+frontiers-slides FR-008	check	.github: tools/run_assurance.sh --browser	Type and contrast: 24px minimum, 4.5:1 in both tones, on-dark figure variant
+frontiers-slides FR-009	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: alternative text; notes read aloud is a human judgment
+frontiers-slides FR-010	check	.github: tools/run_assurance.sh --browser	Viewer: one slide at a time, keys, hash, notes; deck.py build is checked by run.py
+frontiers-slides FR-011	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: points, words and slides against limits.json
+frontiers-slides FR-012	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: speaker notes on content, figure and two-column slides
+frontiers-slides FR-013	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check sweeps slide text and notes with the house voice
+frontiers-slides FR-014	check	.github: tools/run_assurance.sh --browser	run_assurance.sh runs run.mjs under every brand, which exits non-zero on any failure
+frontiers-slides FR-015	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
