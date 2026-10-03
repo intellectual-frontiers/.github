@@ -82,8 +82,11 @@ supplies a decoration kit.
   literal, and the ontology classifies it by every method and category its data governs), then,
   under each brand beside it that has a decoration kit, that every job in
   `assurance/fixtures/pass/` meets every rule and every job in `assurance/fixtures/fail/` breaks the
-  rule it names. It MUST report a brand without a kit as unable to theme goods, never as a pass,
-  and report each product the kit fits by no allowed method.
+  rule it names. A pass job whose artwork the brand's kit fits at no size by its method on its
+  location is the brand's limit, not a fault in the rules: it MUST be reported as beyond that kit,
+  never as a pass, and every pass job MUST meet every rule under at least one brand here. It MUST
+  report a brand without a kit as unable to theme goods, never as a pass, and report each product
+  the kit fits by no allowed method.
 
 ## Out of scope
 
