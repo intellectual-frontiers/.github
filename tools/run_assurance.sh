@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Runs every design system's assurance harness headlessly (0014-design-systems FR-015, FR-017): each web design
-# system once under every brand here (FR-039) in a browser, each print design system under every brand here on TeX
-# (its run.py does the brand loop), every other design system once. Fails if any run fails or any design system has
+# system once under every brand here (FR-039) in a browser, each print and merchandise design system under every
+# brand here in Python (its run.py does the brand loop), every other design system once. Fails if any run fails or any design system has
 # no harness.
 #
 #   tools/run_assurance.sh            everything
 #   tools/run_assurance.sh --browser  only the browser harnesses (needs Node, Playwright and Chromium)
-#   tools/run_assurance.sh --tex      only the TeX harnesses (needs TeX Live with XeLaTeX, LuaLaTeX, latexmk, poppler)
+#   tools/run_assurance.sh --tex      only the Python harnesses: print (needs TeX Live with XeLaTeX, LuaLaTeX, latexmk,
+#                                     poppler) and merchandise (standard library)
 #   tools/run_assurance.sh --images   only each brand's imagery pool and share card (needs ImageMagick with WebP)
 #
 # CI runs each half in its own job (.github/workflows/design-systems.yml).

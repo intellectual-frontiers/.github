@@ -1,0 +1,12 @@
+{
+  "expect": "finer than embroidery",
+  "job": {
+    "product": "structured-cap",
+    "location": "front-panel",
+    "method": "embroidery",
+    "artwork": "icon",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 2.25
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "expect": "cannot fit",
+  "job": {
+    "product": "polo",
+    "location": "left-chest",
+    "method": "embroidery",
+    "artwork": "lockup",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 4
+  }
+}

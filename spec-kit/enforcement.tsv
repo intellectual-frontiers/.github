@@ -305,6 +305,9 @@ requirement	mechanism	by	note
 0014-design-systems FR-042	check	.github: python3 tools/spec_check.py	each print DesignSystem names a print document type
 0014-design-systems FR-043	check	.github: tools/run_assurance.sh --images	each brand's imagery catalog, masters, WebP files and share card, by tools/brand_imagery.py check
 0014-design-systems FR-044	check	.github: tools/run_assurance.sh	each web harness's theme suite and each print harness fail on a color literal
+0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
+0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
+0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
@@ -485,10 +488,21 @@ frontiers-print FR-014	none	-	author setting is the renderer's; not checked
 frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
 frontiers-print FR-016	check	eidolon: make check-covers	the series line's fit is checked; its color and the back-cover rule are not
 frontiers-print FR-017	check	eidolon: make check-covers	a back cover that spills onto a second page or reaches the barcode zone fails
+frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
+frontiers-merchandise FR-002	none	-	directory contents; no check
+frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
+frontiers-merchandise FR-004	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fixture jobs exercise each method's limits; the table and methods.json agreeing is a review judgment
+frontiers-merchandise FR-005	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite and fixture jobs; the table and products.json agreeing is a review judgment
+frontiers-merchandise FR-006	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: method not allowed, imagery by a spot method, unknown location
+frontiers-merchandise FR-007	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: too wide, too tall, below the brand minimum, finer than the method holds
+frontiers-merchandise FR-008	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: ink not in the kit, ink on a method that uses none
+frontiers-merchandise FR-009	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixture: dark ink on dark goods
+frontiers-merchandise FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 example-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 example-brand FR-002	check	.github: tools/run_assurance.sh	Brand contract here, and every web design system run themed by it
 example-brand FR-003	check	.github: node design-systems/example-brand/assurance/run.mjs	Logo files: light and dark lockups, icon and favicon load at their stated sizes
 example-brand FR-004	check	.github: tools/run_assurance.sh --images	brand_imagery.py check and the Imagery suite: the piece is catalogued and loads at its sizes
+example-brand FR-005	check	.github: node design-systems/example-brand/assurance/run.mjs	Decoration kit suite: one-color SVG, finest detail, spot and thread matches
 0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
 0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
 0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent
