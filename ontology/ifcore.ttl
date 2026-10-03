@@ -226,6 +226,15 @@ ifcore:DecisionFlowchart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme 
 ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "hierarchy diagram"@en ;
     skos:definition "A root over its children."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:BarChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "bar chart"@en ;
+    skos:definition "Values compared as bars, one per category, each labelled with its value."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LineChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "line chart"@en ;
+    skos:definition "One or more series over an ordered axis, usually time, each named at its end."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Timeline a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "timeline"@en ;
+    skos:definition "Events in order, each with its date."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:DeckTypeScheme a skos:ConceptScheme ; rdfs:label "Deck type"@en ;
     skos:definition "The kinds of presentation a slides design system serves (0014-design-systems FR-049)."@en ;
@@ -351,7 +360,7 @@ ifcore:FrontiersFigures a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-figures" ;
     rdfs:label "Frontiers Figures"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
+    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram , ifcore:BarChart , ifcore:LineChart , ifcore:Timeline ;
     rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
     ifcore:hasAudience ifcore:Public .
 

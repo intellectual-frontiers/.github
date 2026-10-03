@@ -134,6 +134,15 @@ class SVG:
         m = ' marker-end="url(#arrD)"' if arrow else ""
         self.add(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"{_cls(None, stroke)} stroke-width="{sw}"{d}{m}/>')
 
+    def polyline(self, points, stroke="series-1", sw=3):
+        """An open line through points, unfilled: a chart's series."""
+        pts = " ".join(f"{x:g},{y:g}" for x, y in points)
+        self.add(f'<polyline points="{pts}"{_cls(None, stroke)} fill="none" stroke-width="{sw}" stroke-linejoin="round" stroke-linecap="round"/>')
+
+    def dot(self, cx, cy, r=5, fill="series-1"):
+        """A filled circle: a chart's data point or a timeline's marker."""
+        self.add(f'<circle cx="{cx:g}" cy="{cy:g}" r="{r:g}"{_cls(fill, None)}/>')
+
     def curve(self, x1, y1, cx, cy, x2, y2, stroke="line", sw=2, arrow=True):
         m = ' marker-end="url(#arrD)"' if arrow else ""
         self.add(f'<path d="M{x1},{y1} Q{cx},{cy} {x2},{y2}" fill="none"{_cls(None, stroke)} stroke-width="{sw}"{m}/>')

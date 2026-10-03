@@ -1,8 +1,9 @@
-"""Figure layouts built on the kit (spec FR-007): seven common shapes, each a figure type in the
+"""Figure layouts built on the kit (spec FR-007): ten common shapes, each a figure type in the
 ontology's classification (0014-design-systems FR-032): a process diagram (a vertical chain of
 steps), a comparison (two columns), a cycle diagram (a loop), a layer diagram (a stack), a
-relationship diagram (many sources converging on one), a decision flowchart (a gate) and a
-hierarchy diagram (a tree). A figure that fits none is drawn directly on the kit's primitives.
+relationship diagram (many sources converging on one), a decision flowchart (a gate), a
+hierarchy diagram (a tree), and, drawn from data (spec FR-012), a bar chart, a line chart and a
+timeline. A figure that fits none is drawn directly on the kit's primitives.
 
 Every layout uses the house type sizes: 21px body text, 22px bold for emphasized boxes and
 takeaways, 20px bold for small labels (column heads, YES/NO), a 34px title and a 20px subtitle. Box
@@ -244,4 +245,116 @@ def tree(path, title, subtitle, root, children, width=1040, top=TOP):
         s.line(rx + rw / 2, ry + rh, cx + cw / 2, cy - 1, stroke="line")
         fill, stroke, tfill = ("primary-tint", "primary", "ink") if i % 2 == 0 else ("emphasis-tint", "emphasis", "emphasis")
         s.box_with_text(cx, cy, cw, ch, child, fill=fill, stroke=stroke, text_fill=tfill, size=BODY)
+    s.save(path)
+
+
+# ───── Charts (spec FR-012): drawn from data, every series labelled directly, never by color alone ─────
+
+SOURCE = 20      # the source line under a chart
+MAX_SERIES = 4   # series-1 to series-4
+
+
+def _nice_ticks(top, count=5):
+    """Round axis ticks from 0 to at least top."""
+    raw = top / (count - 1)
+    mag = 10 ** len(str(int(raw))) / 10 if raw >= 1 else 1
+    step = next(m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= raw)
+    n = 0
+    while n * step < top:
+        n += 1
+    return [i * step for i in range(n + 1)]
+
+
+def _fmt(v, unit):
+    text = f"{v:,.0f}" if float(v).is_integer() or abs(v) >= 100 else f"{v:,.1f}"
+    return f"{text}{unit}"
+
+
+def _source(s, y, width, source):
+    if source:
+        s.text(28, y, f"Source: {source}", size=SOURCE, fill="muted", anchor="start")
+
+
+def bar_chart(path, title, subtitle, items, unit="", highlight=None, source=None, width=1040, top=TOP, bar_h=36, gap=18):
+    """Horizontal bars, one per (label, value), longest first as given, each labelled with its value;
+    the item at index `highlight` takes the emphasis role, the rest series-1."""
+    from svgkit import text_width
+    label_w = min(max(text_width(lbl, BODY) for lbl, _ in items) + 8, width * 0.4)
+    vmax = max(v for _, v in items)
+    value_w = max(text_width(_fmt(v, unit), BODY, bold=True) for _, v in items) + 16
+    x0 = 28 + label_w + 12
+    span = width - 40 - value_w - x0
+    h = round(top + len(items) * (bar_h + gap) + (52 if source else 24))
+    s = SVG(width, h)
+    s.title(title, subtitle)
+    y = top
+    for i, (lbl, v) in enumerate(items):
+        w = max(span * v / vmax, 2)
+        s.rect(x0, y, w, bar_h, fill="emphasis" if i == highlight else "series-1", rx=2)
+        s.text(x0 - 12, y + bar_h / 2 + BODY * 0.35, lbl, size=BODY, fill="body", anchor="end")
+        s.text(x0 + w + 10, y + bar_h / 2 + BODY * 0.35, _fmt(v, unit), size=BODY, bold=True, fill="ink", anchor="start")
+        y += bar_h + gap
+    s.line(x0, top - 8, x0, y - gap + 8, stroke="line", sw=1.5, arrow=False)
+    _source(s, h - 20, width, source)
+    s.save(path)
+
+
+def line_chart(path, title, subtitle, x_labels, series, unit="", y_max=None, source=None, width=1040, top=TOP + 10, plot_h=400):
+    """One line per (name, values) over x_labels, from zero, with gridlines at round ticks; each line is
+    named at its last point, so no legend is needed. At most four series."""
+    from svgkit import text_width
+    if len(series) > MAX_SERIES:
+        raise ValueError(f"a line chart draws at most {MAX_SERIES} series; split it or label the rest in the text")
+    ticks = _nice_ticks(y_max or max(max(vals) for _, vals in series))
+    left = 28 + max(text_width(_fmt(t, unit), LABEL) for t in ticks) + 14
+    right = width - 28 - min(max(text_width(name, LABEL, bold=True) for name, _ in series) + 22, 260)
+    h = round(top + plot_h + 50 + (40 if source else 10))
+    s = SVG(width, h)
+    s.title(title, subtitle)
+    ytop, ybot = top, top + plot_h
+    sy = lambda v: ybot - (ybot - ytop) * v / ticks[-1]  # noqa: E731
+    sx = lambda i: left + (right - left) * i / max(len(x_labels) - 1, 1)  # noqa: E731
+    for t in ticks:
+        s.line(left, sy(t), right, sy(t), stroke="rule" if t else "line", sw=1 if t else 1.5, arrow=False)
+        s.text(left - 10, sy(t) + LABEL * 0.35, _fmt(t, unit), size=LABEL, fill="muted", anchor="end")
+    for i, lbl in enumerate(x_labels):
+        s.text(sx(i), ybot + 30, lbl, size=LABEL, fill="muted", anchor="middle")
+    ends = []
+    for k, (name, vals) in enumerate(series):
+        role = f"series-{k + 1}"
+        pts = [(sx(i), sy(v)) for i, v in enumerate(vals)]
+        s.polyline(pts, stroke=role, sw=3)
+        for x, y in pts:
+            s.dot(x, y, r=4.5, fill=role)
+        ends.append([pts[-1][1], name, role])
+    ends.sort()
+    for i in range(1, len(ends)):
+        ends[i][0] = max(ends[i][0], ends[i - 1][0] + LABEL + 8)
+    for y, name, role in ends:
+        s.text(right + 14, y + LABEL * 0.35, name, size=LABEL, bold=True, fill="ink", anchor="start")
+    _source(s, h - 20, width, source)
+    s.save(path)
+
+
+def timeline(path, title, subtitle, events, width=1040, top=TOP, gap=26, text_w=None):
+    """Events top to bottom, each a (when, what): the date in bold on the left, a marker on a vertical
+    line, and what happened beside it, wrapped to fit."""
+    from svgkit import text_width, wrap
+    when_w = max(text_width(w, LABEL, bold=True) for w, _ in events) + 8
+    x_line = 28 + when_w + 24
+    text_w = text_w or width - x_line - 28 - 28
+    rows = [wrap(what, BODY, text_w) for _, what in events]
+    row_h = [max(len(lines), 1) * BODY * 1.3 for lines in rows]
+    h = round(top + sum(row_h) + gap * (len(events) - 1) + 40)
+    s = SVG(width, h)
+    s.title(title, subtitle)
+    s.line(x_line, top - 6, x_line, top + sum(row_h) + gap * (len(events) - 1), stroke="line", sw=2, arrow=False)
+    y = top
+    for (when, _), lines, rh in zip(events, rows, row_h):
+        base = y + BODY * 0.9
+        s.dot(x_line, base - BODY * 0.35, r=7, fill="primary")
+        s.text(x_line - 24, base, when, size=LABEL, bold=True, fill="ink", anchor="end")
+        for j, line in enumerate(lines):
+            s.text(x_line + 24, base + j * BODY * 1.3, line, size=BODY, fill="body", anchor="start")
+        y += rh + gap
     s.save(path)
