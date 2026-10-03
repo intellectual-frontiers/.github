@@ -1,12 +1,12 @@
 # Feature Specification: Frontiers Console design system
 
-**Spec ID:** 0018-frontiers-console
+**Spec ID:** frontiers-console-web
 **Status:** Draft
 **Governed by:** 0014-design-systems
 
-**Input:** A second design system, `frontiers-console`, for Intellectual Frontiers' **operator
+**Input:** A second design system, `frontiers-console-web`, for Intellectual Frontiers' **operator
 (admin) and documentation** surfaces — the kind of interface a property's `/console` needs — as a
-counterpart to the public, editorial `frontiers-nature`. Its visual and structural model is a
+counterpart to the public, editorial `frontiers-nature-web`. Its visual and structural model is a
 neutral, bordered documentation theme with a persistent sidebar, a table of contents and
 command-palette search, chosen because that interaction model is well understood and reads well for
 dense reference and operations content. It is implemented from scratch in this organization's own
@@ -14,13 +14,13 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
 
 ## Identity and scope
 
-- **FR-001**: `frontiers-console` MUST live at `design-systems/frontiers-console/`, be registered in
+- **FR-001**: `frontiers-console-web` MUST live at `design-systems/frontiers-console-web/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` (0014-design-systems FR-010), and carry the status that
   registration states, not one asserted in its own README (0014-design-systems FR-011).
 - **FR-002**: It MUST serve two kinds of surface from one set of assets: **documentation** (articles,
   reference, specs) and **administration** (tables, forms, status, run output). It MUST NOT assume
   which web property consumes it, which backend renders it, or how its content is authored.
-- **FR-003**: It MUST be a distinct system from `frontiers-nature`, which it does not replace. It MAY
+- **FR-003**: It MUST be a distinct system from `frontiers-nature-web`, which it does not replace. It MAY
   reuse that system's palette, typefaces and brand marks; where it does, it carries its own copy
   (0014-design-systems FR-005).
 
@@ -102,7 +102,7 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
 ## Out of scope
 
 - **A dark theme.** Token names are semantic so one can be added; nothing is wired to a switch,
-  consistent with `frontiers-nature`.
+  consistent with `frontiers-nature-web`.
 - **Which property uses it, and migration of any existing `/console`** (0014-design-systems FR-012): a
   fact about that property, decided in that property's own specs after this system is tested.
 - **Producing a search index, rendering Markdown, syntax highlighting, authentication, and any
@@ -142,7 +142,7 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
 
 ## Key entities
 
-- **`frontiers-console`** — the design system this spec governs, at `design-systems/frontiers-console/`.
+- **`frontiers-console-web`** — the design system this spec governs, at `design-systems/frontiers-console-web/`.
 - **Shell** — the `fc-shell` element, its `data-layout`, and the navbar, sidebar, page and table of
   contents it arranges.
 - **Fixture** — a complete page in `assurance/fixtures/` that is both a test subject and a reference

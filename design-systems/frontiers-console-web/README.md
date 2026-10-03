@@ -1,7 +1,7 @@
 # Frontiers Console — design system
 
 > **Canonical and public.** Governed by
-> [`0018-frontiers-console`](../../spec-kit/specs/0018-frontiers-console/spec.md) and
+> [`spec.md`](spec.md) and
 > [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), one of several design
 > systems under `design-systems/` — see [that directory's README](../README.md) for what a design
 > system is. Consumers vendor a pinned copy of this directory and never edit it. Built as **Bare Metal
@@ -11,7 +11,7 @@
 Frontiers Console is the interface for **operator (admin) and documentation** surfaces: a sidebar,
 navbar, page and table-of-contents shell in three selectable layouts, a set of documentation
 components, and the data-dense pieces an admin console needs. It is deliberately a different system
-from [`frontiers-nature`](../frontiers-nature/README.md), which is the public, editorial face of the
+from [`frontiers-nature-web`](../frontiers-nature-web/README.md), which is the public, editorial face of the
 organization; the two share a palette and typefaces, not a purpose.
 
 ## Provenance
@@ -24,8 +24,8 @@ other project is a dependency. The only third-party files are the fonts below.
 
 | Third-party file | License | Why |
 | --- | --- | --- |
-| `fonts/inter-variable-latin.woff2` | SIL OFL 1.1 | Text face (shared with `frontiers-nature`). |
-| `fonts/ibm-plex-mono-normal-{400,500}-latin.woff2` | SIL OFL 1.1 | Code and tabular face (shared with `frontiers-nature`). |
+| `fonts/inter-variable-latin.woff2` | SIL OFL 1.1 | Text face (shared with `frontiers-nature-web`). |
+| `fonts/ibm-plex-mono-normal-{400,500}-latin.woff2` | SIL OFL 1.1 | Code and tabular face (shared with `frontiers-nature-web`). |
 
 ## What is in here
 
@@ -43,7 +43,7 @@ other project is a dependency. The only third-party files are the fonts below.
 | `js/console.js` | The only script. Defines `fc-shell`, `fc-toc`, `fc-tabs`, `fc-codeblock`, `fc-search`, `fc-table`, `fc-terminal` and `FcToast`. |
 | `tokens.json` | Machine-readable mirror of `tokens.css`, kept exact by `assurance/`. |
 | `chrome.md` | **The markup contract**: anatomy, classes and attributes for every layout and component. |
-| `logos/`, `images/` | Brand marks (WebP and PNG) and favicon, shared with `frontiers-nature`. |
+| `logos/`, `images/` | Brand marks (WebP and PNG) and favicon, shared with `frontiers-nature-web`. |
 | `assurance/` | The test harness, report and live documentation. See below. |
 
 ## Three layouts, one attribute
@@ -97,4 +97,4 @@ are the test subjects and the reference rendering.
   nothing is wired to a switch.
 - **Syntax highlighting.** Code blocks are styled, not tokenized; a consumer may highlight server-side
   and emit spans.
-- **Non-Latin font subsets**, as in `frontiers-nature`.
+- **Non-Latin font subsets**, as in `frontiers-nature-web`.

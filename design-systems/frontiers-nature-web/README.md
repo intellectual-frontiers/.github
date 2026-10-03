@@ -47,4 +47,4 @@ environment:
 
 Colors, type scale and spacing are theme tokens in `css/tokens.css` (mirrored in `tokens.json`);
 change them only by amending this design system's own source, not by overriding them downstream,
-or a consumer's pages will drift from `frontiers-nature` without anyone having decided that.
+or a consumer's pages will drift from `frontiers-nature-web` without anyone having decided that.
