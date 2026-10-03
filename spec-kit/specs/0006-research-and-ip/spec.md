@@ -97,6 +97,11 @@ is ontology data, not restated here.
   follows, not the goal research was aimed at.
 - **FR-019**: A patent grant MUST be treated as one signal among others,
   never as proof that a customer, licensee, or market cares.
+- **FR-020**: This unit MUST be one of the units that discovers Native
+  Alpha, per 0003-intellectual-frontiers FR-018: it studies a subject's
+  knowledge, rights, assets, and methods to find an evident advantage, or
+  to state a latent one (0003-intellectual-frontiers FR-014 and FR-015)
+  as a testable thesis. Under FR-018, a discovery is a thesis, not proof.
 
 ## Out of scope
 
@@ -144,6 +149,9 @@ is ontology data, not restated here.
   than deleted.
 - **SC-005**: No AI-amplified tool or content is presented as Native Alpha
   on the strength of the AI capability alone.
+- **SC-006**: Every latent Native Alpha claim this unit states names the
+  existing elements it draws on and the reorganization that would realize
+  it.
 
 ## Review & acceptance checklist
 

@@ -18,9 +18,23 @@ ontology data and registers, not restated here.
   illustration.
 - **FR-002**: Press MUST NOT use narrative to cover weak evidence, and MUST
   NOT manufacture reader approval.
-- **FR-003**: Press MUST make Native Alpha — the advantage already present
-  — legible, credible, useful, and durable. Press MUST NOT invent an
-  advantage that does not already exist.
+- **FR-003**: Press MUST make Native Alpha legible, credible, useful, and
+  durable. Press presents Native Alpha that has already been discovered,
+  by Intellectual Frontiers' discovering units or by others, per
+  0003-intellectual-frontiers FR-018. Press MUST NOT invent an advantage
+  that does not already exist, and MUST NOT originate a Native Alpha
+  claim, evident or latent, that no discovery supports. Press's novelty
+  lies in how it documents and presents an advantage, never in the
+  advantage itself.
+- **FR-029**: A piece presenting Native Alpha MUST name where the
+  discovery came from: the unit, `Note`, or research pillar, or the
+  outside party. It MUST NOT present another party's discovery as the
+  firm's own, per FR-022 and FR-023.
+- **FR-030**: Press MUST present a latent claim
+  (0003-intellectual-frontiers FR-014) as provisional, labeled a
+  framework or an opinion under FR-001 and not an observable fact, until
+  it has changed an actual decision, per 0003-intellectual-frontiers
+  FR-016.
 
 ## Voice
 
@@ -207,6 +221,8 @@ ontology data and registers, not restated here.
   research omits `prov:wasDerivedFrom`; no article republishes an
   externally-originated concept as if the Journal were its primary
   source.
+- **SC-010**: Every piece presenting Native Alpha names the source of its
+  discovery, and no latent claim is labeled an observable fact.
 
 ## Review & acceptance checklist
 

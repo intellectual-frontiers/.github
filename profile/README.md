@@ -15,9 +15,12 @@
 
 Intellectual Frontiers (IF) is a company organized around one idea: an
 advantage is only worth acting on once it has been found, tested, and
-decided on, in that order. We call a real, disproportionate advantage that
-already exists **Native Alpha**, and the whole company is built to find it,
-prove it, and compound it.
+decided on, in that order. We call a real, disproportionate advantage native
+to a company, product, team, or market position **Native Alpha**. Sometimes
+it is already working. Sometimes it is carried by what a company already
+has, and appears only once its units, products, or services are
+reorganized. The whole company is built to find it, prove it, and compound
+it: Research & IP and Studios discover it, and Press makes it legible.
 
 ## The method
 

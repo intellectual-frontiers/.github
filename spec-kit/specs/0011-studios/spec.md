@@ -18,7 +18,14 @@ restated here.
   further work to it.
 - **FR-002**: Studios MUST state an opportunity's Native Alpha thesis in
   plain language, per 0003-intellectual-frontiers FR-005, before
-  validating it.
+  validating it. The thesis MUST say whether the claim is evident or
+  latent (0003-intellectual-frontiers FR-014), and a latent one MUST name
+  the reorganization it depends on (0003-intellectual-frontiers FR-015).
+- **FR-027**: Studios MUST be one of the units that discovers Native
+  Alpha, per 0003-intellectual-frontiers FR-018. It does so by observing
+  real workflows, and by testing whether reorganizing or recombining
+  existing companies, products, services, or units realizes an advantage
+  their parts already carry.
 
 ## The venture lifecycle
 
@@ -232,6 +239,8 @@ restated here.
   is mistaken for, or held to the rules of, a document under a
   repository's own content root — the two are never conflated on the
   strength of sharing a directory name.
+- **SC-013**: Every venture's Native Alpha thesis says whether it is
+  evident or latent, and no latent thesis lacks a named reorganization.
 
 ## Review & acceptance checklist
 
