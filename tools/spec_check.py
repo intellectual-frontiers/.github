@@ -285,6 +285,55 @@ def check_register(root: Path, public: Path | None = None) -> tuple[list[Finding
     return findings, nones, counts
 
 
+CONTROL_MAP = Path("spec-kit") / "controls.tsv"
+CATALOG = re.compile(r"^ifcore:(\w+) a ifcore:ControlCatalog ;[^\n]*\n(?:[^\n]*\n)*?\s*skos:notation \"([^\"]+)\"", re.M)
+CONTROL = re.compile(r"^ifcore:[\w-]+ a skos:Concept ; skos:inScheme ifcore:(\w+) ; skos:notation \"([^\"]+)\"", re.M)
+
+
+def controls_of(ttl: str) -> set[str]:
+    """Every control as '<catalog notation>:<control notation>' (0027-compliance-controls FR-001, FR-005)."""
+    catalogs = dict(CATALOG.findall(ttl))
+    return {f"{catalogs[scheme]}:{code}" for scheme, code in CONTROL.findall(ttl) if scheme in catalogs}
+
+
+# The control catalogs are public (0027 FR-001), so they are always read from the public root this file lives in.
+_PUBLIC_TTL = Path(__file__).resolve().parent.parent / "ontology" / "ifcore.ttl"
+CONTROLS = controls_of(_PUBLIC_TTL.read_text(encoding="utf-8")) if _PUBLIC_TTL.is_file() else set()
+
+
+def check_control_map(root: Path) -> tuple[list[Finding], int]:
+    """0027-compliance-controls FR-005, FR-006: every row of root's control map names a requirement in root's own
+    specs and a control in a catalog, once. Returns findings and the number of rows. A repository whose specs
+    address no control has no control map."""
+    findings: list[Finding] = []
+    path = root / CONTROL_MAP
+    rel = str(CONTROL_MAP)
+    if not path.is_file():
+        return findings, 0
+    own = index_of(root)
+    seen: set[tuple[str, str]] = set()
+    for lineno, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw.strip() or raw.startswith("#") or raw.startswith("requirement\t"):
+            continue
+        where = f"{rel}:{lineno}"
+        cols = raw.split("\t")
+        if len(cols) < 2:
+            findings.append(Finding("error", where, "a row is requirement, control[, note], tab-separated (0027 FR-005)"))
+            continue
+        req, ctl = cols[0].strip(), cols[1].strip()
+        m = REQ.match(req)
+        if not m:
+            findings.append(Finding("error", where, f"{req!r} is not '<spec> FR-NNN' (0027 FR-005)"))
+        elif m.group("id") not in own.get(m.group("spec"), set()):
+            findings.append(Finding("error", where, f"{req} does not exist in this repository's specs (0027 FR-006)"))
+        if ctl not in CONTROLS:
+            findings.append(Finding("error", where, f"{ctl!r} is not '<catalog>:<control>' for a control in a catalog (0027 FR-006)"))
+        if (req, ctl) in seen:
+            findings.append(Finding("error", where, f"{req} and {ctl} have more than one row (0027 FR-005)"))
+        seen.add((req, ctl))
+    return findings, len(seen)
+
+
 DS_IDENTIFIER = re.compile(r"^ifcore:\w+ a ifcore:DesignSystem ;\s*\n\s*dcterms:identifier \"([^\"]+)\"", re.M)
 
 
@@ -435,10 +484,14 @@ def main(argv: list[str] | None = None) -> int:
     findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root)
     reg, nones, counts = check_register(root, public)
     findings += reg
+    cmap, mapped = check_control_map(root)
+    findings += cmap
     for f in findings:
         print(f)
     total = sum(counts.values())
     print(f"enforcement: {total} requirements — " + ", ".join(f"{counts[m]} {m}" for m in ("check", "gate", "review", "none")))
+    if mapped:
+        print(f"control map: {mapped} requirement-control links")
     # 0020 FR-014: every run reports what nothing enforces.
     if nones:
         by_spec: dict[str, list[str]] = {}
