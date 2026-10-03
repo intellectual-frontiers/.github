@@ -1,0 +1,16 @@
+{
+  "$description": "Every printed sign frontiers-signage-print makes (spec FR-004 to FR-008): its trim size in points (72 to the inch), bleed and safe margin in points, title size range in points, the most title lines and words, which other text it carries, whether it carries a piece of the imagery pool, and any band it keeps clear. Read by signage.py; spec.md is the source.",
+  "formats": {
+    "poster-18x24": {"name": "poster, 18 by 24 inches", "trim": [1296, 1728], "bleed": 9, "safe": 54, "title_pt": [96, 150], "max_lines": 4, "max_title_words": 12, "kicker_pt": 40, "details_pt": 32, "max_details": 3, "imagery": true},
+    "poster-a2": {"name": "poster, A2", "trim": [1190.55, 1683.78], "bleed": 8.5, "safe": 51, "title_pt": [92, 144], "max_lines": 4, "max_title_words": 12, "kicker_pt": 38, "details_pt": 30, "max_details": 3, "imagery": true},
+    "rollup-banner": {"name": "roll-up banner, 850 by 2000 mm", "trim": [2409.45, 5669.29], "bleed": 14.17, "safe": 141.73, "title_pt": [180, 260], "max_lines": 4, "max_title_words": 8, "kicker_pt": 72, "details_pt": 56, "max_details": 2, "imagery": true, "keep_clear_bottom": 283.46},
+    "event-badge": {"name": "event badge, 4 by 3 inches", "trim": [288, 216], "bleed": 9, "safe": 18, "title_pt": [26, 40], "max_lines": 2, "max_title_words": 4, "details_pt": 14, "max_details": 2, "imagery": false}
+  },
+  "tones": {
+    "light": {"background": "surface", "text": "text", "kicker": "primary", "details": "text!78!surface"},
+    "dark": {"background": "text", "text": "surface", "kicker": "primary!45!surface", "details": "surface!78!text"}
+  },
+  "min_ppi": 150,
+  "min_text_pt": 9,
+  "min_contrast": 4.5
+}
