@@ -52,7 +52,7 @@ reference model, and governance representation.
 ## Confidentiality classification
 
 - **FR-011**: Every fact asserted anywhere in the Eidolon MUST declare the
-  audience(s) permitted to see it. An audience is one of: everyone, anyone
+  audience(s) permitted to see it. An audience is one of: public, anyone
   affiliated with the company, a specific named agreement, or a specific named role
   or group.
 - **FR-012**: A fact with no declared audience MUST default to the most restrictive
@@ -187,7 +187,7 @@ reference model, and governance representation.
   Frontiers knows about itself.
 - **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
-- **An audience** — a named permission to see a fact: everyone, company
+- **An audience** — a named permission to see a fact: public, company
   affiliation, a specific agreement, or a specific role or group.
 - **A `Reference`** — a fact that points at a value held elsewhere rather than
   storing the value itself; carries its own audience declaration.

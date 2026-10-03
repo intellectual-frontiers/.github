@@ -94,7 +94,7 @@ record's confidentiality follows the same rules as any other fact.
 
 - **OQ-1**: No process addresses a conflict of interest between the
   founder's personal interests and the company's, for a decision that
-  isn't simply about a wholly-owned asset — 0003-intellectual-frontiers
+  isn't simply about a wholly-owned asset — 0001-eidolon-architecture
   FR-033 only covers the wholly-owned case.
 - **OQ-2**: As recorded decisions accumulate, whether they should live in a
   separate location from the core vocabulary they're typed against is
