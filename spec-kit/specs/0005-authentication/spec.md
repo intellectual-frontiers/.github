@@ -10,17 +10,17 @@ requesters outside the vault, per 0004-addressing's deferral.
 
 ## Identity
 
-- **FR-001**: A request for anything beyond `Everyone`-audience content MUST
+- **FR-001**: A request for anything beyond `Public`-audience content MUST
   be bound to exactly one identified agent before it is evaluated against
   0001-eidolon-architecture FR-011. A request with no identified agent MUST
-  be treated as satisfying only the `Everyone` audience.
+  be treated as satisfying only the `Public` audience.
 - **FR-002**: How an agent's identity is established — the specific
   authentication mechanism — is not specified here. This spec constrains
   what must be true of the result, not how the result is produced.
 
 ## Grants
 
-- **FR-003**: Membership in any audience other than `Everyone` MUST be
+- **FR-003**: Membership in any audience other than `Public` MUST be
   represented as a Grant: an explicit link from an identified agent to a
   specific audience, valid from a given date and, where applicable, until a
   given date.
@@ -50,7 +50,7 @@ requesters outside the vault, per 0004-addressing's deferral.
 
 ## Accountability
 
-- **FR-010**: Access to any content beyond the `Everyone` audience MUST be
+- **FR-010**: Access to any content beyond the `Public` audience MUST be
   logged: which agent, which document, and when.
 - **FR-011**: An access log entry is itself subject to the same
   confidentiality rules as any other fact (0001-eidolon-architecture
@@ -87,7 +87,7 @@ requesters outside the vault, per 0004-addressing's deferral.
 ## Success criteria
 
 - **SC-001**: A request with no identified agent is evaluated only against
-  `Everyone`-audience content.
+  `Public`-audience content.
 - **SC-002**: Revoking a grant blocks the very next request that depends on
   it, without waiting for any session to expire.
 - **SC-003**: No credential, session token, or password appears as a

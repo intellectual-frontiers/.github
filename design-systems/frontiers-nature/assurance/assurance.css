@@ -1,0 +1,40 @@
+/* Styles for the assurance page only, built from Frontiers Nature's own tokens. */
+.as-intro { max-inline-size: 52rem; }
+.as-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-block: 1.5rem; padding: 0.75rem 1rem; border: 1px solid var(--rule); background: var(--stone); }
+.as-bar input { padding: 0.5rem 0.75rem; border: 1px solid var(--rule); background: var(--background); font: inherit; }
+#as-run { cursor: pointer; }
+#assurance-summary { font-weight: 600; }
+#assurance-summary[data-status="pass"] { color: var(--studios); }
+#assurance-summary[data-status="fail"] { color: var(--press); }
+.as-suite { margin-block: 0.5rem; border: 1px solid var(--rule); background: var(--background); }
+.as-suite[data-status="fail"] { border-color: var(--press); }
+.as-suite > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding: 0.625rem 1rem; cursor: pointer; list-style: none; }
+.as-suite > summary::-webkit-details-marker { display: none; }
+.as-name { font-weight: 600; }
+.as-group { font-size: 0.75rem; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.08em; }
+.as-counts { margin-inline-start: auto; display: flex; gap: 0.375rem; flex-wrap: wrap; }
+.as-desc { margin: 0; padding: 0 1rem 0.75rem; font-size: 0.875rem; color: var(--muted-foreground); }
+.as-tests { margin: 0; padding: 0.25rem 1rem 0.75rem; border-block-start: 1px solid var(--rule); font-size: 0.875rem; list-style: none; }
+.as-tests li { display: grid; grid-template-columns: 1.25rem 1fr; gap: 0 0.5rem; padding-block: 0.25rem; }
+.as-tests li[data-status="pass"] .as-mark { color: var(--studios); }
+.as-tests li[data-status="fail"] .as-mark { color: var(--press); font-weight: 700; }
+.as-tests li[data-status="skip"] { color: var(--muted-foreground); }
+.as-detail { grid-column: 2; font-family: var(--font-mono); font-size: 0.8125rem; color: var(--press); white-space: pre-wrap; overflow-wrap: anywhere; }
+.as-tests li[data-status="skip"] .as-detail { color: var(--muted-foreground); }
+#as-banner { margin-block: 1rem; padding: 0.75rem 1rem; border: 1px solid var(--rule); border-inline-start: 3px solid #8a5a24; background: var(--stone); font-size: 0.9375rem; }
+#as-banner[hidden] { display: none; }
+.as-fixtures { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 0.75rem; }
+.as-guards dt { margin-block-start: 0.75rem; font-weight: 600; }
+.as-guards dd { margin: 0; color: var(--muted-foreground); }
+.as-prose p, .as-prose li { margin-block-start: 0.75rem; max-inline-size: 48rem; }
+.as-prose code { font-family: var(--font-mono); font-size: 0.875em; }
+
+/* classes emitted by runner.js and boot.js (identical in every design system's harness) */
+.as-sr-only { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.as-badge { display: inline-flex; align-items: center; gap: 0.3125rem; padding: 0.0625rem 0.5rem; background: var(--stone); color: var(--muted-foreground); font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
+.as-badge::before { content: ""; inline-size: 0.4375rem; block-size: 0.4375rem; border-radius: 50%; background: currentColor; }
+.as-badge[data-tone="success"] { color: var(--studios); }
+.as-badge[data-tone="warning"] { color: #8a5a24; }
+.as-badge[data-tone="danger"] { color: var(--press); }
+.as-link { padding: 0.25rem 0.625rem; border: 1px solid var(--ink); font-size: 0.8125rem; font-weight: 500; }
+.as-link:hover { background: var(--ink); color: #fff; }

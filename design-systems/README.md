@@ -26,11 +26,14 @@ its own record in the ontology (`ifcore:DesignSystem`, with a status of
 active, draft, or retired — the ontology, not any design system's own
 `README.md`, is the one place that status is decided).
 
-Right now there is one:
+Right now there are two:
 
 | Design system | Status | What it's for |
 | --- | --- | --- |
-| [`frontiers-nature/`](frontiers-nature/README.md) | Active | Intellectual Frontiers' own "natural-frontier" visual identity: deep ink, frontier blue, signal teal, editorial oxblood, warm paper. |
+| [`frontiers-nature/`](frontiers-nature/README.md) | Active | Intellectual Frontiers' own "natural-frontier" visual identity: deep ink, frontier blue, signal teal, editorial oxblood, warm paper. The public, editorial face. |
+| [`frontiers-console/`](frontiers-console/README.md) | Draft | Operator (admin) and documentation surfaces: sidebar, navbar and table-of-contents shell in three selectable layouts, documentation components, and the data-dense pieces an admin console needs. Governed by [`0018-frontiers-console`](../spec-kit/specs/0018-frontiers-console/spec.md). |
+
+The status column is a convenience; the ontology is the record.
 
 ## Engineering stance
 
@@ -60,6 +63,25 @@ stance, not just the one that happens to exist today:
   means editing the design system's own source, never overriding it from
   a consumer.
 
+## Assurance: every design system proves itself
+
+Every design system carries an `assurance/` directory
+([`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md) FR-015) whose entry point,
+`assurance/index.html`, is at once the test runner, the report, and the documentation of what that
+design system guarantees. It needs nothing but a browser:
+
+| To | Do |
+| --- | --- |
+| See it work | Open `<slug>/assurance/index.html`. Tests that can run from `file://` do; tests that need `fetch` or iframes are reported as **skipped**, never as passed. |
+| Run everything | Serve the design system's directory (`python3 -m http.server`) and open `/assurance/`. |
+| Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` (needs Playwright and Chromium; exits non-zero on failure; `--shots DIR` writes screenshots of every fixture). |
+
+Each harness has `fixtures/` (complete pages written to the system's markup contract, which are both the
+test subjects and reference renderings), `unit.js` and `integration.js` (the suites, each with a
+description that is rendered into the page as documentation), and a runner (`runner.js`, `boot.js`,
+`run.mjs`). The runner files are **copied** between design systems rather than shared, so each directory
+stays self-contained. A change to a design system is complete when its harness is green over http.
+
 ## Using any one of these design systems, in any web environment
 
 None of this assumes Intellectual Frontiers' own stack, or even that the
@@ -81,7 +103,7 @@ system from this directory:
    `fonts/` directory.
 4. Serve its `fonts/`, `logos/`, `images/` and `js/` directories as
    static assets.
-5. Load its first-party script (e.g. `frontiers-nature`'s `js/chrome.js`)
+5. Load its first-party script (e.g. `frontiers-nature`'s `js/chrome.js`, `frontiers-console`'s `js/console.js`)
    on every page. Load its Datastar bundle only on pages that actually
    need server-driven interactivity, per the engineering stance above.
 6. Build your page markup to the contract described in its `chrome.md` —
@@ -100,6 +122,9 @@ system from this directory:
    actually needs; document its real layout in its own `README.md` (see
    `frontiers-nature/README.md` for the shape that's worked so far, not
    as a rigid template).
-2. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
+2. Add an `assurance/` harness per 0014-design-systems FR-015: copy
+   `runner.js`, `boot.js` and `run.mjs` from an existing system, write
+   `fixtures/`, `unit.js`, `integration.js` and an `index.html`, and make it pass.
+3. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
    a status, per 0014-design-systems FR-010.
-3. Add it to the table above.
+4. Add it to the table above.

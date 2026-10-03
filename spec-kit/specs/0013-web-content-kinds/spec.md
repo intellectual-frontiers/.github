@@ -51,13 +51,29 @@ FR-007.
   specific work. It MAY list any number of individuals already declared
   elsewhere in the ontology, of any combination of: `ifcore:PatentFamily`,
   `ifcore:Trademark`, `ifcore:DefensiveDisclosure`, `ifcore:Fund`,
-  `schema:Book`, `ifcore:ResearchPillar`, `ifcore:VentureCategory`,
+  `schema:Book`, `ifcore:ResearchPillar`, `ifcore:SubstantialWork`,
+  `ifcore:VentureCategory`,
   `ifcore:SoftwareCategory`, or `ifcore:SharedServiceCategory`.
 - **FR-011**: A work kind with no existing ontology class — standalone
   software, a dataset, a method, a study — MUST be established, in
   whichever spec actually governs that business concept, before
   `ifweb:PortfolioIndexPage` may list an individual of that kind. This
   spec does not itself establish those classes.
+
+## Content kinds for Substantial Works
+
+- **FR-012**: `ifweb:WorkPage` MUST declare `schema:about` naming exactly
+  one `ifcore:SubstantialWork` individual. It renders facts that already
+  exist about the work — its title, kind, audience-permitted description —
+  and asserts none; a book's own page remains `ifweb:BookPage`
+  (FR-008).
+- **FR-013**: `ifweb:WorkEditionPage` MUST declare `schema:isPartOf`
+  naming exactly one `ifcore:SubstantialWork` individual and
+  `prov:wasDerivedFrom` naming that same individual. It is the content
+  kind of a generated content document (0002-content-format FR-017) that
+  renders a part of a work's source — a chapter, an appendix, a companion
+  page, a show-notes page — and asserts no fact the work's source does not
+  already carry.
 
 ## Out of scope
 
@@ -113,6 +129,9 @@ FR-007.
 - **SC-004**: Every `ifweb:JournalArticlePage` names the Journal via
   `schema:isPartOf`; one derived from the firm's own research also names
   that research via `prov:wasDerivedFrom`.
+- **SC-005**: Every `ifweb:WorkPage` names exactly one real Substantial
+  Work via `schema:about`; every `ifweb:WorkEditionPage` names the same one
+  Substantial Work via both `schema:isPartOf` and `prov:wasDerivedFrom`.
 
 ## Review & acceptance checklist
 

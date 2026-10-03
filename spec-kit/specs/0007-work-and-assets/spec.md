@@ -103,12 +103,16 @@ assets.
 
 - **FR-016**: A creative work whose primary, authoritative text
   Intellectual Frontiers itself publishes MUST have that text represented
-  as a content document in the Eidolon's own content root, per
-  0002-content-format and 0004-addressing FR-004. A creative work whose
-  primary, authoritative text is published elsewhere — by the founder on
-  his own site, for instance — MUST NOT be duplicated into a content
-  document; the Eidolon MUST hold only a reference to it (`schema:url`),
-  never a copy of the text itself.
+  in the Eidolon: as a content document in the Eidolon's own content
+  root, per 0002-content-format and 0004-addressing FR-004, where the
+  text is web content; or as the source of its work package, per
+  0015-work-packages, where the text is long-form, print-bound, or
+  pixel-precise. A web edition of a work held as a work package is a
+  generated content document, per 0002-content-format FR-017. A creative
+  work whose primary, authoritative text is published elsewhere — by the
+  founder on his own site, for instance — MUST NOT be duplicated into a
+  content document or a work package; the Eidolon MUST hold only a
+  reference to it (`schema:url`), never a copy of the text itself.
 
 ## Substantial works and their lifecycle
 
@@ -147,6 +151,11 @@ assets.
   otherwise. Any other unit MAY claim ownership explicitly, overriding
   the default — Studios, for instance, for a venture-specific work.
 
+- **FR-022**: Every Substantial Work MUST have exactly one work package,
+  per 0015-work-packages. The package holds the work's source; the work's
+  lifecycle stage, decisions, and lifecycle owner are asserted once, in
+  the ontology, never restated inside the package.
+
 ## Out of scope
 
 - Equity interests, securities, and other financial assets are Capital's to
@@ -184,9 +193,9 @@ assets.
   and, where it's an adaptation of a prior work, to that work by
   `schema:isBasedOn`.
 - **A content document's origin** — whether Intellectual Frontiers itself
-  is the primary publisher (the text lives in the Eidolon) or merely
-  describes a work published elsewhere (the Eidolon holds a reference,
-  never a copy).
+  is the primary publisher (the text lives in the Eidolon, as a content
+  document or as a work package's source) or merely describes a work
+  published elsewhere (the Eidolon holds a reference, never a copy).
 - **A Substantial Work** — a work whose multi-stage lifecycle is actually
   tracked, from intake through commercialization; a paper, a book, a
   not-yet-filed patent, or production-bound software are the standing
@@ -215,8 +224,8 @@ assets.
   creator differs from its rights-holder, both are stated, not just one.
 - **SC-007**: No content document duplicates the primary text of a work
   whose authoritative source is published elsewhere; no work Intellectual
-  Frontiers itself primarily publishes is left as a bare reference with no
-  content document.
+  Frontiers itself primarily publishes is left as a bare reference with
+  neither a content document nor a work package.
 - **SC-008**: No Substantial Work sits at a lifecycle stage without a
   recorded decision for how it got there; none skip a stage silently.
 - **SC-009**: No not-yet-filed patent is left untracked as a Substantial
@@ -224,6 +233,8 @@ assets.
   lifecycle stages once the registry is its canonical authority.
 - **SC-010**: Every Substantial Work has exactly one lifecycle owner; none
   are left jointly owned by default or unowned.
+- **SC-011**: No Substantial Work lacks a work package; no work package
+  restates its work's lifecycle stage or owner as a literal.
 
 ## Review & acceptance checklist
 

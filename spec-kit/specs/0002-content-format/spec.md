@@ -62,9 +62,19 @@ ontology, and carrying its own confidentiality declaration per
 
 ## Authoring
 
-- **FR-016**: Content MUST be authored directly as HTML5. Markdown,
-  AsciiDoc, or any other markup language MUST NOT be used as an authoring
-  format for content documents.
+- **FR-016**: Content authored as a content document MUST be authored
+  directly as HTML5. Markdown, AsciiDoc, or any other markup language
+  MUST NOT be used as the authoring format of a hand-authored content
+  document. This rule governs content documents only: the source format
+  of a work held as a work package is governed by
+  0015-work-packages, not by this spec.
+- **FR-017**: A content document MAY be generated from a work package's
+  source (0015-work-packages) instead of being authored directly. A
+  generated content document is exempt from FR-016 and from nothing
+  else: FR-001 through FR-015 apply to it unchanged. Its JSON-LD block
+  MUST declare `prov:wasDerivedFrom` naming the Substantial Work it
+  renders, and it MUST satisfy the reproducibility and audience rules of
+  0015-work-packages for generated content documents.
 
 ## Out of scope
 
@@ -72,6 +82,9 @@ ontology, and carrying its own confidentiality declaration per
   addressing — a separate, future spec.
 - Composable layouts, includes, and reusable page fragments are
   templating — a separate, future spec.
+- The source formats, layout, and lifecycle of a work whose text is not
+  authored directly as a content document are work packages, a separate
+  spec (0015-work-packages).
 - Which specific content kinds exist beyond the minimal `Page` shape this
   spec establishes is deferred to the specs that establish those business
   concepts, per FR-007.
@@ -89,6 +102,9 @@ ontology, and carrying its own confidentiality declaration per
   declaration.
 - **`Page`** — the minimal content kind: a content document with no
   properties beyond the ones every document already carries.
+- **A generated content document** — a content document produced
+  deterministically from a work package's source rather than authored
+  directly, otherwise indistinguishable from an authored one.
 
 ## Success criteria
 
@@ -103,6 +119,9 @@ ontology, and carrying its own confidentiality declaration per
   `ExternalRecordReference` value shows its resolved-as-of date.
 - **SC-005**: No content document's `<title>` or `<meta name="description">`
   states a fact its own JSON-LD block doesn't also assert.
+- **SC-006**: No generated content document lacks `prov:wasDerivedFrom`
+  naming the Substantial Work it renders; no content document is
+  hand-authored in any markup other than HTML5.
 
 ## Review & acceptance checklist
 

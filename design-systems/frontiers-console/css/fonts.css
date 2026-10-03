@@ -1,0 +1,23 @@
+/* Self-hosted faces (latin). Inter is variable, clamped to the weights the system uses; IBM Plex Mono
+   ships two static weights. Inter and IBM Plex Mono: SIL OFL 1.1. Paths are relative to this file. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/inter-variable-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-normal-400-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-normal-500-latin.woff2") format("woff2");
+}

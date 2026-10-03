@@ -4,6 +4,7 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:      <http://www.w3.org/ns/shacl#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
 @prefix schema:  <https://schema.org/> .
 
 # Intellectual Frontiers — web content ontology (PUBLIC).
@@ -31,8 +32,9 @@ ifweb:contentKind a owl:DatatypeProperty ;
 ifweb:Page a owl:Class, sh:NodeShape ;
     rdfs:subClassOf ifcore:Fact ;
     rdfs:label "Page"@en ;
-    rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008)."@en ;
-    ifweb:contentKind "Page" .
+    rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008) and, where it is generated from a work package's source, its provenance (0002 FR-017)."@en ;
+    ifweb:contentKind "Page" ;
+    sh:property [ sh:path prov:wasDerivedFrom ; sh:maxCount 1 ] .
 
 # ───────────────────────── Content kinds backed by one existing individual (0013-web-content-kinds) ─────────────────────────
 
@@ -100,6 +102,23 @@ ifweb:BookPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:BookPage ;
     sh:property [ sh:path schema:about ; sh:class schema:Book ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Copyright ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:WorkPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Work page"@en ;
+    rdfs:comment "Renders facts that already exist about one ifcore:SubstantialWork and asserts none; a book's own page remains ifweb:BookPage (0013 FR-012)."@en ;
+    ifweb:contentKind "WorkPage" ;
+    sh:targetClass ifweb:WorkPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+ifweb:WorkEditionPage a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Work edition page"@en ;
+    rdfs:comment "A generated content document rendering a part of a Substantial Work's source — a chapter, appendix, companion page, or show-notes page — naming that same work by both schema:isPartOf and prov:wasDerivedFrom (0013 FR-013; 0002-content-format FR-017)."@en ;
+    ifweb:contentKind "WorkEditionPage" ;
+    sh:targetClass ifweb:WorkEditionPage ;
+    sh:property [ sh:path schema:isPartOf ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path prov:wasDerivedFrom ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] .
 
 ifweb:JournalArticlePage a owl:Class, sh:NodeShape ;
     rdfs:subClassOf ifweb:Page ;
