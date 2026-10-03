@@ -268,7 +268,9 @@ is not stated here.
   own instrument — a sample prompt, an interview guide, a worksheet — that is
   part of the argument is content and stays in the work.
 - **FR-045**: A promotion layer is its own record in a web property's
-  presentation, paired to one work by the work's kind and slug. The record
+  presentation, paired to one work by the work's kind and slug; a
+  promotional post that promotes several works or a Journal issue is such
+  a record for each (0021-works-and-presentations FR-023). The record
   names the work; the work never names the record, and nothing in a work's
   package is edited to make a pairing. When a work's slug changes, its
   pairing MUST move with it in the same change.

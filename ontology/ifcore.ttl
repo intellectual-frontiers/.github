@@ -230,12 +230,24 @@ ifcore:NativeAlphaTrademark a ifcore:Trademark ;
     rdfs:comment "Filing confirmed by the founder; serial number, filing date, and current status not independently verified via USPTO TSDR as of this writing. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012) — this individual MUST NOT carry a literal status until then."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:ChasingNativeAlpha a schema:Book, ifcore:Copyright ;
+ifcore:ChasingNativeAlpha a schema:CreativeWork ;
     rdfs:label "Chasing Native Alpha"@en ;
+    rdfs:comment "The work itself: the idea and method of finding and funding Native Alpha, independent of any form it is presented in (0021-works-and-presentations FR-001). Its stage is the idea's own (FR-022); the book that presents it is ifcore:ChasingNativeAlphaBook, and the skills that carry its method are presentations of it too. Copyright protects a presentation's text, not the idea, so it is asserted on the book."@en ;
     schema:about ifcore:NativeAlpha ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    schema:workExample ifcore:ChasingNativeAlphaBook ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ChasingNativeAlphaBook a ifcore:Presentation, schema:Book, ifcore:Copyright ;
+    rdfs:label "Chasing Native Alpha (book)"@en ;
+    rdfs:comment "The book presenting ifcore:ChasingNativeAlpha (0021-works-and-presentations FR-004, FR-005). Its existence, title, and copyright are public; its production stage and decisions are held with its work package in the vault, whose record specializes this one (prov:specializationOf)."@en ;
+    schema:exampleOfWork ifcore:ChasingNativeAlpha ;
+    dcterms:format ifcore:BookEditionForm ;
     schema:author ifcore:ShahidNehalShah ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    schema:publisher ifcore:Press ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:NativeAlphaArticle a schema:Article ;
@@ -292,7 +304,7 @@ ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:labe
 # ───────────────────────── Substantial works (0007-work-and-assets FR-017 – FR-021) ─────────────────────────
 
 ifcore:SubstantialWork a owl:Class ; rdfs:label "Substantial work"@en ;
-    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing. Treated as the work itself, apart from any of its presentations, while work packages keep their current layout (0021-works-and-presentations FR-019); a form-specific type such as schema:Book is carried until its presentations are populated as ifcore:Presentation individuals."@en .
+    rdfs:comment "A work whose multi-stage production and distribution lifecycle is actually tracked — a peer-reviewed paper, a book, a not-yet-filed patent, or production-bound software are the standing examples, not an exhaustive list (FR-017). Multi-typed onto whatever the work already is (a Note, a schema:Book, a piece of software) rather than replacing that typing. A work or a presentation may be one: each that is produced through stages carries its own (0021-works-and-presentations FR-022). A package's individual is the work, unless a separate record of the work exists, in which case it is a presentation of that work (FR-019); a form-specific type such as schema:Book is carried until its presentations are populated as ifcore:Presentation individuals."@en .
 
 ifcore:lifecycleOwner a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:Unit ;
     rdfs:comment "The one unit accountable for a Substantial Work's progress (FR-021). Defaults to Research & IP while disposition is unsure, Press otherwise; any unit may claim it explicitly, overriding the default."@en .
@@ -588,7 +600,7 @@ ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
     skos:definition "A skill that carries a person's knowledge, judgment, taste, and skill in durable, inspectable, versioned form — what a reader's own work, once named and made durable, is ready to become (0009-press FR-018)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:ChasingNativeAlpha schema:publisher ifcore:Press .
+ifcore:ChasingNativeAlphaBook schema:publisher ifcore:Press .
 
 # ───────────────────────── Owned channels (0009-press FR-028) ─────────────────────────
 
@@ -699,8 +711,13 @@ ifcore:JournalOfIntellectualFrontiers a schema:Periodical ;
     rdfs:label "Journal of Intellectual Frontiers"@en ;
     schema:publisher ifcore:Press ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
-    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020). No short-form abbreviation is asserted here: 'JIF' is already the trademarked abbreviation for Clarivate's Journal Impact Factor, a term of art throughout academic publishing, and reusing it would both confuse readers and risk the mark — a deliberate omission pending a cleared alternative, not an oversight."@en ;
+    schema:alternateName "JINFRO"@en ;
+    dcterms:accrualPeriodicity <http://purl.org/cld/freq/quarterly> ;
+    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020), and the firm's one journal (FR-031). It reports outcomes, what the firm's works found, made, or proved, not company or unit news (FR-032); it is not a presentation of one work but the vehicle for many, each issue a presentation in online and print editions (FR-033). Quarterly, online and in print. Its short form is JINFRO, not 'JIF', which is Clarivate's trademarked abbreviation for Journal Impact Factor; JINFRO's own clearance is a separate decision. In ideation: its lifecycle stage is Intake."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:JournalOfIntellectualFrontiers a ifcore:SubstantialWork ;
+    ifcore:workLifecycleStage ifcore:Intake ;
+    ifcore:lifecycleOwner ifcore:Press .
 
 ifcore:EidolonJournalArticle a schema:Article ;
     rdfs:label "Eidolons: A Working Digital Reflection"@en ;
@@ -1101,5 +1118,7 @@ ifcore:TalkForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; s
     skos:definition "A keynote, talk, or panel given live, recorded or not."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:CourseForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Course"@en ;
     skos:definition "A class, seminar, or course, delivered online or in person."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Periodical issue"@en ;
+    skos:definition "An issue of a periodical, such as a quarterly Journal issue, in an online or a print edition (0009-press FR-033)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
