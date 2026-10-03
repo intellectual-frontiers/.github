@@ -129,7 +129,9 @@ restating them.
   more goods. A simplified landscape mark is not part of the kit until one is designed from the
   master by hand and this spec is amended. Every ink MUST be marked `verified: false` until its
   spot-color and thread match are checked against the physical guide and card, and MUST NOT be
-  ordered before then.
+  ordered before then; the check is recorded by `tools/brand_decoration.py verify`, which writes the
+  matches as checked, who checked them and when (`briefs/ink-verification.md`). A vector master that
+  replaces the trace is commissioned to `briefs/vector-master.md`.
 
 ## Out of scope
 
@@ -161,7 +163,9 @@ restating them.
 
 ## Open questions
 
-None.
+- **OQ-1**: The lockup and icon exist only as raster masters. A vector master, commissioned to
+  `briefs/vector-master.md`, would let goods carry the landscape at small sizes and signs carry it
+  large; until one is delivered, FR-017's trace and wordmark stand in.
 
 ## Key entities
 
