@@ -308,10 +308,11 @@ requirement	mechanism	by	note
 0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
 0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
 0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
-0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
+0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web, print, slides and course DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
 0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
 0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
 0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
+0014-design-systems FR-052	check	.github: python3 tools/spec_check.py	a course design system names a course format and an assessment item type and its figure design system; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -698,6 +699,18 @@ frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/ass
 frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
 frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
 frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats and item types; run.py checks the classification and drawsFiguresWith
+frontiers-course FR-002	none	-	directory contents; no check
+frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; unreadable sources and misplaced videos are refused
+frontiers-course FR-004	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
+frontiers-course FR-005	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: outcome count, observable verbs, no vague verbs, one sentence
+frontiers-course FR-006	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: untaught, unassessed and unknown outcomes; units end with an assessment; one graded
+frontiers-course FR-007	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: unique ids, choice counts, correct counts, feedback, answer keys
+frontiers-course FR-008	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: minutes by type, honest minutes, week order and weekly effort
+frontiers-course FR-009	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: alternative text, captions, heading levels, link text, color or position alone
+frontiers-course FR-010	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check sweeps text under written voice and transcripts under spoken voice
+frontiers-course FR-011	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check runs figcheck over a lesson's SVG figures
+frontiers-course FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
 frontiers-email FR-002	none	-	directory contents; no check
 frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
