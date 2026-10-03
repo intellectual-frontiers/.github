@@ -114,7 +114,16 @@ def run(brand: Path, keep: Path | None) -> Result:
                 want = _expected(role, values)
                 ok = bool(got) and want is not None and (got.group(2).upper() == want or _rgb_matches(got.group(1), got.group(2), want))
                 r.check(ok, f"{name}: {color} is {got.group(0) if got else 'not logged'}, not {brand.name}'s {role} ({want})")
+            if name == "article":
+                # The default typeface set pairs the serif with the house sans, Inter (spec FR-008).
+                names = {line.split()[0].split("+")[-1] for line in fonts}
+                r.check(any(n.startswith("Inter-") for n in names), f"article: its sans is not Inter ({', '.join(sorted(names))})")
             if name == "book":
+                # The book's sans is the theme's font-sans in every style the interior sets (spec FR-004, FR-005).
+                styles = {re.sub(r"-Identity-H$", "", line.split()[0].split("+")[-1]) for line in fonts}
+                for style in ("Regular", "Bold", "Italic", "BoldItalic"):
+                    r.check(any(s.endswith("-" + style) and not s.startswith(("SourceSerif", "SourceCode")) for s in styles),
+                            f"book: no sans {style} in the PDF ({', '.join(sorted(styles))})")
                 images = subprocess.run(["pdfimages", "-list", str(pdf)], capture_output=True, text=True).stdout.splitlines()[2:]
                 r.check(len(images) >= 3, f"book: {len(images)} images placed, not the theme's light and dark lockups and icon")
     return r
