@@ -1,0 +1,7 @@
+Most hospitals still buy software the way they bought it in 2005. A committee writes a list of features, three vendors answer it, and the cheapest one that checks every box wins.
+
+That process picks the vendor with the best sales team. It doesn't pick the one whose product your nurses will use on a Tuesday night.
+
+Picture a deal that dies late. The pilot went well, the contract was ready, and then the security review found that the product stores patient data in a region the hospital can't use. Nobody asked that question in month one.
+
+So ask it in month one. Put the three questions that killed your last deal at the top of the next list.

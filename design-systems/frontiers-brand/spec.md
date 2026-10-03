@@ -14,7 +14,8 @@ restating them.
 - **FR-001**: `frontiers-brand` MUST live at `design-systems/frontiers-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
   and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`,
-  `images/share-card.png`, `imagery/`, a `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
+  `images/share-card.png`, `imagery/`, `fonts/` (the font its wordmark is set in, with its
+  licence), a `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
   every printed work Intellectual Frontiers publishes under its own name (0014-design-systems
   FR-038, FR-040).
 
@@ -42,8 +43,10 @@ restating them.
 ## Typefaces
 
 - **FR-004**: The house sans MUST be Inter and the house serif Source Serif 4, both under the SIL
-  Open Font License, stated in `tokens.json` under `typeface`. The wordmark, and the name
-  "Intellectual Frontiers" wherever it is set in running type, MUST be Inter Bold. A design
+  Open Font License, stated in `tokens.json` under `typeface`. The name "Intellectual Frontiers",
+  wherever it is set in running type, MUST be Inter Bold (`name-weight`). The lockup's own
+  wordmark is drawn in Inter at its Display optical size, weight 850, tracked −0.04em, as measured
+  against the master; a wordmark set apart from the lockup MUST be set in that face (FR-017). A design
   system it themes MAY add a family its medium needs (a monospace, a print heading face) and MUST
   NOT replace either house family except by a requirement citing this one.
 
@@ -76,6 +79,18 @@ restating them.
   files beside the existing set, never replacing a file in place.
 - **FR-013**: The favicon MUST be `images/favicon.png`, a 64×64 rendering of the icon-only mark.
 
+- **FR-018**: Its app icons MUST be those `tokens.json` lists under `logo.app-icons`: an Apple touch
+  icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the icon-only mark
+  centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
+  80% circle a platform may crop it to; and `images/favicon.ico` at 16, 32 and 48px. They are
+  written by `tools/brand_imagery.py build` and never edited by hand.
+- **FR-019**: Each unit MAY be signed by its unit mark, where the unit and not the house signs a
+  work (a Press colophon, a fund's document): the two-line wordmark in the lockup's face and
+  setting (FR-004), with the unit's name beneath it at weight 600 and 62% of the wordmark's size,
+  set by `tools/brand_decoration.py set` as one-color SVG and listed under `logo.units`. It MUST be
+  placed in its unit's color or the text color (FR-003), no narrower than 160px on screen or 1.2in in
+  print, and MUST NOT be combined with the landscape.
+
 ## Imagery
 
 - **FR-012**: Brand imagery MUST follow one idea: the world exists in grayscale, and color marks
@@ -104,11 +119,17 @@ restating them.
   traced from its master (the 1229×362 light lockup and the icon file) by `tools/brand_decoration.py
   trace`, with the threshold, enlargement and speck size it was traced at recorded beside it in
   `tokens.json` as `traced-from`, so the trace is repeatable and nothing in it is drawn, retouched or
-  generated. Its finest detail MUST be what that tool measures, never a value chosen to admit more
-  goods: a decoration that needs finer detail than the trace holds needs a simplified mark,
-  designed from the master and added by amending this spec. Every ink MUST be marked
-  `verified: false` until its spot-color and thread match are checked against the physical guide
-  and card, and MUST NOT be ordered before then.
+  generated; and a wordmark for goods too small for the trace's detail: the name on two lines,
+  "Intellectual" over "Frontiers", set by `tools/brand_decoration.py set` in
+  `fonts/InterVariable.ttf` at the lockup wordmark's optical size and weight (FR-004), its baselines
+  0.88em apart as in the master and its lines aligned on the left, with the settings recorded beside
+  it as `set-from`. The wordmark is tracked 0em, not the lockup's −0.04em, so the gaps between
+  letters hold in thread at the sizes a cap or a polo carries, and MUST NOT be placed narrower than
+  0.75in. Each piece's finest detail MUST be what that tool measures, never a value chosen to admit
+  more goods. A simplified landscape mark is not part of the kit until one is designed from the
+  master by hand and this spec is amended. Every ink MUST be marked `verified: false` until its
+  spot-color and thread match are checked against the physical guide and card, and MUST NOT be
+  ordered before then.
 
 ## Out of scope
 
@@ -131,9 +152,8 @@ restating them.
 - A size between two shipped files: the nearest larger file is scaled down, per FR-008.
 - A work with no good match in the imagery pool: a new piece is made and approved per FR-015; a
   piece is never adapted for one work.
-- Goods too small for the trace's detail (a cap, a polo's left chest, a pen): frontiers-merchandise
-  reports them beyond this kit; a simplified mark is designed and added per FR-017, never traced
-  coarser.
+- Goods too small for the trace's detail (a cap, a polo's left chest, a pen): the wordmark is used,
+  per FR-017; the lockup and icon are never traced coarser for them.
 
 ## Assumptions
 
@@ -148,9 +168,10 @@ None.
 - **Brand color** — one of the five named colors and white in `tokens.json`.
 - **Unit color** — the one color identifying a business unit.
 - **Lockup** — the landscape and two-line wordmark as one fixed image, light or dark.
+- **Unit mark** — the wordmark with a unit's name beneath it, for a unit that signs a work.
 - **Icon-only mark** — the landscape cropped from the master, without the wordmark.
-- **Decoration kit** — the lockup and icon traced to one-color vector art, with each ink's
-  spot-color and thread match, for goods.
+- **Decoration kit** — the lockup and icon traced to one-color vector art and the wordmark set in
+  the lockup's face, with each ink's spot-color and thread match, for goods.
 - **Imagery pool** — the approved pieces of frontier artwork every design system it themes chooses
   from: a cover, a web page's hero.
 

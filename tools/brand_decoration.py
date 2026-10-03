@@ -9,6 +9,13 @@
         full ink a pixel needs to print) and traced by potrace, dropping specks smaller than "speckle-px" master
         pixels. Nothing is drawn, retouched or generated.
 
+    python3 tools/brand_decoration.py set design-systems/<brand>
+        For the wordmark in the kit and every unit mark the brand's logo lists, set the name in the face its "set-from" names (a font in the brand's fonts/,
+        at its optical size and weight, tracked by "tracking-em", one line per entry of "lines", baselines
+        "leading-em" apart and ink-aligned on the left) and write it as one-color outlined SVG at its "file", then
+        measure its finest detail and write it back to tokens.json. It is typesetting, shaped by HarfBuzz with the
+        font's own kerning: nothing is drawn. Needs the uharfbuzz package.
+
     python3 tools/brand_decoration.py measure <svg> [...]
         Print an SVG's finest detail: the thinnest line or gap, as a fraction of its width.
 
@@ -16,10 +23,11 @@
         The nearest colors to <hex> in GIMP palettes (a thread chart, a spot-color guide), by CIEDE2000, to
         propose an ink's matches. A match is a candidate until it is checked against the physical card.
 
-Standard library, ImageMagick (`convert`), potrace and rsvg-convert.
+Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz for `set`.
 """
 from __future__ import annotations
 
+import html
 import json
 import math
 import re
@@ -65,6 +73,88 @@ def trace(brand: Path) -> int:
         print(f"{art['file']}: traced from {src['file']}, finest detail {art['finest-detail']}")
     tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return 0
+
+
+def typeset(brand: Path, spec: dict, title: str) -> str:
+    """Set lines of type as one-color outlined SVG. Each line is a string, or an object that may set its own
+    "wght", "scale" (its size as a share of the first line's), "tracking-em" and "leading-em" (its baseline's
+    distance below the line above, in the first line's em). Shaped by HarfBuzz with the font's own kerning, and
+    every line aligned on its ink at the left."""
+    import uharfbuzz as hb
+
+    face = hb.Face(hb.Blob.from_file_path(str(brand / spec["font"])))
+    font = hb.Font(face)
+    upem = face.upem
+    d, xs, ys = [], [], []
+    baseline = 0.0
+    for n, entry in enumerate(spec["lines"]):
+        line = entry if isinstance(entry, dict) else {"text": entry}
+        scale = line.get("scale", 1)
+        track = line.get("tracking-em", spec["tracking-em"]) * upem
+        if n:
+            baseline += line.get("leading-em", spec["leading-em"]) * upem
+        font.set_variations({"opsz": spec["opsz"], "wght": line.get("wght", spec["wght"])})
+        buf = hb.Buffer()
+        buf.add_str(line["text"])
+        buf.guess_segment_properties()
+        hb.shape(font, buf)
+        x, glyphs = 0.0, []
+        for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+            glyphs.append((info.codepoint, x + pos.x_offset))
+            x += pos.x_advance + track
+        left = min(gx + font.get_glyph_extents(g).x_bearing for g, gx in glyphs)
+        for g, gx in glyphs:
+            e = font.get_glyph_extents(g)
+            gx = (gx - left) * scale
+            xs += [gx + e.x_bearing * scale, gx + (e.x_bearing + e.width) * scale]
+            ys += [baseline - e.y_bearing * scale, baseline - (e.y_bearing + e.height) * scale]
+            d.append(_outline(font, g, gx, baseline, scale))
+    x0, y0 = min(xs), min(ys)
+    w, h = max(xs) - x0, max(ys) - y0
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:g} {y0:g} {w:g} {h:g}" width="{round(w / upem * 100)}" '
+            f'height="{round(h / upem * 100)}">\n<title>{html.escape(title)}</title>\n'
+            f'<path fill="currentColor" d="{" ".join(p for p in d if p)}"/>\n</svg>\n')
+
+
+def set_wordmark(brand: Path) -> int:
+    """The decoration kit's wordmark, and every unit mark tokens.json lists (frontiers-brand FR-017, FR-019)."""
+    tokens_path = brand / "tokens.json"
+    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+    art = tokens["$extensions"].get(KIT, {}).get("wordmark")
+    if art:
+        spec = art["set-from"]
+        name = " / ".join(l if isinstance(l, str) else l["text"] for l in spec["lines"])
+        out = brand / art["file"]
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(typeset(brand, spec, f"{brand.name} wordmark, one color, set in {spec['font']} "
+                                            f"(opsz {spec['opsz']}, wght {spec['wght']}): {name}"), encoding="utf-8")
+        art["finest-detail"] = round(finest_detail(out), 4)
+        print(f"{art['file']}: set from {spec['font']}, finest detail {art['finest-detail']}")
+    for unit, mark in tokens["$extensions"]["com.intellectualfrontiers.logo"].get("units", {}).items():
+        if unit.startswith("$"):
+            continue
+        out = brand / mark["file"]
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(typeset(brand, mark["set-from"], f"{mark['name']}, one color, set in {mark['set-from']['font']}"), encoding="utf-8")
+        print(f"{mark['file']}: {mark['name']}")
+    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return 0
+
+
+def _outline(font, glyph: int, dx: float, baseline: float, scale: float = 1) -> str:
+    """One glyph's outline as SVG path data, scaled, moved to (dx, baseline) and flipped so y grows downward."""
+    parts: list[str] = []
+    pt = lambda x, y: f"{round(x * scale + dx, 1):g} {round(baseline - y * scale, 1):g}"  # noqa: E731
+
+    class Pen:
+        def moveTo(self, p): parts.append("M" + pt(*p))
+        def lineTo(self, p): parts.append("L" + pt(*p))
+        def qCurveTo(self, *ps): parts.append("Q" + " ".join(pt(*p) for p in ps))
+        def curveTo(self, *ps): parts.append("C" + " ".join(pt(*p) for p in ps))
+        def closePath(self): parts.append("Z")
+
+    font.draw_glyph_with_pen(glyph, Pen())
+    return "".join(parts)
 
 
 def clean(svg: str, width: int, height: int, title: str) -> str:
@@ -179,6 +269,8 @@ def match(hex_color: str, palettes: list[str]) -> int:
 def main(argv: list[str]) -> int:
     if len(argv) >= 2 and argv[0] == "trace":
         return max(trace(Path(p)) for p in argv[1:])
+    if len(argv) >= 2 and argv[0] == "set":
+        return max(set_wordmark(Path(p)) for p in argv[1:])
     if len(argv) >= 2 and argv[0] == "measure":
         for p in argv[1:]:
             print(f"{p}: {finest_detail(Path(p)):.4f}")

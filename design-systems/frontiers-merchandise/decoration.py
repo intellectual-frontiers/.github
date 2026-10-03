@@ -8,8 +8,8 @@ A job is what a consumer sends a decorator, as JSON:
     {"product": "polo", "location": "left-chest", "method": "embroidery",
      "artwork": "icon", "ink": "text", "substrate": "#ffffff", "width_in": 2.4}
 
-`artwork` is the brand's `lockup` or `icon` (its decoration kit, 0014-design-systems FR-047), or `imagery:<id>`, a
-piece of its imagery pool (FR-043). `ink` is a color role in the kit's `inks`, and is left out for a method that
+`artwork` is a piece of the brand's decoration kit (0014-design-systems FR-047): its `lockup`, its `icon`, or its
+`wordmark` where the kit has one; or `imagery:<id>`, a piece of its imagery pool (FR-043). `ink` is a color role in the kit's `inks`, and is left out for a method that
 uses none. `substrate` is the color of the goods. Standard library only.
 """
 from __future__ import annotations
@@ -24,6 +24,7 @@ HERE = Path(__file__).resolve().parent
 METHODS = json.loads((HERE / "data" / "methods.json").read_text(encoding="utf-8"))["methods"]
 PRODUCTS = json.loads((HERE / "data" / "products.json").read_text(encoding="utf-8"))
 MIN_CONTRAST = 3.0  # WCAG 2.2 1.4.11, non-text contrast: the mark against the goods
+KIT_ARTWORK = ("lockup", "icon", "wordmark")  # the lockup and icon every kit has; a wordmark it may add
 
 
 class Brand:
@@ -47,6 +48,15 @@ class Brand:
         svg = (self.path / self.kit[artwork]["file"]).read_text(encoding="utf-8")
         _, _, w, h = (float(v) for v in re.search(r'viewBox="([^"]+)"', svg).group(1).split())
         return h / w
+
+    def artwork(self) -> list[str]:
+        """The kit's artwork: the lockup, the icon, and the wordmark if it has one."""
+        return [a for a in KIT_ARTWORK if a in (self.kit or {})]
+
+    def min_width(self, artwork: str) -> float:
+        """The brand's smallest width for a kit artwork: its own, else its logo's (frontiers-brand FR-008)."""
+        own = self.kit[artwork].get("min-width-in")
+        return float(own if own is not None else self.logo.get(artwork, {}).get("min-width-in", 0))
 
 
 def luminance(hex_color: str) -> float:
@@ -88,9 +98,11 @@ def check(job: dict, brand: Brand) -> list[str]:
             problems.append("a piece of the imagery pool is printed in its own colors, never in an ink (FR-008)")
         w, h = piece["pixel_size"]
         aspect, floor, what = h / w, 0.0, "the piece"
-    elif artwork in ("lockup", "icon"):
+    elif artwork in KIT_ARTWORK and artwork not in brand.artwork():
+        return problems + [f"{brand.path.name}'s decoration kit has no {artwork} (FR-006)"]
+    elif artwork in KIT_ARTWORK:
         aspect = brand.aspect(artwork)
-        brand_min = float(brand.logo[artwork].get("min-width-in", 0))
+        brand_min = brand.min_width(artwork)
         method_min = method["min_line_in"] / float(brand.kit[artwork]["finest-detail"])
         floor, what = max(brand_min, method_min), f"the {artwork}"
         if width < brand_min:
@@ -98,7 +110,7 @@ def check(job: dict, brand: Brand) -> list[str]:
         elif width < method_min:
             problems.append(f"{what} at {width:g} in has detail finer than {method['name']} holds ({method['min_line_in']:g} in); it needs at least {method_min:.2f} in (FR-007)")
     else:
-        return problems + [f"artwork {artwork!r} is not the lockup, the icon or imagery:<id> (FR-006)"]
+        return problems + [f"artwork {artwork!r} is not the lockup, the icon, the wordmark or imagery:<id> (FR-006)"]
 
     max_w, max_h = location
     if width > max_w + 1e-9:

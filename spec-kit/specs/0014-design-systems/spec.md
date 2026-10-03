@@ -393,11 +393,15 @@ any number of each kind.
   its lockup and its icon as one-color, outlined vector artwork (SVG, every
   fill and stroke `currentColor` or `none`, with no raster, live text,
   gradient or filter), so a decorator sets the ink, each with its finest
-  detail (its thinnest line or gap, as a fraction of its width); and, for each color
+  detail (its thinnest line or gap, as a fraction of its width); optionally
+  a wordmark, the brand's name alone set in the face its lockup's wordmark
+  is drawn in, as the same kind of artwork with its finest detail and
+  smallest width, for goods too small for the lockup's detail; and, for each color
   role it allows on goods (at least one dark and one light), the spot-color
   and the embroidery-thread match it is reproduced with, named in a
   matching system. A vector file MUST be made from the brand's approved
-  master, never redrawn or traced by a generative tool. Its harness checks
+  master, or for a wordmark set from its font, never redrawn or traced by
+  a generative tool. Its harness checks
   the kit's files and matches.
 
 ## Kind profile: figure
@@ -419,10 +423,59 @@ any number of each kind.
   the tools that render them.
 - **FR-048**: Every figure a web, print or slide presentation carries MUST be
   drawn with a figure design system and themed by the same brand as the
-  presentation. A web or print design system MUST name in the ontology,
-  by `ifcore:drawsFiguresWith`, the figure design system its pages use,
+  presentation. A web, print or slides design system MUST name in the
+  ontology, by `ifcore:drawsFiguresWith`, the figure design system its pages use,
   and MUST NOT define its own figure colors. A raster figure (a screenshot,
   a photograph) is a work's own asset and is exempt.
+
+## Kind profile: slides
+
+- **FR-049**: A slides design system governs how a talk, lecture, workshop
+  or briefing is presented on a screen: its canvas, layouts, type, tones,
+  footer and speaker notes, and the content limits a slide keeps to. Its
+  machine-readable form is its stylesheet and the builder and checker that
+  turn a deck's source into slides. It is themed (FR-038, FR-044): every
+  color is a brand theme role, its figures come from a figure design
+  system (FR-048), and its text is checked against the house voice. Its
+  harness renders a fixture deck of every layout in a browser under every
+  brand here and checks size, overflow, minimum type and contrast, and
+  runs its checker over decks that must pass and must fail. It MUST be
+  classified in the ontology, by `dcterms:type`, with every **deck type**
+  it serves (*talk*, *lecture*, *workshop*, *briefing*). Its consumers are
+  speakers, courses and the tools that build decks.
+
+## Kind profile: media
+
+- **FR-050**: A media design system governs the images that package a work
+  for a platform: podcast and episode art, video thumbnails, title cards,
+  lower thirds and social cards. Its machine-readable form is each asset
+  type's size, safe area, type range and limits, and the tool that lays out
+  and renders an asset from a short job. It is themed (FR-038, FR-044):
+  every color is a brand theme role or a mix of two, its pictures come
+  from the brand's imagery pool (FR-043) never larger than their masters,
+  its logo is the brand's lockup never below its minimum, and its text is
+  checked against the house voice. Its harness renders an asset of every
+  type under every brand here and checks its size, contrast and limits, and
+  runs its checker over jobs that must fail. It MUST be classified in the
+  ontology, by `dcterms:type`, with every **media asset type** it makes,
+  named as the platforms name them. Its consumers are spoken and video
+  works, their publishers, and the tools that publish them.
+
+## Kind profile: email
+
+- **FR-051**: An email design system governs the messages the house sends
+  by email: their layout, type, color, logo, footer and plain-text
+  alternative, within what mail clients render (tables, inline styles, no
+  custom properties, external stylesheets or scripts, hosted images). Its
+  machine-readable form is its layout data and the tool that builds a
+  message from a short source and checks it. It is themed (FR-038, FR-044):
+  its source names colors by brand theme role and the built message
+  carries them resolved, in a light and a dark tone; its text is checked
+  against the house voice. Its harness builds messages under every brand
+  here and checks their structure, contrast and limits, and runs its
+  checker over messages that must fail. It MUST be classified in the
+  ontology, by `dcterms:type`, with every **email type** it sends. Its
+  consumers are the tools and people that send the house's email.
 
 ## Kind profile: written voice
 

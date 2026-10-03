@@ -29,7 +29,7 @@
     });
     s.test("Inter and Source Serif 4, and Inter Bold for the wordmark (spec FR-004)", async (t) => {
       const { typeface } = await tokens();
-      t.equal(typeface.sans.$value, "Inter"); t.equal(typeface.serif.$value, "Source Serif 4"); t.equal(typeface["wordmark-weight"].$value, 700);
+      t.equal(typeface.sans.$value, "Inter"); t.equal(typeface.serif.$value, "Source Serif 4"); t.equal(typeface["name-weight"].$value, 700);
     });
     s.test("every palette ink and unit color is at least 4.5:1 on white and on Warm Paper (spec FR-005)", async (t) => {
       const all = await tokens();

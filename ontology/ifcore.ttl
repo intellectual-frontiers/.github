@@ -42,6 +42,7 @@ ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:ran
 
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
     rdfs:label "Intellectual Frontiers LLC"@en ;
+    skos:altLabel "Intellectual Frontiers"@en ;
     schema:slogan "A think tank that builds useful things."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -104,6 +105,20 @@ ifcore:MerchandiseDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
 ifcore:FigureDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "figure"@en ;
     skos:notation "figures" ;
     skos:definition "How a work's figures are drawn, in print or on the web (0014-design-systems FR-032)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SlidesDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "slides"@en ;
+    skos:notation "slides" ;
+    skos:altLabel "slide deck"@en , "presentation"@en ;
+    skos:definition "How a talk, lecture, workshop or briefing is presented on a screen: canvas, layouts, type, tones and the limits a slide keeps to (0014-design-systems FR-049)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MediaDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "media"@en ;
+    skos:notation "media" ;
+    skos:altLabel "media packaging"@en ;
+    skos:definition "The images that package a work for a platform: podcast and episode art, video thumbnails, title cards, lower thirds and social cards (0014-design-systems FR-050)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EmailDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "email"@en ;
+    skos:notation "email" ;
+    skos:definition "The messages the house sends by email: layout, type, color, logo, footer and plain-text alternative, within what mail clients render (0014-design-systems FR-051)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:WrittenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VerbalDesignSystemKind ; skos:prefLabel "written voice"@en ;
     skos:notation "written-voice" ;
@@ -211,6 +226,69 @@ ifcore:DecisionFlowchart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme 
 ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "hierarchy diagram"@en ;
     skos:definition "A root over its children."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:BarChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "bar chart"@en ;
+    skos:definition "Values compared as bars, one per category, each labelled with its value."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LineChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "line chart"@en ;
+    skos:definition "One or more series over an ordered axis, usually time, each named at its end."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Timeline a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "timeline"@en ;
+    skos:definition "Events in order, each with its date."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DeckTypeScheme a skos:ConceptScheme ; rdfs:label "Deck type"@en ;
+    skos:definition "The kinds of presentation a slides design system serves (0014-design-systems FR-049)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TalkDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "talk"@en ;
+    skos:definition "A deck one speaker presents to an audience, as at a conference or a keynote."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LectureDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "lecture"@en ;
+    skos:definition "A deck that teaches, as one session of a course."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WorkshopDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "workshop"@en ;
+    skos:definition "A deck that runs a working session: exercises, prompts and timings."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BriefingDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "briefing"@en ;
+    skos:definition "A deck that informs a decision: a board, investor or customer briefing."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:MediaAssetTypeScheme a skos:ConceptScheme ; rdfs:label "Media asset type"@en ;
+    skos:definition "The images a media design system makes to package a work for a platform (0014-design-systems FR-050)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PodcastCoverArt a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "podcast cover art"@en ;
+    skos:definition "The square image a podcast directory shows for a show."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EpisodeArt a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "episode art"@en ;
+    skos:definition "The square image a podcast directory shows for one episode."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:VideoThumbnail a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "video thumbnail"@en ;
+    skos:definition "The 16:9 image a video platform shows before a video plays."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TitleCard a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "title card"@en ;
+    skos:definition "The full-frame card that opens a video or one of its parts."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LowerThird a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "lower third"@en ;
+    skos:definition "The transparent overlay naming who is on screen, in the lower third of the frame."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SocialCard a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; skos:prefLabel "social card"@en ;
+    skos:definition "An image announcing a work on a social platform: square, portrait or story."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EmailTypeScheme a skos:ConceptScheme ; rdfs:label "Email type"@en ;
+    skos:definition "The kinds of message an email design system sends (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NewsletterEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "newsletter"@en ;
+    skos:definition "A periodical issue sent to subscribers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AnnouncementEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "announcement"@en ;
+    skos:definition "A one-off message announcing a work, an episode or an event to subscribers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:InvitationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "invitation"@en ;
+    skos:definition "A message inviting its reader to an event, a workshop or a course."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NotificationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "notification"@en ;
+    skos:definition "A message about something its reader did or asked for: a confirmation, a receipt, a reminder."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
@@ -282,8 +360,50 @@ ifcore:FrontiersFigures a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-figures" ;
     rdfs:label "Frontiers Figures"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
+    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram , ifcore:BarChart , ifcore:LineChart , ifcore:Timeline ;
     rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersWrittenVoice a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-written-voice" ;
+    rdfs:label "Frontiers Written Voice"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:WrittenVoiceDesignSystemKind ;
+    rdfs:comment "At design-systems/frontiers-written-voice/; its house rules are design-systems/frontiers-written-voice/spec.md. How the house writes: voice, usage, punctuation and presentation form, with the Chicago Manual of Style as its style authority, and the patterns its mechanical sweep looks for (0014-design-systems FR-033)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSpokenVoice a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-spoken-voice" ;
+    rdfs:label "Frontiers Spoken Voice"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:SpokenVoiceDesignSystemKind ;
+    prov:wasDerivedFrom ifcore:FrontiersWrittenVoice ;
+    rdfs:comment "At design-systems/frontiers-spoken-voice/; its house rules are design-systems/frontiers-spoken-voice/spec.md. How the house voice changes for the ear: scripts written to be heard once, with the written voice's patterns and its own announcement and story-label patterns (0014-design-systems FR-034)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSlides a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-slides" ;
+    rdfs:label "Frontiers Slides"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:SlidesDesignSystemKind , ifcore:TalkDeck , ifcore:LectureDeck , ifcore:WorkshopDeck , ifcore:BriefingDeck ;
+    rdfs:comment "At design-systems/frontiers-slides/; its house rules are design-systems/frontiers-slides/spec.md. Slide decks on a 1920x1080 canvas, built from Markdown by deck.py, themed by a brand, with figures from frontiers-figures and text checked against the house voice (0014-design-systems FR-049)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersMedia a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-media" ;
+    rdfs:label "Frontiers Media"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:MediaDesignSystemKind , ifcore:PodcastCoverArt , ifcore:EpisodeArt , ifcore:VideoThumbnail , ifcore:TitleCard , ifcore:LowerThird , ifcore:SocialCard ;
+    rdfs:comment "At design-systems/frontiers-media/; its house rules are design-systems/frontiers-media/spec.md. Podcast and episode art, video thumbnails, title cards, lower thirds and social cards, laid out and rendered from a short job by media.py, themed by a brand with its imagery pool and lockup (0014-design-systems FR-050)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersEmail a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-email" ;
+    rdfs:label "Frontiers Email"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:EmailDesignSystemKind , ifcore:NewsletterEmail , ifcore:AnnouncementEmail , ifcore:InvitationEmail , ifcore:NotificationEmail ;
+    rdfs:comment "At design-systems/frontiers-email/; its house rules are design-systems/frontiers-email/spec.md. Email built from Markdown by mail.py: 600px, table layout, styles inline, colors resolved from a brand's theme roles with a dark tone, and a plain-text alternative (0014-design-systems FR-051)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
