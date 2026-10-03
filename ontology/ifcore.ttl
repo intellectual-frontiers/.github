@@ -182,6 +182,36 @@ ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; sk
     skos:definition "A standalone document of findings, set for print or PDF."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:drawsFiguresWith a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystem ;
+    rdfs:label "draws figures with"@en ;
+    rdfs:comment "The figure design system whose figures a web or print design system's pages carry, themed by the same brand (0014-design-systems FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FigureTypeScheme a skos:ConceptScheme ; rdfs:label "Figure type"@en ;
+    rdfs:comment "What a figure design system's layouts draw (0014-design-systems FR-032), as diagramming names it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProcessDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "process diagram"@en ;
+    skos:definition "Steps in order, joined by arrows."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComparisonDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "comparison diagram"@en ;
+    skos:definition "Two columns side by side: before and after, this or that."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CycleDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "cycle diagram"@en ;
+    skos:definition "Steps around a loop, each feeding the next."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LayerDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "layer diagram"@en ;
+    skos:definition "Layers stacked, each resting on the one below."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RelationshipDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "relationship diagram"@en ;
+    skos:definition "Many sources converging on one result."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DecisionFlowchart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "decision flowchart"@en ;
+    skos:definition "A question that splits into paths."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "hierarchy diagram"@en ;
+    skos:definition "A root over its children."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -245,6 +275,15 @@ ifcore:FrontiersPrint a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:PrintDesignSystemKind , ifcore:BookInterior , ifcore:BookCover , ifcore:JournalArticle ;
     rdfs:comment "At design-systems/frontiers-print/; its house rules are design-systems/frontiers-print/spec.md. The book interior, book cover and journal article design, in LaTeX, themed by a brand's brand.tex (0014-design-systems FR-031, FR-038)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersFigures a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-figures" ;
+    rdfs:label "Frontiers Figures"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
+    rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
@@ -261,6 +300,7 @@ ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind , ifcore:EditorialSite , ifcore:MarketingSite , ifcore:ExpressiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-nature-web/; its house rules are design-systems/frontiers-nature-web/spec.md. Intellectual Frontiers' public, editorial web presentation."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
@@ -269,6 +309,7 @@ ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind , ifcore:DocumentationSite , ifcore:BackOffice , ifcore:Dashboard , ifcore:ProductiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-console-web/; its house rules are design-systems/frontiers-console-web/spec.md. Operator (admin) and documentation web surfaces: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────

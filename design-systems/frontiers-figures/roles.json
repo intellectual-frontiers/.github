@@ -1,0 +1,122 @@
+{
+  "$description": "frontiers-figures' figure roles (spec FR-004, FR-005): what each figure class colors, and, per variant, the brand role or mix of roles it takes (\"text!62!surface\" is 62% text, 38% surface, as xcolor writes it). A figure's source names roles by class (f-<role> for fill, s-<role> for stroke, c-<role> for a gradient stop) and never a color; theme.py turns this table and a brand into the stylesheet a consumer puts in the figure. Layout variants change the canvas, never a color.",
+  "roles": {
+    "ink": "titles, box headings and the strongest labels",
+    "body": "body text in and beside boxes",
+    "strong": "dark neutral boxes and their outlines",
+    "muted": "subtitles, axis and secondary labels",
+    "line": "arrows, connectors and neutral bars",
+    "rule": "hairlines, grid lines and light outlines",
+    "surface": "the figure's background and text on dark boxes",
+    "neutral-tint": "neutral and note boxes",
+    "primary": "the main category of content: outlines, bars, emphasis text",
+    "primary-tint": "fills of main-category boxes",
+    "emphasis": "a contrasting, terminal or warning item",
+    "emphasis-tint": "fills of emphasized boxes",
+    "emphasis-deep": "text on emphasis tints that needs more weight",
+    "secondary": "a second series",
+    "tertiary": "a third series",
+    "info": "an informational item",
+    "info-tint": "fills of informational boxes"
+  },
+  "foreground": [
+    "ink",
+    "body",
+    "strong",
+    "muted",
+    "primary",
+    "emphasis",
+    "emphasis-deep",
+    "info"
+  ],
+  "background": [
+    "surface",
+    "neutral-tint",
+    "primary-tint",
+    "emphasis-tint",
+    "info-tint"
+  ],
+  "graphics": [
+    "line",
+    "secondary",
+    "tertiary"
+  ],
+  "variants": {
+    "default": {
+      "background": "surface",
+      "map": {
+        "ink": "text",
+        "body": "text!88!surface",
+        "strong": "text!78!surface",
+        "muted": "text!70!surface",
+        "line": "text!56!surface",
+        "rule": "text!12!surface",
+        "surface": "surface",
+        "neutral-tint": "text!5!surface",
+        "primary": "primary",
+        "primary-tint": "primary!14!surface",
+        "emphasis": "accent",
+        "emphasis-tint": "accent!11!surface",
+        "emphasis-deep": "accent!70!text",
+        "secondary": "secondary",
+        "tertiary": "tertiary",
+        "info": "info",
+        "info-tint": "info!12!surface"
+      }
+    },
+    "on-dark": {
+      "background": "text",
+      "map": {
+        "ink": "surface",
+        "body": "surface!90!text",
+        "strong": "surface!80!text",
+        "muted": "surface!68!text",
+        "line": "surface!52!text",
+        "rule": "surface!20!text",
+        "surface": "text",
+        "neutral-tint": "surface!9!text",
+        "primary": "primary!45!surface",
+        "primary-tint": "primary!32!text",
+        "emphasis": "accent!45!surface",
+        "emphasis-tint": "accent!30!text",
+        "emphasis-deep": "accent!30!surface",
+        "secondary": "secondary!45!surface",
+        "tertiary": "tertiary!45!surface",
+        "info": "info!45!surface",
+        "info-tint": "info!30!text"
+      }
+    },
+    "grayscale": {
+      "background": "surface",
+      "map": {
+        "ink": "text",
+        "body": "text!88!surface",
+        "strong": "text!78!surface",
+        "muted": "text!70!surface",
+        "line": "text!56!surface",
+        "rule": "text!12!surface",
+        "surface": "surface",
+        "neutral-tint": "text!5!surface",
+        "primary": "text!80!surface",
+        "primary-tint": "text!7!surface",
+        "emphasis": "text",
+        "emphasis-tint": "text!12!surface",
+        "emphasis-deep": "text",
+        "secondary": "text!70!surface",
+        "tertiary": "text!70!surface",
+        "info": "text!70!surface",
+        "info-tint": "text!12!surface"
+      }
+    }
+  },
+  "layout-variants": {
+    "standard": {
+      "canvas": 1040,
+      "use": "a figure across the text width of a page or a content column"
+    },
+    "compact": {
+      "canvas": 720,
+      "use": "a figure in a narrow slot (a sidebar, one column of two, a slide half) so its type still prints at the minimum"
+    }
+  }
+}

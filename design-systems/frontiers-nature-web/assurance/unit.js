@@ -15,7 +15,7 @@
     description: "Every token the design system promises exists and resolves under the theme, the page is square-cornered and capped at 72rem, and every text/background pairing the chrome relies on meets WCAG AA.",
   }, (s) => {
     const REQUIRED = ["--ink", "--paper", "--stone", "--shell", "--rule", "--background", "--foreground", "--muted-foreground",
-      "--capital", "--ip", "--press", "--studios", "--network", "--diagram-ink", "--diagram-path", "--diagram-warning", "--diagram-positive", "--diagram-caution", "--diagram-secondary",
+      "--capital", "--ip", "--press", "--studios", "--network",
       "--font-sans", "--font-serif", "--font-mono", "--measure-page", "--gutter", "--radius", "--chrome-clearance", "--ease", "--fast"];
     s.test("layout values: 72rem measure, 1.5rem gutter, square corners", (t) => {
       t.equal(raw("--measure-page"), "72rem"); t.equal(raw("--gutter"), "1.5rem"); t.equal(raw("--radius"), "0");
@@ -31,7 +31,7 @@
       ["muted-foreground on background", "--muted-foreground", "--background"], ["muted-foreground on stone (breadcrumb band)", "--muted-foreground", "--stone"],
       ["muted-foreground on shell (header)", "--muted-foreground", "--shell"], ["muted-foreground on paper", "--muted-foreground", "--paper"],
       ["capital on background", "--capital", "--background"], ["press on background", "--press", "--background"], ["studios on background", "--studios", "--background"],
-      ["network on background", "--network", "--background"], ["diagram-caution on background", "--diagram-caution", "--background"],
+      ["network on background", "--network", "--background"],
     ];
     for (const [label, fg, bg] of TEXT) s.test(`text contrast ≥ 4.5:1 — ${label}`, (t) => t.atLeast(color.contrast(token(fg), token(bg)), 4.5, label));
   });

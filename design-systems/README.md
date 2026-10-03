@@ -33,7 +33,7 @@ Each kind has a profile in
 | web presentation | `web` | How a web page looks; the DOM its chrome expects | CSS custom properties, `tokens.json` |
 | print | `print` | How a book, paper or cover is set | Typesetting style files and their data |
 | merchandise | `merchandise` | How the brand goes on physical goods: method, placement, ink | Decoration methods and products data |
-| figure | `figures` | How a work's figures are drawn | Figure palette and layout data |
+| figure | `figures` | How every figure is drawn, in every medium | Figure roles and the drawing kit |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
 
@@ -124,6 +124,12 @@ A **print** design system works the same way: it loads the brand's `brand.tex` b
 definitions, takes its colors, its text and cover families (among the fonts it ships) and its logos
 from it, mixes every other color from its roles, takes cover artwork from its imagery pool, and
 holds no color literal.
+
+A **figure** design system draws every figure the others carry, in print, on the web and on
+slides. A figure's source names its colors by figure role (`f-primary`, `s-line`) and holds no color
+or font; the same brand that themes the page themes the figure, in a default, on-dark or grayscale
+variant, on a standard or compact canvas. Each web and print design system names the figure design
+system its pages use (`ifcore:drawsFiguresWith`).
 
 That is how white-labeling works: a company that wants a web or print design system in its own
 colors, logo and imagery supplies a brand, and the design system is used unchanged. A brand that is not yet public
