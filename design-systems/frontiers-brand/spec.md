@@ -44,7 +44,7 @@ restating them.
 
 - **FR-004**: The house sans MUST be Inter and the house serif Source Serif 4, both under the SIL
   Open Font License, stated in `tokens.json` under `typeface`. The name "Intellectual Frontiers",
-  wherever it is set in running type, MUST be Inter Bold (`wordmark-weight`). The lockup's own
+  wherever it is set in running type, MUST be Inter Bold (`name-weight`). The lockup's own
   wordmark is drawn in Inter at its Display optical size, weight 850, tracked −0.04em, as measured
   against the master; a wordmark set apart from the lockup MUST be set in that face (FR-017). A design
   system it themes MAY add a family its medium needs (a monospace, a print heading face) and MUST
@@ -78,6 +78,18 @@ restating them.
   only as legibility at that size requires. A refreshed logo MUST ship as a new dated set of
   files beside the existing set, never replacing a file in place.
 - **FR-013**: The favicon MUST be `images/favicon.png`, a 64×64 rendering of the icon-only mark.
+
+- **FR-018**: Its app icons MUST be those `tokens.json` lists under `logo.app-icons`: an Apple touch
+  icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the icon-only mark
+  centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
+  80% circle a platform may crop it to; and `images/favicon.ico` at 16, 32 and 48px. They are
+  written by `tools/brand_imagery.py build` and never edited by hand.
+- **FR-019**: Each unit MAY be signed by its unit mark, where the unit and not the house signs a
+  work (a Press colophon, a fund's document): the two-line wordmark in the lockup's face and
+  setting (FR-004), with the unit's name beneath it at weight 600 and 62% of the wordmark's size,
+  set by `tools/brand_decoration.py set` as one-color SVG and listed under `logo.units`. It MUST be
+  placed in its unit's color or the text color (FR-003), no narrower than 160px on screen or 1.2in in
+  print, and MUST NOT be combined with the landscape.
 
 ## Imagery
 
@@ -156,6 +168,7 @@ None.
 - **Brand color** — one of the five named colors and white in `tokens.json`.
 - **Unit color** — the one color identifying a business unit.
 - **Lockup** — the landscape and two-line wordmark as one fixed image, light or dark.
+- **Unit mark** — the wordmark with a unit's name beneath it, for a unit that signs a work.
 - **Icon-only mark** — the landscape cropped from the master, without the wordmark.
 - **Decoration kit** — the lockup and icon traced to one-color vector art and the wordmark set in
   the lockup's face, with each ink's spot-color and thread match, for goods.

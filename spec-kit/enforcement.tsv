@@ -468,6 +468,8 @@ frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assura
 frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
 frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
 frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit: lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
+frontiers-brand FR-018	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: every app icon and favicon.ico present at its size; Logo files: each loads at its size
+frontiers-brand FR-019	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
