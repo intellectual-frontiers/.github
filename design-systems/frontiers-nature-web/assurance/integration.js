@@ -79,6 +79,8 @@
       t.equal(f.$$(".hero [class*='scrim'], .hero__media").length, 0, "nothing covers the artwork");
     }, HOME));
     s.test("hero text meets AA on the page background", (t) => withFrame({ width: 1280 }, (f) => {
+      // Applying the theme changes colors the buttons transition; measure the settled colors, not a frame mid-way.
+      for (const a of f.doc.getAnimations()) a.finish();
       for (const el of f.$$(".t-display, .hero__lede, .hero__actions .btn")) {
         const fg = color.parse(f.style(el, "color"));
         let bg = color.parse(f.style(el, "backgroundColor"));
@@ -102,6 +104,7 @@
       return bg;
     }
     s.test("chrome text meets AA on its real background", (t) => withFrame({ width: 1280 }, (f) => {
+      for (const a of f.doc.getAnimations()) a.finish();
       let measured = 0;
       for (const selector of [".nav-primary a", ".crumbs a", ".crumbs [aria-current]", ".menu__button", ".t-title", ".t-lede", ".t-body", ".t-section", ".btn--outline", ".site-footer__tagline", ".site-footer__col .label", ".site-footer__col a", ".site-footer__legal span", ".site-footer__legal a", ".page-eyebrow"]) {
         for (const el of f.$$(selector)) {
