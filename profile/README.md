@@ -71,7 +71,10 @@ find an audience and turn it into revenue, are running.
 ## How we work
 
 <p align="center">
-  <img alt="How contrarian but practical observations move through Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature-web/images/how-contrarian-but-practical-observations-move-through-intellectual-frontiers-836.webp" width="836">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/profile/figures/how-we-work-dark.svg">
+    <img alt="A cycle of four questions: Find, what is unusually true here; Prove, what small hard thing earns a scarce commitment; Decide, what will we do now; Compound, how does use make the advantage stronger; and back to Find." src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/profile/figures/how-we-work.svg" width="720">
+  </picture>
 </p>
 
 Every opportunity moves through four questions, in order: **Find** (what is
