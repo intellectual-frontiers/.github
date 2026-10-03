@@ -555,3 +555,22 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
 0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
+0022-domain-names FR-001	none	-	no shape yet distinguishes a DomainName from a DigitalAsset
+0022-domain-names FR-002	none	-	no check that an identifier is a registrable name
+0022-domain-names FR-003	none	-	no check on identifier form
+0022-domain-names FR-004	none	-	no shape requires dcterms:rightsHolder
+0022-domain-names FR-005	none	-	no shape requires exactly one dcterms:type in DomainRoleScheme
+0022-domain-names FR-006	none	-	no shape requires dcterms:relation by role
+0022-domain-names FR-007	none	-	no check; dcterms:created on owned channels not yet verified against publishing start
+0022-domain-names FR-008	none	-	completeness needs the registrar reconciliation of FR-018, not yet built
+0022-domain-names FR-009	none	-	no shape on role and audience
+0022-domain-names FR-010	none	-	no shape requires one ExternalRecordReference per DomainName
+0022-domain-names FR-011	none	-	no check on primarySource form
+0022-domain-names FR-012	none	-	no check on verificationMethod or cadence
+0022-domain-names FR-013	none	-	no check on cached contact details
+0022-domain-names FR-014	none	-	secret scanning not configured; nothing checks it
+0022-domain-names FR-015	none	-	no check for DNS records in the ontology
+0022-domain-names FR-016	none	-	no check that acquisition or lapse carries a Decision
+0022-domain-names FR-017	none	-	expiry report not yet built
+0022-domain-names FR-018	none	-	registrar reconciliation not yet built
+0022-domain-names FR-019	none	-	permission boundary on a tool not yet built
