@@ -9,6 +9,13 @@
         full ink a pixel needs to print) and traced by potrace, dropping specks smaller than "speckle-px" master
         pixels. Nothing is drawn, retouched or generated.
 
+    python3 tools/brand_decoration.py set design-systems/<brand>
+        For the wordmark in the kit, set the name in the face its "set-from" names (a font in the brand's fonts/,
+        at its optical size and weight, tracked by "tracking-em", one line per entry of "lines", baselines
+        "leading-em" apart and ink-aligned on the left) and write it as one-color outlined SVG at its "file", then
+        measure its finest detail and write it back to tokens.json. It is typesetting, shaped by HarfBuzz with the
+        font's own kerning: nothing is drawn. Needs the uharfbuzz package.
+
     python3 tools/brand_decoration.py measure <svg> [...]
         Print an SVG's finest detail: the thinnest line or gap, as a fraction of its width.
 
@@ -16,7 +23,7 @@
         The nearest colors to <hex> in GIMP palettes (a thread chart, a spot-color guide), by CIEDE2000, to
         propose an ink's matches. A match is a candidate until it is checked against the physical card.
 
-Standard library, ImageMagick (`convert`), potrace and rsvg-convert.
+Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz for `set`.
 """
 from __future__ import annotations
 
@@ -65,6 +72,68 @@ def trace(brand: Path) -> int:
         print(f"{art['file']}: traced from {src['file']}, finest detail {art['finest-detail']}")
     tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return 0
+
+
+def set_wordmark(brand: Path) -> int:
+    import uharfbuzz as hb
+
+    tokens_path = brand / "tokens.json"
+    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+    art = tokens["$extensions"][KIT]["wordmark"]
+    spec = art["set-from"]
+    face = hb.Face(hb.Blob.from_file_path(str(brand / spec["font"])))
+    font = hb.Font(face)
+    font.set_variations({"opsz": spec["opsz"], "wght": spec["wght"]})
+    upem, track, leading = face.upem, spec["tracking-em"] * face.upem, spec["leading-em"] * face.upem
+    lines = []
+    for n, text in enumerate(spec["lines"]):
+        buf = hb.Buffer()
+        buf.add_str(text)
+        buf.guess_segment_properties()
+        hb.shape(font, buf)
+        x, glyphs = 0.0, []
+        for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+            glyphs.append((info.codepoint, x + pos.x_offset))
+            x += pos.x_advance + track
+        left = min(gx + font.get_glyph_extents(g).x_bearing for g, gx in glyphs)
+        lines.append([(g, gx - left, n * leading) for g, gx in glyphs])
+    d, xs, ys = [], [], []
+    for line in lines:
+        for g, gx, baseline in line:
+            e = font.get_glyph_extents(g)
+            xs += [gx + e.x_bearing, gx + e.x_bearing + e.width]
+            ys += [baseline - e.y_bearing, baseline - e.y_bearing - e.height]
+            d.append(_outline(font, g, gx, baseline))
+    x0, y0 = min(xs), min(ys)
+    w, h = max(xs) - x0, max(ys) - y0
+    name = " / ".join(spec["lines"])
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:g} {y0:g} {w:g} {h:g}" width="{round(w / upem * 100)}" '
+           f'height="{round(h / upem * 100)}">\n<title>{brand.name} wordmark, one color, set in {spec["font"]} '
+           f'(opsz {spec["opsz"]}, wght {spec["wght"]}): {name}</title>\n'
+           f'<path fill="currentColor" d="{" ".join(p for p in d if p)}"/>\n</svg>\n')
+    out = brand / art["file"]
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(svg, encoding="utf-8")
+    art["finest-detail"] = round(finest_detail(out), 4)
+    print(f"{art['file']}: set from {spec['font']}, finest detail {art['finest-detail']}")
+    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return 0
+
+
+def _outline(font, glyph: int, dx: float, baseline: float) -> str:
+    """One glyph's outline as SVG path data, moved to (dx, baseline) and flipped so y grows downward."""
+    parts: list[str] = []
+    pt = lambda x, y: f"{round(x + dx, 1):g} {round(baseline - y, 1):g}"  # noqa: E731
+
+    class Pen:
+        def moveTo(self, p): parts.append("M" + pt(*p))
+        def lineTo(self, p): parts.append("L" + pt(*p))
+        def qCurveTo(self, *ps): parts.append("Q" + " ".join(pt(*p) for p in ps))
+        def curveTo(self, *ps): parts.append("C" + " ".join(pt(*p) for p in ps))
+        def closePath(self): parts.append("Z")
+
+    font.draw_glyph_with_pen(glyph, Pen())
+    return "".join(parts)
 
 
 def clean(svg: str, width: int, height: int, title: str) -> str:
@@ -179,6 +248,8 @@ def match(hex_color: str, palettes: list[str]) -> int:
 def main(argv: list[str]) -> int:
     if len(argv) >= 2 and argv[0] == "trace":
         return max(trace(Path(p)) for p in argv[1:])
+    if len(argv) >= 2 and argv[0] == "set":
+        return max(set_wordmark(Path(p)) for p in argv[1:])
     if len(argv) >= 2 and argv[0] == "measure":
         for p in argv[1:]:
             print(f"{p}: {finest_detail(Path(p)):.4f}")
