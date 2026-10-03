@@ -1,7 +1,7 @@
 /*
  * The theme suite (0014-design-systems FR-036 to FR-039), identical in every web design system: tokens.json mirrors
  * tokens.css; every brand value comes from the theme by reference; the theme supplies every role this system uses,
- * in font families it ships; and no brand color sits in a stylesheet as a literal. Needs http.
+ * in font families it ships; and no stylesheet holds a color literal. Needs http.
  */
 (() => {
   const { suite, fetchText, themeTokens, THEME } = window.Assurance;
@@ -27,7 +27,7 @@
 
   suite("Theme", {
     group: "Unit", needs: "http",
-    description: `Rendered with the theme ${THEME}. tokens.json mirrors tokens.css, with every theme value written as a {role.*} alias; the theme supplies every role this design system uses, in a font family it ships; and no stylesheet holds one of the theme's colors as a literal.`,
+    description: `Rendered with the theme ${THEME}. tokens.json mirrors tokens.css, with every theme value written as a {role.*} alias; the theme supplies every role this design system uses, in a font family it ships; and no stylesheet holds a color literal.`,
   }, (s) => {
     s.test("tokens.json mirrors tokens.css, theme values as {role.*} aliases (FR-036)", async (t) => {
       const css = await declared();
@@ -53,12 +53,11 @@
         if (used) t.ok(shipped.has(resolve(brand, brand.role[role].$value)), `${role} is ${resolve(brand, brand.role[role].$value)}, which this design system does not ship (${[...shipped].join(", ")})`);
       }
     });
-    s.test("no stylesheet holds a theme color as a literal (FR-038)", async (t) => {
-      const brand = await themeTokens();
-      const colors = new Set(Object.values(brand.role).filter((r) => r.$type === "color").map((r) => String(resolve(brand, r.$value)).toLowerCase()));
-      for (const neutral of ["#ffffff", "#000000"]) colors.delete(neutral);
+    s.test("no stylesheet holds a color literal; every color is a role or a mix of roles (FR-044)", async (t) => {
+      const literal = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(|\bcolor\(\s*(?:srgb|display-p3)|(?<![\w-])(?:white|black)(?![\w-])/gi;
       for (const [name, text] of await stylesheets()) {
-        for (const [hex] of text.matchAll(/#[0-9a-f]{6}\b/gi)) t.ok(!colors.has(hex.toLowerCase()), `${name} holds ${hex}, one of ${THEME}'s colors; take it from the theme`);
+        const body = text.replace(/@font-face\s*\{[^}]*\}/g, "");
+        for (const [hit] of body.matchAll(literal)) t.ok(false, `${name} holds the color literal ${hit}; take it from the theme or mix it from roles`);
       }
     });
   });

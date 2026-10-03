@@ -1,7 +1,7 @@
 # Frontiers Brand
 
-Intellectual Frontiers' brand, and the theme of its web design systems: palette, theme roles, unit
-colors, typefaces, logo, icon and imagery identity. Its rules are [`spec.md`](spec.md); it is
+Intellectual Frontiers' brand, and the theme of its web and print design systems: palette, theme roles, unit
+colors, typefaces, logo, icon, share card and imagery pool. Its rules are [`spec.md`](spec.md); it is
 governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md). See
 [`../README.md`](../README.md) for what a design system is and how theming works.
 
@@ -13,6 +13,8 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | `logos/` | The lockup as PNG in every size, light and dark; the icon-only mark. |
 | `logos/web/` | The lockup as WebP in every size below the master, light and dark. |
 | `images/favicon.png` | The icon-only mark at 64×64. |
+| `images/share-card.png` | The link-preview card, 1200×630: the light lockup on the surface. |
+| `imagery/` | The imagery pool: the approved frontier artwork every design system this brand themes chooses from, with `catalog.json` and WebP files for the web. See [`imagery/README.md`](imagery/README.md). |
 | `assurance/` | Tests that double as documentation: the brand contract every brand meets (`contract.js`), this brand's own rules (`unit.js`) and a specimen. `node assurance/run.mjs` runs them headlessly. |
 
 ## Using it
@@ -23,4 +25,4 @@ Used directly (a slide deck, a document, an email signature), take colors from `
 place a logo file at or above its minimum size on the background its variant is for. Never
 redraw, recolor or scale up a logo file.
 
-`brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files.
+`brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files. The imagery pool's WebP files and the share card are written by `tools/brand_imagery.py build`.

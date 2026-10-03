@@ -7,6 +7,7 @@
 #   tools/run_assurance.sh            everything
 #   tools/run_assurance.sh --browser  only the browser harnesses (needs Node, Playwright and Chromium)
 #   tools/run_assurance.sh --tex      only the TeX harnesses (needs TeX Live with XeLaTeX, LuaLaTeX, latexmk, poppler)
+#   tools/run_assurance.sh --images   only each brand's imagery pool and share card (needs ImageMagick with WebP)
 #
 # CI runs each half in its own job (.github/workflows/design-systems.yml).
 set -uo pipefail
@@ -15,10 +16,17 @@ only="${1:-}"
 status=0
 brands=()
 for dir in design-systems/*/; do [[ -f "$dir/brand.css" ]] && brands+=("$(basename "$dir")"); done
+if [[ -z "$only" || "$only" == "--images" ]]; then
+  for brand in "${brands[@]}"; do
+    echo "── $brand's imagery and share card"
+    python3 tools/brand_imagery.py check "design-systems/$brand" || status=1
+  done
+  [[ "$only" == "--images" ]] && exit $status
+fi
 for dir in design-systems/*/; do
   slug=$(basename "$dir")
   if [[ -f "$dir/assurance/run.py" ]]; then
-    [[ "$only" == "--browser" ]] && continue
+    [[ "$only" == "--browser" || "$only" == "--images" ]] && continue
     echo "── $slug, themed by every brand"
     python3 "$dir/assurance/run.py" || status=1
   elif [[ -f "$dir/assurance/run.mjs" ]]; then

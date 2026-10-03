@@ -11,10 +11,10 @@
   }
   .fc-btn:hover { background: var(--fc-accent); }
   .fc-btn[data-variant="primary"] { background: var(--fc-primary); border-color: var(--fc-primary); color: var(--fc-primary-foreground); }
-  .fc-btn[data-variant="primary"]:hover { background: color-mix(in srgb, var(--fc-primary) 88%, black); }
+  .fc-btn[data-variant="primary"]:hover { background: color-mix(in srgb, var(--fc-primary) 88%, var(--brand-text)); }
   .fc-btn[data-variant="ghost"] { border-color: transparent; background: transparent; }
   .fc-btn[data-variant="ghost"]:hover { background: var(--fc-accent); }
-  .fc-btn[data-variant="danger"] { background: var(--fc-danger); border-color: var(--fc-danger); color: #fff; }
+  .fc-btn[data-variant="danger"] { background: var(--fc-danger); border-color: var(--fc-danger); color: var(--brand-surface); }
   .fc-btn[data-size="sm"] { min-block-size: 1.875rem; padding: 0.25rem 0.625rem; font-size: 0.8125rem; }
   .fc-btn[data-size="icon"] { inline-size: 2.25rem; padding: 0; }
   .fc-btn:disabled, .fc-btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
@@ -94,7 +94,7 @@
   .fc-callout[data-type="success"] { --tone: var(--fc-success); --tint: var(--fc-success-tint); }
   .fc-callout::before {
     content: "i"; flex: none; display: grid; place-items: center; inline-size: 1.25rem; block-size: 1.25rem; margin-block-start: 0.125rem;
-    border-radius: 50%; background: var(--tone); color: #fff; font-size: 0.75rem; font-weight: 700; font-style: italic; font-family: serif;
+    border-radius: 50%; background: var(--tone); color: var(--brand-surface); font-size: 0.75rem; font-weight: 700; font-style: italic; font-family: serif;
   }
   .fc-callout[data-type="warning"]::before, .fc-callout[data-type="error"]::before { content: "!"; font-style: normal; font-family: var(--fc-font-sans); }
   .fc-callout[data-type="success"]::before { content: "✓"; font-style: normal; font-family: var(--fc-font-sans); }
@@ -235,7 +235,7 @@
     box-shadow: var(--fc-shadow-lg); overflow: hidden;
   }
   .fc-search-dialog[open] { display: flex; flex-direction: column; }
-  .fc-search-dialog::backdrop { background: rgb(18 24 32 / 40%); backdrop-filter: blur(2px); }
+  .fc-search-dialog::backdrop { background: color-mix(in srgb, var(--brand-text) 40%, transparent); backdrop-filter: blur(2px); }
   .fc-search-input { inline-size: 100%; padding: 0.875rem 1rem; border-block-end: 1px solid var(--fc-border); background: transparent; font-size: 1rem; outline: none; }
   .fc-search-results { overflow-y: auto; padding: 0.5rem; }
   .fc-search-result { display: block; padding: 0.5rem 0.75rem; border-radius: var(--fc-radius-sm); }

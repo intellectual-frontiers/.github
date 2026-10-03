@@ -24,8 +24,8 @@
     s.test("the theme roles map onto the palette as spec.md states (spec FR-014)", async (t) => {
       const all = await tokens();
       const r = (k) => value(all, all.role[k].$value);
-      t.deepEqual(["text", "surface", "primary", "secondary", "tertiary", "success", "warning", "danger", "info", "paper"].map(r),
-        ["#121820", "#ffffff", "#214ea2", "#1f7775", "#8a3147", "#1f7775", "#8a5a24", "#8a3147", "#4a4a8c", "#f3f0e8"]);
+      t.deepEqual(["text", "surface", "primary", "secondary", "tertiary", "success", "warning", "danger", "info", "accent", "link", "paper"].map(r),
+        ["#121820", "#ffffff", "#214ea2", "#1f7775", "#8a3147", "#1f7775", "#8a5a24", "#8a3147", "#4a4a8c", "#8a3147", "#214ea2", "#f3f0e8"]);
     });
     s.test("Inter and Source Serif 4, and Inter Bold for the wordmark (spec FR-004)", async (t) => {
       const { typeface } = await tokens();

@@ -80,24 +80,16 @@
 
 \usepackage[stretch=20, shrink=20]{microtype}
 
-\definecolor{ifaccent}{HTML}{D2691E}
-\definecolor{ifink}{HTML}{1A1A1A}
-\definecolor{ifgray}{HTML}{595959}
-\definecolor{ifrule}{HTML}{D9D9D6}
-\definecolor{ifboxbg}{HTML}{F5F5F2}
-\definecolor{iflink}{HTML}{26428C}
-
-\definecolor{ifjackettitle}{HTML}{10273F}
-\definecolor{ifjacketsubtitle}{HTML}{3E5570}
-\definecolor{ifjacketlabel}{HTML}{8C8C8C}
-\definecolor{ifjacketbody}{HTML}{404040}
-\definecolor{ifjacketquote}{HTML}{595959}
-
-\colorlet{ifdeepink}{brand-text}
-\colorlet{iffrontierblue}{brand-primary}
-\colorlet{ifsignalteal}{brand-secondary}
-\colorlet{ifoxblood}{brand-tertiary}
-\definecolor{ifseriesblue}{HTML}{173A75}
+% Every color is a theme role or a mix of roles; none is a literal (0014-design-systems FR-044).
+\colorlet{ifink}{brand-text}
+\colorlet{ifgray}{brand-text!72!brand-surface}
+\colorlet{iflabel}{brand-text!50!brand-surface}
+\colorlet{ifrule}{brand-text!15!brand-surface}
+\colorlet{iftint}{brand-text!4!brand-surface}
+\colorlet{ifaccent}{brand-accent}
+\colorlet{iflink}{brand-link}
+\colorlet{ifsubtitle}{brand-tertiary}
+\colorlet{ifseries}{brand-primary}
 
 \color{ifink}
 
@@ -222,22 +214,22 @@
   \end{tcolorbox}
   \addvspace{0.6\baselineskip}
 }
-\definecolor{ifnote}{HTML}{26428C}
-\definecolor{iftip}{HTML}{2E7D32}
-\definecolor{ifimportant}{HTML}{B45309}
-\definecolor{ifwarning}{HTML}{B91C1C}
-\definecolor{ifcaution}{HTML}{B91C1C}
+\colorlet{ifnote}{brand-info}
+\colorlet{iftip}{brand-success}
+\colorlet{ifimportant}{brand-warning}
+\colorlet{ifwarning}{brand-danger}
+\colorlet{ifcaution}{brand-danger}
 
 \newtcolorbox{ifsidebar}[1]{
-  enhanced, breakable, colback=ifboxbg, colframe=ifrule, boxrule=0.5pt,
-  arc=2pt, colbacktitle=ifboxbg, coltitle=ifaccent,
+  enhanced, breakable, colback=iftint, colframe=ifrule, boxrule=0.5pt,
+  arc=2pt, colbacktitle=iftint, coltitle=ifaccent,
   fonttitle=\ifsans\bfseries\raggedright\ifnohyph, titlerule=0pt, attach title to upper={\par\smallskip\noindent},
   title={\MakeUppercase{#1}},
   top=10pt, bottom=10pt, left=14pt, right=14pt,
 }
 
-\definecolor{iftryaibg}{HTML}{EBF0F6}
-\definecolor{iftryairule}{HTML}{B9C7D6}
+\colorlet{iftryaibg}{brand-link!8!brand-surface}
+\colorlet{iftryairule}{brand-link!30!brand-surface}
 \newtcolorbox{iftryai}[1]{
   enhanced, breakable, colback=iftryaibg, colframe=iftryairule, boxrule=0.5pt,
   arc=2pt, colbacktitle=iftryaibg, coltitle=iflink,
@@ -266,11 +258,11 @@
 
 \fvset{breaklines=true, breaksymbolleft={}, fontsize=\fontsize{8.8pt}{11.4pt}\selectfont}
 \newtcolorbox{ifcode}{
-  breakable, colback=ifboxbg, colframe=ifrule, boxrule=0.5pt, arc=2pt,
+  breakable, colback=iftint, colframe=ifrule, boxrule=0.5pt, arc=2pt,
   top=8pt, bottom=8pt, left=10pt, right=10pt,
   fontupper=\ifmono\fontsize{8.8pt}{11.4pt}\selectfont,
 }
-\newcommand{\ifcodespan}[1]{{\setlength{\fboxsep}{1.2pt}\colorbox{ifboxbg}{\vphantom{Xyj}\iftryaimono\fontsize{9pt}{1em}\selectfont #1}}}
+\newcommand{\ifcodespan}[1]{{\setlength{\fboxsep}{1.2pt}\colorbox{iftint}{\vphantom{Xyj}\iftryaimono\fontsize{9pt}{1em}\selectfont #1}}}
 
 \newcommand{\iftitlepage}[3]{%
   \thispagestyle{empty}
