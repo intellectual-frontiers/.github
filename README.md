@@ -293,7 +293,7 @@ system. The others, one directory each and listed with their kinds in
 [`design-systems/README.md`](design-systems/README.md): the web
 (`frontiers-nature-web`, `frontiers-console-web`), print (`frontiers-print`,
 `frontiers-signage-print`), figures (`frontiers-figures`), slides (`frontiers-slides`),
-media (`frontiers-media`), email (`frontiers-email`), merchandise
+media (`frontiers-media`), email (`frontiers-email`), courses (`frontiers-course`), merchandise
 (`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
 `frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
 looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system

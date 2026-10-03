@@ -1,0 +1,14 @@
+---
+title: Estimate the barbers in your city
+type: exercise
+minutes: 10
+outcomes: O1, O2
+---
+Estimate how many barbers work in your city. Write each factor on its own line with the reason for its value, then
+multiply them out.
+
+1. How many people live in your city, and how many of them get their hair cut by a barber?
+2. How often does each of them go?
+3. How many haircuts does one barber give in a day, and how many days a year do they work?
+
+Keep your factors. The next unit asks you to check your answer against a published count.

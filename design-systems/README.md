@@ -37,6 +37,7 @@ Each kind has a profile in
 | email | `email` | The messages the house sends by email | Layout data, and the tool that builds and checks a message |
 | media | `media` | The images that package a work for a platform | Asset formats, and the tool that lays out and renders them |
 | slides | `slides` | How a talk, lecture, workshop or briefing is presented on a screen | A slide stylesheet, and the builder and checker for decks |
+| course | `course` | How a long-form course is structured, paced, assessed and made accessible | A course schema, and the reader and checker for a course's source |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
 

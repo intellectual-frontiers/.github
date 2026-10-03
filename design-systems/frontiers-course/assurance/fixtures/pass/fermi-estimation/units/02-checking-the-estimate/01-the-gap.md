@@ -1,0 +1,23 @@
+---
+title: What the gap tells you
+type: reading
+minutes: 3
+outcomes: O3
+---
+Once you have an estimate, look for a measured value to compare it with. A census, a trade association or a
+licensing board often counts what you estimated. The gap between your number and theirs is information.
+
+## Reading the gap
+
+A gap within a factor of three means your factors were sound, and the remaining difference is the sort of error
+that estimation always carries. A gap of ten or more means at least one factor was badly off. Go back through your
+lines one at a time and ask which assumption, if it were wrong, would move the answer that far.
+
+## A worked comparison
+
+Suppose a licensing board lists 28 piano tuners in the city where we estimated 20. The gap is less than a factor of
+two, so the estimate holds. If the board had listed 300, we would look first at the share of households with a
+piano and at how often a piano is tuned, because those are the factors we had the least reason to be sure of.
+
+A measured value can be wrong as well. A board counts only licensed tuners, and a census counts people by their
+main job. Say which count you compared against, and what it leaves out.
