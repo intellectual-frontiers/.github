@@ -126,6 +126,8 @@ spec-kit/
   specs/            one testable spec per NNNN-slug, numbered independently
                     in each repository
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
+  controls.tsv      which compliance control each requirement addresses
+                    (0027-compliance-controls)
 tools/
   spec_check.py     checks specs and the register; CI runs it on every push
 ontology/
@@ -201,6 +203,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
+| [0027](spec-kit/specs/0027-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
+| [0028](spec-kit/specs/0028-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
