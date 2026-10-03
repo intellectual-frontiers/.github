@@ -512,10 +512,24 @@ frontiers-nature-web FR-020	none	-	registry contents not checked
 0022-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
 0022-tooling-environment FR-004	none	-	no check scans tools for installs at run time
 0022-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0022-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet (OQ-1, OQ-2)
+0022-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet
 0022-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0022-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin file exists and holds one flake reference at a full commit
-0022-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet (OQ-2)
-0022-tooling-environment FR-010	none	-	no CI job yet (OQ-2)
+0022-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form only; neither its published images nor the devcontainer tag's match is checked
+0022-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet
+0022-tooling-environment FR-010	none	-	no CI job yet
 0022-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
 0022-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0023-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
+0023-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0023-workspaces FR-003	none	-	no check
+0023-workspaces FR-004	none	-	no .devcontainer/ yet; no check of its image tag
+0023-workspaces FR-005	none	-	no check reads ws-repos.json
+0023-workspaces FR-006	none	-	no check reads devcontainer.json
+0023-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
+0023-workspaces FR-008	none	-	no check reads devcontainer.json
+0023-workspaces FR-009	none	-	documentation judgment
+0023-workspaces FR-010	none	-	no check reads the README
+0023-workspaces FR-011	none	-	documentation judgment
+0023-workspaces FR-012	none	-	no check inspects the image manifest
+0023-workspaces FR-013	none	-	no check
+0023-workspaces FR-014	none	-	no check

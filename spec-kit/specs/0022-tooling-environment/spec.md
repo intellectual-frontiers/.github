@@ -12,7 +12,8 @@ tool is also guaranteed to run in one reference environment,
 AI agent working there never has to install anything to use it. This
 spec states both halves, how the guarantee is pinned and checked, and
 what happens when a tool needs something the reference environment
-lacks.
+lacks. How people enter the reference environment, in which flavor, is
+0023-workspaces.
 
 ## Scope
 
@@ -44,40 +45,49 @@ lacks.
 
 ## The reference environment
 
-- **FR-005**: The reference environment for tooling MUST be the base
-  profile of `intellectual-frontiers/workspaces-host-v3`, with no
-  persona, built from its flake at the commit pinned under FR-008.
+- **FR-005**: The reference environment for tooling MUST be
+  `intellectual-frontiers/workspaces-host-v3`, built from its flake at
+  the commit pinned under FR-008, with the personas the repository's
+  devcontainer names (0023-workspaces FR-004), in any of its flavors
+  (0023-workspaces FR-001).
 - **FR-006**: Every tool MUST run unmodified in the reference
   environment from a fresh clone of the repository that holds it, with
-  no step beyond the clone. Every prerequisite a tool declares MUST be
-  supplied by the reference environment.
-- **FR-007**: A tool that needs a prerequisite the base profile lacks
-  MUST either name the workspaces-host-v3 persona that supplies it, in
-  which case FR-006 holds with that persona added, or wait until the
-  prerequisite is added to workspaces-host-v3 under that repository's
-  own specs. A repository MUST NOT close the gap itself with its own
-  installer, version manager, or bootstrap script.
+  no step beyond the clone: no `make install`, package install, virtual
+  environment, or other setup command. Every prerequisite a tool
+  declares MUST be supplied by the reference environment.
+- **FR-007**: A tool that needs a prerequisite the reference environment
+  lacks MUST either use a workspaces-host-v3 persona that supplies it,
+  named by the repository's devcontainer (0023-workspaces FR-004), or
+  wait until the prerequisite is added to workspaces-host-v3 under that
+  repository's own specs. A repository MUST NOT close the gap itself
+  with its own installer, install target, requirements file, version
+  manager, or bootstrap script.
 - **FR-008**: Each repository holding tools MUST pin the reference
   environment in exactly one place, `tools/reference-environment`: a
   single line holding a Nix flake reference to
   `github:intellectual-frontiers/workspaces-host-v3` at a full 40-hex
-  commit. No other file in the repository MAY name a reference
-  environment commit.
+  commit for which workspaces-host-v3 has published its images, tagged
+  `sha-` and the commit's first seven hex digits. The repository's
+  `.devcontainer/` files MAY name that image tag and MUST match the pin;
+  no other file in the repository MAY name a reference environment
+  commit.
 - **FR-009**: Moving the pin to a newer commit MUST be a change of its
   own, and it MUST pass FR-010's run before it merges.
 - **FR-010**: Each repository's CI MUST run every tool inside the
-  reference environment at the pinned commit, on every push and pull
-  request that changes the tool, what it checks, or the pin. A tool that
-  fails there MUST fail CI.
+  reference environment's published container image at the pinned
+  commit's tag, the same image the repository's devcontainer names, on
+  every push and pull request that changes the tool, what it checks, or
+  the pin. A tool that fails there MUST fail CI.
 - **FR-011**: Each repository's CI MUST also run every tool at least
   once outside the reference environment, on a host given only the
   tool's declared prerequisites, so that FR-002 and FR-003 are tested
   rather than assumed.
 - **FR-012**: The reference environment MUST be named only in this spec,
-  in the ontology (`ifcore:ReferenceEnvironment`), and in the pin file
-  (FR-008). A tool's own code and comments MUST NOT name it. When a
-  successor to workspaces-host-v3 is adopted, this spec, the ontology
-  individual, and each pin file change; no tool does.
+  in 0023-workspaces, in the ontology (`ifcore:ReferenceEnvironment`),
+  in the pin file (FR-008), in each repository's `.devcontainer/` files,
+  and in contributor documentation. A tool's own code and comments MUST
+  NOT name it. When a successor to workspaces-host-v3 is adopted, these
+  change; no tool does.
 
 ## Out of scope
 
@@ -87,9 +97,7 @@ lacks.
   reader's AI runs (0009-press FR-016, 0016-press-production FR-039), or
   a design system a consumer vendors (0014-design-systems). Their
   portability is stated by the specs that govern them.
-- Which CI provider runs FR-010 and FR-011, and how a job enters the
-  reference environment (an activated home-manager profile or the
-  container image workspaces-host-v3 builds from the same closure).
+- Which CI provider runs FR-010 and FR-011.
 
 ## Edge cases
 
@@ -109,6 +117,17 @@ lacks.
   nothing, per FR-004.
 - A newer workspaces-host-v3 commit that breaks a tool: the pin does not
   move until FR-010's run passes, per FR-009.
+- A workspaces-host-v3 commit that changed nothing in the environment, so
+  no image was published for it: it cannot be pinned; the pin names the
+  latest commit with published images, per FR-008.
+- A repository that used to install its prerequisites with `make
+  install`: the install targets and requirements file are removed, and
+  each prerequisite moves into workspaces-host-v3's base profile or a
+  persona, per FR-006 and FR-007.
+- An environment variable a tool relies on that the reference
+  environment sets only for a login shell: CI and devcontainers enter
+  the environment through a login shell, so the tool needs no override,
+  per FR-006 and FR-010.
 - workspaces-host-v3 is superseded by a successor: this spec, the
   ontology individual, and the pin files change together, per FR-012.
 
@@ -121,15 +140,7 @@ lacks.
 
 ## Open questions
 
-- **OQ-1**: The design-system harnesses load the `playwright` Node
-  module, which workspaces-host-v3's base profile does not carry (it
-  carries Node, Chromium, and Playwright's browsers). Either the module
-  is added there, or the harness drives Chromium without it; until one
-  happens, `tools/run_assurance.sh` does not meet FR-006.
-- **OQ-2**: workspaces-host-v3 builds its container image but does not
-  publish it. Whether CI enters the reference environment by building
-  the profile on each run or by pulling a published image is not
-  decided, and FR-010 has no job yet.
+None.
 
 ## Key entities
 
@@ -137,8 +148,9 @@ lacks.
   or CI job an Eidolon repository runs on its own content.
 - **A prerequisite** — a runtime, binary, or module a tool needs and
   declares.
-- **The reference environment** — workspaces-host-v3's base profile,
-  where every tool is guaranteed to run.
+- **The reference environment** — workspaces-host-v3 with the personas a
+  repository names, in any flavor, where every tool is guaranteed to
+  run.
 - **The pin** — the one commit of the reference environment a repository
   is guaranteed against, in `tools/reference-environment`.
 

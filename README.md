@@ -202,6 +202,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
 | [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
 | [0022](spec-kit/specs/0022-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
+| [0023](spec-kit/specs/0023-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -286,6 +287,8 @@ runs it on every push that touches `design-systems/`.
 - [ ] A spec exists for the change, and any spec it affects is amended.
 - [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
+- [ ] Any tool you add declares its prerequisites and installs nothing; it
+      runs from a fresh clone in workspaces-host-v3 (0022).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.
