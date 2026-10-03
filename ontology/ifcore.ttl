@@ -428,6 +428,8 @@ ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFami
 
 ifcore:WorkDomain a owl:Class ; rdfs:label "Work domain"@en ;
     rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
+ifcore:MarketplacesAndPayments a ifcore:WorkDomain ; rdfs:label "Marketplaces and payments"@en ;
+    rdfs:comment "Computer-controlled marketplace networks, digital payments, and related continuations."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:EvidenceAndDecisions a ifcore:WorkDomain ; rdfs:label "Evidence and decisions"@en ;
     rdfs:comment "Traceable metric queues, task scheduling, service-delivery evidence, initiative tracking, document review, case response, decision lifecycles, and risk systems."@en ;
