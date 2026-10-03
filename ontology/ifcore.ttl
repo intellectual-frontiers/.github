@@ -42,6 +42,7 @@ ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:ran
 
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
     rdfs:label "Intellectual Frontiers LLC"@en ;
+    skos:altLabel "Intellectual Frontiers"@en ;
     schema:slogan "A think tank that builds useful things."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -284,6 +285,23 @@ ifcore:FrontiersFigures a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
     rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersWrittenVoice a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-written-voice" ;
+    rdfs:label "Frontiers Written Voice"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:WrittenVoiceDesignSystemKind ;
+    rdfs:comment "At design-systems/frontiers-written-voice/; its house rules are design-systems/frontiers-written-voice/spec.md. How the house writes: voice, usage, punctuation and presentation form, with the Chicago Manual of Style as its style authority, and the patterns its mechanical sweep looks for (0014-design-systems FR-033)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSpokenVoice a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-spoken-voice" ;
+    rdfs:label "Frontiers Spoken Voice"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:SpokenVoiceDesignSystemKind ;
+    prov:wasDerivedFrom ifcore:FrontiersWrittenVoice ;
+    rdfs:comment "At design-systems/frontiers-spoken-voice/; its house rules are design-systems/frontiers-spoken-voice/spec.md. How the house voice changes for the ear: scripts written to be heard once, with the written voice's patterns and its own announcement and story-label patterns (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;

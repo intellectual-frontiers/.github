@@ -1,0 +1,30 @@
+{
+  "$description": "frontiers-spoken-voice's own patterns (spec FR-005 to FR-008), swept together with frontiers-written-voice's (inherited/) by sweep.py. Announcement openings are matched at the start of a sentence; fail_contains and fail_labels anywhere. spec.md is the source; this file must agree with it.",
+  "fail_announcements": [
+    "here's the part", "here is the part", "this is the part", "here is the whole rule", "here's the thing",
+    "here's how", "here's what", "here's why", "here are ways", "here are a few", "here are some", "here are the",
+    "in this episode", "in today's episode", "this episode is about", "today i want", "i want to talk about",
+    "i'd like to talk about", "i'm going to talk about", "i am going to talk about", "i'll start", "i will start",
+    "i'll begin", "let's start with", "let's begin", "let's move on", "let's talk about", "let's dive", "now let's",
+    "now, let's", "let me", "before i close", "before we wrap", "to wrap up", "to summarize", "in summary",
+    "the key takeaway", "the big takeaway", "great question", "let's unpack", "one more thing", "one more for",
+    "one more point", "two more moves", "two more things", "two more points", "two more questions", "two more tools",
+    "two more ideas", "two more reasons", "three more things", "the last tool", "the last piece", "the last thing",
+    "the last framework", "the last point", "the last question", "the next thing", "the next piece",
+    "the final piece", "the final thing", "now the part", "now the buyer's side", "now the builder's side",
+    "now the seller's side", "now the other side", "now for ", "so let me"
+  ],
+  "warn_announcements": [
+    "here's", "here is", "here are", "one more", "the last ", "the next ", "the final ", "so what does"
+  ],
+  "fail_contains": [
+    "deserves its own", "i'll be direct about", "i want to name", "worth naming", "let me say something",
+    "let me be clear"
+  ],
+  "fail_labels": [
+    "illustrative", "composite", "hypothetical case", "hypothetical example", "for illustration",
+    "for the sake of illustration", "made-up", "made up story", "fictional", "fictitious"
+  ],
+  "max_seesaws": 1,
+  "warn_not_fragments": 3
+}
