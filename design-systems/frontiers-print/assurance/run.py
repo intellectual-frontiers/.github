@@ -13,7 +13,7 @@ default layout) with that brand as the theme, and checks:
   - every font in the PDF is embedded and is one this design system ships (fonts/);
   - each theme color the style files use reached the build as the brand's value (brand.tex);
   - the brand's lockups and icon are placed in the book;
-  - no style file holds one of the brand's colors as a literal.
+  - no style file holds a color literal: every color is a role or a mix of roles (0014-design-systems FR-044).
 
 Needs Python 3, latexmk with XeLaTeX and LuaLaTeX, and poppler-utils (pdfinfo, pdffonts, pdfimages). Exits
 non-zero on any failure. This file is the harness and its documentation.
@@ -33,10 +33,15 @@ SYSTEM = HERE.parent
 sys.path.insert(0, str(SYSTEM / "latex"))
 import layout  # noqa: E402  (this design system's own layout resolver)
 
-# Fixture -> engine, page size in points, and which theme role each style-file color must carry.
+# Fixture -> engine, page size in points, and which theme role or mix of roles each style-file color must carry.
+# A role mix is written as xcolor writes it: "text!72!surface" is 72% text, 28% surface.
 FIXTURES = {
-    "book": ("-xelatex", (504.0, 661.68), {"ifdeepink": "text", "iffrontierblue": "primary", "ifsignalteal": "secondary", "ifoxblood": "tertiary"}),
-    "article": ("-lualatex", (612.0, 792.0), {"ifink": "text", "ifblue": "primary", "ifoxblood": "tertiary", "ifteal": "secondary"}),
+    "book": ("-xelatex", (504.0, 661.68), {
+        "ifink": "text", "ifaccent": "accent", "iflink": "link", "ifsubtitle": "tertiary", "ifseries": "primary",
+        "ifnote": "info", "iftip": "success", "ifimportant": "warning", "ifwarning": "danger",
+        "ifgray": "text!72!surface", "iflabel": "text!50!surface", "ifrule": "text!15!surface", "iftint": "text!4!surface"}),
+    "article": ("-lualatex", (612.0, 792.0), {
+        "ifink": "text", "ifgray": "text!70!surface", "ifrule": "text!22!surface", "iftint": "text!4!surface"}),
 }
 
 
@@ -80,9 +85,8 @@ def run(brand: Path, keep: Path | None) -> Result:
     families = {s.split("-")[0] for s in shipped}
     for p in sorted((SYSTEM / "latex").glob("*")):
         if p.suffix in (".tex", ".cls"):
-            literals = {h.upper() for h in re.findall(r"\{HTML\}\{([0-9A-Fa-f]{6})\}", p.read_text(encoding="utf-8"))}
-            hits = sorted(literals & set(values.values()) - {"FFFFFF", "000000"})
-            r.check(not hits, f"latex/{p.name} holds {', '.join(hits)} as a literal: one of {brand.name}'s colors; take it from brand.tex")
+            hits = re.findall(r"\\definecolor\{[^}]*\}\{[^}]*\}\{[^}]*\}|\{(?:HTML|rgb|RGB|cmyk|gray)\}\{[^}]*\}", p.read_text(encoding="utf-8"))
+            r.check(not hits, f"latex/{p.name} holds the color literal {', '.join(hits)}; take it from brand.tex or mix it from roles")
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(keep) / brand.name if keep else Path(tmp)
         for name, (_, size, colors) in FIXTURES.items():
@@ -107,7 +111,7 @@ def run(brand: Path, keep: Path | None) -> Result:
                 r.check(any(flat.startswith(f) for f in families), f"{name}: font {base} is not one this design system ships")
             for color, role in colors.items():
                 got = re.search(rf"THEME {color}=(\w+):([^\s]+)", log)
-                want = values.get(role)
+                want = _expected(role, values)
                 ok = bool(got) and want is not None and (got.group(2).upper() == want or _rgb_matches(got.group(1), got.group(2), want))
                 r.check(ok, f"{name}: {color} is {got.group(0) if got else 'not logged'}, not {brand.name}'s {role} ({want})")
             if name == "book":
@@ -116,11 +120,23 @@ def run(brand: Path, keep: Path | None) -> Result:
     return r
 
 
+def _expected(role: str, values: dict[str, str]) -> str | None:
+    """A role's value, or a mix of two roles ("text!72!surface"), as six hex digits."""
+    if "!" not in role:
+        return values.get(role)
+    a, pct, b = role.split("!")
+    if a not in values or b not in values:
+        return None
+    w = int(pct) / 100
+    mix = [w * int(values[a][i:i + 2], 16) + (1 - w) * int(values[b][i:i + 2], 16) for i in (0, 2, 4)]
+    return "".join(f"{round(c):02X}" for c in mix)
+
+
 def _rgb_matches(model: str, spec: str, want: str) -> bool:
     if model != "rgb":
         return False
-    parts = [round(float(x) * 255) for x in spec.split(",")]
-    return parts == [int(want[i:i + 2], 16) for i in (0, 2, 4)]
+    parts = [float(x) * 255 for x in spec.split(",")]
+    return all(abs(p - int(want[i:i + 2], 16)) <= 1 for p, i in zip(parts, (0, 2, 4)))
 
 
 def main() -> int:

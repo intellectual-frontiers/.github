@@ -1,0 +1,90 @@
+{
+  "$description": "example-brand's imagery pool (0014-design-systems FR-043): one plain test drawing, so every design system that requires imagery can be proven under a second brand.",
+  "fields": {
+    "id": "stable slug, environment first and then the anchor; the master's file name without .png",
+    "name": "a short human name",
+    "file": "the master: <id>.png, the approved file byte for byte, with real transparency",
+    "environment": "one of `environments`",
+    "description": "what is drawn, foreground to horizon",
+    "visual_anchor": "the one built thing the eye lands on",
+    "route": "how people move through the scene",
+    "built_structures": "every human-made thing in the scene",
+    "infrastructure_type": "the kind of system the structures form (bridge, railway, dam, observatory, ...)",
+    "colored_elements": "what carries color: human intervention, plus water when present",
+    "water": "present: true/false, and its form",
+    "metaphors": "what the piece can stand for",
+    "suggested_subjects": "subjects the metaphors suit; a starting point, not a rule",
+    "source": "where the approved piece came from",
+    "pixel_size": "[width, height] of the master",
+    "content_box": "[left, top, right, bottom] pixel bounds of the drawn art (alpha > 16); a renderer that needs the art alone trims to it",
+    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by tools/brand_imagery.py build"
+  },
+  "environments": [
+    "mountain-alpine",
+    "forest",
+    "desert-canyon",
+    "badlands-plains",
+    "maritime-coastal",
+    "volcanic",
+    "subterranean"
+  ],
+  "pieces": [
+    {
+      "id": "example-ridge-trail",
+      "name": "Example Ridge Trail",
+      "file": "example-ridge-trail.png",
+      "environment": "mountain-alpine",
+      "description": "Two gray ridges above a blue lake, a red trail climbing from the shore to a red hut.",
+      "visual_anchor": "the hut at the trail's end",
+      "route": "a trail from the lake shore up the near ridge",
+      "built_structures": [
+        "trail",
+        "hut"
+      ],
+      "infrastructure_type": [
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "hut",
+        "lake"
+      ],
+      "water": {
+        "present": true,
+        "form": "a lake below the ridges"
+      },
+      "metaphors": [
+        "a first route into new ground"
+      ],
+      "suggested_subjects": [
+        "testing a theme"
+      ],
+      "source": {
+        "supplied": "2026-10-03",
+        "generator": "tools/brand_imagery.py test drawing"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        40,
+        300,
+        1411,
+        1041
+      ],
+      "web": [
+        {
+          "file": "web/example-ridge-trail-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/example-ridge-trail-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 /*
- * Frontiers Nature's semantic tokens. Every brand value comes from the theme, as var(--brand-<role>)
- * (spec FR-004; 0014-design-systems FR-038); the rest are this design system's own. Unit colors are
+ * Frontiers Nature's semantic tokens. Every color comes from the theme, as var(--brand-<role>) or a mix of
+ * roles (spec FR-004; 0014-design-systems FR-038); no color is written as a literal. Unit colors are
  * identifiers, not decorative floods. Mirrored in tokens.json; this file is the source of truth.
  */
 @layer theme, reset, tokens, base, chrome, components;
@@ -12,12 +12,12 @@
     /* brand */
     --ink: var(--brand-text);
     --paper: var(--brand-paper);
-    --stone: #f0eee8;
-    --shell: #f4f4f2;
-    --rule: #e2e0da;
+    --stone: color-mix(in srgb, var(--brand-text) 2%, var(--brand-paper));
+    --shell: color-mix(in srgb, var(--brand-text) 5%, var(--brand-surface));
+    --rule: color-mix(in srgb, var(--brand-text) 8%, var(--brand-paper));
     --background: var(--brand-surface);
     --foreground: var(--ink);
-    --muted-foreground: #5b6270;
+    --muted-foreground: color-mix(in srgb, var(--brand-text) 72%, var(--brand-surface));
 
     /* units */
     --capital: var(--brand-unit-capital);
@@ -54,8 +54,8 @@
   :root[data-theme="dark"] {
     color-scheme: dark;
     --background: var(--brand-text);
-    --foreground: #fff;
-    --muted-foreground: #a7adb8;
-    --rule: rgb(255 255 255 / 0.16);
+    --foreground: var(--brand-surface);
+    --muted-foreground: color-mix(in srgb, var(--brand-surface) 68%, var(--brand-text));
+    --rule: color-mix(in srgb, var(--brand-surface) 16%, transparent);
   }
 }

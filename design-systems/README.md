@@ -104,23 +104,27 @@ house rule by being written into the spec as a requirement.
 A **brand** design system holds one identity: its palette, typefaces, logo, icon and imagery, as
 primitive tokens in `tokens.json` (the Design Tokens Community Group format), and a fixed set of
 **theme roles** every brand supplies under the same names: `text`, `surface`, `primary`,
-`secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `font-sans` and `font-serif`. Its
+`secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `accent`, `link`, `font-sans` and `font-serif`. Its
 `brand.css` declares those roles as `--brand-*` custom properties for the web, `brand.tex` declares
 them as `brand-<role>` colors and font and logo commands for print, and `tokens.json` lists its logo
-files and favicon. `tools/brand_theme.py` writes both theme files from `tokens.json`.
+files, favicon and share card. `tools/brand_theme.py` writes both theme files from `tokens.json`. A brand may
+also supply an **imagery pool** (`imagery/`): the approved artwork every design system it themes
+chooses from, catalogued in `imagery/catalog.json`. `tools/brand_imagery.py` builds and checks it.
 
-A **web** design system never holds a brand value. Its semantic tokens reference the roles
-(`--fc-primary: var(--brand-primary)`), its tints are mixed from them with `color-mix()`, and its
-logo and favicon come from the brand's `tokens.json`. Pairing a web design system with a brand is a
+A **web** design system never holds a color literal. Its semantic tokens reference the roles
+(`--fc-primary: var(--brand-primary)`), every other color (a neutral, a tint, a rule, an overlay) is
+mixed from them with `color-mix()`, its logo, favicon and share card come from the brand's
+`tokens.json`, and every picture it places comes from the brand's imagery pool. Pairing a web design system with a brand is a
 **theme**. A theme changes colors, the typeface (among families the web system ships), the logo and
 the favicon; it never changes layout, spacing, components, motion or accessibility.
 
 A **print** design system works the same way: it loads the brand's `brand.tex` before its own
 definitions, takes its colors, its text and cover families (among the fonts it ships) and its logos
-from it, and holds none as a literal.
+from it, mixes every other color from its roles, takes cover artwork from its imagery pool, and
+holds no color literal.
 
 That is how white-labeling works: a company that wants a web or print design system in its own
-colors and logo supplies a brand, and the design system is used unchanged. A brand that is not yet public
+colors, logo and imagery supplies a brand, and the design system is used unchanged. A brand that is not yet public
 lives, with the same layout and harness, outside this repository.
 
 Every web design system's harness runs under any brand vendored beside it

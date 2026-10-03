@@ -21,10 +21,9 @@ book duty.
 
 All three are SIL Open Font License, redistributable, and committed
 here as Latin-subset static instances (regular/bold/italic/bold-italic
-each) built from Google's variable-font sources with `fonttools`. The
-accent color (a warm orange, `D2691E`) is a deliberately-chosen
-approximation in the same family as O'Reilly's, not a copy of their
-exact brand hex.
+each) built from Google's variable-font sources with `fonttools`. Every
+color, including the accent on chapter and section headings and the link
+color, is the theme's (spec FR-003).
 
 A fourth face, outside the Source superfamily, is used in exactly one
 place: **Martian Mono Condensed** (Evil Martians, SIL OFL) for the

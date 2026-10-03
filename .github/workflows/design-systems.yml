@@ -1,13 +1,14 @@
 # Runs every design system's assurance harness on every push and pull request that touches a design system
 # (0014-design-systems FR-015, FR-017, FR-039): the browser harnesses (web and brand design systems) in one job,
-# the TeX harnesses (print design systems) in another, each under every brand here.
+# the TeX harnesses (print design systems) in another, each under every brand here, and each brand's imagery
+# pool and share card in a third.
 name: design-systems
 
 on:
   push:
-    paths: ["design-systems/**", "tools/run_assurance.sh", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", ".github/workflows/design-systems.yml"]
   pull_request:
-    paths: ["design-systems/**", "tools/run_assurance.sh", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", ".github/workflows/design-systems.yml"]
 
 permissions:
   contents: read
@@ -37,3 +38,14 @@ jobs:
           sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
       - name: TeX harnesses
         run: tools/run_assurance.sh --tex
+
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ImageMagick
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q imagemagick webp
+      - name: Brand imagery
+        run: tools/run_assurance.sh --images

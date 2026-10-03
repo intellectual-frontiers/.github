@@ -1,8 +1,8 @@
 /* Integration suites for Frontiers Nature: the page frame, loaded into real sized iframes. Needs http(s). */
 (() => {
-  const { suite, color, sleep, frame } = window.Assurance;
-  const PAGE = "assurance/fixtures/page.html";
-  async function withFrame(size, fn) { const f = await frame(PAGE, size); try { return await fn(f); } finally { f.close(); } }
+  const { suite, color, sleep, frame, THEME } = window.Assurance;
+  const PAGE = "assurance/fixtures/page.html", HOME = "assurance/fixtures/home.html";
+  async function withFrame(size, fn, page = PAGE) { const f = await frame(page, size); try { return await fn(f); } finally { f.close(); } }
 
   suite("Markup contract", {
     group: "Integration", needs: "http",
@@ -64,6 +64,31 @@
       t.ok(f.doc.fonts.check('16px "Inter"'), "Inter"); t.ok(f.doc.fonts.check('500 24px "Source Serif 4"'), "Source Serif 4");
       t.ok(f.style(f.$(".t-title"), "fontFamily").startsWith('"Source Serif 4"'), "page title is serif");
     }));
+  });
+
+  suite("Hero", {
+    group: "Integration", needs: "http",
+    description: "The home page hero sets one piece of the theme's imagery pool, whole and uncropped, on the page's own background beside the title, lede and actions; its text meets AA and it fits every width from 320px.",
+  }, (s) => {
+    s.test("the hero's artwork is a piece of the theme's imagery pool (FR-021)", (t) => withFrame({ width: 1280 }, async (f) => {
+      const art = f.$(".hero__art");
+      t.ok(art, "img.hero__art");
+      t.ok(new URL(art.currentSrc || art.src).pathname.includes(`/${THEME}/imagery/`), `${art.currentSrc || art.src} is not in ${THEME}'s imagery pool`);
+      t.ok(art.naturalWidth > 0, "the artwork loads");
+      t.equal(f.style(art, "objectFit"), "contain", "never cropped");
+      t.equal(f.$$(".hero [class*='scrim'], .hero__media").length, 0, "nothing covers the artwork");
+    }, HOME));
+    s.test("hero text meets AA on the page background", (t) => withFrame({ width: 1280 }, (f) => {
+      for (const el of f.$$(".t-display, .hero__lede, .hero__actions .btn")) {
+        const fg = color.parse(f.style(el, "color"));
+        let bg = color.parse(f.style(el, "backgroundColor"));
+        for (let n = el; bg.a === 0 && n; n = n.parentElement) bg = color.parse(f.style(n, "backgroundColor"));
+        t.atLeast(color.contrast(fg, bg.a ? bg : { r: 255, g: 255, b: 255, a: 1 }), 4.5, el.textContent.trim().slice(0, 24));
+      }
+    }, HOME));
+    for (const w of [320, 768, 1280]) {
+      s.test(`hero fits @${w}`, (t) => withFrame({ width: w }, (f) => t.atMost(f.doc.documentElement.scrollWidth, w, "page is wider than the viewport"), HOME));
+    }
   });
 
   suite("Rendered contrast", {

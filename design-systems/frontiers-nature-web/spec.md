@@ -15,8 +15,7 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   as an editorial site and a marketing site, expressive, at default density (0014-design-systems
   FR-010, FR-041), and serve public, editorial web pages. It MUST NOT assume which web property consumes it, which backend renders it, or how its
   content is authored.
-- **FR-002**: It MUST hold `css/` (with `css/bundle.txt`), `fonts/`, `images/` (hero, diagram
-  and share-card images), `js/`,
+- **FR-002**: It MUST hold `css/` (with `css/bundle.txt`), `fonts/`, `js/`,
   `data/navigation.json`, `data/registry.json`, `tokens.json`, the markup contract `chrome.md`,
   `templating.md`, a `README.md` that documents each path, this spec, and an `assurance/` harness
   (0014-design-systems FR-006, FR-029).
@@ -29,14 +28,16 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   `--diagram-ink`, `--diagram-path`, `--diagram-warning`, `--diagram-positive`, `--diagram-caution`
   and `--diagram-secondary`; `--font-sans`, `--font-serif` and `--font-mono`; `--measure-page`
   (72rem), `--gutter` (1.5rem), `--radius` (0) and `--chrome-clearance`; and `--ease` and `--fast`.
+  It MUST hold no color literal: `--stone`, `--shell`, `--rule`, `--muted-foreground` and every
+  other color it uses MUST be a theme role or a mix of roles (0014-design-systems FR-044).
   `tokens.json` MUST mirror every custom property `css/tokens.css` declares on `:root`, in order,
   in the Design Tokens Community Group format, a value the theme supplies written as a `{role.*}`
   alias (0014-design-systems FR-036); `css/tokens.css` is the source.
 - **FR-004**: It MUST be themed (0014-design-systems FR-038): `--ink`, `--background`, `--paper`,
   each unit token, each diagram role, `--font-sans` and `--font-serif` MUST each be a reference to a
-  theme role, and the logo and favicon MUST be taken from the theme. Beyond the roles every brand
-  supplies, it requires `paper`, `unit-capital`, `unit-ip`, `unit-press`, `unit-studios` and
-  `unit-network`. It ships Inter, Source Serif 4 and IBM Plex Mono, so a theme's `font-sans` and
+  theme role, and the logo, favicon, share card and every picture it places MUST be taken from the
+  theme. Beyond the roles every brand supplies, it requires `paper`, `unit-capital`, `unit-ip`,
+  `unit-press`, `unit-studios` and `unit-network`, and an imagery pool (0014-design-systems FR-043). It ships Inter, Source Serif 4 and IBM Plex Mono, so a theme's `font-sans` and
   `font-serif` MUST be among them. Its harness MUST pass under every brand here.
 - **FR-005**: Every text and background pairing the chrome uses MUST meet WCAG 2.2 AA (4.5:1 for
   body text, 3:1 for large text), both as tokens and as rendered: primary navigation, breadcrumbs,
@@ -98,6 +99,15 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   template vocabulary the markup contract is written against, every name in it marked `server`
   (consumed while rendering, never sent to a browser) or `client` (a web component in
   `js/chrome.js`). Nothing else in this design system MAY depend on a consumer implementing it.
+
+## Pictures
+
+- **FR-021**: The home page hero MUST be `section.hero` whose `.hero__body` holds the title
+  (`h1.t-display`), lede and actions and `img.hero__art`, one piece of the theme's imagery pool chosen
+  by the page, set whole: never cropped, covered, tinted or placed on a panel, on the page's own
+  background, two columns from 48rem and stacked below. A page's link preview MUST use the theme's
+  share card. A picture that belongs to one page's content (a diagram, a photograph of an event) is
+  that page's own asset, never this design system's.
 
 ## Out of scope
 

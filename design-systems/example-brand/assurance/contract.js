@@ -6,8 +6,8 @@
  */
 (() => {
   const { suite, color, fetchText, base, Failure } = window.Assurance;
-  const ROLES = { text: "color", surface: "color", primary: "color", secondary: "color", tertiary: "color", success: "color", warning: "color", danger: "color", info: "color", "font-sans": "fontFamily", "font-serif": "fontFamily" };
-  const FOREGROUND = ["text", "primary", "secondary", "tertiary", "success", "warning", "danger", "info"];
+  const ROLES = { text: "color", surface: "color", primary: "color", secondary: "color", tertiary: "color", success: "color", warning: "color", danger: "color", info: "color", accent: "color", link: "color", "font-sans": "fontFamily", "font-serif": "fontFamily" };
+  const FOREGROUND = ["text", "primary", "secondary", "tertiary", "success", "warning", "danger", "info", "accent", "link"];
   const tokens = async () => JSON.parse(await fetchText("tokens.json"));
   const resolve = (all, value) => {
     for (let i = 0; i < 10 && typeof value === "string" && /^\{[^}]+\}$/.test(value); i++) {
@@ -77,23 +77,57 @@
 
   suite("Logo files", {
     group: "Unit", needs: "http",
-    description: "tokens.json lists lockups for light and for dark backgrounds, an icon-only mark and a favicon, and every file it lists loads at exactly its stated size.",
+    description: "tokens.json lists lockups for light and for dark backgrounds, an icon-only mark, a favicon and a share card, and every file it lists loads at exactly its stated size.",
   }, (s) => {
     const size = (path) => new Promise((resolve, reject) => {
       const img = new Image(); img.onload = () => resolve([img.naturalWidth, img.naturalHeight]);
       img.onerror = () => reject(new Failure(`${path} does not load`)); img.src = new URL(path, base).href;
     });
-    s.test("lockups for light and dark backgrounds, an icon and a favicon are listed (FR-037)", async (t) => {
+    s.test("lockups for light and dark backgrounds, an icon, a favicon and a share card are listed (FR-037)", async (t) => {
       const l = logo(await tokens());
       t.ok(l, "no $extensions.com.intellectualfrontiers.logo");
       for (const bg of ["light", "dark"]) t.ok(l.lockup.files.some((f) => f.background === bg && f.file.endsWith(".webp")), `a WebP lockup for ${bg} backgrounds`);
       t.atLeast(l.icon.files.length, 1, "icon files"); t.ok(l.favicon?.file, "favicon");
+      t.equal(`${l["share-card"]?.width}x${l["share-card"]?.height}`, "1200x630", "a 1200x630 share card");
     });
     s.test("every listed file loads at its stated size", async (t) => {
       const l = logo(await tokens());
-      for (const f of [...l.lockup.files, ...l.icon.files, l.favicon]) {
+      for (const f of [...l.lockup.files, ...l.icon.files, l.favicon, l["share-card"]]) {
         const [w, h] = await size(f.file);
         t.equal(`${w}x${h}`, `${f.width}x${f.height}`, f.file);
+      }
+    });
+  });
+
+  suite("Imagery", {
+    group: "Unit", needs: "http",
+    description: "A brand that supplies an imagery pool lists every piece in imagery/catalog.json with what it shows and its files, and every file loads at its stated size. A brand without one passes and themes no design system that requires imagery.",
+  }, (s) => {
+    const size = (path) => new Promise((resolve, reject) => {
+      const img = new Image(); img.onload = () => resolve([img.naturalWidth, img.naturalHeight]);
+      img.onerror = () => reject(new Failure(`${path} does not load`)); img.src = new URL(path, base).href;
+    });
+    const catalog = async () => {
+      const res = await fetch(new URL("imagery/catalog.json", base));
+      return res.ok ? res.json() : null;
+    };
+    s.test("every piece is described, with a master and WebP files for the web (FR-043)", async (t) => {
+      const cat = await catalog();
+      if (!cat) return t.skip("no imagery pool");
+      t.atLeast(cat.pieces.length, 1, "pieces");
+      for (const p of cat.pieces) {
+        for (const k of ["id", "name", "file", "environment", "description", "visual_anchor", "metaphors", "pixel_size", "content_box"]) t.ok(p[k] && String(p[k]).length, `${p.id}: ${k}`);
+        t.ok(cat.environments.includes(p.environment), `${p.id}: environment ${p.environment}`);
+        t.atLeast(p.web.length, 1, `${p.id}: WebP files`);
+        for (const w of p.web) t.ok(w.file.endsWith(".webp"), `${w.file} is WebP`);
+      }
+    });
+    s.test("every web file loads at its stated size", async (t) => {
+      const cat = await catalog();
+      if (!cat) return t.skip("no imagery pool");
+      for (const p of cat.pieces) for (const w of p.web) {
+        const [width, height] = await size(`imagery/${w.file}`);
+        t.equal(`${width}x${height}`, `${w.width}x${w.height}`, w.file);
       }
     });
   });

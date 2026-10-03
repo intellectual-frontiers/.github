@@ -47,7 +47,7 @@ button with `anchor()`. Outside click and Escape close it natively. The chevron 
 ## Page header and blocks
 `.t-title` (page title), `.t-lede`, `.label` eyebrow; `.t-section` headings; `.heading-row` for a
 heading with an "All …" link; `.rows` ruled lists; `.cols--2|3|split` grids; `.hero` with
-`.hero__media`, `.hero__scrim`, `.hero__body`; `if-shelf` (web component) around `.shelf__track` with `.book` cards; `.updates`.
+`.hero__body` holding the text (`h1.t-display`, `.hero__lede`, `.hero__actions`) and `img.hero__art`, one piece of the theme's imagery (spec FR-021); `if-shelf` (web component) around `.shelf__track` with `.book` cards; `.updates`.
 
 ## Content classes
 A page's own markup may use only the class names this CSS defines; a consumer enforces this with

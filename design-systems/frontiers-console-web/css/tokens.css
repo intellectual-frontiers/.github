@@ -2,7 +2,7 @@
  * Frontiers Console's semantic tokens. The visual model follows the structure of well-known documentation
  * themes (neutral surfaces, one accent, hairline borders, small radii). Every brand value comes from the
  * theme as var(--brand-<role>), and each tint is mixed from its role and the theme's surface
- * (0014-design-systems FR-038); the neutrals are this design system's own. Mirrored in tokens.json; this
+ * (0014-design-systems FR-038); every neutral is mixed from the text and surface roles, so no color is a literal. Mirrored in tokens.json; this
  * file is the source of truth. Light theme only; names are semantic, so a dark theme is a redefinition.
  */
 @layer tokens {
@@ -12,19 +12,19 @@
     /* surfaces */
     --fc-background: var(--brand-surface);
     --fc-foreground: var(--brand-text);
-    --fc-muted: #f4f4f2;
-    --fc-muted-foreground: #5b6270;
-    --fc-card: #f8f7f4;
+    --fc-muted: color-mix(in srgb, var(--brand-text) 5%, var(--brand-surface));
+    --fc-muted-foreground: color-mix(in srgb, var(--brand-text) 72%, var(--brand-surface));
+    --fc-card: color-mix(in srgb, var(--brand-text) 3%, var(--brand-surface));
     --fc-popover: var(--brand-surface);
-    --fc-border: #e2e0da;
-    --fc-border-strong: #c9c6bd;
-    --fc-input-border: #8a8f99;      /* form-control boundary: 3:1 against the background (WCAG 1.4.11) */
-    --fc-accent: #eeece5;
+    --fc-border: color-mix(in srgb, var(--brand-text) 12%, var(--brand-surface));
+    --fc-border-strong: color-mix(in srgb, var(--brand-text) 22%, var(--brand-surface));
+    --fc-input-border: color-mix(in srgb, var(--brand-text) 52%, var(--brand-surface));      /* form-control boundary: 3:1 against the background (WCAG 1.4.11) */
+    --fc-accent: color-mix(in srgb, var(--brand-text) 7%, var(--brand-surface));
     --fc-accent-foreground: var(--brand-text);
 
     /* brand */
     --fc-primary: var(--brand-primary);
-    --fc-primary-foreground: #ffffff;
+    --fc-primary-foreground: var(--brand-surface);
     --fc-primary-tint: color-mix(in srgb, var(--brand-primary) 10%, var(--brand-surface));
     --fc-ring: var(--brand-primary);
 
@@ -40,8 +40,8 @@
 
     /* terminal block */
     --fc-terminal-bg: var(--brand-text);
-    --fc-terminal-fg: #e6e8ec;
-    --fc-terminal-muted: #a7adb8;
+    --fc-terminal-fg: color-mix(in srgb, var(--brand-surface) 90%, var(--brand-text));
+    --fc-terminal-muted: color-mix(in srgb, var(--brand-surface) 68%, var(--brand-text));
 
     /* type */
     --fc-font-sans: var(--brand-font-sans), "Helvetica Neue", Arial, sans-serif;
@@ -68,7 +68,7 @@
     --fc-fast: 150ms;
 
     /* elevation */
-    --fc-shadow: 0 1px 2px rgb(18 24 32 / 6%), 0 4px 16px rgb(18 24 32 / 8%);
-    --fc-shadow-lg: 0 8px 32px rgb(18 24 32 / 16%);
+    --fc-shadow: 0 1px 2px color-mix(in srgb, var(--brand-text) 6%, transparent), 0 4px 16px color-mix(in srgb, var(--brand-text) 8%, transparent);
+    --fc-shadow-lg: 0 8px 32px color-mix(in srgb, var(--brand-text) 16%, transparent);
   }
 }

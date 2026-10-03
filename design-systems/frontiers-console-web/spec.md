@@ -27,7 +27,9 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   `--fc-foreground`, `--fc-accent-foreground`, `--fc-primary`, `--fc-ring`, `--fc-success`,
   `--fc-warning`, `--fc-danger`, `--fc-info`, `--fc-terminal-bg` and `--fc-font-sans` MUST each be a
   reference to a theme role, each status tint MUST be mixed from its role and the theme's
-  `surface`, and the logo and favicon MUST be taken from the theme. It requires no role beyond
+  `surface`, every neutral, border, shadow and overlay MUST be mixed from the `text` and `surface`
+  roles, so it holds no color literal (0014-design-systems FR-044), and the logo and favicon MUST
+  be taken from the theme. It requires no role beyond
   those every brand supplies, and it ships Inter and IBM Plex Mono, so a theme's `font-sans` MUST
   be Inter. Its harness MUST pass under every brand here.
 
