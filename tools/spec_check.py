@@ -285,11 +285,24 @@ def check_register(root: Path, public: Path | None = None) -> tuple[list[Finding
     return findings, nones, counts
 
 
+DS_IDENTIFIER = re.compile(r"^ifcore:\w+ a ifcore:DesignSystem ;\s*\n\s*dcterms:identifier \"([^\"]+)\"", re.M)
+
+
 def check_design_systems(root: Path) -> list[Finding]:
-    """0014-design-systems FR-003 and FR-022: each design system's slug ends with a kind code, and it has a spec."""
+    """0014-design-systems FR-003, FR-010 and FR-022: each design system's slug ends with a kind code, it is
+    registered in ifcore.ttl by that slug (and nothing registered is missing), and it has a spec."""
     findings: list[Finding] = []
     ds = root / "design-systems"
-    for d in sorted(p for p in ds.iterdir() if p.is_dir()) if ds.is_dir() else []:
+    if not ds.is_dir():
+        return findings
+    ttl = root / "ontology" / "ifcore.ttl"
+    registered = set(DS_IDENTIFIER.findall(ttl.read_text(encoding="utf-8"))) if ttl.is_file() else set()
+    dirs = {p.name for p in ds.iterdir() if p.is_dir()}
+    for slug in sorted(registered - dirs):
+        findings.append(Finding("error", "ontology/ifcore.ttl", f"design system {slug} is registered but design-systems/{slug}/ does not exist (0014-design-systems FR-010)"))
+    for d in sorted(p for p in ds.iterdir() if p.is_dir()):
+        if d.name not in registered:
+            findings.append(Finding("error", str(d.relative_to(root)), "is not registered in ifcore.ttl as an ifcore:DesignSystem with this dcterms:identifier (0014-design-systems FR-010)"))
         rel = str(d.relative_to(root))
         if not (DS_DIR and DS_DIR.match(d.name)):
             findings.append(Finding("error", rel, f"design system slug must end with its kind's code, one of {CODES} (0014-design-systems FR-003)"))

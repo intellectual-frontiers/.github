@@ -110,6 +110,7 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersBrand a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-brand" ;
     rdfs:label "Frontiers Brand"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:BrandDesignSystemKind ;
@@ -117,6 +118,7 @@ ifcore:FrontiersBrand a ifcore:DesignSystem ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-nature-web" ;
     rdfs:label "Frontiers Nature Web"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind ;
@@ -125,6 +127,7 @@ ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-console-web" ;
     rdfs:label "Frontiers Console Web"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind ;
