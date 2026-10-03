@@ -38,6 +38,31 @@ not restated here.
   the party providing it something real — money, time, access, data,
   reputation, or a changed decision. Expressed interest or a compliment
   alone MUST NOT count as evidence.
+- **FR-014**: A claimed Native Alpha MAY be evident or latent. It is
+  evident when it already produces a result beyond a credible benchmark.
+  It is latent when the subject's existing people, knowledge, assets,
+  rights, data, relationships, or operating methods carry it, but only a
+  reorganization or recombination of them (of units, companies, products,
+  or services) would realize it. Both are Native Alpha because both
+  originate in what the subject already has.
+- **FR-015**: A latent claim MUST name the existing elements it draws on
+  and the reorganization that would realize it. A claim that depends on a
+  capability the subject does not have, and would have to acquire or build
+  from scratch, MUST NOT be called Native Alpha. It MAY still be pursued
+  as an opportunity on its own evidence.
+- **FR-016**: A latent claim MUST be treated as a provisional thesis to
+  test, not as an advantage, until the reorganization it names has been
+  made and has changed an actual decision, per FR-005 and FR-006. A latent
+  claim MUST NOT be presented as evident.
+- **FR-017**: A core competency stated in general terms (innovation,
+  customer focus, domain expertise) MUST NOT by itself be treated as Native
+  Alpha, evident or latent. It is where a search for Native Alpha may
+  start, not what the search finds.
+- **FR-018**: Discovering Native Alpha (finding an evident advantage, or
+  stating and testing a latent one) and presenting it MUST be treated as
+  different work. Which units discover and which present is set by each
+  unit's own spec. A unit that presents a claim MUST NOT be its only
+  source.
 
 ## The method
 
@@ -88,6 +113,13 @@ not restated here.
   defined as data in the ontology.
 - **Native Alpha** — a claimed advantage, treated as real only once it has
   changed an actual decision; its full definition lives in the ontology.
+- **Evident and latent Native Alpha** — an advantage already producing a
+  result beyond a benchmark, and one that the subject's existing elements
+  carry but that only a stated reorganization would realize. A latent
+  claim stays a provisional thesis until it has changed a decision.
+- **Discovery and presentation** — finding or testing a Native Alpha
+  claim, and documenting or presenting one already discovered; different
+  work, assigned by each unit's own spec.
 - **A method stage** — one step in the ordered sequence an opportunity moves
   through before being treated as proven; the stages are ontology
   individuals, held in sequence.

@@ -212,10 +212,12 @@ ifcore:Network a ifcore:Unit ;
 ifcore:IntellectualFrontiersLLC ifcore:hasUnit
     ifcore:ResearchAndIp, ifcore:Press, ifcore:Capital, ifcore:Studios, ifcore:Network .
 
-# ───────────────────────── Native Alpha (0003-intellectual-frontiers FR-005, FR-006; 0007-work-and-assets FR-015) ─────────────────────────
+# ───────────────────────── Native Alpha (0003-intellectual-frontiers FR-005, FR-006, FR-014 – FR-018; 0007-work-and-assets FR-015) ─────────────────────────
 
 ifcore:NativeAlpha a owl:Class ; rdfs:label "Native Alpha"@en ;
-    skos:definition "An unusual and disproportionate advantage that already exists and is strong enough to change a real decision."@en ;
+    skos:definition "An unusual and disproportionate advantage native to a particular person, team, company, product, operating model, dataset, market position, or set of relationships, carried by its accumulated knowledge, assets, experience, trust, or working methods, and strong enough to change a real decision."@en ;
+    skos:scopeNote "Evident Native Alpha already produces a result beyond a credible benchmark. Latent Native Alpha is carried by what the subject already has, but realized only by reorganizing or recombining it (its units, companies, products, or services). A latent claim stays a provisional thesis until it changes a decision, and an advantage that needs a capability the subject must acquire or build from scratch is not Native Alpha (0003-intellectual-frontiers FR-014 – FR-016). A core competency stated in general terms is where a search starts, not what it finds (FR-017)."@en ;
+    skos:scopeNote "Discovering Native Alpha and presenting it are different work (0003-intellectual-frontiers FR-018). Research & IP and Studios discover it (0006-research-and-ip FR-020, 0011-studios FR-027). Press documents and presents what they or others have discovered, and never originates a claim (0009-press FR-003, FR-029, FR-030)."@en ;
     rdfs:comment "Originates as Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC, with its own creative works and a filed (not yet granted) trademark application — see ifcore:NativeAlphaTrademark and the works that carry schema:about this concept. 0003-intellectual-frontiers FR-005 and FR-006 are the company's own application of it, not a separate thing; no second individual is minted for that application because it names no artifact distinct from the concept itself, unlike ifcore:Eidolon below."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -741,9 +743,9 @@ ifcore:Compound a ifcore:MethodStage ; rdfs:label "Compound"@en ; ifcore:sequenc
 ifcore:VentureLifecycleStage a owl:Class ; rdfs:label "Venture lifecycle stage"@en ;
     rdfs:comment "One stage in the ordered path a venture moves through on the way to being proven or stopped (0011-studios FR-003, FR-004). Reuses ifcore:sequenceOrder and ifcore:question, already declared for ifcore:MethodStage, rather than redeclaring either."@en .
 ifcore:Observe a ifcore:VentureLifecycleStage ; rdfs:label "Observe"@en ; ifcore:sequenceOrder 1 ;
-    ifcore:question "What real asymmetry already exists?"@en ; ifcore:hasAudience ifcore:Public .
+    ifcore:question "What real asymmetry already exists, or is carried by what the subject already has and would show only if it were reorganized (0003 FR-014)?"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Frame a ifcore:VentureLifecycleStage ; rdfs:label "Frame"@en ; ifcore:sequenceOrder 2 ;
-    ifcore:question "What is the Native Alpha thesis, stated in plain language (0011 FR-002)?"@en ; ifcore:hasAudience ifcore:Public .
+    ifcore:question "What is the Native Alpha thesis, stated in plain language, and is it evident or latent (0011 FR-002)?"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Validate a ifcore:VentureLifecycleStage ; rdfs:label "Validate"@en ; ifcore:sequenceOrder 3 ;
     ifcore:question "Does a real buyer and workflow actually exist?"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Experiment a ifcore:VentureLifecycleStage ; rdfs:label "Experiment"@en ; ifcore:sequenceOrder 4 ;
