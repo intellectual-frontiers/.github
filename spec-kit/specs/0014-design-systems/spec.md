@@ -24,10 +24,13 @@ and checked the same way, in the same directory.
   cascade-layered stylesheets, fonts, logos, a few web components and a
   markup contract; for a written-voice design system they are style rules,
   the patterns a mechanical sweep looks for, and passages that pass and fail.
-  A design system is not itself a web property, a work, a content document,
-  or the tool that produces output from it (FR-025); it supplies the rules an
-  output is held to and the assets it is built from, nothing about where that
-  output's content or business logic comes from.
+  Output here is a presentation of a work, in the sense of
+  0021-works-and-presentations FR-004, or the channel it reaches people
+  through (FR-011 there). A design system is not itself a channel, a work, a
+  presentation, a content document, or the tool that produces a presentation
+  from it (FR-025); it supplies the rules a presentation is held to and the
+  assets it is built from, nothing about a work's content or where it comes
+  from.
 - **FR-002**: More than one design system MAY exist at once, of the same kind
   or of different kinds. Nothing in this spec or in the ontology assumes
   exactly one per kind: a future unit, acquisition, or public-facing product
@@ -136,9 +139,10 @@ and checked the same way, in the same directory.
   retired — that status lives in the ontology per FR-010, and the
   directory's own documentation describes how to use it, not its current
   standing.
-- **FR-012**: Which design system(s) an Intellectual Frontiers web
-  property, work, or tool actually vendors is a fact about that consumer,
-  not about the design system, and is stated by the consumer.
+- **FR-012**: Which design system(s) an Intellectual Frontiers channel
+  (a web property, per 0021-works-and-presentations FR-011), production
+  pipeline, or tool actually vendors is a fact about that consumer, not about
+  the design system, and is stated by the consumer.
 - **FR-026**: A consumer that vendors a design system MUST record, beside
   its vendored copies, each design system's slug and the source commit it
   was copied from, including every design system its vendored ones derive
@@ -374,8 +378,9 @@ and checked the same way, in the same directory.
   spec, carried over from the prior attempt's single, unnamed design
   system; named for the "natural-frontier" visual identity its own tokens
   document.
-- **A consumer** — any web property, work, tool or pipeline, internal or
-  external, that vendors a design system's directory; this spec does not
+- **A consumer** — any channel (a web property), production pipeline or
+  tool, internal or external, that vendors a design system's directory to
+  make presentations; this spec does not
   assume a consumer is itself part of this repository or organization.
 
 ## Success criteria
