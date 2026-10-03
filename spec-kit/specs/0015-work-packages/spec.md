@@ -37,7 +37,9 @@ property fetches them are decisions outside this spec.
   change once any content document or delivered rendition exposes it.
 - **FR-005**: `<kind>` MUST name an `ifcore:WorkKind` individual declared in
   the ontology before any work package of that kind exists, per
-  0001-eidolon-architecture FR-037.
+  0001-eidolon-architecture FR-037. A kind names the work's primary
+  presentation form, not the work itself, per
+  0021-works-and-presentations FR-019.
 - **FR-006**: A work package is not a content root. No file inside one is a
   content document, and no consumer serves a file from one directly, per
   0004-addressing FR-004 and FR-009.

@@ -105,9 +105,14 @@ The longer essay is
 
 | Repository | Role | May contain |
 | --- | --- | --- |
-| `.github` (this one) | Public root | Public-tier facts, specs, ontology only |
-| `eidolon` | Private vault | Every non-public spec and ontology individual; imports this ontology and never redefines it |
-| `www.intellectualfrontiers.com` | Web property | Consumes both through an authenticated proxy |
+| `.github` (this one) | The public Eidolon | Public-tier facts, specs, ontology only |
+| `eidolon` | The private Eidolon, and the monorepo where works are made | Every non-public spec and ontology individual, and every work's package; imports this ontology and never redefines it |
+| `www.intellectualfrontiers.com` | One presentation channel | Presents works through an authenticated proxy; holds no work of its own |
+
+A **work** is the deliverable itself; a book, a web page, an episode, a
+keynote, a course, or a skill is a **presentation** of it (0021). Public
+presentations lead with what works found, made, or proved, never with how
+the company is organized.
 
 A legal entity that holds third-party capital (a fund) gets its own separate
 Eidolon (0001 FR-004). Persistence is plain Git on GitHub.
@@ -191,6 +196,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0018](spec-kit/specs/0018-frontiers-console/spec.md) | Frontiers Console design system: operator and documentation surfaces |
 | [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
+| [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
 
 The format is derived from [GitHub Spec Kit](https://github.com/github/spec-kit)'s
 spec template, not a full use of Spec Kit. Specs here are standing rules
