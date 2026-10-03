@@ -13,6 +13,7 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | `logos/` | The lockup as PNG in every size, light and dark; the icon-only mark. |
 | `logos/web/` | The lockup as WebP in every size below the master, light and dark. |
 | `logos/vector/` | The decoration kit: the lockup and icon as one-color SVG, traced from their masters by `tools/brand_decoration.py trace`, and the two-line wordmark for small goods, set by `tools/brand_decoration.py set`; listed in `tokens.json` with their finest detail and each ink's candidate spot-color and thread match. |
+| `briefs/` | Work only people can do: commissioning a vector master of the lockup (`vector-master.md`) and verifying the decoration kit's ink matches against physical guides (`ink-verification.md`). |
 | `fonts/` | Inter's variable font (SIL OFL 1.1), the face the lockup's wordmark is drawn in, for setting the kit's wordmark. |
 | `images/icons/`, `images/favicon.ico` | The app icons (Apple touch, 192, 512, maskable 512) and the multi-size favicon, written by `tools/brand_imagery.py build` from the icon-only mark. |
 | `logos/units/` | Each unit's mark: the wordmark with the unit's name, one-color SVG, set by `tools/brand_decoration.py set`. |
