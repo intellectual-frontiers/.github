@@ -569,3 +569,44 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
 0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
+0022-domain-names FR-001	none	-	no shape yet distinguishes a DomainName from a DigitalAsset
+0022-domain-names FR-002	check	eidolon: make check-domains	identifier unique across the catalog; that it is registrable, not a subdomain, is unchecked
+0022-domain-names FR-003	check	eidolon: make check-domains	identifier lowercase A-label pattern
+0022-domain-names FR-004	check	eidolon: make check-domains	rights-holder present; who is named is unchecked
+0022-domain-names FR-005	check	eidolon: make check-domains	exactly one dcterms:type in DomainRoleScheme
+0022-domain-names FR-006	check	eidolon: make check-domains	relation present for primary, redirect, mail, defensive; a redirect names a DomainName
+0022-domain-names FR-007	none	-	no check; dcterms:created on owned channels not yet verified against publishing start
+0022-domain-names FR-008	none	-	completeness needs the registrar reconciliation of FR-018, not yet built
+0022-domain-names FR-009	check	eidolon: make check-domains	Public only for primary, redirect, mail, and only when every relation target is Public
+0022-domain-names FR-010	check	eidolon: make check-domains	exactly one ExternalRecordReference per DomainName
+0022-domain-names FR-011	none	-	no check on primarySource form
+0022-domain-names FR-012	check	eidolon: make check-domains	cadence no longer than thirty days; the method's being automated is not checked
+0022-domain-names FR-013	none	-	no check on cached contact details
+0022-domain-names FR-014	none	-	secret scanning not configured; nothing checks it
+0022-domain-names FR-015	none	-	no check for DNS records in the ontology
+0022-domain-names FR-016	none	-	no check that acquisition or lapse carries a Decision
+0022-domain-names FR-017	check	eidolon: make domain-security	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
+0022-domain-names FR-018	check	eidolon: make domain-security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
+0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
+0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
+0023-domain-security FR-001	check	eidolon: make domain-security	evaluates every domain against every control
+0023-domain-security FR-002	check	eidolon: make check-domains	an exception names a DomainName and lapses by dcterms:valid within a year
+0023-domain-security FR-003	none	-	domain security check not yet built
+0023-domain-security FR-004	check	eidolon: make domain-security	RDAP status, or the registrar's lock through the API
+0023-domain-security FR-005	check	eidolon: make domain-security	needs CLOUDFLARE_API_TOKEN, else unchecked
+0023-domain-security FR-006	check	eidolon: make domain-security	DS at the registry, from RDAP or DNS
+0023-domain-security FR-007	check	eidolon: make domain-security	registrant email or telephone in RDAP not behind a privacy service
+0023-domain-security FR-008	check	eidolon: make domain-security	nameservers against the zone's own, or the provider's suffix without the API
+0023-domain-security FR-009	check	eidolon: make domain-security	null MX, fail-all SPF, reject DMARC
+0023-domain-security FR-010	check	eidolon: make domain-security	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-011	check	eidolon: make domain-security	MTA-STS record and enforce-mode policy, TLS-RPT address
+0023-domain-security FR-012	check	eidolon: make domain-security	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
+0023-domain-security FR-013	check	eidolon: make domain-security	valid TLS, HTTP to HTTPS, HSTS of at least a year
+0023-domain-security FR-014	check	eidolon: make domain-security	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-015	check	eidolon: make domain-security	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
+0023-domain-security FR-016	check	eidolon: make domain-security	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-017	check	eidolon: make domain-security	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
+0023-domain-security FR-018	check	eidolon: make domain-security	the workflow keeps one domain-security issue with the latest report
+0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
+0023-domain-security FR-020	check	eidolon: make domain-security	a new domain is checked within the week
+0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
