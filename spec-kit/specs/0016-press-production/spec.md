@@ -118,7 +118,8 @@ is not stated here.
 ## House design, jacket, and identifiers
 
 - **FR-018**: Every book Press publishes MUST use the house design for its
-  printed form, as encoded in the repository's design assets; authors choose
+  printed form: the `frontiers-print` design system, themed by
+  `frontiers-brand` (0014-design-systems FR-038); authors choose
   content and the options the design documents and MUST NOT invent layouts.
   A design change MUST be made once, in the shared design, and reviewed on
   rendered pages.
