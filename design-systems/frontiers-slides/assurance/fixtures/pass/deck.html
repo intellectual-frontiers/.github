@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We stop a pilot when the evidence says stop</title>
+<link rel="stylesheet" data-theme="frontiers-brand" href="../../../../frontiers-brand/brand.css">
+<link rel="stylesheet" href="../../../css/slides.css">
+<script src="../../../js/deck.js" defer></script>
+</head>
+<body>
+<section class="slide" data-layout="title" aria-label="Slide 1">
+<img class="lockup" src="../../../../frontiers-brand/logos/if-logo-672x189-2026-Sept.png" alt="Intellectual Frontiers" data-theme-logo="light" data-width="326">
+<h1>We stop a pilot when the evidence says stop</h1>
+<p class="deck-meta">A talk on writing the failure test first</p>
+<p class="deck-meta">A. Speaker · 2026-10-03</p>
+<div class="footer"><span>Stopping rules</span><span>1</span></div>
+</section>
+<section class="slide" data-layout="statement" aria-label="Slide 2">
+<h1>Most pilots we reviewed never had a way to fail.</h1>
+<div class="footer"><span>Stopping rules</span><span>2</span></div>
+<div class="notes"><p>Two of the five pilots we reviewed last year ran past their budget because nobody had written down what failure meant.</p></div>
+</section>
+<section class="slide" data-layout="section" data-tone="dark" aria-label="Slide 3">
+<p class="section-number">Part 1</p>
+<h1>Write the test before you start</h1>
+<div class="footer"><span>Stopping rules</span><span>3</span></div>
+</section>
+<section class="slide" data-layout="content" aria-label="Slide 4">
+<h1>Name the metric, the date and the threshold</h1>
+<ul><li>The metric is one number a skeptic would accept</li><li>The date is on the calendar before the kickoff</li><li>The threshold is what the metric must reach by then</li></ul>
+<div class="footer"><span>Stopping rules</span><span>4</span></div>
+<div class="notes"><p>Each of these is a decision the sponsor signs. If one is missing, the pilot has no way to end.</p></div>
+</section>
+<section class="slide" data-layout="figure" aria-label="Slide 5">
+<h1>Three signals end a pilot</h1>
+<div class="figure"><svg aria-label="Three signals, any one of which ends a pilot" id="fig-5" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 428" width="1040" height="428">
+  <style data-theme="frontiers-brand" data-variant="default">#fig-5 text {font-family:'Inter','Liberation Sans', Arial, sans-serif}#fig-5 .f-ink {fill:#121820}#fig-5 .s-ink {stroke:#121820}#fig-5 .c-ink {stop-color:#121820}#fig-5 .f-body {fill:#2e343b}#fig-5 .s-body {stroke:#2e343b}#fig-5 .c-body {stop-color:#2e343b}#fig-5 .f-strong {fill:#464b51}#fig-5 .s-strong {stroke:#464b51}#fig-5 .c-strong {stop-color:#464b51}#fig-5 .f-muted {fill:#595d63}#fig-5 .s-muted {stroke:#595d63}#fig-5 .c-muted {stop-color:#595d63}#fig-5 .f-line {fill:#7a7e82}#fig-5 .s-line {stroke:#7a7e82}#fig-5 .c-line {stop-color:#7a7e82}#fig-5 .f-rule {fill:#e3e3e4}#fig-5 .s-rule {stroke:#e3e3e4}#fig-5 .c-rule {stop-color:#e3e3e4}#fig-5 .f-surface {fill:#ffffff}#fig-5 .s-surface {stroke:#ffffff}#fig-5 .c-surface {stop-color:#ffffff}#fig-5 .f-neutral-tint {fill:#f3f3f4}#fig-5 .s-neutral-tint {stroke:#f3f3f4}#fig-5 .c-neutral-tint {stop-color:#f3f3f4}#fig-5 .f-primary {fill:#214ea2}#fig-5 .s-primary {stroke:#214ea2}#fig-5 .c-primary {stop-color:#214ea2}#fig-5 .f-primary-tint {fill:#e0e6f2}#fig-5 .s-primary-tint {stroke:#e0e6f2}#fig-5 .c-primary-tint {stop-color:#e0e6f2}#fig-5 .f-emphasis {fill:#8a3147}#fig-5 .s-emphasis {stroke:#8a3147}#fig-5 .c-emphasis {stop-color:#8a3147}#fig-5 .f-emphasis-tint {fill:#f2e8eb}#fig-5 .s-emphasis-tint {stroke:#f2e8eb}#fig-5 .c-emphasis-tint {stop-color:#f2e8eb}#fig-5 .f-emphasis-deep {fill:#662a3b}#fig-5 .s-emphasis-deep {stroke:#662a3b}#fig-5 .c-emphasis-deep {stop-color:#662a3b}#fig-5 .f-secondary {fill:#1f7775}#fig-5 .s-secondary {stroke:#1f7775}#fig-5 .c-secondary {stop-color:#1f7775}#fig-5 .f-tertiary {fill:#8a3147}#fig-5 .s-tertiary {stroke:#8a3147}#fig-5 .c-tertiary {stop-color:#8a3147}#fig-5 .f-info {fill:#4a4a8c}#fig-5 .s-info {stroke:#4a4a8c}#fig-5 .c-info {stop-color:#4a4a8c}#fig-5 .f-info-tint {fill:#e9e9f1}#fig-5 .s-info-tint {stroke:#e9e9f1}#fig-5 .c-info-tint {stop-color:#e9e9f1}</style>
+  <defs><marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-line"/></marker></defs>
+  <rect width="1040" height="428" class="f-surface"/>
+  <text x="28" y="50" text-anchor="start" class="f-ink" font-size="30.27" font-weight="bold">Three signals end a pilot</text>
+  <text x="28" y="84" text-anchor="start" class="f-muted" font-size="17.81" font-weight="normal" font-style="italic">Any one of them is enough</text>
+  <rect x="140.0" y="120" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="162.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The metric misses its threshold</text>
+  <line x1="520.0" y1="190" x2="520.0" y2="223" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <rect x="140.0" y="224" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="266.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The date passes with no signal</text>
+  <line x1="520.0" y1="294" x2="520.0" y2="327" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <rect x="140.0" y="328" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="370.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The team cannot name the next test</text>
+</svg>
+</div>
+<p class="source">Source: Our 2025 pilot reviews.</p>
+<div class="footer"><span>Stopping rules</span><span>5</span></div>
+<div class="notes"><p>Read the three from the top. Any one of them is enough.</p></div>
+</section>
+<section class="slide" data-layout="figure" data-tone="dark" aria-label="Slide 6">
+<h1>The same three signals, on a dark slide</h1>
+<div class="figure"><svg aria-label="Three signals, any one of which ends a pilot" id="fig-6" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 428" width="1040" height="428">
+  <style data-theme="frontiers-brand" data-variant="on-dark">#fig-6 text {font-family:'Inter','Liberation Sans', Arial, sans-serif}#fig-6 .f-ink {fill:#ffffff}#fig-6 .s-ink {stroke:#ffffff}#fig-6 .c-ink {stop-color:#ffffff}#fig-6 .f-body {fill:#e7e8e9}#fig-6 .s-body {stroke:#e7e8e9}#fig-6 .c-body {stop-color:#e7e8e9}#fig-6 .f-strong {fill:#d0d1d2}#fig-6 .s-strong {stroke:#d0d1d2}#fig-6 .c-strong {stop-color:#d0d1d2}#fig-6 .f-muted {fill:#b3b5b8}#fig-6 .s-muted {stroke:#b3b5b8}#fig-6 .c-muted {stop-color:#b3b5b8}#fig-6 .f-line {fill:#8d9094}#fig-6 .s-line {stroke:#8d9094}#fig-6 .c-line {stop-color:#8d9094}#fig-6 .f-rule {fill:#41464d}#fig-6 .s-rule {stroke:#41464d}#fig-6 .c-rule {stop-color:#41464d}#fig-6 .f-surface {fill:#121820}#fig-6 .s-surface {stroke:#121820}#fig-6 .c-surface {stop-color:#121820}#fig-6 .f-neutral-tint {fill:#272d34}#fig-6 .s-neutral-tint {stroke:#272d34}#fig-6 .c-neutral-tint {stop-color:#272d34}#fig-6 .f-primary {fill:#9bafd5}#fig-6 .s-primary {stroke:#9bafd5}#fig-6 .c-primary {stop-color:#9bafd5}#fig-6 .f-primary-tint {fill:#17294a}#fig-6 .s-primary-tint {stroke:#17294a}#fig-6 .c-primary-tint {stop-color:#17294a}#fig-6 .f-emphasis {fill:#caa2ac}#fig-6 .s-emphasis {stroke:#caa2ac}#fig-6 .c-emphasis {stop-color:#caa2ac}#fig-6 .f-emphasis-tint {fill:#361f2c}#fig-6 .s-emphasis-tint {stroke:#361f2c}#fig-6 .c-emphasis-tint {stop-color:#361f2c}#fig-6 .f-emphasis-deep {fill:#dcc1c8}#fig-6 .s-emphasis-deep {stroke:#dcc1c8}#fig-6 .c-emphasis-deep {stop-color:#dcc1c8}#fig-6 .f-secondary {fill:#9ac2c1}#fig-6 .s-secondary {stroke:#9ac2c1}#fig-6 .c-secondary {stop-color:#9ac2c1}#fig-6 .f-tertiary {fill:#caa2ac}#fig-6 .s-tertiary {stroke:#caa2ac}#fig-6 .c-tertiary {stop-color:#caa2ac}#fig-6 .f-info {fill:#aeaecb}#fig-6 .s-info {stroke:#aeaecb}#fig-6 .c-info {stop-color:#aeaecb}#fig-6 .f-info-tint {fill:#232740}#fig-6 .s-info-tint {stroke:#232740}#fig-6 .c-info-tint {stop-color:#232740}</style>
+  <defs><marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-line"/></marker></defs>
+  <rect width="1040" height="428" class="f-surface"/>
+  <text x="28" y="50" text-anchor="start" class="f-ink" font-size="30.27" font-weight="bold">Three signals end a pilot</text>
+  <text x="28" y="84" text-anchor="start" class="f-muted" font-size="17.81" font-weight="normal" font-style="italic">Any one of them is enough</text>
+  <rect x="140.0" y="120" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="162.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The metric misses its threshold</text>
+  <line x1="520.0" y1="190" x2="520.0" y2="223" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <rect x="140.0" y="224" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="266.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The date passes with no signal</text>
+  <line x1="520.0" y1="294" x2="520.0" y2="327" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <rect x="140.0" y="328" width="760" height="70" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="370.35" text-anchor="middle" class="f-ink" font-size="18.7" font-weight="normal">The team cannot name the next test</text>
+</svg>
+</div>
+<div class="footer"><span>Stopping rules</span><span>6</span></div>
+<div class="notes"><p>On a dark slide the figure takes its on-dark variant.</p></div>
+</section>
+<section class="slide" data-layout="two-column" aria-label="Slide 7">
+<h1>A stopped pilot still pays for itself</h1>
+<div class="columns"><div><p>What it costs</p><ul><li>Six weeks of one team</li><li>One sponsor's attention</li></ul></div><div><p>What it returns</p><ul><li>A metric we now trust</li><li>The next test, already named</li></ul></div></div>
+<div class="footer"><span>Stopping rules</span><span>7</span></div>
+<div class="notes"><p>The left column is the cost. The right column is what we keep when we stop.</p></div>
+</section>
+<section class="slide" data-layout="quote" aria-label="Slide 8">
+<blockquote><p>We stopped arguing about the pilot the day we wrote down what failure looked like.</p></blockquote>
+<p class="attribution">A program sponsor, 2025</p>
+<div class="footer"><span>Stopping rules</span><span>8</span></div>
+</section>
+<section class="slide" data-layout="end" data-tone="dark" aria-label="Slide 9">
+<img class="lockup" src="../../../../frontiers-brand/logos/if-logo-dark-672x189-2026-Sept.png" alt="Intellectual Frontiers" data-theme-logo="dark" data-width="326">
+<h1>Write your failure test this week.</h1>
+<p>Send it to the sponsor before the kickoff.</p>
+<div class="footer"><span>Stopping rules</span><span>9</span></div>
+</section>
+</body>
+</html>

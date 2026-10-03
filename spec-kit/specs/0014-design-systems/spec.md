@@ -423,10 +423,26 @@ any number of each kind.
   the tools that render them.
 - **FR-048**: Every figure a web, print or slide presentation carries MUST be
   drawn with a figure design system and themed by the same brand as the
-  presentation. A web or print design system MUST name in the ontology,
-  by `ifcore:drawsFiguresWith`, the figure design system its pages use,
+  presentation. A web, print or slides design system MUST name in the
+  ontology, by `ifcore:drawsFiguresWith`, the figure design system its pages use,
   and MUST NOT define its own figure colors. A raster figure (a screenshot,
   a photograph) is a work's own asset and is exempt.
+
+## Kind profile: slides
+
+- **FR-049**: A slides design system governs how a talk, lecture, workshop
+  or briefing is presented on a screen: its canvas, layouts, type, tones,
+  footer and speaker notes, and the content limits a slide keeps to. Its
+  machine-readable form is its stylesheet and the builder and checker that
+  turn a deck's source into slides. It is themed (FR-038, FR-044): every
+  color is a brand theme role, its figures come from a figure design
+  system (FR-048), and its text is checked against the house voice. Its
+  harness renders a fixture deck of every layout in a browser under every
+  brand here and checks size, overflow, minimum type and contrast, and
+  runs its checker over decks that must pass and must fail. It MUST be
+  classified in the ontology, by `dcterms:type`, with every **deck type**
+  it serves (*talk*, *lecture*, *workshop*, *briefing*). Its consumers are
+  speakers, courses and the tools that build decks.
 
 ## Kind profile: written voice
 

@@ -1,0 +1,8 @@
+{
+  "$description": "frontiers-slides' content limits (spec FR-006, FR-011), read by deck.py check. spec.md is the source; this file must agree with it.",
+  "max_slides": 60,
+  "headline_words": {"title": 12, "section": 10, "statement": 20, "end": 16, "default": 14},
+  "body_words": {"two-column": 70, "quote": 50, "figure": 20, "statement": 0, "section": 0, "default": 45},
+  "max_points": 5,
+  "point_words": 14
+}

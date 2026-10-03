@@ -353,10 +353,12 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             continue
         where = f"ontology/ifcore.ttl ({m.group(1)})"
         named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
+            findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:
             findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
-        if named & {"WebDesignSystemKind", "PrintDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
-            findings.append(Finding("error", where, "a web or print design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web, print or slides design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
     methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
     for block in re.split(r"\n\s*\n", ttl):
         m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)

@@ -106,6 +106,11 @@ ifcore:FigureDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystem
     skos:notation "figures" ;
     skos:definition "How a work's figures are drawn, in print or on the web (0014-design-systems FR-032)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:SlidesDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "slides"@en ;
+    skos:notation "slides" ;
+    skos:altLabel "slide deck"@en , "presentation"@en ;
+    skos:definition "How a talk, lecture, workshop or briefing is presented on a screen: canvas, layouts, type, tones and the limits a slide keeps to (0014-design-systems FR-049)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:WrittenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VerbalDesignSystemKind ; skos:prefLabel "written voice"@en ;
     skos:notation "written-voice" ;
     skos:definition "How the house writes: voice, usage, punctuation, and presentation form (0014-design-systems FR-033)."@en ;
@@ -213,6 +218,22 @@ ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ;
     skos:definition "A root over its children."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:DeckTypeScheme a skos:ConceptScheme ; rdfs:label "Deck type"@en ;
+    skos:definition "The kinds of presentation a slides design system serves (0014-design-systems FR-049)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TalkDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "talk"@en ;
+    skos:definition "A deck one speaker presents to an audience, as at a conference or a keynote."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LectureDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "lecture"@en ;
+    skos:definition "A deck that teaches, as one session of a course."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WorkshopDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "workshop"@en ;
+    skos:definition "A deck that runs a working session: exercises, prompts and timings."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BriefingDeck a skos:Concept ; skos:inScheme ifcore:DeckTypeScheme ; skos:prefLabel "briefing"@en ;
+    skos:definition "A deck that informs a decision: a board, investor or customer briefing."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -302,6 +323,15 @@ ifcore:FrontiersSpokenVoice a ifcore:DesignSystem ;
     dcterms:type ifcore:SpokenVoiceDesignSystemKind ;
     prov:wasDerivedFrom ifcore:FrontiersWrittenVoice ;
     rdfs:comment "At design-systems/frontiers-spoken-voice/; its house rules are design-systems/frontiers-spoken-voice/spec.md. How the house voice changes for the ear: scripts written to be heard once, with the written voice's patterns and its own announcement and story-label patterns (0014-design-systems FR-034)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSlides a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-slides" ;
+    rdfs:label "Frontiers Slides"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:SlidesDesignSystemKind , ifcore:TalkDeck , ifcore:LectureDeck , ifcore:WorkshopDeck , ifcore:BriefingDeck ;
+    rdfs:comment "At design-systems/frontiers-slides/; its house rules are design-systems/frontiers-slides/spec.md. Slide decks on a 1920x1080 canvas, built from Markdown by deck.py, themed by a brand, with figures from frontiers-figures and text checked against the house voice (0014-design-systems FR-049)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
