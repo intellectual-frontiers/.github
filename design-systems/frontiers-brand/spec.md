@@ -13,8 +13,8 @@ restating them.
 
 - **FR-001**: `frontiers-brand` MUST live at `design-systems/frontiers-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
-  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`, a
-  `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
+  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`,
+  `images/share-card.png`, `imagery/`, a `README.md`, this spec and an `assurance/` harness. It MUST be the theme of every web page and
   every printed work Intellectual Frontiers publishes under its own name (0014-design-systems
   FR-038, FR-040).
 
@@ -33,7 +33,8 @@ restating them.
   2.2 AA for body text (4.5:1) on white and on Warm Paper.
 - **FR-014**: Its theme roles (0014-design-systems FR-037) MUST be: `text` Deep Ink, `surface`
   white, `primary` Frontier Blue, `secondary` Signal Teal, `tertiary` Editorial Oxblood, `success`
-  Signal Teal, `warning` amber, `danger` Editorial Oxblood, `info` violet, `font-sans` Inter and
+  Signal Teal, `warning` amber, `danger` Editorial Oxblood, `info` violet, `accent`
+  Editorial Oxblood, `link` Frontier Blue, `font-sans` Inter and
   `font-serif` Source Serif 4; and, for `frontiers-nature-web` (frontiers-nature-web FR-004),
   `paper` Warm Paper and `unit-capital`, `unit-ip`, `unit-press`, `unit-studios` and `unit-network`
   each its unit's color. `brand.css` and `brand.tex` MUST declare exactly these roles.
@@ -83,13 +84,25 @@ restating them.
   bulbs, brains, books, neural networks, circuit imagery, generic AI symbols, compasses, arrows,
   badges, circular mountain emblems, saturated scenic color, sunset gradients, neon, or
   photographic realism.
+- **FR-015**: Its imagery pool (0014-design-systems FR-043) MUST be `imagery/`: each piece a
+  hand-drawn pen-and-ink engraving of one hard natural place, whose land, trees, sky, snow and fog
+  are grayscale and whose built things (a trail, a bridge, a railway, a dam, a lighthouse) and
+  water alone carry restrained, naturalistic color, with a visible route and one dominant built
+  anchor, on a real transparent background with irregular edges, about 4:3, and with no text,
+  lettering, numbers or arrows anywhere. Its environment MUST be one `imagery/catalog.json` lists,
+  and its colored share of the drawn art SHOULD fall between 5% and 30%. A piece MUST NOT be
+  retouched, flattened, recolored or cropped after approval, MUST NOT show or be generated from a
+  finished cover or the logo, and MUST NOT be a near-duplicate of a piece already in the pool. How
+  a piece is made and approved is in `imagery/README.md`.
+- **FR-016**: Its share card MUST be `images/share-card.png`, 1200×630, the light lockup centered
+  on the surface role, written by `tools/brand_imagery.py build`.
 
 ## Out of scope
 
 - Typeface files. Each design system it themes ships the files of the families it uses, in the
   format its medium needs.
-- Cover artwork and its library: per-work facts held by the production pipeline that uses them
-  (0014-design-systems FR-025, FR-031).
+- Which work uses which piece of the imagery pool: a fact about that work, held by its production
+  pipeline (0014-design-systems FR-025).
 
 ## Edge cases
 
@@ -103,6 +116,8 @@ restating them.
   system mixes it from a theme role or states it as its own; it is not a brand color unless this
   spec adds it, per FR-002 and FR-014.
 - A size between two shipped files: the nearest larger file is scaled down, per FR-008.
+- A work with no good match in the imagery pool: a new piece is made and approved per FR-015; a
+  piece is never adapted for one work.
 
 ## Assumptions
 
@@ -118,6 +133,8 @@ None.
 - **Unit color** — the one color identifying a business unit.
 - **Lockup** — the landscape and two-line wordmark as one fixed image, light or dark.
 - **Icon-only mark** — the landscape cropped from the master, without the wordmark.
+- **Imagery pool** — the approved pieces of frontier artwork every design system it themes chooses
+  from: a cover, a web page's hero.
 
 ## Success criteria
 

@@ -62,12 +62,9 @@
 \RequirePackage{xcolor}
 \input{\branddir/brand.tex}
 \colorlet{ifink}{brand-text}
-\colorlet{ifblue}{brand-primary}
-\colorlet{ifoxblood}{brand-tertiary}
-\colorlet{ifteal}{brand-secondary}
-\definecolor{ifgray}{HTML}{5B6470}
-\definecolor{ifrule}{HTML}{C9CED6}
-\definecolor{iftint}{HTML}{F3F5F8}
+\colorlet{ifgray}{brand-text!70!brand-surface}
+\colorlet{ifrule}{brand-text!22!brand-surface}
+\colorlet{iftint}{brand-text!4!brand-surface}
 \color{ifink}
 
 \RequirePackage[protrusion=true,expansion=true,tracking=true,
@@ -100,7 +97,7 @@
 \RequirePackage{needspace}
 \RequirePackage{etoolbox}
 \RequirePackage{xurl}
-\RequirePackage[colorlinks=true,linkcolor=ifink,urlcolor=ifblue,citecolor=ifink,
+\RequirePackage[colorlinks=true,linkcolor=ifink,urlcolor=brand-link,citecolor=ifink,
   breaklinks=true,pdfusetitle=false]{hyperref}
 \RequirePackage{hyperxmp}
 
@@ -145,10 +142,10 @@
   \gdef\ifclaimlabel{#1}\gdef\ifclaimextra{#2}\gdef\ifclaimflagtext{#3}\claimpendingtrue}
 \newcommand{\printclaim}{%
   \ifclaimpending
-    \nobreak{\ifsans\fontsize{6.7}{8}\selectfont\bfseries\color{ifblue}%
+    \nobreak{\ifsans\fontsize{6.7}{8}\selectfont\bfseries\color{brand-primary}%
      \textls[110]{\MakeUppercase{\ifclaimlabel}}%
      \ifdefempty{\ifclaimextra}{}{\ \textperiodcentered\ \textls[60]{\MakeUppercase{\ifclaimextra}}}%
-     \ifdefempty{\ifclaimflagtext}{}{\ \textperiodcentered\ {\color{ifoxblood}\textls[60]{\MakeUppercase{\ifclaimflagtext}}}}%
+     \ifdefempty{\ifclaimflagtext}{}{\ \textperiodcentered\ {\color{brand-accent}\textls[60]{\MakeUppercase{\ifclaimflagtext}}}}%
      \par}\nobreak\vskip1.6pt\nobreak
     \global\claimpendingfalse
   \fi}
@@ -170,11 +167,11 @@
   colback=iftint,left=7pt,right=6pt,top=4.5pt,bottom=4.5pt,
   before skip=7pt,after skip=7pt,
   fontupper=\ifsans\fontsize{8.4}{10.8}\selectfont}}
-\newtcolorbox{ifkeypoint}{ifbase,borderline west={1.6pt}{0pt}{ifblue}}
-\newtcolorbox{ifnote}[1]{ifbase,borderline west={1.6pt}{0pt}{ifblue},
-  before upper={{\ifsans\bfseries\fontsize{6.7}{8}\selectfont\color{ifblue}\textls[100]{\MakeUppercase{#1}}}\par\vspace{2pt}}}
-\newtcolorbox{ifimportant}[1]{ifbase,borderline west={1.6pt}{0pt}{ifoxblood},
-  before upper={{\ifsans\bfseries\fontsize{6.7}{8}\selectfont\color{ifoxblood}\textls[100]{\MakeUppercase{#1}}}\par\vspace{2pt}}}
+\newtcolorbox{ifkeypoint}{ifbase,borderline west={1.6pt}{0pt}{brand-primary}}
+\newtcolorbox{ifnote}[1]{ifbase,borderline west={1.6pt}{0pt}{brand-primary},
+  before upper={{\ifsans\bfseries\fontsize{6.7}{8}\selectfont\color{brand-primary}\textls[100]{\MakeUppercase{#1}}}\par\vspace{2pt}}}
+\newtcolorbox{ifimportant}[1]{ifbase,borderline west={1.6pt}{0pt}{brand-accent},
+  before upper={{\ifsans\bfseries\fontsize{6.7}{8}\selectfont\color{brand-accent}\textls[100]{\MakeUppercase{#1}}}\par\vspace{2pt}}}
 \newtcolorbox{ifpractical}{enhanced,breakable,sharp corners,halign=flush left,colback=white,colframe=ifink,
   boxrule=0.45pt,left=6pt,right=6pt,top=3.5pt,bottom=3.5pt,before skip=5pt,after skip=7pt,
   fontupper=\ifsans\fontsize{8.4}{10.8}\selectfont,
@@ -185,7 +182,7 @@
   fontupper=\ifsans\fontsize{8.5}{11}\selectfont,
   before upper={{\ifsans\bfseries\fontsize{6.9}{8.2}\selectfont\color{ifink}\textls[110]{STATUS OF THIS PAPER}}\par\vspace{3pt}}}
 \newtcolorbox{ifquote}{enhanced,breakable,sharp corners,frame hidden,colback=white,
-  borderline west={1.2pt}{0pt}{ifblue},left=9pt,right=2pt,top=1.5pt,bottom=1.5pt,
+  borderline west={1.2pt}{0pt}{brand-primary},left=9pt,right=2pt,top=1.5pt,bottom=1.5pt,
   before skip=7pt,after skip=8pt,fontupper=\itshape\fontsize{10.2}{13.2}\selectfont}
 \newcommand{\ifquotecite}[1]{\par\upshape\small---#1}
 \newenvironment{ifcode}
@@ -230,10 +227,10 @@
 }
 
 \newtcolorbox{ifkeypoints}{enhanced,sharp corners,colback=white,frame hidden,boxrule=0pt,
-  borderline north={1.6pt}{0pt}{ifblue},borderline south={0.4pt}{0pt}{ifrule},
+  borderline north={1.6pt}{0pt}{brand-primary},borderline south={0.4pt}{0pt}{ifrule},
   left=0pt,right=0pt,top=6pt,bottom=3pt,before skip=0pt,after skip=0pt,
   fontupper=\ifsans\fontsize{8.7}{11.3}\selectfont\setlength{\parindent}{0pt},
-  before upper={{\ifsans\bfseries\fontsize{7}{8.4}\selectfont\color{ifblue}\textls[110]{KEY POINTS}}\par\vspace{3pt}}}
+  before upper={{\ifsans\bfseries\fontsize{7}{8.4}\selectfont\color{brand-primary}\textls[110]{KEY POINTS}}\par\vspace{3pt}}}
 \newcommand{\keypointitem}[2]{\par\noindent{\bfseries #1}\ #2\par\vspace{3.5pt}}
 \newcommand{\paperendnote}{%
   \iftext{license}{\par\vspace{9pt}\noindent{\color{ifrule}\hrule height 0.4pt}\vspace{3pt}

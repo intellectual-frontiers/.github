@@ -108,10 +108,12 @@ any number of each kind.
   `brand.css`, and in `brand.tex` (for print) as an `xcolor` color
   `brand-<role>` or, for a font role, a command `\brandfontsans` or
   `\brandfontserif`: the colors `text`, `surface`, `primary`, `secondary`,
-  `tertiary`, `success`, `warning`, `danger` and `info`, and the font
+  `tertiary`, `success`, `warning`, `danger`, `info`, `accent` (editorial
+  emphasis: a heading, a numeral, a rule) and `link`, and the font
   families `font-sans` and `font-serif`. Under `logo` in `tokens.json`, it
   MUST list its lockup files for light and for dark backgrounds, each with
-  its pixel size, its icon-only mark, and its favicon; `brand.tex` MUST name
+  its pixel size, its icon-only mark, its favicon, and a 1200×630 share
+  card (`share-card`) for link previews; `brand.tex` MUST name
   its widest lockup for light and for dark backgrounds and its widest icon
   (`\brandlockuplight`, `\brandlockupdark`, `\brandicon`), as paths inside
   the brand's directory. A brand MAY supply
@@ -128,6 +130,14 @@ any number of each kind.
   design system ships; it MUST NOT change layout, spacing, components,
   motion or accessibility behaviour. A web or print design system MUST NOT
   be used without a theme.
+- **FR-044**: A web or print design system MUST NOT hold a color literal.
+  A color it needs that no role supplies (a neutral, a tint, a rule, a
+  translucent overlay) MUST be a mix of theme roles, or of a role and
+  `transparent`: `color-mix()` on the web, `xcolor`'s `<role>!<n>!<role>`
+  in print. A picture it places (a hero, cover artwork) MUST be a piece of
+  the theme's imagery pool (FR-043), chosen by its consumer, and a link
+  preview MUST use the theme's share card. Its harness MUST fail on a color
+  literal in its stylesheets or style files.
 - **FR-039**: A web or print design system's harness MUST run under any
   brand vendored beside it, chosen when it runs, and MUST fail when that
   brand lacks a role the system requires, names a font family the system
@@ -246,17 +256,31 @@ any number of each kind.
 
 - **FR-028**: A brand design system governs one identity: its palette, the
   theme roles it supplies (FR-037), its typeface families, its logo and
-  lockups, its favicon, and its imagery. Its machine-readable form is
+  lockups, its favicon and share card, and its imagery (FR-043). Its machine-readable form is
   `tokens.json` (FR-036), `brand.css`, which declares its theme roles as
   CSS custom properties prefixed `--brand-`, inside the `theme` cascade
   layer, and nothing else, and `brand.tex`, which declares them for print
   (FR-037) and nothing else. Its harness checks that the three agree, that it
-  supplies every role of FR-037, the contrast of its role pairings, and its
-  logo files. Its consumers are the design systems it themes and the
+  supplies every role of FR-037, the contrast of its role pairings, its
+  logo files, its share card and its imagery pool. Its consumers are the design systems it themes and the
   channels that pair it with them. A brand that is not yet public MUST live,
   with the same layout and harness, in a repository that may hold
   confidential material, never in this one (0001-eidolon-architecture
   FR-002).
+
+- **FR-043**: A brand MAY supply an **imagery pool**: the approved pieces
+  of artwork a design system it themes, or a work set in one, may choose
+  from, under `imagery/`. `imagery/catalog.json` MUST list every piece with
+  its id, name, environment (from the catalog's own list), what it shows
+  (description, visual anchor, route, built structures, colored elements,
+  water), what it can stand for (metaphors, suggested subjects), its
+  source, and its files: the master `<id>.png` with its pixel size and the
+  bounds of the drawn art, and WebP files for the web, each with its size.
+  Every file MUST be present at its stated size, and every master MUST be
+  catalogued. Every piece MUST follow the brand's imagery rules, which its
+  spec states. Which work uses which piece is that work's fact (FR-025). A
+  design system that places pictures MUST name the imagery pool among the
+  roles it requires (FR-038), so a brand without one cannot theme it.
 
 ## Kind profile: web presentation
 
@@ -265,7 +289,8 @@ any number of each kind.
   custom properties, mirrored in `tokens.json`; it holds `css/` (with a
   `css/bundle.txt` naming the cascade order), `fonts/`, `js/`, and a markup
   contract (`chrome.md`), unless the system's own nature requires
-  otherwise, and never a brand's logo or favicon (FR-038). Its consumers
+  otherwise, and never a brand's logo, favicon, share card or imagery
+  (FR-038, FR-044). Its consumers
   are channels, each pairing it with a brand (FR-038, FR-040).
 - **FR-007**: A web design system's client-side implementation MUST prefer
   plain HTML, modern CSS and light vanilla JavaScript with native web
@@ -325,12 +350,12 @@ any number of each kind.
   families it ships) and its logos come from the brand's `brand.tex`. Its
   harness compiles each fixture under every brand beside it and checks the
   page size, that every font in the output is one it ships and is
-  embedded, that the theme's colors reached the output, and that no theme
-  color appears as a literal in its style files.
-  It holds the cover grammar (how a cover is composed, set and lettered)
-  and MUST NOT hold cover artwork, its library, or which work uses which
-  piece: those are facts about works, held by the production pipeline
-  (FR-025). Its consumers are the typesetting tools of a production
+  embedded, that the theme's colors reached the output, and that its style
+  files hold no color literal.
+  It holds the cover grammar (how a cover is composed, set and lettered).
+  It takes cover artwork from the theme's imagery pool (FR-043) and MUST
+  NOT hold artwork itself or which work uses which piece, a fact about a
+  work held by the production pipeline (FR-025). Its consumers are the typesetting tools of a production
   pipeline, which are not part of it (FR-025).
 
 - **FR-042**: Every print design system MUST be classified in the

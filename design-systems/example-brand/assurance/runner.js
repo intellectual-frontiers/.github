@@ -22,8 +22,9 @@
   /*
    * The theme (0014-design-systems FR-038, FR-039): the brand a web design system is rendered with. A page names
    * its default with <link rel="stylesheet" data-theme="<brand>" href=".../<brand>/brand.css">; ?brand=<slug>
-   * overrides it for this run. applyTheme points that link, every img[data-theme-logo] and every
-   * link[data-theme-favicon] in a document at the chosen brand, vendored beside this design system.
+   * overrides it for this run. applyTheme points that link, every img[data-theme-logo], every
+   * img[data-theme-imagery] (a piece of the brand's imagery pool: the one whose id it names, else the first) and
+   * every link[data-theme-favicon] in a document at the chosen brand, vendored beside this design system.
    */
   const THEME = new URLSearchParams(location.search).get("brand") || document.querySelector("link[data-theme]")?.dataset.theme || null;
   let brandTokens;
@@ -57,9 +58,22 @@
       img.src = new URL(`../${THEME}/${f.file}`, base).href;
       img.width = want; img.height = Math.round((want * f.height) / f.width);
     }
+    const pictures = [...doc.querySelectorAll("img[data-theme-imagery]")];
+    if (pictures.length) {
+      const response = await fetch(new URL(`../${THEME}/imagery/catalog.json`, base));
+      if (!response.ok) throw new Error(`the theme ${THEME} has no imagery pool (../${THEME}/imagery/catalog.json: HTTP ${response.status})`);
+      const { pieces } = await response.json();
+      for (const img of pictures) {
+        const piece = pieces.find((p) => p.id === img.dataset.themeImagery) || pieces[0];
+        const widest = piece.web.reduce((a, b) => (b.width > a.width ? b : a));
+        img.src = new URL(`../${THEME}/imagery/${widest.file}`, base).href;
+        img.srcset = piece.web.map((w) => `${new URL(`../${THEME}/imagery/${w.file}`, base).href} ${w.width}w`).join(", ");
+        img.width = widest.width; img.height = widest.height;
+      }
+    }
     const favicon = tokens.$extensions["com.intellectualfrontiers.logo"].favicon.file;
     for (const l of doc.querySelectorAll("link[data-theme-favicon]")) l.href = new URL(`../${THEME}/${favicon}`, base).href;
-    await Promise.all([...doc.querySelectorAll("img[data-theme-logo]")].map((img) => img.decode().catch(() => {})));
+    await Promise.all([...doc.querySelectorAll("img[data-theme-logo], img[data-theme-imagery]")].map((img) => img.decode().catch(() => {})));
   }
   class Failure extends Error {}
 
