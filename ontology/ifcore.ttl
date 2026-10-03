@@ -69,12 +69,11 @@ ifcore:DesignSystem a owl:Class ; rdfs:label "Design system"@en ;
     rdfs:comment "A named, self-contained, versionable set of public house rules for one kind of output, with their machine-readable form, assets and assurance harness, at design-systems/<slug>/, per 0014-design-systems FR-001, FR-010. Its kind is dcterms:type, a concept in ifcore:DesignSystemKindScheme (FR-018); each design system it derives from is prov:wasDerivedFrom (FR-020)."@en .
 
 ifcore:designSystemStatus a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystemStatus ;
-    rdfs:comment "The one record of whether a design system is active, draft, or retired (0014-design-systems FR-010, FR-011) — never its own README."@en .
+    rdfs:comment "The one record of whether a design system is active or draft (0014-design-systems FR-010, FR-011) — never its own README. A design system no longer used is removed, not given a status (FR-035)."@en .
 
 ifcore:DesignSystemStatus a owl:Class ; rdfs:label "Design system status"@en .
 ifcore:ActiveDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Active"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:DraftDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Draft"@en ; ifcore:hasAudience ifcore:Public .
-ifcore:RetiredDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Retired"@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:DesignSystemKindScheme a skos:ConceptScheme ; rdfs:label "Design system kind"@en ;
     rdfs:comment "What a design system governs (0014-design-systems FR-018). A concept is in this scheme only if 0014-design-systems has a kind profile for it (FR-019), and its skos:notation is the code that ends the slug of every design system of that kind (FR-003, FR-018); a broader concept groups kinds, has no code, and is never itself a design system's kind."@en ;
@@ -110,18 +109,27 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:FrontiersBrand a ifcore:DesignSystem ;
+    rdfs:label "Frontiers Brand"@en ;
+    ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
+    dcterms:type ifcore:BrandDesignSystemKind ;
+    rdfs:comment "At design-systems/frontiers-brand/; its house rules are design-systems/frontiers-brand/spec.md. The palette, unit colors, typefaces, logo, icon and imagery identity every visual design system derives from (0014-design-systems FR-028)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
     rdfs:label "Frontiers Nature Web"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind ;
-    rdfs:comment "At design-systems/frontiers-nature-web/. Carried over from a prior, now-superseded attempt at this repository (.github-q326's design-system/, its own spec 0007-design-system); named for the 'natural-frontier' visual identity its own tokens document (Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper)."@en ;
+    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    rdfs:comment "At design-systems/frontiers-nature-web/; its house rules are design-systems/frontiers-nature-web/spec.md. Intellectual Frontiers' public, editorial web presentation."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
     rdfs:label "Frontiers Console Web"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:WebDesignSystemKind ;
-    rdfs:comment "At design-systems/frontiers-console-web/, its house rules are its own spec, design-systems/frontiers-console-web/spec.md (0014-design-systems FR-022). The operator (admin) and documentation counterpart to ifcore:FrontiersNatureWeb: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components, and a browser-based assurance harness (0014-design-systems FR-015). Written from scratch; shares a palette and typefaces with frontiers-nature-web but is a distinct system."@en ;
+    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    rdfs:comment "At design-systems/frontiers-console-web/; its house rules are design-systems/frontiers-console-web/spec.md. Operator (admin) and documentation web surfaces: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────

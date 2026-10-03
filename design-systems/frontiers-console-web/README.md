@@ -2,9 +2,10 @@
 
 > **Canonical and public.** Governed by
 > [`spec.md`](spec.md) and
-> [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), one of several design
-> systems under `design-systems/` — see [that directory's README](../README.md) for what a design
-> system is. Consumers vendor a pinned copy of this directory and never edit it. Built as **Bare Metal
+> [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), and derives from
+> [`frontiers-brand`](../frontiers-brand/README.md); see [the design systems README](../README.md)
+> for what a design system is. Consumers vendor a pinned copy of this directory, with
+> `frontiers-brand` beside it, and never edit either. Built as **Bare Metal
 > Software**: strict HTML5, modern CSS in cascade layers, and a few native web components in one
 > classic script. No framework, no utility-class system, no build step, **no runtime dependencies**.
 
@@ -12,7 +13,7 @@ Frontiers Console is the interface for **operator (admin) and documentation** su
 navbar, page and table-of-contents shell in three selectable layouts, a set of documentation
 components, and the data-dense pieces an admin console needs. It is deliberately a different system
 from [`frontiers-nature-web`](../frontiers-nature-web/README.md), which is the public, editorial face of the
-organization; the two share a palette and typefaces, not a purpose.
+organization; both derive their palette, typefaces and logo from `frontiers-brand`, and share no purpose.
 
 ## Provenance
 
@@ -43,7 +44,7 @@ other project is a dependency. The only third-party files are the fonts below.
 | `js/console.js` | The only script. Defines `fc-shell`, `fc-toc`, `fc-tabs`, `fc-codeblock`, `fc-search`, `fc-table`, `fc-terminal` and `FcToast`. |
 | `tokens.json` | Machine-readable mirror of `tokens.css`, kept exact by `assurance/`. |
 | `chrome.md` | **The markup contract**: anatomy, classes and attributes for every layout and component. |
-| `logos/`, `images/` | Brand marks (WebP and PNG) and favicon, shared with `frontiers-nature-web`. |
+| `logos/`, `images/` | Copies of `frontiers-brand`'s logo files and favicon, checked by `assurance/inherited.js`. |
 | `assurance/` | The test harness, report and live documentation. See below. |
 
 ## Three layouts, one attribute

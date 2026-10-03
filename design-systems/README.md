@@ -58,17 +58,22 @@ and a status of active, draft, or retired). The ontology, not this file
 or any design system's own `README.md`, is the one record of which
 design systems exist and what their status is.
 
-The design systems here today:
+The design systems here today, each with its rules in its own `spec.md`:
 
-- [`frontiers-nature-web/`](frontiers-nature-web/README.md) (web presentation):
-  Intellectual Frontiers' own "natural-frontier" visual identity: deep
-  ink, frontier blue, signal teal, editorial oxblood, warm paper. The
-  public, editorial face.
-- [`frontiers-console-web/`](frontiers-console-web/README.md) (web presentation):
-  operator (admin) and documentation surfaces: sidebar, navbar and
-  table-of-contents shell in three selectable layouts, documentation
-  components, and the data-dense pieces an admin console needs. Governed
-  by its own [`spec.md`](frontiers-console-web/spec.md).
+- [`frontiers-brand/`](frontiers-brand/README.md) (brand): the palette (Deep
+  Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper), unit
+  colors, typefaces, logo, icon and imagery identity every visual system
+  derives from.
+- [`frontiers-nature-web/`](frontiers-nature-web/README.md) (web
+  presentation, derives from `frontiers-brand`): the public, editorial face.
+- [`frontiers-console-web/`](frontiers-console-web/README.md) (web
+  presentation, derives from `frontiers-brand`): operator (admin) and
+  documentation surfaces: sidebar, navbar and table-of-contents shell in
+  three selectable layouts, documentation components, and the data-dense
+  pieces an admin console needs.
+
+A design system that is no longer used is removed: its directory and its
+ontology record are deleted together, and Git is the record of it.
 
 ## Rules, and how they change
 
@@ -140,11 +145,11 @@ design system guarantees. It needs nothing but a browser:
 | To | Do |
 | --- | --- |
 | See it work | Open `<slug>/assurance/index.html`. Tests that can run from `file://` do; tests that need `fetch` or iframes are reported as **skipped**, never as passed. |
-| Run everything | Serve the design system's directory (`python3 -m http.server`) and open `/assurance/`. |
-| Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` (needs Playwright and Chromium; exits non-zero on failure; `--shots DIR` writes screenshots of every fixture). |
+| Run everything | Serve the directory holding the design system (here, `design-systems/`: `python3 -m http.server`) and open `/<slug>/assurance/`. Serving the parent lets a derived system check its copies against the system it derives from, vendored beside it. |
+| Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` for one system, or `tools/run_assurance.sh` for all (needs Playwright and Chromium; exits non-zero on failure; `--shots DIR` writes screenshots of every fixture). CI runs `tools/run_assurance.sh` on every push that touches `design-systems/`. |
 
 Each harness has `fixtures/` (complete pages written to the system's markup contract, which are both the
-test subjects and reference renderings), `unit.js` and `integration.js` (the suites, each with a
+test subjects and reference renderings), `unit.js` and `integration.js` (the suites, plus `inherited.js` in a derived system, each with a
 description that is rendered into the page as documentation), and a runner (`runner.js`, `boot.js`,
 `run.mjs`). The runner files are **copied** between design systems rather than shared, so each directory
 stays self-contained. A change to a design system is complete when its harness is green over http.

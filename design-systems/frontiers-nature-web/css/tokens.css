@@ -1,9 +1,7 @@
 /*
- * Intellectual Frontiers design tokens.
- * Values extracted from the Lovable site (September 2026 natural-frontier identity):
- * Deep Ink #121820, Frontier Blue #214EA2, Signal Teal #1F7775, Editorial Oxblood #8A3147,
- * Warm Paper #F3F0E8. Unit colors are identifiers, not decorative floods.
- * Mirrors tokens.json; this file is the source of truth.
+ * Frontiers Nature design tokens. Brand and unit colors and the house typefaces are copies of
+ * frontiers-brand's (spec FR-004), checked by assurance/inherited.js. Unit colors are identifiers,
+ * not decorative floods. Mirrored in tokens.json; this file is the source of truth.
  */
 @layer tokens {
   :root {
@@ -50,7 +48,7 @@
     --fast: 150ms;
   }
 
-  /* Retained from Lovable; not wired to any switch yet (0014-design-systems, Out of scope). */
+  /* Dark theme values. Nothing sets data-theme; a switch is out of this design system's scope (spec). */
   :root[data-theme="dark"] {
     color-scheme: dark;
     --background: #121820;

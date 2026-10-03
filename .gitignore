@@ -2,3 +2,4 @@
 # rewrites them, so a tracked one leaves the checkout dirty.
 __pycache__/
 *.pyc
+node_modules/

@@ -1,0 +1,28 @@
+# Runs every design system's assurance harness on every push and pull request that touches a design
+# system (0014-design-systems FR-015, FR-017). A harness serves the directory holding its design system,
+# so a derived system checks its copies against the system it derives from (FR-021).
+name: design-systems
+
+on:
+  push:
+    paths: ["design-systems/**", "tools/run_assurance.sh", ".github/workflows/design-systems.yml"]
+  pull_request:
+    paths: ["design-systems/**", "tools/run_assurance.sh", ".github/workflows/design-systems.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  assurance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Playwright and Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Every design system's harness
+        run: tools/run_assurance.sh

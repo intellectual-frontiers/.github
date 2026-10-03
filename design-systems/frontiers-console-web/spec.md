@@ -15,14 +15,18 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
 ## Identity and scope
 
 - **FR-001**: `frontiers-console-web` MUST live at `design-systems/frontiers-console-web/`, be registered in
-  `ifcore.ttl` as an `ifcore:DesignSystem` (0014-design-systems FR-010), and carry the status that
-  registration states, not one asserted in its own README (0014-design-systems FR-011).
+  `ifcore.ttl` as an `ifcore:DesignSystem` of the web presentation kind that derives from
+  `frontiers-brand` (0014-design-systems FR-010, FR-020), and carry the status that registration
+  states, not one asserted in its own README (0014-design-systems FR-011).
 - **FR-002**: It MUST serve two kinds of surface from one set of assets: **documentation** (articles,
   reference, specs) and **administration** (tables, forms, status, run output). It MUST NOT assume
   which web property consumes it, which backend renders it, or how its content is authored.
-- **FR-003**: It MUST be a distinct system from `frontiers-nature-web`, which it does not replace. It MAY
-  reuse that system's palette, typefaces and brand marks; where it does, it carries its own copy
-  (0014-design-systems FR-005).
+- **FR-003**: It MUST be a distinct system from `frontiers-nature-web`, which it does not replace.
+  `--fc-foreground` MUST be `frontiers-brand`'s Deep Ink, `--fc-primary` its Frontier Blue,
+  `--fc-success` its Signal Teal, `--fc-danger` its Editorial Oxblood and `--fc-info` the Network
+  unit color; `--fc-font-sans` MUST lead with Inter; and every logo file and `images/favicon.png`
+  that `frontiers-brand` also ships MUST be byte-identical to it (frontiers-brand FR-002 to FR-004,
+  FR-006, FR-013; 0014-design-systems FR-021).
 
 ## Engineering stance
 

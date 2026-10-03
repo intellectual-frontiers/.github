@@ -64,6 +64,15 @@
       if (!response.ok) throw new Failure(`${path}: HTTP ${response.status}`);
       return response.text();
     },
+    /**
+     * Fetch a file of a design system this one derives from (0014-design-systems FR-021), vendored beside
+     * this one (`../<slug>/`). Skips, never passes, when that design system is not beside this copy.
+     */
+    async fetchSource(slug, path, as = "text") {
+      const response = await fetch(new URL(`../${slug}/${path}`, base));
+      if (!response.ok) throw new Skip(`${slug} is not vendored beside this design system (../${slug}/${path}: HTTP ${response.status}); vendor it to check what this one inherits`);
+      return as === "bytes" ? new Uint8Array(await response.arrayBuffer()) : response.text();
+    },
     /** Load a page into an off-screen iframe of a given width and resolve once its scripts have run. */
     async frame(path, { width = 1280, height = 900 } = {}) {
       const iframe = document.createElement("iframe");
@@ -95,6 +104,11 @@
   /* ───── colour helpers (used by several suites) ───── */
   Assurance.color = {
     parse(value) {
+      const hex = value.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hex) {
+        const h = hex[1].length === 3 ? [...hex[1]].map((c) => c + c).join("") : hex[1];
+        return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: 1 };
+      }
       const rgb = value.match(/rgba?\(([^)]+)\)/);
       if (rgb) {
         const parts = rgb[1].split(/[\s,/]+/).filter(Boolean).map(Number);

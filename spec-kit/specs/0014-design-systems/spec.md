@@ -3,16 +3,11 @@
 **Spec ID:** 0014-design-systems
 **Status:** Draft
 
-**Input:** Bring the design system developed in a prior, now-superseded
-attempt at this repository (`.github-q326`'s `design-system/`, its own
-spec `0007-design-system`) into this repository, and generalize the
-single, singular directory that attempt assumed into infrastructure for
-however many named design systems Intellectual Frontiers ends up
-maintaining. Then generalize "design system" beyond web presentation, so
-that every public house rule about how Intellectual Frontiers looks,
-reads, and sounds (web pages, printed books and papers, figures, the
-written voice, the spoken voice, and kinds not yet named) is held, changed,
-and checked the same way, in the same directory.
+**Input:** Every public house rule about how Intellectual Frontiers looks,
+reads, and sounds (web pages, printed books and papers, figures, the written
+voice, the spoken voice, and kinds not yet named) held, changed, and checked
+the same way, in one directory of named design systems, of which there may be
+any number of each kind.
 
 ## What a design system is, here
 
@@ -131,17 +126,22 @@ and checked the same way, in the same directory.
 
 - **FR-010**: Each design system MUST be represented in `ifcore.ttl` as an
   `ifcore:DesignSystem` individual, carrying at minimum a label, a status
-  (`ifcore:ActiveDesignSystem`, `ifcore:DraftDesignSystem`, or
-  `ifcore:RetiredDesignSystem`), its kind (`dcterms:type`, a concept in
+  (`ifcore:ActiveDesignSystem` or `ifcore:DraftDesignSystem`), its kind (`dcterms:type`, a concept in
   `ifcore:DesignSystemKindScheme`), each design system it derives from
-  (`prov:wasDerivedFrom`), and a comment naming its directory and origin.
+  (`prov:wasDerivedFrom`), and a comment naming its directory.
   This is the one register of which design systems exist; nothing elsewhere
   (a separate index file, a wiki page, a status column) duplicates it.
 - **FR-011**: A design system's own directory and `README.md` MUST NOT be
-  the asserted source of truth for whether it is active, draft, or
-  retired — that status lives in the ontology per FR-010, and the
+  the asserted source of truth for whether it is active or draft — that
+  status lives in the ontology per FR-010, and the
   directory's own documentation describes how to use it, not its current
   standing.
+- **FR-035**: A design system that is no longer used MUST be removed by
+  deleting its directory and its `ifcore:DesignSystem` individual in the
+  same change, and every design system that derives from it MUST first stop
+  doing so. Nothing in this repository records a removed design system;
+  Git does. A consumer holding a vendored copy keeps it until it next
+  re-vendors (FR-014).
 - **FR-012**: Which design system(s) an Intellectual Frontiers channel
   (a web property, per 0021-works-and-presentations FR-011), production
   pipeline, or tool actually vendors is a fact about that consumer, not about
@@ -163,10 +163,8 @@ and checked the same way, in the same directory.
   own properties are. It MUST NOT carry design system status (FR-010).
 - **FR-014**: A change to a design system's directory MUST be public (design
   systems carry no confidential material, per FR-025) and any consumer that
-  has vendored it is expected to re-pull the changed files — the same
-  must-be-revendored discipline the prior attempt's `0007-design-system`
-  FR-013 already established for its one design system, generalized to
-  apply to each one independently.
+  has vendored it is expected to re-pull the changed files, each design
+  system independently.
 
 ## Assurance
 
@@ -177,8 +175,9 @@ and checked the same way, in the same directory.
     what is tested;
   - contains its own fixtures, outputs written to the system's rules (pages,
     passages, documents) that serve as both test subjects and reference
-    examples, including fixtures that must fail where a rule is a
-    prohibition;
+    examples; where the harness sweeps content for prohibited patterns (a
+    written-voice sweep, a figure check), fixtures that must fail as well
+    as fixtures that must pass;
   - needs nothing to run beyond what its kind profile names;
   - never reports a test it did not run as passed, and says how to run it;
   - is runnable headlessly, so it can gate a change in a terminal or CI,
@@ -248,8 +247,11 @@ and checked the same way, in the same directory.
   typesetting style files (a LaTeX preamble or class) and the data they
   read (typefaces, layouts). Its harness compiles each fixture document
   and fails on a compile error or on a check rule broken in the output.
-  Its consumers are the typesetting tools of a production pipeline, which
-  are not part of it (FR-025).
+  It holds the cover grammar (how a cover is composed, set and lettered)
+  and MUST NOT hold cover artwork, its library, or which work uses which
+  piece: those are facts about works, held by the production pipeline
+  (FR-025). Its consumers are the typesetting tools of a production
+  pipeline, which are not part of it (FR-025).
 
 ## Kind profile: figure
 
@@ -269,7 +271,10 @@ and checked the same way, in the same directory.
   (banned words and phrases, forbidden punctuation). Its harness runs that
   sweep over fixture passages that must pass and must fail. A shared term's
   definition is never part of it: a rule MAY require using a term as the
-  ontology defines it.
+  ontology defines it. Its rules MUST be stated as the house's voice, not as
+  any one person's, and it MUST NOT hold the source material its rules were
+  drawn from (writing samples, instructions written for or about a named
+  person, audit prompts): that material stays with the consumer (FR-025).
   Its consumers are works, their audits, and the tools that check them.
 
 ## Kind profile: spoken voice
@@ -283,26 +288,17 @@ and checked the same way, in the same directory.
 
 ## Out of scope
 
-- A templating or server-side rendering engine (the prior attempt's
-  `0010-templating`, with its `app-field`, `app-each`, `app-include` and
-  similar constructs) is not adopted by this spec. `frontiers-nature-web`
-  carries forward reference documentation (`templating.md`,
-  `data/registry.json`) describing the vocabulary its own markup and
-  chrome were originally designed against, but adopting any templating
-  approach — that one, a different one, or none — is a separate, future
-  decision this spec does not make.
+- A templating or server-side rendering engine. A web design system MAY
+  document an optional template vocabulary its markup contract is written
+  against; implementing one is each consumer's own decision.
 - Which specific web properties, works and tools exist and which design
   systems each one vendors is out of scope; this spec only establishes that
   a consumer's choice is itself a fact it states, per FR-012 and FR-026.
 - The production pipelines that typeset, render, record or publish output
   from a design system are out of scope (FR-025); 0016-press-production and
   0017-spoken-and-research-works govern them.
-- A switch-driven dark theme remains unimplemented in `frontiers-nature-web`
-  (its tokens exist behind `[data-theme="dark"]` but nothing wires a
-  toggle to it) — carried forward from the prior attempt's open question,
-  not resolved here.
-- Non-Latin font subsets are not shipped by `frontiers-nature-web` — also
-  carried forward, not resolved here.
+- What any one design system holds beyond this spec's requirements: its own
+  spec states it.
 
 ## Edge cases
 
@@ -323,6 +319,12 @@ and checked the same way, in the same directory.
 - A design system created for a new kind of output from an existing one,
   such as a print counterpart of a web system: it is a new design system
   with its own slug, per FR-003 and FR-018.
+- A design system no longer used: its directory and ontology individual are
+  removed together once nothing derives from it, per FR-035.
+- A written-voice rule drawn from a named person's writing: it is stated as
+  the house's rule, and the writing stays with the consumer, per FR-033.
+- Cover art for a work not yet published: it is never in a design system,
+  per FR-031 and FR-025.
 - A kind of output with no profile yet, such as motion or slides: no design
   system can be registered under it until a profile and a kind concept are
   added, per FR-018 and FR-019.
@@ -357,17 +359,7 @@ and checked the same way, in the same directory.
 
 ## Open questions
 
-- **OQ-1**: Whether a retired design system's directory stays in
-  `design-systems/` or is removed once its ontology status is retired is
-  not stated.
-- **OQ-2**: Whether a written-voice design system's source material (the
-  writing samples and instructions its rules were drawn from) is public
-  along with its rules, or stays with the consumer, is not decided.
-- **OQ-3**: Whether a print design system holds a cover artwork library,
-  given that art for an unpublished work is not yet public, or holds only
-  the cover grammar, is not decided.
-- **OQ-4**: Whether the brand values now held by `frontiers-nature-web` move to
-  a brand design system it derives from, and when, is not decided.
+None.
 
 ## Key entities
 
@@ -382,10 +374,6 @@ and checked the same way, in the same directory.
   requirements in 0020-spec-format, at `design-systems/<slug>/spec.md`.
 - **Derivation** — one design system inheriting another's rules and
   carrying checked copies of the values it uses.
-- **`frontiers-nature-web`** — the first design system registered under this
-  spec, carried over from the prior attempt's single, unnamed design
-  system; named for the "natural-frontier" visual identity its own tokens
-  document.
 - **A consumer** — any channel (a web property), production pipeline or
   tool, internal or external, that vendors a design system's directory to
   make presentations; this spec does not
