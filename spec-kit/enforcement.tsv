@@ -463,6 +463,7 @@ frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assura
 frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
 frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
 frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
+frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit: one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that it is the recorded trace and that inks are verified are not checked
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
@@ -589,6 +590,12 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0022-domain-names FR-018	check	eidolon: make domain-security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
 0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
 0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
+0022-domain-names FR-021	check	eidolon: make check-domains	the namespace's domain and the web property's domain must be marked crown jewels
+0022-domain-names FR-022	check	eidolon: make check-domains	a crown jewel under a two-letter top-level domain fails
+0022-domain-names FR-023	review	0022-domain-names FR-023	defines the country-code review
+0022-domain-names FR-024	none	-	what depends on a domain is recorded by hand; completeness is unchecked
+0022-domain-names FR-025	check	eidolon: make check-domains	a lapse Decision for a domain something requires or a published address uses fails
+0022-domain-names FR-026	check	eidolon: make check-domains	warns for each Public brand with no defensive-registration Decision
 0023-domain-security FR-001	check	eidolon: make domain-security	evaluates every domain against every control
 0023-domain-security FR-002	check	eidolon: make check-domains	an exception names a DomainName and lapses by dcterms:valid within a year
 0023-domain-security FR-003	none	-	domain security check not yet built
@@ -610,29 +617,47 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
 0023-domain-security FR-020	check	eidolon: make domain-security	a new domain is checked within the week
 0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
-0024-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
-0024-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
-0024-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
-0024-tooling-environment FR-004	none	-	no check scans tools for installs at run time
-0024-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0024-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
-0024-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0024-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
-0024-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
-0024-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
-0024-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
-0024-tooling-environment FR-012	none	-	no check scans tools for the environment's name
-0025-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
-0025-workspaces FR-002	none	-	FR-010 runs only the image flavor
-0025-workspaces FR-003	none	-	no check
-0025-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
-0025-workspaces FR-005	none	-	no check reads ws-repos.json
-0025-workspaces FR-006	none	-	no check reads devcontainer.json
-0025-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
-0025-workspaces FR-008	none	-	no check reads devcontainer.json
-0025-workspaces FR-009	none	-	documentation judgment
-0025-workspaces FR-010	none	-	no check reads the README
-0025-workspaces FR-011	none	-	documentation judgment
-0025-workspaces FR-012	none	-	no check inspects the image manifest
-0025-workspaces FR-013	none	-	no check
-0025-workspaces FR-014	none	-	no check
+0023-domain-security FR-022	check	eidolon: make domain-security	security.txt with a Contact and an unexpired Expires on each primary domain
+0023-domain-security FR-023	check	eidolon: make domain-security	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
+0023-domain-security FR-024	check	eidolon: make domain-security	registered look-alikes of Public primary domains, report only
+0023-domain-security FR-025	check	eidolon: make domain-security	crown jewel expiry at least two years out, from RDAP
+0023-domain-security FR-026	check	eidolon: make domain-security	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
+0023-domain-security FR-027	none	-	billing review is a person's, with FR-015's
+0023-domain-security FR-028	none	-	which subdomain sends bulk mail is not observable
+0024-persistent-addresses FR-001	none	-	definition; the checks below find published addresses by it
+0024-persistent-addresses FR-002	check	eidolon: make domain-security	every published address answers below 400 after redirects
+0024-persistent-addresses FR-003	check	eidolon: make check-domains	no lapse Decision for a domain carrying a published address (0022 FR-025)
+0024-persistent-addresses FR-004	check	eidolon: make domain-security	weekly in the vault's domain-security workflow
+0024-persistent-addresses FR-005	check	eidolon: make domain-security	each public namespace answers 200 with Turtle
+0024-persistent-addresses FR-006	check	eidolon: make domain-security	the private namespace answers 404
+0024-persistent-addresses FR-007	none	-	a namespace address change is caught only by FR-005's check
+0024-persistent-addresses FR-008	check	eidolon: make check-domains	see 0022 FR-021
+0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
+0024-persistent-addresses FR-010	none	-	consent is a person's; nothing checks it
+0024-persistent-addresses FR-011	none	-	no organization identifier held yet (OQ-3)
+0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
+0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
+0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
+0025-tooling-environment FR-004	none	-	no check scans tools for installs at run time
+0025-tooling-environment FR-005	none	-	names the environment; nothing tests it
+0025-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
+0025-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
+0025-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
+0025-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
+0025-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
+0025-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
+0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
+0026-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0026-workspaces FR-003	none	-	no check
+0026-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
+0026-workspaces FR-005	none	-	no check reads ws-repos.json
+0026-workspaces FR-006	none	-	no check reads devcontainer.json
+0026-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
+0026-workspaces FR-008	none	-	no check reads devcontainer.json
+0026-workspaces FR-009	none	-	documentation judgment
+0026-workspaces FR-010	none	-	no check reads the README
+0026-workspaces FR-011	none	-	documentation judgment
+0026-workspaces FR-012	none	-	no check inspects the image manifest
+0026-workspaces FR-013	none	-	no check
+0026-workspaces FR-014	none	-	no check
