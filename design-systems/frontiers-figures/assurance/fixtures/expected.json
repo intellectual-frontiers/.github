@@ -7,5 +7,6 @@
   "unknown-class.svg": "is not a figure-role class",
   "wrong-canvas.svg": "canvas is 900px wide",
   "em-dash.svg": "em dash",
-  "kept-style.svg": "holds a <style>"
+  "kept-style.svg": "holds a <style>",
+  "covered-label.svg": "runs under a shape drawn after it"
 }

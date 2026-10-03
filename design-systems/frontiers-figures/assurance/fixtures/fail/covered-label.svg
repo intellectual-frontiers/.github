@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 200" width="1040" height="200">
+  <rect width="1040" height="200" class="f-surface"/>
+  <text x="40" y="88" font-size="21" class="f-body">A table cell's text that runs on into the next cell</text>
+  <rect x="300" y="60" width="300" height="40" class="f-neutral-tint"/>
+</svg>
