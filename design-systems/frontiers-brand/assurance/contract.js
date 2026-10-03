@@ -101,13 +101,13 @@
 
   suite("Decoration kit", {
     group: "Unit", needs: "http",
-    description: "A brand that supplies a decoration kit (0014-design-systems FR-047) has a one-color vector lockup and icon, drawn only in currentColor so a decorator chooses the ink, each with its finest detail, and a spot-color and a thread match for each color role it lists. A brand without one passes and themes no merchandise design system.",
+    description: "A brand that supplies a decoration kit (0014-design-systems FR-047) has a one-color vector lockup and icon, and may add a wordmark, drawn only in currentColor so a decorator chooses the ink, each with its finest detail, and a spot-color and a thread match for each color role it lists. A brand without one passes and themes no merchandise design system.",
   }, (s) => {
     const kit = async () => (await tokens()).$extensions["com.intellectualfrontiers.decoration"];
-    s.test("the lockup and icon are one-color SVG in currentColor", async (t) => {
+    s.test("the lockup, icon and any wordmark are one-color SVG in currentColor", async (t) => {
       const k = await kit();
       if (!k) return t.skip("no decoration kit");
-      for (const part of ["lockup", "icon"]) {
+      for (const part of ["lockup", "icon", "wordmark"].filter((p) => p !== "wordmark" || k.wordmark)) {
         const res = await fetch(new URL(k[part].file, base));
         t.ok(res.ok, `${k[part].file} loads`);
         const svg = new DOMParser().parseFromString(await res.text(), "image/svg+xml").documentElement;
