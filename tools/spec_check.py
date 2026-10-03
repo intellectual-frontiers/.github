@@ -353,6 +353,8 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             continue
         where = f"ontology/ifcore.ttl ({m.group(1)})"
         named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
+            findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
         if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
             findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:

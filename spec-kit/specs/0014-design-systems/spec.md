@@ -444,6 +444,23 @@ any number of each kind.
   it serves (*talk*, *lecture*, *workshop*, *briefing*). Its consumers are
   speakers, courses and the tools that build decks.
 
+## Kind profile: media
+
+- **FR-050**: A media design system governs the images that package a work
+  for a platform: podcast and episode art, video thumbnails, title cards,
+  lower thirds and social cards. Its machine-readable form is each asset
+  type's size, safe area, type range and limits, and the tool that lays out
+  and renders an asset from a short job. It is themed (FR-038, FR-044):
+  every color is a brand theme role or a mix of two, its pictures come
+  from the brand's imagery pool (FR-043) never larger than their masters,
+  its logo is the brand's lockup never below its minimum, and its text is
+  checked against the house voice. Its harness renders an asset of every
+  type under every brand here and checks its size, contrast and limits, and
+  runs its checker over jobs that must fail. It MUST be classified in the
+  ontology, by `dcterms:type`, with every **media asset type** it makes,
+  named as the platforms name them. Its consumers are spoken and video
+  works, their publishers, and the tools that publish them.
+
 ## Kind profile: written voice
 
 - **FR-033**: A written-voice design system governs how the house writes:
