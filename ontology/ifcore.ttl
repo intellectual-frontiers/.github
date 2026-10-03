@@ -196,6 +196,17 @@ ifcore:JournalArticle a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeSch
 ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "report"@en ;
     skos:definition "A standalone document of findings, set for print or PDF."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:Poster a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "poster"@en ;
+    skos:definition "A sign printed at large size and hung or mounted: an event, a book or a workshop."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RollUpBanner a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "roll-up banner"@en ;
+    skos:altLabel "pull-up banner"@en ;
+    skos:definition "A tall printed banner on a retractable stand, for a booth or a stage."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EventBadge a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "event badge"@en ;
+    skos:altLabel "name badge"@en ;
+    skos:definition "A small printed card naming its wearer at an event."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:drawsFiguresWith a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystem ;
     rdfs:label "draws figures with"@en ;
@@ -404,6 +415,15 @@ ifcore:FrontiersEmail a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:EmailDesignSystemKind , ifcore:NewsletterEmail , ifcore:AnnouncementEmail , ifcore:InvitationEmail , ifcore:NotificationEmail ;
     rdfs:comment "At design-systems/frontiers-email/; its house rules are design-systems/frontiers-email/spec.md. Email built from Markdown by mail.py: 600px, table layout, styles inline, colors resolved from a brand's theme roles with a dark tone, and a plain-text alternative (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSignagePrint a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-signage-print" ;
+    rdfs:label "Frontiers Signage Print"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:PrintDesignSystemKind , ifcore:Poster , ifcore:RollUpBanner , ifcore:EventBadge ;
+    rdfs:comment "At design-systems/frontiers-signage-print/; its house rules are design-systems/frontiers-signage-print/spec.md. Posters, a roll-up banner and event badges as vector PDF at trim size plus bleed, laid out by signage.py from a short job and themed by a brand (0014-design-systems FR-031)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
