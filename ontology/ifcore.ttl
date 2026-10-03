@@ -165,7 +165,7 @@ ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNeh
 # ───────────────────────── Units (0003-intellectual-frontiers FR-001) ─────────────────────────
 
 ifcore:Unit a owl:Class ; rdfs:subClassOf org:OrganizationalUnit ; rdfs:label "Unit"@en ;
-    rdfs:comment "A part of the company with exactly one job and one question — the W3C Organization Ontology's org:OrganizationalUnit, specialized to that one constraint (0015-controlled-vocabulary FR-002)."@en .
+    rdfs:comment "A part of the company with exactly one job and one question — the W3C Organization Ontology's org:OrganizationalUnit, specialized to that one constraint (0019-controlled-vocabulary FR-002)."@en .
 ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:string ;
     rdfs:comment "The one job a unit exists to do."@en .
 ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
