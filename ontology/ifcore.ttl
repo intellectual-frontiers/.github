@@ -66,7 +66,7 @@ ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
 # ───────────────────────── Design systems (0014-design-systems) ─────────────────────────
 
 ifcore:DesignSystem a owl:Class ; rdfs:label "Design system"@en ;
-    rdfs:comment "A self-contained, versionable set of visual and front-end assets at design-systems/<slug>/, per 0014-design-systems FR-001, FR-010."@en .
+    rdfs:comment "A named, self-contained, versionable set of public house rules for one kind of output, with their machine-readable form, assets and assurance harness, at design-systems/<slug>/, per 0014-design-systems FR-001, FR-010. Its kind is dcterms:type, a concept in ifcore:DesignSystemKindScheme (FR-018); each design system it derives from is prov:wasDerivedFrom (FR-020)."@en .
 
 ifcore:designSystemStatus a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystemStatus ;
     rdfs:comment "The one record of whether a design system is active, draft, or retired (0014-design-systems FR-010, FR-011) — never its own README."@en .
@@ -76,15 +76,45 @@ ifcore:ActiveDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Active"@en ;
 ifcore:DraftDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Draft"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RetiredDesignSystem a ifcore:DesignSystemStatus ; rdfs:label "Retired"@en ; ifcore:hasAudience ifcore:Public .
 
+ifcore:DesignSystemKindScheme a skos:ConceptScheme ; rdfs:label "Design system kind"@en ;
+    rdfs:comment "What a design system governs (0014-design-systems FR-018). A concept is in this scheme only if 0014-design-systems has a kind profile for it (FR-019); a broader concept groups kinds and is never itself a design system's kind."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:VisualDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "visual"@en ;
+    skos:definition "Kinds that govern how output looks."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:VerbalDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "verbal"@en ;
+    skos:definition "Kinds that govern how output reads or sounds."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FoundationDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "foundation"@en ;
+    skos:definition "The identity every other kind draws on: palette, typeface families, logo, imagery identity (0014-design-systems FR-028)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "web presentation"@en ;
+    skos:definition "How a web page looks and the DOM shape its interactive chrome expects (0014-design-systems FR-029)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PrintDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "print"@en ;
+    skos:definition "How a printed or ebook book, paper or cover is set (0014-design-systems FR-031)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FigureDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "figure"@en ;
+    skos:definition "How a work's figures are drawn, in print or on the web (0014-design-systems FR-032)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WrittenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VerbalDesignSystemKind ; skos:prefLabel "written voice"@en ;
+    skos:definition "How the house writes: voice, usage, punctuation, and presentation form (0014-design-systems FR-033)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VerbalDesignSystemKind ; skos:prefLabel "spoken voice"@en ;
+    skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersNature a ifcore:DesignSystem ;
     rdfs:label "Frontiers Nature"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
+    dcterms:type ifcore:WebDesignSystemKind ;
     rdfs:comment "At design-systems/frontiers-nature/. Carried over from a prior, now-superseded attempt at this repository (.github-q326's design-system/, its own spec 0007-design-system); named for the 'natural-frontier' visual identity its own tokens document (Deep Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersConsole a ifcore:DesignSystem ;
     rdfs:label "Frontiers Console"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:WebDesignSystemKind ;
     rdfs:comment "At design-systems/frontiers-console/, governed by 0018-frontiers-console FR-001. The operator (admin) and documentation counterpart to ifcore:FrontiersNature: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components, and a browser-based assurance harness (0014-design-systems FR-015). Written from scratch (0018-frontiers-console FR-005); shares a palette and typefaces with frontiers-nature but is a distinct system (0018-frontiers-console FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
 

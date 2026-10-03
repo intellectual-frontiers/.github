@@ -4,41 +4,97 @@ Governed by [`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.m
 
 ## What a design system is
 
-A design system is a self-contained, versionable set of visual and
-front-end assets — CSS design tokens, cascade-layered stylesheets,
-self-hosted fonts, logos and images, a small set of web components, and a
-written markup contract for the page chrome it defines. It is **not** a
-web property, a content document, or a templating engine: it supplies
-what a property's pages look like and the DOM shape its interactive
-chrome expects, nothing about where that property's content or business
-logic comes from. A property vendors (copies) a design system's directory
-wholesale and renders its own pages against it; it never links back to
+A design system is a named, self-contained, versionable set of public
+**house rules for one kind of output**, together with the
+machine-readable form of those rules, the assets they govern, and an
+assurance harness that proves the rules hold. A web design system's
+machine-readable form is CSS tokens and stylesheets; a written-voice
+design system's is the list of patterns a mechanical sweep looks for. The
+shape is the same either way.
+
+A design system is **not** a web property, a work, a content document, or
+the tool that produces output from it (a renderer, a typesetting
+converter, a site server). Nor does it hold facts about one work, person
+or deployment, or views generated from the ontology such as a glossary:
+those belong to whoever uses the design system. A consumer vendors
+(copies) a design system's directory wholesale and never links back to
 this repository live.
+
+## Kinds
+
+Every design system has exactly one **kind**, which decides what its rules
+govern, what its machine-readable form is, and what its harness runs on.
+Each kind has a profile in
+[`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md):
+
+| Kind | Governs | Machine-readable form |
+| --- | --- | --- |
+| foundation | Palette, typeface families, logo, imagery identity | `tokens.json` |
+| web presentation | How a web page looks; the DOM its chrome expects | CSS custom properties, `tokens.json` |
+| print | How a book, paper or cover is set | Typesetting style files and their data |
+| figure | How a work's figures are drawn | Figure palette and layout data |
+| written voice | How the house writes | Patterns a mechanical sweep looks for |
+| spoken voice | How the voice changes for the ear | As written voice, over scripts |
+
+Kinds are recorded in the ontology (`ifcore:DesignSystemKindScheme`), not
+in directory names: `design-systems/` stays flat. A new kind (motion,
+slides, sonic) is added by writing its profile in the spec and adding its
+concept to the scheme. Nothing else moves.
 
 ## Why there's more than one of these
 
-This directory, not a single unnamed `design-system/`, is deliberately
-plural. Intellectual Frontiers may end up with more than one visually
-distinct system — a different unit, a public-facing product, an
-acquisition with its own existing identity — without retiring whichever
-one(s) already exist. Each one gets its own `<slug>/` directory here, and
-its own record in the ontology (`ifcore:DesignSystem`, with a status of
-active, draft, or retired — the ontology, not any design system's own
-`README.md`, is the one place that status is decided).
+Intellectual Frontiers has more than one kind of output, and may end up
+with more than one system of a kind: a different unit, a public-facing
+product, an acquisition with its own existing identity. Each one gets its
+own `<slug>/` directory here and its own record in the ontology
+(`ifcore:DesignSystem`, with a kind, any design systems it derives from,
+and a status of active, draft, or retired). The ontology, not this file
+or any design system's own `README.md`, is the one record of which
+design systems exist and what their status is.
 
-Right now there are two:
+The design systems here today:
 
-| Design system | Status | What it's for |
-| --- | --- | --- |
-| [`frontiers-nature/`](frontiers-nature/README.md) | Active | Intellectual Frontiers' own "natural-frontier" visual identity: deep ink, frontier blue, signal teal, editorial oxblood, warm paper. The public, editorial face. |
-| [`frontiers-console/`](frontiers-console/README.md) | Draft | Operator (admin) and documentation surfaces: sidebar, navbar and table-of-contents shell in three selectable layouts, documentation components, and the data-dense pieces an admin console needs. Governed by [`0018-frontiers-console`](../spec-kit/specs/0018-frontiers-console/spec.md). |
+- [`frontiers-nature/`](frontiers-nature/README.md) (web presentation):
+  Intellectual Frontiers' own "natural-frontier" visual identity: deep
+  ink, frontier blue, signal teal, editorial oxblood, warm paper. The
+  public, editorial face.
+- [`frontiers-console/`](frontiers-console/README.md) (web presentation):
+  operator (admin) and documentation surfaces: sidebar, navbar and
+  table-of-contents shell in three selectable layouts, documentation
+  components, and the data-dense pieces an admin console needs. Governed
+  by [`0018-frontiers-console`](../spec-kit/specs/0018-frontiers-console/spec.md).
 
-The status column is a convenience; the ontology is the record.
+## Rules, and how they change
+
+Every design system states its house rules in its own `rules.md`, each
+under a permanent identifier (`R-001`, `R-002`, ...) cited from elsewhere
+as `<slug> R-NNN`. An identifier is never renumbered or reused; a rule
+that no longer applies is marked retired and keeps its number. Each rule
+says how it is enforced: a `check` (and which harness test), a `gate`, a
+`review` (and who reviews), or `none`. A guide or markup contract in the
+same directory explains rules; it never states one that `rules.md` does
+not.
+
+A rule change is committed with a message saying what changed and why,
+and is recorded as a decision when it is a significant one. A lesson
+learned from a piece of work becomes part of the house rules by being
+adopted into a rule with an identifier.
+
+## Derivation
+
+A design system may **derive from** others: a web design system from a
+foundation one, a spoken-voice system from a written-voice one. It
+inherits every rule of what it derives from, keeps its own copy of any
+inherited value it uses (a color, a typeface, a banned word) so it stays
+self-contained, and its harness checks that copy still agrees with the
+source. It may add or tighten rules; it contradicts an inherited rule only
+with a rule of its own that names the inherited rule's identifier. A
+consumer of a derived system vendors every system in its chain.
 
 ## Engineering stance
 
-Every design system under this directory is expected to hold to the same
-stance, not just the one that happens to exist today:
+Every web design system under this directory holds to the same stance
+(the web presentation profile of 0014-design-systems):
 
 - **Prefer plain HTML, modern CSS and light vanilla JavaScript with
   native web components over any front-end framework.** No React, no
@@ -65,7 +121,9 @@ stance, not just the one that happens to exist today:
 
 ## Assurance: every design system proves itself
 
-Every design system carries an `assurance/` directory
+Every design system carries an `assurance/` harness that runs headlessly, exits non-zero on any
+failure, and never reports a test it did not run as passed; what it runs on depends on its kind. A
+web design system's harness is described here. It carries an `assurance/` directory
 ([`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md) FR-015) whose entry point,
 `assurance/index.html`, is at once the test runner, the report, and the documentation of what that
 design system guarantees. It needs nothing but a browser:
@@ -82,10 +140,12 @@ description that is rendered into the page as documentation), and a runner (`run
 `run.mjs`). The runner files are **copied** between design systems rather than shared, so each directory
 stays self-contained. A change to a design system is complete when its harness is green over http.
 
-## Using any one of these design systems, in any web environment
+## Using a web design system, in any web environment
 
 None of this assumes Intellectual Frontiers' own stack, or even that the
-consumer is part of this organization. In general, to use a design
+consumer is part of this organization. Whatever the kind, vendor the whole
+directory (and every system it derives from), record the slug and source
+commit of each copy, and never edit a copy in place. To use a web design
 system from this directory:
 
 1. Pick the one that fits (see the table above) and open its own
@@ -122,9 +182,14 @@ system from this directory:
    actually needs; document its real layout in its own `README.md` (see
    `frontiers-nature/README.md` for the shape that's worked so far, not
    as a rigid template).
-2. Add an `assurance/` harness per 0014-design-systems FR-015: copy
+2. Add an `assurance/` harness per 0014-design-systems FR-015 and its
+   kind's profile. For a web system: copy
    `runner.js`, `boot.js` and `run.mjs` from an existing system, write
    `fixtures/`, `unit.js`, `integration.js` and an `index.html`, and make it pass.
-3. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
-   a status, per 0014-design-systems FR-010.
-4. Add it to the table above.
+3. Write its `rules.md`, each rule with an identifier and an enforcement
+   mechanism, per 0014-design-systems FR-022 and FR-023.
+4. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
+   a status, a kind (`dcterms:type`) and anything it derives from
+   (`prov:wasDerivedFrom`), per 0014-design-systems FR-010. Its kind must
+   already have a profile in the spec (FR-018).
+5. Add it to the list above.
