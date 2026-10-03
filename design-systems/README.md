@@ -205,7 +205,7 @@ system from this directory:
    and 0020-spec-format, and add a row for each requirement to
    `spec-kit/enforcement.tsv`. Run `python3 tools/spec_check.py`.
 4. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
-   a status, a kind (`dcterms:type`) and anything it derives from
+   its slug (`dcterms:identifier`), a status, a kind (`dcterms:type`) and anything it derives from
    (`prov:wasDerivedFrom`), per 0014-design-systems FR-010. Its kind must
    already have a profile in the spec (FR-018).
 5. Add it to the list above.

@@ -125,7 +125,8 @@ any number of each kind.
 ## Tracking which design systems exist
 
 - **FR-010**: Each design system MUST be represented in `ifcore.ttl` as an
-  `ifcore:DesignSystem` individual, carrying at minimum a label, a status
+  `ifcore:DesignSystem` individual, carrying at minimum its slug
+  (`dcterms:identifier`), a label, a status
   (`ifcore:ActiveDesignSystem` or `ifcore:DraftDesignSystem`), its kind (`dcterms:type`, a concept in
   `ifcore:DesignSystemKindScheme`), each design system it derives from
   (`prov:wasDerivedFrom`), and a comment naming its directory.
