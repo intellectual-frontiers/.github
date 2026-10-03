@@ -116,6 +116,10 @@ ifcore:MediaDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemK
     skos:altLabel "media packaging"@en ;
     skos:definition "The images that package a work for a platform: podcast and episode art, video thumbnails, title cards, lower thirds and social cards (0014-design-systems FR-050)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:EmailDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "email"@en ;
+    skos:notation "email" ;
+    skos:definition "The messages the house sends by email: layout, type, color, logo, footer and plain-text alternative, within what mail clients render (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:WrittenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VerbalDesignSystemKind ; skos:prefLabel "written voice"@en ;
     skos:notation "written-voice" ;
     skos:definition "How the house writes: voice, usage, punctuation, and presentation form (0014-design-systems FR-033)."@en ;
@@ -261,6 +265,22 @@ ifcore:SocialCard a skos:Concept ; skos:inScheme ifcore:MediaAssetTypeScheme ; s
     skos:definition "An image announcing a work on a social platform: square, portrait or story."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:EmailTypeScheme a skos:ConceptScheme ; rdfs:label "Email type"@en ;
+    skos:definition "The kinds of message an email design system sends (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NewsletterEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "newsletter"@en ;
+    skos:definition "A periodical issue sent to subscribers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AnnouncementEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "announcement"@en ;
+    skos:definition "A one-off message announcing a work, an episode or an event to subscribers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:InvitationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "invitation"@en ;
+    skos:definition "A message inviting its reader to an event, a workshop or a course."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NotificationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "notification"@en ;
+    skos:definition "A message about something its reader did or asked for: a confirmation, a receipt, a reminder."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -367,6 +387,14 @@ ifcore:FrontiersMedia a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:MediaDesignSystemKind , ifcore:PodcastCoverArt , ifcore:EpisodeArt , ifcore:VideoThumbnail , ifcore:TitleCard , ifcore:LowerThird , ifcore:SocialCard ;
     rdfs:comment "At design-systems/frontiers-media/; its house rules are design-systems/frontiers-media/spec.md. Podcast and episode art, video thumbnails, title cards, lower thirds and social cards, laid out and rendered from a short job by media.py, themed by a brand with its imagery pool and lockup (0014-design-systems FR-050)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersEmail a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-email" ;
+    rdfs:label "Frontiers Email"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:EmailDesignSystemKind , ifcore:NewsletterEmail , ifcore:AnnouncementEmail , ifcore:InvitationEmail , ifcore:NotificationEmail ;
+    rdfs:comment "At design-systems/frontiers-email/; its house rules are design-systems/frontiers-email/spec.md. Email built from Markdown by mail.py: 600px, table layout, styles inline, colors resolved from a brand's theme roles with a dark tone, and a plain-text alternative (0014-design-systems FR-051)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;

@@ -311,6 +311,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
 0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
 0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
+0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -694,3 +695,15 @@ frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/ass
 frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
 frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
 frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
+frontiers-email FR-002	none	-	directory contents; no check
+frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
+frontiers-email FR-004	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: a known type; unsubscribe by type
+frontiers-email FR-005	check	.github: python3 design-systems/frontiers-email/assurance/run.py	pass fixtures parse and build
+frontiers-email FR-006	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: heading, subject, preheader, one call to action, words
+frontiers-email FR-007	check	.github: python3 design-systems/frontiers-email/assurance/run.py	https links; lockup sized, described, at least 100px, served from --assets
+frontiers-email FR-008	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: postal address; unsubscribe link for subscriber types
+frontiers-email FR-009	check	.github: python3 design-systems/frontiers-email/assurance/run.py	each tone's contrast under every brand; dark stylesheet present
+frontiers-email FR-010	check	.github: python3 design-systems/frontiers-email/assurance/run.py	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
+frontiers-email FR-011	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check sweeps subject, preheader and text
+frontiers-email FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
