@@ -393,11 +393,15 @@ any number of each kind.
   its lockup and its icon as one-color, outlined vector artwork (SVG, every
   fill and stroke `currentColor` or `none`, with no raster, live text,
   gradient or filter), so a decorator sets the ink, each with its finest
-  detail (its thinnest line or gap, as a fraction of its width); and, for each color
+  detail (its thinnest line or gap, as a fraction of its width); optionally
+  a wordmark, the brand's name alone set in the face its lockup's wordmark
+  is drawn in, as the same kind of artwork with its finest detail and
+  smallest width, for goods too small for the lockup's detail; and, for each color
   role it allows on goods (at least one dark and one light), the spot-color
   and the embroidery-thread match it is reproduced with, named in a
   matching system. A vector file MUST be made from the brand's approved
-  master, never redrawn or traced by a generative tool. Its harness checks
+  master, or for a wordmark set from its font, never redrawn or traced by
+  a generative tool. Its harness checks
   the kit's files and matches.
 
 ## Kind profile: figure

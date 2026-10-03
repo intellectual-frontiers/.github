@@ -23,7 +23,7 @@ supplies a decoration kit.
 ## Theme
 
 - **FR-003**: It MUST be themed (0014-design-systems FR-038, FR-044): every logo it places MUST be
-  the brand's decoration kit's one-color lockup or icon (0014-design-systems FR-047), every ink and
+  the brand's decoration kit's one-color lockup, icon or wordmark (0014-design-systems FR-047), every ink and
   thread a color role the kit allows on goods, reproduced with the kit's spot-color or thread match,
   and every picture a piece of the brand's imagery pool. It requires a decoration kit; a brand
   without one cannot theme it. Its harness MUST pass under every brand here that has a kit.
@@ -61,14 +61,15 @@ supplies a decoration kit.
 ## Decoration jobs
 
 - **FR-006**: A decoration job MUST name a product, one of its imprint locations, a method allowed
-  on it, and its artwork: the kit's lockup, its icon, or a piece of the imagery pool. A piece of the
+  on it, and its artwork: the kit's lockup, its icon, its wordmark where the kit has one, or a piece
+  of the imagery pool. A job naming a wordmark under a brand whose kit has none is refused. A piece of the
   imagery pool MUST be decorated only by a method that reproduces full color, in its own colors,
   never recolored, cropped or combined with the logo.
 - **FR-007**: The artwork MUST fit the imprint location, in width and in height at its own aspect
-  ratio. A lockup or icon MUST be placed no smaller than the brand's print minimum for it, and no
+  ratio. A lockup, icon or wordmark MUST be placed no smaller than the brand's print minimum for it, and no
   smaller than the method's finest line divided by the artwork's finest detail, so that no line or
   gap is finer than the method holds. Where the lockup cannot fit by those rules, the icon is used.
-- **FR-008**: A one-color lockup or icon MUST be decorated in exactly one ink, a color role in the
+- **FR-008**: A one-color lockup, icon or wordmark MUST be decorated in exactly one ink, a color role in the
   kit's inks: by its spot-color match for screen and pad printing, by its thread match for
   embroidery, and by its own value for direct-to-garment printing. Laser engraving and debossing MUST
   use no ink.
@@ -112,10 +113,7 @@ supplies a decoration kit.
 
 ## Open questions
 
-- **OQ-1**: `frontiers-brand` has no decoration kit yet. It needs a one-color vector lockup and icon
-  made from the approved master (never traced or redrawn by a generative tool, frontiers-brand
-  FR-009), their finest detail, and a spot-color and thread match for each role allowed on goods,
-  from the brand's owner. Until then no Intellectual Frontiers goods can be checked.
+None.
 
 ## Key entities
 

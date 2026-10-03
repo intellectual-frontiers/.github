@@ -80,7 +80,7 @@ def run(brand_dir: Path) -> Result:
     for path in sorted((HERE / "fixtures" / "pass").glob("*.json")):
         problems = decoration.check(resolve(json.loads(path.read_text(encoding="utf-8")), brand), brand)
         # A job the brand's kit fits at no size is the brand's limit, not the checker's: reported, never a pass.
-        unreachable = [p for p in problems if "at any size" in p]
+        unreachable = [p for p in problems if "at any size" in p or "decoration kit has no" in p]
         if unreachable:
             r.notes.append(f"pass/{path.name} is beyond {brand_dir.name}'s kit: {unreachable[0]}")
             r.beyond.add(path.name)
@@ -93,11 +93,11 @@ def run(brand_dir: Path) -> Result:
                 f"fail/{path.name} should break the rule about {case['expect']!r} under {brand_dir.name}; it reported: {'; '.join(problems) or 'nothing'}")
     for slug, product in decoration.PRODUCTS["products"].items():
         fits = []
-        for art in ("lockup", "icon"):
+        for art in brand.artwork():
             aspect = brand.aspect(art)
             for m in product["methods"]:
                 method = decoration.METHODS[m]
-                floor = max(float(brand.logo[art].get("min-width-in", 0)), method["min_line_in"] / float(brand.kit[art]["finest-detail"]))
+                floor = max(brand.min_width(art), method["min_line_in"] / float(brand.kit[art]["finest-detail"]))
                 for loc, (w, h) in product["locations"].items():
                     if floor <= min(w, h / aspect):
                         fits.append(f"{art} by {method['name']} on the {loc}")
