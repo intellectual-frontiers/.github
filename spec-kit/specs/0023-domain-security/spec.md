@@ -55,8 +55,9 @@ the DNS-as-code source and the registrar account, never in the ontology
   (SPF) naming only its authorized senders and failing all others, a
   DKIM key for each authorized sender, and a DMARC policy of quarantine
   or reject whose aggregate reports go to an address the company
-  controls. A domain whose sender policy authorizes any sender is
-  treated as sending email.
+  controls. A domain that receives email, or whose sender policy
+  authorizes any sender, is treated as sending email, so that a domain
+  with a mailbox cannot be impersonated for want of a sender policy.
 - **FR-011**: A domain that receives email MUST publish an MTA-STS
   policy in enforce mode and a TLS reporting (TLS-RPT) address the
   company controls.
@@ -124,6 +125,9 @@ the DNS-as-code source and the registrar account, never in the ontology
   permit no issuance, per FR-009 and FR-012.
 - A domain used only to send email, with no mailbox behind it: it meets
   FR-010 and, because it receives no email, not FR-011.
+- A domain that receives email but sends none: it is treated as sending,
+  so it still publishes a sender policy and DMARC, per FR-010, and meets
+  FR-011.
 - A domain moving between registrars by a recorded decision: its
   transfer lock may be off while the transfer is under way, per FR-004.
 - A DMARC policy held at quarantine while senders are moved over: it
