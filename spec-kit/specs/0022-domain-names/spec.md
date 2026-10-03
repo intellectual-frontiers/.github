@@ -46,7 +46,8 @@ FR-016 through FR-025 to domain names.
 - **FR-006**: A `DomainName` whose role is primary, redirect, mail, or
   defensive MUST name what it serves by `dcterms:relation`: the
   `DigitalAsset`, organization, `Trademark`, or Eidolon component it is
-  the address of or protects, or, for a redirect, the `DomainName` it
+  the address of or protects; the person whose own name it carries and
+  for whom it is the address; or, for a redirect, the `DomainName` it
   forwards to. A reserved or parked `DomainName` MAY name one.
 - **FR-007**: A `DigitalAsset`'s `dcterms:created` MUST state when the
   company began the property, not when a domain it uses was registered;
@@ -143,6 +144,9 @@ FR-016 through FR-025 to domain names.
   `DigitalAsset`, the new name is a new `DomainName` related to it, and
   the old name becomes a redirect or is let lapse by a recorded decision,
   per FR-001, FR-005, FR-006, and FR-016.
+- A domain carrying the founder's own name, used as his address: it
+  names him by `dcterms:relation`, and may be Public because he is,
+  per FR-006 and FR-009.
 - A subdomain serving a distinct product: it is not a `DomainName`; the
   product is a `DigitalAsset` whose `schema:url` names the subdomain, per
   FR-002.
@@ -180,9 +184,10 @@ FR-016 through FR-025 to domain names.
   each DNS provider, how a change to it is reviewed, and how a
   `RestrictedDataReference` names it are not yet stated; DevOps is to
   supply them.
-- **OQ-2**: Which registrars hold the domain names that are served by the
-  primary DNS provider but registered elsewhere, and how FR-018's
-  reconciliation reaches those registrars, are not yet stated.
+- **OQ-2**: How FR-018's reconciliation reaches a registrar other than
+  the primary one, whether the company holds its own account there, and
+  how a domain is verified under FR-012 where neither its registry nor
+  its registrar offers RDAP, are not yet stated.
 - **OQ-3**: No rule says whether a `DomainName` that has lapsed or been
   transferred away stays in the catalog, or what marks it as no longer
   held.
