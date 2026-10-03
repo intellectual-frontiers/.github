@@ -380,12 +380,14 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             findings.append(Finding("error", where, "an email design system names no email type (0014-design-systems FR-051)"))
         if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
             findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
+        if "CourseDesignSystemKind" in named and not (named & _concepts(ttl, "CourseFormatScheme") and named & _concepts(ttl, "AssessmentItemTypeScheme")):
+            findings.append(Finding("error", where, "a course design system names no course format or no assessment item type (0014-design-systems FR-052)"))
         if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
             findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:
             findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
-        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
-            findings.append(Finding("error", where, "a web, print or slides design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind", "CourseDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web, print, slides or course design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
     methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
     for block in re.split(r"\n\s*\n", ttl):
         m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)

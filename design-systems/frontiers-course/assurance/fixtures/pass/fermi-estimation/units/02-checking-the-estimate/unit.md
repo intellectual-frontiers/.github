@@ -1,0 +1,5 @@
+---
+title: Checking an estimate against a measurement
+week: 2
+---
+When a measured value exists, the gap between it and your estimate tells you which assumption to revisit.

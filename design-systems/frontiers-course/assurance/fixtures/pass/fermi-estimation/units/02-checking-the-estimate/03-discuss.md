@@ -1,0 +1,8 @@
+---
+title: Share your largest gap
+type: discussion
+minutes: 5
+outcomes: O2, O3
+---
+Post your estimate, the measured value, and the factor you would revisit. Read two other posts and suggest one
+assumption each writer could check.

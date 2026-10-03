@@ -1,0 +1,6 @@
+---
+title: Breaking a quantity into factors
+week: 1
+---
+A quantity no one has counted can still be estimated, by multiplying a few smaller quantities that you can reason
+about one at a time.

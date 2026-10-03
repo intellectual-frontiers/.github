@@ -1,0 +1,17 @@
+---
+title: Estimating with confidence
+code: IFEST1
+run: 2026
+language: en
+format: self-paced
+hours-per-week: 0.5
+derived-from: https://example.org/works/estimating
+---
+A short course on estimating a quantity you cannot look up: break it into factors you can reason about, state the
+assumption behind each one, and check the result against a measurement when one exists.
+
+## Outcomes
+
+- O1: Estimate a quantity to within a factor of ten by breaking it into factors you can reason about.
+- O2: Justify each factor in an estimate with a stated assumption.
+- O3: Compare an estimate with a measured value and explain the gap between them.

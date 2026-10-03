@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.intellectualfrontiers.com/design-systems/frontiers-course/schema/course.schema.json",
+  "title": "Course",
+  "description": "The model course.py reads from a course's source directory and every delivery target is compiled from (frontiers-course spec FR-004).",
+  "type": "object",
+  "required": ["id", "title", "code", "run", "language", "format", "hours_per_week", "summary", "outcomes", "units"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 80},
+    "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{1,9}$"},
+    "run": {"type": "string", "pattern": "^[0-9]{4}(?:-[A-Za-z0-9]+)?$"},
+    "language": {"type": "string", "pattern": "^[a-z]{2,3}(?:-[A-Z]{2})?$"},
+    "format": {"enum": ["self-paced", "instructor-paced"]},
+    "hours_per_week": {"type": "number", "minimum": 0.5, "maximum": 20},
+    "derived_from": {"type": "string", "pattern": "^https://"},
+    "summary": {"type": "string", "minLength": 1},
+    "outcomes": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "text"], "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^O[0-9]+$"},
+          "text": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "units": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/unit"}}
+  },
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "unit": {
+      "type": "object", "required": ["slug", "title", "week", "overview", "steps"], "additionalProperties": false,
+      "properties": {
+        "slug": {"$ref": "#/$defs/slug"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 80},
+        "week": {"type": "integer", "minimum": 1},
+        "overview": {"type": "string", "minLength": 1},
+        "steps": {"type": "array", "minItems": 1, "items": {"anyOf": [{"$ref": "#/$defs/lesson"}, {"$ref": "#/$defs/assessment"}]}}
+      }
+    },
+    "lesson": {
+      "type": "object", "required": ["slug", "kind", "type", "title", "minutes", "outcomes", "body"], "additionalProperties": false,
+      "properties": {
+        "slug": {"$ref": "#/$defs/slug"},
+        "kind": {"const": "lesson"},
+        "type": {"enum": ["reading", "video", "exercise", "discussion"]},
+        "title": {"type": "string", "minLength": 1, "maxLength": 80},
+        "minutes": {"type": "integer", "minimum": 1},
+        "outcomes": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^O[0-9]+$"}},
+        "video": {"type": "string", "pattern": "^https://"},
+        "captions": {"type": "string", "pattern": "\\.vtt$"},
+        "body": {"type": "string", "minLength": 1}
+      }
+    },
+    "assessment": {
+      "type": "object", "required": ["slug", "kind", "title", "minutes", "graded", "items"], "additionalProperties": false,
+      "properties": {
+        "slug": {"$ref": "#/$defs/slug"},
+        "kind": {"const": "assessment"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 80},
+        "minutes": {"type": "integer", "minimum": 1},
+        "graded": {"type": "boolean"},
+        "items": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/item"}}
+      }
+    },
+    "item": {
+      "type": "object", "required": ["id", "title", "type", "assesses", "prompt"], "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 80},
+        "type": {"enum": ["multiple-choice", "multiple-response", "numeric", "text-match"]},
+        "assesses": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^O[0-9]+$"}},
+        "prompt": {"type": "string", "minLength": 1},
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object", "required": ["text", "correct", "feedback"], "additionalProperties": false,
+            "properties": {
+              "text": {"type": "string", "minLength": 1},
+              "correct": {"type": "boolean"},
+              "feedback": {"type": "string"}
+            }
+          }
+        },
+        "answer": {"type": "number"},
+        "tolerance": {"type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)?%?$"},
+        "answers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "feedback": {"type": "string"}
+      }
+    }
+  }
+}
