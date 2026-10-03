@@ -230,6 +230,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
 | [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
 | [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
