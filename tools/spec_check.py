@@ -353,6 +353,8 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             continue
         where = f"ontology/ifcore.ttl ({m.group(1)})"
         named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "EmailDesignSystemKind" in named and not named & _concepts(ttl, "EmailTypeScheme"):
+            findings.append(Finding("error", where, "an email design system names no email type (0014-design-systems FR-051)"))
         if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
             findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
         if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
