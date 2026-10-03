@@ -1,0 +1,12 @@
+{
+  "expect": "not allowed",
+  "job": {
+    "product": "ballpoint-pen",
+    "location": "barrel",
+    "method": "screen-printing",
+    "artwork": "lockup",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 1.05
+  }
+}

@@ -32,6 +32,7 @@ Each kind has a profile in
 | brand | `brand` | Palette, typeface families, logo, imagery identity | `tokens.json` |
 | web presentation | `web` | How a web page looks; the DOM its chrome expects | CSS custom properties, `tokens.json` |
 | print | `print` | How a book, paper or cover is set | Typesetting style files and their data |
+| merchandise | `merchandise` | How the brand goes on physical goods: method, placement, ink | Decoration methods and products data |
 | figure | `figures` | How a work's figures are drawn | Figure palette and layout data |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
@@ -107,7 +108,8 @@ primitive tokens in `tokens.json` (the Design Tokens Community Group format), an
 `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `accent`, `link`, `font-sans` and `font-serif`. Its
 `brand.css` declares those roles as `--brand-*` custom properties for the web, `brand.tex` declares
 them as `brand-<role>` colors and font and logo commands for print, and `tokens.json` lists its logo
-files, favicon and share card. `tools/brand_theme.py` writes both theme files from `tokens.json`. A brand may
+files, favicon and share card, and optionally a **decoration kit** for physical goods (one-color vector logo
+and icon, and the spot-color and thread match of each ink). `tools/brand_theme.py` writes both theme files from `tokens.json`. A brand may
 also supply an **imagery pool** (`imagery/`): the approved artwork every design system it themes
 chooses from, catalogued in `imagery/catalog.json`. `tools/brand_imagery.py` builds and checks it.
 
