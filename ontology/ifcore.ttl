@@ -7,6 +7,7 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov:    <http://www.w3.org/ns/prov#> .
 @prefix schema:  <https://schema.org/> .
+@prefix org:     <http://www.w3.org/ns/org#> .
 
 # Intellectual Frontiers — core ontology (PUBLIC).
 #
@@ -163,8 +164,8 @@ ifcore:IntellectualFrontiersLLC ifcore:defaultDecisionAuthority ifcore:ShahidNeh
 
 # ───────────────────────── Units (0003-intellectual-frontiers FR-001) ─────────────────────────
 
-ifcore:Unit a owl:Class ; rdfs:label "Unit"@en ;
-    rdfs:comment "A part of the company with exactly one job and one question."@en .
+ifcore:Unit a owl:Class ; rdfs:subClassOf org:OrganizationalUnit ; rdfs:label "Unit"@en ;
+    rdfs:comment "A part of the company with exactly one job and one question — the W3C Organization Ontology's org:OrganizationalUnit, specialized to that one constraint (0015-controlled-vocabulary FR-002)."@en .
 ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:string ;
     rdfs:comment "The one job a unit exists to do."@en .
 ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
@@ -399,30 +400,30 @@ ifcore:divisionalOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdf
 ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
     rdfs:comment "Adds new matter to a parent application; partial priority (0007 FR-011)."@en .
 
-ifcore:WorkGroup a owl:Class ; rdfs:label "Work group"@en ;
+ifcore:WorkDomain a owl:Class ; rdfs:label "Work domain"@en ;
     rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
-ifcore:MarketplacesAndPayments a ifcore:WorkGroup ; rdfs:label "Marketplaces and payments"@en ;
+ifcore:MarketplacesAndPayments a ifcore:WorkDomain ; rdfs:label "Marketplaces and payments"@en ;
     rdfs:comment "Computer-controlled marketplace networks, digital payments, and related continuations."@en ;
     ifcore:hasAudience ifcore:Everyone .
-ifcore:EvidenceAndDecisions a ifcore:WorkGroup ; rdfs:label "Evidence and decisions"@en ;
+ifcore:EvidenceAndDecisions a ifcore:WorkDomain ; rdfs:label "Evidence and decisions"@en ;
     rdfs:comment "Traceable metric queues, task scheduling, service-delivery evidence, initiative tracking, document review, case response, decision lifecycles, and risk systems."@en ;
     ifcore:hasAudience ifcore:Everyone .
-ifcore:HealthcareDelivery a ifcore:WorkGroup ; rdfs:label "Healthcare delivery"@en ;
+ifcore:HealthcareDelivery a ifcore:WorkDomain ; rdfs:label "Healthcare delivery"@en ;
     rdfs:comment "Medical-device control, patient navigation, longitudinal profiles, team-based tele-diagnostics, smart referrals, and digital-native trials."@en ;
     ifcore:hasAudience ifcore:Everyone .
-ifcore:TrustedDataAndAuthorization a ifcore:WorkGroup ; rdfs:label "Trusted data and authorization"@en ;
+ifcore:TrustedDataAndAuthorization a ifcore:WorkDomain ; rdfs:label "Trusted data and authorization"@en ;
     rdfs:comment "Self-controlled digital authorization, device-driven blockchain integrity, blockchain natural-language processing, and multi-source data integration."@en ;
     ifcore:hasAudience ifcore:Everyone .
-ifcore:LearningAndContent a ifcore:WorkGroup ; rdfs:label "Learning and content"@en ;
+ifcore:LearningAndContent a ifcore:WorkDomain ; rdfs:label "Learning and content"@en ;
     rdfs:comment "Precision education and training, rating aggregation, and rewardable content delivery."@en ;
     ifcore:hasAudience ifcore:Everyone .
-ifcore:inWorkGroup a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkGroup .
+ifcore:inWorkDomain a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkDomain .
 
 ifcore:USPatent10643208 a ifcore:PatentFamily ;
     rdfs:label "Digital payment system (US10643208B2)"@en ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
-    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    ifcore:inWorkDomain ifcore:MarketplacesAndPayments ;
     rdfs:comment "Covers pre-consent capture, data-valuation logic, and a payment engine offsetting a service charge against computed data value, over banking or blockchain rails. Originally assigned to Netspective Communications LLC, reassigned to Intellectual Frontiers LLC in 2023 — consistent with the company-wide 2023 Netspective patent acquisition already in context/company.md."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
@@ -441,7 +442,7 @@ ifcore:USPatent11568401 a ifcore:PatentFamily ;
     ifcore:continuationOf ifcore:USPatent10643208 ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
-    ifcore:inWorkGroup ifcore:MarketplacesAndPayments ;
+    ifcore:inWorkDomain ifcore:MarketplacesAndPayments ;
     rdfs:comment "Continuation of US10643208B2: adds a cloud-based central controller, a dedicated buyer subsystem, third-party payer integration, and ETL processing for standardizing health data from diverse sources."@en ;
     ifcore:hasAudience ifcore:Everyone .
 
