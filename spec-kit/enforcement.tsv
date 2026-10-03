@@ -702,7 +702,7 @@ frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
 frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats, item types and delivery targets; run.py checks the classification and drawsFiguresWith
 frontiers-course FR-002	none	-	directory contents; no check
-frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; unreadable sources and misplaced videos are refused
+frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; a table, a missing title and misplaced videos are refused
 frontiers-course FR-004	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
 frontiers-course FR-005	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: outcome count, observable verbs, no vague verbs, one sentence
 frontiers-course FR-006	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: untaught, unassessed and unknown outcomes; units end with an assessment; one graded

@@ -470,7 +470,7 @@ ifcore:FrontiersCourse a ifcore:DesignSystem ;
     rdfs:label "Frontiers Course"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:CourseDesignSystemKind , ifcore:SelfPacedCourse , ifcore:InstructorPacedCourse , ifcore:MultipleChoiceItem , ifcore:MultipleResponseItem , ifcore:NumericResponseItem , ifcore:TextMatchItem , ifcore:StaticWebEdition , ifcore:OpenEdxOlxExport , ifcore:Cmi5Package ;
-    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of Markdown, read by course.py into a model schema/course.schema.json describes, checked for outcome alignment, pacing, assessment and accessibility, and compiled by build.py to a static web edition, an Open edX OLX export and a cmi5 package, themed by a brand (0014-design-systems FR-052)."@en ;
+    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of AsciiDoc, read by course.py into a model schema/course.schema.json describes, checked for outcome alignment, pacing, assessment and accessibility, and compiled by build.py to a static web edition, an Open edX OLX export and a cmi5 package, themed by a brand (0014-design-systems FR-052)."@en ;
     ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 

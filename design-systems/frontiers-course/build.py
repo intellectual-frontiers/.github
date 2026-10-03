@@ -39,6 +39,7 @@ from xml.sax.saxutils import quoteattr
 HERE = Path(__file__).resolve().parent
 SYSTEMS = HERE.parent
 sys.path.insert(0, str(HERE))
+import adoc  # noqa: E402
 import course as reader  # noqa: E402
 
 WEB = json.loads((HERE / "web.json").read_text(encoding="utf-8"))
@@ -64,77 +65,6 @@ def load(src: Path) -> dict:
     return reader.model(src)
 
 
-# ── Markdown ─────────────────────────────────────────────────────────────────────────────────────────────────────
-
-
-def inline(text: str, asset) -> str:
-    out, pos = [], 0
-    for m in re.finditer(r"!\[([^\]]*)\]\(([^)\s]+)\)|\[([^\]]+)\]\(([^)\s]+)\)", text):
-        out.append(_marks(text[pos:m.start()]))
-        if m.group(2) is not None:
-            out.append(f'<img src="{html.escape(asset(m.group(2)))}" alt="{html.escape(m.group(1))}">')
-        else:
-            out.append(f'<a href="{html.escape(m.group(4))}">{_marks(m.group(3))}</a>')
-        pos = m.end()
-    out.append(_marks(text[pos:]))
-    return "".join(out)
-
-
-def _marks(text: str) -> str:
-    t = html.escape(text, quote=False)
-    t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
-    t = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", t)
-    return re.sub(r"(?<![*\w])\*([^*]+)\*(?![*\w])", r"<em>\1</em>", t)
-
-
-def markdown(body: str, asset, shift: int = 0) -> str:
-    """The Markdown a course is written in, as HTML: headings, paragraphs, lists, quotations, figures."""
-    out, para, lst, quote = [], [], None, []
-
-    def flush():
-        nonlocal lst
-        if para:
-            text = " ".join(para)
-            if re.fullmatch(r"!\[[^\]]*\]\([^)\s]+\)", text):
-                out.append(f"<figure>{inline(text, asset)}</figure>")
-            else:
-                out.append(f"<p>{inline(text, asset)}</p>")
-            para.clear()
-        if lst:
-            tag, items = lst
-            out.append(f"<{tag}>" + "".join(f"<li>{inline(i, asset)}</li>" for i in items) + f"</{tag}>")
-            lst = None
-        if quote:
-            out.append(f"<blockquote><p>{inline(' '.join(quote), asset)}</p></blockquote>")
-            quote.clear()
-    for raw in body.splitlines():
-        line = raw.strip()
-        if not line:
-            flush()
-        elif m := re.match(r"^(#{2,6}) (.+)$", line):
-            flush()
-            n = min(len(m.group(1)) + shift, 6)
-            out.append(f"<h{n}>{inline(m.group(2), asset)}</h{n}>")
-        elif m := re.match(r"^(?:[-*]|(\d+)\.) (.+)$", line):
-            tag = "ol" if m.group(1) else "ul"
-            if para or quote or (lst and lst[0] != tag):
-                flush()
-            lst = lst or (tag, [])
-            lst[1].append(m.group(2))
-        elif line.startswith("> "):
-            if para or lst:
-                flush()
-            quote.append(line[2:])
-        elif lst and raw.startswith("  "):
-            lst[1][-1] += " " + line
-        else:
-            if lst or quote:
-                flush()
-            para.append(line)
-    flush()
-    return "\n".join(out)
-
-
 # ── files a course carries ───────────────────────────────────────────────────────────────────────────────────────
 
 
@@ -156,7 +86,7 @@ def media(src: Path, model: dict, brand: Path) -> dict[str, bytes]:
         for s in unit["steps"]:
             if s["kind"] != "lesson":
                 continue
-            refs = re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", s["body"])
+            refs = [src for src, _ in adoc.images(s["body"])]
             refs += [s["captions"]] if "captions" in s else []
             for ref in refs:
                 if ref.startswith("https://"):
@@ -284,13 +214,13 @@ def item_html(item: dict, n: int) -> str:
     key = html.escape(json.dumps(item_key(item), ensure_ascii=False), quote=True)
     asset = lambda r: r  # noqa: E731
     parts = [f'<fieldset class="item" id="{iid}" data-key="{key}">', f"<legend>{n}. {html.escape(item['title'])}</legend>",
-             markdown(item["prompt"], asset)]
+             adoc.render(item["prompt"], asset)]
     if "choices" in item:
         kind = "radio" if item["type"] == "multiple-choice" else "checkbox"
         if kind == "checkbox":
             parts.append("<p>Choose every answer that applies.</p>")
         for i, c in enumerate(item["choices"]):
-            parts.append(f'<label><input type="{kind}" name="{iid}" value="{i}"> <span>{inline(c["text"], asset)}</span></label>')
+            parts.append(f'<label><input type="{kind}" name="{iid}" value="{i}"> <span>{adoc.inline(c["text"], asset)}</span></label>')
     else:
         hint = "A number" if item["type"] == "numeric" else "A word or short phrase"
         mode = ' inputmode="decimal"' if item["type"] == "numeric" else ""
@@ -324,7 +254,7 @@ def web(src: Path, out: Path, brand: Path, cmi5: bool = False, publisher: str = 
     first = model["units"][0]
     home = (f"<h1>{html.escape(model['title'])}</h1>\n"
             f'<p class="kicker">{len(model["units"])} weeks · about {model["hours_per_week"]:g} hours a week · {model["format"]}</p>\n'
-            f"{markdown(model['summary'], lambda r: r)}\n<h2>By the end you will be able to</h2>\n<ol class=\"outcomes\">{outcomes}</ol>\n"
+            f"{adoc.render(model['summary'], lambda r: r)}\n<h2>By the end you will be able to</h2>\n<ol class=\"outcomes\">{outcomes}</ol>\n"
             f'<p><a href="{first["slug"]}/{first["steps"][0]["slug"]}.html">Start with {html.escape(first["steps"][0]["title"])}</a></p>')
     (out / "index.html").write_text(page(model, model["title"], home, 0, toc(model, None, 0)), encoding="utf-8")
     scripts = ("quiz.js", "cmi5.js") if cmi5 else ("quiz.js",)
@@ -336,9 +266,9 @@ def web(src: Path, out: Path, brand: Path, cmi5: bool = False, publisher: str = 
             body.append(f'<video controls preload="metadata" src="{html.escape(s["video"])}">'
                         f'<track kind="captions" srclang="{model["language"]}" label="Captions" src="{asset(s["captions"])}" default>'
                         f'<p><a href="{html.escape(s["video"])}">Download the video</a>.</p></video>')
-            body.append(f'<section class="transcript" aria-labelledby="transcript"><h2 id="transcript">Transcript</h2>\n{markdown(s["body"], asset, shift=1)}\n</section>')
+            body.append(f'<section class="transcript" aria-labelledby="transcript"><h2 id="transcript">Transcript</h2>\n{adoc.render(s["body"], asset, shift=1)}\n</section>')
         elif s["kind"] == "lesson":
-            body.append(markdown(s["body"], asset))
+            body.append(adoc.render(s["body"], asset))
         else:
             body += [item_html(it, i + 1) for i, it in enumerate(s["items"])]
             body.append('<p class="score" role="status" aria-live="polite"></p>')
@@ -365,27 +295,27 @@ def _id(*parts: str) -> str:
 
 def problem_xml(item: dict, asset) -> str:
     name = quoteattr(item["title"])
-    label = f"<label>{html.escape(' '.join(item['prompt'].split()))}</label>"
+    label = f"<label>{html.escape(adoc.plain(' '.join(item['prompt'].split())))}</label>"
     desc = ""
     t = item["type"]
     if t == "multiple-choice":
-        choices = "".join(f'<choice correct="{str(c["correct"]).lower()}">{html.escape(c["text"])}<choicehint>{html.escape(c["feedback"])}</choicehint></choice>'
+        choices = "".join(f'<choice correct="{str(c["correct"]).lower()}">{html.escape(adoc.plain(c["text"]))}<choicehint>{html.escape(adoc.plain(c["feedback"]))}</choicehint></choice>'
                           for c in item["choices"])
         inner = f'<multiplechoiceresponse>{label}{desc}<choicegroup type="MultipleChoice">{choices}</choicegroup></multiplechoiceresponse>'
     elif t == "multiple-response":
-        choices = "".join(f'<choice correct="{str(c["correct"]).lower()}">{html.escape(c["text"])}<choicehint selected="true">{html.escape(c["feedback"])}</choicehint></choice>'
+        choices = "".join(f'<choice correct="{str(c["correct"]).lower()}">{html.escape(adoc.plain(c["text"]))}<choicehint selected="true">{html.escape(adoc.plain(c["feedback"]))}</choicehint></choice>'
                           for c in item["choices"])
         inner = f"<choiceresponse>{label}{desc}<checkboxgroup>{choices}</checkboxgroup></choiceresponse>"
     elif t == "numeric":
         answer = f"{item['answer']:g}"
         tol = f'<responseparam type="tolerance" default="{item["tolerance"]}"/>' if "tolerance" in item else ""
         inner = (f'<numericalresponse answer="{answer}">{label}{desc}{tol}<formulaequationinput/>'
-                 f"<correcthint>{html.escape(item['feedback'])}</correcthint></numericalresponse>")
+                 f"<correcthint>{html.escape(adoc.plain(item['feedback']))}</correcthint></numericalresponse>")
     else:
         first, *more = item["answers"]
         extra = "".join(f"<additional_answer answer={quoteattr(a)}/>" for a in more)
         inner = (f'<stringresponse answer={quoteattr(first)} type="ci">{label}{desc}{extra}'
-                 f"<correcthint>{html.escape(item['feedback'])}</correcthint><textline size=\"30\"/></stringresponse>")
+                 f"<correcthint>{html.escape(adoc.plain(item['feedback']))}</correcthint><textline size=\"30\"/></stringresponse>")
     return f'<problem display_name={name} max_attempts="" showanswer="finished">\n  {inner}\n</problem>\n'
 
 
@@ -418,11 +348,11 @@ def olx(src: Path, out: Path, brand: Path, org: str) -> dict:
                         f'  <source src={quoteattr(s["video"])}/>\n  <transcript language="{model["language"]}" src="{srt}"/>\n</video>\n')
                     comps.append(("video", sid))
                     put(f"html/{sid}-transcript.xml", f'<html filename="{sid}-transcript" display_name="Transcript"/>\n')
-                    put(f"html/{sid}-transcript.html", "<h3>Transcript</h3>\n" + markdown(s["body"], asset, shift=1) + "\n")
+                    put(f"html/{sid}-transcript.html", "<h3>Transcript</h3>\n" + adoc.render(s["body"], asset, shift=1) + "\n")
                     comps.append(("html", f"{sid}-transcript"))
                 else:
                     put(f"html/{sid}.xml", f'<html filename="{sid}" display_name={quoteattr(s["title"])}/>\n')
-                    put(f"html/{sid}.html", markdown(s["body"], asset) + "\n")
+                    put(f"html/{sid}.html", adoc.render(s["body"], asset) + "\n")
                     comps.append(("html", sid))
                     if s["type"] == "discussion":
                         did = hashlib.sha1(f"{model['id']}/{run}/{sid}".encode()).hexdigest()[:32]
@@ -451,9 +381,9 @@ def olx(src: Path, out: Path, brand: Path, org: str) -> dict:
                                                            "GRADE_CUTOFFS": {"Pass": WEB["mastery"]}}, indent=2) + "\n")
     put("policies/assets.json", "{}\n")
     outcomes = "".join(f"<li>{html.escape(o['text'])}</li>" for o in model["outcomes"])
-    put("about/overview.html", f"<section class=\"about\"><h2>About this course</h2>\n{markdown(model['summary'], lambda r: r)}\n"
+    put("about/overview.html", f"<section class=\"about\"><h2>About this course</h2>\n{adoc.render(model['summary'], lambda r: r)}\n"
         f"<h2>By the end you will be able to</h2><ol>{outcomes}</ol></section>\n")
-    put("about/short_description.html", html.escape(" ".join(model["summary"].split())) + "\n")
+    put("about/short_description.html", html.escape(adoc.plain(" ".join(model["summary"].split()))) + "\n")
     put("about/effort.html", f"{model['hours_per_week']:g} hours a week\n")
     for name, data in media(src, model, brand).items():
         if not name.endswith(".vtt"):
@@ -485,13 +415,13 @@ def cmi5_xml(model: dict, iri: str) -> str:
     out = ['<?xml version="1.0" encoding="utf-8"?>',
            '<courseStructure xmlns="https://w3id.org/xapi/profiles/cmi5/v1/CourseStructure.xsd">',
            f'  <course id="{base}">', f"    <title>{ls(model['title'])}</title>",
-           f"    <description>{ls(' '.join(model['summary'].split()))}</description>", "  </course>", "  <objectives>"]
+           f"    <description>{ls(adoc.plain(' '.join(model['summary'].split())))}</description>", "  </course>", "  <objectives>"]
     for o in model["outcomes"]:
         out.append(f'    <objective id="{base}/outcome/{o["id"]}"><title>{ls(o["id"])}</title><description>{ls(o["text"])}</description></objective>')
     out.append("  </objectives>")
     for u in model["units"]:
         out += [f'  <block id="{base}/unit/{u["slug"]}">', "    <title>" + ls(f"Week {u['week']}: {u['title']}") + "</title>",
-                f"    <description>{ls(' '.join(u['overview'].split()))}</description>"]
+                f"    <description>{ls(adoc.plain(' '.join(u['overview'].split())))}</description>"]
         for s in u["steps"]:
             if s["kind"] == "assessment":
                 refs = sorted({o for it in s["items"] for o in it["assesses"]})

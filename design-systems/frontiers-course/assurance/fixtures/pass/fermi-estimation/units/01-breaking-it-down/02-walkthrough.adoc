@@ -1,11 +1,10 @@
----
-title: Estimating the piano tuners, step by step
-type: video
-minutes: 3
-outcomes: O1
-video: https://example.org/video/piano-tuners.mp4
-captions: 02-walkthrough.vtt
----
+= Estimating the piano tuners, step by step
+:type: video
+:minutes: 3
+:outcomes: O1
+:video: https://example.org/video/piano-tuners.mp4
+:captions: 02-walkthrough.vtt
+
 We are going to estimate how many piano tuners work in a city of a million people. Nobody publishes that number, so
 we will build it from pieces we can reason about.
 

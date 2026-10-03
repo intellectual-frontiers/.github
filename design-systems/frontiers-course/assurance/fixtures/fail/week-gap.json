@@ -1,9 +1,9 @@
 {
   "edits": [
     [
-      "units/02-checking-the-estimate/unit.md",
-      "week: 2",
-      "week: 3"
+      "units/02-checking-the-estimate/unit.adoc",
+      ":week: 2",
+      ":week: 3"
     ]
   ]
 }

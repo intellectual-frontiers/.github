@@ -1,9 +1,9 @@
 {
   "edits": [
     [
-      "course.md",
-      "code: IFEST1",
-      "code: ifest1"
+      "course.adoc",
+      ":code: IFEST1",
+      ":code: ifest1"
     ]
   ]
 }

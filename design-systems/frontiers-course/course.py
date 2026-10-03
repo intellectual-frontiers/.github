@@ -4,37 +4,38 @@
     python3 course.py model COURSE_DIR [-o MODEL.json]
     python3 course.py check COURSE_DIR [...]
 
-A course is a directory named for its id:
+A course is a directory named for its id, written in AsciiDoc (the subset adoc.py reads):
 
     COURSE_DIR/
-      course.md                 front matter (title, code, run, language, format, hours-per-week, derived-from);
-                                its summary, then `## Outcomes` listing `- O1: Estimate ...`
+      course.adoc               = Title, then :code:, :run:, :lang:, :format:, :hours-per-week: and, when it has
+                                one, :derived-from: (the IRI of the work it comes from); its summary; then
+                                `== Outcomes` as a description list, `O1:: Estimate ...`
       units/01-first-unit/
-        unit.md                 front matter (title, week); the unit's overview
-        01-a-reading.md         a lesson: front matter (title, type, minutes, outcomes; for a video, video and
-                                captions); its body is Markdown, and a video's body is its transcript
-        02-check.md             an assessment: front matter (kind: assessment, title, minutes, graded); its items
+        unit.adoc               = Title, :week:; the unit's overview
+        01-a-reading.adoc       a lesson: = Title, :type:, :minutes:, :outcomes: (and for a video :video: and
+                                :captions:); its body, and a video's body is its transcript
+        02-check.adoc           an assessment: = Title, :kind: assessment, :minutes:, :graded:; its items
         01-a-video.vtt          a video's captions
         figures/                the unit's figures, drawn with frontiers-figures
 
-An assessment item is a `###` heading (its title), its keys, a blank line, its prompt, then its choices:
+An assessment item is a section whose attributes give its id, type and the outcomes it assesses; its paragraphs
+are its prompt, its checklist its choices, each choice's nested point its feedback:
 
-    ### Piano tuners in a city of a million
-    id: piano-tuners
-    type: multiple-choice
-    assesses: O1
+    [#piano-tuners,type=multiple-choice,assesses=O1]
+    == Piano tuners in a city of a million
 
     About how many piano tuners work in a city of a million people?
 
-    - [ ] About 5
-      Too few: one tuner can serve about a thousand pianos a year.
-    - [x] About 50
-      Right: ...
+    * [ ] About 5
+    ** Too few: one tuner can serve about a thousand pianos a year.
+    * [x] About 50
+    ** Right: ...
 
-A `numeric` item gives `answer:` and `tolerance:` (a number or a percentage), a `text-match` item `answers:` (comma
-separated); both give `feedback:`. `model` prints the course as the JSON schema/course.schema.json describes, the
-form every delivery target is built from; `check` reports every rule a course breaks. Standard library only; uses
-the house voice, and frontiers-figures' figcheck (with Pillow), when they are beside this design system.
+A `numeric` item gives `answer=` and `tolerance=` (a number or a percentage), a `text-match` item
+`answers="a, b"`; both give their feedback as a paragraph with the role `[.feedback]`. `model` prints the course as
+schema/course.schema.json describes it, the form every delivery target is built from; `check` reports every rule a
+course breaks. Standard library only; uses the house voice, and frontiers-figures' figcheck (with Pillow), when
+they are beside this design system.
 """
 from __future__ import annotations
 
@@ -47,6 +48,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SYSTEMS = HERE.parent
+sys.path.insert(0, str(HERE))
+import adoc  # noqa: E402
+
 LIMITS = json.loads((HERE / "limits.json").read_text(encoding="utf-8"))
 SCHEMA = json.loads((HERE / "schema" / "course.schema.json").read_text(encoding="utf-8"))
 
@@ -58,85 +62,70 @@ class SourceError(ValueError):
 # ── reading ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
-def front(text: str, where: str) -> tuple[dict, str]:
-    """Front matter (`key: value` lines) and the body."""
-    if not text.startswith("---\n") or "\n---\n" not in text[3:]:
-        raise SourceError(f"{where}: no front matter (FR-003)")
-    end = text.index("\n---\n", 3)
-    meta = {}
-    for line in text[4:end].splitlines():
-        if ":" in line:
-            k, v = line.split(":", 1)
-            meta[k.strip()] = v.strip()
-    return meta, text[end + 5:].strip()
+def read(path: Path, where: str) -> tuple[str, dict, str]:
+    try:
+        title, attrs, body = adoc.header(path.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise SourceError(f"{where}: {e} (FR-003)") from None
+    if bad := adoc.unsupported(body):
+        raise SourceError(f"{where}: {', '.join(bad)}, which this design system does not render (FR-003)")
+    return title, attrs, body
 
 
 def _list(v: str) -> list[str]:
     return [x.strip() for x in v.split(",") if x.strip()]
 
 
-def _int(v: str, where: str, key: str) -> int:
+def _int(v: str | None, where: str, key: str) -> int:
     try:
         return int(v)
     except (TypeError, ValueError):
-        raise SourceError(f"{where}: {key} is not a whole number: {v!r} (FR-003)") from None
+        raise SourceError(f"{where}: :{key}: is not a whole number: {v!r} (FR-003)") from None
+
+
+ITEM_KEYS = {"id", "role", "positional", "type", "assesses", "answer", "tolerance", "answers"}
 
 
 def parse_items(body: str, where: str) -> list[dict]:
-    """An assessment's items, from its `###` blocks."""
-    items = []
-    for block in re.split(r"(?m)^### ", body)[1:]:
-        lines = block.splitlines()
-        item: dict = {"title": lines[0].strip()}
-        i = 1
-        keys = {}
-        while i < len(lines) and lines[i].strip():
-            if ":" in lines[i]:
-                k, v = lines[i].split(":", 1)
-                keys[k.strip()] = v.strip()
-            i += 1
-        item["id"] = keys.pop("id", "")
-        item["type"] = keys.pop("type", "")
-        item["assesses"] = _list(keys.pop("assesses", ""))
-        if "answer" in keys:
-            try:
-                item["answer"] = float(keys.pop("answer").replace(",", ""))
-            except ValueError:
-                raise SourceError(f"{where}: item {item['id'] or item['title']!r} has an answer that is not a number (FR-007)") from None
-        if "tolerance" in keys:
-            item["tolerance"] = keys.pop("tolerance")
-        if "answers" in keys:
-            item["answers"] = _list(keys.pop("answers"))
-        if "feedback" in keys:
-            item["feedback"] = keys.pop("feedback")
-        if keys:
-            raise SourceError(f"{where}: item {item['id'] or item['title']!r} has keys this design system does not read: {', '.join(sorted(keys))} (FR-007)")
-        prompt, choices = [], []
-        for line in lines[i:]:
-            if m := re.match(r"^- \[([ xX])\] (.+)$", line):
-                choices.append({"text": m.group(2).strip(), "correct": m.group(1) != " ", "feedback": ""})
-            elif choices and line.startswith("  ") and line.strip():
-                choices[-1]["feedback"] = (choices[-1]["feedback"] + " " + line.strip()).strip()
-            elif not choices:
-                prompt.append(line)
-        item["prompt"] = "\n".join(prompt).strip()
-        if choices:
-            item["choices"] = choices
-        items.append(item)
+    """An assessment's items, one a level-2 section."""
+    items: list[dict] = []
+    for b in adoc.blocks(body):
+        if b["kind"] == "section" and b["level"] == 2:
+            a = b["attrs"]
+            if extra := set(a) - ITEM_KEYS:
+                raise SourceError(f"{where}: item {a.get('id') or b['text']!r} has attributes this design system does not read: {', '.join(sorted(extra))} (FR-007)")
+            item: dict = {"id": a.get("id", ""), "title": b["text"], "type": a.get("type", ""), "assesses": _list(a.get("assesses", "")), "prompt": ""}
+            if "answer" in a:
+                try:
+                    item["answer"] = float(a["answer"].replace(",", ""))
+                except ValueError:
+                    raise SourceError(f"{where}: item {item['id'] or item['title']!r} has an answer that is not a number (FR-007)") from None
+            if "tolerance" in a:
+                item["tolerance"] = a["tolerance"]
+            if "answers" in a:
+                item["answers"] = _list(a["answers"])
+            items.append(item)
+        elif not items:
+            continue
+        elif b["kind"] == "para" and b["attrs"].get("role") == "feedback":
+            items[-1]["feedback"] = (items[-1].get("feedback", "") + " " + b["text"]).strip()
+        elif b["kind"] == "para":
+            items[-1]["prompt"] = (items[-1]["prompt"] + "\n\n" + b["text"]).strip()
+        elif b["kind"] == "checklist":
+            items[-1]["choices"] = [{"text": it["text"], "correct": bool(it["checked"]), "feedback": " ".join(it["sub"])} for it in b["items"]]
+        else:
+            raise SourceError(f"{where}: item {items[-1]['id']!r} holds a {b['kind']}; an item holds its prompt, its choices and its feedback (FR-007)")
     return items
 
 
 def model(src: Path) -> dict:
     """The course in `src`, as schema/course.schema.json describes it."""
-    meta, body = front((src / "course.md").read_text(encoding="utf-8"), "course.md")
-    summary, _, rest = body.partition("## Outcomes")
-    outcomes = []
-    for line in rest.splitlines():
-        if m := re.match(r"^- (O\d+): (.+)$", line.strip()):
-            outcomes.append({"id": m.group(1), "text": m.group(2).strip()})
+    title, meta, body = read(src / "course.adoc", "course.adoc")
+    summary, _, rest = body.partition("== Outcomes")
+    outcomes = [{"id": m.group(1), "text": m.group(2).strip()} for m in re.finditer(r"(?m)^(O\d+):: (.+)$", rest)]
     course = {
-        "id": src.name, "title": meta.get("title", ""), "code": meta.get("code", ""), "run": meta.get("run", ""),
-        "language": meta.get("language", ""), "format": meta.get("format", ""),
+        "id": src.name, "title": title, "code": meta.get("code", ""), "run": meta.get("run", ""),
+        "language": meta.get("lang", ""), "format": meta.get("format", ""),
         "hours_per_week": float(meta.get("hours-per-week") or 0), "summary": summary.strip(), "outcomes": outcomes,
         "units": [],
     }
@@ -144,18 +133,17 @@ def model(src: Path) -> dict:
         course["derived_from"] = meta["derived-from"]
     for udir in sorted(p for p in (src / "units").iterdir() if p.is_dir()) if (src / "units").is_dir() else []:
         where = f"units/{udir.name}"
-        umeta, overview = front((udir / "unit.md").read_text(encoding="utf-8"), f"{where}/unit.md")
-        unit = {"slug": udir.name, "title": umeta.get("title", ""), "week": _int(umeta.get("week"), where, "week"),
-                "overview": overview, "steps": []}
-        for path in sorted(p for p in udir.glob("*.md") if p.name != "unit.md"):
+        utitle, umeta, overview = read(udir / "unit.adoc", f"{where}/unit.adoc")
+        unit = {"slug": udir.name, "title": utitle, "week": _int(umeta.get("week"), where, "week"), "overview": overview, "steps": []}
+        for path in sorted(p for p in udir.glob("*.adoc") if p.name != "unit.adoc"):
             pwhere = f"{where}/{path.name}"
-            m, b = front(path.read_text(encoding="utf-8"), pwhere)
+            stitle, m, b = read(path, pwhere)
             minutes = _int(m.get("minutes"), pwhere, "minutes")
             if m.get("kind") == "assessment":
-                unit["steps"].append({"slug": path.stem, "kind": "assessment", "title": m.get("title", ""), "minutes": minutes,
+                unit["steps"].append({"slug": path.stem, "kind": "assessment", "title": stitle, "minutes": minutes,
                                       "graded": m.get("graded", "false").lower() == "true", "items": parse_items(b, pwhere)})
                 continue
-            lesson = {"slug": path.stem, "kind": "lesson", "type": m.get("type", ""), "title": m.get("title", ""),
+            lesson = {"slug": path.stem, "kind": "lesson", "type": m.get("type", ""), "title": stitle,
                       "minutes": minutes, "outcomes": _list(m.get("outcomes", "")), "body": b}
             for k in ("video", "captions"):
                 if m.get(k):
@@ -230,10 +218,8 @@ def _load(name: str, path: Path):
     return mod
 
 
-def words(markdown: str) -> int:
-    text = re.sub(r"!\[[^\]]*\]\([^)]*\)", " ", markdown)
-    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
-    return len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'’.,%-]*", text))
+def words(body: str) -> int:
+    return len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'’.,%-]*", adoc.text_of(body)))
 
 
 def vtt_end(text: str) -> float | None:
@@ -252,26 +238,27 @@ def _near(declared: float, estimate: float) -> bool:
 
 
 def accessibility(body: str, where: str, base: Path) -> list[str]:
-    """FR-009 over a lesson's Markdown body."""
+    """FR-009 over a lesson's AsciiDoc body."""
     problems = []
-    for alt, src in re.findall(r"!\[([^\]]*)\]\(([^)\s]+)\)", body):
+    for src, alt in adoc.images(body):
         if len(alt.split()) < 3 or re.search(r"\.(svg|png|jpe?g|gif|webp)$", alt, re.I):
             problems.append(f"{where}: the image {src} has no alternative text describing it (FR-009)")
         if not src.startswith("https://") and not (base / src).is_file():
             problems.append(f"{where}: the image {src} is not in the course (FR-003)")
     level = 1
-    for hashes in re.findall(r"(?m)^(#{1,6}) ", body):
-        n = len(hashes)
-        if n == 1:
+    for b in adoc.blocks(body):
+        if b["kind"] == "para" and b["text"].startswith("= "):
             problems.append(f"{where}: a level-one heading in a lesson's body; its title is its heading (FR-009)")
-        elif n > level + 1:
-            problems.append(f"{where}: a level-{n} heading after level {level}; headings go down one level at a time (FR-009)")
-        level = n
-    for text in re.findall(r"(?<!!)\[([^\]]+)\]\([^)]+\)", body):
+        if b["kind"] != "section":
+            continue
+        if b["level"] > level + 1:
+            problems.append(f"{where}: a level-{b['level']} heading after level {level}; headings go down one level at a time (FR-009)")
+        level = b["level"]
+    for target, text in adoc.links(body):
         if text.strip().lower().rstrip(".") in LIMITS["generic_link_text"]:
             problems.append(f"{where}: a link reading {text!r}; a link says where it goes (FR-009)")
     for pattern in LIMITS["sensory_only"]:
-        if m := re.search(pattern, body, re.I):
+        if m := re.search(pattern, adoc.text_of(body), re.I):
             problems.append(f"{where}: {m.group(0)!r} points by color or position alone (FR-009)")
     return problems
 
@@ -308,7 +295,7 @@ def check(src: Path) -> list[str]:
         figcheck = _load("figcheck", SYSTEMS / "frontiers-figures" / "figcheck.py")
     except ImportError:
         figcheck = None
-    prose = [course["summary"], *outs.values()]
+    prose = [adoc.text_of(course["summary"]), *outs.values()]
     last_week = 0
     for unit in course["units"]:
         uw = f"units/{unit['slug']}"
@@ -323,9 +310,9 @@ def check(src: Path) -> list[str]:
             problems.append(f"{uw}: {len(lessons)} lessons; a unit has {a} to {b} (FR-006)")
         if steps[-1]["kind"] != "assessment":
             problems.append(f"{uw}: does not end with an assessment (FR-006)")
-        prose += [unit["overview"]]
+        prose += [adoc.text_of(unit["overview"])]
         for s in steps:
-            where = f"{uw}/{s['slug']}.md"
+            where = f"{uw}/{s['slug']}.adoc"
             weeks[unit["week"]] = weeks.get(unit["week"], 0) + s["minutes"]
             if s["kind"] == "lesson":
                 kind = LIMITS["lesson_types"][s["type"]]
@@ -350,15 +337,15 @@ def check(src: Path) -> list[str]:
                         elif not _near(s["minutes"], end / 60):
                             problems.append(f"{where}: says {s['minutes']} minutes, but its captions run {end / 60:.1f} (FR-008)")
                     if spoken:
-                        fails, _ = spoken.sweep(s["body"])
+                        fails, _ = spoken.sweep(adoc.text_of(s["body"]))
                         problems += [f"{where}: {f} (FR-010)" for f in fails]
                 else:
                     if "video" in s or "captions" in s:
                         problems.append(f"{where}: a {s['type']} lesson names a video; make it a video lesson (FR-003)")
-                    prose.append(s["body"])
+                    prose.append(adoc.text_of(s["body"]))
                 problems += accessibility(s["body"], where, udir)
                 if figcheck:
-                    for ref in re.findall(r"!\[[^\]]*\]\(([^)\s]+\.svg)\)", s["body"]):
+                    for ref in [src for src, _ in adoc.images(s["body"]) if src.endswith(".svg")]:
                         if (udir / ref).is_file():
                             problems += [f"{where}: {ref}: {p} (FR-011)" for p in figcheck.check(str(udir / ref))]
             else:
@@ -372,7 +359,7 @@ def check(src: Path) -> list[str]:
                             problems.append(f"{iw}: assesses {o}, which the course does not state (FR-006)")
                         assessed.add(o)
                     problems += [f"{iw}: {p} (FR-007)" for p in item_problems(item)]
-                    prose += [item["prompt"]] + [c["text"] + ". " + c["feedback"] for c in item.get("choices", [])]
+                    prose += [adoc.plain(item["prompt"])] + [adoc.plain(c["text"]) + ". " + adoc.plain(c["feedback"]) for c in item.get("choices", [])]
                     prose += [item.get("feedback", "")]
     for o in outs:
         if o not in taught:
@@ -389,7 +376,7 @@ def check(src: Path) -> list[str]:
     if written:
         patterns = written.load([SYSTEMS / "frontiers-written-voice" / "patterns.json"])
         terms = written.load_terms([SYSTEMS / "frontiers-written-voice" / "terms.json"])
-        fails, _ = written.sweep(written.prose("\n\n".join(prose), ".md"), patterns, terms=terms)
+        fails, _ = written.sweep("\n\n".join(prose), patterns, terms=terms)
         problems += [f"{f} (FR-010)" for f in fails]
     return problems
 
