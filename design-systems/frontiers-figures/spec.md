@@ -102,7 +102,7 @@ roles, and the light variations a figure may take, themed by any brand.
 
 - A brand whose `font-sans` this design system does not ship: the kit refuses to measure in it, per
   FR-006.
-- A label that fits in Source Sans 3 but not in the theme's sans: it is re-wrapped, set smaller or
+- A label that fits in one brand's sans but not in another's: it is re-wrapped, set smaller or
   tracked tighter within FR-008's limits; past them the figure is redrawn.
 - A figure placed on a dark page: the on-dark variant is used, never a recolored copy, per FR-005.
 

@@ -710,6 +710,19 @@ frontiers-email FR-009	check	.github: python3 design-systems/frontiers-email/ass
 frontiers-email FR-010	check	.github: python3 design-systems/frontiers-email/assurance/run.py	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
 frontiers-email FR-011	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check sweeps subject, preheader and text
 frontiers-email FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-signage-print FR-001	check	.github: python3 tools/spec_check.py	registration, document types and figure design system
+frontiers-signage-print FR-002	none	-	directory contents; no check
+frontiers-signage-print FR-003	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	formats.json holds no color; pictures and logo come from the brand
+frontiers-signage-print FR-004	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	every format renders to one page of trim plus bleed; bleed at least 3mm
+frontiers-signage-print FR-005	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: safe margin and the banner's hidden band
+frontiers-signage-print FR-006	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	each tone's contrast under every brand
+frontiers-signage-print FR-007	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: lockup and picture at 150 pixels per inch or more
+frontiers-signage-print FR-008	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: title words and fit, details count and fit, 9pt minimum
+frontiers-signage-print FR-009	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check sweeps the text with the written voice
+frontiers-signage-print FR-010	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	only the sans embedded in every rendered PDF
+frontiers-signage-print FR-011	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	fail fixtures refused for their reason
+frontiers-signage-print FR-012	none	-	no sign layout places a figure yet; a consumer placing one uses frontiers-figures
+frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
 0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
 0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
