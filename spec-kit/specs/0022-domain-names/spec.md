@@ -127,6 +127,45 @@ FR-016 through FR-025 to domain names.
   `Decision` is recorded under FR-016; the `Decision` itself MUST name
   the domain, and reconciliation under FR-018 MUST NOT report it.
 
+## Crown jewels
+
+- **FR-021**: A `DomainName` whose loss would break the company's identity
+  or its vocabulary MUST be marked a crown jewel, by a second
+  `dcterms:type` from the ontology's domain criticality scheme. A domain
+  that hosts an ontology namespace (0024-persistent-addresses FR-008) or
+  the company's own primary web property MUST be one. Every other domain
+  is standard unless the decision authority marks it a crown jewel.
+- **FR-022**: A crown jewel domain MUST be registered under a generic
+  top-level domain, not a country-code one, because a country-code
+  registry's rules or its very existence can change with the country's
+  politics.
+- **FR-023**: A domain under a country-code top-level domain MUST be
+  reviewed by the decision authority whenever that registry's policy,
+  eligibility rules, or sovereignty changes, and that review MUST end in
+  a recorded `Decision` to keep, move, or let it lapse.
+
+## What depends on a domain
+
+- **FR-024**: Anything that needs a domain to keep working (an account
+  whose sign-in or recovery address is on it, single sign-on, a sign-in
+  redirect address, a platform's verification of the domain, a service
+  that sends mail as it) MUST be recorded in the vault as a reference
+  that `dcterms:requires` the `DomainName`, carrying no credential, per
+  0001-eidolon-architecture FR-023.
+- **FR-025**: A `Decision` to let a domain lapse or to transfer it away
+  MUST NOT be recorded while anything `dcterms:requires` it or while it
+  carries a published address (0024-persistent-addresses FR-003).
+
+## Defensive registration
+
+- **FR-026**: Each Public brand that a primary domain serves MUST have a
+  recorded `Decision`, naming the brand and the defensive domain role
+  by `schema:about`, that states
+  which variants of its name (misspellings, other top-level domains,
+  look-alike characters) the company holds defensively and which it
+  deliberately does not. A variant held under that `Decision` is a
+  defensive `DomainName`.
+
 ## Out of scope
 
 - How DNS records are written, reviewed, and deployed, and which tool
@@ -160,6 +199,15 @@ FR-016 through FR-025 to domain names.
   cached, per FR-013.
 - A domain found at the registrar with no `DomainName`: reconciliation
   reports it and changes nothing, per FR-018 and FR-019.
+- A domain that hosts the ontology namespace: it is a crown jewel, and
+  so may not sit under a country-code top-level domain, per FR-021 and
+  FR-022.
+- A country-code domain whose registry is being wound up: the decision
+  authority reviews it and records whether to keep, move, or drop it,
+  per FR-023.
+- A domain to be dropped that an account still uses for recovery: no
+  lapse `Decision` may be recorded until the account is moved, per
+  FR-024 and FR-025.
 - A domain nearing expiry that the company means to drop: no report is
   needed once a `Decision` to let it lapse is recorded, per FR-016 and
   FR-017.
@@ -189,9 +237,9 @@ FR-016 through FR-025 to domain names.
   the primary one, whether the company holds its own account there, and
   how a domain is verified under FR-012 where neither its registry nor
   its registrar offers RDAP, are not yet stated.
-- **OQ-3**: No rule says whether a `DomainName` that has lapsed or been
-  transferred away stays in the catalog, or what marks it as no longer
-  held.
+- **OQ-3**: No rule says whether a `DomainName` transferred away, which
+  FR-025 permits only once nothing depends on it, stays in the catalog,
+  or what marks it as no longer held.
 
 ## Key entities
 
