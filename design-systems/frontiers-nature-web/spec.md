@@ -24,9 +24,7 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
 
 - **FR-003**: `css/tokens.css` MUST define, on `:root`, the color tokens `--ink`, `--paper`,
   `--stone`, `--shell`, `--rule`, `--background`, `--foreground` and `--muted-foreground`; the unit
-  tokens `--capital`, `--ip`, `--press`, `--studios` and `--network`; the diagram roles
-  `--diagram-ink`, `--diagram-path`, `--diagram-warning`, `--diagram-positive`, `--diagram-caution`
-  and `--diagram-secondary`; `--font-sans`, `--font-serif` and `--font-mono`; `--measure-page`
+  tokens `--capital`, `--ip`, `--press`, `--studios` and `--network`; `--font-sans`, `--font-serif` and `--font-mono`; `--measure-page`
   (72rem), `--gutter` (1.5rem), `--radius` (0) and `--chrome-clearance`; and `--ease` and `--fast`.
   It MUST hold no color literal: `--stone`, `--shell`, `--rule`, `--muted-foreground` and every
   other color it uses MUST be a theme role or a mix of roles (0014-design-systems FR-044).
@@ -34,7 +32,7 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   in the Design Tokens Community Group format, a value the theme supplies written as a `{role.*}`
   alias (0014-design-systems FR-036); `css/tokens.css` is the source.
 - **FR-004**: It MUST be themed (0014-design-systems FR-038): `--ink`, `--background`, `--paper`,
-  each unit token, each diagram role, `--font-sans` and `--font-serif` MUST each be a reference to a
+  each unit token, `--font-sans` and `--font-serif` MUST each be a reference to a
   theme role, and the logo, favicon, share card and every picture it places MUST be taken from the
   theme. Beyond the roles every brand supplies, it requires `paper`, `unit-capital`, `unit-ip`,
   `unit-press`, `unit-studios` and `unit-network`, and an imagery pool (0014-design-systems FR-043). It ships Inter, Source Serif 4 and IBM Plex Mono, so a theme's `font-sans` and
@@ -43,9 +41,10 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   body text, 3:1 for large text), both as tokens and as rendered: primary navigation, breadcrumbs,
   menu buttons, page title, lede, body, section headings, outline buttons, and the footer's
   tagline, headings, links and legal line.
-- **FR-006**: Diagram roles MUST be semantic and sparse: ink for structure, path for the line of
-  argument, warning, positive and caution for judgment, secondary for a second series. A unit
-  color MUST identify its unit and MUST NOT be used as a decorative fill.
+- **FR-006**: A unit color MUST identify its unit and MUST NOT be used as a decorative fill. A figure
+  on a page MUST be drawn with `frontiers-figures`, themed by the page's brand, in its default
+  variant or, on a dark band, its on-dark variant (0014-design-systems FR-048); this design system
+  MUST NOT define figure colors of its own.
 
 ## Stylesheets and scripts
 
@@ -106,7 +105,7 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   (`h1.t-display`), lede and actions and `img.hero__art`, one piece of the theme's imagery pool chosen
   by the page, set whole: never cropped, covered, tinted or placed on a panel, on the page's own
   background, two columns from 48rem and stacked below. A page's link preview MUST use the theme's
-  share card. A picture that belongs to one page's content (a diagram, a photograph of an event) is
+  share card. A picture that belongs to one page's content (a figure drawn per FR-006, a photograph of an event) is
   that page's own asset, never this design system's.
 
 ## Out of scope

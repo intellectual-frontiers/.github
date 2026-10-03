@@ -320,7 +320,9 @@ def _concepts(ttl: str, scheme: str) -> set[str]:
 def _check_web_classification(ttl: str) -> list[Finding]:
     """0014-design-systems FR-041, FR-042 and FR-046: every web design system names one or more interaction models, exactly
     one expression and one or more densities, every print design system one or more print document types, and every
-    merchandise design system one or more decoration methods and product categories, by dcterms:type."""
+    merchandise design system one or more decoration methods and product categories, every figure design system
+    one or more figure types, by dcterms:type; and every web and print design system names its figure design system
+    (FR-048)."""
     findings: list[Finding] = []
     models, expressions, densities = (_concepts(ttl, s) for s in ("WebInteractionModelScheme", "DesignExpressionScheme", "DesignDensityScheme"))
     for block in re.split(r"\n\s*\n", ttl):
@@ -342,6 +344,18 @@ def _check_web_classification(ttl: str) -> list[Finding]:
         types = re.search(r"dcterms:type ([^;]+);", block)
         if m and types and "ifcore:PrintDesignSystemKind" in types.group(1) and not set(re.findall(r"ifcore:(\w+)", types.group(1))) & doc_types:
             findings.append(Finding("error", f"ontology/ifcore.ttl ({m.group(1)})", "a print design system names no print document type (0014-design-systems FR-042)"))
+    figure_types = _concepts(ttl, "FigureTypeScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if not (m and types):
+            continue
+        where = f"ontology/ifcore.ttl ({m.group(1)})"
+        named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        if "FigureDesignSystemKind" in named and not named & figure_types:
+            findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web or print design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
     methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
     for block in re.split(r"\n\s*\n", ttl):
         m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)

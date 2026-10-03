@@ -130,7 +130,7 @@ any number of each kind.
   design system ships; it MUST NOT change layout, spacing, components,
   motion or accessibility behaviour. A web, print or merchandise design
   system MUST NOT be used without a theme.
-- **FR-044**: A web, print or merchandise design system MUST NOT hold a color literal.
+- **FR-044**: A web, print, merchandise or figure design system MUST NOT hold a color literal.
   A color it needs that no role supplies (a neutral, a tint, a rule, a
   translucent overlay) MUST be a mix of theme roles, or of a role and
   `transparent`: `color-mix()` on the web, `xcolor`'s `<role>!<n>!<role>`
@@ -138,7 +138,7 @@ any number of each kind.
   the theme's imagery pool (FR-043), chosen by its consumer, and a link
   preview MUST use the theme's share card. Its harness MUST fail on a color
   literal in its stylesheets or style files.
-- **FR-039**: A web, print or merchandise design system's harness MUST run
+- **FR-039**: A web, print, merchandise or figure design system's harness MUST run
   under any brand vendored beside it, chosen when it runs, and MUST fail
   when that brand lacks a role the system requires, names a font family the
   system does not ship, or (on the web) makes a text pairing fall below
@@ -402,12 +402,27 @@ any number of each kind.
 
 ## Kind profile: figure
 
-- **FR-032**: A figure design system governs the figures a work carries,
-  in print or on the web: palette use, line weights, labelling, and the
-  layouts a figure may take. Its machine-readable form is its figure palette
-  and layout data. Its harness runs its mechanical figure checks over
-  fixture figures that must pass and must fail. Its consumers are works and
-  the tools that check them.
+- **FR-032**: A figure design system governs every figure a work or a
+  channel carries, in every medium (a printed book or paper, a web page, a
+  slide): its canvas, type, boxes, arrows and labelling, the figure types its
+  layouts draw, its colors as figure roles, and the variants a figure may
+  take. Its machine-readable form is its figure roles and the drawing kit
+  that writes a figure's semantic source. It is themed (FR-038, FR-044): a
+  figure's source names its colors by figure role and holds no color, font
+  or stylesheet; a brand supplies them when the figure is rendered, and a
+  variant may change only the values roles take or the canvas width. Its
+  harness draws a figure of every type and runs its mechanical checks,
+  measured in each brand's sans, over those and over fixtures that must
+  fail, under every brand here (FR-039). It MUST be classified in the
+  ontology, by `dcterms:type`, with every **figure type** its layouts draw,
+  named as diagramming names them. Its consumers are works, channels and
+  the tools that render them.
+- **FR-048**: Every figure a web, print or slide presentation carries MUST be
+  drawn with a figure design system and themed by the same brand as the
+  presentation. A web or print design system MUST name in the ontology,
+  by `ifcore:drawsFiguresWith`, the figure design system its pages use,
+  and MUST NOT define its own figure colors. A raster figure (a screenshot,
+  a photograph) is a work's own asset and is exempt.
 
 ## Kind profile: written voice
 
@@ -538,6 +553,9 @@ None.
   classified, in the industry's own terms.
 - **Print document type** — what a print design system sets: book
   interior, book cover, journal article, report.
+- **Figure type** — what a figure design system's layouts draw: a process
+  diagram, a comparison, a cycle, layer or relationship diagram, a decision
+  flowchart, a hierarchy diagram.
 - **Decoration method, product category** — how a merchandise design
   system is classified, in the promotional products industry's own terms.
 - **Decoration kit** — a brand's one-color vector lockup and icon, and the

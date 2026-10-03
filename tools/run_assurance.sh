@@ -7,7 +7,7 @@
 #   tools/run_assurance.sh            everything
 #   tools/run_assurance.sh --browser  only the browser harnesses (needs Node, Playwright and Chromium)
 #   tools/run_assurance.sh --tex      only the Python harnesses: print (needs TeX Live with XeLaTeX, LuaLaTeX, latexmk,
-#                                     poppler) and merchandise (standard library)
+#                                     poppler), merchandise (standard library) and figures (Pillow; librsvg optional)
 #   tools/run_assurance.sh --images   only each brand's imagery pool and share card (needs ImageMagick with WebP)
 #
 # CI runs each half in its own job (.github/workflows/design-systems.yml).

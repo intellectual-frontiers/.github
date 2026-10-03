@@ -83,6 +83,10 @@ themed by a brand so that the same design can be set in another brand's colors, 
   MUST be `ifink`, `ifgray` or `iflabel`. A back cover MUST fit one page and MUST keep a barcode
   zone clear at the lower right, 2 in × 1.2 in, its top edge 7.23 in from the top of the page.
 
+- **FR-018**: Every figure a book or article carries MUST be drawn with `frontiers-figures` and
+  themed by the same brand, in its default variant or, for one-color print, its grayscale variant,
+  and placed as vector (0014-design-systems FR-048). A raster figure is the work's own asset.
+
 ## Journal article
 
 - **FR-007**: A journal article MUST be set on LuaLaTeX on US Letter in a layout from

@@ -104,7 +104,9 @@ is not stated here.
   present each piece of content in the form that best teaches it: prose by
   default, a real list for an enumerable set, a table for content dense
   across two dimensions, a visual for a relationship — and MUST NOT leave a
-  list, table, or visual standing without prose.
+  list, table, or visual standing without prose. A drawn visual MUST be a
+  figure drawn with `frontiers-figures` and themed by the book's brand
+  (0014-design-systems FR-048).
 - **FR-015**: A change that adds or edits a figure, table, or list MUST be
   verified by rebuilding the affected rendition and inspecting the rendered
   pages, not only by a clean build.

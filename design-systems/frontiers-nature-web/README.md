@@ -8,7 +8,7 @@ a little vanilla JavaScript with one web component: no framework, no build step.
 
 | Path | What it is |
 | --- | --- |
-| `css/tokens.css` | Custom properties: brand, unit and diagram colors, type, layout, motion. |
+| `css/tokens.css` | Custom properties: brand and unit colors, type, layout, motion. Figure colors are `frontiers-figures`'. |
 | `css/base.css` | Reset, base typography, focus, print. |
 | `css/chrome.css` | Page frame, sticky header, breadcrumb band, popover menus, super footer. |
 | `css/components.css` | Typography classes, buttons, hero, ruled lists, shelf, update list. |

@@ -109,6 +109,12 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   interactions of FR-009, FR-011–FR-013.
 - **FR-019**: Light theme only. A switchable dark theme is out of scope here (see Out of scope).
 
+## Figures
+
+- **FR-020**: A figure on a console page MUST be drawn with `frontiers-figures` and themed by the
+  page's brand in its default variant (0014-design-systems FR-048); this design system MUST NOT
+  define figure colors of its own.
+
 ## Out of scope
 
 - **A dark theme.** Token names are semantic so one can be added; nothing is wired to a switch,
