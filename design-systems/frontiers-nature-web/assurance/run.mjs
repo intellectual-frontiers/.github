@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
- * Headless runner for the assurance page. No dependencies of its own: it serves this design system's
- * directory over http, opens assurance/index.html in Chromium through Playwright (found on NODE_PATH, in
+ * Headless runner for the assurance page. No dependencies of its own: it serves the directory holding this
+ * design system (so design systems it derives from, vendored beside it, are reachable too), opens assurance/index.html in Chromium through Playwright (found on NODE_PATH, in
  * the current project's node_modules, or at PLAYWRIGHT_MODULE), prints the report and exits non-zero on failure.
  *
  *   node assurance/run.mjs                 run every suite
@@ -15,7 +15,9 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const system = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const root = path.dirname(system);
+const slug = path.basename(system);
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 
@@ -60,7 +62,7 @@ try {
   page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
   page.on("console", (m) => { if (m.type() === "error") problems.push(`console error: ${m.text()}`); });
   const suite = opt("--suite");
-  await page.goto(`${origin}/assurance/index.html${suite ? `?suite=${encodeURIComponent(suite)}` : ""}`);
+  await page.goto(`${origin}/${slug}/assurance/index.html${suite ? `?suite=${encodeURIComponent(suite)}` : ""}`);
   await page.waitForFunction(() => window.__assurance?.done === true, null, { timeout: 180000 });
   const results = await page.evaluate(() => window.__assurance);
   for (const s of results.suites) {
@@ -80,7 +82,7 @@ try {
       const name = fixture.split("/").pop().replace(/\.html$/, "");
       for (const width of [390, 900, 1400]) {
         const p = await browser.newPage({ viewport: { width, height: 900 } });
-        await p.goto(`${origin}/${fixture}`);
+        await p.goto(`${origin}/${slug}/${fixture}`);
         await p.evaluate(() => document.fonts.ready);
         await p.screenshot({ path: path.join(shots, `${name}-${width}.png`), fullPage: width === 1400 });
         await p.close();

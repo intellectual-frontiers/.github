@@ -1,10 +1,8 @@
 # Templating reference
 
-**Inherited reference documentation, not an adopted spec in this repository.** This describes an
-optional server-side template vocabulary this design system's own markup and chrome were
-originally designed against, carried over from this design system's origin project. Whether to
-adopt this vocabulary, a different one, or none is a separate, future decision — see
-`0014-design-systems`' Out of scope. Templates as described here are valid HTML5 inside a content
+The optional server-side template vocabulary the markup contract (`chrome.md`) is written
+against, with its names listed in `data/registry.json`. A consumer MAY implement it or produce the
+same markup another way; nothing else in this design system depends on it (spec FR-020). Templates as described here are valid HTML5 inside a content
 document. They run when content loads, over the whole content store, and nothing of them reaches a
 browser. A template is evaluated against a
 **current record**: the document's own record at the top level, the matched record inside `app-each`,

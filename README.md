@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design-systems/frontiers-nature-web/logos/if-logo-dark-672x189-2026-Sept.png">
-    <img alt="Intellectual Frontiers" src="design-systems/frontiers-nature-web/logos/if-logo-672x189-2026-Sept.png" width="336">
+    <source media="(prefers-color-scheme: dark)" srcset="design-systems/frontiers-brand/logos/if-logo-dark-672x189-2026-Sept.png">
+    <img alt="Intellectual Frontiers" src="design-systems/frontiers-brand/logos/if-logo-672x189-2026-Sept.png" width="336">
   </picture>
 </p>
 
@@ -254,18 +254,21 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 
 ### Brand assets and design systems
 
+[`design-systems/frontiers-brand/`](design-systems/frontiers-brand/) holds the
+palette, unit colors, typefaces, logo (light and dark), icon and favicon.
 [`design-systems/frontiers-nature-web/`](design-systems/frontiers-nature-web/) is the
-canonical, public design system: tokens, CSS, fonts, logos (light and dark),
-the hero and diagram images, favicon, and share card.
+public, editorial web design system: tokens, CSS, fonts, the hero and diagram
+images, and share card.
 [`design-systems/frontiers-console-web/`](design-systems/frontiers-console-web/) is the
-design system for operator (admin) and documentation surfaces. Both are web
-presentation design systems; every public house rule about how Intellectual
+web design system for operator (admin) and documentation surfaces. Both web
+systems derive from `frontiers-brand`; every public house rule about how Intellectual
 Frontiers looks, reads or sounds (print, figures, written and spoken voice)
 belongs in a design system of its kind here too (0014). Every design system
-carries an `assurance/` harness; a web one's opens as `index.html` in a browser.
+carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
+runs it on every push that touches `design-systems/`.
 
-- Logos: `design-systems/frontiers-nature-web/logos/` (PNG masters; WebP in
-  `logos/web/`). Use the `-dark-` variants on dark backgrounds.
+- Logos: `design-systems/frontiers-brand/logos/` (PNG; WebP in `logos/web/`).
+  Use the `-dark-` variants on dark backgrounds.
 - Images: `design-systems/frontiers-nature-web/images/`.
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).

@@ -54,8 +54,8 @@ A page's own markup may use only the class names this CSS defines; a consumer en
 its own linting.
 
 ## Layouts
-`<body data-app-layout="default|bare">`, under the inherited, not-yet-adopted template vocabulary
-described in `templating.md`. With no `data-app-layout` there is no layout:
+`<body data-app-layout="default|bare">`, under the optional template vocabulary described in
+`templating.md`. With no `data-app-layout` there is no layout:
 the document is served as written. `default`: header, breadcrumb band where a trail exists, page,
 footer. `bare`: header, page, footer, with no breadcrumb band or section menu.
 `data-app-chrome="no-breadcrumbs no-header no-footer"` refines `default`.

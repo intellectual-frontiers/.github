@@ -1,12 +1,10 @@
-# Frontiers Nature — design system
+# Frontiers Nature
 
-> **Canonical and public.** Governed by
-> [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md), one of possibly
-> several design systems under `design-systems/` — see that directory's own
-> [`README.md`](../README.md) for what a design system is and how this one fits among others.
-> Consumers vendor a pinned copy of this directory and never edit it. Built as **Bare Metal
-> Software**: strict modern HTML5, modern CSS and modern JavaScript with web components, no
-> framework, no build tool (0014-design-systems FR-007–FR-009).
+Intellectual Frontiers' public, editorial web presentation. Its rules are [`spec.md`](spec.md); it
+is governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md) and derives
+from [`frontiers-brand`](../frontiers-brand/README.md). See [`../README.md`](../README.md) for
+what a design system is and how this one fits among others. Built from plain HTML5, modern CSS and
+a little vanilla JavaScript with one web component: no framework, no build step.
 
 | Path | What it is |
 | --- | --- |
@@ -16,15 +14,16 @@
 | `css/components.css` | Typography classes, buttons, hero, ruled lists, shelf, update list. |
 | `css/fonts.css`, `fonts/` | Self-hosted `woff2` faces. |
 | `css/bundle.txt` | Cascade order for concatenation. |
-| `logos/`, `logos/web/` | Brand master PNGs and WebP sizes, light and dark. |
+| `logos/`, `logos/web/` | Copies of `frontiers-brand`'s logo files, light and dark. |
 | `images/` | Hero and diagram in WebP sizes, favicon, share card. |
-| `templating.md` | Reference documentation for an optional server-side template vocabulary this design system's markup was originally designed against. Inherited from this design system's origin, not itself an adopted spec in this repository — see `0014-design-systems`' Out of scope. |
-| `data/registry.json` | The `app-*`, `data-app-*` and `if-*` names, under that same inherited, not-yet-adopted vocabulary. |
+| `templating.md` | The optional server-side template vocabulary the markup contract is written against (spec FR-020). |
+| `data/registry.json` | The `app-*`, `data-app-*` and `if-*` names of that vocabulary. |
 | `data/navigation.json` | Primary nav, section menus and prefixes, breadcrumb parents, footer. |
 | `js/chrome.js` | Defines the `if-shelf` web component. The only first-party script. |
 | `js/datastar.js` | Datastar bundle, loaded only by pages that need server-driven interactivity — the one interactivity dependency this design system names (0014-design-systems FR-008), opt-in per page, never loaded globally. |
 | `tokens.json` | Machine-readable tokens. |
-| `assurance/` | Tests that double as documentation: open `assurance/index.html` in a browser (serve the directory over http for the full run), or `node assurance/run.mjs` headlessly. Covers tokens, contrast, stylesheet discipline and the page frame. See `../README.md`. |
+| `assurance/` | Tests that double as documentation: serve the directory holding this design system and open `/frontiers-nature-web/assurance/`, or run `node assurance/run.mjs` headlessly. Covers tokens, contrast, stylesheet discipline, the page frame, and what this system inherits from `frontiers-brand`. |
+| `spec.md` | This design system's rules. |
 | `chrome.md` | Anatomy and class contract for the chrome. |
 
 ## Using this anywhere — not just on an Intellectual Frontiers property
@@ -32,7 +31,7 @@
 Nothing here requires Intellectual Frontiers' own stack. To use Frontiers Nature in any web
 environment:
 
-1. Vendor (copy) this whole directory; don't link to it live or re-host from here.
+1. Vendor (copy) this whole directory and `frontiers-brand` beside it; don't link to either live.
 2. Concatenate the CSS files named in `css/bundle.txt`, in that order, into one stylesheet (or
    serve them as separate `<link>` tags in that same order — cascade layers make the order, not the
    file boundary, what matters). Rewrite any `../fonts/` reference to wherever you actually serve

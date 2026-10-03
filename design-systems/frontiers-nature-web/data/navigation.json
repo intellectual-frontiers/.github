@@ -1,5 +1,5 @@
 {
-  "$comment": "Extracted from src/components/site-chrome.tsx and src/lib/breadcrumbs.ts (static pages only) in the Lovable repo. Dynamic record trails (patents, notes, works) are ported per area as each area is built.",
+  "$comment": "The site navigation the chrome renders: primary nav, section menus and their path prefixes, breadcrumb parents, and the footer (chrome.md). Trails for individual records are a consumer's own.",
   "primary": [
     { "to": "/portfolio", "label": "Portfolio" },
     { "to": "/ip", "label": "Research" },
