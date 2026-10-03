@@ -1,0 +1,640 @@
+{
+  "_note": "The registry of paper page layouts. Read by layout.py (emits iflayout.def for the class), the article converter (table, figure and sidebar behavior), and paper-build.sh (validation). Add a layout here and document it in works/research/design-reference.md; no other file changes. Numbers are inches and points. Spec 0017 FR-030.",
+  "default": "two-column",
+  "layouts": {
+    "two-column": {
+      "status": "built",
+      "aliases": [],
+      "summary": "The house default. Two 3.36 in columns, 9.5/12.4 pt, 0.75 in margins. Wide figures and tables span both columns.",
+      "modeled_on": "Between Nature and NEJM; a little more open than either.",
+      "best_for": "Papers light on figures and tables, or whose figures and tables fit inside a column.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.75in,right=0.75in,top=0.98in,bottom=0.92in",
+      "headsep": "0.27in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        9.5,
+        12.4
+      ],
+      "small": [
+        8.6,
+        11
+      ],
+      "foot": [
+        7.8,
+        9.8
+      ],
+      "h": [
+        [
+          10.6,
+          12.6
+        ],
+        [
+          9.6,
+          11.8
+        ],
+        [
+          9.2,
+          11.4
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.36,
+      "wide_in": 7.0,
+      "table_pt": [
+        7.6,
+        7.8
+      ],
+      "display_skip": 7,
+      "typeface": "house"
+    },
+    "two-column-dense": {
+      "status": "built",
+      "aliases": [
+        "nature"
+      ],
+      "summary": "The densest two-column page. Two 3.55 in columns with a 0.17 in gutter, 8.6/11.2 pt, 0.6 in margins.",
+      "modeled_on": "Nature: 89 mm columns, 8.2/10.8 pt, margins about 0.55 in.",
+      "best_for": "Long papers that must stay short in pages; text-led work with compact figures.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.6in,right=0.6in,top=0.82in,bottom=0.78in",
+      "headsep": "0.22in",
+      "footskip": "0.36in",
+      "colsep": "0.17in",
+      "body": [
+        8.6,
+        11.2
+      ],
+      "small": [
+        7.8,
+        10
+      ],
+      "foot": [
+        7.2,
+        9
+      ],
+      "h": [
+        [
+          9.8,
+          11.8
+        ],
+        [
+          9.0,
+          11
+        ],
+        [
+          8.8,
+          10.8
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.55,
+      "wide_in": 7.3,
+      "table_pt": [
+        7.2,
+        7.4
+      ],
+      "display_skip": 6,
+      "typeface": "house"
+    },
+    "two-column-wide-margin": {
+      "status": "built",
+      "aliases": [
+        "nejm"
+      ],
+      "summary": "Two 3.15 in columns at 10/12.4 pt with a wide inside margin (1.2 in) and a 0.85 in outside margin. The most open two-column page.",
+      "modeled_on": "NEJM: 10/12 pt on narrow columns with a wide inner margin.",
+      "best_for": "Short, text-led papers; a reader who will annotate or bind the page.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "inner=1.2in,outer=0.85in,top=0.88in,bottom=1.0in",
+      "headsep": "0.27in",
+      "footskip": "0.45in",
+      "colsep": "0.14in",
+      "body": [
+        10,
+        12.4
+      ],
+      "small": [
+        8.8,
+        11.2
+      ],
+      "foot": [
+        8,
+        10
+      ],
+      "h": [
+        [
+          11,
+          13
+        ],
+        [
+          10.2,
+          12.2
+        ],
+        [
+          9.8,
+          11.8
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.15,
+      "wide_in": 6.45,
+      "table_pt": [
+        7.6,
+        7.8
+      ],
+      "display_skip": 7,
+      "typeface": "house"
+    },
+    "single-sidebar": {
+      "status": "built",
+      "aliases": [
+        "jama"
+      ],
+      "summary": "A 4.85 in main column (about 77 characters at 9.5 pt) with a 2.0 in sidebar. Pull quotes, practical tests, and notes sit in the sidebar. Wide figures and tables span the full 7.1 in.",
+      "modeled_on": "JAMA Network Open: a wide main column beside a narrow side column.",
+      "best_for": "Papers heavy in tables and figures, and papers with many callouts.",
+      "cols": 1,
+      "side": "oneside",
+      "sidebar": true,
+      "geometry": "left=0.75in,textwidth=4.85in,marginparsep=0.25in,marginparwidth=2.0in,top=0.9in,bottom=0.85in",
+      "headsep": "0.28in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        9.5,
+        13.2
+      ],
+      "small": [
+        8.6,
+        11.4
+      ],
+      "foot": [
+        7.8,
+        10
+      ],
+      "h": [
+        [
+          11.6,
+          14
+        ],
+        [
+          10.4,
+          12.8
+        ],
+        [
+          9.8,
+          12.2
+        ]
+      ],
+      "span_in": 2.25,
+      "col_in": 4.85,
+      "wide_in": 7.1,
+      "table_pt": [
+        8.2,
+        8.2
+      ],
+      "display_skip": 9,
+      "typeface": "house"
+    },
+    "single-sidebar-compact": {
+      "status": "built",
+      "aliases": [],
+      "summary": "A 5.2 in main column (about 83 characters at 9.5 pt) with a 1.6 in sidebar. Wide figures and tables span 7.05 in.",
+      "modeled_on": "JAMA Network Open, with a narrower side column.",
+      "best_for": "Callout-heavy papers that need a longer line and a slimmer sidebar.",
+      "cols": 1,
+      "side": "oneside",
+      "sidebar": true,
+      "geometry": "left=0.72in,textwidth=5.2in,marginparsep=0.2in,marginparwidth=1.6in,top=0.9in,bottom=0.85in",
+      "headsep": "0.28in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        9.5,
+        13.2
+      ],
+      "small": [
+        8.6,
+        11.4
+      ],
+      "foot": [
+        7.8,
+        10
+      ],
+      "h": [
+        [
+          11.6,
+          14
+        ],
+        [
+          10.4,
+          12.8
+        ],
+        [
+          9.8,
+          12.2
+        ]
+      ],
+      "span_in": 1.8,
+      "col_in": 5.2,
+      "wide_in": 7.0,
+      "table_pt": [
+        8.2,
+        8.2
+      ],
+      "display_skip": 9,
+      "typeface": "house"
+    },
+    "single-narrow-margin": {
+      "status": "built",
+      "aliases": [],
+      "summary": "One column across the page, 7.0 in wide, 9/12.6 pt, 0.75 in margins. The densest single-column page. Callouts stay inline.",
+      "modeled_on": "None of the four reference publications sets one wide column across the page; this layout follows no reference.",
+      "best_for": "Table- and figure-heavy work with short paragraphs, where a wide page serves the exhibits. Not for long prose.",
+      "caution": "About 105 characters per line at 9 pt, above the 90 characters a reader follows comfortably. Use it only when the content is mostly exhibits and short paragraphs.",
+      "cols": 1,
+      "side": "oneside",
+      "sidebar": false,
+      "geometry": "left=0.75in,right=0.75in,top=0.9in,bottom=0.85in",
+      "headsep": "0.28in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        9,
+        12.6
+      ],
+      "small": [
+        8.2,
+        11
+      ],
+      "foot": [
+        7.4,
+        9.6
+      ],
+      "h": [
+        [
+          11,
+          13.4
+        ],
+        [
+          10,
+          12.4
+        ],
+        [
+          9.4,
+          11.8
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 7.0,
+      "wide_in": 7.0,
+      "table_pt": [
+        8.2,
+        8.2
+      ],
+      "display_skip": 8,
+      "typeface": "house"
+    },
+    "two-column-sidebar": {
+      "status": "planned",
+      "aliases": [
+        "hbr",
+        "lancet",
+        "bmj"
+      ],
+      "summary": "Two 2.65 in text columns with a 0.17 in gutter beside a 1.6 in sidebar band, 9/11.6 pt, 0.6 in outer margins. The sidebar holds short notes, pull quotes, and callouts; wide figures and tables span the band and both columns.",
+      "modeled_on": "The Lancet (about 1.1 in outer band, alternating sides), BMJ (about 1.5 in left band, every page), and HBR (1.75 in sidebar column). Measured 2026-10-01.",
+      "best_for": "Dense papers with many short callouts that must stay two-column.",
+      "note": "Planned. LaTeX places margin material beside a two-column text block unreliably; this layout needs a different technique and is not built. Selecting it fails the build and names the alternatives.",
+      "typeface": "house"
+    },
+    "two-column-science": {
+      "status": "built",
+      "aliases": [
+        "science"
+      ],
+      "summary": "Two 3.57 in columns with a 0.17 in gutter, 8.2/10.6 pt, 0.6 in margins.",
+      "modeled_on": "Science (Reports): 3.53 in columns, 8/10.5 pt, 0.51 in margins.",
+      "best_for": "Short, compact papers with small figures.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.6in,right=0.6in,top=0.8in,bottom=0.78in",
+      "headsep": "0.25in",
+      "footskip": "0.4in",
+      "colsep": "0.17in",
+      "body": [
+        8.2,
+        10.6
+      ],
+      "small": [
+        7.6,
+        9.8
+      ],
+      "foot": [
+        7,
+        8.8
+      ],
+      "h": [
+        [
+          9.4,
+          11.4
+        ],
+        [
+          8.8,
+          10.6
+        ],
+        [
+          8.6,
+          10.4
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.57,
+      "wide_in": 7.3,
+      "table_pt": [
+        7.1,
+        7.3
+      ],
+      "display_skip": 6,
+      "typeface": "house"
+    },
+    "two-column-pnas": {
+      "status": "built",
+      "aliases": [
+        "pnas"
+      ],
+      "summary": "Two 3.4 in columns with a 0.18 in gutter, 9/11 pt, 0.76 in margins.",
+      "modeled_on": "PNAS: 3.40 in columns, 9/10 pt (leading opened to 11 pt here), 0.54 to 0.60 in margins.",
+      "best_for": "General research papers; a balanced, moderately dense page.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.76in,right=0.76in,top=0.85in,bottom=0.8in",
+      "headsep": "0.25in",
+      "footskip": "0.4in",
+      "colsep": "0.18in",
+      "body": [
+        9,
+        11
+      ],
+      "small": [
+        8.2,
+        10.4
+      ],
+      "foot": [
+        7.4,
+        9.2
+      ],
+      "h": [
+        [
+          10,
+          12
+        ],
+        [
+          9.4,
+          11.4
+        ],
+        [
+          9,
+          11
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.4,
+      "wide_in": 6.98,
+      "table_pt": [
+        7.4,
+        7.6
+      ],
+      "display_skip": 6,
+      "typeface": "house"
+    },
+    "two-column-cell": {
+      "status": "built",
+      "aliases": [
+        "cell"
+      ],
+      "summary": "Two 3.32 in columns with a 0.17 in gutter, 8.5/10.9 pt, 0.8 in margins.",
+      "modeled_on": "Cell: 3.32 in columns, 8.5/10.9 pt, margins 0.74 to 0.83 in.",
+      "best_for": "Research papers with many figure panels; a dense page with firm margins.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.8in,right=0.8in,top=0.85in,bottom=0.8in",
+      "headsep": "0.25in",
+      "footskip": "0.4in",
+      "colsep": "0.17in",
+      "body": [
+        8.5,
+        10.9
+      ],
+      "small": [
+        7.8,
+        10
+      ],
+      "foot": [
+        7.2,
+        9
+      ],
+      "h": [
+        [
+          9.6,
+          11.6
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8.8,
+          10.8
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.32,
+      "wide_in": 6.81,
+      "table_pt": [
+        7.3,
+        7.5
+      ],
+      "display_skip": 6,
+      "typeface": "house"
+    },
+    "two-column-large": {
+      "status": "built",
+      "aliases": [
+        "circulation",
+        "aha"
+      ],
+      "summary": "Two 3.3 in columns with a 0.22 in gutter, 10/12 pt, 0.85 in margins. The largest two-column type.",
+      "modeled_on": "AHA's Circulation: 10/12 pt on 3.26 in columns, 0.68 in margins (NAR: 10/11 pt on 3.43 in).",
+      "best_for": "Papers read on screen or by readers who want larger type.",
+      "cols": 2,
+      "side": "twoside",
+      "sidebar": false,
+      "geometry": "left=0.85in,right=0.85in,top=0.9in,bottom=0.85in",
+      "headsep": "0.25in",
+      "footskip": "0.4in",
+      "colsep": "0.22in",
+      "body": [
+        10,
+        12
+      ],
+      "small": [
+        8.8,
+        11
+      ],
+      "foot": [
+        8,
+        10
+      ],
+      "h": [
+        [
+          11,
+          13
+        ],
+        [
+          10.2,
+          12.2
+        ],
+        [
+          9.8,
+          11.8
+        ]
+      ],
+      "span_in": 0,
+      "col_in": 3.3,
+      "wide_in": 6.82,
+      "table_pt": [
+        7.8,
+        8.0
+      ],
+      "display_skip": 6,
+      "typeface": "house"
+    },
+    "single-sidebar-left": {
+      "status": "built",
+      "aliases": [
+        "elife",
+        "scirep"
+      ],
+      "summary": "A 5.64 in main column (about 83 characters at 9/12.2 pt) with a 1.84 in sidebar on the left. Callouts sit in the left sidebar; wide figures and tables span the full 7.5 in.",
+      "modeled_on": "eLife: 5.64 in column, 9/12.2 pt, a 1.84 in left sidebar. Scientific Reports is similar (5.5 in column, 1.6 in left band, 9/10 pt).",
+      "best_for": "Long-form papers where the reader scans the sidebar first; callout-heavy papers.",
+      "cols": 1,
+      "side": "oneside",
+      "sidebar": true,
+      "sidebar_side": "left",
+      "geometry": "left=2.35in,textwidth=5.64in,marginparsep=0.2in,marginparwidth=1.64in,top=0.9in,bottom=0.9in",
+      "headsep": "0.28in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        9,
+        12.2
+      ],
+      "small": [
+        8.2,
+        11
+      ],
+      "foot": [
+        7.4,
+        9.4
+      ],
+      "h": [
+        [
+          11,
+          13.4
+        ],
+        [
+          10,
+          12.4
+        ],
+        [
+          9.4,
+          11.8
+        ]
+      ],
+      "span_in": 1.84,
+      "col_in": 5.64,
+      "wide_in": 7.48,
+      "table_pt": [
+        8.2,
+        8.2
+      ],
+      "display_skip": 9,
+      "typeface": "house"
+    },
+    "single-sidebar-left-wide": {
+      "status": "built",
+      "aliases": [
+        "plos",
+        "plosone"
+      ],
+      "summary": "A 5.22 in main column (about 76 characters at 10/13.2 pt) with a 2.0 in sidebar on the left. Wide figures and tables span 7.5 in.",
+      "modeled_on": "PLOS ONE: 5.22 in column, 10/13 pt, a 2.28 in left sidebar.",
+      "best_for": "Long-form papers with generous callouts; the most open sidebar page.",
+      "cols": 1,
+      "side": "oneside",
+      "sidebar": true,
+      "sidebar_side": "left",
+      "geometry": "left=2.78in,textwidth=5.22in,marginparsep=0.28in,marginparwidth=2.0in,top=0.9in,bottom=0.9in",
+      "headsep": "0.28in",
+      "footskip": "0.42in",
+      "colsep": "0.28in",
+      "body": [
+        10,
+        13.2
+      ],
+      "small": [
+        8.8,
+        11.6
+      ],
+      "foot": [
+        8,
+        10.2
+      ],
+      "h": [
+        [
+          12,
+          14.4
+        ],
+        [
+          11,
+          13.4
+        ],
+        [
+          10.4,
+          12.8
+        ]
+      ],
+      "span_in": 2.28,
+      "col_in": 5.22,
+      "wide_in": 7.5,
+      "table_pt": [
+        8.2,
+        8.2
+      ],
+      "display_skip": 9,
+      "typeface": "house"
+    },
+    "three-column": {
+      "status": "planned",
+      "aliases": [],
+      "summary": "Three 2.28 in text columns, 8.7/10.5 pt, 0.51 in margins. The densest page set.",
+      "modeled_on": "Science Research Articles (measured: 3 columns of 2.28 in with a 0.2 in gutter).",
+      "best_for": "Long, text-dense papers where page count matters most.",
+      "note": "Planned. LaTeX has no native three-column mode that handles floats; this needs multicol and a custom float solution. Selecting it fails the build.",
+      "typeface": "house"
+    }
+  }
+}

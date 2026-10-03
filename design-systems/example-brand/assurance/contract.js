@@ -1,7 +1,7 @@
 /*
  * The brand contract (0014-design-systems FR-028, FR-036, FR-037), identical in every brand design system:
  * tokens.json is DTCG with every alias resolving, it supplies every theme role, brand.css declares exactly
- * those roles with the same values inside the theme layer, every foreground role is legible on the surface,
+ * those roles with the same values inside the theme layer, brand.tex declares them for print, every foreground role is legible on the surface,
  * and every logo file it lists loads at its stated size.
  */
 (() => {
@@ -53,6 +53,20 @@
         const got = declared[`--brand-${role}`] ?? "";
         t.equal(got.replace(/^"|"$/g, "").toLowerCase(), want.toLowerCase(), `--brand-${role}`);
       }
+    });
+    s.test("brand.tex declares every color role, the font roles and the widest lockups and icon, with tokens.json's values (FR-037)", async (t) => {
+      const all = await tokens();
+      const tex = (await fetchText("brand.tex")).split("\n").filter((l) => !l.startsWith("%")).join("\n");
+      const colors = Object.fromEntries([...tex.matchAll(/\\definecolor\{brand-([\w-]+)\}\{HTML\}\{([0-9A-F]{6})\}/g)].map(([, r, v]) => [r, `#${v.toLowerCase()}`]));
+      const commands = Object.fromEntries([...tex.matchAll(/\\newcommand\{\\(\w+)\}\{([^}]*)\}/g)].map(([, n, v]) => [n, v]));
+      const colorRoles = Object.keys(all.role).filter((r) => all.role[r].$type === "color");
+      t.deepEqual(Object.keys(colors).sort(), colorRoles.sort(), "the same color roles");
+      for (const r of colorRoles) t.equal(colors[r], String(roleValue(all, r)).toLowerCase(), `brand-${r}`);
+      t.equal(commands.brandfontsans, roleValue(all, "font-sans")); t.equal(commands.brandfontserif, roleValue(all, "font-serif"));
+      const l = logo(all), listed = new Set([...l.lockup.files, ...l.icon.files].map((f) => f.file));
+      for (const name of ["brandlockuplight", "brandlockupdark", "brandicon"]) t.ok(listed.has(commands[name]), `\\${name} is ${commands[name]}, not a file tokens.json lists`);
+      const widest = (files, bg) => files.filter((f) => f.file.endsWith(".png") && (!bg || f.background === bg)).sort((a, b) => b.width - a.width)[0]?.file;
+      t.equal(commands.brandlockuplight, widest(l.lockup.files, "light")); t.equal(commands.brandlockupdark, widest(l.lockup.files, "dark")); t.equal(commands.brandicon, widest(l.icon.files));
     });
     s.test("every foreground role reaches 4.5:1 on the surface (FR-037)", async (t) => {
       const all = await tokens();

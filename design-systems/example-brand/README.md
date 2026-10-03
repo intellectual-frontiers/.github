@@ -11,9 +11,12 @@ It is also the smallest complete example of a brand: copy this directory to star
 | --- | --- |
 | `tokens.json` | The palette, typefaces and theme roles in the Design Tokens Community Group format, and the logo files under `$extensions`. |
 | `brand.css` | The theme roles as `--brand-*` custom properties in the `theme` cascade layer. |
+| `brand.tex` | The theme roles for print: `brand-<role>` colors, `\brandfontsans`, `\brandfontserif`, and `\brandlockuplight`, `\brandlockupdark` and `\brandicon`. A print design system loads it first. |
 | `logos/`, `logos/web/`, `images/favicon.png` | The lockups (light and dark, PNG and WebP), the icon and the favicon. |
 | `assurance/` | The brand contract (`contract.js`) and a specimen. `node assurance/run.mjs` runs them. |
 
 To see a web design system in this brand, serve `design-systems/` and open
 `/frontiers-console-web/assurance/?brand=example-brand`, or run
 `node design-systems/frontiers-console-web/assurance/run.mjs --brand example-brand --shots <dir>`.
+
+`brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files.

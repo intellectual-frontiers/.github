@@ -12,7 +12,7 @@ favicon, so that every web design system here is proven to be themeable by a bra
 
 - **FR-001**: `example-brand` MUST live at `design-systems/example-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
-  and hold `tokens.json`, `brand.css`, `logos/`, `images/favicon.png`, a `README.md`, this spec and
+  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`, a `README.md`, this spec and
   an `assurance/` harness. It MUST NOT be the brand of anything published; it exists to test theming.
 - **FR-002**: It MUST supply every theme role every brand supplies (0014-design-systems FR-037) and
   every role a web design system here requires (frontiers-nature-web FR-004), with colors that

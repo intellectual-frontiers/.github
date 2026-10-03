@@ -1,6 +1,6 @@
-# Runs every design system's assurance harness on every push and pull request that touches a design
-# system (0014-design-systems FR-015, FR-017). A harness serves the directory holding its design system,
-# so a derived system checks its copies against the system it derives from (FR-021).
+# Runs every design system's assurance harness on every push and pull request that touches a design system
+# (0014-design-systems FR-015, FR-017, FR-039): the browser harnesses (web and brand design systems) in one job,
+# the TeX harnesses (print design systems) in another, each under every brand here.
 name: design-systems
 
 on:
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  assurance:
+  browser:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,5 +24,16 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Every design system's harness
-        run: tools/run_assurance.sh
+      - name: Browser harnesses
+        run: tools/run_assurance.sh --browser
+
+  tex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: TeX Live and poppler
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - name: TeX harnesses
+        run: tools/run_assurance.sh --tex

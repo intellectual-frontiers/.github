@@ -302,6 +302,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-039	check	.github: tools/run_assurance.sh	runs every web design system under every brand; a missing role or failed contrast fails the run
 0014-design-systems FR-040	none	-	one design system and theme per page is a consumer fact; www enforces it for its own areas
 0014-design-systems FR-041	check	.github: python3 tools/spec_check.py	each web DesignSystem names an interaction model, exactly one expression and a density
+0014-design-systems FR-042	check	.github: python3 tools/spec_check.py	each print DesignSystem names a print document type
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
@@ -462,6 +463,15 @@ frontiers-nature-web FR-017	check	.github: node design-systems/frontiers-nature-
 frontiers-nature-web FR-018	none	-	navigation data drives the chrome in a consumer; no check here
 frontiers-nature-web FR-019	none	-	layout attributes are implemented by a consumer; no check here
 frontiers-nature-web FR-020	none	-	registry contents not checked
+frontiers-print FR-001	none	-	registration and classification; spec_check checks the slug, registration and classification only
+frontiers-print FR-002	none	-	directory contents; no check
+frontiers-print FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: the four theme colors reach each build as the brand's roles, logos placed, no theme color as a literal
+frontiers-print FR-004	check	.github: python3 design-systems/frontiers-print/assurance/run.py	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; LICENSES.md coverage not checked
+frontiers-print FR-005	check	.github: python3 design-systems/frontiers-print/assurance/run.py	book page size 7 x 9.19 in; margins and heading faces not checked
+frontiers-print FR-006	none	-	the cover fixture sets the title and author in the theme sans; Fjalla One and Roboto Condensed use is not checked
+frontiers-print FR-007	check	.github: python3 design-systems/frontiers-print/assurance/run.py	article builds on LuaLaTeX in the default layout at US Letter
+frontiers-print FR-008	none	-	licensed-set fallback is not exercised by the harness
+frontiers-print FR-009	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any of its checks
 example-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 example-brand FR-002	check	.github: tools/run_assurance.sh	Brand contract here, and every web design system run themed by it
 example-brand FR-003	check	.github: node design-systems/example-brand/assurance/run.mjs	Logo files: light and dark lockups, icon and favicon load at their stated sizes

@@ -1,0 +1,14 @@
+% Fixture: a journal article page, set with this design system under the theme the harness chooses. The
+% harness writes iflayout.def and defines \printdir, \iffontdir and \branddir (absolute) before this file.
+\documentclass{ifarticle}
+\setpaper{title}{A Fixture Article}
+\begin{document}
+\def\themelog#1{\extractcolorspecs{#1}{\themelogmodel}{\themelogspec}\typeout{THEME #1=\themelogmodel:\themelogspec}}
+\themelog{ifink}\themelog{ifblue}\themelog{ifoxblood}\themelog{ifteal}
+\section{Introduction}
+Body text in the layout's typeface. It runs long enough to fill a paragraph across the column, with
+\textbf{bold} and \textit{italic} words and a link to \href{https://example.com}{a source}.
+{\color{ifblue} A line in the primary color.} {\color{ifteal} A line in the secondary color.}
+\section{Method}
+More text under a second heading.
+\end{document}

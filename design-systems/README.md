@@ -69,6 +69,8 @@ The design systems here today, each with its rules in its own `spec.md`:
   proves every web design system can be themed by someone else's brand.
 - [`frontiers-nature-web/`](frontiers-nature-web/README.md) (web
   presentation): the public, editorial face.
+- [`frontiers-print/`](frontiers-print/README.md) (print): the book
+  interior, book cover and journal article, in LaTeX.
 - [`frontiers-console-web/`](frontiers-console-web/README.md) (web
   presentation): operator (admin) and
   documentation surfaces: sidebar, navbar and table-of-contents shell in
@@ -103,8 +105,9 @@ A **brand** design system holds one identity: its palette, typefaces, logo, icon
 primitive tokens in `tokens.json` (the Design Tokens Community Group format), and a fixed set of
 **theme roles** every brand supplies under the same names: `text`, `surface`, `primary`,
 `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `font-sans` and `font-serif`. Its
-`brand.css` declares those roles as `--brand-*` custom properties, and `tokens.json` lists its logo
-files and favicon.
+`brand.css` declares those roles as `--brand-*` custom properties for the web, `brand.tex` declares
+them as `brand-<role>` colors and font and logo commands for print, and `tokens.json` lists its logo
+files and favicon. `tools/brand_theme.py` writes both theme files from `tokens.json`.
 
 A **web** design system never holds a brand value. Its semantic tokens reference the roles
 (`--fc-primary: var(--brand-primary)`), its tints are mixed from them with `color-mix()`, and its
@@ -112,8 +115,12 @@ logo and favicon come from the brand's `tokens.json`. Pairing a web design syste
 **theme**. A theme changes colors, the typeface (among families the web system ships), the logo and
 the favicon; it never changes layout, spacing, components, motion or accessibility.
 
-That is how white-labeling works: a company that wants a web design system in its own colors and
-logo supplies a brand, and the web design system is used unchanged. A brand that is not yet public
+A **print** design system works the same way: it loads the brand's `brand.tex` before its own
+definitions, takes its colors, its text and cover families (among the fonts it ships) and its logos
+from it, and holds none as a literal.
+
+That is how white-labeling works: a company that wants a web or print design system in its own
+colors and logo supplies a brand, and the design system is used unchanged. A brand that is not yet public
 lives, with the same layout and harness, outside this repository.
 
 Every web design system's harness runs under any brand vendored beside it
@@ -121,7 +128,8 @@ Every web design system's harness runs under any brand vendored beside it
 names a font it doesn't ship, or makes text unreadable. `tools/run_assurance.sh` runs every web
 design system here under every brand here, including [`example-brand`](example-brand/README.md), a
 deliberately different test brand that proves no web system depends on Intellectual Frontiers'
-own colors.
+own colors. Each print design system's `assurance/run.py` compiles its fixtures under every brand
+beside it and checks the output the same way.
 
 A page uses exactly one web design system and one theme. A site may use several, each for an
 area of it: www's public pages use `frontiers-nature-web` and its `/console` uses
@@ -139,6 +147,12 @@ Each web design system is classified in the ontology on three axes, in the indus
 
 `frontiers-nature-web` is an editorial and marketing site, expressive. `frontiers-console-web` is
 documentation, back office and dashboard, productive.
+
+## Classifying print design systems
+
+Each print design system names the **print document types** it sets, as publishing names them:
+book interior, book cover, journal article, report. `frontiers-print` sets book interiors, book
+covers and journal articles.
 
 ## Derivation
 
