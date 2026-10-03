@@ -875,7 +875,7 @@ ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
     ifcore:describes ifcore:IntellectualFrontiersLLC ;
     ifcore:heldIn "Cloudflare, the company's primary registrar and DNS provider."@en ;
     ifcore:accessInstructions "Access, including any read-only API token, is granted by the decision authority in effect (0001-eidolon-architecture FR-029). No credential is held in any Eidolon repository (0022-domain-names FR-014)."@en ;
-    rdfs:comment "Which registrars hold the domains served here but registered elsewhere is 0022-domain-names OQ-2."@en ;
+    rdfs:comment "Other registrar accounts, and how reconciliation reaches them, are 0022-domain-names OQ-2."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:IntellectualFrontiersComDomain a ifcore:DomainName ;
@@ -979,6 +979,183 @@ ifcore:OperationalTruthOrgDomainRegistration a ifcore:ExternalRecordReference ;
     ifcore:describes ifcore:OperationalTruthOrgDomain ;
     ifcore:primarySource "https://rdap.publicinterestregistry.org/rdap/domain/operationaltruth.org"^^xsd:anyURI ;
     ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2026-01-15; expires 2027-01-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NeuvistComDomain a ifcore:DomainName ;
+    rdfs:label "neuvist.com"@en ;
+    dcterms:identifier "neuvist.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:Neuvist ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NeuvistComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:NeuvistComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/neuvist.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2009-02-01; expires 2027-02-01; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PatientteamComDomain a ifcore:DomainName ;
+    rdfs:label "patientteam.com"@en ;
+    dcterms:identifier "patientteam.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:PatientTeamCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PatientteamComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:PatientteamComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/patientteam.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2009-03-01; expires 2027-03-01; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:UnblockHealthDomain a ifcore:DomainName ;
+    rdfs:label "unblock.health"@en ;
+    dcterms:identifier "unblock.health" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:UnblockHealth ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:UnblockHealthDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:UnblockHealthDomain ;
+    ifcore:primarySource "https://rdap.nic.health/domain/unblock.health"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2019-09-25; expires 2027-09-25; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:LaborascodeComDomain a ifcore:DomainName ;
+    rdfs:label "laborascode.com"@en ;
+    dcterms:identifier "laborascode.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:LaborAsCode ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LaborascodeComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:LaborascodeComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/laborascode.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2026-02-09; expires 2027-02-09; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FederalarchitectComDomain a ifcore:DomainName ;
+    rdfs:label "federalarchitect.com"@en ;
+    dcterms:identifier "federalarchitect.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:GovConICComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FederalarchitectComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:FederalarchitectComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/federalarchitect.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2008-07-14; expires 2027-07-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShahidShahComDomain a ifcore:DomainName ;
+    rdfs:label "shahidshah.com"@en ;
+    dcterms:identifier "shahidshah.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ShahidShahComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:ShahidShahComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/shahidshah.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2005-10-15; expires 2027-10-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShahidIoDomain a ifcore:DomainName ;
+    rdfs:label "shahid.io"@en ;
+    dcterms:identifier "shahid.io" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ShahidIoDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:ShahidIoDomain ;
+    ifcore:primarySource "https://rdap.cloudflare.com/rdap/v1/domain/shahid.io"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2013-09-02; expires 2027-09-02; status client transfer prohibited, renew period; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    rdfs:comment "The .io registry offers no RDAP service, so the registrar's own RDAP record is the primary source (0022-domain-names FR-011)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthitspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthitspeaker.com"@en ;
+    dcterms:identifier "healthitspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthitspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthitspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthitspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2012-09-07; expires 2027-09-07; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DigitalhealthspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "digitalhealthspeaker.com"@en ;
+    dcterms:identifier "digitalhealthspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DigitalhealthspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:DigitalhealthspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/digitalhealthspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-09-14; expires 2027-09-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthcareitspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthcareitspeaker.com"@en ;
+    dcterms:identifier "healthcareitspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareitspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthcareitspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthcareitspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-03-28; expires 2027-03-28; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthtechspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthtechspeaker.com"@en ;
+    dcterms:identifier "healthtechspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthtechspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthtechspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthtechspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-09-14; expires 2027-09-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
     ifcore:resolvedAt "2026-10-03"^^xsd:date ;
     ifcore:verificationCadence "P30D"^^xsd:duration ;
     ifcore:verificationMethod "automated"@en ;
