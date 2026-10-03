@@ -128,6 +128,9 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
 tools/
   spec_check.py     checks specs and the register; CI runs it on every push
+  reference-environment
+                    the workspaces-host-v3 commit every tool is guaranteed
+                    to run in (0022-tooling-environment)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)
@@ -198,6 +201,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
 | [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
+| [0022](spec-kit/specs/0022-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
