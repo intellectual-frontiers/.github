@@ -271,7 +271,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-007	none	-	rule of judgment; no check possible
 0014-design-systems FR-008	none	-	no check that Datastar is opt-in per page
 0014-design-systems FR-009	check	.github: tools/run_assurance.sh	both web harnesses check layers, @import, remote URL and framework
-0014-design-systems FR-010	none	-	check-ontology does not validate ifcore:DesignSystem individuals, their kind or derivation
+0014-design-systems FR-010	check	.github: python3 tools/spec_check.py	every design-systems/ directory has an individual with its dcterms:identifier and every identifier a directory; status, kind and derivation not checked
 0014-design-systems FR-011	none	-	no check that a README omits status
 0014-design-systems FR-012	none	-	scoping statement; nothing to test
 0014-design-systems FR-013	none	-	README content is a judgment; no check
