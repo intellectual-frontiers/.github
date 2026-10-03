@@ -1,0 +1,28 @@
+/*
+ * frontiers-brand's theme for the web (0014-design-systems FR-028, FR-037): every role in tokens.json under "role",
+ * as a custom property, and nothing else. Load it before a web design system's stylesheets.
+ * Written by tools/brand_theme.py from tokens.json; do not edit.
+ */
+@layer theme {
+  :root {
+    --brand-text: #121820;
+    --brand-surface: #ffffff;
+    --brand-primary: #214ea2;
+    --brand-secondary: #1f7775;
+    --brand-tertiary: #8a3147;
+    --brand-success: #1f7775;
+    --brand-warning: #8a5a24;
+    --brand-danger: #8a3147;
+    --brand-info: #4a4a8c;
+    --brand-accent: #8a3147;
+    --brand-link: #214ea2;
+    --brand-font-sans: "Inter";
+    --brand-font-serif: "Source Serif 4";
+    --brand-paper: #f3f0e8;
+    --brand-unit-capital: #214ea2;
+    --brand-unit-ip: #121820;
+    --brand-unit-press: #8a3147;
+    --brand-unit-studios: #1f7775;
+    --brand-unit-network: #4a4a8c;
+  }
+}

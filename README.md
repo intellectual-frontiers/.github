@@ -130,7 +130,7 @@ tools/
   spec_check.py     checks specs and the register; CI runs it on every push
   reference-environment
                     the workspaces-host-v3 commit every tool is guaranteed
-                    to run in (0022-tooling-environment)
+                    to run in (0024-tooling-environment)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)
@@ -201,8 +201,10 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
 | [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
-| [0022](spec-kit/specs/0022-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
-| [0023](spec-kit/specs/0023-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
+| [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
+| [0024](spec-kit/specs/0024-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
+| [0025](spec-kit/specs/0025-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -288,7 +290,7 @@ runs it on every push that touches `design-systems/`.
 - [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
 - [ ] Any tool you add declares its prerequisites and installs nothing; it
-      runs from a fresh clone in workspaces-host-v3 (0022).
+      runs from a fresh clone in workspaces-host-v3 (0024).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.

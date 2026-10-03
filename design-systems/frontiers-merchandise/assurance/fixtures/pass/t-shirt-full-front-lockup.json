@@ -1,0 +1,9 @@
+{
+  "product": "t-shirt",
+  "location": "full-front",
+  "method": "screen-printing",
+  "artwork": "lockup",
+  "ink": "surface",
+  "substrate": "#202124",
+  "width_in": 10
+}

@@ -282,20 +282,33 @@ requirement	mechanism	by	note
 0014-design-systems FR-018	none	-	no check that a registered kind has a profile, or that a kind never changes
 0014-design-systems FR-019	none	-	what a profile states is a judgment; no check
 0014-design-systems FR-020	none	-	no check of derivation records or cycles
-0014-design-systems FR-021	check	.github: tools/run_assurance.sh	each derived web system checks its colours, fonts and logo bytes against frontiers-brand beside it
+0014-design-systems FR-021	none	-	no design system derives from another yet; nothing checks a derived copy
 0014-design-systems FR-022	none	-	spec_check checks each design system spec against 0020, but a missing spec.md only warns
 0014-design-systems FR-023	none	-	spec-amendment discipline; no check
 0014-design-systems FR-025	none	-	no check of what a design system directory holds
 0014-design-systems FR-026	none	-	consumers record pins (www VENDORED.txt, eidolon console/vendor/PIN) in two formats; no check
 0014-design-systems FR-027	none	-	no check of harness coverage of check rules
-0014-design-systems FR-028	none	-	brand profile; no system of this kind yet
+0014-design-systems FR-028	check	.github: tools/run_assurance.sh	every brand runs contract.js: roles, brand.css agreement, theme layer, role contrast, logo files
 0014-design-systems FR-029	none	-	web layout; no check
 0014-design-systems FR-030	check	.github: tools/run_assurance.sh	web harnesses run headlessly in Chromium; file:// skipping not checked in CI
 0014-design-systems FR-031	none	-	print profile; no system of this kind yet
-0014-design-systems FR-032	none	-	figure profile; no system of this kind yet
+0014-design-systems FR-032	check	.github: python3 tools/spec_check.py	each figure DesignSystem names a figure type; the profile's rules are checked by each figure system's harness
 0014-design-systems FR-033	none	-	written-voice profile; no system of this kind yet
 0014-design-systems FR-034	none	-	spoken-voice profile; no system of this kind yet
 0014-design-systems FR-035	none	-	removal discipline; no check that a removed system leaves no ontology individual
+0014-design-systems FR-036	check	.github: tools/run_assurance.sh	contract.js: every brand token has $value and every alias resolves; theme.js: each web tokens.json mirrors tokens.css with {role.*} aliases
+0014-design-systems FR-037	check	.github: tools/run_assurance.sh	contract.js: every role present with its type, brand.css declares exactly the roles, logo extension lists light and dark lockups, icon, favicon
+0014-design-systems FR-038	check	.github: tools/run_assurance.sh	theme.js: roles used exist in the theme, font families shipped, no theme color as a literal; that logos come from the theme is not checked outside fixtures
+0014-design-systems FR-039	check	.github: tools/run_assurance.sh	runs every web design system under every brand; a missing role or failed contrast fails the run
+0014-design-systems FR-040	none	-	one design system and theme per page is a consumer fact; www enforces it for its own areas
+0014-design-systems FR-041	check	.github: python3 tools/spec_check.py	each web DesignSystem names an interaction model, exactly one expression and a density
+0014-design-systems FR-042	check	.github: python3 tools/spec_check.py	each print DesignSystem names a print document type
+0014-design-systems FR-043	check	.github: tools/run_assurance.sh --images	each brand's imagery catalog, masters, WebP files and share card, by tools/brand_imagery.py check
+0014-design-systems FR-044	check	.github: tools/run_assurance.sh	each web harness's theme suite and each print harness fail on a color literal
+0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
+0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
+0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
+0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
@@ -405,11 +418,11 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-031	check	eidolon: make research-check	fails a published paper with no promotion brief
 frontiers-console-web FR-001	none	-	registration and derivation are not checked
 frontiers-console-web FR-002	none	-	rule of judgment; no check possible
-frontiers-console-web FR-003	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	Inherited from frontiers-brand: colours, font stack, logo bytes
+frontiers-console-web FR-003	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, Inter shipped, no color literal
 frontiers-console-web FR-004	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness: no @import, remote URL, framework; classic script; runs on vendored copy
 frontiers-console-web FR-005	none	-	provenance of code; no check possible
 frontiers-console-web FR-006	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks layer order declared once in reset.css and one layer per file
-frontiers-console-web FR-007	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks required --fc- tokens and tokens.json mirror; semantic naming unchecked
+frontiers-console-web FR-007	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	Theme: tokens.json mirrors tokens.css exactly, theme values as {role.*} aliases
 frontiers-console-web FR-008	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness Layouts suite checks each layout and runtime reflow
 frontiers-console-web FR-009	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
 frontiers-console-web FR-010	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks changing --fc-sidebar-width moves the page
@@ -422,27 +435,42 @@ frontiers-console-web FR-016	check	.github: node design-systems/frontiers-consol
 frontiers-console-web FR-017	none	-	documentation completeness; no check possible
 frontiers-console-web FR-018	none	-	harness runs, but nothing checks which suites it covers
 frontiers-console-web FR-019	none	-	no check
-frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug, nothing checks contents or derivations
-frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: brand colour names and #rrggbb values
-frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: every unit has a colour, a brand colour or network
-frontiers-brand FR-004	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: sans, serif and wordmark named
-frontiers-brand FR-005	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Contrast: listed pairings and unit colours ≥ 4.5:1
-frontiers-brand FR-006	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: each loads at its stated size; light and dark, PNG and WebP per size
+frontiers-console-web FR-020	none	-	no console page carries a figure yet; the ontology link is checked by spec_check (0014-design-systems FR-048)
+frontiers-figures FR-001	check	.github: python3 tools/spec_check.py	registration and figure types
+frontiers-figures FR-002	none	-	directory contents; no check
+frontiers-figures FR-003	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	fail fixtures: literal color, font name, kept stylesheet, unknown class; every drawn figure passes figcheck
+frontiers-figures FR-004	check	.github: tools/run_assurance.sh	run.py under every brand and variant: every role resolves; text 4.5:1 and graphics 3:1 on every background role
+frontiers-figures FR-005	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every figure type drawn on both canvases; every color variant themes and parses; that a variant changes nothing else is a review judgment
+frontiers-figures FR-006	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	a themed figure renders with only the brand's sans embedded where rsvg-convert is installed
+frontiers-figures FR-007	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: canvas, minimum size, tracking; title and label sizes are the kit's
+frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: labels inside their boxes and the canvas, measured in the brand's sans
+frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
+frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
+frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
+frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
+frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
+frontiers-brand FR-004	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: Inter, Source Serif 4, wordmark weight 700
+frontiers-brand FR-005	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: palette inks and unit colors on white and Warm Paper
+frontiers-brand FR-006	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files and Frontiers palette: sizes load as stated; light and dark, PNG and WebP; names state sizes
 frontiers-brand FR-007	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: icon files load at their stated size; crop provenance not checked
-frontiers-brand FR-008	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: minimum sizes stated and every lockup file above them
-frontiers-brand FR-009	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Specimen: light lockups on light, dark on Deep Ink; redrawing or recolouring not checked
+frontiers-brand FR-008	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: minimum sizes stated
+frontiers-brand FR-009	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Specimen: light lockups on light, dark on dark; redrawing or recoloring not checked
 frontiers-brand FR-010	none	-	clear space is a placement judgment; no check
 frontiers-brand FR-011	none	-	how a new size is made; no check
 frontiers-brand FR-012	none	-	imagery judgment; no check
-frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: favicon loads at 64×64
+frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: the favicon loads at its stated size
+frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
+frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
+frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
-frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; tokens.json mirrors tokens.css
-frontiers-nature-web FR-004	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Inherited from frontiers-brand: colours, font stacks, logo bytes
+frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
+frontiers-nature-web FR-004	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, families shipped, no color literal; Hero suite: imagery from the theme
 frontiers-nature-web FR-005	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens and Rendered contrast suites
-frontiers-nature-web FR-006	none	-	semantic use of diagram and unit colours is a judgment; no check
+frontiers-nature-web FR-006	none	-	semantic use of unit colours is a judgment; figures are frontiers-figures' (spec_check checks the ontology link)
 frontiers-nature-web FR-007	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: bundle.txt order and files
-frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important
+frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important; the order statement itself is not checked
 frontiers-nature-web FR-009	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: every font file fonts.css references exists; Page frame: fonts load
 frontiers-nature-web FR-010	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: chrome.js defines if-shelf, no modules or network; Datastar opt-in not checked
 frontiers-nature-web FR-011	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract and Page frame: one main, one h1, page capped at 72rem
@@ -455,6 +483,40 @@ frontiers-nature-web FR-017	check	.github: node design-systems/frontiers-nature-
 frontiers-nature-web FR-018	none	-	navigation data drives the chrome in a consumer; no check here
 frontiers-nature-web FR-019	none	-	layout attributes are implemented by a consumer; no check here
 frontiers-nature-web FR-020	none	-	registry contents not checked
+frontiers-nature-web FR-021	check	.github: tools/run_assurance.sh	Hero suite under every brand: the artwork is from the theme's pool, uncropped, uncovered; text AA; fits 320 to 1280px
+frontiers-print FR-001	none	-	registration and classification; spec_check checks the slug, registration and classification only
+frontiers-print FR-002	none	-	directory contents; no check
+frontiers-print FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: every named color reaches each build as its role or mix of roles, logos placed, no color literal in a style file
+frontiers-print FR-004	check	.github: python3 design-systems/frontiers-print/assurance/run.py	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; the book sets the sans in Regular, Bold, Italic and Bold Italic; LICENSES.md coverage not checked
+frontiers-print FR-005	check	.github: python3 design-systems/frontiers-print/assurance/run.py	book page size 7 x 9.19 in; the book's sans styles are the theme's font-sans; margins not checked
+frontiers-print FR-006	none	-	the cover fixture sets the title in the theme sans; Fjalla One and Roboto Condensed use is not checked
+frontiers-print FR-007	check	.github: python3 design-systems/frontiers-print/assurance/run.py	article builds on LuaLaTeX in the default layout at US Letter
+frontiers-print FR-008	check	.github: python3 design-systems/frontiers-print/assurance/run.py	the default set's sans is Inter in the article PDF; licensed-set fallback is not exercised by the harness
+frontiers-print FR-009	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any of its checks
+frontiers-print FR-010	review	frontiers-print FR-010	cover structure and reading order are judged at cover review; the pipeline's covercheck checks type overlaps
+frontiers-print FR-011	none	-	lockup placement is the renderer's; not checked
+frontiers-print FR-012	check	eidolon: make check-covers	the renderer refuses a title line wider than the box; casing and line composition are judged at review
+frontiers-print FR-013	none	-	subtitle setting is the renderer's; not checked
+frontiers-print FR-014	none	-	author setting is the renderer's; not checked
+frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
+frontiers-print FR-016	check	eidolon: make check-covers	the series line's fit is checked; its color and the back-cover rule are not
+frontiers-print FR-017	check	eidolon: make check-covers	a back cover that spills onto a second page or reaches the barcode zone fails
+frontiers-print FR-018	check	eidolon: make check-books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
+frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
+frontiers-merchandise FR-002	none	-	directory contents; no check
+frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
+frontiers-merchandise FR-004	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fixture jobs exercise each method's limits; the table and methods.json agreeing is a review judgment
+frontiers-merchandise FR-005	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite and fixture jobs; the table and products.json agreeing is a review judgment
+frontiers-merchandise FR-006	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: method not allowed, imagery by a spot method, unknown location
+frontiers-merchandise FR-007	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: too wide, too tall, below the brand minimum, finer than the method holds
+frontiers-merchandise FR-008	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: ink not in the kit, ink on a method that uses none
+frontiers-merchandise FR-009	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixture: dark ink on dark goods
+frontiers-merchandise FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+example-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
+example-brand FR-002	check	.github: tools/run_assurance.sh	Brand contract here, and every web design system run themed by it
+example-brand FR-003	check	.github: node design-systems/example-brand/assurance/run.mjs	Logo files: light and dark lockups, icon and favicon load at their stated sizes
+example-brand FR-004	check	.github: tools/run_assurance.sh --images	brand_imagery.py check and the Imagery suite: the piece is catalogued and loads at its sizes
+example-brand FR-005	check	.github: node design-systems/example-brand/assurance/run.mjs	Decoration kit suite: one-color SVG, finest detail, spot and thread matches
 0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
 0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
 0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent
@@ -507,29 +569,70 @@ frontiers-nature-web FR-020	none	-	registry contents not checked
 0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
 0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
-0022-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
-0022-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
-0022-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
-0022-tooling-environment FR-004	none	-	no check scans tools for installs at run time
-0022-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0022-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet
-0022-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0022-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form only; neither its published images nor the devcontainer tag's match is checked
-0022-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet
-0022-tooling-environment FR-010	none	-	no CI job yet
-0022-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
-0022-tooling-environment FR-012	none	-	no check scans tools for the environment's name
-0023-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
-0023-workspaces FR-002	none	-	FR-010 runs only the image flavor
-0023-workspaces FR-003	none	-	no check
-0023-workspaces FR-004	none	-	no .devcontainer/ yet; no check of its image tag
-0023-workspaces FR-005	none	-	no check reads ws-repos.json
-0023-workspaces FR-006	none	-	no check reads devcontainer.json
-0023-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
-0023-workspaces FR-008	none	-	no check reads devcontainer.json
-0023-workspaces FR-009	none	-	documentation judgment
-0023-workspaces FR-010	none	-	no check reads the README
-0023-workspaces FR-011	none	-	documentation judgment
-0023-workspaces FR-012	none	-	no check inspects the image manifest
-0023-workspaces FR-013	none	-	no check
-0023-workspaces FR-014	none	-	no check
+0022-domain-names FR-001	none	-	no shape yet distinguishes a DomainName from a DigitalAsset
+0022-domain-names FR-002	check	eidolon: make check-domains	identifier unique across the catalog; that it is registrable, not a subdomain, is unchecked
+0022-domain-names FR-003	check	eidolon: make check-domains	identifier lowercase A-label pattern
+0022-domain-names FR-004	check	eidolon: make check-domains	rights-holder present; who is named is unchecked
+0022-domain-names FR-005	check	eidolon: make check-domains	exactly one dcterms:type in DomainRoleScheme
+0022-domain-names FR-006	check	eidolon: make check-domains	relation present for primary, redirect, mail, defensive; a redirect names a DomainName
+0022-domain-names FR-007	none	-	no check; dcterms:created on owned channels not yet verified against publishing start
+0022-domain-names FR-008	none	-	completeness needs the registrar reconciliation of FR-018, not yet built
+0022-domain-names FR-009	check	eidolon: make check-domains	Public only for primary, redirect, mail, and only when every relation target is Public
+0022-domain-names FR-010	check	eidolon: make check-domains	exactly one ExternalRecordReference per DomainName
+0022-domain-names FR-011	none	-	no check on primarySource form
+0022-domain-names FR-012	check	eidolon: make check-domains	cadence no longer than thirty days; the method's being automated is not checked
+0022-domain-names FR-013	none	-	no check on cached contact details
+0022-domain-names FR-014	none	-	secret scanning not configured; nothing checks it
+0022-domain-names FR-015	none	-	no check for DNS records in the ontology
+0022-domain-names FR-016	none	-	no check that acquisition or lapse carries a Decision
+0022-domain-names FR-017	check	eidolon: make domain-security	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
+0022-domain-names FR-018	check	eidolon: make domain-security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
+0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
+0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
+0023-domain-security FR-001	check	eidolon: make domain-security	evaluates every domain against every control
+0023-domain-security FR-002	check	eidolon: make check-domains	an exception names a DomainName and lapses by dcterms:valid within a year
+0023-domain-security FR-003	none	-	domain security check not yet built
+0023-domain-security FR-004	check	eidolon: make domain-security	RDAP status, or the registrar's lock through the API
+0023-domain-security FR-005	check	eidolon: make domain-security	needs CLOUDFLARE_API_TOKEN, else unchecked
+0023-domain-security FR-006	check	eidolon: make domain-security	DS at the registry, from RDAP or DNS
+0023-domain-security FR-007	check	eidolon: make domain-security	registrant email or telephone in RDAP not behind a privacy service
+0023-domain-security FR-008	check	eidolon: make domain-security	nameservers against the zone's own, or the provider's suffix without the API
+0023-domain-security FR-009	check	eidolon: make domain-security	null MX, fail-all SPF, reject DMARC
+0023-domain-security FR-010	check	eidolon: make domain-security	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-011	check	eidolon: make domain-security	MTA-STS record and enforce-mode policy, TLS-RPT address
+0023-domain-security FR-012	check	eidolon: make domain-security	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
+0023-domain-security FR-013	check	eidolon: make domain-security	valid TLS, HTTP to HTTPS, HSTS of at least a year
+0023-domain-security FR-014	check	eidolon: make domain-security	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-015	check	eidolon: make domain-security	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
+0023-domain-security FR-016	check	eidolon: make domain-security	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-017	check	eidolon: make domain-security	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
+0023-domain-security FR-018	check	eidolon: make domain-security	the workflow keeps one domain-security issue with the latest report
+0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
+0023-domain-security FR-020	check	eidolon: make domain-security	a new domain is checked within the week
+0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
+0024-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
+0024-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
+0024-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
+0024-tooling-environment FR-004	none	-	no check scans tools for installs at run time
+0024-tooling-environment FR-005	none	-	names the environment; nothing tests it
+0024-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet
+0024-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
+0024-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form only; neither its published images nor the devcontainer tag's match is checked
+0024-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet
+0024-tooling-environment FR-010	none	-	no CI job yet
+0024-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
+0024-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0025-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
+0025-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0025-workspaces FR-003	none	-	no check
+0025-workspaces FR-004	none	-	no .devcontainer/ yet; no check of its image tag
+0025-workspaces FR-005	none	-	no check reads ws-repos.json
+0025-workspaces FR-006	none	-	no check reads devcontainer.json
+0025-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
+0025-workspaces FR-008	none	-	no check reads devcontainer.json
+0025-workspaces FR-009	none	-	documentation judgment
+0025-workspaces FR-010	none	-	no check reads the README
+0025-workspaces FR-011	none	-	documentation judgment
+0025-workspaces FR-012	none	-	no check inspects the image manifest
+0025-workspaces FR-013	none	-	no check
+0025-workspaces FR-014	none	-	no check

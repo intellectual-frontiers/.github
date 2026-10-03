@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 200" width="1040" height="200">
+  <rect width="1040" height="200" class="f-surface"/>
+  <rect x="400" y="40" width="200" height="80" class="f-primary-tint s-primary"/>
+  <text x="500" y="88" text-anchor="middle" font-size="21" class="f-ink">A label far too long for its box</text>
+</svg>

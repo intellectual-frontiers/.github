@@ -1,0 +1,12 @@
+{
+  "expect": "is not an ink",
+  "job": {
+    "product": "polo",
+    "location": "left-chest",
+    "method": "embroidery",
+    "artwork": "icon",
+    "ink": "info",
+    "substrate": "#ffffff",
+    "width_in": 2.4
+  }
+}
