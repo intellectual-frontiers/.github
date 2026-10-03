@@ -12,7 +12,7 @@ favicon, so that every web design system here is proven to be themeable by a bra
 
 - **FR-001**: `example-brand` MUST live at `design-systems/example-brand/`, be registered in
   `ifcore.ttl` as an `ifcore:DesignSystem` of the brand kind (0014-design-systems FR-010, FR-028),
-  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`, `images/share-card.png`, `imagery/`, a `README.md`, this spec and
+  and hold `tokens.json`, `brand.css`, `brand.tex`, `logos/`, `images/favicon.png`, `images/share-card.png`, `imagery/`, `logos/vector/`, a `README.md`, this spec and
   an `assurance/` harness. It MUST NOT be the brand of anything published; it exists to test theming.
 - **FR-002**: It MUST supply every theme role every brand supplies (0014-design-systems FR-037) and
   every role a web design system here requires (frontiers-nature-web FR-004), with colors that
@@ -23,11 +23,16 @@ favicon, so that every web design system here is proven to be themeable by a bra
 - **FR-004**: Its imagery pool (0014-design-systems FR-043) MUST be one plain test drawing, gray
   ridges with a colored trail, hut and lake on a transparent background, so a design system that
   places pictures can be run under it; it MUST NOT hold artwork from any other brand.
+- **FR-005**: Its decoration kit (0014-design-systems FR-047) MUST be its mark and the word "Example"
+  as one-color outlined SVG, and its mark alone, each with its finest detail, and a spot-color and
+  thread match for `text`, `surface`, `primary`, `secondary` and `tertiary`, named in invented
+  matching systems ("Example Spot Guide", "Example Thread Card") so no real color reference is
+  implied.
 
 ## Out of scope
 
 - Any rule of identity, imagery or usage beyond the brand contract: this brand exists only to
-  theme the web and print design systems under test.
+  theme the web, print and merchandise design systems under test.
 
 ## Edge cases
 

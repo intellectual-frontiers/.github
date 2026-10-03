@@ -1,0 +1,12 @@
+{
+  "expect": "taller than",
+  "job": {
+    "product": "ballpoint-pen",
+    "location": "barrel",
+    "method": "pad-printing",
+    "artwork": "lockup",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 1.5
+  }
+}

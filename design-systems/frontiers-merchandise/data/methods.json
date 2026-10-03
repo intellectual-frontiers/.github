@@ -1,0 +1,47 @@
+{
+  "$description": "Each decoration method frontiers-merchandise governs and its limits (spec FR-004). ink: spot (a spot-color match), thread (an embroidery-thread match), process (full color, a role's own value) or none (the material is the only color). min_line_in: the finest line or gap the method holds, in inches. Read by decoration.py; spec.md is the source.",
+  "methods": {
+    "screen-printing": {
+      "name": "screen printing",
+      "ink": "spot",
+      "max_inks": 4,
+      "min_line_in": 0.01,
+      "imagery": false
+    },
+    "embroidery": {
+      "name": "embroidery",
+      "ink": "thread",
+      "max_inks": 6,
+      "min_line_in": 0.04,
+      "imagery": false
+    },
+    "pad-printing": {
+      "name": "pad printing",
+      "ink": "spot",
+      "max_inks": 2,
+      "min_line_in": 0.006,
+      "imagery": false
+    },
+    "laser-engraving": {
+      "name": "laser engraving",
+      "ink": "none",
+      "max_inks": 0,
+      "min_line_in": 0.006,
+      "imagery": false
+    },
+    "direct-to-garment-printing": {
+      "name": "direct-to-garment printing",
+      "ink": "process",
+      "max_inks": null,
+      "min_line_in": 0.02,
+      "imagery": true
+    },
+    "debossing": {
+      "name": "debossing",
+      "ink": "none",
+      "max_inks": 0,
+      "min_line_in": 0.02,
+      "imagery": false
+    }
+  }
+}

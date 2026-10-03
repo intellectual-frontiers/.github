@@ -99,6 +99,40 @@
     });
   });
 
+  suite("Decoration kit", {
+    group: "Unit", needs: "http",
+    description: "A brand that supplies a decoration kit (0014-design-systems FR-047) has a one-color vector lockup and icon, drawn only in currentColor so a decorator chooses the ink, each with its finest detail, and a spot-color and a thread match for each color role it lists. A brand without one passes and themes no merchandise design system.",
+  }, (s) => {
+    const kit = async () => (await tokens()).$extensions["com.intellectualfrontiers.decoration"];
+    s.test("the lockup and icon are one-color SVG in currentColor", async (t) => {
+      const k = await kit();
+      if (!k) return t.skip("no decoration kit");
+      for (const part of ["lockup", "icon"]) {
+        const res = await fetch(new URL(k[part].file, base));
+        t.ok(res.ok, `${k[part].file} loads`);
+        const svg = new DOMParser().parseFromString(await res.text(), "image/svg+xml").documentElement;
+        t.equal(svg.nodeName, "svg", `${k[part].file} is SVG`);
+        t.ok(k[part]["finest-detail"] > 0 && k[part]["finest-detail"] < 0.2, `${part}: its finest line or gap, as a fraction of its width`);
+        t.equal(svg.querySelectorAll("image, text, linearGradient, radialGradient, pattern, filter").length, 0, `${k[part].file} is outlined vector art, with no raster, live text, gradient or filter`);
+        for (const el of svg.querySelectorAll("*")) for (const attr of ["fill", "stroke"]) {
+          const v = el.getAttribute(attr);
+          if (v !== null) t.ok(v === "currentColor" || v === "none", `${k[part].file}: ${el.nodeName} ${attr}="${v}"`);
+        }
+      }
+    });
+    s.test("every listed ink is a color role with a spot-color and a thread match", async (t) => {
+      const k = await kit();
+      if (!k) return t.skip("no decoration kit");
+      const all = await tokens();
+      t.ok(Object.keys(k.inks).length >= 2, "at least a dark and a light ink");
+      for (const [role, ink] of Object.entries(k.inks)) {
+        t.equal(all.role[role]?.$type, "color", `${role} is a color role`);
+        t.ok(ink.spot?.system && ink.spot?.name, `${role}: a spot-color match`);
+        t.ok(ink.thread?.system && ink.thread?.number, `${role}: a thread match`);
+      }
+    });
+  });
+
   suite("Imagery", {
     group: "Unit", needs: "http",
     description: "A brand that supplies an imagery pool lists every piece in imagery/catalog.json with what it shows and its files, and every file loads at its stated size. A brand without one passes and themes no design system that requires imagery.",

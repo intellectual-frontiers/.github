@@ -318,9 +318,9 @@ def _concepts(ttl: str, scheme: str) -> set[str]:
 
 
 def _check_web_classification(ttl: str) -> list[Finding]:
-    """0014-design-systems FR-041 and FR-042: every web design system names one or more interaction models, exactly
-    one expression and one or more densities, and every print design system one or more print document types,
-    by dcterms:type."""
+    """0014-design-systems FR-041, FR-042 and FR-046: every web design system names one or more interaction models, exactly
+    one expression and one or more densities, every print design system one or more print document types, and every
+    merchandise design system one or more decoration methods and product categories, by dcterms:type."""
     findings: list[Finding] = []
     models, expressions, densities = (_concepts(ttl, s) for s in ("WebInteractionModelScheme", "DesignExpressionScheme", "DesignDensityScheme"))
     for block in re.split(r"\n\s*\n", ttl):
@@ -342,6 +342,17 @@ def _check_web_classification(ttl: str) -> list[Finding]:
         types = re.search(r"dcterms:type ([^;]+);", block)
         if m and types and "ifcore:PrintDesignSystemKind" in types.group(1) and not set(re.findall(r"ifcore:(\w+)", types.group(1))) & doc_types:
             findings.append(Finding("error", f"ontology/ifcore.ttl ({m.group(1)})", "a print design system names no print document type (0014-design-systems FR-042)"))
+    methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if m and types and "ifcore:MerchandiseDesignSystemKind" in types.group(1):
+            named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+            where = f"ontology/ifcore.ttl ({m.group(1)})"
+            if not named & methods:
+                findings.append(Finding("error", where, "a merchandise design system names no decoration method (0014-design-systems FR-046)"))
+            if not named & categories:
+                findings.append(Finding("error", where, "a merchandise design system names no product category (0014-design-systems FR-046)"))
     return findings
 
 

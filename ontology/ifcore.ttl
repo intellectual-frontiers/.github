@@ -96,6 +96,11 @@ ifcore:PrintDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemK
     skos:notation "print" ;
     skos:definition "How a printed or ebook book, paper or cover is set (0014-design-systems FR-031)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:MerchandiseDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "merchandise"@en ;
+    skos:notation "merchandise" ;
+    skos:altLabel "branded merchandise"@en , "promotional products"@en ;
+    skos:definition "How the brand is applied to physical goods: decoration method, imprint location and size, ink and thread (0014-design-systems FR-045)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:FigureDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "figure"@en ;
     skos:notation "figures" ;
     skos:definition "How a work's figures are drawn, in print or on the web (0014-design-systems FR-032)."@en ;
@@ -177,6 +182,47 @@ ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; sk
     skos:definition "A standalone document of findings, set for print or PDF."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
+    rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ScreenPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "screen printing"@en ;
+    skos:definition "Spot-color ink pushed through a mesh stencil, one screen per color."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Embroidery a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "embroidery"@en ;
+    skos:definition "Artwork stitched in thread."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PadPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "pad printing"@en ;
+    skos:definition "Spot-color ink transferred by a silicone pad onto a small or curved surface."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LaserEngraving a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "laser engraving"@en ;
+    skos:definition "Artwork burned or etched into the surface; the material is the only color."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DirectToGarmentPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "direct-to-garment printing"@en ;
+    skos:definition "Full-color inkjet printing onto fabric."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Debossing a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "debossing"@en ;
+    skos:definition "Artwork pressed into the material, with no ink."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ProductCategoryScheme a skos:ConceptScheme ; rdfs:label "Product category"@en ;
+    rdfs:comment "What goods a merchandise design system governs (0014-design-systems FR-046), as the promotional products industry names them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Apparel a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "apparel"@en ;
+    skos:definition "Shirts, polos and other garments."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Headwear a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "headwear"@en ;
+    skos:definition "Caps and hats."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Drinkware a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "drinkware"@en ;
+    skos:definition "Mugs, tumblers and bottles."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WritingInstruments a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "writing instruments"@en ;
+    skos:definition "Pens and pencils."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Bags a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "bags"@en ;
+    skos:definition "Totes and other bags."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersBrand a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-brand" ;
     rdfs:label "Frontiers Brand"@en ;
@@ -199,6 +245,14 @@ ifcore:FrontiersPrint a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:PrintDesignSystemKind , ifcore:BookInterior , ifcore:BookCover , ifcore:JournalArticle ;
     rdfs:comment "At design-systems/frontiers-print/; its house rules are design-systems/frontiers-print/spec.md. The book interior, book cover and journal article design, in LaTeX, themed by a brand's brand.tex (0014-design-systems FR-031, FR-038)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-merchandise" ;
+    rdfs:label "Frontiers Merchandise"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:MerchandiseDesignSystemKind , ifcore:ScreenPrinting , ifcore:Embroidery , ifcore:PadPrinting , ifcore:LaserEngraving , ifcore:DirectToGarmentPrinting , ifcore:Debossing , ifcore:Apparel , ifcore:Headwear , ifcore:Drinkware , ifcore:WritingInstruments , ifcore:Bags ;
+    rdfs:comment "At design-systems/frontiers-merchandise/; its house rules are design-systems/frontiers-merchandise/spec.md. How the brand goes on apparel, headwear, drinkware, writing instruments and bags, themed by a brand's decoration kit (0014-design-systems FR-045, FR-047)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;

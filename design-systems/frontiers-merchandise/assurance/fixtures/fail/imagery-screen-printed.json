@@ -1,0 +1,11 @@
+{
+  "expect": "needs full color",
+  "job": {
+    "product": "ceramic-mug",
+    "location": "wrap",
+    "method": "screen-printing",
+    "artwork": "imagery:@first",
+    "substrate": "#ffffff",
+    "width_in": 4
+  }
+}
