@@ -10,8 +10,14 @@ reference model, and governance representation.
 ## Repository topology
 
 - **FR-001**: The Eidolon MUST consist of exactly three repositories with distinct
-  roles: a public root (`.github`), a private extension (`eidolon`), and a consuming
-  web property (`www.intellectualfrontiers.com`).
+  roles: a public root (`.github`), which is the public Eidolon; a private extension
+  (`eidolon`), which is the private Eidolon and the monorepo where the company's works
+  are made and maintained; and a web property (`www.intellectualfrontiers.com`), which
+  is one channel presenting those works and holds no work of its own. Works and their
+  presentations are kept apart, per 0021-works-and-presentations; the web property is
+  one channel among several (print, audio, video, events, courses). A work MAY live in
+  a repository of its own outside these three, in which case the vault holds its facts
+  and a reference to that repository, never a copy of it.
 - **FR-002**: The public root MUST contain only Public-tier facts, specs, and
   ontology. Nothing of any other confidentiality classification may be asserted
   there, regardless of how it is labeled.
@@ -217,9 +223,10 @@ reference model, and governance representation.
   fact, and does not require an audience declaration under FR-011 — only an
   individual asserting factual content does, explicitly, every time, never
   left implicit from the repository it happens to live in.
-- **The Eidolon** — the three-repository system (`.github`, `eidolon`,
-  `www.intellectualfrontiers.com`) that models and serves everything Intellectual
-  Frontiers knows about itself.
+- **The Eidolon** — the three-repository system that models and serves everything
+  Intellectual Frontiers knows about itself: the public Eidolon (`.github`), the
+  private Eidolon where works are made (`eidolon`), and one presentation channel for
+  them (`www.intellectualfrontiers.com`).
 - **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
 - **An audience** — a named permission to see a fact: public, company

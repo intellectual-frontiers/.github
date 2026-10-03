@@ -424,3 +424,24 @@ requirement	mechanism	by	note
 0020-spec-format FR-015	check	.github: .github/workflows/spec-check.yml	runs on every push and pull request
 0020-spec-format FR-016	check	eidolon: make check-specs	loads the public root's tools/spec_check.py
 0020-spec-format FR-017	check	.github: python3 tools/spec_check.py	exit status is non-zero on any listed breach
+0021-works-and-presentations FR-001	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-002	none	-	draft; ontology terms not yet written
+0021-works-and-presentations FR-003	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-004	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-005	none	-	draft; exampleOfWork links not yet populated
+0021-works-and-presentations FR-006	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-007	none	-	0015 checks cover renditions and generated pages only
+0021-works-and-presentations FR-008	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-009	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-010	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-011	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-012	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-013	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-014	none	-	draft; the ifweb shape FR-018 calls for is not written
+0021-works-and-presentations FR-015	none	-	draft; profile README does not yet comply
+0021-works-and-presentations FR-016	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-017	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-018	none	-	draft; ifweb shape not yet written
+0021-works-and-presentations FR-019	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-020	none	-	draft; nothing checks it yet
+0021-works-and-presentations FR-021	none	-	draft; nothing checks it yet
