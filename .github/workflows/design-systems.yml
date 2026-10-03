@@ -17,8 +17,8 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Playwright and Chromium
@@ -31,7 +31,7 @@ jobs:
   tex:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: TeX Live, poppler, Pillow and librsvg
         run: |
           sudo apt-get update -q
@@ -42,7 +42,7 @@ jobs:
   images:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: ImageMagick
         run: |
           sudo apt-get update -q
