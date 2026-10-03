@@ -1,5 +1,5 @@
 # Runs this repository's tools inside the reference environment, in the image .devcontainer/devcontainer.json names at
-# the commit tools/reference-environment pins (0024-tooling-environment FR-010). Nothing is installed: a failure here
+# the commit tools/reference-environment pins (0025-tooling-environment FR-010). Nothing is installed: a failure here
 # is a tool or the environment falling short of FR-006. spec-check.yml and design-systems.yml stay as the runs outside
 # it, on stock runners given only each tool's prerequisites (FR-011).
 name: reference-environment
@@ -25,7 +25,7 @@ jobs:
           image=$(grep -oP '"image"\s*:\s*"\K[^"]+' .devcontainer/devcontainer.json)
           echo "image=$image" >> "$GITHUB_OUTPUT"
           docker pull -q "$image"
-      # A login shell, as a devcontainer opens one, so the environment's session variables are set (0024 FR-006).
+      # A login shell, as a devcontainer opens one, so the environment's session variables are set (0025 FR-006).
       - name: Specs, enforcement register and ontology
         run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc 'python3 tools/spec_check.py'
       - name: Browser harnesses

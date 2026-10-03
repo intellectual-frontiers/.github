@@ -1,11 +1,11 @@
 # Feature Specification: Workspaces
 
-**Spec ID:** 0025-workspaces
+**Spec ID:** 0026-workspaces
 **Status:** Draft
 
 **Input:** How people, technical or not, start working in an
 Intellectual Frontiers repository. The reference environment
-(0024-tooling-environment FR-005) is one opinionated environment that
+(0025-tooling-environment FR-005) is one opinionated environment that
 runs in several flavors. Each repository carries a devcontainer that
 selects the environment, lists the repositories it works alongside, and
 logs in to GitHub before anything is cloned. Someone on macOS or
@@ -26,7 +26,7 @@ same result there.
 - **FR-002**: A tool, a devcontainer, or a contributor instruction MUST
   NOT depend on which flavor it runs in. Anything that works in one
   flavor and not another is a defect in workspaces-host-v3, fixed there
-  (0024-tooling-environment FR-007).
+  (0025-tooling-environment FR-007).
 - **FR-003**: A new flavor MUST be added by adding its concept to the
   workspace flavor scheme and naming it in FR-001; nothing else moves.
 
@@ -35,7 +35,7 @@ same result there.
 - **FR-004**: Every Intellectual Frontiers repository that people or
   agents work in MUST carry `.devcontainer/devcontainer.json` naming a
   published workspaces-host-v3 image at the pinned tag
-  (0024-tooling-environment FR-008). The image chosen MUST be the one
+  (0025-tooling-environment FR-008). The image chosen MUST be the one
   that carries the personas the repository's tools need; that choice is
   how a repository names its personas.
 - **FR-005**: Every such repository MUST carry
@@ -48,7 +48,7 @@ same result there.
 - **FR-006**: A repository's devcontainer MUST add nothing to the
   environment beyond the image, its `ws-repos.json`, editor extensions,
   and the environment's first-run command (FR-008). Any package, tool,
-  or setup step belongs in workspaces-host-v3 (0024-tooling-environment
+  or setup step belongs in workspaces-host-v3 (0025-tooling-environment
   FR-007).
 
 ## Authentication and first run
@@ -87,7 +87,7 @@ same result there.
   `ws-repos` at the same `ws-repos.json`.
 - **FR-014**: Every flavor MUST lay out cloned repositories the way
   `ws-repos` does, so contributor instructions read the same in each.
-  A tool MUST NOT depend on that layout (0024-tooling-environment
+  A tool MUST NOT depend on that layout (0025-tooling-environment
   FR-002).
 
 ## Out of scope

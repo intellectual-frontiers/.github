@@ -1,6 +1,6 @@
 # Feature Specification: Tooling environment
 
-**Spec ID:** 0024-tooling-environment
+**Spec ID:** 0025-tooling-environment
 **Status:** Draft
 
 **Input:** Where the company's own tooling is expected to run. Every
@@ -13,7 +13,7 @@ AI agent working there never has to install anything to use it. This
 spec states both halves, how the guarantee is pinned and checked, and
 what happens when a tool needs something the reference environment
 lacks. How people enter the reference environment, in which flavor, is
-0025-workspaces.
+0026-workspaces.
 
 ## Scope
 
@@ -48,8 +48,8 @@ lacks. How people enter the reference environment, in which flavor, is
 - **FR-005**: The reference environment for tooling MUST be
   `intellectual-frontiers/workspaces-host-v3`, built from its flake at
   the commit pinned under FR-008, with the personas the repository's
-  devcontainer names (0025-workspaces FR-004), in any of its flavors
-  (0025-workspaces FR-001).
+  devcontainer names (0026-workspaces FR-004), in any of its flavors
+  (0026-workspaces FR-001).
 - **FR-006**: Every tool MUST run unmodified in the reference
   environment from a fresh clone of the repository that holds it, with
   no step beyond the clone: no `make install`, package install, virtual
@@ -57,7 +57,7 @@ lacks. How people enter the reference environment, in which flavor, is
   declares MUST be supplied by the reference environment.
 - **FR-007**: A tool that needs a prerequisite the reference environment
   lacks MUST either use a workspaces-host-v3 persona that supplies it,
-  named by the repository's devcontainer (0025-workspaces FR-004), or
+  named by the repository's devcontainer (0026-workspaces FR-004), or
   wait until the prerequisite is added to workspaces-host-v3 under that
   repository's own specs. A repository MUST NOT close the gap itself
   with its own installer, install target, requirements file, version
@@ -83,7 +83,7 @@ lacks. How people enter the reference environment, in which flavor, is
   tool's declared prerequisites, so that FR-002 and FR-003 are tested
   rather than assumed.
 - **FR-012**: The reference environment MUST be named only in this spec,
-  in 0025-workspaces, in the ontology (`ifcore:ReferenceEnvironment`),
+  in 0026-workspaces, in the ontology (`ifcore:ReferenceEnvironment`),
   in the pin file (FR-008), in each repository's `.devcontainer/` files,
   and in contributor documentation. A tool's own code and comments MUST
   NOT name it. When a successor to workspaces-host-v3 is adopted, these

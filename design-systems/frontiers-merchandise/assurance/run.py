@@ -34,6 +34,7 @@ ONTOLOGY = SYSTEM.parent.parent / "ontology" / "ifcore.ttl"
 class Result:
     def __init__(self) -> None:
         self.passed, self.failed, self.notes = 0, [], []
+        self.beyond: set[str] = set()  # pass jobs this brand's kit fits at no size
 
     def check(self, ok: bool, what: str) -> None:
         if ok:
@@ -78,6 +79,12 @@ def run(brand_dir: Path) -> Result:
         return r
     for path in sorted((HERE / "fixtures" / "pass").glob("*.json")):
         problems = decoration.check(resolve(json.loads(path.read_text(encoding="utf-8")), brand), brand)
+        # A job the brand's kit fits at no size is the brand's limit, not the checker's: reported, never a pass.
+        unreachable = [p for p in problems if "at any size" in p]
+        if unreachable:
+            r.notes.append(f"pass/{path.name} is beyond {brand_dir.name}'s kit: {unreachable[0]}")
+            r.beyond.add(path.name)
+            continue
         r.check(not problems, f"pass/{path.name} should meet every rule under {brand_dir.name}: " + "; ".join(problems))
     for path in sorted((HERE / "fixtures" / "fail").glob("*.json")):
         case = json.loads(path.read_text(encoding="utf-8"))
@@ -111,8 +118,12 @@ def main() -> int:
     print(f"{'ok  ' if not data.failed else 'FAIL'} frontiers-merchandise data  ({data.passed} passed{', ' + str(len(data.failed)) + ' failed' if data.failed else ''})")
     for f in data.failed:
         print(f"     ✗ {f}")
+    met = {p.name: False for p in (HERE / "fixtures" / "pass").glob("*.json")}
     for b in brands:
         r = run(b)
+        if r.passed or r.failed:
+            for name in met:
+                met[name] |= name not in r.beyond
         if r.passed == 0 and not r.failed:
             print(f"skip frontiers-merchandise, themed by {b.name}")
         else:
@@ -123,7 +134,11 @@ def main() -> int:
         for n in r.notes:
             print(f"     · {n}")
         failed |= bool(r.failed)
-    return 1 if failed else 0
+    # A pass job beyond every kit here would prove nothing about the rules (FR-010).
+    unmet = sorted(name for name, ok in met.items() if not ok) if not args.brand else []
+    for name in unmet:
+        print(f"FAIL pass/{name} meets every rule under no brand here: every kit is too fine or too wide for it")
+    return 1 if failed or unmet else 0
 
 
 if __name__ == "__main__":
