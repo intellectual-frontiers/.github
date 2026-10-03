@@ -10,7 +10,8 @@
 \input{\branddir/brand.tex}
 
 % The families this design system ships, by the name a brand gives them (spec FR-004): file stem and extension.
-% A theme's font-serif sets the text; its font-sans sets the cover. Any other family stops the build.
+% A theme's font-serif sets the text; its font-sans sets headings, running heads, captions, boxes and the cover.
+% Any other family stops the build.
 \usepackage{etoolbox}
 \csdef{ifserif@Source Serif 4}{SourceSerif4}
 \csdef{ifserif@Spectral}{Spectral}
@@ -19,9 +20,9 @@
 \csdef{ifserif@Charis SIL}{CharisSIL}
 \csdef{ifsansfamily@Inter}{Inter}
 \ifcsdef{ifserif@\brandfontserif}{}{\errmessage{frontiers-print: the theme's font-serif, \brandfontserif, is not a family this design system ships}}
-\ifcsdef{ifsansfamily@\brandfontsans}{}{\errmessage{frontiers-print: the theme's font-sans, \brandfontsans, is not a family this design system ships for covers}}
+\ifcsdef{ifsansfamily@\brandfontsans}{}{\errmessage{frontiers-print: the theme's font-sans, \brandfontsans, is not a family this design system ships}}
 \edef\ifserifstem{\csuse{ifserif@\brandfontserif}}
-\edef\ifcoverstem{\csuse{ifsansfamily@\brandfontsans}}
+\edef\ifsansstem{\csuse{ifsansfamily@\brandfontsans}}
 
 \usepackage{fontspec}
 \usepackage{polyglossia}
@@ -39,9 +40,9 @@
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
 ]
-\newfontfamily\ifsans{SourceSans3}[
+\newfontfamily\ifsans{\ifsansstem}[
   Path=\iffontdir,
-  Extension=.ttf,
+  Extension=.otf,
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
 ]
@@ -51,10 +52,10 @@
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
 ]
-\newfontfamily\ifinterregular{\ifcoverstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular]
-\newfontfamily\ifintermedium{\ifcoverstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium]
-\newfontfamily\ifintersemibold{\ifcoverstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold]
-\newfontfamily\ifinterbold{\ifcoverstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold]
+\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular]
+\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium]
+\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold]
+\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold]
 \newfontfamily\iffjallaone{FjallaOne}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular]
 \newfontfamily\ifjacketsans{RobotoCondensed}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]
 \newfontfamily\iftryaimono{MartianMonoCondensed}[

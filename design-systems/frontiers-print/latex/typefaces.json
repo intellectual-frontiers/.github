@@ -7,14 +7,14 @@
       "STIXTwoMath-Regular.otf"
     ],
     "sans": [
-      "SourceSans3-Regular.ttf",
+      "Inter-Regular.otf",
       "STIXTwoMath-Regular.otf"
     ]
   },
   "sets": {
     "house": {
       "status": "built",
-      "summary": "The house typeface: Source Serif 4 for text, Source Sans 3 for headings, tables, captions, and boxes. Open licence; full glyph coverage.",
+      "summary": "The house typeface: Source Serif 4 for text, Inter for headings, tables, captions, and boxes. Open licence; full glyph coverage.",
       "modeled_on": "No journal. Close to the width pattern of BMJ's Meta Serif and Nature's Harding Text (within 0.003 to 0.01 of the best open match in the measured comparison).",
       "best_for": "Everything by default; the safe choice.",
       "main": {
@@ -29,18 +29,18 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".ttf",
-        "regular": "SourceSans3-Regular",
-        "bold": "SourceSans3-Bold",
-        "italic": "SourceSans3-Italic",
-        "bolditalic": "SourceSans3-BoldItalic",
+        "ext": ".otf",
+        "regular": "Inter-Regular",
+        "bold": "Inter-Bold",
+        "italic": "Inter-Italic",
+        "bolditalic": "Inter-BoldItalic",
         "scale": 1.0,
         "features": ""
       }
     },
     "spectral": {
       "status": "built",
-      "summary": "Spectral for text, Source Sans 3 for the rest. A light, open, humanist text face.",
+      "summary": "Spectral for text, Inter for the rest. A light, open, humanist text face.",
       "modeled_on": "NEJM's Quadraat, the closest open match measured (width-pattern residual 0.027, scale 1.00).",
       "best_for": "A page that should feel like NEJM or a similar humanist journal.",
       "main": {
@@ -55,18 +55,18 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".ttf",
-        "regular": "SourceSans3-Regular",
-        "bold": "SourceSans3-Bold",
-        "italic": "SourceSans3-Italic",
-        "bolditalic": "SourceSans3-BoldItalic",
+        "ext": ".otf",
+        "regular": "Inter-Regular",
+        "bold": "Inter-Bold",
+        "italic": "Inter-Italic",
+        "bolditalic": "Inter-BoldItalic",
         "scale": 1.0,
         "features": ""
       }
     },
     "pt-serif": {
       "status": "built",
-      "summary": "PT Serif for text, Source Sans 3 for the rest. A sturdy, large-x-height text face.",
+      "summary": "PT Serif for text, Inter for the rest. A sturdy, large-x-height text face.",
       "modeled_on": "Nature's Harding Text and HBR's Guardian Text Egyptian and Le Monde Journal (best or second best open match; scale 1.07).",
       "best_for": "A page that should feel like Nature or HBR.",
       "main": {
@@ -81,18 +81,18 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".ttf",
-        "regular": "SourceSans3-Regular",
-        "bold": "SourceSans3-Bold",
-        "italic": "SourceSans3-Italic",
-        "bolditalic": "SourceSans3-BoldItalic",
+        "ext": ".otf",
+        "regular": "Inter-Regular",
+        "bold": "Inter-Bold",
+        "italic": "Inter-Italic",
+        "bolditalic": "Inter-BoldItalic",
         "scale": 1.0,
         "features": ""
       }
     },
     "gelasio": {
       "status": "built",
-      "summary": "Gelasio for text, Source Sans 3 for the rest. A Georgia-like, robust face.",
+      "summary": "Gelasio for text, Inter for the rest. A Georgia-like, robust face.",
       "modeled_on": "Minion Pro (PLOS ONE, Scientific Reports), Scala (The Lancet), and Meta Serif (BMJ): the closest open match for all three (scale 0.97).",
       "best_for": "A page that should feel like PLOS ONE, Scientific Reports, The Lancet, or BMJ.",
       "main": {
@@ -107,18 +107,18 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".ttf",
-        "regular": "SourceSans3-Regular",
-        "bold": "SourceSans3-Bold",
-        "italic": "SourceSans3-Italic",
-        "bolditalic": "SourceSans3-BoldItalic",
+        "ext": ".otf",
+        "regular": "Inter-Regular",
+        "bold": "Inter-Bold",
+        "italic": "Inter-Italic",
+        "bolditalic": "Inter-BoldItalic",
         "scale": 1.0,
         "features": ""
       }
     },
     "charis": {
       "status": "built",
-      "summary": "Charis SIL for text, Source Sans 3 for the rest. A broad, sturdy face with the widest glyph coverage here.",
+      "summary": "Charis SIL for text, Inter for the rest. A broad, sturdy face with the widest glyph coverage here.",
       "modeled_on": "HBR's Le Monde Journal (closest, scale 1.03), BMJ's Meta Serif, and the Times of NAR.",
       "best_for": "A page that should feel like HBR in its 2012 reprint, or a Times-like journal; and papers with many special characters.",
       "main": {
@@ -133,11 +133,11 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".ttf",
-        "regular": "SourceSans3-Regular",
-        "bold": "SourceSans3-Bold",
-        "italic": "SourceSans3-Italic",
-        "bolditalic": "SourceSans3-BoldItalic",
+        "ext": ".otf",
+        "regular": "Inter-Regular",
+        "bold": "Inter-Bold",
+        "italic": "Inter-Italic",
+        "bolditalic": "Inter-BoldItalic",
         "scale": 1.0,
         "features": ""
       }

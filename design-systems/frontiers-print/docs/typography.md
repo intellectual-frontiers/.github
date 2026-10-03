@@ -7,25 +7,25 @@ something this pipeline can legally embed or replicate. This theme
 matches O'Reilly's *layout* conventions using open-source fonts chosen
 to read the same way, not to imitate O'Reilly's branding.
 
-It uses the **Source** superfamily (Adobe, SIL OFL): Source Serif 4,
-Source Sans 3, and Source Code Pro are drawn together by the same
-foundry with matching metrics, and — importantly — Source Serif 4 is an
-actual *text/book* face (set here at its optical size 12, the "for
-reading at book sizes" cut), not a broad-coverage UI font pressed into
-book duty.
+The book is set in the theme's two families and one code face, all SIL
+Open Font License and redistributable. For Intellectual Frontiers the
+theme's serif is **Source Serif 4**, an actual *text/book* face (set here
+at its optical size 12, the "for reading at book sizes" cut), and its
+sans is **Inter**, the brand's house sans.
 
-- **Source Serif 4** — body text.
-- **Source Sans 3** — headings, running heads, title page, captions,
-  the chapter-numeral label, cover typography.
+- **The theme's serif** (Source Serif 4) — body text.
+- **The theme's sans** (Inter) — headings, running heads, title page,
+  captions, tables, boxes, the chapter-numeral label, cover typography.
 - **Source Code Pro** — code blocks and inline code.
 
-All three are SIL Open Font License, redistributable, and committed
-here as Latin-subset static instances (regular/bold/italic/bold-italic
-each) built from Google's variable-font sources with `fonttools`. Every
+Source Serif 4 and Source Code Pro are committed as Latin-subset static
+instances (regular/bold/italic/bold-italic) built from Google's
+variable-font sources with `fonttools`; Inter is the static OpenType set
+from its 4.0 release. Every
 color, including the accent on chapter and section headings and the link
 color, is the theme's (spec FR-003).
 
-A fourth face, outside the Source superfamily, is used in exactly one
+A fourth face is used in exactly one
 place: **Martian Mono Condensed** (Evil Martians, SIL OFL) for the
 "Try this with AI" console boxes (`iftryai`, see the sidebar section
 above). A fixed-width font reads larger than body text at the same
@@ -35,7 +35,7 @@ a face that's condensed *by design*, sourced from Martian Mono's
 upstream variable font (`wdth,wght` axes) and pinned with `fonttools`'
 `varLib.instancer` at `wdth=75` (labeled "Condensed" in the font's own
 `STAT` table), the same Latin-subset-via-`fonttools` approach as the
-Source faces. Only Regular and Bold are built — Martian Mono has no
+Source Serif 4 and Source Code Pro. Only Regular and Bold are built — Martian Mono has no
 italic cut upstream, and no "Try this with AI" prompt in any book uses
 emphasis inside the box (bold labels — see the next section — are a
 different thing: they switch font family entirely, not just weight
@@ -113,7 +113,7 @@ than the serif body face (tabular data reads better in a sans face;
 the serif body face is for continuous prose), and ranged-left/ragged,
 never fully justified — standard practice, and also how O'Reilly and
 most well-set trade books handle tables. Body text here is 10.5pt
-Source Serif 4; table cells are 9pt Source Sans 3 (7.75pt for 6+ column
+Source Serif 4; table cells are 9pt Inter (7.75pt for 6+ column
 tables, where fitting content matters more than matching the standard
 size exactly), ragged-right. The header row adds bold and this theme's
 accent color, matching every other heading in the book, plus a visibly

@@ -36,14 +36,15 @@ themed by a brand so that the same design can be set in another brand's colors, 
 - **FR-004**: It MUST ship, in `fonts/`, only families whose licenses allow embedding and
   redistribution, each listed in `fonts/LICENSES.md`, and never a licensed commercial face. The
   theme's `font-serif` sets the book text and MUST be one of Source Serif 4, Spectral, PT Serif,
-  Gelasio or Charis SIL; the theme's `font-sans` sets the cover and MUST be Inter. Any other family
-  MUST stop the build with a message naming it.
+  Gelasio or Charis SIL; the theme's `font-sans` sets the book's sans and the cover and MUST be
+  Inter, shipped in Regular, Medium, SemiBold, Bold, Italic and Bold Italic. Any other family MUST
+  stop the build with a message naming it.
 
 ## Book interior and cover
 
 - **FR-005**: A book interior MUST be set on XeLaTeX at a 7 × 9.19 in trim with mirrored margins
-  (inner 0.9 in, outer 0.7 in, top and bottom 0.85 in), in the theme's serif for text, Source Sans 3
-  for headings, captions and boxes, and Source Code Pro for code.
+  (inner 0.9 in, outer 0.7 in, top and bottom 0.85 in), in the theme's serif for text, the theme's
+  sans for headings, running heads, captions, tables and boxes, and Source Code Pro for code.
 - **FR-006**: A book cover MUST set its title, series line, author and back-cover headline in Fjalla
   One, a print heading face (frontiers-brand FR-004), its subtitle in the theme's sans at Regular or
   Medium, and the rest of its back cover in Roboto Condensed. Cover artwork and the record of which
@@ -89,8 +90,9 @@ themed by a brand so that the same design can be set in another brand's colors, 
   the `iflayout.def` the class reads. The default layout MUST be `two-column`.
 - **FR-008**: An article's typeface set MUST come from `latex/typefaces.json`. A set marked
   `license-required` MUST be used only where its files are in the directory `IF_FONTS_LICENSED`
-  names; otherwise the layout's own set is used, with a note. Every set MUST fall back to the house
-  fonts and STIX Two Math for a character its own fonts lack.
+  names; otherwise the layout's own set is used, with a note. Every open-license set that pairs a
+  serif with a sans MUST pair it with Inter, the house sans (frontiers-brand FR-004). Every set MUST
+  fall back to Source Serif 4, Inter and STIX Two Math for a character its own fonts lack.
 
 ## Assurance
 
