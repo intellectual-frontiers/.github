@@ -1,0 +1,7 @@
+{
+  "$description": "What each fixture in fail/ must be refused for: a fragment of the finding sweep.py reports.",
+  "announcement.txt": "announcement ('in this episode')",
+  "story-label.txt": "labels a story ('illustrative')",
+  "inherited-word.txt": "banned word 'delve'",
+  "filler.txt": "'let me be clear'"
+}

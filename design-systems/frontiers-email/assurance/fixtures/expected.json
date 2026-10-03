@@ -1,0 +1,8 @@
+{
+  "$description": "What each message in fail/ must be refused for: a fragment of the problem mail.py check reports.",
+  "two-buttons.md": "2 calls to action",
+  "http-link.md": "a link that is not https",
+  "no-address.md": "no postal address",
+  "long-subject.md": "a subject of 79 characters",
+  "banned-word.md": "banned word 'delve'"
+}

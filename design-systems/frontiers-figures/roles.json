@@ -1,5 +1,5 @@
 {
-  "$description": "frontiers-figures' figure roles (spec FR-004, FR-005): what each figure class colors, and, per variant, the brand role or mix of roles it takes (\"text!62!surface\" is 62% text, 38% surface, as xcolor writes it). A figure's source names roles by class (f-<role> for fill, s-<role> for stroke, c-<role> for a gradient stop) and never a color; theme.py turns this table and a brand into the stylesheet a consumer puts in the figure. Layout variants change the canvas, never a color.",
+  "$description": "frontiers-figures' figure roles (spec FR-004, FR-005): what each figure class colors, and, per variant, the brand role or mix of roles it takes (\"text!62!surface\" is 62% text, 38% surface, as xcolor writes it). A figure's source names roles by class (f-<role> for fill, s-<role> for stroke, c-<role> for a gradient stop) and never a color; theme.py turns this table and a brand into the stylesheet a consumer puts in the figure. Layout variants change the canvas, never a color. series: a chart's categorical roles, each 3:1 against the background and, in the color variants, distinct to normal and color-blind vision (spec FR-012). sequential: a scale's steps, ordered from least to most.",
   "roles": {
     "ink": "titles, box headings and the strongest labels",
     "body": "body text in and beside boxes",
@@ -17,7 +17,16 @@
     "secondary": "a second series",
     "tertiary": "a third series",
     "info": "an informational item",
-    "info-tint": "fills of informational boxes"
+    "info-tint": "fills of informational boxes",
+    "series-1": "a chart's first series",
+    "series-2": "a chart's second series",
+    "series-3": "a chart's third series",
+    "series-4": "a chart's fourth series",
+    "seq-1": "the lightest step of a sequential scale (the least)",
+    "seq-2": "a sequential scale's second step",
+    "seq-3": "a sequential scale's middle step",
+    "seq-4": "a sequential scale's fourth step",
+    "seq-5": "the darkest step of a sequential scale (the most)"
   },
   "foreground": [
     "ink",
@@ -61,7 +70,16 @@
         "secondary": "secondary",
         "tertiary": "tertiary",
         "info": "info",
-        "info-tint": "info!12!surface"
+        "info-tint": "info!12!surface",
+        "series-1": "primary",
+        "series-2": "secondary!75!surface",
+        "series-3": "warning",
+        "series-4": "text",
+        "seq-1": "primary!14!surface",
+        "seq-2": "primary!32!surface",
+        "seq-3": "primary!52!surface",
+        "seq-4": "primary!76!surface",
+        "seq-5": "primary"
       }
     },
     "on-dark": {
@@ -83,7 +101,16 @@
         "secondary": "secondary!45!surface",
         "tertiary": "tertiary!45!surface",
         "info": "info!45!surface",
-        "info-tint": "info!30!text"
+        "info-tint": "info!30!text",
+        "series-1": "primary!75!surface",
+        "series-2": "warning!45!surface",
+        "series-3": "info!45!surface",
+        "series-4": "surface",
+        "seq-1": "primary!35!text",
+        "seq-2": "primary!70!text",
+        "seq-3": "primary!80!surface",
+        "seq-4": "primary!55!surface",
+        "seq-5": "primary!25!surface"
       }
     },
     "grayscale": {
@@ -105,7 +132,16 @@
         "secondary": "text!70!surface",
         "tertiary": "text!70!surface",
         "info": "text!70!surface",
-        "info-tint": "text!12!surface"
+        "info-tint": "text!12!surface",
+        "series-1": "text",
+        "series-2": "text!56!surface",
+        "series-3": "text!78!surface",
+        "series-4": "text!66!surface",
+        "seq-1": "text!10!surface",
+        "seq-2": "text!28!surface",
+        "seq-3": "text!48!surface",
+        "seq-4": "text!70!surface",
+        "seq-5": "text"
       }
     }
   },
@@ -128,5 +164,18 @@
         "x-height": 0.5459
       }
     }
-  }
+  },
+  "series": [
+    "series-1",
+    "series-2",
+    "series-3",
+    "series-4"
+  ],
+  "sequential": [
+    "seq-1",
+    "seq-2",
+    "seq-3",
+    "seq-4",
+    "seq-5"
+  ]
 }

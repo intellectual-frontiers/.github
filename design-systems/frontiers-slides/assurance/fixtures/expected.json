@@ -1,0 +1,9 @@
+{
+  "$description": "What each deck in fail/ must be refused for: a fragment of the problem deck.py check reports.",
+  "no-headline.md": "no headline",
+  "too-many-points.md": "6 points, over 5",
+  "raw-figure.md": "not frontiers-figures' semantic SVG",
+  "banned-word.md": "banned word 'delve'",
+  "no-notes.md": "no speaker notes",
+  "long-headline.md": "a headline of 19 words, over 14"
+}

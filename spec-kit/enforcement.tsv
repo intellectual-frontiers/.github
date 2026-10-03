@@ -11,11 +11,11 @@ requirement	mechanism	by	note
 0001-eidolon-architecture FR-008	none	-	a membership review exists in the vault; not citable from the public root
 0001-eidolon-architecture FR-009	none	-	a membership review exists in the vault; not citable from the public root
 0001-eidolon-architecture FR-010	none	-	
-0001-eidolon-architecture FR-011	check	eidolon: make check-ontology	ontology.py: every vault individual declares a declared audience
+0001-eidolon-architecture FR-011	check	eidolon: eid check ontology	ontology.py: every vault individual declares a declared audience
 0001-eidolon-architecture FR-012	none	-	check-ontology requires an explicit audience; no default is applied or tested
 0001-eidolon-architecture FR-013	none	-	
 0001-eidolon-architecture FR-014	none	-	
-0001-eidolon-architecture FR-015	check	eidolon: make check-ontology	ontology.py: every vault individual declares a declared audience
+0001-eidolon-architecture FR-015	check	eidolon: eid check ontology	ontology.py: every vault individual declares a declared audience
 0001-eidolon-architecture FR-016	none	-	sensitivity is a judgment; only narrow pattern checks exist (e.g. emails in schedule)
 0001-eidolon-architecture FR-017	none	-	
 0001-eidolon-architecture FR-018	none	-	
@@ -23,7 +23,7 @@ requirement	mechanism	by	note
 0001-eidolon-architecture FR-020	none	-	
 0001-eidolon-architecture FR-021	none	-	
 0001-eidolon-architecture FR-022	none	-	producer-schedule-check covers schedule snapshot refs only; no general shape
-0001-eidolon-architecture FR-023	check	eidolon: make check-sensitive	sensitive.py secret-pattern scan of vault files; credential clause only
+0001-eidolon-architecture FR-023	check	eidolon: eid check sensitive	sensitive.py secret-pattern scan of vault files; credential clause only
 0001-eidolon-architecture FR-024	none	-	producer-schedule-check covers schedule snapshot refs only; no general shape
 0001-eidolon-architecture FR-025	none	-	
 0001-eidolon-architecture FR-026	none	-	
@@ -38,23 +38,23 @@ requirement	mechanism	by	note
 0001-eidolon-architecture FR-035	none	-	no commit-msg hook or check
 0001-eidolon-architecture FR-036	none	-	remediation duty; secret scan detects but does not enforce rewrite
 0001-eidolon-architecture FR-037	none	-	ordering rule; content @type check covers only content kinds
-0002-content-format FR-001	check	eidolon: make check-content	strict parse; head and body required; vault docs
-0002-content-format FR-002	check	eidolon: make check-content	html5lib strict parser fails the document; vault docs
-0002-content-format FR-003	check	eidolon: make check-content	doctype and html lang checked; vault docs
-0002-content-format FR-004	check	eidolon: make check-content	charset, title, description checked; vault docs
-0002-content-format FR-005	check	eidolon: make check-content	one ld+json block, ifweb @context, declared @type; vault docs
-0002-content-format FR-006	check	eidolon: make check-content	unknown property and SHACL shape checked; vault docs
-0002-content-format FR-007	check	eidolon: make check-content	@type must be a declared ifweb:contentKind; vault docs
+0002-content-format FR-001	check	eidolon: eid check content	strict parse; head and body required; vault docs
+0002-content-format FR-002	check	eidolon: eid check content	html5lib strict parser fails the document; vault docs
+0002-content-format FR-003	check	eidolon: eid check content	doctype and html lang checked; vault docs
+0002-content-format FR-004	check	eidolon: eid check content	charset, title, description checked; vault docs
+0002-content-format FR-005	check	eidolon: eid check content	one ld+json block, ifweb @context, declared @type; vault docs
+0002-content-format FR-006	check	eidolon: eid check content	unknown property and SHACL shape checked; vault docs
+0002-content-format FR-007	check	eidolon: eid check content	@type must be a declared ifweb:contentKind; vault docs
 0002-content-format FR-008	none	-	no check compares title or description with JSON-LD facts
-0002-content-format FR-009	check	eidolon: make check-content	hasAudience required and must be a declared audience; vault docs
+0002-content-format FR-009	check	eidolon: eid check content	hasAudience required and must be a declared audience; vault docs
 0002-content-format FR-010	none	-	no check for restricted values in body
 0002-content-format FR-011	none	-	no check for resolved-as-of dates
-0002-content-format FR-012	check	eidolon: make check-content	element and attribute allowlist; script, style, iframe, on* rejected; vault docs
-0002-content-format FR-013	check	eidolon: make check-content	img alt, width, height checked; vault docs
-0002-content-format FR-014	check	eidolon: make check-content	target=_blank requires rel=noopener; vault docs
-0002-content-format FR-015	check	eidolon: make check-content	href, src, cite schemes checked; JSON-LD URLs not checked; vault docs
+0002-content-format FR-012	check	eidolon: eid check content	element and attribute allowlist; script, style, iframe, on* rejected; vault docs
+0002-content-format FR-013	check	eidolon: eid check content	img alt, width, height checked; vault docs
+0002-content-format FR-014	check	eidolon: eid check content	target=_blank requires rel=noopener; vault docs
+0002-content-format FR-015	check	eidolon: eid check content	href, src, cite schemes checked; JSON-LD URLs not checked; vault docs
 0002-content-format FR-016	none	-	nothing rejects non-HTML files under content/
-0002-content-format FR-017	check	eidolon: make check-content	WorkEditionPage shape requires prov:wasDerivedFrom; vault docs
+0002-content-format FR-017	check	eidolon: eid check content	WorkEditionPage shape requires prov:wasDerivedFrom; vault docs
 0003-intellectual-frontiers FR-001	none	-	no shape on ifcore:Unit job and question
 0003-intellectual-frontiers FR-002	none	-	rule of judgment; no check possible
 0003-intellectual-frontiers FR-003	none	-	rule of judgment; no check possible
@@ -75,7 +75,7 @@ requirement	mechanism	by	note
 0003-intellectual-frontiers FR-018	none	-	rule of judgment; no check possible
 0004-addressing FR-001	none	-	mapping computed in content.py but nothing fails on it; consumer applies it
 0004-addressing FR-002	none	-	mapping computed in content.py but nothing fails on it; consumer applies it
-0004-addressing FR-003	check	eidolon: make check-content	content.py fails duplicate URL paths across both content roots
+0004-addressing FR-003	check	eidolon: eid check content	content.py fails duplicate URL paths across both content roots
 0004-addressing FR-004	none	-	nothing finds content documents outside content/
 0004-addressing FR-005	none	-	consumer behavior; the website repository is not available
 0004-addressing FR-006	none	-	consumer behavior; the website repository is not available
@@ -91,7 +91,7 @@ requirement	mechanism	by	note
 0005-authentication FR-006	none	-	no check ties a Grant to a recorded Decision
 0005-authentication FR-007	none	-	session behaviour; no serving code in either repository
 0005-authentication FR-008	none	-	session behaviour; no serving code in either repository
-0005-authentication FR-009	check	eidolon: make check-sensitive	sensitive.py secret patterns; scans the vault only, not .github
+0005-authentication FR-009	check	eidolon: eid check sensitive	sensitive.py secret patterns; scans the vault only, not .github
 0005-authentication FR-010	none	-	access logging; no serving code in either repository
 0005-authentication FR-011	none	-	judgment on a log entry's audience; no check possible
 0006-research-and-ip FR-001	none	-	no check that a finding sits under an area and pillar
@@ -131,16 +131,16 @@ requirement	mechanism	by	note
 0007-work-and-assets FR-015	none	-	no check on concepts that are also authored research
 0007-work-and-assets FR-016	none	-	no check for duplicated or missing primary text
 0007-work-and-assets FR-017	none	-	classification is operational judgment
-0007-work-and-assets FR-018	gate	eidolon: make advance	works.advance refuses to skip a stage and writes the Decision; check-works also
+0007-work-and-assets FR-018	gate	eidolon: eid work advance	works.advance refuses to skip a stage and writes the Decision; check-works also
 0007-work-and-assets FR-019	none	-	no check on Commercialization substages
 0007-work-and-assets FR-020	none	-	no check that unfiled patents are tracked
-0007-work-and-assets FR-021	check	eidolon: make check-ontology	works.shapes.ttl: lifecycleOwner minCount 1 maxCount 1
-0007-work-and-assets FR-022	check	eidolon: make check-works	works.py: package without ontology file, file without package, restated stage
+0007-work-and-assets FR-021	check	eidolon: eid check ontology	works.shapes.ttl: lifecycleOwner minCount 1 maxCount 1
+0007-work-and-assets FR-022	check	eidolon: eid check works	works.py: package without ontology file, file without package, restated stage
 0008-decision-records FR-001	none	-	significance is judgment; no check possible
-0008-decision-records FR-002	check	eidolon: make check-ontology	works.shapes.ttl DecisionShape: decidedBy minCount 1, class Person
+0008-decision-records FR-002	check	eidolon: eid check ontology	works.shapes.ttl DecisionShape: decidedBy minCount 1, class Person
 0008-decision-records FR-003	none	-	rule of judgment; no check possible
 0008-decision-records FR-004	none	-	permission; nothing to test
-0008-decision-records FR-005	gate	eidolon: make advance	refuses without BECAUSE; covers only Decisions written by advance, publish, work-new
+0008-decision-records FR-005	gate	eidolon: eid work advance	refuses without BECAUSE; covers only Decisions written by advance, publish, work-new
 0008-decision-records FR-006	none	-	SHOULD; no check
 0008-decision-records FR-007	none	-	permission; nothing to test
 0008-decision-records FR-008	none	-	no check on isReplacedBy use
@@ -221,7 +221,7 @@ requirement	mechanism	by	note
 0011-studios FR-016	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-017	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-018	none	-	rule of judgment; no check or defined review covers it
-0011-studios FR-019	check	eidolon: make test	test_tools asserts nested ventures content is exempt from content check; placement unchecked
+0011-studios FR-019	check	eidolon: eid test	test_tools asserts nested ventures content is exempt from content check; placement unchecked
 0011-studios FR-020	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-021	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-022	none	-	rule of judgment; no check or defined review covers it
@@ -246,22 +246,22 @@ requirement	mechanism	by	note
 0012-network FR-014	none	-	rule of judgment; no check or defined review covers it
 0012-network FR-015	none	-	rule of judgment; no check or defined review covers it
 0012-network FR-016	none	-	rule of judgment; no check or defined review covers it
-0012-network FR-017	check	eidolon: make check-ontology	ontology.py fails any vault individual, a recorded path included, lacking hasAudience
+0012-network FR-017	check	eidolon: eid check ontology	ontology.py fails any vault individual, a recorded path included, lacking hasAudience
 0012-network FR-018	none	-	rule of judgment; no check or defined review covers it
 0012-network FR-019	none	-	rule of judgment; no check or defined review covers it
-0013-web-content-kinds FR-001	check	eidolon: make check-content	ifweb UnitPage shape: one schema:about of class ifcore:Unit; vault content only
-0013-web-content-kinds FR-002	check	eidolon: make check-content	ifweb ResearchPillarPage shape: one schema:about ResearchPillar; vault content only
-0013-web-content-kinds FR-003	check	eidolon: make check-content	ifweb ResearchNotePage shape: one schema:about Note; vault content only
-0013-web-content-kinds FR-004	check	eidolon: make check-content	shape checks one schema:about PatentFamily; ExternalRecordReference rule unchecked
-0013-web-content-kinds FR-005	check	eidolon: make check-content	shape checks one schema:about Trademark; ExternalRecordReference rule unchecked
-0013-web-content-kinds FR-006	check	eidolon: make check-content	ifweb DefensiveDisclosurePage shape: one schema:about; vault content only
-0013-web-content-kinds FR-007	check	eidolon: make check-content	ifweb FundPage shape: one schema:about ifcore:Fund; vault content only
-0013-web-content-kinds FR-008	check	eidolon: make check-content	BookPage shape requires schema:about to be both schema:Book and ifcore:Copyright
-0013-web-content-kinds FR-009	check	eidolon: make check-content	shape checks isPartOf a Periodical and one about; conditional wasDerivedFrom unchecked
-0013-web-content-kinds FR-010	check	eidolon: make check-content	shape allows only featuresWork; sh:or omits SubstantialWork that FR-010 permits
-0013-web-content-kinds FR-011	check	eidolon: make check-content	featuresWork sh:or rejects any class not in the list
-0013-web-content-kinds FR-012	check	eidolon: make check-content	WorkPage shape: one schema:about of class ifcore:SubstantialWork
-0013-web-content-kinds FR-013	check	eidolon: make check-content	shape checks both point to a SubstantialWork, not that they name the same one
+0013-web-content-kinds FR-001	check	eidolon: eid check content	ifweb UnitPage shape: one schema:about of class ifcore:Unit; vault content only
+0013-web-content-kinds FR-002	check	eidolon: eid check content	ifweb ResearchPillarPage shape: one schema:about ResearchPillar; vault content only
+0013-web-content-kinds FR-003	check	eidolon: eid check content	ifweb ResearchNotePage shape: one schema:about Note; vault content only
+0013-web-content-kinds FR-004	check	eidolon: eid check content	shape checks one schema:about PatentFamily; ExternalRecordReference rule unchecked
+0013-web-content-kinds FR-005	check	eidolon: eid check content	shape checks one schema:about Trademark; ExternalRecordReference rule unchecked
+0013-web-content-kinds FR-006	check	eidolon: eid check content	ifweb DefensiveDisclosurePage shape: one schema:about; vault content only
+0013-web-content-kinds FR-007	check	eidolon: eid check content	ifweb FundPage shape: one schema:about ifcore:Fund; vault content only
+0013-web-content-kinds FR-008	check	eidolon: eid check content	BookPage shape requires schema:about to be both schema:Book and ifcore:Copyright
+0013-web-content-kinds FR-009	check	eidolon: eid check content	shape checks isPartOf a Periodical and one about; conditional wasDerivedFrom unchecked
+0013-web-content-kinds FR-010	check	eidolon: eid check content	shape allows only featuresWork; sh:or omits SubstantialWork that FR-010 permits
+0013-web-content-kinds FR-011	check	eidolon: eid check content	featuresWork sh:or rejects any class not in the list
+0013-web-content-kinds FR-012	check	eidolon: eid check content	WorkPage shape: one schema:about of class ifcore:SubstantialWork
+0013-web-content-kinds FR-013	check	eidolon: eid check content	shape checks both point to a SubstantialWork, not that they name the same one
 0014-design-systems FR-001	none	-	definition; nothing to test
 0014-design-systems FR-002	none	-	permission; nothing to test
 0014-design-systems FR-003	check	.github: python3 tools/spec_check.py	slug must end with a kind code read from ifcore.ttl; directory contents not checked
@@ -309,113 +309,116 @@ requirement	mechanism	by	note
 0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
 0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
 0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
+0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
+0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
+0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
-0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
-0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
-0015-work-packages FR-004	check	eidolon: make check-works	works.py SLUG regex; location and slug immutability unchecked
-0015-work-packages FR-005	check	eidolon: make check-works	works.py: kind must be a declared ifcore:WorkKind
+0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
+0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
+0015-work-packages FR-004	check	eidolon: eid check works	works.py SLUG regex; location and slug immutability unchecked
+0015-work-packages FR-005	check	eidolon: eid check works	works.py: kind must be a declared ifcore:WorkKind
 0015-work-packages FR-006	none	-	no check that a consumer never serves from a package
 0015-work-packages FR-007	none	-	no check for a second live copy or a frozen predecessor
-0015-work-packages FR-008	check	eidolon: make check-works	works.py RESTATEMENT rejects stage/owner/audience literals; .auto. naming unchecked
-0015-work-packages FR-009	check	eidolon: make check-works	book needs manuscript.adoc, research one *.adoc record; other kinds unchecked
+0015-work-packages FR-008	check	eidolon: eid check works	works.py RESTATEMENT rejects stage/owner/audience literals; .auto. naming unchecked
+0015-work-packages FR-009	check	eidolon: eid check works	book needs manuscript.adoc, research one *.adoc record; other kinds unchecked
 0015-work-packages FR-010	none	-	rule of judgment; no check possible
 0015-work-packages FR-011	none	-	rule on other specs; no check
 0015-work-packages FR-012	none	-	no check of a published text source format
 0015-work-packages FR-013	none	-	definition; nothing to test
-0015-work-packages FR-014	check	eidolon: make check-sensitive	sensitive.py fails on tracked .pdf, .epub, audio, video, .zip
-0015-work-packages FR-015	check	eidolon: make check-ontology	DeliveryRecord shape requires 40-hex sourceCommit; artifact metadata unchecked
+0015-work-packages FR-014	check	eidolon: eid check sensitive	sensitive.py fails on tracked .pdf, .epub, audio, video, .zip
+0015-work-packages FR-015	check	eidolon: eid check ontology	DeliveryRecord shape requires 40-hex sourceCommit; artifact metadata unchecked
 0015-work-packages FR-016	none	-	cuts write records but deliver nothing; no delivery command exists
-0015-work-packages FR-017	check	eidolon: make check-ontology	DeliveryRecord shape: location, commit, date, checksum, audience, no signed URL
-0015-work-packages FR-018	gate	eidolon: make final	release.py refuses a final cut before Deploy; review PDFs are watermarked
+0015-work-packages FR-017	check	eidolon: eid check ontology	DeliveryRecord shape: location, commit, date, checksum, audience, no signed URL
+0015-work-packages FR-018	gate	eidolon: eid release final	release.py refuses a final cut before Deploy; review PDFs are watermarked
 0015-work-packages FR-019	none	-	generator writes to content/ by design; no check
-0015-work-packages FR-020	check	eidolon: make fresh	regenerates content and fails if the tree differs
-0015-work-packages FR-021	check	eidolon: make fresh	generator copies the work audience; fresh fails on a hand-edited one
-0015-work-packages FR-022	check	eidolon: make check-ontology	SubstantialWork shape: exactly one stage and one owner
-0015-work-packages FR-023	gate	eidolon: make advance	works.py advance refuses to skip a stage; check-works also checks the chain
-0015-work-packages FR-024	check	eidolon: make check-works	Public without a broadening Decision fails; other defaults unchecked
-0015-work-packages FR-025	check	eidolon: make check-works	Public work needs a broadensAudienceTo Public Decision; decider authority unchecked
+0015-work-packages FR-020	check	eidolon: eid fresh	regenerates content and fails if the tree differs
+0015-work-packages FR-021	check	eidolon: eid fresh	generator copies the work audience; fresh fails on a hand-edited one
+0015-work-packages FR-022	check	eidolon: eid check ontology	SubstantialWork shape: exactly one stage and one owner
+0015-work-packages FR-023	gate	eidolon: eid work advance	works.py advance refuses to skip a stage; check-works also checks the chain
+0015-work-packages FR-024	check	eidolon: eid check works	Public without a broadening Decision fails; other defaults unchecked
+0015-work-packages FR-025	check	eidolon: eid check works	Public work needs a broadensAudienceTo Public Decision; decider authority unchecked
 0015-work-packages FR-026	none	-	no check
 0016-press-production FR-001	none	-	house voice is a judgment; no check
-0016-press-production FR-002	check	eidolon: make check-spoken	audit record required for episodes past draft and anthology chapters; not books
+0016-press-production FR-002	check	eidolon: eid check spoken	audit record required for episodes past draft and anthology chapters; not books
 0016-press-production FR-003	none	-	separate-reader audit of AI text is not checked
-0016-press-production FR-004	check	eidolon: make check-works	works.py fails a book package without manuscript.adoc; jacket and figures unchecked
+0016-press-production FR-004	check	eidolon: eid check works	works.py fails a book package without manuscript.adoc; jacket and figures unchecked
 0016-press-production FR-005	none	-	book bible contents and order of update are not checked
-0016-press-production FR-006	check	eidolon: make check-works	works.py fails a chapter heading with no [[id]] or a duplicate id
-0016-press-production FR-007	gate	eidolon: make final	release.py cut refuses a final cut while issues.yml has an open blocker
-0016-press-production FR-008	check	eidolon: make check-works	works.py fails a -volume-N slug with no book-series package or no schema:isPartOf
+0016-press-production FR-006	check	eidolon: eid check works	works.py fails a chapter heading with no [[id]] or a duplicate id
+0016-press-production FR-007	gate	eidolon: eid release final	release.py cut refuses a final cut while issues.yml has an open blocker
+0016-press-production FR-008	check	eidolon: eid check works	works.py fails a -volume-N slug with no book-series package or no schema:isPartOf
 0016-press-production FR-009	none	-	series bible contents are not checked
 0016-press-production FR-010	none	-	no command requires volumes to be cut together
 0016-press-production FR-011	none	-	uniqueness of synthetic names per volume is not checked
 0016-press-production FR-012	none	-	case accuracy and composite statement are judgment; no check
 0016-press-production FR-013	none	-	factual accuracy is judgment; no check
-0016-press-production FR-014	check	eidolon: make check-spoken	anthology-check fails a chapter with no captioned visual; other books unchecked
+0016-press-production FR-014	check	eidolon: eid check spoken	anthology-check fails a chapter with no captioned visual; other books unchecked
 0016-press-production FR-015	none	-	inspection of rendered pages is a person's act
 0016-press-production FR-016	none	-	re-derivation of appendix content is judgment
 0016-press-production FR-017	none	-	print-to-companion tool move is not checked
-0016-press-production FR-018	check	eidolon: make check-books	figcheck and covercheck fail figures and covers off the house rules
+0016-press-production FR-018	check	eidolon: eid check books	figcheck and covercheck fail figures and covers off the house rules
 0016-press-production FR-019	none	-	jacket category line derivation is not checked
 0016-press-production FR-020	none	-	author credit and publisher line are not checked against the author record
-0016-press-production FR-021	check	eidolon: make check-distribute	validate_distribution fails a BISAC code not in bisac_codes.py (error from Deploy)
-0016-press-production FR-022	check	eidolon: make check-distribute	isbn.py fails invalid or duplicate ISBN-13s; make final also refuses a placeholder
+0016-press-production FR-021	check	eidolon: eid check distribute	validate_distribution fails a BISAC code not in bisac_codes.py (error from Deploy)
+0016-press-production FR-022	check	eidolon: eid check distribute	isbn.py fails invalid or duplicate ISBN-13s; eid release final also refuses a placeholder
 0016-press-production FR-023	none	-	cover series line is by construction in jacket-to-latex.py; no check
-0016-press-production FR-024	check	eidolon: make check-works	works.py fails a manuscript without a whole-number :edition:
-0016-press-production FR-025	gate	eidolon: make final	release.py cut needs a clean commit, never overwrites, refuses a second final cut
+0016-press-production FR-024	check	eidolon: eid check works	works.py fails a manuscript without a whole-number :edition:
+0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut
 0016-press-production FR-026	none	-	attribution of authorship is not checked
 0016-press-production FR-027	none	-	reserved human acts are not mechanically enforced
 0016-press-production FR-028	none	-	praise quote and cover art origin are not checked
 0016-press-production FR-029	none	-	cover commissioning order is not checked
 0016-press-production FR-030	none	-	online appendix content and placement are not checked
-0016-press-production FR-031	check	eidolon: make check-editorial	companion-check fails a companion page that is Markdown or HTML or lacks its header
-0016-press-production FR-032	check	eidolon: make check-editorial	check-site-address.py fails any printed address but the canonical site
+0016-press-production FR-031	check	eidolon: eid check editorial	companion-check fails a companion page that is Markdown or HTML or lacks its header
+0016-press-production FR-032	check	eidolon: eid check editorial	check-site-address.py fails any printed address but the canonical site
 0016-press-production FR-033	none	-	companion chapter citations by title are not checked
 0016-press-production FR-034	none	-	companion-check only warns; committing a generated CSV is not checked
-0016-press-production FR-035	check	eidolon: make check-editorial	news-check fails a book with no NEWS.adoc, undated entries, or wrong order
+0016-press-production FR-035	check	eidolon: eid check editorial	news-check fails a book with no NEWS.adoc, undated entries, or wrong order
 0016-press-production FR-036	none	-	news-check only warns on process or object wording
 0016-press-production FR-037	none	-	news page inherits the work's audience by construction; no check
 0016-press-production FR-038	none	-	whether a book has a skill is not checked
 0016-press-production FR-039	none	-	faithfulness of a skill is judgment
 0016-press-production FR-040	none	-	console panel shows missing isBasedOn; no check fails
-0016-press-production FR-041	check	eidolon: make check-ontology	every concept individual must declare an audience; provenance unchecked
+0016-press-production FR-041	check	eidolon: eid check ontology	every concept individual must declare an audience; provenance unchecked
 0016-press-production FR-042	none	-	website package contents are not checked
 0016-press-production FR-043	review	0009-press FR-027	quarterly surface review covers the website text audit
 0016-press-production FR-044	none	-	promotion in a work's source is not detected
 0016-press-production FR-045	none	-	promotion record pairing is not checked
-0016-press-production FR-046	check	eidolon: make research-check	fails a published paper with no promotion-brief.md; other kinds unchecked
+0016-press-production FR-046	check	eidolon: eid paper check	fails a published paper with no promotion-brief.md; other kinds unchecked
 0016-press-production FR-047	none	-	promotion outrunning the work is judgment
-0016-press-production FR-048	check	eidolon: make check-editorial	issues.py check fails a category or gate group outside the closed sets
+0016-press-production FR-048	check	eidolon: eid check editorial	issues.py check fails a category or gate group outside the closed sets
 0016-press-production FR-049	none	-	Rolebook five answers and kicker use are not checked
 0016-press-production FR-050	none	-	shared-term definition in the ontology is not checked
 0017-spoken-and-research-works FR-001	none	-	spoken-first classification is judgment
-0017-spoken-and-research-works FR-002	check	eidolon: make check-works	works.py fails a spoken package without show-bible.md or editorial-constitution.md
+0017-spoken-and-research-works FR-002	check	eidolon: eid check works	works.py fails a spoken package without show-bible.md or editorial-constitution.md
 0017-spoken-and-research-works FR-003	none	-	episode brief contents are not checked
-0017-spoken-and-research-works FR-004	check	eidolon: make check-spoken	spoken-check fails an episode with no script.adoc
-0017-spoken-and-research-works FR-005	check	eidolon: make check-spoken	spoken-check fails a missing format file or a script off its format
-0017-spoken-and-research-works FR-006	check	eidolon: make check-sensitive	sensitive.py fails any tracked audio or video file
+0017-spoken-and-research-works FR-004	check	eidolon: eid check spoken	spoken-check fails an episode with no script.adoc
+0017-spoken-and-research-works FR-005	check	eidolon: eid check spoken	spoken-check fails a missing format file or a script off its format
+0017-spoken-and-research-works FR-006	check	eidolon: eid check sensitive	sensitive.py fails any tracked audio or video file
 0017-spoken-and-research-works FR-007	none	-	transcript is generated by spoken-transcribe; hand edits are not detected
-0017-spoken-and-research-works FR-008	check	eidolon: make check-spoken	spoken-estimate --check fails a missing estimate or one from an older script
-0017-spoken-and-research-works FR-009	check	eidolon: make check-extras	producer-schedule-check fails a snapshot with no ExternalRecordReference or with an email
+0017-spoken-and-research-works FR-008	check	eidolon: eid check spoken	spoken-estimate --check fails a missing estimate or one from an older script
+0017-spoken-and-research-works FR-009	check	eidolon: eid check extras	producer-schedule-check fails a snapshot with no ExternalRecordReference or with an email
 0017-spoken-and-research-works FR-010	none	-	binding Press to an event is not checked
-0017-spoken-and-research-works FR-011	check	eidolon: make check-spoken	anthology-build --check fails when chapters.auto.adoc is not in release order
-0017-spoken-and-research-works FR-012	check	eidolon: make check-spoken	anthology-check fails no visual or missing source hash; warns on a changed source
+0017-spoken-and-research-works FR-011	check	eidolon: eid check spoken	anthology-build --check fails when chapters.auto.adoc is not in release order
+0017-spoken-and-research-works FR-012	check	eidolon: eid check spoken	anthology-check fails no visual or missing source hash; warns on a changed source
 0017-spoken-and-research-works FR-013	none	-	guest attribution and fidelity are judgment
 0017-spoken-and-research-works FR-014	none	-	running and formal releases of a volume are not checked
-0017-spoken-and-research-works FR-015	check	eidolon: make check-works	works.py fails a Public work with no Decision broadening its audience
+0017-spoken-and-research-works FR-015	check	eidolon: eid check works	works.py fails a Public work with no Decision broadening its audience
 0017-spoken-and-research-works FR-016	none	-	no show-notes generator or check exists
-0017-spoken-and-research-works FR-017	check	eidolon: make check-works	works.py fails a research package without exactly one typed record source
-0017-spoken-and-research-works FR-018	check	eidolon: make check-works	works.py requires the record source as <type>.adoc; research-check checks header
-0017-spoken-and-research-works FR-019	check	eidolon: make research-check	fails a hypothesis heading with no practical test
+0017-spoken-and-research-works FR-017	check	eidolon: eid check works	works.py fails a research package without exactly one typed record source
+0017-spoken-and-research-works FR-018	check	eidolon: eid check works	works.py requires the record source as <type>.adoc; research-check checks header
+0017-spoken-and-research-works FR-019	check	eidolon: eid paper check	fails a hypothesis heading with no practical test
 0017-spoken-and-research-works FR-020	none	-	research-check states DOI-registry matching is not built
-0017-spoken-and-research-works FR-021	check	eidolon: make research-check	fails a claim label outside the closed set or not above a heading
-0017-spoken-and-research-works FR-022	check	eidolon: make research-check	fails a hypothesis/inference/recommendation with no falsifier, or no status section
-0017-spoken-and-research-works FR-023	check	eidolon: make research-check	fails an undated reference, an evidence section without checked=, an overdue review-by
-0017-spoken-and-research-works FR-024	check	eidolon: make research-check	fails a patent-family copy held in the repository
+0017-spoken-and-research-works FR-021	check	eidolon: eid paper check	fails a claim label outside the closed set or not above a heading
+0017-spoken-and-research-works FR-022	check	eidolon: eid paper check	fails a hypothesis/inference/recommendation with no falsifier, or no status section
+0017-spoken-and-research-works FR-023	check	eidolon: eid paper check	fails an undated reference, an evidence section without checked=, an overdue review-by
+0017-spoken-and-research-works FR-024	check	eidolon: eid paper check	fails a patent-family copy held in the repository
 0017-spoken-and-research-works FR-025	none	-	research-check only requires revisions.md to exist; claim history unchecked
 0017-spoken-and-research-works FR-026	none	-	research-check states slug stability is not built
-0017-spoken-and-research-works FR-027	check	eidolon: make research-check	fails an unresolved cross-reference or image in a paper; outside links unchecked
+0017-spoken-and-research-works FR-027	check	eidolon: eid paper check	fails an unresolved cross-reference or image in a paper; outside links unchecked
 0017-spoken-and-research-works FR-028	none	-	companion tool behavior is not checked
 0017-spoken-and-research-works FR-029	none	-	skill labeling and study-kit results are not checked
 0017-spoken-and-research-works FR-030	none	-	paper-build.sh labels a working paper by construction; no check
-0017-spoken-and-research-works FR-031	check	eidolon: make research-check	fails a published paper with no promotion brief
+0017-spoken-and-research-works FR-031	check	eidolon: eid paper check	fails a published paper with no promotion brief
 frontiers-console-web FR-001	none	-	registration and derivation are not checked
 frontiers-console-web FR-002	none	-	rule of judgment; no check possible
 frontiers-console-web FR-003	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, Inter shipped, no color literal
@@ -447,6 +450,7 @@ frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures
 frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
 frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
 frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-figures FR-012	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	series contrast, color-blind and grayscale distinctness, sequential order and steps; direct labels by the layouts
 frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
 frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
@@ -463,7 +467,9 @@ frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assura
 frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
 frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
 frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
-frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit: one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that it is the recorded trace and that inks are verified are not checked
+frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit: lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
+frontiers-brand FR-018	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: every app icon and favicon.ico present at its size; Logo files: each loads at its size
+frontiers-brand FR-019	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
@@ -496,13 +502,13 @@ frontiers-print FR-008	check	.github: python3 design-systems/frontiers-print/ass
 frontiers-print FR-009	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any of its checks
 frontiers-print FR-010	review	frontiers-print FR-010	cover structure and reading order are judged at cover review; the pipeline's covercheck checks type overlaps
 frontiers-print FR-011	none	-	lockup placement is the renderer's; not checked
-frontiers-print FR-012	check	eidolon: make check-covers	the renderer refuses a title line wider than the box; casing and line composition are judged at review
+frontiers-print FR-012	check	eidolon: eid check covers	the renderer refuses a title line wider than the box; casing and line composition are judged at review
 frontiers-print FR-013	none	-	subtitle setting is the renderer's; not checked
 frontiers-print FR-014	none	-	author setting is the renderer's; not checked
 frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
-frontiers-print FR-016	check	eidolon: make check-covers	the series line's fit is checked; its color and the back-cover rule are not
-frontiers-print FR-017	check	eidolon: make check-covers	a back cover that spills onto a second page or reaches the barcode zone fails
-frontiers-print FR-018	check	eidolon: make check-books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
+frontiers-print FR-016	check	eidolon: eid check covers	the series line's fit is checked; its color and the back-cover rule are not
+frontiers-print FR-017	check	eidolon: eid check covers	a back cover that spills onto a second page or reaches the barcode zone fails
+frontiers-print FR-018	check	eidolon: eid check books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
 frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
 frontiers-merchandise FR-002	none	-	directory contents; no check
 frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
@@ -542,7 +548,7 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0020-spec-format FR-013	check	.github: python3 tools/spec_check.py	form of command or citation; its truth is not verified
 0020-spec-format FR-014	check	.github: python3 tools/spec_check.py	every run lists none rows
 0020-spec-format FR-015	check	.github: .github/workflows/spec-check.yml	runs on every push and pull request
-0020-spec-format FR-016	check	eidolon: make check-specs	loads the public root's tools/spec_check.py
+0020-spec-format FR-016	check	eidolon: eid check specs	loads the public root's tools/spec_check.py
 0020-spec-format FR-017	check	.github: python3 tools/spec_check.py	exit status is non-zero on any listed breach
 0020-spec-format FR-018	check	.github: python3 tools/spec_check.py	Spec ID must match its directory, numbered or design system
 0021-works-and-presentations FR-001	none	-	draft; nothing checks it yet
@@ -558,83 +564,152 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0021-works-and-presentations FR-011	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-012	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-013	none	-	draft; nothing checks it yet
-0021-works-and-presentations FR-014	check	eidolon: make check-content	ifweb:PublicSubjectShape fails a Public page whose about is a unit; the positive subject is unchecked
+0021-works-and-presentations FR-014	check	eidolon: eid check content	ifweb:PublicSubjectShape fails a Public page whose about is a unit; the positive subject is unchecked
 0021-works-and-presentations FR-015	none	-	profile README complies; nothing checks it
 0021-works-and-presentations FR-016	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-017	none	-	draft; nothing checks it yet
-0021-works-and-presentations FR-018	check	eidolon: make check-content	ifweb:PublicSubjectShape, tested in the vault's ContentTests
+0021-works-and-presentations FR-018	check	eidolon: eid check content	ifweb:PublicSubjectShape, tested in the vault's ContentTests
 0021-works-and-presentations FR-019	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-020	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-021	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-022	none	-	stages are asserted per record; nothing compares them
-0021-works-and-presentations FR-023	check	eidolon: make check-content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
-0021-works-and-presentations FR-024	check	eidolon: make check-content	PublicSubjectShape exempts only the PromotionPost kind
+0021-works-and-presentations FR-023	check	eidolon: eid check content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
+0021-works-and-presentations FR-024	check	eidolon: eid check content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
 0022-domain-names FR-001	none	-	no shape yet distinguishes a DomainName from a DigitalAsset
-0022-domain-names FR-002	check	eidolon: make check-domains	identifier unique across the catalog; that it is registrable, not a subdomain, is unchecked
-0022-domain-names FR-003	check	eidolon: make check-domains	identifier lowercase A-label pattern
-0022-domain-names FR-004	check	eidolon: make check-domains	rights-holder present; who is named is unchecked
-0022-domain-names FR-005	check	eidolon: make check-domains	exactly one dcterms:type in DomainRoleScheme
-0022-domain-names FR-006	check	eidolon: make check-domains	relation present for primary, redirect, mail, defensive; a redirect names a DomainName
+0022-domain-names FR-002	check	eidolon: eid check domains	identifier unique across the catalog; that it is registrable, not a subdomain, is unchecked
+0022-domain-names FR-003	check	eidolon: eid check domains	identifier lowercase A-label pattern
+0022-domain-names FR-004	check	eidolon: eid check domains	rights-holder present; who is named is unchecked
+0022-domain-names FR-005	check	eidolon: eid check domains	exactly one dcterms:type in DomainRoleScheme
+0022-domain-names FR-006	check	eidolon: eid check domains	relation present for primary, redirect, mail, defensive; a redirect names a DomainName
 0022-domain-names FR-007	none	-	no check; dcterms:created on owned channels not yet verified against publishing start
 0022-domain-names FR-008	none	-	completeness needs the registrar reconciliation of FR-018, not yet built
-0022-domain-names FR-009	check	eidolon: make check-domains	Public only for primary, redirect, mail, and only when every relation target is Public
-0022-domain-names FR-010	check	eidolon: make check-domains	exactly one ExternalRecordReference per DomainName
+0022-domain-names FR-009	check	eidolon: eid check domains	Public only for primary, redirect, mail, and only when every relation target is Public
+0022-domain-names FR-010	check	eidolon: eid check domains	exactly one ExternalRecordReference per DomainName
 0022-domain-names FR-011	none	-	no check on primarySource form
-0022-domain-names FR-012	check	eidolon: make check-domains	cadence no longer than thirty days; the method's being automated is not checked
+0022-domain-names FR-012	check	eidolon: eid check domains	cadence no longer than thirty days; the method's being automated is not checked
 0022-domain-names FR-013	none	-	no check on cached contact details
 0022-domain-names FR-014	none	-	secret scanning not configured; nothing checks it
 0022-domain-names FR-015	none	-	no check for DNS records in the ontology
 0022-domain-names FR-016	none	-	no check that acquisition or lapse carries a Decision
-0022-domain-names FR-017	check	eidolon: make domain-security	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
-0022-domain-names FR-018	check	eidolon: make domain-security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
+0022-domain-names FR-017	check	eidolon: eid domain security	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
+0022-domain-names FR-018	check	eidolon: eid domain security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
 0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
 0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
-0022-domain-names FR-021	check	eidolon: make check-domains	the namespace's domain and the web property's domain must be marked crown jewels
-0022-domain-names FR-022	check	eidolon: make check-domains	a crown jewel under a two-letter top-level domain fails
+0022-domain-names FR-021	check	eidolon: eid check domains	the namespace's domain and the web property's domain must be marked crown jewels
+0022-domain-names FR-022	check	eidolon: eid check domains	a crown jewel under a two-letter top-level domain fails
 0022-domain-names FR-023	review	0022-domain-names FR-023	defines the country-code review
 0022-domain-names FR-024	none	-	what depends on a domain is recorded by hand; completeness is unchecked
-0022-domain-names FR-025	check	eidolon: make check-domains	a lapse Decision for a domain something requires or a published address uses fails
-0022-domain-names FR-026	check	eidolon: make check-domains	warns for each Public brand with no defensive-registration Decision
-0023-domain-security FR-001	check	eidolon: make domain-security	evaluates every domain against every control
-0023-domain-security FR-002	check	eidolon: make check-domains	an exception names a DomainName and lapses by dcterms:valid within a year
+0022-domain-names FR-025	check	eidolon: eid check domains	a lapse Decision for a domain something requires or a published address uses fails
+0022-domain-names FR-026	check	eidolon: eid check domains	warns for each Public brand with no defensive-registration Decision
+0023-domain-security FR-001	check	eidolon: eid domain security	evaluates every domain against every control
+0023-domain-security FR-002	check	eidolon: eid check domains	an exception names a DomainName and lapses by dcterms:valid within a year
 0023-domain-security FR-003	none	-	domain security check not yet built
-0023-domain-security FR-004	check	eidolon: make domain-security	RDAP status, or the registrar's lock through the API
-0023-domain-security FR-005	check	eidolon: make domain-security	needs CLOUDFLARE_API_TOKEN, else unchecked
-0023-domain-security FR-006	check	eidolon: make domain-security	DS at the registry, from RDAP or DNS
-0023-domain-security FR-007	check	eidolon: make domain-security	registrant email or telephone in RDAP not behind a privacy service
-0023-domain-security FR-008	check	eidolon: make domain-security	nameservers against the zone's own, or the provider's suffix without the API
-0023-domain-security FR-009	check	eidolon: make domain-security	null MX, fail-all SPF, reject DMARC
-0023-domain-security FR-010	check	eidolon: make domain-security	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-011	check	eidolon: make domain-security	MTA-STS record and enforce-mode policy, TLS-RPT address
-0023-domain-security FR-012	check	eidolon: make domain-security	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
-0023-domain-security FR-013	check	eidolon: make domain-security	valid TLS, HTTP to HTTPS, HSTS of at least a year
-0023-domain-security FR-014	check	eidolon: make domain-security	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-015	check	eidolon: make domain-security	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
-0023-domain-security FR-016	check	eidolon: make domain-security	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-017	check	eidolon: make domain-security	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
-0023-domain-security FR-018	check	eidolon: make domain-security	the workflow keeps one domain-security issue with the latest report
+0023-domain-security FR-004	check	eidolon: eid domain security	RDAP status, or the registrar's lock through the API
+0023-domain-security FR-005	check	eidolon: eid domain security	needs CLOUDFLARE_API_TOKEN, else unchecked
+0023-domain-security FR-006	check	eidolon: eid domain security	DS at the registry, from RDAP or DNS
+0023-domain-security FR-007	check	eidolon: eid domain security	registrant email or telephone in RDAP not behind a privacy service
+0023-domain-security FR-008	check	eidolon: eid domain security	nameservers against the zone's own, or the provider's suffix without the API
+0023-domain-security FR-009	check	eidolon: eid domain security	null MX, fail-all SPF, reject DMARC
+0023-domain-security FR-010	check	eidolon: eid domain security	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-011	check	eidolon: eid domain security	MTA-STS record and enforce-mode policy, TLS-RPT address
+0023-domain-security FR-012	check	eidolon: eid domain security	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
+0023-domain-security FR-013	check	eidolon: eid domain security	valid TLS, HTTP to HTTPS, HSTS of at least a year
+0023-domain-security FR-014	check	eidolon: eid domain security	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-015	check	eidolon: eid domain security	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
+0023-domain-security FR-016	check	eidolon: eid domain security	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-017	check	eidolon: eid domain security	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
+0023-domain-security FR-018	check	eidolon: eid domain security	the workflow keeps one domain-security issue with the latest report
 0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
-0023-domain-security FR-020	check	eidolon: make domain-security	a new domain is checked within the week
+0023-domain-security FR-020	check	eidolon: eid domain security	a new domain is checked within the week
 0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
-0023-domain-security FR-022	check	eidolon: make domain-security	security.txt with a Contact and an unexpired Expires on each primary domain
-0023-domain-security FR-023	check	eidolon: make domain-security	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
-0023-domain-security FR-024	check	eidolon: make domain-security	registered look-alikes of Public primary domains, report only
-0023-domain-security FR-025	check	eidolon: make domain-security	crown jewel expiry at least two years out, from RDAP
-0023-domain-security FR-026	check	eidolon: make domain-security	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
+0023-domain-security FR-022	check	eidolon: eid domain security	security.txt with a Contact and an unexpired Expires on each primary domain
+0023-domain-security FR-023	check	eidolon: eid domain security	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
+0023-domain-security FR-024	check	eidolon: eid domain security	registered look-alikes of Public primary domains, report only
+0023-domain-security FR-025	check	eidolon: eid domain security	crown jewel expiry at least two years out, from RDAP
+0023-domain-security FR-026	check	eidolon: eid domain security	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
 0023-domain-security FR-027	none	-	billing review is a person's, with FR-015's
 0023-domain-security FR-028	none	-	which subdomain sends bulk mail is not observable
 0024-persistent-addresses FR-001	none	-	definition; the checks below find published addresses by it
-0024-persistent-addresses FR-002	check	eidolon: make domain-security	every published address answers below 400 after redirects
-0024-persistent-addresses FR-003	check	eidolon: make check-domains	no lapse Decision for a domain carrying a published address (0022 FR-025)
-0024-persistent-addresses FR-004	check	eidolon: make domain-security	weekly in the vault's domain-security workflow
-0024-persistent-addresses FR-005	check	eidolon: make domain-security	each public namespace answers 200 with Turtle
-0024-persistent-addresses FR-006	check	eidolon: make domain-security	the private namespace answers 404
+0024-persistent-addresses FR-002	check	eidolon: eid domain security	every published address answers below 400 after redirects
+0024-persistent-addresses FR-003	check	eidolon: eid check domains	no lapse Decision for a domain carrying a published address (0022 FR-025)
+0024-persistent-addresses FR-004	check	eidolon: eid domain security	weekly in the vault's domain-security workflow
+0024-persistent-addresses FR-005	check	eidolon: eid domain security	each public namespace answers 200 with Turtle
+0024-persistent-addresses FR-006	check	eidolon: eid domain security	the private namespace answers 404
 0024-persistent-addresses FR-007	none	-	a namespace address change is caught only by FR-005's check
-0024-persistent-addresses FR-008	check	eidolon: make check-domains	see 0022 FR-021
+0024-persistent-addresses FR-008	check	eidolon: eid check domains	see 0022 FR-021
 0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
 0024-persistent-addresses FR-010	none	-	consent is a person's; nothing checks it
 0024-persistent-addresses FR-011	none	-	no organization identifier held yet (OQ-3)
+frontiers-written-voice FR-001	check	.github: python3 tools/spec_check.py	registration and kind; that no rule names a person or holds source material is a review judgment
+frontiers-written-voice FR-002	none	-	directory contents; no check
+frontiers-written-voice FR-003	none	-	style authority; applied by a human read
+frontiers-written-voice FR-004	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	throat-clearing and announcement openings; whether a piece starts with its point is a human read
+frontiers-written-voice FR-005	none	-	person and voice; a human read
+frontiers-written-voice FR-006	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	plain-word swaps warn; specificity is a human read
+frontiers-written-voice FR-007	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	hedge phrases; whether uncertainty is real is a human read
+frontiers-written-voice FR-008	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	banned words, hedges, stock openings and closings refused by the sweep
+frontiers-written-voice FR-009	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	announcement openings and wrap-up asides; headings as claims are a human read
+frontiers-written-voice FR-010	none	-	literary prose and humor; a human read
+frontiers-written-voice FR-011	none	-	contrarian claims and useful conclusions; a human read
+frontiers-written-voice FR-012	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
+frontiers-written-voice FR-013	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	Not-X fragments warn; rhythm and paragraph jobs are a human read
+frontiers-written-voice FR-014	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	procedure mode: instruction and sentence length, passive instructions
+frontiers-written-voice FR-015	none	-	presentation form; a human read
+frontiers-written-voice FR-016	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	every shared term is in ifcore.ttl under its label; avoided variants refused
+frontiers-written-voice FR-017	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	the sweep against fail and pass fixtures
+frontiers-written-voice FR-018	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	a derived voice keeps every inherited pattern
+frontiers-written-voice FR-019	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-spoken-voice FR-001	check	.github: python3 tools/spec_check.py	registration, kind and derivation from a written-voice design system
+frontiers-spoken-voice FR-002	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the inherited copy is identical to its source; no inherited pattern dropped or loosened
+frontiers-spoken-voice FR-003	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings; repeating the intro is the consumer's format check
+frontiers-spoken-voice FR-004	none	-	writing for one hearing; a read-aloud judgment
+frontiers-spoken-voice FR-005	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings and filler refused by the sweep; fake banter is a human read
+frontiers-spoken-voice FR-006	none	-	transitions and repetition; a human read
+frontiers-spoken-voice FR-007	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	story labels refused; naming a real party is the consumer's check
+frontiers-spoken-voice FR-008	none	-	humor and performance punctuation; a human read
+frontiers-spoken-voice FR-009	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
+frontiers-spoken-voice FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-slides FR-001	check	.github: python3 tools/spec_check.py	registration, deck types and figure design system
+frontiers-slides FR-002	none	-	directory contents; no check
+frontiers-slides FR-003	check	.github: tools/run_assurance.sh --browser	Canvas and layouts: every slide 1920x1080, nothing outside its slide or under its footer
+frontiers-slides FR-004	check	.github: tools/run_assurance.sh --browser	Stylesheet discipline: no color literal; deck.py check refuses a color in a slide's text
+frontiers-slides FR-005	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: known layout, title first, quote attribution; the browser harness checks every layout renders
+frontiers-slides FR-006	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: headline present and within its word limit; that it states a claim is a human read
+frontiers-slides FR-007	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check refuses an SVG that is not frontiers-figures' semantic SVG
+frontiers-slides FR-008	check	.github: tools/run_assurance.sh --browser	Type and contrast: 24px minimum, 4.5:1 in both tones, on-dark figure variant
+frontiers-slides FR-009	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: alternative text; notes read aloud is a human judgment
+frontiers-slides FR-010	check	.github: tools/run_assurance.sh --browser	Viewer: one slide at a time, keys, hash, notes; deck.py build is checked by run.py
+frontiers-slides FR-011	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: points, words and slides against limits.json
+frontiers-slides FR-012	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: speaker notes on content, figure and two-column slides
+frontiers-slides FR-013	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check sweeps slide text and notes with the house voice
+frontiers-slides FR-014	check	.github: tools/run_assurance.sh --browser	run_assurance.sh runs run.mjs under every brand, which exits non-zero on any failure
+frontiers-slides FR-015	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-media FR-001	check	.github: python3 tools/spec_check.py	registration and media asset types
+frontiers-media FR-002	none	-	directory contents; no check
+frontiers-media FR-003	check	.github: python3 design-systems/frontiers-media/assurance/run.py	formats.json holds no color; pictures and logo come from the brand
+frontiers-media FR-004	check	.github: python3 design-systems/frontiers-media/assurance/run.py	every format rendered at its size, transparent where it is
+frontiers-media FR-005	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: safe margin, the thumbnail's clear corner, text the format carries
+frontiers-media FR-006	check	.github: python3 design-systems/frontiers-media/assurance/run.py	each tone's text roles meet 4.5:1 under every brand
+frontiers-media FR-007	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: the piece exists, the lockup is at least 100px; never enlarged by construction
+frontiers-media FR-008	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: title words, fit within the size range, 24px minimum
+frontiers-media FR-009	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check sweeps the text with the written voice
+frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/assurance/run.py	every pass job renders through fonts/
+frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
+frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
+frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
+frontiers-email FR-002	none	-	directory contents; no check
+frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
+frontiers-email FR-004	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: a known type; unsubscribe by type
+frontiers-email FR-005	check	.github: python3 design-systems/frontiers-email/assurance/run.py	pass fixtures parse and build
+frontiers-email FR-006	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: heading, subject, preheader, one call to action, words
+frontiers-email FR-007	check	.github: python3 design-systems/frontiers-email/assurance/run.py	https links; lockup sized, described, at least 100px, served from --assets
+frontiers-email FR-008	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: postal address; unsubscribe link for subscriber types
+frontiers-email FR-009	check	.github: python3 design-systems/frontiers-email/assurance/run.py	each tone's contrast under every brand; dark stylesheet present
+frontiers-email FR-010	check	.github: python3 design-systems/frontiers-email/assurance/run.py	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
+frontiers-email FR-011	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check sweeps subject, preheader and text
+frontiers-email FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
 0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
 0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites

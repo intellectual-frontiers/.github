@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assurance · Frontiers Slides design system</title>
+<link rel="stylesheet" data-theme="frontiers-brand" href="../../frontiers-brand/brand.css">
+<style>
+  body { margin: 2rem auto; max-width: 60rem; padding: 0 1rem; font: 16px/1.5 system-ui, sans-serif; color: var(--brand-text); background: var(--brand-surface); }
+  .as-suite { border-block-start: 1px solid color-mix(in oklab, var(--brand-text) 20%, var(--brand-surface)); padding-block: .75rem; }
+</style>
+<script src="runner.js" defer></script>
+<script src="slides.js" defer></script>
+<script src="boot.js" defer></script>
+</head>
+<body>
+<h1>Frontiers Slides: assurance</h1>
+<p>Tests that prove the slide stylesheet and viewer do what <code>spec.md</code> says, run on the fixture deck built by <code>deck.py</code>. Serve the directory holding this design system and its brand (<code>python3 -m http.server</code>) and open <code>/frontiers-slides/assurance/</code>, or run <code>node assurance/run.mjs</code>. Add <code>?brand=example-brand</code> for another brand.</p>
+<p id="as-banner" hidden><strong>Opened from file://</strong>: every suite needs http and is skipped.</p>
+<p><span id="assurance-summary" role="status" aria-live="polite">Not run yet</span></p>
+<div id="assurance-results"></div>
+</body>
+</html>

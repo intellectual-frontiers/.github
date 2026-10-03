@@ -1,0 +1,14 @@
+{
+  "$description": "What each fixture in fail/ must be refused for: a fragment of the finding sweep.py reports. A fixture whose name starts with procedure- is swept in procedure mode, as in pass/.",
+  "em-dash.md": "an em dash",
+  "banned-word.md": "banned word 'delve'",
+  "hedge.md": "hedge 'it is important to note'",
+  "throat-clearing.md": "throat-clearing \"in today's rapidly evolving landscape\"",
+  "announcement.md": "announcement (\"here's the part\")",
+  "seesaws.md": "seesaws; the limit is 1",
+  "not-only.md": "'not only X but also Y'",
+  "wrap-up-aside.md": "wrap-up aside 'deserves the same courtesy'",
+  "term-variant.md": "'IF Press' for the shared term",
+  "procedure-long-step.md": "an instruction of 25 words, over 20",
+  "procedure-passive.md": "a passive instruction"
+}
