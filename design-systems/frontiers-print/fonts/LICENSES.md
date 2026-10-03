@@ -4,8 +4,8 @@ Every font in this folder is free to use, embed in a PDF, and redistribute. Each
 
 | Family | Files | Designer or foundry (from the font) | Licence | Used for |
 |---|---|---|---|---|
-| Source Serif 4, Source Sans 3, Source Code Pro | SourceSerif4-*, SourceSans3-*, SourceCodePro-* | Adobe | OFL 1.1 | The book's text and code; the article's house typeface set (`house`) |
-| Inter | Inter-* (Regular, Medium, SemiBold, Bold, Italic, Bold Italic; Inter 4.0) | Rasmus Andersson | OFL 1.1 | The book's sans and covers |
+| Source Serif 4, Source Code Pro | SourceSerif4-*, SourceCodePro-* | Adobe | OFL 1.1 | The book's text and code; the article's house typeface set (`house`) |
+| Inter | Inter-* (Regular, Medium, SemiBold, Bold, Italic, Bold Italic; Inter 4.0); Inter-Regular.ttf and Inter-Bold.ttf, static TrueType instances (text optical size) cut from `frontiers-brand/fonts/InterVariable.ttf` for tools that read only TrueType | Rasmus Andersson | OFL 1.1 | The book's sans and covers |
 | STIX Two Math | STIXTwoMath-Regular.otf | STI Pub | OFL 1.1 | Mathematics; glyph fallback |
 | Spectral | Spectral-* | Production Type | OFL 1.1 | `spectral` typeface set |
 | PT Serif | PTSerif-* | ParaType | OFL 1.1 (as published by Google Fonts) | `pt-serif` set |
