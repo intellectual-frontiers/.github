@@ -174,6 +174,39 @@ ontology data and registers, not restated here.
   how it's built and reviewed) lives relative to the vault is not decided
   here.
 
+## Edge cases
+
+- A piece that mixes a measured result with the author's reading of it:
+  each claim carries its own kind, so the result is an observable fact
+  and the reading an opinion or a framework, per FR-001.
+- A latent Native Alpha claim that has not yet changed a decision: it is
+  presented as provisional and labeled a framework or an opinion, never
+  an observable fact, per FR-030, and names its source, per FR-029.
+- An article that draws on both a tracked `Note` and a concept that
+  originated outside the firm: it is related to the `Note` by
+  `prov:wasDerivedFrom`, per FR-022, and references the outside concept
+  rather than republishing it, per FR-023.
+- A piece that draws no criticism and no argument: the silence is not
+  read as confirmation, per FR-015; its reception is placed on the
+  evidence ladder like any other, per FR-014.
+- A fact on a vendor registry profile changes between quarterly reviews:
+  the profile's words are Press's, per FR-026, and are reviewed within
+  ten business days of the change, per FR-027.
+- A Fieldbook method whose last step is a judgment the reader must make:
+  the companion skill or MCP tool runs the method up to that judgment and
+  leaves the judgment to the reader, per FR-017.
+
+## Assumptions
+
+- Each claim in a piece can be assigned exactly one of the four claim
+  kinds FR-001 names.
+- The ontology holds the Press levels, the claim kinds, and the evidence
+  ladder that FR-001, FR-007, and FR-014 point to.
+- A reader's own AI can load a skill or call an MCP tool, so FR-016's
+  companion is usable by the reader it is meant for.
+- Every surface FR-025 and FR-026 cover can be listed, so the review
+  FR-027 requires can find each one.
+
 ## Open questions
 
 - **OQ-1**: No individual Press lead is named, distinct from the founder —
@@ -182,6 +215,8 @@ ontology data and registers, not restated here.
 - **OQ-2**: No process is stated for whether Press retains any oversight
   of a company's claims-standard compliance after capability transfer is
   complete and the company owns its own voice.
+- **OQ-3**: No rule states whether FR-005 or FR-006 governs Press's help
+  to a company that is both a Studios company and an IF Capital company.
 
 ## Key entities
 

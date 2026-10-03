@@ -90,6 +90,31 @@ record's confidentiality follows the same rules as any other fact.
 - Where ongoing decision data should live relative to the core vocabulary
   file as volume grows is not decided here (OQ-2).
 
+## Edge cases
+
+- One record would settle choices about two separate things: it is split
+  into two `Decision` individuals, per FR-003.
+- A later decision revises only part of an earlier one: the earlier
+  decision is split, and the later one fully replaces the affected part,
+  per FR-009.
+- A decision's outcome is shareable but its reasoning is not: outcome and
+  rationale are two linked facts, linked only from the private side, per
+  FR-011 and FR-012.
+- A decision recorded with a broad audience is later found to need a
+  narrower one: 0001-eidolon-architecture FR-036 applies in full, per
+  FR-013.
+- The context behind a decision was never recorded as a tracked Fact: the
+  reasoning is stated as a plain-text rationale instead, per FR-005.
+
+## Assumptions
+
+- Every significant decision has one accountable person who can be named
+  as its `decidedBy`.
+- A `Decision` and the facts it cites are held in one graph, so links
+  between them resolve.
+- The audience model of 0001-eidolon-architecture applies to a `Decision`
+  the same as to any other fact.
+
 ## Open questions
 
 - **OQ-1**: No process addresses a conflict of interest between the

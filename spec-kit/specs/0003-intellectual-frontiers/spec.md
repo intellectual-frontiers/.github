@@ -103,9 +103,38 @@ not restated here.
   misread. An alternate name MUST NOT redefine the unit's job or question —
   only how it is labeled.
 
+## Edge cases
+
+- A patent from one unit offered as the case for an investment: it is not
+  sufficient proof on its own, per FR-003.
+- Evidence that consists of a letter of interest: it cost the writer
+  nothing real, so it does not count, per FR-006.
+- A latent claim that depends on a capability the subject would have to
+  acquire: it is not Native Alpha, but may still be pursued as an
+  opportunity on its own evidence, per FR-015.
+- A general core competency such as domain expertise: it is where a
+  search for Native Alpha may start, not a finding, per FR-017.
+- A later stage succeeding after an earlier stage was skipped: the
+  earlier stage remains unsatisfied, per FR-008.
+- A credible outside effort pursuing the same thesis on stronger
+  evidence: backing it is preferred over building a rival internally, per
+  FR-011.
+
+## Assumptions
+
+- The ontology holds each unit's job and question, Native Alpha's
+  definition, and the method's stages, so this spec can refer to them
+  without restating them.
+- Whether an actual decision changed can be observed, so FR-005 can be
+  applied.
+- Shared functions such as legal and finance can be sourced from outside
+  on terms that serve every unit alike.
+
 ## Open questions
 
 - **OQ-1**: No individual unit lead is named, distinct from the founder.
+- **OQ-2**: FR-011 sets no standard for judging whether an outside
+  effort's evidence is as strong as the company's own.
 
 ## Key entities
 
@@ -126,6 +155,19 @@ not restated here.
 - **A public-facing alternate name** — a unit's own name stated plainly, used
   where the formal name alone would mislead a reader about what the unit
   does.
+
+## Success criteria
+
+- **SC-001**: Every unit in the ontology has exactly one job and one
+  question.
+- **SC-002**: No claim is presented as Native Alpha before it has changed
+  an actual decision, and no latent claim is presented as evident.
+- **SC-003**: No evidence offered for a claimed advantage consists only of
+  expressed interest or a compliment.
+- **SC-004**: No opportunity is treated as proven while a stage of the
+  method is unrun.
+- **SC-005**: Every decision made under this spec resolves to a
+  decision-checkpoint outcome.
 
 ## Review & acceptance checklist
 

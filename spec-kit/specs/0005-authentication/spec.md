@@ -68,11 +68,41 @@ requesters outside the vault, per 0004-addressing's deferral.
 - A vault member's direct access to the `eidolon` repository — governed
   already by 0001-eidolon-architecture FR-008 and FR-009, not by this spec.
 
+## Edge cases
+
+- A grant is revoked while an agent's session is still open: the next
+  request is evaluated only against grants valid at that moment, so the
+  revoked grant no longer counts, per FR-004, FR-005, and FR-007.
+- A grant whose start date has not yet arrived: it is not counted for any
+  request until that date, per FR-004.
+- A session has expired and the requester proves no identity again: the
+  request has no identified agent and satisfies only the `Public`
+  audience, per FR-001 and FR-008.
+- A request for `Public`-audience content only: it needs no identified
+  agent and no access log entry, per FR-001 and FR-010.
+- A vault member reaches content through a mediated request rather than
+  through the repository: the request is evaluated against grants like
+  any other, per FR-003; clone access is governed separately, per
+  0001-eidolon-architecture FR-008 and FR-009.
+
+## Assumptions
+
+- Content beyond the `Public` audience reaches an outside requester only
+  through a service that evaluates each request, never as a file read
+  directly from a repository.
+- An established identity belongs to one agent and is not shared among
+  several people.
+- The service evaluating a request has a trustworthy clock to compare
+  against grant dates and session expiry.
+
 ## Open questions
 
 - **OQ-1**: No mechanism yet defines how an agent is notified before a
   time-bound grant expires, or whether renewal requires a fresh decision
   under FR-006.
+- **OQ-2**: No requirement states whether a request for content beyond
+  the `Public` audience may proceed when its access cannot be logged
+  under FR-010.
 
 ## Key entities
 

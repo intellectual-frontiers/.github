@@ -1041,3 +1041,35 @@ ifcore:RecordedOutcome a ifcore:NetworkMeasure ; rdfs:label "A recorded outcome,
 ifcore:measuredBy a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:NetworkMeasure .
 ifcore:Network ifcore:measuredBy ifcore:HuntWithThesis, ifcore:CandidateJudgedWorthContacting,
     ifcore:ThesisRevisingConversation, ifcore:ExperimentStarted, ifcore:RecordedOutcome .
+
+# ───────────────────────── Spec format (0020-spec-format) ─────────────────────────
+# Both schemes reuse SKOS rather than declaring new classes (0019-controlled-vocabulary FR-001).
+
+ifcore:SpecStatusScheme a skos:ConceptScheme ; rdfs:label "Spec status"@en ;
+    rdfs:comment "Whether a spec is in force and what it takes to change it (0020-spec-format FR-009, FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DraftSpec a skos:Concept ; skos:inScheme ifcore:SpecStatusScheme ; skos:prefLabel "Draft"@en ;
+    skos:definition "In force, and open to amendment by anyone working in spec, ontology, then implementation order."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AdoptedSpec a skos:Concept ; skos:inScheme ifcore:SpecStatusScheme ; skos:prefLabel "Adopted"@en ;
+    skos:definition "In force, and amended only by the decision authority in effect or with its explicit approval; the amendment is recorded by its commit message, not a Decision individual (0008-decision-records FR-014)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SupersededSpec a skos:Concept ; skos:inScheme ifcore:SpecStatusScheme ; skos:prefLabel "Superseded"@en ;
+    skos:definition "No longer in force; the spec its status names governs instead."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EnforcementMechanismScheme a skos:ConceptScheme ; rdfs:label "Enforcement mechanism"@en ;
+    rdfs:comment "What catches a breach of a requirement, recorded once per requirement in a repository's enforcement register (0020-spec-format FR-011 – FR-014)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CheckEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechanismScheme ; skos:prefLabel "check"@en ;
+    skos:definition "A deterministic check fails when the requirement is broken."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GateEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechanismScheme ; skos:prefLabel "gate"@en ;
+    skos:definition "A command refuses to proceed when the requirement would be broken."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ReviewEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechanismScheme ; skos:prefLabel "review"@en ;
+    skos:definition "A recurring or triggered review, defined by a requirement, covers it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoEnforcement a skos:Concept ; skos:inScheme ifcore:EnforcementMechanismScheme ; skos:prefLabel "none"@en ;
+    skos:definition "Nothing catches a breach of the requirement."@en ;
+    ifcore:hasAudience ifcore:Public .

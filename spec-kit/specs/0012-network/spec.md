@@ -104,6 +104,36 @@ vault and register data, not restated here.
   versus held only in the private vault — is governed by
   0001-eidolon-architecture, not re-decided here.
 
+## Edge cases
+
+- A candidate introduced with a warm endorsement from a trusted contact:
+  the introduction is not a reference, and the endorsement is not
+  recorded as evidence about the candidate, per FR-006.
+- A promising candidate about whom important facts are still unknown:
+  the evidence packet names those unknowns rather than dropping them,
+  per FR-008.
+- A ranking that orders candidates by fit: it does not decide whether to
+  contact anyone; that decision is a written human judgment, per FR-004.
+- A hunt that ends without a match: it records what its thesis got
+  wrong, per FR-005, and still counts as an outcome Network is evaluated
+  by, per FR-019.
+- A search for a Capital opportunity that finds no credible existing
+  effort: the failure to find one is recorded, not assumed, per FR-011.
+- A founder Network found whose company Capital then considers backing:
+  the founder is linked to the hunt and packet, per FR-013, but that
+  record alone does not justify the investment, per FR-014.
+
+## Assumptions
+
+- The ontology holds the search stages in a fixed order, which FR-003
+  relies on.
+- Every signal behind a claim in an evidence packet has a source that
+  can be cited, as FR-007 requires.
+- Relationship memory is recorded somewhere an audience can be declared
+  on it, as FR-017 requires.
+- A speaker's consent can be asked for and recorded before anything from
+  a private conversation is published, as FR-015 requires.
+
 ## Open questions
 
 - **OQ-1**: No individual Network lead is named, distinct from the
@@ -112,6 +142,9 @@ vault and register data, not restated here.
 - **OQ-2**: No rule states how long relationship memory about a candidate
   who was never matched to anything is retained, or when it should be
   purged.
+- **OQ-3**: No rule states what happens to material already on a
+  public-facing page when a speaker withdraws the consent FR-015 relied
+  on.
 
 ## Key entities
 

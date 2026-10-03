@@ -151,11 +151,6 @@ reference model, and governance representation.
   separate-Eidolon-per-fund requirement is what carries a higher standard whenever
   third-party capital becomes relevant.
 
-## Open questions
-
-- **OQ-1**: No emergency or successor decision authority is defined for when the
-  founder is unreachable.
-
 ## Spec maintenance
 
 - **FR-034**: A spec MUST state only the current architecture and the intended
@@ -173,6 +168,46 @@ reference model, and governance representation.
 - **FR-037**: A new capability or concept MUST be established in a spec before it is
   represented in the ontology, and in the ontology before it is implemented anywhere
   else — code, content, or process. Work MUST NOT proceed out of this order.
+
+## Edge cases
+
+- A fact that is both a third party's confidential information and
+  personally identifying: it is sensitive under either clause, so it is
+  stored only as a `RestrictedDataReference`, per FR-016 and FR-021.
+- An ontology class or property declaration with no audience: it is
+  vocabulary rather than a fact, so it needs no audience declaration,
+  per FR-011.
+- A fact listing two audiences, of which a viewer satisfies only one: the
+  viewer may see it, per FR-013.
+- A fact whose sensitivity under FR-016 is genuinely unclear: it is
+  treated as sensitive until a deliberate decision says otherwise, per
+  FR-018.
+- A figure from an `ExternalRecordReference` quoted in a slide: the slide
+  shows the date it was resolved as of, and a restricted value may not
+  appear at all, per FR-026 and FR-027.
+- A decision reviewed after its domain has been delegated to a new role:
+  it is judged against the authority in effect when it was made, per
+  FR-030.
+
+## Assumptions
+
+- Repository permissions can limit clone access to named individuals, so
+  the vault circle can be enforced where the repositories are hosted.
+- Every viewer outside the vault reaches vault content only through a
+  proxy able to apply an audience check.
+- Each external source an `ExternalRecordReference` names stays reachable
+  for re-verification on the reference's cadence.
+- The company's legal structure stays as FR-028 models it; FR-032 and
+  FR-033 would need revisiting if it changed.
+
+## Open questions
+
+- **OQ-1**: No emergency or successor decision authority is defined for when the
+  founder is unreachable.
+- **OQ-2**: No rule says whether a fact whose audience is not Public, but
+  which is not sensitive under FR-016, requires a history rewrite once it
+  has been committed to the public root, as FR-036 requires for sensitive
+  data.
 
 ## Key entities
 
@@ -198,6 +233,21 @@ reference model, and governance representation.
   no field able to hold the value itself.
 - **The decision checkpoint** — the five possible outcomes of a recorded decision:
   continue, change, back someone else, build it, stop.
+
+## Success criteria
+
+- **SC-001**: Every individual asserting factual content, in either
+  repository, declares at least one audience.
+- **SC-002**: No sensitive fact appears as a literal in any Eidolon
+  repository, and no `RestrictedDataReference` holds a value or a
+  credential.
+- **SC-003**: Every `ExternalRecordReference` carries a re-verification
+  cadence and method, so whether it is overdue can be computed.
+- **SC-004**: No static or non-live artifact carries a resolved external
+  value without its resolved-as-of date, or any restricted value.
+- **SC-005**: No spec contains dated provenance or change narration.
+- **SC-006**: No one outside the vault circle holds clone access to the
+  vault.
 
 ## Review & acceptance checklist
 

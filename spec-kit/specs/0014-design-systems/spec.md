@@ -159,6 +159,42 @@ maintaining. The first one brought over and registered is
 - Non-Latin font subsets are not shipped by `frontiers-nature` — also
   carried forward, not resolved here.
 
+## Edge cases
+
+- A file two design systems would both use, such as the assurance runner:
+  it is copied into each system rather than shared, and nothing but
+  design systems and the top-level `README.md` sits in `design-systems/`,
+  per FR-003, FR-005 and FR-017.
+- An HTML reference file inside a design system, such as its markup
+  contract: it is not a content document and 0002-content-format's rules
+  do not apply to it, per FR-004.
+- A design system's README describing it as deprecated while the
+  ontology marks it active: the ontology governs, per FR-010 and FR-011.
+- A page that needs live, server-driven updates: it may opt into
+  Datastar on that page alone, per FR-008; any other framework is
+  admitted only with its reason recorded in the system's README, per
+  FR-007.
+- A harness test that needs `fetch` or iframe inspection, opened from
+  `file://`: it is reported as skipped, never as passed, with how to run
+  it over http, per FR-015.
+- A consumer holding an older vendored copy after a change: it is
+  expected to re-pull the changed files, per FR-014.
+
+## Assumptions
+
+- A consumer can copy a design system's directory whole and serve its
+  files statically.
+- The browsers a consumer targets support CSS custom properties, cascade
+  layers and native web components without a polyfill or build step.
+- A headless browser is available wherever a harness is run outside an
+  interactive browser.
+
+## Open questions
+
+- **OQ-1**: Whether a retired design system's directory stays in
+  `design-systems/` or is removed once its ontology status is retired is
+  not stated.
+
 ## Key entities
 
 - **A design system** — a self-contained, versioned set of visual and
