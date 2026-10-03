@@ -73,11 +73,36 @@ network-mounted source (0001-eidolon-architecture FR-005).
   0001-eidolon-architecture FR-005; addressing here is defined entirely
   over Git-backed content.
 
+## Edge cases
+
+- Both `about.html` and `about/index.html` in content roots: both map to
+  `/about`, which is forbidden, per FR-001, FR-002, and FR-003.
+- A document whose audience is Public held in the vault's content root:
+  it is resolved and served exactly as a public-root document is, per
+  FR-004.
+- A requester who does not satisfy the audience of a matched vault
+  document: the response is the same not-found response as for no
+  document at all, per FR-007 and FR-008.
+- A request for a file inside a work package: it is not served, except as
+  a content document or a delivered rendition, per FR-009.
+- A delivered rendition whose own delivery record names an audience: the
+  consumer applies that audience, per FR-010.
+
+## Assumptions
+
+- A consumer can read both repositories' content roots at its build time.
+- Consumers are rebuilt often enough that vendored content does not
+  drift far from the repositories.
+- The authentication mechanism OQ-1 leaves open can answer the audience
+  check FR-006 defines without changing what is checked.
+
 ## Open questions
 
 - **OQ-1**: No mechanism yet exists for actually authenticating a requester
   against an audience. FR-006 and FR-007 describe what must happen once
   that mechanism exists, not how to build it.
+- **OQ-2**: No rule says whether a request for a URL path with a trailing
+  slash, or differing only in letter case, matches the same document.
 
 ## Key entities
 
@@ -98,7 +123,6 @@ network-mounted source (0001-eidolon-architecture FR-005).
   indistinguishable from outside.
 - **SC-003**: No two content documents across both repositories ever
   resolve to the same URL.
-
 - **SC-004**: No consumer serves a document or a delivered rendition
   without the audience check; no consumer serves a work package's source
   file directly.

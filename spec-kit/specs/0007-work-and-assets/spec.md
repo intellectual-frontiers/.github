@@ -173,12 +173,43 @@ assets.
   substages track that commercialization is happening and at what
   point, not the amounts involved.
 
+## Edge cases
+
+- A patent draft tracked as a Substantial Work is filed: the resulting
+  `PatentFamily` is a new individual derived from the Note, the registry
+  becomes canonical for its status, and the lifecycle does not continue,
+  per FR-005, FR-012, and FR-020.
+- A web property with many pages: it is one `DigitalAsset`, and no page
+  or file within it becomes one of its own, per FR-007.
+- A right created by a named person with no agreement stating otherwise:
+  the person is its `dcterms:creator` and the company its
+  `dcterms:rightsHolder`, per FR-014.
+- A work whose authoritative text is published on another site: the
+  Eidolon holds only a `schema:url` reference, never a copy, per FR-016.
+- A trade secret: its classifying facts may be literals, per FR-009, while
+  its content is sensitive and its public representation does not say
+  what it is, per FR-010.
+- An output that is neither the subject of a Note nor dispositioned: it
+  need not be represented in the Eidolon at all, per FR-004.
+
+## Assumptions
+
+- External registries remain the authority over the rights they
+  register, and their records can be referenced one right at a time.
+- The ontology declares the work lifecycle stages and the
+  Commercialization substages, in order.
+- PROV-O, Dublin Core, and schema.org remain available to reuse for the
+  relationships this spec names.
+
 ## Open questions
 
 - **OQ-1**: Whether a `prov:Activity` individual should ever be tracked
   directly — to resolve an inventorship question, for instance — is
   unresolved. Today's default is that only outputs are tracked, never the
   activity itself.
+- **OQ-2**: No requirement states whether a Substantial Work's lifecycle
+  owner moves from the Research & IP default to Press on its own once its
+  disposition is settled, or only by a recorded decision under FR-021.
 
 ## Key entities
 

@@ -95,6 +95,39 @@ FR-007.
   spec — a content kind here works the same whether the document carrying
   it is Public or Confidential.
 
+## Edge cases
+
+- A content document whose `schema:about` names an individual of the
+  wrong class, or one the ontology does not declare at all: the document
+  is not valid under its kind, per FR-001 through FR-008 and FR-012.
+- A book whose individual is a `schema:Book` but not yet an
+  `ifcore:Copyright`: its page is not valid as `ifweb:BookPage` until the
+  individual is both, per FR-008, and it does not fall back to
+  `ifweb:WorkPage`, per FR-012.
+- A patent family page that shows a filing date or a current status: the
+  value is a resolved `ExternalRecordReference`, never a typed literal,
+  per FR-004; a trademark page follows the same rule, per FR-005.
+- A Journal article not drawn from the firm's own tracked research: it
+  names the Journal and its subject and needs no `prov:wasDerivedFrom`,
+  per FR-009.
+- A work edition page whose `schema:isPartOf` and `prov:wasDerivedFrom`
+  name different works: it is not valid; both name the same Substantial
+  Work, per FR-013.
+- A portfolio entry for standalone software or a dataset with no ontology
+  class of its own: it is not listed until a governing spec establishes
+  that class, per FR-011, with the gap held as OQ-2.
+
+## Assumptions
+
+- Every business concept a content kind here renders already has a
+  settled class in the core ontology, so a content kind only points at
+  an individual and never defines one.
+- A content document's JSON-LD block can be validated against its kind's
+  shape, so a requirement stated here is checkable on the document alone
+  plus the ontology it points into.
+- The web properties that render these documents read the JSON-LD block
+  as the page's meaning, not the visible HTML alone.
+
 ## Open questions
 
 - **OQ-1**: No decision is recorded on which legacy Record-shaped content
@@ -103,6 +136,8 @@ FR-007.
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own
   governing spec before FR-011 is satisfied for it.
+- **OQ-3**: Whether an `ifweb:PortfolioIndexPage` may list an individual
+  whose audience is narrower than the page's own audience is not stated.
 
 ## Key entities
 

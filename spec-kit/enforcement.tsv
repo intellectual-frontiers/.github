@@ -1,0 +1,426 @@
+# What enforces each requirement in this repository's specs (0020-spec-format FR-011 – FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-eidolon-architecture FR-001	none	-	repository topology; no check
+0001-eidolon-architecture FR-002	none	-	Public-tier judgment; no check of the public root's audiences
+0001-eidolon-architecture FR-003	none	-	nothing checks owl:imports or that the vault never redefines public terms
+0001-eidolon-architecture FR-004	none	-	
+0001-eidolon-architecture FR-005	none	-	
+0001-eidolon-architecture FR-006	none	-	
+0001-eidolon-architecture FR-007	check	.github: python3 tools/spec_check.py	spec_check.py rejects a bare if: prefix in ontology files
+0001-eidolon-architecture FR-008	none	-	a membership review exists in the vault; not citable from the public root
+0001-eidolon-architecture FR-009	none	-	a membership review exists in the vault; not citable from the public root
+0001-eidolon-architecture FR-010	none	-	
+0001-eidolon-architecture FR-011	check	eidolon: make check-ontology	ontology.py: every vault individual declares a declared audience
+0001-eidolon-architecture FR-012	none	-	check-ontology requires an explicit audience; no default is applied or tested
+0001-eidolon-architecture FR-013	none	-	
+0001-eidolon-architecture FR-014	none	-	
+0001-eidolon-architecture FR-015	check	eidolon: make check-ontology	ontology.py: every vault individual declares a declared audience
+0001-eidolon-architecture FR-016	none	-	sensitivity is a judgment; only narrow pattern checks exist (e.g. emails in schedule)
+0001-eidolon-architecture FR-017	none	-	
+0001-eidolon-architecture FR-018	none	-	
+0001-eidolon-architecture FR-019	none	-	
+0001-eidolon-architecture FR-020	none	-	
+0001-eidolon-architecture FR-021	none	-	
+0001-eidolon-architecture FR-022	none	-	producer-schedule-check covers schedule snapshot refs only; no general shape
+0001-eidolon-architecture FR-023	check	eidolon: make check-sensitive	sensitive.py secret-pattern scan of vault files; credential clause only
+0001-eidolon-architecture FR-024	none	-	producer-schedule-check covers schedule snapshot refs only; no general shape
+0001-eidolon-architecture FR-025	none	-	
+0001-eidolon-architecture FR-026	none	-	
+0001-eidolon-architecture FR-027	none	-	
+0001-eidolon-architecture FR-028	none	-	
+0001-eidolon-architecture FR-029	none	-	
+0001-eidolon-architecture FR-030	none	-	
+0001-eidolon-architecture FR-031	none	-	
+0001-eidolon-architecture FR-032	none	-	
+0001-eidolon-architecture FR-033	none	-	
+0001-eidolon-architecture FR-034	check	.github: python3 tools/spec_check.py	rejects dated provenance lines in specs
+0001-eidolon-architecture FR-035	none	-	no commit-msg hook or check
+0001-eidolon-architecture FR-036	none	-	remediation duty; secret scan detects but does not enforce rewrite
+0001-eidolon-architecture FR-037	none	-	ordering rule; content @type check covers only content kinds
+0002-content-format FR-001	check	eidolon: make check-content	strict parse; head and body required; vault docs
+0002-content-format FR-002	check	eidolon: make check-content	html5lib strict parser fails the document; vault docs
+0002-content-format FR-003	check	eidolon: make check-content	doctype and html lang checked; vault docs
+0002-content-format FR-004	check	eidolon: make check-content	charset, title, description checked; vault docs
+0002-content-format FR-005	check	eidolon: make check-content	one ld+json block, ifweb @context, declared @type; vault docs
+0002-content-format FR-006	check	eidolon: make check-content	unknown property and SHACL shape checked; vault docs
+0002-content-format FR-007	check	eidolon: make check-content	@type must be a declared ifweb:contentKind; vault docs
+0002-content-format FR-008	none	-	no check compares title or description with JSON-LD facts
+0002-content-format FR-009	check	eidolon: make check-content	hasAudience required and must be a declared audience; vault docs
+0002-content-format FR-010	none	-	no check for restricted values in body
+0002-content-format FR-011	none	-	no check for resolved-as-of dates
+0002-content-format FR-012	check	eidolon: make check-content	element and attribute allowlist; script, style, iframe, on* rejected; vault docs
+0002-content-format FR-013	check	eidolon: make check-content	img alt, width, height checked; vault docs
+0002-content-format FR-014	check	eidolon: make check-content	target=_blank requires rel=noopener; vault docs
+0002-content-format FR-015	check	eidolon: make check-content	href, src, cite schemes checked; JSON-LD URLs not checked; vault docs
+0002-content-format FR-016	none	-	nothing rejects non-HTML files under content/
+0002-content-format FR-017	check	eidolon: make check-content	WorkEditionPage shape requires prov:wasDerivedFrom; vault docs
+0003-intellectual-frontiers FR-001	none	-	no shape on ifcore:Unit job and question
+0003-intellectual-frontiers FR-002	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-003	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-004	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-005	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-006	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-007	none	-	no check on ifcore:MethodStage sequence
+0003-intellectual-frontiers FR-008	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-009	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-010	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-011	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-012	none	-	DecisionShape does not require an outcome
+0003-intellectual-frontiers FR-013	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-014	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-015	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-016	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-017	none	-	rule of judgment; no check possible
+0003-intellectual-frontiers FR-018	none	-	rule of judgment; no check possible
+0004-addressing FR-001	none	-	mapping computed in content.py but nothing fails on it; consumer applies it
+0004-addressing FR-002	none	-	mapping computed in content.py but nothing fails on it; consumer applies it
+0004-addressing FR-003	check	eidolon: make check-content	content.py fails duplicate URL paths across both content roots
+0004-addressing FR-004	none	-	nothing finds content documents outside content/
+0004-addressing FR-005	none	-	consumer behavior; the website repository is not available
+0004-addressing FR-006	none	-	consumer behavior; the website repository is not available
+0004-addressing FR-007	none	-	consumer behavior; the website repository is not available
+0004-addressing FR-008	none	-	consumer behavior; the website repository is not available
+0004-addressing FR-009	none	-	consumer behavior; the website repository is not available
+0004-addressing FR-010	none	-	consumer behavior; the website repository is not available
+0005-authentication FR-001	none	-	request-time rule for a serving system; no check in either repository
+0005-authentication FR-002	none	-	states what this spec leaves open; nothing to test
+0005-authentication FR-003	none	-	no shape requires a Grant's agent, audience, or validFrom
+0005-authentication FR-004	none	-	request-time rule; no serving code in either repository
+0005-authentication FR-005	none	-	request-time rule; no serving code in either repository
+0005-authentication FR-006	none	-	no check ties a Grant to a recorded Decision
+0005-authentication FR-007	none	-	session behaviour; no serving code in either repository
+0005-authentication FR-008	none	-	session behaviour; no serving code in either repository
+0005-authentication FR-009	check	eidolon: make check-sensitive	sensitive.py secret patterns; scans the vault only, not .github
+0005-authentication FR-010	none	-	access logging; no serving code in either repository
+0005-authentication FR-011	none	-	judgment on a log entry's audience; no check possible
+0006-research-and-ip FR-001	none	-	no check that a finding sits under an area and pillar
+0006-research-and-ip FR-002	none	-	no check on a pillar's question or findings
+0006-research-and-ip FR-003	none	-	research-check.py requires :record-type: but not a note type
+0006-research-and-ip FR-004	none	-	research-check.py does not check for a DOI
+0006-research-and-ip FR-005	none	-	disposition timing is not checked
+0006-research-and-ip FR-006	none	-	rule of judgment on intent; no check possible
+0006-research-and-ip FR-007	review	0009-press FR-027	quarterly accuracy review of public surfaces against the record
+0006-research-and-ip FR-008	none	-	no check on patent ExternalRecordReferences
+0006-research-and-ip FR-009	none	-	no check that a register count carries a date
+0006-research-and-ip FR-010	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-011	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-012	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-013	none	-	no check on executable content
+0006-research-and-ip FR-014	none	-	response deadline is not tracked by any tool
+0006-research-and-ip FR-015	none	-	handling of outside material; no check possible
+0006-research-and-ip FR-016	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-017	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-018	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-019	none	-	rule of judgment; no check possible
+0006-research-and-ip FR-020	none	-	rule of judgment; no check possible
+0007-work-and-assets FR-001	none	-	no check on how activities or pillars are typed
+0007-work-and-assets FR-002	none	-	no shape requires prov:wasGeneratedBy
+0007-work-and-assets FR-003	none	-	permission; nothing to test
+0007-work-and-assets FR-004	none	-	materiality threshold is judgment; audience itself is 0001 FR-011's check
+0007-work-and-assets FR-005	none	-	no check that a derived individual is distinct
+0007-work-and-assets FR-006	none	-	no shape on Asset categorization
+0007-work-and-assets FR-007	none	-	no check on DigitalAsset granularity
+0007-work-and-assets FR-008	none	-	no check for registry values held as literals
+0007-work-and-assets FR-009	none	-	permission; nothing to test
+0007-work-and-assets FR-010	none	-	sensitivity is judgment (0001 FR-016); no check possible
+0007-work-and-assets FR-011	none	-	no check on patent family relationships
+0007-work-and-assets FR-012	none	-	rule of authority; no check possible
+0007-work-and-assets FR-013	none	-	permission; nothing to test
+0007-work-and-assets FR-014	review	0019-controlled-vocabulary FR-007	vocabulary review flags a new property minted for an established term
+0007-work-and-assets FR-015	none	-	no check on concepts that are also authored research
+0007-work-and-assets FR-016	none	-	no check for duplicated or missing primary text
+0007-work-and-assets FR-017	none	-	classification is operational judgment
+0007-work-and-assets FR-018	gate	eidolon: make advance	works.advance refuses to skip a stage and writes the Decision; check-works also
+0007-work-and-assets FR-019	none	-	no check on Commercialization substages
+0007-work-and-assets FR-020	none	-	no check that unfiled patents are tracked
+0007-work-and-assets FR-021	check	eidolon: make check-ontology	works.shapes.ttl: lifecycleOwner minCount 1 maxCount 1
+0007-work-and-assets FR-022	check	eidolon: make check-works	works.py: package without ontology file, file without package, restated stage
+0008-decision-records FR-001	none	-	significance is judgment; no check possible
+0008-decision-records FR-002	check	eidolon: make check-ontology	works.shapes.ttl DecisionShape: decidedBy minCount 1, class Person
+0008-decision-records FR-003	none	-	rule of judgment; no check possible
+0008-decision-records FR-004	none	-	permission; nothing to test
+0008-decision-records FR-005	gate	eidolon: make advance	refuses without BECAUSE; covers only Decisions written by advance, publish, work-new
+0008-decision-records FR-006	none	-	SHOULD; no check
+0008-decision-records FR-007	none	-	permission; nothing to test
+0008-decision-records FR-008	none	-	no check on isReplacedBy use
+0008-decision-records FR-009	none	-	rule of judgment; no check possible
+0008-decision-records FR-010	none	-	default audience is judgment; check only requires an audience exists
+0008-decision-records FR-011	none	-	rule of judgment; no check possible
+0008-decision-records FR-012	none	-	no check for public-to-private links
+0008-decision-records FR-013	none	-	incident response; no check possible
+0008-decision-records FR-014	none	-	rule of routing; no check possible
+0009-press FR-001	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-002	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-003	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-004	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-005	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-006	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-007	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-008	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-009	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-010	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-011	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-012	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-013	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-014	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-015	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-016	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-017	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-018	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-019	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-020	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-021	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-022	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-023	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-024	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-025	review	0009-press FR-027	quarterly and on-change surface review checks web property words against record
+0009-press FR-026	review	0009-press FR-027	quarterly and on-change surface review covers registry profile words
+0009-press FR-027	none	-	no tool records or checks that the surface review took place
+0009-press FR-028	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-029	none	-	rule of judgment; no check or defined review covers it
+0009-press FR-030	none	-	rule of judgment; no check or defined review covers it
+0010-capital FR-001	none	-	rule of judgment; no check possible
+0010-capital FR-002	none	-	rule of judgment; no check possible
+0010-capital FR-003	none	-	rule of judgment; no check possible
+0010-capital FR-004	none	-	rule of judgment; no check possible
+0010-capital FR-005	none	-	rule of judgment; no check possible
+0010-capital FR-006	none	-	rule of judgment; no check possible
+0010-capital FR-007	none	-	no check that allocations are recorded as Decisions
+0010-capital FR-008	none	-	no check on recorded disagreement
+0010-capital FR-009	none	-	rule of judgment; no check possible
+0010-capital FR-010	review	0009-press FR-027	quarterly accuracy review of public surfaces; covers public claims only
+0010-capital FR-011	review	0009-press FR-027	quarterly accuracy review covers Capital's public description
+0010-capital FR-012	none	-	no check on capital sources
+0010-capital FR-013	none	-	rule of judgment; no check possible
+0010-capital FR-014	none	-	rule of judgment; no check possible
+0010-capital FR-015	none	-	rule of judgment; no check possible
+0010-capital FR-016	none	-	rule of judgment; no check possible
+0011-studios FR-001	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-002	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-003	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-004	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-005	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-006	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-007	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-008	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-009	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-010	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-011	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-012	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-013	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-014	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-015	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-016	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-017	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-018	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-019	check	eidolon: make test	test_tools asserts nested ventures content is exempt from content check; placement unchecked
+0011-studios FR-020	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-021	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-022	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-023	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-024	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-025	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-026	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-027	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-001	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-002	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-003	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-004	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-005	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-006	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-007	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-008	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-009	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-010	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-011	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-012	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-013	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-014	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-015	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-016	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-017	check	eidolon: make check-ontology	ontology.py fails any vault individual, a recorded path included, lacking hasAudience
+0012-network FR-018	none	-	rule of judgment; no check or defined review covers it
+0012-network FR-019	none	-	rule of judgment; no check or defined review covers it
+0013-web-content-kinds FR-001	check	eidolon: make check-content	ifweb UnitPage shape: one schema:about of class ifcore:Unit; vault content only
+0013-web-content-kinds FR-002	check	eidolon: make check-content	ifweb ResearchPillarPage shape: one schema:about ResearchPillar; vault content only
+0013-web-content-kinds FR-003	check	eidolon: make check-content	ifweb ResearchNotePage shape: one schema:about Note; vault content only
+0013-web-content-kinds FR-004	check	eidolon: make check-content	shape checks one schema:about PatentFamily; ExternalRecordReference rule unchecked
+0013-web-content-kinds FR-005	check	eidolon: make check-content	shape checks one schema:about Trademark; ExternalRecordReference rule unchecked
+0013-web-content-kinds FR-006	check	eidolon: make check-content	ifweb DefensiveDisclosurePage shape: one schema:about; vault content only
+0013-web-content-kinds FR-007	check	eidolon: make check-content	ifweb FundPage shape: one schema:about ifcore:Fund; vault content only
+0013-web-content-kinds FR-008	check	eidolon: make check-content	BookPage shape requires schema:about to be both schema:Book and ifcore:Copyright
+0013-web-content-kinds FR-009	check	eidolon: make check-content	shape checks isPartOf a Periodical and one about; conditional wasDerivedFrom unchecked
+0013-web-content-kinds FR-010	check	eidolon: make check-content	shape allows only featuresWork; sh:or omits SubstantialWork that FR-010 permits
+0013-web-content-kinds FR-011	check	eidolon: make check-content	featuresWork sh:or rejects any class not in the list
+0013-web-content-kinds FR-012	check	eidolon: make check-content	WorkPage shape: one schema:about of class ifcore:SubstantialWork
+0013-web-content-kinds FR-013	check	eidolon: make check-content	shape checks both point to a SubstantialWork, not that they name the same one
+0014-design-systems FR-001	none	-	definition; nothing to test
+0014-design-systems FR-002	none	-	permission; nothing to test
+0014-design-systems FR-003	none	-	no check of design-systems/ layout; .github has no CI
+0014-design-systems FR-004	none	-	check-content scans content/ only, by construction; no check
+0014-design-systems FR-005	none	-	console-assurance covers only the vendored frontiers-console copy
+0014-design-systems FR-006	none	-	SHOULD layout and README content; no check
+0014-design-systems FR-007	none	-	rule of judgment; no check possible
+0014-design-systems FR-008	none	-	no check that Datastar is opt-in per page
+0014-design-systems FR-009	none	-	frontiers-console harness tests this for one system; frontiers-nature is not run
+0014-design-systems FR-010	none	-	check-ontology does not validate ifcore:DesignSystem individuals
+0014-design-systems FR-011	none	-	no check that a README omits status
+0014-design-systems FR-012	none	-	scoping statement; nothing to test
+0014-design-systems FR-013	none	-	README content is a judgment; no check
+0014-design-systems FR-014	none	-	re-vendoring is a consumer expectation; no check
+0014-design-systems FR-015	none	-	no make target or CI runs frontiers-nature harness; console-assurance covers one system
+0014-design-systems FR-016	none	-	no check of a harness coverage
+0014-design-systems FR-017	none	-	completion rule; no check runs every harness
+0015-work-packages FR-001	none	-	definition; nothing to test
+0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
+0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
+0015-work-packages FR-004	check	eidolon: make check-works	works.py SLUG regex; location and slug immutability unchecked
+0015-work-packages FR-005	check	eidolon: make check-works	works.py: kind must be a declared ifcore:WorkKind
+0015-work-packages FR-006	none	-	no check that a consumer never serves from a package
+0015-work-packages FR-007	none	-	no check for a second live copy or a frozen predecessor
+0015-work-packages FR-008	check	eidolon: make check-works	works.py RESTATEMENT rejects stage/owner/audience literals; .auto. naming unchecked
+0015-work-packages FR-009	check	eidolon: make check-works	book needs manuscript.adoc, research one *.adoc record; other kinds unchecked
+0015-work-packages FR-010	none	-	rule of judgment; no check possible
+0015-work-packages FR-011	none	-	rule on other specs; no check
+0015-work-packages FR-012	none	-	no check of a published text source format
+0015-work-packages FR-013	none	-	definition; nothing to test
+0015-work-packages FR-014	check	eidolon: make check-sensitive	sensitive.py fails on tracked .pdf, .epub, audio, video, .zip
+0015-work-packages FR-015	check	eidolon: make check-ontology	DeliveryRecord shape requires 40-hex sourceCommit; artifact metadata unchecked
+0015-work-packages FR-016	none	-	cuts write records but deliver nothing; no delivery command exists
+0015-work-packages FR-017	check	eidolon: make check-ontology	DeliveryRecord shape: location, commit, date, checksum, audience, no signed URL
+0015-work-packages FR-018	gate	eidolon: make final	release.py refuses a final cut before Deploy; review PDFs are watermarked
+0015-work-packages FR-019	none	-	generator writes to content/ by design; no check
+0015-work-packages FR-020	check	eidolon: make fresh	regenerates content and fails if the tree differs
+0015-work-packages FR-021	check	eidolon: make fresh	generator copies the work audience; fresh fails on a hand-edited one
+0015-work-packages FR-022	check	eidolon: make check-ontology	SubstantialWork shape: exactly one stage and one owner
+0015-work-packages FR-023	gate	eidolon: make advance	works.py advance refuses to skip a stage; check-works also checks the chain
+0015-work-packages FR-024	check	eidolon: make check-works	Public without a broadening Decision fails; other defaults unchecked
+0015-work-packages FR-025	check	eidolon: make check-works	Public work needs a broadensAudienceTo Public Decision; decider authority unchecked
+0015-work-packages FR-026	none	-	no check
+0016-press-production FR-001	none	-	house voice is a judgment; no check
+0016-press-production FR-002	check	eidolon: make check-spoken	audit record required for episodes past draft and anthology chapters; not books
+0016-press-production FR-003	none	-	separate-reader audit of AI text is not checked
+0016-press-production FR-004	check	eidolon: make check-works	works.py fails a book package without manuscript.adoc; jacket and figures unchecked
+0016-press-production FR-005	none	-	book bible contents and order of update are not checked
+0016-press-production FR-006	check	eidolon: make check-works	works.py fails a chapter heading with no [[id]] or a duplicate id
+0016-press-production FR-007	gate	eidolon: make final	release.py cut refuses a final cut while issues.yml has an open blocker
+0016-press-production FR-008	check	eidolon: make check-works	works.py fails a -volume-N slug with no book-series package or no schema:isPartOf
+0016-press-production FR-009	none	-	series bible contents are not checked
+0016-press-production FR-010	none	-	no command requires volumes to be cut together
+0016-press-production FR-011	none	-	uniqueness of synthetic names per volume is not checked
+0016-press-production FR-012	none	-	case accuracy and composite statement are judgment; no check
+0016-press-production FR-013	none	-	factual accuracy is judgment; no check
+0016-press-production FR-014	check	eidolon: make check-spoken	anthology-check fails a chapter with no captioned visual; other books unchecked
+0016-press-production FR-015	none	-	inspection of rendered pages is a person's act
+0016-press-production FR-016	none	-	re-derivation of appendix content is judgment
+0016-press-production FR-017	none	-	print-to-companion tool move is not checked
+0016-press-production FR-018	check	eidolon: make check-books	figcheck and covercheck fail figures and covers off the house rules
+0016-press-production FR-019	none	-	jacket category line derivation is not checked
+0016-press-production FR-020	none	-	author credit and publisher line are not checked against the author record
+0016-press-production FR-021	check	eidolon: make check-distribute	validate_distribution fails a BISAC code not in bisac_codes.py (error from Deploy)
+0016-press-production FR-022	check	eidolon: make check-distribute	isbn.py fails invalid or duplicate ISBN-13s; make final also refuses a placeholder
+0016-press-production FR-023	none	-	cover series line is by construction in jacket-to-latex.py; no check
+0016-press-production FR-024	check	eidolon: make check-works	works.py fails a manuscript without a whole-number :edition:
+0016-press-production FR-025	gate	eidolon: make final	release.py cut needs a clean commit, never overwrites, refuses a second final cut
+0016-press-production FR-026	none	-	attribution of authorship is not checked
+0016-press-production FR-027	none	-	reserved human acts are not mechanically enforced
+0016-press-production FR-028	none	-	praise quote and cover art origin are not checked
+0016-press-production FR-029	none	-	cover commissioning order is not checked
+0016-press-production FR-030	none	-	online appendix content and placement are not checked
+0016-press-production FR-031	check	eidolon: make check-editorial	companion-check fails a companion page that is Markdown or HTML or lacks its header
+0016-press-production FR-032	check	eidolon: make check-editorial	check-site-address.py fails any printed address but the canonical site
+0016-press-production FR-033	none	-	companion chapter citations by title are not checked
+0016-press-production FR-034	none	-	companion-check only warns; committing a generated CSV is not checked
+0016-press-production FR-035	check	eidolon: make check-editorial	news-check fails a book with no NEWS.adoc, undated entries, or wrong order
+0016-press-production FR-036	none	-	news-check only warns on process or object wording
+0016-press-production FR-037	none	-	news page inherits the work's audience by construction; no check
+0016-press-production FR-038	none	-	whether a book has a skill is not checked
+0016-press-production FR-039	none	-	faithfulness of a skill is judgment
+0016-press-production FR-040	none	-	console panel shows missing isBasedOn; no check fails
+0016-press-production FR-041	check	eidolon: make check-ontology	every concept individual must declare an audience; provenance unchecked
+0016-press-production FR-042	none	-	website package contents are not checked
+0016-press-production FR-043	review	0009-press FR-027	quarterly surface review covers the website text audit
+0016-press-production FR-044	none	-	promotion in a work's source is not detected
+0016-press-production FR-045	none	-	promotion record pairing is not checked
+0016-press-production FR-046	check	eidolon: make research-check	fails a published paper with no promotion-brief.md; other kinds unchecked
+0016-press-production FR-047	none	-	promotion outrunning the work is judgment
+0016-press-production FR-048	check	eidolon: make check-editorial	issues.py check fails a category or gate group outside the closed sets
+0016-press-production FR-049	none	-	Rolebook five answers and kicker use are not checked
+0016-press-production FR-050	none	-	shared-term definition in the ontology is not checked
+0017-spoken-and-research-works FR-001	none	-	spoken-first classification is judgment
+0017-spoken-and-research-works FR-002	check	eidolon: make check-works	works.py fails a spoken package without show-bible.md or editorial-constitution.md
+0017-spoken-and-research-works FR-003	none	-	episode brief contents are not checked
+0017-spoken-and-research-works FR-004	check	eidolon: make check-spoken	spoken-check fails an episode with no script.adoc
+0017-spoken-and-research-works FR-005	check	eidolon: make check-spoken	spoken-check fails a missing format file or a script off its format
+0017-spoken-and-research-works FR-006	check	eidolon: make check-sensitive	sensitive.py fails any tracked audio or video file
+0017-spoken-and-research-works FR-007	none	-	transcript is generated by spoken-transcribe; hand edits are not detected
+0017-spoken-and-research-works FR-008	check	eidolon: make check-spoken	spoken-estimate --check fails a missing estimate or one from an older script
+0017-spoken-and-research-works FR-009	check	eidolon: make check-extras	producer-schedule-check fails a snapshot with no ExternalRecordReference or with an email
+0017-spoken-and-research-works FR-010	none	-	binding Press to an event is not checked
+0017-spoken-and-research-works FR-011	check	eidolon: make check-spoken	anthology-build --check fails when chapters.auto.adoc is not in release order
+0017-spoken-and-research-works FR-012	check	eidolon: make check-spoken	anthology-check fails no visual or missing source hash; warns on a changed source
+0017-spoken-and-research-works FR-013	none	-	guest attribution and fidelity are judgment
+0017-spoken-and-research-works FR-014	none	-	running and formal releases of a volume are not checked
+0017-spoken-and-research-works FR-015	check	eidolon: make check-works	works.py fails a Public work with no Decision broadening its audience
+0017-spoken-and-research-works FR-016	none	-	no show-notes generator or check exists
+0017-spoken-and-research-works FR-017	check	eidolon: make check-works	works.py fails a research package without exactly one typed record source
+0017-spoken-and-research-works FR-018	check	eidolon: make check-works	works.py requires the record source as <type>.adoc; research-check checks header
+0017-spoken-and-research-works FR-019	check	eidolon: make research-check	fails a hypothesis heading with no practical test
+0017-spoken-and-research-works FR-020	none	-	research-check states DOI-registry matching is not built
+0017-spoken-and-research-works FR-021	check	eidolon: make research-check	fails a claim label outside the closed set or not above a heading
+0017-spoken-and-research-works FR-022	check	eidolon: make research-check	fails a hypothesis/inference/recommendation with no falsifier, or no status section
+0017-spoken-and-research-works FR-023	check	eidolon: make research-check	fails an undated reference, an evidence section without checked=, an overdue review-by
+0017-spoken-and-research-works FR-024	check	eidolon: make research-check	fails a patent-family copy held in the repository
+0017-spoken-and-research-works FR-025	none	-	research-check only requires revisions.md to exist; claim history unchecked
+0017-spoken-and-research-works FR-026	none	-	research-check states slug stability is not built
+0017-spoken-and-research-works FR-027	check	eidolon: make research-check	fails an unresolved cross-reference or image in a paper; outside links unchecked
+0017-spoken-and-research-works FR-028	none	-	companion tool behavior is not checked
+0017-spoken-and-research-works FR-029	none	-	skill labeling and study-kit results are not checked
+0017-spoken-and-research-works FR-030	none	-	paper-build.sh labels a working paper by construction; no check
+0017-spoken-and-research-works FR-031	check	eidolon: make research-check	fails a published paper with no promotion brief
+0018-frontiers-console FR-001	none	-	registration and README status not checked
+0018-frontiers-console FR-002	none	-	rule of judgment; no check possible
+0018-frontiers-console FR-003	none	-	rule of judgment; no check possible
+0018-frontiers-console FR-004	check	eidolon: make console-assurance	harness: no @import, remote URL, framework; classic script; runs on vendored copy
+0018-frontiers-console FR-005	none	-	provenance of code; no check possible
+0018-frontiers-console FR-006	check	eidolon: make console-assurance	harness checks layer order declared once in reset.css and one layer per file
+0018-frontiers-console FR-007	check	eidolon: make console-assurance	harness checks required --fc- tokens and tokens.json mirror; semantic naming unchecked
+0018-frontiers-console FR-008	check	eidolon: make console-assurance	harness Layouts suite checks each layout and runtime reflow
+0018-frontiers-console FR-009	check	eidolon: make console-assurance	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
+0018-frontiers-console FR-010	check	eidolon: make console-assurance	harness checks changing --fc-sidebar-width moves the page
+0018-frontiers-console FR-011	check	eidolon: make console-assurance	partial: tabs, sync, TOC, copy, toast, accordion tested; not every component
+0018-frontiers-console FR-012	check	eidolon: make console-assurance	partial: table sort/filter/count/empty, stats, badges, hints, run log tested
+0018-frontiers-console FR-013	check	eidolon: make console-assurance	harness tests Ctrl+K, /, arrows, cancelable selection
+0018-frontiers-console FR-014	none	-	no test that a badge carries text
+0018-frontiers-console FR-015	check	eidolon: make console-assurance	harness tests token and rendered contrast, ring 3:1, icon-button names
+0018-frontiers-console FR-016	check	eidolon: make console-assurance	partial: single classic script tested; no-script degradation untested
+0018-frontiers-console FR-017	none	-	documentation completeness; no check possible
+0018-frontiers-console FR-018	none	-	harness runs, but nothing checks which suites it covers
+0018-frontiers-console FR-019	none	-	no check
+0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
+0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
+0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent
+0019-controlled-vocabulary FR-004	review	0019-controlled-vocabulary FR-007	review identifies a term lacking both a mapping and a Decision
+0019-controlled-vocabulary FR-005	review	0019-controlled-vocabulary FR-007	judged at review time, per the spec out of scope
+0019-controlled-vocabulary FR-006	none	-	constraint on the review itself; nothing checks it
+0019-controlled-vocabulary FR-007	none	-	defines the review; nothing ensures it happens
+0019-controlled-vocabulary FR-008	none	-	no check
+0019-controlled-vocabulary FR-009	none	-	no point-of-change gate exists; FR-007 review finds such terms only afterward
+0020-spec-format FR-001	none	-	broad; its concrete parts are checked under FR-005
+0020-spec-format FR-002	none	-	no check looks for plan or tasks files
+0020-spec-format FR-003	none	-	inline clarification markers are not scanned for
+0020-spec-format FR-004	none	-	a permission, not a constraint a check can test
+0020-spec-format FR-005	check	.github: python3 tools/spec_check.py	sections present, ordered, and non-empty
+0020-spec-format FR-006	check	.github: python3 tools/spec_check.py	each edge case must cite FR or SC; whether it resolves is unchecked
+0020-spec-format FR-007	none	-	whether an assumption asserts a fact is judgment
+0020-spec-format FR-008	check	.github: python3 tools/spec_check.py	catches duplicates only; renumbering is not detected
+0020-spec-format FR-009	check	.github: python3 tools/spec_check.py	status value and successor existence
+0020-spec-format FR-010	none	-	no check ties a status change to a Decision
+0020-spec-format FR-011	check	.github: python3 tools/spec_check.py	one row per FR, none for missing FRs
+0020-spec-format FR-012	check	.github: python3 tools/spec_check.py	mechanism value only; the choice is not verified
+0020-spec-format FR-013	check	.github: python3 tools/spec_check.py	form of command or citation; its truth is not verified
+0020-spec-format FR-014	check	.github: python3 tools/spec_check.py	every run lists none rows
+0020-spec-format FR-015	check	.github: .github/workflows/spec-check.yml	runs on every push and pull request
+0020-spec-format FR-016	check	eidolon: make check-specs	loads the public root's tools/spec_check.py
+0020-spec-format FR-017	check	.github: python3 tools/spec_check.py	exit status is non-zero on any listed breach

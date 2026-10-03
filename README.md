@@ -120,6 +120,9 @@ profile/
 spec-kit/
   specs/            one testable spec per NNNN-slug, numbered independently
                     in each repository
+  enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
+tools/
+  spec_check.py     checks specs and the register; CI runs it on every push
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)
@@ -143,8 +146,22 @@ of it. If you want to add something, ask which layer it is missing from.
 ### Writing a spec
 
 - Create `spec-kit/specs/NNNN-slug/spec.md`; take the next unused number.
-- Follow the shape of the existing specs: title, `Spec ID`, `Status`, `Input`,
-  then requirements as `FR-NNN` (`MUST` / `MAY` / `MUST NOT`), each testable.
+- Follow [`0020-spec-format`](spec-kit/specs/0020-spec-format/spec.md): title,
+  `Spec ID`, `Status`, `Input`, then requirements as `FR-NNN` (`MUST` / `MAY`
+  / `MUST NOT`), then `Out of scope` (optional), `Edge cases`, `Assumptions`,
+  `Open questions`, `Key entities`, `Success criteria`, and the review
+  checklist. Each edge case cites the requirement that resolves it; one that
+  nothing resolves is an open question.
+- Never renumber or reuse a requirement number; a new one takes the next
+  unused number in its spec.
+- Status is `Draft` (in force, open to amendment), `Adopted` (amended only by
+  the decision authority or with its approval), or `Superseded by
+  NNNN-slug`. Only the decision authority moves a spec between them, in a
+  commit that says so.
+- Add a row to [`spec-kit/enforcement.tsv`](spec-kit/enforcement.tsv) for
+  every new `FR-NNN`: `check`, `gate`, `review`, or `none`, and what does it.
+  Record `none` honestly; the check lists every one on every run.
+- Run `python3 tools/spec_check.py` before you push; CI runs it too.
 - Cite other specs by ID and FR (for example, "0001 FR-016"). Do not restate
   their rules.
 - When a spec changes the meaning of an earlier one, amend the earlier spec in
@@ -173,6 +190,14 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0017](spec-kit/specs/0017-spoken-and-research-works/spec.md) | Spoken works and research records |
 | [0018](spec-kit/specs/0018-frontiers-console/spec.md) | Frontiers Console design system: operator and documentation surfaces |
 | [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
+| [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
+
+The format is derived from [GitHub Spec Kit](https://github.com/github/spec-kit)'s
+spec template, not a full use of Spec Kit. Specs here are standing rules
+rather than per-feature documents, so there is no `plan.md`, `tasks.md`, or
+feature branch; the ontology plays the data model's part, open questions
+(`OQ-N`) replace inline clarification markers, and the enforcement register
+replaces Spec Kit's consistency analysis. 0020 states each difference.
 
 ### Editing the ontology
 
@@ -237,6 +262,8 @@ design system carries an `assurance/` harness: open its `index.html` in a browse
 ### Before you commit
 
 - [ ] A spec exists for the change, and any spec it affects is amended.
+- [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
+      row in `spec-kit/enforcement.tsv`.
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.
