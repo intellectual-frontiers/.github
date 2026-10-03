@@ -53,6 +53,10 @@ find an audience and turn it into revenue, are running.
 
 ## What we publish and hold
 
+- **The Journal of Intellectual Frontiers (JINFRO)**, in preparation: a
+  quarterly, online and in print, reporting what our work found, made, or
+  proved since the last issue, with the evidence, and correcting itself in
+  the next issue when we get something wrong.
 - **A publishing record since 2005** on health IT and public-sector
   technology: [HealthcareGuy.com](https://healthcareguy.com),
   [HealthcareGuys.com](https://healthcareguys.com), [Medigy.com](https://medigy.com),
