@@ -893,7 +893,7 @@ ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
 ifcore:DomainName a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset, ifcore:Fact ; rdfs:label "Domain name"@en ;
     skos:definition "A registrable domain name the company holds through a registrar: the label directly beneath a public suffix, never a subdomain (0022-domain-names FR-001, FR-002)."@en ;
     skos:closeMatch <http://www.wikidata.org/entity/Q32635> ;
-    rdfs:comment "Specializes ifcore:IntangibleAsset (0019 FR-002): ASC 805 and IFRS 3 both list Internet domain names among marketing-related intangible assets. Distinct from any ifcore:DigitalAsset deployed at it (FR-001). Its dcterms:identifier is the lowercase A-label name (FR-003); its dcterms:rightsHolder defaults to Intellectual Frontiers LLC (FR-004); its dcterms:type is exactly one concept in ifcore:DomainRoleScheme (FR-005); what it serves is dcterms:relation (FR-006). Registrar, dates, status, nameservers, and DNSSEC are never literals here: they sit on the ExternalRecordReference that ifcore:describes it (FR-010)."@en .
+    rdfs:comment "Specializes ifcore:IntangibleAsset (0019 FR-002): ASC 805 and IFRS 3 both list Internet domain names among marketing-related intangible assets. Distinct from any ifcore:DigitalAsset deployed at it (FR-001). Its dcterms:identifier is the lowercase A-label name (FR-003); its dcterms:rightsHolder defaults to Intellectual Frontiers LLC (FR-004); its dcterms:type is exactly one concept in ifcore:DomainRoleScheme (FR-005), plus ifcore:CrownJewelDomain when it is one (FR-021); what it serves is dcterms:relation (FR-006). Registrar, dates, status, nameservers, and DNSSEC are never literals here: they sit on the ExternalRecordReference that ifcore:describes it (FR-010)."@en .
 
 ifcore:DomainRoleScheme a skos:ConceptScheme ; rdfs:label "Domain role"@en ;
     rdfs:comment "Why the company holds a domain name; the value of a DomainName's dcterms:type (0022-domain-names FR-005). Only primary, redirect, and mail domains may be Public (FR-009)."@en ;
@@ -912,7 +912,7 @@ ifcore:ParkedDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ;
     skos:definition "Held with no current use."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:DomainSecurityControlScheme a skos:ConceptScheme ; rdfs:label "Domain security control"@en ;
-    rdfs:comment "The controls every domain name is checked against (0023-domain-security FR-001). An exception is a Decision naming a DomainName and one of these by schema:about, lapsing on its dcterms:valid date (FR-002). Each concept's skos:notation is the code a check or report uses. Which controls apply to a domain follows from its role and its published records, as 0023 states; no property here restates that."@en ;
+    rdfs:comment "The controls every domain name is checked against (0023-domain-security FR-001; 0024-persistent-addresses FR-004). An exception is a Decision naming a DomainName and one of these by schema:about, lapsing on its dcterms:valid date (FR-002). Each concept's skos:notation is the code a check or report uses. Which controls apply to a domain follows from its role and its published records, as 0023 states; no property here restates that."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:TransferLockControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Transfer lock"@en ;
     skos:notation "transfer-lock" ; skos:definition "The registrar transfer lock is on (FR-004)."@en ; ifcore:hasAudience ifcore:Public .
@@ -940,6 +940,27 @@ ifcore:AccountMFAControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityCon
     skos:notation "account-mfa" ; skos:definition "Multi-factor sign-in, scoped expiring tokens, and access reviewed every ninety days, for each registrar and DNS provider account (FR-015)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AccountRecoveryControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Account recovery"@en ;
     skos:notation "account-recovery" ; skos:definition "Account recovery does not depend solely on a domain in the same account (FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SecurityTxtControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "security.txt"@en ;
+    skos:notation "security-txt" ; skos:definition "A security.txt with a contact and an unexpired date, on a primary domain (0023 FR-022)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CertificateTransparencyControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Certificate transparency"@en ;
+    skos:notation "certificate-transparency" ; skos:definition "No certificate in the public logs from an authority the domain's CAA does not permit, or for a hostname nobody serves (0023 FR-023)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LookalikesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Look-alike domains"@en ;
+    skos:notation "lookalikes" ; skos:definition "No look-alike of a Public primary domain registered by anyone else; reported, never acted on (0023 FR-024)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CrownJewelRenewalControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Crown jewel renewal"@en ;
+    skos:notation "crown-jewel-renewal" ; skos:definition "A crown jewel domain registered at least two years ahead (0023 FR-025)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CrownJewelAccessControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Crown jewel access"@en ;
+    skos:notation "crown-jewel-access" ; skos:definition "At least two people can administer the accounts holding a crown jewel domain (0023 FR-026)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PublishedAddressesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Published addresses"@en ;
+    skos:notation "published-addresses" ; skos:definition "Every published address on the domain answers, or redirects permanently (0024-persistent-addresses FR-002)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NamespaceResolvesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Namespace resolution"@en ;
+    skos:notation "namespace" ; skos:definition "Each public ontology namespace answers with Turtle, and the private one answers not found (0024 FR-005, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:DomainCriticalityScheme a skos:ConceptScheme ; rdfs:label "Domain criticality"@en ;
+    rdfs:comment "How much breaks if a domain is lost (0022-domain-names FR-021). A crown jewel carries this concept as a second dcterms:type beside its role; every other domain is standard and carries none. Anything that needs a domain to work names it by dcterms:requires (FR-024), reused from Dublin Core rather than declared here (0019-controlled-vocabulary FR-001)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CrownJewelDomain a skos:Concept ; skos:inScheme ifcore:DomainCriticalityScheme ; skos:prefLabel "Crown jewel"@en ;
+    skos:definition "A domain whose loss would break the company's identity or its vocabulary: one hosting an ontology namespace or the company's own primary web property, or one the decision authority marks (0022 FR-021; 0024-persistent-addresses FR-008). Generic top-level domains only (0022 FR-022); registered two years ahead and administered by at least two people (0023-domain-security FR-025, FR-026)."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
     rdfs:label "Cloudflare account"@en ;
@@ -952,7 +973,7 @@ ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
 ifcore:IntellectualFrontiersComDomain a ifcore:DomainName ;
     rdfs:label "intellectualfrontiers.com"@en ;
     dcterms:identifier "intellectualfrontiers.com" ;
-    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:type ifcore:PrimaryDomainRole, ifcore:CrownJewelDomain ;
     dcterms:relation ifcore:WebProperty ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     ifcore:hasAudience ifcore:Public .
