@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 868" width="1040" height="868">
+  <defs><marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-line"/></marker></defs>
+  <rect width="1040" height="868" class="f-surface"/>
+  <text x="28" y="50" text-anchor="start" class="f-ink" font-size="34" font-weight="bold">Every opportunity moves through four questions</text>
+  <text x="28" y="84" text-anchor="start" class="f-muted" font-size="20" font-weight="normal" font-style="italic">An advantage counts only once it has changed a real decision.</text>
+  <rect x="395.0" y="119.99999999999999" width="250" height="117.9" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="172.64999999999998" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">Find: what is unusually</text>
+  <text x="520.0" y="199.95" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">true here?</text>
+  <rect x="740.0" y="420.0" width="250" height="117.9" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="865.0" y="459.0" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">Prove: what small hard</text>
+  <text x="865.0" y="486.3" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">thing earns a scarce</text>
+  <text x="865.0" y="513.6" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">commitment?</text>
+  <rect x="395.0" y="720.0" width="250" height="117.9" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="520.0" y="772.6500000000001" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">Decide: what will we do</text>
+  <text x="520.0" y="799.95" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">now?</text>
+  <rect x="50.0" y="420.00000000000006" width="250" height="117.9" rx="4" class="f-primary-tint s-primary" stroke-width="1.5"/>
+  <text x="175.0" y="459.00000000000006" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">Compound: how does</text>
+  <text x="175.0" y="486.30000000000007" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">use make the</text>
+  <text x="175.0" y="513.6" text-anchor="middle" class="f-ink" font-size="21" font-weight="normal">advantage stronger?</text>
+  <path d="M594.6925,243.89999999999998 Q668.8775662627077,356.11579879788616 790.3075,414.0" fill="none" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <path d="M790.3075,543.9 Q668.8775662627077,601.7842012021139 594.6925,714.0" fill="none" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <path d="M445.3075,714.0 Q371.12243373729234,601.7842012021139 249.6925,543.9000000000001" fill="none" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+  <path d="M249.6925,414.00000000000006 Q371.12243373729234,356.1157987978862 445.3075,243.89999999999998" fill="none" class="s-line" stroke-width="2" marker-end="url(#arrD)"/>
+</svg>
