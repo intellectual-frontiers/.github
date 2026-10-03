@@ -54,8 +54,9 @@ where it departs from it.
   status scheme defines them: `Draft` (in force, and open to amendment by
   anyone working under 0001-eidolon-architecture FR-037), `Adopted` (in
   force, and amended only by the authority in effect or with its explicit
-  approval), or `Superseded by NNNN-slug` (no longer in force; the named
-  spec governs instead).
+  approval), or `Superseded by <spec>` (no longer in force; the named
+  spec governs instead), where `<spec>` is a numbered spec's `NNNN-slug`
+  or a design system's slug (FR-018).
 - **FR-010**: A spec MUST move from `Draft` to `Adopted`, or to
   `Superseded`, only by the authority in effect, per
   0001-eidolon-architecture FR-029. The move is a spec amendment, recorded
@@ -84,6 +85,16 @@ where it departs from it.
   `none`, not omitted or credited to a general expectation that someone
   will notice. The check MUST report every `none` row on every run.
 
+## Where a spec lives
+
+- **FR-018**: A spec MUST live at `spec-kit/specs/NNNN-slug/spec.md` with
+  `NNNN-slug` as its Spec ID, except a design system's spec
+  (0014-design-systems FR-022), which MUST live at
+  `design-systems/<slug>/spec.md` with the design system's slug as its Spec
+  ID. Every other requirement of this spec applies to both alike; a design
+  system spec's requirements are cited, and named in the register, as
+  `<slug> FR-NNN`.
+
 ## Checking the format
 
 - **FR-015**: The public root MUST check its own specs and enforcement
@@ -95,8 +106,8 @@ where it departs from it.
   implementation of them.
 - **FR-017**: A spec or register that breaks FR-005, FR-006 (an edge case
   citing no requirement), FR-008 (a duplicated identifier), FR-009,
-  FR-011, FR-012, or FR-013 (a missing command or citation) MUST fail the
-  check.
+  FR-011, FR-012, FR-013 (a missing command or citation), or FR-018 (a
+  Spec ID that does not match where the spec lives) MUST fail the check.
 
 ## Out of scope
 
@@ -115,6 +126,9 @@ where it departs from it.
 - A requirement enforced only by a check in the vault: the public
   register still names it, by repository and command, per FR-013; the
   public check cannot run it but can verify the row is well-formed.
+- A design system's house rules: they are a spec in that design system's
+  own directory, named by its slug, and every other requirement here
+  applies to them, per FR-018.
 - A spec superseded by another: its status names the successor, per
   FR-009, and its requirements keep their register rows until it is
   removed, per FR-011.

@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature/logos/if-logo-dark-672x189-2026-Sept.png">
-    <img alt="Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature/logos/if-logo-672x189-2026-Sept.png" width="336">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature-web/logos/if-logo-dark-672x189-2026-Sept.png">
+    <img alt="Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature-web/logos/if-logo-672x189-2026-Sept.png" width="336">
   </picture>
 </p>
 
@@ -66,12 +66,12 @@ find an audience and turn it into revenue, are running.
 - **Patents** in marketplaces and payments, evidence and decisions,
   healthcare delivery, trusted data and authorization, and learning and
   content.
-- **A design system** anyone may reuse: [frontiers-nature](https://github.com/intellectual-frontiers/.github/tree/main/design-systems).
+- **A design system** anyone may reuse: [frontiers-nature-web](https://github.com/intellectual-frontiers/.github/tree/main/design-systems).
 
 ## How we work
 
 <p align="center">
-  <img alt="How contrarian but practical observations move through Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature/images/how-contrarian-but-practical-observations-move-through-intellectual-frontiers-836.webp" width="836">
+  <img alt="How contrarian but practical observations move through Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-nature-web/images/how-contrarian-but-practical-observations-move-through-intellectual-frontiers-836.webp" width="836">
 </p>
 
 Every opportunity moves through four questions, in order: **Find** (what is

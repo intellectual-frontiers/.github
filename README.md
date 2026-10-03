@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design-systems/frontiers-nature/logos/if-logo-dark-672x189-2026-Sept.png">
-    <img alt="Intellectual Frontiers" src="design-systems/frontiers-nature/logos/if-logo-672x189-2026-Sept.png" width="336">
+    <source media="(prefers-color-scheme: dark)" srcset="design-systems/frontiers-nature-web/logos/if-logo-dark-672x189-2026-Sept.png">
+    <img alt="Intellectual Frontiers" src="design-systems/frontiers-nature-web/logos/if-logo-672x189-2026-Sept.png" width="336">
   </picture>
 </p>
 
@@ -135,8 +135,9 @@ content/
   journal/          public content documents (the only content root)
 design-systems/
   README.md         what a design system is, its kinds, and how to use any one
-  <slug>/           one self-contained design system per directory, of one
-                    kind (web, print, voice, ...), registered in ifcore.ttl
+  <identity>-<kind>/ one self-contained design system per directory, of one
+                    kind (web, print, written-voice, ...), registered in
+                    ifcore.ttl; its spec.md states its house rules
                     (0014-design-systems)
 ```
 
@@ -194,10 +195,14 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0015](spec-kit/specs/0015-work-packages/spec.md) | Work packages: how a Substantial Work is held |
 | [0016](spec-kit/specs/0016-press-production/spec.md) | Press production: books and series as work packages |
 | [0017](spec-kit/specs/0017-spoken-and-research-works/spec.md) | Spoken works and research records |
-| [0018](spec-kit/specs/0018-frontiers-console/spec.md) | Frontiers Console design system: operator and documentation surfaces |
 | [0019](spec-kit/specs/0019-controlled-vocabulary/spec.md) | Controlled vocabulary: reuse an established term before inventing one |
 | [0020](spec-kit/specs/0020-spec-format/spec.md) | Spec format, status, and the enforcement register |
 | [0021](spec-kit/specs/0021-works-and-presentations/spec.md) | Works and presentations: the deliverable apart from its forms; not shipping the organization |
+
+Each design system's house rules are a spec too, kept in its own directory
+and named by its slug rather than a number: for example
+[`frontiers-console-web`](design-systems/frontiers-console-web/spec.md)
+(0020 FR-018).
 
 The format is derived from [GitHub Spec Kit](https://github.com/github/spec-kit)'s
 spec template, not a full use of Spec Kit. Specs here are standing rules
@@ -249,19 +254,19 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 
 ### Brand assets and design systems
 
-[`design-systems/frontiers-nature/`](design-systems/frontiers-nature/) is the
+[`design-systems/frontiers-nature-web/`](design-systems/frontiers-nature-web/) is the
 canonical, public design system: tokens, CSS, fonts, logos (light and dark),
 the hero and diagram images, favicon, and share card.
-[`design-systems/frontiers-console/`](design-systems/frontiers-console/) is the
+[`design-systems/frontiers-console-web/`](design-systems/frontiers-console-web/) is the
 design system for operator (admin) and documentation surfaces. Both are web
 presentation design systems; every public house rule about how Intellectual
 Frontiers looks, reads or sounds (print, figures, written and spoken voice)
 belongs in a design system of its kind here too (0014). Every design system
 carries an `assurance/` harness; a web one's opens as `index.html` in a browser.
 
-- Logos: `design-systems/frontiers-nature/logos/` (PNG masters; WebP in
+- Logos: `design-systems/frontiers-nature-web/logos/` (PNG masters; WebP in
   `logos/web/`). Use the `-dark-` variants on dark backgrounds.
-- Images: `design-systems/frontiers-nature/images/`.
+- Images: `design-systems/frontiers-nature-web/images/`.
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one

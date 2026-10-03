@@ -40,11 +40,14 @@ and checked the same way, in the same directory.
 
 - **FR-003**: Every design system MUST live at
   `design-systems/<slug>/` in this repository, where `<slug>` is a short,
-  URL-safe, kebab-case name. No design system MAY live anywhere else in
+  URL-safe, kebab-case name of the form `<identity>-<kind code>`: the
+  identity it expresses, then the code of its kind (FR-018), as in
+  `frontiers-nature-web`. No design system MAY live anywhere else in
   this repository, and `design-systems/` MUST hold nothing but design
   systems and the top-level `README.md` required by FR-013. The directory
   is flat: a design system's kind is recorded in the ontology (FR-010,
-  FR-018), never in its path.
+  FR-018), and its slug's suffix is derived from that record, never a
+  second statement of it.
 - **FR-004**: A design system's directory is not a content root. Per
   0004-addressing FR-004, a repository's only content root is `content/`;
   nothing under `design-systems/<slug>/` is a content document, and
@@ -58,7 +61,7 @@ and checked the same way, in the same directory.
   bundle). What it inherits from a design system it derives from is
   carried as a vendored copy, per FR-021.
 - **FR-006**: Every design system directory MUST contain a top-level
-  `README.md` (what it is for and how to use it), a `rules.md` (FR-022), its
+  `README.md` (what it is for and how to use it), a `spec.md` (FR-022), its
   rules' machine-readable form where its kind profile names one, the assets
   its rules govern, and an `assurance/` harness (FR-015). Anything further
   follows its kind profile. It MUST document its actual layout in its own
@@ -69,18 +72,22 @@ and checked the same way, in the same directory.
 - **FR-018**: Every design system MUST have exactly one kind, drawn from the
   ontology's design system kind scheme (FR-010). A kind MUST be in that
   scheme only if this spec has a kind profile for it (FR-019), and a design
-  system MUST NOT be registered under a kind with no profile. Adding a kind
+  system MUST NOT be registered under a kind with no profile. Each kind
+  concept MUST carry a short code (`skos:notation`), unique in the scheme,
+  that ends the slug of every design system of that kind (FR-003). A design
+  system's kind MUST NOT change: output of another kind is a new design
+  system. Adding a kind
   is adding a profile here and a concept to the scheme; it changes no other
   requirement and moves no directory.
 - **FR-019**: A kind profile MUST state, for its kind: what the rules govern;
   what the rules' machine-readable form is, if any; what its assurance
-  harness runs on and what it must cover beyond FR-023; and what a consumer
+  harness runs on and what it must cover beyond FR-027; and what a consumer
   of it is.
 
 ## Derivation
 
 - **FR-020**: A design system MAY derive from one or more other design
-  systems, of its own kind or another (a web design system from a foundation
+  systems, of its own kind or another (a web design system from a brand
   one; a spoken-voice design system from a written-voice one). Derivation
   MUST be recorded in the ontology (FR-010) and MUST NOT form a cycle.
 - **FR-021**: A derived design system inherits every rule of what it derives
@@ -88,30 +95,26 @@ and checked the same way, in the same directory.
   files use (a color, a typeface, a banned word), and its harness MUST check
   that copy agrees with the source design system. It MAY add rules and
   narrow inherited ones. It MUST NOT contradict an inherited rule except by
-  a rule of its own that names the inherited rule by its identifier
-  (FR-022) and states the override.
+  a requirement of its own that cites the inherited one (`<slug> FR-NNN`)
+  and states the override.
 
 ## Rules
 
-- **FR-022**: A design system's house rules MUST be stated in its
-  `rules.md`, each under an identifier `R-NNN` that is cited from outside
-  the system as `<slug> R-NNN`. An identifier MUST NOT be renumbered or
-  reused; a rule that no longer applies is marked retired, with the rule
-  that replaces it if any, and keeps its identifier. Prose elsewhere in the
-  system (a markup contract, a guide, a worked example) explains or
-  illustrates rules; it MUST NOT state a rule `rules.md` does not.
-- **FR-023**: Every rule MUST name its enforcement mechanism, as the
-  ontology's enforcement mechanism scheme defines them (check, gate,
-  review, or none, per 0020-spec-format FR-012). A `check` rule MUST name
-  the harness test or machine-readable entry that enforces it; a `review`
-  rule MUST say who reviews what. A rule enforced by nothing MUST say
-  `none`.
-- **FR-024**: A change that adds, retires, or changes the meaning of a rule
-  MUST be committed with a message stating what changed and why, as
-  0001-eidolon-architecture FR-035 asks of spec changes, and MUST be
-  recorded as a `Decision` wherever 0008-decision-records FR-001 makes it a
-  significant decision. A lesson that a work teaches, once adopted, is
-  adopted into a rule with an identifier.
+- **FR-022**: A design system's house rules MUST be stated as the
+  requirements of a spec at `design-systems/<slug>/spec.md`, whose Spec ID
+  is the slug and which is governed by this spec. That spec MUST follow
+  0020-spec-format in full: its requirement identifiers, cited from outside
+  as `<slug> FR-NNN`, are never renumbered or reused; its status is Draft or
+  Adopted and moves only as 0020-spec-format FR-009 and FR-010 allow; and
+  each requirement has a row in the enforcement register. Prose elsewhere in
+  the system (a markup contract, a guide, a worked example) explains or
+  illustrates rules; it MUST NOT state a rule the spec does not. A long list
+  a rule depends on (banned words, a palette) MAY be held in the system's
+  machine-readable form and cited by the requirement, not restated in it.
+- **FR-023**: A change to a design system's spec is a spec amendment
+  (0001-eidolon-architecture FR-034, FR-035), whether it adds, retires, or
+  changes the meaning of a house rule. A lesson a work teaches becomes a
+  house rule only by being written into that spec as a requirement.
 
 ## What a design system holds, and what it does not
 
@@ -121,8 +124,8 @@ and checked the same way, in the same directory.
   It MUST NOT hold the tool that produces output from it (a renderer, a
   typesetting converter, a site server), a fact about one work, person, or
   deployment (which artwork a book uses, an author's bio, which mounts a
-  site exposes), or a view generated from the ontology (a glossary, per
-  0016-press-production FR-050). Those belong to the consumer.
+  site exposes), or a view generated from the ontology. Those belong to the
+  consumer.
 
 ## Tracking which design systems exist
 
@@ -153,7 +156,8 @@ and checked the same way, in the same directory.
 - **FR-013**: `design-systems/README.md` MUST exist and MUST explain, in
   terms that don't assume the reader has seen this spec: what a design
   system is, the kinds there are and why more than one design system may
-  exist, how derivation and rule identifiers work, and how to vendor and
+  exist, how slugs are formed, how derivation works, where each system's
+  rules are stated, and how to vendor and
   use any one of them (by pointing into that system's own README) in an
   arbitrary environment — not only one built the way this organization's
   own properties are. It MUST NOT carry design system status (FR-010).
@@ -179,8 +183,8 @@ and checked the same way, in the same directory.
   - never reports a test it did not run as passed, and says how to run it;
   - is runnable headlessly, so it can gate a change in a terminal or CI,
     and fails (non-zero) on any failing test.
-- **FR-027**: A design system's harness MUST cover, at minimum: every `check`
-  rule in its `rules.md` (FR-023); that its machine-readable form agrees with
+- **FR-027**: A design system's harness MUST cover, at minimum: every
+  requirement of its spec whose register row is `check` (FR-022); that its machine-readable form agrees with
   its rules where both state the same thing; and, for a derived system, that
   its vendored copies agree with their source (FR-021).
 - **FR-017**: A change to a design system's rules, machine-readable form,
@@ -189,9 +193,9 @@ and checked the same way, in the same directory.
   each system, not shared, so each directory remains self-contained per
   FR-005.
 
-## Kind profile: foundation
+## Kind profile: brand
 
-- **FR-028**: A foundation design system governs the identity every other
+- **FR-028**: A brand design system governs the identity every other
   kind draws on: the palette, the typeface families, the logo and its
   lockups, and the imagery identity. Its machine-readable form is a token
   file (`tokens.json`) naming each value once. Its harness checks its token
@@ -265,7 +269,7 @@ and checked the same way, in the same directory.
   (banned words and phrases, forbidden punctuation). Its harness runs that
   sweep over fixture passages that must pass and must fail. A shared term's
   definition is never part of it: a rule MAY require using a term as the
-  ontology defines it, and the glossary stays a generated view (FR-025).
+  ontology defines it.
   Its consumers are works, their audits, and the tools that check them.
 
 ## Kind profile: spoken voice
@@ -281,7 +285,7 @@ and checked the same way, in the same directory.
 
 - A templating or server-side rendering engine (the prior attempt's
   `0010-templating`, with its `app-field`, `app-each`, `app-include` and
-  similar constructs) is not adopted by this spec. `frontiers-nature`
+  similar constructs) is not adopted by this spec. `frontiers-nature-web`
   carries forward reference documentation (`templating.md`,
   `data/registry.json`) describing the vocabulary its own markup and
   chrome were originally designed against, but adopting any templating
@@ -293,11 +297,11 @@ and checked the same way, in the same directory.
 - The production pipelines that typeset, render, record or publish output
   from a design system are out of scope (FR-025); 0016-press-production and
   0017-spoken-and-research-works govern them.
-- A switch-driven dark theme remains unimplemented in `frontiers-nature`
+- A switch-driven dark theme remains unimplemented in `frontiers-nature-web`
   (its tokens exist behind `[data-theme="dark"]` but nothing wires a
   toggle to it) — carried forward from the prior attempt's open question,
   not resolved here.
-- Non-Latin font subsets are not shipped by `frontiers-nature` — also
+- Non-Latin font subsets are not shipped by `frontiers-nature-web` — also
   carried forward, not resolved here.
 
 ## Edge cases
@@ -310,15 +314,19 @@ and checked the same way, in the same directory.
   owns it and the other derives from it and carries a checked copy, per
   FR-020 and FR-021; neither states it independently.
 - A derived system that needs to depart from an inherited rule: it states an
-  override rule naming the inherited rule's identifier, per FR-021.
-- A rule that is replaced: it is marked retired and keeps its identifier,
-  and the replacement takes a new one, per FR-022.
-- A rule stated only in a guide or markup contract and not in `rules.md`:
-  it is not a rule until `rules.md` states it, per FR-022.
+  override requirement citing the inherited one, per FR-021.
+- A house rule that is replaced: its requirement number stays retired and
+  the replacement takes the next unused one, per FR-022 and
+  0020-spec-format FR-008.
+- A rule stated only in a guide or markup contract and not in the system's
+  spec: it is not a rule until the spec states it, per FR-022.
+- A design system created for a new kind of output from an existing one,
+  such as a print counterpart of a web system: it is a new design system
+  with its own slug, per FR-003 and FR-018.
 - A kind of output with no profile yet, such as motion or slides: no design
   system can be registered under it until a profile and a kind concept are
   added, per FR-018 and FR-019.
-- A glossary, author bio, or record of which artwork a book uses: it stays
+- An author bio, or a record of which artwork a book uses: it stays
   with the consumer, per FR-025.
 - An HTML reference file inside a design system, such as its markup
   contract: it is not a content document and 0002-content-format's rules
@@ -358,8 +366,8 @@ and checked the same way, in the same directory.
 - **OQ-3**: Whether a print design system holds a cover artwork library,
   given that art for an unpublished work is not yet public, or holds only
   the cover grammar, is not decided.
-- **OQ-4**: Whether the brand values now held by `frontiers-nature` move to
-  a foundation design system it derives from, and when, is not decided.
+- **OQ-4**: Whether the brand values now held by `frontiers-nature-web` move to
+  a brand design system it derives from, and when, is not decided.
 
 ## Key entities
 
@@ -367,14 +375,14 @@ and checked the same way, in the same directory.
   rules for one kind of output, with their machine-readable form, assets
   and harness, at `design-systems/<slug>/`, registered in `ifcore.ttl` as
   an `ifcore:DesignSystem`.
-- **A kind** — what a design system governs (foundation, web
+- **A kind** — what a design system governs (brand, web
   presentation, print, figure, written voice, spoken voice), a concept in
   `ifcore:DesignSystemKindScheme` with a profile in this spec.
-- **A rule** — one house rule in a design system's `rules.md`, with a
-  permanent identifier and an enforcement mechanism.
+- **A design system's spec** — the house rules of one design system, as
+  requirements in 0020-spec-format, at `design-systems/<slug>/spec.md`.
 - **Derivation** — one design system inheriting another's rules and
   carrying checked copies of the values it uses.
-- **`frontiers-nature`** — the first design system registered under this
+- **`frontiers-nature-web`** — the first design system registered under this
   spec, carried over from the prior attempt's single, unnamed design
   system; named for the "natural-frontier" visual identity its own tokens
   document.
@@ -406,9 +414,10 @@ and checked the same way, in the same directory.
   harness that never reports a test it did not run as passing, and that
   exits zero on a clean checkout and non-zero when a rule its harness
   covers is broken.
-- **SC-007**: Every rule in every `rules.md` has an identifier that has
-  never been used for another rule, and an enforcement mechanism; every
-  `check` rule names the test that enforces it.
+- **SC-007**: Every design system directory has a `spec.md` that passes the
+  spec check, and every one of its requirements has a row in the
+  enforcement register; every design system's slug ends with its kind's
+  code.
 - **SC-008**: No value inherited through derivation differs between a
   derived design system and its source.
 
