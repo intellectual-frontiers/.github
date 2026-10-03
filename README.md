@@ -134,9 +134,10 @@ ontology/
 content/
   journal/          public content documents (the only content root)
 design-systems/
-  README.md         what a design system is and how to use any one of them
-  <slug>/           one self-contained design system per directory,
-                    registered in ifcore.ttl (0014-design-systems)
+  README.md         what a design system is, its kinds, and how to use any one
+  <slug>/           one self-contained design system per directory, of one
+                    kind (web, print, voice, ...), registered in ifcore.ttl
+                    (0014-design-systems)
 ```
 
 ### The working order
@@ -252,8 +253,11 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 canonical, public design system: tokens, CSS, fonts, logos (light and dark),
 the hero and diagram images, favicon, and share card.
 [`design-systems/frontiers-console/`](design-systems/frontiers-console/) is the
-draft design system for operator (admin) and documentation surfaces. Every
-design system carries an `assurance/` harness: open its `index.html` in a browser.
+design system for operator (admin) and documentation surfaces. Both are web
+presentation design systems; every public house rule about how Intellectual
+Frontiers looks, reads or sounds (print, figures, written and spoken voice)
+belongs in a design system of its kind here too (0014). Every design system
+carries an `assurance/` harness; a web one's opens as `index.html` in a browser.
 
 - Logos: `design-systems/frontiers-nature/logos/` (PNG masters; WebP in
   `logos/web/`). Use the `-dark-` variants on dark backgrounds.

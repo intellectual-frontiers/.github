@@ -267,18 +267,35 @@ requirement	mechanism	by	note
 0014-design-systems FR-003	none	-	no check of design-systems/ layout; .github has no CI
 0014-design-systems FR-004	none	-	check-content scans content/ only, by construction; no check
 0014-design-systems FR-005	none	-	console-assurance covers only the vendored frontiers-console copy
-0014-design-systems FR-006	none	-	SHOULD layout and README content; no check
+0014-design-systems FR-006	none	-	no check that each system has README.md, rules.md and assurance/
 0014-design-systems FR-007	none	-	rule of judgment; no check possible
 0014-design-systems FR-008	none	-	no check that Datastar is opt-in per page
 0014-design-systems FR-009	none	-	frontiers-console harness tests this for one system; frontiers-nature is not run
-0014-design-systems FR-010	none	-	check-ontology does not validate ifcore:DesignSystem individuals
+0014-design-systems FR-010	none	-	check-ontology does not validate ifcore:DesignSystem individuals, their kind or derivation
 0014-design-systems FR-011	none	-	no check that a README omits status
 0014-design-systems FR-012	none	-	scoping statement; nothing to test
 0014-design-systems FR-013	none	-	README content is a judgment; no check
 0014-design-systems FR-014	none	-	re-vendoring is a consumer expectation; no check
-0014-design-systems FR-015	none	-	no make target or CI runs frontiers-nature harness; console-assurance covers one system
-0014-design-systems FR-016	none	-	no check of a harness coverage
+0014-design-systems FR-015	none	-	no make target or CI runs any harness; eidolon console-assurance covers one vendored copy, by hand
+0014-design-systems FR-016	none	-	no check of a web harness coverage
 0014-design-systems FR-017	none	-	completion rule; no check runs every harness
+0014-design-systems FR-018	none	-	no check that a registered kind has a profile
+0014-design-systems FR-019	none	-	what a profile states is a judgment; no check
+0014-design-systems FR-020	none	-	no check of derivation records or cycles
+0014-design-systems FR-021	none	-	no harness checks inherited copies; no system derives yet
+0014-design-systems FR-022	none	-	no check of rules.md identifiers; no system has rules.md yet
+0014-design-systems FR-023	none	-	no check that each rule names an enforcement mechanism
+0014-design-systems FR-024	none	-	commit-message and Decision discipline; no check
+0014-design-systems FR-025	none	-	no check of what a design system directory holds
+0014-design-systems FR-026	none	-	consumers record pins (www VENDORED.txt, eidolon console/vendor/PIN) in two formats; no check
+0014-design-systems FR-027	none	-	no check of harness coverage of check rules
+0014-design-systems FR-028	none	-	foundation profile; no system of this kind yet
+0014-design-systems FR-029	none	-	web layout; no check
+0014-design-systems FR-030	none	-	web harness runtime; no check runs it
+0014-design-systems FR-031	none	-	print profile; no system of this kind yet
+0014-design-systems FR-032	none	-	figure profile; no system of this kind yet
+0014-design-systems FR-033	none	-	written-voice profile; no system of this kind yet
+0014-design-systems FR-034	none	-	spoken-voice profile; no system of this kind yet
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
