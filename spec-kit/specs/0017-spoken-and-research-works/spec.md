@@ -169,7 +169,8 @@ stated here.
   hypothesis's status. A result a study kit returns from outside is evidence
   to weigh and MUST NOT by itself change a claim's label.
 - **FR-030**: A paper's printed form MUST be a rendition built from the same
-  AsciiDoc source to the house design for research papers, which holds the
+  AsciiDoc source to the house design for research papers (`frontiers-print`'s
+  journal article, themed by `frontiers-brand`), which holds the
   quality of the best professional journals of its kind. The paper's source
   and printed form MUST carry only what a reader needs to read, judge, and cite
   it; editorial records MUST sit beside it, never in it. A paper unpublished
