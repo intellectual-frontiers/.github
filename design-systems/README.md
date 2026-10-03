@@ -131,6 +131,11 @@ or font; the same brand that themes the page themes the figure, in a default, on
 variant, on a standard or compact canvas. Each web and print design system names the figure design
 system its pages use (`ifcore:drawsFiguresWith`).
 
+A **written-voice** design system states how the house writes, as the house's voice and never one
+person's, with the patterns its sweep refuses (`frontiers-written-voice`); a **spoken-voice** one
+derives from it and adds what changes for the ear (`frontiers-spoken-voice`). Writing samples,
+instructions written for a named author and audit prompts stay with the consumer.
+
 That is how white-labeling works: a company that wants a web or print design system in its own
 colors, logo and imagery supplies a brand, and the design system is used unchanged. A brand that is not yet public
 lives, with the same layout and harness, outside this repository.
