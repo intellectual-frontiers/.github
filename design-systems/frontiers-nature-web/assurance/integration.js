@@ -25,7 +25,10 @@
       const ids = f.$$("[id]").map((e) => e.id); t.deepEqual(ids.filter((id, i) => ids.indexOf(id) !== i), [], "duplicate ids");
       for (const a of f.$$('a[href^="#"]')) { const id = a.getAttribute("href").slice(1); if (id) t.ok(f.doc.getElementById(id), `anchor #${id}`); }
       for (const img of f.$$("img")) t.ok(img.hasAttribute("alt"), `img without alt: ${img.src}`);
-      for (const el of f.$$("script[src], link[href], img[src]")) t.ok(!/^(https?:)?\/\//.test(el.getAttribute("src") || el.getAttribute("href")), "external resource");
+      for (const el of f.$$("script[src], link[href], img[src]")) {
+        const url = new URL(el.getAttribute("src") || el.getAttribute("href"), f.doc.baseURI);
+        t.equal(url.origin, f.win.location.origin, `external resource: ${url.href}`);
+      }
     }));
   });
 

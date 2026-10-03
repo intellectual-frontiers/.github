@@ -53,21 +53,24 @@ Intellectual Frontiers has more than one kind of output, and may end up
 with more than one system of a kind: a different unit, a public-facing
 product, an acquisition with its own existing identity. Each one gets its
 own `<slug>/` directory here and its own record in the ontology
-(`ifcore:DesignSystem`, with a kind, any design systems it derives from,
+(`ifcore:DesignSystem`, with a kind, a classification if it is a web
+design system, any design systems it derives from,
 and a status of active, draft, or retired). The ontology, not this file
 or any design system's own `README.md`, is the one record of which
 design systems exist and what their status is.
 
 The design systems here today, each with its rules in its own `spec.md`:
 
-- [`frontiers-brand/`](frontiers-brand/README.md) (brand): the palette (Deep
-  Ink, Frontier Blue, Signal Teal, Editorial Oxblood, Warm Paper), unit
-  colors, typefaces, logo, icon and imagery identity every visual system
-  derives from.
+- [`frontiers-brand/`](frontiers-brand/README.md) (brand): Intellectual
+  Frontiers' palette (Deep Ink, Frontier Blue, Signal Teal, Editorial
+  Oxblood, Warm Paper), unit colors, typefaces, logo, icon and imagery; the
+  theme of everything it publishes.
+- [`example-brand/`](example-brand/README.md) (brand): a test brand that
+  proves every web design system can be themed by someone else's brand.
 - [`frontiers-nature-web/`](frontiers-nature-web/README.md) (web
-  presentation, derives from `frontiers-brand`): the public, editorial face.
+  presentation): the public, editorial face.
 - [`frontiers-console-web/`](frontiers-console-web/README.md) (web
-  presentation, derives from `frontiers-brand`): operator (admin) and
+  presentation): operator (admin) and
   documentation surfaces: sidebar, navbar and table-of-contents shell in
   three selectable layouts, documentation components, and the data-dense
   pieces an admin console needs.
@@ -94,16 +97,56 @@ Changing a house rule is amending that spec, with a commit message saying
 what changed and why. A lesson learned from a piece of work becomes a
 house rule by being written into the spec as a requirement.
 
+## Brands and themes
+
+A **brand** design system holds one identity: its palette, typefaces, logo, icon and imagery, as
+primitive tokens in `tokens.json` (the Design Tokens Community Group format), and a fixed set of
+**theme roles** every brand supplies under the same names: `text`, `surface`, `primary`,
+`secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `font-sans` and `font-serif`. Its
+`brand.css` declares those roles as `--brand-*` custom properties, and `tokens.json` lists its logo
+files and favicon.
+
+A **web** design system never holds a brand value. Its semantic tokens reference the roles
+(`--fc-primary: var(--brand-primary)`), its tints are mixed from them with `color-mix()`, and its
+logo and favicon come from the brand's `tokens.json`. Pairing a web design system with a brand is a
+**theme**. A theme changes colors, the typeface (among families the web system ships), the logo and
+the favicon; it never changes layout, spacing, components, motion or accessibility.
+
+That is how white-labeling works: a company that wants a web design system in its own colors and
+logo supplies a brand, and the web design system is used unchanged. A brand that is not yet public
+lives, with the same layout and harness, outside this repository.
+
+Every web design system's harness runs under any brand vendored beside it
+(`node <slug>/assurance/run.mjs --brand <brand>`), and fails when the brand lacks a role it uses,
+names a font it doesn't ship, or makes text unreadable. `tools/run_assurance.sh` runs every web
+design system here under every brand here, including [`example-brand`](example-brand/README.md), a
+deliberately different test brand that proves no web system depends on Intellectual Frontiers'
+own colors.
+
+A page uses exactly one web design system and one theme. A site may use several, each for an
+area of it: www's public pages use `frontiers-nature-web` and its `/console` uses
+`frontiers-console-web`, both themed by `frontiers-brand`.
+
+## Classifying web design systems
+
+Each web design system is classified in the ontology on three axes, in the industry's own terms:
+
+| Axis | Values | Source of the terms |
+| --- | --- | --- |
+| Interaction model (one or more) | *Content site*: marketing site, editorial site, documentation. *Web application*: product application, back office, dashboard, transactional service. | Content vs. application sites; Diátaxis for documentation; GOV.UK for transactional services |
+| Expression (exactly one) | productive, expressive | IBM Carbon |
+| Density (one or more) | default, comfortable, compact | Material Design |
+
+`frontiers-nature-web` is an editorial and marketing site, expressive. `frontiers-console-web` is
+documentation, back office and dashboard, productive.
+
 ## Derivation
 
-A design system may **derive from** others: a web design system from a
-brand one, a spoken-voice system from a written-voice one. It
-inherits every rule of what it derives from, keeps its own copy of any
-inherited value it uses (a color, a typeface, a banned word) so it stays
-self-contained, and its harness checks that copy still agrees with the
-source. It may add or tighten rules; it contradicts an inherited rule only
-with a requirement of its own that cites the inherited one. A
-consumer of a derived system vendors every system in its chain.
+A design system may **derive from** another of a related kind, a spoken-voice system from a
+written-voice one, for instance. It inherits every rule of what it derives from, keeps its own
+copy of any inherited value it uses so it stays self-contained, and its harness checks that copy
+still agrees with the source. It contradicts an inherited rule only with a requirement of its own
+that cites the inherited one. A brand is never derived from; it themes.
 
 ## Engineering stance
 
@@ -149,7 +192,7 @@ design system guarantees. It needs nothing but a browser:
 | Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` for one system, or `tools/run_assurance.sh` for all (needs Playwright and Chromium; exits non-zero on failure; `--shots DIR` writes screenshots of every fixture). CI runs `tools/run_assurance.sh` on every push that touches `design-systems/`. |
 
 Each harness has `fixtures/` (complete pages written to the system's markup contract, which are both the
-test subjects and reference renderings), `unit.js` and `integration.js` (the suites, plus `inherited.js` in a derived system, each with a
+test subjects and reference renderings), `unit.js` and `integration.js` (the suites, plus `theme.js` in a web system and `contract.js` in a brand, each with a
 description that is rendered into the page as documentation), and a runner (`runner.js`, `boot.js`,
 `run.mjs`). The runner files are **copied** between design systems rather than shared, so each directory
 stays self-contained. A change to a design system is complete when its harness is green over http.
@@ -158,7 +201,7 @@ stays self-contained. A change to a design system is complete when its harness i
 
 None of this assumes Intellectual Frontiers' own stack, or even that the
 consumer is part of this organization. Whatever the kind, vendor the whole
-directory (and every system it derives from), record the slug and source
+directory, a brand beside it to theme it, record the slug and source
 commit of each copy, and never edit a copy in place. To use a web design
 system from this directory:
 
@@ -175,7 +218,8 @@ system from this directory:
    cascade layers, not the file boundaries, are what make the order
    matter). Point any font references at wherever you actually serve its
    `fonts/` directory.
-4. Serve its `fonts/`, `logos/`, `images/` and `js/` directories as
+4. Load the brand's `brand.css` before the design system's stylesheets, take the logo and
+   favicon from the brand's `tokens.json`, and serve its `fonts/`, `images/` and `js/` directories as
    static assets.
 5. Load its first-party script (e.g. `frontiers-nature-web`'s `js/chrome.js`, `frontiers-console-web`'s `js/console.js`)
    on every page. Load its Datastar bundle only on pages that actually
@@ -205,7 +249,8 @@ system from this directory:
    and 0020-spec-format, and add a row for each requirement to
    `spec-kit/enforcement.tsv`. Run `python3 tools/spec_check.py`.
 4. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
-   its slug (`dcterms:identifier`), a status, a kind (`dcterms:type`) and anything it derives from
+   its slug (`dcterms:identifier`), a status, a kind (`dcterms:type`; a web system adds its
+   interaction models, expression and densities) and anything it derives from
    (`prov:wasDerivedFrom`), per 0014-design-systems FR-010. Its kind must
    already have a profile in the spec (FR-018).
 5. Add it to the list above.

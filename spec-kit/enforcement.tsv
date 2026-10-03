@@ -282,13 +282,13 @@ requirement	mechanism	by	note
 0014-design-systems FR-018	none	-	no check that a registered kind has a profile, or that a kind never changes
 0014-design-systems FR-019	none	-	what a profile states is a judgment; no check
 0014-design-systems FR-020	none	-	no check of derivation records or cycles
-0014-design-systems FR-021	check	.github: tools/run_assurance.sh	each derived web system checks its colours, fonts and logo bytes against frontiers-brand beside it
+0014-design-systems FR-021	none	-	no design system derives from another yet; nothing checks a derived copy
 0014-design-systems FR-022	none	-	spec_check checks each design system spec against 0020, but a missing spec.md only warns
 0014-design-systems FR-023	none	-	spec-amendment discipline; no check
 0014-design-systems FR-025	none	-	no check of what a design system directory holds
 0014-design-systems FR-026	none	-	consumers record pins (www VENDORED.txt, eidolon console/vendor/PIN) in two formats; no check
 0014-design-systems FR-027	none	-	no check of harness coverage of check rules
-0014-design-systems FR-028	none	-	brand profile; no system of this kind yet
+0014-design-systems FR-028	check	.github: tools/run_assurance.sh	every brand runs contract.js: roles, brand.css agreement, theme layer, role contrast, logo files
 0014-design-systems FR-029	none	-	web layout; no check
 0014-design-systems FR-030	check	.github: tools/run_assurance.sh	web harnesses run headlessly in Chromium; file:// skipping not checked in CI
 0014-design-systems FR-031	none	-	print profile; no system of this kind yet
@@ -296,6 +296,12 @@ requirement	mechanism	by	note
 0014-design-systems FR-033	none	-	written-voice profile; no system of this kind yet
 0014-design-systems FR-034	none	-	spoken-voice profile; no system of this kind yet
 0014-design-systems FR-035	none	-	removal discipline; no check that a removed system leaves no ontology individual
+0014-design-systems FR-036	check	.github: tools/run_assurance.sh	contract.js: every brand token has $value and every alias resolves; theme.js: each web tokens.json mirrors tokens.css with {role.*} aliases
+0014-design-systems FR-037	check	.github: tools/run_assurance.sh	contract.js: every role present with its type, brand.css declares exactly the roles, logo extension lists light and dark lockups, icon, favicon
+0014-design-systems FR-038	check	.github: tools/run_assurance.sh	theme.js: roles used exist in the theme, font families shipped, no theme color as a literal; that logos come from the theme is not checked outside fixtures
+0014-design-systems FR-039	check	.github: tools/run_assurance.sh	runs every web design system under every brand; a missing role or failed contrast fails the run
+0014-design-systems FR-040	none	-	one design system and theme per page is a consumer fact; www enforces it for its own areas
+0014-design-systems FR-041	check	.github: python3 tools/spec_check.py	each web DesignSystem names an interaction model, exactly one expression and a density
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
@@ -405,11 +411,11 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-031	check	eidolon: make research-check	fails a published paper with no promotion brief
 frontiers-console-web FR-001	none	-	registration and derivation are not checked
 frontiers-console-web FR-002	none	-	rule of judgment; no check possible
-frontiers-console-web FR-003	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	Inherited from frontiers-brand: colours, font stack, logo bytes
+frontiers-console-web FR-003	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, Inter shipped, no theme color as a literal
 frontiers-console-web FR-004	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness: no @import, remote URL, framework; classic script; runs on vendored copy
 frontiers-console-web FR-005	none	-	provenance of code; no check possible
 frontiers-console-web FR-006	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks layer order declared once in reset.css and one layer per file
-frontiers-console-web FR-007	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks required --fc- tokens and tokens.json mirror; semantic naming unchecked
+frontiers-console-web FR-007	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	Theme: tokens.json mirrors tokens.css exactly, theme values as {role.*} aliases
 frontiers-console-web FR-008	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness Layouts suite checks each layout and runtime reflow
 frontiers-console-web FR-009	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
 frontiers-console-web FR-010	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks changing --fc-sidebar-width moves the page
@@ -422,27 +428,28 @@ frontiers-console-web FR-016	check	.github: node design-systems/frontiers-consol
 frontiers-console-web FR-017	none	-	documentation completeness; no check possible
 frontiers-console-web FR-018	none	-	harness runs, but nothing checks which suites it covers
 frontiers-console-web FR-019	none	-	no check
-frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug, nothing checks contents or derivations
-frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: brand colour names and #rrggbb values
-frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: every unit has a colour, a brand colour or network
-frontiers-brand FR-004	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Tokens: sans, serif and wordmark named
-frontiers-brand FR-005	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Contrast: listed pairings and unit colours ≥ 4.5:1
-frontiers-brand FR-006	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: each loads at its stated size; light and dark, PNG and WebP per size
+frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
+frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
+frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
+frontiers-brand FR-004	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: Inter, Source Serif 4, wordmark weight 700
+frontiers-brand FR-005	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: palette inks and unit colors on white and Warm Paper
+frontiers-brand FR-006	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files and Frontiers palette: sizes load as stated; light and dark, PNG and WebP; names state sizes
 frontiers-brand FR-007	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: icon files load at their stated size; crop provenance not checked
-frontiers-brand FR-008	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: minimum sizes stated and every lockup file above them
-frontiers-brand FR-009	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Specimen: light lockups on light, dark on Deep Ink; redrawing or recolouring not checked
+frontiers-brand FR-008	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: minimum sizes stated
+frontiers-brand FR-009	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Specimen: light lockups on light, dark on dark; redrawing or recoloring not checked
 frontiers-brand FR-010	none	-	clear space is a placement judgment; no check
 frontiers-brand FR-011	none	-	how a new size is made; no check
 frontiers-brand FR-012	none	-	imagery judgment; no check
-frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: favicon loads at 64×64
+frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: the favicon loads at its stated size
+frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
-frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; tokens.json mirrors tokens.css
-frontiers-nature-web FR-004	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Inherited from frontiers-brand: colours, font stacks, logo bytes
+frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
+frontiers-nature-web FR-004	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, families shipped, no theme color as a literal
 frontiers-nature-web FR-005	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens and Rendered contrast suites
 frontiers-nature-web FR-006	none	-	semantic use of diagram and unit colours is a judgment; no check
 frontiers-nature-web FR-007	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: bundle.txt order and files
-frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important
+frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important; the order statement itself is not checked
 frontiers-nature-web FR-009	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: every font file fonts.css references exists; Page frame: fonts load
 frontiers-nature-web FR-010	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: chrome.js defines if-shelf, no modules or network; Datastar opt-in not checked
 frontiers-nature-web FR-011	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract and Page frame: one main, one h1, page capped at 72rem
@@ -455,6 +462,9 @@ frontiers-nature-web FR-017	check	.github: node design-systems/frontiers-nature-
 frontiers-nature-web FR-018	none	-	navigation data drives the chrome in a consumer; no check here
 frontiers-nature-web FR-019	none	-	layout attributes are implemented by a consumer; no check here
 frontiers-nature-web FR-020	none	-	registry contents not checked
+example-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
+example-brand FR-002	check	.github: tools/run_assurance.sh	Brand contract here, and every web design system run themed by it
+example-brand FR-003	check	.github: node design-systems/example-brand/assurance/run.mjs	Logo files: light and dark lockups, icon and favicon load at their stated sizes
 0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
 0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
 0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent

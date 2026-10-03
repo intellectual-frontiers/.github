@@ -1,0 +1,25 @@
+/*
+ * example-brand's theme (0014-design-systems FR-028, FR-037): every role in tokens.json under "role", as a custom
+ * property, and nothing else.
+ */
+@layer theme {
+  :root {
+    --brand-text: #1f1a24;
+    --brand-surface: #ffffff;
+    --brand-primary: #6b2fa3;
+    --brand-secondary: #0b6e4f;
+    --brand-tertiary: #a23b12;
+    --brand-success: #0b6e4f;
+    --brand-warning: #8a5300;
+    --brand-danger: #b3261e;
+    --brand-info: #1f5fa8;
+    --brand-font-sans: "Inter";
+    --brand-font-serif: "Source Serif 4";
+    --brand-paper: #f6f3fb;
+    --brand-unit-capital: #1f5fa8;
+    --brand-unit-ip: #1f1a24;
+    --brand-unit-press: #a23b12;
+    --brand-unit-studios: #0b6e4f;
+    --brand-unit-network: #6b2fa3;
+  }
+}
