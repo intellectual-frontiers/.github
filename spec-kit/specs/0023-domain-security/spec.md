@@ -109,6 +109,45 @@ the DNS-as-code source and the registrar account, never in the ontology
   or through a person with access to the account concerned
   (0022-domain-names FR-014), never through the check itself.
 
+## Watching for impersonation
+
+- **FR-022**: A primary domain MUST publish a `security.txt` file
+  (RFC 9116) at `/.well-known/security.txt`, naming a contact the company
+  controls and an expiry date that has not passed, so that anyone who
+  finds a weakness in what the company publishes knows where to report
+  it.
+- **FR-023**: Certificates issued for a company domain MUST be watched
+  through the public certificate transparency logs. A certificate issued
+  by an authority the domain's CAA records do not permit, or for a
+  hostname the DNS-as-code source does not serve, MUST be reported under
+  FR-018.
+- **FR-024**: Domain names that look like a Public primary domain (one
+  character dropped, doubled, swapped, or replaced by a neighbouring key
+  or a look-alike character, or the same name under another common
+  top-level domain) MUST be checked for registration on FR-017's cadence.
+  One registered by anyone other than the company MUST be reported under
+  FR-018; the check MUST NOT contact or act against it.
+
+## Crown jewels
+
+- **FR-025**: A crown jewel domain (0022-domain-names FR-021) MUST be
+  registered at least two years ahead at all times, so that a failed
+  renewal leaves time to notice it.
+- **FR-026**: At least two people MUST be able to administer the
+  registrar and DNS provider accounts that hold a crown jewel domain, each
+  signing in with a phishing-resistant second factor (a hardware security
+  key or a passkey), so that the domain does not depend on one person
+  being reachable.
+- **FR-027**: The payment method and billing contact on every registrar
+  account MUST be reviewed with FR-015's access review, so that an expired
+  card cannot let a domain lapse unnoticed.
+
+## Email at scale
+
+- **FR-028**: Bulk or newsletter email MUST be sent from a dedicated
+  subdomain, never from a crown jewel domain itself, so that a sending
+  problem cannot damage the reputation of the company's own address.
+
 ## Out of scope
 
 - Hosting, application security, and the security of what a domain
@@ -134,6 +173,12 @@ the DNS-as-code source and the registrar account, never in the ontology
   meets FR-010; holding it at none needs an exception, per FR-002.
 - An exception whose lapse date has passed: it counts as a failure and
   is reported, per FR-002 and FR-018.
+- A crown jewel domain renewed for only one more year: it fails, per
+  FR-025.
+- A look-alike of a public brand registered by a stranger: it is
+  reported and nothing is done to it by the check, per FR-024.
+- A certificate for a hostname nobody configured: it is reported, per
+  FR-023.
 - A record left pointing at a deleted hosting service: it fails the
   check, per FR-014.
 
@@ -151,7 +196,7 @@ the DNS-as-code source and the registrar account, never in the ontology
   domains served through the DNS provider's proxy and for any served
   elsewhere, is not yet stated.
 - **OQ-2**: Whether a registry lock, beyond the registrar transfer lock,
-  is required for the company's most valuable domains is not decided.
+  is required for crown jewel domains, at its cost, is not decided.
 - **OQ-3**: Where DMARC aggregate and TLS reports are received, and who
   reads them, is not yet stated.
 - **OQ-4**: Whether registrar settings (transfer lock, renewal, DNSSEC
@@ -160,6 +205,12 @@ the DNS-as-code source and the registrar account, never in the ontology
   0022-domain-names OQ-1.
 - **OQ-5**: Whether a role other than the founder receives FR-018's
   reports is not yet delegated, per 0001-eidolon-architecture FR-029.
+- **OQ-6**: Whether newsletter email carries a verified brand logo
+  (BIMI), which needs a registered trademark and a paid mark certificate,
+  is not decided.
+- **OQ-7**: Who may create a subdomain, and the naming convention
+  subdomains follow, are for DevOps to state with 0022-domain-names
+  OQ-1.
 
 ## Key entities
 
