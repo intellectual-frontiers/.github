@@ -42,10 +42,12 @@ assets.
   `IntangibleAsset`, or `FinancialAsset`.
 - **FR-007**: `IntellectualProperty` (patents, trademarks, trade secrets,
   defensive disclosures) and `DigitalAsset` (a distinct, separately-valuable
-  digital property — a domain and its deployment, a distinct software
-  product, a distinct dataset) MUST be represented as kinds of
-  `IntangibleAsset`. A `DigitalAsset` MUST NOT be created for an individual
-  page or file within a larger property.
+  digital property — a web property, a distinct software product, a
+  distinct dataset) MUST be represented as kinds of `IntangibleAsset`. A
+  `DigitalAsset` MUST NOT be created for an individual page or file within
+  a larger property. A domain name a digital property is deployed at is a
+  `DomainName`, a separate kind of `IntangibleAsset`, per
+  0022-domain-names FR-001.
 - **FR-008**: An asset's own literal properties MUST be limited to
   classifications Intellectual Frontiers itself is the authority on. Any
   property an external registry (a patent office, a trademark office) is
@@ -181,6 +183,9 @@ assets.
   per FR-005, FR-012, and FR-020.
 - A web property with many pages: it is one `DigitalAsset`, and no page
   or file within it becomes one of its own, per FR-007.
+- A web property and the domain it is deployed at: the property is a
+  `DigitalAsset` and the domain a `DomainName`, two individuals, per
+  FR-007.
 - A right created by a named person with no agreement stating otherwise:
   the person is its `dcterms:creator` and the company its
   `dcterms:rightsHolder`, per FR-014.
