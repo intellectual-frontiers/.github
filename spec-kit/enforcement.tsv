@@ -635,3 +635,32 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
 0024-persistent-addresses FR-010	none	-	consent is a person's; nothing checks it
 0024-persistent-addresses FR-011	none	-	no organization identifier held yet (OQ-3)
+frontiers-written-voice FR-001	check	.github: python3 tools/spec_check.py	registration and kind; that no rule names a person or holds source material is a review judgment
+frontiers-written-voice FR-002	none	-	directory contents; no check
+frontiers-written-voice FR-003	none	-	style authority; applied by a human read
+frontiers-written-voice FR-004	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	throat-clearing and announcement openings; whether a piece starts with its point is a human read
+frontiers-written-voice FR-005	none	-	person and voice; a human read
+frontiers-written-voice FR-006	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	plain-word swaps warn; specificity is a human read
+frontiers-written-voice FR-007	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	hedge phrases; whether uncertainty is real is a human read
+frontiers-written-voice FR-008	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	banned words, hedges, stock openings and closings refused by the sweep
+frontiers-written-voice FR-009	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	announcement openings and wrap-up asides; headings as claims are a human read
+frontiers-written-voice FR-010	none	-	literary prose and humor; a human read
+frontiers-written-voice FR-011	none	-	contrarian claims and useful conclusions; a human read
+frontiers-written-voice FR-012	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
+frontiers-written-voice FR-013	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	Not-X fragments warn; rhythm and paragraph jobs are a human read
+frontiers-written-voice FR-014	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	procedure mode: instruction and sentence length, passive instructions
+frontiers-written-voice FR-015	none	-	presentation form; a human read
+frontiers-written-voice FR-016	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	every shared term is in ifcore.ttl under its label; avoided variants refused
+frontiers-written-voice FR-017	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	the sweep against fail and pass fixtures
+frontiers-written-voice FR-018	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	a derived voice keeps every inherited pattern
+frontiers-written-voice FR-019	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-spoken-voice FR-001	check	.github: python3 tools/spec_check.py	registration, kind and derivation from a written-voice design system
+frontiers-spoken-voice FR-002	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the inherited copy is identical to its source; no inherited pattern dropped or loosened
+frontiers-spoken-voice FR-003	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings; repeating the intro is the consumer's format check
+frontiers-spoken-voice FR-004	none	-	writing for one hearing; a read-aloud judgment
+frontiers-spoken-voice FR-005	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings and filler refused by the sweep; fake banter is a human read
+frontiers-spoken-voice FR-006	none	-	transitions and repetition; a human read
+frontiers-spoken-voice FR-007	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	story labels refused; naming a real party is the consumer's check
+frontiers-spoken-voice FR-008	none	-	humor and performance punctuation; a human read
+frontiers-spoken-voice FR-009	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
+frontiers-spoken-voice FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
