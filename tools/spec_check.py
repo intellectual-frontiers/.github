@@ -380,8 +380,8 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             findings.append(Finding("error", where, "an email design system names no email type (0014-design-systems FR-051)"))
         if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
             findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
-        if "CourseDesignSystemKind" in named and not (named & _concepts(ttl, "CourseFormatScheme") and named & _concepts(ttl, "AssessmentItemTypeScheme")):
-            findings.append(Finding("error", where, "a course design system names no course format or no assessment item type (0014-design-systems FR-052)"))
+        if "CourseDesignSystemKind" in named and not all(named & _concepts(ttl, s) for s in ("CourseFormatScheme", "AssessmentItemTypeScheme", "CourseDeliveryTargetScheme")):
+            findings.append(Finding("error", where, "a course design system names no course format, assessment item type or delivery target (0014-design-systems FR-052)"))
         if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
             findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:
