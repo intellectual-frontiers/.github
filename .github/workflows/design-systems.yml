@@ -6,9 +6,9 @@ name: design-systems
 
 on:
   push:
-    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", ".github/workflows/design-systems.yml"]
   pull_request:
-    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", ".github/workflows/design-systems.yml"]
 
 permissions:
   contents: read
