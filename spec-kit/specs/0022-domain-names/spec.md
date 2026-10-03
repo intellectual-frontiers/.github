@@ -29,7 +29,9 @@ FR-016 through FR-025 to domain names.
   its ASCII (A-label) form.
 - **FR-004**: A `DomainName` MUST state its rights-holder by
   `dcterms:rightsHolder`, defaulting to Intellectual Frontiers LLC per
-  0007-work-and-assets FR-014.
+  0007-work-and-assets FR-014. Another organization that operates the
+  domain, or in whose name the registrar or DNS account holding it is
+  kept, MUST NOT be stated as its rights-holder on that account alone.
 
 ## Its role
 
@@ -119,6 +121,10 @@ FR-016 through FR-025 to domain names.
 - **FR-019**: A reconciliation run under FR-018 MUST only report; it MUST
   NOT add, change, or remove a `DomainName` on its own. Acting on a report
   follows FR-016 and FR-037 of 0001-eidolon-architecture.
+- **FR-020**: A domain name the decision authority has decided to let
+  lapse MAY be left out of the catalog, despite FR-008, once that
+  `Decision` is recorded under FR-016; the `Decision` itself MUST name
+  the domain, and reconciliation under FR-018 MUST NOT report it.
 
 ## Out of scope
 
@@ -152,6 +158,12 @@ FR-016 through FR-025 to domain names.
 - A domain nearing expiry that the company means to drop: no report is
   needed once a `Decision` to let it lapse is recorded, per FR-016 and
   FR-017.
+- A misspelled registration the company will not renew: once a
+  `Decision` to let it lapse names it, it is left out of the catalog and
+  reconciliation does not report it, per FR-020.
+- A domain a sister company operates, in an account kept in that
+  company's name: the company that holds it by policy is still its
+  rights-holder, per FR-004.
 
 ## Assumptions
 
@@ -168,18 +180,13 @@ FR-016 through FR-025 to domain names.
   each DNS provider, how a change to it is reviewed, and how a
   `RestrictedDataReference` names it are not yet stated; DevOps is to
   supply them.
-- **OQ-2**: Whether the company holds domain names at any registrar or
-  DNS provider besides the primary one represented in the ontology is
-  not yet established.
-- **OQ-3**: Whether a domain a venture uses, such as one built by
-  Studios, is held by Intellectual Frontiers LLC or by the venture is not
-  yet established for every venture. A domain the venture holds is the
-  venture's asset; the Eidolon would hold only a `schema:url` reference
-  to it.
-- **OQ-4**: No rule says whether a `DomainName` that has lapsed or been
+- **OQ-2**: Which registrars hold the domain names that are served by the
+  primary DNS provider but registered elsewhere, and how FR-018's
+  reconciliation reaches those registrars, are not yet stated.
+- **OQ-3**: No rule says whether a `DomainName` that has lapsed or been
   transferred away stays in the catalog, or what marks it as no longer
   held.
-- **OQ-5**: No rule says whether a domain's delegation must be signed
+- **OQ-4**: No rule says whether a domain's delegation must be signed
   (DNSSEC), or whether its registrar transfer lock must be on.
 
 ## Key entities

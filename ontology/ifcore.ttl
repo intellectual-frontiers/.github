@@ -875,7 +875,7 @@ ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
     ifcore:describes ifcore:IntellectualFrontiersLLC ;
     ifcore:heldIn "Cloudflare, the company's primary registrar and DNS provider."@en ;
     ifcore:accessInstructions "Access, including any read-only API token, is granted by the decision authority in effect (0001-eidolon-architecture FR-029). No credential is held in any Eidolon repository (0022-domain-names FR-014)."@en ;
-    rdfs:comment "Whether other registrar or DNS provider accounts exist is 0022-domain-names OQ-2."@en ;
+    rdfs:comment "Which registrars hold the domains served here but registered elsewhere is 0022-domain-names OQ-2."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:IntellectualFrontiersComDomain a ifcore:DomainName ;

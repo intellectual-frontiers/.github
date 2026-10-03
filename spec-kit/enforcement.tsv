@@ -574,3 +574,4 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0022-domain-names FR-017	none	-	expiry report not yet built
 0022-domain-names FR-018	none	-	registrar reconciliation not yet built
 0022-domain-names FR-019	none	-	permission boundary on a tool not yet built
+0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
