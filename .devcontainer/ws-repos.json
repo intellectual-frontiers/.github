@@ -1,0 +1,7 @@
+{
+  "repos": [
+    { "repo": "github.com/intellectual-frontiers/.github" },
+    { "repo": "github.com/intellectual-frontiers/eidolon" },
+    { "repo": "github.com/intellectual-frontiers/www.intellectualfrontiers.com" }
+  ]
+}

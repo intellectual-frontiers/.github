@@ -313,6 +313,29 @@ def check_design_systems(root: Path) -> list[Finding]:
     return findings
 
 
+PIN = re.compile(r"^github:[\w.-]+/[\w.-]+/[0-9a-f]{40}$")
+
+
+def check_reference_environment(root: Path) -> list[Finding]:
+    """0025-tooling-environment FR-008: tools/reference-environment pins the reference environment as one
+    flake reference at a full commit, and the devcontainer's image, if there is one, is tagged with that commit."""
+    pin = root / "tools" / "reference-environment"
+    if not (root / "tools").is_dir():
+        return []
+    if not pin.is_file():
+        return [Finding("error", "tools/reference-environment", "is missing; pin the reference environment (0025-tooling-environment FR-008)")]
+    lines = [l for l in pin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    if len(lines) != 1 or not PIN.match(lines[0].strip()):
+        return [Finding("error", "tools/reference-environment", "must hold one line, github:<owner>/<repo>/<40-hex commit> (0025-tooling-environment FR-008)")]
+    commit = lines[0].strip().rsplit("/", 1)[1]
+    dc = root / ".devcontainer" / "devcontainer.json"
+    if dc.is_file():
+        image = re.search(r'"image"\s*:\s*"[^"]*:sha-([0-9a-f]+)"', dc.read_text(encoding="utf-8"))
+        if not image or not commit.startswith(image.group(1)) or len(image.group(1)) < 7:
+            return [Finding("error", ".devcontainer/devcontainer.json", f"its image must be tagged sha-{commit[:7]}, matching tools/reference-environment (0025-tooling-environment FR-008)")]
+    return []
+
+
 def _concepts(ttl: str, scheme: str) -> set[str]:
     """Local names of the skos:Concepts in `scheme`."""
     return set(re.findall(rf"^ifcore:(\w+) a skos:Concept ; skos:inScheme ifcore:{scheme}\b", ttl, re.M))
@@ -432,7 +455,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     root = args.root.resolve()
     public = args.public.resolve() if args.public else None
-    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root)
+    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root) + check_reference_environment(root)
     reg, nones, counts = check_register(root, public)
     findings += reg
     for f in findings:

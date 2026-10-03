@@ -723,3 +723,29 @@ frontiers-signage-print FR-010	check	.github: python3 design-systems/frontiers-s
 frontiers-signage-print FR-011	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	fail fixtures refused for their reason
 frontiers-signage-print FR-012	none	-	no sign layout places a figure yet; a consumer placing one uses frontiers-figures
 frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
+0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
+0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
+0025-tooling-environment FR-004	none	-	no check scans tools for installs at run time
+0025-tooling-environment FR-005	none	-	names the environment; nothing tests it
+0025-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
+0025-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
+0025-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
+0025-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
+0025-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
+0025-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
+0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
+0026-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0026-workspaces FR-003	none	-	no check
+0026-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
+0026-workspaces FR-005	none	-	no check reads ws-repos.json
+0026-workspaces FR-006	none	-	no check reads devcontainer.json
+0026-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
+0026-workspaces FR-008	none	-	no check reads devcontainer.json
+0026-workspaces FR-009	none	-	documentation judgment
+0026-workspaces FR-010	none	-	no check reads the README
+0026-workspaces FR-011	none	-	documentation judgment
+0026-workspaces FR-012	none	-	no check inspects the image manifest
+0026-workspaces FR-013	none	-	no check
+0026-workspaces FR-014	none	-	no check

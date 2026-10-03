@@ -1873,3 +1873,40 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
     skos:definition "An issue of a periodical, such as a quarterly Journal issue, in an online or a print edition (0009-press FR-033)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
+# Which environment every tool is guaranteed to run in. The repository is reused as
+# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
+# guaranteed against is not a fact here but its tools/reference-environment pin (0025 FR-008).
+
+ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
+    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+
+ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
+    dcterms:identifier "workspaces-host-v3" ;
+    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
+    ifcore:workspaceFlavor ifcore:BareMetalNixFlavor, ifcore:VirtualMachineNixFlavor, ifcore:ContainerImageFlavor, ifcore:DevcontainerFlavor, ifcore:CloudAgentSessionFlavor ;
+    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0025-tooling-environment FR-005)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
+# The flavors are ways to run the one reference environment, built from the same flake commit (0026 FR-001).
+# Which repositories carry a devcontainer, and what each lists, is held in each repository's .devcontainer/
+# files, never restated here (0001-eidolon-architecture FR-019).
+
+ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
+    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
+
+ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
+    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0026-workspaces FR-001 (FR-003)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BareMetalNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Bare-metal Linux with Nix"@en ;
+    skos:definition "Installed with Nix and home-manager directly on a Linux machine."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:VirtualMachineNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Linux virtual machine with Nix"@en ;
+    skos:definition "Installed with Nix and home-manager in a Linux virtual machine, including WSL on Windows and a Linux virtual machine on macOS."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ContainerImageFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "OCI container image"@en ;
+    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0025-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DevcontainerFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Devcontainer"@en ;
+    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0026-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CloudAgentSessionFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Cloud agent session"@en ;
+    skos:definition "A hosted session in which an AI agent works in the environment."@en ; ifcore:hasAudience ifcore:Public .
