@@ -7,11 +7,11 @@ How every figure is drawn, in any medium: a book, a paper, a web page or a slide
 
 | Path | What it is |
 | --- | --- |
-| `roles.json` | The figure roles (ink, primary, emphasis, ...) and, per variant, the brand role or mix each takes; the standard and compact canvases. |
+| `roles.json` | The figure roles (ink, primary, emphasis, ...) and, per variant, the brand role or mix each takes; the standard and compact canvases; the families shipped and their x-heights. |
 | `svgkit.py` | Drawing primitives: boxes, labels, arrows, curves, titles. Every color is a role, and text is measured in the theme's sans. |
 | `layouts.py` | The figure types: process, comparison, cycle, layer, relationship, decision and hierarchy diagrams. |
 | `figcheck.py` | These rules as a check: canvas, roles not colors, minimum type, labels fitting their boxes. |
-| `theme.py` | The stylesheet a brand and a variant give a figure; `apply` puts it in one. |
+| `theme.py` | The stylesheet a brand and a variant give a figure; `apply` puts it in one and sets its type at the brand sans's optical size. |
 | `fonts/` | Inter, which the kit measures in and a renderer sets the labels in. |
 | `assurance/` | `run.py`: every figure type on both canvases, under every brand and variant, plus fixtures that must fail. |
 

@@ -158,7 +158,7 @@ def run(brand: Path, keep: Path | None) -> Result:
             r.check(done.returncode == 0, f"rsvg-convert could not render {sample.name}: {done.stderr.decode()[:200]}")
             if done.returncode == 0:
                 fonts = {line.split()[0].split("+")[-1].split("-")[0] for line in subprocess.run(["pdffonts", str(pdf)], capture_output=True, text=True).stdout.splitlines()[2:]}
-                family = svgkit.FAMILIES[svgkit._family]
+                family = svgkit.FAMILIES[svgkit._family]["stem"]
                 r.check(fonts == {family}, f"the rendered figure embeds {sorted(fonts)}, not only {family} (install fonts/ where the renderer finds them)")
     return r
 
