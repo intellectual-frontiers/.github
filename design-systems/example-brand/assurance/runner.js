@@ -49,7 +49,8 @@
     if (link.href !== href) {
       const loaded = new Promise((resolve) => { link.onload = link.onerror = resolve; });
       link.href = href; link.dataset.theme = THEME;
-      await loaded;
+      // Some Chromium builds never fire load on a stylesheet link whose href changes; the new sheet itself is the signal.
+      await Promise.race([loaded, waitFor(() => link.sheet?.href === href, { timeout: 10000 }).catch(() => {})]);
     }
     const tokens = await themeTokens();
     for (const img of doc.querySelectorAll("img[data-theme-logo]")) {
