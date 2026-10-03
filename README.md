@@ -101,6 +101,28 @@ The longer essay is
 
 ## For editors and maintainers
 
+### Start working
+
+Everything this repository's tools need is already in the workspace. There
+is nothing to install and no `make install` (0024, 0025). Pick one:
+
+1. **In your browser, nothing installed** (the default on macOS and
+   Windows 11): [Open in GitHub Codespaces](https://codespaces.new/intellectual-frontiers/.github).
+2. **On your own computer, in a container:** install
+   [VS Code](https://code.visualstudio.com/) and
+   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on
+   Windows, with its WSL 2 backend), then
+   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/intellectual-frontiers/.github).
+3. **On Linux or in a VM, without containers:** install
+   [workspaces-host-v3](https://intellectual-frontiers.github.io/workspaces-host-v3/)
+   and activate the `press` persona.
+
+Whichever you pick, **log in to GitHub first.** When the workspace opens,
+it asks you to (`gh auth login`); in a Codespace you are already logged
+in. It then clones `.github`, `eidolon` and `www.intellectualfrontiers.com`
+beside each other, from
+[`.devcontainer/ws-repos.json`](.devcontainer/ws-repos.json).
+
 ### Three repositories, one Eidolon
 
 | Repository | Role | May contain |
@@ -128,6 +150,11 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
 tools/
   spec_check.py     checks specs and the register; CI runs it on every push
+  reference-environment
+                    the workspaces-host-v3 commit every tool is guaranteed
+                    to run in (0025-tooling-environment)
+.devcontainer/      the workspace this repository opens in, and the
+                    repositories it clones beside it (0026-workspaces)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)
@@ -201,6 +228,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
+| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
+| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -285,6 +314,8 @@ runs it on every push that touches `design-systems/`.
 - [ ] A spec exists for the change, and any spec it affects is amended.
 - [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
+- [ ] Any tool you add declares its prerequisites and installs nothing; it
+      runs from a fresh clone in workspaces-host-v3 (0025).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.
