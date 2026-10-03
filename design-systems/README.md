@@ -34,6 +34,7 @@ Each kind has a profile in
 | print | `print` | How a book, paper or cover is set | Typesetting style files and their data |
 | merchandise | `merchandise` | How the brand goes on physical goods: method, placement, ink | Decoration methods and products data |
 | figure | `figures` | How every figure is drawn, in every medium | Figure roles and the drawing kit |
+| media | `media` | The images that package a work for a platform | Asset formats, and the tool that lays out and renders them |
 | slides | `slides` | How a talk, lecture, workshop or briefing is presented on a screen | A slide stylesheet, and the builder and checker for decks |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
