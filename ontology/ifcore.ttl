@@ -749,6 +749,9 @@ ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:iden
 ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterms:identifier "research" ;
     rdfs:comment "An area, pillar, note, paper, publication, disclosure, trademark record, or patent draft (0017-spoken-and-research-works FR-017)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:CourseKind a ifcore:WorkKind ; rdfs:label "Course"@en ; dcterms:identifier "course" ;
+    rdfs:comment "A subject taught at length, over weeks, with outcomes, lessons and assessments; its source is AsciiDoc in frontiers-course's form (0027-course-works FR-001, FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
     rdfs:comment "The stage a Substantial Work currently occupies."@en .
 
