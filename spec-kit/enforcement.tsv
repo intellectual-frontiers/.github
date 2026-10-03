@@ -471,6 +471,7 @@ frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imag
 frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit (and frontiers-merchandise's harness refusing orders in unverified inks): lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
 frontiers-brand FR-018	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: every app icon and favicon.ico present at its size; Logo files: each loads at its size
 frontiers-brand FR-019	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
+frontiers-brand FR-020	check	.github: PARAGON=… python3 design-systems/frontiers-brand/assurance/run.py	brand_openedx.py check: the package and dist/ are what the tool and Paragon write; built pairs meet 4.5:1 (CI browser job)
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css

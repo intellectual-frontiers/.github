@@ -1,0 +1,11 @@
+{
+  "color": {
+    "$type": "color",
+    "body": {
+      "base": {
+        "source": "$body-color",
+        "$value": "{color.dark.base}"
+      }
+    }
+  }
+}
