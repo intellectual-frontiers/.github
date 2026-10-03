@@ -18,7 +18,8 @@ FR-007.
 ## Content kinds backed by one existing individual
 
 - **FR-001**: `ifweb:UnitPage` MUST declare `schema:about` naming exactly
-  one `ifcore:Unit` individual.
+  one `ifcore:Unit` individual. A `UnitPage` MUST NOT declare the Public
+  audience, per 0021-works-and-presentations FR-014.
 - **FR-002**: `ifweb:ResearchPillarPage` MUST declare `schema:about`
   naming exactly one `ifcore:ResearchPillar` individual.
 - **FR-003**: `ifweb:ResearchNotePage` MUST declare `schema:about` naming

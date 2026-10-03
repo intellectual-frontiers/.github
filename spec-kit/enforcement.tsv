@@ -437,11 +437,11 @@ requirement	mechanism	by	note
 0021-works-and-presentations FR-011	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-012	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-013	none	-	draft; nothing checks it yet
-0021-works-and-presentations FR-014	none	-	draft; the ifweb shape FR-018 calls for is not written
+0021-works-and-presentations FR-014	check	eidolon: make check-content	ifweb:PublicSubjectShape fails a Public page whose about is a unit; the positive subject is unchecked
 0021-works-and-presentations FR-015	none	-	profile README complies; nothing checks it
 0021-works-and-presentations FR-016	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-017	none	-	draft; nothing checks it yet
-0021-works-and-presentations FR-018	none	-	draft; ifweb shape not yet written
+0021-works-and-presentations FR-018	check	eidolon: make check-content	ifweb:PublicSubjectShape, tested in the vault's ContentTests
 0021-works-and-presentations FR-019	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-020	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-021	none	-	draft; nothing checks it yet

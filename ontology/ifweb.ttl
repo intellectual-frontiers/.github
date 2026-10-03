@@ -36,12 +36,27 @@ ifweb:Page a owl:Class, sh:NodeShape ;
     ifweb:contentKind "Page" ;
     sh:property [ sh:path prov:wasDerivedFrom ; sh:maxCount 1 ] .
 
+# ───────────────────────── Not shipping the organization (0021-works-and-presentations FR-014, FR-018) ─────────────────────────
+
+ifweb:PublicSubjectShape a sh:NodeShape ;
+    rdfs:label "Public subject"@en ;
+    rdfs:comment "Every content document, of every kind: one that declares the Public audience has no ifcore:Unit as its principal subject (schema:about or schema:mainEntity). A unit may still appear in its body or as provenance, such as a byline (0021-works-and-presentations FR-014, FR-016, FR-018; 0013-web-content-kinds FR-001)."@en ;
+    sh:targetClass ifweb:Page ;
+    sh:message "A public content document's principal subject (schema:about or schema:mainEntity) is never a unit; lead with a work, its result, or the reader's problem (0021-works-and-presentations FR-014)" ;
+    sh:or (
+        [ sh:not [ sh:path ifcore:hasAudience ; sh:hasValue ifcore:Public ] ]
+        [ sh:and (
+            [ sh:path schema:about ; sh:not [ sh:class ifcore:Unit ] ]
+            [ sh:path schema:mainEntity ; sh:not [ sh:class ifcore:Unit ] ]
+        ) ]
+    ) .
+
 # ───────────────────────── Content kinds backed by one existing individual (0013-web-content-kinds) ─────────────────────────
 
 ifweb:UnitPage a owl:Class, sh:NodeShape ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Unit page"@en ;
-    rdfs:comment "Renders one ifcore:Unit individual; asserts no new fact about it (0013 FR-001)."@en ;
+    rdfs:comment "Renders one ifcore:Unit individual; asserts no new fact about it (0013 FR-001). Never Public: ifweb:PublicSubjectShape fails a public page whose subject is a unit (0021-works-and-presentations FR-014)."@en ;
     ifweb:contentKind "UnitPage" ;
     sh:targetClass ifweb:UnitPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Unit ; sh:minCount 1 ; sh:maxCount 1 ] .
