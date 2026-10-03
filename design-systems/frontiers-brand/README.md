@@ -12,6 +12,7 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | `brand.tex` | The theme roles for print: `brand-<role>` colors, `\brandfontsans`, `\brandfontserif`, and `\brandlockuplight`, `\brandlockupdark` and `\brandicon`. A print design system loads it first. |
 | `logos/` | The lockup as PNG in every size, light and dark; the icon-only mark. |
 | `logos/web/` | The lockup as WebP in every size below the master, light and dark. |
+| `logos/vector/` | The decoration kit: the lockup and icon as one-color SVG, traced from their masters by `tools/brand_decoration.py trace`, listed in `tokens.json` with their finest detail and each ink's candidate spot-color and thread match. |
 | `images/favicon.png` | The icon-only mark at 64×64. |
 | `images/share-card.png` | The link-preview card, 1200×630: the light lockup on the surface. |
 | `imagery/` | The imagery pool: the approved frontier artwork every design system this brand themes chooses from, with `catalog.json` and WebP files for the web. See [`imagery/README.md`](imagery/README.md). |
@@ -26,3 +27,5 @@ place a logo file at or above its minimum size on the background its variant is 
 redraw, recolor or scale up a logo file.
 
 `brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files. The imagery pool's WebP files and the share card are written by `tools/brand_imagery.py build`.
+
+The decoration kit is traced, never drawn: `python3 tools/brand_decoration.py trace design-systems/frontiers-brand` rewrites `logos/vector/` and the measured finest detail from the masters and the `traced-from` settings in `tokens.json` (needs ImageMagick, potrace and rsvg-convert). Its engraved detail holds only on large prints; smaller goods need a designed, simplified mark (spec FR-017). Its ink matches are candidates until checked on the physical Pantone guide and Isacord card.
