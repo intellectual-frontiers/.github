@@ -16,6 +16,11 @@
         measure its finest detail and write it back to tokens.json. It is typesetting, shaped by HarfBuzz with the
         font's own kerning: nothing is drawn. Needs the uharfbuzz package.
 
+    python3 tools/brand_decoration.py verify design-systems/<brand> --ink ROLE --spot NAME --thread NUMBER --by WHO --on DATE
+        Record that an ink's matches were checked against the physical guide and card (frontiers-brand FR-017,
+        briefs/ink-verification.md): its spot-color name and thread number as checked, who checked them and when,
+        and verified: true, after which goods may be ordered in it.
+
     python3 tools/brand_decoration.py measure <svg> [...]
         Print an SVG's finest detail: the thinnest line or gap, as a fraction of its width.
 
@@ -27,6 +32,7 @@ Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz f
 """
 from __future__ import annotations
 
+import argparse
 import html
 import json
 import math
@@ -266,11 +272,37 @@ def match(hex_color: str, palettes: list[str]) -> int:
     return 0
 
 
+def verify(brand: Path, ink: str, spot: str, thread: str, by: str, on: str) -> int:
+    import datetime
+    datetime.date.fromisoformat(on)
+    tokens_path = brand / "tokens.json"
+    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+    inks = tokens["$extensions"][KIT]["inks"]
+    if ink not in inks:
+        print(f"no ink {ink!r}; the kit's inks are {', '.join(inks)}", file=sys.stderr)
+        return 1
+    entry = inks[ink]
+    entry["spot"]["name"] = spot
+    # A thread's color name belongs to its number; a different number checked against the card drops the old name.
+    entry["thread"] = {"system": entry["thread"]["system"], "number": thread}
+    entry.update({"verified": True, "verified-by": by, "verified-on": on})
+    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"{ink}: {spot} and thread {thread}, verified by {by} on {on}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     if len(argv) >= 2 and argv[0] == "trace":
         return max(trace(Path(p)) for p in argv[1:])
     if len(argv) >= 2 and argv[0] == "set":
         return max(set_wordmark(Path(p)) for p in argv[1:])
+    if len(argv) >= 2 and argv[0] == "verify":
+        ap = argparse.ArgumentParser(prog="brand_decoration.py verify")
+        ap.add_argument("brand", type=Path)
+        for flag in ("--ink", "--spot", "--thread", "--by", "--on"):
+            ap.add_argument(flag, required=True)
+        a = ap.parse_args(argv[1:])
+        return verify(a.brand, a.ink, a.spot, a.thread, a.by, a.on)
     if len(argv) >= 2 and argv[0] == "measure":
         for p in argv[1:]:
             print(f"{p}: {finest_detail(Path(p)):.4f}")
