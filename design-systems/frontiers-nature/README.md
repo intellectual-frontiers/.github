@@ -24,6 +24,7 @@
 | `js/chrome.js` | Defines the `if-shelf` web component. The only first-party script. |
 | `js/datastar.js` | Datastar bundle, loaded only by pages that need server-driven interactivity — the one interactivity dependency this design system names (0014-design-systems FR-008), opt-in per page, never loaded globally. |
 | `tokens.json` | Machine-readable tokens. |
+| `assurance/` | Tests that double as documentation: open `assurance/index.html` in a browser (serve the directory over http for the full run), or `node assurance/run.mjs` headlessly. Covers tokens, contrast, stylesheet discipline and the page frame. See `../README.md`. |
 | `chrome.md` | Anatomy and class contract for the chrome. |
 
 ## Using this anywhere — not just on an Intellectual Frontiers property

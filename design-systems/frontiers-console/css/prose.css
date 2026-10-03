@@ -1,0 +1,44 @@
+/* Long-form content. Wrap rendered Markdown or hand-written article HTML in .fc-prose. */
+@layer prose {
+  .fc-prose { font-size: 1rem; line-height: 1.75; color: var(--fc-foreground); }
+  .fc-prose > :first-child { margin-block-start: 0; }
+  .fc-prose :where(p, ul, ol, blockquote, table, figure, details, dl) { margin-block: 1rem; }
+  .fc-prose :where(h2, h3, h4, h5) {
+    position: relative; scroll-margin-block-start: calc(var(--fc-top, 0px) + 1.5rem); line-height: 1.3; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance;
+  }
+  .fc-prose h2 { margin-block: 2.5rem 0.75rem; padding-block-end: 0.5rem; border-block-end: 1px solid var(--fc-border); font-size: 1.5rem; }
+  .fc-prose h3 { margin-block: 2rem 0.5rem; font-size: 1.25rem; }
+  .fc-prose h4 { margin-block: 1.5rem 0.5rem; font-size: 1.0625rem; }
+  .fc-prose :where(h2, h3, h4) > a.fc-anchor { color: inherit; }
+  .fc-prose :where(h2, h3, h4) > a.fc-anchor::after {
+    content: "#"; margin-inline-start: 0.375rem; color: var(--fc-muted-foreground); opacity: 0; transition: opacity var(--fc-fast) var(--fc-ease);
+  }
+  .fc-prose :where(h2, h3, h4):hover > a.fc-anchor::after, .fc-prose a.fc-anchor:focus-visible::after { opacity: 1; }
+  .fc-prose a:not(.fc-btn):not(.fc-card):not(.fc-anchor):not([class*="fc-"]) {
+    color: var(--fc-primary); font-weight: 500; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--fc-primary) 40%, transparent);
+    text-underline-offset: 3px; transition: text-decoration-color var(--fc-fast) var(--fc-ease);
+  }
+  .fc-prose a:not([class*="fc-"]):hover { text-decoration-color: currentColor; }
+  /* lists: only plain, unclassed lists. Component lists (.fc-steps, .fc-files, .fc-tree…) style themselves. */
+  .fc-prose :is(ul, ol):not([class]):not(.fc-files *, .fc-tree *) { padding-inline-start: 1.5rem; }
+  .fc-prose ul:not([class]):not(.fc-files *, .fc-tree *) { list-style: disc; }
+  .fc-prose ol:not([class]):not(.fc-files *, .fc-tree *) { list-style: decimal; }
+  .fc-prose :is(ul, ol):not([class]):not(.fc-files *, .fc-tree *) > li { margin-block: 0.375rem; padding-inline-start: 0.25rem; }
+  .fc-prose :is(ul, ol):not([class]) > li::marker { color: var(--fc-muted-foreground); }
+  .fc-prose :is(ul, ol):not([class]) :is(ul, ol):not([class]) { margin-block: 0.25rem; }
+  .fc-prose :not(pre) > code {
+    padding: 0.125rem 0.375rem; border: 1px solid var(--fc-border); border-radius: 0.3125rem; background: var(--fc-card); font-size: 0.875em;
+  }
+  .fc-prose pre:not(.fc-terminal__log) { margin-block: 1.25rem; padding: 0.875rem 1rem; overflow-x: auto; border: 1px solid var(--fc-border); border-radius: var(--fc-radius); background: var(--fc-card); font-size: 0.8125rem; line-height: 1.7; }
+  .fc-prose blockquote { padding-inline-start: 1rem; border-inline-start: 3px solid var(--fc-border-strong); color: var(--fc-muted-foreground); font-style: italic; }
+  .fc-prose hr { margin-block: 2.5rem; border-block-start-width: 1px; border-color: var(--fc-border); }
+  .fc-prose strong { font-weight: 600; }
+  .fc-prose img { border: 1px solid var(--fc-border); border-radius: var(--fc-radius); }
+  /* plain tables only: <fc-table> and .fc-typetable own their table styling */
+  .fc-prose table:not(fc-table *, .fc-typetable *) { inline-size: 100%; display: block; overflow-x: auto; font-size: 0.9375rem; }
+  .fc-prose :is(th, td):not(fc-table *, .fc-typetable *) { padding: 0.5rem 0.875rem; border: 1px solid var(--fc-border); text-align: start; vertical-align: top; }
+  .fc-prose th:not(fc-table *, .fc-typetable *) { background: var(--fc-card); font-weight: 600; }
+  .fc-prose dt { font-weight: 600; }
+  .fc-prose dd { margin-inline-start: 1rem; color: var(--fc-muted-foreground); }
+  .fc-prose[data-size="sm"] { font-size: 0.875rem; line-height: 1.65; }
+}

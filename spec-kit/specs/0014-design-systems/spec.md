@@ -47,9 +47,10 @@ maintaining. The first one brought over and registered is
   bundle).
 - **FR-006**: A design system directory SHOULD follow the layout already
   proven by `frontiers-nature` (`css/`, `fonts/`, `images/`, `logos/`,
-  `js/`, `data/`, `tokens.json`, a markup-contract document, a top-level
-  `README.md`) unless the system's own nature requires otherwise; it MUST
-  document its actual layout in its own `README.md` regardless.
+  `js/`, `data/`, `tokens.json`, a markup-contract document, an
+  `assurance/` harness per FR-015, a top-level `README.md`) unless the
+  system's own nature requires otherwise; it MUST document its actual
+  layout in its own `README.md` regardless.
 
 ## Engineering stance
 
@@ -107,6 +108,37 @@ maintaining. The first one brought over and registered is
   FR-013 already established for its one design system, generalized to
   apply to each one independently.
 
+## Assurance
+
+- **FR-015**: Every design system MUST carry an assurance harness at
+  `design-systems/<slug>/assurance/`, whose entry point is
+  `assurance/index.html`, and which:
+  - runs in any modern browser with no build step, install or dependency —
+    the harness and its fixtures are plain HTML, CSS and JavaScript;
+  - is at once the test runner, the report and the documentation of what the
+    design system guarantees, so that what is described cannot drift from
+    what is tested;
+  - contains its own fixture pages, complete pages written to the system's
+    markup contract, which serve as both test subjects and reference
+    renderings;
+  - works from `file://` for every test that can run there, and reports each
+    test it cannot run (those needing `fetch` or iframe inspection) as
+    **skipped**, never as passed, while telling the reader how to run them
+    (serving the directory over http);
+  - is also runnable headlessly, so the same page can gate a change in a
+    terminal or CI, and fails (non-zero) on any failing test.
+- **FR-016**: A design system's harness MUST cover, at minimum: that every
+  token it documents is defined and that any machine-readable mirror of the
+  tokens agrees with the stylesheet; WCAG 2.2 AA contrast of its text pairings;
+  the stylesheet stance of FR-009 (cascade layers, no `@import`, no remote URL,
+  no framework); the markup contract on its fixtures; and its responsive
+  behaviour. A system with interactive components MUST also cover each
+  component's keyboard and ARIA behaviour.
+- **FR-017**: A change to a design system's CSS, tokens, scripts or markup
+  contract is complete only when its harness passes over http. A harness file
+  that is not specific to one design system (the runner) is copied into each
+  system, not shared, so each directory remains self-contained per FR-005.
+
 ## Out of scope
 
 - A templating or server-side rendering engine (the prior attempt's
@@ -158,6 +190,11 @@ maintaining. The first one brought over and registered is
   class system, or a build step; no page rendered with one depends on a
   JavaScript framework; any use of Datastar is opt-in per page, not
   loaded globally.
+- **SC-006**: Every design system directory contains `assurance/index.html`;
+  opened from `file://` it never reports a test it did not run as passing, and
+  served over http with `node assurance/run.mjs` it exits zero on a clean
+  checkout and non-zero when a token, contrast, layer, layout or contract
+  regression is introduced.
 
 ## Review & acceptance checklist
 

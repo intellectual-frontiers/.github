@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overview · Frontiers Console assurance fixture</title>
+<link rel="icon" href="../../images/favicon.png">
+<link rel="stylesheet" href="../../css/fonts.css">
+<link rel="stylesheet" href="../../css/reset.css">
+<link rel="stylesheet" href="../../css/tokens.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/layout.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/prose.css">
+<link rel="stylesheet" href="../../css/admin.css">
+<script src="../../js/console.js" defer></script>
+</head>
+<body>
+<a class="fc-skip" href="#main">Skip to content</a>
+<fc-shell data-layout="docs">
+<header class="fc-nav">
+<button class="fc-btn fc-nav__toggle" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-toggle aria-controls="fc-sidebar" aria-expanded="false" aria-label="Open navigation">☰</button>
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<nav class="fc-nav__links" aria-label="Primary"><a class="fc-nav__link" href="docs.html" aria-current="page">Overview</a><a class="fc-nav__link" href="components.html">Components</a><a class="fc-nav__link" href="admin.html">Admin surfaces</a></nav>
+<span class="fc-nav__spacer"></span>
+<div class="fc-nav__actions"><a class="fc-btn" data-variant="primary" data-size="sm" href="admin.html">Open console</a></div>
+</header>
+<aside class="fc-sidebar" id="fc-sidebar" aria-label="Sidebar">
+<div class="fc-sidebar__head">
+<a class="fc-brand" href="home.html"><img src="../../logos/web/if-logo-150x36-2026-Sept.webp" width="150" height="36" alt="Intellectual Frontiers"><span class="fc-brand__name">Console</span></a>
+<button class="fc-btn fc-sidebar__collapse" type="button" data-variant="ghost" data-size="icon" data-fc-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true">‹</button>
+</div>
+<div class="fc-sidebar__tools">
+<fc-search placeholder="Search…" label="Search documentation"><script type="application/json">[{"title": "Overview", "description": "Reading pages with the docs layout", "href": "docs.html", "section": "Start", "keywords": ["docs", "layout", "sidebar"]}, {"title": "Components", "description": "Callouts, cards, tabs, steps, accordion, files", "href": "components.html", "section": "Reference", "keywords": ["callout", "tabs", "cards", "steps"]}, {"title": "Admin surfaces", "description": "Data tables, forms, stats, run logs", "href": "admin.html", "section": "Reference", "keywords": ["table", "form", "terminal", "badge"]}, {"title": "Notebook layout", "description": "Top navigation bar with a sidebar below", "href": "notebook.html", "section": "Layouts", "keywords": ["navbar", "notebook"]}, {"title": "Home layout", "description": "Landing page without a sidebar", "href": "home.html", "section": "Layouts", "keywords": ["landing", "home"]}, {"title": "Search", "description": "Command-palette search over a JSON index", "href": "components.html#search", "section": "Reference", "keywords": ["command", "palette", "index"]}]</script></fc-search>
+<details class="fc-menu"><summary>Documentation</summary><div class="fc-menu__panel">
+<a class="fc-menu__item" href="docs.html" aria-current="true">Documentation<small>Guides and reference</small></a>
+<a class="fc-menu__item" href="admin.html">Admin<small>Operate the site</small></a>
+</div></details>
+</div>
+<div class="fc-sidebar__scroll">
+<nav class="fc-tree" aria-label="Documentation">
+<ul>
+<li class="fc-tree__label">Start</li>
+<li><a class="fc-tree__link" href="docs.html" aria-current="page">Overview</a></li>
+<li><a class="fc-tree__link" href="components.html">Components</a></li>
+<li><a class="fc-tree__link" href="admin.html">Admin surfaces</a></li>
+<li class="fc-tree__label">Layouts</li>
+<li><a class="fc-tree__link" href="notebook.html">Notebook layout</a></li>
+<li><a class="fc-tree__link" href="home.html">Home layout</a></li>
+<li class="fc-tree__label">Guides</li>
+<li><details open><summary>Operating</summary><ul>
+<li><a class="fc-tree__link" href="docs.html#health">Health checks</a></li>
+<li><a class="fc-tree__link" href="docs.html#tasks">Running tasks <span class="fc-badge fc-tree__badge" data-tone="warning">dev</span></a></li>
+</ul></details></li>
+</ul>
+</nav>
+</div>
+<div class="fc-sidebar__foot"><span>Frontiers Console</span><span class="fc-badge">v0.1</span></div>
+</aside>
+<button class="fc-btn fc-sidebar-expand" type="button" data-size="icon" data-fc-sidebar-collapse aria-label="Expand sidebar" aria-expanded="false">›</button>
+<div class="fc-page" id="page">
+<main class="fc-article" id="main">
+<nav class="fc-crumbs" aria-label="Breadcrumb"><ol><li><a href="home.html">Documentation</a></li><li><span aria-current="page">Overview</span></li></ol></nav>
+<header class="fc-article__head">
+<h1 class="fc-title">Overview</h1>
+<p class="fc-description">A documentation page in the docs layout: persistent sidebar, breadcrumbs, article, table of contents and pager.</p>
+</header>
+<details class="fc-toc-mobile"><summary>On this page</summary><fc-toc><ol><li><a href="#what" data-depth="2">What this page shows</a></li><li><a href="#layouts" data-depth="2">Choosing a layout</a></li><li><a href="#health" data-depth="2">Health checks</a></li><li><a href="#tasks" data-depth="2">Running tasks</a></li><li><a href="#tasks-dev" data-depth="3">Development only</a></li><li><a href="#next" data-depth="2">Where next</a></li></ol></fc-toc></details>
+<div class="fc-prose">
+<h2 id="what"><a class="fc-anchor" href="#what">What this page shows</a></h2>
+<p>This is a fixture used by the assurance harness, and also the reference rendering of the <code>docs</code> layout. Resize the window: below 64rem the sidebar becomes a drawer, and the table of contents moves into a disclosure above the article.</p>
+<div class="fc-callout" data-type="info"><div class="fc-callout__body"><p class="fc-callout__title">Note</p><p>Everything here is plain HTML and CSS; the few web components in <code>js/console.js</code> only add behaviour.</p></div></div>
+<h2 id="layouts"><a class="fc-anchor" href="#layouts">Choosing a layout</a></h2>
+<p>Set <code>data-layout</code> on <code>&lt;fc-shell&gt;</code> to <code>docs</code>, <code>notebook</code> or <code>home</code>. Nothing else in the markup changes.</p>
+<fc-codeblock><figure class="fc-code"><div class="fc-code__title">index.html</div><pre><code>&lt;fc-shell data-layout="docs"&gt;
+  &lt;aside class="fc-sidebar"&gt;…&lt;/aside&gt;
+  &lt;div class="fc-page"&gt;…&lt;/div&gt;
+&lt;/fc-shell&gt;</code></pre></figure></fc-codeblock>
+<h2 id="health"><a class="fc-anchor" href="#health">Health checks</a></h2>
+<p>Each check reports a status. Use a badge, never colour alone: <span class="fc-badge" data-tone="success" data-dot>passing</span> <span class="fc-badge" data-tone="warning" data-dot>warning</span> <span class="fc-badge" data-tone="danger" data-dot>failing</span>.</p>
+<h2 id="tasks"><a class="fc-anchor" href="#tasks">Running tasks</a></h2>
+<p>Long-running work streams into a run log, described under <a href="admin.html">Admin surfaces</a>.</p>
+<h3 id="tasks-dev"><a class="fc-anchor" href="#tasks-dev">Development only</a></h3>
+<p>Task execution is gated by the deployment mode, never by what the page chooses to show.</p>
+<p style="min-height:60vh">Padding paragraph so the page is long enough to scroll and exercise the table of contents.</p>
+<h2 id="next"><a class="fc-anchor" href="#next">Where next</a></h2>
+<div class="fc-cards">
+<a class="fc-card" href="components.html"><div class="fc-card__icon" aria-hidden="true">▦</div><div class="fc-card__title">Components</div><p class="fc-card__text">Callouts, tabs, steps and more.</p></a>
+<a class="fc-card" href="admin.html"><div class="fc-card__icon" aria-hidden="true">⚙</div><div class="fc-card__title">Admin surfaces</div><p class="fc-card__text">Tables, forms and run logs.</p></a>
+</div>
+</div>
+<nav class="fc-pager" aria-label="Pagination"><span></span><a href="components.html" rel="next"><small>Next</small><span>Components</span></a></nav>
+<footer class="fc-footer"><span>© Intellectual Frontiers</span><span>Last updated 2 October 2026</span></footer>
+</main>
+<aside class="fc-toc" aria-label="On this page"><p class="fc-toc__title">On this page</p><fc-toc><ol><li><a href="#what" data-depth="2">What this page shows</a></li><li><a href="#layouts" data-depth="2">Choosing a layout</a></li><li><a href="#health" data-depth="2">Health checks</a></li><li><a href="#tasks" data-depth="2">Running tasks</a></li><li><a href="#tasks-dev" data-depth="3">Development only</a></li><li><a href="#next" data-depth="2">Where next</a></li></ol></fc-toc></aside>
+</div>
+</fc-shell>
+</body>
+</html>
