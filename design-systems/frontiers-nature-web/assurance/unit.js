@@ -12,29 +12,19 @@
 
   suite("Design tokens", {
     group: "Unit",
-    description: "Every token the design system promises exists and resolves; tokens.json agrees with tokens.css on every colour and layout value it mirrors; and every text/background pairing the chrome relies on meets WCAG AA.",
+    description: "Every token the design system promises exists and resolves under the theme, the page is square-cornered and capped at 72rem, and every text/background pairing the chrome relies on meets WCAG AA.",
   }, (s) => {
     const REQUIRED = ["--ink", "--paper", "--stone", "--shell", "--rule", "--background", "--foreground", "--muted-foreground",
       "--capital", "--ip", "--press", "--studios", "--network", "--diagram-ink", "--diagram-path", "--diagram-warning", "--diagram-positive", "--diagram-caution", "--diagram-secondary",
       "--font-sans", "--font-serif", "--font-mono", "--measure-page", "--gutter", "--radius", "--chrome-clearance", "--ease", "--fast"];
+    s.test("layout values: 72rem measure, 1.5rem gutter, square corners", (t) => {
+      t.equal(raw("--measure-page"), "72rem"); t.equal(raw("--gutter"), "1.5rem"); t.equal(raw("--radius"), "0");
+    });
     s.test("every required token is defined on :root", (t) => {
       const missing = REQUIRED.filter((name) => !raw(name));
       t.ok(missing.length === 0, `missing tokens: ${missing.join(", ")}`);
     });
 
-    s.test("tokens.json mirrors tokens.css (colours, layout, radius)", async (t) => {
-      const css = (await fetchText("css/tokens.css")).replace(/\/\*[\s\S]*?\*\//g, "");
-      const root = css.match(/:root\s*\{([\s\S]*?)\n  \}/)[1];
-      const value = (name) => root.match(new RegExp(`${name}\\s*:\\s*([^;]+);`))?.[1].trim();
-      const json = JSON.parse(await fetchText("tokens.json"));
-      const hex = (v) => v?.toLowerCase();
-      for (const k of ["ink", "paper", "stone", "shell", "rule"]) t.equal(hex(json.color[k]), hex(value(`--${k}`)), `color.${k}`);
-      for (const [k, v] of Object.entries(json.color.unit)) t.equal(hex(v), hex(value(`--${k}`)), `color.unit.${k}`);
-      for (const [k, v] of Object.entries(json.color.diagram)) t.equal(hex(v), hex(value(`--diagram-${k}`)), `color.diagram.${k}`);
-      t.equal(json.layout.maxWidth, value("--measure-page"), "layout.maxWidth"); t.equal(json.layout.gutter, value("--gutter"), "layout.gutter");
-      t.equal(json.layout.chromeClearance, value("--chrome-clearance"), "layout.chromeClearance"); t.equal(json.radius, "0px", "radius");
-      t.equal(value("--radius"), "0", "radius is square");
-    }, { needs: "http" });
 
     const TEXT = [
       ["ink on background", "--ink", "--background"], ["ink on paper", "--ink", "--paper"], ["ink on stone", "--ink", "--stone"], ["ink on shell", "--ink", "--shell"],

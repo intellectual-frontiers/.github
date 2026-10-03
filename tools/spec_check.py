@@ -300,6 +300,7 @@ def check_design_systems(root: Path) -> list[Finding]:
     dirs = {p.name for p in ds.iterdir() if p.is_dir()}
     for slug in sorted(registered - dirs):
         findings.append(Finding("error", "ontology/ifcore.ttl", f"design system {slug} is registered but design-systems/{slug}/ does not exist (0014-design-systems FR-010)"))
+    findings += _check_web_classification(ttl.read_text(encoding="utf-8") if ttl.is_file() else "")
     for d in sorted(p for p in ds.iterdir() if p.is_dir()):
         if d.name not in registered:
             findings.append(Finding("error", str(d.relative_to(root)), "is not registered in ifcore.ttl as an ifcore:DesignSystem with this dcterms:identifier (0014-design-systems FR-010)"))
@@ -308,6 +309,32 @@ def check_design_systems(root: Path) -> list[Finding]:
             findings.append(Finding("error", rel, f"design system slug must end with its kind's code, one of {CODES} (0014-design-systems FR-003)"))
         if not (d / "spec.md").is_file():
             findings.append(Finding("warning", rel, "has no spec.md stating its house rules (0014-design-systems FR-022)"))
+    return findings
+
+
+def _concepts(ttl: str, scheme: str) -> set[str]:
+    """Local names of the skos:Concepts in `scheme`."""
+    return set(re.findall(rf"^ifcore:(\w+) a skos:Concept ; skos:inScheme ifcore:{scheme}\b", ttl, re.M))
+
+
+def _check_web_classification(ttl: str) -> list[Finding]:
+    """0014-design-systems FR-041: every web design system names one or more interaction models, exactly one
+    expression and one or more densities, by dcterms:type."""
+    findings: list[Finding] = []
+    models, expressions, densities = (_concepts(ttl, s) for s in ("WebInteractionModelScheme", "DesignExpressionScheme", "DesignDensityScheme"))
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if not m or not types or "ifcore:WebDesignSystemKind" not in types.group(1):
+            continue
+        named = set(re.findall(r"ifcore:(\w+)", types.group(1)))
+        where = f"ontology/ifcore.ttl ({m.group(1)})"
+        if not named & models:
+            findings.append(Finding("error", where, "a web design system names no interaction model (0014-design-systems FR-041)"))
+        if len(named & expressions) != 1:
+            findings.append(Finding("error", where, "a web design system names exactly one expression, productive or expressive (0014-design-systems FR-041)"))
+        if not named & densities:
+            findings.append(Finding("error", where, "a web design system names no density (0014-design-systems FR-041)"))
     return findings
 
 

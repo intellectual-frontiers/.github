@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assurance · Example Brand design system</title>
+<link rel="icon" href="../images/favicon.png">
+<link rel="stylesheet" href="assurance.css">
+<script src="runner.js" defer></script>
+<script src="contract.js" defer></script>
+<script src="unit.js" defer></script>
+<script src="integration.js" defer></script>
+<script src="boot.js" defer></script>
+</head>
+<body>
+<main class="page" id="main">
+<p class="label page-eyebrow">Example Brand</p>
+<h1 class="t-title page-title">Assurance</h1>
+<p class="t-lede">Tests that prove this brand meets the brand contract every brand meets. This page is the harness, the report and the documentation, and it needs nothing but a browser.</p>
+
+<p id="as-banner" hidden><strong>Opened from file://</strong>: browsers do not let a file:// page fetch files or inspect iframes, so every test that reads <code>tokens.json</code> or a logo file is skipped (never counted as passing). Serve the directory holding this design system with any static server (for example <code>python3 -m http.server</code>) and open <code>/example-brand/assurance/</code>.</p>
+
+<div class="as-bar">
+<button class="btn btn--outline" type="button" id="as-run">Run all</button>
+<label class="as-sr-only" for="as-filter">Only suites whose name contains</label>
+<input id="as-filter" type="search" placeholder="Filter suites…">
+<span id="assurance-summary" role="status" aria-live="polite">Not run yet</span>
+</div>
+<div id="assurance-results"></div>
+
+<div class="as-prose">
+<h2 class="t-section" style="margin-block-start:3rem">How to use this</h2>
+<ol>
+<li><strong>Everything, in a browser:</strong> serve the directory holding this design system (<code>python3 -m http.server</code>) and open <code>/example-brand/assurance/</code>.</li>
+<li><strong>Headless, for CI or a quick check:</strong> <code>node assurance/run.mjs</code> serves the directory holding this design system, runs this page in Chromium through Playwright and exits non-zero on any failure.</li>
+</ol>
+<p>Add <code>?suite=logo</code> to run only suites whose name contains that text, and <code>?manual</code> to wait for the Run button.</p>
+
+<h2 class="t-section" style="margin-block-start:3rem">What is guarded</h2>
+<p>Generated from the suites registered in <code>unit.js</code> and <code>integration.js</code>, so it cannot drift from what is tested.</p>
+<div id="as-guards" class="as-guards"></div>
+
+<h2 class="t-section" style="margin-block-start:3rem">Fixtures</h2>
+<p>The specimen shows every brand colour, the typefaces and every logo file at its native size, on the background the spec allows it.</p>
+<div class="as-fixtures" id="as-fixture-links"></div>
+</div>
+</main>
+</body>
+</html>

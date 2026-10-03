@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /*
  * Headless runner for the assurance page. No dependencies of its own: it serves the directory holding this
- * design system (so design systems it derives from, vendored beside it, are reachable too), opens assurance/index.html in Chromium through Playwright (found on NODE_PATH, in
+ * design system (so the brand theming it, and any design system it derives from, vendored beside it, are reachable), opens assurance/index.html in Chromium through Playwright (found on NODE_PATH, in
  * the current project's node_modules, or at PLAYWRIGHT_MODULE), prints the report and exits non-zero on failure.
  *
  *   node assurance/run.mjs                 run every suite
  *   node assurance/run.mjs --suite layout  run suites whose name contains "layout"
+ *   node assurance/run.mjs --brand SLUG    render with the brand SLUG vendored beside this design system
  *   node assurance/run.mjs --shots DIR     also screenshot every fixture at 390, 900 and 1400 px into DIR
  *   CHROMIUM=/path/to/chrome               use a specific browser binary
  */
@@ -60,15 +61,17 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const problems = [];
   page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
-  // A missing file inside this design system is a failure; a missing sibling it derives from is not (those
+  // A missing file inside this design system is a failure; a missing sibling (a brand, a system it derives from) is not (those
   // tests report themselves as skipped), so 404s are judged by URL, not by the browser's console message.
   page.on("console", (m) => { if (m.type() === "error" && !/^Failed to load resource/.test(m.text())) problems.push(`console error: ${m.text()}`); });
   page.on("response", (r) => {
     const { pathname } = new URL(r.url());
     if (r.status() >= 400 && pathname.startsWith(`/${slug}/`)) problems.push(`HTTP ${r.status()}: ${pathname}`);
   });
-  const suite = opt("--suite");
-  await page.goto(`${origin}/${slug}/assurance/index.html${suite ? `?suite=${encodeURIComponent(suite)}` : ""}`);
+  const query = new URLSearchParams();
+  if (opt("--suite")) query.set("suite", opt("--suite"));
+  if (opt("--brand")) { query.set("brand", opt("--brand")); console.log(`theme: ${opt("--brand")}`); }
+  await page.goto(`${origin}/${slug}/assurance/index.html${query.size ? `?${query}` : ""}`);
   await page.waitForFunction(() => window.__assurance?.done === true, null, { timeout: 180000 });
   const results = await page.evaluate(() => window.__assurance);
   for (const s of results.suites) {

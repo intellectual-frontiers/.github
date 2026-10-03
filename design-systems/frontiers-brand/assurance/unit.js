@@ -1,78 +1,50 @@
-/* Unit suites for Frontiers Brand: tokens.json and the logo files it lists. */
+/* Suites specific to Frontiers Brand: its palette, units, typefaces and logo set (spec.md). */
 (() => {
-  const { suite, color, fetchText, base } = window.Assurance;
+  const { suite, color, fetchText } = window.Assurance;
   window.Assurance.FIXTURES = ["assurance/fixtures/specimen.html"];
   const tokens = async () => JSON.parse(await fetchText("tokens.json"));
-  const HEX = /^#[0-9a-f]{6}$/;
+  const value = (all, v) => { while (/^\{/.test(v)) { const [g, k] = v.slice(1, -1).split("."); v = all[g][k].$value; } return v; };
 
-  suite("Tokens", {
+  suite("Frontiers palette", {
     group: "Unit", needs: "http",
-    description: "tokens.json names every brand colour, unit colour, typeface and logo file the spec requires, each value once and well formed.",
+    description: "The palette, unit colors and typefaces are the ones spec.md states, the theme roles map onto them as it says, and each brand color and unit color is legible on white and on Warm Paper.",
   }, (s) => {
-    s.test("the five brand colours and white are lower-case #rrggbb (spec FR-002)", async (t) => {
+    s.test("the palette is the named colors, lower-case #rrggbb (spec FR-002)", async (t) => {
       const { color: c } = await tokens();
-      t.deepEqual(Object.keys(c), ["deep-ink", "frontier-blue", "signal-teal", "editorial-oxblood", "warm-paper", "white"], "brand colour names");
-      for (const [k, v] of Object.entries(c)) t.ok(HEX.test(v), `color.${k} = ${v}`);
+      t.deepEqual(Object.fromEntries(Object.entries(c).filter(([k]) => !k.startsWith("$")).map(([k, v]) => [k, v.$value])), {
+        "deep-ink": "#121820", "frontier-blue": "#214ea2", "signal-teal": "#1f7775", "editorial-oxblood": "#8a3147",
+        "warm-paper": "#f3f0e8", white: "#ffffff", amber: "#8a5a24", violet: "#4a4a8c",
+      });
     });
-    s.test("every unit has a colour, and each is a brand colour or the network violet (spec FR-003)", async (t) => {
-      const { color: c, unit } = await tokens();
-      t.deepEqual(Object.keys(unit), ["capital", "ip", "press", "studios", "network"], "unit names");
-      const brand = new Set(Object.values(c));
-      for (const [k, v] of Object.entries(unit)) t.ok(HEX.test(v) && (brand.has(v) || k === "network"), `unit.${k} = ${v}`);
+    s.test("each unit has its color (spec FR-003)", async (t) => {
+      const all = await tokens();
+      const u = Object.fromEntries(["capital", "ip", "press", "studios", "network"].map((k) => [k, value(all, all.unit[k].$value)]));
+      t.deepEqual(u, { capital: "#214ea2", ip: "#121820", press: "#8a3147", studios: "#1f7775", network: "#4a4a8c" });
     });
-    s.test("the sans and serif families and the wordmark are named (spec FR-004)", async (t) => {
+    s.test("the theme roles map onto the palette as spec.md states (spec FR-014)", async (t) => {
+      const all = await tokens();
+      const r = (k) => value(all, all.role[k].$value);
+      t.deepEqual(["text", "surface", "primary", "secondary", "tertiary", "success", "warning", "danger", "info", "paper"].map(r),
+        ["#121820", "#ffffff", "#214ea2", "#1f7775", "#8a3147", "#1f7775", "#8a5a24", "#8a3147", "#4a4a8c", "#f3f0e8"]);
+    });
+    s.test("Inter and Source Serif 4, and Inter Bold for the wordmark (spec FR-004)", async (t) => {
       const { typeface } = await tokens();
-      t.equal(typeface.sans, "Inter"); t.equal(typeface.serif, "Source Serif 4");
-      t.deepEqual(typeface.wordmark, { family: "Inter", weight: 700 });
+      t.equal(typeface.sans.$value, "Inter"); t.equal(typeface.serif.$value, "Source Serif 4"); t.equal(typeface["wordmark-weight"].$value, 700);
     });
-  });
-
-  suite("Contrast", {
-    group: "Unit", needs: "http",
-    description: "Every text pairing tokens.json lists, and every unit colour on white and on Warm Paper, meets WCAG 2.2 AA for body text (4.5:1).",
-  }, (s) => {
-    s.test("listed text pairings are at least 4.5:1 (spec FR-005)", async (t) => {
-      const { color: c, "text-pairings": pairs } = await tokens();
-      t.atLeast(pairs.length, 8, "pairings listed");
-      for (const [fg, bg] of pairs) t.atLeast(color.contrast(color.parse(c[fg]), color.parse(c[bg])), 4.5, `${fg} on ${bg}`);
+    s.test("every palette ink and unit color is at least 4.5:1 on white and on Warm Paper (spec FR-005)", async (t) => {
+      const all = await tokens();
+      const inks = ["deep-ink", "frontier-blue", "signal-teal", "editorial-oxblood", "amber", "violet"].map((k) => [k, all.color[k].$value]);
+      for (const [k, v] of inks) for (const bg of ["white", "warm-paper"]) t.atLeast(color.contrast(color.parse(v), color.parse(all.color[bg].$value)), 4.5, `${k} on ${bg}`);
     });
-    s.test("unit colours are at least 4.5:1 on white and on Warm Paper (spec FR-005)", async (t) => {
-      const { color: c, unit } = await tokens();
-      for (const [k, v] of Object.entries(unit)) for (const bg of ["white", "warm-paper"]) t.atLeast(color.contrast(color.parse(v), color.parse(c[bg])), 4.5, `${k} on ${bg}`);
-    });
-  });
-
-  suite("Logo files", {
-    group: "Unit", needs: "http",
-    description: "Every lockup, icon and favicon tokens.json lists exists at exactly its stated pixel size, comes in a light and a dark variant where the spec requires both, and no logo file sits outside that list.",
-  }, (s) => {
-    const size = (path) => new Promise((resolve, reject) => {
-      const img = new Image(); img.onload = () => resolve([img.naturalWidth, img.naturalHeight]);
-      img.onerror = () => reject(new window.Assurance.Failure(`${path} does not load`)); img.src = new URL(path, base).href;
-    });
-    s.test("every listed file loads at its stated size (spec FR-006, FR-007)", async (t) => {
-      const { logo } = await tokens();
-      const files = [...logo.lockup.files, ...logo.icon.files, logo.favicon];
-      for (const f of files) {
-        const [w, h] = await size(f.file);
-        t.equal(`${w}x${h}`, `${f.width}x${f.height}`, f.file);
-        if (f.file.startsWith("logos/")) t.ok(f.file.includes(`-${f.width}x${f.height}-`), `${f.file} names its size`);
-      }
-    });
-    s.test("each lockup size has a light and a dark variant, in PNG and in WebP below the master size (spec FR-006)", async (t) => {
-      const { logo } = await tokens();
-      const have = new Set(logo.lockup.files.map((f) => `${f.background} ${f.width}x${f.height} ${f.file.split(".").pop()}`));
-      const sizes = [...new Set(logo.lockup.files.map((f) => `${f.width}x${f.height}`))];
-      for (const sz of sizes) for (const bg of ["light", "dark"]) {
+    s.test("each lockup size has light and dark variants, PNG and WebP below the master; names state their size (spec FR-006, FR-008)", async (t) => {
+      const l = (await tokens()).$extensions["com.intellectualfrontiers.logo"];
+      const have = new Set(l.lockup.files.map((f) => `${f.background} ${f.width}x${f.height} ${f.file.split(".").pop()}`));
+      for (const sz of new Set(l.lockup.files.map((f) => `${f.width}x${f.height}`))) for (const bg of ["light", "dark"]) {
         t.ok(have.has(`${bg} ${sz} png`), `${bg} ${sz} png`);
         if (sz !== "1229x362") t.ok(have.has(`${bg} ${sz} webp`), `${bg} ${sz} webp`);
       }
-    });
-    s.test("minimum sizes are stated (spec FR-008)", async (t) => {
-      const { logo } = await tokens();
-      t.equal(logo.lockup["min-width-px"], 100); t.equal(logo.lockup["min-width-in"], 1);
-      t.equal(logo.icon["min-width-px"], 50); t.equal(logo.icon["min-width-in"], 0.5);
-      for (const f of logo.lockup.files) t.atLeast(f.width, logo.lockup["min-width-px"], `${f.file} is above the minimum`);
+      for (const f of [...l.lockup.files, ...l.icon.files]) t.ok(f.file.includes(`-${f.width}x${f.height}-`), `${f.file} names its size`);
+      t.equal(l.lockup["min-width-px"], 100); t.equal(l.icon["min-width-px"], 50);
     });
   });
 })();
