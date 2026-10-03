@@ -71,7 +71,7 @@ OPTIONAL = {"Out of scope"}
 
 MECHANISMS = {"check", "gate", "review", "none"}  # 0020 FR-012
 REQ = re.compile(rf"^(?P<spec>{SPEC_NAME}) (?P<id>FR-\d{{3}})$")
-COMMAND = re.compile(r"^(\.github|eidolon): \S")
+COMMAND = re.compile(r"^(\.github|eidolon|www\.intellectualfrontiers\.com): \S")
 REGISTER = Path("spec-kit") / "enforcement.tsv"
 
 
@@ -270,7 +270,7 @@ def check_register(root: Path, public: Path | None = None) -> tuple[list[Finding
             continue
         counts[mech] += 1
         if mech in ("check", "gate") and not COMMAND.match(by):
-            findings.append(Finding("error", where, f"a {mech} row names its repository and command, e.g. 'eidolon: make check' (0020 FR-013)"))
+            findings.append(Finding("error", where, f"a {mech} row names its repository and command, e.g. 'eidolon: make check' or 'www.intellectualfrontiers.com: cargo test' (0020 FR-013)"))
         elif mech == "review":
             r = REF.fullmatch(by)
             ids = _expand(r.group("ids")) if r else []
