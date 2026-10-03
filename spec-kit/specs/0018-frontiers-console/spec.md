@@ -110,6 +110,36 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   implementation.
 - **Non-Latin font subsets.**
 
+## Edge cases
+
+- A viewport exactly 64rem wide: the sidebar is persistent and collapsible; one pixel narrower it is an
+  off-canvas drawer, per FR-009.
+- A viewport between 64rem and 80rem: the table of contents folds into a disclosure above the article,
+  per FR-009.
+- `/` typed while the focus is in a text field: it types the character and does not open search, per
+  FR-013.
+- A consumer that wants to route a search selection itself: it cancels the selection event, per FR-013.
+- Two statuses whose badge colours a reader cannot tell apart: each badge still carries its text, per
+  FR-014.
+- A page loaded with script disabled: the tree, menus, accordions, anchors and table-of-contents links
+  still work, per FR-016.
+
+## Assumptions
+
+- A consumer can copy the directory whole and serve it, fonts included, from its own origin.
+- The browsers a consumer targets support CSS custom properties, cascade layers and native web
+  components without a polyfill.
+- A consumer can produce a search index in the JSON shape the system defines.
+
+## Open questions
+
+- **OQ-1**: Whether the admin set needs a pagination control and a date/time input once a property's
+  first real console migrates; not specified until a real page needs them.
+- **OQ-2**: Whether syntax-highlighting token colours should be defined as `--fc-` tokens now so
+  server-side highlighters can target them.
+- **OQ-3**: How the sidebar presents below 64rem when script is unavailable is not stated: FR-009 makes
+  it a drawer there, and FR-016 leaves the drawer to script.
+
 ## Key entities
 
 - **`frontiers-console`** — the design system this spec governs, at `design-systems/frontiers-console/`.
@@ -129,13 +159,6 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   three layouts with no other file from this repository.
 - **SC-004**: No stylesheet or script in the directory depends on a framework, a build step, a remote
   URL, or another project's source.
-
-## Open questions
-
-- **OQ-1**: Whether the admin set needs a pagination control and a date/time input once a property's
-  first real console migrates; not specified until a real page needs them.
-- **OQ-2**: Whether syntax-highlighting token colours should be defined as `--fc-` tokens now so
-  server-side highlighters can target them.
 
 ## Review & acceptance checklist
 

@@ -169,6 +169,39 @@ restated here.
   not this spec. FR-017 and FR-018 establish that it must exist and that
   representation transfers to it; they do not establish how.
 
+## Edge cases
+
+- A friendly contact who meets every design-partner requirement but one:
+  the contact is not yet a design partner, per FR-006.
+- A venture that would pass most of what the independence test asks: it
+  is not called independent; the test is one binary judgment, not a
+  score, per FR-008.
+- A shared service branded as AI Workforce while people still do most of
+  its production work: it is not classified at that tier, whatever its
+  branding, per FR-011.
+- Markdown notes under `ventures/<company>/content/`: they are not
+  content documents and 0002-content-format's rules do not apply to
+  them, per FR-019.
+- A company that is already its own independent institution when Studios
+  first works with it: it gets no `ventures/<company>/` directory here,
+  and its material lives in its own Eidolon, per FR-021.
+- Software built for internal use that proves worth more outside the
+  firm: it is spun out rather than kept as an internal tool, per FR-016,
+  and handed off where a better-positioned operator exists, per FR-023.
+
+## Assumptions
+
+- The ontology states the venture lifecycle stages, the design-partner
+  requirements, and what each kind of evidence shows, which FR-003,
+  FR-006, and FR-007 rely on.
+- A company Studios incubates can be given repositories of its own,
+  separate from Intellectual Frontiers' own Eidolon, as FR-017 requires.
+- Whether a qualified replacement could continue a venture can be judged
+  from the company's records, rights, systems, and relationships, as
+  FR-008's single judgment requires.
+- The private vault stays readable only by its named circle, so FR-019's
+  private default keeps a company's material out of public view.
+
 ## Open questions
 
 - **OQ-1**: No individual Studios lead is named, distinct from the
@@ -177,6 +210,9 @@ restated here.
 - **OQ-2**: No rule states whether, or how, a company continues to use a
   Studios shared service after it has been called independent, or how
   that would be governed or billed once it does.
+- **OQ-3**: No rule states when a venture that makes no hire must have
+  the entity, operator, rights position, and closure condition FR-014
+  requires before a first hire.
 
 ## Key entities
 

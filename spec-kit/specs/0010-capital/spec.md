@@ -93,6 +93,34 @@ ontology and register data, not restated here.
   facts, not operating doctrine, the same reasoning `context/registers.md`
   already applies to patent counts.
 
+## Edge cases
+
+- An outside founder pursues the same thesis as an internally originated
+  venture, with evidence as strong or stronger: Capital prefers backing
+  them, per FR-005.
+- A company falls just short of a fund's qualifying condition but is
+  strong on every other measure: it is not funded under that fund, per
+  FR-013.
+- A company proposed under a fund's "build" mode whose unit economics
+  cannot be settled: the build does not start, per FR-014.
+- A transaction between commonly owned vehicles whose parties trust each
+  other: it still needs a control that makes it independently reviewable,
+  per FR-009.
+- An opportunity rests mainly on a strong patent: the patent alone is not
+  a basis, per FR-002, and the Native Alpha test is applied separately
+  from the underwriting analysis, per FR-003.
+- Someone who shaped an allocation decision disagreed with the final
+  choice: the disagreement is recorded with it, per FR-008.
+
+## Assumptions
+
+- Each fund states its qualifying condition and its terms in writing
+  before it funds a company.
+- Capital's underwriting standard is written down and available to
+  whoever applies it.
+- Every dollar Capital deploys passes through records that can be traced
+  back to its source.
+
 ## Open questions
 
 - **OQ-1**: No individual Capital lead is named, distinct from the
@@ -101,6 +129,8 @@ ontology and register data, not restated here.
 - **OQ-2**: No process is stated for resolving a disagreement between a
   specialist's licensed diligence opinion and Capital's own underwriting
   judgment.
+- **OQ-3**: No requirement states which fund holds a company that meets
+  more than one fund's qualifying condition.
 
 ## Key entities
 

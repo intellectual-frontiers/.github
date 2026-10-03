@@ -327,6 +327,40 @@ is not stated here.
 - The register of books and their status, and any specific book's decisions,
   which are ontology data and package records.
 
+## Edge cases
+
+- A chapter is retitled after a companion page has quoted it: the
+  chapter keeps its identifier, and the commit that retitles it updates
+  every page quoting the old title, per FR-006 and FR-033.
+- A final cut is asked for while the ISBN is a placeholder or a blocker is
+  open in the issue register: the cut is refused, per FR-007 and FR-022.
+- A content-affecting correction is needed after an edition's final cut:
+  the printing number rises and the corrected printing gets its own final
+  cut and delivery record, per FR-024 and FR-025.
+- A series built from a spoken program's released items, one volume per
+  calendar year: it is exempt from joint release, and each volume keeps
+  its own edition and printing, per FR-010 and
+  0017-spoken-and-research-works FR-011.
+- A change moves a table to the companion and also changes the page
+  count: the news entry describes the move and says nothing of the page
+  count, per FR-036.
+- A skill that realizes a book's method is ready before the book's
+  publication decision: it does not reach a reader until that decision,
+  per FR-040.
+
+## Assumptions
+
+- Every book is produced as a work package and moves through the work
+  lifecycle that 0015-work-packages defines.
+- Printed books are sold through outside vendors that publish their own
+  subject taxonomies and require an ISBN for print.
+- The company controls a public site of its own that a printed book can
+  point readers to for as long as the book is in circulation.
+- A voice standard and its audit checklist are kept as house assets that
+  Press maintains apart from any one work.
+- Any rendition can be rebuilt from its source at the commit it was cut
+  from.
+
 ## Open questions
 
 - **OQ-1**: Whether a serial series' lifecycle stage is asserted for the
@@ -334,6 +368,9 @@ is not stated here.
   assumes the volumes advance together.
 - **OQ-2**: No process is stated for a reader's correction of a published
   printing beyond the printing number's meaning in FR-024.
+- **OQ-3**: Whether a companion page that a printed copy points to may be
+  withdrawn, rather than moved, is not stated; FR-032 forbids only a change
+  of its address or file name.
 
 ## Key entities
 

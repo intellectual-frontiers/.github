@@ -118,10 +118,40 @@ is ontology data, not restated here.
   FR-007 — this spec establishes the business concepts; it does not yet
   establish how they're rendered as pages.
 
+## Edge cases
+
+- A related paper publishes before a patent's priority-date deadline: the
+  finding's disposition is due at publication, whichever comes first, per
+  FR-005.
+- A priority-date deadline approaches with no filing ready: the finding
+  still needs an explicit disposition by then, per FR-005, and a defensive
+  disclosure may be chosen only on its own terms, never as the fallback,
+  per FR-006.
+- A patent is granted and a proposal follows to build or license on it:
+  the grant alone is not a reason, per FR-010 and FR-019; the FR-011
+  questions are answered first.
+- An outside party sends unsolicited confidential material along with a
+  disclosure: the material is deleted unread, per FR-015, and the response
+  clock runs from receipt of a non-confidential summary, per FR-014.
+- An AI tool proposes inventors, claim language, or patentability: a
+  person still makes each of those decisions, per FR-016.
+
+## Assumptions
+
+- A protectable finding can be recognized as one before its disposition
+  falls due.
+- Each patent registry publishes a record for an individual family that
+  can be referenced.
+- A person with authority to make the decisions FR-016 reserves is
+  available when a disposition or filing falls due.
+
 ## Open questions
 
 - **OQ-1**: No rule resolves which research pillar owns the disposition
   decision when two pillars produce overlapping findings.
+- **OQ-2**: No requirement states whether, or how soon, this unit
+  responds to an outside party whose disclosure arrived only as
+  confidential material and was deleted under FR-015.
 
 ## Key entities
 

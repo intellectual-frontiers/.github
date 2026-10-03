@@ -89,11 +89,40 @@ ontology, and carrying its own confidentiality declaration per
   spec establishes is deferred to the specs that establish those business
   concepts, per FR-007.
 
+## Edge cases
+
+- A parser error that a browser would silently repair: the document
+  fails, per FR-002.
+- A content document generated from a work package's source: it is
+  exempt from FR-016 only, and must declare `prov:wasDerivedFrom`, per
+  FR-017.
+- An image used only as decoration: it still carries `alt`, `width`, and
+  `height`, per FR-013.
+- A document that must mention a restricted fact: it may say the fact
+  exists and how to request it, never its value, per FR-010.
+- A link using `javascript:` or `data:`: neither is a permitted form, so
+  the document fails, per FR-015.
+- A `@type` the ontology does not yet declare: the document fails until
+  the content kind is added to the ontology, per FR-005 and FR-007.
+
+## Assumptions
+
+- A standard HTML5 parser can report every parse error rather than only
+  repair it, so FR-002 can be applied mechanically.
+- Every content kind can be expressed as an ontology shape that a
+  validator can test a JSON-LD block against.
+- A document's title and description can be derived from the facts its
+  JSON-LD block asserts.
+- The body allowlist can be widened as content needs it without changing
+  any other requirement here.
+
 ## Open questions
 
 - **OQ-1**: The full allowlist of permitted body elements and attributes
-  (FR-011) is not yet enumerated exhaustively; it will be refined as real
+  (FR-012) is not yet enumerated exhaustively; it will be refined as real
   content is authored against it.
+- **OQ-2**: FR-015 does not say whether a protocol-relative URL
+  (`//host/path`) counts as a site-relative path.
 
 ## Key entities
 

@@ -1,0 +1,21 @@
+# Checks this repository's specs and enforcement register on every push and
+# pull request (0020-spec-format FR-015). Standard library only; no installs.
+name: spec-check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  spec-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Specs, enforcement register, and ontology prefixes
+        run: python3 tools/spec_check.py

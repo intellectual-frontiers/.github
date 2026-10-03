@@ -190,6 +190,36 @@ stated here.
   transcription and estimation tooling.
 - Spoken-program scheduling by an outside producer beyond FR-009.
 
+## Edge cases
+
+- An episode's format requires a full script and only talking points
+  exist: the episode does not meet its format, per FR-005.
+- A quotation taken from a machine transcript differs from the
+  recording: the recording governs, and the quotation is checked against
+  it before it is relied on, per FR-007.
+- An outside producer's schedule document also holds credentials or
+  contact details: only the schedule is copied, and nothing else in the
+  document is read or kept, per FR-009.
+- A guest asks that a quotation come out of a chapter already in a
+  running release: it is removed in the next running release, per
+  FR-013.
+- A patent draft is filed: the draft is closed with a pointer to its
+  application and is not edited further, per FR-024.
+- A study kit returns a result from outside that bears on a hypothesis:
+  the result is evidence to weigh and does not by itself change the
+  claim's label, per FR-029.
+
+## Assumptions
+
+- Spoken works are recorded and distributed through channels outside the
+  Eidolon, and their audio and video can be held outside Git.
+- An outside producer's schedule reaches the company as a document the
+  company can read but does not control.
+- Every peer-reviewed publication a record holds is registered with a DOI
+  registry that states its authors, journal, date, and address.
+- Machine transcription is available but is not accurate enough to quote
+  from without checking the recording.
+
 ## Open questions
 
 - **OQ-1**: Whether the claim label vocabulary of FR-021 is to be established
@@ -197,6 +227,10 @@ stated here.
   merged, is not decided.
 - **OQ-2**: The lifecycle stage of a recurring spoken program's individual
   episode, where each episode is its own work, is not stated.
+- **OQ-3**: Whether a guest's request to remove a quotation obliges a new
+  printing of a formal release that already carries it is not stated;
+  FR-013 requires removal only from the next running release, and FR-014
+  lets a retail volume change only through printings.
 
 ## Key entities
 

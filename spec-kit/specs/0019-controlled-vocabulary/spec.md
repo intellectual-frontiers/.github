@@ -71,6 +71,31 @@ sooner.
 - Renaming a term that FR-007 surfaces as a current candidate is a decision
   to make when it happens, not restated here.
 
+## Edge cases
+
+- An `ifcore:` term already names the concept and so does schema.org: the
+  `ifcore:` term is reused, per FR-001.
+- A concept that is a narrower kind of something a standard names: it is
+  declared as a subclass of the standard class, not beside it, per
+  FR-002.
+- A proposed term whose only advantage is a more on-brand label: that is
+  not a reason to declare it, per FR-003.
+- A justified novel term coming up again at a later review: it is not
+  re-justified, and it stands until a later Decision supersedes it, per
+  FR-006.
+- A review that finds a newly established equivalent for an existing
+  term: it flags the term and renames nothing; any rename follows the
+  spec, then ontology, then implementation order, per FR-008.
+
+## Assumptions
+
+- The established vocabularies a term is checked against stay published
+  and stable enough to reference by IRI.
+- A `Decision` individual can name the term it justifies, so a reviewer
+  can find the justification from the term.
+- Whoever reviews a change can recognize an established equivalent when
+  one exists.
+
 ## Open questions
 
 - **OQ-1**: No rule yet states how a candidate FR-007 flags is surfaced to
@@ -79,6 +104,9 @@ sooner.
 - **OQ-2**: Whether FR-009's gate applies to every Eidolon repository, or
   only the ones that commit ontology files directly — a venture's own
   ontology extension, for instance — is not yet decided.
+- **OQ-3**: Whether these rules apply to a term FR-001 does not list — an
+  `owl:AnnotationProperty`, a SHACL shape, or a SKOS concept scheme — is
+  not stated.
 
 ## Key entities
 

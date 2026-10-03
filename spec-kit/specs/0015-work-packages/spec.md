@@ -153,11 +153,42 @@ property fetches them are decisions outside this spec.
   those belong to an implementation plan.
 - How a web property renders and presents a generated content document.
 
+## Edge cases
+
+- A simple work whose lifecycle starts being tracked: it is promoted by
+  establishing its individual and creating its package together, and its
+  existing content document keeps its URL path, per FR-003.
+- A work brought in already well advanced: it enters at the stage its
+  actual state supports, with a `Decision` recording why, per FR-023.
+- A predecessor of the source kept in an older format: it sits in its
+  own folder marked non-live and is never edited, per FR-007.
+- Cover artwork or a font inside a package: it is an input and may be
+  tracked; the cover or PDF built from it may not, per FR-014.
+- A review copy shared before the publication decision: it is marked on
+  its face as unpublished and uncorrected, per FR-018.
+- A rendition held in storage reached through a signed or expiring link:
+  its delivery record names where it lives without that link, per
+  FR-017.
+
+## Assumptions
+
+- Each repository holding work packages is under Git, so a commit is a
+  stable reference for a source and its tooling.
+- The build toolchain can be pinned closely enough that rebuilding at a
+  recorded commit reproduces a rendition.
+- Storage outside every Eidolon repository exists and can be written by
+  a deterministic command.
+- A work's lifecycle stages form a single ordered sequence, so "the next
+  stage" is always defined.
+
 ## Open questions
 
 - **OQ-1**: Which lifecycle stage a continuously released work — an online
   edition that is updated each time an item is released — occupies between
   releases is not stated.
+- **OQ-2**: Whether a slug must be unique within its kind across the
+  root's `works/` and every venture's `works/`, or only within the one
+  directory that holds it, is not stated.
 
 ## Key entities
 
