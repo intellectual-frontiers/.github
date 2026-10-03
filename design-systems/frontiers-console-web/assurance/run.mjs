@@ -60,7 +60,13 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const problems = [];
   page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
-  page.on("console", (m) => { if (m.type() === "error") problems.push(`console error: ${m.text()}`); });
+  // A missing file inside this design system is a failure; a missing sibling it derives from is not (those
+  // tests report themselves as skipped), so 404s are judged by URL, not by the browser's console message.
+  page.on("console", (m) => { if (m.type() === "error" && !/^Failed to load resource/.test(m.text())) problems.push(`console error: ${m.text()}`); });
+  page.on("response", (r) => {
+    const { pathname } = new URL(r.url());
+    if (r.status() >= 400 && pathname.startsWith(`/${slug}/`)) problems.push(`HTTP ${r.status()}: ${pathname}`);
+  });
   const suite = opt("--suite");
   await page.goto(`${origin}/${slug}/assurance/index.html${suite ? `?suite=${encodeURIComponent(suite)}` : ""}`);
   await page.waitForFunction(() => window.__assurance?.done === true, null, { timeout: 180000 });
