@@ -101,6 +101,28 @@ The longer essay is
 
 ## For editors and maintainers
 
+### Start working
+
+Everything this repository's tools need is already in the workspace. There
+is nothing to install and no `make install` (0024, 0025). Pick one:
+
+1. **In your browser, nothing installed** (the default on macOS and
+   Windows 11): [Open in GitHub Codespaces](https://codespaces.new/intellectual-frontiers/.github).
+2. **On your own computer, in a container:** install
+   [VS Code](https://code.visualstudio.com/) and
+   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on
+   Windows, with its WSL 2 backend), then
+   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/intellectual-frontiers/.github).
+3. **On Linux or in a VM, without containers:** install
+   [workspaces-host-v3](https://intellectual-frontiers.github.io/workspaces-host-v3/)
+   and activate the `press` persona.
+
+Whichever you pick, **log in to GitHub first.** When the workspace opens,
+it asks you to (`gh auth login`); in a Codespace you are already logged
+in. It then clones `.github`, `eidolon` and `www.intellectualfrontiers.com`
+beside each other, from
+[`.devcontainer/ws-repos.json`](.devcontainer/ws-repos.json).
+
 ### Three repositories, one Eidolon
 
 | Repository | Role | May contain |
@@ -131,6 +153,8 @@ tools/
   reference-environment
                     the workspaces-host-v3 commit every tool is guaranteed
                     to run in (0024-tooling-environment)
+.devcontainer/      the workspace this repository opens in, and the
+                    repositories it clones beside it (0025-workspaces)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)

@@ -615,17 +615,17 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0024-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
 0024-tooling-environment FR-004	none	-	no check scans tools for installs at run time
 0024-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0024-tooling-environment FR-006	none	-	no job runs tools in the reference environment yet
+0024-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
 0024-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0024-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form only; neither its published images nor the devcontainer tag's match is checked
-0024-tooling-environment FR-009	none	-	no job runs tools in the reference environment yet
-0024-tooling-environment FR-010	none	-	no CI job yet
+0024-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
+0024-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
+0024-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
 0024-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
 0024-tooling-environment FR-012	none	-	no check scans tools for the environment's name
 0025-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
 0025-workspaces FR-002	none	-	FR-010 runs only the image flavor
 0025-workspaces FR-003	none	-	no check
-0025-workspaces FR-004	none	-	no .devcontainer/ yet; no check of its image tag
+0025-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
 0025-workspaces FR-005	none	-	no check reads ws-repos.json
 0025-workspaces FR-006	none	-	no check reads devcontainer.json
 0025-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
