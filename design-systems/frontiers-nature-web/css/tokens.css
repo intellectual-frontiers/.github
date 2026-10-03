@@ -26,13 +26,6 @@
     --studios: var(--brand-unit-studios);
     --network: var(--brand-unit-network);
 
-    /* editorial whiteboard roles: semantic and sparse */
-    --diagram-ink: var(--brand-text);
-    --diagram-path: var(--brand-primary);
-    --diagram-warning: var(--brand-danger);
-    --diagram-positive: var(--brand-success);
-    --diagram-caution: var(--brand-warning);
-    --diagram-secondary: var(--brand-info);
 
     /* type */
     --font-sans: var(--brand-font-sans), "Helvetica Neue", Arial, sans-serif;

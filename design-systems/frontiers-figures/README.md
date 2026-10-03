@@ -1,0 +1,48 @@
+# Frontiers Figures
+
+How every figure is drawn, in any medium: a book, a paper, a web page or a slide. Its rules are
+[`spec.md`](spec.md); it is governed by
+[`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md). See
+[`../README.md`](../README.md) for what a design system is and how theming works.
+
+| Path | What it is |
+| --- | --- |
+| `roles.json` | The figure roles (ink, primary, emphasis, ...) and, per variant, the brand role or mix each takes; the standard and compact canvases. |
+| `svgkit.py` | Drawing primitives: boxes, labels, arrows, curves, titles. Every color is a role, and text is measured in the theme's sans. |
+| `layouts.py` | The figure types: process, comparison, cycle, layer, relationship, decision and hierarchy diagrams. |
+| `figcheck.py` | These rules as a check: canvas, roles not colors, minimum type, labels fitting their boxes. |
+| `theme.py` | The stylesheet a brand and a variant give a figure; `apply` puts it in one. |
+| `fonts/` | Inter, which the kit measures in and a renderer sets the labels in. |
+| `assurance/` | `run.py`: every figure type on both canvases, under every brand and variant, plus fixtures that must fail. |
+
+## Using it
+
+Draw a figure (Python 3 with Pillow):
+
+```python
+import sys; sys.path.insert(0, "design-systems/frontiers-figures")
+import layouts, svgkit
+svgkit.use_brand("design-systems/frontiers-brand")      # measure in the theme's sans
+layouts.gate("fig-2.1.svg", "Ship or test again?", None,
+             "Does the evidence hold?", "Ship it", "Go back and test")
+```
+
+and check it:
+
+```
+python3 design-systems/frontiers-figures/figcheck.py --brand design-systems/frontiers-brand fig-2.1.svg
+```
+
+The figure names roles, never colors. Theme it when it is rendered or placed:
+
+```
+python3 design-systems/frontiers-figures/theme.py apply fig-2.1.svg \
+    --brand design-systems/frontiers-brand --variant default -o fig-2.1.themed.svg
+```
+
+- **Print:** render the themed figure with `rsvg-convert -f pdf`, with `fonts/` where fontconfig finds it.
+- **The web:** inline the themed figure, or serve it as an image.
+- **A dark page or slide:** `--variant on-dark`. **One-color print:** `--variant grayscale`.
+- **A narrow slot:** draw it on the compact canvas (`width=svgkit.CANVAS["compact"]`).
+
+A different brand needs no change to the figure: theme it with that brand.

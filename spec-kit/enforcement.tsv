@@ -292,7 +292,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-029	none	-	web layout; no check
 0014-design-systems FR-030	check	.github: tools/run_assurance.sh	web harnesses run headlessly in Chromium; file:// skipping not checked in CI
 0014-design-systems FR-031	none	-	print profile; no system of this kind yet
-0014-design-systems FR-032	none	-	figure profile; no system of this kind yet
+0014-design-systems FR-032	check	.github: python3 tools/spec_check.py	each figure DesignSystem names a figure type; the profile's rules are checked by each figure system's harness
 0014-design-systems FR-033	none	-	written-voice profile; no system of this kind yet
 0014-design-systems FR-034	none	-	spoken-voice profile; no system of this kind yet
 0014-design-systems FR-035	none	-	removal discipline; no check that a removed system leaves no ontology individual
@@ -308,6 +308,7 @@ requirement	mechanism	by	note
 0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
 0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
 0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
+0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: make check-works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: make check-works	package and individual must both exist; URL-path stability unchecked
@@ -434,6 +435,18 @@ frontiers-console-web FR-016	check	.github: node design-systems/frontiers-consol
 frontiers-console-web FR-017	none	-	documentation completeness; no check possible
 frontiers-console-web FR-018	none	-	harness runs, but nothing checks which suites it covers
 frontiers-console-web FR-019	none	-	no check
+frontiers-console-web FR-020	none	-	no console page carries a figure yet; the ontology link is checked by spec_check (0014-design-systems FR-048)
+frontiers-figures FR-001	check	.github: python3 tools/spec_check.py	registration and figure types
+frontiers-figures FR-002	none	-	directory contents; no check
+frontiers-figures FR-003	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	fail fixtures: literal color, font name, kept stylesheet, unknown class; every drawn figure passes figcheck
+frontiers-figures FR-004	check	.github: tools/run_assurance.sh	run.py under every brand and variant: every role resolves; text 4.5:1 and graphics 3:1 on every background role
+frontiers-figures FR-005	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every figure type drawn on both canvases; every color variant themes and parses; that a variant changes nothing else is a review judgment
+frontiers-figures FR-006	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	a themed figure renders with only the brand's sans embedded where rsvg-convert is installed
+frontiers-figures FR-007	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: canvas, minimum size, tracking; title and label sizes are the kit's
+frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: labels inside their boxes and the canvas, measured in the brand's sans
+frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
+frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
+frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
 frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
 frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
@@ -455,7 +468,7 @@ frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
 frontiers-nature-web FR-004	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, families shipped, no color literal; Hero suite: imagery from the theme
 frontiers-nature-web FR-005	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens and Rendered contrast suites
-frontiers-nature-web FR-006	none	-	semantic use of diagram and unit colours is a judgment; no check
+frontiers-nature-web FR-006	none	-	semantic use of unit colours is a judgment; figures are frontiers-figures' (spec_check checks the ontology link)
 frontiers-nature-web FR-007	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: bundle.txt order and files
 frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important; the order statement itself is not checked
 frontiers-nature-web FR-009	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: every font file fonts.css references exists; Page frame: fonts load
@@ -488,6 +501,7 @@ frontiers-print FR-014	none	-	author setting is the renderer's; not checked
 frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
 frontiers-print FR-016	check	eidolon: make check-covers	the series line's fit is checked; its color and the back-cover rule are not
 frontiers-print FR-017	check	eidolon: make check-covers	a back cover that spills onto a second page or reaches the barcode zone fails
+frontiers-print FR-018	check	eidolon: make check-books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
 frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
 frontiers-merchandise FR-002	none	-	directory contents; no check
 frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
