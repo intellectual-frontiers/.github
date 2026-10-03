@@ -11,8 +11,8 @@ Every font in this folder is free to use, embed in a PDF, and redistribute. Each
 | Gelasio | Gelasio-* | Eben Sorkin | OFL 1.1 | `gelasio` set |
 | Charis SIL | CharisSIL-* | SIL International | OFL 1.1 | `charis` set |
 | Lato | Lato-* | Lukasz Dziedzic | OFL 1.1 | `lato` set |
-| Inter, Roboto Condensed, Fjalla One, Martian Mono | various | various | OFL 1.1 (Apache 2.0 for Roboto Condensed) | Figures and diagrams (the figure kit) |
+| Inter, Roboto Condensed, Fjalla One, Martian Mono | various | various | OFL 1.1 (Apache 2.0 for Roboto Condensed) | Covers, "Try this with AI" boxes, and figures |
 
-Spectral, PT Serif, and Gelasio here are the Latin subsets Google Fonts serves (about 220 to 230 characters). They do not have arrows, mathematical signs, or Greek letters, so every typeface set falls back to the house fonts and STIX Two Math for a missing character (`house-design/latex/typefaces.json`). They are fit for this build and not as general-purpose copies.
+Spectral, PT Serif, and Gelasio here are the Latin subsets Google Fonts serves (about 220 to 230 characters). They do not have arrows, mathematical signs, or Greek letters, so every typeface set falls back to the house fonts and STIX Two Math for a missing character (`latex/typefaces.json`). They are fit for this build and not as general-purpose copies.
 
-Commercial typefaces (Quadraat, Harding, Guardian, Meta, Minion, and others) are never kept here. Licensed copies go in `house-design/theme/fonts-licensed/`, which is not committed (`works/research/layouts/README.md`, "Typefaces").
+Commercial typefaces (Quadraat, Harding, Guardian, Meta, Minion, and others) are never kept here. Licensed copies are the consumer's own: it installs them outside this design system and names their directory in `IF_FONTS_LICENSED` (`docs/paper-layouts.md`, "Typefaces").

@@ -6,7 +6,7 @@
 \providecommand{\iffontdir}{fonts/}
 \providecommand{\branddir}{../../frontiers-brand}
 
-\InputIfFileExists{iflayout.def}{}{\ClassError{ifarticle}{iflayout.def not found: build the paper with tools/render/paper-build.sh}{}}
+\InputIfFileExists{iflayout.def}{}{\ClassError{ifarticle}{iflayout.def not found: write it beside this class with latex/layout.py emit <layout>}{}}
 \newif\ififsingle
 \ifnum\ifLcols=1 \ifsingletrue\else\ifsinglefalse\fi
 \ififsingle

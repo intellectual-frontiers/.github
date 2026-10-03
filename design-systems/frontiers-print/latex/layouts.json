@@ -1,5 +1,5 @@
 {
-  "_note": "The registry of paper page layouts. Read by layout.py (emits iflayout.def for the class), the article converter (table, figure and sidebar behavior), and paper-build.sh (validation). Add a layout here and document it in works/research/design-reference.md; no other file changes. Numbers are inches and points. Spec 0017 FR-030.",
+  "_note": "The registry of paper page layouts. Read by layout.py (emits iflayout.def for the class) and by the production pipeline's article converter (table, figure and sidebar behavior). Add a layout here and document it in docs/paper-layouts.md; no other file changes. Numbers are inches and points. Spec 0017 FR-030.",
   "default": "two-column",
   "layouts": {
     "two-column": {
