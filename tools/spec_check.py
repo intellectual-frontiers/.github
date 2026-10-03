@@ -318,8 +318,9 @@ def _concepts(ttl: str, scheme: str) -> set[str]:
 
 
 def _check_web_classification(ttl: str) -> list[Finding]:
-    """0014-design-systems FR-041: every web design system names one or more interaction models, exactly one
-    expression and one or more densities, by dcterms:type."""
+    """0014-design-systems FR-041 and FR-042: every web design system names one or more interaction models, exactly
+    one expression and one or more densities, and every print design system one or more print document types,
+    by dcterms:type."""
     findings: list[Finding] = []
     models, expressions, densities = (_concepts(ttl, s) for s in ("WebInteractionModelScheme", "DesignExpressionScheme", "DesignDensityScheme"))
     for block in re.split(r"\n\s*\n", ttl):
@@ -335,6 +336,12 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             findings.append(Finding("error", where, "a web design system names exactly one expression, productive or expressive (0014-design-systems FR-041)"))
         if not named & densities:
             findings.append(Finding("error", where, "a web design system names no density (0014-design-systems FR-041)"))
+    doc_types = _concepts(ttl, "PrintDocumentTypeScheme")
+    for block in re.split(r"\n\s*\n", ttl):
+        m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
+        types = re.search(r"dcterms:type ([^;]+);", block)
+        if m and types and "ifcore:PrintDesignSystemKind" in types.group(1) and not set(re.findall(r"ifcore:(\w+)", types.group(1))) & doc_types:
+            findings.append(Finding("error", f"ontology/ifcore.ttl ({m.group(1)})", "a print design system names no print document type (0014-design-systems FR-042)"))
     return findings
 
 

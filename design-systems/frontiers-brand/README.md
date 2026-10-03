@@ -9,6 +9,7 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | --- | --- |
 | `tokens.json` | Every brand value in the Design Tokens Community Group format: the palette, unit colors, typefaces, the theme roles (`role`), and each logo file with its size and background (under `$extensions`). |
 | `brand.css` | The theme roles as `--brand-*` custom properties in the `theme` cascade layer. A web page loads it before its design system's stylesheets. |
+| `brand.tex` | The theme roles for print: `brand-<role>` colors, `\brandfontsans`, `\brandfontserif`, and `\brandlockuplight`, `\brandlockupdark` and `\brandicon`. A print design system loads it first. |
 | `logos/` | The lockup as PNG in every size, light and dark; the icon-only mark. |
 | `logos/web/` | The lockup as WebP in every size below the master, light and dark. |
 | `images/favicon.png` | The icon-only mark at 64×64. |
@@ -16,8 +17,10 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 
 ## Using it
 
-This brand is a theme. A web design system takes every brand value by reference (`var(--brand-primary)`, the logo files listed in `tokens.json`), so a page is themed by loading `brand.css` first and taking logos from `tokens.json`. Vendor this directory beside the web design system it themes.
+This brand is a theme. A web design system takes every brand value by reference (`var(--brand-primary)`, the logo files listed in `tokens.json`), so a page is themed by loading `brand.css` first and taking logos from `tokens.json`, and a printed work by loading `brand.tex` first. Vendor this directory beside the web design system it themes.
 
 Used directly (a slide deck, a document, an email signature), take colors from `tokens.json` and
 place a logo file at or above its minimum size on the background its variant is for. Never
 redraw, recolor or scale up a logo file.
+
+`brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files.

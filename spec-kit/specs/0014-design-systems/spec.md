@@ -104,31 +104,37 @@ any number of each kind.
   Tokens Community Group format (`$value`, `$type`, and `{group.token}` for
   a token that refers to another).
 - **FR-037**: Every brand MUST supply these theme roles, each in
-  `tokens.json` under `role` and as a `--brand-<role>` custom property in
-  `brand.css`: the colors `text`, `surface`, `primary`, `secondary`,
+  `tokens.json` under `role`, as a `--brand-<role>` custom property in
+  `brand.css`, and in `brand.tex` (for print) as an `xcolor` color
+  `brand-<role>` or, for a font role, a command `\brandfontsans` or
+  `\brandfontserif`: the colors `text`, `surface`, `primary`, `secondary`,
   `tertiary`, `success`, `warning`, `danger` and `info`, and the font
   families `font-sans` and `font-serif`. Under `logo` in `tokens.json`, it
   MUST list its lockup files for light and for dark backgrounds, each with
-  its pixel size, its icon-only mark, and its favicon. A brand MAY supply
+  its pixel size, its icon-only mark, and its favicon; `brand.tex` MUST name
+  its widest lockup for light and for dark backgrounds and its widest icon
+  (`\brandlockuplight`, `\brandlockupdark`, `\brandicon`), as paths inside
+  the brand's directory. A brand MAY supply
   further roles that a design system it themes requires (FR-038).
-- **FR-038**: A web design system MUST take every brand value it uses (a
-  color a theme role supplies, a font family, a logo, the favicon) from the
-  theme by reference, as `var(--brand-<role>)` or, for files, from the
-  brand's `tokens.json`, and never as a literal or a copy. Its cascade
-  layer order MUST begin with `theme`. Its spec MUST name every role it
+- **FR-038**: A web or print design system MUST take every brand value it
+  uses (a color a theme role supplies, a font family, a logo, the favicon)
+  from the theme by reference, and never as a literal or a copy: a web
+  design system as `var(--brand-<role>)` and, for files, from the brand's
+  `tokens.json`, its cascade layer order beginning with `theme`; a print
+  design system from `brand.tex`, loaded before its own definitions. Its spec MUST name every role it
   requires beyond FR-037 and the font families it ships. Pairing a design
   system with a brand is a *theme*: it MAY change only the values FR-037
   and those named roles supply, and the font families only among those the
   design system ships; it MUST NOT change layout, spacing, components,
-  motion or accessibility behaviour. A web design system MUST NOT be used
-  without a theme.
-- **FR-039**: A web design system's harness MUST run under any brand
-  vendored beside it, chosen when it runs, and MUST fail when that brand
-  lacks a role the system requires, names a font family the system does
-  not ship, or makes a text pairing fall below WCAG 2.2 AA. This
-  repository's CI MUST run every web design system here under every brand
-  here. A brand outside this repository is proven against a web design
-  system by running that system's harness under it where both are
+  motion or accessibility behaviour. A web or print design system MUST NOT
+  be used without a theme.
+- **FR-039**: A web or print design system's harness MUST run under any
+  brand vendored beside it, chosen when it runs, and MUST fail when that
+  brand lacks a role the system requires, names a font family the system
+  does not ship, or (on the web) makes a text pairing fall below WCAG 2.2
+  AA. This repository's CI MUST run every web and print design system here
+  under every brand here. A brand outside this repository is proven against
+  a design system by running that system's harness under it where both are
   vendored.
 - **FR-040**: A page MUST be rendered with exactly one web design system
   and one theme. A channel MAY use several, each for an area of it (a path
@@ -241,9 +247,10 @@ any number of each kind.
 - **FR-028**: A brand design system governs one identity: its palette, the
   theme roles it supplies (FR-037), its typeface families, its logo and
   lockups, its favicon, and its imagery. Its machine-readable form is
-  `tokens.json` (FR-036) and `brand.css`, which declares its theme roles as
+  `tokens.json` (FR-036), `brand.css`, which declares its theme roles as
   CSS custom properties prefixed `--brand-`, inside the `theme` cascade
-  layer, and nothing else. Its harness checks that the two agree, that it
+  layer, and nothing else, and `brand.tex`, which declares them for print
+  (FR-037) and nothing else. Its harness checks that the three agree, that it
   supplies every role of FR-037, the contrast of its role pairings, and its
   logo files. Its consumers are the design systems it themes and the
   channels that pair it with them. A brand that is not yet public MUST live,
@@ -314,11 +321,23 @@ any number of each kind.
   typesetting style files (a LaTeX preamble or class) and the data they
   read (typefaces, layouts). Its harness compiles each fixture document
   and fails on a compile error or on a check rule broken in the output.
+  It is themed (FR-038): its colors, its text and sans families (among the
+  families it ships) and its logos come from the brand's `brand.tex`. Its
+  harness compiles each fixture under every brand beside it and checks the
+  page size, that every font in the output is one it ships and is
+  embedded, that the theme's colors reached the output, and that no theme
+  color appears as a literal in its style files.
   It holds the cover grammar (how a cover is composed, set and lettered)
   and MUST NOT hold cover artwork, its library, or which work uses which
   piece: those are facts about works, held by the production pipeline
   (FR-025). Its consumers are the typesetting tools of a production
   pipeline, which are not part of it (FR-025).
+
+- **FR-042**: Every print design system MUST be classified in the
+  ontology, by `dcterms:type`, with one or more **print document types** it
+  sets, named as publishing names them: *book interior*, *book cover*,
+  *journal article* and *report*. A print design system's slug MUST NOT
+  encode them.
 
 ## Kind profile: figure
 
@@ -456,6 +475,8 @@ None.
   (`primary`, `surface`, `font-sans`, ...).
 - **Interaction model, expression, density** — how a web design system is
   classified, in the industry's own terms.
+- **Print document type** — what a print design system sets: book
+  interior, book cover, journal article, report.
 - **A consumer** — any channel (a web property), production pipeline or
   tool, internal or external, that vendors a design system's directory to
   make presentations; this spec does not

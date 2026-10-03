@@ -1,0 +1,361 @@
+{
+  "_note": "Typeface sets for the paper PDF. A layout names its default set (layouts.json: typeface); a paper may choose another with :typeface: in its header. 'built' sets are open-licence fonts kept in fonts/ (fonts/LICENSES.md). 'license-required' sets need font files an editor licenses and installs in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed) , which is never committed; if they are missing the build uses the layout's default set and says so. Every set falls back to the house fonts and STIX Two Math for a character its own font lacks. scale is a size factor so a lookalike sets the same line length as the journal (measured by tools/render/typeface-compare.py). Spec 0017 FR-030.",
+  "default": "house",
+  "fallback": {
+    "main": [
+      "SourceSerif4-Regular.ttf",
+      "STIXTwoMath-Regular.otf"
+    ],
+    "sans": [
+      "SourceSans3-Regular.ttf",
+      "STIXTwoMath-Regular.otf"
+    ]
+  },
+  "sets": {
+    "house": {
+      "status": "built",
+      "summary": "The house typeface: Source Serif 4 for text, Source Sans 3 for headings, tables, captions, and boxes. Open licence; full glyph coverage.",
+      "modeled_on": "No journal. Close to the width pattern of BMJ's Meta Serif and Nature's Harding Text (within 0.003 to 0.01 of the best open match in the measured comparison).",
+      "best_for": "Everything by default; the safe choice.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSerif4-Regular",
+        "bold": "SourceSerif4-Bold",
+        "italic": "SourceSerif4-Italic",
+        "bolditalic": "SourceSerif4-BoldItalic",
+        "scale": 1.0,
+        "features": "Numbers=Lining"
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSans3-Regular",
+        "bold": "SourceSans3-Bold",
+        "italic": "SourceSans3-Italic",
+        "bolditalic": "SourceSans3-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      }
+    },
+    "spectral": {
+      "status": "built",
+      "summary": "Spectral for text, Source Sans 3 for the rest. A light, open, humanist text face.",
+      "modeled_on": "NEJM's Quadraat, the closest open match measured (width-pattern residual 0.027, scale 1.00).",
+      "best_for": "A page that should feel like NEJM or a similar humanist journal.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "Spectral-Regular",
+        "bold": "Spectral-Bold",
+        "italic": "Spectral-Italic",
+        "bolditalic": "Spectral-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSans3-Regular",
+        "bold": "SourceSans3-Bold",
+        "italic": "SourceSans3-Italic",
+        "bolditalic": "SourceSans3-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      }
+    },
+    "pt-serif": {
+      "status": "built",
+      "summary": "PT Serif for text, Source Sans 3 for the rest. A sturdy, large-x-height text face.",
+      "modeled_on": "Nature's Harding Text and HBR's Guardian Text Egyptian and Le Monde Journal (best or second best open match; scale 1.07).",
+      "best_for": "A page that should feel like Nature or HBR.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "PTSerif-Regular",
+        "bold": "PTSerif-Bold",
+        "italic": "PTSerif-Italic",
+        "bolditalic": "PTSerif-BoldItalic",
+        "scale": 1.07,
+        "features": ""
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSans3-Regular",
+        "bold": "SourceSans3-Bold",
+        "italic": "SourceSans3-Italic",
+        "bolditalic": "SourceSans3-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      }
+    },
+    "gelasio": {
+      "status": "built",
+      "summary": "Gelasio for text, Source Sans 3 for the rest. A Georgia-like, robust face.",
+      "modeled_on": "Minion Pro (PLOS ONE, Scientific Reports), Scala (The Lancet), and Meta Serif (BMJ): the closest open match for all three (scale 0.97).",
+      "best_for": "A page that should feel like PLOS ONE, Scientific Reports, The Lancet, or BMJ.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "Gelasio-Regular",
+        "bold": "Gelasio-Bold",
+        "italic": "Gelasio-Italic",
+        "bolditalic": "Gelasio-BoldItalic",
+        "scale": 0.97,
+        "features": ""
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSans3-Regular",
+        "bold": "SourceSans3-Bold",
+        "italic": "SourceSans3-Italic",
+        "bolditalic": "SourceSans3-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      }
+    },
+    "charis": {
+      "status": "built",
+      "summary": "Charis SIL for text, Source Sans 3 for the rest. A broad, sturdy face with the widest glyph coverage here.",
+      "modeled_on": "HBR's Le Monde Journal (closest, scale 1.03), BMJ's Meta Serif, and the Times of NAR.",
+      "best_for": "A page that should feel like HBR in its 2012 reprint, or a Times-like journal; and papers with many special characters.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "CharisSIL-Regular",
+        "bold": "CharisSIL-Bold",
+        "italic": "CharisSIL-Italic",
+        "bolditalic": "CharisSIL-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "SourceSans3-Regular",
+        "bold": "SourceSans3-Bold",
+        "italic": "SourceSans3-Italic",
+        "bolditalic": "SourceSans3-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      }
+    },
+    "lato": {
+      "status": "built",
+      "summary": "Lato for text and for the rest: a sans-serif body, as JAMA sets.",
+      "modeled_on": "JAMA's Guardian Sans body, the closest open match measured by a wide margin (residual 0.016, scale 0.98).",
+      "best_for": "A JAMA-style page. Pair with a sidebar layout.",
+      "main": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "Lato-Regular",
+        "bold": "Lato-Bold",
+        "italic": "Lato-Italic",
+        "bolditalic": "Lato-BoldItalic",
+        "scale": 0.98,
+        "features": ""
+      },
+      "sans": {
+        "dir": "house",
+        "ext": ".ttf",
+        "regular": "Lato-Regular",
+        "bold": "Lato-Bold",
+        "italic": "Lato-Italic",
+        "bolditalic": "Lato-BoldItalic",
+        "scale": 0.98,
+        "features": ""
+      }
+    },
+    "quadraat-scala": {
+      "status": "license-required",
+      "summary": "Quadraat for text, Scala Sans for the rest.",
+      "modeled_on": "NEJM (its own custom OTNEJM builds).",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "Quadraat-Regular",
+        "bold": "Quadraat-Bold",
+        "italic": "Quadraat-Italic",
+        "bolditalic": "Quadraat-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "ScalaSans-Regular",
+        "bold": "ScalaSans-Bold",
+        "italic": "ScalaSans-Italic",
+        "bolditalic": "ScalaSans-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "harding-graphik": {
+      "status": "license-required",
+      "summary": "Harding Text for text, Graphik for the rest.",
+      "modeled_on": "Nature (Harding Text; Graphik Naturel).",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "HardingText-Regular",
+        "bold": "HardingText-Bold",
+        "italic": "HardingText-Italic",
+        "bolditalic": "HardingText-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "Graphik-Regular",
+        "bold": "Graphik-Bold",
+        "italic": "Graphik-Italic",
+        "bolditalic": "Graphik-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "guardian-national": {
+      "status": "license-required",
+      "summary": "Guardian Text Egyptian for text, National for the rest.",
+      "modeled_on": "HBR (2011 reprint).",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "GuardianTextEgyptian-Regular",
+        "bold": "GuardianTextEgyptian-Bold",
+        "italic": "GuardianTextEgyptian-Italic",
+        "bolditalic": "GuardianTextEgyptian-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "National-Regular",
+        "bold": "National-Bold",
+        "italic": "National-Italic",
+        "bolditalic": "National-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "guardian-sans": {
+      "status": "license-required",
+      "summary": "Guardian Sans for text and for the rest.",
+      "modeled_on": "JAMA.",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "GuardianSans-Regular",
+        "bold": "GuardianSans-Bold",
+        "italic": "GuardianSans-Italic",
+        "bolditalic": "GuardianSans-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "GuardianSans-Regular",
+        "bold": "GuardianSans-Bold",
+        "italic": "GuardianSans-Italic",
+        "bolditalic": "GuardianSans-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "meta": {
+      "status": "license-required",
+      "summary": "Meta Serif Pro for text, Meta Pro for the rest.",
+      "modeled_on": "BMJ.",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "MetaSerifPro-Regular",
+        "bold": "MetaSerifPro-Bold",
+        "italic": "MetaSerifPro-Italic",
+        "bolditalic": "MetaSerifPro-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "MetaPro-Regular",
+        "bold": "MetaPro-Bold",
+        "italic": "MetaPro-Italic",
+        "bolditalic": "MetaPro-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "minion-myriad": {
+      "status": "license-required",
+      "summary": "Minion Pro for text, Myriad Pro for the rest.",
+      "modeled_on": "PLOS ONE, Scientific Reports.",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "MinionPro-Regular",
+        "bold": "MinionPro-Bold",
+        "italic": "MinionPro-Italic",
+        "bolditalic": "MinionPro-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "MyriadPro-Regular",
+        "bold": "MyriadPro-Bold",
+        "italic": "MyriadPro-Italic",
+        "bolditalic": "MyriadPro-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    },
+    "le-monde": {
+      "status": "license-required",
+      "summary": "Le Monde Journal for text, Le Monde Sans for the rest.",
+      "modeled_on": "HBR (2012 reprint).",
+      "best_for": "A page that matches the journal's own type. Needs licensed font files.",
+      "main": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "LeMondeJournal-Regular",
+        "bold": "LeMondeJournal-Bold",
+        "italic": "LeMondeJournal-Italic",
+        "bolditalic": "LeMondeJournal-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "sans": {
+        "dir": "licensed",
+        "ext": ".otf",
+        "regular": "LeMondeSans-Regular",
+        "bold": "LeMondeSans-Bold",
+        "italic": "LeMondeSans-Italic",
+        "bolditalic": "LeMondeSans-BoldItalic",
+        "scale": 1.0,
+        "features": ""
+      },
+      "note": "Install licensed copies in `fonts-licensed/` (a directory the consumer provides beside `fonts/`, never committed)  with the file names given here (edit them to match your files). Without them the build uses the layout's own set and says so."
+    }
+  }
+}

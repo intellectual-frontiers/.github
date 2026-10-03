@@ -1,0 +1,32 @@
+% Fixture: a book cover page and an interior chapter, set with this design system under the theme the harness
+% chooses. The harness defines \printdir, \iffontdir and \branddir (absolute) before \input-ing this file.
+\documentclass[10pt,twoside,openright]{book}
+\input{\printdir/latex/preamble}
+\newcommand{\themelog}[1]{\extractcolorspecs{#1}{\themelogmodel}{\themelogspec}\typeout{THEME #1=\themelogmodel:\themelogspec}}
+\begin{document}
+\themelog{ifdeepink}\themelog{iffrontierblue}\themelog{ifsignalteal}\themelog{ifoxblood}
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{0.6in}
+  {\ifinterbold\fontsize{30}{34}\selectfont\color{ifdeepink} A Fixture Title\par}
+  \vspace{0.15in}
+  {\ifintermedium\fontsize{14}{18}\selectfont\color{ifoxblood} A subtitle in the theme's tertiary color\par}
+  \vspace{0.3in}
+  {\ifintersemibold\fontsize{12}{15}\selectfont\color{iffrontierblue} An Author\par}
+  \vfill
+  \includegraphics[width=2.4in]{\branddir/\brandlockuplight}\par
+  \vspace{0.2in}
+  \colorbox{ifdeepink}{\includegraphics[width=2.4in]{\branddir/\brandlockupdark}}\par
+  \vspace{0.2in}
+  \includegraphics[width=0.6in]{\branddir/\brandicon}
+\end{center}
+\cleardoublepage
+\chapter{A Chapter}
+Body text in the theme's serif. It runs long enough to fill a paragraph and test the measure, with
+\textbf{bold}, \textit{italic} and \texttt{monospace} words, and a reference to
+\href{https://example.com}{a link}. {\color{iffrontierblue} A line in the primary color.}
+{\color{ifsignalteal} A line in the secondary color.}
+\section{A Section}
+{\ifsans A line in the interior sans.} More body text follows the section heading so the page has
+a heading, its text, and the running head the design sets.
+\end{document}

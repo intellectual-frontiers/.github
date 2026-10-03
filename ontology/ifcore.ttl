@@ -161,6 +161,22 @@ ifcore:CompactDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme 
     skos:definition "The tightest spacing, for data-dense tables and tools."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:PrintDocumentTypeScheme a skos:ConceptScheme ; rdfs:label "Print document type"@en ;
+    rdfs:comment "What a print design system sets (0014-design-systems FR-042), as publishing names it. A print design system names every one it sets, by dcterms:type."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookInterior a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "book interior"@en ;
+    skos:definition "The pages of a printed or ebook book between its covers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookCover a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "book cover"@en ;
+    skos:definition "The front cover, spine and back cover of a book."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:JournalArticle a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "journal article"@en ;
+    skos:definition "A research paper set as a journal sets one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "report"@en ;
+    skos:definition "A standalone document of findings, set for print or PDF."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersBrand a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-brand" ;
     rdfs:label "Frontiers Brand"@en ;
@@ -175,6 +191,14 @@ ifcore:ExampleBrand a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:BrandDesignSystemKind ;
     rdfs:comment "At design-systems/example-brand/; its house rules are design-systems/example-brand/spec.md. A test brand, deliberately not Intellectual Frontiers', that every web design system is run themed by, to prove it can be themed by any brand (0014-design-systems FR-039). Never used to publish."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersPrint a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-print" ;
+    rdfs:label "Frontiers Print"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:PrintDesignSystemKind , ifcore:BookInterior , ifcore:BookCover , ifcore:JournalArticle ;
+    rdfs:comment "At design-systems/frontiers-print/; its house rules are design-systems/frontiers-print/spec.md. The book interior, book cover and journal article design, in LaTeX, themed by a brand's brand.tex (0014-design-systems FR-031, FR-038)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
