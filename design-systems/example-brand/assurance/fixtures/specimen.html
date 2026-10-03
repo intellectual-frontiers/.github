@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specimen · example-brand assurance</title>
+<link rel="icon" href="../../images/favicon.png">
+<style>
+  body { margin: 0; background: #ffffff; color: #1f1a24; font: 1rem/1.5 "Source Serif 4", Georgia, serif; }
+  main { max-inline-size: 90rem; margin-inline: auto; padding: 2rem 1.5rem; }
+  h1, h2 { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; }
+  ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+  .swatch { display: block; inline-size: 6rem; block-size: 3rem; border: 1px solid #e2e0da; }
+  [data-surface] { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2rem; padding: 2rem; }
+  figure { margin: 0; }
+  figure img { display: block; max-inline-size: 100%; block-size: auto; }
+  figcaption { font: 0.75rem ui-monospace, monospace; margin-block-start: 0.5rem; }
+  [data-surface="light"] { background: #ffffff; }
+  [data-surface="dark"] { background: #1f1a24; color: #ffffff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>example-brand specimen</h1>
+  <h2>Palette</h2>
+  <ul>
+    <li><span class="swatch" data-swatch="ink" style="background:#1f1a24"></span><code>ink</code> #1f1a24</li>
+    <li><span class="swatch" data-swatch="violet" style="background:#6b2fa3"></span><code>violet</code> #6b2fa3</li>
+    <li><span class="swatch" data-swatch="pine" style="background:#0b6e4f"></span><code>pine</code> #0b6e4f</li>
+    <li><span class="swatch" data-swatch="rust" style="background:#a23b12"></span><code>rust</code> #a23b12</li>
+    <li><span class="swatch" data-swatch="ochre" style="background:#8a5300"></span><code>ochre</code> #8a5300</li>
+    <li><span class="swatch" data-swatch="crimson" style="background:#b3261e"></span><code>crimson</code> #b3261e</li>
+    <li><span class="swatch" data-swatch="cobalt" style="background:#1f5fa8"></span><code>cobalt</code> #1f5fa8</li>
+    <li><span class="swatch" data-swatch="lavender" style="background:#f6f3fb"></span><code>lavender</code> #f6f3fb</li>
+    <li><span class="swatch" data-swatch="white" style="background:#ffffff"></span><code>white</code> #ffffff</li>
+  </ul>
+  <h2>Theme roles</h2>
+  <ul>
+    <li><span class="swatch" style="background:#1f1a24"></span><code>text</code> #1f1a24</li>
+    <li><span class="swatch" style="background:#ffffff"></span><code>surface</code> #ffffff</li>
+    <li><span class="swatch" style="background:#6b2fa3"></span><code>primary</code> #6b2fa3</li>
+    <li><span class="swatch" style="background:#0b6e4f"></span><code>secondary</code> #0b6e4f</li>
+    <li><span class="swatch" style="background:#a23b12"></span><code>tertiary</code> #a23b12</li>
+    <li><span class="swatch" style="background:#0b6e4f"></span><code>success</code> #0b6e4f</li>
+    <li><span class="swatch" style="background:#8a5300"></span><code>warning</code> #8a5300</li>
+    <li><span class="swatch" style="background:#b3261e"></span><code>danger</code> #b3261e</li>
+    <li><span class="swatch" style="background:#1f5fa8"></span><code>info</code> #1f5fa8</li>
+    <li><span class="swatch" style="background:#f6f3fb"></span><code>paper</code> #f6f3fb</li>
+    <li><span class="swatch" style="background:#1f5fa8"></span><code>unit-capital</code> #1f5fa8</li>
+    <li><span class="swatch" style="background:#1f1a24"></span><code>unit-ip</code> #1f1a24</li>
+    <li><span class="swatch" style="background:#a23b12"></span><code>unit-press</code> #a23b12</li>
+    <li><span class="swatch" style="background:#0b6e4f"></span><code>unit-studios</code> #0b6e4f</li>
+    <li><span class="swatch" style="background:#6b2fa3"></span><code>unit-network</code> #6b2fa3</li>
+  </ul>
+  <h2>Lockup, light backgrounds</h2>
+  <section data-surface="light" aria-label="Lockups on white">
+      <figure><img src="../../logos/example-160x40.png" width="160" height="40" alt="example-brand logo" data-background="light"><figcaption>logos/example-160x40.png</figcaption></figure>
+      <figure><img src="../../logos/web/example-160x40.webp" width="160" height="40" alt="example-brand logo" data-background="light"><figcaption>logos/web/example-160x40.webp</figcaption></figure>
+      <figure><img src="../../logos/example-320x80.png" width="320" height="80" alt="example-brand logo" data-background="light"><figcaption>logos/example-320x80.png</figcaption></figure>
+      <figure><img src="../../logos/web/example-320x80.webp" width="320" height="80" alt="example-brand logo" data-background="light"><figcaption>logos/web/example-320x80.webp</figcaption></figure>
+  </section>
+  <h2>Lockup, dark backgrounds</h2>
+  <section data-surface="dark" aria-label="Lockups on a dark background">
+      <figure><img src="../../logos/example-dark-160x40.png" width="160" height="40" alt="example-brand logo" data-background="dark"><figcaption>logos/example-dark-160x40.png</figcaption></figure>
+      <figure><img src="../../logos/web/example-dark-160x40.webp" width="160" height="40" alt="example-brand logo" data-background="dark"><figcaption>logos/web/example-dark-160x40.webp</figcaption></figure>
+      <figure><img src="../../logos/example-dark-320x80.png" width="320" height="80" alt="example-brand logo" data-background="dark"><figcaption>logos/example-dark-320x80.png</figcaption></figure>
+      <figure><img src="../../logos/web/example-dark-320x80.webp" width="320" height="80" alt="example-brand logo" data-background="dark"><figcaption>logos/web/example-dark-320x80.webp</figcaption></figure>
+  </section>
+  <h2>Icon</h2>
+  <section data-surface="light" aria-label="Icons on white">
+      <figure><img src="../../logos/example-icon-128x128.png" width="128" height="128" alt="example-brand logo" data-background="light"><figcaption>logos/example-icon-128x128.png</figcaption></figure>
+  </section>
+</main>
+</body>
+</html>

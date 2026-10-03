@@ -82,9 +82,10 @@ any number of each kind.
 ## Derivation
 
 - **FR-020**: A design system MAY derive from one or more other design
-  systems, of its own kind or another (a web design system from a brand
-  one; a spoken-voice design system from a written-voice one). Derivation
-  MUST be recorded in the ontology (FR-010) and MUST NOT form a cycle.
+  systems, of its own kind or another (a spoken-voice design system from a
+  written-voice one). Derivation MUST be recorded in the ontology (FR-010)
+  and MUST NOT form a cycle. Nothing derives from a brand design system: a
+  brand themes a design system (FR-038), which is a different relation.
 - **FR-021**: A derived design system inherits every rule of what it derives
   from. It MUST hold a vendored copy of whatever inherited value its own
   files use (a color, a typeface, a banned word), and its harness MUST check
@@ -92,6 +93,65 @@ any number of each kind.
   narrow inherited ones. It MUST NOT contradict an inherited rule except by
   a requirement of its own that cites the inherited one (`<slug> FR-NNN`)
   and states the override.
+
+## Tokens and theming
+
+- **FR-036**: Design tokens MUST be organized in three tiers: *primitive*
+  tokens, a brand's own named values (a color, a typeface); *semantic*
+  tokens, a design system's named purposes (body text, the action color),
+  each referring to a primitive or theme role; and *component* tokens,
+  referring to semantic ones. Every `tokens.json` MUST use the Design
+  Tokens Community Group format (`$value`, `$type`, and `{group.token}` for
+  a token that refers to another).
+- **FR-037**: Every brand MUST supply these theme roles, each in
+  `tokens.json` under `role`, as a `--brand-<role>` custom property in
+  `brand.css`, and in `brand.tex` (for print) as an `xcolor` color
+  `brand-<role>` or, for a font role, a command `\brandfontsans` or
+  `\brandfontserif`: the colors `text`, `surface`, `primary`, `secondary`,
+  `tertiary`, `success`, `warning`, `danger`, `info`, `accent` (editorial
+  emphasis: a heading, a numeral, a rule) and `link`, and the font
+  families `font-sans` and `font-serif`. Under `logo` in `tokens.json`, it
+  MUST list its lockup files for light and for dark backgrounds, each with
+  its pixel size, its icon-only mark, its favicon, and a 1200×630 share
+  card (`share-card`) for link previews; `brand.tex` MUST name
+  its widest lockup for light and for dark backgrounds and its widest icon
+  (`\brandlockuplight`, `\brandlockupdark`, `\brandicon`), as paths inside
+  the brand's directory. A brand MAY supply
+  further roles that a design system it themes requires (FR-038).
+- **FR-038**: A web or print design system MUST take every brand value it
+  uses (a color a theme role supplies, a font family, a logo, the favicon)
+  from the theme by reference, and never as a literal or a copy: a web
+  design system as `var(--brand-<role>)` and, for files, from the brand's
+  `tokens.json`, its cascade layer order beginning with `theme`; a print
+  design system from `brand.tex`, loaded before its own definitions. Its spec MUST name every role it
+  requires beyond FR-037 and the font families it ships. Pairing a design
+  system with a brand is a *theme*: it MAY change only the values FR-037
+  and those named roles supply, and the font families only among those the
+  design system ships; it MUST NOT change layout, spacing, components,
+  motion or accessibility behaviour. A web, print or merchandise design
+  system MUST NOT be used without a theme.
+- **FR-044**: A web, print, merchandise or figure design system MUST NOT hold a color literal.
+  A color it needs that no role supplies (a neutral, a tint, a rule, a
+  translucent overlay) MUST be a mix of theme roles, or of a role and
+  `transparent`: `color-mix()` on the web, `xcolor`'s `<role>!<n>!<role>`
+  in print. A picture it places (a hero, cover artwork) MUST be a piece of
+  the theme's imagery pool (FR-043), chosen by its consumer, and a link
+  preview MUST use the theme's share card. Its harness MUST fail on a color
+  literal in its stylesheets or style files.
+- **FR-039**: A web, print, merchandise or figure design system's harness MUST run
+  under any brand vendored beside it, chosen when it runs, and MUST fail
+  when that brand lacks a role the system requires, names a font family the
+  system does not ship, or (on the web) makes a text pairing fall below
+  WCAG 2.2 AA. A brand that lacks an optional part the system requires (an
+  imagery pool, a decoration kit) cannot theme that system: the harness
+  MUST report it as such and MUST NOT count it as a pass. This repository's
+  CI MUST run every such design system here under every brand here. A brand outside this repository is proven against
+  a design system by running that system's harness under it where both are
+  vendored.
+- **FR-040**: A page MUST be rendered with exactly one web design system
+  and one theme. A channel MAY use several, each for an area of it (a path
+  prefix, a host), and MUST state which design system and which brand each
+  area uses (FR-012).
 
 ## Rules
 
@@ -128,7 +188,8 @@ any number of each kind.
   `ifcore:DesignSystem` individual, carrying at minimum its slug
   (`dcterms:identifier`), a label, a status
   (`ifcore:ActiveDesignSystem` or `ifcore:DraftDesignSystem`), its kind (`dcterms:type`, a concept in
-  `ifcore:DesignSystemKindScheme`), each design system it derives from
+  `ifcore:DesignSystemKindScheme`) and, for a web design system, its
+  classification (FR-041), each design system it derives from
   (`prov:wasDerivedFrom`), and a comment naming its directory.
   This is the one register of which design systems exist; nothing elsewhere
   (a separate index file, a wiki page, a status column) duplicates it.
@@ -195,21 +256,44 @@ any number of each kind.
 
 ## Kind profile: brand
 
-- **FR-028**: A brand design system governs the identity every other
-  kind draws on: the palette, the typeface families, the logo and its
-  lockups, and the imagery identity. Its machine-readable form is a token
-  file (`tokens.json`) naming each value once. Its harness checks its token
-  file against its rules and contrast of its documented color pairings. Its
-  consumers are other design systems, which derive from it (FR-020).
+- **FR-028**: A brand design system governs one identity: its palette, the
+  theme roles it supplies (FR-037), its typeface families, its logo and
+  lockups, its favicon and share card, and its imagery (FR-043). Its machine-readable form is
+  `tokens.json` (FR-036), `brand.css`, which declares its theme roles as
+  CSS custom properties prefixed `--brand-`, inside the `theme` cascade
+  layer, and nothing else, and `brand.tex`, which declares them for print
+  (FR-037) and nothing else. Its harness checks that the three agree, that it
+  supplies every role of FR-037, the contrast of its role pairings, its
+  logo files, its share card and its imagery pool. Its consumers are the design systems it themes and the
+  channels that pair it with them. A brand that is not yet public MUST live,
+  with the same layout and harness, in a repository that may hold
+  confidential material, never in this one (0001-eidolon-architecture
+  FR-002).
+
+- **FR-043**: A brand MAY supply an **imagery pool**: the approved pieces
+  of artwork a design system it themes, or a work set in one, may choose
+  from, under `imagery/`. `imagery/catalog.json` MUST list every piece with
+  its id, name, environment (from the catalog's own list), what it shows
+  (description, visual anchor, route, built structures, colored elements,
+  water), what it can stand for (metaphors, suggested subjects), its
+  source, and its files: the master `<id>.png` with its pixel size and the
+  bounds of the drawn art, and WebP files for the web, each with its size.
+  Every file MUST be present at its stated size, and every master MUST be
+  catalogued. Every piece MUST follow the brand's imagery rules, which its
+  spec states. Which work uses which piece is that work's fact (FR-025). A
+  design system that places pictures MUST name the imagery pool among the
+  roles it requires (FR-038), so a brand without one cannot theme it.
 
 ## Kind profile: web presentation
 
 - **FR-029**: A web design system governs how a web page looks and the DOM
   shape its interactive chrome expects. Its machine-readable form is its CSS
   custom properties, mirrored in `tokens.json`; it holds `css/` (with a
-  `css/bundle.txt` naming the cascade order), `fonts/`, `images/`, `logos/`,
-  `js/`, and a markup contract (`chrome.md`), unless the system's own
-  nature requires otherwise. Its consumers are web properties.
+  `css/bundle.txt` naming the cascade order), `fonts/`, `js/`, and a markup
+  contract (`chrome.md`), unless the system's own nature requires
+  otherwise, and never a brand's logo, favicon, share card or imagery
+  (FR-038, FR-044). Its consumers
+  are channels, each pairing it with a brand (FR-038, FR-040).
 - **FR-007**: A web design system's client-side implementation MUST prefer
   plain HTML, modern CSS and light vanilla JavaScript with native web
   components over any front-end framework. A framework or non-trivial
@@ -240,6 +324,22 @@ any number of each kind.
   behaviour. A system with interactive components MUST also cover each
   component's keyboard and ARIA behaviour.
 
+- **FR-041**: Every web design system MUST be classified in the ontology,
+  by `dcterms:type`, with concepts from three schemes, each named as the
+  industry names it:
+  - one or more **interaction models** it serves: under *content site*
+    (read-mostly), *marketing site*, *editorial site* and *documentation*;
+    under *web application* (read-write), *product application*, *back
+    office*, *dashboard* and *transactional service*;
+  - exactly one **expression**: *productive* (calm, dense, task-focused
+    type and motion) or *expressive* (larger type, more motion and
+    imagery, for marketing and editorial), as IBM's Carbon design system
+    names them;
+  - one or more **densities** it supports: *default*, *comfortable* or
+    *compact*, as Material Design names them.
+  A design system's slug MUST NOT encode these; they are facts in the
+  ontology, and a system MAY serve several interaction models.
+
 ## Kind profile: print
 
 - **FR-031**: A print design system governs how a printed or ebook book,
@@ -248,20 +348,81 @@ any number of each kind.
   typesetting style files (a LaTeX preamble or class) and the data they
   read (typefaces, layouts). Its harness compiles each fixture document
   and fails on a compile error or on a check rule broken in the output.
-  It holds the cover grammar (how a cover is composed, set and lettered)
-  and MUST NOT hold cover artwork, its library, or which work uses which
-  piece: those are facts about works, held by the production pipeline
-  (FR-025). Its consumers are the typesetting tools of a production
+  It is themed (FR-038): its colors, its text and sans families (among the
+  families it ships) and its logos come from the brand's `brand.tex`. Its
+  harness compiles each fixture under every brand beside it and checks the
+  page size, that every font in the output is one it ships and is
+  embedded, that the theme's colors reached the output, and that its style
+  files hold no color literal.
+  It holds the cover grammar (how a cover is composed, set and lettered).
+  It takes cover artwork from the theme's imagery pool (FR-043) and MUST
+  NOT hold artwork itself or which work uses which piece, a fact about a
+  work held by the production pipeline (FR-025). Its consumers are the typesetting tools of a production
   pipeline, which are not part of it (FR-025).
+
+- **FR-042**: Every print design system MUST be classified in the
+  ontology, by `dcterms:type`, with one or more **print document types** it
+  sets, named as publishing names them: *book interior*, *book cover*,
+  *journal article* and *report*. A print design system's slug MUST NOT
+  encode them.
+
+## Kind profile: merchandise
+
+- **FR-045**: A merchandise design system governs how the brand is applied
+  to physical goods (branded merchandise, or promotional products): which
+  decoration method may be used on which product, where the artwork goes
+  on it and how large, the limits of each method (colors, minimum line,
+  minimum size), and which ink or thread goes on which substrate. Its
+  machine-readable form is its decoration methods and products data, and a
+  decoration job (product, imprint location, method, artwork, ink,
+  substrate color, width) that a consumer writes. Its harness checks fixture
+  jobs that must pass and must fail, and the brand's decoration kit against
+  each method's limits, under every brand here (FR-039). It is themed: its
+  artwork, inks and threads come from the brand's decoration kit (FR-047),
+  and it holds no artwork, logo or color of its own (FR-044). Its consumers
+  are the people and tools that order goods from a decorator.
+- **FR-046**: Every merchandise design system MUST be classified in the
+  ontology, by `dcterms:type`, with every **decoration method** it governs
+  (*screen printing*, *embroidery*, *pad printing*, *laser engraving*,
+  *direct-to-garment printing*, *debossing*) and every **product category**
+  (*apparel*, *headwear*, *drinkware*, *writing instruments*, *bags*), named
+  as the promotional products industry names them. A slug MUST NOT encode
+  them.
+- **FR-047**: A brand MAY supply a **decoration kit**, under
+  `$extensions["com.intellectualfrontiers.decoration"]` in `tokens.json`:
+  its lockup and its icon as one-color, outlined vector artwork (SVG, every
+  fill and stroke `currentColor` or `none`, with no raster, live text,
+  gradient or filter), so a decorator sets the ink, each with its finest
+  detail (its thinnest line or gap, as a fraction of its width); and, for each color
+  role it allows on goods (at least one dark and one light), the spot-color
+  and the embroidery-thread match it is reproduced with, named in a
+  matching system. A vector file MUST be made from the brand's approved
+  master, never redrawn or traced by a generative tool. Its harness checks
+  the kit's files and matches.
 
 ## Kind profile: figure
 
-- **FR-032**: A figure design system governs the figures a work carries,
-  in print or on the web: palette use, line weights, labelling, and the
-  layouts a figure may take. Its machine-readable form is its figure palette
-  and layout data. Its harness runs its mechanical figure checks over
-  fixture figures that must pass and must fail. Its consumers are works and
-  the tools that check them.
+- **FR-032**: A figure design system governs every figure a work or a
+  channel carries, in every medium (a printed book or paper, a web page, a
+  slide): its canvas, type, boxes, arrows and labelling, the figure types its
+  layouts draw, its colors as figure roles, and the variants a figure may
+  take. Its machine-readable form is its figure roles and the drawing kit
+  that writes a figure's semantic source. It is themed (FR-038, FR-044): a
+  figure's source names its colors by figure role and holds no color, font
+  or stylesheet; a brand supplies them when the figure is rendered, and a
+  variant may change only the values roles take or the canvas width. Its
+  harness draws a figure of every type and runs its mechanical checks,
+  measured in each brand's sans, over those and over fixtures that must
+  fail, under every brand here (FR-039). It MUST be classified in the
+  ontology, by `dcterms:type`, with every **figure type** its layouts draw,
+  named as diagramming names them. Its consumers are works, channels and
+  the tools that render them.
+- **FR-048**: Every figure a web, print or slide presentation carries MUST be
+  drawn with a figure design system and themed by the same brand as the
+  presentation. A web or print design system MUST name in the ontology,
+  by `ifcore:drawsFiguresWith`, the figure design system its pages use,
+  and MUST NOT define its own figure colors. A raster figure (a screenshot,
+  a photograph) is a work's own asset and is exempt.
 
 ## Kind profile: written voice
 
@@ -307,9 +468,9 @@ any number of each kind.
   it is copied into each system rather than shared, and nothing but
   design systems and the top-level `README.md` sits in `design-systems/`,
   per FR-003, FR-005 and FR-017.
-- A value two design systems both use, such as a brand color: one system
-  owns it and the other derives from it and carries a checked copy, per
-  FR-020 and FR-021; neither states it independently.
+- A brand color a web design system uses: the brand supplies it as a theme
+  role and the web design system references it, never copies it, per
+  FR-037 and FR-038.
 - A derived system that needs to depart from an inherited rule: it states an
   override requirement citing the inherited one, per FR-021.
 - A house rule that is replaced: its requirement number stays retired and
@@ -320,6 +481,15 @@ any number of each kind.
 - A design system created for a new kind of output from an existing one,
   such as a print counterpart of a web system: it is a new design system
   with its own slug, per FR-003 and FR-018.
+- A Studios company that wants an Intellectual Frontiers web design system
+  in its own colors and logo: it supplies a brand, which themes the web
+  design system unchanged, per FR-037 and FR-038; until the company is
+  public its brand lives outside this repository, per FR-028.
+- A brand without a role a web design system requires, or whose colors fail
+  contrast in that system: the pairing fails that system's harness and is
+  not a usable theme, per FR-039.
+- A channel with a public site and an operator console: each area uses its
+  own web design system and theme, and no page mixes them, per FR-040.
 - A design system no longer used: its directory and ontology individual are
   removed together once nothing derives from it, per FR-035.
 - A written-voice rule drawn from a named person's writing: it is stated as
@@ -369,12 +539,27 @@ None.
   and harness, at `design-systems/<slug>/`, registered in `ifcore.ttl` as
   an `ifcore:DesignSystem`.
 - **A kind** — what a design system governs (brand, web
-  presentation, print, figure, written voice, spoken voice), a concept in
+  presentation, print, merchandise, figure, written voice, spoken voice), a concept in
   `ifcore:DesignSystemKindScheme` with a profile in this spec.
 - **A design system's spec** — the house rules of one design system, as
   requirements in 0020-spec-format, at `design-systems/<slug>/spec.md`.
 - **Derivation** — one design system inheriting another's rules and
   carrying checked copies of the values it uses.
+- **Theme** — a brand paired with a design system, supplying the theme
+  roles that system takes by reference.
+- **Theme role** — one value every brand supplies under a fixed name
+  (`primary`, `surface`, `font-sans`, ...).
+- **Interaction model, expression, density** — how a web design system is
+  classified, in the industry's own terms.
+- **Print document type** — what a print design system sets: book
+  interior, book cover, journal article, report.
+- **Figure type** — what a figure design system's layouts draw: a process
+  diagram, a comparison, a cycle, layer or relationship diagram, a decision
+  flowchart, a hierarchy diagram.
+- **Decoration method, product category** — how a merchandise design
+  system is classified, in the promotional products industry's own terms.
+- **Decoration kit** — a brand's one-color vector lockup and icon, and the
+  spot-color and thread match of each color role allowed on goods.
 - **A consumer** — any channel (a web property), production pipeline or
   tool, internal or external, that vendors a design system's directory to
   make presentations; this spec does not
@@ -409,6 +594,9 @@ None.
   code.
 - **SC-008**: No value inherited through derivation differs between a
   derived design system and its source.
+- **SC-009**: Every web design system here passes its harness under every
+  brand here, and no web design system's stylesheets contain a brand's
+  color as a literal.
 
 ## Review & acceptance checklist
 

@@ -3,7 +3,7 @@
   /* ───── typography ───── */
   .t-display {   /* hero title */
     max-inline-size: 48rem; font-family: var(--font-serif); font-size: 2.9rem; font-weight: 500;
-    line-height: 1.05; letter-spacing: -0.025em; color: #fff;
+    line-height: 1.05; letter-spacing: -0.025em; color: var(--ink);
     @media (width >= 48rem) { font-size: 3.75rem; }
   }
   .t-title {     /* page title */
@@ -35,9 +35,8 @@
     display: inline-block; padding: 0.75rem 1.5rem; border: 1px solid; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500;
     transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease), border-color var(--fast) var(--ease);
   }
-  .btn--outline { border-color: var(--ink); color: var(--ink); &:hover { background: var(--ink); color: #fff; } }
-  .btn--on-dark { border-color: #fff; background: #fff; color: var(--ink); &:hover { background: transparent; color: #fff; } }
-  .btn--on-dark-ghost { border-color: rgb(255 255 255 / 0.55); color: #fff; &:hover { border-color: #fff; } }
+  .btn--outline { border-color: var(--ink); color: var(--ink); &:hover { background: var(--ink); color: var(--background); } }
+  .btn--solid { border-color: var(--ink); background: var(--ink); color: var(--background); &:hover { background: transparent; color: var(--ink); } }
   .btn--sm { padding: 0.25rem 0.75rem; border-color: var(--rule); color: var(--muted-foreground); &:hover { border-color: var(--ink); color: var(--ink); } }
 
   /* small-caps link used for "All …" and register links */
@@ -66,11 +65,15 @@
   .clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 
   /* ───── hero ───── */
-  .hero { position: relative; isolation: isolate; display: flex; align-items: center; min-block-size: 26rem; overflow: hidden; @media (width >= 48rem) { min-block-size: 32.5rem; } }
-  .hero__media { position: absolute; inset: 0; z-index: -2; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: center 55%; }
-  .hero__scrim { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(10 16 24 / 0.82) 0%, rgb(10 16 24 / 0.55) 52%, rgb(10 16 24 / 0.2) 100%); }
-  .hero__body { inline-size: 100%; padding-block: 4rem; }
-  .hero__lede { margin-block-start: 1.25rem; max-inline-size: 36rem; font-size: 1.0625rem; line-height: 1.625; color: rgb(255 255 255 / 0.8); }
+  /* One piece of the theme's artwork on the page's own background: the artwork's edges are irregular and
+     transparent, so it is never cropped, covered or set on a panel (frontiers-brand FR-012). */
+  .hero { background: var(--background); }
+  .hero__body {
+    display: grid; gap: 2.5rem; align-items: center; padding-block: 3.5rem;
+    @media (width >= 48rem) { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); padding-block: 4.5rem; }
+  }
+  .hero__art { inline-size: 100%; block-size: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+  .hero__lede { margin-block-start: 1.25rem; max-inline-size: 36rem; font-size: 1.0625rem; line-height: 1.625; color: var(--muted-foreground); }
   .hero__actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-block-start: 2rem; }
 
   /* ───── home blocks ───── */

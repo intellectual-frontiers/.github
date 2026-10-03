@@ -15,18 +15,23 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
 ## Identity and scope
 
 - **FR-001**: `frontiers-console-web` MUST live at `design-systems/frontiers-console-web/`, be registered in
-  `ifcore.ttl` as an `ifcore:DesignSystem` of the web presentation kind that derives from
-  `frontiers-brand` (0014-design-systems FR-010, FR-020), and carry the status that registration
+  `ifcore.ttl` as an `ifcore:DesignSystem` of the web presentation kind, classified as
+  documentation, back office and dashboard, productive, at default density (0014-design-systems
+  FR-010, FR-041), and carry the status that registration
   states, not one asserted in its own README (0014-design-systems FR-011).
 - **FR-002**: It MUST serve two kinds of surface from one set of assets: **documentation** (articles,
   reference, specs) and **administration** (tables, forms, status, run output). It MUST NOT assume
   which web property consumes it, which backend renders it, or how its content is authored.
-- **FR-003**: It MUST be a distinct system from `frontiers-nature-web`, which it does not replace.
-  `--fc-foreground` MUST be `frontiers-brand`'s Deep Ink, `--fc-primary` its Frontier Blue,
-  `--fc-success` its Signal Teal, `--fc-danger` its Editorial Oxblood and `--fc-info` the Network
-  unit color; `--fc-font-sans` MUST lead with Inter; and every logo file and `images/favicon.png`
-  that `frontiers-brand` also ships MUST be byte-identical to it (frontiers-brand FR-002 to FR-004,
-  FR-006, FR-013; 0014-design-systems FR-021).
+- **FR-003**: It MUST be a distinct system from `frontiers-nature-web`, which it does not replace,
+  and it MUST be themed (0014-design-systems FR-038): `--fc-background`, `--fc-popover`,
+  `--fc-foreground`, `--fc-accent-foreground`, `--fc-primary`, `--fc-ring`, `--fc-success`,
+  `--fc-warning`, `--fc-danger`, `--fc-info`, `--fc-terminal-bg` and `--fc-font-sans` MUST each be a
+  reference to a theme role, each status tint MUST be mixed from its role and the theme's
+  `surface`, every neutral, border, shadow and overlay MUST be mixed from the `text` and `surface`
+  roles, so it holds no color literal (0014-design-systems FR-044), and the logo and favicon MUST
+  be taken from the theme. It requires no role beyond
+  those every brand supplies, and it ships Inter and IBM Plex Mono, so a theme's `font-sans` MUST
+  be Inter. Its harness MUST pass under every brand here.
 
 ## Engineering stance
 
@@ -38,12 +43,13 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   vendored from another documentation framework or theme; another project's *documented behaviour* MAY
   be used as a guide to what a good result looks like. Its README states this.
 - **FR-006**: Its stylesheets MUST declare one cascade-layer order, once, in the first layered file, and
-  put every other rule in the layer named for its file: `reset, tokens, base, layout, prose,
-  components, admin`. Component and admin rules MUST sit after `prose`, so a component is never
+  put every other rule in the layer named for its file: `theme, reset, tokens, base, layout,
+  prose, components, admin`, where `theme` is filled by the brand's `brand.css`. Component and admin rules MUST sit after `prose`, so a component is never
   restyled by article typography.
 - **FR-007**: Its design tokens MUST be CSS custom properties prefixed `--fc-`, defined in
   `css/tokens.css` as the source of truth, and mirrored exactly, one entry per property, in
-  `tokens.json`. Token names MUST be semantic, not theme-specific, so a theme can be added by
+  `tokens.json` in the Design Tokens Community Group format, a value the theme supplies written as
+  a `{role.*}` alias (0014-design-systems FR-036). Token names MUST be semantic, not theme-specific, so a theme can be added by
   redefining them.
 
 ## Layouts
@@ -102,6 +108,12 @@ stack, and ships with a browser-based assurance harness that doubles as its docu
   layout at its breakpoints; no horizontal overflow; the markup contract on every fixture; and the
   interactions of FR-009, FR-011–FR-013.
 - **FR-019**: Light theme only. A switchable dark theme is out of scope here (see Out of scope).
+
+## Figures
+
+- **FR-020**: A figure on a console page MUST be drawn with `frontiers-figures` and themed by the
+  page's brand in its default variant (0014-design-systems FR-048); this design system MUST NOT
+  define figure colors of its own.
 
 ## Out of scope
 

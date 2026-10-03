@@ -86,7 +86,7 @@
     }
   }
   .fc-backdrop {
-    position: fixed; inset: 0; z-index: 40; background: rgb(18 24 32 / 40%);
+    position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--brand-text) 40%, transparent);
     opacity: 0; pointer-events: none; transition: opacity 200ms var(--fc-ease);
   }
   fc-shell[data-sidebar-open] .fc-backdrop { opacity: 1; pointer-events: auto; }

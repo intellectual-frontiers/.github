@@ -96,6 +96,11 @@ ifcore:PrintDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemK
     skos:notation "print" ;
     skos:definition "How a printed or ebook book, paper or cover is set (0014-design-systems FR-031)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:MerchandiseDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "merchandise"@en ;
+    skos:notation "merchandise" ;
+    skos:altLabel "branded merchandise"@en , "promotional products"@en ;
+    skos:definition "How the brand is applied to physical goods: decoration method, imprint location and size, ink and thread (0014-design-systems FR-045)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:FigureDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:broader ifcore:VisualDesignSystemKind ; skos:prefLabel "figure"@en ;
     skos:notation "figures" ;
     skos:definition "How a work's figures are drawn, in print or on the web (0014-design-systems FR-032)."@en ;
@@ -109,30 +114,202 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:WebInteractionModelScheme a skos:ConceptScheme ; rdfs:label "Web interaction model"@en ;
+    rdfs:comment "What a web design system's pages are for (0014-design-systems FR-041): a read-mostly content site or a read-write web application, and the kinds of each. A web design system names every one it serves, by dcterms:type."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ContentSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:prefLabel "content site"@en ;
+    skos:definition "A read-mostly site: people come to read, compare and decide."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MarketingSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "marketing site"@en ;
+    skos:definition "Pages that present an offer and lead to one action: landing pages, product pages."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EditorialSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "editorial site"@en ;
+    skos:definition "Long-form reading: articles, essays, issues of a publication."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DocumentationSite a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:ContentSite ; skos:prefLabel "documentation"@en ;
+    skos:definition "Tutorials, how-to guides, reference and explanation, as the Diataxis framework divides them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WebApplication a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:prefLabel "web application"@en ;
+    skos:definition "A read-write application: people come to create, change and act on records."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProductApplication a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "product application"@en ;
+    skos:definition "The application a product sells to its customers (software as a service)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BackOffice a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "back office"@en ;
+    skos:definition "Internal tools for the people who operate a business."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Dashboard a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "dashboard"@en ;
+    skos:definition "Monitoring and reporting at a glance: figures, status, trends."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TransactionalService a skos:Concept ; skos:inScheme ifcore:WebInteractionModelScheme ; skos:broader ifcore:WebApplication ; skos:prefLabel "transactional service"@en ;
+    skos:definition "A multi-step task completed once: sign-up, checkout, an application (GOV.UK names these transactional services)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DesignExpressionScheme a skos:ConceptScheme ; rdfs:label "Design expression"@en ;
+    rdfs:comment "How much a web design system's type and motion assert themselves (0014-design-systems FR-041), as IBM's Carbon design system names the two ends. A web design system is exactly one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProductiveExpression a skos:Concept ; skos:inScheme ifcore:DesignExpressionScheme ; skos:prefLabel "productive"@en ;
+    skos:definition "Calm, dense, efficient type and motion that keep attention on the task."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ExpressiveExpression a skos:Concept ; skos:inScheme ifcore:DesignExpressionScheme ; skos:prefLabel "expressive"@en ;
+    skos:definition "Larger type, more motion and imagery, for marketing and editorial moments."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DesignDensityScheme a skos:ConceptScheme ; rdfs:label "Design density"@en ;
+    rdfs:comment "How much a web design system fits in a space (0014-design-systems FR-041), as Material Design names the steps. A web design system names every density it supports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DefaultDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "default"@en ;
+    skos:definition "The standard spacing of controls and rows."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComfortableDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "comfortable"@en ;
+    skos:definition "Tighter than default, for screens people scan often."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompactDensity a skos:Concept ; skos:inScheme ifcore:DesignDensityScheme ; skos:prefLabel "compact"@en ;
+    skos:definition "The tightest spacing, for data-dense tables and tools."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PrintDocumentTypeScheme a skos:ConceptScheme ; rdfs:label "Print document type"@en ;
+    rdfs:comment "What a print design system sets (0014-design-systems FR-042), as publishing names it. A print design system names every one it sets, by dcterms:type."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookInterior a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "book interior"@en ;
+    skos:definition "The pages of a printed or ebook book between its covers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BookCover a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "book cover"@en ;
+    skos:definition "The front cover, spine and back cover of a book."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:JournalArticle a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "journal article"@en ;
+    skos:definition "A research paper set as a journal sets one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "report"@en ;
+    skos:definition "A standalone document of findings, set for print or PDF."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:drawsFiguresWith a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystem ;
+    rdfs:label "draws figures with"@en ;
+    rdfs:comment "The figure design system whose figures a web or print design system's pages carry, themed by the same brand (0014-design-systems FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FigureTypeScheme a skos:ConceptScheme ; rdfs:label "Figure type"@en ;
+    rdfs:comment "What a figure design system's layouts draw (0014-design-systems FR-032), as diagramming names it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProcessDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "process diagram"@en ;
+    skos:definition "Steps in order, joined by arrows."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComparisonDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "comparison diagram"@en ;
+    skos:definition "Two columns side by side: before and after, this or that."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CycleDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "cycle diagram"@en ;
+    skos:definition "Steps around a loop, each feeding the next."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LayerDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "layer diagram"@en ;
+    skos:definition "Layers stacked, each resting on the one below."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RelationshipDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "relationship diagram"@en ;
+    skos:definition "Many sources converging on one result."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DecisionFlowchart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "decision flowchart"@en ;
+    skos:definition "A question that splits into paths."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "hierarchy diagram"@en ;
+    skos:definition "A root over its children."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
+    rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ScreenPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "screen printing"@en ;
+    skos:definition "Spot-color ink pushed through a mesh stencil, one screen per color."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Embroidery a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "embroidery"@en ;
+    skos:definition "Artwork stitched in thread."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PadPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "pad printing"@en ;
+    skos:definition "Spot-color ink transferred by a silicone pad onto a small or curved surface."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LaserEngraving a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "laser engraving"@en ;
+    skos:definition "Artwork burned or etched into the surface; the material is the only color."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DirectToGarmentPrinting a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "direct-to-garment printing"@en ;
+    skos:definition "Full-color inkjet printing onto fabric."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Debossing a skos:Concept ; skos:inScheme ifcore:DecorationMethodScheme ; skos:prefLabel "debossing"@en ;
+    skos:definition "Artwork pressed into the material, with no ink."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ProductCategoryScheme a skos:ConceptScheme ; rdfs:label "Product category"@en ;
+    rdfs:comment "What goods a merchandise design system governs (0014-design-systems FR-046), as the promotional products industry names them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Apparel a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "apparel"@en ;
+    skos:definition "Shirts, polos and other garments."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Headwear a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "headwear"@en ;
+    skos:definition "Caps and hats."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Drinkware a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "drinkware"@en ;
+    skos:definition "Mugs, tumblers and bottles."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WritingInstruments a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "writing instruments"@en ;
+    skos:definition "Pens and pencils."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Bags a skos:Concept ; skos:inScheme ifcore:ProductCategoryScheme ; skos:prefLabel "bags"@en ;
+    skos:definition "Totes and other bags."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:FrontiersBrand a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-brand" ;
     rdfs:label "Frontiers Brand"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
     dcterms:type ifcore:BrandDesignSystemKind ;
-    rdfs:comment "At design-systems/frontiers-brand/; its house rules are design-systems/frontiers-brand/spec.md. The palette, unit colors, typefaces, logo, icon and imagery identity every visual design system derives from (0014-design-systems FR-028)."@en ;
+    rdfs:comment "At design-systems/frontiers-brand/; its house rules are design-systems/frontiers-brand/spec.md. Intellectual Frontiers' own identity: palette, theme roles, unit colors, typefaces, logo, icon and imagery (0014-design-systems FR-028). It themes the Intellectual Frontiers web design systems (FR-038)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ExampleBrand a ifcore:DesignSystem ;
+    dcterms:identifier "example-brand" ;
+    rdfs:label "Example Brand"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:BrandDesignSystemKind ;
+    rdfs:comment "At design-systems/example-brand/; its house rules are design-systems/example-brand/spec.md. A test brand, deliberately not Intellectual Frontiers', that every web design system is run themed by, to prove it can be themed by any brand (0014-design-systems FR-039). Never used to publish."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersPrint a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-print" ;
+    rdfs:label "Frontiers Print"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:PrintDesignSystemKind , ifcore:BookInterior , ifcore:BookCover , ifcore:JournalArticle ;
+    rdfs:comment "At design-systems/frontiers-print/; its house rules are design-systems/frontiers-print/spec.md. The book interior, book cover and journal article design, in LaTeX, themed by a brand's brand.tex (0014-design-systems FR-031, FR-038)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersFigures a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-figures" ;
+    rdfs:label "Frontiers Figures"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
+    rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-merchandise" ;
+    rdfs:label "Frontiers Merchandise"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:MerchandiseDesignSystemKind , ifcore:ScreenPrinting , ifcore:Embroidery , ifcore:PadPrinting , ifcore:LaserEngraving , ifcore:DirectToGarmentPrinting , ifcore:Debossing , ifcore:Apparel , ifcore:Headwear , ifcore:Drinkware , ifcore:WritingInstruments , ifcore:Bags ;
+    rdfs:comment "At design-systems/frontiers-merchandise/; its house rules are design-systems/frontiers-merchandise/spec.md. How the brand goes on apparel, headwear, drinkware, writing instruments and bags, themed by a brand's decoration kit (0014-design-systems FR-045, FR-047)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersNatureWeb a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-nature-web" ;
     rdfs:label "Frontiers Nature Web"@en ;
     ifcore:designSystemStatus ifcore:ActiveDesignSystem ;
-    dcterms:type ifcore:WebDesignSystemKind ;
-    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    dcterms:type ifcore:WebDesignSystemKind , ifcore:EditorialSite , ifcore:MarketingSite , ifcore:ExpressiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-nature-web/; its house rules are design-systems/frontiers-nature-web/spec.md. Intellectual Frontiers' public, editorial web presentation."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-console-web" ;
     rdfs:label "Frontiers Console Web"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:WebDesignSystemKind ;
-    prov:wasDerivedFrom ifcore:FrontiersBrand ;
+    dcterms:type ifcore:WebDesignSystemKind , ifcore:DocumentationSite , ifcore:BackOffice , ifcore:Dashboard , ifcore:ProductiveExpression , ifcore:DefaultDensity ;
     rdfs:comment "At design-systems/frontiers-console-web/; its house rules are design-systems/frontiers-console-web/spec.md. Operator (admin) and documentation web surfaces: a sidebar, navbar, page and table-of-contents shell in three selectable layouts, documentation and administration components."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Facts and audiences (FR-011 – FR-015) ─────────────────────────
@@ -345,7 +522,7 @@ ifcore:Equipment a owl:Class ; rdfs:subClassOf ifcore:TangibleAsset ; rdfs:label
 
 ifcore:IntellectualProperty a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Intellectual property"@en .
 ifcore:DigitalAsset a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Digital asset"@en ;
-    rdfs:comment "A distinct, separately-valuable digital property — a domain and its deployment, a distinct software product, a distinct dataset. Not created for an individual page or file within a larger property (0007 FR-007)."@en .
+    rdfs:comment "A distinct, separately-valuable digital property — a web property, a distinct software product, a distinct dataset. Not created for an individual page or file within a larger property (0007 FR-007). The domain names it is deployed at are ifcore:DomainName individuals, not this asset (0022-domain-names FR-001); its dcterms:created is when the company began the property, not when a domain was registered (0022 FR-007)."@en .
 ifcore:Goodwill a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset ; rdfs:label "Goodwill"@en .
 
 # ───────────────────────── Substantial works (0007-work-and-assets FR-017 – FR-021) ─────────────────────────
@@ -703,6 +880,372 @@ ifcore:OperationalTruthOrg a ifcore:DigitalAsset ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     dcterms:created "2018"^^xsd:gYear ;
     rdfs:comment "The record of what systems actually do in the field versus what they are documented to do."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Domain names (0022-domain-names) ─────────────────────────
+# A domain name is an asset apart from the property deployed at it (FR-001). Its name, role, rights-holder,
+# and what it serves are the company's own facts; its registration facts are the registry's, held in one
+# ExternalRecordReference per domain whose primary source is the registry's RDAP record (FR-010, FR-011).
+# Properties reuse Dublin Core (dcterms:identifier, dcterms:type, dcterms:relation, dcterms:rightsHolder)
+# rather than declaring new ones (0019-controlled-vocabulary FR-001). Only Public domains are asserted here;
+# the vault holds the rest of the catalog (FR-008, FR-009). DNS records are never asserted (FR-015).
+
+ifcore:DomainName a owl:Class ; rdfs:subClassOf ifcore:IntangibleAsset, ifcore:Fact ; rdfs:label "Domain name"@en ;
+    skos:definition "A registrable domain name the company holds through a registrar: the label directly beneath a public suffix, never a subdomain (0022-domain-names FR-001, FR-002)."@en ;
+    skos:closeMatch <http://www.wikidata.org/entity/Q32635> ;
+    rdfs:comment "Specializes ifcore:IntangibleAsset (0019 FR-002): ASC 805 and IFRS 3 both list Internet domain names among marketing-related intangible assets. Distinct from any ifcore:DigitalAsset deployed at it (FR-001). Its dcterms:identifier is the lowercase A-label name (FR-003); its dcterms:rightsHolder defaults to Intellectual Frontiers LLC (FR-004); its dcterms:type is exactly one concept in ifcore:DomainRoleScheme (FR-005); what it serves is dcterms:relation (FR-006). Registrar, dates, status, nameservers, and DNSSEC are never literals here: they sit on the ExternalRecordReference that ifcore:describes it (FR-010)."@en .
+
+ifcore:DomainRoleScheme a skos:ConceptScheme ; rdfs:label "Domain role"@en ;
+    rdfs:comment "Why the company holds a domain name; the value of a DomainName's dcterms:type (0022-domain-names FR-005). Only primary, redirect, and mail domains may be Public (FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PrimaryDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Primary"@en ;
+    skos:definition "The address of the thing it serves."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RedirectDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Redirect"@en ;
+    skos:definition "Forwards to another domain the company holds."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:MailDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Mail"@en ;
+    skos:definition "Carries email and serves nothing else."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DefensiveDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Defensive"@en ;
+    skos:definition "Held to protect a name, a brand, a misspelling, or another top-level domain; serves nothing."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReservedDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Reserved"@en ;
+    skos:definition "Held for a work, venture, or presentation not yet announced."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ParkedDomainRole a skos:Concept ; skos:inScheme ifcore:DomainRoleScheme ; skos:prefLabel "Parked"@en ;
+    skos:definition "Held with no current use."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:DomainSecurityControlScheme a skos:ConceptScheme ; rdfs:label "Domain security control"@en ;
+    rdfs:comment "The controls every domain name is checked against (0023-domain-security FR-001). An exception is a Decision naming a DomainName and one of these by schema:about, lapsing on its dcterms:valid date (FR-002). Each concept's skos:notation is the code a check or report uses. Which controls apply to a domain follows from its role and its published records, as 0023 states; no property here restates that."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TransferLockControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Transfer lock"@en ;
+    skos:notation "transfer-lock" ; skos:definition "The registrar transfer lock is on (FR-004)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AutoRenewControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Automatic renewal"@en ;
+    skos:notation "auto-renew" ; skos:definition "Automatic renewal is on (FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DNSSECControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "DNSSEC"@en ;
+    skos:notation "dnssec" ; skos:definition "The zone is signed and its delegation signer record is published at the registry (FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RegistrantPrivacyControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Registrant privacy"@en ;
+    skos:notation "registrant-privacy" ; skos:definition "The registry record discloses no registrant personal contact details (FR-007)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DelegationControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Delegation"@en ;
+    skos:notation "delegation" ; skos:definition "The domain is delegated only to its DNS-as-code provider's nameservers (FR-008)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NoMailControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "No-mail posture"@en ;
+    skos:notation "no-mail" ; skos:definition "A null MX, a fail-all sender policy, and a reject DMARC policy, for a domain that neither sends nor receives email (FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SendingAuthenticationControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Sending authentication"@en ;
+    skos:notation "sending-authentication" ; skos:definition "SPF, DKIM, and a DMARC policy of quarantine or reject with company-held reporting, for a domain that sends email (FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReceivingTransportControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Receiving transport security"@en ;
+    skos:notation "receiving-transport" ; skos:definition "MTA-STS in enforce mode and a TLS-RPT address, for a domain that receives email (FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CAAControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Certificate authority authorization"@en ;
+    skos:notation "caa" ; skos:definition "CAA records naming only the company's certificate authorities, or permitting none for a domain with no web content (FR-012)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HTTPSControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "HTTPS and HSTS"@en ;
+    skos:notation "https" ; skos:definition "A valid certificate, HTTP redirected to HTTPS, and HSTS of at least one year, for a primary or redirect domain (FR-013)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NoDanglingRecordsControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "No dangling records"@en ;
+    skos:notation "no-dangling-records" ; skos:definition "No record points at a host, service, or address the company no longer controls (FR-014)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AccountMFAControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Account access"@en ;
+    skos:notation "account-mfa" ; skos:definition "Multi-factor sign-in, scoped expiring tokens, and access reviewed every ninety days, for each registrar and DNS provider account (FR-015)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AccountRecoveryControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Account recovery"@en ;
+    skos:notation "account-recovery" ; skos:definition "Account recovery does not depend solely on a domain in the same account (FR-016)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
+    rdfs:label "Cloudflare account"@en ;
+    ifcore:describes ifcore:IntellectualFrontiersLLC ;
+    ifcore:heldIn "Cloudflare, the company's primary registrar and DNS provider."@en ;
+    ifcore:accessInstructions "Access, including any read-only API token, is granted by the decision authority in effect (0001-eidolon-architecture FR-029). No credential is held in any Eidolon repository (0022-domain-names FR-014)."@en ;
+    rdfs:comment "Other registrar accounts, and how reconciliation reaches them, are 0022-domain-names OQ-2."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntellectualFrontiersComDomain a ifcore:DomainName ;
+    rdfs:label "intellectualfrontiers.com"@en ;
+    dcterms:identifier "intellectualfrontiers.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:WebProperty ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:IntellectualFrontiersComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:IntellectualFrontiersComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/intellectualfrontiers.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2023-09-06; expires 2027-09-06; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareGuyComDomain a ifcore:DomainName ;
+    rdfs:label "healthcareguy.com"@en ;
+    dcterms:identifier "healthcareguy.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:HealthcareGuyCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareGuyComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthcareGuyComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthcareguy.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2005-10-15; expires 2027-10-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareGuysComDomain a ifcore:DomainName ;
+    rdfs:label "healthcareguys.com"@en ;
+    dcterms:identifier "healthcareguys.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:HealthcareGuysCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareGuysComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthcareGuysComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthcareguys.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2005-10-15; expires 2027-10-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MedigyComDomain a ifcore:DomainName ;
+    rdfs:label "medigy.com"@en ;
+    dcterms:identifier "medigy.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:MedigyCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MedigyComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:MedigyComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/medigy.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2002-04-03; expires 2027-04-03; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GovConICComDomain a ifcore:DomainName ;
+    rdfs:label "govconic.com"@en ;
+    dcterms:identifier "govconic.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:GovConIC ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GovConICComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:GovConICComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/govconic.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2026-07-23; expires 2027-07-23; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompliantInSecurityComDomain a ifcore:DomainName ;
+    rdfs:label "compliantinsecurity.com"@en ;
+    dcterms:identifier "compliantinsecurity.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:CompliantInSecurityCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CompliantInSecurityComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:CompliantInSecurityComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/compliantinsecurity.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2023-09-25; expires 2027-09-25; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OperationalTruthOrgDomain a ifcore:DomainName ;
+    rdfs:label "operationaltruth.org"@en ;
+    dcterms:identifier "operationaltruth.org" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:OperationalTruthOrg ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OperationalTruthOrgDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:OperationalTruthOrgDomain ;
+    ifcore:primarySource "https://rdap.publicinterestregistry.org/rdap/domain/operationaltruth.org"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2026-01-15; expires 2027-01-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NeuvistComDomain a ifcore:DomainName ;
+    rdfs:label "neuvist.com"@en ;
+    dcterms:identifier "neuvist.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:Neuvist ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NeuvistComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:NeuvistComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/neuvist.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2009-02-01; expires 2027-02-01; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PatientteamComDomain a ifcore:DomainName ;
+    rdfs:label "patientteam.com"@en ;
+    dcterms:identifier "patientteam.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:PatientTeamCom ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PatientteamComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:PatientteamComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/patientteam.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2009-03-01; expires 2027-03-01; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:UnblockHealthDomain a ifcore:DomainName ;
+    rdfs:label "unblock.health"@en ;
+    dcterms:identifier "unblock.health" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:UnblockHealth ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:UnblockHealthDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:UnblockHealthDomain ;
+    ifcore:primarySource "https://rdap.nic.health/domain/unblock.health"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2019-09-25; expires 2027-09-25; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, ursula.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:LaborascodeComDomain a ifcore:DomainName ;
+    rdfs:label "laborascode.com"@en ;
+    dcterms:identifier "laborascode.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:LaborAsCode ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LaborascodeComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:LaborascodeComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/laborascode.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2026-02-09; expires 2027-02-09; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FederalarchitectComDomain a ifcore:DomainName ;
+    rdfs:label "federalarchitect.com"@en ;
+    dcterms:identifier "federalarchitect.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:GovConICComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FederalarchitectComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:FederalarchitectComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/federalarchitect.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2008-07-14; expires 2027-07-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShahidShahComDomain a ifcore:DomainName ;
+    rdfs:label "shahidshah.com"@en ;
+    dcterms:identifier "shahidshah.com" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ShahidShahComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:ShahidShahComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/shahidshah.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2005-10-15; expires 2027-10-15; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShahidIoDomain a ifcore:DomainName ;
+    rdfs:label "shahid.io"@en ;
+    dcterms:identifier "shahid.io" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ShahidIoDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:ShahidIoDomain ;
+    ifcore:primarySource "https://rdap.cloudflare.com/rdap/v1/domain/shahid.io"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2013-09-02; expires 2027-09-02; status client transfer prohibited, renew period; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    rdfs:comment "The .io registry offers no RDAP service, so the registrar's own RDAP record is the primary source (0022-domain-names FR-011)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthitspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthitspeaker.com"@en ;
+    dcterms:identifier "healthitspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthitspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthitspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthitspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2012-09-07; expires 2027-09-07; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DigitalhealthspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "digitalhealthspeaker.com"@en ;
+    dcterms:identifier "digitalhealthspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DigitalhealthspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:DigitalhealthspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/digitalhealthspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-09-14; expires 2027-09-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthcareitspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthcareitspeaker.com"@en ;
+    dcterms:identifier "healthcareitspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareitspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthcareitspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthcareitspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-03-28; expires 2027-03-28; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:HealthtechspeakerComDomain a ifcore:DomainName ;
+    rdfs:label "healthtechspeaker.com"@en ;
+    dcterms:identifier "healthtechspeaker.com" ;
+    dcterms:type ifcore:RedirectDomainRole ;
+    dcterms:relation ifcore:ShahidShahComDomain ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthtechspeakerComDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:HealthtechspeakerComDomain ;
+    ifcore:primarySource "https://rdap.verisign.com/com/v1/domain/healthtechspeaker.com"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2014-09-14; expires 2027-09-14; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:RevenueHealthDomain a ifcore:DomainName ;
+    rdfs:label "revenue.health"@en ;
+    dcterms:identifier "revenue.health" ;
+    dcterms:type ifcore:PrimaryDomainRole ;
+    dcterms:relation ifcore:RevenueAccelerationLLC ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RevenueHealthDomainRegistration a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:RevenueHealthDomain ;
+    ifcore:primarySource "https://rdap.nic.health/domain/revenue.health"^^xsd:anyURI ;
+    ifcore:cachedValue "Registrar Cloudflare, Inc.; registered 2018-05-07; expires 2027-05-07; status client transfer prohibited; nameservers cameron.ns.cloudflare.com, lorna.ns.cloudflare.com; delegation not signed."@en ;
+    ifcore:resolvedAt "2026-10-03"^^xsd:date ;
+    ifcore:verificationCadence "P30D"^^xsd:duration ;
+    ifcore:verificationMethod "automated"@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Renditions and delivery (0015-work-packages FR-013 – FR-018) ─────────────────────────
@@ -1170,39 +1713,39 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
 
-# ───────────────────────── Tooling environment (0022-tooling-environment) ─────────────────────────
+# ───────────────────────── Tooling environment (0024-tooling-environment) ─────────────────────────
 # Which environment every tool is guaranteed to run in. The repository is reused as
 # schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
-# guaranteed against is not a fact here but its tools/reference-environment pin (0022 FR-008).
+# guaranteed against is not a fact here but its tools/reference-environment pin (0024 FR-008).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
-    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0022-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0024-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
 
 ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
     dcterms:identifier "workspaces-host-v3" ;
     schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
     ifcore:workspaceFlavor ifcore:BareMetalNixFlavor, ifcore:VirtualMachineNixFlavor, ifcore:ContainerImageFlavor, ifcore:DevcontainerFlavor, ifcore:CloudAgentSessionFlavor ;
-    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0022-tooling-environment FR-005)."@en ;
+    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0024-tooling-environment FR-005)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-# ───────────────────────── Workspaces (0023-workspaces) ─────────────────────────
-# The flavors are ways to run the one reference environment, built from the same flake commit (0023 FR-001).
+# ───────────────────────── Workspaces (0025-workspaces) ─────────────────────────
+# The flavors are ways to run the one reference environment, built from the same flake commit (0025 FR-001).
 # Which repositories carry a devcontainer, and what each lists, is held in each repository's .devcontainer/
 # files, never restated here (0001-eidolon-architecture FR-019).
 
 ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
-    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0023-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
+    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0025-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
 
 ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
-    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0023-workspaces FR-001 (FR-003)."@en ;
+    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0025-workspaces FR-001 (FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:BareMetalNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Bare-metal Linux with Nix"@en ;
     skos:definition "Installed with Nix and home-manager directly on a Linux machine."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:VirtualMachineNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Linux virtual machine with Nix"@en ;
     skos:definition "Installed with Nix and home-manager in a Linux virtual machine, including WSL on Windows and a Linux virtual machine on macOS."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:ContainerImageFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "OCI container image"@en ;
-    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0022-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0024-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:DevcontainerFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Devcontainer"@en ;
-    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0023-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0025-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:CloudAgentSessionFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Cloud agent session"@en ;
     skos:definition "A hosted session in which an AI agent works in the environment."@en ; ifcore:hasAudience ifcore:Public .

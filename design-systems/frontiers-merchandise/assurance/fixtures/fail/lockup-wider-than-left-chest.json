@@ -1,0 +1,12 @@
+{
+  "expect": "wider than",
+  "job": {
+    "product": "t-shirt",
+    "location": "left-chest",
+    "method": "screen-printing",
+    "artwork": "lockup",
+    "ink": "text",
+    "substrate": "#ffffff",
+    "width_in": 5
+  }
+}

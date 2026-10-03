@@ -1,0 +1,10 @@
+{
+  "expect": "no imprint location",
+  "job": {
+    "product": "leather-tote",
+    "location": "back",
+    "method": "debossing",
+    "artwork": "icon",
+    "width_in": 2
+  }
+}

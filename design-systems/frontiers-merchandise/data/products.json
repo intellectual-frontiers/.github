@@ -1,0 +1,140 @@
+{
+  "$description": "Each product frontiers-merchandise governs: its product category, the decoration methods allowed on it, and each imprint location's largest artwork, width by height in inches (spec FR-005). Read by decoration.py; spec.md is the source.",
+  "categories": [
+    "apparel",
+    "headwear",
+    "drinkware",
+    "writing-instruments",
+    "bags"
+  ],
+  "products": {
+    "t-shirt": {
+      "name": "T-shirt",
+      "category": "apparel",
+      "methods": [
+        "screen-printing",
+        "direct-to-garment-printing"
+      ],
+      "locations": {
+        "left-chest": [
+          4,
+          4
+        ],
+        "full-front": [
+          12,
+          14
+        ],
+        "back-yoke": [
+          10,
+          3
+        ]
+      }
+    },
+    "polo": {
+      "name": "Polo shirt",
+      "category": "apparel",
+      "methods": [
+        "embroidery"
+      ],
+      "locations": {
+        "left-chest": [
+          4,
+          2.5
+        ],
+        "right-sleeve": [
+          3,
+          1.5
+        ]
+      }
+    },
+    "structured-cap": {
+      "name": "Structured cap",
+      "category": "headwear",
+      "methods": [
+        "embroidery"
+      ],
+      "locations": {
+        "front-panel": [
+          4.5,
+          2.25
+        ],
+        "left-side": [
+          2.5,
+          1.5
+        ]
+      }
+    },
+    "ceramic-mug": {
+      "name": "Ceramic mug",
+      "category": "drinkware",
+      "methods": [
+        "screen-printing",
+        "pad-printing"
+      ],
+      "locations": {
+        "front": [
+          3.5,
+          3
+        ],
+        "wrap": [
+          8.5,
+          3.25
+        ]
+      }
+    },
+    "steel-tumbler": {
+      "name": "Stainless steel tumbler",
+      "category": "drinkware",
+      "methods": [
+        "laser-engraving"
+      ],
+      "locations": {
+        "front": [
+          2.5,
+          3
+        ]
+      }
+    },
+    "ballpoint-pen": {
+      "name": "Ballpoint pen",
+      "category": "writing-instruments",
+      "methods": [
+        "pad-printing",
+        "laser-engraving"
+      ],
+      "locations": {
+        "barrel": [
+          1.75,
+          0.3
+        ]
+      }
+    },
+    "canvas-tote": {
+      "name": "Canvas tote",
+      "category": "bags",
+      "methods": [
+        "screen-printing",
+        "direct-to-garment-printing"
+      ],
+      "locations": {
+        "front": [
+          10,
+          10
+        ]
+      }
+    },
+    "leather-tote": {
+      "name": "Leather tote",
+      "category": "bags",
+      "methods": [
+        "debossing"
+      ],
+      "locations": {
+        "front": [
+          6,
+          4
+        ]
+      }
+    }
+  }
+}

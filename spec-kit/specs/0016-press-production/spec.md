@@ -36,8 +36,10 @@ is not stated here.
 - **FR-004**: A book is a work of kind `book` (0015-work-packages FR-005).
   Its package MUST hold, as its live sources, `manuscript.adoc` (interior
   prose), a jacket data file (cover and back-cover copy, distribution
-  metadata), and its figures and cover artwork. Each of those is committed
-  together because the manuscript references the other two by path.
+  metadata, and which piece of its theme's imagery pool its cover uses), and
+  its figures. Each of those is committed together because the manuscript
+  references the other two by path; the artwork itself is the brand's
+  (0014-design-systems FR-043).
 - **FR-005**: A book package MUST keep a book bible: the book's thesis, its
   recorded decisions, its relationship to other books, its reader, its
   conventions, every named tool with its fixed definition, every recurring
@@ -102,7 +104,9 @@ is not stated here.
   present each piece of content in the form that best teaches it: prose by
   default, a real list for an enumerable set, a table for content dense
   across two dimensions, a visual for a relationship — and MUST NOT leave a
-  list, table, or visual standing without prose.
+  list, table, or visual standing without prose. A drawn visual MUST be a
+  figure drawn with `frontiers-figures` and themed by the book's brand
+  (0014-design-systems FR-048).
 - **FR-015**: A change that adds or edits a figure, table, or list MUST be
   verified by rebuilding the affected rendition and inspecting the rendered
   pages, not only by a clean build.
@@ -118,7 +122,8 @@ is not stated here.
 ## House design, jacket, and identifiers
 
 - **FR-018**: Every book Press publishes MUST use the house design for its
-  printed form, as encoded in the repository's design assets; authors choose
+  printed form: the `frontiers-print` design system, themed by
+  `frontiers-brand` (0014-design-systems FR-038); authors choose
   content and the options the design documents and MUST NOT invent layouts.
   A design change MUST be made once, in the shared design, and reviewed on
   rendered pages.
@@ -173,8 +178,8 @@ is not stated here.
   Cover artwork MUST NOT be generated, altered, or approved by the production
   pipeline; a marketing image of a cover MUST be composed from the book's own
   approved cover pixels and MUST NOT be redrawn by a generative tool.
-- **FR-029**: Cover artwork commissioning MUST NOT begin before the
-  manuscript has passed its audit.
+- **FR-029**: A new piece for the imagery pool MUST NOT be commissioned for a
+  book before the manuscript has passed its audit.
 
 ## Online appendix, companion, and news
 

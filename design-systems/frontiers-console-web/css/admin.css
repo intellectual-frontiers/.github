@@ -68,7 +68,7 @@
   }
   .fc-switch input::after {
     content: ""; position: absolute; inset-block-start: 0.125rem; inset-inline-start: 0.125rem; inline-size: 1rem; block-size: 1rem;
-    border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 25%); transition: transform var(--fc-fast) var(--fc-ease);
+    border-radius: 50%; background: var(--brand-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--brand-text) 25%, transparent); transition: transform var(--fc-fast) var(--fc-ease);
   }
   .fc-switch input:checked { background: var(--fc-primary); }
   .fc-switch input:checked::after { transform: translateX(1rem); }
@@ -85,10 +85,10 @@
 
   /* ───── Run log (<fc-terminal>) ───── */
   fc-terminal { display: block; margin-block: 1rem; border-radius: var(--fc-radius); overflow: hidden; background: var(--fc-terminal-bg); color: var(--fc-terminal-fg); }
-  .fc-terminal__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.875rem; border-block-end: 1px solid rgb(255 255 255 / 12%); font-family: var(--fc-font-mono); font-size: 0.75rem; color: var(--fc-terminal-muted); }
+  .fc-terminal__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.875rem; border-block-end: 1px solid color-mix(in srgb, var(--brand-surface) 12%, transparent); font-family: var(--fc-font-mono); font-size: 0.75rem; color: var(--fc-terminal-muted); }
   .fc-terminal__log { margin: 0; padding: 0.875rem 1rem; border: 0; border-radius: 0; background: transparent; color: inherit; max-block-size: 22rem; overflow: auto; font-size: 0.8125rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-  .fc-terminal__log .fc-t-err { color: #f2a7b7; }
-  .fc-terminal__log .fc-t-ok { color: #7fd1ce; }
+  .fc-terminal__log .fc-t-err { color: color-mix(in srgb, var(--brand-danger) 35%, var(--brand-surface)); }
+  .fc-terminal__log .fc-t-ok { color: color-mix(in srgb, var(--brand-success) 45%, var(--brand-surface)); }
   .fc-terminal__log .fc-t-dim { color: var(--fc-terminal-muted); }
 
   /* ───── Key/value detail list ───── */

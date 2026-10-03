@@ -1,0 +1,35 @@
+% Fixture: a book cover page and an interior chapter, set with this design system under the theme the harness
+% chooses. The harness defines \printdir, \iffontdir and \branddir (absolute) before \input-ing this file.
+\documentclass[10pt,twoside,openright]{book}
+\input{\printdir/latex/preamble}
+\newcommand{\themelog}[1]{\extractcolorspecs{#1}{\themelogmodel}{\themelogspec}\typeout{THEME #1=\themelogmodel:\themelogspec}}
+\begin{document}
+\themelog{ifink}\themelog{ifaccent}\themelog{iflink}\themelog{ifsubtitle}\themelog{ifseries}\themelog{ifnote}\themelog{iftip}\themelog{ifimportant}\themelog{ifwarning}\themelog{ifgray}\themelog{iflabel}\themelog{ifrule}\themelog{iftint}
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{0.6in}
+  {\ifsansbold\fontsize{30}{34}\selectfont\color{ifink} A Fixture Title\par}
+  \vspace{0.15in}
+  {\ifsansmedium\fontsize{14}{18}\selectfont\color{ifsubtitle} A subtitle in the theme's tertiary color\par}
+  \vspace{0.3in}
+  {\ifsanssemibold\fontsize{12}{15}\selectfont\color{ifseries} An Author\par}
+  \vfill
+  \includegraphics[width=2.4in]{\branddir/\brandlockuplight}\par
+  \vspace{0.2in}
+  \colorbox{ifink}{\includegraphics[width=2.4in]{\branddir/\brandlockupdark}}\par
+  \vspace{0.2in}
+  \includegraphics[width=0.6in]{\branddir/\brandicon}
+\end{center}
+\cleardoublepage
+\chapter{A Chapter}
+Body text in the theme's serif. It runs long enough to fill a paragraph and test the measure, with
+\textbf{bold}, \textit{italic} and \texttt{monospace} words, and a reference to
+\href{https://example.com}{a link}. {\color{brand-primary} A line in the primary color.}
+{\color{brand-secondary} A line in the secondary color.}
+\section{A Section}
+{\ifsans A line in the interior sans.} More body text follows the section heading so the page has
+a heading, its text, and the running head the design sets.
+\subsection{A Subsection in the Sans's Bold Italic}
+More body text under the subsection.
+\iffigcaption{Figure 1.1: A caption in the sans's italic.}
+\end{document}
