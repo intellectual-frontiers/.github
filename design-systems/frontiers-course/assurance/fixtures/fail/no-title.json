@@ -2,8 +2,8 @@
   "edits": [
     [
       "units/02-checking-the-estimate/unit.adoc",
-      ":week: 2",
-      ":week: 3"
+      "= Checking an estimate against a measurement\n",
+      ""
     ]
   ]
 }

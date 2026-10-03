@@ -19,5 +19,7 @@
   "no-final-assessment.json": "does not end with an assessment",
   "bad-code.json": "$.code is 'ifest1'",
   "banned-word.json": "delve",
-  "spoken-announcement.json": "i want to talk about"
+  "spoken-announcement.json": "i want to talk about",
+  "unsupported-table.json": "a table, which this design system does not render",
+  "no-title.json": "no document title"
 }

@@ -1,9 +1,9 @@
 {
   "edits": [
     [
-      "course.md",
-      "O2: Justify each factor",
-      "O2: Understand each factor"
+      "course.adoc",
+      "O2:: Justify each factor",
+      "O2:: Understand each factor"
     ]
   ]
 }

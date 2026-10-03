@@ -16,17 +16,22 @@ the compiler that turns one source into every form a course is delivered in.
   numeric response, text match) and every delivery target it compiles to (static web edition, Open edX OLX
   export, cmi5 package), naming `frontiers-figures` by `ifcore:drawsFiguresWith` (0014-design-systems FR-048,
   FR-052). It MUST NOT assume which work a course comes from, who teaches it, or where it is delivered.
-- **FR-002**: It MUST hold `course.py` (the reader and checker), `build.py` (the compiler), `schema/course.schema.json`,
+- **FR-002**: It MUST hold `course.py` (the reader and checker), `adoc.py` (the AsciiDoc it reads and renders), `build.py` (the compiler), `schema/course.schema.json`,
   `limits.json`, `web.json`, `web/` (the web edition's stylesheet, scripts and fonts, with their licence), a
   `README.md`, this spec and an `assurance/` harness.
 
 ## Source and model
 
-- **FR-003**: A course's source MUST be a directory named for the course's id, holding `course.md` (front matter:
-  title, code, run, language, format, hours per week and, when it has one, the IRI of the work it is derived from;
-  then its summary and its outcomes) and `units/NN-slug/`, each holding `unit.md` (title, week, overview), its
-  lessons and assessments as `NN-slug.md` files in the order a learner meets them, and the captions and figures
-  they name. A file that cannot be read, or that names a video in a lesson that is not a video, MUST be refused.
+- **FR-003**: A course's source MUST be AsciiDoc (0015-work-packages FR-009): a directory named for the course's
+  id, holding `course.adoc` (its title, and as header attributes its code, run, language, format, hours per week
+  and, when it has one, the IRI of the work it is derived from; then its summary and its outcomes as a description
+  list) and `units/NN-slug/`, each holding `unit.adoc` (title, week, overview), its lessons and assessments as
+  `NN-slug.adoc` files in the order a learner meets them, and the captions and figures they name. It MUST keep to
+  the subset `adoc.py` reads and renders (sections, paragraphs, lists, checklists, figures, quotations, block
+  attributes, and strong, emphasis, code, links and inline images); a file that uses anything else (a table, an
+  include, an admonition, another delimited block, a passthrough, an attribute entry or reference in its body),
+  that cannot be read, or that names a video in a lesson that is not a video MUST be refused, so every target
+  shows what the source says.
 - **FR-004**: `course.py model` MUST read a source into one JSON model that `schema/course.schema.json` accepts,
   the same model on every run; every delivery target MUST be built from that model and nothing else, and
   `course.py check` MUST refuse a course whose model the schema rejects, naming where.
@@ -149,7 +154,7 @@ None.
 ## Success criteria
 
 - **SC-001**: `python3 assurance/run.py` and `node assurance/run.mjs` under every brand here exit zero.
-- **SC-002**: An author writes a course in Markdown and learns, before it reaches a platform, every outcome left
+- **SC-002**: An author writes a course in AsciiDoc and learns, before it reaches a platform, every outcome left
   untaught or unassessed, every week that asks too much, and every lesson a learner using a screen reader or
   captions could not follow.
 - **SC-003**: The same source becomes a site anyone can read, a course Open edX imports and a package any cmi5

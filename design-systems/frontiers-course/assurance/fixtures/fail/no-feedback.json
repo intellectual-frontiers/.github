@@ -1,8 +1,8 @@
 {
   "edits": [
     [
-      "units/01-breaking-it-down/04-check.md",
-      "feedback: Four pianos a day for 250 working days gives about 1,000 tunings a year.\n",
+      "units/01-breaking-it-down/04-check.adoc",
+      "[.feedback]\nFour pianos a day for 250 working days gives about 1,000 tunings a year.\n",
       ""
     ]
   ]
