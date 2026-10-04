@@ -978,6 +978,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-062	none	-	no check; workspaces-host tests trust and its configuration
 0041-command-line FR-063	none	-	no check; workspaces-host tests that unpushed work survives an update and that a skipped repository exits 0
 0041-command-line FR-064	none	-	no check of the wire shape in agora yet (0042 OQ-3); workspaces-host's tests check its own and the extension's contract
+0041-command-line FR-065	none	-	agora has no help command; workspaces-host's tests check its topics, their actions and that its documentation is generated and fresh
 0042-agora FR-001	none	-	agora still declares its name, audience, groups and suites in manifests (OQ-3); the move to code is not checked
 0042-agora FR-002	check	.github: agora check commands	the launcher's and manifest's name is checked; the choice is a decision
 0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
