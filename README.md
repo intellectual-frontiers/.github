@@ -150,18 +150,27 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
   controls.tsv      which compliance control each requirement addresses
                     (0028-compliance-controls)
+agora               the command line: one launcher (needs uv and Python 3) that
+                    runs every check, build and record in this repository
+                    (0041-command-line, 0042-agora); CI calls only it
 tools/
-  spec_check.py     checks specs and the register; CI runs it on every push
+  agora/            agora's code: core, lib, groups/<group>/ (each with its
+                    agora.toml, and an agora.lock where it pins packages),
+                    and tests/
   reference-environment
                     the workspaces-host-v3 commit every tool is guaranteed
                     to run in (0025-tooling-environment)
 .devcontainer/      the workspace this repository opens in, and the
                     repositories it clones beside it (0026-workspaces)
 ontology/
-  ifcore.ttl        core company ontology (the ifcore: namespace)
+  ifcore.ttl        core company ontology (the ifcore: namespace), including
+                    agora's command set
   ifweb.ttl         web content shapes (the ifweb: namespace)
 content/
   journal/          public content documents (the only content root)
+.agora/
+  logs/             agora's untracked action logs (gitignored, 0041 FR-042)
+  proposals/        changes proposed for a person to decide (tracked)
 design-systems/
   README.md         what a design system is, its kinds, and how to use any one
   <identity>-<kind>/ one self-contained design system per directory, of one
@@ -197,7 +206,7 @@ of it. If you want to add something, ask which layer it is missing from.
 - Add a row to [`spec-kit/enforcement.tsv`](spec-kit/enforcement.tsv) for
   every new `FR-NNN`: `check`, `gate`, `review`, or `none`, and what does it.
   Record `none` honestly; the check lists every one on every run.
-- Run `python3 tools/spec_check.py` before you push; CI runs it too.
+- Run `./agora check --suite spec` before you push; CI runs it too.
 - Cite other specs by ID and FR (for example, "0001 FR-016"). Do not restate
   their rules.
 - When a spec changes the meaning of an earlier one, amend the earlier spec in
@@ -246,6 +255,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
 | [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
 | [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
+| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's command line: launcher and locked packages, typed commands, resources in three renderings, surfaces by category, Git as the only record |
+| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's command line, its command set, checks, generators, and CI |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -258,6 +269,31 @@ rather than per-feature documents, so there is no `plan.md`, `tasks.md`, or
 feature branch; the ontology plays the data model's part, open questions
 (`OQ-N`) replace inline clarification markers, and the enforcement register
 replaces Spec Kit's consistency analysis. 0020 states each difference.
+
+### The command line
+
+`agora` (the public square) is this repository's one command line: every
+check, build and record runs through it, and CI calls nothing else. The name
+says what it is for, a command line for what is public; it differs from any
+other command line's name at a glance and by any one typo, and it reads well in
+a prompt (0042-agora FR-002). It reads nothing outside this repository.
+
+- Run `./agora check` for every check, `./agora check --suite spec` for the
+  spec, register and ontology checks, `./agora fresh` to prove generated files
+  are current, `./agora doctor` for what is missing, `./agora test` for its own
+  tests, and `./agora command list` for what it can do. Every command takes
+  `--json` and, if it writes, `--dry-run`.
+- The launcher needs only `uv` and Python 3. Python packages come from
+  committed, hashed locks (`tools/agora/groups/<group>/agora.lock`), and
+  `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
+  Python (TeX, Chromium, ImageMagick, potrace, rsvg-convert, Node) come from the
+  host, and `doctor` says which are missing (0025 FR-013, 0041).
+- Git is the only record: `agora` never commits or pushes. What is not worth a
+  commit goes to untracked logs in `.agora/logs/`.
+- `./agora ui open console` opens the local web UI; `./agora mcp serve` serves
+  its commands to an AI agent, except decisions, which only a person makes.
+- To add a command: spec first (0042), then its individual in the ontology, then
+  its code in a group under `tools/agora/groups/`.
 
 ### Editing the ontology
 
@@ -313,14 +349,15 @@ media (`frontiers-media`), email (`frontiers-email`), courses (`frontiers-course
 (`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
 `frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
 looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system
-carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
-runs it on every push that touches `design-systems/`.
+carries an `assurance/` harness that runs on its own; `agora check design-systems`
+runs them all, and CI runs `agora check --suite browser`, `--suite python` and `--suite images`
+on every push that touches `design-systems/`.
 
 - Logos: `design-systems/frontiers-brand/logos/` (PNG; WebP in `logos/web/`).
   Use the `-dark-` variants on dark backgrounds.
 - Pictures: the brand's imagery pool, `design-systems/frontiers-brand/imagery/`; app icons and the share card in
   `design-systems/frontiers-brand/images/`; figures are drawn with `design-systems/frontiers-figures/` (the
-  profile's are made by `profile/figures/make.py`).
+  profile's are made by agora's `profile-figure` generator).
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one
@@ -331,10 +368,12 @@ runs it on every push that touches `design-systems/`.
 ### Before you commit
 
 - [ ] A spec exists for the change, and any spec it affects is amended.
-- [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
+- [ ] `./agora check --suite spec` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
-- [ ] Any tool you add declares its prerequisites and installs nothing; it
-      runs from a fresh clone in workspaces-host-v3 (0025).
+- [ ] Any command you add is declared in `agora`'s registry and in the
+      ontology, and `./agora check commands` passes; it declares its
+      prerequisites and installs nothing; it runs from a fresh clone in
+      workspaces-host-v3 (0025, 0041, 0042).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.
