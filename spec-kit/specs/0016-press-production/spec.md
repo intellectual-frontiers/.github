@@ -169,8 +169,11 @@ is not stated here.
   for distribution, MUST be cut as a review cut or a final cut, never an
   ordinary build, and MUST trace to the exact source commit it came from. A
   review cut MUST NOT overwrite an earlier one, and a final cut MUST be made
-  at most once per edition and printing. Each cut MUST have a delivery
-  record (0015-work-packages FR-017).
+  at most once per edition and printing. A final cut MUST also be refused
+  while an open issue is unsorted (FR-007), while any of the five gate groups
+  (FR-048) lacks a recorded check made after the manuscript last changed, and
+  without a passing release validation at the book's current commit. Each cut
+  MUST have a delivery record (0015-work-packages FR-017).
 - **FR-026**: Every authorship attribution MUST reflect whose work it is, not
   who ran the command. An AI that runs its own autonomous editorial or audit
   pass MUST be attributed to its own agent identity, never to a human, and
