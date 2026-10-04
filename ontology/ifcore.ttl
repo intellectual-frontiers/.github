@@ -831,6 +831,9 @@ ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore
 ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Note or paper"@en ;
     rdfs:comment "Where a finding is recorded (0006 FR-003), and the entity a research activity generates via prov:wasGeneratedBy (0007-work-and-assets FR-002). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
+ifcore:LandscapeReview a owl:Class ; rdfs:subClassOf ifcore:Note ; rdfs:label "Landscape review"@en ;
+    rdfs:comment "A research record that shows how an organization is likely to fare against others on a complex task, by letting the reader place their own numbers against a peer spread (0017-spoken-and-research-works FR-017). A kind of note, so a check can find it by type."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
 ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
 
