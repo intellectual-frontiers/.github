@@ -39,7 +39,8 @@ lacks. How people enter the reference environment, in which flavor, is
 - **FR-004**: A tool MUST keep its prerequisites to the fewest that do
   the job, preferring a runtime's standard library to a third-party
   package. A tool MUST NOT install, download, or upgrade a prerequisite
-  when it runs. Installing prerequisites belongs to the host: to the
+  when it runs, except Python packages obtained as FR-013 allows.
+  Installing prerequisites belongs to the host: to the
   reference environment, or to a CI job that stands in for some other
   host (FR-011).
 
@@ -54,14 +55,16 @@ lacks. How people enter the reference environment, in which flavor, is
   environment from a fresh clone of the repository that holds it, with
   no step beyond the clone: no `make install`, package install, virtual
   environment, or other setup command. Every prerequisite a tool
-  declares MUST be supplied by the reference environment.
+  declares MUST be supplied by the reference environment, except Python
+  packages obtained as FR-013 allows.
 - **FR-007**: A tool that needs a prerequisite the reference environment
   lacks MUST either use a workspaces-host-v3 persona that supplies it,
   named by the repository's devcontainer (0026-workspaces FR-004), or
   wait until the prerequisite is added to workspaces-host-v3 under that
   repository's own specs. A repository MUST NOT close the gap itself
   with its own installer, install target, requirements file, version
-  manager, or bootstrap script.
+  manager, or bootstrap script. A command line obtaining locked Python
+  packages under FR-013 is not such an installer.
 - **FR-008**: Each repository holding tools MUST pin the reference
   environment in exactly one place, `tools/reference-environment`: a
   single line holding a Nix flake reference to
@@ -88,6 +91,23 @@ lacks. How people enter the reference environment, in which flavor, is
   and in contributor documentation. A tool's own code and comments MUST
   NOT name it. When a successor to workspaces-host-v3 is adopted, these
   change; no tool does.
+
+## Locked Python packages
+
+- **FR-013**: A repository MAY give its tools one command line that
+  obtains the Python packages its commands need on first use, and only
+  those, when all of these hold: each package is declared at the command
+  or command group that needs it (FR-003) and pinned to one exact
+  version; the full resolution is committed in the repository as a lock
+  with a hash for every distribution; the packages are obtained only
+  through uv, which the reference environment supplies, into uv's own
+  cache and an environment uv creates for the run, never into an
+  interpreter, virtual environment or site-packages the host owns; and
+  the command line can be told to run offline, failing with the name of
+  what is missing rather than downloading. This is the one exception to
+  FR-004, FR-006 and FR-007, and it covers Python packages only: a
+  program outside Python (a typesetter, a browser, a Java runtime) MUST
+  still come from the host, per FR-006 and FR-007.
 
 ## Out of scope
 
@@ -123,7 +143,12 @@ lacks. How people enter the reference environment, in which flavor, is
 - A repository that used to install its prerequisites with `make
   install`: the install targets and requirements file are removed, and
   each prerequisite moves into workspaces-host-v3's base profile or a
-  persona, per FR-006 and FR-007.
+  persona, per FR-006 and FR-007, or, for a Python package, into a lock,
+  per FR-013.
+- A repository whose command line fetches its Python packages from a
+  committed, hashed lock through uv: allowed, per FR-013; its typesetter
+  and browser still come from the reference environment's personas, per
+  FR-007.
 - An environment variable a tool relies on that the reference
   environment sets only for a login shell: CI and devcontainers enter
   the environment through a login shell, so the tool needs no override,
@@ -153,6 +178,8 @@ None.
   run.
 - **The pin** — the one commit of the reference environment a repository
   is guaranteed against, in `tools/reference-environment`.
+- **A lock** — a repository's committed, hashed resolution of the Python
+  packages its commands declare (FR-013).
 
 ## Success criteria
 
@@ -161,7 +188,8 @@ None.
 - **SC-002**: Every tool passes at least once outside the reference
   environment with only its declared prerequisites.
 - **SC-003**: No tool in any Eidolon repository installs or downloads a
-  prerequisite when it runs.
+  prerequisite when it runs, except Python packages obtained from a
+  committed, hashed lock under FR-013.
 - **SC-004**: Replacing the reference environment changes no tool's code.
 
 ## Review & acceptance checklist
