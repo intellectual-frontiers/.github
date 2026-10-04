@@ -22,7 +22,7 @@ class Declared(unittest.TestCase):
     def test_the_generators_are_the_ones_0042_names(self):  # 0042 FR-015
         self.assertEqual(sorted(self.reg.generators),
                          sorted(["brand-theme", "brand-specimen", "brand-imagery", "brand-decoration", "openedx-sources",
-                                 "print-layout-docs", "profile-figure", "agent-skill"]))
+                                 "print-layout-docs", "profile-figure", "agent-skill", "reference-docs"]))
 
     def test_every_generator_declares_its_sources_outputs_and_the_command_that_rewrites_it(self):  # 0041 FR-035
         for g in self.reg.generators.values():
@@ -160,6 +160,7 @@ class Fresh(Repo):
         for n in ("profile-figure", "brand-imagery", "brand-decoration"):
             reg.generators[n].fn = lambda ctx, scope: Generated()  # the ones that need their own environment; proved apart
         self.go("skill", "generate")
+        self.go("docs", "generate")
         from unittest import mock
         with mock.patch("agora.core.generate.needs_worker", return_value=False):
             code, doc = run_json(["fresh"], home=self.root, registry=reg, env={"AGORA_PLAN_GROUP": "assurance"})

@@ -124,6 +124,12 @@
         "icon": "$(question)"
       },
       {
+        "command": "if-console.learn",
+        "title": "Learn",
+        "category": "IF Console",
+        "icon": "$(book)"
+      },
+      {
         "command": "if-console.copyContext",
         "title": "Copy Context",
         "category": "IF Console",
@@ -192,6 +198,10 @@
         },
         {
           "command": "if-console.getHelp",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.learn",
           "when": "if-console.hasRepository || if-console.untrusted"
         },
         {
@@ -312,7 +322,8 @@
     ]
   },
   "devDependencies": {
-    "@vscode/vsce": "4.0.0"
+    "@vscode/vsce": "4.0.0",
+    "@vscode/test-electron": "3.1.0"
   },
   "scripts": {
     "test": "node --test test/*.test.js"

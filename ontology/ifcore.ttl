@@ -2161,6 +2161,9 @@ ifcore:ExtensionResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindS
 ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
     skos:notation "skill" ;
     skos:definition "The skill file that tells an AI agent how to use the orchestrator, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DocsResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "docs"@en ;
+    skos:notation "docs" ;
+    skos:definition "The guide: the AsciiDoc book in docs-src/, its generated reference chapters and its four built editions (0042-agora FR-034)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:FigureResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "figure"@en ;
     skos:notation "figure" ;
     skos:definition "A figure drawn with the figure design system."@en ; ifcore:hasAudience ifcore:Public .
@@ -2211,6 +2214,10 @@ ifcore:AgoraContextCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rd
     dcterms:identifier "context" ;
     ifcore:commandCategory ifcore:ReadCommandCategory ;
     skos:definition "Returns what an agent needs to work on one resource (0041-command-line FR-038)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraHelpCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "help"@en ;
+    dcterms:identifier "help" ;
+    ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the help topics, or returns one: the daily work in plain language, each step an action (0041-command-line FR-065, 0042-agora FR-033)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraCommandListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "command list"@en ;
     dcterms:identifier "command list" ;
     ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
@@ -2395,6 +2402,14 @@ ifcore:AgoraSkillGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agor
     dcterms:identifier "skill generate" ;
     ifcore:commandNoun ifcore:SkillResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
     skos:definition "Writes the agent skill, .claude/skills/agora/SKILL.md, from the registry (0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDocsGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "docs generate"@en ;
+    dcterms:identifier "docs generate" ;
+    ifcore:commandNoun ifcore:DocsResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes the guide's reference chapters from the registry, the help topics, the toolchain, the checks and the design systems (0042-agora FR-034)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDocsBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "docs build"@en ;
+    dcterms:identifier "docs build" ;
+    ifcore:commandNoun ifcore:DocsResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds the guide into a directory: the multi-page HTML site, the single page, the PDF and the EPUB (0042-agora FR-034)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraDeckBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "deck build"@en ;
     dcterms:identifier "deck build" ;
     ifcore:commandNoun ifcore:DeckResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;

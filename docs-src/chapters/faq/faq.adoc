@@ -1,0 +1,46 @@
+[#faq]
+== Why it works this way
+
+=== Why only Python and uv?
+Because a person, a CI job and an AI agent should all find the same thing under their hands, and every other requirement is a way
+for two machines to differ unseen. Python and uv are the two things a machine can be assumed to install in a minute. Everything
+else is pinned, fetched, and checked by fingerprint.
+
+=== Why does it not use the TeX or Chromium on my machine?
+Because then its output would depend on your machine. A program of yours stands in for a toolchain entry only when you name it, and
+`doctor` lists every one that is set.
+
+=== Why is there one command that uses sudo?
+A browser and VS Code link a few system libraries, and a display server is needed to start VS Code, that only an administrator can
+install. One documented command, `agora system add`, does it once. It prints what it will run and asks first, and no other command
+uses `sudo`.
+
+=== Why is there no web console?
+A server is a second thing to run, secure and keep current. The editor extension and the MCP server give the same commands without
+one.
+
+=== Why can an AI agent not accept a decision?
+Because a decision is what only a person decides: a spec's status, an ink record, accepting a proposal. The command line, the editor
+and MCP offer the command for a person, and MCP does not offer it at all. An agent writes a proposal, and a person reads and accepts it.
+
+=== Why does a check say "skipped" and exit 3?
+Because a section that could not run is not a pass. It says what it lacked, such as a toolchain entry offline or a system library, and
+the command that fixes it.
+
+=== Why is the reference generated?
+Because a guide that repeats the program is wrong the day the program changes. The command and check reference, the toolchain, the
+help topics and the design systems are written by `agora docs generate` from the code, and `agora fresh` fails until they are current.
+
+=== Why is `help` in the program?
+So the daily work can be learned in the terminal and in VS Code with a button on every step, and so there is exactly one copy of it.
+
+=== Where is the guide published?
+At https://intellectual-frontiers.github.io/.github/ by the `pages` workflow, on every push to `main`. The repository's owner sets
+Settings, Pages, Source to GitHub Actions once. Until then the deploy job fails and says so. You can build the same site anywhere
+with `./agora docs build`; the result is in `build/docs/`.
+
+=== How do I add a command?
+With an AI, spec first. The help topic `extend` has the steps and a prompt to start from.
+
+=== Does it run on Windows?
+Through WSL, as Linux. On macOS the toolchain has builds for both architectures, except that the system-library step is Linux's.

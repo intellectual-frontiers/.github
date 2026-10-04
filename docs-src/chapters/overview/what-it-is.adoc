@@ -1,0 +1,55 @@
+[#what-it-is]
+== What an Eidolon is
+
+An *Eidolon* is a working digital reflection of a person, company, customer, product, or system. It is not a replica. It is enough
+grounded evidence for an AI to reason about the real thing accurately and flexibly. The concept is the founder's own authored
+research; the system in this repository is the company's first working instance of it.
+
+=== The problem
+
+Organizations describe themselves in prose: a website, a deck, a one-pager, a founder's memory of what was decided and why. Prose
+drifts. A page says the company does five things; by the time a reader, or an AI, encounters it, the company does three of them,
+differently, for different reasons. A person can sense that something is stale. An AI usually cannot, and will reason confidently from
+the stale version.
+
+An Eidolon inverts the usual order. Instead of writing a description and hoping it stays true, it asserts *facts*: discrete, dated,
+sourced, each carrying its own visibility. Descriptions are generated from those facts, or checked against them.
+
+=== Specs, ontology and work
+
+We think the best shape for any AI-native deliverable has three parts, always made in this order:
+
+. *Specs say what must be true.* A spec is a short, numbered, testable statement of intent: "the public root MUST contain only
+Public-tier facts." Because each requirement is testable, a person or an AI can check a deliverable against it instead of guessing
+what the author meant. Specs live in `spec-kit/specs/`, and <<reference-specs>> lists them.
+. *The ontology says what things are.* The ontology is the shared, typed vocabulary: what a Unit, a Work, a Decision, a Right, an
+Audience, a Reference is, and how they relate. It reuses established standards (W3C PROV, schema.org, SKOS, Dublin Core) rather than
+inventing terms, so an AI does not have to infer what "asset" or "decision" means in this company. It lives in `ontology/`.
+. *Work is what gets made.* Books, websites, research records, skills, spoken works, ventures: the deliverables. Each is produced
+against the specs and typed against the ontology, so it can be audited. Why does this exist, what rule shaped it, what does it
+claim, who may see it.
+
+The order is not a preference; it is a rule (spec 0001, FR-037). A new capability is established in a spec before it is represented in
+the ontology, and in the ontology before it is implemented anywhere else. Each layer is only as good as the one before it: an ontology
+with no spec is vocabulary without intent, and work with no ontology is prose again, ready to drift.
+
+Why this suits AI in particular:
+
+* *AI needs grounding, not eloquence.* A model briefed from typed facts with declared sources reasons about the company the way a
+well-briefed person would. A model briefed from a brochure repeats the brochure.
+* *AI needs a stopping rule.* Specs say where the work is done and where human judgment resumes (for example, where AI's role stops in
+Research & IP, spec 0006).
+* *AI needs to know what it may say.* Every fact declares its audience, so an AI producing a public document cannot silently pull in
+something confidential.
+* *People need to audit the result.* The test of an Eidolon is whether an AI reasoning from it reaches the conclusion a well-briefed
+person would, and whether a person auditing it can find out why. How elegant the ontology looks does not matter.
+
+=== What makes it hold together
+
+* *A vocabulary before any content.* Terms are agreed before facts go in.
+* *A confidentiality model that is not a ladder.* Audiences overlap (public, anyone affiliated, a specific agreement, a specific
+role) and a fact may belong to several; clearance for one does not imply another.
+* *A hard line between what we assert and what we merely watch.* A patent's status belongs to the patent office, not to our own
+saying-so. We hold a _reference_ with a verification date and cadence, not a copy of the value.
+
+The longer essay is `content/journal/eidolons.html`.

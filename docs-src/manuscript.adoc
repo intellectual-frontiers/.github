@@ -1,0 +1,51 @@
+= The Intellectual Frontiers Guide
+Intellectual Frontiers
+:doctype: book
+:toc:
+:toclevels: 2
+:sectnums:
+:sectnumlevels: 2
+:experimental:
+:xrefstyle: short
+:partnums:
+:description: How the public root of Intellectual Frontiers works, and how to work in it with agora, its command line.
+
+include::chapters/front-matter/preface.adoc[]
+
+= Part I: Start
+
+include::chapters/start/first-day.adoc[]
+
+include::chapters/start/vscode.adoc[]
+
+= Part II: Overview
+
+include::chapters/overview/what-it-is.adoc[]
+
+include::chapters/overview/repositories.adoc[]
+
+include::chapters/overview/working-order.adoc[]
+
+include::chapters/overview/orchestrator.adoc[]
+
+include::chapters/overview/brand-assets.adoc[]
+
+include::chapters/overview/before-you-commit.adoc[]
+
+= Part III: Reference
+
+include::chapters/reference/commands.adoc[]
+
+include::chapters/reference/checks.adoc[]
+
+include::chapters/reference/help-topics.adoc[]
+
+include::chapters/reference/toolchain.adoc[]
+
+include::chapters/reference/design-systems.adoc[]
+
+include::chapters/reference/specs.adoc[]
+
+= Part IV: Questions
+
+include::chapters/faq/faq.adoc[]

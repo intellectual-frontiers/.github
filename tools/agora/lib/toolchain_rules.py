@@ -21,7 +21,8 @@ HOST_PROGRAMS = tuple("""git convert identify magick pdftotext pdfinfo pdffonts 
                          xelatex lualatex pdflatex node npm npx chromium chrome java asciidoctor""".split())
 HOST_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(re.escape(p) for p in HOST_PROGRAMS) + r")[\"']")
 WHICH_CALL = re.compile(r"shutil\.which\(\s*[\"']([\w.-]+)[\"']")
-WHICH_ALLOWED = ("uv", "python3")
+# Xvfb is the display server `system add` installs for VS Code's tests; it has no download (0042 FR-030).
+WHICH_ALLOWED = ("uv", "python3", "Xvfb")
 # Where a download may be made: only the toolchain machinery, which verifies what it fetches (0025 FR-004, FR-017).
 NETWORK_IMPORT = re.compile(r"^\s*(?:import|from)\s+(?:urllib\.request|http\.client|requests|httpx|ftplib|socket)\b")
 NETWORK_ALLOWED = ("tools/agora/core/toolchain.py",)
@@ -44,9 +45,9 @@ def entry_findings(entries: dict[str, tcore.Entry], registry: Any) -> list[Findi
                                    "(0041-command-line FR-066)"))
 
     for c in registry.commands.values():
-        named(f"command {c.id}", c.toolchain)
+        named(f"command {c.id}", c.toolchain + c.toolchain_optional)
     for s in registry.sections.values():
-        named(f"section {s.name}", s.toolchain)
+        named(f"section {s.name}", s.toolchain + s.toolchain_optional)
     for g in registry.generators.values():
         named(f"generator {g.name}", g.toolchain)
     for group in registry.groups.values():

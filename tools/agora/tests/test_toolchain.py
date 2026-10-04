@@ -314,7 +314,7 @@ class Declarations(unittest.TestCase):
 
     def test_the_real_entries_are_complete_and_pinned(self):
         entries = tcore.discover()
-        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages", "vsce"})
+        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages", "vsce", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
         self.assertEqual(tcore.problems(entries), [])
         for e in entries.values():
             self.assertIn("linux-x86_64", e.platforms, e.name)
@@ -378,7 +378,10 @@ class SystemLibraries(Base):
     def test_libraries_are_none_off_linux_and_pinned_to_the_chromium_entry(self):
         self.assertEqual(system.chromium_libraries("macos-arm64"), ())
         self.assertIn("libnss3.so", system.chromium_libraries("linux-x86_64"))
-        self.assertEqual(set(system.needed(tcore.discover(), "linux-x86_64")), set(system.APT_LIBRARIES))
+        self.assertEqual(set(system.needed(tcore.discover(), "linux-x86_64")), set(system.APT_LIBRARIES) | set(system.APT_VSCODE_EXTRA))
+        self.assertEqual(set(system.vscode_libraries("linux-x86_64")), set(system.APT_LIBRARIES) | set(system.APT_VSCODE_EXTRA))
+        self.assertEqual(system.vscode_libraries("macos-arm64"), ())
+        self.assertIn("Xvfb", system.APT_VSCODE_EXTRA)  # a program, not a soname: found on PATH
 
 
 class Families(unittest.TestCase):
@@ -430,7 +433,7 @@ class SystemCommands(unittest.TestCase):
     def fake_run(self, argv, **kw):
         self.ran.append(list(argv))
         if argv[:2] == ["sudo", "apt-get"] and "install" in argv:
-            self.present.update(system.APT_LIBRARIES)  # the install worked
+            self.present.update(system.APT_LIBRARIES, system.APT_VSCODE_EXTRA)  # the install worked
         return mock.Mock(returncode=0)
 
     def test_list_names_each_library_its_package_and_whether_it_loads(self):
@@ -495,7 +498,7 @@ class SystemCommands(unittest.TestCase):
         self.assertIn("apt-get update", doc["data"]["message"])
 
     def test_nothing_is_run_when_every_library_loads(self):
-        self.present = set(system.APT_LIBRARIES)
+        self.present = set(system.APT_LIBRARIES) | set(system.APT_VSCODE_EXTRA)
         code, doc = run_json(["system", "add", "--yes"], env=self.env)
         self.assertEqual((code, self.ran), (0, []))
         self.assertIn("nothing to install", doc["data"]["message"])

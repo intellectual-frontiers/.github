@@ -15,13 +15,14 @@ NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
 # 0042 FR-013: the check sections, and FR-014: the suites, as `sections`. The `extension` section, and its suite, come with
 # the step that adds them.
-SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "extension", "design-systems", "imagery", "openedx",
+SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "help", "extension", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
-SUITES = {"spec": {"specs", "register", "controls", "ontology", "toolchain", "commands"},
+SUITES = {"spec": {"specs", "register", "controls", "ontology", "toolchain", "commands", "help"},
           "browser": {"design-systems --runner browser", "openedx"},
           "python": {"design-systems --runner python"},
           "images": {"imagery"},
-          "extension": {"extension"}}
+          "extension": {"extension"},
+          "vscode": {"extension"}}
 
 
 def check_layout(home: Path, registry) -> list[Finding]:
@@ -101,7 +102,7 @@ def check_workflows(home: Path) -> list[Finding]:
         if not re.search(r"(?<![\w/-])\./agora(?![\w-])", text):
             out.append(Finding("error", rel, f"a workflow calls {NAME}, as ./{NAME} (0042 FR-022)"))
         for n, line in enumerate(text.splitlines(), 1):
-            if line.lstrip().startswith("#"):
+            if line.lstrip().startswith("#") or "paths:" in line or "hashFiles(" in line:  # a trigger or a cache key names files; it calls nothing
                 continue
             for m in re.finditer(r"(?<![\w.-])tools/(?!agora(?:/|\b))[\w./-]+", line):
                 out.append(Finding("error", f"{rel}:{n}", f"calls {m.group(0)}, a tool of this repository other than {NAME} (0042 FR-022)"))
@@ -147,22 +148,51 @@ def check_watched(registry) -> list[Finding]:
     return out
 
 
+GUIDE_URL = "https://intellectual-frontiers.github.io/.github/"  # 0042 FR-035
+README_MAX_LINES = 120  # 0042 FR-036
+
+
 def check_readme(home: Path, registry) -> list[Finding]:
-    """0042 FR-013: the README's command-line section names every noun and every repository-wide command."""
+    """0042 FR-036: the README is the short way in: it links to the guide, names the one-time `system add` and `help`, and stays short."""
     readme = home / "README.md"
-    text = readme.read_text(encoding="utf-8") if readme.is_file() else ""
-    start = text.find("### The orchestrator")
-    if start < 0:
-        return [Finding("error", "README.md", "has no section `### The orchestrator` (0042 FR-013)")]
-    end = text.find("\n### ", start + 5)
-    body = text[start:end if end > 0 else len(text)]
+    if not readme.is_file():
+        return [Finding("error", "README.md", "is missing (0042 FR-036)")]
+    text = readme.read_text(encoding="utf-8")
     out = []
-    for n in sorted(registry.nouns):
-        if f"`{n}`" not in body:
-            out.append(Finding("error", "README.md", f"the command line section does not name the noun `{n}` (0042 FR-013)"))
-    for c in sorted(registry.commands.values(), key=lambda c: c.id):
-        if len(c.words) == 1 and f"agora {c.words[0]}" not in body and f"`{c.words[0]}" not in body:
-            out.append(Finding("error", "README.md", f"the command line section does not name the command `{c.words[0]}` (0042 FR-013)"))
+    if GUIDE_URL not in text:
+        out.append(Finding("error", "README.md", f"does not link to the guide, {GUIDE_URL} (0042 FR-036)"))
+    for needle, why in (("agora system add", "the one-time system add"), ("agora help", "the help command")):
+        if needle not in text:
+            out.append(Finding("error", "README.md", f"does not name {why}, `{needle}` (0042 FR-036)"))
+    n = len(text.splitlines())
+    if n > README_MAX_LINES:
+        out.append(Finding("error", "README.md", f"is {n} lines; the README is short and the rest belongs in the guide, at most {README_MAX_LINES} (0042 FR-036)"))
+    return out
+
+
+def check_guide_files(home: Path) -> list[Finding]:
+    """0042 FR-035: docs/index.html is the one hand-written page and uses only the brand's own assets, which `docs build` copies beside
+    it; pages.yml builds the guide with the launcher."""
+    out: list[Finding] = []
+    from . import guide
+
+    index = home / "docs" / "index.html"
+    extra = sorted(p.name for p in (home / "docs").iterdir()) if (home / "docs").is_dir() else []
+    if extra != ["index.html"]:
+        out.append(Finding("error", "docs", f"holds {extra}; docs/index.html is the one hand-written page and nothing else lives there (0042 FR-035)"))
+    if index.is_file():
+        for n, line in enumerate(index.read_text(encoding="utf-8").splitlines(), 1):
+            for ref in re.findall(r"""(?:src|srcset|href)=["']assets/([^\s"']+)""", line):
+                if ref not in guide.ASSETS:
+                    out.append(Finding("error", f"docs/index.html:{n}", f"uses assets/{ref}, which is not one of the brand's assets `docs build` copies (0042 FR-035)"))
+    for name, src in guide.ASSETS.items():
+        if not (home / src).is_file():
+            out.append(Finding("error", "tools/agora/lib/guide.py", f"the guide's asset {name} comes from {src}, which does not exist (0042 FR-035)"))
+    wf = home / ".github" / "workflows" / "pages.yml"
+    if not wf.is_file():
+        out.append(Finding("error", ".github/workflows/pages.yml", "is missing: the guide is published to GitHub Pages by this workflow (0042 FR-035)"))
+    elif "./agora docs build" not in wf.read_text(encoding="utf-8"):
+        out.append(Finding("error", ".github/workflows/pages.yml", "does not build the guide with `./agora docs build` (0042 FR-035)"))
     return out
 
 

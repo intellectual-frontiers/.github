@@ -4,11 +4,12 @@ Thin: the rules and the packing are agora.lib.extension. Node is the one the loc
 """
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 from agora.core import AgoraError, Ctx, Finding, Resource, SectionResult, command, next_command, section
 from agora.core.resource import MISSING, FAILED
-from agora.lib import extension, node
+from agora.lib import extension, node, vscode_tests
 from agora.lib.register import known_repositories
 
 
@@ -22,6 +23,9 @@ def _node(ctx: Ctx) -> str:
 
 @section("extension")
 def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
+    runner = ctx.section_options.get("runner")
+    if runner in ("browser", "python"):
+        return SectionResult("extension", "skipped", reason=f"--runner {runner} is for design-systems; this section's runners are node and vscode")
     home = ctx.public
     try:
         exe = _node(ctx)
@@ -31,8 +35,35 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
     names = sorted(known_repositories(home) - {own} | {ctx.registry.name})
     findings = extension.manifest_findings(home)
     findings += extension.lint_findings(home, exe, names)
-    tests, notes = extension.run_tests(home, exe, ctx.toolchain().clean_env(), home)
-    return SectionResult.from_findings("extension", findings + tests, notes + ["manifest and lint read tools/if-console/"])
+    notes = ["manifest and lint read tools/if-console/"]
+    data: dict = {}
+    if runner in (None, "node"):
+        tests, more = extension.run_tests(home, exe, ctx.toolchain().clean_env(), home)
+        findings, notes = findings + tests, notes + more
+    unrun = ""
+    if runner in (None, "vscode"):
+        try:
+            r = ctx.toolchain().use(["vscode", "vsce"])
+        except AgoraError as e:
+            unrun, r = e.message, None
+        if r is not None:
+            with tempfile.TemporaryDirectory(prefix="agora-vsix-") as tmp:
+                vsix = Path(tmp) / extension.vsix_name(home)
+                built = extension.package(home, exe, str(r.path_of("vsce")), vsix, r.env())
+                if built.returncode != 0 or not vsix.is_file():
+                    findings.append(Finding("error", "tools/if-console", "vsce could not pack the extension for the VS Code tests: "
+                                            + (built.stderr or built.stdout).strip()[-300:]))
+                else:
+                    try:
+                        f, more, rows = vscode_tests.run(home, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")),
+                                                         str(vsix), ctx.toolchain().clean_env())
+                        findings, notes, data = findings + f, notes + more, {"vscode": rows}
+                    except vscode_tests.DisplayError as e:
+                        unrun = str(e)
+    result = SectionResult.from_findings("extension", findings, notes, data)
+    if unrun and result.status == "passed":  # what could not run is skipped, never passed (0041 FR-033)
+        result.status, result.reason = "skipped", f"the vscode runner did not run: {unrun}"
+    return result
 
 
 @command("extension build", category="build", toolchain=("vsce",),

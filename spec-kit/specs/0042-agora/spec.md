@@ -13,10 +13,13 @@ on the host: its Python packages come from hashed locks and every other
 program from its toolchain lock (0025-tooling-environment), so that no tool
 is installed by hand and no workspace is required. Its surfaces are the
 command line, which is the core; the IF Console VS Code extension
-(0043-if-console); and its MCP server. This spec states its name, its
-public-only rule, its command set (also declared in the ontology), its check
-sections and suites, its generators, its toolchain, how it relates to the
-design systems' own harnesses, and what CI runs.
+(0043-if-console); and its MCP server. A person learns it from one place,
+`help`, whose topics are code; the guide, a book in four editions published to
+GitHub Pages, explains how the pieces fit and generates its reference from the
+same code; and the README is only the short way in. This spec states its name,
+its public-only rule, its command set (also declared in the ontology), its
+check sections and suites, its generators, its toolchain, its help and its
+guide, how it relates to the design systems' own harnesses, and what CI runs.
 
 ## Identity and name
 
@@ -57,10 +60,10 @@ design systems' own harnesses, and what CI runs.
 - **FR-005**: `agora` MUST provide these repository-wide commands, which take
   no noun (0041-command-line FR-010): `check [SECTION...] [--scope ID]
   [--suite SUITE] [--changed]`, `fresh [GENERATOR...]`, `test`, `doctor`,
-  `lock [GROUP]` and `context RESOURCE`; and these under the nouns
-  `command` (`list`, `show`) and `mcp` (`serve`). Their categories are: `check`,
-  `fresh`, `test` and `doctor` check; `context`, `command list` and `command
-  show` read; `lock` and `mcp serve` setup.
+  `lock [GROUP]`, `context RESOURCE` and `help [TOPIC]` (FR-033); and these
+  under the nouns `command` (`list`, `show`) and `mcp` (`serve`). Their
+  categories are: `check`, `fresh`, `test` and `doctor` check; `context`,
+  `help`, `command list` and `command show` read; `lock` and `mcp serve` setup.
 - **FR-006**: `agora` MUST provide these commands under the nouns of the
   public root's own resources, each in the category shown:
   - `spec`: `list`, `show` (read); `new` (generate); `set --status`
@@ -92,6 +95,8 @@ design systems' own harnesses, and what CI runs.
   - `proposal`: `list [--status]`, `show` (read); `new RESOURCE --reason
     --run COMMAND --field NAME=VALUE...` (record); `advance` (decision): FR-029.
   - `skill`: `generate` (generate): the agent skill (FR-028).
+  - `docs`: `generate` (generate): the guide's generated chapters; `build
+    [--output DIR]` (build): the guide's four editions (FR-034).
 - **FR-007**: A `decision` command MUST be one of these three: `spec set
   --status`, `ink record` and `proposal advance` (0041-command-line FR-014).
   None MAY be callable over MCP (0041-command-line FR-023). `spec set
@@ -142,9 +147,13 @@ design systems' own harnesses, and what CI runs.
   (FR-004; and the registry's grammar, the workflows, the scripts, the boundary
   of FR-003, that every section and generator declares watched paths that match
   files (0041-command-line FR-032), the proposals of FR-029, and that the README
-  names every noun and repository-wide command),
-  `extension` (the IF Console extension's own tests and lint, 0043-if-console
-  FR-028),
+  links to the guide, FR-036), `help` (FR-033: every topic is well formed and
+  names only commands, topics and paths that exist),
+  `extension [--runner node|vscode]` (the IF Console extension's lint and its
+  tests, 0043-if-console FR-028: `node` runs the unit tests under Node's test
+  runner against a stand-in for the VS Code API, `vscode` runs the tests inside
+  a real VS Code under a display server, 0043-if-console FR-032, and with no
+  runner both run, a runner that cannot start being skipped, never passed),
   `design-systems [--scope SLUG] [--brand B] [--runner browser|python]` (each
   design system's harness under every brand, 0014-design-systems FR-015,
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
@@ -160,11 +169,11 @@ design systems' own harnesses, and what CI runs.
   and `--spoken`, and the other item checks take `--brand`, themed by
   `frontiers-brand` when none is named, as their scripts are.
 - **FR-014**: `agora` MUST declare these suites (0041-command-line FR-031):
-  `spec` (`specs`, `register`, `controls`, `ontology`, `toolchain` and
-  `commands`, which need no package and no toolchain entry beyond Python),
+  `spec` (`specs`, `register`, `controls`, `ontology`, `toolchain`, `commands`
+  and `help`, which need no package and no toolchain entry beyond Python),
   `browser` (`design-systems --runner browser` and `openedx`), `python`
-  (`design-systems --runner python`), `images` (`imagery`) and `extension`
-  (`extension`). A section MUST
+  (`design-systems --runner python`), `images` (`imagery`), `extension`
+  (`extension`, both runners) and `vscode` (`extension --runner vscode`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on
   a stock host with only Python and uv. The item checks of FR-013 belong to no
   suite: they run when named, and in a plain `check`.
@@ -176,13 +185,14 @@ design systems' own harnesses, and what CI runs.
   `profile-figure` (the organization profile's figures), `brand-imagery` (a
   brand's WebP files, share card, app icons and favicon from its masters and
   tokens), `brand-decoration` (its traced lockup and icon, its set wordmark and
-  unit marks, and their measured finest detail in `tokens.json`) and
-  `agent-skill` (the file that tells an AI agent how to use `agora`, FR-028).
+  unit marks, and their measured finest detail in `tokens.json`),
+  `agent-skill` (the file that tells an AI agent how to use `agora`, FR-028)
+  and `reference-docs` (the guide's reference chapters, FR-034).
   Each names the command that rewrites its files (0041-command-line FR-035):
   `brand generate` for `brand-theme` and `brand-specimen`, `imagery build` for
   `brand-imagery`, `decoration generate` for `brand-decoration`, `openedx
   generate` for `openedx-sources`, `figure generate` for `profile-figure`,
-  `skill generate` for `agent-skill`; the files of
+  `skill generate` for `agent-skill`, `docs generate` for `reference-docs`; the files of
   `print-layout-docs` are rewritten by the print design system's own
   `latex/layout.py sync`, which `fresh` calls and which stays in the design
   system (FR-017). `fresh` MUST say that a generator needs a toolchain entry the cache lacks
@@ -239,7 +249,15 @@ design systems' own harnesses, and what CI runs.
     libcairo); `potracer` in place of `potrace`; `nodejs-wheel-binaries` in place of a host Node (it supplies
     `node`, `npm` and `npx`); and `dulwich` in place of `git` where a command
     only reads Git's state.
-  - Toolchain entries: `tinytex` and `tex-packages` (a TinyTeX release and the
+  - Toolchain entries: `jre` (a Temurin 21 runtime), `asciidoctor`
+    (AsciidoctorJ 3.0.1, which carries Asciidoctor 2.0.26 and the EPUB 3
+    converter) and `asciidoctor-pdf` (asciidoctorj-pdf, as its own entry so that
+    `asciidoctor` stays exactly the version and checksum the other
+    repositories' toolchains pin, which lets one cache serve them), for the
+    guide (FR-034); `vscode` (the stable VS Code tarball for Linux, and the zip
+    for macOS, at the address and SHA-256 the vendor publishes for the
+    version), for the extension's tests (0043-if-console FR-032);
+    `tinytex` and `tex-packages` (a TinyTeX release and the
     TeX Live packages the harnesses need that it lacks, each package's container pinned
     by its own checksum from TeX Live's frozen 2025 repository, supplying XeLaTeX and
     LuaLaTeX; there is no `latexmk`, a Perl program, so the print harness runs the
@@ -247,11 +265,69 @@ design systems' own harnesses, and what CI runs.
     Chromium build, from the address Playwright publishes it at, for the Playwright
     version the npm lock holds), and the npm lock (`package.json` and
     `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`. The
-    browser's Linux system libraries are installed
+    browser's and VS Code's Linux system libraries,
+    and the display server `Xvfb` that VS Code is started under, are installed
     once by the `system` noun's `add` (0041-command-line FR-069), whose package
     list for Debian and Ubuntu is pinned in `agora`'s code, and which the
-    README documents.
+    README and `help start` document. `agora` starts the display server itself,
+    on a free display, for the one run, and stops it.
   The list is confirmed by the change that implements it (OQ-2).
+## Help and the guide
+
+- **FR-033**: `agora` MUST provide `help [TOPIC]` (read), the one place its
+  daily work is documented (0041-command-line FR-065). A topic MUST be a Python
+  module of `tools/agora/help/`, found by presence, standard library only, with
+  a name, a one-sentence summary in plain language, a plain first paragraph,
+  sections of plain language and steps. Every step MUST be an action
+  (0041-command-line FR-017): a command of the registry with its fields, shown
+  as one pasteable line in the terminal and as a button in the editor; a thing
+  the person must do themselves, such as installing `python3`, MUST be said in
+  words and not given as a step. `help` with no topic MUST list the topics.
+  The topics MUST include `start` (the first day: `python3` and `uv` from the
+  host, `system add`, `toolchain add`), `check` (what to run before pushing),
+  `specs` (writing a spec and its register rows), `design-systems`, `brands`,
+  `toolchain`, `editor` (IF Console), `ai` (agents, MCP and proposals),
+  `extend` (adding a command or a group with an AI) and `recover` (what to do
+  when something fails). The section `help` MUST fail a topic that is missing
+  its summary or its sections, a step whose command is not in the registry or
+  whose fields the command does not take, a line of a topic that names an
+  `agora` command or `help` topic that does not exist, and a repository path it
+  names that does not exist. A topic MUST NOT be a file a person edits, and
+  MUST work offline.
+- **FR-034**: `agora` MUST keep a guide: a book in AsciiDoc under `docs-src/`,
+  whose manuscript includes hand-written chapters (an overview, the start, and
+  a FAQ) and generated reference chapters. `docs generate` (generate) MUST write
+  the reference chapters from the registry, the help topics, the toolchain
+  entries, the check sections, suites and generators, and the design systems,
+  each file carrying a header that names the generator `reference-docs` and the
+  command that rewrites it, and `fresh` MUST prove them current. A reference
+  chapter MUST NOT repeat a step a topic gives; it names the topic. `docs build
+  [--output DIR]` (build; default `build/docs`) MUST write into DIR the
+  multi-page HTML site (`guide/`, one page per chapter with navigation), the
+  single page (`guide.html`), the PDF (`guide.pdf`) and the EPUB (`guide.epub`),
+  and `index.html` with the pictures it uses, and MUST report each edition as
+  built, failed or skipped, never built when it was not. The converters MUST be
+  the toolchain entries `asciidoctor` and `asciidoctor-pdf` on `jre` (FR-030),
+  never a program of the host. The site's links MUST all resolve: `docs build`
+  MUST fail naming each relative link or fragment in the multi-page site that
+  points at nothing. The guide MUST be written in the voice the repository's
+  writing rules set.
+- **FR-035**: `docs/index.html` MUST be the one hand-written page of the guide's
+  site: a landing page that links to each edition and uses the brand's own logo
+  and imagery from `design-systems/frontiers-brand/`, which `docs build` copies
+  beside it, and no art of its own. The workflow `pages.yml` MUST build the
+  guide with `./agora docs build` and publish it to GitHub Pages on a push to
+  `main`. The repository's owner MUST set Settings, Pages, Source to GitHub
+  Actions once; until then the deploy job fails and says so. The guide is
+  served at `https://intellectual-frontiers.github.io/.github/`.
+- **FR-036**: The `README.md` MUST be short: what the repository is, the flow in
+  a few numbered steps (install `python3` and `uv`, run `./agora help start`,
+  `./agora system add` once, `./agora toolchain add`, `./agora check`), the
+  link to the guide, and a paragraph for contributors; and everything else it
+  once held MUST be in the guide. The section `commands` MUST fail when the
+  README lacks the link to the guide, the one-time `system add` and the
+  `help` command, or is longer than 120 lines.
+
 ## Surfaces
 
 - **FR-031**: `agora` MUST expose its commands on three surfaces: the command
@@ -314,7 +390,11 @@ design systems' own harnesses, and what CI runs.
   Node or a browser itself, pull an image, or run in a container.
   `spec-check.yml` MUST run `./agora check --suite spec`. `design-systems.yml`
   MUST run `./agora check --suite browser`, `--suite python`, `--suite images`
-  and `--suite extension` in separate jobs. A workflow that runs `agora` in a
+  and `--suite extension` in separate jobs, each that needs a browser's or
+  VS Code's libraries or a display server after `./agora system add --yes`.
+  `pages.yml` MUST build the guide with `./agora docs build` and MAY use
+  GitHub's own `actions/configure-pages`, `actions/upload-pages-artifact` and
+  `actions/deploy-pages`, which publish and install nothing (FR-035). A workflow that runs `agora` in a
   reference environment MUST NOT exist (0025-tooling-environment FR-022,
   FR-025), and neither MUST `tools/reference-environment`. Every job MUST fail
   on any non-zero exit status, except that a job MAY show exit status 3 from
@@ -407,6 +487,18 @@ design systems' own harnesses, and what CI runs.
 - A view that needs a page outside `design-systems/`: not offered, per FR-019.
 - A new editor view: declared in code by presence and named by no other file,
   per FR-019 and 0041-command-line FR-007.
+- A topic that tells a person to run a command that was renamed: `agora check
+  help` fails naming the topic and the command, per FR-033.
+- A generated chapter edited by hand, or a command added without `docs
+  generate`: `agora fresh` fails and names `reference-docs`, per FR-034.
+- `docs build` where the PDF converter cannot start: the PDF is reported
+  skipped or failed with the reason and the other editions are still built,
+  per FR-034.
+- A VS Code test run on a host without a display server or VS Code's libraries:
+  the section is skipped naming `agora system add` and the status is 3, never
+  passed, per FR-013 and FR-030.
+- Pages not enabled for the repository: the deploy job fails and says the
+  owner must set the Pages source to GitHub Actions, per FR-035.
 
 ## Assumptions
 
@@ -457,17 +549,21 @@ design systems' own harnesses, and what CI runs.
 - **agora** — the public root's orchestrator, the one thing CI calls.
 - **The command set** — the commands declared in the ontology and the
   registry, which must agree.
-- **A suite** — `spec`, `browser`, `python`, `images` or `extension`: the
-  sections one CI job runs.
+- **A suite** — `spec`, `browser`, `python`, `images`, `extension` or `vscode`:
+  the sections one CI job runs.
 - **The toolchain** — the packages and toolchain entries that replace the
   host programs `agora`'s commands once needed (FR-030).
+- **A help topic** — one piece of the daily work in code, in plain language,
+  whose steps are actions (FR-033).
+- **The guide** — the AsciiDoc book in `docs-src/`, built to HTML, one page,
+  PDF and EPUB, and published to GitHub Pages (FR-034, FR-035).
 - **An editor view** — `console`, the registry browser, or `assurance`, the
   list of the design systems' in-browser harness pages; each is a resource the
   IF Console extension shows, and `agora` runs no server for either.
 - **A proposal** — a tracked, replayable change an agent drafts for a person to
   accept (FR-029).
 - **A generator** — brand-theme, brand-specimen, openedx-sources,
-  print-layout-docs, profile-figure or agent-skill.
+  print-layout-docs, profile-figure, agent-skill or reference-docs.
 
 ## Success criteria
 

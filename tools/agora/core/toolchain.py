@@ -96,6 +96,8 @@ class Entry:
     env: Callable[["Resolved", Path, str], Mapping[str, str]] | None = None    # (resolved, entry dir or override, platform) -> env
     installer: Callable[["Toolchain", Path, str], None] | None = None          # runs after unpacking, in the scratch dir
     needs_system: Callable[[str], tuple[str, ...]] | None = None               # platform -> shared libraries it links
+    argv: Callable[["Resolved", str], list[str]] | None = None                 # (resolved, program) -> the argv that starts it, where a
+    #                                                                            program is a jar another program runs it with
 
     @property
     def variable(self) -> str:
@@ -220,6 +222,15 @@ class Resolved:
             given = self.overridden[owner]
             return given / Path(entry.provides(self.platform)[program]).name if given.is_dir() else given
         return self.dirs[owner] / entry.provides(self.platform)[program]
+
+    def argv(self, program: str) -> list[str]:
+        """The argument vector that starts a program, before its own arguments: the program itself, or what its entry says
+        starts it (a jar is run by the entry's runtime). A program of the person's own, named by an override, starts as itself."""
+        owner = self.toolchain.owner(program)
+        entry = self.toolchain.entries[owner] if owner else None
+        if entry is not None and entry.argv and owner not in self.overridden:
+            return entry.argv(self, program)
+        return [str(self.path_of(program))]
 
     def env(self, extra: Mapping[str, str] | None = None) -> dict[str, str]:
         """The host's environment without what would change a program's output, plus each obtained entry's own variables

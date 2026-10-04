@@ -1,0 +1,16 @@
+name = "guide"
+help = "Help topics and the guide: the one place the daily work is documented, and the book that explains how the pieces fit (0042-agora FR-033 to FR-035)"
+
+[nouns.docs]
+help = "The guide: the AsciiDoc book in docs-src/, its generated reference chapters and its four built editions (0042-agora FR-034)"
+
+[sections.help]
+help = "Every help topic is well formed, its steps are actions of the registry, and it names only commands, topics and paths that exist (0042 FR-033; 0041 FR-065)"
+watch = ["tools/agora/help/**", "tools/agora/core/help.py", "tools/agora/lib/helps.py", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "spec-kit/specs/**", "docs-src/**"]
+relocatable = false
+
+[generators.reference-docs]
+help = "The guide's reference chapters: commands, checks, help topics, toolchain, design systems and specs"
+sources = ["tools/agora/agora.toml", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "tools/agora/help/*.py", "tools/agora/toolchain/*.py", "tools/agora/core/system.py", "tools/agora/core/registry.py", "tools/agora/lib/guide.py", "ontology/ifcore.ttl", "design-systems/*/spec.md", "spec-kit/specs/*/spec.md"]
+outputs = ["docs-src/chapters/reference/*.adoc"]
+command = "docs generate"

@@ -110,7 +110,7 @@ it does, what it never does, and how it is built.
   Run Command`, which lists every command that declares the editor surface,
   grouped by repository and noun, with its category, and the repository-wide
   commands as their own entries (`IF Console: Check`, `Fresh`, `Test`,
-  `Doctor`, `Show Command Line`, `Get Help`, `Copy Context`, `Open View`). It
+  `Doctor`, `Show Command Line`, `Get Help`, `Learn`, `Copy Context`, `Open View`). It
   MUST list no command that the editor surface does not expose
   (0041-command-line FR-022).
 - **FR-013**: The extension MUST build the input for a command from the
@@ -131,7 +131,8 @@ it does, what it never does, and how it is built.
   that names the command, the resource and what it changes, shown after its
   dry run (FR-014), and that only a person can give. The extension MUST expose
   no setting, command, keybinding, task or API that runs a `decision` command
-  without that confirmation, MUST NOT export an API to other extensions, and
+  without that confirmation (the one answer a test gives in place of a person is
+  FR-033's, which exists only in VS Code's test mode), MUST NOT export an API to other extensions, and
   MUST NOT list a `decision` command in its MCP registration (FR-022;
   0041-command-line FR-023, FR-051).
 - **FR-016**: The extension MUST show a status bar item for the active
@@ -217,9 +218,11 @@ it does, what it never does, and how it is built.
 - **FR-028**: The extension MUST carry tests that run under Node's built-in
   test runner with a stand-in for the VS Code API and a fake launcher that
   replays recorded resources, covering discovery (FR-004 through FR-007),
-  every feature of FR-008 through FR-022, the refusals of FR-015, and the
-  absence of network and telemetry calls (FR-023), and `agora check extension`
-  MUST run them and a lint of the code (0042-agora FR-013).
+  every feature of FR-008 through FR-022 and FR-031, the refusals of FR-015,
+  and the absence of network and telemetry calls (FR-023), and `agora check
+  extension` MUST run them (the `node` runner) and a lint of the code
+  (0042-agora FR-013). The stand-in shows that the code does what the tests
+  expect of VS Code; FR-032's tests show that VS Code does what the code expects.
 - **FR-029**: A person installs the extension from the `.vsix` that FR-027
   builds, with VS Code's own `--install-extension` or its Install from VSIX
   command, and updates it by building and installing again. Publishing the
@@ -228,6 +231,56 @@ it does, what it never does, and how it is built.
 - **FR-030**: The extension MUST state the VS Code version it needs in its
   manifest, and MUST keep working, with the features that need a newer VS Code
   absent and said to be, on the oldest version it states (FR-022).
+
+## Learning
+
+- **FR-031**: The extension MUST offer `IF Console: Learn`, a quick pick of the
+  topics that the repository's `help` command lists (0041-command-line FR-065),
+  from each repository whose command list has `help`, grouped by repository
+  when a window holds several; and MUST show the topic chosen as any other
+  resource (FR-008): its plain words, its sections, and its steps as buttons
+  that run each step through the one path every command takes (FR-013 to
+  FR-015). A topic is a resource of kind `help` whose data has `topic`,
+  `summary`, `plain`, `sections` (a heading and its words each) and `steps`, and
+  whose actions are the steps in order. A step whose command the launcher does
+  not offer to the editor, or which it says cannot run now, MUST be a disabled
+  button that says why, with its command line shown to paste in a terminal. The
+  extension MUST carry no topic and no step of its own (FR-003).
+
+## Tested in a real VS Code
+
+- **FR-032**: The extension MUST also be tested inside a real VS Code, started
+  under a display server, with `@vscode/test-electron` from the extension's own
+  hashed lock (FR-027), the VS Code build a pinned toolchain entry (0042-agora
+  FR-030), and the tests in `tools/if-console/test/vscode/`, run by `agora check
+  extension --runner vscode`. They MUST cover: activation in a trusted
+  workspace holding this repository and a fixture second command line; the
+  three views populated; every command of the manifest registered, with the
+  palette entries the manifest lists; a check that produces diagnostics in the
+  Problems panel at the finding's file and line; a dry-run write that opens a
+  diff and then applies; a decision that shows a modal, answered through FR-033;
+  an untrusted workspace in which the extension does not activate and no launcher
+  runs; Learn listing the repository's help topics; and the MCP server
+  registered where VS Code supports it. A run that cannot start (no VS Code in
+  the cache, no display server, a library missing) MUST be reported as
+  skipped, naming the cause and the command that fixes it.
+- **FR-033**: A test in a real VS Code cannot press the button of a modal
+  dialog or read a quick pick, so the extension MUST have one test hook and no
+  other: when VS Code runs the extension in its test mode
+  (`ExtensionMode.Test`, which VS Code sets only for a host started with an
+  extension test path, never for an installed extension), the extension MUST
+  publish an object under `Symbol.for('if-console.test')` on `globalThis`
+  through which a test (a) queues the answer to the next decision modal, where
+  `true` gives the modal's one button, anything else refuses it, an answer is
+  used once and with none queued the modal is refused; (b) reads what the
+  extension showed, in order: each modal's message, detail, whether it was
+  modal and its buttons, each quick pick's title and items, and each webview's
+  page; and (c) reads a snapshot, taken on demand and changing nothing, of the
+  repositories found, the entries of the three views and the MCP servers it
+  registers. Outside test mode the object MUST NOT exist and the modal MUST be
+  VS Code's own. The hook MUST affect no other prompt: quick picks and input
+  boxes are driven by VS Code's own commands in the tests, and no source other
+  than the hook's own file MAY read the extension mode.
 
 ## Out of scope
 
@@ -279,6 +332,10 @@ it does, what it never does, and how it is built.
 - A host with no Node installed: the extension is still built, with Node from
   the locked wheel, per FR-027.
 - Another extension asks this one for its API: it exports none, per FR-015.
+- A decision modal in a test: answered through the test hook, which exists only
+  in test mode; an installed extension has none, per FR-033.
+- A real VS Code run on a host with no display server: skipped with the cause
+  and `agora system add`, per FR-032.
 
 ## Assumptions
 
@@ -297,13 +354,10 @@ it does, what it never does, and how it is built.
   values (a requirement among several thousand): by the noun's `list` command
   and a filter, or by a completion resource that 0041-command-line states.
   Until then the extension uses the noun's `list` command (FR-013).
-- **OQ-2**: Whether the test suite also runs the extension inside a real VS
-  Code. The stand-in (FR-028) is what runs today. A VS Code build can be had
-  as a toolchain entry with a checksum (it downloads from the vendor's update
-  address, which is reachable), but it needs a display server to start, and a
-  display server is a program the host would have to supply
-  (0025-tooling-environment FR-014), so no real-VS-Code run exists until a
-  display server can be a locked entry or VS Code runs headless.
+- **OQ-2**: Answered by FR-032. VS Code is a toolchain entry with the vendor's
+  checksum; the display server is `Xvfb`, which has no download and is
+  installed with VS Code's libraries by `system add` (0042-agora FR-030), so the
+  host still needs only `python3` and `uv` and one documented `sudo` setup.
 - **OQ-3**: Whether a file open in the editor maps to a resource for `Copy
   Context` through a `file` resource kind each orchestrator declares, or the
   person always chooses the resource (FR-018).
@@ -320,6 +374,10 @@ it does, what it never does, and how it is built.
   it is made (FR-014).
 - **A modal confirmation** — what a `decision` command needs and only a person
   can give (FR-015).
+- **Learn** — the quick pick of a repository's help topics, each shown as a
+  resource with its steps as buttons (FR-031).
+- **The test hook** — the one object, present only in VS Code's test mode,
+  through which a test answers a decision's modal (FR-033).
 - **The Chores view** — the repository-wide commands and what needs a person,
   from the launcher's own resources (FR-019).
 
@@ -337,6 +395,9 @@ it does, what it never does, and how it is built.
   telemetry.
 - **SC-005**: The extension is built with no program from the host and ships
   no runtime npm dependency.
+- **SC-006**: A person learns the daily work from Learn without reading the
+  guide, and the extension's behavior is shown in a real VS Code, not only in
+  a stand-in for its API.
 
 ## Review & acceptance checklist
 

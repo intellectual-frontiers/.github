@@ -1,0 +1,23 @@
+[#vscode]
+== Working in VS Code
+
+The Intellectual Frontiers Console, IF Console, is the one VS Code extension for every repository's command line, this one
+included. It is the secondary interface: the command line is the core, and the extension adds nothing a command does not do. It
+finds a repository's launcher by that repository's own `.if-console.env`, and this repository's names `./agora`.
+
+What it gives you:
+
+* A tree of nouns, commands and resources, and a Chores view of what needs doing.
+* Findings in the Problems panel, at their file and line.
+* Every command from the palette, with a quick pick from each typed argument.
+* A diff of what a write would change, before it is made.
+* A modal confirmation for any decision, which only you can give.
+* Learn: the help topics, each shown with its steps as buttons.
+* This repository's MCP server, registered with VS Code.
+
+It re-implements nothing, writes nothing itself, collects no telemetry and opens no network connection. It runs nothing in a
+workspace that VS Code does not trust, and the trust choice is VS Code's own.
+
+Build and install it with the steps in the help topic `editor`: run `./agora help editor`. To change it, the extension's source is
+in `tools/if-console/`, and `./agora check extension` runs its unit tests on Node and its tests inside a real VS Code under a
+display server. <<reference-checks>> lists the sections and suites.

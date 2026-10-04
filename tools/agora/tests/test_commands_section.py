@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from .helpers import HOME, run_json
+from .helpers import HOME, copy_guide, run_json
 
 
 class CommandsSection(unittest.TestCase):
@@ -21,6 +21,7 @@ class CommandsSection(unittest.TestCase):
         shutil.copy(HOME / ".if-console.env", self.home / ".if-console.env")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
         shutil.copy(HOME / "README.md", self.home / "README.md")
+        copy_guide(self.home)
         self.ttl = (HOME / "ontology" / "ifcore.ttl").read_text()
 
     def findings(self, ttl=None):
@@ -54,12 +55,28 @@ class CommandsSection(unittest.TestCase):
         for k in ("noun", "verb", "category"):
             self.assertIn(f"{k} is", text)
 
-    def test_a_readme_that_leaves_out_a_noun_or_a_command_fails(self):  # 0042 FR-013
+    def test_a_readme_without_the_link_the_setup_or_help_fails_and_so_does_a_long_one(self):  # 0042 FR-036
         readme = self.home / "README.md"
-        readme.write_text(readme.read_text().replace("| `skill` | `generate` |\n", ""))
+        kept = readme.read_text()
+        readme.write_text("# only a title\n")
         code, found = self.findings()
         self.assertEqual(code, 1)
-        self.assertTrue(any("does not name the noun `skill`" in x for x in found))
+        for want in ("does not link to the guide", "the one-time system add", "the help command"):
+            self.assertTrue(any(want in x for x in found), want)
+        readme.write_text(kept + "\nmore\n" * 130)
+        code, found = self.findings()
+        self.assertTrue(any("the README is short" in x for x in found))
+
+    def test_the_guides_landing_page_and_workflow_are_checked(self):  # 0042 FR-035
+        index = self.home / "docs" / "index.html"
+        index.write_text(index.read_text().replace('assets/logo.webp', 'assets/invented.png', 1))
+        self.assertTrue(any("assets/invented.png" in x for x in self.findings()[1]))
+        copy_guide(self.home)
+        (self.home / "docs" / "stray.txt").write_text("x")
+        self.assertTrue(any("one hand-written page" in x for x in self.findings()[1]))
+        (self.home / "docs" / "stray.txt").unlink()
+        (self.home / ".github" / "workflows" / "pages.yml").unlink()
+        self.assertTrue(any("published to GitHub Pages" in x for x in self.findings()[1]))
 
     def test_a_reference_to_a_script_agora_replaced_fails(self):  # 0042 FR-016
         (self.home / "notes.md").write_text("run tools/spec_check.py to check\n")

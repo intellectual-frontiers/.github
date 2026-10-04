@@ -33,7 +33,8 @@ COMMAND = Dynamic("COMMAND", "a command's words, as `command list` shows them", 
 CATEGORY = Choice("CATEGORY", CATEGORIES, "a command category")
 GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
 VOICE_MODE = Choice("VOICE_MODE", ("prose", "procedure"), "how the voice sweep reads a text: as prose or as a procedure's steps")
-RUNNER = Choice("RUNNER", ("browser", "python"), "which kind of design system harness")
+RUNNER = Choice("RUNNER", ("browser", "python", "node", "vscode"),
+                "which harness: browser or python for design-systems; node or vscode for extension")
 
 
 class _Resource(Dynamic):
@@ -120,7 +121,7 @@ def context_command(ctx: Ctx, ident: str) -> dict[str, Any]:
                   Opt("--suite", "SUITE", "run a named set of sections"),
                   Opt("--changed", None, "run only sections whose watched paths changed"),
                   Opt("--since", "TEXT", "with --changed, also what differs from this Git commit"),
-                  Opt("--runner", "RUNNER", "design-systems: which harness"),
+                  Opt("--runner", "RUNNER", "design-systems: browser or python; extension: node or vscode"),
                   Opt("--brand", "BRAND", "design-systems: one brand"),
                   Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)"),
                   Opt("--mode", "VOICE_MODE", "voice: sweep as prose or as a procedure (prose by default)"),
@@ -244,9 +245,13 @@ def doctor(ctx: Ctx) -> Resource:
     for c in reg.commands.values():
         for n in c.toolchain:
             needed_by.setdefault(n, []).append(c.id)
+        for n in c.toolchain_optional:
+            needed_by.setdefault(n, []).append(f"{c.id} (for one edition)")
     for sec in reg.sections.values():
         for n in sec.toolchain:
             needed_by.setdefault(n, []).append(f"check {sec.name}")
+        for n in sec.toolchain_optional:
+            needed_by.setdefault(n, []).append(f"check {sec.name} (the vscode runner)")
     for g in reg.groups.values():
         for kind, label in (("runners", "check design-systems --runner"), ("harnesses", "check design-systems")):
             for key, spec in g.manifest.get(kind, {}).items():
@@ -372,6 +377,7 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
     findings += layout.check_boundaries(ctx.home, reg.root_manifest.get("register_name"))
     findings += layout.check_watched(reg)
     findings += layout.check_readme(ctx.home, reg)
+    findings += layout.check_guide_files(ctx.home)
     findings += layout.check_proposals(ctx)
     ttl_path = ctx.home / "ontology" / "ifcore.ttl"
     onto = ontology.command_individuals(ttl_path.read_text(encoding="utf-8")) if ttl_path.is_file() else {}

@@ -1,0 +1,28 @@
+[#repositories]
+== Three repositories, one Eidolon
+
+[cols="2,3,4"]
+|===
+|Repository |Role |May contain
+
+|`.github` (this one)
+|The public Eidolon
+|Public-tier facts, specs and ontology only
+
+|`eidolon`
+|The private Eidolon, and the monorepo where works are made
+|Every non-public spec and ontology individual, and every work's package; it imports this ontology and never redefines it
+
+|`www.intellectualfrontiers.com`
+|One presentation channel
+|Presents works through an authenticated proxy; holds no work of its own
+|===
+
+A *work* is the deliverable itself. A book, a web page, an episode, a keynote, a course or a skill is a *presentation* of it (spec 0021).
+Public presentations lead with what works found, made, or proved, never with how the company is organized.
+
+A legal entity that holds third-party capital, a fund, gets its own separate Eidolon (spec 0001, FR-004). Persistence is plain Git on
+GitHub.
+
+Each repository has its own command line, found by the IF Console extension through the repository's own `.if-console.env`. This
+guide is about this repository's, `agora`, and `agora` is public only: it reads and depends on nothing outside this repository.
