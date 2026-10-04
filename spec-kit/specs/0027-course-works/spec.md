@@ -80,8 +80,13 @@ package records and Decisions, not stated here.
 
 ## Open questions
 
-None. Which platforms run the house's courses is a standing decision kept in
-the vault; each run names its platform in a Decision, per FR-007.
+- **OQ-1**: The IRIs a course's cmi5 package names its course, blocks and units under, and the Open
+  edX organization code its runs use, are not decided (0024-persistent-addresses governs the IRIs).
+- **OQ-2**: Before the managed provider for public courses is signed, it must confirm in writing
+  that it accepts the house's own design-token theme on the plan quoted, imports OLX without
+  restriction, and returns full data on exit; those answers are not in. Which platforms run the
+  house's courses is a standing decision kept in the vault, and each run names its platform in a
+  Decision, per FR-007.
 
 ## Key entities
 

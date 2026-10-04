@@ -604,7 +604,22 @@ any number of each kind.
 
 ## Open questions
 
-None.
+- **OQ-1**: No kind governs the house's own business documents (letterhead, proposals, invoices,
+  contracts, memos, one-pagers) or its stationery. The business cards the house already has are to
+  be loaded as the first of them. Whether this is one kind or two (documents, and stationery under
+  print) is not decided.
+- **OQ-2**: No kind governs motion and sound: animated titles and lower thirds, intro and outro
+  stings, caption styling burned into video, a podcast's music and loudness. A media design system
+  covers still images (FR-050) and a spoken-voice design system covers words (FR-034); whether
+  motion and sound are one kind or two is not decided.
+- **OQ-3**: Consumers pin each design system by commit (FR-026), but no design system records what
+  changed between commits or whether a change breaks a consumer. Whether each keeps a change record,
+  a version, or both is not decided.
+- **OQ-4**: No design system is checked in a language other than English or in a right-to-left
+  script; what each must support before a work is translated is not stated.
+- **OQ-5**: Whether every web design system must offer a dark tone, as figure, slides and email
+  design systems do, is not decided.
+- **OQ-6**: No spec requires an accessibility statement for the house's public web properties.
 
 ## Key entities
 

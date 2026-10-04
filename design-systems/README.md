@@ -52,6 +52,15 @@ slug. A new kind (motion, slides, sonic) is added by writing its profile
 in the spec and adding its concept, with a code, to the scheme. Nothing
 else moves.
 
+### Not yet covered
+
+What no kind governs yet, and what waits on people rather than code, is kept as open questions in the spec that
+owns it, so the console's backlog lists every one: [`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md)
+(business documents and stationery, motion and sound, change records, other languages, dark tones, an accessibility
+statement), [`frontiers-brand`](frontiers-brand/spec.md) (the vector master, ink verification, the business cards),
+[`frontiers-email`](frontiers-email/spec.md) (where its images are served) and
+[`0027-course-works`](../spec-kit/specs/0027-course-works/spec.md) (course IRIs, the public course provider's terms).
+
 ## Why there's more than one of these
 
 Intellectual Frontiers has more than one kind of output, and may end up
