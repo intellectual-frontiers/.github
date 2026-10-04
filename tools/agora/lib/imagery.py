@@ -1,19 +1,12 @@
-#!/usr/bin/env python3
-"""Build and check a brand's imagery pool and share card (0014-design-systems FR-037, FR-043).
+"""A brand's imagery pool and share card: build, check and measure (0014-design-systems FR-037, FR-043).
 
-    python3 tools/brand_imagery.py build design-systems/<brand> [...]
-        Write each piece's WebP files for the web (the widths imagery/catalog.json lists under "web") and
-        images/share-card.png (the brand's lockup centered on its surface, 1200x630), and the app icons tokens.json
-        lists with images/favicon.ico (the icon-only mark on the surface, never enlarged).
-
-    python3 tools/brand_imagery.py check design-systems/<brand> [...]
-        Every catalog entry complete, its master present at pixel_size with real transparency and the
-        content_box it states, its WebP files present at their sizes, every master catalogued, and the
-        share card present at 1200x630. Exits non-zero on any problem.
-
-    python3 tools/brand_imagery.py measure <png> [...]
-        For a candidate piece: pixel_size and content_box to paste into the catalog, whether it has real
-        transparency, and how much of the drawn art carries color.
+`build` writes each piece's WebP files for the web (the widths imagery/catalog.json lists under "web"),
+images/share-card.png (the brand's lockup centered on its surface, 1200x630), and the app icons tokens.json lists
+with images/favicon.ico (the icon-only mark on the surface, never enlarged). `check` returns every problem: an
+incomplete catalog entry, a master absent or not at pixel_size with real transparency and the content_box it
+states, WebP files absent or off size, a master not catalogued, a share card absent or not 1200x630. `measure`
+reports a candidate piece's pixel_size and content_box for the catalog, whether it has real transparency, and
+how much of the drawn art carries color.
 
 Standard library and ImageMagick (`convert`, `identify`) only.
 """
@@ -22,7 +15,6 @@ from __future__ import annotations
 import colorsys
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 REQUIRED = ["id", "name", "file", "environment", "description", "visual_anchor", "route", "built_structures",
@@ -124,7 +116,7 @@ def build_icons(brand: Path) -> int:
     return len(app_icons(brand)) + 1
 
 
-def build(brand: Path) -> None:
+def build(brand: Path) -> dict:
     cat = catalog(brand)
     for piece in (cat or {}).get("pieces", []):
         master = brand / "imagery" / piece["file"]
@@ -140,24 +132,24 @@ def build(brand: Path) -> None:
     magick("-size", f"{w}x{h}", f"xc:{bg}", "(", str(logo), "-resize", f"{w * 46 // 100}x", ")",
            "-gravity", "center", "-composite", "-strip", str(brand / path))
     icons = build_icons(brand) if app_icons(brand) else 0
-    print(f"built {brand}: {sum(len(p['web']) for p in (cat or {}).get('pieces', []))} WebP files, {path}, {icons} app icons")
+    return {"webp": sum(len(p["web"]) for p in (cat or {}).get("pieces", [])), "share_card": path, "app_icons": icons}
 
 
 def check(brand: Path) -> list[str]:
     problems = []
     path, w, h = SHARE_CARD
     if not (brand / path).exists():
-        problems.append(f"{path}: missing (python3 tools/brand_imagery.py build {brand})")
+        problems.append(f"{path}: missing (run `agora imagery build {brand.name}`)")
     elif size(brand / path) != [w, h]:
         problems.append(f"{path}: {size(brand / path)}, not [{w}, {h}]")
     for icon in app_icons(brand):
         f = brand / icon["file"]
         if not f.is_file():
-            problems.append(f"{icon['file']}: missing (python3 tools/brand_imagery.py build {brand})")
+            problems.append(f"{icon['file']}: missing (run `agora imagery build {brand.name}`)")
         elif size(f) != [icon["width"], icon["height"]]:
             problems.append(f"{icon['file']}: {size(f)}, not [{icon['width']}, {icon['height']}]")
     if app_icons(brand) and not (brand / "images" / "favicon.ico").is_file():
-        problems.append(f"images/favicon.ico: missing (python3 tools/brand_imagery.py build {brand})")
+        problems.append(f"images/favicon.ico: missing (run `agora imagery build {brand.name}`)")
     cat = catalog(brand)
     if cat is None:
         return problems
@@ -188,7 +180,7 @@ def check(brand: Path) -> list[str]:
         for web in piece.get("web") or []:
             f = brand / "imagery" / web["file"]
             if not f.is_file():
-                problems.append(f"{pid}: {web['file']} not found (python3 tools/brand_imagery.py build {brand})")
+                problems.append(f"{pid}: {web['file']} not found (run `agora imagery build {brand.name}`)")
             elif size(f) != [web["width"], web["height"]]:
                 problems.append(f"{pid}: {web['file']} is {size(f)}, not [{web['width']}, {web['height']}]")
     catalogued = {p.get("file") for p in cat.get("pieces", [])}
@@ -200,35 +192,3 @@ def check(brand: Path) -> list[str]:
         if f"web/{f.name}" not in listed:
             problems.append(f"imagery/web/{f.name}: not in catalog.json")
     return problems
-
-
-def main(argv: list[str]) -> int:
-    if len(argv) < 3 or argv[1] not in ("build", "check", "measure"):
-        print(__doc__, file=sys.stderr)
-        return 2
-    if argv[1] == "measure":
-        for p in argv[2:]:
-            m = measure(Path(p))
-            print(p)
-            print(f'  "pixel_size": {json.dumps(m["pixel_size"])},')
-            print(f'  "content_box": {json.dumps(m["content_box"])},')
-            print(f'  real transparency: {"yes" if m["transparent"] else "NO"}')
-            print(f'  colored share of drawn art: {100 * m["colored_share"]:.0f}%')
-        return 0
-    failed = 0
-    for b in argv[2:]:
-        brand = Path(b)
-        if argv[1] == "build":
-            build(brand)
-            continue
-        problems = check(brand)
-        for p in problems:
-            print(f"PROBLEM {brand.name}: {p}")
-        cat = catalog(brand)
-        print(f"{brand.name}: {len((cat or {}).get('pieces', []))} pieces, {len(problems)} problems")
-        failed |= bool(problems)
-    return 1 if failed else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main(sys.argv))

@@ -18,8 +18,10 @@ class Plans(unittest.TestCase):
         reg = Registry.load(HOME)
         for g in reg.groups:
             p = plan.plan_for(reg, g)
-            self.assertTrue(p.stdlib, g)
-            self.assertIsNone(p.lock)
+            self.assertEqual(p.stdlib, not reg.groups[g].packages, g)
+            self.assertEqual(p.lock is None, p.stdlib)
+        for g in ("core", "spec"):
+            self.assertTrue(plan.plan_for(reg, g).stdlib, g)
 
     def test_the_spec_suite_groups_pin_nothing(self):  # 0042 FR-018
         reg = Registry.load(HOME)
@@ -102,12 +104,16 @@ class Core(unittest.TestCase):
         stdlib = set(sys.stdlib_module_names)
         for sub in ("core", "lib", "groups"):
             for f in (HOME / "tools" / "agora" / sub).rglob("*.py"):
-                for node in ast.walk(ast.parse(f.read_text())):
+                tree = ast.parse(f.read_text())
+                # a package a group pins is imported only inside the function that uses it, never by the core (FR-005)
+                lazy = {id(n) for fn in ast.walk(tree) if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef))
+                        for n in ast.walk(fn)} if sub != "core" else set()
+                for node in ast.walk(tree):
                     mods = [a.name for a in node.names] if isinstance(node, ast.Import) else \
                            [node.module] if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module else []
                     for m in mods:
                         top = m.split(".")[0]
-                        self.assertTrue(top in stdlib or top == "agora", f"{f}: imports {m}")
+                        self.assertTrue(top in stdlib or top == "agora" or id(node) in lazy, f"{f}: imports {m}")
 
     def test_the_core_runs_with_no_package_installed(self):
         p = subprocess.run([sys.executable, "-S", "-m", "agora", "command", "list", "--json"], capture_output=True, text=True,

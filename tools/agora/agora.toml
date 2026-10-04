@@ -4,7 +4,7 @@ name = "agora"
 audience = "public"
 # The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
 register_name = ".github"
-groups = ["core", "spec"]
+groups = ["core", "spec", "assurance"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
@@ -20,25 +20,21 @@ hint = "install Python 3.11 or later from the host"
 sections = ["specs", "register", "controls", "ontology", "environment", "commands"]
 planned = ["ui"]
 [suites.browser]
-sections = []
-planned = ["design-systems --runner browser", "openedx"]
+sections = ["design-systems", "openedx"]
+options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems; openedx takes no runner
+planned = []
 [suites.python]
-sections = []
-planned = ["design-systems --runner python"]
+sections = ["design-systems"]
+options = { runner = "python" }
+planned = []
 [suites.images]
-sections = []
-planned = ["imagery"]
+sections = ["imagery"]
+planned = []
 
 # Sections declared and not yet implemented: a name `check` rows may cite, which fails if run (it is reported as
 # planned, never as passed). A step that implements one moves it into its group's manifest.
 [planned.sections.ui]
 step = "ui"
-[planned.sections.design-systems]
-scope = "DESIGN_SYSTEM"
-options = ["--runner", "--brand"]
-[planned.sections.imagery]
-[planned.sections.openedx]
-scope = "DESIGN_SYSTEM"
 [planned.sections.figures]
 scope = "PATH"
 [planned.sections.voice]

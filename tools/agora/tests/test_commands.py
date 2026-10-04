@@ -181,7 +181,10 @@ class OtherCommands(unittest.TestCase):
         self.assertTrue(any("requirements" in o for o in d["omitted"]) or len(d["requirements"]) <= 60)
 
     def test_doctor_reports_and_changes_nothing(self):
-        code, doc = run_json(["doctor"])
+        from agora.core.registry import Registry
+        reg = Registry.load(HOME)
+        reg.groups["assurance"].programs = {}  # what the host lacks is its own test below; this one reads a healthy host
+        code, doc = run_json(["doctor"], registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
         self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv", "python3"])
@@ -203,7 +206,7 @@ class OtherCommands(unittest.TestCase):
         self.assertIn("get it from the host", [p["hint"] for p in doc["data"]["programs"]])
 
     def test_lock_with_nothing_pinned_reports_nothing_to_lock(self):
-        code, doc = run_json(["lock"])
+        code, doc = run_json(["lock", "core"])
         self.assertEqual((code, doc["data"]["locked"]), (0, []))
         code, doc = run_json(["lock", "spec", "--dry-run"])
         self.assertEqual(code, 0)

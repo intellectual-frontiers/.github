@@ -1,0 +1,101 @@
+name = "assurance"
+help = "The design systems' assurance harnesses, each brand's imagery pool and share card, and its Open edX package"
+
+# Python packages the harnesses and the brand tools import (0041-command-line FR-003; 0042-agora FR-018), each to one
+# exact version, locked with hashes in agora.lock. Found by reading every harness and the scripts it imports:
+#   Pillow    frontiers-figures (svgkit.py), frontiers-media (media.py), frontiers-signage-print (signage.py) measure
+#             text with ImageFont; the Open edX package writer converts a favicon.png for a brand without a favicon.ico
+#   fontTools frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF
+#   lxml      frontiers-course's harness validates cmi5.xml against cmi5's schema
+[packages]
+Pillow = "12.3.0"
+fonttools = "4.66.1"
+lxml = "6.1.3"
+
+# Programs outside Python (0041-command-line FR-006): the host supplies them. Each hint names the program or the
+# workspaces-host-v3 persona that supplies it, never the environment itself (0025-tooling-environment FR-012).
+[programs.node]
+needed_by = ["check design-systems --runner browser", "check design-systems --runner python (frontiers-course)", "check openedx"]
+hint = "install Node 22 from the host"
+
+[programs.chromium]
+needed_by = ["check design-systems --runner browser"]
+hint = "install Chromium through Playwright (npx playwright install chromium), or set PLAYWRIGHT_BROWSERS_PATH to where it is"
+probe_env = "PLAYWRIGHT_BROWSERS_PATH"
+probe_default = ["/opt/pw-browsers", "~/.cache/ms-playwright"]
+probe_globs = ["chromium-*/chrome-linux*/chrome", "chromium_headless_shell-*/chrome-linux*/headless_shell"]
+
+[programs.latexmk]
+needed_by = ["check design-systems --runner python (frontiers-print)"]
+hint = "install TeX Live with latexmk from the host (the press persona carries it)"
+[programs.xelatex]
+needed_by = ["check design-systems --runner python (frontiers-print)"]
+hint = "install TeX Live with XeLaTeX from the host (texlive-xetex; the press persona carries it)"
+[programs.lualatex]
+needed_by = ["check design-systems --runner python (frontiers-print)"]
+hint = "install TeX Live with LuaLaTeX from the host (texlive-luatex; the press persona carries it)"
+
+[programs.pdfinfo]
+needed_by = ["check design-systems --runner python (frontiers-print, frontiers-signage-print)"]
+hint = "install poppler-utils from the host (the press persona carries it)"
+[programs.pdffonts]
+needed_by = ["check design-systems --runner python (frontiers-print, frontiers-figures, frontiers-signage-print)"]
+hint = "install poppler-utils from the host (the press persona carries it)"
+[programs.pdftotext]
+needed_by = ["check design-systems --runner python (frontiers-print)"]
+hint = "install poppler-utils from the host (the press persona carries it)"
+[programs.pdfimages]
+needed_by = ["check design-systems --runner python (frontiers-print)"]
+hint = "install poppler-utils from the host (the press persona carries it)"
+
+[programs.rsvg-convert]
+needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)"]
+hint = "install librsvg (rsvg-convert) from the host (the press persona carries it)"
+
+[programs.convert]
+needed_by = ["check imagery"]
+hint = "install ImageMagick, with WebP support, from the host"
+[programs.identify]
+needed_by = ["check imagery"]
+hint = "install ImageMagick from the host"
+[programs.cwebp]
+needed_by = ["imagery build"]
+hint = "install webp (cwebp) from the host"
+
+# What each kind of harness needs of the host. A program here that is missing skips the harness, naming it and its
+# hint, and makes the run exit 3 (0041-command-line FR-033); nothing is reported as passed that did not run.
+[runners.browser]
+programs = ["node", "chromium"]
+[runners.python]
+programs = []
+
+# What one harness needs beyond its kind: `programs` it cannot run without, and `optional` programs it checks
+# without and says it did not exercise (found by reading each harness).
+[harnesses."frontiers-print:python"]
+programs = ["latexmk", "xelatex", "lualatex", "pdfinfo", "pdffonts", "pdftotext", "pdfimages"]
+[harnesses."frontiers-course:python"]
+programs = ["node"]
+[harnesses."frontiers-figures:python"]
+optional = ["rsvg-convert", "pdffonts"]
+[harnesses."frontiers-media:python"]
+optional = ["rsvg-convert"]
+[harnesses."frontiers-signage-print:python"]
+optional = ["rsvg-convert", "pdfinfo", "pdffonts"]
+
+[sections.design-systems]
+help = "Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039)"
+watch = ["design-systems/**", "tools/agora/lib/assurance.py", "tools/agora/groups/assurance/**"]
+scope = "DESIGN_SYSTEM"
+options = ["--runner", "--brand"]
+
+[sections.imagery]
+help = "Each brand's imagery pool and share card: catalog, masters, WebP files, app icons (0014 FR-037, FR-043)"
+watch = ["design-systems/*/imagery/**", "design-systems/*/images/**", "design-systems/*/tokens.json", "tools/agora/lib/imagery.py"]
+scope = "BRAND"
+programs = ["convert", "identify"]
+
+[sections.openedx]
+help = "A brand's Open edX package is what is written from its tokens, and, with Paragon, what it builds, every pair 4.5:1 (frontiers-brand FR-020)"
+watch = ["design-systems/*/openedx/**", "design-systems/*/tokens.json", "design-systems/*/assurance/run.py", "tools/agora/lib/openedx.py"]
+scope = "BRAND"
+options = ["--paragon"]

@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 from typing import Any
 
 from . import plan
@@ -27,16 +28,33 @@ def run_section(ctx: Ctx, s: Section, scope: str | None) -> SectionResult:
     argv = [str(py), "-m", "agora", "check", s.name, "--json", "--no-log"]
     if scope:
         argv += ["--scope", scope]
+    for flag in ("runner", "brand", "paragon"):
+        if ctx.section_options.get(flag) and f"--{flag}" in s.options:
+            argv += [f"--{flag}", str(ctx.section_options[flag])]
     if ctx.relocated:
         argv += ["--root", str(ctx.root)]
     if ctx.offline:
         argv.append("--offline")
     env = {**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "AGORA_PLAN_GROUP": s.group}
-    proc = subprocess.run(argv, capture_output=True, text=True, env=env, cwd=ctx.home)
+    # The worker's stderr is the section's progress (a harness's own output): pass it on as it arrives, keep its tail.
+    proc = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env, cwd=ctx.home)
+    tail: list[str] = []
+
+    def forward() -> None:
+        for line in proc.stderr:  # type: ignore[union-attr]
+            print(line, end="", file=sys.stderr, flush=True)
+            tail.append(line)
+            del tail[:-20]
+
+    t = threading.Thread(target=forward, daemon=True)
+    t.start()
+    stdout = proc.stdout.read()  # type: ignore[union-attr]
+    proc.wait()
+    t.join()
     try:
-        doc = json.loads(proc.stdout)
+        doc = json.loads(stdout)
     except ValueError:
-        raise AgoraError("worker", f"the worker for section {s.name} returned no resource: {proc.stderr.strip()[-300:]}",
+        raise AgoraError("worker", f"the worker for section {s.name} returned no resource: {''.join(tail).strip()[-300:]}",
                          exit=FAILED) from None
     if doc.get("kind") == "error":
         d = doc["data"]

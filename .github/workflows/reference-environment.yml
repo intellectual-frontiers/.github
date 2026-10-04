@@ -29,4 +29,4 @@ jobs:
       - name: agora's doctor, the spec suite and agora's own tests
         run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora doctor && ./agora check --suite spec && ./agora test'
       - name: Every design system's harness (browser, TeX and imagery)
-        run: docker run --rm --shm-size=1g -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc 'tools/run_assurance.sh'
+        run: docker run --rm --shm-size=1g -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora check --suite browser && ./agora check --suite python && ./agora check --suite images'

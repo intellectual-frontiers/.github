@@ -279,7 +279,11 @@ other command line's name at a glance and by any one typo, and it reads well in
 a prompt (0042-agora FR-002). It reads nothing outside this repository.
 
 - Run `./agora check` for every check, `./agora check --suite spec` for the
-  spec, register and ontology checks, `./agora fresh` to prove generated files
+  spec, register and ontology checks, `./agora check --suite browser`, `python` or
+  `images` for the design systems' harnesses, each brand's imagery and its Open edX
+  package (they need programs from the host: Node and Chromium, TeX Live and
+  poppler, ImageMagick; a harness whose program is missing is skipped, never
+  passed, and the run exits 3), `./agora fresh` to prove generated files
   are current, `./agora doctor` for what is missing, `./agora test` for its own
   tests, and `./agora command list` for what it can do. Every command takes
   `--json` and, if it writes, `--dry-run`.

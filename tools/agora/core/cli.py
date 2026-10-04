@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from . import completion, logs, plan, render
+from .checks import find_program
 from .ctx import Ctx
 from .registry import WRITES, Command, Opt, Registry
 from .resource import FAILED, MISSING, OK, USAGE, Action, AgoraError, Call, Link, Resource, next_command
@@ -169,7 +170,7 @@ def _loggable(cmd: Command, values: dict[str, Any]) -> dict[str, Any]:
 
 def _check_programs(ctx: Ctx, cmd: Command) -> None:
     for prog in cmd.programs:
-        if shutil.which(prog) is None:
+        if find_program(ctx.registry, prog, ctx.env) is None:
             hint = ctx.registry.program(prog).get("hint", f"install {prog} on the host")
             raise AgoraError("missing-program", f"{cmd.id} needs {prog}, which is not on PATH", exit=MISSING,
                              detail={"program": prog, "hint": hint}, actions=[next_command("see what is missing", "doctor")])

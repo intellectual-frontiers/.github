@@ -6,4 +6,4 @@ help = "A command of this command line"
 
 [sections.commands]
 help = "The registry and the ontology list the same commands, with the same noun, verb and category (0042-agora FR-004)"
-watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl"]
+watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl", ".github/workflows/**"]

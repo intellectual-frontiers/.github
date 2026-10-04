@@ -17,7 +17,7 @@
     "source": "where the approved piece came from",
     "pixel_size": "[width, height] of the master",
     "content_box": "[left, top, right, bottom] pixel bounds of the drawn art (alpha > 16); a renderer that needs the art alone trims to it",
-    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by tools/brand_imagery.py build"
+    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by `agora imagery build`"
   },
   "environments": [
     "mountain-alpine",
@@ -61,7 +61,7 @@
       ],
       "source": {
         "supplied": "2026-10-03",
-        "generator": "tools/brand_imagery.py test drawing"
+        "generator": "a test drawing made with ImageMagick"
       },
       "pixel_size": [
         1448,
