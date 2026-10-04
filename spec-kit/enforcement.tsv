@@ -749,3 +749,4 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0026-workspaces FR-012	none	-	no check inspects the image manifest
 0026-workspaces FR-013	none	-	no check
 0026-workspaces FR-014	none	-	no check
+0026-workspaces FR-015	none	-	no check; verified by hand with the devcontainer CLI, where ws-repos ensure pulls the linked checkout and clones only the rest

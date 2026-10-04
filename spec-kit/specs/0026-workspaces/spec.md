@@ -47,7 +47,9 @@ same result there.
   has all three.
 - **FR-006**: A repository's devcontainer MUST add nothing to the
   environment beyond the image, its `ws-repos.json`, editor extensions,
-  and the environment's first-run command (FR-008). Any package, tool,
+  the environment's first-run command (FR-008), and, where the
+  environment does not yet do it, the linking FR-015 requires
+  (`.devcontainer/workspace-links.sh`, identical in every repository). Any package, tool,
   or setup step belongs in workspaces-host-v3 (0025-tooling-environment
   FR-007).
 
@@ -89,6 +91,16 @@ same result there.
   `ws-repos` does, so contributor instructions read the same in each.
   A tool MUST NOT depend on that layout (0025-tooling-environment
   FR-002).
+- **FR-015**: Every repository MUST live at `~/workspaces/<host>/<org>/
+  <repo>`, the layout `ws-repos` manages, and every repository in a
+  repository's list MUST be cloned there by `ws-repos ensure`, never as
+  a second copy elsewhere. Where a flavor opens the repository somewhere
+  else, as GitHub Codespaces and a Dev Container cloned into a volume
+  open it at `/workspaces/<repo>`, the opened checkout MUST be
+  registered at its `~/workspaces` path, so `ws-repos ensure` pulls it
+  rather than cloning it again, and every other repository in its list
+  MUST be reachable beside it, so `../<repo>` resolves as it does on any
+  other host.
 
 ## Out of scope
 
@@ -109,6 +121,11 @@ same result there.
   FR-007 and FR-008.
 - A Codespace: GitHub's own token satisfies the login, so the first-run
   command clones without prompting, per FR-007.
+- A Codespace, or a Dev Container cloned into a volume, opens the
+  repository at `/workspaces/<repo>`: that checkout is linked in at its
+  `~/workspaces` path and its siblings are linked beside it, so
+  `ws-repos ensure` clones only the others, into `~/workspaces`, per
+  FR-015.
 - A private repository listed in `ws-repos.json` that the person cannot
   read: the first-run command reports it and clones the rest, per
   FR-008.
