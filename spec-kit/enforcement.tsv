@@ -363,7 +363,7 @@ requirement	mechanism	by	note
 0016-press-production FR-022	check	eidolon: eid check distribute	isbn.py fails invalid or duplicate ISBN-13s; eid release final also refuses a placeholder
 0016-press-production FR-023	none	-	cover series line is by construction in jacket-to-latex.py; no check
 0016-press-production FR-024	check	eidolon: eid check works	works.py fails a manuscript without a whole-number :edition:
-0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut
+0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut, an unsorted open issue, a gate group with no check recorded after the manuscript last changed, and a release validation that does not pass at the current commit
 0016-press-production FR-026	none	-	attribution of authorship is not checked
 0016-press-production FR-027	none	-	reserved human acts are not mechanically enforced
 0016-press-production FR-028	none	-	praise quote and cover art origin are not checked
