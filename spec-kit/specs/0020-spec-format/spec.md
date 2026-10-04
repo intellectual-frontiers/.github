@@ -46,7 +46,10 @@ where it departs from it.
   belongs in the ontology.
 - **FR-008**: Requirement identifiers MUST NOT be renumbered or reused. A
   new requirement takes the next unused number in its spec, whichever
-  section it is placed in. A removed requirement's number stays retired.
+  section it is placed in. A removed requirement's number stays retired: the
+  requirement stays in its spec as `- **FR-NNN**: Retired.` followed by
+  one sentence saying what governs now, so that a citation of it still
+  resolves, and its register row is `none` with a note that begins `retired`.
 
 ## Status
 
