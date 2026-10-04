@@ -98,8 +98,8 @@ the public root's command set is 0042-agora.
   outside the clone); `serve` (run until stopped). `check` is not a noun's
   verb: FR-010.
 - **FR-010**: A small closed set of repository-wide commands MUST take no
-  noun: `check`, `fresh`, `test`, `doctor`, `lock` and `context`, with the
-  arguments FR-031, FR-036, FR-014, FR-030 and FR-038 state; and an
+  noun: `check`, `fresh`, `test`, `doctor`, `lock`, `context` and `help`, with
+  the arguments FR-031, FR-036, FR-014, FR-030, FR-038 and FR-065 state; and an
   environment orchestrator MAY also have `workspace`, a noun whose commands
   prepare the person's machine (FR-063). An orchestrator MAY omit any of the
   repository-wide commands but MUST NOT add another without amending this
@@ -254,6 +254,15 @@ the public root's command set is 0042-agora.
   `name`, `status` (`passed`, `failed` or `skipped`) and `findings`, each with
   `level`, `where`, `message` and `next`. A field MAY be added without
   raising a schema version (FR-019); none MAY be renamed or removed without it.
+
+- **FR-065**: An orchestrator MAY provide `help [TOPIC]` (read), the one place
+  its daily-work documentation lives. A topic MUST be code, in plain language
+  (FR-054), and MUST be a resource whose steps are actions (FR-017) the editor
+  can run, so that a person can learn by doing in the editor as well as by
+  reading in the terminal. No other document MAY restate what a topic says: a
+  reference or an overview MUST link to the topic, or MUST be generated from
+  the same code and proven current by `fresh` (FR-036), so that documentation
+  does not drift from behavior. `help` with no topic MUST list the topics.
 
 ## Behavior and information
 
@@ -542,6 +551,8 @@ the public root's command set is 0042-agora.
   per FR-027.
 - A new verb a repository wants: amend this spec first, per FR-008 and
   0001 FR-037.
+- A guide that repeats what `help` says: it is replaced by a link or generated
+  from the same code, per FR-065.
 - Two modules declare a command with one name, or a kit module imports a
   package at module level: `doctor` fails and names both modules, per FR-029.
 - A repository's kit needs trust that the person has not given: the kit does
