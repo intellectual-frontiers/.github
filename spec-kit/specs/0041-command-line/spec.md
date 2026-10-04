@@ -237,6 +237,24 @@ the public root's command set is 0042-agora.
   update is needed, with the action that updates it, rather than fail or
   show a document it cannot read.
 
+- **FR-064**: Every orchestrator MUST use one wire shape for what the editor
+  reads, so that the extension holds no rule of any one orchestrator. `command
+  list` MUST have `data.commands`, each with `id`, `category`, `group`,
+  `surfaces` (any of `terminal`, `editor`, `mcp`) and `help`. `command show`
+  MUST have `id`, `noun`, `verb`, `category`, `help`, `group`, `arguments` (each
+  with `name`, `type`, `help`, `required`, `words` and `many`, and `choices`
+  where the type can list them), `options` (each with `flag`, `type`, `help`,
+  `multiple` and `required`), `usage`, `surfaces` and `programs`. An action
+  MUST have `label`, `command` (its words), `fields` (by argument name),
+  `category`, `surfaces`, `cli` (the one pasteable line of FR-055, or null
+  where a value is needed), `enabled` and, where it needs a value only a person
+  can give, `needs` and, where disabled, `reason`; a link MUST have `rel`,
+  `command`, `fields` and `cli`. A `check` resource's data MUST have `status`,
+  `summary` (`run`, `passed`, `failed`, `skipped`) and `sections`, each with
+  `name`, `status` (`passed`, `failed` or `skipped`) and `findings`, each with
+  `level`, `where`, `message` and `next`. A field MAY be added without
+  raising a schema version (FR-019); none MAY be renamed or removed without it.
+
 ## Behavior and information
 
 - **FR-046**: An orchestrator's own configuration MUST be sorted into
