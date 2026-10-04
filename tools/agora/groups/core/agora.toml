@@ -1,0 +1,9 @@
+name = "core"
+help = "The repository-wide commands (0041-command-line FR-010) and the registry's own"
+
+[nouns.command]
+help = "A command of this command line"
+
+[sections.commands]
+help = "The registry and the ontology list the same commands, with the same noun, verb and category (0042-agora FR-004)"
+watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl"]

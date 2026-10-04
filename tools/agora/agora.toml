@@ -1,0 +1,98 @@
+# agora's root manifest (0041-command-line FR-007; 0042-agora FR-001): the command line's name, its audience, its
+# command groups, its suites, and what is declared but not yet implemented.
+name = "agora"
+audience = "public"
+# The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
+register_name = ".github"
+groups = ["core", "spec"]
+logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
+proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
+
+# What the launcher needs from the host (0041 FR-001, FR-006). The hint names the program, never the reference environment.
+[prerequisites.uv]
+hint = "install uv (https://docs.astral.sh/uv/) from the host"
+[prerequisites.python3]
+hint = "install Python 3.11 or later from the host"
+
+# Suites (0041 FR-031; 0042 FR-014). `sections` is what the suite runs today; `planned` names what it will run once
+# implemented. A section appears in no suite it does not belong to, and none is left out silently.
+[suites.spec]
+sections = ["specs", "register", "controls", "ontology", "environment", "commands"]
+planned = ["ui"]
+[suites.browser]
+sections = []
+planned = ["design-systems --runner browser", "openedx"]
+[suites.python]
+sections = []
+planned = ["design-systems --runner python"]
+[suites.images]
+sections = []
+planned = ["imagery"]
+
+# Sections declared and not yet implemented: a name `check` rows may cite, which fails if run (it is reported as
+# planned, never as passed). A step that implements one moves it into its group's manifest.
+[planned.sections.ui]
+step = "ui"
+[planned.sections.design-systems]
+scope = "DESIGN_SYSTEM"
+options = ["--runner", "--brand"]
+[planned.sections.imagery]
+[planned.sections.openedx]
+scope = "DESIGN_SYSTEM"
+[planned.sections.figures]
+scope = "PATH"
+[planned.sections.voice]
+scope = "PATH"
+[planned.sections.slides]
+scope = "PATH"
+[planned.sections.email]
+scope = "PATH"
+[planned.sections.course]
+scope = "PATH"
+[planned.sections.media]
+scope = "PATH"
+[planned.sections.signage]
+scope = "PATH"
+[planned.sections.merchandise]
+scope = "PATH"
+
+# Commands declared in the ontology (0042 FR-004, FR-005, FR-006) and not yet implemented, with their categories. A
+# step that implements one deletes its line here; `check commands` fails if a command is in both places.
+[planned.commands]
+"fresh" = "check"
+"ui serve" = "setup"
+"ui open" = "setup"
+"ui stop" = "setup"
+"ui link" = "read"
+"mcp serve" = "setup"
+"proposal list" = "read"
+"proposal show" = "read"
+"proposal new" = "record"
+"proposal advance" = "decision"
+"design-system list" = "read"
+"design-system show" = "read"
+"design-system new" = "generate"
+"brand list" = "read"
+"brand show" = "read"
+"brand generate" = "generate"
+"imagery list" = "read"
+"imagery show" = "read"
+"imagery build" = "build"
+"imagery add" = "record"
+"decoration show" = "read"
+"decoration generate" = "generate"
+"ink list" = "read"
+"ink show" = "read"
+"ink record" = "decision"
+"openedx generate" = "generate"
+"openedx build" = "build"
+"layout list" = "read"
+"layout show" = "read"
+"layout build" = "build"
+"figure build" = "build"
+"deck build" = "build"
+"email build" = "build"
+"media build" = "build"
+"sign build" = "build"
+"course show" = "read"
+"course build" = "build"
