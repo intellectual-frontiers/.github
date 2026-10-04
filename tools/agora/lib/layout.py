@@ -15,12 +15,13 @@ NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
 # 0042 FR-013: the check sections, and FR-014: the suites, as `sections`. The `extension` section, and its suite, come with
 # the step that adds them.
-SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "design-systems", "imagery", "openedx",
+SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "extension", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
 SUITES = {"spec": {"specs", "register", "controls", "ontology", "toolchain", "commands"},
           "browser": {"design-systems --runner browser", "openedx"},
           "python": {"design-systems --runner python"},
-          "images": {"imagery"}}
+          "images": {"imagery"},
+          "extension": {"extension"}}
 
 
 def check_layout(home: Path, registry) -> list[Finding]:
@@ -37,6 +38,9 @@ def check_layout(home: Path, registry) -> list[Finding]:
         f.append(Finding("error", "tools/agora/agora.toml", f"the command line's name is {registry.name!r}; it must be {NAME!r} (0042 FR-002)"))
     if registry.audience != "public":
         f.append(Finding("error", "tools/agora/agora.toml", f"the audience is {registry.audience!r}; it must be 'public' (0042 FR-001)"))
+    decl = home / ".if-console.env"  # 0042 FR-032: the repository's own declaration of its launcher for the editor
+    if not decl.is_file() or f"IF_CONSOLE_LAUNCHER=./{NAME}" not in decl.read_text(encoding="utf-8").splitlines():
+        f.append(Finding("error", ".if-console.env", f"must hold the line IF_CONSOLE_LAUNCHER=./{NAME} (0042 FR-032)"))
     for name, g in registry.groups.items():
         if not (g.path / "agora.toml").is_file():
             f.append(Finding("error", f"tools/agora/groups/{name}", "a group has an agora.toml (0042 FR-001)"))
@@ -109,14 +113,15 @@ SKIP_DIRS = (".git", "node_modules", "__pycache__", ".agora", ".venv")
 
 
 def check_scripts(home: Path) -> list[Finding]:
-    """0042 FR-016: no script of this repository's own outside a design system's directory and tools/agora/ (SC-003)."""
+    """0042 FR-016: no script of this repository's own outside a design system's directory, tools/agora/ and the IF Console's own
+    directory (0043 FR-002; SC-003)."""
     out: list[Finding] = []
     for dirpath, dirs, names in os.walk(home):
         here = Path(dirpath).relative_to(home)
-        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and (here / d).parts not in (("design-systems",), ("tools", NAME)))
+        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and (here / d).parts not in (("design-systems",), ("tools", NAME), ("tools", "if-console")))
         for n in sorted(names):
             if n.endswith(SCRIPT_SUFFIXES):
-                out.append(Finding("error", str(here / n), f"a script outside design-systems/ and tools/{NAME}/: delete it once {NAME} "
+                out.append(Finding("error", str(here / n), f"a script outside design-systems/, tools/{NAME}/ and tools/if-console/: delete it once {NAME} "
                                    "provides its function, and rewrite every reference to it (0042 FR-016)"))
     return out
 

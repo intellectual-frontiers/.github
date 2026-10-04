@@ -314,7 +314,7 @@ class Declarations(unittest.TestCase):
 
     def test_the_real_entries_are_complete_and_pinned(self):
         entries = tcore.discover()
-        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages"})
+        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages", "vsce"})
         self.assertEqual(tcore.problems(entries), [])
         for e in entries.values():
             self.assertIn("linux-x86_64", e.platforms, e.name)
@@ -510,8 +510,9 @@ class SystemCommands(unittest.TestCase):
 
     def test_it_is_refused_over_mcp_and_listed_on_no_surface_but_the_terminal(self):
         reg = Registry.load(HOME)
+        self.assertEqual(reg.surfaces_of(reg.commands["system add"]), ())
+        self.assertEqual(reg.surfaces_of(reg.commands["toolchain add"]), ("editor",))  # widened to the editor, never MCP (0041 FR-022)
         for words in ("system add", "toolchain add"):
-            self.assertEqual(reg.surfaces_of(reg.commands[words]), (), words)
             self.assertEqual(reg.commands[words].category, "setup")
         ctx = Ctx(reg, HOME, HOME, surface="mcp", env=dict(self.env))
         from agora.core.resource import AgoraError

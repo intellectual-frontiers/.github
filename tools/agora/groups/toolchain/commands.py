@@ -36,12 +36,41 @@ def _row(tc: toolchain.Toolchain, e: toolchain.Entry) -> dict[str, Any]:
             "platforms": sorted(e.platforms), "variable": e.variable, "summary": e.summary}
 
 
+def _consumer(tc: toolchain.Toolchain, e: toolchain.Entry) -> dict[str, Any]:
+    """What a repository that builds on this one needs to use an entry as it stands (0025 FR-027): where it is installed, the
+    environment to set, the programs it provides (absolute) and its version. `path` is null while the entry is not in the cache."""
+    r = tc.resolve([e.name])
+    base: dict[str, Any] = {"version": e.version, "state": tc.state(e), "path": None, "env": {}, "provides": {}}
+    if not r.has_entry(e.name):
+        return base
+    path = r.entry_path(e.name)
+    env = {k: str(v) for k, v in (e.env(r, path, tc.platform).items() if e.env else [])}
+    provides = {}
+    for prog in e.provides(tc.platform):
+        try:
+            provides[prog] = str(r.path_of(prog))
+        except AgoraError:
+            pass
+    return {**base, "path": str(path), "env": env, "provides": provides}
+
+
+def _pins(ctx: Ctx) -> dict[str, Any]:
+    """The pinned Python packages across every group, and the node version, so another repository can check it uses the same pins."""
+    packages: dict[str, str] = {}
+    for g in ctx.registry.groups.values():
+        for name, version in g.packages.items():
+            packages[name] = version
+    return {"packages": dict(sorted(packages.items())), "node": packages.get("nodejs-wheel-binaries")}
+
+
 # toolchain list | show ---------------------------------------------------------------------------------------------
 @command("toolchain list", category="read", help="List the toolchain entries: version, platforms and whether the cache holds each")
 def toolchain_list(ctx: Ctx) -> Resource:
     tc = ctx.toolchain()
-    rows = [_row(tc, e) for e in tc.entries.values()]
-    res = Resource("toolchain-list", "all", {"platform": tc.platform, "cache": str(tc.cache), "count": len(rows), "entries": rows},
+    rows = [{**_row(tc, e), **_consumer(tc, e)} for e in tc.entries.values()]
+    pins = _pins(ctx)
+    res = Resource("toolchain-list", "all", {"platform": tc.platform, "cache": str(tc.cache), "count": len(rows), "entries": rows,
+                                             **pins},
                    links=[Link("entry", Call("toolchain show", {"entry": r["name"]})) for r in rows],
                    actions=[next_command("fetch every entry", "toolchain add")])
     res.columns["entries"] = ["name", "version", "state", "size", "platforms"]
@@ -57,8 +86,8 @@ def toolchain_show(ctx: Ctx, entry: str) -> Resource:
                   "form": a.form, "size": _mb(a.size)} for p, archives in e.platforms.items() for a in archives]
     libs = list(e.needs_system(tc.platform)) if e.needs_system else []
     data = {"name": e.name, "version": e.version, "summary": e.summary, "host platform": tc.platform, "state": tc.describe(e),
-            "provides": dict(e.provides(tc.platform)) if e.archives(tc.platform) else {}, "needs": list(e.needs),
-            "override": f"{e.variable}={e.override_hint or 'a program of your own'}",
+            "programs": dict(e.provides(tc.platform)) if e.archives(tc.platform) else {}, "needs": list(e.needs),
+            "override": f"{e.variable}={e.override_hint or 'a program of your own'}", **_consumer(tc, e),
             "system libraries": libs or "none", "platforms": platforms}
     res = Resource("toolchain-entry", e.name, data, actions=[next_command(f"fetch {e.name}", "toolchain add", entries=[e.name])])
     res.columns["platforms"] = ["platform", "form", "size", "url", "sha256"]
@@ -66,7 +95,7 @@ def toolchain_show(ctx: Ctx, entry: str) -> Resource:
 
 
 # toolchain add -----------------------------------------------------------------------------------------------------
-@command("toolchain add", category="setup",
+@command("toolchain add", category="setup", surfaces=("editor",),  # widened to the editor (0041 FR-022): the Chores view fetches an entry
          help="Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check",
          args=[Arg("entries", "ENTRY", "the entries; every one with a build for this platform when none is named", many=True)])
 def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:
@@ -120,6 +149,8 @@ def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:
             except AgoraError as err:
                 row["check"] = f"FAILED: {err.message}"
                 status = max(status, FAILED)
+    for row in rows:  # where each now is and the environment a consumer sets (0025 FR-027)
+        row.update({k: v for k, v in _consumer(tc, tc.get(row["entry"])).items() if k not in ("version", "state")})
     res = Resource("toolchain-add", " ".join(entries) or "all", {"platform": tc.platform, "cache": str(tc.cache),
                                                                  "dry_run": ctx.dry_run, "entries": rows}, exit=status)
     res.columns["entries"] = ["entry", "version", "before", "did", "bytes", "seconds", "check"]

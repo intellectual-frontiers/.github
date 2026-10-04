@@ -1,0 +1,57 @@
+"""The extension group: `extension build` and the `extension` check section (0042-agora FR-013, FR-032; 0043-if-console FR-027, FR-028).
+
+Thin: the rules and the packing are agora.lib.extension. Node is the one the locked `nodejs-wheel-binaries` package supplies.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+from agora.core import AgoraError, Ctx, Finding, Resource, SectionResult, command, next_command, section
+from agora.core.resource import MISSING, FAILED
+from agora.lib import extension, node
+from agora.lib.register import known_repositories
+
+
+def _node(ctx: Ctx) -> str:
+    found = node.node_path(ctx.env)
+    if found is None:
+        raise AgoraError("missing-program", "this needs node, which comes from the package " + node.PACKAGE, exit=MISSING,
+                         detail={"package": node.PACKAGE})
+    return found
+
+
+@section("extension")
+def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
+    home = ctx.public
+    try:
+        exe = _node(ctx)
+    except AgoraError as e:
+        return SectionResult("extension", "skipped", reason=e.message)
+    own = ctx.registry.root_manifest.get("register_name", "")
+    names = sorted(known_repositories(home) - {own} | {ctx.registry.name})
+    findings = extension.manifest_findings(home)
+    findings += extension.lint_findings(home, exe, names)
+    tests, notes = extension.run_tests(home, exe, ctx.toolchain().clean_env(), home)
+    return SectionResult.from_findings("extension", findings + tests, notes + ["manifest and lint read tools/if-console/"])
+
+
+@command("extension build", category="build", toolchain=("vsce",),
+         help="Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock")
+def extension_build(ctx: Ctx) -> Resource:
+    exe = _node(ctx)
+    problems = extension.manifest_findings(ctx.home)
+    if problems:
+        raise AgoraError("invalid-extension", "the extension's package.json is not valid: " + "; ".join(f.message for f in problems[:3]),
+                         exit=FAILED, detail={"findings": [f"{f.where}: {f.message}" for f in problems]})
+    out = ctx.home / "build" / extension.vsix_name(ctx.home)
+    rel = str(out.relative_to(ctx.home))
+    data = {"vsix": rel, "dry_run": ctx.dry_run, "changes": [{"path": rel, "change": "modify" if out.exists() else "create", "added": 0,
+                                                              "removed": 0, "diff": []}]}
+    if not ctx.dry_run:
+        resolved = ctx.toolchain().use(["vsce"])
+        done = extension.package(ctx.home, exe, str(resolved.path_of("vsce")), out, resolved.env())
+        if done.returncode != 0 or not out.is_file():
+            raise AgoraError("build", "vsce could not pack the extension: " + (done.stderr or done.stdout).strip()[-500:], exit=FAILED)
+        data["bytes"] = out.stat().st_size
+        data["files"] = extension.contents(out)
+    return Resource("extension", "if-console", data, actions=[next_command("check the extension", "check", sections=["extension"])])

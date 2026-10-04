@@ -137,7 +137,7 @@ class Completion(unittest.TestCase):
         self.assertIn("0020-spec-format", self.complete("spec", "show", "0020"))
         self.assertEqual(self.complete("requirement", "list", "--mechanism", ""), ["check", "gate", "none", "review"])
         self.assertIn("0042-agora/FR-001", self.complete("requirement", "show", "0042/FR-00"))
-        self.assertEqual(self.complete("check", "--suite", ""), ["browser", "images", "python", "spec"])
+        self.assertEqual(self.complete("check", "--suite", ""), ["browser", "extension", "images", "python", "spec"])
         self.assertIn("--suite", self.complete("check", "--s"))
         self.assertIn("specs", self.complete("check", "sp"))
 

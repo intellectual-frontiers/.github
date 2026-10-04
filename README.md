@@ -318,6 +318,7 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   | `figure`, `deck`, `email`, `media`, `sign` | `build`; `figure` also `generate` |
   | `course` | `show`, `build` |
   | `proposal` | `list`, `show`, `new`, `advance` (decision) |
+  | `extension` | `build` |
   | `skill` | `generate` |
   | `command` | `list`, `show` |
   | `toolchain` | `list`, `show`, `add` (setup: fetches and verifies the pinned programs) |
@@ -367,14 +368,43 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants
   a decision made drafts it with `agora proposal new`, a tracked file in
   `.agora/proposals/` that a person accepts with `agora proposal advance`.
-- The graphical interface is the VS Code extension `workspaces-host` ships: it shows
-  the resources agora returns, and runs their actions by calling agora, with a modal
+- The graphical interface is the VS Code extension IF Console (below): it shows the
+  resources agora returns, and runs their actions by calling agora, with a modal
   confirmation a person must click for any decision (0041 FR-050, FR-051). agora runs
   no server. `./agora mcp serve` serves its commands and the repository's resources to an AI agent
   over standard input and output, a write a dry run unless it says otherwise, and never
   a decision, which only a person makes.
 - To add a command: spec first (0042), then its individual in the ontology, then
   its code in a group under `tools/agora/groups/`.
+
+### IF Console (the VS Code extension)
+
+The Intellectual Frontiers Console, "IF Console" (`tools/if-console/`, 0043), is the one
+VS Code extension for every repository's command line, agora's included. It is a secondary
+interface: it finds a repository's launcher by that repository's own `.if-console.env` (this
+repository's names `./agora`), runs it with `--json`, and offers what it returns: a tree of
+nouns, commands and resources; a Chores view (checks, fresh, doctor, regenerate, proposals,
+toolchain fetches, help); findings in the Problems panel at file and line; checks as tasks and as
+tests; every command from the palette, with quick picks from each typed argument; a diff of what
+a write would change, before it is made; a modal confirmation for any decision; a status bar
+item; and each repository's MCP server registered with VS Code. It re-implements nothing,
+writes nothing itself, collects no telemetry and opens no network connection, and it runs
+nothing in a workspace VS Code does not trust.
+
+To install it, build the package and install the `.vsix`:
+
+```sh
+./agora extension build          # build/if-console-0.1.0.vsix (not committed); --dry-run says what it would write
+code --install-extension build/if-console-0.1.0.vsix   # or: Extensions, "...", Install from VSIX
+```
+
+The build needs only `python3` and `uv`: Node comes from the locked `nodejs-wheel-binaries`
+package and `@vscode/vsce` from the extension's own `package-lock.json`, fetched once into the
+toolchain cache. `./agora check extension` validates the manifest, lints the code and runs its
+unit tests (Node's test runner against a stand-in for the VS Code API, a fake second command
+line, and the real `./agora`). Update by building and installing again. A person who wants a
+repository's launcher that declares nothing adds its file name to the user setting
+`if-console.launchers`; no workspace can set it.
 
 ### Editing the ontology
 
