@@ -16,7 +16,8 @@ brand's web fonts, and token overrides under paragon/tokens/ that Paragon's `bui
 `write` writes the package's sources; `build` also runs Paragon's CLI (the paragon executable, such as
 node_modules/.bin/paragon) to write dist/, the CSS and files an Open edX instance or a managed host loads; `check`
 returns where the committed package differs from what `write` (and, given Paragon, `build`) would write, and every
-pair of built colors that misses 4.5:1. Standard library only; Pillow only for a brand without a favicon.ico.
+pair of built colors that misses 4.5:1. Standard library only; ImageMagick (`convert`) only for a brand without a
+favicon.ico.
 """
 from __future__ import annotations
 
@@ -29,8 +30,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-FONTS = ROOT / "design-systems" / "frontiers-course" / "web" / "fonts"
+FONTS = Path("frontiers-course") / "web" / "fonts"  # inside design-systems/: the web fonts the package carries
 WEB_FONTS = {"Inter": ("inter-variable-latin.woff2", "400 800"), "Source Serif 4": ("source-serif-4-variable-latin.woff2", "400 500")}
 # Paragon 23's light grays (tokens/src/themes/light/global/color.json); each is replaced by the brand's text mixed
 # into its surface at the same luminance, so every contrast Paragon was designed around holds.
@@ -106,6 +106,7 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
     """Every source file of the package, by path inside it."""
     tokens = json.loads((brand / "tokens.json").read_text(encoding="utf-8"))
     name = brand.name
+    fonts = brand.parent / FONTS
     logo = tokens["$extensions"]["com.intellectualfrontiers.logo"]
     lockups = logo["lockup"]["files"]
 
@@ -131,11 +132,11 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
     for family in (sans, serif):
         if family in WEB_FONTS:
             file, weights = WEB_FONTS[family]
-            out[f"paragon/fonts/{file}"] = (FONTS / file).read_bytes()
+            out[f"paragon/fonts/{file}"] = (fonts / file).read_bytes()
             faces.append(f'@font-face {{\n  font-family: "{family}";\n  font-style: normal;\n  font-weight: {weights};\n'
                          f'  font-display: swap;\n  src: url("./fonts/{file}") format("woff2");\n}}\n')
     for lic in ("LICENSES.md", "OFL-1.1.txt"):
-        out[f"paragon/fonts/{lic}"] = (FONTS / lic).read_bytes()
+        out[f"paragon/fonts/{lic}"] = (fonts / lic).read_bytes()
     out["paragon/_fonts.scss"] = "// The brand's web fonts, served beside the built CSS (dist/fonts/). Written by `agora openedx generate`.\n" + "\n".join(faces)
     out["paragon/core.scss"] = ("// Assembled by `paragon build-scss` into dist/core.css. Written by `agora openedx generate`.\n"
                                 '@use "./fonts";\n@use "./build/core/variables";\n')
@@ -183,26 +184,53 @@ def favicon(brand: Path) -> bytes:
     ico = brand / "images" / "favicon.ico"
     if ico.is_file():
         return ico.read_bytes()
-    from io import BytesIO
-    from PIL import Image
-    buf = BytesIO()
-    Image.open(brand / "images" / "favicon.png").save(buf, format="ICO", sizes=[(16, 16), (32, 32), (48, 48)])
-    return buf.getvalue()
+    return subprocess.run(["convert", str(brand / "images" / "favicon.png"), "-define", "icon:auto-resize=48,32,16", "ico:-"],
+                          check=True, capture_output=True).stdout
+
+
+def package_name(brand: Path) -> str:
+    return f"{brand.name}-openedx"
+
+
+def rendered(brand: Path, package: str) -> dict[str, bytes | str]:
+    """Every source file of the package as the text or bytes written, by path inside it."""
+    return {path: (json.dumps(data, indent=2, ensure_ascii=False) + "\n" if isinstance(data, (dict, list)) else data)
+            for path, data in files(brand, package).items()}
 
 
 def write(brand: Path, out: Path, package: str) -> None:
     for sub in ("paragon", "logo.svg"):
         if (out / sub).is_dir():
             shutil.rmtree(out / sub)
-    for path, data in files(brand, package).items():
+    for path, data in rendered(brand, package).items():
         dst = out / path
         dst.parent.mkdir(parents=True, exist_ok=True)
-        if isinstance(data, (dict, list)):
-            dst.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        elif isinstance(data, str):
+        if isinstance(data, str):
             dst.write_text(data, encoding="utf-8")
         else:
             dst.write_bytes(data)
+
+
+# What a package directory holds that its sources do not write: built by Paragon (dist), or by npm.
+UNOWNED = ("node_modules", "package-lock.json")
+
+
+def built(brand: Path, package: str, paragon: Path) -> dict[str, bytes | str]:
+    """The sources and the built dist/ as Paragon's CLI writes them, from a scratch directory, by path inside the package."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "pkg"
+        write(brand, out, package)
+        build(out, paragon)
+        got: dict[str, bytes | str] = {}
+        for f in sorted(out.rglob("*")):
+            rel = f.relative_to(out)
+            if f.is_file() and rel.parts[0] not in UNOWNED:
+                data = f.read_bytes()
+                try:
+                    got[str(rel)] = data.decode("utf-8")
+                except UnicodeDecodeError:
+                    got[str(rel)] = data
+        return got
 
 
 def build(out: Path, paragon: Path) -> None:

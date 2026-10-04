@@ -4,6 +4,7 @@ Thin: each calls library code (0041-command-line FR-024). Standard library only.
 """
 from __future__ import annotations
 
+import json
 import os
 import platform
 import re
@@ -16,8 +17,8 @@ from typing import Any
 
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
-from agora.core import plan
-from agora.core.checks import find_program
+from agora.core import generate, plan
+from agora.core.checks import changed_paths, find_program, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
@@ -31,6 +32,7 @@ GROUP = Dynamic("GROUP", "a command group", lambda c: list(c.registry.groups))
 COMMAND = Dynamic("COMMAND", "a command's words, as `command list` shows them", lambda c: list(c.registry.commands))
 CATEGORY = Choice("CATEGORY", CATEGORIES, "a command category")
 STATUS_OF_COMMAND = Choice("COMMAND_STATUS", ("implemented", "planned"), "whether a command is implemented or only declared")
+GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
 RUNNER = Choice("RUNNER", ("browser", "python"), "which kind of design system harness")
 
 
@@ -113,6 +115,71 @@ def command_show(ctx: Ctx, command: str) -> Resource:
 def check(ctx: Ctx, sections: list[str], scope: str | None, suite: str | None, changed: bool, since: str | None,
           runner: str | None, brand: str | None, paragon: str | None) -> Resource:
     return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon)
+
+
+# fresh -------------------------------------------------------------------------------------------------------------
+@command("fresh", category="check", help="Prove every generator's tracked output current, writing nothing", relocatable=False,
+         args=[Arg("generators", "GENERATOR", "the generators to prove; every one when none is named", many=True)],
+         options=[Opt("--changed", None, "prove only generators whose sources or outputs changed")])
+def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
+    reg = ctx.registry
+    explicit = bool(generators)
+    names = generators or [n for n, g in reg.generators.items() if g.status == "implemented"]
+    planned = [n for n in names if reg.generators[n].status == "planned"]
+    if planned:
+        raise AgoraError("not-implemented", f"generator {', '.join(planned)} is declared but not implemented yet; it proved nothing",
+                         exit=FAILED, actions=[next_command("prove what is implemented", "fresh")])
+    not_run = [{"name": n, "reason": "planned: not implemented yet"} for n, g in reg.generators.items()
+               if g.status == "planned"] if not explicit else []
+    skipped_unchanged: list[dict[str, str]] = []
+    if changed:
+        paths = changed_paths(ctx.root, None)
+        keep = []
+        for n in names:
+            run, why = section_changed(reg.generators[n].watch, paths)
+            (keep.append(n) if run else skipped_unchanged.append({"name": n, "reason": why}))
+        names = keep
+    rows = [generate.prove(ctx, reg.generators[n]) for n in names]
+    stale = [r for r in rows if r["status"] == "stale"]
+    skipped = [r for r in rows if r["status"] == "skipped"]
+    status = "stale" if stale else "skipped" if skipped else "fresh"
+    data = {"status": status, "generators": rows, "not_run": not_run, "skipped_unchanged": skipped_unchanged,
+            "summary": {"run": len(rows), "fresh": sum(r["status"] == "fresh" for r in rows), "stale": len(stale),
+                        "skipped": len(skipped)}}
+    res = Resource("fresh", " ".join(generators) or "all", data, text=_fresh_text,
+                   exit=FAILED if stale else MISSING if skipped else OK)
+    res.columns["generators"] = ["name", "status", "files"]
+    seen: set[str] = set()
+    for r in stale:
+        for f in r["stale"]:
+            c = f.get("call")
+            key = json.dumps(c, sort_keys=True)
+            if c and key not in seen:
+                seen.add(key)
+                res.actions.append(next_command(f"rewrite what {r['name']} writes", c["command"], **c["fields"]))
+    res.actions += [next_command(f"prove {r['name']} again", "fresh", generators=[r["name"]]) for r in stale + skipped]
+    return res
+
+
+def _fresh_text(res: Resource) -> str:
+    d = res.data
+    out: list[str] = []
+    for r in d["generators"]:
+        if r["status"] == "skipped":
+            out.append(f"⏭️  {r['name']}: skipped, {r['reason']}")
+        elif r["status"] == "stale":
+            for f in r["stale"]:
+                out.append(f"❎ {r['name']}: {f['path']} {f['why']}" + (f"; run `{f['rewrite']}`" if f["rewrite"] else ""))
+            out.append(f"❎ {r['name']}: {len(r['stale'])} stale of {r['files']} file(s)")
+        else:
+            out.append(f"✅ {r['name']}: {r['files']} file(s) current")
+    for s in d["skipped_unchanged"]:
+        out.append(f"⏭️  {s['name']}: not proved ({s['reason']})")
+    if d["not_run"]:
+        out.append("⏳ planned, not implemented yet, so not proved: " + ", ".join(s["name"] for s in d["not_run"]))
+    m = d["summary"]
+    out.append(f"fresh: {d['status']}: {m['run']} generator(s) proved, {m['stale']} stale, {m['skipped']} skipped")
+    return "\n".join(out)
 
 
 # test --------------------------------------------------------------------------------------------------------------
@@ -249,6 +316,7 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
     findings = [Finding("error", "tools/agora", p) for p in reg.validate()]
     findings += layout.check_layout(ctx.home, reg)
     findings += layout.check_workflows(ctx.home)
+    findings += layout.check_scripts(ctx.home)
     findings += layout.check_boundaries(ctx.home, reg.root_manifest.get("register_name"))
     ttl_path = ctx.home / "ontology" / "ifcore.ttl"
     onto = ontology.command_individuals(ttl_path.read_text(encoding="utf-8")) if ttl_path.is_file() else {}

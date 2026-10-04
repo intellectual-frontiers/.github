@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-"""Write a brand design system's assurance specimen from its tokens.json (0014-design-systems FR-028).
+"""A brand design system's assurance specimen, from its tokens.json (0014-design-systems FR-028; 0042-agora FR-015).
 
-    python3 tools/brand_specimen.py design-systems/<brand>
-
-The specimen shows every palette color as a swatch, every theme role, and every logo file at its native
+`agora brand generate` writes it and `agora fresh brand-specimen` proves it current. The specimen shows every palette color as a swatch, every theme role, and every logo file at its native
 size on the background its variant is for; the brand's integration suite checks it. Standard library only.
 """
 from __future__ import annotations
 
 import html
 import json
-import sys
 from pathlib import Path
+
+GENERATOR = "brand-specimen"
 
 
 def resolve(tokens: dict, value):
@@ -40,6 +38,7 @@ def specimen(brand: Path) -> str:
             for f in files if f.get("background", "light") == bg)
 
     return f'''<!doctype html>
+<!-- Written by agora's brand-specimen generator from tokens.json; do not edit: run `agora brand generate {html.escape(name)}`. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -89,10 +88,9 @@ def specimen(brand: Path) -> str:
 '''
 
 
-if __name__ == "__main__":
-    for arg in sys.argv[1:]:
-        brand = Path(arg)
-        out = brand / "assurance" / "fixtures" / "specimen.html"
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(specimen(brand), encoding="utf-8")
-        print(f"wrote {out}")
+def path_of(brand: Path) -> Path:
+    return brand / "assurance" / "fixtures" / "specimen.html"
+
+
+def generate(brand: Path) -> dict[Path, str]:
+    return {path_of(brand): specimen(brand)}

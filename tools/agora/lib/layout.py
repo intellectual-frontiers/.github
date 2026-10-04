@@ -101,3 +101,20 @@ def check_workflows(home: Path) -> list[Finding]:
             for m in re.finditer(r"(?<![\w.-])tools/(?!agora(?:/|\b))[\w./-]+", line):
                 out.append(Finding("error", f"{rel}:{n}", f"calls {m.group(0)}, a tool of this repository other than {NAME} (0042 FR-022)"))
     return out
+
+
+SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".js", ".mjs", ".cjs", ".ts")
+SKIP_DIRS = (".git", "node_modules", "__pycache__", ".agora", ".venv")
+
+
+def check_scripts(home: Path) -> list[Finding]:
+    """0042 FR-016: no script of this repository's own outside a design system's directory and tools/agora/ (SC-003)."""
+    out: list[Finding] = []
+    for dirpath, dirs, names in os.walk(home):
+        here = Path(dirpath).relative_to(home)
+        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and (here / d).parts not in (("design-systems",), ("tools", NAME)))
+        for n in sorted(names):
+            if n.endswith(SCRIPT_SUFFIXES):
+                out.append(Finding("error", str(here / n), f"a script outside design-systems/ and tools/{NAME}/: delete it once {NAME} "
+                                   "provides its function, and rewrite every reference to it (0042 FR-016)"))
+    return out

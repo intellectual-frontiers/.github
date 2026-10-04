@@ -2344,6 +2344,10 @@ ifcore:AgoraFigureBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "figure build" ;
     ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
     skos:definition "Builds a figure from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraFigureGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure generate"@en ;
+    dcterms:identifier "figure generate" ;
+    ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes the organization profile's figure from frontiers-figures and the brand."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraDeckBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "deck build"@en ;
     dcterms:identifier "deck build" ;
     ifcore:commandNoun ifcore:DeckResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;

@@ -70,6 +70,6 @@ jobs:
       - name: ImageMagick
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q imagemagick webp
+          sudo apt-get install -y -q imagemagick
       - name: Brand imagery
         run: ./agora check --suite images

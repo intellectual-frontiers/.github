@@ -1,11 +1,12 @@
 name = "assurance"
-help = "The design systems' assurance harnesses, each brand's imagery pool and share card, and its Open edX package"
+help = "The design systems' assurance harnesses, each brand's imagery pool and share card, its Open edX package, and the profile's figure"
 
 # Python packages the harnesses and the brand tools import (0041-command-line FR-003; 0042-agora FR-018), each to one
 # exact version, locked with hashes in agora.lock. Found by reading every harness and the scripts it imports:
 #   Pillow    frontiers-figures (svgkit.py), frontiers-media (media.py), frontiers-signage-print (signage.py) measure
-#             text with ImageFont; the Open edX package writer converts a favicon.png for a brand without a favicon.ico
-#   fontTools frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF
+#             text with ImageFont; the profile's figure generator draws with frontiers-figures
+#   fontTools frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF; the
+#             profile's figure embeds it
 #   lxml      frontiers-course's harness validates cmi5.xml against cmi5's schema
 [packages]
 Pillow = "12.3.0"
@@ -15,7 +16,7 @@ lxml = "6.1.3"
 # Programs outside Python (0041-command-line FR-006): the host supplies them. Each hint names the program or the
 # workspaces-host-v3 persona that supplies it, never the environment itself (0025-tooling-environment FR-012).
 [programs.node]
-needed_by = ["check design-systems --runner browser", "check design-systems --runner python (frontiers-course)", "check openedx"]
+needed_by = ["check design-systems --runner browser", "check design-systems --runner python (frontiers-course)", "check openedx", "openedx build"]
 hint = "install Node 22 from the host"
 
 [programs.chromium]
@@ -49,18 +50,15 @@ needed_by = ["check design-systems --runner python (frontiers-print)"]
 hint = "install poppler-utils from the host (the press persona carries it)"
 
 [programs.rsvg-convert]
-needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)"]
+needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)", "decoration generate", "decoration show --measure"]
 hint = "install librsvg (rsvg-convert) from the host (the press persona carries it)"
 
 [programs.convert]
-needed_by = ["check imagery"]
+needed_by = ["check imagery", "imagery build", "imagery show", "imagery add", "decoration generate", "decoration show --measure"]
 hint = "install ImageMagick, with WebP support, from the host"
 [programs.identify]
-needed_by = ["check imagery"]
+needed_by = ["check imagery", "imagery build", "imagery show", "imagery add", "decoration generate (trace)"]
 hint = "install ImageMagick from the host"
-[programs.cwebp]
-needed_by = ["imagery build"]
-hint = "install webp (cwebp) from the host"
 
 # What each kind of harness needs of the host. A program here that is missing skips the harness, naming it and its
 # hint, and makes the run exit 3 (0041-command-line FR-033); nothing is reported as passed that did not run.
@@ -99,3 +97,12 @@ help = "A brand's Open edX package is what is written from its tokens, and, with
 watch = ["design-systems/*/openedx/**", "design-systems/*/tokens.json", "design-systems/*/assurance/run.py", "tools/agora/lib/openedx.py"]
 scope = "BRAND"
 options = ["--paragon"]
+
+[nouns.figure]
+help = "A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044)"
+
+[generators.profile-figure]
+help = "The organization profile's figure: its semantic source and the themed default and on-dark images"
+sources = ["design-systems/frontiers-figures/**", "design-systems/frontiers-brand/tokens.json", "design-systems/frontiers-brand/fonts/**", "tools/agora/lib/profile_figure.py"]
+outputs = ["profile/figures/*.svg"]
+command = "figure generate"

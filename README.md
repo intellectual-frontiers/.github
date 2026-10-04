@@ -361,7 +361,7 @@ on every push that touches `design-systems/`.
   Use the `-dark-` variants on dark backgrounds.
 - Pictures: the brand's imagery pool, `design-systems/frontiers-brand/imagery/`; app icons and the share card in
   `design-systems/frontiers-brand/images/`; figures are drawn with `design-systems/frontiers-figures/` (the
-  profile's are made by agora's `profile-figure` generator).
+  profile's are written by `agora figure generate`, the `profile-figure` generator).
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one
