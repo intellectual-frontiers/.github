@@ -30,4 +30,4 @@ colors, typefaces and logo by loading that brand's `brand.tex` first, so the sam
    name their directory in `IF_FONTS_LICENSED`.
 
 Run the harness with `python3 assurance/run.py` (every brand beside it) or `--brand <slug>`; `--keep
-<dir>` keeps the PDFs. It needs TeX Live with XeLaTeX, LuaLaTeX and latexmk, and poppler-utils.
+<dir>` keeps the PDFs. It needs TeX Live with XeLaTeX, LuaLaTeX and latexmk, and the Python packages `pypdf` and `pypdfium2` (`pip install pypdf pypdfium2`), which read the PDFs; `agora` runs it in its locked environment.

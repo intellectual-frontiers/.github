@@ -13,10 +13,11 @@ from .register import known_repositories
 
 NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
-# 0042 FR-013: the check sections, and FR-014: the suites, as `sections`.
-SECTIONS = {"specs", "register", "controls", "ontology", "environment", "commands", "design-systems", "imagery", "openedx",
+# 0042 FR-013: the check sections, and FR-014: the suites, as `sections`. The `toolchain` and `extension` sections, and
+# their place in the spec and extension suites, come with the steps that add them.
+SECTIONS = {"specs", "register", "controls", "ontology", "commands", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
-SUITES = {"spec": {"specs", "register", "controls", "ontology", "environment", "commands"},
+SUITES = {"spec": {"specs", "register", "controls", "ontology", "commands"},
           "browser": {"design-systems --runner browser", "openedx"},
           "python": {"design-systems --runner python"},
           "images": {"imagery"}}

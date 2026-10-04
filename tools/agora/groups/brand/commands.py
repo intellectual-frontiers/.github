@@ -1,7 +1,8 @@
 """The brand group: `brand`, `imagery`, `ink` and `openedx`, and the generators `brand-theme`, `brand-specimen` and
 `openedx-sources` (0042-agora FR-006, FR-012, FR-015).
 
-Thin: the rules live in agora.lib. Standard library only; ImageMagick and Paragon come from the host.
+Thin: the rules live in agora.lib. Runs under this group's locked environment (Pillow for the images, nodejs-wheel-binaries
+for the Node Paragon's CLI runs on); Paragon itself is given by the person until the npm lock supplies it.
 """
 from __future__ import annotations
 
@@ -17,7 +18,7 @@ from agora.core import files
 from agora.core.generate import Generated, orphans
 from agora.core.registry import context_for, generator
 from agora.core.resource import FAILED, MISSING, USAGE
-from agora.lib import assurance, brand_specimen, brand_theme, brands, decoration, imagery, openedx, specs
+from agora.lib import assurance, brand_specimen, brand_theme, brands, decoration, imagery, node, openedx, specs
 
 
 # types -------------------------------------------------------------------------------------------------------------
@@ -162,7 +163,7 @@ def imagery_list(ctx: Ctx, brand: str) -> Resource:
     return res
 
 
-@command("imagery show", category="read", programs=("convert", "identify"),
+@command("imagery show", category="read",
          help="Show one piece: its catalog entry, and what its master measures (pixel size, content box, transparency, color)",
          args=[Arg("piece", "PIECE", "the piece, as <brand>/<piece>")])
 def imagery_show(ctx: Ctx, piece: str) -> Resource:
@@ -184,7 +185,7 @@ def imagery_show(ctx: Ctx, piece: str) -> Resource:
     return res
 
 
-@command("imagery build", category="build", programs=("convert", "identify"),
+@command("imagery build", category="generate",
          help="Write a brand's WebP files, share card and app icons from its masters and tokens",
          args=[Arg("brand", "BRAND", "the brand")])
 def imagery_build(ctx: Ctx, brand: str) -> Resource:
@@ -200,7 +201,7 @@ def _slug(path: Path) -> str:
     return path.name[:-4]
 
 
-@command("imagery add", category="record", programs=("convert", "identify"),
+@command("imagery add", category="record",
          help="Add a master to a brand's pool: copy it byte for byte, measure it, and catalog it (then build its WebP files)",
          args=[Arg("brand", "BRAND", "the brand")],
          options=[Opt("--master", "TEXT", "the approved PNG; its file name without .png is the piece's id", required=True),
@@ -338,11 +339,15 @@ def openedx_generate(ctx: Ctx, brand: str) -> Resource:
                              next_command("check it", "check", sections=["openedx"], scope=brand)])
 
 
-@command("openedx build", category="build", programs=("node",),
+@command("openedx build", category="build",
          help="Write a brand's Open edX package sources and build dist/ with Paragon's CLI",
          args=[Arg("brand", "BRAND", "the brand")],
          options=[Opt("--paragon", "TEXT", "Paragon's CLI, such as node_modules/.bin/paragon (PARAGON in the environment otherwise)")])
 def openedx_build(ctx: Ctx, brand: str, paragon: str | None) -> Resource:
+    if node.node_path(ctx.env) is None:
+        raise AgoraError("missing-program", "openedx build needs node, which comes from the package " + node.PACKAGE
+                         + (f"; {node.OVERRIDE} names {node.override(ctx.env)}, which is not a file" if node.override(ctx.env) else ""),
+                         exit=MISSING, detail={"package": node.PACKAGE})
     cli = assurance.paragon_path(paragon, ctx.env)
     if cli is None or not cli.is_file():
         raise AgoraError("missing-program", "Paragon's CLI was " + ("not a file: " + str(cli) if cli else "not given")
@@ -355,6 +360,17 @@ def openedx_build(ctx: Ctx, brand: str, paragon: str | None) -> Resource:
     changes = files.apply(ctx, {**gd.files, **{p: None for p in orphans(gd)}})
     return Resource("openedx", brand, {"brand": brand, "paragon": str(cli), "dry_run": ctx.dry_run, "changes": changes},
                     actions=[next_command("check it", "check", sections=["openedx"], scope=brand, paragon=str(cli))])
+
+
+@generator("brand-imagery")
+def gen_imagery(ctx: Ctx, scope: str | None) -> Generated:
+    gd = Generated()
+    for n in [scope] if scope else _brands(ctx):
+        b = _brand_dir(ctx, n)
+        for path, data in imagery.build_changes(b).items():
+            gd.files[path] = data
+            gd.calls[path] = Call("imagery build", {"brand": n})
+    return gd
 
 
 @generator("openedx-sources")

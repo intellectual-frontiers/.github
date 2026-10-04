@@ -12,7 +12,7 @@ from agora.core.registry import Registry
 from agora.groups.decoration import commands as deco
 from agora.lib import brand_specimen, brand_theme, brands, decoration, imagery, openedx
 
-from .brandfix import HAS_MAGICK, Repo, png, tree, webp_works
+from .brandfix import HAS_PILLOW, Repo, png, tree, webp_works
 from .helpers import HOME, run_json
 
 GPL = "GIMP Palette\nName: Test card\nColumns: 3\n# comment\n 33  78 162  Blue 1\n 31 119 117  Teal 2\n200  10  10  Red 3\n"
@@ -117,7 +117,7 @@ class Ink(Repo):
         import io
         from agora.core.cli import main
         main(["ink", "record", "mini-brand/text", "--spot", "s", "--thread", "1", "--by", "Q. Person", "--on", "2026-10-10"],
-             home=self.root, stdout=io.StringIO(), stderr=io.StringIO(), env={"PATH": "/usr/bin"})
+             home=self.root, stdout=io.StringIO(), stderr=io.StringIO(), env={"PATH": "/usr/bin", "AGORA_PLAN_GROUP": "brand"})
         logs = "".join(f.read_text() for f in (self.root / ".agora" / "logs").glob("*.ndjson"))
         self.assertIn("ink record", logs)
         self.assertNotIn("Q. Person", logs)
@@ -131,7 +131,7 @@ class Ink(Repo):
         self.assertEqual(decoration.match("#c80a0a", [pal], 1)[0]["color"], "Red 3")
 
 
-@unittest.skipUnless(HAS_MAGICK, "needs ImageMagick")
+@unittest.skipUnless(HAS_PILLOW, "needs Pillow")
 class Imagery(Repo):
     def setUp(self):
         super().setUp()
@@ -202,7 +202,7 @@ class Imagery(Repo):
         self.assertFalse(d["agrees"])
         self.assertIn("pixel_size", d["problems"][0])
 
-    @unittest.skipUnless(webp_works(), "needs ImageMagick with WebP support")
+    @unittest.skipUnless(webp_works(), "needs Pillow with WebP support")
     def test_imagery_build_writes_the_webp_files_and_the_share_card(self):  # 0014 FR-037, FR-043
         self.go("imagery", "add", "mini-brand", "--master", str(self.master()), *self.ADD)
         before = tree(self.root)
@@ -216,29 +216,46 @@ class Imagery(Repo):
         self.assertEqual(imagery.size(self.brand / "images" / "share-card.png"), [1200, 630])
         self.assertEqual(self.go("imagery", "build", "mini-brand")[1]["data"]["changes"], [])  # nothing left to write
 
+    @unittest.skipUnless(webp_works(), "needs Pillow with WebP support")
+    def test_the_files_pillow_writes_are_what_the_catalog_and_the_tokens_say(self):  # 0042 FR-030: Pillow in place of ImageMagick
+        from PIL import Image
+        self.go("imagery", "add", "mini-brand", "--master", str(self.master()), *self.ADD)
+        self.assertEqual(self.go("imagery", "build", "mini-brand")[0], 0)
+        for name, size in (("forest-fire-tower-20.webp", (20, 15)), ("forest-fire-tower-40.webp", (40, 30))):
+            with Image.open(self.brand / "imagery" / "web" / name) as im:
+                self.assertEqual((im.format, im.size), ("WEBP", size))
+                self.assertIn("A", im.convert("RGBA").getbands())
+                self.assertLess(im.convert("RGBA").getchannel("A").getextrema()[0], 16)  # the transparency survived
+        with Image.open(self.brand / "images" / "share-card.png") as im:
+            self.assertEqual((im.format, im.size), ("PNG", (1200, 630)))
+        again = {p: p.read_bytes() for p in (self.brand / "imagery" / "web").glob("*.webp")}
+        self.go("imagery", "build", "mini-brand")
+        self.assertEqual({p: p.read_bytes() for p in again}, again)  # the same bytes every time
+
     def test_building_in_place_and_building_elsewhere_write_the_same_bytes(self):
         if not webp_works():
-            self.skipTest("needs WebP support")
+            self.skipTest("needs Pillow with WebP support")
         self.go("imagery", "add", "mini-brand", "--master", str(self.master()), *self.ADD)
         imagery.build(self.brand)
         for path, data in imagery.build_changes(self.brand).items():
             self.assertEqual(path.read_bytes(), data, path.name)
 
 
-class Missing(Repo):
-    def test_a_command_without_its_program_says_so_and_exits_3(self):  # 0041 FR-006, FR-021
+class NoHostPrograms(Repo):
+    def test_the_image_and_decoration_commands_run_no_program_of_the_host(self):  # 0042 FR-030
+        reg = Registry.load(HOME)
+        for cid in ("imagery build", "imagery show", "imagery add", "decoration generate", "decoration show", "openedx build"):
+            self.assertEqual(reg.commands[cid].programs, (), cid)
+        for g in ("brand", "decoration"):
+            self.assertEqual(reg.groups[g].programs, {})
+        self.assertIn("Pillow", reg.groups["brand"].packages)
+        self.assertTrue({"Pillow", "potracer", "resvg-py", "uharfbuzz"} <= set(reg.groups["decoration"].packages))
+
+    def test_a_command_run_with_no_path_still_runs(self):  # nothing is found on the host's PATH
         from unittest import mock
         with mock.patch.dict(os.environ, {"PATH": "/nonexistent"}):
-            for argv in (["imagery", "build", "mini-brand"], ["imagery", "show", "mini-brand/x"]):
-                code, doc = self.go(*argv)
-                self.assertIn(code, (2, 3), argv)  # a piece that does not exist is refused first
-            code, doc = self.go("imagery", "build", "mini-brand")
-            self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
-            self.assertIn("ImageMagick", doc["data"]["hint"])
-            code, doc = self.go("decoration", "generate", "mini-brand", plan="decoration")
-            self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
-            self.assertIn("potrace", doc["data"]["programs"])
-            self.assertIn("potrace", doc["data"]["message"])
+            self.assertEqual(self.go("imagery", "build", "mini-brand", "--dry-run")[0], 0)
+            self.assertEqual(self.go("decoration", "generate", "mini-brand", "--only", "set", "--dry-run")[0], 0)
 
 
 class Decoration(Repo):
@@ -252,7 +269,11 @@ class Decoration(Repo):
             kit[part]["traced-from"] = dict(self.TRACE)
             kit[part]["finest-detail"] = 0
         (self.brand / "tokens.json").write_text(decoration.dumps(t))
-        self.fake_programs("convert", "identify", "potrace", "rsvg-convert")
+        png(self.brand / "logos" / "master.png", "40x30", transparent=True)  # a red block on nothing: ink to trace
+        from unittest import mock
+        patch = mock.patch.object(decoration, "MEASURE_WIDTH", 160)  # the measure is slow at full size
+        patch.start()
+        self.addCleanup(patch.stop)
 
     def test_decoration_show_reports_the_kit(self):
         code, doc = self.go("decoration", "show", "mini-brand", plan="decoration")
@@ -269,7 +290,7 @@ class Decoration(Repo):
         self.assertIn("traced from logos/master.png", svg)
         self.assertNotIn("metadata", svg)
         kit = brands.tokens_of(self.brand)["$extensions"][decoration.KIT]
-        self.assertTrue(0 < kit["lockup"]["finest-detail"] <= 1)  # measured from the (fake) render, and written back
+        self.assertTrue(0 < kit["lockup"]["finest-detail"] <= 1)  # measured from the render, and written back
         self.assertEqual(kit["lockup"]["finest-detail"], kit["icon"]["finest-detail"])
         self.assertEqual(len(doc["data"]["made"]), 2)
 
@@ -290,22 +311,39 @@ class Decoration(Repo):
         (self.brand / "tokens.json").write_text(decoration.dumps(t))
         self.assertEqual(self.go("decoration", "generate", "mini-brand", plan="decoration")[0], 2)
 
-    def test_the_wordmark_is_set_by_harfbuzz_to_the_committed_bytes(self):  # needs uharfbuzz, from the group's lock
-        uv = shutil.which("uv", path=os.environ.get("ORIG_PATH") or None) or shutil.which("uv", path="/usr/local/bin:/usr/bin:/root/.local/bin")
-        if not uv:
-            self.skipTest("needs uv")
-        lock = HOME / "tools" / "agora" / "groups" / "decoration" / "agora.lock"
-        code = ("import sys, json; sys.path.insert(0, %r); from pathlib import Path; from agora.lib import decoration as d; "
-                "b = Path(%r); t = json.loads((b/'tokens.json').read_text()); a = t['$extensions'][d.KIT]['wordmark']; s = a['set-from']; "
-                "name = ' / '.join(l if isinstance(l, str) else l['text'] for l in s['lines']); "
-                "sys.stdout.write(d.typeset(b, s, f\"{b.name} wordmark, one color, set in {s['font']} (opsz {s['opsz']}, wght {s['wght']}): {name}\"))"
-                % (str(HOME / "tools"), str(HOME / "design-systems" / "frontiers-brand")))
-        p = subprocess.run([uv, "run", "--no-project", "--offline", "--with-requirements", str(lock), "python", "-c", code],
-                           capture_output=True, text=True, env={k: v for k, v in os.environ.items() if k != "PATH"} | {"PATH": "/usr/local/bin:/usr/bin:/bin:/root/.local/bin"})
-        if p.returncode != 0:
-            self.skipTest(f"the decoration group's environment is not available offline: {p.stderr.strip()[-120:]}")
-        committed = (HOME / "design-systems" / "frontiers-brand" / "logos" / "vector" / "if-wordmark-one-color-2026-Sept.svg").read_text()
-        self.assertEqual(p.stdout, committed)
+    def test_the_wordmark_is_set_by_harfbuzz_to_the_committed_bytes(self):  # uharfbuzz is the decoration group's package
+        b = HOME / "design-systems" / "frontiers-brand"
+        a = json.loads((b / "tokens.json").read_text(encoding="utf-8"))["$extensions"][decoration.KIT]["wordmark"]
+        spec = a["set-from"]
+        name = " / ".join(l if isinstance(l, str) else l["text"] for l in spec["lines"])
+        text = decoration.typeset(b, spec, f"{b.name} wordmark, one color, set in {spec['font']} (opsz {spec['opsz']}, wght {spec['wght']}): {name}")
+        self.assertEqual(text, (b / "logos" / "vector" / "if-wordmark-one-color-2026-Sept.svg").read_text())
+
+    def test_the_trace_draws_the_ink_of_the_master_and_nothing_else(self):  # 0042 FR-030: potracer in place of potrace
+        import io
+        import resvg_py
+        from PIL import Image, ImageDraw
+        master = self.root / "ring.png"
+        ring = Image.new("RGBA", (48, 48), (0, 0, 0, 0))
+        d = ImageDraw.Draw(ring)
+        d.ellipse((6, 8, 41, 39), fill="#101010")
+        d.ellipse((17, 18, 30, 29), fill=(0, 0, 0, 0))  # a hole, so the winding of the outlines matters
+        ring.save(master)
+        width, height, svg = decoration.trace_master(master, 4, 0.5, 2)
+        self.assertEqual((width, height), (48, 48))
+        art = decoration.clean(svg, width, height, "ring").replace("currentColor", "#000000")
+        drawn = Image.open(io.BytesIO(bytes(resvg_py.svg_to_bytes(svg_string=art, width=48, background="white")))).convert("L")
+        want = Image.new("RGBA", ring.size, "white")
+        want.alpha_composite(ring)
+        want = want.convert("L")
+        wrong = sum(abs(a - b) > 128 for a, b in zip(drawn.tobytes(), want.tobytes()))
+        self.assertLess(wrong, 48 * 48 * 0.02)  # the trace agrees with the master almost everywhere, hole and all
+        self.assertEqual(svg.count("<path"), 1)
+        self.assertNotIn("potrace", svg.lower())
+
+    def test_the_trace_is_repeatable(self):
+        master = self.brand / "logos" / "master.png"
+        self.assertEqual(decoration.trace_master(master, 4, 0.5, 2), decoration.trace_master(master, 4, 0.5, 2))
 
 
 class OpenEdx(Repo):
@@ -358,10 +396,31 @@ class OpenEdx(Repo):
         self.assertFalse((self.brand / "openedx" / "paragon" / "build").exists())
         self.assertEqual(self.go("fresh", "openedx-sources")[0], 0)  # dist/ is Paragon's, not a source
 
-    def test_the_package_needs_no_pillow(self):
-        self.assertNotIn("PIL", Path(openedx.__file__).read_text())
-        ico = openedx.favicon(self.brand) if (self.brand / "images" / "favicon.ico").is_file() else b""
-        self.assertEqual(ico, b"ico")
+    def test_the_favicon_a_brand_has_is_used_as_it_is_and_one_it_lacks_is_drawn_by_pillow(self):
+        self.assertEqual(openedx.favicon(self.brand), b"ico")  # make_repo gave this brand a favicon.ico
+        (self.brand / "images" / "favicon.ico").unlink()
+        png(self.brand / "images" / "favicon.png", "64x64", transparent=True)
+        import io
+        from PIL import Image
+        with Image.open(io.BytesIO(openedx.favicon(self.brand))) as ico:
+            self.assertEqual(sorted(ico.info["sizes"]), [(16, 16), (32, 32), (48, 48)])
+
+    def test_paragon_runs_on_the_locked_node_not_the_hosts(self):  # 0042 FR-030
+        cli = self.root / "paragon"
+        cli.write_text("#!/usr/bin/env node\nrequire('fs').writeFileSync('node-used.txt', process.execPath)\n")
+        cli.chmod(0o755)
+        out = self.root / "pkg"
+        out.mkdir()
+        from unittest import mock
+        with mock.patch.dict(os.environ, {"PATH": "/usr/bin:/bin"}):
+            try:
+                openedx.build(out, cli)
+            except (OSError, Exception):
+                pass  # the stand-in writes no CSS; only which node ran it matters
+        used = (out / "node-used.txt").read_text()
+        from agora.lib import node
+        self.assertEqual(used, node.wheel_node())
+        self.assertNotEqual(used, shutil.which("node", path="/usr/bin:/bin:/opt/node22/bin") or "")
 
 
 class Types(Repo):

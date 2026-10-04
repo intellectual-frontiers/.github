@@ -1,9 +1,14 @@
 name = "brand"
 help = "A brand's theme and specimen, imagery pool, ink verification and Open edX package"
 
-# This group pins no package: the brand tools need only the standard library and the programs the host supplies
-# (ImageMagick for imagery, Node and Paragon for the Open edX build). Those programs are declared with the assurance
-# group's, whose checks need them too.
+# Python packages the brand tools import (0041-command-line FR-003; 0042-agora FR-018), each to one exact version, locked with
+# hashes in agora.lock. Found by reading the libraries:
+#   Pillow                 `imagery` reads the masters and writes the WebP, PNG and ICO files; `openedx generate` writes the
+#                          favicon of a brand that has none (0042-agora FR-030: Pillow in place of ImageMagick)
+#   nodejs-wheel-binaries  the Node that Paragon's CLI runs on in `openedx build` (in place of a host Node)
+[packages]
+Pillow = "12.3.0"
+nodejs-wheel-binaries = "22.20.0"
 
 [nouns.brand]
 help = "A brand design system: tokens.json and what is written from it (0014-design-systems FR-028)"
@@ -27,6 +32,12 @@ help = "A brand's assurance specimen, from its tokens.json"
 sources = ["design-systems/*/tokens.json"]
 outputs = ["design-systems/*/assurance/fixtures/specimen.html"]
 command = "brand generate"
+
+[generators.brand-imagery]
+help = "A brand's WebP files, share card, app icons and favicon, from its masters and tokens"
+sources = ["design-systems/*/imagery/*.png", "design-systems/*/imagery/catalog.json", "design-systems/*/logos/*.png", "design-systems/*/images/favicon.png", "design-systems/*/tokens.json", "tools/agora/lib/imagery.py"]
+outputs = ["design-systems/*/imagery/web/**", "design-systems/*/images/share-card.png", "design-systems/*/images/favicon.ico", "design-systems/*/images/icons/**"]
+command = "imagery build"
 
 [generators.openedx-sources]
 help = "A brand's Open edX package sources (everything but the built dist/), from its tokens.json, logos and fonts"

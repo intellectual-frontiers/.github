@@ -107,27 +107,6 @@ class SpecCommands(TempRepo):
         code, doc = run_json(["requirement", "show", "0001/FR-001", "--root", str(self.root)])
         self.assertEqual((doc["data"]["mechanism"], doc["data"]["text"]), ("none", "A thing MUST hold."))
 
-    def test_environment_moves_the_pin_and_the_tag_together(self):
-        new = "c" * 40
-        self.run_here("spec", "list")
-        code, doc = self.run_here("environment", "set", new, "--dry-run")
-        self.assertEqual((code, len(doc["data"]["changes"])), (0, 2))
-        self.assertIn("a" * 40, (self.root / "tools/reference-environment").read_text())
-        self.assertEqual(self.run_here("environment", "set", new)[0], 0)
-        self.assertIn(new, (self.root / "tools/reference-environment").read_text())
-        self.assertIn("sha-ccccccc", (self.root / ".devcontainer/devcontainer.json").read_text())
-        self.assertEqual(run_json(["check", "environment", "--root", str(self.root)])[0], 0)
-        code, doc = run_json(["environment", "show", "--root", str(self.root)])
-        self.assertEqual((doc["data"]["agree"], doc["data"]["commit"]), (True, new))
-
-    def test_environment_set_changes_neither_without_the_other(self):
-        self.run_here("spec", "list")
-        (self.root / ".devcontainer/devcontainer.json").write_text('{"name": "x"}')
-        code, doc = self.run_here("environment", "set", "d" * 40)
-        self.assertEqual(code, 2)
-        self.assertIn("a" * 40, (self.root / "tools/reference-environment").read_text())
-        self.assertEqual(self.run_here("environment", "set", "short")[0], 2)
-
     def test_no_command_commits_or_pushes(self):
         import re
         src = "\n".join(p.read_text() for p in (HOME / "tools/agora").rglob("*.py") if "tests" not in p.parts)
@@ -193,7 +172,12 @@ class OtherCommands(unittest.TestCase):
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
         self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv", "python3"])
-        self.assertEqual(doc["data"]["programs"][0]["program"], "git")
+        self.assertEqual(doc["data"]["programs"], [])  # no host program is declared once the packages replace them (0042 FR-030)
+
+    def test_doctor_lists_every_opt_in_override_that_is_set(self):  # 0025 FR-019
+        code, doc = run_json(["doctor"], env={"AGORA_NODE": "/no/such/node"})
+        self.assertEqual(doc["data"]["overrides"], [{"entry": "node", "variable": "AGORA_NODE", "path": "/no/such/node", "present": False}])
+        self.assertEqual(run_json(["doctor"])[1]["data"]["overrides"], [])
 
     def test_doctor_fails_on_a_registry_conflict(self):
         from agora.core.registry import Command, Registry

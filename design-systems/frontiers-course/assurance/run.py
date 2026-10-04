@@ -193,7 +193,7 @@ def targets(check) -> None:
         except build.BuildError:
             check(True, "")
     node = shutil.which("node")
-    check(bool(node), "Node is not installed, so quiz.js and cmi5.js went untested (FR-018)")
+    check(bool(node), "Node is not on PATH (pip install nodejs-wheel-binaries gives one), so quiz.js and cmi5.js went untested (FR-018)")
     if node:
         out = subprocess.run([node, str(HERE / "js.test.mjs")], input=json.dumps(m), capture_output=True, text=True)
         try:

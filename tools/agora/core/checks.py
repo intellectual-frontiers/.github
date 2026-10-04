@@ -1,6 +1,7 @@
 """Check sections, suites and `--changed` (0041-command-line FR-028, FR-031 to FR-033)."""
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -74,23 +75,18 @@ def glob_regex(pattern: str) -> re.Pattern[str]:
     return re.compile(out + "$")
 
 
-def changed_paths(root: Path, since: str | None = None) -> list[str]:
-    """Files Git reports as changed in the working tree, staged, or untracked, or that differ from `since`."""
-    if shutil.which("git") is None:
-        raise AgoraError("missing-program", "git is needed for --changed and is not on PATH",
-                         exit=MISSING, detail={"program": "git", "hint": "install git from the host"})
-    def git(*args: str) -> str:
-        p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
-        if p.returncode != 0:
-            raise AgoraError("git", f"git {' '.join(args)} failed: {p.stderr.strip()}", exit=USAGE)
-        return p.stdout
-    paths: set[str] = set()
-    for line in git("status", "--porcelain", "-z", "--untracked-files=all").split("\0"):
-        if len(line) > 3:
-            paths.add(line[3:])
-    if since:
-        paths.update(p for p in git("diff", "--name-only", since).splitlines() if p)
-    return sorted(paths)
+def changed_paths(ctx: Any, since: str | None = None) -> list[str]:
+    """Files Git reports as changed in the working tree, staged, or untracked, or that differ from `since`.
+
+    Read with the pinned dulwich package, never a `git` program (0042-agora FR-030): the vcs group's locked environment
+    runs agora.lib.gitstate and prints the paths."""
+    from . import plan
+    py = plan.prepare(ctx.registry, "vcs", offline=ctx.offline, command="check --changed")
+    p = subprocess.run([str(py), "-m", "agora.lib.gitstate", str(ctx.root), since or ""], capture_output=True, text=True,
+                       env={**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "PYTHONDONTWRITEBYTECODE": "1"})
+    if p.returncode != 0:
+        raise AgoraError("git", f"could not read Git's state: {p.stderr.strip()[-300:]}", exit=USAGE)
+    return json.loads(p.stdout)
 
 
 def section_changed(watch: tuple[str, ...], changed: list[str]) -> tuple[bool, str]:

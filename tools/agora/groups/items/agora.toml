@@ -3,15 +3,17 @@ help = "What the item design systems' scripts build, and the checks of their wor
 
 # Python packages the item scripts import (0041-command-line FR-003; 0042-agora FR-018), each to one exact version, locked
 # with hashes in agora.lock. Found by reading the scripts:
-#   Pillow    frontiers-figures (svgkit.py), frontiers-media and frontiers-signage-print measure text with ImageFont
-#   fontTools frontiers-figures (theme.py) and frontiers-course (build.py) cut the brand's sans for --embed-fonts and the web edition
+#   Pillow     frontiers-figures (svgkit.py), frontiers-media and frontiers-signage-print measure text with ImageFont
+#   fontTools  frontiers-figures (theme.py) and frontiers-course (build.py) cut the brand's sans for --embed-fonts and the
+#              web edition; frontiers-signage-print cuts the sans it embeds in a PDF
+#   resvg-py   frontiers-media renders its SVG to PNG with fonts/ alone, in place of rsvg-convert (0042-agora FR-030)
+#   reportlab  frontiers-signage-print writes the sign's vector PDF, in place of rsvg-convert
 # The voice, slides, email, course and merchandise scripts need only the standard library, and run here beside them.
 [packages]
 Pillow = "12.3.0"
 fonttools = "4.66.1"
-
-# The programs outside Python these commands need are declared with the assurance group's, whose harnesses need them
-# too: rsvg-convert renders `media build` and `sign build`.
+reportlab = "5.0.1"
+resvg-py = "0.5.0"
 
 [nouns.deck]
 help = "A slide deck written in Markdown and built by frontiers-slides (0014-design-systems FR-040)"

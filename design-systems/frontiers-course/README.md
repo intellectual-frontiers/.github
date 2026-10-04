@@ -13,7 +13,7 @@ platform. Its rules are [`spec.md`](spec.md); governed by
 | `adoc.py` | The AsciiDoc subset a course is written in, read and rendered without Asciidoctor; anything outside it is refused. |
 | `schema/course.schema.json` | The model, as JSON Schema 2020-12. |
 | `limits.json` | Outcome verbs, lesson types and their minutes, item types, and the pacing and accessibility limits. |
-| `assurance/` | `python3 assurance/run.py`: a fixture course that must pass, edits of it that must fail, and every target built under every brand and checked (`js.test.mjs` in Node for the scripts, cmi5's XSD with lxml); `node assurance/run.mjs --brand SLUG`: the web edition in Chromium. |
+| `assurance/` | `python3 assurance/run.py`: a fixture course that must pass, edits of it that must fail, and every target built under every brand and checked (`js.test.mjs` in Node for the scripts, cmi5's XSD with lxml; it needs `node` on PATH, which `pip install nodejs-wheel-binaries` supplies, and the Python packages lxml and fonttools, which `agora` supplies from its locked environment); `node assurance/run.mjs --brand SLUG`: the web edition in Chromium. |
 
 See `assurance/fixtures/pass/fermi-estimation/` for a course: two units, every lesson type (reading, video,
 exercise, discussion) and every item type (multiple choice, multiple response, numeric, text match). `course.py`

@@ -3,22 +3,32 @@ help = "The design systems' assurance harnesses, each brand's imagery pool and s
 
 # Python packages the harnesses and the brand tools import (0041-command-line FR-003; 0042-agora FR-018), each to one
 # exact version, locked with hashes in agora.lock. Found by reading every harness and the scripts it imports:
-#   Pillow    frontiers-figures (svgkit.py), frontiers-media (media.py), frontiers-signage-print (signage.py) measure
-#             text with ImageFont; the profile's figure generator draws with frontiers-figures
-#   fontTools frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF; the
-#             profile's figure embeds it
-#   lxml      frontiers-course's harness validates cmi5.xml against cmi5's schema
+#   Pillow                 frontiers-figures (svgkit.py), frontiers-media (media.py), frontiers-signage-print (signage.py)
+#                          measure text with ImageFont; the imagery checks and the Open edX favicon read and write images
+#                          (in place of ImageMagick); the profile's figure generator draws with frontiers-figures
+#   fontTools              frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF;
+#                          frontiers-signage-print cuts the sans it embeds in a PDF
+#   lxml                   frontiers-course's harness validates cmi5.xml against cmi5's schema
+#   pypdf, pypdfium2       frontiers-print and frontiers-signage-print read the PDFs they build: page size, fonts, images
+#                          (pypdf, BSD-3-Clause) and the text layer (pypdfium2, Apache-2.0 or BSD-3-Clause), in place of
+#                          poppler's pdfinfo, pdffonts, pdfimages and pdftotext
+#   reportlab              frontiers-signage-print writes the sign's vector PDF (BSD-3-Clause), in place of rsvg-convert
+#   resvg-py               frontiers-figures and frontiers-media render SVG with the design systems' own fonts alone, in
+#                          place of rsvg-convert
+#   nodejs-wheel-binaries  the Node the browser harnesses, the course's script tests and Paragon's CLI run on (lib/node.py)
 [packages]
 Pillow = "12.3.0"
 fonttools = "4.66.1"
 lxml = "6.1.3"
+nodejs-wheel-binaries = "22.20.0"
+pypdf = "6.19.0"
+pypdfium2 = "5.14.0"
+reportlab = "5.0.1"
+resvg-py = "0.5.0"
 
-# Programs outside Python (0041-command-line FR-006): the host supplies them. Each hint names the program or the
-# workspaces-host-v3 persona that supplies it, never the environment itself (0025-tooling-environment FR-012).
-[programs.node]
-needed_by = ["check design-systems --runner browser", "check design-systems --runner python (frontiers-course)", "check openedx", "openedx build"]
-hint = "install Node 22 from the host"
-
+# Programs outside Python (0041-command-line FR-006): the host supplies them until the toolchain lock supplies them
+# (0042-agora FR-030). Each hint names the program, never the environment itself (0025-tooling-environment FR-012).
+# Everything else the harnesses once needed from the host is a package above: Node, poppler, librsvg, ImageMagick.
 [programs.chromium]
 needed_by = ["check design-systems --runner browser"]
 hint = "install Chromium through Playwright (npx playwright install chromium), or set PLAYWRIGHT_BROWSERS_PATH to where it is"
@@ -28,59 +38,25 @@ probe_globs = ["chromium-*/chrome-linux*/chrome", "chromium_headless_shell-*/chr
 
 [programs.latexmk]
 needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with latexmk from the host (the press persona carries it)"
+hint = "install TeX Live with latexmk on the host until the toolchain lock supplies it (0042 FR-030)"
 [programs.xelatex]
 needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with XeLaTeX from the host (texlive-xetex; the press persona carries it)"
+hint = "install TeX Live with XeLaTeX on the host until the toolchain lock supplies it (0042 FR-030)"
 [programs.lualatex]
 needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with LuaLaTeX from the host (texlive-luatex; the press persona carries it)"
-
-[programs.pdfinfo]
-needed_by = ["check design-systems --runner python (frontiers-print, frontiers-signage-print)"]
-hint = "install poppler-utils from the host (the press persona carries it)"
-[programs.pdffonts]
-needed_by = ["check design-systems --runner python (frontiers-print, frontiers-figures, frontiers-signage-print)"]
-hint = "install poppler-utils from the host (the press persona carries it)"
-[programs.pdftotext]
-needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install poppler-utils from the host (the press persona carries it)"
-[programs.pdfimages]
-needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install poppler-utils from the host (the press persona carries it)"
-
-[programs.rsvg-convert]
-needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)", "decoration generate", "decoration show --measure", "media build", "sign build"]
-hint = "install librsvg (rsvg-convert) from the host (the press persona carries it)"
-
-[programs.convert]
-needed_by = ["check imagery", "check openedx (a brand without a favicon.ico)", "check design-systems (frontiers-brand's Open edX harness)", "imagery build", "imagery show", "imagery add", "decoration generate", "decoration show --measure", "openedx generate (a brand without a favicon.ico)"]
-hint = "install ImageMagick, with WebP support, from the host"
-[programs.identify]
-needed_by = ["check imagery", "imagery build", "imagery show", "imagery add", "decoration generate (trace)"]
-hint = "install ImageMagick from the host"
+hint = "install TeX Live with LuaLaTeX on the host until the toolchain lock supplies it (0042 FR-030)"
 
 # What each kind of harness needs of the host. A program here that is missing skips the harness, naming it and its
 # hint, and makes the run exit 3 (0041-command-line FR-033); nothing is reported as passed that did not run.
 [runners.browser]
-programs = ["node", "chromium"]
+programs = ["chromium"]
 [runners.python]
 programs = []
 
 # What one harness needs beyond its kind: `programs` it cannot run without, and `optional` programs it checks
 # without and says it did not exercise (found by reading each harness).
 [harnesses."frontiers-print:python"]
-programs = ["latexmk", "xelatex", "lualatex", "pdfinfo", "pdffonts", "pdftotext", "pdfimages"]
-[harnesses."frontiers-course:python"]
-programs = ["node"]
-[harnesses."frontiers-brand:python"]
-optional = ["convert"]  # a brand without a favicon.ico is skipped, naming it, when ImageMagick is missing (exit 3)
-[harnesses."frontiers-figures:python"]
-optional = ["rsvg-convert", "pdffonts"]
-[harnesses."frontiers-media:python"]
-optional = ["rsvg-convert"]
-[harnesses."frontiers-signage-print:python"]
-optional = ["rsvg-convert", "pdfinfo", "pdffonts"]
+programs = ["latexmk", "xelatex", "lualatex"]
 
 [sections.design-systems]
 help = "Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039)"
@@ -92,7 +68,6 @@ options = ["--runner", "--brand"]
 help = "Each brand's imagery pool and share card: catalog, masters, WebP files, app icons (0014 FR-037, FR-043)"
 watch = ["design-systems/*/imagery/**", "design-systems/*/images/**", "design-systems/*/tokens.json", "tools/agora/lib/imagery.py"]
 scope = "BRAND"
-programs = ["convert", "identify"]
 
 [sections.openedx]
 help = "A brand's Open edX package is what is written from its tokens, and, with Paragon, what it builds, every pair 4.5:1 (frontiers-brand FR-020)"

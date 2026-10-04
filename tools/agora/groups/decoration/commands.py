@@ -1,7 +1,7 @@
 """The decoration group: `decoration show` and `decoration generate` (0042-agora FR-006; 0014-design-systems FR-047).
 
-Thin: the rules live in agora.lib.decoration. Runs under this group's locked environment, which holds uharfbuzz for
-`--only set`. ImageMagick, potrace and rsvg-convert come from the host.
+Thin: the rules live in agora.lib.decoration. Runs under this group's locked environment, which holds Pillow, potracer
+(the trace), resvg-py (the measure) and uharfbuzz (`--only set`); no program of the host is run.
 """
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from typing import Any
 
 from agora.core import AgoraError, Arg, Call, Choice, Ctx, Dynamic, Link, Opt, Resource, command, next_command
 from agora.core import files
-from agora.core.checks import find_program
-from agora.core.resource import MISSING
+from agora.core.generate import Generated
+from agora.core.registry import generator
 from agora.lib import assurance, brands, decoration
 
 
@@ -23,28 +23,14 @@ def _brands(ctx: Ctx) -> list[str]:
 BRAND = Dynamic("BRAND", "a brand's slug: a design system with a brand.css (0014-design-systems FR-028)", _brands)
 KIT_PART = Choice("KIT_PART", ("trace", "set"), "which part of the decoration kit: trace (the lockup and icon) or set (the wordmark and unit marks)")
 
-TRACE_PROGRAMS = ("convert", "identify", "potrace", "rsvg-convert")
-SET_PROGRAMS = ("convert", "rsvg-convert")  # to measure what is set; the shaping is the package
-
-
-def _need(ctx: Ctx, programs: tuple[str, ...], what: str) -> None:
-    gone = [p for p in programs if find_program(ctx.registry, p, ctx.env) is None]
-    if gone:
-        hints = "; ".join(f"{p}: {ctx.registry.program(p).get('hint', 'install it on the host')}" for p in gone)
-        raise AgoraError("missing-program", f"{what} needs {', '.join(gone)}, not found on PATH ({hints})", exit=MISSING,
-                         detail={"program": gone[0], "programs": gone, "hint": ctx.registry.program(gone[0]).get("hint", "")},
-                         actions=[next_command("see what is missing", "doctor")])
-
 
 @command("decoration show", category="read",
          help="Show a brand's decoration kit: each part's file and finest detail, and how it is made",
          args=[Arg("brand", "BRAND", "the brand")],
-         options=[Opt("--measure", None, "measure each SVG's finest detail again (needs rsvg-convert and ImageMagick; slow)")])
+         options=[Opt("--measure", None, "measure each SVG's finest detail again (slow)")])
 def decoration_show(ctx: Ctx, brand: str, measure: bool) -> Resource:
     b = brands.brand_dir(ctx.root, brand)
     kit = decoration.kit_of(brands.tokens_of(b))
-    if measure:
-        _need(ctx, SET_PROGRAMS, "--measure")
     rows = []
     for part in ("lockup", "icon", "wordmark"):
         art = kit.get(part)
@@ -72,10 +58,6 @@ def decoration_show(ctx: Ctx, brand: str, measure: bool) -> Resource:
          args=[Arg("brand", "BRAND", "the brand")],
          options=[Opt("--only", "KIT_PART", "only trace (the lockup and icon) or only set (the wordmark and unit marks)")])
 def decoration_generate(ctx: Ctx, brand: str, only: str | None) -> Resource:
-    if only in (None, "trace"):
-        _need(ctx, TRACE_PROGRAMS, "decoration generate (trace)")
-    if only in (None, "set"):
-        _need(ctx, SET_PROGRAMS, "decoration generate (set)")
     b = brands.brand_dir(ctx.root, brand)
     if not decoration.kit_of(brands.tokens_of(b)):
         raise AgoraError("invalid-argument", f"{brand} has no decoration kit in its tokens.json", exit=2)
@@ -83,3 +65,17 @@ def decoration_generate(ctx: Ctx, brand: str, only: str | None) -> Resource:
     changes = files.apply(ctx, made)
     return Resource("decoration", brand, {"brand": brand, "only": only, "dry_run": ctx.dry_run, "made": notes, "changes": changes},
                     actions=[next_command("see the kit", "decoration show", brand=brand)])
+
+
+@generator("brand-decoration")
+def gen_decoration(ctx: Ctx, scope: str | None) -> Generated:
+    gd = Generated()
+    for n in [scope] if scope else _brands(ctx):
+        b = brands.brand_dir(ctx.root, n)
+        if not decoration.kit_of(brands.tokens_of(b)):
+            continue
+        made, _ = decoration.generate(b)
+        for path, text in made.items():
+            gd.files[path] = text
+            gd.calls[path] = Call("decoration generate", {"brand": n})
+    return gd

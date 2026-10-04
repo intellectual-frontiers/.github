@@ -23,7 +23,7 @@ CATEGORY_HELP = {
     "build": "writes derived output that is not itself the record",
     "generate": "rewrites tracked generated files",
     "decision": "changes what only a person decides: for a person, in the terminal or the editor; never over MCP",
-    "setup": "changes the clone's own environment (a lock, a pin, a running server)",
+    "setup": "changes the clone's own environment (a lock, a fetched toolchain entry, a running server)",
 }
 
 
@@ -154,7 +154,7 @@ def text(reg: Registry) -> str:
       "you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, "
       "whose next action is `proposal new`. Resources are readable by URI: "
       + ", ".join(f"`{name}://{u}`" for u in ("spec/ID", "requirement/SPEC/FR-NNN", "design-system/SLUG", "brand/SLUG", "term/ID",
-                                              "command/WORDS", "proposal/ID", "environment/reference", "context/KIND:ID")) + ".")
+                                              "command/WORDS", "proposal/ID", "context/KIND:ID")) + ".")
     w("")
     w("| Tool | Writes |")
     w("| --- | --- |")

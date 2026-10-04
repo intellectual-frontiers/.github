@@ -35,7 +35,7 @@ class ThreeRenderings(unittest.TestCase):
         return json.loads(out)
 
     def test_json_carries_the_schema_and_audience(self):
-        for argv in (["command", "show", "check"], ["term", "show", "ReadCommandCategory"], ["environment", "show"]):
+        for argv in (["command", "show", "check"], ["term", "show", "ReadCommandCategory"], ["command", "list"]):
             with self.subTest(argv=argv):
                 d = self.resource(argv)
                 self.assertEqual(sorted(d), ["actions", "audience", "data", "id", "kind", "links", "schema"])
@@ -43,7 +43,7 @@ class ThreeRenderings(unittest.TestCase):
                 self.assertEqual(d["audience"], "public")
 
     def test_text_and_html_say_what_json_says(self):
-        for argv in (["term", "show", "ReadCommandCategory"], ["environment", "show"], ["command", "show", "spec show"],
+        for argv in (["term", "show", "ReadCommandCategory"], ["command", "show", "imagery show"], ["command", "show", "spec show"],
                      ["requirement", "show", "0020/FR-013"]):
             with self.subTest(argv=argv):
                 d = self.resource(argv)
@@ -74,7 +74,7 @@ class ThreeRenderings(unittest.TestCase):
         self.assertNotIn("<script", page)
 
     def test_html_flag(self):
-        code, out, _ = run(["environment", "show", "--html"])
+        code, out, _ = run(["command", "list", "--html"])
         self.assertEqual(code, 0)
         self.assertTrue(out.startswith("<!doctype html>"))
 

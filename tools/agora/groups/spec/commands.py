@@ -1,4 +1,4 @@
-"""Specs, requirements, terms, the environment pin, and the check sections for them (0042-agora FR-006, FR-013).
+"""Specs, requirements, terms, and the check sections for them (0042-agora FR-006, FR-013).
 
 Thin: the rules live in agora.lib. Standard library only.
 """
@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, design_systems, environment, ontology, register, specs
+from agora.lib import controls, design_systems, ontology, register, specs
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -408,34 +408,6 @@ def term_show(ctx: Ctx, term: str) -> Resource:
     return res
 
 
-# environment -------------------------------------------------------------------------------------------------------
-@command("environment show", category="read", help="Show the reference environment pin and the devcontainer image tag",
-         relocatable=True)
-def environment_show(ctx: Ctx) -> Resource:
-    commit, tag = environment.pin_commit(ctx.root), environment.image_tag(ctx.root)
-    agree = bool(commit and tag and commit.startswith(tag))
-    res = Resource("environment", "reference", {"commit": commit, "image tag": tag, "agree": agree})
-    res.actions = [next_command("check it", "check", sections=["environment"])]
-    return res
-
-
-@command("environment set", category="setup", help="Move the reference environment pin and the devcontainer image tag together",
-         args=[Arg("commit", "COMMIT", "the full commit of the reference environment")])
-def environment_set(ctx: Ctx, commit: str) -> Resource:
-    pin = ctx.root / "tools" / "reference-environment"
-    dc = ctx.root / ".devcontainer" / "devcontainer.json"
-    if not pin.is_file() or not dc.is_file():
-        raise AgoraError("missing", "both tools/reference-environment and .devcontainer/devcontainer.json must exist; "
-                         "the pin and the image tag move together (0042 FR-011)", exit=USAGE)
-    new_pin = environment.new_pin_text(pin.read_text(encoding="utf-8"), commit)
-    new_dc = environment.new_devcontainer_text(dc.read_text(encoding="utf-8"), commit)
-    if environment.IMAGE.search(dc.read_text(encoding="utf-8")) is None:
-        raise AgoraError("missing", "the devcontainer has no image tagged sha-<commit> to move (0042 FR-011)", exit=USAGE)
-    changes = files.apply(ctx, {pin: new_pin, dc: new_dc})
-    return Resource("environment", "reference", {"commit": commit, "dry_run": ctx.dry_run, "changes": changes},
-                    actions=[next_command("check it", "check", sections=["environment"])])
-
-
 # context providers (0041 FR-038) -----------------------------------------------------------------------------------
 @context_for("spec", "SPEC")
 def context_spec(ctx: Ctx, ident: str) -> dict[str, Any]:
@@ -522,11 +494,6 @@ def check_controls(ctx: Ctx, scope: str | None) -> SectionResult:
 def check_ontology(ctx: Ctx, scope: str | None) -> SectionResult:
     findings = ontology.check_prefixes(ctx.root) + ontology.check_design_systems(ctx.root, ctx.public)
     return SectionResult.from_findings("ontology", findings)
-
-
-@section("environment")
-def check_environment(ctx: Ctx, scope: str | None) -> SectionResult:
-    return SectionResult.from_findings("environment", environment.check_reference_environment(ctx.root))
 
 
 # design-system -----------------------------------------------------------------------------------------------------

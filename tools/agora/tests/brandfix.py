@@ -1,36 +1,37 @@
 """A small public root holding one brand, for the brand, imagery, ink, decoration and generator tests."""
 from __future__ import annotations
 
+import importlib.util
 import json
-import os
 import shutil
-import stat
-import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest import mock
+
+from agora.core.registry import Registry
 
 from .helpers import HOME, run_json
 
-HAS_MAGICK = bool(shutil.which("convert") and shutil.which("identify"))
+HAS_PILLOW = importlib.util.find_spec("PIL") is not None
 
 
 def webp_works() -> bool:
-    if not HAS_MAGICK:
+    if not HAS_PILLOW:
         return False
-    with tempfile.TemporaryDirectory() as d:
-        return subprocess.run(["convert", "-size", "4x4", "xc:white", str(Path(d, "t.webp"))], capture_output=True).returncode == 0
+    from PIL import features
+    return bool(features.check("webp"))
 
 
 def png(path: Path, size: str = "40x30", transparent: bool = False, color: str = "white") -> None:
+    """A PNG of `size` (WxH): a flat color, or transparent with a colored rectangle, drawn with Pillow."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    if HAS_MAGICK:
-        args = ["convert", "-size", size, "xc:none" if transparent else f"xc:{color}"]
+    if HAS_PILLOW:
+        from PIL import Image, ImageDraw
+        w, h = (int(v) for v in size.split("x"))
+        im = Image.new("RGBA", (w, h), (0, 0, 0, 0) if transparent else color)
         if transparent:
-            args += ["-fill", "#c0392b", "-draw", "rectangle 6,5 24,20"]
-        subprocess.run([*args, f"png:{path}"], check=True, capture_output=True)
+            ImageDraw.Draw(im).rectangle((6, 5, min(24, w - 1), min(20, h - 1)), fill="#c0392b")
+        im.save(path, format="PNG")
     else:
         path.write_bytes(b"\x89PNG\r\n\x1a\n")
 
@@ -79,21 +80,6 @@ def tree(root: Path) -> dict[str, bytes]:
     return {str(p.relative_to(root)): p.read_bytes() for p in sorted(root.rglob("*")) if p.is_file() and "__pycache__" not in p.parts}
 
 
-FAKE_CONVERT = """#!{py}
-import sys
-a = sys.argv[1:]
-if "pgm:-" in a:
-    sys.stdout.buffer.write(b"P5\\n8 8\\n255\\n" + bytes(([0] * 4 + [255] * 4) * 8))
-else:
-    open(a[-1], "wb").write(b"fake")
-"""
-FAKE_IDENTIFY = "#!{py}\nprint('40 10')\n"
-FAKE_POTRACE = """#!{py}
-print('<svg version="1.0" viewBox="0 0 160 40"><metadata>m</metadata><g transform="scale(1)" fill="#000000" stroke="none"><path d="M0 0h10v10z"/></g></svg>')
-"""
-FAKE_RSVG = "#!{py}\nimport sys\nsys.stdout.buffer.write(b'png')\n"
-
-
 class Repo(unittest.TestCase):
     """A temporary public root with one brand. `go` runs agora with it as its home."""
 
@@ -107,22 +93,12 @@ class Repo(unittest.TestCase):
 
     def go(self, *argv: str, plan: str | None = None, env: dict[str, str] | None = None) -> tuple[int, dict]:
         """A command in this root. `plan` names the group whose locked environment the process stands in, as a worker's
-        does, so that a command of a group that pins packages runs here and does not re-run itself."""
+        does, so that a command of a group that pins packages runs here and does not re-run itself; by default it is the
+        group of the command, whose packages the tests' own environment holds (the selftest group)."""
+        if plan is None:
+            found, _ = Registry.load(self.root).lookup(list(argv))
+            plan = found.group if found is not None else None
         return run_json(list(argv), home=self.root, env={**({"AGORA_PLAN_GROUP": plan} if plan else {}), **(env or {})})
-
-    def fake_programs(self, *names: str) -> Path:
-        """Stand-ins for programs the host may lack, first on PATH for the test."""
-        d = self.root / "fakebin"
-        d.mkdir(exist_ok=True)
-        scripts = {"convert": FAKE_CONVERT, "identify": FAKE_IDENTIFY, "potrace": FAKE_POTRACE, "rsvg-convert": FAKE_RSVG}
-        for n in names:
-            f = d / n
-            f.write_text(scripts[n].format(py=sys.executable), encoding="utf-8")
-            f.chmod(f.stat().st_mode | stat.S_IEXEC)
-        p = mock.patch.dict(os.environ, {"PATH": str(d)})
-        p.start()
-        self.addCleanup(p.stop)
-        return d
 
     def generate(self) -> None:
         self.assertEqual(self.go("brand", "generate")[0], 0)

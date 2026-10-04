@@ -152,7 +152,7 @@ def course_build(ctx: Ctx, path: str, target: str, out: str, brand: str | None, 
 # media, sign -------------------------------------------------------------------------------------------------------
 @command("media build", category="build",
          help="Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009)",
-         args=[Arg("job", "PATH", "the job's JSON file")], programs=("rsvg-convert",),
+         args=[Arg("job", "PATH", "the job's JSON file")],
          options=[Opt("--out", "TEXT", "the PNG to write; the job's name with .png beside it by default", alias="-o"),
                   Opt("--svg", "TEXT", "also write the SVG the PNG is rendered from"),
                   Opt("--brand", "BRAND", f"the brand that themes it ({DEFAULT_BRAND} by default)")])
@@ -169,7 +169,7 @@ def media_build(ctx: Ctx, job: str, out: str | None, svg: str | None, brand: str
 
 @command("sign build", category="build",
          help="Render a sign's job to a vector PDF at its trim size plus bleed: a poster, roll-up banner or event badge (frontiers-signage-print FR-009)",
-         args=[Arg("job", "PATH", "the job's JSON file")], programs=("rsvg-convert",),
+         args=[Arg("job", "PATH", "the job's JSON file")],
          options=[Opt("--out", "TEXT", "the PDF to write; the job's name with .pdf beside it by default", alias="-o"),
                   Opt("--brand", "BRAND", f"the brand that themes it ({DEFAULT_BRAND} by default)")])
 def sign_build(ctx: Ctx, job: str, out: str | None, brand: str | None) -> Resource:

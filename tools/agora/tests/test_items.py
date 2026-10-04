@@ -1,13 +1,13 @@
 """The items group and the layout commands: builds and item checks that call the design systems' own scripts
 (0042-agora FR-006, FR-008, FR-013, FR-017; 0014-design-systems FR-005; 0041-command-line FR-006, FR-015, FR-033).
 
-Scripts that need only the standard library run for real against this repository's design systems. What needs Pillow or
-rsvg-convert runs against stand-ins in a temporary root, so that the test holds on a host without them.
+Scripts that need only the standard library run for real against this repository's design systems, and so do the renders
+that need the items group's packages (Pillow, resvg-py, reportlab), which the tests' own environment holds. What is about
+the plumbing around a script runs against stand-ins in a temporary root.
 """
 import json
 import os
 import shutil
-import stat
 import sys
 import tempfile
 import unittest
@@ -152,20 +152,10 @@ class FakeSystems(unittest.TestCase):
     def go(self, *argv, env=None):
         return run_json(list(argv), home=self.root, env={**IN_GROUP, **(env or {})})
 
-    def fake_rsvg(self):
-        d = self.root / "fakebin"
-        d.mkdir(exist_ok=True)
-        f = d / "rsvg-convert"
-        f.write_text(f"#!{sys.executable}\nimport sys\na = sys.argv\nopen(a[a.index('-o') + 1], 'wb').write(b'%PDF-fake')\n")
-        f.chmod(f.stat().st_mode | stat.S_IEXEC)
-        p = mock.patch.dict(os.environ, {"PATH": str(d)})
-        p.start()
-        self.addCleanup(p.stop)
-
     JOB_SCRIPT = ("import json\nfrom pathlib import Path\n"
                   "def check(job, brand):\n    return [] if job.get('title') else ['no title']\n"
                   "def render(job, brand, out, svg_out=None):\n"
-                  "    import subprocess\n    subprocess.run(['rsvg-convert', '-o', str(out), 'x.svg'], check=True)\n"
+                  "    out.write_bytes(b'%PDF-fake')\n"
                   "    if svg_out:\n        svg_out.write_text('<svg/>')\n")
 
     def test_media_and_signage_checks_take_jobs_and_report_the_scripts_problems(self):
@@ -207,21 +197,20 @@ class FakeSystems(unittest.TestCase):
         self.assertIn("frontiers-brand's sans", r.notes[0])
         self.assertTrue(items.load(self.root, "frontiers-figures", "svgkit.py").BRAND[0].endswith("frontiers-brand"))
 
-    def test_media_and_sign_build_need_rsvg_convert_and_say_so_with_exit_3(self):
+    def test_media_and_sign_build_need_no_program_of_the_host(self):  # 0042 FR-030
         self.script("frontiers-media", "media.py", self.JOB_SCRIPT)
         job = self.root / "job.json"
         job.write_text('{"title": "T"}')
         empty = self.root / "empty"
         empty.mkdir()
+        reg = Registry.load(self.root)
+        self.assertEqual((reg.commands["media build"].programs, reg.commands["sign build"].programs), ((), ()))
         with mock.patch.dict(os.environ, {"PATH": str(empty)}):
-            for cmd in ("media", "sign"):
-                code, doc = self.go(cmd, "build", str(job))
-                self.assertEqual((code, doc["data"]["code"], doc["data"]["program"]), (3, "missing-program", "rsvg-convert"), cmd)
-                self.assertIn("librsvg", doc["data"]["hint"])
-        self.assertFalse((self.root / "job.png").exists())
+            code, doc = self.go("media", "build", str(job))
+        self.assertEqual(code, 0, doc)
+        self.assertTrue((self.root / "job.png").is_file())
 
     def test_media_build_renders_beside_the_job_and_dry_run_writes_nothing(self):
-        self.fake_rsvg()
         self.script("frontiers-media", "media.py", self.JOB_SCRIPT)
         job = self.root / "job.json"
         job.write_text('{"title": "T"}')
@@ -235,7 +224,6 @@ class FakeSystems(unittest.TestCase):
         self.assertEqual((self.root / "job.svg").read_text(), "<svg/>")
 
     def test_sign_build_writes_a_pdf_through_apply(self):
-        self.fake_rsvg()
         self.script("frontiers-signage-print", "signage.py", self.JOB_SCRIPT)
         job = self.root / "poster.json"
         job.write_text('{"title": "T"}')
@@ -245,7 +233,6 @@ class FakeSystems(unittest.TestCase):
         self.assertEqual(self.go("sign", "build", str(job), "-o", str(self.root / "out" / "p.pdf"))[1]["data"]["changes"], [])
 
     def test_a_script_that_refuses_is_exit_1_in_its_own_words(self):
-        self.fake_rsvg()
         self.script("frontiers-media", "media.py", "def render(job, brand, out, svg_out=None):\n    raise SystemExit('format is not one of formats.json')\n")
         job = self.root / "job.json"
         job.write_text("{}")
@@ -488,6 +475,50 @@ class Plumbing(unittest.TestCase):
         for c in ("deck build", "email build", "course show", "course build", "media build", "sign build", "figure build",
                   "layout list", "layout show", "layout build"):
             self.assertTrue(callable(reg.commands[c].fn), c)
-        self.assertEqual(reg.commands["media build"].programs, ("rsvg-convert",))
-        self.assertEqual(reg.commands["sign build"].programs, ("rsvg-convert",))
+        self.assertEqual((reg.commands["media build"].programs, reg.commands["sign build"].programs), ((), ()))
         self.assertEqual(run_json(["check", "commands"])[0], 0)
+
+
+class RealRenders(unittest.TestCase):
+    """media build and sign build against the real design systems and the brand's own fonts (0042 FR-030: resvg-py and
+    reportlab in place of rsvg-convert)."""
+
+    def build(self, command: str, job: Path, out: Path):
+        return run_json([command, "build", str(job), "--out", str(out)], env={**IN_GROUP, "PATH": "/nonexistent"})
+
+    def test_a_media_job_renders_to_a_png_of_its_format_with_the_brands_font_alone(self):
+        import struct
+        jobs = sorted((DS / "frontiers-media" / "assurance" / "fixtures" / "pass").glob("*.json"))
+        job = next(j for j in jobs if json.loads(j.read_text())["format"] == "podcast-cover")
+        formats = json.loads((DS / "frontiers-media" / "formats.json").read_text())["formats"]
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d, "cover.png")
+            code, doc = self.build("media", job, out)
+            self.assertEqual(code, 0, doc)
+            data = out.read_bytes()
+            self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
+            self.assertEqual(list(struct.unpack(">II", data[16:24])), formats["podcast-cover"]["size"])
+            again = Path(d, "again.png")
+            self.build("media", job, again)
+            self.assertEqual(again.read_bytes(), data)  # the bytes depend on the locked renderer alone
+
+    def test_a_sign_job_renders_to_a_one_page_vector_pdf_with_only_the_sans_embedded(self):
+        from pypdf import PdfReader
+        job = DS / "frontiers-signage-print" / "assurance" / "fixtures" / "pass" / "event-badge.json"
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d, "badge.pdf")
+            code, doc = self.build("sign", job, out)
+            self.assertEqual(code, 0, doc)
+            reader = PdfReader(str(out))
+            self.assertEqual(len(reader.pages), 1)
+            self.assertEqual([round(float(v)) for v in reader.pages[0].mediabox[2:]], [306, 234])  # 4 x 3 in plus 9 pt bleed
+            fonts = [f.get_object() for f in reader.pages[0]["/Resources"]["/Font"].values()]
+            self.assertTrue(fonts)
+            for f in fonts:
+                self.assertIn("Inter", f["/BaseFont"])
+                self.assertIn("/FontFile2", f["/FontDescriptor"])  # embedded
+            text = reader.pages[0].extract_text()
+            self.assertIn("Speaker", text)
+            again = Path(d, "again.pdf")
+            self.build("sign", job, again)
+            self.assertEqual(again.read_bytes(), out.read_bytes())

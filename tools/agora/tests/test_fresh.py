@@ -21,7 +21,8 @@ class Declared(unittest.TestCase):
 
     def test_the_generators_are_the_ones_0042_names(self):  # 0042 FR-015
         self.assertEqual(sorted(self.reg.generators),
-                         sorted(["brand-theme", "brand-specimen", "openedx-sources", "print-layout-docs", "profile-figure", "agent-skill"]))
+                         sorted(["brand-theme", "brand-specimen", "brand-imagery", "brand-decoration", "openedx-sources",
+                                 "print-layout-docs", "profile-figure", "agent-skill"]))
 
     def test_every_generator_declares_its_sources_outputs_and_the_command_that_rewrites_it(self):  # 0041 FR-035
         for g in self.reg.generators.values():
@@ -35,7 +36,8 @@ class Declared(unittest.TestCase):
     def test_a_generator_in_a_locked_group_runs_in_its_own_process(self):  # 0041 FR-028
         ctx = Ctx(self.reg, HOME, HOME, env={})
         self.assertTrue(generate.needs_worker(ctx, self.reg.generators["profile-figure"]))
-        self.assertFalse(generate.needs_worker(ctx, self.reg.generators["brand-theme"]))
+        self.assertTrue(generate.needs_worker(ctx, self.reg.generators["brand-decoration"]))
+        self.assertFalse(generate.needs_worker(ctx, self.reg.generators["print-layout-docs"]))
         ctx.env["AGORA_PLAN_GROUP"] = "assurance"
         self.assertFalse(generate.needs_worker(ctx, self.reg.generators["profile-figure"]))
 
@@ -43,7 +45,7 @@ class Declared(unittest.TestCase):
         self.assertEqual(self.reg.conflicts, [])
 
     def test_the_real_repository_is_fresh(self):  # 0042 FR-015: what is committed is what the generators write
-        code, out, err = run(["fresh", *ALL])
+        code, out, err = run(["fresh", *ALL], env={"AGORA_PLAN_GROUP": "brand"})  # as the brand group's own process stands
         self.assertEqual(code, 0, out + err)
         self.assertIn("fresh: fresh: 4 generator(s) proved, 0 stale, 0 skipped", out)
 
@@ -71,7 +73,9 @@ class Fresh(Repo):
         self.assertEqual(self.go("openedx", "generate", "mini-brand")[0], 0)
 
     def fresh(self, *names):
-        return self.go("fresh", *(names or ALL))
+        from unittest import mock
+        with mock.patch("agora.core.generate.needs_worker", return_value=False):  # the tests' own environment holds every group's packages
+            return self.go("fresh", *(names or ALL))
 
     def test_it_passes_on_what_the_generators_wrote(self):  # 0041 FR-036
         code, doc = self.fresh()
@@ -136,21 +140,27 @@ class Fresh(Repo):
         g = reg.generators["brand-theme"]
         reg.generators["needs-a-program"] = Generator("needs-a-program", "x", g.sources, g.outputs, g.command,
                                                       ("no-such-program-xyz",), "brand", g.fn)
-        code, doc = run_json(["fresh", "needs-a-program"], home=self.root, registry=reg)
+        from unittest import mock
+        with mock.patch("agora.core.generate.needs_worker", return_value=False):
+            code, doc = run_json(["fresh", "needs-a-program"], home=self.root, registry=reg)
         (row,) = doc["data"]["generators"]
         self.assertEqual((code, row["status"], row["stale"]), (3, "skipped", []))
         self.assertIn("needs no-such-program-xyz", row["reason"])
         css = self.brand / "brand.css"
         css.write_text("hand edited")
-        code, doc = run_json(["fresh", "needs-a-program", "brand-theme"], home=self.root, registry=reg)
+        with mock.patch("agora.core.generate.needs_worker", return_value=False):
+            code, doc = run_json(["fresh", "needs-a-program", "brand-theme"], home=self.root, registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "stale"))  # a stale generator still fails the run
 
     def test_with_none_named_every_generator_is_proved_and_none_is_left_out(self):
         from agora.core.generate import Generated
         reg = Registry.load(self.root)
-        reg.generators["profile-figure"].fn = lambda ctx, scope: Generated()  # the one that needs its own environment
+        for n in ("profile-figure", "brand-imagery", "brand-decoration"):
+            reg.generators[n].fn = lambda ctx, scope: Generated()  # the ones that need their own environment; proved apart
         self.go("skill", "generate")
-        code, doc = run_json(["fresh"], home=self.root, registry=reg, env={"AGORA_PLAN_GROUP": "assurance"})
+        from unittest import mock
+        with mock.patch("agora.core.generate.needs_worker", return_value=False):
+            code, doc = run_json(["fresh"], home=self.root, registry=reg, env={"AGORA_PLAN_GROUP": "assurance"})
         self.assertEqual(code, 0, doc)
         self.assertEqual([r["name"] for r in doc["data"]["generators"]], list(reg.generators))
         self.assertNotIn("not_run", doc["data"])
@@ -171,7 +181,8 @@ class Fresh(Repo):
         reg = Registry.load(self.root)
         from agora.core.registry import Command
         reg.add_command(Command(("spec", "frobnicate"), "read", "Frobnicates a spec", group="spec", fn=lambda ctx: None))
-        code, doc = run_json(["fresh", "agent-skill"], home=self.root, registry=reg)
+        with __import__("unittest").mock.patch("agora.core.generate.needs_worker", return_value=False):
+            code, doc = run_json(["fresh", "agent-skill"], home=self.root, registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "stale"))
 
     def test_changed_proves_only_generators_whose_inputs_or_outputs_changed(self):  # 0041 FR-032

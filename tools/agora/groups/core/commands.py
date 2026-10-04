@@ -24,7 +24,7 @@ from agora.core.mcp import Server
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
 from agora.core.resource import FAILED, MISSING, OK
 from agora.core.types import COMMIT  # noqa: F401  (declared here, once, for every group)
-from agora.lib import layout, ontology, testrun
+from agora.lib import layout, node, ontology, testrun
 
 SECTION = Dynamic("SECTION", "a check section, as `command show check` lists them", lambda c: list(c.registry.sections))
 SUITE = Dynamic("SUITE", "a named set of check sections", lambda c: list(c.registry.suites))
@@ -140,7 +140,7 @@ def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
     names = generators or list(reg.generators)
     skipped_unchanged: list[dict[str, str]] = []
     if changed:
-        paths = changed_paths(ctx.root, None)
+        paths = changed_paths(ctx, None)
         keep = []
         for n in names:
             run, why = section_changed(reg.generators[n].watch, paths)
@@ -188,11 +188,12 @@ def _fresh_text(res: Resource) -> str:
 
 
 # test --------------------------------------------------------------------------------------------------------------
-@command("test", category="check", help="Run agora's own tests with the standard library's runner")
+@command("test", category="check", help="Run agora's own tests with the standard library's runner, under the selftest group's locked packages")
 def test(ctx: Ctx) -> Resource:
     tests = ctx.home / "tools" / "agora" / "tests"
     env = {**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "PYTHONDONTWRITEBYTECODE": "1", "AGORA_TESTING": "1"}
-    p = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(tests), "-t", str(ctx.home / "tools")],
+    py = plan.prepare(ctx.registry, "selftest", offline=ctx.offline, command="test")
+    p = subprocess.run([str(py), "-m", "unittest", "discover", "-s", str(tests), "-t", str(ctx.home / "tools")],
                        capture_output=True, text=True, env=env, cwd=ctx.home)
     data = testrun.summarize(p.returncode, p.stderr)
     failed = data["status"] == "failed"
@@ -243,13 +244,18 @@ def doctor(ctx: Ctx) -> Resource:
                              "path": path or "", "hint": spec.get("hint", "")})
             if not path:
                 missing.append(prog)
+    # An opt-in override stands in for a package or an entry the person names (0025 FR-019): doctor lists each one that is set.
+    overrides = [{"entry": "node", "variable": node.OVERRIDE, "path": node.override(ctx.env),
+                  "present": bool(node.override(ctx.env) and Path(node.override(ctx.env)).is_file())}
+                 for _ in [0] if node.override(ctx.env)]
     status = "failed" if problems else "missing" if missing else "ok"
-    data = {"status": status, "prerequisites": prereq, "groups": groups, "programs": programs,
+    data = {"status": status, "prerequisites": prereq, "groups": groups, "programs": programs, "overrides": overrides,
             "conflicts": problems, "missing": missing, "offline": ctx.offline,
             "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)
     res.columns["prerequisites"] = ["name", "present", "version", "hint"]
     res.columns["programs"] = ["program", "group", "needed by", "present", "hint"]
+    res.columns["overrides"] = ["entry", "variable", "path", "present"]
     res.columns["groups"] = ["group", "packages", "lock", "in cache", "plan"]
     if problems or missing:
         res.actions = [next_command("run the doctor again", "doctor")]

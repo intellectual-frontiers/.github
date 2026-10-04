@@ -174,7 +174,7 @@ def figure_variants(root: Path) -> list[str]:
 
 
 def build_media(root: Path, job: Path, out: Path, brand: str, svg_out: Path | None) -> dict[Path, str | bytes]:
-    """Render in a scratch directory (rsvg-convert writes the file itself), and return what it made."""
+    """Render in a scratch directory, and return what it made."""
     mod = load(root, "frontiers-media", "media.py")
     made: dict[Path, str | bytes] = {}
     with tempfile.TemporaryDirectory() as tmp:

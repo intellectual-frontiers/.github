@@ -137,7 +137,7 @@ class OverPipes(unittest.TestCase):
         self.assertEqual(doc_of(r)["data"]["code"], "usage")
 
     def test_stderr_carries_diagnostics_and_stdout_only_protocol(self):
-        self.s.call("check", sections=["environment"])
+        self.s.call("check", sections=["controls"])
         out, err, code = self.s.close()
         self.assertEqual(out, "")
         self.assertEqual(code, 0)
@@ -218,7 +218,7 @@ class InProcess(unittest.TestCase):
         self.init()
         listed = {r["uri"] for r in self.rpc("resources/list")["result"]["resources"]}
         for uri in ("agora://spec/0020-spec-format", "agora://design-system/frontiers-brand", "agora://brand/frontiers-brand",
-                    "agora://command/spec+show", "agora://environment/reference"):
+                    "agora://command/spec+show"):
             self.assertIn(uri, listed)
         templates = [t["uriTemplate"] for t in self.rpc("resources/templates/list")["result"]["resourceTemplates"]]
         self.assertIn("agora://requirement/{spec}/{id}", templates)
@@ -229,7 +229,6 @@ class InProcess(unittest.TestCase):
                                  ("agora://brand/frontiers-brand", "brand", "frontiers-brand"),
                                  ("agora://term/ReadCommandCategory", "term", "ReadCommandCategory"),
                                  ("agora://command/spec+show", "command", "spec show"),
-                                 ("agora://environment/reference", "environment", "reference"),
                                  ("agora://context/spec:0020", "context", "spec:0020-spec-format")):
             with self.subTest(uri=uri):
                 (c,) = self.rpc("resources/read", uri=uri)["result"]["contents"]

@@ -6,8 +6,9 @@ pair meets 4.5:1. Every other brand here is written to a scratch directory, so t
     python3 assurance/run.py
 
 Runs on its own, without `agora`: it imports the package writer, agora/lib/openedx.py, from the tools/ directory of
-the public root that holds this design system (found relative to this file). Standard library only; ImageMagick (`convert`) draws the
-favicon of a brand without a favicon.ico, and without it that brand is skipped, not failed: the run says so and exits 3
+the public root that holds this design system (found relative to this file). Standard library only; the Python package Pillow
+draws the favicon of a brand without a favicon.ico (`pip install Pillow`), and without it that brand is skipped, not failed:
+the run says so and exits 3
 (0041-command-line FR-006, FR-033). `agora check openedx` runs this file.
 """
 from __future__ import annotations

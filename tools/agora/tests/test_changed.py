@@ -24,7 +24,7 @@ class Globs(unittest.TestCase):
         self.assertTrue(section_changed(("a/**",), ["a/x"])[0])
 
 
-@unittest.skipUnless(shutil.which("git"), "git is not installed")
+@unittest.skipUnless(shutil.which("git") and shutil.which("uv"), "git (to make the repository) and uv (for the locked dulwich) are needed")
 class Changed(TempRepo):
     def git(self, *args):
         subprocess.run(["git", "-C", str(self.root), "-c", "user.name=t", "-c", "user.email=t@t", *args], check=True,
@@ -37,20 +37,20 @@ class Changed(TempRepo):
         self.git("commit", "-q", "-m", "first")
 
     def ran(self, *extra):
-        code, doc = run_json(["check", "specs", "register", "controls", "ontology", "environment", "--changed", "--root",
+        code, doc = run_json(["check", "specs", "register", "controls", "ontology", "--changed", "--root",
                               str(self.root), *extra])
         return code, [s["name"] for s in doc["data"]["sections"]], doc["data"]["skipped_unchanged"]
 
     def test_nothing_changed_runs_nothing_and_lists_each_skip_with_its_reason(self):
         code, ran, skipped = self.ran()
         self.assertEqual((code, ran), (0, []))
-        self.assertEqual(sorted(s["name"] for s in skipped), ["controls", "environment", "ontology", "register", "specs"])
+        self.assertEqual(sorted(s["name"] for s in skipped), ["controls", "ontology", "register", "specs"])
         self.assertTrue(all(s["reason"] == "no watched path changed" for s in skipped))
 
     def test_a_changed_file_runs_the_sections_that_watch_it(self):
-        self.write("tools/reference-environment", "github:o/r/" + "a" * 40 + "\n# x\n")
+        self.write("spec-kit/controls.tsv", "requirement\tcontrol\n")
         _, ran, skipped = self.ran()
-        self.assertEqual(ran, ["environment"])
+        self.assertEqual(ran, ["controls"])
         self.assertIn("specs", [s["name"] for s in skipped])
 
     def test_untracked_files_count_as_changes(self):
@@ -75,12 +75,12 @@ class Changed(TempRepo):
 class Isolation(TempRepo):
     def test_an_isolated_section_runs_in_its_own_worker(self):
         reg = Registry.load(HOME)
-        reg.sections["environment"].isolated = True
-        code, doc = run_json(["check", "environment", "specs", "--root", str(self.root)], registry=reg)
+        reg.sections["controls"].isolated = True
+        code, doc = run_json(["check", "controls", "specs", "--root", str(self.root)], registry=reg)
         self.assertEqual(code, 0, doc)
-        self.assertEqual([s["name"] for s in doc["data"]["sections"]], ["environment", "specs"])
-        self.write("tools/reference-environment", "bad\n")
-        code, doc = run_json(["check", "environment", "--root", str(self.root)], registry=reg)
+        self.assertEqual([s["name"] for s in doc["data"]["sections"]], ["controls", "specs"])
+        self.write("spec-kit/controls.tsv", "bad\n")
+        code, doc = run_json(["check", "controls", "--root", str(self.root)], registry=reg)
         self.assertEqual((code, doc["data"]["sections"][0]["status"]), (1, "failed"))
 
 

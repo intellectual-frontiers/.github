@@ -75,8 +75,6 @@ class TempRepo(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.write("spec-kit/specs/0001-first/spec.md", spec_text("0001-first"))
         self.write("spec-kit/enforcement.tsv", "requirement\tmechanism\tby\tnote\n0001-first FR-001\tnone\t-\tnot yet\n")
-        self.write("tools/reference-environment", "github:o/r/" + "a" * 40 + "\n")
-        self.write(".devcontainer/devcontainer.json", '{\n  "image": "ghcr.io/o/r:sha-aaaaaaa",\n}\n')
 
     def write(self, rel: str, text: str) -> Path:
         p = self.root / rel

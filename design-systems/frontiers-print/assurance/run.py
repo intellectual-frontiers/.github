@@ -17,8 +17,10 @@ default layout) with that brand as the theme, and checks:
     line extracts as set;
   - no style file holds a color literal: every color is a role or a mix of roles (0014-design-systems FR-044).
 
-Needs Python 3, latexmk with XeLaTeX and LuaLaTeX, and poppler-utils (pdfinfo, pdffonts, pdfimages, pdftotext). Exits
-non-zero on any failure. This file is the harness and its documentation.
+Needs Python 3 with the packages pypdf and pypdfium2 (`pip install pypdf pypdfium2`; they read the PDF: its page size,
+fonts, images and text layer), and latexmk with XeLaTeX and LuaLaTeX. In this repository `agora` supplies the packages
+from its locked environment and the TeX toolchain from its own cache. Exits non-zero on any failure. This file is the
+harness and its documentation.
 """
 from __future__ import annotations
 
@@ -56,6 +58,46 @@ class Result:
             self.passed += 1
         else:
             self.failed.append(what)
+
+
+def pdf_facts(pdf: Path) -> tuple[tuple[float, float], list[tuple[str, bool]], int, str]:
+    """The first page's size in points, each font as (BaseFont, embedded), how many images the pages place, and the
+    text layer, read with pypdf and pypdfium2."""
+    import pypdfium2
+    from pypdf import PdfReader
+
+    reader = PdfReader(str(pdf))
+    fonts: dict[object, tuple[str, bool]] = {}
+    images = 0
+
+    def walk(resources, seen: set) -> None:
+        nonlocal images
+        for key, ref in (resources.get("/Font") or {}).items():
+            font = ref.get_object()
+            face = font["/DescendantFonts"][0].get_object() if "/DescendantFonts" in font else font
+            desc = face.get("/FontDescriptor")
+            embedded = font.get("/Subtype") == "/Type3" or (desc is not None and any(
+                k in desc.get_object() for k in ("/FontFile", "/FontFile2", "/FontFile3")))
+            fonts[getattr(ref, "idnum", id(font))] = (str(font.get("/BaseFont", "")).lstrip("/"), embedded)
+        for ref in (resources.get("/XObject") or {}).values():
+            xobj = ref.get_object()
+            if xobj.get("/Subtype") == "/Image":
+                images += 1
+            elif xobj.get("/Subtype") == "/Form" and getattr(ref, "idnum", None) not in seen:
+                seen.add(getattr(ref, "idnum", None))
+                if xobj.get("/Resources") is not None:
+                    walk(xobj["/Resources"].get_object(), seen)
+
+    for page in reader.pages:
+        if page.get("/Resources") is not None:
+            walk(page["/Resources"].get_object(), set())
+    first = reader.pages[0].mediabox
+    doc = pypdfium2.PdfDocument(str(pdf))
+    try:
+        text = "\n".join(p.get_textpage().get_text_range() for p in doc)
+    finally:
+        doc.close()
+    return (float(first.width), float(first.height)), list(fonts.values()), images, text
 
 
 def brand_values(brand: Path) -> dict[str, str]:
@@ -99,21 +141,15 @@ def run(brand: Path, keep: Path | None) -> Result:
             if proc.returncode != 0:
                 continue
             pdf = work / "main.pdf"
-            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
-            m = re.search(r"Page size:\s+([\d.]+) x ([\d.]+) pts", info)
-            r.check(bool(m) and abs(float(m.group(1)) - size[0]) < 0.6 and abs(float(m.group(2)) - size[1]) < 0.6, f"{name}: page size {m.group(0) if m else '?'} is not {size[0]} x {size[1]} pts")
-            fonts = subprocess.run(["pdffonts", str(pdf)], capture_output=True, text=True).stdout.splitlines()[2:]
-            for line in fonts:
-                cols = line.split()
-                base = cols[0].split("+")[-1]
-                emb = cols[-5] if len(cols) >= 7 else "no"
-                r.check(emb == "yes", f"{name}: font {base} is not embedded")
+            size_found, fonts, images, text = pdf_facts(pdf)
+            r.check(abs(size_found[0] - size[0]) < 0.6 and abs(size_found[1] - size[1]) < 0.6, f"{name}: page size {size_found[0]:g} x {size_found[1]:g} pts is not {size[0]} x {size[1]} pts")
+            for base, emb in fonts:
+                r.check(emb, f"{name}: font {base} is not embedded")
                 # A PostScript name is the family's name plus its instance (SourceSerif4Roman-12pt for SourceSerif4-*).
-                flat = re.sub(r"[^A-Za-z0-9]", "", base)
-                r.check(any(flat.startswith(f) for f in families), f"{name}: font {base} is not one this design system ships")
+                flat = re.sub(r"[^A-Za-z0-9]", "", base.split("+")[-1])
+                r.check(any(flat.startswith(f) for f in families), f"{name}: font {base.split('+')[-1]} is not one this design system ships")
             # The text layer maps every glyph to its Unicode character (spec FR-019): no private-use code point, the
             # fixture's typographic quotes extract as themselves, and its sans line extracts as one unspaced string.
-            text = subprocess.run(["pdftotext", "-enc", "UTF-8", str(pdf), "-"], capture_output=True, text=True).stdout
             pua = sorted({f"U+{ord(c):04X}" for c in text if 0xE000 <= ord(c) <= 0xF8FF})
             r.check(not pua, f"{name}: the text layer holds private-use code points {', '.join(pua)}; a font feature put glyphs in the PDF with no Unicode mapping")
             # A glyph a font lacks falls back to another font and never vanishes (spec FR-020).
@@ -129,16 +165,15 @@ def run(brand: Path, keep: Path | None) -> Result:
                 r.check(ok, f"{name}: {color} is {got.group(0) if got else 'not logged'}, not {brand.name}'s {role} ({want})")
             if name == "article":
                 # The default typeface set pairs the serif with the house sans, Inter (spec FR-008).
-                names = {line.split()[0].split("+")[-1] for line in fonts}
+                names = {base.split("+")[-1] for base, _ in fonts}
                 r.check(any(re.match(r"Inter(TT)?-", n) for n in names), f"article: its sans is not Inter ({', '.join(sorted(names))})")
             if name == "book":
                 # The book's sans is the theme's font-sans in every style the interior sets (spec FR-004, FR-005).
-                styles = {re.sub(r"-Identity-H$", "", line.split()[0].split("+")[-1]) for line in fonts}
+                styles = {re.sub(r"-Identity-H$", "", base.split("+")[-1]) for base, _ in fonts}
                 for style in ("Regular", "Bold", "Italic", "BoldItalic"):
                     r.check(any(s.endswith("-" + style) and not s.startswith(("SourceSerif", "SourceCode")) for s in styles),
                             f"book: no sans {style} in the PDF ({', '.join(sorted(styles))})")
-                images = subprocess.run(["pdfimages", "-list", str(pdf)], capture_output=True, text=True).stdout.splitlines()[2:]
-                r.check(len(images) >= 3, f"book: {len(images)} images placed, not the theme's light and dark lockups and icon")
+                r.check(images >= 3, f"book: {images} images placed, not the theme's light and dark lockups and icon")
     return r
 
 
