@@ -17,7 +17,7 @@ from typing import Any, Callable
 from .types import ArgType
 
 VERBS = ("list", "show", "status", "check", "build", "generate", "add", "set", "record", "new", "advance", "publish", "serve")
-NOUNLESS = ("check", "fresh", "test", "doctor", "lock", "context")  # 0041 FR-010
+NOUNLESS = ("check", "fresh", "test", "doctor", "lock", "context", "help")  # 0041 FR-010
 CONTROL_WORDS = {"mcp": ("serve",)}  # 0041 FR-011
 CATEGORIES = ("read", "check", "record", "build", "generate", "decision", "setup")  # 0041 FR-014
 SURFACES = ("editor", "mcp")
@@ -77,6 +77,7 @@ class Command:
     isolated: bool = False
     group: str = ""
     fn: Callable[..., Any] | None = None
+    toolchain_optional: tuple[str, ...] = ()  # entries it uses when it can: without one it says what it left out (`doctor` lists them)
 
     @property
     def id(self) -> str:
@@ -106,6 +107,7 @@ class Section:
     group: str = ""
     fn: Callable[..., Any] | None = None
     many: bool = False  # `--scope` may be given more than once, and the function receives a list (0042 FR-013)
+    toolchain_optional: tuple[str, ...] = ()  # entries a runner of it uses when it can; one it cannot have is skipped and said
 
 
 @dataclass
@@ -146,12 +148,12 @@ class Group:
 
 def command(name: str, *, category: str, help: str = "", args: tuple[Arg, ...] | list[Arg] = (),
             options: tuple[Opt, ...] | list[Opt] = (), relocatable: bool = False, surfaces: tuple[str, ...] | None = None,
-            toolchain: tuple[str, ...] = (), toolchain_unless: str = "", isolated: bool = False):
+            toolchain: tuple[str, ...] = (), toolchain_unless: str = "", isolated: bool = False, toolchain_optional: tuple[str, ...] = ()):
     """Declare a command. The function is `fn(ctx, **values) -> Resource`, thin: it calls library code (0041 FR-024)."""
 
     def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
         fn.__agora_command__ = Command(tuple(name.split()), category, help, tuple(args), tuple(options), relocatable,
-                                       surfaces, tuple(toolchain), toolchain_unless, isolated, "", fn)
+                                       surfaces, tuple(toolchain), toolchain_unless, isolated, "", fn, tuple(toolchain_optional))
         return fn
 
     return deco
@@ -203,6 +205,7 @@ class Registry:
         self.suites: dict[str, dict[str, Any]] = {}
         self.conflicts: list[str] = []
         self.contexts: dict[str, tuple[str, Callable[..., Any]]] = {}  # kind -> (id type, provider)
+        self.topics: dict[str, Any] = {}  # name -> help.Topic, found by presence in agora/help/ (0041 FR-065)
 
     # loading -------------------------------------------------------------------------------------------------
     @classmethod
@@ -215,6 +218,9 @@ class Registry:
         reg.audience = rm.get("audience", "public")
         for gname in rm.get("groups", []):
             reg.load_group(home / "tools" / "agora" / "groups" / gname)
+        from . import help as helping
+
+        reg.topics = helping.discover()
         reg.suites = {k: {"sections": list(v.get("sections", [])), "options": dict(v.get("options", {}))}
                       for k, v in rm.get("suites", {}).items()}
         return reg
@@ -234,7 +240,7 @@ class Registry:
             self._add_section(Section(sname, s.get("help", ""), tuple(s.get("watch", ())), s.get("scope"),
                                       tuple(s.get("options", ())), tuple(s.get("toolchain", ())), s.get("toolchain_unless", ""),
                                       bool(s.get("relocatable", False)), bool(s.get("isolated", False)), g.name,
-                                      many=bool(s.get("scope_many", False))))
+                                      many=bool(s.get("scope_many", False)), toolchain_optional=tuple(s.get("toolchain_optional", ()))))
         for gname, gen in m.get("generators", {}).items():
             if gname in self.generators:
                 self.conflicts.append(f"generator {gname} is declared twice")

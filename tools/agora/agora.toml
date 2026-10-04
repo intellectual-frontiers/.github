@@ -4,7 +4,7 @@ name = "agora"
 audience = "public"
 # The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
 register_name = ".github"
-groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "extension", "agent", "vcs", "selftest"]
+groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "extension", "guide", "agent", "vcs", "selftest"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
@@ -16,7 +16,7 @@ hint = "install Python 3.11 or later from the host"
 
 # Suites (0041 FR-031; 0042 FR-014): the sections each runs. A section appears in no suite it does not belong to.
 [suites.spec]
-sections = ["specs", "register", "controls", "ontology", "toolchain", "commands"]
+sections = ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"]
 [suites.browser]
 sections = ["design-systems", "openedx"]
 options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems; openedx takes no runner
@@ -25,6 +25,9 @@ sections = ["design-systems"]
 options = { runner = "python" }
 [suites.extension]
 sections = ["extension"]
+[suites.vscode]
+sections = ["extension"]
+options = { runner = "vscode" }  # the extension's tests inside a real VS Code under a display server
 
 [suites.images]
 sections = ["imagery"]

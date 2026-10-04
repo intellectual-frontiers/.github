@@ -19,6 +19,9 @@ const { openHtmlView } = require('./webview');
 const context = require('./context');
 const { TaskProvider } = require('./tasks');
 const { CheckTests } = require('./tests');
+const learn = require('./learn');
+const testmode = require('./testmode');
+const mcpmod = require('./mcp');
 
 const nodeFs = {
   async readFile(p) { try { return await fs.promises.readFile(p, 'utf8'); } catch (e) { return null; } },
@@ -113,14 +116,15 @@ class App {
     return f ? this.repos.find((x) => x.key === f.uri.toString()) || null : null;
   }
 
-  async chooseRepo(placeholder) {
-    const ready = this.repos.filter((r) => r.state === 'ready');
+  async chooseRepo(placeholder, filter) {
+    const ready = this.repos.filter((r) => r.state === 'ready' && (!filter || filter(r)));
     if (!ready.length) {
       const why = this.repos.find((r) => r.state !== 'ready');
       vscode.window.showInformationMessage(why ? why.reason : 'No folder in this window declares a command line for IF Console (a .if-console.env file at its root).');
       return null;
     }
     if (ready.length === 1) return ready[0];
+    testmode.note('quickpick', { title: '', placeholder: placeholder || 'Which repository?', items: ready.map((r) => r.name) });
     const pick = await vscode.window.showQuickPick(ready.map((r) => ({ label: r.name, description: r.folder.name, detail: r.root, repo: r })),
       { placeHolder: placeholder || 'Which repository?', ignoreFocusOut: true });
     return pick ? pick.repo : null;
@@ -221,6 +225,7 @@ class App {
     };
     add(`${repo.name}: repository-wide`, repoWide);
     for (const [noun, cmds] of nouns) add(`${repo.name}: ${noun}`, cmds);
+    testmode.note('quickpick', { title: '', placeholder: 'Which command?', items: items.filter((i) => i.kind !== vscode.QuickPickItemKind.Separator).map((i) => i.label) });
     const pick = await vscode.window.showQuickPick(items, { placeHolder: 'Which command?', matchOnDescription: true, matchOnDetail: true, ignoreFocusOut: true });
     return pick ? pick.id : null;
   }
@@ -344,6 +349,52 @@ class App {
     } catch (e) { this.fail(e); }
   }
 
+  // --- learning (FR-031) -----------------------------------------------------------------------------------------------
+  // The topics the repository's `help` command lists, as a quick pick; a topic is shown as a resource with its steps as buttons.
+  async learn() {
+    const repo = await this.chooseRepo('Which repository do you want to learn about?', (r) => r.has('help'));
+    if (!repo) return null;
+    const listed = await repo.launcher.run(['help']);
+    const ok = listed.doc && !listed.error ? wire.checkSchema(listed.doc) : { ok: false, message: listed.error ? listed.error.message : `${repo.program} gave no help topics.` };
+    if (!ok.ok) { vscode.window.showInformationMessage(ok.message); return null; }
+    const topics = learn.topicsOf(listed.doc);
+    if (!topics.length) { vscode.window.showInformationMessage(`${repo.name} lists no help topics.`); return null; }
+    const picked = await this.ui.pick({ title: 'Learn', placeholder: `${repo.name}: which topic?`,
+      items: topics.map((t) => ({ label: t.topic, description: t.summary, value: t.topic })) });
+    return picked === undefined ? null : this.openTopic(repo, picked);
+  }
+
+  async openTopic(repo, topic) {
+    const r = await repo.launcher.run(['help', topic]);
+    const ok = r.doc && !r.error ? wire.checkSchema(r.doc) : { ok: false, message: r.error ? r.error.message : `${repo.program} gave no help for ${topic}.` };
+    if (!ok.ok) { vscode.window.showInformationMessage(ok.message); return null; }
+    const steps = learn.stepsOf(r.doc);
+    return openHtmlView({ repo, title: `${repo.name}: ${topic}`, html: learn.topicPage(r.doc), output: this.output,
+      onCommand: (words) => this.runWords(repo, words),
+      onStep: async (i) => { const step = steps[i]; if (step && step.runnable) await this.runAction(repo, step.action); } });
+  }
+
+  // What the test hook reads (FR-033): what this holds, read-only.
+  async snapshot() {
+    const open = ['repo', 'wide', 'group'];
+    const labels = async (provider, node) => {
+      const out = [];
+      for (const k of await provider.getChildren(node)) {
+        const item = provider.getTreeItem(k);
+        const entry = { kind: k.kind, label: String(item.label), description: item.description ? String(item.description) : '' };
+        if (open.includes(k.kind)) entry.children = await labels(provider, k);
+        out.push(entry);
+      }
+      return out;
+    };
+    return {
+      repositories: this.repos.map((r) => ({ name: r.name, audience: r.audience, state: r.state, folder: r.folder.name, root: r.root, health: r.health })),
+      views: { commands: await labels(this.commandsView), chores: await labels(this.choresView), checks: await labels(this.checksView) },
+      mcp: { supported: mcpmod.supported(), registered: this.mcp.disposable !== null,
+        servers: mcpmod.definitions(this.repos).map((d) => ({ label: d.label, command: d.command, args: d.args })) },
+    };
+  }
+
   // --- context and help (FR-018) ---------------------------------------------------------------------------------------
   async pickResource(repo, node) {
     if (node && node.data && node.data.link) {
@@ -430,6 +481,7 @@ class App {
     cmd('doctor', () => this.runRepoWide('doctor'));
     cmd('showCommandLine', () => this.showCommandLine());
     cmd('getHelp', () => this.getHelp());
+    cmd('learn', () => this.learn());
     cmd('copyContext', (node) => this.copyContext(node));
     cmd('openView', () => this.openViewCommand());
     cmd('refresh', () => this.refresh());
@@ -446,6 +498,8 @@ class App {
     const watcher = vscode.workspace.createFileSystemWatcher('**/.if-console.env');
     sub(watcher); sub(watcher.onDidChange(() => this.refresh())); sub(watcher.onDidCreate(() => this.refresh())); sub(watcher.onDidDelete(() => this.refresh()));
     this.mcp.start();
+    testmode.install(this.context, () => this.snapshot());
+    sub({ dispose: () => testmode.uninstall() });
   }
 }
 

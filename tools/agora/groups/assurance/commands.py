@@ -40,6 +40,8 @@ def _env(ctx: Ctx) -> dict[str, str]:
 @section("design-systems")
 def check_design_systems(ctx: Ctx, scope: str | None) -> SectionResult:
     opts = ctx.section_options
+    if opts.get("runner") in ("node", "vscode"):  # the extension's runners (0042 FR-013)
+        return SectionResult("design-systems", "skipped", reason=f"--runner {opts['runner']} is for the extension; this section's runners are browser and python")
     harnesses, missing = assurance.plan(ctx.home, _manifest(ctx), scope, opts.get("brand"), opts.get("runner"))
     findings = [Finding("error", f"design-systems/{slug}", f"{slug} has no assurance harness, assurance/run.mjs or "
                         "assurance/run.py (0014-design-systems FR-015)") for slug in missing]

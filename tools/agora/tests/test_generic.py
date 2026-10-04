@@ -11,7 +11,7 @@ from agora.core.ctx import Ctx
 from agora.core.registry import WRITES, Registry
 from agora.lib import testrun
 
-from .helpers import HOME, TempRepo, run, run_json
+from .helpers import HOME, TempRepo, copy_guide, run, run_json
 
 
 class EveryCommand(unittest.TestCase):
@@ -137,6 +137,7 @@ class Boundaries(unittest.TestCase):
         shutil.copy(HOME / ".if-console.env", self.home / ".if-console.env")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
         shutil.copy(HOME / "README.md", self.home / "README.md")
+        copy_guide(self.home)
 
     def findings(self):
         code, doc = run_json(["check", "commands"], home=self.home)
@@ -170,7 +171,7 @@ class Boundaries(unittest.TestCase):
 
     def test_sections_and_suites_must_be_the_ones_0042_declares(self):
         m = self.home / "tools" / "agora" / "agora.toml"
-        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "toolchain", "commands"]',
+        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"]',
                                             'sections = ["specs", "register"]'))
         self.assertTrue(any("suite spec is" in x for x in self.findings()[1]))
 

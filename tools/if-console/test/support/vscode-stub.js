@@ -42,7 +42,7 @@ function createStub(options = {}) {
   const vscode = {
     EventEmitter, Uri, Position, Range, Location, Diagnostic, DiagnosticSeverity, ThemeIcon, TreeItem, TreeItemCollapsibleState, Task, CustomExecution,
     TestMessage, TaskGroup: { Build: 'build', Test: 'test' }, StatusBarAlignment: { Left: 1, Right: 2 }, ProgressLocation: { Notification: 15 },
-    QuickPickItemKind: { Separator: -1, Default: 0 }, ViewColumn: { Beside: -2 }, TestRunProfileKind: { Run: 1 },
+    QuickPickItemKind: { Separator: -1, Default: 0 }, ExtensionMode: { Production: 1, Development: 2, Test: 3 }, ViewColumn: { Beside: -2 }, TestRunProfileKind: { Run: 1 },
     window: {
       createOutputChannel: (name) => ({ name, appendLine: (l) => calls.output.push(l), show() {}, dispose() {} }),
       createStatusBarItem: () => ({ text: '', tooltip: '', command: '', visible: false, show() { this.visible = true; }, hide() { this.visible = false; }, dispose() {} }),

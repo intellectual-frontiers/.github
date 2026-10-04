@@ -1,0 +1,20 @@
+[preface]
+[#preface]
+== Preface
+
+image::hero.webp[A railway station on a mountain trestle: one of the approved frontier pictures of the brand,width=100%]
+
+This is the public root of Intellectual Frontiers: the company's own account of what it is and how it works, written as
+specs and typed against an ontology so that a person or an AI can check it instead of guessing. This guide is how you work in it.
+
+Everything here is done with one command line, `agora`. It needs only Python and `uv` on your machine and fetches the rest,
+pinned and checked. You can use it from a terminal, from VS Code through the IF Console extension, or through an AI agent over MCP.
+All three run the same commands.
+
+The guide is a reference and an overview. It does not teach the daily work. That lives in one place, in the program: run
+`./agora help`, or use Learn in VS Code, where every step is a button. A guide that repeated the program would be wrong the day the
+program changed, so this one links to the help topics and takes its reference from the same code. `./agora fresh` fails until
+the reference is current.
+
+The guide comes in four editions: a website, one long page, a PDF and an EPUB. They are built from the same source by
+`./agora docs build` and published to GitHub Pages on every change to `main`.

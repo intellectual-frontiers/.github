@@ -24,10 +24,17 @@ APT_LIBRARIES: dict[str, str] = {
     "libpango-1.0.so.0": "libpango-1.0-0", "libcairo.so.2": "libcairo2", "libasound.so.2": "libasound2",
     "libX11.so.6": "libx11-6", "libxcb.so.1": "libxcb1", "libXext.so.6": "libxext6", "libglib-2.0.so.0": "libglib2.0-0",
 }
+# What VS Code links beyond what Chromium does (it is an Electron build), found by reading the binaries' dynamic sections, and the
+# display server its extension tests start it under. A name without ".so" is a program, found on PATH (0043-if-console FR-032).
+APT_VSCODE_EXTRA: dict[str, str] = {
+    "libgtk-3.so.0": "libgtk-3-0", "libsmime3.so": "libnss3", "libexpat.so.1": "libexpat1", "libudev.so.1": "libudev1",
+    "libxkbfile.so.1": "libxkbfile1", "libgobject-2.0.so.0": "libglib2.0-0", "libgio-2.0.so.0": "libglib2.0-0",
+    "Xvfb": "xvfb",
+}
 # Ubuntu 24.04 and Debian 13 renamed these for the 64-bit time_t transition.
 APT_T64_RENAMED = {"libatk1.0-0": "libatk1.0-0t64", "libatk-bridge2.0-0": "libatk-bridge2.0-0t64",
                    "libatspi2.0-0": "libatspi2.0-0t64", "libcups2": "libcups2t64", "libasound2": "libasound2t64",
-                   "libglib2.0-0": "libglib2.0-0t64"}
+                   "libglib2.0-0": "libglib2.0-0t64", "libgtk-3-0": "libgtk-3-0t64"}
 
 
 @dataclass(frozen=True)
@@ -67,7 +74,7 @@ def family(release: Mapping[str, str] | None = None) -> Family:
     if "debian" in ids or "ubuntu" in ids:
         v = _version(r.get("VERSION_ID", ""))
         t64 = (r.get("ID") == "ubuntu" and v >= 24.04) or (r.get("ID") == "debian" and v >= 13)
-        packages = {lib: (APT_T64_RENAMED.get(pkg, pkg) if t64 else pkg) for lib, pkg in APT_LIBRARIES.items()}
+        packages = {lib: (APT_T64_RENAMED.get(pkg, pkg) if t64 else pkg) for lib, pkg in {**APT_LIBRARIES, **APT_VSCODE_EXTRA}.items()}
         return Family("apt", f"{r.get('PRETTY_NAME') or r.get('ID')} (apt{', t64 names' if t64 else ''})", packages,
                       ("apt-get", "update"), ("apt-get", "install", "-y", "--no-install-recommends"))
     return Family(r.get("ID") or "unknown", r.get("PRETTY_NAME") or r.get("ID") or "this distribution", {})
@@ -76,6 +83,11 @@ def family(release: Mapping[str, str] | None = None) -> Family:
 def chromium_libraries(platform: str) -> tuple[str, ...]:
     """The shared libraries a Chromium build links against and a fetch cannot supply; none off Linux."""
     return tuple(APT_LIBRARIES) if platform.startswith("linux") else ()
+
+
+def vscode_libraries(platform: str) -> tuple[str, ...]:
+    """What VS Code links and the display server it starts under: Chromium's libraries, VS Code's own and Xvfb; none off Linux."""
+    return (*chromium_libraries(platform), *APT_VSCODE_EXTRA) if platform.startswith("linux") else ()
 
 
 def needed(entries: Mapping[str, object], platform: str) -> tuple[str, ...]:
@@ -89,6 +101,9 @@ def needed(entries: Mapping[str, object], platform: str) -> tuple[str, ...]:
 
 
 def loads(soname: str) -> bool:
+    if ".so" not in soname:  # a program, such as the display server
+        import shutil
+        return shutil.which(soname) is not None
     try:
         ctypes.CDLL(soname)
         return True

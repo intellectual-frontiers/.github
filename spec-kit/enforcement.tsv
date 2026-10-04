@@ -984,23 +984,23 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
 0042-agora FR-004	check	.github: agora check commands	the registry and the ontology's command individuals are compared by words, noun, verb and category
 0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
-0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included; the README's command table is checked to name every noun
+0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included; the guide's generated command reference is proved current by fresh and names every noun
 0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
 0042-agora FR-008	none	-	agora test validates the typed arguments it has; ENTRY replaces VERSION when the toolchain moves in (OQ-3)
 0042-agora FR-009	check	.github: agora test	tests run design-system new against a fixture clone: refused without the spec, without the ontology entry, for a kind that is not the entry's; scaffolding, --dry-run and no overwrite
 0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
 0042-agora FR-011	check	.github: agora test	tests: the registry has no environment noun, command, section or resource, and no tools/reference-environment file exists
 0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
-0042-agora FR-013	none	-	check toolchain is built and agora check commands compares the section list with 0042; the extension section is not built, and the registry is still declared in manifests (OQ-3)
-0042-agora FR-014	none	-	the spec suite holds toolchain and agora check commands compares the suites with 0042; the extension suite is not built (OQ-3)
-0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, brand-imagery, brand-decoration, openedx-sources, print-layout-docs, profile-figure and agent-skill, naming the command that rewrites each
+0042-agora FR-013	check	.github: agora check commands	agora check commands compares the section list with 0042 and checks the README's link to the guide; check help and the extension runners are tested by agora test
+0042-agora FR-014	check	.github: agora check commands	agora check commands compares the suites with 0042, the spec suite including help and the extension and vscode suites
+0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, brand-imagery, brand-decoration, openedx-sources, print-layout-docs, profile-figure, agent-skill and reference-docs, naming the command that rewrites each
 0042-agora FR-016	check	.github: agora check commands	check commands fails a script outside design-systems/ and tools/agora/, a workflow that calls another tool, and any file that refers to a script agora replaced; tools/if-console/ is not yet allowed by it
 0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review
 0042-agora FR-018	none	-	doctor reports python3, uv, each lock, each toolchain entry's cache state for the platform and every override with a hint naming an entry; agora still keeps per-group locks (OQ-3)
 0042-agora FR-019	none	-	the editor views are not declared yet (OQ-3)
 0042-agora FR-020	check	.github: agora test	tests drive agora mcp serve over pipes and in process: the tool list is exactly the commands that declare mcp and are not decisions, a write defaults to a dry run, a decision is refused with decision-refused and proposal new as the next action, resources and templates are readable by URI, protocol revisions are negotiated, and standard output holds only protocol
 0042-agora FR-021	check	.github: agora test	tests check the log lines of the terminal and of the MCP server (surface mcp), the value kept out of them, that reads are not logged, and that .gitignore lists the log directory; proposals are tracked files, checked by agora check commands
-0042-agora FR-022	none	-	agora check toolchain and agora check commands enforce the workflow rules, and design-systems.yml now runs only the launcher, the caches and ./agora system add; the extension job is not built
+0042-agora FR-022	check	.github: agora check toolchain	agora check toolchain and agora check commands enforce the workflow rules, with pages.yml's three GitHub actions allowed and nothing else installed; design-systems.yml runs the launcher, the caches and ./agora system add
 0042-agora FR-028	check	.github: agora fresh	fresh proves the agent skill current and names agora skill generate when it is not; tests check it is written from the registry alone, deterministic, and lists every command, noun, section and generator
 0042-agora FR-029	check	.github: agora test	tests run proposal new, list, show and advance: the file's fields and id, validation, refusal of a command that is not record, generate or decision and of a proposal command, the dry run shown first, a failing dry run leaving the proposal open, and agora check commands failing a malformed one
 0025-tooling-environment FR-014	check	.github: agora check toolchain	fails code that looks for any host program other than python3 and uv on PATH; documentation is a judgment of each README; doctor reports python3 and uv and a missing one exits 3
@@ -1026,6 +1026,10 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-030	check	.github: agora test	tests prove each package replacement (test_packages, the harness and command tests), the toolchain entries and their declarations (test_toolchain) and fresh proves the files they write; the browser and print harnesses ran from an empty cache (verified by hand)
 0042-agora FR-031	check	.github: agora check extension	agora lists its commands to the editor by command list; the extension's real-launcher tests drive them; agora declares no editor views yet (OQ-3)
 0042-agora FR-032	check	.github: agora check commands	.if-console.env must name ./agora (agora check commands); agora extension build is tested by agora test and run by hand
+0042-agora FR-033	check	.github: agora check help	the help section fails a topic with no summary or sections, a step whose command is not in the registry or whose fields it does not take, and a named command, topic or path that does not exist; tests drive help and the section
+0042-agora FR-034	check	.github: agora fresh	fresh proves reference-docs current and names docs generate; tests drive docs generate and docs build (the editions, the link check, a missing converter)
+0042-agora FR-035	check	.github: agora check commands	agora check commands checks docs/index.html uses only the brand's own assets and pages.yml calls ./agora docs build; the Pages deployment itself is the owner's setting and cannot be checked here
+0042-agora FR-036	check	.github: agora check commands	agora check commands fails a README without the link to the guide, the one-time system add and help, or over 120 lines
 0043-if-console FR-001	check	.github: agora check extension	the manifest is read: id, display name, prefixes, no API export
 0043-if-console FR-002	check	.github: agora check extension	the lint refuses another repository's or orchestrator's name in tools/if-console/; agora check commands allows the directory (0042 FR-016); public-only is otherwise a review
 0043-if-console FR-003	check	.github: agora check extension	tests check that child_process is used in one place, only to spawn a launcher with --json or --html
@@ -1037,7 +1041,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-009	check	.github: agora check extension	diagnostics tests: file:line, severity, source, cleared per section, unplaced findings in the output
 0043-if-console FR-010	check	.github: agora check extension	task provider and Test Controller tests; a skipped section is skipped, never passed
 0043-if-console FR-011	check	.github: agora check extension	webview tests: policy, link classification, one own script
-0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun
+0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun; the real VS Code run lists the manifest's palette entries
 0043-if-console FR-013	check	.github: agora check extension	form tests: choices from the type or the noun's list, retry on a refused value, the whole line before running
 0043-if-console FR-014	check	.github: agora check extension	executor and diff tests: dry run first, diff from a virtual document, apply only on acceptance, failed dry run stops
 0043-if-console FR-015	check	.github: agora check extension	tests: modal required, exactly true, forged nodes ignored, no API export, no decision in the manifest's tasks or keys
@@ -1053,6 +1057,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-025	none	-	plain language is a review of each message; theme icons and accessibility labels are set in the code and not tested for reading
 0043-if-console FR-026	check	.github: agora check extension	tests scan the code for any write and a session leaves the clone unchanged
 0043-if-console FR-027	check	.github: agora check toolchain	the lock of tools/if-console is checked (hashes, exact pins, no runtime dependency); agora extension build is tested by agora test
-0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the unit tests and the lint
+0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the unit tests under node (the node runner), the real VS Code tests (the vscode runner) and the lint
 0043-if-console FR-029	none	-	no check; installation is a person's act
 0043-if-console FR-030	check	.github: agora check extension	the manifest's engine is checked; the features that need a newer VS Code are feature-detected and tested (MCP)
+0043-if-console FR-031	check	.github: agora check extension	Learn tests with the stand-in, and the real VS Code run lists a repository's help topics
+0043-if-console FR-032	check	.github: agora check extension	agora check extension --runner vscode runs the tests of tools/if-console/test/vscode/ in a real VS Code under Xvfb; a run that cannot start is skipped naming the cause
+0043-if-console FR-033	check	.github: agora check extension	unit tests: the hook exists only in test mode and answers once; the real VS Code run answers a decision modal through it, and the never-tests scan the source for any other path

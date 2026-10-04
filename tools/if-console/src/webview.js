@@ -5,9 +5,12 @@
 const vscode = require('vscode');
 const path = require('path');
 const crypto = require('crypto');
+const testmode = require('./testmode');
 
 const CLICK_SCRIPT = `const api = acquireVsCodeApi();
 document.addEventListener('click', (e) => {
+  const b = e.target && e.target.closest ? e.target.closest('button[data-step]') : null;
+  if (b && !b.disabled) { api.postMessage({ step: Number(b.getAttribute('data-step')) }); return; }
   const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
   if (!a) return;
   e.preventDefault();
@@ -37,12 +40,14 @@ function classifyLink(href, root) {
   return { kind: 'file', file: abs };
 }
 
-function openHtmlView({ repo, title, html, output, onCommand }) {
+function openHtmlView({ repo, title, html, output, onCommand, onStep }) {
   const panel = vscode.window.createWebviewPanel('if-console.view', title, vscode.ViewColumn.Beside,
     { enableScripts: true, enableCommandUris: false, localResourceRoots: [repo.folder.uri], retainContextWhenHidden: false });
   const nonce = crypto.randomBytes(16).toString('hex');
   panel.webview.html = wrap(html, panel.webview.cspSource, nonce);
+  testmode.note('webview', { title, html: String(html) });
   panel.webview.onDidReceiveMessage(async (m) => {
+    if (m && typeof m.step === 'number') { if (onStep) await onStep(m.step); return; }
     const link = classifyLink(m && m.href, repo.root);
     if (link.kind === 'file') await vscode.window.showTextDocument(vscode.Uri.file(link.file), { preview: true });
     else if (link.kind === 'command' && onCommand) await onCommand(link.words);

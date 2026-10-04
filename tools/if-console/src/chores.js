@@ -60,6 +60,7 @@ function deriveChores(repo) {
     }
   }
   groups.push({ id: 'help', label: 'Get help', items: [
+    ...(repo.has('help') ? [item('ext', 'Learn', { command: 'if-console.learn', description: 'the help topics, each with its steps as buttons' })] : []),
     item('ext', 'Get Help', { command: 'if-console.getHelp', description: 'the report to paste to a person or an AI' }),
     item('ext', 'Copy Context', { command: 'if-console.copyContext', description: 'what an AI agent needs to know about a resource' }),
   ] });

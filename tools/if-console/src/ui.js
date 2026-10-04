@@ -5,6 +5,7 @@ const vscode = require('vscode');
 const wire = require('./wire');
 const preview = require('./preview');
 const path = require('path');
+const testmode = require('./testmode');
 
 const SCHEME = 'if-console-diff';
 
@@ -36,6 +37,7 @@ function createUi({ docs, output }) {
   const ui = {
     async pick({ title, placeholder, items, canPickMany }) {
       const shown = items.map((i) => ({ label: i.label, description: i.description, detail: i.detail, value: i.value, picked: false }));
+      testmode.note('quickpick', { title: title || '', placeholder: placeholder || '', items: shown.map((i) => i.label) });
       const got = await vscode.window.showQuickPick(shown, { title, placeHolder: placeholder, canPickMany: !!canPickMany,
         ignoreFocusOut: true, matchOnDescription: true });
       if (got === undefined) return undefined;
@@ -95,10 +97,13 @@ function createUi({ docs, output }) {
     async confirmDecision({ repo, detail, argv, changes, line }) {
       const what = changes.length ? preview.summaryOf(changes) : 'The dry run lists no files.';
       const resource = argv.slice(detail.words.length).filter((a) => !a.startsWith('-')).join(' ') || '(none)';
-      const pick = await vscode.window.showWarningMessage(
-        `${repo.name}: ${detail.id} is a decision only you can make.`,
-        { modal: true, detail: `Command: ${line}\nResource: ${resource}\nWhat it changes: ${what}\n\n${detail.help}` }, 'Make this decision');
-      return pick === 'Make this decision';
+      const message = `${repo.name}: ${detail.id} is a decision only you can make.`;
+      const options = { modal: true, detail: `Command: ${line}\nResource: ${resource}\nWhat it changes: ${what}\n\n${detail.help}` };
+      const button = 'Make this decision';
+      // In VS Code's test mode only, a test answers the modal through the hook (0043 FR-033); otherwise VS Code shows it.
+      if (testmode.active()) return testmode.answerModal({ message, modal: options.modal, detail: options.detail, buttons: [button] }, button) === button;
+      const pick = await vscode.window.showWarningMessage(message, options, button);
+      return pick === button;
     },
   };
   return ui;

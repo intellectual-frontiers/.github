@@ -180,7 +180,7 @@ def _system_add_text(res: Resource) -> str:
     return "\n".join(out)
 
 
-@command("system list", category="read", help="List the shared libraries a browser links, the package that holds each on this host's distribution, and which are present")
+@command("system list", category="read", help="List the shared libraries a browser and VS Code link and the display server VS Code's tests start under, the package that holds each on this host's distribution, and which are present")
 def system_list(ctx: Ctx) -> Resource:
     tc = ctx.toolchain()
     fam, libs = _needed(tc)
@@ -195,7 +195,7 @@ def system_list(ctx: Ctx) -> Resource:
 
 
 @command("system add", category="setup",
-         help="Install the browser's missing shared libraries with the host's package manager through sudo: prints what it runs, asks first, never runs by itself",
+         help="Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself",
          options=[Opt("--yes", None, "do not ask: for a person who has read what --dry-run prints, and for CI")])
 def system_add(ctx: Ctx, yes: bool) -> Resource:
     if ctx.surface == "mcp":

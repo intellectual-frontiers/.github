@@ -5,7 +5,7 @@ help = "The toolchain lock: the programs outside Python that commands need, fetc
 help = "The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067)"
 
 [nouns.system]
-help = "The one prerequisite beyond python3 and uv: a browser's shared libraries, installed once with sudo (0041-command-line FR-069)"
+help = "The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069)"
 
 [sections.toolchain]
 help = "The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025)"

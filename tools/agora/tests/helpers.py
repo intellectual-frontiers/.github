@@ -45,6 +45,19 @@ CLOSING = """
 """
 
 
+def copy_guide(home: Path) -> None:
+    """The guide's own files that `check commands` reads (0042 FR-035): docs/index.html, pages.yml, and an empty stand-in for each brand asset."""
+    from agora.lib import guide
+
+    (home / "docs").mkdir(exist_ok=True)
+    shutil.copy(HOME / "docs" / "index.html", home / "docs" / "index.html")
+    (home / ".github" / "workflows").mkdir(parents=True, exist_ok=True)
+    shutil.copy(HOME / ".github" / "workflows" / "pages.yml", home / ".github" / "workflows" / "pages.yml")
+    for src in guide.ASSETS.values():
+        (home / src).parent.mkdir(parents=True, exist_ok=True)
+        (home / src).write_bytes(b"")
+
+
 def spec_text(name: str, status: str = "Draft", frs: int = 1, extra: str = "") -> str:
     items = "\n".join(f"- **FR-{i:03d}**: A thing MUST hold." for i in range(1, frs + 1))
     return (f"# Feature Specification: {name}\n\n**Spec ID:** {name}\n**Status:** {status}\n\n**Input:** A thing.\n\n"

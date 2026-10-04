@@ -11,7 +11,7 @@ description: Use agora, this repository's command line, to read its specs, requi
 ## How to call it
 
 - `agora <noun> <verb> [ID] [--options]`; the ID is the first word after the verb. Verbs: `list`, `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`, `new`, `advance`, `publish`, `serve`.
-- Repository-wide commands take no noun: `check`, `context`, `doctor`, `fresh`, `lock`, `test`.
+- Repository-wide commands take no noun: `check`, `context`, `doctor`, `fresh`, `help`, `lock`, `test`.
 - `--json` on any command gives one JSON document `{schema, audience, kind, id, data, links, actions}`; `links` and `actions` say what to run next. A failure is a resource of kind `error` with a stable `code` and the actions to take next.
 - Exit status: 0 success; 1 it ran and what it checked failed; 2 usage or an invalid argument; 3 a missing package, program or offline prerequisite.
 - `--dry-run` on any command that writes shows what it would change and writes nothing. Run it first.
@@ -42,6 +42,7 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `deck` | A slide deck written in Markdown and built by frontiers-slides (0014-design-systems FR-040) |
 | `decoration` | A brand's decoration kit: one-color artwork made mechanically from the masters and the brand's fonts (0014-design-systems FR-047) |
 | `design-system` | A design system: its spec, its entry in the ontology and its harness (0014-design-systems) |
+| `docs` | The guide: the AsciiDoc book in docs-src/, its generated reference chapters and its four built editions (0042-agora FR-034) |
 | `email` | An email written in Markdown and built by frontiers-email (0014-design-systems FR-040) |
 | `extension` | The IF Console VS Code extension, built from tools/if-console/ (0043-if-console) |
 | `figure` | A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044) |
@@ -56,7 +57,7 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `sign` | A printed sign, a job rendered by frontiers-signage-print (0014-design-systems FR-040) |
 | `skill` | The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028) |
 | `spec` | A spec: a numbered spec or a design system's spec (0020-spec-format) |
-| `system` | The one prerequisite beyond python3 and uv: a browser's shared libraries, installed once with sudo (0041-command-line FR-069) |
+| `system` | The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069) |
 | `term` | A concept or scheme of the ontology (0019-controlled-vocabulary) |
 | `toolchain` | The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067) |
 
@@ -81,12 +82,15 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `design-system list` | `read` | terminal, editor, mcp | List design systems: kind, status, spec and harness | `agora design-system list [--kind KIND]` |
 | `design-system new` | `generate` | terminal, editor, mcp | Scaffold a design system whose spec and ontology entry already exist (0001 FR-037) | `agora design-system new SLUG --kind KIND` |
 | `design-system show` | `read` | terminal, editor, mcp | Show one design system: its registration, spec, harness and derivation | `agora design-system show DESIGN_SYSTEM` |
+| `docs build` | `build` | terminal, editor, mcp | Build the guide into a folder: the multi-page site, the single page, the PDF and the EPUB, with the toolchain's converters | `agora docs build [--out\|-o TEXT]` |
+| `docs generate` | `generate` | terminal, editor, mcp | Write the guide's reference chapters from the registry, the help topics, the toolchain, the checks and the design systems | `agora docs generate` |
 | `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
 | `extension build` | `build` | terminal, editor, mcp | Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock | `agora extension build` |
 | `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
 | `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
 | `fresh` | `check` | terminal, editor, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
+| `help` | `read` | terminal, editor, mcp | Explain the daily work: the topics, or one topic with its sections and steps, each step a command you can run | `agora help [TOPIC]` |
 | `imagery add` | `record` | terminal, editor, mcp | Add a master to a brand's pool: copy it byte for byte, measure it, and catalog it (then build its WebP files) | `agora imagery add BRAND --master TEXT --name TEXT --environment TEXT --description TEXT --visual-anchor TEXT --route TEXT [--built-structure TEXT] [--infrastructure-type TEXT] [--colored-element TEXT] [--water-form TEXT] [--metaphor TEXT] [--suggested-subject TEXT] [--supplied DATE] --generator TEXT` |
 | `imagery build` | `generate` | terminal, editor, mcp | Write a brand's WebP files, share card and app icons from its masters and tokens | `agora imagery build BRAND` |
 | `imagery list` | `read` | terminal, editor, mcp | List a brand's imagery pieces | `agora imagery list BRAND` |
@@ -116,8 +120,8 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `spec new` | `generate` | terminal, editor, mcp | Create a spec in the form 0020 FR-005 states, with the next unused number | `agora spec new SLUG [--title TEXT]` |
 | `spec set` | `decision` | terminal, editor | Move a spec between Draft, Adopted and Superseded, only as 0020 FR-010 allows | `agora spec set SPEC --status SPEC_STATUS [--superseded-by SPEC]` |
 | `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
-| `system add` | `setup` | terminal | Install the browser's missing shared libraries with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system add [--yes]` |
-| `system list` | `read` | terminal, editor, mcp | List the shared libraries a browser links, the package that holds each on this host's distribution, and which are present | `agora system list` |
+| `system add` | `setup` | terminal | Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system add [--yes]` |
+| `system list` | `read` | terminal, editor, mcp | List the shared libraries a browser and VS Code link and the display server VS Code's tests start under, the package that holds each on this host's distribution, and which are present | `agora system list` |
 | `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
 | `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
 | `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner, under the selftest group's locked packages | `agora test` |
@@ -138,7 +142,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--suite` (SUITE): run a named set of sections
   - `--changed` (flag): run only sections whose watched paths changed
   - `--since` (TEXT): with --changed, also what differs from this Git commit
-  - `--runner` (RUNNER): design-systems: which harness
+  - `--runner` (RUNNER): design-systems: browser or python; extension: node or vscode
   - `--brand` (BRAND): design-systems: one brand
   - `--paragon` (TEXT): openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)
   - `--mode` (VOICE_MODE): voice: sweep as prose or as a procedure (prose by default)
@@ -182,6 +186,11 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `design-system show`
   - `design_system` (DESIGN_SYSTEM): the design system
+- `docs build`
+  - `--out` (TEXT): the folder to write; build/docs in this clone when none is named
+  - `--dry-run` (flag): validate, write nothing, show the change
+- `docs generate`
+  - `--dry-run` (flag): validate, write nothing, show the change
 - `email build`
   - `path` (PATH): the message's Markdown file
   - `--out` (TEXT): the HTML file to write, and its .txt beside it; the message's name with .html by default
@@ -202,6 +211,8 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 - `fresh`
   - `generators` (GENERATOR, zero or more): the generators to prove; every one when none is named
   - `--changed` (flag): prove only generators whose sources or outputs changed
+- `help`
+  - `topic` (TOPIC, optional): the topic; the topics are listed when none is named
 - `imagery add`
   - `brand` (BRAND): the brand
   - `--master` (TEXT, required): the approved PNG; its file name without .png is the piece's id
@@ -355,7 +366,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `PROPOSAL_STATUS` | whether a proposal is open or accepted | open, accepted |
 | `REQUIREMENT` | a requirement as <spec>/FR-NNN, such as 0020/FR-013 | 0020/FR-013, 0041-command-line/FR-008 |
 | `RESOURCE` | a resource as kind:id, such as spec:0020 or requirement:0020/FR-013 | spec:0020, requirement:0020/FR-013 |
-| `RUNNER` | which kind of design system harness | browser, python |
+| `RUNNER` | which harness: browser or python for design-systems; node or vscode for extension | browser, python, node, vscode |
 | `SCHEME` | a concept scheme of the ontology by its local name, such as CommandCategoryScheme | a value `<noun> list` or `--complete` offers |
 | `SECTION` | a check section, as `command show check` lists them | a value `<noun> list` or `--complete` offers |
 | `SLUG` | lowercase words joined by hyphens | agora, command-line |
@@ -363,6 +374,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `SPEC_STATUS` | a spec's status (0020 FR-009) | Draft, Adopted, Superseded |
 | `SUITE` | a named set of check sections | a value `<noun> list` or `--complete` offers |
 | `TERM` | a concept or scheme of the ontology by its local name, such as ReadCommandCategory | ReadCommandCategory, CommandCategoryScheme |
+| `TOPIC` | a help topic, as `help` lists them: start, check, specs, ... | a value `<noun> list` or `--complete` offers |
 | `VARIANT` | a figure color variant of frontiers-figures: default, on-dark or grayscale | a value `<noun> list` or `--complete` offers |
 | `VOICE_MODE` | how the voice sweep reads a text: as prose or as a procedure's steps | prose, procedure |
 
@@ -377,8 +389,9 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | `course` | Courses against frontiers-course's rules: outcomes taught and assessed, accessibility, limits, voice (course.py check) | PATH | none |
 | `design-systems` | Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039) | DESIGN_SYSTEM | `browser`, `python` |
 | `email` | Messages against frontiers-email's rules: subject, preheader, one button, https links, address, voice (mail.py check) | PATH | none |
-| `extension` | The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), and its unit tests under node's test runner (0043-if-console FR-028) | none | `extension` |
+| `extension` | The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032) | none | `extension`, `vscode` |
 | `figures` | Figure sources against frontiers-figures' mechanical rules: canvas, role colors, label size, labels inside their boxes (figcheck.py) | PATH | none |
+| `help` | Every help topic is well formed, its steps are actions of the registry, and it names only commands, topics and paths that exist (0042 FR-033; 0041 FR-065) | none | `spec` |
 | `imagery` | Each brand's imagery pool and share card: catalog, masters, WebP files, app icons (0014 FR-037, FR-043) | BRAND | `images` |
 | `media` | Media jobs against frontiers-media's rules: format, safe margin, title fit, lockup, voice (media.py check) | PATH | none |
 | `merchandise` | Decoration jobs against frontiers-merchandise's rules and a brand's decoration kit (decoration.py) | PATH | none |
@@ -405,10 +418,11 @@ A generated file carries a header naming its generator and must not be edited by
 | `openedx-sources` | A brand's Open edX package sources (everything but the built dist/), from its tokens.json, logos and fonts | `agora openedx generate` |
 | `print-layout-docs` | The print design system's layout and typeface catalogs inside its Markdown, from latex/layouts.json and latex/typefaces.json | `agora ` |
 | `profile-figure` | The organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
+| `reference-docs` | The guide's reference chapters: commands, checks, help topics, toolchain, design systems and specs | `agora docs generate` |
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 51 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 54 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -427,12 +441,15 @@ A generated file carries a header naming its generator and must not be edited by
 | `design-system_list` | no |
 | `design-system_new` | yes, dry run by default |
 | `design-system_show` | no |
+| `docs_build` | yes, dry run by default |
+| `docs_generate` | yes, dry run by default |
 | `doctor` | no |
 | `email_build` | yes, dry run by default |
 | `extension_build` | yes, dry run by default |
 | `figure_build` | yes, dry run by default |
 | `figure_generate` | yes, dry run by default |
 | `fresh` | no |
+| `help` | no |
 | `imagery_add` | yes, dry run by default |
 | `imagery_build` | yes, dry run by default |
 | `imagery_list` | no |

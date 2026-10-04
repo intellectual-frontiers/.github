@@ -120,7 +120,7 @@ def _action_dict(a: Action, registry: Any, name: str) -> dict[str, Any]:
         "enabled": a.enabled,
     }
     if cmd is not None:  # a value only a person can give: no pasteable line, and the names that are missing (0041 FR-064)
-        needs = [x.name for x in cmd.args if x.required and a.call.fields.get(x.name) in (None, "", [])]
+        needs = [x.name for x in cmd.args if x.required and not x.many and a.call.fields.get(x.name) in (None, "", [])]
         needs += [o.dest for o in cmd.options if o.required and a.call.fields.get(o.dest) in (None, "", [], False)]
         if needs:
             d["cli"], d["needs"] = None, needs

@@ -1,0 +1,46 @@
+# The guide's PDF theme for asciidoctor-pdf. Colors are frontiers-brand's (deep-ink #121820, frontier-blue #214ea2, warm-paper #f3f0e8);
+# the type is asciidoctor-pdf's own default faces, since the brand's variable font cannot be embedded by it. The logo is the brand's,
+# copied beside the theme by `agora docs build`.
+extends: default
+
+page:
+  background_color: FFFFFF
+  size: A4
+  margin: [36, 48, 40, 48]
+
+base:
+  font_color: 121820
+  line_height: 1.45
+
+link:
+  font_color: 214EA2
+
+heading:
+  font_color: 121820
+  h1_font_color: 214EA2
+
+title_page:
+  align: center
+  logo:
+    image: image:logo.png[width=280]
+    top: 18%
+  title:
+    top: 42%
+    font_size: 30
+    font_color: 214EA2
+  subtitle:
+    font_size: 14
+    font_color: 4B5563
+
+code:
+  background_color: F3F0E8
+  border_color: E3DFD3
+
+admonition:
+  border_color: 214EA2
+
+table:
+  head:
+    background_color: F3F0E8
+  border_color: DFE3E8
+  grid_color: DFE3E8
