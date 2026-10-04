@@ -1950,30 +1950,36 @@ ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormSch
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
-# Which environment every tool is guaranteed to run in. The repository is reused as
-# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
-# guaranteed against, where it has one, is not a fact here but the WS_HOST_VERSION line of its
-# .workspaces-host/ws-host.env (0025 FR-008).
+# Every tool installs itself: a host supplies only python3 and uv (0025 FR-014); Python packages come from hashed uv
+# locks and every other program from a toolchain lock fetched into a per-user cache (0025 FR-013, FR-015). A reference
+# environment is an optional convenience, never required (0025 FR-005, FR-025). The repository is reused as
+# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002). Which entries a repository's toolchain lock holds is
+# declared in that repository's orchestrator code, not restated here (0001-eidolon-architecture FR-019).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
-    rdfs:comment "The provisioned environment, a release of its repository on a Debian-family host with the kit a repository declares, in which every tool in an Eidolon repository is guaranteed to run unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+    rdfs:comment "An optional, prepared environment, a release of its repository on a Debian-family host, that a person MAY choose as a convenience. No tool, check, workflow or hint of an Eidolon repository requires it, and a tool runs on a host that has only python3 and uv (0025-tooling-environment FR-005, FR-014, FR-025)."@en .
+
+ifcore:ToolchainEntry a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Toolchain entry"@en ;
+    skos:definition "A program a command needs that has no Python wheel, pinned in a repository's toolchain lock with a version and, for each platform, an address and a SHA-256, fetched once into a per-user cache and verified before use (0025-tooling-environment FR-015, FR-016, FR-017)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002). The entries themselves are declared in each orchestrator's code (0041-command-line FR-066) and are not individuals here."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:WorkspacesHost a ifcore:ReferenceEnvironment ;
     dcterms:identifier "workspaces-host" ;
     schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host> ;
     ifcore:workspaceFlavor ifcore:DebianFamilyBareMetalFlavor ;
-    rdfs:comment "Prepares a person's machine, clones and updates their repositories, installs kits, checks health, and ships the editor extension that is the graphical interface of every orchestrator (0041-command-line FR-050, FR-058). Its orchestrator is ws-host. It is the reference environment (0025-tooling-environment FR-005)."@en ;
+    rdfs:comment "Prepares a person's machine, clones and updates their repositories without touching their work, and checks health (0026-workspaces FR-008). Its orchestrator is ws-host. It is an optional convenience and the reference environment a person MAY choose (0025-tooling-environment FR-005); nothing depends on it."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
-# The flavor is the one way the reference environment is run (0026 FR-001). What each repository needs is held in
+# The flavor is the one way the optional workspace is run (0026 FR-001). What each repository lists is held in
 # its own .workspaces-host/ws-host.env, never restated here (0001-eidolon-architecture FR-019).
 
 ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
-    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
+    rdfs:comment "A flavor the optional reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
 
 ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
-    rdfs:comment "The ways the reference environment runs; a new one is added here and in 0026-workspaces FR-001 under its own spec (FR-003)."@en ;
+    rdfs:comment "The ways the optional workspace runs; a new one is added here and in 0026-workspaces FR-001 under its own spec (FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:DebianFamilyBareMetalFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Debian-family bare metal"@en ;
     skos:definition "Installed directly on a machine running a Debian-family Linux distribution, Debian or Ubuntu, including Ubuntu under WSL on Windows, with VS Code as its graphical interface (0026-workspaces FR-001)."@en ; ifcore:hasAudience ifcore:Public .
@@ -2005,6 +2011,24 @@ ifcore:Agora a ifcore:Orchestrator ; rdfs:label "agora"@en ;
     dcterms:identifier "agora" ;
     skos:definition "The public root's orchestrator, named for the public square (0042-agora FR-001, FR-002)."@en ;
     rdfs:comment "Public only: it reads and depends on no other repository (0042 FR-003). Its commands are the ifcore:Command individuals below that name it by ifcore:commandOf."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EditorExtension a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Editor extension"@en ;
+    skos:definition "A program that runs inside an editor and operates orchestrators only through their command lines, holding no behavior of its own (0041-command-line FR-050)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:drives a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range ifcore:Orchestrator ;
+    rdfs:comment "An orchestrator whose commands an editor extension offers by running its command line (0043-if-console FR-003). The extension finds orchestrators by each repository's own declaration (0043 FR-004), so a repository states its own individual here only where its own ontology holds it. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+ifcore:providesSurface a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range skos:Concept ;
+    rdfs:comment "The command surface an extension is (0043-if-console FR-001), a concept in ifcore:CommandSurfaceScheme. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+
+ifcore:IfConsole a ifcore:EditorExtension ; rdfs:label "Intellectual Frontiers Console"@en ;
+    dcterms:identifier "if-console" ;
+    skos:altLabel "IF Console"@en ;
+    skos:definition "The one VS Code extension that is the secondary interface for every orchestrator: a tree of nouns, commands and resources, findings in the Problems panel, checks as tasks and tests, quick picks from typed arguments, a diff before any write, a modal confirmation for a decision, and each repository's MCP server registered (0043-if-console FR-001, FR-008 through FR-022)."@en ;
+    rdfs:comment "Public, held in the public root at tools/if-console/ (0043 FR-002). It drives the public root's orchestrator, and discovers any other by that repository's own declaration (0043 FR-004). It collects no telemetry and opens no network connection (0043 FR-023)."@en ;
+    ifcore:providesSurface ifcore:EditorCommandSurface ;
+    ifcore:drives ifcore:Agora ;
     ifcore:hasAudience ifcore:Public .
 
 
@@ -2077,14 +2101,14 @@ ifcore:ServeCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme 
     skos:definition "Runs until stopped."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandSurfaceScheme a skos:ConceptScheme ; rdfs:label "Command surface"@en ;
-    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The editor is served by the extension of the environment orchestrator, not by a command, and no web UI is a surface."@en ;
+    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The terminal is the core; the editor is served by the IF Console extension (0043-if-console), not by a command; and MCP is for agents. No web UI is a surface."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:TerminalCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "terminal"@en ;
     skos:notation "cli" ;
-    skos:definition "The command line; every command is callable here (0041-command-line FR-022)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The command line, the core interface; every command is callable here (0041-command-line FR-022)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:EditorCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "editor"@en ;
     skos:notation "editor" ;
-    skos:definition "The VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The secondary interface, the IF Console VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050, 0043-if-console FR-003)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "MCP"@en ;
     skos:notation "mcp" ;
     skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .

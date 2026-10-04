@@ -103,24 +103,23 @@ The longer essay is
 
 ### Start working
 
-Everything this repository's tools need comes from one environment,
-`workspaces-host`, on a Debian-family Linux machine: Debian, or Ubuntu
-(including Ubuntu under WSL on Windows), with [VS Code](https://code.visualstudio.com/)
-as the graphical interface. There is no `make install` (0024, 0025, 0026).
+This repository's tools install themselves. A computer needs only `python3`
+(3.11 or later) and [`uv`](https://docs.astral.sh/uv/); there is no
+`make install` and no environment to prepare (0024, 0025).
 
-1. Install `workspaces-host` with the install line in its README. It needs
-   only `python3` and `uv` on your machine.
-2. Run `ws-host workspace advance`. It signs you in to GitHub if you are not,
-   clones `.github`, `eidolon` and `www.intellectualfrontiers.com` beside
-   each other, updates the ones you already have without ever touching your
-   own changes, and installs the kit this repository names in
-   `.workspaces-host/ws-host.env`. Run it as often as you like.
-3. Open the folder in VS Code; the `ws-host vscode add` extension shows the
-   state of every repository and the actions you can take.
+1. Install `python3` and `uv`.
+2. Clone this repository and run `./agora doctor`, then `./agora check`.
+   `agora` fetches the Python packages its commands need from hashed locks,
+   and every other program (a typesetter, a browser) into a per-user cache,
+   verified by checksum, the first time a command needs it. Nothing found on
+   your computer is used unless you opt in by name.
+3. Optionally, work in VS Code with the IF Console extension (0043): a tree
+   of the commands, findings in the Problems panel, a diff before any write.
+   The command line is the core; the extension only runs it.
 
-Until `workspaces-host` ships its first release, existing clones keep their
-`.devcontainer/` files and CI keeps running in the earlier environment's
-published image (0025 OQ-1).
+A prepared workspace (`workspaces-host`, on Debian or Ubuntu, including under
+WSL) is another way to set up a machine and clone the sibling repositories. It
+is a convenience: nothing here requires it (0026).
 
 ### Three repositories, one Eidolon
 
@@ -149,21 +148,21 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
   controls.tsv      which compliance control each requirement addresses
                     (0028-compliance-controls)
-agora               the orchestrator: one launcher (needs uv and Python 3) that
-                    runs every check, build and record in this repository
+agora               the orchestrator: one launcher (needs only uv and Python 3)
+                    that runs every check, build and record in this repository
                     (0041-command-line, 0042-agora); CI calls only it
 tools/
   agora/            agora's code: core, lib, groups/<group>/ (each with its
                     agora.toml, and an agora.lock where it pins packages, until
                     each moves to code and uv.lock, 0042 OQ-3), and tests/
+  if-console/       the IF Console VS Code extension's source (0043-if-console);
+                    built by agora, no runtime dependencies
 .claude/
   skills/agora/     SKILL.md, the agent skill agora generates from its registry
                     (0042-agora FR-028)
-tools/reference-environment
-                    the earlier environment's commit CI still runs in, until
-                    the pin moves to .workspaces-host/ws-host.env
-                    (0025-tooling-environment OQ-1)
-.devcontainer/      the earlier workspace, kept until CI moves (0026 OQ-1)
+tools/reference-environment, .devcontainer/
+                    files for an optional workspace that nothing requires and
+                    that are removed (0025 FR-025, 0026 OQ-1, 0042 OQ-3)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace), including
                     agora's command set
@@ -241,8 +240,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
-| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in the reference environment, workspaces-host with the repository's kit |
-| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one flavor, Debian-family bare metal with VS Code; each repository's needs file, fast-forward-only updates, and trust |
+| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools install themselves; a host needs only python3 and uv; hashed Python locks and a toolchain lock fetched into a verified per-user cache; no workspace required |
+| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: an optional convenience; one flavor, Debian-family bare metal with VS Code; sibling repositories, fast-forward-only updates, and trust |
 | [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 | [0028](spec-kit/specs/0028-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
 | [0029](spec-kit/specs/0029-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
@@ -257,8 +256,9 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
 | [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
 | [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
-| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's orchestrator: launcher and uv's files, a registry in code, typed commands, resources in three renderings, surfaces (terminal, editor, MCP) by category, kits, Git as the only record |
-| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's orchestrator, its command set, checks, generators, and CI |
+| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's orchestrator: launcher and uv's files, a registry in code, typed commands, resources in three renderings, surfaces (the command line, IF Console, MCP) by category, a toolchain lock, Git as the only record |
+| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's orchestrator, its command set, checks, generators, toolchain, and CI |
+| [0043](spec-kit/specs/0043-if-console/spec.md) | Intellectual Frontiers Console (IF Console): the VS Code extension that is every orchestrator's secondary interface |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example

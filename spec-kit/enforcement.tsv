@@ -754,28 +754,28 @@ frontiers-signage-print FR-011	check	.github: agora check design-systems --runne
 frontiers-signage-print FR-012	none	-	no sign layout places a figure yet; a consumer placing one uses frontiers-figures
 frontiers-signage-print FR-013	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	agora check design-systems runs run.py, which exits non-zero on any failure
 0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
-0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
-0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
-0025-tooling-environment FR-004	none	-	no check scans tools for installs at run time
-0025-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0025-tooling-environment FR-006	check	.github: agora check	agora check, with doctor, fresh and test, runs in the reference environment (reference-environment.yml, in the published image of the earlier environment until 0025 OQ-1 is resolved)
-0025-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0025-tooling-environment FR-008	none	-	the pin moves to .workspaces-host/ws-host.env when CI moves (0042 OQ-4); agora check environment still checks the earlier pin until then
-0025-tooling-environment FR-009	none	-	a pin move runs every in-environment job before merge once CI runs on prepared runners (0025 OQ-1)
-0025-tooling-environment FR-010	none	-	reference-environment.yml runs agora in the published image of the earlier environment until 0025 OQ-1 is resolved; the prepared-runner form does not exist yet
-0025-tooling-environment FR-011	check	.github: agora check --suite spec	spec-check.yml runs the spec suite on a stock runner with only Python and uv; design-systems.yml does the same for the harnesses with Node and Playwright
-0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
-0025-tooling-environment FR-013	none	-	agora has not yet moved to pyproject.toml and uv.lock (0042 OQ-3); the earlier lock check lives in eidolon's eid test
+0025-tooling-environment FR-002	none	-	agora check toolchain will fail a command that reads a host program without the override (0042 FR-013); not built yet
+0025-tooling-environment FR-003	none	-	no check reads a tool's declared packages and toolchain entries against what its code uses; the registry declares them (0041 FR-066) once built
+0025-tooling-environment FR-004	none	-	no check scans tools for installs or downloads at run time; agora check toolchain will (0042 FR-013)
+0025-tooling-environment FR-005	none	-	a reference environment is optional; nothing tests that none is required; see FR-025
+0025-tooling-environment FR-006	none	-	spec-check.yml runs the spec suite on a runner with only Python and uv; the other suites still install programs on the runner until the toolchain lock exists (0042 FR-022)
+0025-tooling-environment FR-007	none	-	agora check toolchain will fail a package-manager call, installer or bootstrap script; not built yet
+0025-tooling-environment FR-008	none	-	retired: a repository holds no pin of a reference environment (FR-013, FR-015)
+0025-tooling-environment FR-009	none	-	a pin move is a review judgment of the change; fresh then proves what it affects once the toolchain exists
+0025-tooling-environment FR-010	none	-	workflows still run agora in several jobs; agora check toolchain will check that each calls the launcher (0042 FR-013)
+0025-tooling-environment FR-011	none	-	spec-check.yml qualifies; design-systems.yml and reference-environment.yml still install programs or run in an image until the toolchain lock exists (0042 FR-022)
+0025-tooling-environment FR-012	none	-	no check scans tools for the names of a workspace, devcontainer or persona; agora check toolchain will (0042 FR-013)
+0025-tooling-environment FR-013	none	-	agora has not yet moved to pyproject.toml and one uv.lock (0042 OQ-3); doctor will check hashes and the lock against pyproject.toml
 0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
-0026-workspaces FR-002	none	-	no check; verified by running the same steps on Debian and Ubuntu
+0026-workspaces FR-002	none	-	agora check toolchain will fail a tool that depends on a workspace (0042 FR-013); the stock-runner jobs prove it once moved
 0026-workspaces FR-003	none	-	no check
 0026-workspaces FR-007	none	-	workspaces-host will gate clones on a login; no check here
 0026-workspaces FR-008	none	-	no check; workspaces-host tests workspace advance
 0026-workspaces FR-009	none	-	documentation judgment
 0026-workspaces FR-015	none	-	no check; workspaces-host tests the layout
-0026-workspaces FR-016	none	-	no check reads .workspaces-host/ws-host.env
+0026-workspaces FR-016	none	-	no check reads .workspaces-host/ws-host.env; the file is optional (0025 FR-025)
 0026-workspaces FR-017	none	-	no check reads .workspaces-host/ws-host.env
-0026-workspaces FR-018	none	-	no check
+0026-workspaces FR-018	none	-	no check; agora check toolchain will fail a tool that reads a workspace file (0042 FR-013)
 0026-workspaces FR-019	none	-	no check; workspaces-host tests that unpushed work survives repo advance
 0026-workspaces FR-020	none	-	no check
 0026-workspaces FR-021	none	-	no check; workspaces-host tests that cloning trusts nothing
@@ -919,9 +919,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-001	check	.github: agora test	the launcher is POSIX sh, executable, and runs from any directory in the clone; agora check commands checks its form
 0041-command-line FR-002	none	-	agora still plans from per-group manifests (0042 OQ-3); the plan from pyproject.toml groups is not checked
 0041-command-line FR-003	none	-	agora still keeps per-group locks (0042 OQ-3); doctor does not yet check uv.lock against pyproject.toml
-0041-command-line FR-004	check	.github: agora test	tests run lock and a cold-cache plan offline, by flag and by environment, and the launcher offline
+0041-command-line FR-004	check	.github: agora test	tests run lock and a cold-cache plan offline, by flag and by environment, and the launcher offline; tests cover packages offline; the toolchain cache offline is not built
 0041-command-line FR-005	check	.github: agora test	tests parse every core, lib and group module's imports and run the core with no site-packages
-0041-command-line FR-006	check	.github: agora test	tests run a command and a section whose program is missing, and doctor reporting the hint
+0041-command-line FR-006	none	-	tests still run the earlier host-program behavior; the package and toolchain-entry rule, the override and the hint are not built (0042 OQ-3)
 0041-command-line FR-007	none	-	agora still loads its registry from manifests (0042 OQ-3); the registry in code is not checked
 0041-command-line FR-008	check	.github: agora check commands	the registry's grammar: a command is noun and verb from the fixed set, or one of the closed set
 0041-command-line FR-009	none	-	verb meanings are a review judgment of each command; no check
@@ -930,7 +930,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-012	check	.github: agora test	tests compare command list and show with the registry, and completion with it
 0041-command-line FR-013	check	.github: agora test	tests run every type's validation, completion and error, and the input schemas generated from them
 0041-command-line FR-014	check	.github: agora check commands	the registry requires exactly one category from the seven for every command
-0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run and that a dry run leaves a clone's tree unchanged
+0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run and that a dry run leaves a clone's tree unchanged; a unified diff in the dry run is not yet tested (0043 FR-014)
 0041-command-line FR-016	check	.github: agora test	tests run every command that takes no required argument and check its resource
 0041-command-line FR-017	check	.github: agora test	tests generate links' and actions' command lines from their calls
 0041-command-line FR-018	check	.github: agora test	tests compare the three renderings of resources
@@ -942,7 +942,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-024	check	.github: agora test	tests run the same commands through the terminal and the MCP server and compare the resources they return
 0041-command-line FR-027	check	.github: agora test	tests drive the server over pipes: initialize, tools/list with schemas from the typed arguments, tools/call of a read, of a write that defaults to a dry run and of a decision, resources, error resources, notifications, and that standard output holds only protocol
 0041-command-line FR-028	check	.github: agora test	tests run an isolated section in its own worker; agora doctor fails a plan needing two locks in one process
-0041-command-line FR-029	none	-	agora doctor does not yet check kits, module-level imports or uv.lock (0042 OQ-3)
+0041-command-line FR-029	none	-	agora doctor does not yet report toolchain entries, overrides or browser libraries, nor check module-level imports or uv.lock (0042 OQ-3)
 0041-command-line FR-030	none	-	agora lock still writes per-group locks (0042 OQ-3); not checked against uv.lock
 0041-command-line FR-031	check	.github: agora test	tests run sections, suites, scope and options; agora check commands compares suites with their sections
 0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone (modified, staged, untracked, --since) and, over every section and generator, that each declares watched paths that match files and that a change runs exactly those whose paths it touches; agora check commands fails a section or generator with none
@@ -955,7 +955,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-039	check	.github: agora test	tests run proposal new, list, show and advance in a fixture clone: validation as the command would, a dry run first, replay, accepted, a failing dry run leaving it open, and no commit; agora check commands fails a malformed proposal
 0041-command-line FR-040	check	.github: agora test	tests check the audience stamp, unstated under --root, and a write refusing --root
 0041-command-line FR-041	check	.github: agora test	tests run every write command in a fixture clone and check Git's HEAD, index and tags are untouched
-0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, that a read and an MCP resource read are not logged while a write, a check, a refused decision and an MCP call that runs something are, and that the directory is ignored
+0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, that a read and an MCP resource read are not logged while a write, a check, a refused decision and an MCP call that runs something are, and that the directory is ignored; the editor surface from IF_CONSOLE is not yet tested (0043 FR-017)
 0041-command-line FR-043	none	-	that no command calls an AI model or service is a review judgment of each command; no check
 0041-command-line FR-044	none	-	a rule about what is not built; no check
 0041-command-line FR-045	check	.github: agora check commands	agora's launcher, code, manifests and its two specs are scanned for the names of the other repositories the register lists
@@ -963,19 +963,19 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-047	none	-	no check; workspaces-host tests its environment-file parser
 0041-command-line FR-048	none	-	no check; workspaces-host tests that it reads no other orchestrator's files
 0041-command-line FR-049	none	-	no check scans an orchestrator for YAML or a format it does not own
-0041-command-line FR-050	none	-	enforced by workspaces-host's tests of the extension once it ships (its contract is tested from Python); agora has no editor views yet (0042 OQ-3)
-0041-command-line FR-051	none	-	enforced by workspaces-host's tests of the extension once it ships
-0041-command-line FR-052	none	-	enforced by workspaces-host's tests of the extension once it ships
-0041-command-line FR-053	none	-	enforced by workspaces-host's tests of the extension once it ships
+0041-command-line FR-050	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
+0041-command-line FR-051	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
+0041-command-line FR-052	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
+0041-command-line FR-053	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
 0041-command-line FR-054	none	-	no check of a text rendering's first line; workspaces-host will test its own
 0041-command-line FR-055	none	-	no check of displayed commands; workspaces-host will test its own
 0041-command-line FR-056	none	-	no check; workspaces-host tests that a skipped repository is reported with its reason
 0041-command-line FR-057	none	-	no check; workspaces-host tests its help report
-0041-command-line FR-058	none	-	no check; workspaces-host tests its kit contract
-0041-command-line FR-059	none	-	no check; workspaces-host tests its installers
-0041-command-line FR-060	none	-	no check; workspaces-host tests doctor's report
-0041-command-line FR-061	none	-	no check; workspaces-host tests that a kit loads only from a trusted repository
-0041-command-line FR-062	none	-	no check; workspaces-host tests trust and its configuration
+0041-command-line FR-058	none	-	retired: a program comes from a package or a toolchain entry (FR-066)
+0041-command-line FR-059	none	-	retired: the only fetch is a toolchain entry into the cache
+0041-command-line FR-060	none	-	retired: doctor prints each entry's and package's version (FR-029)
+0041-command-line FR-061	none	-	no check; workspaces-host tests trust, and IF Console tests that it runs a launcher only when trusted (0043 FR-028)
+0041-command-line FR-062	none	-	no check; workspaces-host tests trust and its configuration, and IF Console tests it (0043 FR-028)
 0041-command-line FR-063	none	-	no check; workspaces-host tests that unpushed work survives an update and that a skipped repository exits 0
 0041-command-line FR-064	none	-	no check of the wire shape in agora yet (0042 OQ-3); workspaces-host's tests check its own and the extension's contract
 0041-command-line FR-065	none	-	agora has no help command; workspaces-host's tests check its topics, their actions and that its documentation is generated and fresh
@@ -986,20 +986,69 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
 0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included; the README's command table is checked to name every noun
 0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
-0042-agora FR-008	none	-	agora test validates the typed arguments it has, but VERSION replaces COMMIT only when environment set moves (OQ-3, OQ-4)
+0042-agora FR-008	none	-	agora test validates the typed arguments it has; ENTRY replaces VERSION when the toolchain moves in (OQ-3)
 0042-agora FR-009	check	.github: agora test	tests run design-system new against a fixture clone: refused without the spec, without the ontology entry, for a kind that is not the entry's; scaffolding, --dry-run and no overwrite
 0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
-0042-agora FR-011	none	-	environment set still moves the earlier pin and the image tag together until CI moves (OQ-4)
+0042-agora FR-011	none	-	retired: no pin of a reference environment; the environment noun is removed in code (OQ-3)
 0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
-0042-agora FR-013	check	.github: agora check commands	the declared sections are compared with this list, each with watched paths; the README is checked to name every noun and repository-wide command, and proposals to be well formed; agora test runs each item check against the design systems' passing and failing fixtures, with and without --scope, and checks that a scope holding nothing is not a pass
-0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; agora test checks that no item check is in a suite and that a suite naming no section fails
+0042-agora FR-013	none	-	the sections toolchain and extension, and the removal of environment, are not built; agora check commands still compares the earlier list (OQ-3)
+0042-agora FR-014	none	-	the suites extension and the toolchain section are not built; agora check commands still compares the earlier list (OQ-3)
 0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, openedx-sources, print-layout-docs, profile-figure and agent-skill, naming the command that rewrites each
-0042-agora FR-016	check	.github: agora check commands	check commands fails a script outside design-systems/ and tools/agora/, a workflow that calls another tool, and any file that refers to a script agora replaced
+0042-agora FR-016	check	.github: agora check commands	check commands fails a script outside design-systems/ and tools/agora/, a workflow that calls another tool, and any file that refers to a script agora replaced; tools/if-console/ is not yet allowed by it
 0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review
-0042-agora FR-018	none	-	agora still keeps per-group locks (OQ-3); doctor does not yet check pyproject.toml and uv.lock
+0042-agora FR-018	none	-	agora still keeps per-group locks and host programs (OQ-3); doctor does not yet report toolchain entries
 0042-agora FR-019	none	-	the editor views are not declared yet (OQ-3)
 0042-agora FR-020	check	.github: agora test	tests drive agora mcp serve over pipes and in process: the tool list is exactly the commands that declare mcp and are not decisions, a write defaults to a dry run, a decision is refused with decision-refused and proposal new as the next action, resources and templates are readable by URI, protocol revisions are negotiated, and standard output holds only protocol
 0042-agora FR-021	check	.github: agora test	tests check the log lines of the terminal and of the MCP server (surface mcp), the value kept out of them, that reads are not logged, and that .gitignore lists the log directory; proposals are tracked files, checked by agora check commands
-0042-agora FR-022	check	.github: agora check commands	agora check commands fails a workflow that does not call ./agora or that calls another script under tools/; which suite each job runs, and that reference-environment.yml shows doctor's exit 3 as a warning and fails on any other status, is a review of the workflow
+0042-agora FR-022	none	-	agora check commands still checks the earlier workflow rules; the stock-runner-only jobs and the removal of reference-environment.yml are not done (OQ-3, OQ-4)
 0042-agora FR-028	check	.github: agora fresh	fresh proves the agent skill current and names agora skill generate when it is not; tests check it is written from the registry alone, deterministic, and lists every command, noun, section and generator
 0042-agora FR-029	check	.github: agora test	tests run proposal new, list, show and advance: the file's fields and id, validation, refusal of a command that is not record, generate or decision and of a proposal command, the dry run shown first, a failing dry run leaving the proposal open, and agora check commands failing a malformed one
+0025-tooling-environment FR-014	none	-	agora doctor reports python3 and uv but no check fails a repository documenting another host program; agora check toolchain will (0042 FR-013)
+0025-tooling-environment FR-015	none	-	no toolchain lock exists yet; agora check toolchain will check entries and package-lock.json (0042 FR-013)
+0025-tooling-environment FR-016	none	-	agora check toolchain will fail an incomplete entry (0041 FR-068); not built yet
+0025-tooling-environment FR-017	none	-	the fetch, cache and verification are not built; agora test will cover them (0041 FR-066)
+0025-tooling-environment FR-018	none	-	offline toolchain behavior is not built; agora test will cover it (0041 FR-004)
+0025-tooling-environment FR-019	none	-	overrides are not built; agora test will cover them and agora doctor will list them (0041 FR-029)
+0025-tooling-environment FR-020	none	-	agora check toolchain will fail an entry without linux-x86_64 (0041 FR-068); not built yet
+0025-tooling-environment FR-021	none	-	the library check is not built; agora test will cover it with a stand-in binary
+0025-tooling-environment FR-022	none	-	agora check toolchain will scan workflows for package-manager steps and images (0042 FR-013); not built yet
+0025-tooling-environment FR-023	none	-	a cache is an optimization; a cold-cache CI run is the check once the workflows are moved (0042 FR-022)
+0025-tooling-environment FR-024	none	-	documentation judgment of each README
+0025-tooling-environment FR-025	none	-	agora check toolchain will fail a file that requires a workspace or reference environment; not built yet
+0025-tooling-environment FR-026	none	-	agora fresh proves generated files on one host; nothing compares two hosts
+0041-command-line FR-066	none	-	the toolchain is not built; agora doctor and agora test will check the declaration (0042 FR-030)
+0041-command-line FR-067	none	-	the toolchain noun is not built; agora check commands will compare it with the ontology once it is
+0041-command-line FR-068	none	-	agora check toolchain will fail an incomplete entry; not built yet (0042 FR-013)
+0042-agora FR-030	none	-	the toolchain and the package replacements are not built; agora doctor will report them (OQ-2)
+0042-agora FR-031	none	-	agora has no editor views declared yet (OQ-3); IF Console tests the extension side (0043 FR-028)
+0042-agora FR-032	none	-	.if-console.env and agora extension build are not built; agora check extension will check them
+0043-if-console FR-001	none	-	the extension is not built; agora check extension will check its manifest
+0043-if-console FR-002	none	-	agora check commands will check where code lives once tools/if-console/ exists (0042 FR-016); public-only is a review of the directory
+0043-if-console FR-003	none	-	IF Console tests will check that it runs only launcher commands (FR-028); not built yet
+0043-if-console FR-004	none	-	IF Console tests will cover discovery (FR-028); not built yet
+0043-if-console FR-005	none	-	IF Console tests will cover the handshake (FR-028); not built yet
+0043-if-console FR-006	none	-	IF Console tests will cover trust and Restricted Mode (FR-028); not built yet
+0043-if-console FR-007	none	-	IF Console tests will cover several folders (FR-028); not built yet
+0043-if-console FR-008	none	-	IF Console tests will cover the tree (FR-028); not built yet
+0043-if-console FR-009	none	-	IF Console tests will cover diagnostics (FR-028); not built yet
+0043-if-console FR-010	none	-	IF Console tests will cover tasks and tests (FR-028); not built yet
+0043-if-console FR-011	none	-	IF Console tests will cover the webview policy (FR-028); not built yet
+0043-if-console FR-012	none	-	IF Console tests will cover the palette (FR-028); not built yet
+0043-if-console FR-013	none	-	IF Console tests will cover forms (FR-028); not built yet
+0043-if-console FR-014	none	-	IF Console tests will cover the dry-run diff (FR-028); not built yet
+0043-if-console FR-015	none	-	IF Console tests will cover the modal and the absence of an API (FR-028); not built yet
+0043-if-console FR-016	none	-	IF Console tests will cover the status bar (FR-028); not built yet
+0043-if-console FR-017	none	-	IF Console tests will cover the output channel and IF_CONSOLE (FR-028); not built yet
+0043-if-console FR-018	none	-	IF Console tests will cover context and help (FR-028); not built yet
+0043-if-console FR-019	none	-	IF Console tests will cover the Chores view (FR-028); not built yet
+0043-if-console FR-020	none	-	IF Console tests will cover streams and cancel (FR-028); not built yet
+0043-if-console FR-021	none	-	IF Console tests will cover the schema check (FR-028); not built yet
+0043-if-console FR-022	none	-	IF Console tests will cover the MCP registration (FR-028); not built yet
+0043-if-console FR-023	none	-	IF Console tests will scan for network and telemetry calls (FR-028); not built yet
+0043-if-console FR-024	none	-	IF Console tests will check the manifest's settings (FR-028); not built yet
+0043-if-console FR-025	none	-	plain language is a review of each message; theme colors and labels will be tested (FR-028)
+0043-if-console FR-026	none	-	IF Console tests will check that it writes no file (FR-028); not built yet
+0043-if-console FR-027	none	-	agora extension build is not built; agora check toolchain will check the lock
+0043-if-console FR-028	none	-	agora check extension is not built
+0043-if-console FR-029	none	-	no check; installation is a person's act
+0043-if-console FR-030	none	-	IF Console tests will check the manifest's engine and the absent features (FR-028); not built yet
