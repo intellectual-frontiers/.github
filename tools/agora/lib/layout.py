@@ -13,7 +13,7 @@ from .register import known_repositories
 
 NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
-# 0042 FR-013: the check sections, and FR-014: the suites, as `sections` plus `planned`.
+# 0042 FR-013: the check sections, and FR-014: the suites, as `sections`.
 SECTIONS = {"specs", "register", "controls", "ontology", "environment", "commands", "ui", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
 SUITES = {"spec": {"specs", "register", "controls", "ontology", "environment", "commands", "ui"},
@@ -58,8 +58,8 @@ def check_layout(home: Path, registry) -> list[Finding]:
                          f"extra {sorted(declared - SECTIONS)}"))
     for suite, want in SUITES.items():
         s = registry.suites.get(suite)
-        have = set(s["sections"]) | set(s["planned"]) if s else set()
-        # a section with options is named with them in `planned`; compare by section name
+        have = set(s["sections"]) if s else set()
+        # a section with options is named with them; compare by section name
         norm = lambda names: {n.split(" ")[0] for n in names}
         if norm(have) != norm(want):
             f.append(Finding("error", "tools/agora/agora.toml", f"suite {suite} is {sorted(have)}; 0042 FR-014 says {sorted(want)}"))
@@ -120,4 +120,74 @@ def check_scripts(home: Path) -> list[Finding]:
             if n.endswith(SCRIPT_SUFFIXES):
                 out.append(Finding("error", str(here / n), f"a script outside design-systems/ and tools/{NAME}/: delete it once {NAME} "
                                    "provides its function, and rewrite every reference to it (0042 FR-016)"))
+    return out
+
+
+def repository_files(home: Path) -> list[str]:
+    out: list[str] = []
+    for dirpath, dirs, names in os.walk(home):
+        here = Path(dirpath).relative_to(home)
+        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
+        out += [(here / n).as_posix() for n in sorted(names)]
+    return out
+
+
+def check_watched(registry) -> list[Finding]:
+    """0041 FR-032, 0042 FR-013: every section and every generator declares watched paths, so that `check --changed` and
+    `fresh --changed` run what a change can affect. (That each pattern matches a file is a test of this repository.)"""
+    out: list[Finding] = []
+    declared = [(f"section {s.name}", s.watch, "tools/agora/groups/%s/agora.toml" % s.group) for s in registry.sections.values()]
+    declared += [(f"generator {g.name}", g.watch, "tools/agora/groups/%s/agora.toml" % g.group) for g in registry.generators.values()]
+    for what, watch, where in declared:
+        if not watch:
+            out.append(Finding("error", where, f"{what} declares no watched paths, so --changed would always run it (0041 FR-032)"))
+    return out
+
+
+def check_readme(home: Path, registry) -> list[Finding]:
+    """0042 FR-013: the README's command-line section names every noun and every repository-wide command."""
+    readme = home / "README.md"
+    text = readme.read_text(encoding="utf-8") if readme.is_file() else ""
+    start = text.find("### The command line")
+    if start < 0:
+        return [Finding("error", "README.md", "has no section `### The command line` (0042 FR-013)")]
+    end = text.find("\n### ", start + 5)
+    body = text[start:end if end > 0 else len(text)]
+    out = []
+    for n in sorted(registry.nouns):
+        if f"`{n}`" not in body:
+            out.append(Finding("error", "README.md", f"the command line section does not name the noun `{n}` (0042 FR-013)"))
+    for c in sorted(registry.commands.values(), key=lambda c: c.id):
+        if len(c.words) == 1 and f"agora {c.words[0]}" not in body and f"`{c.words[0]}" not in body:
+            out.append(Finding("error", "README.md", f"the command line section does not name the command `{c.words[0]}` (0042 FR-013)"))
+    return out
+
+
+def check_proposals(ctx) -> list[Finding]:
+    """0042 FR-029: each proposal is well formed, and an open one still replays."""
+    from . import proposals
+    return [Finding("error", f"{ctx.registry.root_manifest.get('proposals', '.agora/proposals')}/{pid}.json", why)
+            for pid in proposals.ids(ctx) for why in proposals.problems(ctx, pid)]
+
+
+# 0042 FR-016: the scripts agora replaced. No file of this repository may refer to one, except the spec that names them.
+REMOVED = ("tools/spec_check.py", "tools/run_assurance.sh", "tools/brand_decoration.py", "tools/brand_imagery.py", "tools/brand_openedx.py",
+           "tools/brand_specimen.py", "tools/brand_theme.py", "spec_check.py", "run_assurance.sh")
+TEXT_SUFFIXES = (".md", ".py", ".toml", ".yml", ".yaml", ".json", ".ttl", ".tsv", ".html", ".js", ".mjs", ".css", ".txt", ".tex", "")
+
+
+def check_removed_scripts(home: Path) -> list[Finding]:
+    out: list[Finding] = []
+    for rel in repository_files(home):
+        if rel.startswith("tools/agora/tests/") or rel in ("spec-kit/specs/0042-agora/spec.md", "tools/agora/lib/layout.py") or not rel.endswith(TEXT_SUFFIXES):
+            continue
+        try:
+            text = (home / rel).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for n, line in enumerate(text.splitlines(), 1):
+            for name in REMOVED:
+                if name in line:
+                    out.append(Finding("error", f"{rel}:{n}", f"refers to {name}, which agora replaced: name the agora command instead (0042 FR-016)"))
+                    break
     return out

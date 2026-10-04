@@ -24,6 +24,7 @@ from agora.core import generate, plan
 from agora.core.checks import changed_paths, find_program, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
+from agora.core.mcp import Server
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
 from agora.core.resource import FAILED, MISSING, OK
 from agora.core.types import COMMIT  # noqa: F401  (declared here, once, for every group)
@@ -38,7 +39,6 @@ SUITE = Dynamic("SUITE", "a named set of check sections", lambda c: list(c.regis
 GROUP = Dynamic("GROUP", "a command group", lambda c: list(c.registry.groups))
 COMMAND = Dynamic("COMMAND", "a command's words, as `command list` shows them", lambda c: list(c.registry.commands))
 CATEGORY = Choice("CATEGORY", CATEGORIES, "a command category")
-STATUS_OF_COMMAND = Choice("COMMAND_STATUS", ("implemented", "planned"), "whether a command is implemented or only declared")
 GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
 VOICE_MODE = Choice("VOICE_MODE", ("prose", "procedure"), "how the voice sweep reads a text: as prose or as a procedure's steps")
 RUNNER = Choice("RUNNER", ("browser", "python"), "which kind of design system harness")
@@ -100,18 +100,18 @@ RESOURCE = _Resource()
 
 # command list | show ---------------------------------------------------------------------------------------------
 @command("command list", category="read", help="List the registry's commands", relocatable=True,
-         options=[Opt("--category", "CATEGORY", "only this category"), Opt("--status", "COMMAND_STATUS", "implemented or planned")])
-def command_list(ctx: Ctx, category: str | None, status: str | None) -> Resource:
+         options=[Opt("--category", "CATEGORY", "only this category")])
+def command_list(ctx: Ctx, category: str | None) -> Resource:
     reg = ctx.registry
     rows = []
     for c in sorted(reg.commands.values(), key=lambda c: c.id):
-        if (category and c.category != category) or (status and c.status != status):
+        if category and c.category != category:
             continue
         rows.append({"id": c.id, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
-                     "status": c.status, "help": c.help})
+                     "help": c.help})
     res = Resource("command-list", "all", {"count": len(rows), "commands": rows},
                    links=[Link("command", Call("command show", {"command": r["id"]})) for r in rows])
-    res.columns["commands"] = ["id", "category", "group", "surfaces", "status"]
+    res.columns["commands"] = ["id", "category", "group", "surfaces"]
     return res
 
 
@@ -126,6 +126,17 @@ def command_show(ctx: Ctx, command: str) -> Resource:
     res.columns["options"] = ["flag", "type", "help"]
     res.links = [Link("noun", Call("command list", {"category": c.category}))]
     return res
+
+
+@context_for("command", "COMMAND")
+def context_command(ctx: Ctx, ident: str) -> dict[str, Any]:
+    d = command_show(ctx, ident)
+    c = ctx.registry.commands[ident]
+    mod = f"tools/agora/groups/{c.group}/commands.py" if c.group else ""
+    return {"resource": d.data, "specs": [{"name": "0041-command-line", "status": "see spec show"}, {"name": "0042-agora", "status": "see spec show"}],
+            "requirements": [], "files": [f for f in (mod, f"tools/agora/groups/{c.group}/agora.toml" if c.group else "",
+                                                       "ontology/ifcore.ttl") if f],
+            "links": d.links, "actions": d.actions}
 
 
 # check -------------------------------------------------------------------------------------------------------------
@@ -152,14 +163,7 @@ def check(ctx: Ctx, sections: list[str], scope: list[str], suite: str | None, ch
          options=[Opt("--changed", None, "prove only generators whose sources or outputs changed")])
 def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
     reg = ctx.registry
-    explicit = bool(generators)
-    names = generators or [n for n, g in reg.generators.items() if g.status == "implemented"]
-    planned = [n for n in names if reg.generators[n].status == "planned"]
-    if planned:
-        raise AgoraError("not-implemented", f"generator {', '.join(planned)} is declared but not implemented yet; it proved nothing",
-                         exit=FAILED, actions=[next_command("prove what is implemented", "fresh")])
-    not_run = [{"name": n, "reason": "planned: not implemented yet"} for n, g in reg.generators.items()
-               if g.status == "planned"] if not explicit else []
+    names = generators or list(reg.generators)
     skipped_unchanged: list[dict[str, str]] = []
     if changed:
         paths = changed_paths(ctx.root, None)
@@ -172,7 +176,7 @@ def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
     stale = [r for r in rows if r["status"] == "stale"]
     skipped = [r for r in rows if r["status"] == "skipped"]
     status = "stale" if stale else "skipped" if skipped else "fresh"
-    data = {"status": status, "generators": rows, "not_run": not_run, "skipped_unchanged": skipped_unchanged,
+    data = {"status": status, "generators": rows, "skipped_unchanged": skipped_unchanged,
             "summary": {"run": len(rows), "fresh": sum(r["status"] == "fresh" for r in rows), "stale": len(stale),
                         "skipped": len(skipped)}}
     res = Resource("fresh", " ".join(generators) or "all", data, text=_fresh_text,
@@ -204,8 +208,6 @@ def _fresh_text(res: Resource) -> str:
             out.append(f"✅ {r['name']}: {r['files']} file(s) current")
     for s in d["skipped_unchanged"]:
         out.append(f"⏭️  {s['name']}: not proved ({s['reason']})")
-    if d["not_run"]:
-        out.append("⏳ planned, not implemented yet, so not proved: " + ", ".join(s["name"] for s in d["not_run"]))
     m = d["summary"]
     out.append(f"fresh: {d['status']}: {m['run']} generator(s) proved, {m['stale']} stale, {m['skipped']} skipped")
     return "\n".join(out)
@@ -270,8 +272,7 @@ def doctor(ctx: Ctx) -> Resource:
     status = "failed" if problems else "missing" if missing else "ok"
     data = {"status": status, "prerequisites": prereq, "groups": groups, "programs": programs,
             "conflicts": problems, "missing": missing, "offline": ctx.offline,
-            "commands": {"implemented": sum(1 for c in reg.commands.values() if c.status == "implemented"),
-                         "planned": sum(1 for c in reg.commands.values() if c.status == "planned")}}
+            "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)
     res.columns["prerequisites"] = ["name", "present", "version", "hint"]
     res.columns["programs"] = ["program", "group", "needed by", "present", "hint"]
@@ -414,6 +415,14 @@ def ui_link(ctx: Ctx, ui: str) -> Resource:
     return res
 
 
+# mcp ---------------------------------------------------------------------------------------------------------------
+@command("mcp serve", category="setup", help="Serve MCP over standard input and output until the client closes it: for AI agents")
+def mcp_serve(ctx: Ctx):
+    """The protocol owns standard output: this command returns no resource of its own (0041 FR-027)."""
+    Server(ctx.registry, ctx.home, ctx.env).serve(sys.stdin, sys.stdout)
+    yield from ()
+
+
 # context -----------------------------------------------------------------------------------------------------------
 MAX_ITEMS = 60  # a context is bounded; it says what it left out (0041 FR-038)
 
@@ -452,7 +461,11 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
     findings += layout.check_layout(ctx.home, reg)
     findings += layout.check_workflows(ctx.home)
     findings += layout.check_scripts(ctx.home)
+    findings += layout.check_removed_scripts(ctx.home)
     findings += layout.check_boundaries(ctx.home, reg.root_manifest.get("register_name"))
+    findings += layout.check_watched(reg)
+    findings += layout.check_readme(ctx.home, reg)
+    findings += layout.check_proposals(ctx)
     ttl_path = ctx.home / "ontology" / "ifcore.ttl"
     onto = ontology.command_individuals(ttl_path.read_text(encoding="utf-8")) if ttl_path.is_file() else {}
     for cid, c in sorted(reg.commands.items()):
@@ -468,8 +481,7 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
         if cid not in reg.commands:
             findings.append(Finding("error", f"ontology/ifcore.ttl: {ind['iri']}", f"declares command {cid!r}, which the registry does not (0042 FR-004)"))
     decisions = sorted(c.id for c in reg.commands.values() if c.category == "decision")
-    n_impl = sum(1 for c in reg.commands.values() if c.status == "implemented")
-    notes = [f"commands: {len(reg.commands)} in the registry ({n_impl} implemented, {len(reg.commands) - n_impl} planned), "
+    notes = [f"commands: {len(reg.commands)} in the registry, "
              f"{len(onto)} in the ontology; decisions: {', '.join(decisions)}"]
     return SectionResult.from_findings("commands", findings, notes,
                                        {"registry": len(reg.commands), "ontology": len(onto), "decisions": decisions})

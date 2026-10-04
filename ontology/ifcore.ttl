@@ -2129,6 +2129,9 @@ ifcore:OpenedxResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindSch
 ifcore:LayoutResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "layout"@en ;
     skos:notation "layout" ;
     skos:definition "A print layout of the print design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
+    skos:notation "skill" ;
+    skos:definition "The skill file that tells an AI agent how to use the command line, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:FigureResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "figure"@en ;
     skos:notation "figure" ;
     skos:definition "A figure drawn with the figure design system."@en ; ifcore:hasAudience ifcore:Public .
@@ -2348,6 +2351,10 @@ ifcore:AgoraFigureGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Ago
     dcterms:identifier "figure generate" ;
     ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
     skos:definition "Writes the organization profile's figure from frontiers-figures and the brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSkillGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "skill generate"@en ;
+    dcterms:identifier "skill generate" ;
+    ifcore:commandNoun ifcore:SkillResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes the agent skill, .claude/skills/agora/SKILL.md, from the registry (0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraDeckBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "deck build"@en ;
     dcterms:identifier "deck build" ;
     ifcore:commandNoun ifcore:DeckResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;

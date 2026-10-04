@@ -15,7 +15,7 @@ from agora.core import cli, render
 from agora.core.registry import WRITES, Command
 from agora.core.resource import AgoraError, Resource
 
-from . import execute as ex
+from agora.core import execute as ex
 from . import forms, pages
 from .forms import h
 from .server import App, Reply, Request, Sse, patch, static_file
@@ -41,14 +41,14 @@ class Console(App):
     # the registry as pages -------------------------------------------------------------------------------------
     def exposed(self, cmd: Command | None) -> bool:
         """Whether the console may offer a command at all: the registry's surfaces for it include `ui` (0041 FR-022)."""
-        return cmd is not None and cmd.status == "implemented" and "ui" in self.reg.surfaces_of(cmd)
+        return cmd is not None and "ui" in self.reg.surfaces_of(cmd)
 
     def ctx(self, **kw: Any):
         kw.setdefault("no_log", self.no_log)
         return ex.new_ctx(self.reg, self.home, self.env, **kw)
 
     def implemented(self) -> list[Command]:
-        return sorted((c for c in self.reg.commands.values() if c.status == "implemented"), key=lambda c: c.id)
+        return sorted((c for c in self.reg.commands.values()), key=lambda c: c.id)
 
     @staticmethod
     def cmd_url(cmd: Command) -> str:
@@ -146,7 +146,7 @@ class Console(App):
         cards = "".join(f'<a class="fc-card" href="/n/{h(n)}"><span class="fc-card__title">{h(n)}</span>'
                         f'<span class="fc-card__text">{h(self.reg.nouns.get(n, ""))} ({len(cs)} command{"s" if len(cs) != 1 else ""})</span></a>'
                         for n, cs in sorted(nouns.items()))
-        listing = self.run_one(self.reg.commands["command list"], {"category": None, "status": "implemented"})
+        listing = self.run_one(self.reg.commands["command list"], {"category": None})
         article = "".join(self.render(r, listing[0], 3) for r in listing[1])
         main = (f'<header class="fc-article__head"><h1 class="fc-title">{h(self.title)}</h1>'
                 f'<p class="fc-description">The registry of {h(self.reg.name)}: each noun, its commands, and what each command does. '
@@ -172,7 +172,7 @@ class Console(App):
 
     def command_page(self, words: str, run: bool = False) -> Reply:
         cmd = self.reg.find(words.replace("/", " "))
-        if cmd is None or cmd.status != "implemented":
+        if cmd is None:
             return self.page("Not found", '<header class="fc-article__head"><h1 class="fc-title">No such command</h1></header>', None,
                              [(self.title, "/"), (words, None)], 404)
         ctx = self.ctx()

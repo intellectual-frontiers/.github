@@ -28,13 +28,22 @@ class Logs(unittest.TestCase):
         return main(list(argv), home=self.home, stdout=io.StringIO(), stderr=io.StringIO(), env={"PATH": "/usr/bin"}, **kw)
 
     def test_a_run_is_logged_with_surface_command_args_and_exit(self):
-        self.call("spec", "show", "0020", "--root", str(HOME))
-        self.call("spec", "show", "99")
+        self.call("check", "environment", "--root", str(HOME))
+        self.call("check", "--suite", "no-such-suite")
         a, b = self.lines()
-        self.assertEqual((a["surface"], a["command"], a["exit"]), ("cli", "spec show", 0))
-        self.assertEqual(a["args"]["spec"], "0020-spec-format")
-        self.assertEqual((b["command"], b["exit"], b["args"]), ("spec show", 2, {}))
+        self.assertEqual((a["surface"], a["command"], a["exit"]), ("cli", "check", 0))
+        self.assertEqual(a["args"]["sections"], ["environment"])
+        self.assertEqual((b["command"], b["exit"], b["args"]), ("check", 2, {}))
         self.assertIn("time", a)
+
+    def test_a_read_is_not_logged_but_what_changes_or_runs_something_is(self):  # 0041 FR-042, 0042 FR-021
+        self.call("spec", "show", "0020")
+        self.call("spec", "show", "99")  # a refused read changed nothing either
+        self.call("command", "list")
+        self.assertEqual(self.lines(), [])
+        self.call("spec", "new", "demo", "--dry-run")
+        self.call("doctor")
+        self.assertEqual([l["command"] for l in self.lines()], ["spec new", "doctor"])
 
     def test_a_dry_run_is_logged_as_one(self):
         self.call("spec", "new", "demo", "--dry-run")
@@ -43,7 +52,7 @@ class Logs(unittest.TestCase):
 
     def test_a_value_marked_unlogged_never_reaches_the_log(self):
         reg = Registry.load(self.home)
-        reg.add_command(Command(("spec", "status"), "read", group="spec", args=(Arg("spec", "TEXT"),),
+        reg.add_command(Command(("spec", "status"), "record", group="spec", args=(Arg("spec", "TEXT"),),
                                 options=(Opt("--who", "TEXT", log=False), Opt("--what", "TEXT")),
                                 fn=lambda ctx, spec, who, what: Resource("x", "y")))
         self.call("spec", "status", "0020", "--who", "A Person", "--what", "thing", registry=reg)

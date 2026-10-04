@@ -65,10 +65,6 @@ class Parser(unittest.TestCase):
     def test_reads_refuse_dry_run(self):
         self.assertEqual(run(["spec", "show", "0020", "--dry-run"])[0], 2)
 
-    def test_planned_commands_fail_plainly(self):
-        code, doc = run_json(["mcp", "serve"])
-        self.assertEqual((code, doc["data"]["code"]), (1, "not-implemented"))
-
     def test_a_missing_program_is_exit_3_with_the_hint(self):
         reg = Registry.load(HOME)
         reg.add_command(Command(("spec", "status"), "read", "x", programs=("no-such-program-xyz",), group="spec",
@@ -126,7 +122,8 @@ class Completion(unittest.TestCase):
             self.assertIn(expected, w)
         self.assertIn("design-system", w)
         self.assertIn("ui", w)
-        self.assertNotIn("mcp", w)  # planned, not implemented
+        self.assertIn("mcp", w)
+        self.assertIn("proposal", w)
 
     def test_verbs_of_a_noun(self):
         self.assertEqual(self.complete("spec", ""), ["list", "new", "set", "show"])

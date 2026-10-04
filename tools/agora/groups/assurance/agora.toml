@@ -54,7 +54,7 @@ needed_by = ["check design-systems --runner python (frontiers-figures, frontiers
 hint = "install librsvg (rsvg-convert) from the host (the press persona carries it)"
 
 [programs.convert]
-needed_by = ["check imagery", "imagery build", "imagery show", "imagery add", "decoration generate", "decoration show --measure"]
+needed_by = ["check imagery", "check openedx (a brand without a favicon.ico)", "check design-systems (frontiers-brand's Open edX harness)", "imagery build", "imagery show", "imagery add", "decoration generate", "decoration show --measure", "openedx generate (a brand without a favicon.ico)"]
 hint = "install ImageMagick, with WebP support, from the host"
 [programs.identify]
 needed_by = ["check imagery", "imagery build", "imagery show", "imagery add", "decoration generate (trace)"]
@@ -73,6 +73,8 @@ programs = []
 programs = ["latexmk", "xelatex", "lualatex", "pdfinfo", "pdffonts", "pdftotext", "pdfimages"]
 [harnesses."frontiers-course:python"]
 programs = ["node"]
+[harnesses."frontiers-brand:python"]
+optional = ["convert"]  # a brand without a favicon.ico is skipped, naming it, when ImageMagick is missing (exit 3)
 [harnesses."frontiers-figures:python"]
 optional = ["rsvg-convert", "pdffonts"]
 [harnesses."frontiers-media:python"]

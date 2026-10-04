@@ -18,7 +18,8 @@ from agora.core.ctx import Ctx
 from agora.core.registry import Registry
 from agora.core.resource import AgoraError, Resource
 from agora.core.ui import check as ui_check
-from agora.core.ui import execute, htmlcheck, state
+from agora.core import execute
+from agora.core.ui import htmlcheck, state
 from agora.core.ui.check import elements_of, events
 
 from .helpers import HOME, run, run_json
@@ -176,15 +177,21 @@ class Console(UiRepo):
         read = c.fetch("GET", "/c/spec/list")[2].decode()
         self.assertNotIn("--dry-run", read.split("About this command")[0])
 
-    def test_a_read_runs_over_an_event_stream_and_is_logged_as_the_ui(self):  # 0042 FR-021, FR-024
+    def test_a_read_runs_over_an_event_stream_and_is_not_logged_but_a_check_is_logged_as_the_ui(self):  # 0041 FR-042, 0042 FR-021, FR-024
         server, c = self.serve()
         status, headers, text = c.post("/act/start", {"cmd": ["spec show"], "spec": ["0001"]})
         self.assertEqual((status, headers["content-type"]), (200, "text/event-stream"))
         html = panel_html(text)
         self.assertIn('data-kind="spec"', html)
         self.assertEqual(htmlcheck.parse(elements_of([e for e in events(text) if e[0] == "datastar-patch-elements"][-1][1])[1]).problems, [])
+        self.assertEqual(self.logs(), "")  # a read changes nothing: no page and no read is logged
+        c.fetch("GET", "/c/spec/show")
+        c.fetch("GET", "/")
+        self.assertEqual(self.logs(), "")
+        c.post("/act/start", {"cmd": ["check"], "sections": ["environment"]})
         lines = [json.loads(l) for l in self.logs().splitlines()]
-        self.assertEqual([(l["surface"], l["command"], l["args"], l["exit"]) for l in lines], [("ui", "spec show", {"spec": "0001-first"}, 0)])
+        self.assertEqual([(l["surface"], l["command"], l["args"], l["exit"]) for l in lines],
+                         [("ui", "check", {"sections": ["environment"]}, 0)])
 
     def test_a_form_with_a_bad_value_answers_with_an_error_resource(self):  # 0041 FR-013, FR-020
         server, c = self.serve()

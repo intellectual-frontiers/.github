@@ -123,9 +123,6 @@ def _run(ctx: Ctx, tokens: list[str], g: dict[str, Any], fmt: str, out: Any, err
     if g["help"]:
         _emit(ctx, _command_help(ctx, cmd), fmt, out, err)
         return OK
-    if cmd.status == "planned":
-        raise AgoraError("not-implemented", f"{cmd.id} is declared but not implemented yet", exit=FAILED,
-                         actions=[next_command("see what is implemented", "command list")])
     if g["dry_run"] and cmd.category not in WRITES:
         raise AgoraError("usage", f"{cmd.id} writes nothing, so it takes no --dry-run (0041 FR-015)", exit=USAGE)
     if ctx.relocated and (cmd.category in WRITES or not cmd.relocatable):
@@ -134,7 +131,7 @@ def _run(ctx: Ctx, tokens: list[str], g: dict[str, Any], fmt: str, out: Any, err
     try:
         values = parse_values(ctx, cmd, rest)
     except AgoraError as e:  # a refused invocation is still a command run (0041 FR-042); its words are not logged
-        if not g["no_log"]:
+        if not g["no_log"] and logs.worth_logging(cmd.category):
             logs.write(ctx.home / reg.root_manifest.get("logs", ".agora/logs"), surface=ctx.surface, command=cmd.id,
                        args={}, exit=e.exit, dry_run=ctx.dry_run)
         raise
@@ -152,7 +149,7 @@ def _run(ctx: Ctx, tokens: list[str], g: dict[str, Any], fmt: str, out: Any, err
         trace = traceback.format_exc()
         code = FAILED
         _emit(ctx, internal_error(ctx, e, trace, cmd), fmt, out, err)
-    if not g["no_log"]:
+    if not g["no_log"] and (logs.worth_logging(cmd.category) or trace):
         logs.write(ctx.home / reg.root_manifest.get("logs", ".agora/logs"), surface=ctx.surface, command=cmd.id,
                    args=loggable(cmd, values), exit=code, dry_run=ctx.dry_run, trace=trace)
     return code
@@ -290,7 +287,7 @@ def _help_for(ctx: Ctx, tokens: list[str]) -> Resource:
     words = [t for t in tokens if not t.startswith("-")]
     if not words:
         rows = [{"command": c.id, "category": c.category, "help": c.help} for c in sorted(
-            reg.commands.values(), key=lambda c: c.id) if c.status == "implemented"]
+            reg.commands.values(), key=lambda c: c.id)]
         res = Resource("help", reg.name, {
             "usage": f"{reg.name} <noun> <verb> [ID] [--options]  |  {reg.name} {{{'|'.join(sorted(w for w in reg.first_words() if w in ('check','fresh','test','doctor','lock','context')))}}} ...",
             "global options": ["--json", "--html", "--root DIR", "--offline", "--dry-run (writes)", "--debug", "--no-log", "--help"],

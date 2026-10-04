@@ -247,7 +247,7 @@ class SuitesAndOptions(unittest.TestCase):
 
     def test_the_sections_and_suites_are_declared(self):
         for n in ("design-systems", "imagery", "openedx"):
-            self.assertEqual(self.reg.sections[n].status, "implemented", n)
+            self.assertTrue(callable(self.reg.sections[n].fn), n)
         s = self.reg.suites
         self.assertEqual((s["browser"]["sections"], s["browser"]["options"]), (["design-systems", "openedx", "ui"], {"runner": "browser"}))
         self.assertEqual((s["python"]["sections"], s["python"]["options"]), (["design-systems"], {"runner": "python"}))
@@ -417,3 +417,40 @@ class OpenedxLibrary(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OpenedxWithoutImageMagick(unittest.TestCase):
+    """A brand without a favicon.ico needs `convert`; where the host lacks it the harness skips that brand, naming the
+    program and exiting 3, and is not a failure (0041 FR-006, FR-033; 0042 FR-013)."""
+
+    def test_the_harness_exits_3_and_says_what_it_skipped(self):
+        import subprocess
+        import sys
+        p = subprocess.run([sys.executable, "design-systems/frontiers-brand/assurance/run.py"], cwd=HOME, capture_output=True, text=True,
+                           env={"PATH": "/nonexistent", "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("skipped example-brand: needs convert", p.stdout)
+        self.assertNotIn("FAIL", p.stdout)
+
+    def test_agora_reports_the_harness_as_skipped_with_the_hint(self):
+        from agora.lib import assurance
+        lines: list[str] = []
+        reg = Registry.load(HOME)
+        o = assurance.run_openedx(reg, "frontiers-brand", HOME, {"PATH": "/nonexistent"}, None, lines.append)
+        self.assertEqual(o.status, "skipped")
+        self.assertIn("convert", o.reason)
+        self.assertIn("install ImageMagick from the host", o.reason)
+
+    def test_convert_is_declared_as_needed_by_the_openedx_check_and_the_brand_harness(self):
+        reg = Registry.load(HOME)
+        needed = reg.program("convert")["needed_by"]
+        self.assertTrue(any(n.startswith("check openedx") for n in needed))
+        self.assertTrue(any("frontiers-brand" in n for n in needed))
+        self.assertIn("convert", reg.groups["assurance"].manifest["harnesses"]["frontiers-brand:python"]["optional"])
+
+    def test_the_workflows_install_imagemagick_where_the_harness_needs_it(self):
+        text = (HOME / ".github" / "workflows" / "design-systems.yml").read_text()
+        browser, rest = text.split("  python:\n")
+        python_job = rest.split("  images:\n")[0]
+        self.assertIn("imagemagick", browser)
+        self.assertIn("imagemagick", python_job)

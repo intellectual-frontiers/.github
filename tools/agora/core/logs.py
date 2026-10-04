@@ -7,6 +7,11 @@ from pathlib import Path
 from typing import Any
 
 
+def worth_logging(category: str) -> bool:
+    """What changes or runs something is logged; a `read` changes nothing and is not (0041 FR-042)."""
+    return category != "read"
+
+
 def write(logs_dir: Path, *, surface: str, command: str, args: dict[str, Any], exit: int, dry_run: bool = False,
           trace: str | None = None) -> None:
     """Append one line: time, surface, command, typed arguments (never a person's name, secret or file contents), exit

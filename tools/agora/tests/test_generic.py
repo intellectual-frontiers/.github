@@ -20,9 +20,10 @@ class EveryCommand(unittest.TestCase):
 
     def test_every_command_without_required_arguments_returns_a_resource(self):  # 0041 FR-016
         # the commands that run the checks again, write tracked files, or run in a group's locked environment (tested apart)
-        skip = {"check", "test", "doctor", "lock", "environment set", "spec new", "fresh", "brand generate", "figure generate"}
+        skip = {"check", "test", "doctor", "lock", "environment set", "spec new", "fresh", "brand generate", "figure generate", "skill generate",
+                "mcp serve"}  # the last speaks on standard input
         for c in self.reg.commands.values():
-            if c.status != "implemented" or c.id in skip or any(a.required for a in c.args) or any(o.required for o in c.options):
+            if c.id in skip or any(a.required for a in c.args) or any(o.required for o in c.options):
                 continue
             with self.subTest(command=c.id):
                 code, doc = run_json(c.id.split())
@@ -32,8 +33,6 @@ class EveryCommand(unittest.TestCase):
 
     def test_every_write_command_takes_dry_run_and_every_other_does_not(self):  # 0041 FR-015
         for c in self.reg.commands.values():
-            if c.status != "implemented":
-                continue
             flags = [o["flag"] for o in run_json(["command", "show", c.id])[1]["data"]["options"]]
             self.assertEqual("--dry-run" in flags, c.category in WRITES, c.id)
 
@@ -42,7 +41,7 @@ class EveryCommand(unittest.TestCase):
             d = run_json(["command", "show", c.id])[1]["data"]
             self.assertEqual(d["category"], c.category)
             self.assertEqual(d["surfaces"][0], "terminal")
-            self.assertIn("status", d)
+            self.assertNotIn("status", d)
 
     def test_input_schemas_come_from_the_typed_arguments(self):  # 0041 FR-013, FR-027
         ctx = Ctx(self.reg, HOME, HOME)
@@ -137,6 +136,7 @@ class Boundaries(unittest.TestCase):
         shutil.copy(HOME / ".devcontainer" / "ws-repos.json", self.home / ".devcontainer" / "ws-repos.json")
         shutil.copy(HOME / "agora", self.home / "agora")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
+        shutil.copy(HOME / "README.md", self.home / "README.md")
 
     def findings(self):
         code, doc = run_json(["check", "commands"], home=self.home)

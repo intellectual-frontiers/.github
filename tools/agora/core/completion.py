@@ -17,15 +17,12 @@ def complete(ctx: Ctx, words: list[str]) -> list[str]:
     cmd, rest = reg.lookup(prior)
     if cmd is None:
         if not [w for w in prior if not w.startswith("-")]:
-            cands = [w for w in reg.first_words() if any(c.status == "implemented" and c.words[0] == w
-                                                         for c in reg.commands.values())]
+            cands = list(reg.first_words())
             cands += GLOBAL_FLAGS if cur.startswith("-") else []
         else:
             noun = [w for w in prior if not w.startswith("-")][0]
-            cands = [c.words[1] for c in reg.commands_under(noun) if c.status == "implemented"]
+            cands = [c.words[1] for c in reg.commands_under(noun)]
         return sorted(c for c in set(cands) if c.startswith(cur))
-    if cmd.status != "implemented":
-        return []
     opts = {o.flag: o for o in cmd.options}
     if rest and rest[-1] in opts and opts[rest[-1]].type:
         return _values(ctx, opts[rest[-1]].type, cur)

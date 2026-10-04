@@ -157,6 +157,9 @@ tools/
   agora/            agora's code: core, lib, groups/<group>/ (each with its
                     agora.toml, and an agora.lock where it pins packages),
                     vendor/ (Datastar, the web UIs' interactivity), and tests/
+.claude/
+  skills/agora/     SKILL.md, the agent skill agora generates from its registry
+                    (0042-agora FR-028)
   reference-environment
                     the workspaces-host-v3 commit every tool is guaranteed
                     to run in (0025-tooling-environment)
@@ -284,10 +287,38 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   `images` for the design systems' harnesses, each brand's imagery and its Open edX
   package (they need programs from the host: Node and Chromium, TeX Live and
   poppler, ImageMagick; a harness whose program is missing is skipped, never
-  passed, and the run exits 3), `./agora fresh` to prove generated files
-  are current, `./agora doctor` for what is missing, `./agora test` for its own
-  tests, and `./agora command list` for what it can do. Every command takes
-  `--json` and, if it writes, `--dry-run`.
+  passed, and the run exits 3), `./agora check --changed` for only the sections whose
+  watched paths changed, `./agora fresh` to prove generated files are current,
+  `./agora doctor` for what is missing, `./agora test` for its own tests, `./agora lock
+  [GROUP]` to write a group's hashed lock, and `./agora context RESOURCE` (such as
+  `context spec:0020`) for what an agent needs to work on one resource. Every command
+  takes `--json` and, if it writes, `--dry-run`.
+- A command is `agora <noun> <verb> [ID] [--options]`. `agora command list` and
+  `agora command show COMMAND` list every command with its category, arguments and
+  surfaces, and `.claude/skills/agora/SKILL.md` says the same to an AI agent; both
+  come from the registry. By noun (a `decision` command is for a person):
+
+  | Noun | Commands |
+  | --- | --- |
+  | `spec` | `list`, `show`, `new`, `set --status` (decision) |
+  | `requirement` | `list`, `show`, `set`, `add --control` |
+  | `term` | `list`, `show` |
+  | `design-system` | `list`, `show`, `new --kind` |
+  | `brand` | `list`, `show`, `generate` |
+  | `imagery` | `list`, `show`, `build`, `add` |
+  | `decoration` | `show`, `generate` |
+  | `ink` | `list`, `show`, `record` (decision) |
+  | `openedx` | `generate`, `build` |
+  | `layout` | `list`, `show`, `build` |
+  | `figure`, `deck`, `email`, `media`, `sign` | `build`; `figure` also `generate` |
+  | `course` | `show`, `build` |
+  | `environment` | `show`, `set` |
+  | `proposal` | `list`, `show`, `new`, `advance` (decision) |
+  | `skill` | `generate` |
+  | `command` | `list`, `show` |
+  | `ui` | `serve`, `open`, `stop`, `link` |
+  | `mcp` | `serve` |
+
 - The design systems' own scripts stay in their directories and `agora` calls them:
   `agora deck build`, `email build`, `course build`, `media build`, `sign build` and
   `figure build` build what they build, `agora layout list|show|build` reads the print
@@ -299,8 +330,11 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
   Python (TeX, Chromium, ImageMagick, potrace, rsvg-convert, Node) come from the
   host, and `doctor` says which are missing (0025 FR-013, 0041).
-- Git is the only record: `agora` never commits or pushes. What is not worth a
-  commit goes to untracked logs in `.agora/logs/`.
+- Git is the only record: `agora` never commits or pushes. What changes or runs
+  something and is not worth a commit (a check, a build, a dry run, a UI or MCP call)
+  goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants
+  a decision made drafts it with `agora proposal new`, a tracked file in
+  `.agora/proposals/` that a person accepts with `agora proposal advance`.
 - `./agora ui open console` opens the console, the local web UI for the registry:
   each noun and command, each resource as a page, and a form and a run for every
   command the `ui` surface exposes (a write shows its `--dry-run` first, a decision
@@ -308,8 +342,9 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   in-browser harnesses and lists each page per brand, in place of a bare static
   server. `ui serve UI` runs one in the foreground, `ui link UI` prints its address and
   `ui stop UI` stops it; `./agora check ui` proves both serve and render offline.
-  `./agora mcp serve` serves its commands to an AI agent, except decisions, which only
-  a person makes.
+  `./agora mcp serve` serves its commands and the repository's resources to an AI agent
+  over standard input and output, a write a dry run unless it says otherwise, and never
+  a decision, which only a person makes.
 - To add a command: spec first (0042), then its individual in the ontology, then
   its code in a group under `tools/agora/groups/`.
 

@@ -207,8 +207,21 @@ for any repository; the public root's command set is 0042-agora.
   that declare MCP and are not `decision` commands (FR-022, FR-023). Each
   tool's input schema MUST be generated from its typed arguments (FR-013), its
   result MUST be the command's JSON resource (FR-019), and its failures MUST be
-  error resources (FR-020). A tool that writes MUST take a `dry_run` argument
-  that defaults to true.
+  error resources (FR-020) that carry what to run next. A tool that writes MUST
+  take a `dry_run` argument that defaults to true. The server MUST implement
+  the MCP lifecycle (`initialize`, then the client's `notifications/initialized`),
+  `ping`, `tools/list`, `tools/call`, `resources/list`, `resources/templates/list`
+  and `resources/read`, ignore a notification it does not handle without
+  answering it, and answer a request it does not know with JSON-RPC's
+  method-not-found error. It MUST answer `initialize` with the protocol
+  revision the client asks for where it supports that revision, and otherwise
+  with its own latest; it MUST write nothing to standard output but protocol
+  messages, one JSON-RPC message per line; and, like the rest of the core, it
+  MUST need no package (FR-005). It MUST expose the repository's resources
+  (a spec, a requirement, a design system and the like) as MCP resources
+  readable by URI, each the JSON resource of the command that shows it
+  (FR-019), and a URI that names none MUST be answered with an error that
+  carries an error resource (FR-020).
 
 ## Isolated commands and the doctor
 
@@ -282,11 +295,14 @@ for any repository; the public root's command set is 0042-agora.
   needs to work on the resource it names: the resource itself, the specs and
   requirements that govern it, its links, its actions, and the files it
   concerns. It MUST be deterministic, bounded in size, and say what it left
-  out.
+  out. It MUST be available for every kind of resource that has a context
+  provider, each provider returning the same parts in the same shape.
 - **FR-039**: A proposal MUST be a tracked file in a directory the root
   manifest names, holding an id, the resource it concerns, the reason, and
   the change proposed as a typed action (FR-017) that can be replayed. A
-  proposal is open or accepted. `proposal list` and `proposal show` MUST be
+  proposal is open or accepted. Only a `record`, `generate` or `decision`
+  command MAY be proposed, and never a proposal command; a proposal is tracked
+  because the change it proposes is not worth less than a commit. `proposal list` and `proposal show` MUST be
   `read` commands, `proposal new` a `record` command, and `proposal advance` a
   `decision` command that replays the action (showing its `--dry-run` first,
   FR-015) and marks the proposal accepted. Refusing a proposal is deleting its
@@ -304,11 +320,15 @@ for any repository; the public root's command set is 0042-agora.
 - **FR-041**: Git MUST be the only record. A command that changes the record
   writes tracked files and leaves the commit to a person; no command MAY
   commit, push, tag, or otherwise write to Git. A command MAY read Git's state.
-- **FR-042**: What does not warrant a commit (a command run, a UI opened,
-  a dry run, a check) MUST go as NDJSON lines to untracked logs in a
-  directory the root manifest names, which the repository ignores, each line
-  noting the time, the surface (terminal, UI or MCP), the command, its typed
-  arguments and its exit status. A log line MUST NOT hold a person's name, a
+- **FR-042**: What does not warrant a commit but changes or runs something (a
+  command that writes, a check, a build, a decision, a dry run, a UI started or
+  stopped, an MCP call that does one of these) MUST go as NDJSON lines to
+  untracked logs in a directory the root manifest names, which the repository
+  ignores, each line noting the time, the surface (terminal, UI or MCP), the
+  command, its typed arguments and its exit status. A `read` command, a page
+  viewed in a UI and a resource read over MCP change nothing and MUST NOT be
+  logged; a refused call to a command that is not `read` (a decision over MCP,
+  an invalid argument) MUST be. A log line MUST NOT hold a person's name, a
   secret or file contents. A person's name MUST NOT be written to a tracked
   file except where a command's own data requires it, as a command argument
   that records who.

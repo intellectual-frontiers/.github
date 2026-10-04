@@ -21,9 +21,8 @@ class RegistryLoads(unittest.TestCase):
     def test_every_command_has_one_category_and_a_known_group(self):
         for c in self.reg.commands.values():
             self.assertIn(c.category, ("read", "check", "record", "build", "generate", "decision", "setup"))
-            if c.status == "implemented":
-                self.assertIn(c.group, self.reg.groups)
-                self.assertTrue(callable(c.fn))
+            self.assertIn(c.group, self.reg.groups)
+            self.assertTrue(callable(c.fn))
 
     def test_default_surfaces_follow_category(self):
         s = self.reg.surfaces_of
@@ -36,13 +35,17 @@ class RegistryLoads(unittest.TestCase):
             if c.category == "decision":
                 self.assertNotIn("mcp", self.reg.surfaces_of(c))
 
-    def test_every_declared_section_is_implemented_or_planned(self):
+    def test_every_declared_section_and_generator_is_implemented(self):
         for s in self.reg.sections.values():
-            self.assertTrue(s.status == "planned" or callable(s.fn), s.name)
+            self.assertTrue(callable(s.fn), s.name)
+        for g in self.reg.generators.values():
+            self.assertTrue(callable(g.fn), g.name)
 
-    def test_spec_suite_runs_only_implemented_sections(self):
-        for n in self.reg.suites["spec"]["sections"]:
-            self.assertEqual(self.reg.sections[n].status, "implemented")
+    def test_nothing_is_declared_and_left_unimplemented(self):
+        """No `[planned]` mechanism: the root manifest declares groups and suites only (0041 FR-007)."""
+        self.assertNotIn("planned", self.reg.root_manifest)
+        for s in self.reg.suites.values():
+            self.assertEqual(set(s), {"sections", "options"})
 
     def test_lookup_takes_the_longest_words(self):
         c, rest = self.reg.lookup(["spec", "show", "0020", "--json"])
@@ -109,8 +112,8 @@ class RegistryConflicts(unittest.TestCase):
         r = Registry()
         for n in ("g1", "g2"):
             r.groups[n] = Group(n, "", Path("."), {"p": "1"})
-            r.sections[n] = Section(n, group=n, status="implemented")
-        r.suites["s"] = {"sections": ["g1", "g2"], "planned": []}
+            r.sections[n] = Section(n, group=n)
+        r.suites["s"] = {"sections": ["g1", "g2"]}
         self.assertTrue(r.plan_conflicts())
         r.sections["g2"].isolated = True
         self.assertEqual(r.plan_conflicts(), [])

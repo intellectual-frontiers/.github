@@ -219,7 +219,7 @@ def check_refusals(ctx: Ctx, run: Run, app: Any, c: Client) -> None:
     status, _, _ = c.post("/act/start", {"cmd": ["command list"]}, origin="http://example.test")
     if status != 403:
         run.bad("/act/start", f"answered {status} to a post from another origin; it must refuse (0042 FR-026)")
-    unexposed = next((x.id for x in ctx.registry.commands.values() if x.status == "implemented" and not app.exposed(x)), None)
+    unexposed = next((x.id for x in ctx.registry.commands.values() if not app.exposed(x)), None)
     if unexposed:
         status, _, _ = c.post("/act/start", {"cmd": [unexposed]})
         if status != 403:

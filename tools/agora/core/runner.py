@@ -68,20 +68,11 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
         runner, brand, paragon = (v or fixed.get(k) for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon)))
     ctx.section_options = {k: v for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon), ("mode", mode),
                                              ("draft", draft), ("spoken", spoken)) if v}
-    planned_rows: list[dict[str, str]] = []
     if not explicit:
-        names = [n for n, s in reg.sections.items() if s.status == "implemented"]
-        planned_rows = [{"name": n, "reason": "planned: not implemented yet"} for n, s in reg.sections.items() if s.status == "planned"]
-    elif suite:
-        planned_rows = [{"name": p, "reason": "planned: not implemented yet"} for p in reg.suites[suite]["planned"]]
-    unrunnable = [n for n in names if reg.sections[n].status == "planned"]
-    if unrunnable:
-        raise AgoraError("not-implemented", f"section {', '.join(unrunnable)} is declared but not implemented yet; it ran nothing",
-                         exit=FAILED, actions=[next_command("run what is implemented", "check")])
+        names = list(reg.sections)
     if explicit and not names:
-        raise AgoraError("not-implemented", f"suite {suite} has no implemented section yet (planned: "
-                         f"{', '.join(reg.suites[suite]['planned']) or 'none'}); it ran nothing", exit=FAILED,
-                         actions=[next_command("run what is implemented", "check", suite="spec")])
+        raise AgoraError("empty", f"suite {suite} names no section; it ran nothing", exit=FAILED,
+                         actions=[next_command("run a suite that has sections", "check", suite="spec")])
     chosen: list[Section] = [reg.sections[n] for n in names]
     if ctx.relocated:
         bad = [s.name for s in chosen if not s.relocatable]
@@ -119,7 +110,7 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
         "summary": {"run": len(results), "passed": len(results) - len(failed) - len(skipped), "failed": len(failed),
                     "skipped": len(skipped)},
         "sections": [r.to_dict() for r in results],
-        "skipped_unchanged": skipped_unchanged, "planned": planned_rows,
+        "skipped_unchanged": skipped_unchanged,
     }
     res = Resource("check", label, data, text=_text, exit=FAILED if failed else MISSING if skipped else OK)
     res.actions = [next_command(f"run {r.name} again", "check", sections=[r.name]) for r in failed + skipped]
@@ -150,8 +141,6 @@ def _text(res: Resource) -> str:
             out.append(f"✅ {s['name']}" if s["status"] == "passed" else f"❎ {s['name']}: {errors} error(s)")
     for s in d["skipped_unchanged"]:
         out.append(f"⏭️  {s['name']}: not run ({s['reason']})")
-    if d["planned"]:
-        out.append("⏳ planned, not implemented yet, so not run: " + ", ".join(s["name"] for s in d["planned"]))
     m = d["summary"]
     out.append(f"check {res.id}: {d['status']}: {m['run']} section(s) run, {m['failed']} failed, {m['skipped']} skipped")
     return "\n".join(out)
