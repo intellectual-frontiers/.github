@@ -1,0 +1,1 @@
+The full notes are at https://example.org/native-alpha[where we delve into the numbers] if you want them.

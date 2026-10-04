@@ -3,5 +3,6 @@
   "announcement.txt": "announcement ('in this episode')",
   "story-label.txt": "labels a story ('illustrative')",
   "inherited-word.txt": "banned word 'delve'",
-  "filler.txt": "'let me be clear'"
+  "filler.txt": "'let me be clear'",
+  "url-link-text.txt": "banned word 'delve'"
 }

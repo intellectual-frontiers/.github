@@ -102,6 +102,11 @@ patterns a mechanical sweep looks for.
 - **FR-018**: A design system that derives from this one (a spoken voice, 0014-design-systems FR-020,
   FR-034) MUST add its own patterns in a file of the same shape, swept together with these by
   `sweep.py --patterns`, and MUST NOT remove any of these.
+- **FR-020**: A URL is never swept; its link text is. `sweep.py` MUST leave out of every pattern in FR-017
+  each `http://` or `https://` URL (up to whitespace or a bracket, without the sentence's own closing
+  punctuation) and each `mailto:` address, in any text it is given, so that a variant, a banned word or
+  an em dash inside an address is never reported. It MUST still sweep the link text written after a URL
+  in an AsciiDoc macro (`https://example.org/a-b[Native Alpha]`) and the text around it.
 
 ## Assurance
 
@@ -124,6 +129,9 @@ patterns a mechanical sweep looks for.
 - A banned word used in its literal sense, quoted or named as an example (this spec quoting "delve"):
   the sweep cannot tell, so a passage that discusses the rules is not swept, or its finding is waived by
   the human read, per FR-017.
+- A printed sources box that must give a page's address (`https://www.intellectualfrontiers.com/native-alpha`)
+  whose slug spells a shared term's avoided variant: the address is not prose and is not swept; its link
+  text is, per FR-020.
 - A work that must match an outside style guide: it states the exception, per FR-003.
 - A procedure inside an essay: the procedure is swept in procedure mode and the essay in prose mode, per FR-014 and FR-017.
 
