@@ -4,7 +4,7 @@ name = "agora"
 audience = "public"
 # The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
 register_name = ".github"
-groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "agent", "vcs", "selftest"]
+groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "extension", "agent", "vcs", "selftest"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
@@ -23,5 +23,8 @@ options = { runner = "browser" }  # the suite runs the browser harnesses of desi
 [suites.python]
 sections = ["design-systems"]
 options = { runner = "python" }
+[suites.extension]
+sections = ["extension"]
+
 [suites.images]
 sections = ["imagery"]

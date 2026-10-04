@@ -5,3 +5,6 @@ node_modules/
 
 # agora's action logs: what is not worth a commit (0041-command-line FR-042, 0042-agora FR-021).
 .agora/logs/
+
+# The IF Console extension's package, built by `agora extension build` (0043-if-console FR-027).
+build/

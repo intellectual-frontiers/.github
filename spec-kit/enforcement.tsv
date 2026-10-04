@@ -930,7 +930,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-012	check	.github: agora test	tests compare command list and show with the registry, and completion with it
 0041-command-line FR-013	check	.github: agora test	tests run every type's validation, completion and error, and the input schemas generated from them
 0041-command-line FR-014	check	.github: agora check commands	the registry requires exactly one category from the seven for every command
-0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run and that a dry run leaves a clone's tree unchanged; a unified diff in the dry run is not yet tested (0043 FR-014)
+0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run, that a dry run leaves a clone's tree unchanged and carries the whole unified diff for each file; the editor's diff of it is tested by agora check extension (0043 FR-014)
 0041-command-line FR-016	check	.github: agora test	tests run every command that takes no required argument and check its resource
 0041-command-line FR-017	check	.github: agora test	tests generate links' and actions' command lines from their calls
 0041-command-line FR-018	check	.github: agora test	tests compare the three renderings of resources
@@ -963,10 +963,10 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-047	none	-	no check; workspaces-host tests its environment-file parser
 0041-command-line FR-048	none	-	no check; workspaces-host tests that it reads no other orchestrator's files
 0041-command-line FR-049	none	-	no check scans an orchestrator for YAML or a format it does not own
-0041-command-line FR-050	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
-0041-command-line FR-051	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
-0041-command-line FR-052	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
-0041-command-line FR-053	none	-	enforced by the IF Console extension's own tests once built (0043 FR-028; agora check extension)
+0041-command-line FR-050	check	.github: agora check extension	the extension's own tests (node test runner, a stand-in VS Code API, a fake launcher) cover what it runs, shows and never does (0043 FR-028)
+0041-command-line FR-051	check	.github: agora check extension	tests check that a decision runs only after the dry run, the diff and a modal confirmation, that a forged tree node runs nothing and that the extension exports no API
+0041-command-line FR-052	check	.github: agora check extension	tests check that no launcher runs in an untrusted workspace and the manifest declares no untrusted-workspace support
+0041-command-line FR-053	check	.github: agora check extension	tests check that a newer schema is never shown and an update is offered
 0041-command-line FR-054	none	-	no check of a text rendering's first line; workspaces-host will test its own
 0041-command-line FR-055	none	-	no check of displayed commands; workspaces-host will test its own
 0041-command-line FR-056	none	-	no check; workspaces-host tests that a skipped repository is reported with its reason
@@ -974,11 +974,11 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-058	none	-	retired: a program comes from a package or a toolchain entry (FR-066)
 0041-command-line FR-059	none	-	retired: the only fetch is a toolchain entry into the cache
 0041-command-line FR-060	none	-	retired: doctor prints each entry's and package's version (FR-029)
-0041-command-line FR-061	none	-	no check; workspaces-host tests trust, and IF Console tests that it runs a launcher only when trusted (0043 FR-028)
-0041-command-line FR-062	none	-	no check; workspaces-host tests trust and its configuration, and IF Console tests it (0043 FR-028)
+0041-command-line FR-061	check	.github: agora check extension	tests check that a launcher runs only in a trusted workspace; trust here is VS Code's own per-folder trust (0043 FR-006); a recorded per-repository trust is an environment orchestrator's
+0041-command-line FR-062	check	.github: agora check extension	tests check that reading .if-console.env needs no trust and that only the declaring launcher runs
 0041-command-line FR-063	none	-	no check; workspaces-host tests that unpushed work survives an update and that a skipped repository exits 0
-0041-command-line FR-064	none	-	no check of the wire shape in agora yet (0042 OQ-3); workspaces-host's tests check its own and the extension's contract
-0041-command-line FR-065	none	-	agora has no help command; workspaces-host's tests check its topics, their actions and that its documentation is generated and fresh
+0041-command-line FR-064	check	.github: agora test	tests check command list and show, the typed arguments' choices, actions (cli null and needs where a value is needed), links and check data; agora check extension reads them from the real launcher
+0041-command-line FR-065	none	-	agora provides no help command (it is a MAY); the extension runs an orchestrator's help like any read command and its actions as buttons, tested with a fake launcher
 0042-agora FR-001	none	-	agora still declares its name, audience, groups and suites in manifests (OQ-3); the move to code is not checked
 0042-agora FR-002	check	.github: agora check commands	the launcher's and manifest's name is checked; the choice is a decision
 0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
@@ -1016,40 +1016,43 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0025-tooling-environment FR-024	none	-	documentation judgment of each README
 0025-tooling-environment FR-025	none	-	check toolchain fails code that names a reference environment; agora register still reads .devcontainer/ws-repos.json, which 0042 OQ-3 records
 0025-tooling-environment FR-026	none	-	agora fresh proves generated files on one host; nothing compares two hosts
+0025-tooling-environment FR-027	check	.github: agora test	tests check that toolchain show and add return path, env, provides, version and state; that another repository uses them is checked in that repository
+0025-tooling-environment FR-028	check	.github: agora test	tests check that toolchain list returns the pinned packages and the node version
+0025-tooling-environment FR-029	none	-	the comparison runs in the repository that builds on this one; this repository has no such consumer to check
 0041-command-line FR-066	check	.github: agora check toolchain	fails an entry declared outside tools/agora/toolchain, a command, section, generator, runner or harness that names an entry that does not exist; doctor and the plan are computed from the registry
 0041-command-line FR-067	check	.github: agora test	tests drive toolchain list, show and add (fetch, check, dry-run, offline refusal, failing check); agora check commands compares them with the ontology
 0041-command-line FR-068	check	.github: agora check toolchain	fails an entry whose fields are incomplete, whose address is not https, whose version is a range or floating tag, or that lacks linux-x86_64; that a change of an entry is a commit of its own is a review judgment
 0041-command-line FR-069	check	.github: agora test	tests drive system list and add with a stand-in sudo: the exact commands, --dry-run, the question, --yes, another family, refusal over MCP and no surface but the terminal
 0042-agora FR-030	check	.github: agora test	tests prove each package replacement (test_packages, the harness and command tests), the toolchain entries and their declarations (test_toolchain) and fresh proves the files they write; the browser and print harnesses ran from an empty cache (verified by hand)
-0042-agora FR-031	none	-	agora has no editor views declared yet (OQ-3); IF Console tests the extension side (0043 FR-028)
-0042-agora FR-032	none	-	.if-console.env and agora extension build are not built; agora check extension will check them
-0043-if-console FR-001	none	-	the extension is not built; agora check extension will check its manifest
-0043-if-console FR-002	none	-	agora check commands will check where code lives once tools/if-console/ exists (0042 FR-016); public-only is a review of the directory
-0043-if-console FR-003	none	-	IF Console tests will check that it runs only launcher commands (FR-028); not built yet
-0043-if-console FR-004	none	-	IF Console tests will cover discovery (FR-028); not built yet
-0043-if-console FR-005	none	-	IF Console tests will cover the handshake (FR-028); not built yet
-0043-if-console FR-006	none	-	IF Console tests will cover trust and Restricted Mode (FR-028); not built yet
-0043-if-console FR-007	none	-	IF Console tests will cover several folders (FR-028); not built yet
-0043-if-console FR-008	none	-	IF Console tests will cover the tree (FR-028); not built yet
-0043-if-console FR-009	none	-	IF Console tests will cover diagnostics (FR-028); not built yet
-0043-if-console FR-010	none	-	IF Console tests will cover tasks and tests (FR-028); not built yet
-0043-if-console FR-011	none	-	IF Console tests will cover the webview policy (FR-028); not built yet
-0043-if-console FR-012	none	-	IF Console tests will cover the palette (FR-028); not built yet
-0043-if-console FR-013	none	-	IF Console tests will cover forms (FR-028); not built yet
-0043-if-console FR-014	none	-	IF Console tests will cover the dry-run diff (FR-028); not built yet
-0043-if-console FR-015	none	-	IF Console tests will cover the modal and the absence of an API (FR-028); not built yet
-0043-if-console FR-016	none	-	IF Console tests will cover the status bar (FR-028); not built yet
-0043-if-console FR-017	none	-	IF Console tests will cover the output channel and IF_CONSOLE (FR-028); not built yet
-0043-if-console FR-018	none	-	IF Console tests will cover context and help (FR-028); not built yet
-0043-if-console FR-019	none	-	IF Console tests will cover the Chores view (FR-028); not built yet
-0043-if-console FR-020	none	-	IF Console tests will cover streams and cancel (FR-028); not built yet
-0043-if-console FR-021	none	-	IF Console tests will cover the schema check (FR-028); not built yet
-0043-if-console FR-022	none	-	IF Console tests will cover the MCP registration (FR-028); not built yet
-0043-if-console FR-023	none	-	IF Console tests will scan for network and telemetry calls (FR-028); not built yet
-0043-if-console FR-024	none	-	IF Console tests will check the manifest's settings (FR-028); not built yet
-0043-if-console FR-025	none	-	plain language is a review of each message; theme colors and labels will be tested (FR-028)
-0043-if-console FR-026	none	-	IF Console tests will check that it writes no file (FR-028); not built yet
-0043-if-console FR-027	none	-	agora extension build is not built; agora check toolchain will check the lock
-0043-if-console FR-028	none	-	agora check extension is not built
+0042-agora FR-031	check	.github: agora check extension	agora lists its commands to the editor by command list; the extension's real-launcher tests drive them; agora declares no editor views yet (OQ-3)
+0042-agora FR-032	check	.github: agora check commands	.if-console.env must name ./agora (agora check commands); agora extension build is tested by agora test and run by hand
+0043-if-console FR-001	check	.github: agora check extension	the manifest is read: id, display name, prefixes, no API export
+0043-if-console FR-002	check	.github: agora check extension	the lint refuses another repository's or orchestrator's name in tools/if-console/; agora check commands allows the directory (0042 FR-016); public-only is otherwise a review
+0043-if-console FR-003	check	.github: agora check extension	tests check that child_process is used in one place, only to spawn a launcher with --json or --html
+0043-if-console FR-004	check	.github: agora check extension	discovery tests: declaration, rejected names, person-only setting
+0043-if-console FR-005	check	.github: agora check extension	handshake tests with a fake and the real launcher
+0043-if-console FR-006	check	.github: agora check extension	trust tests: nothing runs untrusted; the reason and the trust action are shown
+0043-if-console FR-007	check	.github: agora check extension	tests with two folders whose launchers share a name
+0043-if-console FR-008	check	.github: agora check extension	tree tests: nouns, commands, resources, links, actions, disabled with reason
+0043-if-console FR-009	check	.github: agora check extension	diagnostics tests: file:line, severity, source, cleared per section, unplaced findings in the output
+0043-if-console FR-010	check	.github: agora check extension	task provider and Test Controller tests; a skipped section is skipped, never passed
+0043-if-console FR-011	check	.github: agora check extension	webview tests: policy, link classification, one own script
+0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun
+0043-if-console FR-013	check	.github: agora check extension	form tests: choices from the type or the noun's list, retry on a refused value, the whole line before running
+0043-if-console FR-014	check	.github: agora check extension	executor and diff tests: dry run first, diff from a virtual document, apply only on acceptance, failed dry run stops
+0043-if-console FR-015	check	.github: agora check extension	tests: modal required, exactly true, forged nodes ignored, no API export, no decision in the manifest's tasks or keys
+0043-if-console FR-016	check	.github: agora check extension	status bar tests: orchestrator, audience as stated, state from doctor
+0043-if-console FR-017	check	.github: agora check extension	launcher tests: the one-line command, exit status, stderr, stream lines, IF_CONSOLE=1, no stdout contents
+0043-if-console FR-018	check	.github: agora check extension	tests: Copy Context and the help report remove secrets and send nothing
+0043-if-console FR-019	check	.github: agora check extension	Chores tests: derived from categories and the launcher's own resources
+0043-if-console FR-020	check	.github: agora check extension	launcher tests: stream progress and cancel end the process
+0043-if-console FR-021	check	.github: agora check extension	tests: a newer schema is not shown and an update is offered
+0043-if-console FR-022	check	.github: agora check extension	MCP tests: registered for a trusted repository with mcp serve; absent API said in the output
+0043-if-console FR-023	check	.github: agora check extension	tests scan the code for network and telemetry and watch a whole session for connections
+0043-if-console FR-024	check	.github: agora check extension	manifest tests: only the two settings, application scope; checkOnSave test
+0043-if-console FR-025	none	-	plain language is a review of each message; theme icons and accessibility labels are set in the code and not tested for reading
+0043-if-console FR-026	check	.github: agora check extension	tests scan the code for any write and a session leaves the clone unchanged
+0043-if-console FR-027	check	.github: agora check toolchain	the lock of tools/if-console is checked (hashes, exact pins, no runtime dependency); agora extension build is tested by agora test
+0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the unit tests and the lint
 0043-if-console FR-029	none	-	no check; installation is a person's act
-0043-if-console FR-030	none	-	IF Console tests will check the manifest's engine and the absent features (FR-028); not built yet
+0043-if-console FR-030	check	.github: agora check extension	the manifest's engine is checked; the features that need a newer VS Code are feature-detected and tested (MCP)
