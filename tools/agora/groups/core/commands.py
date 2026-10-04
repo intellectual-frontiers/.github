@@ -9,13 +9,16 @@ import os
 import platform
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import time
+import webbrowser
 from pathlib import Path
 from typing import Any
 
-from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
+from agora.core import (Arg, ArgType, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
 from agora.core import generate, plan
 from agora.core.checks import changed_paths, find_program, section_changed
@@ -24,6 +27,10 @@ from agora.core.describe import command_data
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
 from agora.core.resource import FAILED, MISSING, OK
 from agora.core.types import COMMIT  # noqa: F401  (declared here, once, for every group)
+from agora.core.ui import check as ui_check
+from agora.core.ui import runtime as ui_runtime
+from agora.core.ui import state as ui_state
+from agora.core.ui import theme as ui_theme
 from agora.lib import layout, ontology, testrun
 
 SECTION = Dynamic("SECTION", "a check section, as `command show check` lists them", lambda c: list(c.registry.sections))
@@ -35,6 +42,24 @@ STATUS_OF_COMMAND = Choice("COMMAND_STATUS", ("implemented", "planned"), "whethe
 GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
 VOICE_MODE = Choice("VOICE_MODE", ("prose", "procedure"), "how the voice sweep reads a text: as prose or as a procedure's steps")
 RUNNER = Choice("RUNNER", ("browser", "python"), "which kind of design system harness")
+UI = Dynamic("UI", "a web UI of this command line, as its manifest declares them: console or assurance",
+             lambda c: sorted(ui_theme.declared(c.registry)))
+
+
+class _Port(ArgType):
+    name = "PORT"
+    doc = "a TCP port, 1 to 65535"
+
+    def validate(self, ctx: Ctx, value: str) -> int:
+        if not value.isdigit() or not 1 <= int(value) <= 65535:
+            raise ValueError(f"{value!r} is not a port, 1 to 65535")
+        return int(value)
+
+    def examples(self, ctx: Ctx) -> list[str]:
+        return ["8080"]
+
+
+PORT = _Port()
 
 
 class _Resource(Dynamic):
@@ -290,6 +315,105 @@ def lock(ctx: Ctx, group: str | None) -> Resource:
     return Resource("lock", group or "all", {"locked": changes, "dry_run": ctx.dry_run})
 
 
+# ui ----------------------------------------------------------------------------------------------------------------
+def _ui_resource(ui: str, st: dict[str, Any], **more: Any) -> Resource:
+    data = {"ui": ui, "url": st["url"], "port": st["port"], "pid": st["pid"], **more}
+    return Resource("ui", ui, data, actions=[next_command(f"stop {ui}", "ui stop", ui=ui)])
+
+
+def _running_error(ui: str, st: dict[str, Any]) -> AgoraError:
+    return AgoraError("running", f"{ui} is already running for this clone, at {st['url']} (pid {st['pid']})", exit=FAILED,
+                      detail={"url": st["url"], "pid": st["pid"]},
+                      actions=[next_command(f"print its address", "ui link", ui=ui), next_command(f"stop it", "ui stop", ui=ui)])
+
+
+@command("ui serve", category="setup", help="Serve a web UI in the foreground, on the loopback interface, until stopped",
+         args=[Arg("ui", "UI", "the UI: console or assurance")],
+         options=[Opt("--port", "PORT", "the port to listen on; a free one by default")])
+def ui_serve(ctx: Ctx, ui: str, port: int | None):
+    st = ui_state.read(ctx.home, ctx.registry, ui)
+    if st:
+        raise _running_error(ui, st)
+    try:
+        server = ui_runtime.start(ctx.registry, ctx.home, ctx.env, ui, port or 0)
+    except OSError as e:
+        raise AgoraError("port", f"cannot listen on {ui_state.HOST}:{port}: {e.strerror or e}", exit=FAILED,
+                         actions=[next_command("let agora pick a free port", "ui serve", ui=ui)]) from None
+    st = ui_state.write(ctx.home, ctx.registry, ui, server.port)
+    signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))  # `ui stop` ends it cleanly
+    try:
+        yield _ui_resource(ui, st, status="serving")
+        sys.stdout.flush()
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+    finally:
+        server.httpd.server_close()
+        ui_state.clear(ctx.home, ctx.registry, ui, os.getpid())
+    yield Resource("ui", ui, {"ui": ui, "url": st["url"], "status": "stopped"})
+
+
+def _can_open_browser(env: dict[str, str]) -> bool:
+    return sys.platform in ("darwin", "win32") or any(env.get(k) for k in ("DISPLAY", "WAYLAND_DISPLAY", "BROWSER"))
+
+
+@command("ui open", category="setup", help="Serve a web UI in the background if it is not running, and open it in a browser",
+         args=[Arg("ui", "UI", "the UI: console or assurance")],
+         options=[Opt("--port", "PORT", "the port to listen on when it has to be started; a free one by default")])
+def ui_open(ctx: Ctx, ui: str, port: int | None) -> Resource:
+    st = ui_state.read(ctx.home, ctx.registry, ui)
+    started = False
+    if not st:
+        argv = [sys.executable, "-m", "agora", "ui", "serve", ui, "--no-log"] + (["--port", str(port)] if port else []) \
+            + (["--offline"] if ctx.offline else [])
+        proc = subprocess.Popen(argv, cwd=ctx.home, env={**ctx.env, "PYTHONPATH": str(ctx.home / "tools")}, stdin=subprocess.DEVNULL,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        for _ in range(100):
+            st = ui_state.read(ctx.home, ctx.registry, ui)
+            if st and st["pid"] == proc.pid:
+                break
+            if proc.poll() is not None:
+                raise AgoraError("serve", f"{ui} did not start (exit {proc.returncode}); run `ui serve {ui}` to see why", exit=FAILED,
+                                 actions=[next_command("serve it in the foreground", "ui serve", ui=ui)])
+            time.sleep(0.1)
+        else:
+            raise AgoraError("serve", f"{ui} did not start in ten seconds", exit=FAILED)
+        started = True
+    opened = bool(_can_open_browser(ctx.env) and webbrowser.open(st["url"]))
+    note = "opened in the browser" if opened else "no browser here; open the address yourself"
+    return _ui_resource(ui, st, status="started" if started else "running", opened=opened, note=note)
+
+
+@command("ui stop", category="setup", help="Stop a running web UI", args=[Arg("ui", "UI", "the UI: console or assurance")])
+def ui_stop(ctx: Ctx, ui: str) -> Resource:
+    st = ui_state.read(ctx.home, ctx.registry, ui)
+    if not st:
+        return Resource("ui", ui, {"ui": ui, "status": "not running", "message": f"{ui} is not running for this clone"},
+                        actions=[next_command(f"serve {ui}", "ui serve", ui=ui)])
+    try:
+        os.kill(st["pid"], signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    for _ in range(100):
+        if not ui_state.alive(st["pid"]):
+            break
+        time.sleep(0.05)
+    ui_state.clear(ctx.home, ctx.registry, ui)
+    return Resource("ui", ui, {"ui": ui, "url": st["url"], "pid": st["pid"], "status": "stopped"})
+
+
+@command("ui link", category="read", help="Print the address of a running web UI", args=[Arg("ui", "UI", "the UI: console or assurance")])
+def ui_link(ctx: Ctx, ui: str) -> Resource:
+    st = ui_state.read(ctx.home, ctx.registry, ui)
+    if not st:
+        raise AgoraError("not-running", f"{ui} is not running for this clone", exit=FAILED,
+                         actions=[next_command(f"serve {ui}", "ui serve", ui=ui), next_command(f"serve it and open a browser", "ui open", ui=ui)])
+    res = _ui_resource(ui, st, status="running")
+    res.text = lambda r: r.data["url"]
+    return res
+
+
 # context -----------------------------------------------------------------------------------------------------------
 MAX_ITEMS = 60  # a context is bounded; it says what it left out (0041 FR-038)
 
@@ -310,6 +434,13 @@ def context(ctx: Ctx, resource: str) -> Resource:
     res = Resource("context", resource, data, links=got.get("links", []), actions=got.get("actions", []))
     res.columns["requirements"] = ["id", "mechanism", "text"]
     return res
+
+
+# the ui section ----------------------------------------------------------------------------------------------------
+@section("ui")
+def check_ui_section(ctx: Ctx, scope: str | None) -> SectionResult:
+    """0042-agora FR-027: each web UI serves and renders offline."""
+    return ui_check.check_ui(ctx, scope)
 
 
 # the commands section ----------------------------------------------------------------------------------------------

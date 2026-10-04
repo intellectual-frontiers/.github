@@ -90,10 +90,17 @@ own harnesses, and what CI runs.
   (`<brand>/<role>`), LAYOUT (a print layout's name or alias, as
   `layouts.json` gives them), UI, SECTION, GENERATOR and COMMIT (40 hex
   digits).
-- **FR-009**: `design-system new` MUST refuse unless the design system's
-  spec and its entry in the ontology already exist, so that the spec comes
-  first, then the ontology, then the work (0001-eidolon-architecture FR-037;
-  0014-design-systems FR-010, FR-022).
+- **FR-009**: `design-system new SLUG --kind KIND` MUST refuse unless the
+  design system's spec (`design-systems/<slug>/spec.md`) and its entry in the
+  ontology already exist, and the entry's kind is KIND, a kind code of the
+  ontology's kind scheme that ends the slug, so that the spec comes first,
+  then the ontology, then the work (0001-eidolon-architecture FR-037;
+  0014-design-systems FR-003, FR-010, FR-022). When it does not refuse it MUST
+  create only the files 0014-design-systems FR-006 names that the directory
+  lacks, a `README.md` and an `assurance/` harness that reports it has no
+  tests and fails, so that a harness cannot pass before it is written, and it
+  MUST NOT overwrite a file or put a stub beside a harness the directory
+  already has. It MUST take `--dry-run`.
 - **FR-010**: `requirement set` and `requirement add` MUST edit only the
   enforcement register and the control map, and `spec new` MUST create only a
   spec in the form 0020-spec-format FR-005 states, with the next unused
@@ -134,7 +141,8 @@ own harnesses, and what CI runs.
 - **FR-014**: `agora` MUST declare these suites (0041-command-line FR-031):
   `spec` (`specs`, `register`, `controls`, `ontology`, `environment`,
   `commands` and `ui`, which need no package and no program beyond Python),
-  `browser` (`design-systems --runner browser` and `openedx`), `python`
+  `browser` (`design-systems --runner browser`, `openedx` and `ui --runner
+  browser`), `python`
   (`design-systems --runner python`) and `images` (`imagery`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on
   a stock host with only Python and uv. The item checks of FR-013 belong to no
@@ -195,7 +203,9 @@ own harnesses, and what CI runs.
   (`frontiers-console-web` FR-004); the interactivity is `agora`'s own
   application layer, a copy of `design-systems/frontiers-nature-web/js/datastar.js`
   vendored in `tools/agora/` (0041-command-line FR-026). `agora check ui`
-  MUST prove each UI serves and renders offline.
+  MUST prove each UI serves and renders offline. The copy's version and
+  license MUST be recorded beside it, in `tools/agora/vendor/README.md`, and
+  the copy MUST be the version recorded.
 - **FR-020**: `agora mcp serve` MUST expose the commands that declare MCP and
   are not `decision` commands (FR-007; 0041-command-line FR-027). The default
   exposure by category is 0041-command-line FR-022's.
@@ -204,6 +214,59 @@ own harnesses, and what CI runs.
   surface (`cli`, `ui` or `mcp`) and the action (0041-command-line FR-042).
   Proposals MUST be tracked files under `.agora/proposals/`
   (0041-command-line FR-039).
+
+## The web UIs
+
+- **FR-023**: The `ui` commands MUST take the UI as their ID, one of the UIs a
+  group's manifest declares (`console`, `assurance`; 0041-command-line
+  FR-025). `ui serve UI [--port N]` MUST serve the UI in the foreground on the
+  loopback address, on the port given or a free one, write its process id,
+  port and address to a state file under the directory the root manifest
+  names for it (`.agora/ui/`, which `.gitignore` MUST list), remove the file
+  when it stops, and refuse to start a UI already running for the clone
+  (0041-command-line FR-044). `ui open UI` MUST serve the UI in a background
+  process when it is not running, and open its address in a browser, or print
+  the address where the host has none. `ui stop UI` MUST stop the UI and
+  remove its state file, and say so when none was running. `ui link UI` MUST
+  print the address of a running UI, and otherwise fail with the command that
+  starts one.
+- **FR-024**: The `console` UI MUST be a registry browser: the nouns, the
+  commands under each, and a page for each command. Every resource it shows
+  MUST be the HTML rendering of the command's resource, its links as links to
+  the resources they fetch and its actions as buttons (0041-command-line
+  FR-017, FR-018). It MUST offer an action only where the registry's surfaces
+  for the action's command include `ui`, and a command's form MUST take its
+  fields, choices and validation from the command's typed arguments
+  (0041-command-line FR-013). A command MUST run through the same library call
+  as the terminal (0041-command-line FR-024), and its result MUST stream over
+  server-sent events, patched into the page by Datastar; a check MUST stream
+  section by section. A command that writes MUST show its `--dry-run` result
+  first, and the server MUST refuse to run it for real unless the preview was
+  made for the same call; a `decision` command MUST also require a
+  confirmation the person gives (0041-command-line FR-026). It MUST log each
+  call as 0041-command-line FR-042 states, with the surface `ui`.
+- **FR-025**: The `assurance` UI MUST serve `design-systems/` read-only, so
+  that each design system's in-browser harness runs from its own directory as
+  it does under any static server (0014-design-systems FR-015), and MUST list
+  each design system's assurance page, once for every brand that themes it and
+  once for a brand itself. It MUST serve nothing outside `design-systems/`
+  and MUST accept no request that writes.
+- **FR-026**: Each UI MUST answer only requests addressed to its own loopback
+  address and port, MUST refuse a request that changes anything unless it
+  carries Datastar's request header and, where it has an origin, its own, and
+  MUST send a content security policy that lets a page load and request
+  nothing from outside the UI itself (0041-command-line FR-025).
+- **FR-027**: `agora check ui` MUST start each UI on a free port in its own
+  process, fetch every page and a sample of its resource routes, and fail on
+  HTML that is not well formed, on a remote reference, on an action that names
+  a command the registry lacks or does not expose on `ui`, on a request that
+  changes something without the header FR-026 requires, and on an event
+  stream that does not answer; it MUST check that Datastar is vendored at the
+  version recorded (FR-019). Given `--runner browser`, which the `browser`
+  suite does, it MUST also load the console in Chromium and run one read
+  action end to end, and be reported as skipped, with the program's hint, when
+  Chromium is missing (0041-command-line FR-006, FR-033). Without it, it MUST
+  say that the browser part did not run.
 
 ## Continuous integration
 
@@ -246,6 +309,16 @@ own harnesses, and what CI runs.
   with its references, per FR-016.
 - A UI that wants a CDN script: not allowed; Datastar is vendored, per FR-019
   and 0041-command-line FR-026.
+- `ui serve console` while it is running: refused, naming the address, per
+  FR-023.
+- A write whose preview was made for other values: the server refuses to run
+  it, per FR-024.
+- A page on another origin that posts to the console's address: refused, per
+  FR-026.
+- `ui link assurance` with no assurance UI running: an error saying to run `ui
+  serve assurance`, per FR-023.
+- `design-system new` for a slug with a spec and no ontology entry: refused,
+  and nothing is written, per FR-009.
 - A generated file hand-edited, such as a brand's `brand.css`: `agora fresh`
   fails and names `brand-theme`, per FR-015.
 
@@ -270,6 +343,8 @@ own harnesses, and what CI runs.
   registry, which must agree.
 - **A suite** — `spec`, `browser`, `python` or `images`: the sections one CI
   job runs.
+- **A UI** — `console`, the registry browser, or `assurance`, the server of
+  the design systems' in-browser harnesses; each runs inside `agora`.
 - **A generator** — brand-theme, brand-specimen, openedx-sources,
   print-layout-docs, profile-figure or agent-skill.
 
@@ -283,6 +358,8 @@ own harnesses, and what CI runs.
   directory and `tools/agora/`.
 - **SC-004**: No file of `agora` names or reads another repository.
 - **SC-005**: Every workflow's run steps call `agora`.
+- **SC-006**: `agora check ui` passes with both UIs serving on loopback ports and
+  no page naming a remote host.
 
 ## Review & acceptance checklist
 

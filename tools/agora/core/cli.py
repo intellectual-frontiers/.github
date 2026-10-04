@@ -101,11 +101,11 @@ def main(argv: list[str] | None = None, *, home: Path | None = None, stdout: Any
         _emit(ctx, e.resource(), fmt, out, err)
         return e.exit
     except Exception as e:  # 0041 FR-020: never a stack trace as the error
-        _emit(ctx, _internal(ctx, e, traceback.format_exc(), None), fmt, out, err)
+        _emit(ctx, internal_error(ctx, e, traceback.format_exc(), None), fmt, out, err)
         return FAILED
 
 
-def _internal(ctx: Ctx, e: Exception, trace: str, cmd: Command | None) -> Resource:
+def internal_error(ctx: Ctx, e: Exception, trace: str, cmd: Command | None) -> Resource:
     data = {"code": "internal", "message": f"{type(e).__name__}: {e}"}
     if ctx.debug:
         data["trace"] = trace
@@ -141,7 +141,7 @@ def _run(ctx: Ctx, tokens: list[str], g: dict[str, Any], fmt: str, out: Any, err
     ctx.values = values
     code, trace = OK, None
     try:
-        _check_programs(ctx, cmd)
+        check_programs(ctx, cmd)
         _ensure_plan(ctx, cmd, tokens)
         result = cmd.fn(ctx, **values)
         code = _emit_result(ctx, result, fmt, out, err)
@@ -151,10 +151,10 @@ def _run(ctx: Ctx, tokens: list[str], g: dict[str, Any], fmt: str, out: Any, err
     except Exception as e:  # 0041 FR-020: never a stack trace as the error
         trace = traceback.format_exc()
         code = FAILED
-        _emit(ctx, _internal(ctx, e, trace, cmd), fmt, out, err)
+        _emit(ctx, internal_error(ctx, e, trace, cmd), fmt, out, err)
     if not g["no_log"]:
         logs.write(ctx.home / reg.root_manifest.get("logs", ".agora/logs"), surface=ctx.surface, command=cmd.id,
-                   args=_loggable(cmd, values), exit=code, dry_run=ctx.dry_run, trace=trace)
+                   args=loggable(cmd, values), exit=code, dry_run=ctx.dry_run, trace=trace)
     return code
 
 
@@ -163,12 +163,12 @@ def invoke(ctx: Ctx, cmd: Command, values: dict[str, Any]) -> Any:
     return cmd.fn(ctx, **values)
 
 
-def _loggable(cmd: Command, values: dict[str, Any]) -> dict[str, Any]:
+def loggable(cmd: Command, values: dict[str, Any]) -> dict[str, Any]:
     quiet = {o.dest for o in cmd.options if not o.log}
     return {k: v for k, v in values.items() if v not in (None, False, []) and k not in quiet}
 
 
-def _check_programs(ctx: Ctx, cmd: Command) -> None:
+def check_programs(ctx: Ctx, cmd: Command) -> None:
     for prog in cmd.programs:
         if find_program(ctx.registry, prog, ctx.env) is None:
             hint = ctx.registry.program(prog).get("hint", f"install {prog} on the host")
@@ -222,6 +222,47 @@ def parse_values(ctx: Ctx, cmd: Command, rest: list[str]) -> dict[str, Any]:
         if o.type and v not in (None, []):
             v = [convert(ctx, o.type, o.flag, x) for x in v] if o.multiple else convert(ctx, o.type, o.flag, v)
         values[o.dest] = v
+    return values
+
+
+def _as_list(v: Any) -> list[str]:
+    items = v if isinstance(v, (list, tuple)) else str(v or "").splitlines()
+    return [x.strip() for x in items if str(x).strip()]
+
+
+def values_from_raw(ctx: Ctx, cmd: Command, raw: dict[str, Any]) -> dict[str, Any]:
+    """What a surface that has no command line (a web form) gives a command: strings, lists and flags by name, validated by
+    the same types as the terminal's words (0041 FR-013, FR-024)."""
+    values: dict[str, Any] = {}
+    for a in cmd.args:
+        v = raw.get(a.name)
+        if a.many:
+            values[a.name] = [convert(ctx, a.type, a.name, x) for x in _as_list(v)]
+            continue
+        v = None if v is None or (isinstance(v, (list, tuple)) and not v) else (v[0] if isinstance(v, (list, tuple)) else v)
+        v = str(v).strip() if v is not None else None
+        if not v:
+            if a.required:
+                raise AgoraError("usage", f"{a.name} is required: a {a.type}", exit=USAGE,
+                                 actions=[next_command("see how it is used", "command show", command=cmd.id)])
+            values[a.name] = None
+            continue
+        values[a.name] = convert(ctx, a.type, a.name, v)
+    for o in cmd.options:
+        v = raw.get(o.dest)
+        if o.type is None:
+            values[o.dest] = (v[0] if isinstance(v, (list, tuple)) and v else v) in (True, "true", "on", "yes", "1")
+        elif o.multiple:
+            values[o.dest] = [convert(ctx, o.type, o.flag, x) for x in _as_list(v)] or (o.default or [])
+        else:
+            v = str(v[0] if isinstance(v, (list, tuple)) and v else v or "").strip()
+            if not v:
+                if o.required:
+                    raise AgoraError("usage", f"{o.flag} is required: a {o.type}", exit=USAGE,
+                                     actions=[next_command("see how it is used", "command show", command=cmd.id)])
+                values[o.dest] = o.default
+            else:
+                values[o.dest] = convert(ctx, o.type, o.flag, v)
     return values
 
 

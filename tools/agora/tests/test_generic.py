@@ -170,7 +170,7 @@ class Boundaries(unittest.TestCase):
 
     def test_sections_and_suites_must_be_the_ones_0042_declares(self):
         m = self.home / "tools" / "agora" / "agora.toml"
-        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "environment", "commands"]',
+        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "environment", "commands", "ui"]',
                                             'sections = ["specs", "register"]'))
         self.assertTrue(any("suite spec is" in x for x in self.findings()[1]))
 

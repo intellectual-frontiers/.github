@@ -96,7 +96,9 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
             (keep if run else skipped_unchanged).append(s if run else {"name": s.name, "reason": why})
         chosen = keep
     results: list[SectionResult] = []
+    tell = ctx.on_section or (lambda event, name, result: None)  # a surface that streams hears of each section
     for s in chosen:
+        tell("start", s.name, None)
         missing = program_missing(ctx, s.programs)
         if missing:
             hints = "; ".join(f"{m}: {reg.program(m).get('hint', 'install it on the host')}" for m in missing)
@@ -107,6 +109,7 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
                 results.append(worker.run_section(ctx, s, mine))
             else:
                 results.append(s.fn(ctx, mine))
+        tell("done", s.name, results[-1])
     failed = [r for r in results if r.status == "failed"]
     skipped = [r for r in results if r.status == "skipped"]
     status = "failed" if failed else "skipped" if skipped else "passed"

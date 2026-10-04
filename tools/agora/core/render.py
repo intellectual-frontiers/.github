@@ -110,20 +110,27 @@ def _html_value(value: Any, path: str, res: Resource) -> str:
     return "<ul>" + "".join(f"<li>{_html_value(x, path, res)}</li>" for x in value) + "</ul>"
 
 
-def to_html(res: Resource, ctx: Any) -> str:
-    """The resource as a page fragment for a web UI: markup only, no script, no remote reference."""
+def to_html(res: Resource, ctx: Any, href: Any = None, action_html: Any = None, level: int = 1) -> str:
+    """The resource as a page fragment for a web UI: markup only, no script, no remote reference. A surface may turn a link
+    into a link to the resource it fetches (`href(link) -> url | None`) and add its control to an action
+    (`action_html(action) -> markup | ""`); neither adds anything the resource does not carry. `level` is the heading's
+    level, 1 for a page of its own and lower for a resource shown inside another page."""
     d = res.to_dict(ctx.registry, ctx.audience, ctx.name)
     parts = [f'<article class="resource" data-kind="{_h(res.kind)}" data-id="{_h(res.id)}" data-audience="{_h(d["audience"])}">',
-             f"<header><h1>{_h(res.kind)}: {_h(res.id)}</h1><p class=\"audience\">audience: {_h(d['audience'])}</p></header>",
+             f"<header><h{level}>{_h(res.kind)}: {_h(res.id)}</h{level}><p class=\"audience\">audience: {_h(d['audience'])}</p></header>",
              f'<section class="data">{_html_value(res.data, "", res)}</section>']
     if d["links"]:
-        parts.append('<nav class="links"><ul>' + "".join(
-            f'<li><span class="rel">{_h(l["rel"])}</span> <code>{_h(l["cli"])}</code></li>' for l in d["links"]) + "</ul></nav>")
+        def link(l: dict) -> str:
+            url = href(l) if href else None
+            code = f"<code>{_h(l['cli'])}</code>"
+            return f'<li><span class="rel">{_h(l["rel"])}</span> ' + (f'<a href="{_h(url)}">{code}</a>' if url else code) + "</li>"
+        parts.append('<nav class="links" aria-label="Related resources"><ul>' + "".join(link(l) for l in d["links"]) + "</ul></nav>")
     if d["actions"]:
         parts.append('<footer class="actions"><ul>' + "".join(
             f'<li data-command="{_h(a["command"])}" data-category="{_h(a["category"])}"'
             f'{"" if a["enabled"] else " data-disabled"}><span class="label">{_h(a["label"])}</span> '
-            f'<code>{_h(a["cli"])}</code>{"" if a["enabled"] else " <em>" + _h(a.get("reason", "")) + "</em>"}</li>'
+            f'<code>{_h(a["cli"])}</code>{"" if a["enabled"] else " <em>" + _h(a.get("reason", "")) + "</em>"}'
+            f'{(action_html(a) if action_html and a["enabled"] else "") or ""}</li>'
             for a in d["actions"]) + "</ul></footer>")
     parts.append("</article>")
     return "\n".join(parts)

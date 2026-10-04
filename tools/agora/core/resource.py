@@ -84,6 +84,14 @@ class Resource:
         if isinstance(self.data.get("changes"), list):  # a write's change: text shows what changed, JSON the diff too
             self.columns.setdefault("changes", ["path", "change", "added", "removed"])
 
+    @classmethod
+    def from_dict(cls, d: dict[str, Any], exit: int = OK) -> "Resource":
+        """A resource read back from its JSON document, as a parent reads an isolated worker's (0041 FR-028)."""
+        return cls(d["kind"], d["id"], d["data"],
+                   [Link(l["rel"], Call(l["command"], l["fields"])) for l in d.get("links", [])],
+                   [Action(a["label"], Call(a["command"], a["fields"]), a.get("enabled", True), a.get("reason", ""))
+                    for a in d.get("actions", [])], exit=exit, version=int(str(d.get("schema", "@1")).rsplit("@", 1)[-1]))
+
     def to_dict(self, registry: Any = None, audience: str = "public", name: str = "agora") -> dict[str, Any]:
         """The one JSON document (0041 FR-019)."""
         return {

@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, environment, ontology, register, specs
+from agora.lib import controls, design_systems, environment, ontology, register, specs
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -126,6 +126,10 @@ class _Control(ArgType):
         return value
 
 
+def design_systems_kinds(ctx: Ctx) -> list[str]:
+    return sorted(names(ctx.public).codes)
+
+
 def _design_systems(ctx: Ctx) -> list[str]:
     d = ctx.root / "design-systems"
     return sorted(p.name for p in d.iterdir() if p.is_dir()) if d.is_dir() else []
@@ -137,6 +141,7 @@ TERM = _Term()
 SCHEME = _Scheme()
 CONTROL = _Control()
 DESIGN_SYSTEM = Dynamic("DESIGN_SYSTEM", "a design system's slug, a directory of design-systems/", _design_systems)
+KIND = Dynamic("KIND", "a design system kind code of the ontology's kind scheme, such as web or brand", lambda c: design_systems_kinds(c))
 MECHANISM = Choice("MECHANISM", MECHANISMS, "how a requirement is enforced (0020 FR-012)")
 SPEC_STATUS = Choice("SPEC_STATUS", ("Draft", "Adopted", "Superseded"), "a spec's status (0020 FR-009)")
 SLUG = Pattern("SLUG", r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", "lowercase words joined by hyphens", ["agora", "command-line"])
@@ -497,3 +502,63 @@ def check_ontology(ctx: Ctx, scope: str | None) -> SectionResult:
 @section("environment")
 def check_environment(ctx: Ctx, scope: str | None) -> SectionResult:
     return SectionResult.from_findings("environment", environment.check_reference_environment(ctx.root))
+
+
+# design-system -----------------------------------------------------------------------------------------------------
+@command("design-system list", category="read", help="List design systems: kind, status, spec and harness", relocatable=True,
+         options=[Opt("--kind", "KIND", "only design systems of this kind")])
+def design_system_list(ctx: Ctx, kind: str | None) -> Resource:
+    reg_ = design_systems.entries(ctx.root)
+    rows = [design_systems.row(ctx.root, s, reg_.get(s)) for s in design_systems.slugs(ctx.root)]
+    rows = [r for r in rows if not kind or r["kind"] == kind]
+    res = Resource("design-system-list", kind or "all", {"count": len(rows), "kind": kind, "design systems": rows},
+                   links=[Link("design system", Call("design-system show", {"design_system": r["slug"]})) for r in rows])
+    res.columns["design systems"] = ["slug", "kind", "status", "spec", "requirements", "harness"]
+    return res
+
+
+@command("design-system show", category="read", help="Show one design system: its registration, spec, harness and derivation",
+         relocatable=True, args=[Arg("design_system", "DESIGN_SYSTEM", "the design system")])
+def design_system_show(ctx: Ctx, design_system: str) -> Resource:
+    d = design_systems.detail(ctx.root, design_system)
+    res = Resource("design-system", design_system, d)
+    res.links = [Link("spec", Call("spec show", {"spec": design_system}))] if d["spec"] != "none" else []
+    res.links += [Link("derives from", Call("design-system show", {"design_system": x})) for x in d["derives from"]
+                  if x in design_systems.slugs(ctx.root)]
+    res.links += [Link("derived by", Call("design-system show", {"design_system": x})) for x in d["derived by"]]
+    if d["kind"] == "brand":
+        res.links.append(Link("brand", Call("brand show", {"brand": design_system})))
+    res.actions = [next_command("check its spec", "check", sections=["specs", "register"], scope=design_system)]
+    return res
+
+
+@command("design-system new", category="generate",
+         help="Scaffold a design system whose spec and ontology entry already exist (0001 FR-037)",
+         args=[Arg("slug", "SLUG", "the design system's slug, ending with its kind's code")],
+         options=[Opt("--kind", "KIND", "its kind: the ontology entry's, and the code its slug ends with", required=True)])
+def design_system_new(ctx: Ctx, slug: str, kind: str) -> Resource:
+    again = [next_command("see the design systems", "design-system list")]
+    if not slug.endswith("-" + kind):
+        raise AgoraError("kind", f"{slug} does not end with -{kind}: a design system's slug ends with its kind's code (0014-design-systems FR-003)",
+                         exit=USAGE, actions=again)
+    d = ctx.root / "design-systems" / slug
+    if not (d / "spec.md").is_file():
+        raise AgoraError("no-spec", f"design-systems/{slug}/spec.md does not exist: the spec comes first, then the ontology, then the work "
+                         "(0001-eidolon-architecture FR-037; 0014-design-systems FR-022)", exit=FAILED,
+                         actions=[next_command("write the spec first", "spec list")])
+    entry = design_systems.entries(ctx.root).get(slug)
+    if entry is None:
+        raise AgoraError("no-entry", f"{slug} has no ifcore:DesignSystem individual in ontology/ifcore.ttl: the ontology comes before the work "
+                         "(0001-eidolon-architecture FR-037; 0014-design-systems FR-010)", exit=FAILED, actions=again)
+    if entry["kind"] != kind:
+        raise AgoraError("kind", f"the ontology registers {slug} as kind {entry['kind']!r}, not {kind!r} (a kind never changes, "
+                         "0014-design-systems FR-018)", exit=USAGE, actions=again)
+    wanted = design_systems.scaffold(ctx.root, slug, entry["label"] or slug)
+    missing = {p: t for p, t in wanted.items() if not p.exists()}
+    changes = files.apply(ctx, missing)
+    res = Resource("design-system", slug, {"slug": slug, "kind": kind, "dry_run": ctx.dry_run, "changes": changes,
+                                           "kept": [str(p.relative_to(ctx.root)) for p in wanted if p not in missing]
+                                           + [f"design-systems/{slug}/{h}" for h in design_systems.harness_files(ctx.root, slug)]})
+    res.actions = [next_command("check its spec and register rows", "check", sections=["specs", "register"], scope=slug),
+                   next_command("run its harness", "check", sections=["design-systems"], scope=slug)]
+    return res

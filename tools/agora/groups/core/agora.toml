@@ -7,3 +7,23 @@ help = "A command of this command line"
 [sections.commands]
 help = "The registry and the ontology list the same commands, with the same noun, verb and category (0042-agora FR-004)"
 watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl", ".github/workflows/**"]
+
+[nouns.ui]
+help = "A web UI of this command line, served inside its own process (0041-command-line FR-025)"
+
+# The UIs (0041-command-line FR-025): each names the design system whose markup and style it uses and the brand that themes
+# it (0042-agora FR-019). The interactivity is Datastar, vendored in tools/agora/vendor/.
+[uis.console]
+help = "The registry browser: nouns, commands, resources, and a form and a run for each command the ui surface exposes (0042-agora FR-024)"
+design_system = "frontiers-console-web"
+theme = "frontiers-brand"
+[uis.assurance]
+help = "The design systems' in-browser harnesses, served read-only from design-systems/ (0042-agora FR-025)"
+design_system = "frontiers-console-web"
+theme = "frontiers-brand"
+
+[sections.ui]
+help = "Each web UI serves and renders offline: well-formed pages, no remote reference, actions the registry exposes, an event stream; with --runner browser, the console in Chromium (0041-command-line FR-025, FR-026; 0042-agora FR-027)"
+watch = ["agora", "tools/agora/**", "design-systems/frontiers-console-web/**", "design-systems/frontiers-brand/brand.css", "design-systems/frontiers-brand/tokens.json"]
+scope = "UI"
+options = ["--runner"]
