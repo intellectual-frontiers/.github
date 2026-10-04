@@ -131,9 +131,10 @@ FR-007.
 
 ## Open questions
 
-- **OQ-1**: No decision is recorded on which legacy Record-shaped content
-  gets curated forward, by Press or by Research & IP — tracked as a
-  standing editorial decision, not resolved here.
+- **OQ-1**: Which legacy Record-shaped content is curated forward into
+  content documents, and under which content kind, is not stated; until then
+  the public website carries all of it as an archive read from its snapshot
+  (0041-public-website FR-013).
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own
   governing spec before FR-011 is satisfied for it.

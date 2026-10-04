@@ -246,6 +246,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
 | [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
 | [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
+| [0041](spec-kit/specs/0041-public-website/spec.md) | The public website: generated from the Eidolon as static files, showing the works rather than the organization |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example

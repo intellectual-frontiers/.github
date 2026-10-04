@@ -239,9 +239,9 @@ is not stated here.
   promise what the book does not deliver, or name unshipped work, and one that
   stops being true MUST be corrected or removed.
 - **FR-037**: A book's news record MUST be published as a generated content
-  document once the book itself is announced, and MUST NOT be published for a
-  book that has not been announced, because publishing its news would
-  announce the book.
+  document once the book itself is announced (0015-work-packages FR-027),
+  and MUST NOT be published for a book that has not been announced, because
+  publishing its news would announce the book.
 
 ## Books as working AI
 
