@@ -260,8 +260,9 @@ is not stated here.
   and MUST say so in its front matter; 0009-press FR-017 governs it.
 - **FR-040**: A skill is a work of kind `skill` and a Substantial Work. It
   MUST be related to the concept it operationalizes by `schema:isBasedOn`
-  (0007-work-and-assets FR-015) and MUST NOT reach a reader before the
-  publication decision for the book it realizes, nor stand in its place.
+  (0007-work-and-assets FR-015) and MUST NOT reach a reader before the book
+  it realizes is announced (0015-work-packages FR-027), nor stand in its
+  place.
 - **FR-041**: The named tools, tests, and frameworks of a book MUST also be
   queryable in the ontology, each individual carrying provenance to the exact
   source file and section it was extracted from and an explicit audience
@@ -374,8 +375,8 @@ is not stated here.
 - A change moves a table to the companion and also changes the page
   count: the news entry describes the move and says nothing of the page
   count, per FR-036.
-- A skill that realizes a book's method is ready before the book's
-  publication decision: it does not reach a reader until that decision,
+- A skill that realizes a book's method is ready before the book is
+  announced: it does not reach a reader until the book's announcement,
   per FR-040.
 
 ## Assumptions
