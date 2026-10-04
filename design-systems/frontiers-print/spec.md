@@ -105,7 +105,7 @@ themed by a brand so that the same design can be set in another brand's colors, 
   named with `--brand`, and fail when a build fails, a page is not the size FR-005 or FR-007 sets, a
   font in the output is not embedded or not one `fonts/` ships, a color FR-003 names is not the
   theme's role or mix of roles, the theme's lockups and icon are not placed in the book, a style
-  file holds a color literal, or a PDF's text layer breaks FR-019.
+  file holds a color literal, a PDF's text layer breaks FR-019, or a build drops a glyph its font lacks (FR-020).
 - **FR-019**: A PDF this design system builds MUST map every glyph to its Unicode character in its
   text layer, so that copying, searching and screen readers return the text that was set. The house
   sans (Inter) MUST be set without contextual alternates (`calt`) in the book interior and in every
@@ -114,6 +114,11 @@ themed by a brand so that the same design can be set in another brand's colors, 
   make the text extract letter-spaced. A compiled
   sample's extracted text MUST hold no code point in U+E000–U+F8FF, MUST give typographic quotes as
   themselves, and MUST give sans-set text as the string that was set, without added spaces.
+- **FR-020**: A glyph a font lacks MUST fall back to another font this design system ships and never
+  vanish from the PDF. The main, sans and monospace families of an article fall back to STIX Two Math
+  and Inter, and the book interior's families do the same for the technical symbols `≈ ≠ ≤ ≥ ≡ ∞ ∑ √ ∂ ∆ → ← ↔ ✓ ✗`.
+  A build that logs a missing character fails the assurance check, and a code block, inline code and
+  monospace text MUST extract those symbols as set.
 
 ## Out of scope
 
@@ -137,6 +142,8 @@ themed by a brand so that the same design can be set in another brand's colors, 
 
 - A heading, box or running head sets a colon, hyphen or parenthesis between capitals in the sans: the
   contextual alternate is off, so it extracts as the plain character, per FR-019.
+- A code block or inline code sets `≈`, `≠`, `≤`, `≥` or `→`, which the monospace face lacks: the symbol is set
+  from the fallback font and extracts as itself, per FR-020.
 
 ## Assumptions
 
@@ -158,6 +165,7 @@ None.
 - **SC-002**: The same fixture set under two brands differs only in the values the theme supplies.
 - **SC-003**: No PDF built by this design system extracts a private-use code point or letter-spaced
   sans text.
+- **SC-004**: No build logs a missing character, and no technical symbol in code or text is dropped.
 
 ## Review & acceptance checklist
 

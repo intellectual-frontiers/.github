@@ -9,6 +9,10 @@
     "sans": [
       "Inter-Regular.ttf",
       "STIXTwoMath-Regular.otf"
+    ],
+    "mono": [
+      "STIXTwoMath-Regular.otf",
+      "Inter-Regular.ttf"
     ]
   },
   "sets": {

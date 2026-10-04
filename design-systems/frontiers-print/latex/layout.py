@@ -77,7 +77,7 @@ def emit(canon, typeface=''):
     d('typeface', tf)
     for role, key in (('main', 'main'), ('sans', 'sans')):
         name, opts = _fontspec(st[key], sans=(key == 'sans')); d(role + 'font', name); d(role + 'opts', opts)
-    for role in ('main', 'sans'):
+    for role in ('main', 'sans', 'mono'):
         d('fb' + role, ','.join('"[' + str(FONT_DIRS['house'] / f) + ']"' for f in TF['fallback'][role]))
     return '\n'.join(o) + '\n'
 
