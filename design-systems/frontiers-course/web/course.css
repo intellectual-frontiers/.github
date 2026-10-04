@@ -1,0 +1,105 @@
+/*
+ * frontiers-course's web edition (spec FR-014). Every color is a --course-* role, which theme.css (written by
+ * build.py from web.json) maps to the brand's roles; this stylesheet holds no color of its own.
+ */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/inter-variable-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("fonts/source-serif-4-variable-latin.woff2") format("woff2");
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; }
+body {
+  margin: 0;
+  background: var(--course-surface);
+  color: var(--course-text);
+  font: 400 1.0625rem/1.6 var(--course-sans);
+}
+a { color: var(--course-link); text-underline-offset: 0.15em; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--course-accent);
+  outline-offset: 2px;
+}
+.skip { position: absolute; left: -999px; top: 0; }
+.skip:focus { left: 16px; top: 16px; background: var(--course-surface); padding: 8px 12px; z-index: 2; }
+
+.site {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 16px max(16px, calc((100vw - 72rem) / 2));
+  border-bottom: 1px solid var(--course-rule);
+}
+.site img { display: block; height: auto; }
+.site .course-title { font-weight: 700; color: var(--course-text); text-decoration: none; }
+
+.layout {
+  display: grid; grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr); gap: 48px;
+  max-width: 72rem; margin: 0 auto; padding: 32px 16px 64px;
+}
+@media (max-width: 52rem) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .toc { order: 2; border-top: 1px solid var(--course-rule); padding-top: 16px; }
+}
+
+.toc { font-size: 0.9375rem; }
+.toc details { border-bottom: 1px solid var(--course-rule); padding: 8px 0; }
+.toc summary { cursor: pointer; font-weight: 600; }
+.toc ol { list-style: none; margin: 8px 0 0; padding: 0; }
+.toc li { margin: 4px 0; }
+.toc a { text-decoration: none; display: block; padding: 2px 0; }
+.toc a[aria-current="page"] { font-weight: 700; color: var(--course-text); }
+.toc .meta { display: block; color: var(--course-muted); font-size: 0.8125rem; }
+
+main { max-width: 42rem; min-width: 0; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+h2 { font-size: 1.375rem; line-height: 1.3; margin: 2em 0 0.5em; }
+h3 { font-size: 1.125rem; margin: 1.5em 0 0.5em; }
+.kicker { color: var(--course-muted); font-size: 0.9375rem; margin: 0 0 24px; }
+blockquote { margin: 1.5em 0; padding-left: 20px; border-left: 3px solid var(--course-rule); font-family: "Source Serif 4", Georgia, serif; }
+code { font-size: 0.9375em; background: var(--course-panel); padding: 0.1em 0.3em; border-radius: 3px; }
+figure { margin: 2em 0; }
+figure img, video { display: block; max-width: 100%; height: auto; }
+video { width: 100%; background: var(--course-text); }
+.outcomes li { margin: 6px 0; }
+.transcript { border-top: 1px solid var(--course-rule); margin-top: 32px; }
+
+.item {
+  border: 1px solid var(--course-rule); border-radius: 6px; background: var(--course-panel);
+  margin: 24px 0; padding: 16px 20px 20px;
+}
+.item legend { font-weight: 700; padding: 0 6px; margin-left: -6px; }
+.item input { accent-color: var(--course-accent); }
+.item label { display: flex; gap: 10px; align-items: baseline; margin: 8px 0; cursor: pointer; }
+.item label.answer { flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 0; }
+.item label.answer + .kicker { margin: 6px 0 0; }
+.item input[type="text"] {
+  font: inherit; color: var(--course-text); background: var(--course-surface);
+  border: 1px solid var(--course-muted); border-radius: 4px; padding: 6px 10px; width: min(100%, 20rem);
+}
+.item button, .score button {
+  font: 600 1rem/1 var(--course-sans); color: var(--course-on-accent); background: var(--course-accent);
+  border: 0; border-radius: 4px; padding: 10px 16px; margin-top: 12px; cursor: pointer;
+}
+.feedback:empty { display: none; }
+.feedback { margin: 12px 0 0; font-weight: 500; }
+.feedback[data-result="correct"] { color: var(--course-correct); }
+.feedback[data-result="incorrect"] { color: var(--course-incorrect); }
+.score { font-weight: 600; }
+
+.steps { display: flex; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--course-rule); }
+.steps a { max-width: 48%; }
+.steps .next { margin-left: auto; text-align: right; }
+
+@media print {
+  .toc, .site, .steps, .skip, .item button { display: none; }
+  .layout { display: block; padding: 0; }
+}

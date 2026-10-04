@@ -45,7 +45,10 @@ roles, and the light variations a figure may take, themed by any brand.
   for every figure-role class and the brand's `font-sans` for every label, which MUST be a family
   this design system ships in `fonts/` (Inter), and MUST set every type size at that family's optical
   size (FR-007). A consumer MUST render or place a figure only with
-  that stylesheet in it.
+  that stylesheet in it. A figure shown as an image (an `<img>` on a page, a picture in an ebook),
+  which cannot load the page's fonts, MUST be themed with the sans embedded (`theme.py apply
+  --embed-fonts`): each weight and style it sets, cut to the letters it uses, as WOFF in its
+  stylesheet.
 
 ## Type, boxes and layout
 
@@ -87,8 +90,8 @@ roles, and the light variations a figure may take, themed by any brand.
   every type on both canvases and check it passes `figcheck.py` measured in the brand's `font-sans`;
   check every fixture in `assurance/fixtures/fail/` fails with the problem
   `assurance/fixtures/expected.json` names; check every variant's contrast per FR-004 and its chart
-  palette per FR-012, and that a
-  themed figure parses; and, where `rsvg-convert` is installed, that a themed figure renders with
+  palette per FR-012, that a figure themed with the sans embedded carries every letter it sets
+  (where fontTools is installed), and that a themed figure parses; and, where `rsvg-convert` is installed, that a themed figure renders with
   the brand's sans embedded and no other family.
 
 ## Out of scope

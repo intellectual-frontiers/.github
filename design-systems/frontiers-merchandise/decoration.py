@@ -10,7 +10,8 @@ A job is what a consumer sends a decorator, as JSON:
 
 `artwork` is a piece of the brand's decoration kit (0014-design-systems FR-047): its `lockup`, its `icon`, or its
 `wordmark` where the kit has one; or `imagery:<id>`, a piece of its imagery pool (FR-043). `ink` is a color role in the kit's `inks`, and is left out for a method that
-uses none. `substrate` is the color of the goods. Standard library only.
+uses none. `substrate` is the color of the goods. `"order": true` marks a job going to a decorator, which may use
+only an ink whose matches are verified; a proof may use any. Standard library only.
 """
 from __future__ import annotations
 
@@ -132,6 +133,8 @@ def check(job: dict, brand: Brand) -> list[str]:
     match = brand.kit["inks"].get(ink)
     if match is None:
         return problems + [f"{ink!r} is not an ink {brand.path.name} allows on goods: {', '.join(brand.kit['inks'])} (FR-008)"]
+    if job.get("order") and match.get("verified") is False:
+        problems.append(f"{ink}'s matches are not verified against the physical guide and card; a proof may use it, an order may not (FR-008, frontiers-brand FR-017)")
     if method["ink"] == "thread" and not match.get("thread"):
         problems.append(f"{ink} has no thread match for embroidery (FR-008)")
     if method["ink"] == "spot" and not match.get("spot"):

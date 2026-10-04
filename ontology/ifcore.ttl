@@ -128,6 +128,11 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     skos:notation "spoken-voice" ;
     skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:CourseDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "course"@en ;
+    skos:notation "course" ;
+    skos:altLabel "courseware"@en , "long-form education"@en ;
+    skos:definition "How a long-form course is structured, paced, assessed and made accessible, and the delivery targets it is compiled to; it spans how a course looks and how it reads (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:WebInteractionModelScheme a skos:ConceptScheme ; rdfs:label "Web interaction model"@en ;
     rdfs:comment "What a web design system's pages are for (0014-design-systems FR-041): a read-mostly content site or a read-write web application, and the kinds of each. A web design system names every one it serves, by dcterms:type."@en ;
@@ -301,6 +306,49 @@ ifcore:NotificationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ;
     skos:definition "A message about something its reader did or asked for: a confirmation, a receipt, a reminder."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:CourseFormatScheme a skos:ConceptScheme ; rdfs:label "Course format"@en ;
+    skos:definition "How a course paces its learners (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SelfPacedCourse a skos:Concept ; skos:inScheme ifcore:CourseFormatScheme ; skos:prefLabel "self-paced"@en ;
+    skos:definition "A course a learner takes at their own pace, with every unit open from the start."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:InstructorPacedCourse a skos:Concept ; skos:inScheme ifcore:CourseFormatScheme ; skos:prefLabel "instructor-paced"@en ;
+    skos:altLabel "cohort"@en ;
+    skos:definition "A course a cohort takes together, with units released and due by week."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AssessmentItemTypeScheme a skos:ConceptScheme ; rdfs:label "Assessment item type"@en ;
+    skos:definition "The kinds of item a course design system's assessments ask, each graded automatically (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MultipleChoiceItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "multiple choice"@en ;
+    skos:definition "An item with one correct choice among several."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MultipleResponseItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "multiple response"@en ;
+    skos:altLabel "checkbox"@en ;
+    skos:definition "An item where the learner selects every correct choice among several."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NumericResponseItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "numeric response"@en ;
+    skos:definition "An item answered with a number, accepted within a stated tolerance."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TextMatchItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "text match"@en ;
+    skos:altLabel "text input"@en ;
+    skos:definition "An item answered with a short text, accepted if it matches one of the stated answers."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CourseDeliveryTargetScheme a skos:ConceptScheme ; rdfs:label "Course delivery target"@en ;
+    skos:definition "The forms a course design system compiles a course to, each for a place courses are delivered (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:StaticWebEdition a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "static web edition"@en ;
+    skos:definition "A course as a static web site anyone can read, its practice graded in the browser."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpenEdxOlxExport a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "Open edX OLX export"@en ;
+    skos:altLabel "OLX"@en ;
+    skos:definition "A course as an Open edX course export (Open Learning XML) that Studio imports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Cmi5Package a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "cmi5 package"@en ;
+    skos:definition "A course as a cmi5 course package an LMS imports, its pages reporting to the LMS by xAPI."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
     rdfs:comment "How a merchandise design system puts artwork on goods (0014-design-systems FR-046), as the promotional products industry names it."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -415,6 +463,15 @@ ifcore:FrontiersEmail a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:EmailDesignSystemKind , ifcore:NewsletterEmail , ifcore:AnnouncementEmail , ifcore:InvitationEmail , ifcore:NotificationEmail ;
     rdfs:comment "At design-systems/frontiers-email/; its house rules are design-systems/frontiers-email/spec.md. Email built from Markdown by mail.py: 600px, table layout, styles inline, colors resolved from a brand's theme roles with a dark tone, and a plain-text alternative (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersCourse a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-course" ;
+    rdfs:label "Frontiers Course"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:CourseDesignSystemKind , ifcore:SelfPacedCourse , ifcore:InstructorPacedCourse , ifcore:MultipleChoiceItem , ifcore:MultipleResponseItem , ifcore:NumericResponseItem , ifcore:TextMatchItem , ifcore:StaticWebEdition , ifcore:OpenEdxOlxExport , ifcore:Cmi5Package ;
+    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of AsciiDoc, read by course.py into a model schema/course.schema.json describes, checked for outcome alignment, pacing, assessment and accessibility, and compiled by build.py to a static web edition, an Open edX OLX export and a cmi5 package, themed by a brand (0014-design-systems FR-052)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersSignagePrint a ifcore:DesignSystem ;
@@ -691,6 +748,9 @@ ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:iden
     ifcore:hasAudience ifcore:Public .
 ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterms:identifier "research" ;
     rdfs:comment "An area, pillar, note, paper, publication, disclosure, trademark record, or patent draft (0017-spoken-and-research-works FR-017)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CourseKind a ifcore:WorkKind ; rdfs:label "Course"@en ; dcterms:identifier "course" ;
+    rdfs:comment "A subject taught at length, over weeks, with outcomes, lessons and assessments; its source is AsciiDoc in frontiers-course's form (0027-course-works FR-001, FR-002)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
     rdfs:comment "The stage a Substantial Work currently occupies."@en .

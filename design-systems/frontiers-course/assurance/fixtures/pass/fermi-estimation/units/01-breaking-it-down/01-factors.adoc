@@ -1,0 +1,31 @@
+= A quantity is a product of factors
+:type: reading
+:minutes: 3
+:outcomes: O1, O2
+
+Nobody has counted the piano tuners in a city of a million people, and you can still estimate how many there are.
+Write the answer as a product of quantities you can reason about one at a time.
+
+== The factors
+
+Start with the people. A city of a million holds about 400,000 households, at two and a half people each. Perhaps
+one household in twenty owns a piano, which gives 20,000 pianos. A piano is tuned about once a year, so the city
+needs 20,000 tunings a year.
+
+Now the tuners. A tuner finishes about four pianos a day and works about 250 days a year, which comes to 1,000
+tunings each. Divide the tunings the city needs by the tunings one tuner can do, and the city supports about 20
+tuners.
+
+image::figures/factors.svg[A bar chart comparing the four factors of the piano tuner estimate, households largest and tuners smallest]
+
+== Why the errors cancel
+
+Each factor is uncertain, and some of your guesses run high while others run low. Across four or five factors the
+errors tend to offset each other, so the product lands within a factor of ten more often than any single guess
+would suggest. The method works because you state each assumption where a reader can see it and change it.
+
+== What to write down
+
+For every factor, write the number and the reason for it in one line. A reader who disagrees with a factor can then
+replace it with their own and recompute the answer. An estimate without its assumptions is only a number, and no one
+can check it. The https://example.org/estimation[worked examples on estimation] show more of these.

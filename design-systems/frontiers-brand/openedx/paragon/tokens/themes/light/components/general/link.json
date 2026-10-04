@@ -1,0 +1,17 @@
+{
+  "color": {
+    "$type": "color",
+    "link": {
+      "base": {
+        "source": "$link-color",
+        "$value": "#214EA2"
+      },
+      "inline": {
+        "base": {
+          "source": "$inline-link-color",
+          "$value": "#214EA2"
+        }
+      }
+    }
+  }
+}
