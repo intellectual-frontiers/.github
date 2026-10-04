@@ -249,7 +249,7 @@ class SuitesAndOptions(unittest.TestCase):
         for n in ("design-systems", "imagery", "openedx"):
             self.assertTrue(callable(self.reg.sections[n].fn), n)
         s = self.reg.suites
-        self.assertEqual((s["browser"]["sections"], s["browser"]["options"]), (["design-systems", "openedx", "ui"], {"runner": "browser"}))
+        self.assertEqual((s["browser"]["sections"], s["browser"]["options"]), (["design-systems", "openedx"], {"runner": "browser"}))
         self.assertEqual((s["python"]["sections"], s["python"]["options"]), (["design-systems"], {"runner": "python"}))
         self.assertEqual(s["images"]["sections"], ["imagery"])
         self.assertEqual(self.reg.validate(), [])

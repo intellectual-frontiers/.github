@@ -1,16 +1,46 @@
 """`design-system list`, `show` and `new` (0042-agora FR-006, FR-009; 0001-eidolon-architecture FR-037)."""
 from __future__ import annotations
 
+import shutil
 import json
 
 from agora.core.registry import Registry
 from agora.lib import design_systems
 
-from .helpers import HOME, run_json, spec_text
-from .uifix import UiRepo
+from .helpers import HOME, TempRepo, run_json, spec_text
 
 
-class DesignSystems(UiRepo):
+KIND_TTL = """@prefix ifcore: <https://example.test/ifcore#> .
+
+ifcore:DesignSystemKindScheme a skos:ConceptScheme ; rdfs:label "Design system kind"@en .
+ifcore:WebDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "web presentation"@en ;
+    skos:notation "web" ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BrandDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "brand"@en ;
+    skos:notation "brand" ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ToyWeb a ifcore:DesignSystem ;
+    dcterms:identifier "toy-web" ;
+    rdfs:label "Toy Web"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:WebDesignSystemKind ;
+    rdfs:comment "At design-systems/toy-web/."@en ;
+    ifcore:hasAudience ifcore:Public .
+"""
+
+
+class ToyRepo(TempRepo):
+    """A clone holding agora's code, a spec, the register and a one-design-system ontology."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        self.write("ontology/ifcore.ttl", KIND_TTL)
+        self.write("design-systems/toy-web/spec.md", spec_text("toy-web"))
+
+
+class DesignSystems(ToyRepo):
     def go(self, *argv):
         return run_json(list(argv), home=self.root)
 

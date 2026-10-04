@@ -1,72 +1,84 @@
-# Feature Specification: A repository's command line
+# Feature Specification: A repository's orchestrator
 
 **Spec ID:** 0041-command-line
 **Status:** Draft
 
-**Input:** The rules any Eidolon repository's command line follows, so that
-one command line replaces that repository's scattered scripts and every
-person, CI job and AI agent reaches its checks, builds and records the same
-way. A repository's command line is one launcher and one body of code that
-declares its commands in a registry, takes typed arguments, returns every
-result as a resource rendered as text, JSON or HTML, reports errors as
-resources, exposes each command on the surfaces its category allows (the
-terminal, a local web UI, and an MCP server for agents), and never decides
-for a person what only a person decides. It obtains its Python packages only
-from committed, hashed locks (0025-tooling-environment FR-013), runs offline
-on request, and records nothing outside Git. This spec states those rules
-for any repository; the public root's command set is 0042-agora.
+**Input:** The rules any Eidolon repository's orchestrator follows. An
+orchestrator is the one command that runs a repository's behavior: the only
+way a person, a CI job or an AI agent runs what that repository does, in
+place of scattered scripts. It is one launcher and one body of Python code
+that declares its commands in a registry found by presence, takes typed
+arguments, returns every result as a resource rendered as text, JSON or HTML,
+reports errors as resources, exposes each command on the surfaces its
+category allows (the terminal, the editor and, for agents, MCP), and never
+decides for a person what only a person decides. Its behavior is code and its
+information is a small environment-style file. It obtains its Python packages
+only from uv's own files, runs offline on request, and records nothing outside
+Git. An orchestrator that prepares a person's machine, clones their
+repositories and installs kits is an environment orchestrator; the editor
+extension that is the graphical interface for every orchestrator ships with
+it. This spec states those rules for any repository. Names such as `agora`,
+`eid` and `ws-host` are examples of orchestrator names, not part of any rule;
+the public root's command set is 0042-agora.
 
 ## The launcher and its dependency plan
 
-- **FR-001**: A repository's command line MUST be one executable launcher at
-  the repository root, named for the command line, written in POSIX `sh`,
+- **FR-001**: A repository's orchestrator MUST be one executable launcher at
+  the repository root, named for the orchestrator, written in POSIX `sh`,
   that needs only `uv` and a Python 3 interpreter from the host. It MUST run
   from a fresh clone with no step beyond the clone (0025-tooling-environment
   FR-006), from any working directory inside the clone, and MUST find the
   repository from its own location.
-- **FR-002**: Every command MUST declare the dependency group it needs, and
-  the launcher MUST compute the dependency plan for the requested command
-  before running it, from the registry's declarations alone, without
-  importing any third-party package. A command that needs no package MUST
-  run on the plain standard-library interpreter. A command that needs
-  packages MUST run under `uv` against its group's lock, frozen and with
-  hash checking, and MUST NOT resolve, upgrade or install anything.
-- **FR-003**: The launcher MUST obtain Python packages only as
-  0025-tooling-environment FR-013 allows: from a lock committed in the
-  repository, with a hash for every distribution, into uv's own cache and an
-  environment uv creates for the run, never into an interpreter, virtual
-  environment or site-packages the host owns.
-- **FR-004**: The command line MUST run offline on request: when the
-  environment variable named for the command line with the suffix `_OFFLINE`
+- **FR-002**: Every command MUST declare, in code, the packages it needs as
+  names of dependency groups in the repository's `pyproject.toml`, and the
+  launcher MUST compute the dependency plan for the requested command before
+  running it, from the registry's declarations alone, without importing any
+  third-party package. A command that needs no package MUST run on the plain
+  standard-library interpreter. A command that needs packages MUST run under
+  `uv` against the committed `uv.lock` and the groups it names, and MUST NOT
+  resolve, upgrade or rewrite the lock when it runs.
+- **FR-003**: An orchestrator MUST obtain Python packages only as
+  0025-tooling-environment FR-013 allows: through `uv`, from `pyproject.toml`
+  and `uv.lock`, the two files uv owns and the only TOML an orchestrator keeps
+  (FR-049), into uv's own cache and an environment uv creates for the run,
+  never into an interpreter, virtual environment or site-packages the host
+  owns. An orchestrator MUST NOT keep a lock of its own format.
+- **FR-004**: The orchestrator MUST run offline on request: when the
+  environment variable named for the orchestrator with the suffix `_OFFLINE`
   is `1`, or `--offline` is given, it MUST NOT download anything, and a
-  command whose plan needs something not already in uv's cache MUST fail
-  with an error resource naming the package, its group and the command that
+  command whose plan needs something not already in uv's cache MUST fail with
+  an error resource naming the package, its group and the command that
   prepares it while online (FR-020).
-- **FR-005**: The command line's core (its registry, parser, typed
-  arguments, resources, renderings, errors, dependency plan, logging, UI
-  server, MCP server and generated-file machinery) MUST use the Python
-  standard library only. A command MAY import a third-party package only
-  inside the function that uses it, so that the registry, help, completion
-  and every command needing no package run with none installed.
+- **FR-005**: The orchestrator's core (its registry, parser, typed arguments,
+  resources, renderings, errors, dependency plan, logging, environment-file
+  parser, MCP server and generated-file machinery) MUST use the Python
+  standard library only. Every module that declares a command or a kit
+  (FR-007, FR-058) MUST import only the standard library at module level and
+  MAY import a third-party package only inside the function that uses it, so
+  that the registry, help, completion and the dependency plan work with no
+  package installed. `doctor` MUST enforce this (FR-029).
 - **FR-006**: A program outside Python that a command needs (a typesetter, a
   browser, an image tool, a Node runtime) MUST come from the host
-  (0025-tooling-environment FR-006, FR-007). The command line MUST NOT
-  install, download or upgrade one. A group's manifest MUST declare each such
-  program, the commands that need it, and a hint naming the workspaces-host-v3
-  persona or the program that supplies it, never the reference environment
-  itself (0025-tooling-environment FR-012). A command whose program is
-  missing MUST fail with an error resource carrying that hint.
+  (0025-tooling-environment FR-006, FR-007). An orchestrator MUST NOT install,
+  download or upgrade one, except an environment orchestrator installing a kit
+  a person asks for (FR-059). The registry MUST declare each such program, the
+  commands that need it, and a hint naming the kit that supplies it, never the
+  reference environment itself (0025-tooling-environment FR-012). A command
+  whose program is missing MUST fail with an error resource carrying that hint.
 
 ## The registry and the grammar
 
-- **FR-007**: A command line MUST keep one registry of its commands, built
-  from a root manifest, one manifest per command group, and the commands each
-  group's code declares. The manifest is the declaration of the command line's
+- **FR-007**: An orchestrator MUST keep one registry of its commands, kept in
+  code: a command, a check section, a generator, a suite and a type is a
+  function or class declared with the registry's decorators, and the registry
+  is discovered by presence. Adding a module under the orchestrator's commands
+  package adds its commands, and nothing else lists it; deleting the module
+  removes them. The registry is the declaration of the orchestrator's
   prerequisites, packages, programs, check sections, generators, suites and
-  per-command tables at their point of use
-  (0025-tooling-environment FR-003). The manifest and the lock are named for
-  the command line, `<name>.toml` and `<name>.lock`, and a group holds one lock
-  only when it pins packages.
+  per-command tables at their point of use (0025-tooling-environment FR-003).
+  The reason is that AI agents change code with ease, while configuration files
+  exist for people to edit by hand; a registry in code gives an agent one place
+  to read and one place to change, and gives the tests something to run.
 - **FR-008**: A command MUST be invoked as `<name> <noun> <verb> [ID]
   [--options]`: the noun names a kind of resource, the verb is one of a fixed
   set, and the ID, where the command takes one, is always the first
@@ -87,15 +99,18 @@ for any repository; the public root's command set is 0042-agora.
   verb: FR-010.
 - **FR-010**: A small closed set of repository-wide commands MUST take no
   noun: `check`, `fresh`, `test`, `doctor`, `lock` and `context`, with the
-  arguments FR-031, FR-036, FR-014, FR-030 and FR-038 state. A command line MAY
-  omit any of them but MUST NOT add another without amending this spec. A check
-  MUST run only through `check`; no `<noun> check` command MAY exist.
-- **FR-011**: The surfaces a command line serves are commands under two
-  fixed nouns, `ui` (FR-025) and `mcp` (FR-027), whose commands take the
-  surface's own control words (`serve`, `open`, `stop`, `link` for `ui`;
-  `serve` for `mcp`) and are the only commands whose second word may be
-  outside FR-008's set.
-- **FR-012**: The registry MUST be readable through the command line itself:
+  arguments FR-031, FR-036, FR-014, FR-030 and FR-038 state; and an
+  environment orchestrator MAY also have `workspace`, a noun whose commands
+  prepare the person's machine (FR-063). An orchestrator MAY omit any of the
+  repository-wide commands but MUST NOT add another without amending this
+  spec. A check MUST run only through `check`; no `<noun> check` command MAY
+  exist.
+- **FR-011**: The one noun that serves a surface is `mcp` (FR-027), whose
+  command takes the surface's own control word (`serve`) and is the only
+  command whose second word may be outside FR-008's set. The editor
+  (FR-050) is served by the extension, not by a command of the orchestrator;
+  the orchestrator needs no `ui` command and no server for it.
+- **FR-012**: The registry MUST be readable through the orchestrator itself:
   `command list` and `command show ID` MUST return every declared command and
   its noun, verb, category, arguments, surfaces, dependency group and programs
   as resources. Help and shell completion MUST be derived from the registry,
@@ -106,11 +121,11 @@ for any repository; the public root's command set is 0042-agora.
 - **FR-013**: Every argument a command takes MUST have a declared type, a name
   in capitals (for example a spec, a requirement, a design system, a commit).
   A type MUST define how to validate a value, how to resolve it to a resource,
-  and how to complete it. The parser, shell completion, a web UI's forms
-  (FR-025) and an MCP tool's input schema (FR-027) MUST all take their
-  validation and choices from that one declaration. A value that fails its
-  type MUST produce an error resource naming the type and examples of valid
-  values.
+  and how to complete it. The parser, shell completion, the editor's
+  quick-picks (FR-050) and an MCP tool's input schema (FR-027) MUST all take
+  their validation and choices from that one declaration. A value that fails
+  its type MUST produce an error resource naming the type and examples of
+  valid values.
 
 ## Categories
 
@@ -119,9 +134,10 @@ for any repository; the public root's command set is 0042-agora.
   tracked); `record` (appends a fact to the tracked record); `build` (writes
   derived output); `generate` (rewrites tracked generated files); `decision`
   (changes what only the authority in effect decides, per 0001 FR-029, such
-  as a spec's status or an approval); `setup` (changes the clone's own
-  environment, such as a lock, a pin or a running server). A command MUST NOT
-  do more than its category allows.
+  as a spec's status, an approval or a repository's trust); `setup` (changes
+  the machine's or the clone's own environment, such as a lock, a pin, an
+  installed kit or a running server). A command MUST NOT do more than its
+  category allows.
 - **FR-015**: Every command that writes (every category but `read` and
   `check`) MUST accept `--dry-run`, which validates exactly as the real run
   does, writes nothing, and returns the change it would make as a resource
@@ -139,14 +155,16 @@ for any repository; the public root's command set is 0042-agora.
   the related resource. An action MUST be a library call with typed fields
   (FR-013), carrying its category (FR-014) and the surfaces that expose it
   (FR-022); its displayed command line MUST be generated from that call, never
-  written by hand. An action that cannot run now MUST be absent, or present
-  and disabled with the reason. The same resource therefore drives the
-  terminal's "what next", a web UI's buttons and an agent's tools.
+  written by hand, and MUST follow FR-055. An action that cannot run now MUST
+  be absent, or present and disabled with the reason. The same resource
+  therefore drives the terminal's "what next", the editor's buttons and an
+  agent's tools.
 - **FR-018**: A resource MUST have three renderings, and no more: text
-  (the default, for people), JSON (`--json`, on every command) and HTML (for
-  a web UI). All three MUST be views of the same resource, and MUST NOT differ
-  in what they say: nothing may appear in one that the resource does not
-  carry. Text MAY omit fields a person does not need; JSON MUST NOT.
+  (the default, for people), JSON (`--json`, on every command) and HTML
+  (`--html`, used by the editor's webviews and by nothing else). All three
+  MUST be views of the same resource, and MUST NOT differ in what they say:
+  nothing may appear in one that the resource does not carry. Text MAY omit
+  fields a person does not need; JSON MUST NOT.
 - **FR-019**: JSON output MUST be one document per command:
   `{"schema": "<name>/<kind>@<n>", "audience", "kind", "id", "data", "links",
   "actions"}`, where `<n>` is the schema's integer version, raised on any
@@ -161,48 +179,93 @@ for any repository; the public root's command set is 0042-agora.
   its trace going to the log (FR-042) and shown only under `--debug`.
 - **FR-021**: Exit status MUST be: 0 for success; 1 when the command ran and
   what it checked or tried failed; 2 for a usage error or an invalid
-  argument; 3 for a missing package, program or offline prerequisite
-  (FR-004, FR-006).
+  argument; 3 for a missing package, program or prerequisite (FR-004, FR-006).
+  An item a command deliberately leaves alone to protect a person's work (a
+  repository with changes not yet committed, say) is not a failure: the
+  command MUST exit 0 and list each skip, with the reason, in its resource
+  (FR-056).
 
 ## Surfaces
 
 - **FR-022**: Every command MUST be callable in the terminal. Each command
-  MUST declare which of the other surfaces (the web UI, MCP) expose it, and
+  MUST declare which of the other surfaces (the editor, MCP) expose it, and
   where it declares none the default MUST follow its category: `read`,
-  `check`, `record`, `build` and `generate` on both; `decision` on the web UI
+  `check`, `record`, `build` and `generate` on both; `decision` on the editor
   only; `setup` on neither. A command MAY narrow its default, and MAY widen a
   `setup` command to a surface by declaring it, but MUST NOT widen a
-  `decision` command to MCP (FR-023).
+  `decision` command to MCP (FR-023). A `setup` command that needs
+  administrator rights (installing a package with the host's package manager)
+  MUST NOT be exposed over MCP.
 - **FR-023**: A `decision` command MUST NOT be callable over MCP. The MCP
   server MUST NOT list one, MUST refuse a call that names one, and no
   declaration, option or environment variable MAY change that. An agent that
   wants a decision made records a proposal (FR-039) for a person to decide in
-  the terminal or the web UI.
+  the terminal or the editor.
 - **FR-024**: Every surface MUST call the same library call as the terminal
   and return the command's own resource. A command's code MUST be thin: it
   parses nothing, renders nothing and keeps no surface-specific logic; its
-  rules live in the repository's library code, so that the three surfaces
-  cannot disagree.
+  rules live in the repository's library code, so that the surfaces cannot
+  disagree.
 
-## The web UI
+## The editor surface
 
-- **FR-025**: A command line MAY serve local web UIs, each declared in its
-  manifest, through `ui serve UI` (run in the foreground), `ui open UI`
-  (serve if needed and open a browser), `ui stop UI` and `ui link UI` (print
-  the address). A UI MUST run inside the command line's own process, listen
-  on the loopback interface only, make no request to any remote host, and need
-  no build step. Its pages MUST be the HTML rendering of resources (FR-018).
-- **FR-026**: A UI MUST be interactive through Datastar over server-sent
-  events: the server sends HTML and signal updates, and the page holds no
-  application logic of its own. Datastar MUST be vendored in the repository as
-  one file, not fetched. Each interaction MUST call the registry's library
-  call for the command (FR-024); a UI action that writes MUST show its
-  `--dry-run` result (FR-015) before it runs, and a `decision` action MUST
-  require a person's explicit confirmation.
+- **FR-050**: The editor surface MUST be one VS Code extension, shipped by the
+  environment orchestrator and the graphical interface for every
+  orchestrator. It MUST hold no behavior of its own: it discovers each trusted
+  repository's orchestrator launcher at the repository root, runs
+  `<name> command list --json` and `<name> <noun> <verb> ... --json` or
+  `--html`, renders the resources they return, and runs a resource's actions
+  by invoking the orchestrator, and does nothing else. It MUST show a status
+  that says in plain words whether things are well, the orchestrators and their
+  audiences, an action as a button with a way to show its command (FR-055), a
+  quick-pick for a typed argument (FR-013), a check's findings in the editor's
+  problems list, a stream (FR-019) as progress, and an HTML rendering in a
+  panel that loads local resources only and runs no script from outside it. It
+  MUST be plain JavaScript with no build step, so that the clone is the
+  installed extension.
+- **FR-051**: A `decision` action in the editor MUST require a modal
+  confirmation that only a person can give. An AI agent working inside the
+  editor MUST NOT be able to trigger a `decision` through any editor command,
+  setting or API the extension exposes, and the extension MUST NOT offer
+  such a command.
+- **FR-052**: The extension MUST run the orchestrator of a repository only when
+  the repository is trusted (FR-061), MUST refuse to run in VS Code's
+  Restricted Mode, and MUST declare that it runs where the workspace is and
+  does not support untrusted workspaces.
+- **FR-053**: The extension MUST check each document's `schema` (FR-019)
+  against the versions it understands, and MUST say in plain words that an
+  update is needed, with the action that updates it, rather than fail or
+  show a document it cannot read.
+
+## Behavior and information
+
+- **FR-046**: An orchestrator's own configuration MUST be sorted into
+  behavior and information. Anything whose change alters what the
+  orchestrator does is behavior and MUST be Python code: commands, kits,
+  package lists, the versions and hashes of downloads, checks, rules, the
+  orchestrator's name, audience, suites and paths. Information is names,
+  places, identities and credentials, and MUST be held as an environment file
+  (FR-047). This rule governs an orchestrator's own configuration only. It
+  does not govern the repository's content, which keeps its own formats: specs
+  stay Markdown, the ontology Turtle, registers TSV, and tokens and fixtures
+  JSON.
+- **FR-047**: An environment file MUST follow the syntax of `os-release(5)`
+  and of systemd's `EnvironmentFile`: one `KEY=value` per line, the value
+  optionally in single or double quotes, `#` starting a comment, no variable
+  expansion and no line continuation. A list MUST be space-separated values on
+  one line. The orchestrator's core parses it with the standard library alone.
+- **FR-048**: An orchestrator MUST need no configuration file by default.
+  An orchestrator MUST NOT read another orchestrator's files; what another
+  needs, the environment orchestrator exports as environment variables.
+- **FR-049**: An orchestrator's own configuration MUST NOT use YAML. A file format owned
+  by a third-party tool (`pyproject.toml` and `uv.lock`, which uv owns, and
+  an editor extension's `package.json`, which VS Code owns) MAY be used only
+  where that tool owns the format. Markdown MUST be used only for a proposal
+  (FR-039).
 
 ## The MCP server
 
-- **FR-027**: A command line MAY serve MCP through `mcp serve`, over standard
+- **FR-027**: An orchestrator MAY serve MCP through `mcp serve`, over standard
   input and output, as JSON-RPC. It MUST expose as tools exactly the commands
   that declare MCP and are not `decision` commands (FR-022, FR-023). Each
   tool's input schema MUST be generated from its typed arguments (FR-013), its
@@ -229,36 +292,38 @@ for any repository; the public root's command set is 0042-agora.
   dependency group differs from another command's that runs beside it in one
   invocation. An isolated command MUST run in its own worker process under its
   own plan (FR-002) and return its resource as JSON to its parent. One
-  process MUST NOT ever hold two locks: `check` with sections from several
-  groups MUST run each section's group in its own worker.
-- **FR-029**: `doctor` MUST report what the command line needs and what is
-  present: the launcher's prerequisites, each group's lock against its
-  manifest's pins, whether the packages are in uv's cache (so offline runs
-  work), and each group's programs, with hints (FR-006). It MUST also check
-  the registry for conflicts and fail on any: two commands with one name; a
-  command in two groups; a type declared twice with different meanings; a
-  non-isolated invocation whose plan needs two locks (FR-028); and a manifest
-  pin the lock does not match. `doctor` MUST change nothing.
-- **FR-030**: `lock [GROUP]` MUST be a `setup` command that writes a group's
-  lock from the pins in its manifest, through uv, with a hash for every
-  distribution, and MUST refuse to run offline (FR-004). A manifest and a lock
-  that disagree MUST fail `doctor` (FR-029).
+  process MUST NOT ever hold two dependency groups: `check` with sections from
+  several groups MUST run each section's group in its own worker.
+- **FR-029**: `doctor` MUST report what the orchestrator needs and what is
+  present: the launcher's prerequisites, whether `uv.lock` matches
+  `pyproject.toml`, whether each group's packages are in uv's cache (so
+  offline runs work), and each group's programs, with hints (FR-006). It MUST
+  also check the registry and fail on any conflict: two commands with one
+  name; two kits with one name (FR-058); a command in two groups; a type
+  declared twice with different meanings; a non-isolated invocation whose plan
+  needs two groups (FR-028); a module that declares a command or a kit and
+  imports a third-party package at module level (FR-005); and a `uv.lock`
+  that does not match `pyproject.toml`. `doctor` MUST change nothing.
+- **FR-030**: `lock` MUST be a `setup` command that writes `uv.lock` from
+  `pyproject.toml` through uv, and MUST refuse to run offline (FR-004). A
+  `pyproject.toml` and a `uv.lock` that disagree MUST fail `doctor` (FR-029).
 
 ## Checking
 
 - **FR-031**: Every check MUST run through `check [SECTION...] [--scope ID]
-  [--suite SUITE] [--changed]`. A section is a named check a group's manifest
-  declares, with the programs it needs (FR-006), the watched paths it depends
-  on (FR-032), and the suites it belongs to. A suite is a named set of
+  [--suite SUITE] [--changed]`. A section is a named check the registry
+  declares in code, with the programs it needs (FR-006), the watched paths it
+  depends on (FR-032), and the suites it belongs to. A suite is a named set of
   sections, so that a CI job runs one suite and a person runs all. `--scope`
   limits a section that supports it to one resource, as that section's typed
   argument.
 - **FR-032**: `check --changed` MUST run only the sections whose declared
-  watched paths (path globs in the manifest) contain a file that Git reports
-  as changed in the working tree, staged, or untracked, or that differs from
-  the commit it is told to compare with. A section that declares no watched
-  paths MUST always run. `--changed` MUST list each section it skipped and
-  why, and MUST NOT use any rule that is not a declared watched path.
+  watched paths (path globs in the section's declaration) contain a file that
+  Git reports as changed in the working tree, staged, or untracked, or that
+  differs from the commit it is told to compare with. A section that declares
+  no watched paths MUST always run. `--changed` MUST list each section it
+  skipped and why, and MUST NOT use any rule that is not a declared watched
+  path.
 - **FR-033**: A check MUST NOT report a section it did not run as passed. With
   no sections or suite named, `check` MUST run every section, and a section
   whose program is missing (FR-006) MUST be reported as skipped and make the
@@ -266,23 +331,23 @@ for any repository; the public root's command set is 0042-agora.
   what it names. A check's resource MUST list each section's result, and
   each finding with its location and the action to take next (FR-017). A
   check MUST NOT change any tracked file.
-- **FR-034**: A command line MUST carry its own tests, run by `test` with the
+- **FR-034**: An orchestrator MUST carry its own tests, run by `test` with the
   standard library's test runner, unless the group declares packages it needs;
   `test` MUST fail on any failing test and report none it did not run as
   passed.
 
 ## Generated files
 
-- **FR-035**: A group MUST declare each generator by name, with the sources it
-  reads and the tracked files it writes. A file a generator writes MUST carry
-  a header naming the generator and its source, and MUST NOT be edited by
-  hand. The `generate` command for the generator's noun rewrites them, with
-  `--dry-run` (FR-015).
+- **FR-035**: The registry MUST declare each generator by name, with the
+  sources it reads and the tracked files it writes. A file a generator writes
+  MUST carry a header naming the generator and its source, and MUST NOT be
+  edited by hand. The `generate` command for the generator's noun rewrites
+  them, with `--dry-run` (FR-015).
 - **FR-036**: `fresh [GENERATOR...]` MUST regenerate each named generator's
   output (every generator when none is named) outside the working tree and
   compare it with the tracked files, fail on any difference naming the
   generator and the command that rewrites it, and write nothing.
-- **FR-037**: The files that tell an AI agent how to use the command line (a
+- **FR-037**: The files that tell an AI agent how to use the orchestrator (a
   skill, an instructions file) MUST be generated from the registry by a
   generator (FR-035), listing exactly the commands, their categories and the
   surfaces that expose them, saying that a `decision` command is for a person,
@@ -297,21 +362,21 @@ for any repository; the public root's command set is 0042-agora.
   concerns. It MUST be deterministic, bounded in size, and say what it left
   out. It MUST be available for every kind of resource that has a context
   provider, each provider returning the same parts in the same shape.
-- **FR-039**: A proposal MUST be a tracked file in a directory the root
-  manifest names, holding an id, the resource it concerns, the reason, and
-  the change proposed as a typed action (FR-017) that can be replayed. A
-  proposal is open or accepted. Only a `record`, `generate` or `decision`
-  command MAY be proposed, and never a proposal command; a proposal is tracked
-  because the change it proposes is not worth less than a commit. `proposal list` and `proposal show` MUST be
-  `read` commands, `proposal new` a `record` command, and `proposal advance` a
-  `decision` command that replays the action (showing its `--dry-run` first,
-  FR-015) and marks the proposal accepted. Refusing a proposal is deleting its
-  file in a commit.
+- **FR-039**: A proposal MUST be a tracked file in a directory the
+  orchestrator's code names, holding an id, the resource it concerns, the
+  reason, and the change proposed as a typed action (FR-017) that can be
+  replayed. A proposal is open or accepted. Only a `record`, `generate` or
+  `decision` command MAY be proposed, and never a proposal command; a proposal
+  is tracked because the change it proposes is not worth less than a commit.
+  `proposal list` and `proposal show` MUST be `read` commands, `proposal new` a
+  `record` command, and `proposal advance` a `decision` command that replays
+  the action (showing its `--dry-run` first, FR-015) and marks the proposal
+  accepted. Refusing a proposal is deleting its file in a commit.
 
 ## Audience and boundaries
 
 - **FR-040**: Every output MUST name its audience: the resource's `audience`
-  field and, in text, a line saying so. The audience the root manifest
+  field and, in text, a line saying so. The audience the orchestrator's code
   declares is stamped on every output. `--root DIR` MAY point a `read` or
   `check` command that declares itself relocatable at another repository,
   checking it with this repository's rules; the output MUST then NOT carry
@@ -319,34 +384,112 @@ for any repository; the public root's command set is 0042-agora.
   MUST refuse `--root`.
 - **FR-041**: Git MUST be the only record. A command that changes the record
   writes tracked files and leaves the commit to a person; no command MAY
-  commit, push, tag, or otherwise write to Git. A command MAY read Git's state.
+  commit, push, tag, or otherwise write to Git, except that an environment
+  orchestrator MAY clone a repository and advance a clone by fetch and
+  fast-forward only (FR-063). A command MAY read Git's state.
 - **FR-042**: What does not warrant a commit but changes or runs something (a
-  command that writes, a check, a build, a decision, a dry run, a UI started or
-  stopped, an MCP call that does one of these) MUST go as NDJSON lines to
-  untracked logs in a directory the root manifest names, which the repository
-  ignores, each line noting the time, the surface (terminal, UI or MCP), the
-  command, its typed arguments and its exit status. A `read` command, a page
-  viewed in a UI and a resource read over MCP change nothing and MUST NOT be
-  logged; a refused call to a command that is not `read` (a decision over MCP,
-  an invalid argument) MUST be. A log line MUST NOT hold a person's name, a
-  secret or file contents. A person's name MUST NOT be written to a tracked
-  file except where a command's own data requires it, as a command argument
-  that records who.
+  command that writes, a check, a build, a decision, a dry run, an installed
+  kit, an MCP call that does one of these) MUST go as NDJSON lines to
+  untracked logs in a directory the orchestrator's code names, which the
+  repository ignores, each line noting the time, the surface (`cli`, `editor`
+  or `mcp`), the command, its typed arguments and its exit status. A `read`
+  command, a page viewed in the editor and a resource read over MCP change
+  nothing and MUST NOT be logged; a refused call to a command that is not
+  `read` (a decision over MCP, an invalid argument) MUST be. A log line MUST
+  NOT hold a person's name, a secret or file contents. A person's name MUST
+  NOT be written to a tracked file except where a command's own data requires
+  it, as a command argument that records who.
 - **FR-043**: No command MAY call an AI model or service. Agents call the
-  command line; the command line never calls them.
-- **FR-044**: A command line MUST be built for one user in one clone: it MUST
-  NOT lock, queue or reconcile concurrent writers. It MAY refuse to start a
-  second UI for the same clone.
-- **FR-045**: A repository's command line MUST NOT read, fetch or depend on
+  orchestrator; the orchestrator never calls them.
+- **FR-044**: An orchestrator MUST be built for one user in one clone: it MUST
+  NOT lock, queue or reconcile concurrent writers.
+- **FR-045**: A repository's orchestrator MUST NOT read, fetch or depend on
   the code or data of another repository, except a repository the person
-  names with `--root` (FR-040). It MUST treat the names of repositories as
-  data from the ontology or the repository's own register, never as
-  literals in its code, specs, documentation or messages.
+  names with `--root` (FR-040), and except that an environment orchestrator
+  MAY read the `.workspaces-host/` directory of a repository the person
+  trusts (FR-061) and MAY clone repositories that a person's configuration or
+  a listed repository's environment file names as data (FR-062). It MUST treat
+  the names of repositories as data from the ontology or the repository's own
+  register, never as literals in its code, specs, documentation or messages.
+
+## Plain language and pasteable actions
+
+- **FR-054**: The first line of every text rendering MUST be plain language
+  that a person who understands nothing technical can read: no jargon, no
+  identifiers, no command words. Jargon MAY appear in JSON and in later lines
+  of the text.
+- **FR-055**: An action's displayed command MUST be one line, ready to paste
+  into the terminal, with no placeholder and no shell-specific quoting, so
+  that it reads the same in bash and in fish. An action that needs a value the
+  orchestrator cannot fill in itself MUST be offered as a button or a
+  quick-pick in the editor, not as a printed command.
+- **FR-056**: Whenever a command deliberately leaves something alone, its
+  rendering MUST say in plain words that the person's work is safe, name what
+  was left alone and why, and give the one next action, if there is one.
+- **FR-057**: `context` together with `doctor`, with secrets removed, MUST
+  form a report a person can paste to a person or to an AI to get help. The
+  editor MUST offer it as a "Get help" command (FR-050).
+
+## Kits
+
+- **FR-058**: A kit MUST be a Python module holding a class that subclasses
+  the environment orchestrator's kit base, declaring in code: the packages it
+  installs with the host's package manager; its fetched downloads, each with a
+  name, a version, a URL template, a SHA-256 for each architecture of
+  `x86_64` and `aarch64`, and its install steps; and its checks, being the
+  programs it provides and functional checks that prove they work (a document
+  compiles, an image tool reads and writes a format). A package name MAY
+  differ by distribution inside the kit's code. A kit is found by presence in
+  the kits package (FR-007), and a kit's module MUST import only the standard
+  library at module level (FR-005).
+- **FR-059**: An environment orchestrator MUST install a kit with two
+  installers only: the host's package manager, through `sudo`, installing what
+  the distribution ships and pinning no snapshot; and a fetch, which
+  downloads, verifies the SHA-256, unpacks into a versioned directory under
+  the person's own data directory, repoints a `current` link atomically, and
+  links the binaries into the person's own `bin` directory. It MUST NOT use a
+  version manager, a second package system or any other installer. A command
+  that needs `sudo` MUST say so before it runs and MUST NOT be offered to an
+  agent (FR-022); a person without `sudo` MUST still be able to install the
+  parts of a kit that are fetched.
+- **FR-060**: An environment orchestrator's `doctor` MUST print the
+  distribution and the version of every program each installed kit provides,
+  and run each kit's functional checks, so that a difference between two
+  machines is visible. A difference in distribution packages between machines
+  MUST NOT be treated as a failure.
+- **FR-061**: A repository MAY ship kits in `<repo>/.workspaces-host/kits/`,
+  following FR-058, and MAY name the kit it needs in
+  `<repo>/.workspaces-host/ws-host.env` (FR-062). A kit shipped by a repository
+  MUST load only when the person has trusted that repository. Trust MUST be an
+  explicit act of the person, MUST NOT be granted by any repository's own file
+  or by cloning, MUST NOT pass from a repository to the repositories its file
+  lists, and changing it MUST be a `decision` command (FR-014). Trust applies
+  to the repository, not to its content: the commit at which it was granted
+  MUST be recorded, and `doctor` MUST warn, without blocking, when the
+  repository's kits have changed since.
+- **FR-062**: Reading a repository's `.workspaces-host/ws-host.env` is reading
+  information and MUST need no trust; running that repository's code (its kits,
+  or its orchestrator from the editor) MUST need trust (FR-052, FR-061). A
+  person's own configuration, and no repository's file, MUST be what names the
+  organizations whose repositories are trusted.
+- **FR-063**: An environment orchestrator MUST update a clone only by fetching
+  and then advancing it by fast-forward alone; it MUST NOT pull, rebase, merge
+  other than by fast-forward, or stash. A clone with changes not yet
+  committed, with commits that have diverged from its upstream, or with no
+  upstream MUST be left exactly as it was and reported in plain words
+  (FR-056), with exit status 0 (FR-021). A clone or fetch MUST run without
+  prompting, and when it fails MUST report git's own reason with the one
+  action that fixes it, never report success for a repository it could not
+  reach, and never write into a clone's working tree, its ignore rules or
+  its editor settings, or change the person's git or editor configuration
+  unasked.
 
 ## Out of scope
 
-- The commands a particular repository's command line has; each repository
+- The commands a particular repository's orchestrator has; each repository
   states them in its own spec (the public root's is 0042-agora).
+- The environment orchestrator's own commands, layout and paths; the
+  repository that holds it states them in its own specs.
 - How a command's library code is written, beyond FR-024.
 - How AI agents choose which commands to call.
 
@@ -356,12 +499,14 @@ for any repository; the public root's command set is 0042-agora.
   fails with an error resource naming the package and group, per FR-004 and
   FR-020; it does not fall back to downloading.
 - A command needs a program the host lacks: the error resource carries the
-  persona or program hint and exit status 3, per FR-006, FR-020 and FR-021.
+  kit or program hint and exit status 3, per FR-006, FR-020 and FR-021.
 - An agent asks to accept a proposal over MCP: the call is refused and the
   tool is not listed, per FR-023; the person advances it in the terminal or
-  the web UI, per FR-039.
-- Two sections of one `check` need different locks: each runs in its own
-  worker, per FR-028 and FR-031.
+  the editor, per FR-039.
+- An AI agent inside the editor tries to confirm a `decision` itself: no
+  editor command offers it and the confirmation is modal, per FR-051.
+- Two sections of one `check` need different dependency groups: each runs in
+  its own worker, per FR-028 and FR-031.
 - A check runs before its program is installed: the section is skipped, the
   exit status is non-zero and the summary says so, per FR-033.
 - `check --changed` on a clone with only untracked files: they count as
@@ -379,50 +524,97 @@ for any repository; the public root's command set is 0042-agora.
   per FR-027.
 - A new verb a repository wants: amend this spec first, per FR-008 and
   0001 FR-037.
+- Two modules declare a command with one name, or a kit module imports a
+  package at module level: `doctor` fails and names both modules, per FR-029.
+- A repository's kit needs trust that the person has not given: the kit does
+  not load and the orchestrator says so in plain words, per FR-061.
+- A trusted repository lists a sibling repository in its environment file: the
+  sibling is cloned but not trusted, per FR-061 and FR-062.
+- A repository's file tries to name an organization as trusted: ignored, per
+  FR-062.
+- A clone has commits that were never pushed and the upstream has moved: the
+  update leaves it exactly as it was, says the work is safe and why it was not
+  updated, and exits 0, per FR-063, FR-056 and FR-021.
+- A clone fails because the person has not signed in: the report carries git's
+  own reason and the one action that signs in, per FR-063 and FR-055.
+- The extension meets a document whose schema is newer than it knows: it says
+  an update is needed and shows nothing it cannot read, per FR-053.
+- VS Code is in Restricted Mode: the extension runs no orchestrator, per
+  FR-052.
+- An action needs a value the orchestrator cannot fill in: the editor asks for
+  it with a quick-pick and no command with a placeholder is printed, per
+  FR-055.
+- A person with no `sudo` asks for a kit: the fetched parts install and the
+  rest is reported in plain words, per FR-059 and FR-056.
 
 ## Assumptions
 
 - `uv` is available on the host (0025-tooling-environment FR-013), and a
   Python 3 interpreter with the standard library is present.
-- Each repository's command line is used by one person at a time in one
+- Each repository's orchestrator is used by one person at a time in one
   clone, and Git is the means of sharing and merging work.
-- A person's browser can reach the loopback interface of the machine the web
-  UI runs on.
+- People run on bare metal, on a Debian-family Linux distribution, including
+  one under WSL on Windows; other systems and determinism by generated
+  containers are for later specs.
+- A person works in VS Code; the editor surface is the one graphical
+  interface.
+- A person without technical knowledge can copy and paste a line into a
+  terminal and click a button, and nothing more.
+- The orchestrators of repositories that already exist declare their registry
+  in a manifest until each is moved to code; this spec states the rule they
+  move to.
 
 ## Open questions
 
 - **OQ-1**: Whether a stream's last line should summarize it, or leave that
   to the consumer.
-- **OQ-2**: Whether a web UI's pages should be exportable as static files.
+- **OQ-2**: Whether the editor's HTML renderings should be exportable as
+  static files.
+- **OQ-3**: How an AI agent reaches an orchestrator over MCP when the editor
+  is not in use, and which commands that surface exposes by default.
 
 ## Key entities
 
-- **The command line** — a repository's launcher and the registry of commands
-  behind it.
+- **An orchestrator** — a repository's launcher and the registry of commands
+  behind it; the only way its behavior is run.
+- **An environment orchestrator** — the orchestrator that prepares a person's
+  machine, clones their repositories, installs kits and ships the editor
+  extension.
 - **The registry** — the commands, nouns, verbs, categories, surfaces,
-  dependency groups and arguments the manifests and the code declare.
+  dependency groups and arguments the orchestrator's code declares.
 - **A resource** — what every command returns: kind, id, audience, data,
   links and actions.
 - **A category** — read, check, record, build, generate, decision or setup;
   what a command may do and where it is exposed.
-- **A dependency group** — the commands that share one set of locked
-  packages.
+- **A surface** — the terminal, the editor, or MCP.
+- **A dependency group** — the commands that share one set of packages in
+  `pyproject.toml` and `uv.lock`.
 - **A section and a suite** — a named check, and a named set of them.
 - **A generator** — a declared source and the tracked files wholly derived
   from it.
 - **A proposal** — a tracked, replayable change suggested for a person to
   decide.
+- **A kit** — a Python module declaring the packages, downloads and checks
+  that make a machine fit for one kind of work.
+- **Trust** — a person's explicit act that lets a repository's code run.
 
 ## Success criteria
 
-- **SC-001**: A fresh clone runs the command line's `doctor` and its
-  `check` with only the host's prerequisites and no setup step.
+- **SC-001**: A fresh clone runs the orchestrator's `doctor` and its `check`
+  with only the host's prerequisites and no setup step.
 - **SC-002**: Every command's three renderings agree, because each is a view
   of the one resource.
-- **SC-003**: No `decision` command is reachable over MCP.
+- **SC-003**: No `decision` command is reachable over MCP or by an AI agent
+  inside the editor.
 - **SC-004**: `fresh` passes on every clone whose generated files are
   unedited.
 - **SC-005**: No command commits, pushes, or calls a model.
+- **SC-006**: Adding a module to the commands package adds its commands, and
+  nothing else needs editing.
+- **SC-007**: An update never changes a clone that holds work the person has
+  not pushed.
+- **SC-008**: The first line of every command's text output is plain
+  language.
 
 ## Review & acceptance checklist
 

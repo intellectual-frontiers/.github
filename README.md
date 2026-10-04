@@ -103,25 +103,24 @@ The longer essay is
 
 ### Start working
 
-Everything this repository's tools need is already in the workspace. There
-is nothing to install and no `make install` (0024, 0025). Pick one:
+Everything this repository's tools need comes from one environment,
+`workspaces-host`, on a Debian-family Linux machine: Debian, or Ubuntu
+(including Ubuntu under WSL on Windows), with [VS Code](https://code.visualstudio.com/)
+as the graphical interface. There is no `make install` (0024, 0025, 0026).
 
-1. **In your browser, nothing installed** (the default on macOS and
-   Windows 11): [Open in GitHub Codespaces](https://codespaces.new/intellectual-frontiers/.github).
-2. **On your own computer, in a container:** install
-   [VS Code](https://code.visualstudio.com/) and
-   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on
-   Windows, with its WSL 2 backend), then
-   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/intellectual-frontiers/.github).
-3. **On Linux or in a VM, without containers:** install
-   [workspaces-host-v3](https://intellectual-frontiers.github.io/workspaces-host-v3/)
-   and activate the `press` persona.
+1. Install `workspaces-host` with the install line in its README. It needs
+   only `python3` and `uv` on your machine.
+2. Run `ws-host workspace advance`. It signs you in to GitHub if you are not,
+   clones `.github`, `eidolon` and `www.intellectualfrontiers.com` beside
+   each other, updates the ones you already have without ever touching your
+   own changes, and installs the kit this repository names in
+   `.workspaces-host/ws-host.env`. Run it as often as you like.
+3. Open the folder in VS Code; the `ws-host vscode add` extension shows the
+   state of every repository and the actions you can take.
 
-Whichever you pick, **log in to GitHub first.** When the workspace opens,
-it asks you to (`gh auth login`); in a Codespace you are already logged
-in. It then clones `.github`, `eidolon` and `www.intellectualfrontiers.com`
-beside each other, from
-[`.devcontainer/ws-repos.json`](.devcontainer/ws-repos.json).
+Until `workspaces-host` ships its first release, existing clones keep their
+`.devcontainer/` files and CI keeps running in the earlier environment's
+published image (0025 OQ-1).
 
 ### Three repositories, one Eidolon
 
@@ -150,21 +149,21 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
   controls.tsv      which compliance control each requirement addresses
                     (0028-compliance-controls)
-agora               the command line: one launcher (needs uv and Python 3) that
+agora               the orchestrator: one launcher (needs uv and Python 3) that
                     runs every check, build and record in this repository
                     (0041-command-line, 0042-agora); CI calls only it
 tools/
   agora/            agora's code: core, lib, groups/<group>/ (each with its
-                    agora.toml, and an agora.lock where it pins packages),
-                    vendor/ (Datastar, the web UIs' interactivity), and tests/
+                    agora.toml, and an agora.lock where it pins packages, until
+                    each moves to code and uv.lock, 0042 OQ-3), and tests/
 .claude/
   skills/agora/     SKILL.md, the agent skill agora generates from its registry
                     (0042-agora FR-028)
-  reference-environment
-                    the workspaces-host-v3 commit every tool is guaranteed
-                    to run in (0025-tooling-environment)
-.devcontainer/      the workspace this repository opens in, and the
-                    repositories it clones beside it (0026-workspaces)
+tools/reference-environment
+                    the earlier environment's commit CI still runs in, until
+                    the pin moves to .workspaces-host/ws-host.env
+                    (0025-tooling-environment OQ-1)
+.devcontainer/      the earlier workspace, kept until CI moves (0026 OQ-1)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace), including
                     agora's command set
@@ -173,7 +172,6 @@ content/
   journal/          public content documents (the only content root)
 .agora/
   logs/             agora's untracked action logs (gitignored, 0041 FR-042)
-  ui/               the state of a running web UI: pid, port, address (gitignored)
   proposals/        changes proposed for a person to decide (tracked)
 design-systems/
   README.md         what a design system is, its kinds, and how to use any one
@@ -243,8 +241,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
-| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
-| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in the reference environment, workspaces-host with the repository's kit |
+| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one flavor, Debian-family bare metal with VS Code; each repository's needs file, fast-forward-only updates, and trust |
 | [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 | [0028](spec-kit/specs/0028-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
 | [0029](spec-kit/specs/0029-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
@@ -259,8 +257,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
 | [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
 | [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
-| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's command line: launcher and locked packages, typed commands, resources in three renderings, surfaces by category, Git as the only record |
-| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's command line, its command set, checks, generators, and CI |
+| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's orchestrator: launcher and uv's files, a registry in code, typed commands, resources in three renderings, surfaces (terminal, editor, MCP) by category, kits, Git as the only record |
+| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's orchestrator, its command set, checks, generators, and CI |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -274,12 +272,12 @@ feature branch; the ontology plays the data model's part, open questions
 (`OQ-N`) replace inline clarification markers, and the enforcement register
 replaces Spec Kit's consistency analysis. 0020 states each difference.
 
-### The command line
+### The orchestrator
 
-`agora` (the public square) is this repository's one command line: every
+`agora` (the public square) is this repository's one orchestrator: every
 check, build and record runs through it, and CI calls nothing else. The name
-says what it is for, a command line for what is public; it differs from any
-other command line's name at a glance and by any one typo, and it reads well in
+says what it is for, an orchestrator for what is public; it differs from any
+other orchestrator's name at a glance and by any one typo, and it reads well in
 a prompt (0042-agora FR-002). It reads nothing outside this repository.
 
 - Run `./agora check` for every check, `./agora check --suite spec` for the
@@ -290,7 +288,7 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   passed, and the run exits 3), `./agora check --changed` for only the sections whose
   watched paths changed, `./agora fresh` to prove generated files are current,
   `./agora doctor` for what is missing, `./agora test` for its own tests, `./agora lock
-  [GROUP]` to write a group's hashed lock, and `./agora context RESOURCE` (such as
+  [GROUP]` to write the lock, and `./agora context RESOURCE` (such as
   `context spec:0020`) for what an agent needs to work on one resource. Every command
   takes `--json` and, if it writes, `--dry-run`.
 - A command is `agora <noun> <verb> [ID] [--options]`. `agora command list` and
@@ -316,7 +314,6 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   | `proposal` | `list`, `show`, `new`, `advance` (decision) |
   | `skill` | `generate` |
   | `command` | `list`, `show` |
-  | `ui` | `serve`, `open`, `stop`, `link` |
   | `mcp` | `serve` |
 
 - The design systems' own scripts stay in their directories and `agora` calls them:
@@ -326,23 +323,19 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   --scope PATH` checks a piece of work with a design system's own rules (with no
   `--scope`, each checks that design system's passing fixtures).
 - The launcher needs only `uv` and Python 3. Python packages come from
-  committed, hashed locks (`tools/agora/groups/<group>/agora.lock`), and
+  committed locks (`tools/agora/groups/<group>/agora.lock`, moving to uv's `uv.lock`), and
   `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
   Python (TeX, Chromium, ImageMagick, potrace, rsvg-convert, Node) come from the
   host, and `doctor` says which are missing (0025 FR-013, 0041).
 - Git is the only record: `agora` never commits or pushes. What changes or runs
-  something and is not worth a commit (a check, a build, a dry run, a UI or MCP call)
+  something and is not worth a commit (a check, a build, a dry run, an MCP call)
   goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants
   a decision made drafts it with `agora proposal new`, a tracked file in
   `.agora/proposals/` that a person accepts with `agora proposal advance`.
-- `./agora ui open console` opens the console, the local web UI for the registry:
-  each noun and command, each resource as a page, and a form and a run for every
-  command the `ui` surface exposes (a write shows its `--dry-run` first, a decision
-  needs your confirmation). `./agora ui open assurance` serves the design systems'
-  in-browser harnesses and lists each page per brand, in place of a bare static
-  server. `ui serve UI` runs one in the foreground, `ui link UI` prints its address and
-  `ui stop UI` stops it; `./agora check ui` proves both serve and render offline.
-  `./agora mcp serve` serves its commands and the repository's resources to an AI agent
+- The graphical interface is the VS Code extension `workspaces-host` ships: it shows
+  the resources agora returns, and runs their actions by calling agora, with a modal
+  confirmation a person must click for any decision (0041 FR-050, FR-051). agora runs
+  no server. `./agora mcp serve` serves its commands and the repository's resources to an AI agent
   over standard input and output, a write a dry run unless it says otherwise, and never
   a decision, which only a person makes.
 - To add a command: spec first (0042), then its individual in the ontology, then
@@ -426,7 +419,7 @@ on every push that touches `design-systems/`.
 - [ ] Any command you add is declared in `agora`'s registry and in the
       ontology, and `./agora check commands` passes; it declares its
       prerequisites and installs nothing; it runs from a fresh clone in
-      workspaces-host-v3 (0025, 0041, 0042).
+      workspaces-host (0025, 0041, 0042).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.

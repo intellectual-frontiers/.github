@@ -1952,56 +1952,48 @@ ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormSch
 # ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
 # Which environment every tool is guaranteed to run in. The repository is reused as
 # schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
-# guaranteed against is not a fact here but its tools/reference-environment pin (0025 FR-008).
+# guaranteed against, where it has one, is not a fact here but the WS_HOST_VERSION line of its
+# .workspaces-host/ws-host.env (0025 FR-008).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
-    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+    rdfs:comment "The provisioned environment, a release of its repository on a Debian-family host with the kit a repository declares, in which every tool in an Eidolon repository is guaranteed to run unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
 
-ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
-    dcterms:identifier "workspaces-host-v3" ;
-    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
-    ifcore:workspaceFlavor ifcore:BareMetalNixFlavor, ifcore:VirtualMachineNixFlavor, ifcore:ContainerImageFlavor, ifcore:DevcontainerFlavor, ifcore:CloudAgentSessionFlavor ;
-    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0025-tooling-environment FR-005)."@en ;
+ifcore:WorkspacesHost a ifcore:ReferenceEnvironment ;
+    dcterms:identifier "workspaces-host" ;
+    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host> ;
+    ifcore:workspaceFlavor ifcore:DebianFamilyBareMetalFlavor ;
+    rdfs:comment "Prepares a person's machine, clones and updates their repositories, installs kits, checks health, and ships the editor extension that is the graphical interface of every orchestrator (0041-command-line FR-050, FR-058). Its orchestrator is ws-host. It is the reference environment (0025-tooling-environment FR-005)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
-# The flavors are ways to run the one reference environment, built from the same flake commit (0026 FR-001).
-# Which repositories carry a devcontainer, and what each lists, is held in each repository's .devcontainer/
-# files, never restated here (0001-eidolon-architecture FR-019).
+# The flavor is the one way the reference environment is run (0026 FR-001). What each repository needs is held in
+# its own .workspaces-host/ws-host.env, never restated here (0001-eidolon-architecture FR-019).
 
 ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
     rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
 
 ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
-    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0026-workspaces FR-001 (FR-003)."@en ;
+    rdfs:comment "The ways the reference environment runs; a new one is added here and in 0026-workspaces FR-001 under its own spec (FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:BareMetalNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Bare-metal Linux with Nix"@en ;
-    skos:definition "Installed with Nix and home-manager directly on a Linux machine."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:VirtualMachineNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Linux virtual machine with Nix"@en ;
-    skos:definition "Installed with Nix and home-manager in a Linux virtual machine, including WSL on Windows and a Linux virtual machine on macOS."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:ContainerImageFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "OCI container image"@en ;
-    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0025-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:DevcontainerFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Devcontainer"@en ;
-    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0026-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:CloudAgentSessionFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Cloud agent session"@en ;
-    skos:definition "A hosted session in which an AI agent works in the environment."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DebianFamilyBareMetalFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Debian-family bare metal"@en ;
+    skos:definition "Installed directly on a machine running a Debian-family Linux distribution, Debian or Ubuntu, including Ubuntu under WSL on Windows, with VS Code as its graphical interface (0026-workspaces FR-001)."@en ; ifcore:hasAudience ifcore:Public .
 
-# ───────────────────────── Command lines (0041-command-line, 0042-agora) ─────────────────────────
-# A repository's command line declares its commands in a registry (0041 FR-007); the public root's command set
+# ───────────────────────── Orchestrators (0041-command-line, 0042-agora) ─────────────────────────
+# A repository's orchestrator declares its commands in a registry in code (0041 FR-007); the public root's command set
 # is also declared here, one individual per command, and `agora check commands` fails when the registry and these
 # individuals disagree (0042 FR-004). The schemes reuse SKOS rather than declaring new classes (0019-controlled-vocabulary
-# FR-001); a command is a schema:Action and its command line a schema:SoftwareApplication (0019 FR-002).
+# FR-001); a command is a schema:Action and its orchestrator a schema:SoftwareApplication (0019 FR-002).
 
-ifcore:CommandLine a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Command line"@en ;
-    skos:definition "The one launcher and registry of commands through which a repository's checks, builds and records run (0041-command-line FR-001, FR-007)."@en ;
+ifcore:Orchestrator a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Orchestrator"@en ;
+    skos:definition "The one launcher and registry of commands through which a repository's behavior runs, for people, CI and AI agents alike (0041-command-line FR-001, FR-007)."@en ;
     rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002). Each of its commands is an ifcore:Command naming it by ifcore:commandOf."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:Command a owl:Class ; rdfs:subClassOf schema:Action ; rdfs:label "Command"@en ;
-    skos:definition "One command of a command line: its words, the kind of resource it acts on, its verb, and its category (0041-command-line FR-008, FR-014)."@en ;
-    rdfs:comment "Specializes schema:Action (0019 FR-002). Its words are dcterms:identifier, for example spec show. A command with no noun is one of the closed repository-wide set (0041 FR-010) and has no ifcore:commandNoun; a command whose second word is not in the verb scheme (the ui control words, 0041 FR-011) or that is repository-wide has no ifcore:commandVerb, except check, which carries the verb check. Every command has exactly one category."@en ;
+    skos:definition "One command of an orchestrator: its words, the kind of resource it acts on, its verb, and its category (0041-command-line FR-008, FR-014)."@en ;
+    rdfs:comment "Specializes schema:Action (0019 FR-002). Its words are dcterms:identifier, for example spec show. A command with no noun is one of the closed repository-wide set (0041 FR-010) and has no ifcore:commandNoun; a command whose second word is not in the verb scheme (the mcp control word, 0041 FR-011) or that is repository-wide has no ifcore:commandVerb, except check, which carries the verb check. Every command has exactly one category."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:commandOf a owl:ObjectProperty ; rdfs:subPropertyOf schema:isPartOf ; rdfs:domain ifcore:Command ; rdfs:range ifcore:CommandLine ;
-    rdfs:comment "The command line a command belongs to (0042-agora FR-004)."@en .
+ifcore:commandOf a owl:ObjectProperty ; rdfs:subPropertyOf schema:isPartOf ; rdfs:domain ifcore:Command ; rdfs:range ifcore:Orchestrator ;
+    rdfs:comment "The orchestrator a command belongs to (0042-agora FR-004)."@en .
 ifcore:commandNoun a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
     rdfs:comment "The kind of resource a command acts on, a concept in ifcore:ResourceKindScheme (0041-command-line FR-008). No established property names it (0019-controlled-vocabulary FR-004)."@en .
 ifcore:commandVerb a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
@@ -2009,9 +2001,9 @@ ifcore:commandVerb a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:rang
 ifcore:commandCategory a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
     rdfs:comment "A command's one category, a concept in ifcore:CommandCategoryScheme, which decides what it may do and which surfaces expose it by default (0041-command-line FR-014, FR-022). No established property names it (0019-controlled-vocabulary FR-004)."@en .
 
-ifcore:Agora a ifcore:CommandLine ; rdfs:label "agora"@en ;
+ifcore:Agora a ifcore:Orchestrator ; rdfs:label "agora"@en ;
     dcterms:identifier "agora" ;
-    skos:definition "The public root's command line, named for the public square (0042-agora FR-001, FR-002)."@en ;
+    skos:definition "The public root's orchestrator, named for the public square (0042-agora FR-001, FR-002)."@en ;
     rdfs:comment "Public only: it reads and depends on no other repository (0042 FR-003). Its commands are the ifcore:Command individuals below that name it by ifcore:commandOf."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -2042,7 +2034,7 @@ ifcore:SetupCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategor
     skos:definition "Changes the clone's own environment, such as a lock, a pin or a running server."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandVerbScheme a skos:ConceptScheme ; rdfs:label "Command verb"@en ;
-    rdfs:comment "The fixed set of thirteen verbs a command line's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
+    rdfs:comment "The fixed set of thirteen verbs an orchestrator's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:ListCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "list"@en ;
     skos:notation "list" ;
@@ -2084,15 +2076,25 @@ ifcore:ServeCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme 
     skos:notation "serve" ;
     skos:definition "Runs until stopped."@en ; ifcore:hasAudience ifcore:Public .
 
+ifcore:CommandSurfaceScheme a skos:ConceptScheme ; rdfs:label "Command surface"@en ;
+    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The editor is served by the extension of the environment orchestrator, not by a command, and no web UI is a surface."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TerminalCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "terminal"@en ;
+    skos:notation "cli" ;
+    skos:definition "The command line; every command is callable here (0041-command-line FR-022)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EditorCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "editor"@en ;
+    skos:notation "editor" ;
+    skos:definition "The VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "MCP"@en ;
+    skos:notation "mcp" ;
+    skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+
 ifcore:ResourceKindScheme a skos:ConceptScheme ; rdfs:label "Resource kind"@en ;
-    rdfs:comment "The kinds of resource a command line's commands act on, which are its nouns (0041-command-line FR-008, FR-016). A repository-wide command's own resource has its command's name as its kind, and an error has the kind error; neither is a noun."@en ;
+    rdfs:comment "The kinds of resource an orchestrator's commands act on, which are its nouns (0041-command-line FR-008, FR-016). A repository-wide command's own resource has its command's name as its kind, and an error has the kind error; neither is a noun."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:CommandResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "command"@en ;
     skos:notation "command" ;
     skos:definition "A command in the registry."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:UiResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "ui"@en ;
-    skos:notation "ui" ;
-    skos:definition "A local web UI agora serves."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:McpResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "mcp"@en ;
     skos:notation "mcp" ;
     skos:definition "The MCP server agora serves."@en ; ifcore:hasAudience ifcore:Public .
@@ -2131,7 +2133,7 @@ ifcore:LayoutResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindSche
     skos:definition "A print layout of the print design system."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
     skos:notation "skill" ;
-    skos:definition "The skill file that tells an AI agent how to use the command line, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The skill file that tells an AI agent how to use the orchestrator, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:FigureResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "figure"@en ;
     skos:notation "figure" ;
     skos:definition "A figure drawn with the figure design system."@en ; ifcore:hasAudience ifcore:Public .
@@ -2187,22 +2189,6 @@ ifcore:AgoraCommandShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "command show" ;
     ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
     skos:definition "Shows one command with its arguments, surfaces and programs."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraUiServeCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ui serve"@en ;
-    dcterms:identifier "ui serve" ;
-    ifcore:commandNoun ifcore:UiResourceKind ; ifcore:commandVerb ifcore:ServeCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Serves a local web UI in the foreground (0041-command-line FR-025)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraUiOpenCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ui open"@en ;
-    dcterms:identifier "ui open" ;
-    ifcore:commandNoun ifcore:UiResourceKind ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Serves a local web UI if needed and opens a browser."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraUiStopCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ui stop"@en ;
-    dcterms:identifier "ui stop" ;
-    ifcore:commandNoun ifcore:UiResourceKind ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Stops a local web UI."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraUiLinkCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ui link"@en ;
-    dcterms:identifier "ui link" ;
-    ifcore:commandNoun ifcore:UiResourceKind ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Prints a local web UI's address."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraMcpServeCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "mcp serve"@en ;
     dcterms:identifier "mcp serve" ;
     ifcore:commandNoun ifcore:McpResourceKind ; ifcore:commandVerb ifcore:ServeCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
@@ -2382,11 +2368,11 @@ ifcore:AgoraCourseBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
 ifcore:AgoraEnvironmentShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "environment show"@en ;
     dcterms:identifier "environment show" ;
     ifcore:commandNoun ifcore:EnvironmentResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Shows the reference environment pin and the devcontainer image tag."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "Shows the reference environment pin, where the repository has one, and the image tag CI still runs in (0042-agora FR-011, OQ-4)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraEnvironmentSetCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "environment set"@en ;
     dcterms:identifier "environment set" ;
     ifcore:commandNoun ifcore:EnvironmentResourceKind ; ifcore:commandVerb ifcore:SetCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Moves the pin and the devcontainer image tag together (0042-agora FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "Sets the reference environment pin in .workspaces-host/ws-host.env (0042-agora FR-011)."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Compliance controls (0028-compliance-controls) ─────────────────────────
 # NIST OSCAL's model, reused rather than invented (0019-controlled-vocabulary FR-001): a framework is a

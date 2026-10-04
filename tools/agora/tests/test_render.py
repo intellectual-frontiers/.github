@@ -86,7 +86,7 @@ class ThreeRenderings(unittest.TestCase):
         self.assertEqual(d["links"][0]["cli"], "agora spec show 0020-spec-format")
         a = d["actions"][0]
         self.assertEqual(a["cli"], "agora requirement set 0020-spec-format/FR-001 --mechanism none --by - --note 'a b'")
-        self.assertEqual((a["category"], a["surfaces"]), ("record", ["ui", "mcp"]))
+        self.assertEqual((a["category"], a["surfaces"]), ("record", ["editor", "mcp"]))
 
     def test_a_disabled_action_says_why(self):
         res = Resource("t", "x", actions=[Action("go", Call("check"), enabled=False, reason="nothing changed")])

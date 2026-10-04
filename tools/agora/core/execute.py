@@ -1,4 +1,4 @@
-"""Running a command for a surface that has no command line, a UI or MCP (0041-command-line FR-024): the same library call as
+"""Running a command for a surface that has no command line, an editor or MCP (0041-command-line FR-024): the same library call as
 the terminal, and the same record.
 
 `cli.invoke` is the seam. A command of a group that pins packages runs in its own worker under that group's locked plan
@@ -15,7 +15,7 @@ from agora.core.registry import Command
 from agora.core.resource import FAILED, OK, AgoraError, Resource
 
 
-def new_ctx(registry: Any, home: Any, env: dict[str, str], *, surface: str = "ui", dry_run: bool = False, no_log: bool = False,
+def new_ctx(registry: Any, home: Any, env: dict[str, str], *, surface: str = "cli", dry_run: bool = False, no_log: bool = False,
             on_section: Callable[[str, str, Any], None] | None = None) -> Ctx:
     ctx = Ctx(registry, home, home, surface=surface, env=dict(env))
     ctx.offline = env.get(f"{registry.name.upper()}_OFFLINE") == "1"

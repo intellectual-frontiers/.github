@@ -22,7 +22,7 @@ CATEGORY_HELP = {
     "record": "appends a fact to the tracked record",
     "build": "writes derived output that is not itself the record",
     "generate": "rewrites tracked generated files",
-    "decision": "changes what only a person decides: for a person, in the terminal or the web UI; never over MCP",
+    "decision": "changes what only a person decides: for a person, in the terminal or the editor; never over MCP",
     "setup": "changes the clone's own environment (a lock, a pin, a running server)",
 }
 
@@ -96,7 +96,7 @@ def text(reg: Registry) -> str:
     w("")
     w("## Commands")
     w("")
-    w("Surfaces: `terminal` always; `ui` the local web UI; `mcp` the MCP server. Each row's example is its usage line.")
+    w("Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. Each row's example is its usage line.")
     w("")
     w("| Command | Category | Surfaces | Does | Example |")
     w("| --- | --- | --- | --- | --- |")

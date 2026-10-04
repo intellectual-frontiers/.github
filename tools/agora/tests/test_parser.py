@@ -121,7 +121,7 @@ class Completion(unittest.TestCase):
         for expected in ("check", "spec", "doctor", "command"):
             self.assertIn(expected, w)
         self.assertIn("design-system", w)
-        self.assertIn("ui", w)
+        self.assertNotIn("ui", w)
         self.assertIn("mcp", w)
         self.assertIn("proposal", w)
 
