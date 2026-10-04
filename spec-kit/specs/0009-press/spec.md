@@ -161,7 +161,16 @@ ontology data and registers, not restated here.
   earns a stage, Press MUST partner with an operator who owns the venue,
   ticketing, and logistics, and MUST hold a talk to the same editorial
   bar as print — no slide goes in front of an audience that would not
-  pass FR-001 and FR-002.
+  pass FR-001 and FR-002. Press MUST NOT solicit or pitch itself into an
+  event partnership; a partnership becomes eligible only after a Press work
+  has been published and an event operator or practitioner has
+  independently expressed interest. Accepting or pursuing a partnership,
+  and negotiating its terms, is a person's decision, recorded as a
+  Decision (0008-decision-records); an agent MAY draft a proposal and MUST
+  NOT commit Press or negotiate for it. A talk, deck, workshop, or panel
+  built from Press concepts passes the same voice and audit steps as a
+  published work (0016-press-production FR-001, FR-002) before it is
+  presented.
 
 ## Written public-facing surfaces
 
