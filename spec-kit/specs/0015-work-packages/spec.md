@@ -112,7 +112,8 @@ property fetches them are decisions outside this spec.
   identical bytes, and a difference MUST fail the check. A generated
   content document MUST NOT be hand-edited.
 - **FR-021**: A generated content document's audience MUST NOT be broader
-  than the audience of the work it renders.
+  than the audience of the work it renders, except a companion page or a
+  news record of an announced work, per FR-030.
 
 ## Lifecycle, decisions, and audience
 
@@ -135,6 +136,48 @@ property fetches them are decisions outside this spec.
   serves the work, one of its generated content documents, or one of its
   renditions to the public. Broadening an audience requires no history
   rewrite; narrowing one is governed by 0008-decision-records FR-013.
+
+## Announcement
+
+- **FR-027**: A Substantial Work MAY be announced: its public record (FR-029)
+  is made visible to the public while the work itself keeps its audience.
+  Announcing a work MUST be its own `Decision`, made by the decision
+  authority in effect (0001-eidolon-architecture FR-029) and recorded before
+  any consumer shows the work's public record, and the announcement MUST be
+  asserted once, on the work's individual, in the same edit. A Public work's
+  publication decision (FR-025) also announces it.
+- **FR-028**: A work MUST NOT be announced before it reaches the Review
+  stage. Advancing a work to Review MUST record its announcement Decision in
+  the same edit, unless the person deciding states that the work is held,
+  which the stage `Decision` records; a held work is announced only by a
+  later Decision of its own.
+- **FR-029**: An announced work's public record MUST be only these facts, as
+  the work's own source states them:
+  - every kind: its title and subtitle, its kind, its author's name and
+    published biography, and its status (FR-031);
+  - a book or a book series: its tagline, its jacket's description, its
+    back-cover headline, body and bullets, its subject categories, its
+    series and volume, its list price, its front cover, and its ISBN once
+    the jacket holds an issued one (0016-press-production FR-022);
+  - a research record: its abstract, its area and pillar, its licence, its
+    claim labels (0017-spoken-and-research-works FR-021), and its DOI once
+    one is minted;
+  - a spoken work: its description and, for each released episode, its
+    show-notes page (0017-spoken-and-research-works FR-016);
+  - a skill: its name and its description;
+  - a course: its code, its format and the work it is derived from.
+- **FR-030**: A companion page and a news record generated from an
+  announced work MUST carry the Public audience. No other content document
+  generated from an announced work that is not Public may carry it.
+- **FR-031**: A consumer MUST show an announced work's status as one of
+  three, derived from the work's records and never asserted: *available*,
+  when a delivery record or reference for one of its presentations is
+  Public; *working paper*, for a research record with none; *forthcoming*,
+  for any other work with none. A consumer MUST NOT show an announced work's
+  lifecycle stage or its Decisions.
+- **FR-032**: Announcing a work MUST NOT make its source, its concepts file,
+  its renditions, its delivery records, or its Decisions visible beyond the
+  work's own audience.
 
 ## Works published elsewhere
 
@@ -168,6 +211,15 @@ property fetches them are decisions outside this spec.
   tracked; the cover or PDF built from it may not, per FR-014.
 - A review copy shared before the publication decision: it is marked on
   its face as unpublished and uncorrected, per FR-018.
+- A work advanced to Review that its author is not ready to show: the
+  advance records that it is held, and it is announced only by a later
+  Decision, per FR-028.
+- An announced book that is later published: its publication decision
+  makes it Public and its status follows its records, per FR-025 and
+  FR-031.
+- An announced book whose jacket still holds an ISBN placeholder: its
+  public record leaves the ISBN out until an issued one is stated, per
+  FR-029.
 - A rendition held in storage reached through a signed or expiring link:
   its delivery record names where it lives without that link, per
   FR-017.
@@ -191,6 +243,8 @@ property fetches them are decisions outside this spec.
 - **OQ-2**: Whether a slug must be unique within its kind across the
   root's `works/` and every venture's `works/`, or only within the one
   directory that holds it, is not stated.
+- **OQ-3**: How an announcement is withdrawn, and what a consumer then
+  shows at the work's addresses, is not stated.
 
 ## Key entities
 
@@ -207,6 +261,10 @@ property fetches them are decisions outside this spec.
 - **A delivery record** — a `Reference` recording where a delivered binary
   rendition lives, from which source commit, with its checksum and its own
   audience.
+- **An announced work** — a work whose public record is visible to the
+  public by a recorded Decision while the work keeps its own audience.
+- **A public record** — the fixed set of facts about an announced work a
+  consumer may show, per FR-029.
 - **A generated content document** — a content document produced from a
   work package's source, living in the content root of the repository that
   holds the package.
@@ -227,6 +285,9 @@ property fetches them are decisions outside this spec.
   the same commit.
 - **SC-007**: No work, generated content document, or rendition reaches
   the public without a recorded decision broadening its audience.
+- **SC-008**: No consumer shows a fact of an announced, non-Public work
+  outside its public record, and none shows a work that is neither
+  announced nor Public.
 
 ## Review & acceptance checklist
 

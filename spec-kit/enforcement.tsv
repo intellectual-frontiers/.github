@@ -339,6 +339,12 @@ requirement	mechanism	by	note
 0015-work-packages FR-024	check	eidolon: eid check works	Public without a broadening Decision fails; other defaults unchecked
 0015-work-packages FR-025	check	eidolon: eid check works	Public work needs a broadensAudienceTo Public Decision; decider authority unchecked
 0015-work-packages FR-026	none	-	no check
+0015-work-packages FR-027	check	eidolon: eid check works	works.py: an announcedTo needs an announcing Decision; eid work announce writes both
+0015-work-packages FR-028	gate	eidolon: eid work advance	advance to Review records the announcement unless --hold; announce refuses before Review
+0015-work-packages FR-029	check	eidolon: eid site check	the generator reads only the listed facts; the leak check fails a page showing any other
+0015-work-packages FR-030	check	eidolon: eid fresh	the generator gives companion and news pages of an announced work the Public audience
+0015-work-packages FR-031	none	-	status derived by eid site build; no check of other consumers
+0015-work-packages FR-032	check	eidolon: eid site check	the leak check fails a page carrying a non-public work's source text
 0016-press-production FR-001	none	-	house voice is a judgment; no check
 0016-press-production FR-002	check	eidolon: eid check spoken	audit record required for episodes past draft and anthology chapters; not books
 0016-press-production FR-003	none	-	separate-reader audit of AI text is not checked
@@ -912,3 +918,17 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0040-security-program-policy FR-005	none	-	publication to the people bound is not observed (0030 OQ-2)
 0040-security-program-policy FR-006	none	-	where commitments are published is 0040 OQ-2
 0040-security-program-policy FR-007	check	eidolon: eid compliance status	an assessment no longer current is reported; whether one exists is judgment
+0041-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
+0041-public-website FR-002	none	-	repository topology; no check
+0041-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
+0041-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
+0041-public-website FR-005	review	0041-public-website FR-005	what the home page leads with is editorial judgment
+0041-public-website FR-006	check	eidolon: eid site check	every section index and item page exists
+0041-public-website FR-007	check	eidolon: eid site check	the toolbox lists every Public skill
+0041-public-website FR-008	check	eidolon: eid site check	every image is a book cover or comes from the imagery pool
+0041-public-website FR-009	none	-	no check that a reference is not a copy
+0041-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
+0041-public-website FR-011	check	eidolon: eid site check	every patent address and patent redirect from the snapshot answers
+0041-public-website FR-012	check	eidolon: eid site check	the namespace files, their content types and the not-found page exist
+0041-public-website FR-013	none	-	eid site snapshot writes the snapshot; no check of a hand edit
+0041-public-website FR-014	check	eidolon: eid site parity	lists every previous sitemap address neither served nor redirected
