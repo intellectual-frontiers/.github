@@ -289,10 +289,10 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
 - Run `./agora check` for every check, `./agora check --suite spec` for the
   spec, register and ontology checks, `./agora check --suite browser`, `python` or
   `images` for the design systems' harnesses, each brand's imagery and its Open edX
-  package (Node, the PDF readers, the SVG renderer, the image library and the tracer are
-  Python packages in agora's locks; Chromium and TeX Live have no wheel and still come from
-  the host until the toolchain lock supplies them, so a harness whose program is missing is
-  skipped, never passed, and the run exits 3), `./agora check --changed` for only the sections whose
+  package (the programs they need are fetched once, pinned and verified: see below; a
+  harness whose program cannot be had, offline with a cold cache or for lack of a browser
+  library, is skipped naming what it needs and the command that supplies it, never passed,
+  and the run exits 3), `./agora check --changed` for only the sections whose
   watched paths changed, `./agora fresh` to prove generated files are current,
   `./agora doctor` for what is missing, `./agora test` for its own tests, `./agora lock
   [GROUP]` to write the lock, and `./agora context RESOURCE` (such as
@@ -320,6 +320,8 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   | `proposal` | `list`, `show`, `new`, `advance` (decision) |
   | `skill` | `generate` |
   | `command` | `list`, `show` |
+  | `toolchain` | `list`, `show`, `add` (setup: fetches and verifies the pinned programs) |
+  | `system` | `list`, `add` (setup: the one command that runs `sudo`; asks first) |
   | `mcp` | `serve` |
 
 - The design systems' own scripts stay in their directories and `agora` calls them:
@@ -335,9 +337,31 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   (`nodejs-wheel-binaries`), poppler's readers (`pypdfium2`, `pypdf`), rsvg-convert
   (`resvg-py`, and `reportlab` for a sign's PDF), ImageMagick (`Pillow`), potrace
   (`potracer`) and Git's reads (`dulwich`), so none of them is installed on the host
-  and a command's output never depends on one. Only TeX and Chromium, which have no
-  wheel, still come from the host until the toolchain lock supplies them, and `doctor`
-  says which are missing (0042 FR-030, 0025 FR-007, FR-013).
+  and a command's output never depends on one (0042 FR-030, 0025 FR-007, FR-013).
+- What has no wheel is the **toolchain lock**, declared in `tools/agora/toolchain/`:
+  `tinytex` (TinyTeX, TeX Live 2025: XeLaTeX and LuaLaTeX), `tex-packages` (the extra
+  TeX Live packages the print design system loads, each container pinned by its
+  checksum from TeX Live's frozen 2025 repository), `chromium` (Playwright's pinned
+  build) and `npm-packages` (Playwright for Node and Paragon, from
+  `tools/agora/npm/package-lock.json`, installed with `npm ci` by the Node the locked
+  package supplies). Each has a version, an address and a SHA-256 per platform and a
+  functional check. A command that needs one fetches it into a per-user cache the first
+  time (`~/.cache/agora/toolchain`, or `AGORA_TOOLCHAIN_CACHE`), verifies the checksum
+  before unpacking, and uses that copy, never one found on the host. `agora toolchain
+  list|show|add` reads and prepares the cache while online; `--offline` uses only the
+  cache and fails naming the entry and `agora toolchain add`. A program of your own
+  stands in for an entry only if you name it, with `AGORA_<ENTRY>` (`AGORA_TINYTEX`,
+  `AGORA_TEX_PACKAGES`, `AGORA_CHROMIUM`, `AGORA_NPM_PACKAGES`); `doctor` lists each one
+  and `fresh` will not call a generator's output current while one stands in (0025
+  FR-015 to FR-020).
+- The one thing a fetch cannot supply is Chromium's shared libraries on Linux, which need
+  administrator rights. `agora system list` shows which are missing; `agora system add
+  --dry-run` prints exactly what it would run (`apt` on Debian and Ubuntu; on another
+  family it names the libraries and stops); `agora system add` asks before it runs
+  `sudo`, and `agora system add --yes` skips the question (for CI). It is the only
+  command that uses `sudo`, it is never run by another command, and it is not offered
+  over MCP: a command that needs the browser fails naming each library and this command
+  (0025 FR-021).
 - Git is the only record: `agora` never commits or pushes. What changes or runs
   something and is not worth a commit (a check, a build, a dry run, an MCP call)
   goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants

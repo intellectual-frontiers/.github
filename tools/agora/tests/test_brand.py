@@ -244,10 +244,9 @@ class Imagery(Repo):
 class NoHostPrograms(Repo):
     def test_the_image_and_decoration_commands_run_no_program_of_the_host(self):  # 0042 FR-030
         reg = Registry.load(HOME)
-        for cid in ("imagery build", "imagery show", "imagery add", "decoration generate", "decoration show", "openedx build"):
-            self.assertEqual(reg.commands[cid].programs, (), cid)
-        for g in ("brand", "decoration"):
-            self.assertEqual(reg.groups[g].programs, {})
+        for cid in ("imagery build", "imagery show", "imagery add", "decoration generate", "decoration show"):
+            self.assertEqual(reg.commands[cid].toolchain, (), cid)
+        self.assertEqual(reg.commands["openedx build"].toolchain, ("npm-packages",))  # Paragon, from the npm lock
         self.assertIn("Pillow", reg.groups["brand"].packages)
         self.assertTrue({"Pillow", "potracer", "resvg-py", "uharfbuzz"} <= set(reg.groups["decoration"].packages))
 
@@ -373,10 +372,14 @@ class OpenEdx(Repo):
         self.assertGreater(len(doc["data"]["changes"]), 10)
         self.assertEqual(tree(self.root), before)
 
-    def test_openedx_build_needs_paragon_and_names_it(self):
-        code, doc = self.go("openedx", "build", "mini-brand")
-        self.assertEqual((code, doc["data"]["code"]), (3, "missing-program" if shutil.which("node") else "missing-program"))
-        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon")
+    def test_openedx_build_without_paragon_uses_the_npm_lock_and_names_it_when_it_cannot(self):
+        offline = {"AGORA_OFFLINE": "1", "AGORA_TOOLCHAIN_CACHE": str(self.root / "cold-cache")}
+        code, doc = self.go("openedx", "build", "mini-brand", env=offline)
+        self.assertEqual((code, doc["data"]["code"]), (3, "offline"))
+        self.assertIn("npm-packages", doc["data"]["message"])
+        self.assertIn("agora toolchain add npm-packages", doc["data"]["message"])
+        # a Paragon of the person's own is named explicitly, and stands in for the lock: nothing is fetched or asked for
+        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
         self.assertIn("paragon", doc["data"]["message"].lower())
 

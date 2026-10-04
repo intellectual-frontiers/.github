@@ -164,15 +164,19 @@ class OtherCommands(unittest.TestCase):
         self.assertTrue(any("requirements" in o for o in d["omitted"]) or len(d["requirements"]) <= 60)
 
     def test_doctor_reports_and_changes_nothing(self):
-        from agora.core.registry import Registry
-        reg = Registry.load(HOME)
-        for g in ("assurance", "decoration"):
-            reg.groups[g].programs = {}  # what the host lacks is its own test below; this one reads a healthy host
-        code, doc = run_json(["doctor"], registry=reg)
+        from unittest import mock
+        from agora.core import system
+        with mock.patch.object(system, "loads", lambda lib: True):  # a healthy host: the browser's libraries load
+            code, doc = run_json(["doctor"])
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
         self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv", "python3"])
-        self.assertEqual(doc["data"]["programs"], [])  # no host program is declared once the packages replace them (0042 FR-030)
+        self.assertNotIn("programs", doc["data"])  # no host program is declared: packages and toolchain entries supply them
+        rows = {r["entry"]: r for r in doc["data"]["toolchain"]}
+        self.assertEqual(set(rows), {"tinytex", "tex-packages", "chromium", "npm-packages"})
+        self.assertTrue(all(r["cache"] in ("ready", "not fetched") and r["needed by"] for r in rows.values()))
+        self.assertTrue(any("browser" in n for n in rows["chromium"]["needed by"]))
+        self.assertTrue(any("frontiers-print" in n for n in rows["tinytex"]["needed by"]))
 
     def test_doctor_lists_every_opt_in_override_that_is_set(self):  # 0025 FR-019
         code, doc = run_json(["doctor"], env={"AGORA_NODE": "/no/such/node"})
@@ -185,14 +189,6 @@ class OtherCommands(unittest.TestCase):
         reg.add_command(Command(("spec", "show"), "read", group="other"))
         code, doc = run_json(["doctor"], registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "failed"))
-
-    def test_doctor_reports_a_missing_program_with_its_hint(self):
-        from agora.core.registry import Registry
-        reg = Registry.load(HOME)
-        reg.groups["spec"].programs["no-such-program-xyz"] = {"needed_by": ["x"], "hint": "get it from the host"}
-        code, doc = run_json(["doctor"], registry=reg)
-        self.assertEqual((code, doc["data"]["status"]), (3, "missing"))
-        self.assertIn("get it from the host", [p["hint"] for p in doc["data"]["programs"]])
 
     def test_lock_with_nothing_pinned_reports_nothing_to_lock(self):
         code, doc = run_json(["lock", "core"])

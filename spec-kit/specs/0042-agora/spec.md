@@ -240,13 +240,17 @@ design systems' own harnesses, and what CI runs.
     `node`, `npm` and `npx`); and `dulwich` in place of `git` where a command
     only reads Git's state.
   - Toolchain entries: `tinytex` and `tex-packages` (a TinyTeX release and the
-    TeX Live packages the harnesses need, pinned, supplying XeLaTeX, LuaLaTeX
-    and latexmk), `chromium` (Playwright's pinned Chromium build, from the
-    address Playwright publishes it at), and the npm lock (`package.json` and
-    `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`. The browser's Linux system libraries are installed
-  once by the `system` noun's `add` (0041-command-line FR-069), whose package
-  list for Debian and Ubuntu is pinned in `agora`'s code, and which the
-  README documents.
+    TeX Live packages the harnesses need that it lacks, each package's container pinned
+    by its own checksum from TeX Live's frozen 2025 repository, supplying XeLaTeX and
+    LuaLaTeX; there is no `latexmk`, a Perl program, so the print harness runs the
+    engine again until the cross-references settle), `chromium` (Playwright's pinned
+    Chromium build, from the address Playwright publishes it at, for the Playwright
+    version the npm lock holds), and the npm lock (`package.json` and
+    `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`. The
+    browser's Linux system libraries are installed
+    once by the `system` noun's `add` (0041-command-line FR-069), whose package
+    list for Debian and Ubuntu is pinned in `agora`'s code, and which the
+    README documents.
   The list is confirmed by the change that implements it (OQ-2).
 ## Surfaces
 
@@ -417,8 +421,13 @@ design systems' own harnesses, and what CI runs.
 - **OQ-1**: Whether `check` sections that need Node and Playwright can run
   their harnesses through `agora`'s own worker, or must always run the
   harness's documented command.
-- **OQ-2**: Whether TinyTeX with pinned packages reaches the fidelity the print
-  design system needs from TeX Live. The package replacements FR-030 names are
+- **OQ-2**: Answered for TinyTeX: TinyTeX 2026.03 (TeX Live 2025) with eight
+  pinned packages passes the print design system's harness, 79 checks under each
+  brand, with no host TeX; one package, `microtype`, is taken from the frozen
+  repository at a newer revision than TinyTeX holds, because the bundled one stops a
+  document that loads `titletoc` after it. Chromium 133 (Playwright 1.50.0's build)
+  passes every browser harness, and Paragon 23.23.0 from the npm lock rebuilds the Open
+  edX package to the committed `dist/`. The package replacements FR-030 names are
   confirmed, each with the generated files it changed regenerated and proven by
   `fresh`: `pypdfium2` (text layer) and `pypdf` (page size, fonts, images) for
   poppler's readers, with PyMuPDF excluded for its AGPL licence; `resvg-py`

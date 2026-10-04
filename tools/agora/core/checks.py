@@ -2,9 +2,7 @@
 from __future__ import annotations
 
 import json
-import os
 import re
-import shutil
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -98,29 +96,3 @@ def section_changed(watch: tuple[str, ...], changed: list[str]) -> tuple[bool, s
         if any(r.match(p) for r in rx):
             return True, f"{p} changed"
     return False, "no watched path changed"
-
-
-def find_program(registry: Any, name: str, env: dict[str, str] | None = None) -> str | None:
-    """Where a program the host supplies is, or None (0041 FR-006). A program is on PATH; one a manifest declares with
-    `probe_env`, `probe_default` and `probe_globs` (a browser Playwright installs outside PATH) is also looked for in
-    those directories, the environment's variable first, so a host's own override wins (0025 FR-002)."""
-    found = shutil.which(name)
-    if found:
-        return found
-    spec = registry.program(name) if registry is not None else {}
-    globs = spec.get("probe_globs")
-    if not globs:
-        return None
-    env = os.environ if env is None else env
-    bases = [env.get(spec["probe_env"], "")] if spec.get("probe_env") else []
-    bases += [os.path.expanduser(b) for b in spec.get("probe_default", [])]
-    for base in bases:
-        for pattern in globs:
-            for hit in sorted(Path(base).glob(pattern)) if base else []:
-                if hit.is_file():
-                    return str(hit)
-    return None
-
-
-def program_missing(ctx: Any, programs: tuple[str, ...]) -> list[str]:
-    return [p for p in programs if find_program(ctx.registry, p, ctx.env) is None]

@@ -26,37 +26,19 @@ pypdfium2 = "5.14.0"
 reportlab = "5.0.1"
 resvg-py = "0.5.0"
 
-# Programs outside Python (0041-command-line FR-006): the host supplies them until the toolchain lock supplies them
-# (0042-agora FR-030). Each hint names the program, never the environment itself (0025-tooling-environment FR-012).
-# Everything else the harnesses once needed from the host is a package above: Node, poppler, librsvg, ImageMagick.
-[programs.chromium]
-needed_by = ["check design-systems --runner browser"]
-hint = "install Chromium through Playwright (npx playwright install chromium), or set PLAYWRIGHT_BROWSERS_PATH to where it is"
-probe_env = "PLAYWRIGHT_BROWSERS_PATH"
-probe_default = ["/opt/pw-browsers", "~/.cache/ms-playwright"]
-probe_globs = ["chromium-*/chrome-linux*/chrome", "chromium_headless_shell-*/chrome-linux*/headless_shell"]
-
-[programs.latexmk]
-needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with latexmk on the host until the toolchain lock supplies it (0042 FR-030)"
-[programs.xelatex]
-needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with XeLaTeX on the host until the toolchain lock supplies it (0042 FR-030)"
-[programs.lualatex]
-needed_by = ["check design-systems --runner python (frontiers-print)"]
-hint = "install TeX Live with LuaLaTeX on the host until the toolchain lock supplies it (0042 FR-030)"
-
-# What each kind of harness needs of the host. A program here that is missing skips the harness, naming it and its
-# hint, and makes the run exit 3 (0041-command-line FR-033); nothing is reported as passed that did not run.
+# Programs outside Python are toolchain entries (0041-command-line FR-006, FR-066; 0042-agora FR-030), declared in code under
+# tools/agora/toolchain/ and fetched into the per-user cache on first use. What each kind of harness needs of them: an entry
+# that cannot be had (offline with a cold cache, no build for the platform, a browser's system libraries missing) skips the
+# harness, naming the entry and the command that fixes it, and makes the run exit 3 (0041-command-line FR-033); nothing is
+# reported as passed that did not run.
 [runners.browser]
-programs = ["chromium"]
+toolchain = ["chromium", "npm-packages"]
 [runners.python]
-programs = []
+toolchain = []
 
-# What one harness needs beyond its kind: `programs` it cannot run without, and `optional` programs it checks
-# without and says it did not exercise (found by reading each harness).
+# What one harness needs beyond its kind.
 [harnesses."frontiers-print:python"]
-programs = ["latexmk", "xelatex", "lualatex"]
+toolchain = ["tinytex", "tex-packages"]
 
 [sections.design-systems]
 help = "Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039)"
@@ -74,6 +56,8 @@ help = "A brand's Open edX package is what is written from its tokens, and, with
 watch = ["design-systems/*/openedx/**", "design-systems/*/tokens.json", "design-systems/*/assurance/run.py", "tools/agora/lib/openedx.py"]
 scope = "BRAND"
 options = ["--paragon"]
+toolchain = ["npm-packages"]
+toolchain_unless = "paragon"  # Paragon's CLI, from the npm lock, unless --paragon names one of the person's own
 
 [nouns.figure]
 help = "A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044)"

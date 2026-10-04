@@ -12,13 +12,14 @@ from pathlib import Path
 from unittest import mock
 
 from agora.core import runner as checkrun
-from agora.core.checks import find_program
+from agora.core import toolchain as tcore
 from agora.core.ctx import Ctx
 from agora.core.registry import Registry
 from agora.groups.assurance import commands
 from agora.lib import assurance, imagery, openedx
 
 from .helpers import HOME, run_json
+from .toolchain_fixture import entry as fixture_entry, make_tar, toolchain as fixture_toolchain
 
 TOKENS = '{"$extensions": {"com.intellectualfrontiers.logo": {}}}'
 PASS = "import sys\nprint('ok')\n"
@@ -41,6 +42,12 @@ class Repo(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.reg = Registry.load(HOME)
+        # the toolchain lock for these tests: the cache is a temp directory, and `no-such-tool` has no build anywhere
+        self.nobuild = tcore.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
+        self.tc = fixture_toolchain({"no-such-tool": self.nobuild}, self.root / "tc-cache", env=dict(os.environ))
+
+    def add_entry(self, e):
+        self.tc.entries[e.name] = e
 
     def ds(self, slug, *, brand=False, py=None, mjs=None):
         d = self.root / "design-systems" / slug
@@ -56,6 +63,7 @@ class Repo(unittest.TestCase):
     def ctx(self, **options):
         c = Ctx(self.reg, home=self.root, root=self.root, env=dict(os.environ))
         c.section_options = options
+        c.__dict__["_toolchain"] = self.tc
         return c
 
     def manifest(self):
@@ -114,17 +122,19 @@ class Discovery(Repo):
     def test_each_harness_carries_what_the_manifest_says_it_needs(self):
         found, _ = self.plan()
         browser = next(h for h in found if h.kind == "browser")
-        self.assertEqual(browser.programs, ["chromium"])  # node is a package, not a program (0042 FR-030)
+        self.assertEqual(browser.toolchain, ["chromium", "npm-packages"])  # node is a package, not an entry (0042 FR-030)
         m = self.manifest()
-        m["harnesses"]["print:python"] = {"programs": ["latexmk"], "optional": ["xelatex"]}
+        m["harnesses"]["print:python"] = {"toolchain": ["tinytex"]}
         found, _ = self.plan(runner="python")
         printer = next(h for h in found if h.slug == "print")
-        self.assertEqual((printer.programs, printer.optional), (["latexmk"], ["xelatex"]))
+        self.assertEqual(printer.toolchain, ["tinytex"])
 
-    def test_the_real_manifest_names_the_print_harness_programs_and_the_python_packages(self):
+    def test_the_real_manifest_names_the_print_harness_toolchain_and_the_python_packages(self):
         m = Registry.load(HOME).groups["assurance"].manifest
-        self.assertEqual(set(m["harnesses"]["frontiers-print:python"]["programs"]),
-                         {"latexmk", "xelatex", "lualatex"})
+        self.assertEqual(m["harnesses"]["frontiers-print:python"]["toolchain"], ["tinytex", "tex-packages"])
+        self.assertEqual(m["runners"]["browser"]["toolchain"], ["chromium", "npm-packages"])
+        self.assertEqual(m["runners"]["python"]["toolchain"], [])
+        self.assertNotIn("programs", m)  # no host program is declared (0042 FR-030)
         self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml", "nodejs-wheel-binaries", "pypdf", "pypdfium2",
                                               "reportlab", "resvg-py"})
         self.assertTrue(all(v.replace(".", "").isdigit() for v in m["packages"].values()))  # exact pins
@@ -133,12 +143,12 @@ class Discovery(Repo):
 class Running(Repo):
     def run_one(self, h):
         lines = []
-        return assurance.run_one(self.reg, h, self.root, dict(os.environ), lines.append), lines
+        return assurance.run_one(self.tc, h, self.root, dict(os.environ), lines.append), lines
 
-    def harness(self, slug, text, programs=()):
+    def harness(self, slug, text, toolchain=()):
         self.ds(slug, py=text)
         found, _ = assurance.plan(self.root, self.manifest(), scope=slug)
-        found[0].programs = list(programs)
+        found[0].toolchain = list(toolchain)
         return found[0]
 
     def test_a_passing_harness_streams_its_output(self):
@@ -152,26 +162,49 @@ class Running(Repo):
         self.assertIn("✗ a rule broke", assurance.failure_message(o))
         self.assertIn("✗ a rule broke", lines)
 
-    def test_a_missing_program_skips_the_harness_with_its_hint_and_never_runs_it(self):
-        self.reg.groups["assurance"].programs["no-such-program-xyz"] = {"hint": "install it from the host"}
-        h = self.harness("a", "raise SystemExit('must not run')\n", ["no-such-program-xyz"])
+    def test_an_entry_that_cannot_be_had_skips_the_harness_naming_it_and_never_runs_it(self):
+        h = self.harness("a", "raise SystemExit('must not run')\n", ["no-such-tool"])
         o, lines = self.run_one(h)
         self.assertEqual(o.status, "skipped")
-        self.assertIn("no-such-program-xyz", o.reason)
-        self.assertIn("install it from the host", o.reason)
+        self.assertIn("no-such-tool 1.0", o.reason)
+        self.assertIn("AGORA_NO_SUCH_TOOL", o.reason)
         self.assertFalse(any("must not run" in l for l in lines))
 
-    def test_an_optional_program_that_is_missing_is_said_not_skipped(self):
-        h = self.harness("a", PASS)
-        h.optional = ["no-such-program-xyz"]
+    def test_offline_with_a_cold_cache_skips_the_harness_naming_the_entry_and_the_command_that_fetches_it(self):
+        archive = self.root / "t.tar.gz"
+        self.add_entry(fixture_entry("cold-tool", archive, make_tar(archive, {"bin/cold-tool": b"x"})))
+        self.tc.offline = True
+        h = self.harness("a", "raise SystemExit('must not run')\n", ["cold-tool"])
+        o, _ = self.run_one(h)
+        self.assertEqual(o.status, "skipped")
+        self.assertIn("cold-tool 1.0", o.reason)
+        self.assertIn("agora toolchain add cold-tool", o.reason)
+
+    def test_an_entry_is_fetched_on_first_use_and_its_environment_reaches_the_harness(self):
+        archive = self.root / "t.tar.gz"
+        self.add_entry(fixture_entry("warm-tool", archive, make_tar(archive, {"bin/warm-tool": b"x"}),
+                                     env=lambda r, path, platform: {"WARM_TOOL_HOME": str(path)}))
+        h = self.harness("a", "import os\nprint('HOME=' + os.environ.get('WARM_TOOL_HOME', ''))\n", ["warm-tool"])
+        o, _ = self.run_one(h)
+        self.assertEqual(o.status, "passed")
+        self.assertTrue(any(l.startswith("HOME=") and "warm-tool-1.0" in l for l in o.tail), o.tail)
+
+    def test_an_override_is_said_and_the_hosts_own_settings_do_not_reach_the_harness(self):
+        archive = self.root / "t.tar.gz"
+        self.add_entry(fixture_entry("warm-tool", archive, make_tar(archive, {"bin/warm-tool": b"x"})))
+        mine = self.root / "mine"
+        mine.mkdir()
+        self.tc.env = {**os.environ, "AGORA_WARM_TOOL": str(mine), "CHROMIUM": "/host/chromium", "PLAYWRIGHT_BROWSERS_PATH": "/host/pw"}
+        h = self.harness("a", "import os\nprint('SEEN', os.environ.get('CHROMIUM'), os.environ.get('PLAYWRIGHT_BROWSERS_PATH'))\n", ["warm-tool"])
         o, lines = self.run_one(h)
         self.assertEqual(o.status, "passed")
-        self.assertTrue(any("no-such-program-xyz is not installed" in l for l in lines))
+        self.assertTrue(any("warm-tool is" in l and "AGORA_WARM_TOOL" in l for l in lines))
+        self.assertIn("SEEN None None", o.tail)
 
     def test_a_harness_runs_without_agoras_environment(self):
         h = self.harness("a", "import os\nprint('PP', os.environ.get('PYTHONPATH'), os.environ.get('AGORA_PLAN_GROUP'))\n")
         with mock.patch.dict(os.environ, {"PYTHONPATH": "/x/tools", "AGORA_PLAN_GROUP": "assurance"}):
-            o = assurance.run_one(self.reg, h, self.root, dict(os.environ), lambda _l: None)
+            o = assurance.run_one(self.tc, h, self.root, dict(os.environ), lambda _l: None)
         self.assertIn("PP None None", o.tail)
 
     def test_the_harness_runs_in_the_root(self):
@@ -208,19 +241,17 @@ class DesignSystemsSection(Repo):
         self.assertEqual([f.where for f in r.findings], ["design-systems/b/assurance/run.py"])
 
     def test_a_skipped_harness_makes_the_section_skipped_not_passed(self):
-        self.reg.groups["assurance"].programs["no-such-program-xyz"] = {"hint": "install it from the host"}
-        self.manifest().setdefault("harnesses", {})["b:python"] = {"programs": ["no-such-program-xyz"]}
+        self.manifest().setdefault("harnesses", {})["b:python"] = {"toolchain": ["no-such-tool"]}
         self.ds("a", py=PASS)
         self.ds("b", py="raise SystemExit(1)\n")
         r, _ = self.section(runner="python")
         self.assertEqual(r.status, "skipped")
-        self.assertIn("no-such-program-xyz", r.reason)
+        self.assertIn("no-such-tool", r.reason)
         self.assertIn("1 passed", r.reason)
         self.assertEqual(r.data["summary"]["skipped"], 1)
 
     def test_a_failure_outranks_a_skip(self):
-        self.reg.groups["assurance"].programs["no-such-program-xyz"] = {}
-        self.manifest().setdefault("harnesses", {})["b:python"] = {"programs": ["no-such-program-xyz"]}
+        self.manifest().setdefault("harnesses", {})["b:python"] = {"toolchain": ["no-such-tool"]}
         self.ds("a", py=FAIL)
         self.ds("b", py=PASS)
         r, _ = self.section(runner="python")
@@ -232,15 +263,14 @@ class DesignSystemsSection(Repo):
         self.assertEqual(r.status, "failed")
         self.assertIn("nothing was checked", r.findings[0].message)
 
-    def test_a_missing_browser_program_skips_the_browser_harness_with_a_hint(self):
+    def test_a_browser_entry_that_cannot_be_had_skips_the_browser_harness_naming_it(self):
         self.ds("web", mjs="//")
         self.ds("b", brand=True)
-        self.manifest()["runners"]["browser"]["programs"] = ["no-such-program-xyz"]
-        self.reg.groups["assurance"].programs["no-such-program-xyz"] = {"hint": "install it from the host"}
+        self.manifest()["runners"]["browser"]["toolchain"] = ["no-such-tool"]
         (self.root / "design-systems" / "b" / "assurance" / "run.mjs").write_text("//")
         r, _ = self.section(runner="browser")
         self.assertEqual(r.status, "skipped")
-        self.assertIn("install it from the host", r.reason)
+        self.assertIn("AGORA_NO_SUCH_TOOL", r.reason)
 
 
 class SuitesAndOptions(unittest.TestCase):
@@ -279,35 +309,21 @@ class SuitesAndOptions(unittest.TestCase):
             self.assertIsNone(invocation.problem(ctx, text), text)
         self.assertIn("not a known", invocation.problem(ctx, "agora check openedx --scope no-such-brand") or "")
 
-    def test_a_section_whose_programs_are_missing_is_skipped_with_exit_3_and_the_hint(self):
+    def test_a_section_whose_toolchain_cannot_be_had_is_skipped_with_exit_3_naming_the_entry(self):
         import dataclasses
         reg = Registry.load(HOME)
-        reg.sections["imagery"] = dataclasses.replace(reg.sections["imagery"], programs=("no-such-program-xyz",))
-        reg.groups["assurance"].programs["no-such-program-xyz"] = {"hint": "install the package that supplies it"}
-        ctx = Ctx(reg, HOME, HOME, env={"PATH": "/nonexistent"})
-        with mock.patch.dict(os.environ, {"PATH": "/nonexistent"}):
+        reg.sections["imagery"] = dataclasses.replace(reg.sections["imagery"], toolchain=("no-such-tool",))
+        nobuild = tcore.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
+        ctx = Ctx(reg, HOME, HOME, env=dict(os.environ))
+        with mock.patch.object(tcore, "discover", lambda: {"no-such-tool": nobuild}):
             res = checkrun.run_check(ctx, ["imagery"], None, None, False, None)
         (s,) = res.data["sections"]
         self.assertEqual((s["status"], res.exit), ("skipped", 3))
-        self.assertIn("no-such-program-xyz", s["reason"])
-        self.assertIn("install the package that supplies it", s["reason"])
+        self.assertIn("no-such-tool 1.0", s["reason"])
 
     def test_no_host_program_of_the_replaced_kind_is_declared(self):  # 0042 FR-030
-        programs = {p for g in self.reg.groups.values() for p in g.programs}
-        self.assertEqual(programs & {"node", "pdfinfo", "pdffonts", "pdftotext", "pdfimages", "rsvg-convert", "convert",
-                                     "identify", "potrace", "git"}, set())
-
-
-class Probe(unittest.TestCase):
-    def test_a_browser_installed_outside_path_is_found_through_the_override_first(self):
-        reg = Registry.load(HOME)
-        with tempfile.TemporaryDirectory() as d:
-            exe = Path(d, "chromium-1234", "chrome-linux", "chrome")
-            exe.parent.mkdir(parents=True)
-            exe.write_text("")
-            with mock.patch("shutil.which", return_value=None):
-                self.assertEqual(find_program(reg, "chromium", {"PLAYWRIGHT_BROWSERS_PATH": d}), str(exe))
-                self.assertIsNone(find_program(reg, "no-such-program-xyz", {}))
+        self.assertFalse(any(hasattr(g, "programs") for g in self.reg.groups.values()))
+        self.assertNotIn("programs", self.reg.groups["assurance"].manifest)
 
 
 @unittest.skipUnless(importlib.util.find_spec("PIL"), "Pillow is not installed")
@@ -361,23 +377,43 @@ class OpenedxSection(Repo):
         ctx.env = {**{k: v for k, v in os.environ.items() if k != "PARAGON"}, **(env or {})}
         return quiet(commands.check_openedx, ctx, scope)
 
-    def test_without_paragon_the_sources_are_checked_and_it_is_said_dist_was_not(self):
-        self.package(PASS)
-        r, err = self.section()
-        self.assertEqual(r.status, "passed")
-        self.assertTrue(any(f.level == "warning" and "dist/ was not rebuilt" in f.message for f in r.findings))
-        self.assertIn("── brand-x's Open edX package", err)
+    def locked_paragon(self):
+        """The npm tree, as a local archive holding a stand-in Paragon, so that the lock is used with no network."""
+        archive = self.root / "npm.tar.gz"
+        sha = make_tar(archive, {"node_modules/.bin/paragon": b"#!/bin/sh\n"})
+        self.add_entry(fixture_entry("npm-packages", archive, sha, provides={"paragon": "node_modules/.bin/paragon", "playwright": "x"},
+                                     env=lambda r, path, platform: {"PLAYWRIGHT_MODULE": str(path)}))
 
-    def test_paragon_comes_from_the_option_or_the_environment_to_the_harness(self):
+    def test_without_paragon_the_one_the_npm_lock_installs_is_used(self):
+        self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")
+        self.locked_paragon()
+        r, err = self.section()
+        self.assertEqual(r.status, "passed", r.findings)
+        self.assertIn("node_modules/.bin/paragon", r.data["paragon"])
+        self.assertIn(f"PARAGON={r.data['paragon']}", err)
+        self.assertIn("rebuilt with", err)
+
+    def test_without_paragon_offline_and_a_cold_cache_the_section_is_skipped_naming_the_entry(self):
+        self.package(PASS)
+        self.locked_paragon()
+        self.tc.offline = True
+        r, _ = self.section()
+        self.assertEqual(r.status, "skipped")
+        self.assertIn("npm-packages", r.reason)
+        self.assertIn("agora toolchain add npm-packages", r.reason)
+
+    def test_paragon_comes_from_the_option_and_not_from_the_hosts_environment(self):
         self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")
         fake = self.root / "paragon"
         fake.write_text("")
-        for kw in ({"paragon": str(fake)}, {"env": {"PARAGON": str(fake)}}):
-            r, err = self.section(**kw)
-            self.assertEqual(r.status, "passed", kw)
-            self.assertIn(f"PARAGON={fake.resolve()}", err)
-            self.assertFalse(r.findings)
-            self.assertEqual(r.data["paragon"], str(fake.resolve()))
+        r, err = self.section(paragon=str(fake))
+        self.assertEqual(r.status, "passed")
+        self.assertIn(f"PARAGON={fake.resolve()}", err)
+        self.assertEqual(r.data["paragon"], str(fake.resolve()))
+        self.locked_paragon()
+        self.tc.offline = True  # a PARAGON in the environment is the host's: it stands in for nothing
+        r, _ = self.section(env={"PARAGON": str(fake)})
+        self.assertEqual(r.status, "skipped")
 
     def test_a_paragon_that_is_not_a_file_fails(self):
         self.package(PASS)
@@ -387,6 +423,7 @@ class OpenedxSection(Repo):
 
     def test_a_failing_harness_fails_the_section(self):
         self.package(FAIL)
+        self.locked_paragon()
         r, _ = self.section()
         self.assertEqual(r.status, "failed")
         self.assertIn("✗ a rule broke", r.findings[0].message)
@@ -394,6 +431,7 @@ class OpenedxSection(Repo):
     def test_a_package_with_no_harness_and_a_brand_with_no_package_fail(self):
         b = self.ds("brand-y", brand=True)
         (b / "openedx").mkdir()
+        self.locked_paragon()
         r, _ = self.section()
         self.assertEqual(r.status, "failed")
         self.assertIn("no assurance/run.py", r.findings[0].message)
@@ -403,6 +441,7 @@ class OpenedxSection(Repo):
 
     def test_with_no_package_anywhere_nothing_passes(self):
         self.ds("brand-z", brand=True)
+        self.locked_paragon()
         r, _ = self.section()
         self.assertEqual(r.status, "failed")
 

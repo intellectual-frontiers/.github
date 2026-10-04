@@ -156,7 +156,7 @@ class Selection(unittest.TestCase):
         code, doc = run_json(["check", "--suite", "spec"])
         self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual([s["name"] for s in doc["data"]["sections"]],
-                         ["specs", "register", "controls", "ontology", "commands"])
+                         ["specs", "register", "controls", "ontology", "toolchain", "commands"])
         self.assertEqual(doc["audience"], "public")
 
     def test_a_suite_that_names_no_section_ran_nothing_and_fails(self):
@@ -174,11 +174,11 @@ class Selection(unittest.TestCase):
         for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
                   "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
-            reg.sections[n].programs = ()
+            reg.sections[n].toolchain = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 16)
+        self.assertEqual(doc["data"]["summary"]["run"], 17)
 
     def test_scope_and_options_must_apply(self):
         self.assertEqual(run(["check", "controls", "--scope", "x"])[0], 2)
@@ -189,11 +189,16 @@ class Selection(unittest.TestCase):
         code, doc = run_json(["check", "commands", "--root", str(HOME / "design-systems")])
         self.assertEqual((code, doc["data"]["code"]), (2, "usage"))
 
-    def test_a_missing_program_skips_the_section_and_fails_the_run(self):
+    def test_a_toolchain_entry_that_cannot_be_had_skips_the_section_and_fails_the_run(self):
+        from unittest import mock
+        from agora.core import toolchain
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
-        reg.sections["controls"].programs = ("no-such-program-xyz",)
-        code, doc = run_json(["check", "controls"], registry=reg)
+        reg.sections["controls"].toolchain = ("no-such-tool",)
+        nobuild = toolchain.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})  # no build for any platform
+        with mock.patch.object(toolchain, "discover", lambda: {"no-such-tool": nobuild}):
+            code, doc = run_json(["check", "controls"], registry=reg)
         s = doc["data"]["sections"][0]
         self.assertEqual((code, s["status"], doc["data"]["status"]), (3, "skipped", "skipped"))
-        self.assertIn("no-such-program-xyz", s["reason"])
+        self.assertIn("no-such-tool", s["reason"])
+        self.assertIn("AGORA_NO_SUCH_TOOL", s["reason"])

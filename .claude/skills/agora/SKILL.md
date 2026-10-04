@@ -55,7 +55,9 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `sign` | A printed sign, a job rendered by frontiers-signage-print (0014-design-systems FR-040) |
 | `skill` | The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028) |
 | `spec` | A spec: a numbered spec or a design system's spec (0020-spec-format) |
+| `system` | The one prerequisite beyond python3 and uv: a browser's shared libraries, installed once with sudo (0041-command-line FR-069) |
 | `term` | A concept or scheme of the ontology (0019-controlled-vocabulary) |
+| `toolchain` | The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067) |
 
 ## Commands
 
@@ -112,9 +114,14 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `spec new` | `generate` | terminal, editor, mcp | Create a spec in the form 0020 FR-005 states, with the next unused number | `agora spec new SLUG [--title TEXT]` |
 | `spec set` | `decision` | terminal, editor | Move a spec between Draft, Adopted and Superseded, only as 0020 FR-010 allows | `agora spec set SPEC --status SPEC_STATUS [--superseded-by SPEC]` |
 | `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
+| `system add` | `setup` | terminal | Install the browser's missing shared libraries with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system add [--yes]` |
+| `system list` | `read` | terminal, editor, mcp | List the shared libraries a browser links, the package that holds each on this host's distribution, and which are present | `agora system list` |
 | `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
 | `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
 | `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner, under the selftest group's locked packages | `agora test` |
+| `toolchain add` | `setup` | terminal | Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check | `agora toolchain add [ENTRY...]` |
+| `toolchain list` | `read` | terminal, editor, mcp | List the toolchain entries: version, platforms and whether the cache holds each | `agora toolchain list` |
+| `toolchain show` | `read` | terminal, editor, mcp | Show one entry: version, addresses and checksums per platform, what it provides, and the cache | `agora toolchain show ENTRY` |
 
 ### Arguments and options
 
@@ -249,7 +256,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `openedx build`
   - `brand` (BRAND): the brand
-  - `--paragon` (TEXT): Paragon's CLI, such as node_modules/.bin/paragon (PARAGON in the environment otherwise)
+  - `--paragon` (TEXT): Paragon's CLI of your own, such as node_modules/.bin/paragon (the npm lock's is used otherwise)
   - `--dry-run` (flag): validate, write nothing, show the change
 - `openedx generate`
   - `brand` (BRAND): the brand
@@ -303,10 +310,18 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `spec show`
   - `spec` (SPEC): the spec
+- `system add`
+  - `--yes` (flag): do not ask: for a person who has read what --dry-run prints, and for CI
+  - `--dry-run` (flag): validate, write nothing, show the change
 - `term list`
   - `--scheme` (SCHEME): only the concepts of this scheme
 - `term show`
   - `term` (TERM): the term's local name
+- `toolchain add`
+  - `entries` (ENTRY, zero or more): the entries; every one with a build for this platform when none is named
+  - `--dry-run` (flag): validate, write nothing, show the change
+- `toolchain show`
+  - `entry` (ENTRY): the entry
 
 ## Typed arguments
 
@@ -322,6 +337,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `COURSE_TARGET` | what a course is built to: a static site, an Open edX export or a cmi5 package | web, olx, cmi5 |
 | `DATE` | a date as YYYY-MM-DD | 2026-10-04 |
 | `DESIGN_SYSTEM` | a design system's slug, a directory of design-systems/ | a value `<noun> list` or `--complete` offers |
+| `ENTRY` | a toolchain entry, as `toolchain list` names them: tinytex, chromium, ... | a value `<noun> list` or `--complete` offers |
 | `GENERATOR` | a generator, as `fresh` proves it: brand-theme, brand-specimen, ... | a value `<noun> list` or `--complete` offers |
 | `GROUP` | a command group | a value `<noun> list` or `--complete` offers |
 | `INK` | an ink of a brand's decoration kit as <brand>/<role>, such as frontiers-brand/primary | a value `<noun> list` or `--complete` offers |
@@ -367,6 +383,7 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | `signage` | Sign jobs against frontiers-signage-print's rules: format, details, imagery resolution, voice (signage.py check) | PATH | none |
 | `slides` | Decks against frontiers-slides' rules: layouts, headlines, points, notes, figures, voice (deck.py check) | PATH | none |
 | `specs` | Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034) | SPEC | `spec` |
+| `toolchain` | The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025) | none | `spec` |
 | `voice` | Prose against frontiers-written-voice's sweep, or with --spoken a script against frontiers-spoken-voice's too (sweep.py) | PATH | none |
 
 ## Generators
@@ -386,7 +403,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 47 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 50 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -434,6 +451,9 @@ A generated file carries a header naming its generator and must not be edited by
 | `spec_list` | no |
 | `spec_new` | yes, dry run by default |
 | `spec_show` | no |
+| `system_list` | no |
 | `term_list` | no |
 | `term_show` | no |
 | `test` | no |
+| `toolchain_list` | no |
+| `toolchain_show` | no |

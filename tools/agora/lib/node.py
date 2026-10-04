@@ -61,3 +61,32 @@ def npm_argv(*args: str, env: dict[str, str] | None = None) -> list[str] | None:
         return None
     cli = Path(here).parent.parent / "lib" / "node_modules" / "npm" / "bin" / "npm-cli.js"
     return [here, str(cli), *args] if cli.is_file() else None
+
+
+def locate(home: Path, env: dict[str, str] | None = None, *, offline: bool = False) -> str:
+    """The node a core command that holds no package runs, as `toolchain add` does to install the npm tree: the person's
+    override, the package's own where this interpreter has it, else the package's in the locked environment of the group
+    that pins it (created by uv from the committed lock, as for any command that needs it). Raises a ToolchainError."""
+    import subprocess
+
+    from agora.core import plan
+    from agora.core.registry import Registry
+    from agora.core.toolchain import ToolchainError
+
+    env = dict(os.environ if env is None else env)
+    found = node_path(env)
+    if found:
+        return found
+    if override(env):
+        raise ToolchainError(f"{OVERRIDE} names {override(env)}, which is not a file", fetchable=False)
+    reg = Registry.load(home)
+    group = next((g.name for g in reg.groups.values() if PACKAGE in {p.lower() for p in g.packages}), None)
+    if group is None:
+        raise ToolchainError(f"no group of this command line pins {PACKAGE}, the package that supplies node", fetchable=False)
+    py = plan.prepare(reg, group, offline=offline, command="toolchain add")
+    done = subprocess.run([str(py), "-c", "from agora.lib import node; print(node.wheel_node() or '')"], capture_output=True,
+                          text=True, env={**env, "PYTHONPATH": str(home / "tools"), "PYTHONDONTWRITEBYTECODE": "1"})
+    path = done.stdout.strip()
+    if done.returncode != 0 or not path:
+        raise ToolchainError(f"the locked environment of group {group} holds no node: {done.stderr.strip()[-300:]}", fetchable=False)
+    return path

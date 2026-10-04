@@ -65,14 +65,18 @@ class Parser(unittest.TestCase):
     def test_reads_refuse_dry_run(self):
         self.assertEqual(run(["spec", "show", "0020", "--dry-run"])[0], 2)
 
-    def test_a_missing_program_is_exit_3_with_the_hint(self):
+    def test_a_toolchain_entry_that_cannot_be_had_is_exit_3_naming_it_and_the_override(self):
+        from unittest import mock
+        from agora.core import toolchain
         reg = Registry.load(HOME)
-        reg.add_command(Command(("spec", "status"), "read", "x", programs=("no-such-program-xyz",), group="spec",
+        reg.add_command(Command(("spec", "status"), "read", "x", toolchain=("no-such-tool",), group="spec",
                                 fn=lambda ctx: Resource("x", "y")))
-        reg.groups["spec"].programs["no-such-program-xyz"] = {"hint": "install it from the host"}
-        code, doc = run_json(["spec", "status"], registry=reg)
-        self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
-        self.assertEqual(doc["data"]["hint"], "install it from the host")
+        nobuild = toolchain.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
+        with mock.patch.object(toolchain, "discover", lambda: {"no-such-tool": nobuild}):
+            code, doc = run_json(["spec", "status"], registry=reg)
+        self.assertEqual((code, doc["data"]["code"]), (3, "toolchain"))
+        self.assertIn("no-such-tool 1.0", doc["data"]["message"])
+        self.assertIn("AGORA_NO_SUCH_TOOL", doc["data"]["message"])
 
     def test_an_unexpected_exception_is_an_error_resource_not_a_trace(self):
         reg = Registry.load(HOME)

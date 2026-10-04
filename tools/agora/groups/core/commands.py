@@ -16,8 +16,8 @@ from typing import Any
 
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
-from agora.core import generate, plan
-from agora.core.checks import changed_paths, find_program, section_changed
+from agora.core import generate, plan, system
+from agora.core.checks import changed_paths, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
 from agora.core.mcp import Server
@@ -236,25 +236,55 @@ def doctor(ctx: Ctx) -> Resource:
         groups.append({"group": g.name, "packages": [f"{k}=={v}" for k, v in sorted(g.packages.items())] or "none",
                        "lock": ("ok" if g.packages and not lp else "problem" if lp else "none needed"),
                        "in cache": in_cache or "n/a", "plan": plan.plan_for(reg, g.name).describe()})
-    programs = []
+    # The toolchain lock (0025 FR-015 to FR-021): each entry's cache state on this platform, the commands that need it, the
+    # browser's system libraries and every opt-in override that is set (FR-019). An entry not yet fetched is not a fault:
+    # a command that needs it fetches it on first use.
+    tc = ctx.toolchain()
+    needed_by: dict[str, list[str]] = {}
+    for c in reg.commands.values():
+        for n in c.toolchain:
+            needed_by.setdefault(n, []).append(c.id)
+    for sec in reg.sections.values():
+        for n in sec.toolchain:
+            needed_by.setdefault(n, []).append(f"check {sec.name}")
     for g in reg.groups.values():
-        for prog, spec in sorted(g.programs.items()):
-            path = find_program(reg, prog, ctx.env)
-            programs.append({"program": prog, "group": g.name, "needed by": spec.get("needed_by", []), "present": bool(path),
-                             "path": path or "", "hint": spec.get("hint", "")})
-            if not path:
-                missing.append(prog)
-    # An opt-in override stands in for a package or an entry the person names (0025 FR-019): doctor lists each one that is set.
-    overrides = [{"entry": "node", "variable": node.OVERRIDE, "path": node.override(ctx.env),
-                  "present": bool(node.override(ctx.env) and Path(node.override(ctx.env)).is_file())}
-                 for _ in [0] if node.override(ctx.env)]
+        for kind, label in (("runners", "check design-systems --runner"), ("harnesses", "check design-systems")):
+            for key, spec in g.manifest.get(kind, {}).items():
+                for n in spec.get("toolchain", []):
+                    needed_by.setdefault(n, []).append(f"{label} {key.replace(':', ' ')}" if kind == "harnesses" else f"{label} {key}")
+    for gen in reg.generators.values():
+        for n in gen.toolchain:
+            needed_by.setdefault(n, []).append(f"fresh {gen.name}")
+    toolchain_rows = []
+    for e in tc.entries.values():
+        state = tc.state(e)
+        hint = (f"fetched on first use, or `{reg.name} toolchain add {e.name}`" if state == "missing" else
+                f"set {e.variable} to a program of your own" if state == "no build" else "")
+        toolchain_rows.append({"entry": e.name, "version": e.version, "platform": tc.platform,
+                               "cache": "ready" if state == "ready" else "not fetched" if state == "missing" else state,
+                               "needed by": sorted(needed_by.get(e.name, [])), "hint": hint})
+        if state == "no build":
+            missing.append(e.name)
+    fam, libs = system.family(), system.needed(tc.entries, tc.platform)
+    gone = system.missing(libs, fam)
+    libraries = {"distribution": fam.label, "pinned list": "yes" if fam.packages else "none",
+                 "missing": [f"{lib} ({pkg or 'no package listed'})" for lib, pkg in gone],
+                 "hint": f"run `{reg.name} system add` once (it asks before sudo; --dry-run prints what it runs)" if gone else ""}
+    if gone:
+        missing.append("browser system libraries")
+    # An opt-in override stands in for an entry or a package the person names (0025 FR-019): doctor lists each one that is set.
+    overrides = [{"entry": e.name, "variable": e.variable, "path": str(p), "present": p.exists()} for e, p in tc.overrides()]
+    if node.override(ctx.env):
+        overrides.append({"entry": "node", "variable": node.OVERRIDE, "path": node.override(ctx.env),
+                          "present": Path(node.override(ctx.env)).is_file()})
     status = "failed" if problems else "missing" if missing else "ok"
-    data = {"status": status, "prerequisites": prereq, "groups": groups, "programs": programs, "overrides": overrides,
+    data = {"status": status, "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows, "system libraries": libraries,
+            "toolchain cache": str(tc.cache), "overrides": overrides,
             "conflicts": problems, "missing": missing, "offline": ctx.offline,
             "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)
     res.columns["prerequisites"] = ["name", "present", "version", "hint"]
-    res.columns["programs"] = ["program", "group", "needed by", "present", "hint"]
+    res.columns["toolchain"] = ["entry", "version", "cache", "needed by", "hint"]
     res.columns["overrides"] = ["entry", "variable", "path", "present"]
     res.columns["groups"] = ["group", "packages", "lock", "in cache", "plan"]
     if problems or missing:
