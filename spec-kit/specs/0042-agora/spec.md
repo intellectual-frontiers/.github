@@ -84,6 +84,8 @@ design systems' own harnesses, and what CI runs.
     (build).
   - `toolchain`: `list`, `show ENTRY` (read); `add [ENTRY...]` (setup): the
     toolchain lock (FR-030; 0041-command-line FR-067).
+  - `system`: `list` (read); `add` (setup, `sudo`): the browser's system
+    libraries (FR-030; 0041-command-line FR-069).
   - `extension`: `show` (read); `build` (build): the IF Console extension's
     package (FR-032; 0043-if-console).
   - `proposal`: `list [--status]`, `show` (read); `new RESOURCE --reason
@@ -235,7 +237,10 @@ design systems' own harnesses, and what CI runs.
     TeX Live packages the harnesses need, pinned, supplying XeLaTeX, LuaLaTeX
     and latexmk), `chromium` (Playwright's pinned Chromium build, from the
     address Playwright publishes it at), and the npm lock (`package.json` and
-    `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`.
+    `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`. The browser's Linux system libraries are installed
+  once by the `system` noun's `add` (0041-command-line FR-069), whose package
+  list for Debian and Ubuntu is pinned in `agora`'s code, and which the
+  README documents.
   The list is confirmed by the change that implements it (OQ-2).
 ## Surfaces
 
@@ -360,8 +365,8 @@ design systems' own harnesses, and what CI runs.
   copy is not used, the locked one is, per FR-030 and 0025-tooling-environment
   FR-019.
 - A Linux host without a library Chromium links against: the browser sections
-  fail with exit status 3 naming each library and `agora` installs nothing, per
-  FR-030 and 0025-tooling-environment FR-021.
+  fail with exit status 3 naming each library and the setup command, and
+  `agora` installs nothing itself, per FR-030 and 0025-tooling-environment FR-021.
 - A workflow that runs `apt-get`, sets up Node, or runs in a container image:
   `agora check toolchain` fails, per FR-013 and FR-022.
 - An agent asked to set a spec's status: the command is a `decision` command

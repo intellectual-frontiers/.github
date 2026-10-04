@@ -1019,6 +1019,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-066	none	-	the toolchain is not built; agora doctor and agora test will check the declaration (0042 FR-030)
 0041-command-line FR-067	none	-	the toolchain noun is not built; agora check commands will compare it with the ontology once it is
 0041-command-line FR-068	none	-	agora check toolchain will fail an incomplete entry; not built yet (0042 FR-013)
+0041-command-line FR-069	none	-	the system noun is not built; agora test will drive it with a stand-in sudo and check --dry-run and the refusal over MCP
 0042-agora FR-030	none	-	the toolchain and the package replacements are not built; agora doctor will report them (OQ-2)
 0042-agora FR-031	none	-	agora has no editor views declared yet (OQ-3); IF Console tests the extension side (0043 FR-028)
 0042-agora FR-032	none	-	.if-console.env and agora extension build are not built; agora check extension will check them

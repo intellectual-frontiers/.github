@@ -73,8 +73,9 @@ command set is 0042-agora.
   that supplies it, and a hint MUST name only that package or entry
   (0025-tooling-environment FR-012). A command whose entry cannot be obtained
   (offline with a cold cache, or no build for the platform) MUST fail with an
-  error resource that says what is missing; the one thing it may ask a person
-  to install is what 0025-tooling-environment FR-021 names.
+  error resource that says what is missing; the one
+  thing it may ask a person to install is what 0025-tooling-environment FR-021
+  names, through the `system` noun's `add` (FR-069).
 
 ## The registry and the grammar
 
@@ -206,8 +207,7 @@ command set is 0042-agora.
   only; `setup` on neither. A command MAY narrow its default, and MAY widen a
   `setup` command to a surface by declaring it, but MUST NOT widen a
   `decision` command to MCP (FR-023). A `setup` command that needs
-  administrator rights (installing a package with the host's package manager)
-  MUST NOT be exposed over MCP.
+  administrator rights (FR-069) MUST NOT be exposed over MCP.
 - **FR-023**: A `decision` command MUST NOT be callable over MCP. The MCP
   server MUST NOT list one, MUST refuse a call that names one, and no
   declaration, option or environment variable MAY change that. An agent that
@@ -342,7 +342,8 @@ command set is 0042-agora.
   cache for the host's platform (absent, fetched and verified, or unavailable
   for the platform), every opt-in override that is set
   (0025-tooling-environment FR-019), and the system libraries a browser entry
-  needs (0025-tooling-environment FR-021), with hints (FR-006). It MUST also
+  needs (0025-tooling-environment FR-021), with hints (FR-006) that name the
+  `system` noun's `add` for a missing library. It MUST also
   check the registry and fail on any conflict: two commands with one name; two
   toolchain entries with one name (FR-066); a command in two groups; a type
   declared twice with different meanings; a non-isolated invocation whose plan
@@ -483,7 +484,7 @@ command set is 0042-agora.
   toolchain entry (FR-066), not from a kit a person installs.
 - **FR-059**: Retired. The only fetch an orchestrator makes is of a toolchain
   entry into the toolchain cache (0025-tooling-environment FR-017), and it
-  uses no package manager and no `sudo`.
+  uses no package manager and no `sudo` (the one `sudo` command is FR-069).
 - **FR-060**: Retired. `doctor` prints the version of each toolchain entry
   and package (FR-029).
 - **FR-061**: A repository's launcher MUST run from the editor only when the
@@ -535,6 +536,16 @@ command set is 0042-agora.
   `check` MUST fail on an entry whose fields are incomplete, whose address is
   not `https`, whose version is a range or a floating tag, or that lacks the
   platform `linux-x86_64` (0025-tooling-environment FR-020).
+- **FR-069**: An orchestrator whose toolchain has a browser entry MUST have the
+  noun `system`, with `list` (`read`: the pinned packages for the host's
+  distribution family and which are present) and `add` (`setup`: installs the
+  missing ones with the host's package manager through `sudo`). `add` is the
+  only command that may run `sudo`. It MUST print exactly the commands it will
+  run, take `--dry-run` (FR-015) that prints them and runs nothing, ask the
+  person before running `sudo`, refuse to run under MCP (FR-022) and be run by
+  no other command. The package lists are pinned per distribution family in
+  the orchestrator's code (FR-046): `apt` on Debian and Ubuntu at least, and on
+  another family `add` MUST say that no list exists and name the libraries.
 
 ## Out of scope
 
@@ -557,8 +568,8 @@ command set is 0042-agora.
 - A command needs a toolchain entry the cache lacks and the machine is online:
   it fetches and verifies it once, then runs, per FR-066 and FR-067.
 - A browser's system libraries are missing on Linux: the command fails with
-  exit status 3 naming each library, and nothing is installed, per FR-006 and
-  FR-021.
+  exit status 3 naming each library and the setup command, and installs
+  nothing, per FR-006, FR-021 and FR-069.
 - An agent asks to accept a proposal over MCP: the call is refused and the
   tool is not listed, per FR-023; the person advances it in the terminal or
   the editor, per FR-039.
