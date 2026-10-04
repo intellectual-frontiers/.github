@@ -19,18 +19,21 @@ from .resource import AgoraError, FAILED
 def needs_worker(ctx: Ctx, s: Section) -> bool:
     p = plan.plan_for(ctx.registry, s.group)
     mine = ctx.env.get("AGORA_PLAN_GROUP")
-    return s.isolated or (not p.stdlib and mine != s.group) or (p.stdlib and mine not in (None, "") and mine != s.group)
+    return (s.isolated and mine != s.group) or (not p.stdlib and mine != s.group) or (p.stdlib and mine not in (None, "") and mine != s.group)
 
 
-def run_section(ctx: Ctx, s: Section, scope: str | None) -> SectionResult:
+def run_section(ctx: Ctx, s: Section, scope: str | list[str] | None) -> SectionResult:
     p = plan.plan_for(ctx.registry, s.group)
     py = plan.prepare(ctx.registry, s.group, offline=ctx.offline, command=f"check {s.name}") if not p.stdlib else sys.executable
     argv = [str(py), "-m", "agora", "check", s.name, "--json", "--no-log"]
-    if scope:
-        argv += ["--scope", scope]
-    for flag in ("runner", "brand", "paragon"):
+    for one in [scope] if isinstance(scope, str) else scope or []:
+        argv += ["--scope", one]
+    for flag in ("runner", "brand", "paragon", "mode"):
         if ctx.section_options.get(flag) and f"--{flag}" in s.options:
             argv += [f"--{flag}", str(ctx.section_options[flag])]
+    for flag in ("draft", "spoken"):
+        if ctx.section_options.get(flag) and f"--{flag}" in s.options:
+            argv.append(f"--{flag}")
     if ctx.relocated:
         argv += ["--root", str(ctx.root)]
     if ctx.offline:

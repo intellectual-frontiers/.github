@@ -7,7 +7,7 @@ against the house voice. Its rules are [`spec.md`](spec.md); governed by
 
 | Path | What it is |
 | --- | --- |
-| `deck.py` | `python3 deck.py build DECK.md` writes the slides as HTML (`--inline` for one self-contained file, `--brand SLUG` for another brand); `python3 deck.py check DECK.md` reports every rule a deck breaks. Standard library only. |
+| `deck.py` | `python3 deck.py build DECK.md` writes the slides as HTML (`--inline` for one self-contained file, `--brand SLUG` for another brand); `python3 deck.py check DECK.md` reports every rule a deck breaks. Standard library only. In this repository: `agora deck build PATH [--inline] [--brand SLUG] [-o OUT]` and `agora check slides --scope PATH`. |
 | `css/slides.css` | The canvas, layouts, tones and type, colored only by the brand's theme roles. |
 | `js/deck.js` | The viewer: one slide at a time, scaled to the window; arrow keys, Home and End; N for speaker notes; P for every slide in order. |
 | `limits.json` | The words, points and slides a deck keeps to. |

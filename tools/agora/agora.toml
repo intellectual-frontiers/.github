@@ -4,7 +4,7 @@ name = "agora"
 audience = "public"
 # The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
 register_name = ".github"
-groups = ["core", "spec", "assurance", "brand", "decoration", "layout"]
+groups = ["core", "spec", "assurance", "brand", "decoration", "layout", "items"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
@@ -35,22 +35,6 @@ planned = []
 # planned, never as passed). A step that implements one moves it into its group's manifest.
 [planned.sections.ui]
 step = "ui"
-[planned.sections.figures]
-scope = "PATH"
-[planned.sections.voice]
-scope = "PATH"
-[planned.sections.slides]
-scope = "PATH"
-[planned.sections.email]
-scope = "PATH"
-[planned.sections.course]
-scope = "PATH"
-[planned.sections.media]
-scope = "PATH"
-[planned.sections.signage]
-scope = "PATH"
-[planned.sections.merchandise]
-scope = "PATH"
 
 # Generators declared (0042-agora FR-015) and not yet implemented: `fresh` names them as planned and proves nothing for them.
 [planned.generators.agent-skill]
@@ -72,13 +56,3 @@ help = "The files that tell an AI agent how to use agora, from the registry (004
 "design-system list" = "read"
 "design-system show" = "read"
 "design-system new" = "generate"
-"layout list" = "read"
-"layout show" = "read"
-"layout build" = "build"
-"figure build" = "build"
-"deck build" = "build"
-"email build" = "build"
-"media build" = "build"
-"sign build" = "build"
-"course show" = "read"
-"course build" = "build"

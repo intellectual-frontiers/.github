@@ -28,7 +28,8 @@ def problem(ctx: Ctx, text: str) -> str | None:
         values = cli.parse_values(home_ctx, cmd, rest)
         if cmd.id == "check":
             runner.validate_selection(home_ctx, values["sections"], values["suite"], values["scope"], values["runner"],
-                                      values["brand"], values["paragon"])
+                                      values["brand"], values["paragon"], mode=values["mode"], draft=values["draft"],
+                                      spoken=values["spoken"])
     except AgoraError as e:
         return f"{text!r}: {e.message}"
     return None

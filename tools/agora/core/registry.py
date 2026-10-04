@@ -56,6 +56,7 @@ class Opt:
     required: bool = False
     default: Any = None
     log: bool = True
+    alias: str = ""  # a short flag the script has for it, such as -o for --out
 
     @property
     def dest(self) -> str:
@@ -104,6 +105,7 @@ class Section:
     fn: Callable[..., Any] | None = None
     status: str = "implemented"
     step: str = ""
+    many: bool = False  # `--scope` may be given more than once, and the function receives a list (0042 FR-013)
 
 
 @dataclass
@@ -236,7 +238,8 @@ class Registry:
         for sname, s in m.get("sections", {}).items():
             self._add_section(Section(sname, s.get("help", ""), tuple(s.get("watch", ())), s.get("scope"),
                                       tuple(s.get("options", ())), tuple(s.get("programs", ())),
-                                      bool(s.get("relocatable", False)), bool(s.get("isolated", False)), g.name))
+                                      bool(s.get("relocatable", False)), bool(s.get("isolated", False)), g.name,
+                                      many=bool(s.get("scope_many", False))))
         for gname, gen in m.get("generators", {}).items():
             if gname in self.generators:
                 self.conflicts.append(f"generator {gname} is declared twice")

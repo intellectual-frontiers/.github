@@ -966,13 +966,13 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
 0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
 0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
-0042-agora FR-008	none	-	BRAND, PIECE, INK and GENERATOR now exist and agora test validates every type; LAYOUT and UI do not exist yet
+0042-agora FR-008	none	-	BRAND, PIECE, INK, LAYOUT and GENERATOR now exist and agora test validates each, and that a layout's alias resolves to its name; UI does not exist yet
 0042-agora FR-009	none	-	design-system new does not exist yet; agora test will check that it refuses
 0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
 0042-agora FR-011	check	.github: agora test	tests check environment set moves the pin and the image tag together, or neither
 0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
-0042-agora FR-013	check	.github: agora check commands	the declared sections, implemented or planned, are compared with this list
-0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; a section not implemented yet is named in planned, not run
+0042-agora FR-013	check	.github: agora check commands	the declared sections are compared with this list; agora test runs each item check against the design systems' passing and failing fixtures, with and without --scope, and checks that a scope holding nothing fails and a design system with no passing fixture is skipped
+0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; a section not implemented yet is named in planned, not run; agora test checks that no item check is in a suite
 0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, openedx-sources, print-layout-docs and profile-figure; agent-skill is declared planned and fresh names it as not proved until the agent files are generated
 0042-agora FR-016	check	.github: agora check commands	check commands fails on a script outside design-systems/ and tools/agora/, and on a workflow that calls another tool; the references in documentation and specs are a review
 0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review

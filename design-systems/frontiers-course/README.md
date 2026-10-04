@@ -7,8 +7,8 @@ platform. Its rules are [`spec.md`](spec.md); governed by
 
 | Path | What it is |
 | --- | --- |
-| `course.py` | `python3 course.py check COURSE_DIR` reports every rule a course breaks; `python3 course.py model COURSE_DIR` prints the model every delivery target is built from. Standard library only. |
-| `build.py` | `python3 build.py web COURSE_DIR -o DIR`, `olx COURSE_DIR -o OUT.tar.gz --org ORG`, `cmi5 COURSE_DIR -o OUT.zip --iri https://...`; each takes `--brand SLUG`. |
+| `course.py` | `python3 course.py check COURSE_DIR` reports every rule a course breaks; `python3 course.py model COURSE_DIR` prints the model every delivery target is built from. Standard library only. In this repository: `agora course show PATH` and `agora check course --scope PATH`. |
+| `build.py` | `python3 build.py web COURSE_DIR -o DIR`, `olx COURSE_DIR -o OUT.tar.gz --org ORG`, `cmi5 COURSE_DIR -o OUT.zip --iri https://...`; each takes `--brand SLUG`. In this repository: `agora course build PATH --target web -o DIR`, `--target olx --org ORG -o OUT.tar.gz`, `--target cmi5 --iri https://... -o OUT.zip`; each takes `--brand`, and `--dry-run` shows what would change. |
 | `web/`, `web.json` | The web edition's stylesheet, in-browser grading (`quiz.js`), cmi5 runtime (`cmi5.js`), fonts, and its theme roles. |
 | `adoc.py` | The AsciiDoc subset a course is written in, read and rendered without Asciidoctor; anything outside it is refused. |
 | `schema/course.schema.json` | The model, as JSON Schema 2020-12. |

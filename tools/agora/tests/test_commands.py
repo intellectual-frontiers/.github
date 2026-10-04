@@ -149,7 +149,7 @@ class OtherCommands(unittest.TestCase):
         code, doc = run_json(["command", "list", "--status", "implemented"])
         ids = [c["id"] for c in doc["data"]["commands"]]
         self.assertIn("check", ids)
-        self.assertNotIn("course show", ids)
+        self.assertNotIn("design-system list", ids)
         self.assertIn("brand list", ids)
         code, doc = run_json(["command", "list", "--category", "decision"])
         self.assertEqual([c["id"] for c in doc["data"]["commands"]], ["ink record", "proposal advance", "spec set"])
