@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """frontiers-media's assurance harness (spec FR-013): formats.json holds together; under every brand here, every
-tone's text roles meet 4.5:1, every job in fixtures/pass/ passes media.py check and renders (where rsvg-convert is
-installed) to a PNG of its format's size, transparent where the format is; every job in fixtures/fail/ is refused
-for the reason fixtures/expected.json names; and the ontology registers this design system.
+tone's text roles meet 4.5:1, every job in fixtures/pass/ passes media.py check and renders (where the resvg-py
+package is installed) to a PNG of its format's size, transparent where the format is; every job in fixtures/fail/ is
+refused for the reason fixtures/expected.json names; and the ontology registers this design system.
 
     python3 assurance/run.py
 
-Needs Pillow; rendering needs rsvg-convert.
+Needs the Python package Pillow; rendering needs resvg-py (`pip install Pillow resvg-py`).
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
-import shutil
 import struct
 import sys
 import tempfile
@@ -54,7 +54,7 @@ def run_brand(brand: Path) -> Result:
         for role in ("text", "kicker", "byline"):
             ratio = media.contrast(media.color(roles[role], tokens), bg)
             r.check(ratio >= media.DATA["min_contrast"], f"{tone} tone: {role} is {ratio:.2f}:1 under {brand.name} (FR-006)")
-    render = shutil.which("rsvg-convert")
+    render = importlib.util.find_spec("resvg_py") is not None
     with tempfile.TemporaryDirectory() as tmp:
         for path in sorted((HERE / "fixtures" / "pass").glob("*.json")):
             job = json.loads(path.read_text(encoding="utf-8"))
@@ -78,7 +78,7 @@ def run_brand(brand: Path) -> Result:
         want = expected.get(path.name, "")
         r.check(bool(want) and any(want in p for p in problems), f"fail/{path.name} should be refused for {want!r} under {brand.name}; it reported: {'; '.join(problems) or 'nothing'}")
     if not render:
-        print(f"     · rsvg-convert is not installed; assets were checked, not rendered")
+        print("     · resvg-py is not installed; assets were checked, not rendered")
     return r
 
 

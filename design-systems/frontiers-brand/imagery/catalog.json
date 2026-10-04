@@ -1,5 +1,5 @@
 {
-  "$description": "frontiers-brand's imagery pool (0014-design-systems FR-043; frontiers-brand FR-015): every approved piece of artwork a design system it themes may choose from, what each shows and can stand for, and its files. Which work uses which piece is that work's own record, never this file's. Checked by tools/brand_imagery.py check.",
+  "$description": "frontiers-brand's imagery pool (0014-design-systems FR-043; frontiers-brand FR-015): every approved piece of artwork a design system it themes may choose from, what each shows and can stand for, and its files. Which work uses which piece is that work's own record, never this file's. Checked by `agora check imagery`.",
   "fields": {
     "id": "stable slug, environment first and then the anchor; the master's file name without .png",
     "name": "a short human name",
@@ -17,7 +17,7 @@
     "source": "where the approved piece came from",
     "pixel_size": "[width, height] of the master",
     "content_box": "[left, top, right, bottom] pixel bounds of the drawn art (alpha > 16); a renderer that needs the art alone trims to it",
-    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by tools/brand_imagery.py build"
+    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by `agora imagery build`"
   },
   "environments": [
     "mountain-alpine",
@@ -1331,6 +1331,737 @@
         },
         {
           "file": "web/mountain-dam-sluice-gates-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "alpine-lake-cabin-and-dock",
+      "name": "Alpine Lake Cabin and Dock",
+      "file": "alpine-lake-cabin-and-dock.png",
+      "environment": "mountain-alpine",
+      "description": "A log cabin with a smoking chimney sits above a deep alpine lake under a glaciated range. A fenced foot trail with a signpost winds down through boulders to the shore, where a small dock and rowboat wait; the lake spills out through a cascading stream in the foreground.",
+      "visual_anchor": "red-roofed cabin above a still alpine lake",
+      "route": "fenced foot trail with a signpost, winding from the foreground down to the cabin and lakeshore",
+      "built_structures": [
+        "log cabin with chimney",
+        "split-rail fence",
+        "signpost",
+        "boat dock",
+        "rowboat",
+        "campfire ring"
+      ],
+      "infrastructure_type": [
+        "dwelling",
+        "trail",
+        "dock"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "signpost",
+        "cabin roof and walls",
+        "dock",
+        "rowboat",
+        "lake",
+        "outlet stream"
+      ],
+      "water": {
+        "present": true,
+        "form": "alpine lake with a cascading outlet stream"
+      },
+      "metaphors": [
+        "establishing a base at the edge of the known",
+        "a durable home in hard country",
+        "settling in for sustained work",
+        "stewardship"
+      ],
+      "suggested_subjects": [
+        "building durable operating capability",
+        "organizational culture",
+        "long-term stewardship",
+        "small-team operations"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        6,
+        2,
+        1445,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/alpine-lake-cabin-and-dock-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/alpine-lake-cabin-and-dock-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "canyon-river-homestead",
+      "name": "Canyon River Homestead",
+      "file": "canyon-river-homestead.png",
+      "environment": "desert-canyon",
+      "description": "A fenced trail with a signpost descends a boulder-strewn canyon wall toward a homestead on a river bend: ranch house, barn, corral with horses, a covered wagon, and a timber gate arch. Sheer mesas and a long canyon recede behind it.",
+      "visual_anchor": "homestead and corral on a river bend inside a deep canyon",
+      "route": "fenced foot trail with a signpost, descending the canyon wall to the homestead",
+      "built_structures": [
+        "ranch house",
+        "barn",
+        "corral",
+        "covered wagon",
+        "gate arch",
+        "split-rail fence",
+        "signpost"
+      ],
+      "infrastructure_type": [
+        "homestead",
+        "trail",
+        "fencing"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "signpost",
+        "homestead buildings",
+        "corral",
+        "wagon",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "river winding through the canyon floor"
+      },
+      "metaphors": [
+        "making a living in hard country",
+        "settling beside the resource that sustains you",
+        "the long way down to where the work happens",
+        "founding"
+      ],
+      "suggested_subjects": [
+        "founding a company",
+        "entering a difficult market",
+        "small-business operations",
+        "rural or regional institutions"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        10,
+        15,
+        1440,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/canyon-river-homestead-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/canyon-river-homestead-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "badlands-ranch-windmill",
+      "name": "Badlands Ranch and Windmill",
+      "file": "badlands-ranch-windmill.png",
+      "environment": "badlands-plains",
+      "description": "A wagon-rutted dirt road runs from an open timber gate across dry badlands to a ranch: house, windmill, water tank, fenced pasture with grazing horses. A pond and creek run beside the road; mesas and eroded bluffs fill the horizon.",
+      "visual_anchor": "windmill and ranch house on open badlands",
+      "route": "wagon-rutted dirt road through a gate, running across open country to the ranch",
+      "built_structures": [
+        "ranch house",
+        "windmill",
+        "water tank",
+        "timber gate",
+        "pasture fence"
+      ],
+      "infrastructure_type": [
+        "ranch",
+        "road",
+        "water pumping"
+      ],
+      "colored_elements": [
+        "road",
+        "gate",
+        "fences",
+        "ranch house",
+        "windmill",
+        "horses",
+        "pond",
+        "creek"
+      ],
+      "water": {
+        "present": true,
+        "form": "pond and creek beside the road"
+      },
+      "metaphors": [
+        "making open, dry country productive",
+        "patient operating economics",
+        "the long road out to where the value is",
+        "steady yield from hard land"
+      ],
+      "suggested_subjects": [
+        "operations and unit economics",
+        "small-business management",
+        "rural health",
+        "long-cycle businesses"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        4,
+        14,
+        1448,
+        1080
+      ],
+      "web": [
+        {
+          "file": "web/badlands-ranch-windmill-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/badlands-ranch-windmill-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "alpine-lakeshore-landing",
+      "name": "Alpine Lakeshore Landing",
+      "file": "alpine-lakeshore-landing.png",
+      "environment": "mountain-alpine",
+      "description": "A lakeside trail with a signpost leads past a cabin to a lantern-lit landing with a moored rowboat on a long alpine lake. Glaciated peaks rise across the water.",
+      "visual_anchor": "lantern-lit landing on a long alpine lake",
+      "route": "lakeshore foot trail with a signpost, ending at a cabin and landing",
+      "built_structures": [
+        "cabin with chimney",
+        "landing with lantern",
+        "rowboat",
+        "fence",
+        "signpost"
+      ],
+      "infrastructure_type": [
+        "dwelling",
+        "dock",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "signpost",
+        "fence",
+        "cabin",
+        "landing",
+        "lantern",
+        "rowboat",
+        "lake"
+      ],
+      "water": {
+        "present": true,
+        "form": "long alpine lake"
+      },
+      "metaphors": [
+        "arrival",
+        "a place to launch from",
+        "readiness for the next crossing",
+        "the edge of a larger body you have not yet crossed"
+      ],
+      "suggested_subjects": [
+        "transitions",
+        "starting out",
+        "leadership handoffs",
+        "career decisions"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        2,
+        1,
+        1445,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/alpine-lakeshore-landing-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/alpine-lakeshore-landing-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "old-growth-forest-cabin",
+      "name": "Old-Growth Forest Cabin",
+      "file": "old-growth-forest-cabin.png",
+      "environment": "forest",
+      "description": "Among enormous old-growth trunks and ferns, a trail with a signpost crosses a timber footbridge over a stream below a waterfall and climbs to a lit cabin with a stone chimney on a rocky outcrop.",
+      "visual_anchor": "cabin on an outcrop among giant trees",
+      "route": "fenced foot trail with a signpost, crossing a footbridge and climbing to a cabin",
+      "built_structures": [
+        "cabin with stone chimney",
+        "timber footbridge",
+        "fence",
+        "signpost"
+      ],
+      "infrastructure_type": [
+        "dwelling",
+        "footbridge",
+        "trail"
+      ],
+      "colored_elements": [
+        "trail",
+        "signpost",
+        "fence",
+        "footbridge",
+        "cabin",
+        "waterfall and stream"
+      ],
+      "water": {
+        "present": true,
+        "form": "waterfall and forest stream"
+      },
+      "metaphors": [
+        "the scale and age of the system you enter",
+        "patient growth",
+        "a shelter among giants",
+        "stewardship of something older than you"
+      ],
+      "suggested_subjects": [
+        "legacy systems",
+        "institutions",
+        "family business and succession",
+        "long-term stewardship"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        8,
+        0,
+        1448,
+        1078
+      ],
+      "web": [
+        {
+          "file": "web/old-growth-forest-cabin-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/old-growth-forest-cabin-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "gorge-railway-arch-bridge",
+      "name": "Gorge Railway Arch Bridge",
+      "file": "gorge-railway-arch-bridge.png",
+      "environment": "mountain-alpine",
+      "description": "A steam train crosses a red iron arch bridge on stone piers above a waterfall gorge, pulling away from a lit mountain station with a signal flag. A fenced trail curves up to the station through boulders and conifers.",
+      "visual_anchor": "iron arch railway bridge over a waterfall gorge",
+      "route": "fenced foot trail curving up to the station; the railway spans the gorge on an iron arch",
+      "built_structures": [
+        "railway station",
+        "iron arch bridge",
+        "stone piers",
+        "steam train",
+        "signal flag",
+        "lantern"
+      ],
+      "infrastructure_type": [
+        "railway",
+        "bridge",
+        "station"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "station",
+        "arch bridge",
+        "train",
+        "flag",
+        "waterfall and river"
+      ],
+      "water": {
+        "present": true,
+        "form": "waterfall and gorge river"
+      },
+      "metaphors": [
+        "an engineered span over a hard gap",
+        "reliability",
+        "commitment to a route",
+        "infrastructure that outlasts its builders"
+      ],
+      "suggested_subjects": [
+        "infrastructure",
+        "capital projects",
+        "systems architecture",
+        "reliability engineering"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        8,
+        42,
+        1445,
+        1082
+      ],
+      "web": [
+        {
+          "file": "web/gorge-railway-arch-bridge-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/gorge-railway-arch-bridge-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "canyon-aqueduct-mill",
+      "name": "Canyon Aqueduct and Mill",
+      "file": "canyon-aqueduct-mill.png",
+      "environment": "desert-canyon",
+      "description": "A stone aqueduct on tall arches carries a water channel with timber sluice gates across a canyon to a stone mill house with a water wheel. A stone stairway trail with a fence climbs to the mill; a river runs through the gorge below; mesas beyond.",
+      "visual_anchor": "arched stone aqueduct crossing a canyon",
+      "route": "fenced stone stairway and trail climbing to the mill; the aqueduct carries water across the canyon",
+      "built_structures": [
+        "arched stone aqueduct",
+        "water channel",
+        "sluice gates",
+        "stone mill house",
+        "water wheel",
+        "lantern post",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "aqueduct",
+        "mill",
+        "water control"
+      ],
+      "colored_elements": [
+        "trail and stairs",
+        "fence",
+        "lantern",
+        "mill house roof",
+        "sluice gates",
+        "wheel",
+        "aqueduct water",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "aqueduct channel and canyon river"
+      },
+      "metaphors": [
+        "carrying a resource across terrain to where it can be used",
+        "delivery",
+        "infrastructure that turns supply into value",
+        "patient engineering"
+      ],
+      "suggested_subjects": [
+        "revenue operations",
+        "delivery and distribution",
+        "infrastructure",
+        "public works"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        10,
+        65,
+        1444,
+        1058
+      ],
+      "web": [
+        {
+          "file": "web/canyon-aqueduct-mill-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/canyon-aqueduct-mill-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-penstock-powerhouse",
+      "name": "Mountain Penstock and Powerhouse",
+      "file": "mountain-penstock-powerhouse.png",
+      "environment": "mountain-alpine",
+      "description": "A riveted penstock pipe runs down a forested slope on stone piers from a hillside intake to a lit powerhouse, whose tailrace arches release water into a rapid river. A fenced switchback trail descends beside it; a timber footbridge and utility poles lead away.",
+      "visual_anchor": "penstock pipe descending to a riverside powerhouse",
+      "route": "fenced switchback trail descending beside the penstock to the powerhouse",
+      "built_structures": [
+        "water intake",
+        "penstock pipe on piers",
+        "powerhouse",
+        "tailrace arches",
+        "timber footbridge",
+        "utility poles"
+      ],
+      "infrastructure_type": [
+        "hydroelectric plant",
+        "pipeline",
+        "power line"
+      ],
+      "colored_elements": [
+        "trail",
+        "fence",
+        "intake",
+        "penstock",
+        "powerhouse",
+        "utility poles",
+        "lights",
+        "river"
+      ],
+      "water": {
+        "present": true,
+        "form": "intake flow and whitewater river"
+      },
+      "metaphors": [
+        "converting a natural gradient into power",
+        "harnessing force",
+        "energy for a whole valley",
+        "leverage"
+      ],
+      "suggested_subjects": [
+        "AI leverage",
+        "energy",
+        "capacity building",
+        "platforms"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        3,
+        8,
+        1445,
+        1077
+      ],
+      "web": [
+        {
+          "file": "web/mountain-penstock-powerhouse-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-penstock-powerhouse-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "coastal-causeway-lighthouse",
+      "name": "Coastal Causeway Lighthouse",
+      "file": "coastal-causeway-lighthouse.png",
+      "environment": "maritime-coastal",
+      "description": "A fenced stone causeway on arches, lit by lamp posts, runs across breaking surf and rocks to a lighthouse, keeper's house, and signal mast with flags on a rocky islet. Fogged sea cliffs and forest line the coast behind.",
+      "visual_anchor": "lamp-lit causeway to a lighthouse islet",
+      "route": "fenced causeway with lamp posts, crossing the surf to the lighthouse islet",
+      "built_structures": [
+        "arched stone causeway",
+        "lamp posts",
+        "lighthouse",
+        "keeper's house",
+        "signal mast with flags",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "causeway",
+        "navigation aid",
+        "signal station"
+      ],
+      "colored_elements": [
+        "causeway rail",
+        "lamps",
+        "lighthouse",
+        "keeper's house",
+        "signal flags",
+        "sea"
+      ],
+      "water": {
+        "present": true,
+        "form": "ocean surf around a rocky islet"
+      },
+      "metaphors": [
+        "a continuous safe path across broken ground",
+        "signaling",
+        "a guided approach",
+        "reaching an outpost through hazards"
+      ],
+      "suggested_subjects": [
+        "navigation",
+        "communication",
+        "safety",
+        "guidance and advising"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        12,
+        118,
+        1431,
+        1074
+      ],
+      "web": [
+        {
+          "file": "web/coastal-causeway-lighthouse-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/coastal-causeway-lighthouse-1448.webp",
+          "width": 1448,
+          "height": 1086
+        }
+      ]
+    },
+    {
+      "id": "mountain-road-tunnel-viaduct",
+      "name": "Mountain Road Tunnel and Viaduct",
+      "file": "mountain-road-tunnel-viaduct.png",
+      "environment": "mountain-alpine",
+      "description": "A fenced road climbs in switchbacks on massive stone retaining walls to a lit tunnel portal, while a stone viaduct crosses the gorge beside a waterfall. A small timber shelter with a lamp stands at the foot of the road.",
+      "visual_anchor": "switchback road climbing to a tunnel beside a viaduct",
+      "route": "fenced switchback road on retaining walls, entering a tunnel; a viaduct crosses the gorge",
+      "built_structures": [
+        "switchback road",
+        "stone retaining walls",
+        "tunnel portal",
+        "arched stone viaduct",
+        "shelter",
+        "lamp",
+        "fence"
+      ],
+      "infrastructure_type": [
+        "road",
+        "tunnel",
+        "viaduct"
+      ],
+      "colored_elements": [
+        "road",
+        "fence",
+        "tunnel lights",
+        "shelter",
+        "lamp",
+        "waterfall and river"
+      ],
+      "water": {
+        "present": true,
+        "form": "waterfall and gorge river"
+      },
+      "metaphors": [
+        "an engineered route through impossible terrain",
+        "a sequence of hard problems solved in order",
+        "persistence",
+        "commitment to a long route"
+      ],
+      "suggested_subjects": [
+        "large programs",
+        "roadmaps",
+        "infrastructure",
+        "persistence through complexity"
+      ],
+      "source": {
+        "supplied": "2026-09-27",
+        "generator": "ChatGPT"
+      },
+      "pixel_size": [
+        1448,
+        1086
+      ],
+      "content_box": [
+        9,
+        4,
+        1440,
+        1086
+      ],
+      "web": [
+        {
+          "file": "web/mountain-road-tunnel-viaduct-724.webp",
+          "width": 724,
+          "height": 543
+        },
+        {
+          "file": "web/mountain-road-tunnel-viaduct-1448.webp",
           "width": 1448,
           "height": 1086
         }

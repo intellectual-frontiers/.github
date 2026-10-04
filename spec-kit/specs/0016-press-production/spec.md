@@ -90,8 +90,9 @@ is not stated here.
   true and its numbers agree with each other and with the text — and
   relevant to the section it sits in. No case MAY give invented events or
   statements to a real third party, and no case MAY name a real customer of
-  the company. A composite an AI wrote MUST be listed for the author's
-  review.
+  the company. The author's own organizations MAY appear in a case; the
+  series or book bible records where. A composite an AI wrote MUST be listed
+  for the author's review.
 - **FR-013**: A book MUST NOT knowingly include inaccurate information.
   Every factual claim MUST be true as stated or be labeled fact, inference,
   hypothesis, or illustrative composite. A myth or a misquoted figure MAY be
@@ -109,7 +110,9 @@ is not stated here.
   (0014-design-systems FR-048).
 - **FR-015**: A change that adds or edits a figure, table, or list MUST be
   verified by rebuilding the affected rendition and inspecting the rendered
-  pages, not only by a clean build.
+  pages, not only by a clean build. Before a final cut, the full rendered
+  book, cover and jacket pages included, MUST be read page by page by a
+  person; a clean build, or a check of the changed pages, is not that read.
 - **FR-016**: A chapter MUST NOT re-derive content that belongs in full to
   an appendix or prompt library elsewhere in the same work; it MUST point to
   it and MAY show one worked instance.
@@ -145,7 +148,11 @@ is not stated here.
   book's jacket data, or as an `ExternalRecordReference` to the agency's
   record — and any index of ISBNs MUST be a generated view, never a second
   live source. A final cut MUST be refused with a placeholder ISBN, and an
-  ISBN MUST NOT be invented or guessed.
+  ISBN MUST NOT be invented or guessed. An ebook distributed to a retailer
+  that requires an ISBN follows the same rule (an ISBN bought under the
+  imprint's own account, never a platform's or reseller's); an ebook sold
+  only where the retailer assigns its own identifier needs none. An ebook's
+  number is stated once, in the jacket data field `distribution.ebook_isbn`.
 - **FR-023**: A volume of a serial series MUST carry its series name and
   volume number on its cover in their own line, not inside the title, and
   anything that shows a title without the cover's layout MUST show the full
@@ -162,8 +169,11 @@ is not stated here.
   for distribution, MUST be cut as a review cut or a final cut, never an
   ordinary build, and MUST trace to the exact source commit it came from. A
   review cut MUST NOT overwrite an earlier one, and a final cut MUST be made
-  at most once per edition and printing. Each cut MUST have a delivery
-  record (0015-work-packages FR-017).
+  at most once per edition and printing. A final cut MUST also be refused
+  while an open issue is unsorted (FR-007), while any of the five gate groups
+  (FR-048) lacks a recorded check made after the manuscript last changed, and
+  without a passing release validation at the book's current commit. Each cut
+  MUST have a delivery record (0015-work-packages FR-017).
 - **FR-026**: Every authorship attribution MUST reflect whose work it is, not
   who ran the command. An AI that runs its own autonomous editorial or audit
   pass MUST be attributed to its own agent identity, never to a human, and
@@ -171,8 +181,15 @@ is not stated here.
 - **FR-027**: The following MUST remain a person's acts and MUST NOT be done
   by an agent: the publication decision and publish date, praise-quote
   outreach, commissioning and approving cover art, the vendor and ISBN
-  accounts, the AI-content disclosure a vendor requires, the print proof, and
-  a vendor's submission. An agent MAY draft any of them for the person.
+  accounts, the AI-content disclosure a vendor requires, the print proof, the
+  page-by-page read of the full rendered book before a final cut (FR-015), the
+  decision to accept, pursue, or negotiate an event partnership
+  (0009-press FR-024), writing or confirming a research record's basis
+  statement (0017-spoken-and-research-works FR-032), minting a DOI, deciding
+  a research record's licence or copyright holder
+  (0017-spoken-and-research-works FR-033), and a vendor's submission. An
+  agent MAY draft any of them for the person, except the page-by-page read,
+  which no draft stands in for.
 - **FR-028**: A praise quote MUST be real, from a named endorser actually
   contacted, and MUST NOT be drafted, paraphrased, or fabricated by an agent.
   Cover artwork MUST NOT be generated, altered, or approved by the production
@@ -241,7 +258,9 @@ is not stated here.
   present the live options side by side with what would make each right.
   Where the evidence is too thin for any recommendation, it MUST say so
   plainly and name the evidence that would resolve it, and MUST NOT fabricate
-  certainty.
+  certainty. A skill whose role, as its book defines it, is to draft,
+  reconcile and execute without deciding is exempt from the duty to conclude
+  and MUST say so in its front matter; 0009-press FR-017 governs it.
 - **FR-040**: A skill is a work of kind `skill` and a Substantial Work. It
   MUST be related to the concept it operationalizes by `schema:isBasedOn`
   (0007-work-and-assets FR-015) and MUST NOT reach a reader before the
@@ -287,6 +306,11 @@ is not stated here.
   decisions a person still owes, and who checks each category and surface
   live. A book keeps this as its distribution metadata; every other work
   keeps it beside its source. The brief is never a second copy of the work.
+  The brief MUST state how the work will be found and by whom. Promotion
+  MUST be deliberate and in good taste: no spam, manufactured urgency, or
+  inflated social proof. Whether, where, and how hard to promote is a
+  decision of the decision authority or the editor they name, and no quota
+  sets how much.
 - **FR-047**: Promotion MUST NOT outrun the work. A description, brief, or
   social text MUST NOT claim more than the work keeps, an epistemic label
   MUST survive into any text that summarizes a claim, and no promotion goal,
@@ -310,15 +334,17 @@ is not stated here.
   questions — what changed around the role, which old work is disappearing or
   commoditizing, which work stays valuable, what the person is now responsible
   for, and what the person does differently on Monday — and it is short by
-  design, so no length range applies to it and it MUST NOT be padded to reach
-  one. A chapter that bears on none of the five answers SHOULD be cut or moved
+  design, so no word-count, chapter-length, or page-count range applies to it
+  and it MUST NOT be padded to reach one; its chapter-count range still
+  applies. A chapter that bears on none of the five answers SHOULD be cut or moved
   to the companion. A format's series kicker MUST NOT be applied to a book of
   the other format.
 - **FR-050**: A term that more than one Press work uses MUST be defined once, in
   the ontology, and every work MUST use it as defined and MUST NOT redefine it
   locally. A term that only one work coins is defined in that work's book bible
   (FR-005). A human-readable glossary MAY be generated from the ontology and
-  MUST NOT be authored by hand. A work that appears to define a shared term
+  MUST NOT be authored by hand; the Press glossary is generated, and lives in
+  the vault at `ai-training/voice/shahid-shah/glossary.md`. A work that appears to define a shared term
   differently MUST be flagged for a person's decision, never silently
   reconciled.
 

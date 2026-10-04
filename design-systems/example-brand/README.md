@@ -21,4 +21,4 @@ To see a web design system in this brand, serve `design-systems/` and open
 `/frontiers-console-web/assurance/?brand=example-brand`, or run
 `node design-systems/frontiers-console-web/assurance/run.mjs --brand example-brand --shots <dir>`.
 
-`brand.css` and `brand.tex` are written from `tokens.json` by `tools/brand_theme.py`; edit `tokens.json` and run it, never the two files. `tools/brand_imagery.py build` writes the WebP files and the share card.
+`brand.css` and `brand.tex` are written from `tokens.json` by `agora brand generate`; edit `tokens.json` and run it, never the two files. `agora imagery build example-brand` writes the WebP files and the share card.

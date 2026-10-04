@@ -11,8 +11,10 @@ work's production pipeline keeps its own record.
 | `web/<id>-<width>.webp` | The master as WebP for the web, at half and full width. |
 | `catalog.json` | What each piece shows and can stand for, and its files. Its `fields` block defines every field. |
 
-`python3 tools/brand_imagery.py check design-systems/frontiers-brand` checks the pool;
-`build` writes the WebP files and the share card; `measure <png>` measures a candidate.
+`agora check imagery --scope frontiers-brand` checks the pool; `agora imagery list frontiers-brand` and
+`agora imagery show frontiers-brand/<id>` read it, with what each master measures; `agora imagery build frontiers-brand`
+writes the WebP files, the share card and the app icons; `agora imagery add frontiers-brand --master <png> ...` adds a
+piece (with `--dry-run`, it only measures the candidate).
 
 ## Choosing a piece
 
@@ -99,14 +101,16 @@ Accept it only if every answer is yes:
 - [ ] It sits on the same shelf as the pool's style and palette.
 - [ ] It is not a near-duplicate of a piece already here.
 - [ ] It is about 4:3 landscape.
-- [ ] `measure` reports real transparency and a colored share near the pool's 9–24%. Too high
+- [ ] `agora imagery add --dry-run` reports real transparency and a colored share near the pool's 9–24%. Too high
       usually means colored rock or foliage; too low, built things that came out gray.
 - [ ] The brand's owner has approved it.
 
 ## Adding it
 
-1. Name it environment first, then the anchor, lowercase with hyphens
-   (`river-delta-survey-tower`), and copy the approved PNG here as `<id>.png`, unchanged.
-2. Run `measure` and add a `catalog.json` entry with every field, describing what is drawn, not
-   what was asked for. A genuinely new kind of frontier adds a value to `environments`.
-3. Run `build`, then `check`, and fix everything `check` reports.
+1. Name the approved PNG environment first, then the anchor, lowercase with hyphens
+   (`river-delta-survey-tower.png`); its name without `.png` is the id.
+2. Run `agora imagery add frontiers-brand --master river-delta-survey-tower.png --name ... --environment ...` with every
+   field the catalog needs, describing what is drawn, not what was asked for. It copies the PNG here unchanged, measures it
+   and writes the `catalog.json` entry. A genuinely new kind of frontier adds a value to `environments` first.
+3. Run `agora imagery build frontiers-brand`, then `agora check imagery --scope frontiers-brand`, and fix everything
+   `check` reports.

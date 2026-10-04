@@ -13,22 +13,21 @@ It checks this design system's own data, then, under each brand:
   - every variant (default, on-dark, grayscale) gives every figure role a color, every text role
     reaches 4.5:1 and every graphic role 3:1 on every background role, and the themed figure
     parses with its stylesheet in place;
-  - where rsvg-convert is installed, a themed figure renders to PDF with the brand's font-sans
-    embedded and none other.
+  - where resvg-py is installed, a themed figure rendered with only the shipped fonts sets its text in them: it
+    differs from the same figure rendered with no font at all.
 
-Needs Python 3 and Pillow; rsvg-convert and pdffonts are optional. Exits non-zero on any failure.
+Needs Python 3 and the Python packages Pillow and fonttools; resvg-py is optional (`pip install Pillow fonttools
+resvg-py`). Exits non-zero on any failure.
 """
 from __future__ import annotations
 
 import argparse
 import base64
 import html
+import importlib.util
 import io
 import json
 import re
-import os
-import shutil
-import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
@@ -254,21 +253,16 @@ def run(brand: Path, keep: Path | None) -> Result:
                 key = ("700" if bold else "400", "italic" if 'font-style="italic"' in m.group(1) else "normal")
                 missing = {c for c in html.unescape(m.group(2)) if ord(c) not in cmaps.get(key, set())}
                 r.check(not missing, f"{p.name}: the embedded {key} face lacks {sorted(missing)} (FR-006)")
-        if shutil.which("rsvg-convert") and shutil.which("pdffonts"):
-            sample = root / "default" / figs[0].name
-            pdf = root / "sample.pdf"
-            # The renderer finds the shipped fonts through a fontconfig file of its own, not the machine's.
-            conf = root / "fonts.conf"
-            conf.write_text(f'<?xml version="1.0"?><fontconfig><dir>{SYSTEM / "fonts"}</dir>'
-                            f'<include ignore_missing="yes">/etc/fonts/fonts.conf</include><cachedir>{root / "fc-cache"}</cachedir></fontconfig>',
-                            encoding="utf-8")
-            done = subprocess.run(["rsvg-convert", "-f", "pdf", "-o", str(pdf), str(sample)], capture_output=True,
-                                  env={**os.environ, "FONTCONFIG_FILE": str(conf)})
-            r.check(done.returncode == 0, f"rsvg-convert could not render {sample.name}: {done.stderr.decode()[:200]}")
-            if done.returncode == 0:
-                fonts = {line.split()[0].split("+")[-1].split("-")[0] for line in subprocess.run(["pdffonts", str(pdf)], capture_output=True, text=True).stdout.splitlines()[2:]}
-                family = svgkit.FAMILIES[svgkit._family]["stem"]
-                r.check(fonts == {family}, f"the rendered figure embeds {sorted(fonts)}, not only {family} (install fonts/ where the renderer finds them)")
+        if importlib.util.find_spec("resvg_py"):
+            # The renderer is given the shipped fonts and no other (no font of the machine's): the figure's text shows
+            # only if its own sans is what sets it, so a render with no fonts at all differs from the render with them.
+            import resvg_py
+            sample = (root / "default" / figs[0].name).read_text(encoding="utf-8")
+            kw = {"svg_string": sample, "skip_system_fonts": True}
+            with_fonts = bytes(resvg_py.svg_to_bytes(font_dirs=[str(SYSTEM / "fonts")], **kw))
+            without = bytes(resvg_py.svg_to_bytes(**kw))
+            family = svgkit.FAMILIES[svgkit._family]["stem"]
+            r.check(with_fonts != without, f"the rendered figure sets no text in {family} (its text did not need fonts/, so a fallback face set it)")
     return r
 
 

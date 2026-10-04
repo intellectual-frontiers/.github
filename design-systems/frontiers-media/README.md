@@ -7,7 +7,7 @@ and social cards, themed by a brand with its imagery pool and lockup. Its rules 
 | Path | What it is |
 | --- | --- |
 | `formats.json` | Every asset type: size, safe margin, title range and limits, what it carries, and the two tones' roles. |
-| `media.py` | `python3 media.py render JOB.json -o OUT.png` lays out and renders an asset; `python3 media.py check JOB.json` reports every rule it breaks. Needs Pillow and rsvg-convert. |
+| `media.py` | `python3 media.py render JOB.json -o OUT.png` lays out and renders an asset; `python3 media.py check JOB.json` reports every rule it breaks. Needs the Python packages Pillow and resvg-py (`pip install Pillow resvg-py`); `agora` runs it in its locked environment. In this repository: `agora media build JOB.json` and `agora check media --scope JOB.json`. |
 | `fonts/` | Inter Regular and Bold, SIL OFL 1.1, to measure and set the text. |
 | `assurance/` | `python3 assurance/run.py`: every format rendered and checked under every brand, and jobs that must fail. |
 

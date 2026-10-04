@@ -1,5 +1,7 @@
-# Python bytecode caches. Running tools/spec_check.py (here, or from the vault's make check)
-# rewrites them, so a tracked one leaves the checkout dirty.
+# Python bytecode caches. Running agora rewrites them, so a tracked one leaves the checkout dirty.
 __pycache__/
 *.pyc
 node_modules/
+
+# agora's action logs: what is not worth a commit (0041-command-line FR-042, 0042-agora FR-021).
+.agora/logs/

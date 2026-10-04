@@ -1,0 +1,10 @@
+name = "layout"
+help = "The print design system's layouts: listed, shown, built to the file its class reads, and their generated documentation"
+
+[nouns.layout]
+help = "An article layout of the print design system, from its layouts.json (frontiers-print FR-006)"
+
+[generators.print-layout-docs]
+help = "The print design system's layout and typeface catalogs inside its Markdown, from latex/layouts.json and latex/typefaces.json"
+sources = ["design-systems/frontiers-print/latex/layouts.json", "design-systems/frontiers-print/latex/typefaces.json", "design-systems/frontiers-print/latex/layout.py"]
+outputs = ["design-systems/frontiers-print/docs/*.md"]

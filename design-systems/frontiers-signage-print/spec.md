@@ -43,8 +43,8 @@ from a short job as vector PDF at their trim size plus bleed, themed by a brand.
 
 ## Making and checking
 
-- **FR-010**: `signage.py render` MUST render a job to PDF with `rsvg-convert` through `fonts/`, embedding
-  only the brand's sans. The PDF is RGB; a printer that needs CMYK or PDF/X converts it.
+- **FR-010**: `signage.py render` MUST render a job to PDF, drawing the sign's layout with reportlab and embedding
+  only the brand's sans from `fonts/`. The PDF is RGB; a printer that needs CMYK or PDF/X converts it.
 - **FR-011**: `signage.py check` MUST report every rule here a job breaks, naming the requirement.
 - **FR-012**: A figure on a sign MUST be drawn with `frontiers-figures` and themed by the sign's brand
   (0014-design-systems FR-048).
@@ -54,7 +54,7 @@ from a short job as vector PDF at their trim size plus bleed, themed by a brand.
 - **FR-013**: `assurance/run.py` MUST check that `formats.json` holds no color and every bleed is at least
   3 mm; and, under every brand here, that each tone meets contrast, that a job of every format in
   `assurance/fixtures/pass/` passes the checks and renders to a one-page PDF of its trim plus bleed with
-  only the sans embedded (where `rsvg-convert` and poppler are installed), and that every job in
+  only the sans embedded (where the `reportlab` and `pypdf` packages are installed), and that every job in
   `assurance/fixtures/fail/` is refused for the reason `assurance/fixtures/expected.json` names.
 
 ## Out of scope

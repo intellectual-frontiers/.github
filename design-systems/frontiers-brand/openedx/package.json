@@ -2,7 +2,7 @@
   "name": "frontiers-brand-openedx",
   "version": "1.0.0",
   "private": true,
-  "description": "frontiers-brand's Open edX brand package, written by tools/brand_openedx.py from its tokens.json.",
+  "description": "frontiers-brand's Open edX brand package, written by `agora openedx generate` from its tokens.json.",
   "exports": {
     "./*": "./dist/*"
   },

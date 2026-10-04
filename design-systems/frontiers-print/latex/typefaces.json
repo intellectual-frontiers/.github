@@ -7,8 +7,12 @@
       "STIXTwoMath-Regular.otf"
     ],
     "sans": [
-      "Inter-Regular.otf",
+      "Inter-Regular.ttf",
       "STIXTwoMath-Regular.otf"
+    ],
+    "mono": [
+      "STIXTwoMath-Regular.otf",
+      "Inter-Regular.ttf"
     ]
   },
   "sets": {
@@ -29,7 +33,7 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".otf",
+        "ext": ".ttf",
         "regular": "Inter-Regular",
         "bold": "Inter-Bold",
         "italic": "Inter-Italic",
@@ -55,7 +59,7 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".otf",
+        "ext": ".ttf",
         "regular": "Inter-Regular",
         "bold": "Inter-Bold",
         "italic": "Inter-Italic",
@@ -81,7 +85,7 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".otf",
+        "ext": ".ttf",
         "regular": "Inter-Regular",
         "bold": "Inter-Bold",
         "italic": "Inter-Italic",
@@ -107,7 +111,7 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".otf",
+        "ext": ".ttf",
         "regular": "Inter-Regular",
         "bold": "Inter-Bold",
         "italic": "Inter-Italic",
@@ -133,7 +137,7 @@
       },
       "sans": {
         "dir": "house",
-        "ext": ".otf",
+        "ext": ".ttf",
         "regular": "Inter-Regular",
         "bold": "Inter-Bold",
         "italic": "Inter-Italic",

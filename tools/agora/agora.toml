@@ -1,0 +1,27 @@
+# agora's root manifest (0041-command-line FR-007; 0042-agora FR-001): the command line's name, its audience, its
+# command groups and its suites.
+name = "agora"
+audience = "public"
+# The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
+register_name = ".github"
+groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "agent", "vcs", "selftest"]
+logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
+proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
+
+# What the launcher needs from the host (0041 FR-001, FR-006). The hint names what supplies it.
+[prerequisites.uv]
+hint = "install uv (https://docs.astral.sh/uv/) from the host"
+[prerequisites.python3]
+hint = "install Python 3.11 or later from the host"
+
+# Suites (0041 FR-031; 0042 FR-014): the sections each runs. A section appears in no suite it does not belong to.
+[suites.spec]
+sections = ["specs", "register", "controls", "ontology", "toolchain", "commands"]
+[suites.browser]
+sections = ["design-systems", "openedx"]
+options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems; openedx takes no runner
+[suites.python]
+sections = ["design-systems"]
+options = { runner = "python" }
+[suites.images]
+sections = ["imagery"]
