@@ -161,7 +161,7 @@ class Selection(unittest.TestCase):
         self.assertEqual(doc["audience"], "public")
 
     def test_a_planned_section_never_passes(self):
-        for argv in (["check", "ui"], ["check", "figures"], ["check", "voice"]):
+        for argv in (["check", "ui"],):
             with self.subTest(argv=argv):
                 code, doc = run_json(argv)
                 self.assertEqual((code, doc["kind"], doc["data"]["code"]), (1, "error", "not-implemented"))
@@ -171,14 +171,15 @@ class Selection(unittest.TestCase):
         from agora.core.checks import SectionResult
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
-        for n in ("design-systems", "imagery", "openedx"):  # the harnesses have their own tests; this one proves the selection
+        for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
+                  "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
             reg.sections[n].programs = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 9)
-        self.assertIn("figures", [p["name"] for p in doc["data"]["planned"]])
+        self.assertEqual(doc["data"]["summary"]["run"], 17)
+        self.assertIn("ui", [p["name"] for p in doc["data"]["planned"]])
         self.assertNotIn("design-systems", [p["name"] for p in doc["data"]["planned"]])
 
     def test_scope_and_options_must_apply(self):

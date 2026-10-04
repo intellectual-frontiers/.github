@@ -1,7 +1,8 @@
 name = "layout"
-help = "The print design system's layouts: the generated documentation of them"
+help = "The print design system's layouts: listed, shown, built to the file its class reads, and their generated documentation"
 
-# `layout list`, `layout show` and `layout build` arrive here; the nouns are declared with the first command.
+[nouns.layout]
+help = "An article layout of the print design system, from its layouts.json (frontiers-print FR-006)"
 
 [generators.print-layout-docs]
 help = "The print design system's layout and typeface catalogs inside its Markdown, from latex/layouts.json and latex/typefaces.json"

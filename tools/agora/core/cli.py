@@ -202,7 +202,7 @@ def build_parser(cmd: Command) -> argparse.ArgumentParser:
             kw["default"] = o.default or []
         if o.type is not None:
             kw["metavar"] = o.type
-        p.add_argument(o.flag, **kw)
+        p.add_argument(o.flag, *([o.alias] if o.alias else []), **kw)
     return p
 
 

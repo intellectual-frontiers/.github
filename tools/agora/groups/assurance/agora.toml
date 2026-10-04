@@ -50,7 +50,7 @@ needed_by = ["check design-systems --runner python (frontiers-print)"]
 hint = "install poppler-utils from the host (the press persona carries it)"
 
 [programs.rsvg-convert]
-needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)", "decoration generate", "decoration show --measure"]
+needed_by = ["check design-systems --runner python (frontiers-figures, frontiers-media, frontiers-signage-print: rendering)", "decoration generate", "decoration show --measure", "media build", "sign build"]
 hint = "install librsvg (rsvg-convert) from the host (the press persona carries it)"
 
 [programs.convert]

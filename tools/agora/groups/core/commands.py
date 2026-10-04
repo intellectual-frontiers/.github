@@ -33,6 +33,7 @@ COMMAND = Dynamic("COMMAND", "a command's words, as `command list` shows them", 
 CATEGORY = Choice("CATEGORY", CATEGORIES, "a command category")
 STATUS_OF_COMMAND = Choice("COMMAND_STATUS", ("implemented", "planned"), "whether a command is implemented or only declared")
 GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
+VOICE_MODE = Choice("VOICE_MODE", ("prose", "procedure"), "how the voice sweep reads a text: as prose or as a procedure's steps")
 RUNNER = Choice("RUNNER", ("browser", "python"), "which kind of design system harness")
 
 
@@ -105,16 +106,19 @@ def command_show(ctx: Ctx, command: str) -> Resource:
 # check -------------------------------------------------------------------------------------------------------------
 @command("check", category="check", help="Run checks: sections, a suite, one scope, or only what changed", relocatable=True,
          args=[Arg("sections", "SECTION", "the sections to run; every section when none and no suite is named", many=True)],
-         options=[Opt("--scope", "TEXT", "limit a section that supports it to one resource"),
+         options=[Opt("--scope", "TEXT", "limit a section that supports it to one resource; the item checks take it more than once", multiple=True),
                   Opt("--suite", "SUITE", "run a named set of sections"),
                   Opt("--changed", None, "run only sections whose watched paths changed"),
                   Opt("--since", "TEXT", "with --changed, also what differs from this Git commit"),
                   Opt("--runner", "RUNNER", "design-systems: which harness"),
                   Opt("--brand", "BRAND", "design-systems: one brand"),
-                  Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)")])
-def check(ctx: Ctx, sections: list[str], scope: str | None, suite: str | None, changed: bool, since: str | None,
-          runner: str | None, brand: str | None, paragon: str | None) -> Resource:
-    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon)
+                  Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)"),
+                  Opt("--mode", "VOICE_MODE", "voice: sweep as prose or as a procedure (prose by default)"),
+                  Opt("--draft", None, "voice: report every failure as a warning"),
+                  Opt("--spoken", None, "voice: sweep as a script to be spoken, with the spoken voice's patterns too")])
+def check(ctx: Ctx, sections: list[str], scope: list[str], suite: str | None, changed: bool, since: str | None,
+          runner: str | None, brand: str | None, paragon: str | None, mode: str | None, draft: bool, spoken: bool) -> Resource:
+    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon, mode, draft, spoken)
 
 
 # fresh -------------------------------------------------------------------------------------------------------------

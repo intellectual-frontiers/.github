@@ -9,13 +9,13 @@ from .registry import WRITES, Command, Registry
 def command_data(reg: Registry, c: Command) -> dict[str, Any]:
     """One command: noun, verb, category, arguments, surfaces, dependency group and programs (0041 FR-012)."""
     args = [{"name": a.name, "type": a.type, "help": a.help, "required": a.required, "words": a.words, "many": a.many} for a in c.args]
-    opts = [{"flag": o.flag, "type": o.type or "flag", "help": o.help, "multiple": o.multiple, "required": o.required}
-            for o in c.options]
+    opts = [{"flag": o.flag, "type": o.type or "flag", "help": o.help, "multiple": o.multiple, "required": o.required,
+             **({"alias": o.alias} if o.alias else {})} for o in c.options]
     if c.category in WRITES:
         opts.append({"flag": "--dry-run", "type": "flag", "help": "validate, write nothing, show the change", "multiple": False,
                      "required": False})
     usage = " ".join([reg.name, *c.words] + [(a.type + "..." if a.many else a.type if a.required else f"[{a.type}]") if not a.many else f"[{a.type}...]" for a in c.args]
-                     + [f"[{o.flag}{' ' + o.type if o.type else ''}]" if not o.required else f"{o.flag} {o.type}"
+                     + [f"[{o.flag}{'|' + o.alias if o.alias else ''}{' ' + o.type if o.type else ''}]" if not o.required else f"{o.flag} {o.type}"
                         for o in c.options])
     return {
         "id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "help": c.help, "group": c.group or None,

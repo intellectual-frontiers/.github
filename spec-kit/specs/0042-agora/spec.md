@@ -87,7 +87,8 @@ own harnesses, and what CI runs.
 - **FR-008**: `agora` MUST take these typed arguments (0041-command-line
   FR-013): SPEC (`NNNN-slug`, `NNNN`, or a design system's slug), REQUIREMENT
   (`<spec>/FR-NNN`), DESIGN_SYSTEM, BRAND, PIECE (`<brand>/<piece>`), INK
-  (`<brand>/<role>`), LAYOUT, UI, SECTION, GENERATOR and COMMIT (40 hex
+  (`<brand>/<role>`), LAYOUT (a print layout's name or alias, as
+  `layouts.json` gives them), UI, SECTION, GENERATOR and COMMIT (40 hex
   digits).
 - **FR-009**: `design-system new` MUST refuse unless the design system's
   spec and its entry in the ontology already exist, so that the spec comes
@@ -121,14 +122,23 @@ own harnesses, and what CI runs.
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
   (a brand's Open edX package), and the item checks `figures`, `voice`,
   `slides`, `email`, `course`, `media`, `signage` and `merchandise`, each of
-  which takes `--scope PATH` to the work it checks and runs only with it.
+  which takes `--scope PATH`, more than once if need be, to the work it checks
+  (a file, or a directory of such files), and calls the design system's own
+  script on it (FR-017). With no `--scope` an item check MUST check the
+  passing fixtures of the design system whose script it runs, which that
+  script is meant to accept, and MUST say so; it MUST NOT report a scope that
+  holds nothing as a pass, and MUST report a design system with no passing
+  fixture as skipped. `voice` also takes `--mode prose|procedure`, `--draft`
+  and `--spoken`, and the other item checks take `--brand`, themed by
+  `frontiers-brand` when none is named, as their scripts are.
 - **FR-014**: `agora` MUST declare these suites (0041-command-line FR-031):
   `spec` (`specs`, `register`, `controls`, `ontology`, `environment`,
   `commands` and `ui`, which need no package and no program beyond Python),
   `browser` (`design-systems --runner browser` and `openedx`), `python`
   (`design-systems --runner python`) and `images` (`imagery`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on
-  a stock host with only Python and uv.
+  a stock host with only Python and uv. The item checks of FR-013 belong to no
+  suite: they run when named, and in a plain `check`.
 - **FR-015**: `agora` MUST declare these generators (0041-command-line
   FR-035), each proven by `agora fresh`: `brand-theme` (a brand's `brand.css`
   and `brand.tex` from its `tokens.json`), `brand-specimen` (its specimen),

@@ -1,6 +1,7 @@
 """`check [SECTION...] [--scope ID] [--suite SUITE] [--changed]` (0041-command-line FR-031 to FR-033)."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from . import worker
@@ -10,8 +11,14 @@ from .registry import Section
 from .resource import FAILED, MISSING, OK, USAGE, Action, AgoraError, Call, Resource, next_command
 
 
-def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: str | None, runner: str | None = None,
-                       brand: str | None = None, paragon: str | None = None, root_ctx: Ctx | None = None) -> list[str]:
+def scopes_of(scope: str | list[str] | None) -> list[str]:
+    """`--scope` as a list: it may be given more than once for a section that takes many (0042 FR-013)."""
+    return [] if scope is None else [scope] if isinstance(scope, str) else list(scope)
+
+
+def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: str | list[str] | None, runner: str | None = None,
+                       brand: str | None = None, paragon: str | None = None, root_ctx: Ctx | None = None,
+                       mode: str | None = None, draft: bool = False, spoken: bool = False) -> list[str]:
     """The section names `check` would run for these arguments, or an error resource (exit 2). Names are in
     declaration order, suite first."""
     reg = ctx.registry
@@ -27,32 +34,40 @@ def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: 
                 raise AgoraError("usage", f"--{flag} {value} conflicts with suite {suite}, which runs --{flag} {fixed}", exit=USAGE)
     names += [s for s in sections if s not in names]
     chosen = [reg.sections[n] for n in names]
-    if scope is not None:
+    scopes = scopes_of(scope)
+    if scopes:
         takers = [s for s in chosen if s.scope]
         if not takers:
             raise AgoraError("usage", "--scope applies to a section that supports it; none selected does", exit=USAGE)
+        if len(scopes) > 1 and not all(s.many for s in takers):
+            one = [s.name for s in takers if not s.many]
+            raise AgoraError("usage", f"--scope was given {len(scopes)} times; section {', '.join(one)} takes one", exit=USAGE)
         t = reg.types.get(takers[0].scope or "")
-        if t is not None:
+        for one_scope in scopes if t is not None else ():
             try:
-                t.validate(root_ctx or ctx, scope)
+                t.validate(root_ctx or ctx, one_scope)
             except ValueError as e:
                 raise AgoraError("invalid-argument", f"--scope: {e}. A {t.name} is {t.doc}", exit=USAGE,
-                                 detail={"type": t.name, "value": scope}) from None
-    for flag, value in (("--runner", runner), ("--brand", brand), ("--paragon", paragon)):
+                                 detail={"type": t.name, "value": one_scope}) from None
+    for flag, value in (("--runner", runner), ("--brand", brand), ("--paragon", paragon), ("--mode", mode),
+                        ("--draft", draft or None), ("--spoken", spoken or None)):
         if value is not None and not any(flag in s.options for s in chosen):
             raise AgoraError("usage", f"{flag} applies to a section that declares it; none selected does", exit=USAGE)
     return names
 
 
-def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | None, changed: bool, since: str | None,
-              runner: str | None = None, brand: str | None = None, paragon: str | None = None) -> Resource:
+def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | list[str] | None, changed: bool, since: str | None,
+              runner: str | None = None, brand: str | None = None, paragon: str | None = None, mode: str | None = None,
+              draft: bool = False, spoken: bool = False) -> Resource:
     reg = ctx.registry
     explicit = bool(sections or suite)
-    names = validate_selection(ctx, sections, suite, scope, runner, brand, paragon)
+    names = validate_selection(ctx, sections, suite, scope, runner, brand, paragon, mode=mode, draft=draft, spoken=spoken)
+    scopes = scopes_of(scope)
     if suite:  # a suite may fix an option of its sections, such as the harness kind (0042 FR-014)
         fixed = reg.suites[suite].get("options", {})
         runner, brand, paragon = (v or fixed.get(k) for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon)))
-    ctx.section_options = {k: v for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon)) if v}
+    ctx.section_options = {k: v for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon), ("mode", mode),
+                                             ("draft", draft), ("spoken", spoken)) if v}
     planned_rows: list[dict[str, str]] = []
     if not explicit:
         names = [n for n, s in reg.sections.items() if s.status == "implemented"]
@@ -86,17 +101,18 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | Non
         if missing:
             hints = "; ".join(f"{m}: {reg.program(m).get('hint', 'install it on the host')}" for m in missing)
             results.append(SectionResult(s.name, "skipped", reason=f"needs {', '.join(missing)}, which is not on PATH ({hints})"))
-        elif worker.needs_worker(ctx, s):
-            results.append(worker.run_section(ctx, s, scope if s.scope else None))
         else:
-            r = s.fn(ctx, scope if s.scope else None)
-            results.append(r)
+            mine = _scope_for(s, scopes)
+            if worker.needs_worker(ctx, s):
+                results.append(worker.run_section(ctx, s, mine))
+            else:
+                results.append(s.fn(ctx, mine))
     failed = [r for r in results if r.status == "failed"]
     skipped = [r for r in results if r.status == "skipped"]
     status = "failed" if failed else "skipped" if skipped else "passed"
     label = suite or (" ".join(sections) if sections else "all")
     data: dict[str, Any] = {
-        "suite": suite, "scope": scope, "changed": changed, "status": status,
+        "suite": suite, "scope": scopes[0] if len(scopes) == 1 else scopes or None, "changed": changed, "status": status,
         "summary": {"run": len(results), "passed": len(results) - len(failed) - len(skipped), "failed": len(failed),
                     "skipped": len(skipped)},
         "sections": [r.to_dict() for r in results],
@@ -105,6 +121,16 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | Non
     res = Resource("check", label, data, text=_text, exit=FAILED if failed else MISSING if skipped else OK)
     res.actions = [next_command(f"run {r.name} again", "check", sections=[r.name]) for r in failed + skipped]
     return res
+
+
+def _scope_for(s: Section, scopes: list[str]) -> Any:
+    """What a section's function receives as `scope`: nothing, one value, or for a section that takes many a list, whose
+    paths are made absolute here, since a worker runs in another directory."""
+    if not s.scope or not scopes:
+        return None
+    if s.many:
+        return [str(Path(v).resolve()) for v in scopes] if s.scope == "PATH" else list(scopes)
+    return scopes[0]
 
 
 def _text(res: Resource) -> str:

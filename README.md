@@ -287,6 +287,12 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   are current, `./agora doctor` for what is missing, `./agora test` for its own
   tests, and `./agora command list` for what it can do. Every command takes
   `--json` and, if it writes, `--dry-run`.
+- The design systems' own scripts stay in their directories and `agora` calls them:
+  `agora deck build`, `email build`, `course build`, `media build`, `sign build` and
+  `figure build` build what they build, `agora layout list|show|build` reads the print
+  layouts, and `agora check figures|voice|slides|email|course|media|signage|merchandise
+  --scope PATH` checks a piece of work with a design system's own rules (with no
+  `--scope`, each checks that design system's passing fixtures).
 - The launcher needs only `uv` and Python 3. Python packages come from
   committed, hashed locks (`tools/agora/groups/<group>/agora.lock`), and
   `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
