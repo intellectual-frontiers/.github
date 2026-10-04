@@ -1,4 +1,4 @@
-"""A command described as data: for `command list|show`, help, a web UI's forms and an MCP tool's schema."""
+"""A command described as data: for `command list|show`, help, an editor's forms and an MCP tool's schema."""
 from __future__ import annotations
 
 from typing import Any

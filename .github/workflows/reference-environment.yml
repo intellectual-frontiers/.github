@@ -1,5 +1,7 @@
-# Runs this repository's tools inside the reference environment, in the image .devcontainer/devcontainer.json names at
-# the commit tools/reference-environment pins (0025-tooling-environment FR-010). Nothing is installed: a failure here
+# Runs this repository's tools inside the reference environment (0025-tooling-environment FR-010): for now, in the earlier
+# environment's published image that .devcontainer/devcontainer.json names at the commit tools/reference-environment pins.
+# When the environment orchestrator's first release ships, this job moves to a GitHub Ubuntu runner running its install.sh
+# and `ws-host kit add` for the repository's kit, and that image stays published until then (0025 OQ-1). Nothing is installed: a failure here
 # is a tool or the environment falling short of FR-006. spec-check.yml and design-systems.yml stay as the runs outside
 # it, on stock runners given only each tool's prerequisites (FR-011).
 name: reference-environment

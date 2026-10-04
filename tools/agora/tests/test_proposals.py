@@ -106,8 +106,8 @@ class Proposals(TempRepo):
 
     def test_the_surfaces_follow_the_categories_and_advance_is_never_on_mcp(self):  # 0041 FR-022, FR-023
         reg = {c["id"]: c for c in self.go("command", "list")[1]["data"]["commands"]}
-        self.assertEqual(reg["proposal advance"]["surfaces"], ["terminal", "ui"])
-        self.assertEqual(reg["proposal new"]["surfaces"], ["terminal", "ui", "mcp"])
+        self.assertEqual(reg["proposal advance"]["surfaces"], ["terminal", "editor"])
+        self.assertEqual(reg["proposal new"]["surfaces"], ["terminal", "editor", "mcp"])
         self.assertEqual(self.go("command", "show", "proposal new")[1]["data"]["category"], "record")
         self.assertEqual(self.go("command", "show", "proposal advance")[1]["data"]["category"], "decision")
 

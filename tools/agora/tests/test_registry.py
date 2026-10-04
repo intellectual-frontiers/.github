@@ -26,8 +26,8 @@ class RegistryLoads(unittest.TestCase):
 
     def test_default_surfaces_follow_category(self):
         s = self.reg.surfaces_of
-        self.assertEqual(s(self.reg.find("spec show")), ("ui", "mcp"))
-        self.assertEqual(s(self.reg.find("spec set")), ("ui",))
+        self.assertEqual(s(self.reg.find("spec show")), ("editor", "mcp"))
+        self.assertEqual(s(self.reg.find("spec set")), ("editor",))
         self.assertEqual(s(self.reg.find("lock")), ())
 
     def test_decisions_are_never_on_mcp(self):
@@ -96,15 +96,14 @@ class RegistryConflicts(unittest.TestCase):
         self.assertIn("not one of read, check", problems)
         self.assertIn("decision command must not be exposed over MCP", problems)
 
-    def test_ui_and_mcp_words(self):
+    def test_mcp_words(self):
         r = Registry()
-        r.nouns.update({"ui": "", "mcp": ""})
-        r.add_command(cmd("ui open", "setup"))
-        r.add_command(cmd("ui frobnicate", "setup"))
+        r.nouns.update({"mcp": ""})
         r.add_command(cmd("mcp serve", "setup"))
+        r.add_command(cmd("mcp frobnicate", "setup"))
         problems = r.validate()
         self.assertEqual(len(problems), 1)
-        self.assertIn("ui frobnicate", problems[0])
+        self.assertIn("mcp frobnicate", problems[0])
 
     def test_a_plan_needing_two_locks_in_one_process(self):
         from agora.core.registry import Group, Section

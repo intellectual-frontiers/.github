@@ -77,7 +77,7 @@ class Server:
     def refusal(self, c: Command) -> Resource:
         res = Resource("error", "decision-refused", {
             "code": "decision-refused",
-            "message": f"{c.id} is a decision command: only a person decides it, in the terminal or the web UI, and it is never callable "
+            "message": f"{c.id} is a decision command: only a person decides it, in the terminal or the editor, and it is never callable "
                        "over MCP (0041-command-line FR-023). Draft the decision as a proposal for a person to accept."},
             actions=[next_command("draft it as a proposal for a person to decide", "proposal new")], exit=1)
         return res

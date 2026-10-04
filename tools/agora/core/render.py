@@ -111,7 +111,7 @@ def _html_value(value: Any, path: str, res: Resource) -> str:
 
 
 def to_html(res: Resource, ctx: Any, href: Any = None, action_html: Any = None, level: int = 1) -> str:
-    """The resource as a page fragment for a web UI: markup only, no script, no remote reference. A surface may turn a link
+    """The resource as a page fragment for a web view (an editor's webview): markup only, no script, no remote reference. A surface may turn a link
     into a link to the resource it fetches (`href(link) -> url | None`) and add its control to an action
     (`action_html(action) -> markup | ""`); neither adds anything the resource does not carry. `level` is the heading's
     level, 1 for a page of its own and lower for a resource shown inside another page."""

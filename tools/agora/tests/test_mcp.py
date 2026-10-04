@@ -187,7 +187,7 @@ class InProcess(unittest.TestCase):
 
     def test_no_declaration_can_make_a_decision_callable(self):  # 0041 FR-023
         reg = Registry.load(HOME)
-        reg.find("spec set").surfaces = ("ui", "mcp")  # a declaration that tries
+        reg.find("spec set").surfaces = ("editor", "mcp")  # a declaration that tries
         server = Server(reg, HOME, {})
         server.line(json.dumps(msg(0, "initialize", protocolVersion=VERSIONS[0])))
         listed = json.loads(server.line(json.dumps(msg(1, "tools/list"))))["result"]["tools"]

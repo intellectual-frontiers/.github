@@ -27,7 +27,7 @@ description: Use agora, this repository's command line, to read its specs, requi
 | `record` | appends a fact to the tracked record |
 | `build` | writes derived output that is not itself the record |
 | `generate` | rewrites tracked generated files |
-| `decision` | changes what only a person decides: for a person, in the terminal or the web UI; never over MCP |
+| `decision` | changes what only a person decides: for a person, in the terminal or the editor; never over MCP |
 | `setup` | changes the clone's own environment (a lock, a pin, a running server) |
 
 A `decision` command is for a person: `ink record`, `proposal advance`, `spec set`. Do not run one for a person. To ask for a decision, draft it with `agora proposal new RESOURCE --reason TEXT --run COMMAND --field NAME=VALUE`; a person reviews it and runs `agora proposal advance ID`. A proposal is a tracked file under `.agora/proposals/`.
@@ -57,72 +57,67 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `skill` | The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028) |
 | `spec` | A spec: a numbered spec or a design system's spec (0020-spec-format) |
 | `term` | A concept or scheme of the ontology (0019-controlled-vocabulary) |
-| `ui` | A web UI of this command line, served inside its own process (0041-command-line FR-025) |
 
 ## Commands
 
-Surfaces: `terminal` always; `ui` the local web UI; `mcp` the MCP server. Each row's example is its usage line.
+Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. Each row's example is its usage line.
 
 | Command | Category | Surfaces | Does | Example |
 | --- | --- | --- | --- | --- |
-| `brand generate` | `generate` | terminal, ui, mcp | Write a brand's brand.css, brand.tex and specimen from its tokens.json (every brand when none is named) | `agora brand generate [BRAND]` |
-| `brand list` | `read` | terminal, ui, mcp | List the brands: design systems with a brand.css | `agora brand list` |
-| `brand show` | `read` | terminal, ui, mcp | Show a brand: its palette, roles, logos, and whether what is written from its tokens is current | `agora brand show BRAND` |
-| `check` | `check` | terminal, ui, mcp | Run checks: sections, a suite, one scope, or only what changed | `agora check [SECTION...] [--scope TEXT] [--suite SUITE] [--changed] [--since TEXT] [--runner RUNNER] [--brand BRAND] [--paragon TEXT] [--mode VOICE_MODE] [--draft] [--spoken]` |
-| `command list` | `read` | terminal, ui, mcp | List the registry's commands | `agora command list [--category CATEGORY]` |
-| `command show` | `read` | terminal, ui, mcp | Show one command: arguments, surfaces, group and programs | `agora command show COMMAND` |
-| `context` | `read` | terminal, ui, mcp | Return what an agent needs to work on one resource | `agora context RESOURCE` |
-| `course build` | `build` | terminal, ui, mcp | Build a course to a delivery target: a static site, an Open edX export (OLX) or a cmi5 package (frontiers-course FR-013) | `agora course build PATH --target COURSE_TARGET --out TEXT [--brand BRAND] [--org TEXT] [--iri TEXT] [--publisher TEXT]` |
-| `course show` | `read` | terminal, ui, mcp | Show a course as frontiers-course reads it: its outcomes, units and steps, and the model every target is built from | `agora course show PATH` |
-| `deck build` | `build` | terminal, ui, mcp | Build a slide deck from its Markdown into one HTML page (frontiers-slides FR-010) | `agora deck build PATH [--out\|-o TEXT] [--brand BRAND] [--inline]` |
-| `decoration generate` | `generate` | terminal, ui, mcp | Make a brand's decoration kit: trace the lockup and icon from their masters, and set the wordmark and unit marks in type | `agora decoration generate BRAND [--only KIT_PART]` |
-| `decoration show` | `read` | terminal, ui, mcp | Show a brand's decoration kit: each part's file and finest detail, and how it is made | `agora decoration show BRAND [--measure]` |
-| `design-system list` | `read` | terminal, ui, mcp | List design systems: kind, status, spec and harness | `agora design-system list [--kind KIND]` |
-| `design-system new` | `generate` | terminal, ui, mcp | Scaffold a design system whose spec and ontology entry already exist (0001 FR-037) | `agora design-system new SLUG --kind KIND` |
-| `design-system show` | `read` | terminal, ui, mcp | Show one design system: its registration, spec, harness and derivation | `agora design-system show DESIGN_SYSTEM` |
-| `doctor` | `check` | terminal, ui, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
-| `email build` | `build` | terminal, ui, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
+| `brand generate` | `generate` | terminal, editor, mcp | Write a brand's brand.css, brand.tex and specimen from its tokens.json (every brand when none is named) | `agora brand generate [BRAND]` |
+| `brand list` | `read` | terminal, editor, mcp | List the brands: design systems with a brand.css | `agora brand list` |
+| `brand show` | `read` | terminal, editor, mcp | Show a brand: its palette, roles, logos, and whether what is written from its tokens is current | `agora brand show BRAND` |
+| `check` | `check` | terminal, editor, mcp | Run checks: sections, a suite, one scope, or only what changed | `agora check [SECTION...] [--scope TEXT] [--suite SUITE] [--changed] [--since TEXT] [--runner RUNNER] [--brand BRAND] [--paragon TEXT] [--mode VOICE_MODE] [--draft] [--spoken]` |
+| `command list` | `read` | terminal, editor, mcp | List the registry's commands | `agora command list [--category CATEGORY]` |
+| `command show` | `read` | terminal, editor, mcp | Show one command: arguments, surfaces, group and programs | `agora command show COMMAND` |
+| `context` | `read` | terminal, editor, mcp | Return what an agent needs to work on one resource | `agora context RESOURCE` |
+| `course build` | `build` | terminal, editor, mcp | Build a course to a delivery target: a static site, an Open edX export (OLX) or a cmi5 package (frontiers-course FR-013) | `agora course build PATH --target COURSE_TARGET --out TEXT [--brand BRAND] [--org TEXT] [--iri TEXT] [--publisher TEXT]` |
+| `course show` | `read` | terminal, editor, mcp | Show a course as frontiers-course reads it: its outcomes, units and steps, and the model every target is built from | `agora course show PATH` |
+| `deck build` | `build` | terminal, editor, mcp | Build a slide deck from its Markdown into one HTML page (frontiers-slides FR-010) | `agora deck build PATH [--out\|-o TEXT] [--brand BRAND] [--inline]` |
+| `decoration generate` | `generate` | terminal, editor, mcp | Make a brand's decoration kit: trace the lockup and icon from their masters, and set the wordmark and unit marks in type | `agora decoration generate BRAND [--only KIT_PART]` |
+| `decoration show` | `read` | terminal, editor, mcp | Show a brand's decoration kit: each part's file and finest detail, and how it is made | `agora decoration show BRAND [--measure]` |
+| `design-system list` | `read` | terminal, editor, mcp | List design systems: kind, status, spec and harness | `agora design-system list [--kind KIND]` |
+| `design-system new` | `generate` | terminal, editor, mcp | Scaffold a design system whose spec and ontology entry already exist (0001 FR-037) | `agora design-system new SLUG --kind KIND` |
+| `design-system show` | `read` | terminal, editor, mcp | Show one design system: its registration, spec, harness and derivation | `agora design-system show DESIGN_SYSTEM` |
+| `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
+| `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
 | `environment set` | `setup` | terminal | Move the reference environment pin and the devcontainer image tag together | `agora environment set COMMIT` |
-| `environment show` | `read` | terminal, ui, mcp | Show the reference environment pin and the devcontainer image tag | `agora environment show` |
-| `figure build` | `build` | terminal, ui, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
-| `figure generate` | `generate` | terminal, ui, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
-| `fresh` | `check` | terminal, ui, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
-| `imagery add` | `record` | terminal, ui, mcp | Add a master to a brand's pool: copy it byte for byte, measure it, and catalog it (then build its WebP files) | `agora imagery add BRAND --master TEXT --name TEXT --environment TEXT --description TEXT --visual-anchor TEXT --route TEXT [--built-structure TEXT] [--infrastructure-type TEXT] [--colored-element TEXT] [--water-form TEXT] [--metaphor TEXT] [--suggested-subject TEXT] [--supplied DATE] --generator TEXT` |
-| `imagery build` | `build` | terminal, ui, mcp | Write a brand's WebP files, share card and app icons from its masters and tokens | `agora imagery build BRAND` |
-| `imagery list` | `read` | terminal, ui, mcp | List a brand's imagery pieces | `agora imagery list BRAND` |
-| `imagery show` | `read` | terminal, ui, mcp | Show one piece: its catalog entry, and what its master measures (pixel size, content box, transparency, color) | `agora imagery show PIECE` |
-| `ink list` | `read` | terminal, ui, mcp | List a brand's inks: each role's spot color and thread, and whether they were verified | `agora ink list BRAND` |
-| `ink record` | `decision` | terminal, ui | Record that a person checked an ink's spot color and thread against the physical guide and card | `agora ink record INK --spot TEXT --thread TEXT --by TEXT --on DATE` |
-| `ink show` | `read` | terminal, ui, mcp | Show one ink, and with GIMP palettes (a thread chart, a spot-color guide) its nearest candidates by CIEDE2000 | `agora ink show INK [--palette TEXT]` |
-| `layout build` | `build` | terminal, ui, mcp | Write a built layout's iflayout.def, the macros the article class reads, from layouts.json and typefaces.json | `agora layout build LAYOUT --out TEXT [--typeface TEXT]` |
-| `layout list` | `read` | terminal, ui, mcp | List the print design system's article layouts: status, aliases and summary | `agora layout list` |
-| `layout show` | `read` | terminal, ui, mcp | Show one print layout: what it is for, its numbers and, with --def, the iflayout.def the class reads | `agora layout show LAYOUT [--def] [--typeface TEXT]` |
+| `environment show` | `read` | terminal, editor, mcp | Show the reference environment pin and the devcontainer image tag | `agora environment show` |
+| `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
+| `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
+| `fresh` | `check` | terminal, editor, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
+| `imagery add` | `record` | terminal, editor, mcp | Add a master to a brand's pool: copy it byte for byte, measure it, and catalog it (then build its WebP files) | `agora imagery add BRAND --master TEXT --name TEXT --environment TEXT --description TEXT --visual-anchor TEXT --route TEXT [--built-structure TEXT] [--infrastructure-type TEXT] [--colored-element TEXT] [--water-form TEXT] [--metaphor TEXT] [--suggested-subject TEXT] [--supplied DATE] --generator TEXT` |
+| `imagery build` | `build` | terminal, editor, mcp | Write a brand's WebP files, share card and app icons from its masters and tokens | `agora imagery build BRAND` |
+| `imagery list` | `read` | terminal, editor, mcp | List a brand's imagery pieces | `agora imagery list BRAND` |
+| `imagery show` | `read` | terminal, editor, mcp | Show one piece: its catalog entry, and what its master measures (pixel size, content box, transparency, color) | `agora imagery show PIECE` |
+| `ink list` | `read` | terminal, editor, mcp | List a brand's inks: each role's spot color and thread, and whether they were verified | `agora ink list BRAND` |
+| `ink record` | `decision` | terminal, editor | Record that a person checked an ink's spot color and thread against the physical guide and card | `agora ink record INK --spot TEXT --thread TEXT --by TEXT --on DATE` |
+| `ink show` | `read` | terminal, editor, mcp | Show one ink, and with GIMP palettes (a thread chart, a spot-color guide) its nearest candidates by CIEDE2000 | `agora ink show INK [--palette TEXT]` |
+| `layout build` | `build` | terminal, editor, mcp | Write a built layout's iflayout.def, the macros the article class reads, from layouts.json and typefaces.json | `agora layout build LAYOUT --out TEXT [--typeface TEXT]` |
+| `layout list` | `read` | terminal, editor, mcp | List the print design system's article layouts: status, aliases and summary | `agora layout list` |
+| `layout show` | `read` | terminal, editor, mcp | Show one print layout: what it is for, its numbers and, with --def, the iflayout.def the class reads | `agora layout show LAYOUT [--def] [--typeface TEXT]` |
 | `lock` | `setup` | terminal | Write a group's hashed lock from the packages its manifest pins, through uv | `agora lock [GROUP]` |
 | `mcp serve` | `setup` | terminal | Serve MCP over standard input and output until the client closes it: for AI agents | `agora mcp serve` |
-| `media build` | `build` | terminal, ui, mcp | Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009) | `agora media build PATH [--out\|-o TEXT] [--svg TEXT] [--brand BRAND]` |
-| `openedx build` | `build` | terminal, ui, mcp | Write a brand's Open edX package sources and build dist/ with Paragon's CLI | `agora openedx build BRAND [--paragon TEXT]` |
-| `openedx generate` | `generate` | terminal, ui, mcp | Write a brand's Open edX package sources from its tokens.json, logos and fonts (not the built dist/) | `agora openedx generate BRAND` |
-| `proposal advance` | `decision` | terminal, ui | Accept a proposal: show its dry run, replay its action and mark it accepted | `agora proposal advance PROPOSAL` |
-| `proposal list` | `read` | terminal, ui, mcp | List proposals: open or accepted, the resource each concerns and what it proposes | `agora proposal list [--status PROPOSAL_STATUS]` |
-| `proposal new` | `record` | terminal, ui, mcp | Draft a change for a person to decide: a tracked proposal that names a command and its fields | `agora proposal new RESOURCE --reason TEXT --run COMMAND [--field TEXT]` |
-| `proposal show` | `read` | terminal, ui, mcp | Show one proposal: its reason and the action it proposes, as a command line | `agora proposal show PROPOSAL` |
-| `requirement add` | `record` | terminal, ui, mcp | Add the control a requirement addresses to the control map | `agora requirement add REQUIREMENT --control CONTROL [--note TEXT]` |
-| `requirement list` | `read` | terminal, ui, mcp | List requirements with how each is enforced | `agora requirement list [--spec SPEC] [--mechanism MECHANISM]` |
-| `requirement set` | `record` | terminal, ui, mcp | Set how a requirement is enforced, in the enforcement register | `agora requirement set REQUIREMENT --mechanism MECHANISM [--by TEXT] [--note TEXT]` |
-| `requirement show` | `read` | terminal, ui, mcp | Show one requirement in full, with its enforcement and controls | `agora requirement show REQUIREMENT` |
-| `sign build` | `build` | terminal, ui, mcp | Render a sign's job to a vector PDF at its trim size plus bleed: a poster, roll-up banner or event badge (frontiers-signage-print FR-009) | `agora sign build PATH [--out\|-o TEXT] [--brand BRAND]` |
-| `skill generate` | `generate` | terminal, ui, mcp | Write the agent skill from the registry: .claude/skills/agora/SKILL.md | `agora skill generate` |
-| `spec list` | `read` | terminal, ui, mcp | List specs | `agora spec list [--status SPEC_STATUS]` |
-| `spec new` | `generate` | terminal, ui, mcp | Create a spec in the form 0020 FR-005 states, with the next unused number | `agora spec new SLUG [--title TEXT]` |
-| `spec set` | `decision` | terminal, ui | Move a spec between Draft, Adopted and Superseded, only as 0020 FR-010 allows | `agora spec set SPEC --status SPEC_STATUS [--superseded-by SPEC]` |
-| `spec show` | `read` | terminal, ui, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
-| `term list` | `read` | terminal, ui, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
-| `term show` | `read` | terminal, ui, mcp | Show one concept or scheme | `agora term show TERM` |
-| `test` | `check` | terminal, ui, mcp | Run agora's own tests with the standard library's runner | `agora test` |
-| `ui link` | `read` | terminal, ui, mcp | Print the address of a running web UI | `agora ui link UI` |
-| `ui open` | `setup` | terminal | Serve a web UI in the background if it is not running, and open it in a browser | `agora ui open UI [--port PORT]` |
-| `ui serve` | `setup` | terminal | Serve a web UI in the foreground, on the loopback interface, until stopped | `agora ui serve UI [--port PORT]` |
-| `ui stop` | `setup` | terminal | Stop a running web UI | `agora ui stop UI` |
+| `media build` | `build` | terminal, editor, mcp | Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009) | `agora media build PATH [--out\|-o TEXT] [--svg TEXT] [--brand BRAND]` |
+| `openedx build` | `build` | terminal, editor, mcp | Write a brand's Open edX package sources and build dist/ with Paragon's CLI | `agora openedx build BRAND [--paragon TEXT]` |
+| `openedx generate` | `generate` | terminal, editor, mcp | Write a brand's Open edX package sources from its tokens.json, logos and fonts (not the built dist/) | `agora openedx generate BRAND` |
+| `proposal advance` | `decision` | terminal, editor | Accept a proposal: show its dry run, replay its action and mark it accepted | `agora proposal advance PROPOSAL` |
+| `proposal list` | `read` | terminal, editor, mcp | List proposals: open or accepted, the resource each concerns and what it proposes | `agora proposal list [--status PROPOSAL_STATUS]` |
+| `proposal new` | `record` | terminal, editor, mcp | Draft a change for a person to decide: a tracked proposal that names a command and its fields | `agora proposal new RESOURCE --reason TEXT --run COMMAND [--field TEXT]` |
+| `proposal show` | `read` | terminal, editor, mcp | Show one proposal: its reason and the action it proposes, as a command line | `agora proposal show PROPOSAL` |
+| `requirement add` | `record` | terminal, editor, mcp | Add the control a requirement addresses to the control map | `agora requirement add REQUIREMENT --control CONTROL [--note TEXT]` |
+| `requirement list` | `read` | terminal, editor, mcp | List requirements with how each is enforced | `agora requirement list [--spec SPEC] [--mechanism MECHANISM]` |
+| `requirement set` | `record` | terminal, editor, mcp | Set how a requirement is enforced, in the enforcement register | `agora requirement set REQUIREMENT --mechanism MECHANISM [--by TEXT] [--note TEXT]` |
+| `requirement show` | `read` | terminal, editor, mcp | Show one requirement in full, with its enforcement and controls | `agora requirement show REQUIREMENT` |
+| `sign build` | `build` | terminal, editor, mcp | Render a sign's job to a vector PDF at its trim size plus bleed: a poster, roll-up banner or event badge (frontiers-signage-print FR-009) | `agora sign build PATH [--out\|-o TEXT] [--brand BRAND]` |
+| `skill generate` | `generate` | terminal, editor, mcp | Write the agent skill from the registry: .claude/skills/agora/SKILL.md | `agora skill generate` |
+| `spec list` | `read` | terminal, editor, mcp | List specs | `agora spec list [--status SPEC_STATUS]` |
+| `spec new` | `generate` | terminal, editor, mcp | Create a spec in the form 0020 FR-005 states, with the next unused number | `agora spec new SLUG [--title TEXT]` |
+| `spec set` | `decision` | terminal, editor | Move a spec between Draft, Adopted and Superseded, only as 0020 FR-010 allows | `agora spec set SPEC --status SPEC_STATUS [--superseded-by SPEC]` |
+| `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
+| `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
+| `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
+| `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner | `agora test` |
 
 ### Arguments and options
 
@@ -318,19 +313,6 @@ Surfaces: `terminal` always; `ui` the local web UI; `mcp` the MCP server. Each r
   - `--scheme` (SCHEME): only the concepts of this scheme
 - `term show`
   - `term` (TERM): the term's local name
-- `ui link`
-  - `ui` (UI): the UI: console or assurance
-- `ui open`
-  - `ui` (UI): the UI: console or assurance
-  - `--port` (PORT): the port to listen on when it has to be started; a free one by default
-  - `--dry-run` (flag): validate, write nothing, show the change
-- `ui serve`
-  - `ui` (UI): the UI: console or assurance
-  - `--port` (PORT): the port to listen on; a free one by default
-  - `--dry-run` (flag): validate, write nothing, show the change
-- `ui stop`
-  - `ui` (UI): the UI: console or assurance
-  - `--dry-run` (flag): validate, write nothing, show the change
 
 ## Typed arguments
 
@@ -355,7 +337,6 @@ A value that fails its type is an error resource that names the type and gives e
 | `MECHANISM` | how a requirement is enforced (0020 FR-012) | check, gate, review, none |
 | `PATH` | a path to a file or directory that exists, relative to where the command runs | design-systems/frontiers-slides/assurance/fixtures/pass/deck.md |
 | `PIECE` | an imagery piece as <brand>/<piece>, such as frontiers-brand/fog-coast-lighthouse-footbridge | a value `<noun> list` or `--complete` offers |
-| `PORT` | a TCP port, 1 to 65535 | 8080 |
 | `PROPOSAL` | a proposal as NNNN-slug, as `proposal list` shows them | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL_STATUS` | whether a proposal is open or accepted | open, accepted |
 | `REQUIREMENT` | a requirement as <spec>/FR-NNN, such as 0020/FR-013 | 0020/FR-013, 0041-command-line/FR-008 |
@@ -368,7 +349,6 @@ A value that fails its type is an error resource that names the type and gives e
 | `SPEC_STATUS` | a spec's status (0020 FR-009) | Draft, Adopted, Superseded |
 | `SUITE` | a named set of check sections | a value `<noun> list` or `--complete` offers |
 | `TERM` | a concept or scheme of the ontology by its local name, such as ReadCommandCategory | ReadCommandCategory, CommandCategoryScheme |
-| `UI` | a web UI of this command line, as its manifest declares them: console or assurance | a value `<noun> list` or `--complete` offers |
 | `VARIANT` | a figure color variant of frontiers-figures: default, on-dark or grayscale | a value `<noun> list` or `--complete` offers |
 | `VOICE_MODE` | how the voice sweep reads a text: as prose or as a procedure's steps | prose, procedure |
 
@@ -394,7 +374,6 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | `signage` | Sign jobs against frontiers-signage-print's rules: format, details, imagery resolution, voice (signage.py check) | PATH | none |
 | `slides` | Decks against frontiers-slides' rules: layouts, headlines, points, notes, figures, voice (deck.py check) | PATH | none |
 | `specs` | Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034) | SPEC | `spec` |
-| `ui` | Each web UI serves and renders offline: well-formed pages, no remote reference, actions the registry exposes, an event stream; with --runner browser, the console in Chromium (0041-command-line FR-025, FR-026; 0042-agora FR-027) | UI | `browser`, `spec` |
 | `voice` | Prose against frontiers-written-voice's sweep, or with --spoken a script against frontiers-spoken-voice's too (sweep.py) | PATH | none |
 
 ## Generators
@@ -412,7 +391,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 49 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://environment/reference`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 48 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://environment/reference`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -464,4 +443,3 @@ A generated file carries a header naming its generator and must not be edited by
 | `term_list` | no |
 | `term_show` | no |
 | `test` | no |
-| `ui_link` | no |

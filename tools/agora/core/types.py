@@ -1,7 +1,7 @@
 """Typed arguments (0041-command-line FR-013).
 
 A type defines how to validate a value, how to resolve it to a resource, and how to complete it. The parser,
-completion, a web UI's forms and an MCP tool's input schema all take their validation and choices from here.
+completion, an editor's forms and an MCP tool's input schema all take their validation and choices from here.
 """
 from __future__ import annotations
 

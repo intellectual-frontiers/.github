@@ -15,16 +15,17 @@ own harnesses, and what CI runs.
 
 ## Identity and name
 
-- **FR-001**: The public root's command line MUST be `agora`: the launcher
-  `agora` at the repository root, its code in `tools/agora/`, its root
-  manifest `tools/agora/agora.toml` declaring the name, the audience
-  `public`, the command groups and the suites, and each group's manifest
-  `tools/agora/groups/<group>/agora.toml` with its lock `agora.lock` only
-  where the group pins packages (0041-command-line FR-007). It MUST follow
+- **FR-001**: The public root's orchestrator MUST be `agora`: the launcher
+  `agora` at the repository root and its code in `tools/agora/`, where the
+  name, the audience `public`, the command groups, the check sections, the
+  generators and the suites are declared in code, each group a module of
+  `tools/agora/groups/`, and found by presence (0041-command-line FR-007). The
+  packages a group needs are declared in the repository's `pyproject.toml` and
+  locked in its `uv.lock` (0041-command-line FR-002, FR-003). It MUST follow
   0041-command-line in every respect this spec does not state otherwise.
-- **FR-002**: The command line's name MUST be `agora`, after the public
+- **FR-002**: The orchestrator's name MUST be `agora`, after the public
   square where people met in the open. It is chosen because it says what the
-  tool is, a command line for what is public; because it differs from any
+  tool is, an orchestrator for what is public; because it differs from any
   other command line's name at a glance and by any single typo, so one
   cannot be mistaken for another; and because it reads well in a prompt (run
   `agora check`). The name MUST NOT be shortened, aliased or changed except by
@@ -40,7 +41,7 @@ own harnesses, and what CI runs.
 ## The command set
 
 - **FR-004**: The command set MUST be declared in the ontology
-  (`ontology/ifcore.ttl`) as an `ifcore:CommandLine` individual for `agora`, a
+  (`ontology/ifcore.ttl`) as an `ifcore:Orchestrator` individual for `agora`, a
   scheme of command categories, a scheme of command verbs, a scheme of
   resource kinds (the nouns), and one `ifcore:Command` individual for every
   command, naming its noun, its verb and its category
@@ -52,10 +53,9 @@ own harnesses, and what CI runs.
   no noun (0041-command-line FR-010): `check [SECTION...] [--scope ID]
   [--suite SUITE] [--changed]`, `fresh [GENERATOR...]`, `test`, `doctor`,
   `lock [GROUP]` and `context RESOURCE`; and these under the nouns
-  `command` (`list`, `show`), `ui` (`serve`, `open`, `stop`, `link`) and
-  `mcp` (`serve`). Their categories are: `check`, `fresh`, `test` and
-  `doctor` check; `context`, `command list`, `command show` and `ui link`
-  read; `lock`, `ui serve`, `ui open`, `ui stop` and `mcp serve` setup.
+  `command` (`list`, `show`) and `mcp` (`serve`). Their categories are: `check`,
+  `fresh`, `test` and `doctor` check; `context`, `command list` and `command
+  show` read; `lock` and `mcp serve` setup.
 - **FR-006**: `agora` MUST provide these commands under the nouns of the
   public root's own resources, each in the category shown:
   - `spec`: `list`, `show` (read); `new` (generate); `set --status`
@@ -77,7 +77,7 @@ own harnesses, and what CI runs.
     (build). `figure` also has `generate` (generate): the organization
     profile's figure (FR-015). `course`: `show` (read), `build --target`
     (build).
-  - `environment`: `show` (read); `set COMMIT` (setup).
+  - `environment`: `show` (read); `set VERSION` (setup).
   - `proposal`: `list [--status]`, `show` (read); `new RESOURCE --reason
     --run COMMAND --field NAME=VALUE...` (record); `advance` (decision): FR-029.
   - `skill`: `generate` (generate): the agent skill (FR-028).
@@ -90,8 +90,8 @@ own harnesses, and what CI runs.
   FR-013): SPEC (`NNNN-slug`, `NNNN`, or a design system's slug), REQUIREMENT
   (`<spec>/FR-NNN`), DESIGN_SYSTEM, BRAND, PIECE (`<brand>/<piece>`), INK
   (`<brand>/<role>`), LAYOUT (a print layout's name or alias, as
-  `layouts.json` gives them), UI, SECTION, GENERATOR and COMMIT (40 hex
-  digits).
+  `layouts.json` gives them), SECTION, GENERATOR and VERSION (a release of the
+  environment orchestrator, as the reference environment pins it).
 - **FR-009**: `design-system new SLUG --kind KIND` MUST refuse unless the
   design system's spec (`design-systems/<slug>/spec.md`) and its entry in the
   ontology already exist, and the entry's kind is KIND, a kind code of the
@@ -107,10 +107,11 @@ own harnesses, and what CI runs.
   enforcement register and the control map, and `spec new` MUST create only a
   spec in the form 0020-spec-format FR-005 states, with the next unused
   number. None of them MAY write a requirement's text.
-- **FR-011**: `environment set COMMIT` MUST change the pin in
-  `tools/reference-environment` and the image tag in the devcontainer
-  together, and MUST NOT change one without the other
-  (0025-tooling-environment FR-008, FR-009).
+- **FR-011**: `environment set VERSION` MUST edit the `WS_HOST_VERSION` line
+  of `.workspaces-host/ws-host.env`, the one place the repository pins the
+  reference environment, and MUST write nothing else (0025-tooling-environment
+  FR-008, FR-009). `tools/reference-environment` is retired and MUST NOT
+  exist once the pin moves there.
 - **FR-012**: A person's name MUST be written to a tracked file only by `ink
   record --by`, which records who verified a spot color and a thread match
   (0041-command-line FR-042).
@@ -128,8 +129,7 @@ own harnesses, and what CI runs.
   (FR-004; and the registry's grammar, the workflows, the scripts, the boundary
   of FR-003, that every section and generator declares watched paths that match
   files (0041-command-line FR-032), the proposals of FR-029, and that the README
-  names every noun and repository-wide command), `ui` (0041-command-line
-  FR-025 and FR-026 for each UI declared),
+  names every noun and repository-wide command),
   `design-systems [--scope SLUG] [--brand B] [--runner browser|python]` (each
   design system's harness under every brand, 0014-design-systems FR-015,
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
@@ -145,10 +145,9 @@ own harnesses, and what CI runs.
   and `--spoken`, and the other item checks take `--brand`, themed by
   `frontiers-brand` when none is named, as their scripts are.
 - **FR-014**: `agora` MUST declare these suites (0041-command-line FR-031):
-  `spec` (`specs`, `register`, `controls`, `ontology`, `environment`,
-  `commands` and `ui`, which need no package and no program beyond Python),
-  `browser` (`design-systems --runner browser`, `openedx` and `ui --runner
-  browser`), `python`
+  `spec` (`specs`, `register`, `controls`, `ontology`, `environment` and
+  `commands`, which need no package and no program beyond Python),
+  `browser` (`design-systems --runner browser` and `openedx`), `python`
   (`design-systems --runner python`) and `images` (`imagery`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on
   a stock host with only Python and uv. The item checks of FR-013 belong to no
@@ -194,25 +193,26 @@ own harnesses, and what CI runs.
 ## Dependencies
 
 - **FR-018**: A group MUST pin only the packages its own commands need, each
-  to one exact version, with a committed hashed lock
-  (0025-tooling-environment FR-013). The groups the `spec` suite uses MUST pin
-  none. Programs outside Python (TeX, Chromium, ImageMagick, potrace,
-  rsvg-convert, Node, Paragon) MUST come from the host; `agora doctor` MUST
-  report each with a hint naming the workspaces-host-v3 persona or the program
+  to one exact version, as a dependency group of `pyproject.toml`, locked in
+  the committed `uv.lock` (0025-tooling-environment FR-013). The groups the
+  `spec` suite uses MUST pin none. Programs outside Python (TeX, Chromium,
+  ImageMagick, potrace, rsvg-convert, Node, Paragon) MUST come from the host;
+  `agora doctor` MUST report each with a hint naming the kit or the program
   that supplies it, and never the reference environment by name
   (0025-tooling-environment FR-007, FR-012).
 
 ## Surfaces
 
-- **FR-019**: `agora` MUST serve two web UIs, `console` and `assurance`,
-  inside its own process (0041-command-line FR-025). Their markup and style
-  MUST come from `frontiers-console-web`, which stays free of Datastar
-  (`frontiers-console-web` FR-004); the interactivity is `agora`'s own
-  application layer, a copy of `design-systems/frontiers-nature-web/js/datastar.js`
-  vendored in `tools/agora/` (0041-command-line FR-026). `agora check ui`
-  MUST prove each UI serves and renders offline. The copy's version and
-  license MUST be recorded beside it, in `tools/agora/vendor/README.md`, and
-  the copy MUST be the version recorded.
+- **FR-019**: `agora` MUST declare two editor views in code, `console` and
+  `assurance`, and MUST run no server (0041-command-line FR-011). A view is a
+  `read` command's resource and its HTML rendering that the editor extension
+  lists for `agora` (0041-command-line FR-050). `console` MUST be a registry
+  browser: the nouns, the commands under each, and a page for each command;
+  its markup and style MUST come from `frontiers-console-web`. `assurance`
+  MUST list each design system's assurance page, once for every brand that
+  themes it and once for a brand itself, and open it from the clone's own files
+  under `design-systems/`; it MUST name nothing outside that directory.
+
 - **FR-020**: `agora mcp serve` MUST expose the commands that declare MCP and
   are not `decision` commands (FR-007; 0041-command-line FR-027). The default
   exposure by category is 0041-command-line FR-022's. It MUST be written with
@@ -233,64 +233,12 @@ own harnesses, and what CI runs.
   returns.
 - **FR-021**: `agora` MUST write what is not worth a commit as NDJSON lines
   under `.agora/logs/`, which `.gitignore` MUST list, each line noting the
-  surface (`cli`, `ui` or `mcp`) and the action (0041-command-line FR-042).
-  Only what changes or runs something is logged, as 0041-command-line FR-042
-  states: no `read` command, console page or MCP resource read is. Proposals
+  surface (`cli`, `editor` or `mcp`) and the action (0041-command-line
+  FR-042). Only what changes or runs something is logged, as
+  0041-command-line FR-042 states: no `read` command, editor view or MCP
+  resource read is. Proposals
   MUST be tracked files under `.agora/proposals/` (0041-command-line FR-039,
   FR-029).
-
-## The web UIs
-
-- **FR-023**: The `ui` commands MUST take the UI as their ID, one of the UIs a
-  group's manifest declares (`console`, `assurance`; 0041-command-line
-  FR-025). `ui serve UI [--port N]` MUST serve the UI in the foreground on the
-  loopback address, on the port given or a free one, write its process id,
-  port and address to a state file under the directory the root manifest
-  names for it (`.agora/ui/`, which `.gitignore` MUST list), remove the file
-  when it stops, and refuse to start a UI already running for the clone
-  (0041-command-line FR-044). `ui open UI` MUST serve the UI in a background
-  process when it is not running, and open its address in a browser, or print
-  the address where the host has none. `ui stop UI` MUST stop the UI and
-  remove its state file, and say so when none was running. `ui link UI` MUST
-  print the address of a running UI, and otherwise fail with the command that
-  starts one.
-- **FR-024**: The `console` UI MUST be a registry browser: the nouns, the
-  commands under each, and a page for each command. Every resource it shows
-  MUST be the HTML rendering of the command's resource, its links as links to
-  the resources they fetch and its actions as buttons (0041-command-line
-  FR-017, FR-018). It MUST offer an action only where the registry's surfaces
-  for the action's command include `ui`, and a command's form MUST take its
-  fields, choices and validation from the command's typed arguments
-  (0041-command-line FR-013). A command MUST run through the same library call
-  as the terminal (0041-command-line FR-024), and its result MUST stream over
-  server-sent events, patched into the page by Datastar; a check MUST stream
-  section by section. A command that writes MUST show its `--dry-run` result
-  first, and the server MUST refuse to run it for real unless the preview was
-  made for the same call; a `decision` command MUST also require a
-  confirmation the person gives (0041-command-line FR-026). It MUST log each
-  call as 0041-command-line FR-042 states, with the surface `ui`.
-- **FR-025**: The `assurance` UI MUST serve `design-systems/` read-only, so
-  that each design system's in-browser harness runs from its own directory as
-  it does under any static server (0014-design-systems FR-015), and MUST list
-  each design system's assurance page, once for every brand that themes it and
-  once for a brand itself. It MUST serve nothing outside `design-systems/`
-  and MUST accept no request that writes.
-- **FR-026**: Each UI MUST answer only requests addressed to its own loopback
-  address and port, MUST refuse a request that changes anything unless it
-  carries Datastar's request header and, where it has an origin, its own, and
-  MUST send a content security policy that lets a page load and request
-  nothing from outside the UI itself (0041-command-line FR-025).
-- **FR-027**: `agora check ui` MUST start each UI on a free port in its own
-  process, fetch every page and a sample of its resource routes, and fail on
-  HTML that is not well formed, on a remote reference, on an action that names
-  a command the registry lacks or does not expose on `ui`, on a request that
-  changes something without the header FR-026 requires, and on an event
-  stream that does not answer; it MUST check that Datastar is vendored at the
-  version recorded (FR-019). Given `--runner browser`, which the `browser`
-  suite does, it MUST also load the console in Chromium and run one read
-  action end to end, and be reported as skipped, with the program's hint, when
-  Chromium is missing (0041-command-line FR-006, FR-033). Without it, it MUST
-  say that the browser part did not run.
 
 ## Continuous integration
 
@@ -300,13 +248,13 @@ own harnesses, and what CI runs.
   `design-systems.yml` MUST run `./agora check --suite browser`, `--suite
   python` and `--suite images` in separate jobs, each job installing only the
   programs outside Python it needs (0025-tooling-environment FR-011).
-  `reference-environment.yml` MUST run, inside the pinned image, `./agora
-  doctor`, `./agora check`, `./agora fresh` and `./agora test`
-  (0025-tooling-environment FR-010). The job MUST show `doctor`'s exit
-  status 3 (a program outside Python missing, 0041-command-line FR-021) as a
-  warning that names what is missing, so that a gap in the environment is seen
-  and does not fail a job whose other steps do not use the program, and MUST
-  fail on any other non-zero status.
+  `reference-environment.yml` MUST run, in the reference environment
+  (0025-tooling-environment FR-005), `./agora doctor`, `./agora check`,
+  `./agora fresh` and `./agora test` (0025-tooling-environment FR-010). The
+  job MUST show `doctor`'s exit status 3 (a program outside Python missing,
+  0041-command-line FR-021) as a warning that names what is missing, so that a
+  gap in the environment is seen and does not fail a job whose other steps do
+  not use the program, and MUST fail on any other non-zero status.
 
 ## The agent skill and proposals
 
@@ -340,12 +288,12 @@ own harnesses, and what CI runs.
 
 - The implementation of any one command beyond the rules here and in
   0041-command-line.
-- A command line for any other repository.
+- An orchestrator for any other repository.
 - The design systems' own rules and harnesses (0014-design-systems).
 
 ## Edge cases
 
-- A tool or workflow here that names another repository's command line: not
+- A tool or workflow here that names another repository's orchestrator: not
   allowed, per FR-003; the name belongs as data only where a register already
   holds it.
 - Another repository's specs checked with this repository's rules: `agora
@@ -363,16 +311,6 @@ own harnesses, and what CI runs.
   instead, per FR-021.
 - A script that still exists after its function is in `agora`: it is deleted
   with its references, per FR-016.
-- A UI that wants a CDN script: not allowed; Datastar is vendored, per FR-019
-  and 0041-command-line FR-026.
-- `ui serve console` while it is running: refused, naming the address, per
-  FR-023.
-- A write whose preview was made for other values: the server refuses to run
-  it, per FR-024.
-- A page on another origin that posts to the console's address: refused, per
-  FR-026.
-- `ui link assurance` with no assurance UI running: an error saying to run `ui
-  serve assurance`, per FR-023.
 - `design-system new` for a slug with a spec and no ontology entry: refused,
   and nothing is written, per FR-009.
 - A generated file hand-edited, such as a brand's `brand.css`: `agora fresh`
@@ -390,8 +328,10 @@ own harnesses, and what CI runs.
   FR-028.
 - A reference environment without a program `doctor` declares: the workflow
   warns and names it and does not fail, per FR-022.
-- A console page is viewed or a `read` command run: nothing is logged, per
-  FR-021.
+- A view or a `read` command is run: nothing is logged, per FR-021.
+- A view that needs a page outside `design-systems/`: not offered, per FR-019.
+- A new editor view: declared in code by presence and named by no other file,
+  per FR-019 and 0041-command-line FR-007.
 
 ## Assumptions
 
@@ -408,18 +348,30 @@ own harnesses, and what CI runs.
   harness's documented command.
 - **OQ-2**: The reference environment lacks `potrace`, which `decoration
   generate --only trace` needs, so its `doctor` exits 3. The program belongs in
-  workspaces-host-v3's `press` persona (0025-tooling-environment FR-007); until
-  it is there, `reference-environment.yml` shows the gap as a warning (FR-022).
+  the `press` kit (0025-tooling-environment FR-007); until it is there,
+  `reference-environment.yml` shows the gap as a warning (FR-022).
+- **OQ-3**: `agora` still declares its registry in manifests and its UI-less
+  views are not yet declared; moving the registry into code (FR-001) and
+  declaring the editor views (FR-019) is pending, and until it is done the
+  requirements that depend on it are enforced by nothing.
+- **OQ-4**: CI currently runs inside the published image of the earlier
+  reference environment, which stays published until the environment
+  orchestrator's first release. Once that release ships, CI moves to GitHub's
+  Ubuntu runners, running its `install.sh` and `ws-host kit add <kit>` for the
+  kit the repository declares in `.workspaces-host/ws-host.env`; until then
+  `tools/reference-environment` and the devcontainer keep the image pin
+  (FR-011, FR-022).
 
 ## Key entities
 
-- **agora** — the public root's command line, the one thing CI calls.
+- **agora** — the public root's orchestrator, the one thing CI calls.
 - **The command set** — the commands declared in the ontology and the
   registry, which must agree.
 - **A suite** — `spec`, `browser`, `python` or `images`: the sections one CI
   job runs.
-- **A UI** — `console`, the registry browser, or `assurance`, the server of
-  the design systems' in-browser harnesses; each runs inside `agora`.
+- **An editor view** — `console`, the registry browser, or `assurance`, the
+  list of the design systems' in-browser harness pages; each is a resource the
+  editor extension shows, and `agora` runs no server for either.
 - **A proposal** — a tracked, replayable change an agent drafts for a person to
   accept (FR-029).
 - **A generator** — brand-theme, brand-specimen, openedx-sources,
@@ -435,8 +387,8 @@ own harnesses, and what CI runs.
   directory and `tools/agora/`.
 - **SC-004**: No file of `agora` names or reads another repository.
 - **SC-005**: Every workflow's run steps call `agora`.
-- **SC-006**: `agora check ui` passes with both UIs serving on loopback ports and
-  no page naming a remote host.
+- **SC-006**: `agora` runs no server: it has no `ui` command, and both views
+  render from `read` commands' resources.
 
 ## Review & acceptance checklist
 

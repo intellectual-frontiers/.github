@@ -1,5 +1,5 @@
 # Runs every design system's assurance harness on every push and pull request that touches a design system or the
-# command line that runs them (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-022): the browser harnesses
+# orchestrator that runs them (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-022): the browser harnesses
 # (web, slides, course and brand design systems) and the Open edX package in one job, the Python harnesses (print on
 # TeX Live, merchandise, figure, slides, course, media, signage, email and voice design systems) in another, each
 # under every brand here, and each brand's imagery pool and share card in a third. A job installs only the programs

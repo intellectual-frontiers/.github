@@ -18,18 +18,18 @@ from .types import ArgType
 
 VERBS = ("list", "show", "status", "check", "build", "generate", "add", "set", "record", "new", "advance", "publish", "serve")
 NOUNLESS = ("check", "fresh", "test", "doctor", "lock", "context")  # 0041 FR-010
-CONTROL_WORDS = {"ui": ("serve", "open", "stop", "link"), "mcp": ("serve",)}  # 0041 FR-011
+CONTROL_WORDS = {"mcp": ("serve",)}  # 0041 FR-011
 CATEGORIES = ("read", "check", "record", "build", "generate", "decision", "setup")  # 0041 FR-014
-SURFACES = ("ui", "mcp")
+SURFACES = ("editor", "mcp")
 WRITES = ("record", "build", "generate", "decision", "setup")  # every category but read and check (0041 FR-015)
 
 
 def default_surfaces(category: str) -> tuple[str, ...]:
     """0041 FR-022: by category."""
     if category in ("read", "check", "record", "build", "generate"):
-        return ("ui", "mcp")
+        return ("editor", "mcp")
     if category == "decision":
-        return ("ui",)
+        return ("editor",)
     return ()
 
 
@@ -361,7 +361,7 @@ class Registry:
                 out.append(f"{c.id}: a decision command must not be exposed over MCP (0041 FR-023)")
             for s in self.surfaces_of(c):
                 if s not in SURFACES:
-                    out.append(f"{c.id}: surface {s!r} is not ui or mcp (0041 FR-022)")
+                    out.append(f"{c.id}: surface {s!r} is not editor or mcp (0041 FR-022)")
             for a in c.args:
                 if a.type not in self.types and a.type != "TEXT":
                     out.append(f"{c.id}: argument {a.name} has type {a.type}, which no group declares (0041 FR-013)")

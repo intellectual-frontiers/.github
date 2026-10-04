@@ -60,7 +60,7 @@ class SpecCommands(TempRepo):
 
     def test_spec_set_is_a_decision(self):
         _, doc = run_json(["command", "show", "spec set"])
-        self.assertEqual((doc["data"]["category"], doc["data"]["surfaces"]), ("decision", ["terminal", "ui"]))
+        self.assertEqual((doc["data"]["category"], doc["data"]["surfaces"]), ("decision", ["terminal", "editor"]))
 
     def test_requirement_set_writes_only_the_register(self):
         before = (self.root / "spec-kit/specs/0001-first/spec.md").read_text()
@@ -162,7 +162,7 @@ class OtherCommands(unittest.TestCase):
         self.assertEqual((d["noun"], d["verb"], d["category"], d["group"]), ("requirement", "set", "record", "spec"))
         self.assertEqual(d["arguments"][0]["type"], "REQUIREMENT")
         self.assertIn("--dry-run", [o["flag"] for o in d["options"]])
-        self.assertEqual(d["surfaces"], ["terminal", "ui", "mcp"])
+        self.assertEqual(d["surfaces"], ["terminal", "editor", "mcp"])
         self.assertEqual(run_json(["command", "show", "nope"])[0], 2)
 
     def test_context_for_a_spec_and_a_requirement(self):
