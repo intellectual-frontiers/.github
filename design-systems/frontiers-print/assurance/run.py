@@ -13,9 +13,11 @@ default layout) with that brand as the theme, and checks:
   - every font in the PDF is embedded and is one this design system ships (fonts/);
   - each theme color the style files use reached the build as the brand's value (brand.tex);
   - the brand's lockups and icon are placed in the book;
+  - the PDF's text layer maps every glyph to its Unicode character: no private-use code point, and the sans sample
+    line extracts as set;
   - no style file holds a color literal: every color is a role or a mix of roles (0014-design-systems FR-044).
 
-Needs Python 3, latexmk with XeLaTeX and LuaLaTeX, and poppler-utils (pdfinfo, pdffonts, pdfimages). Exits
+Needs Python 3, latexmk with XeLaTeX and LuaLaTeX, and poppler-utils (pdfinfo, pdffonts, pdfimages, pdftotext). Exits
 non-zero on any failure. This file is the harness and its documentation.
 """
 from __future__ import annotations
@@ -109,6 +111,14 @@ def run(brand: Path, keep: Path | None) -> Result:
                 # A PostScript name is the family's name plus its instance (SourceSerif4Roman-12pt for SourceSerif4-*).
                 flat = re.sub(r"[^A-Za-z0-9]", "", base)
                 r.check(any(flat.startswith(f) for f in families), f"{name}: font {base} is not one this design system ships")
+            # The text layer maps every glyph to its Unicode character (spec FR-019): no private-use code point, the
+            # fixture's typographic quotes extract as themselves, and its sans line extracts as one unspaced string.
+            text = subprocess.run(["pdftotext", "-enc", "UTF-8", str(pdf), "-"], capture_output=True, text=True).stdout
+            pua = sorted({f"U+{ord(c):04X}" for c in text if 0xE000 <= ord(c) <= 0xF8FF})
+            r.check(not pua, f"{name}: the text layer holds private-use code points {', '.join(pua)}; a font feature put glyphs in the PDF with no Unicode mapping")
+            flat_text = " ".join(text.split())
+            r.check("NOTE: A-B (C) 2026-10 © 2026 Shahid, it’s “set in the sans”." in flat_text,
+                    f"{name}: the sans sample line does not extract as the text that was set (a quote, colon, hyphen, parenthesis or letter-spacing is wrong in the text layer)")
             for color, role in colors.items():
                 got = re.search(rf"THEME {color}=(\w+):([^\s]+)", log)
                 want = _expected(role, values)
@@ -117,7 +127,7 @@ def run(brand: Path, keep: Path | None) -> Result:
             if name == "article":
                 # The default typeface set pairs the serif with the house sans, Inter (spec FR-008).
                 names = {line.split()[0].split("+")[-1] for line in fonts}
-                r.check(any(n.startswith("Inter-") for n in names), f"article: its sans is not Inter ({', '.join(sorted(names))})")
+                r.check(any(re.match(r"Inter(TT)?-", n) for n in names), f"article: its sans is not Inter ({', '.join(sorted(names))})")
             if name == "book":
                 # The book's sans is the theme's font-sans in every style the interior sets (spec FR-004, FR-005).
                 styles = {re.sub(r"-Identity-H$", "", line.split()[0].split("+")[-1]) for line in fonts}
