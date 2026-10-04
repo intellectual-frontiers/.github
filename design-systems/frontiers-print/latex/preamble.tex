@@ -45,6 +45,7 @@
   Extension=.otf,
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+  RawFeature={-calt},
 ]
 \newfontfamily\ifmono{SourceCodePro}[
   Path=\iffontdir,
@@ -52,10 +53,10 @@
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
 ]
-\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular]
-\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium]
-\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold]
-\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold]
+\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular, RawFeature={-calt}]
+\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium, RawFeature={-calt}]
+\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold, RawFeature={-calt}]
+\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold, RawFeature={-calt}]
 \newfontfamily\iffjallaone{FjallaOne}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular]
 \newfontfamily\ifjacketsans{RobotoCondensed}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]
 \newfontfamily\iftryaimono{MartianMonoCondensed}[
