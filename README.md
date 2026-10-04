@@ -101,6 +101,28 @@ The longer essay is
 
 ## For editors and maintainers
 
+### Start working
+
+Everything this repository's tools need is already in the workspace. There
+is nothing to install and no `make install` (0024, 0025). Pick one:
+
+1. **In your browser, nothing installed** (the default on macOS and
+   Windows 11): [Open in GitHub Codespaces](https://codespaces.new/intellectual-frontiers/.github).
+2. **On your own computer, in a container:** install
+   [VS Code](https://code.visualstudio.com/) and
+   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on
+   Windows, with its WSL 2 backend), then
+   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/intellectual-frontiers/.github).
+3. **On Linux or in a VM, without containers:** install
+   [workspaces-host-v3](https://intellectual-frontiers.github.io/workspaces-host-v3/)
+   and activate the `press` persona.
+
+Whichever you pick, **log in to GitHub first.** When the workspace opens,
+it asks you to (`gh auth login`); in a Codespace you are already logged
+in. It then clones `.github`, `eidolon` and `www.intellectualfrontiers.com`
+beside each other, from
+[`.devcontainer/ws-repos.json`](.devcontainer/ws-repos.json).
+
 ### Three repositories, one Eidolon
 
 | Repository | Role | May contain |
@@ -127,9 +149,14 @@ spec-kit/
                     in each repository
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
   controls.tsv      which compliance control each requirement addresses
-                    (0027-compliance-controls)
+                    (0028-compliance-controls)
 tools/
   spec_check.py     checks specs and the register; CI runs it on every push
+  reference-environment
+                    the workspaces-host-v3 commit every tool is guaranteed
+                    to run in (0025-tooling-environment)
+.devcontainer/      the workspace this repository opens in, and the
+                    repositories it clones beside it (0026-workspaces)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace)
   ifweb.ttl         web content shapes (the ifweb: namespace)
@@ -203,8 +230,11 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
-| [0027](spec-kit/specs/0027-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
-| [0028](spec-kit/specs/0028-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
+| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
+| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
+| [0028](spec-kit/specs/0028-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
+| [0029](spec-kit/specs/0029-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -262,21 +292,24 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 ### Brand assets and design systems
 
 [`design-systems/frontiers-brand/`](design-systems/frontiers-brand/) holds the
-palette, unit colors, typefaces, logo (light and dark), icon and favicon.
-[`design-systems/frontiers-nature-web/`](design-systems/frontiers-nature-web/) is the
-public, editorial web design system: tokens, CSS, fonts, the hero and diagram
-images, and share card.
-[`design-systems/frontiers-console-web/`](design-systems/frontiers-console-web/) is the
-web design system for operator (admin) and documentation surfaces. Both web
-systems derive from `frontiers-brand`; every public house rule about how Intellectual
-Frontiers looks, reads or sounds (print, figures, written and spoken voice)
-belongs in a design system of its kind here too (0014). Every design system
+palette, unit colors, typefaces, logo (light and dark), icon, app icons, unit marks,
+the imagery pool, the share card and the decoration kit; it themes every other design
+system. The others, one directory each and listed with their kinds in
+[`design-systems/README.md`](design-systems/README.md): the web
+(`frontiers-nature-web`, `frontiers-console-web`), print (`frontiers-print`,
+`frontiers-signage-print`), figures (`frontiers-figures`), slides (`frontiers-slides`),
+media (`frontiers-media`), email (`frontiers-email`), courses (`frontiers-course`), merchandise
+(`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
+`frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
+looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system
 carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
 runs it on every push that touches `design-systems/`.
 
 - Logos: `design-systems/frontiers-brand/logos/` (PNG; WebP in `logos/web/`).
   Use the `-dark-` variants on dark backgrounds.
-- Images: `design-systems/frontiers-nature-web/images/`.
+- Pictures: the brand's imagery pool, `design-systems/frontiers-brand/imagery/`; app icons and the share card in
+  `design-systems/frontiers-brand/images/`; figures are drawn with `design-systems/frontiers-figures/` (the
+  profile's are made by `profile/figures/make.py`).
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one
@@ -289,6 +322,8 @@ runs it on every push that touches `design-systems/`.
 - [ ] A spec exists for the change, and any spec it affects is amended.
 - [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
+- [ ] Any tool you add declares its prerequisites and installs nothing; it
+      runs from a fresh clone in workspaces-host-v3 (0025).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.

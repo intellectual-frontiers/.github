@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "Intellectual Frontiers .github",
+  // The reference environment's press image (0025-tooling-environment FR-005, 0026-workspaces FR-004): the design
+  // systems' print harnesses need TeX. Its tag must match tools/reference-environment (0025 FR-008).
+  "image": "ghcr.io/intellectual-frontiers/workspaces-host-v3-press:sha-516c77c",
+  "remoteUser": "root",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteEnv": {
+    "WS_REPOS_CONFIG": "${containerWorkspaceFolder}/.devcontainer/ws-repos.json"
+  },
+  // Nothing is installed here (0026 FR-006). On create, workspace-links.sh puts this checkout in the ~/workspaces layout
+  // ws-repos manages and links its sibling repositories beside it (0026 FR-015); login and cloning, by ws-repos ensure
+  // into ~/workspaces, wait for the first attach, when a person is there to log in to GitHub (0026 FR-007, FR-008).
+  "postCreateCommand": "bash -lc 'git config --global --add safe.directory \"*\" && sh .devcontainer/workspace-links.sh && (doctor || true)'",
+  "postAttachCommand": "bash -lc 'ws-start'"
+}

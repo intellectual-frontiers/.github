@@ -291,18 +291,18 @@ CONTROL = re.compile(r"^ifcore:[\w-]+ a skos:Concept ; skos:inScheme ifcore:(\w+
 
 
 def controls_of(ttl: str) -> set[str]:
-    """Every control as '<catalog notation>:<control notation>' (0027-compliance-controls FR-001, FR-005)."""
+    """Every control as '<catalog notation>:<control notation>' (0028-compliance-controls FR-001, FR-005)."""
     catalogs = dict(CATALOG.findall(ttl))
     return {f"{catalogs[scheme]}:{code}" for scheme, code in CONTROL.findall(ttl) if scheme in catalogs}
 
 
-# The control catalogs are public (0027 FR-001), so they are always read from the public root this file lives in.
+# The control catalogs are public (0028 FR-001), so they are always read from the public root this file lives in.
 _PUBLIC_TTL = Path(__file__).resolve().parent.parent / "ontology" / "ifcore.ttl"
 CONTROLS = controls_of(_PUBLIC_TTL.read_text(encoding="utf-8")) if _PUBLIC_TTL.is_file() else set()
 
 
 def check_control_map(root: Path) -> tuple[list[Finding], int]:
-    """0027-compliance-controls FR-005, FR-006: every row of root's control map names a requirement in root's own
+    """0028-compliance-controls FR-005, FR-006: every row of root's control map names a requirement in root's own
     specs and a control in a catalog, once. Returns findings and the number of rows. A repository whose specs
     address no control has no control map."""
     findings: list[Finding] = []
@@ -318,18 +318,18 @@ def check_control_map(root: Path) -> tuple[list[Finding], int]:
         where = f"{rel}:{lineno}"
         cols = raw.split("\t")
         if len(cols) < 2:
-            findings.append(Finding("error", where, "a row is requirement, control[, note], tab-separated (0027 FR-005)"))
+            findings.append(Finding("error", where, "a row is requirement, control[, note], tab-separated (0028 FR-005)"))
             continue
         req, ctl = cols[0].strip(), cols[1].strip()
         m = REQ.match(req)
         if not m:
-            findings.append(Finding("error", where, f"{req!r} is not '<spec> FR-NNN' (0027 FR-005)"))
+            findings.append(Finding("error", where, f"{req!r} is not '<spec> FR-NNN' (0028 FR-005)"))
         elif m.group("id") not in own.get(m.group("spec"), set()):
-            findings.append(Finding("error", where, f"{req} does not exist in this repository's specs (0027 FR-006)"))
+            findings.append(Finding("error", where, f"{req} does not exist in this repository's specs (0028 FR-006)"))
         if ctl not in CONTROLS:
-            findings.append(Finding("error", where, f"{ctl!r} is not '<catalog>:<control>' for a control in a catalog (0027 FR-006)"))
+            findings.append(Finding("error", where, f"{ctl!r} is not '<catalog>:<control>' for a control in a catalog (0028 FR-006)"))
         if (req, ctl) in seen:
-            findings.append(Finding("error", where, f"{req} and {ctl} have more than one row (0027 FR-005)"))
+            findings.append(Finding("error", where, f"{req} and {ctl} have more than one row (0028 FR-005)"))
         seen.add((req, ctl))
     return findings, len(seen)
 
@@ -360,6 +360,29 @@ def check_design_systems(root: Path) -> list[Finding]:
         if not (d / "spec.md").is_file():
             findings.append(Finding("warning", rel, "has no spec.md stating its house rules (0014-design-systems FR-022)"))
     return findings
+
+
+PIN = re.compile(r"^github:[\w.-]+/[\w.-]+/[0-9a-f]{40}$")
+
+
+def check_reference_environment(root: Path) -> list[Finding]:
+    """0025-tooling-environment FR-008: tools/reference-environment pins the reference environment as one
+    flake reference at a full commit, and the devcontainer's image, if there is one, is tagged with that commit."""
+    pin = root / "tools" / "reference-environment"
+    if not (root / "tools").is_dir():
+        return []
+    if not pin.is_file():
+        return [Finding("error", "tools/reference-environment", "is missing; pin the reference environment (0025-tooling-environment FR-008)")]
+    lines = [l for l in pin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    if len(lines) != 1 or not PIN.match(lines[0].strip()):
+        return [Finding("error", "tools/reference-environment", "must hold one line, github:<owner>/<repo>/<40-hex commit> (0025-tooling-environment FR-008)")]
+    commit = lines[0].strip().rsplit("/", 1)[1]
+    dc = root / ".devcontainer" / "devcontainer.json"
+    if dc.is_file():
+        image = re.search(r'"image"\s*:\s*"[^"]*:sha-([0-9a-f]+)"', dc.read_text(encoding="utf-8"))
+        if not image or not commit.startswith(image.group(1)) or len(image.group(1)) < 7:
+            return [Finding("error", ".devcontainer/devcontainer.json", f"its image must be tagged sha-{commit[:7]}, matching tools/reference-environment (0025-tooling-environment FR-008)")]
+    return []
 
 
 def _concepts(ttl: str, scheme: str) -> set[str]:
@@ -406,12 +429,14 @@ def _check_web_classification(ttl: str) -> list[Finding]:
             findings.append(Finding("error", where, "an email design system names no email type (0014-design-systems FR-051)"))
         if "MediaDesignSystemKind" in named and not named & _concepts(ttl, "MediaAssetTypeScheme"):
             findings.append(Finding("error", where, "a media design system names no media asset type (0014-design-systems FR-050)"))
+        if "CourseDesignSystemKind" in named and not all(named & _concepts(ttl, s) for s in ("CourseFormatScheme", "AssessmentItemTypeScheme", "CourseDeliveryTargetScheme")):
+            findings.append(Finding("error", where, "a course design system names no course format, assessment item type or delivery target (0014-design-systems FR-052)"))
         if "SlidesDesignSystemKind" in named and not named & _concepts(ttl, "DeckTypeScheme"):
             findings.append(Finding("error", where, "a slides design system names no deck type (0014-design-systems FR-049)"))
         if "FigureDesignSystemKind" in named and not named & figure_types:
             findings.append(Finding("error", where, "a figure design system names no figure type (0014-design-systems FR-032)"))
-        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
-            findings.append(Finding("error", where, "a web, print or slides design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
+        if named & {"WebDesignSystemKind", "PrintDesignSystemKind", "SlidesDesignSystemKind", "CourseDesignSystemKind"} and "ifcore:drawsFiguresWith" not in block:
+            findings.append(Finding("error", where, "a web, print, slides or course design system names no figure design system by ifcore:drawsFiguresWith (0014-design-systems FR-048)"))
     methods, categories = _concepts(ttl, "DecorationMethodScheme"), _concepts(ttl, "ProductCategoryScheme")
     for block in re.split(r"\n\s*\n", ttl):
         m = re.search(r'^ifcore:\w+ a ifcore:DesignSystem ;[\s\S]*?dcterms:identifier "([^"]+)"', block, re.M)
@@ -481,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     root = args.root.resolve()
     public = args.public.resolve() if args.public else None
-    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root)
+    findings = check_format(root, public) + check_prefixes(root) + check_design_systems(root) + check_reference_environment(root)
     reg, nones, counts = check_register(root, public)
     findings += reg
     cmap, mapped = check_control_map(root)

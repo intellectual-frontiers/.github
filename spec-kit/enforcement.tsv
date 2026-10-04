@@ -308,10 +308,11 @@ requirement	mechanism	by	note
 0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
 0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
 0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
-0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web and print DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
+0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web, print, slides and course DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
 0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
 0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
 0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
+0014-design-systems FR-052	check	.github: python3 tools/spec_check.py	a course design system names a course format, an assessment item type, a delivery target and its figure design system; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -450,6 +451,7 @@ frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures
 frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
 frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
 frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-figures FR-012	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	series contrast, color-blind and grayscale distinctness, sequential order and steps; direct labels by the layouts
 frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
 frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
 frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
@@ -466,7 +468,10 @@ frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assura
 frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
 frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
 frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
-frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit: lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
+frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit (and frontiers-merchandise's harness refusing orders in unverified inks): lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
+frontiers-brand FR-018	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: every app icon and favicon.ico present at its size; Logo files: each loads at its size
+frontiers-brand FR-019	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
+frontiers-brand FR-020	check	.github: PARAGON=… python3 design-systems/frontiers-brand/assurance/run.py	brand_openedx.py check: the package and dist/ are what the tool and Paragon write; built pairs meet 4.5:1 (CI browser job)
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
@@ -695,6 +700,24 @@ frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/ass
 frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
 frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
 frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats, item types and delivery targets; run.py checks the classification and drawsFiguresWith
+frontiers-course FR-002	none	-	directory contents; no check
+frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; a table, a missing title and misplaced videos are refused
+frontiers-course FR-004	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
+frontiers-course FR-005	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: outcome count, observable verbs, no vague verbs, one sentence
+frontiers-course FR-006	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: untaught, unassessed and unknown outcomes; units end with an assessment; one graded
+frontiers-course FR-007	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: unique ids, choice counts, correct counts, feedback, answer keys
+frontiers-course FR-008	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: minutes by type, honest minutes, week order and weekly effort
+frontiers-course FR-009	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: alternative text, captions, heading levels, link text, color or position alone
+frontiers-course FR-010	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check sweeps text under written voice and transcripts under spoken voice
+frontiers-course FR-011	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check runs figcheck over a lesson's SVG figures
+frontiers-course FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-course FR-013	check	.github: python3 design-systems/frontiers-course/assurance/run.py	each target is refused for a failing course and is byte-identical across two builds
+frontiers-course FR-014	check	.github: python3 design-systems/frontiers-course/assurance/run.py; node design-systems/frontiers-course/assurance/run.mjs	run.py: no color literal, role contrast under every brand, lang, one h1, alternative text, links resolve; run.mjs: phone and desktop width, rendered contrast, fonts, skip link
+frontiers-course FR-015	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs grades every fixture item right and wrong; run.mjs answers every item by its key in Chromium
+frontiers-course FR-016	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs runs cmi5.js against a mock LMS; cmi5.xml validated against CourseStructure.xsd; every AU's page and objectives
+frontiers-course FR-017	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the tarball's structure, every url_name, static file, transcript, problem type and the grading policy
+frontiers-course FR-018	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, and run.mjs under every brand
 frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
 frontiers-email FR-002	none	-	directory contents; no check
 frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
@@ -707,42 +730,90 @@ frontiers-email FR-009	check	.github: python3 design-systems/frontiers-email/ass
 frontiers-email FR-010	check	.github: python3 design-systems/frontiers-email/assurance/run.py	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
 frontiers-email FR-011	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check sweeps subject, preheader and text
 frontiers-email FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-0027-compliance-controls FR-001	check	eidolon: eid check compliance	each ControlCatalog has a unique notation, and each control a notation unique in its catalog
-0027-compliance-controls FR-002	none	-	whether a publisher holds copyright in a control's text is judgment; the catalog's dcterms:source is checked with FR-001
-0027-compliance-controls FR-003	check	eidolon: eid check compliance	exactly one revision reference per catalog, re-verified at least yearly; overdue ones are in the status report
-0027-compliance-controls FR-004	check	eidolon: eid check compliance	a collection is part of one catalog and selects only that catalog's controls
-0027-compliance-controls FR-005	check	.github: python3 tools/spec_check.py	each control map row's shape, requirement, and control; the vault's map through eid check specs
-0027-compliance-controls FR-006	check	.github: python3 tools/spec_check.py	a row naming a missing requirement or control fails; whether the rule truly addresses the control is judgment
-0027-compliance-controls FR-007	check	eidolon: eid compliance-status	gaps per boundary, weekly (compliance workflow)
-0027-compliance-controls FR-008	check	eidolon: eid compliance-status	controls whose every mapped requirement is enforced by none
-0027-compliance-controls FR-009	check	eidolon: eid check compliance	one provider, a baseline of catalogs or collections, and an audience on each boundary
-0027-compliance-controls FR-010	none	-	the system security plan generator is not yet built; the status report is its first part
-0027-compliance-controls FR-011	check	eidolon: eid check compliance	each boundary is named by schema:about on a Decision that is not a disposition
-0027-compliance-controls FR-012	check	eidolon: eid check compliance	one boundary, one disposition, and a dcterms:valid within a year of decidedAt
-0027-compliance-controls FR-013	check	eidolon: eid check compliance	no accepted-risk or planned-remediation disposition on a control a NoPlanOfActionAllowed baseline selects
-0027-compliance-controls FR-014	none	-	evidence ledger not yet built; where it lives is 0027 OQ-1
-0027-compliance-controls FR-015	none	-	evidence ledger not yet built (0027 OQ-1)
-0027-compliance-controls FR-016	none	-	evidence ledger not yet built (0027 OQ-1)
-0027-compliance-controls FR-017	none	-	evidence ledger not yet built (0027 OQ-1)
-0027-compliance-controls FR-018	none	-	evidence ledger not yet built (0027 OQ-1)
-0027-compliance-controls FR-019	check	eidolon: eid check sensitive	government information markings in tracked vault files; anything unmarked is judgment
-0027-compliance-controls FR-020	none	-	whether an audience stands for a marking is judgment
-0027-compliance-controls FR-021	none	-	no system holding Controlled Unclassified Information is modelled yet
-0027-compliance-controls FR-022	check	eidolon: eid check compliance	a Grant to an Agreement naming a boundary states validUntil within a year of validFrom
-0027-compliance-controls FR-023	check	eidolon: eid check compliance	an assessment reference describes a boundary and states dcterms:valid; reports are kept out by eid check sensitive
-0027-compliance-controls FR-024	check	eidolon: eid check compliance	runs in make check on every push to the vault
-0027-compliance-controls FR-025	check	eidolon: eid compliance-status	weekly; the compliance workflow keeps one compliance issue current
-0028-government-registrations FR-001	check	eidolon: eid check compliance	each registration reference carries exactly one registration kind
-0028-government-registrations FR-002	check	eidolon: eid check compliance	the organization a registration describes provides a boundary or is named by a Decision
-0028-government-registrations FR-003	check	eidolon: eid check compliance	an Organization, or a ComplianceBoundary for an affirmation
-0028-government-registrations FR-004	check	eidolon: eid check compliance	a dcterms:valid or cached value needs resolvedAt; literals elsewhere are judgment
-0028-government-registrations FR-005	check	eidolon: eid check compliance	a verified recurring filing states the next due date as dcterms:valid
-0028-government-registrations FR-006	check	eidolon: eid check compliance	a primary source is stated; whether it is the government's own record is judgment
-0028-government-registrations FR-007	check	eidolon: eid check compliance	cadence no longer than ninety days, method automated or manual
-0028-government-registrations FR-008	check	eidolon: eid check compliance	no taxpayer identification number or email address in a registration's cached value
-0028-government-registrations FR-009	check	eidolon: eid compliance-status	expiry within ninety days, or passed, unless a Decision names the registration
-0028-government-registrations FR-010	none	-	whether a registration was obtained by a Decision is not observable
-0028-government-registrations FR-011	none	-	no tool submits to a government; nothing to gate
-0028-government-registrations FR-012	check	eidolon: eid check compliance	an affirmation names what it affirms; a current one over a gap or open disposition fails in the status report
-0028-government-registrations FR-013	check	eidolon: eid check compliance	runs in make check on every push to the vault
-0028-government-registrations FR-014	check	eidolon: eid compliance-status	weekly, in the compliance issue
+frontiers-signage-print FR-001	check	.github: python3 tools/spec_check.py	registration, document types and figure design system
+frontiers-signage-print FR-002	none	-	directory contents; no check
+frontiers-signage-print FR-003	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	formats.json holds no color; pictures and logo come from the brand
+frontiers-signage-print FR-004	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	every format renders to one page of trim plus bleed; bleed at least 3mm
+frontiers-signage-print FR-005	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: safe margin and the banner's hidden band
+frontiers-signage-print FR-006	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	each tone's contrast under every brand
+frontiers-signage-print FR-007	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: lockup and picture at 150 pixels per inch or more
+frontiers-signage-print FR-008	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: title words and fit, details count and fit, 9pt minimum
+frontiers-signage-print FR-009	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check sweeps the text with the written voice
+frontiers-signage-print FR-010	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	only the sans embedded in every rendered PDF
+frontiers-signage-print FR-011	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	fail fixtures refused for their reason
+frontiers-signage-print FR-012	none	-	no sign layout places a figure yet; a consumer placing one uses frontiers-figures
+frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
+0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
+0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
+0025-tooling-environment FR-004	none	-	no check scans tools for installs at run time
+0025-tooling-environment FR-005	none	-	names the environment; nothing tests it
+0025-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
+0025-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
+0025-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
+0025-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
+0025-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
+0025-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
+0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0025-tooling-environment FR-013	check	eidolon: eid test	test_every_package_is_pinned, test_a_stale_lock_is_a_problem; the lock check runs in eid check
+0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
+0026-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0026-workspaces FR-003	none	-	no check
+0026-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
+0026-workspaces FR-005	none	-	no check reads ws-repos.json
+0026-workspaces FR-006	none	-	no check reads devcontainer.json
+0026-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
+0026-workspaces FR-008	none	-	no check reads devcontainer.json
+0026-workspaces FR-009	none	-	documentation judgment
+0026-workspaces FR-010	none	-	no check reads the README
+0026-workspaces FR-011	none	-	documentation judgment
+0026-workspaces FR-012	none	-	no check inspects the image manifest
+0026-workspaces FR-013	none	-	no check
+0026-workspaces FR-014	none	-	no check
+0026-workspaces FR-015	none	-	no check; verified by hand with the devcontainer CLI, where ws-repos ensure pulls the linked checkout and clones only the rest
+0027-course-works FR-001	none	-	whether a work teaches at length is judgment
+0027-course-works FR-002	check	eidolon: eid check works	works.py fails a course package without course/course.adoc
+0027-course-works FR-003	check	eidolon: eid check works	works.py fails a course package without course-bible.md
+0027-course-works FR-004	check	eidolon: eid check works	works.py fails a :derived-from: that names no work in the vault; that lessons are not pasted prose is the audit's
+0027-course-works FR-005	check	eidolon: eid check works	works.py runs course.py check on a course at Prep or later and fails it on any problem
+0027-course-works FR-006	check	eidolon: eid check works	build/ is ignored; 0015 FR-014's check fails a tracked rendition; where grades are kept is review
+0027-course-works FR-007	none	-	a run is recorded as a Decision on the work; nothing checks that a source names no platform
+0028-compliance-controls FR-001	check	eidolon: eid check compliance	each ControlCatalog has a unique notation, and each control a notation unique in its catalog
+0028-compliance-controls FR-002	none	-	whether a publisher holds copyright in a control's text is judgment; the catalog's dcterms:source is checked with FR-001
+0028-compliance-controls FR-003	check	eidolon: eid check compliance	exactly one revision reference per catalog, re-verified at least yearly; overdue ones are in the status report
+0028-compliance-controls FR-004	check	eidolon: eid check compliance	a collection is part of one catalog and selects only that catalog's controls
+0028-compliance-controls FR-005	check	.github: python3 tools/spec_check.py	each control map row's shape, requirement, and control; the vault's map through eid check specs
+0028-compliance-controls FR-006	check	.github: python3 tools/spec_check.py	a row naming a missing requirement or control fails; whether the rule truly addresses the control is judgment
+0028-compliance-controls FR-007	check	eidolon: eid compliance status	gaps per boundary, weekly (compliance workflow)
+0028-compliance-controls FR-008	check	eidolon: eid compliance status	controls whose every mapped requirement is enforced by none
+0028-compliance-controls FR-009	check	eidolon: eid check compliance	one provider, a baseline of catalogs or collections, and an audience on each boundary
+0028-compliance-controls FR-010	none	-	the system security plan generator is not yet built; the status report is its first part
+0028-compliance-controls FR-011	check	eidolon: eid check compliance	each boundary is named by schema:about on a Decision that is not a disposition
+0028-compliance-controls FR-012	check	eidolon: eid check compliance	one boundary, one disposition, and a dcterms:valid within a year of decidedAt
+0028-compliance-controls FR-013	check	eidolon: eid check compliance	no accepted-risk or planned-remediation disposition on a control a NoPlanOfActionAllowed baseline selects
+0028-compliance-controls FR-014	none	-	evidence ledger not yet built; where it lives is 0028 OQ-1
+0028-compliance-controls FR-015	none	-	evidence ledger not yet built (0028 OQ-1)
+0028-compliance-controls FR-016	none	-	evidence ledger not yet built (0028 OQ-1)
+0028-compliance-controls FR-017	none	-	evidence ledger not yet built (0028 OQ-1)
+0028-compliance-controls FR-018	none	-	evidence ledger not yet built (0028 OQ-1)
+0028-compliance-controls FR-019	check	eidolon: eid check sensitive	government information markings in tracked vault files; anything unmarked is judgment
+0028-compliance-controls FR-020	none	-	whether an audience stands for a marking is judgment
+0028-compliance-controls FR-021	none	-	no system holding Controlled Unclassified Information is modelled yet
+0028-compliance-controls FR-022	check	eidolon: eid check compliance	a Grant to an Agreement naming a boundary states validUntil within a year of validFrom
+0028-compliance-controls FR-023	check	eidolon: eid check compliance	an assessment reference describes a boundary and states dcterms:valid; reports are kept out by eid check sensitive
+0028-compliance-controls FR-024	check	eidolon: eid check compliance	runs in make check on every push to the vault
+0028-compliance-controls FR-025	check	eidolon: eid compliance status	weekly; the compliance workflow keeps one compliance issue current
+0029-government-registrations FR-001	check	eidolon: eid check compliance	each registration reference carries exactly one registration kind
+0029-government-registrations FR-002	check	eidolon: eid check compliance	the organization a registration describes provides a boundary or is named by a Decision
+0029-government-registrations FR-003	check	eidolon: eid check compliance	an Organization, or a ComplianceBoundary for an affirmation
+0029-government-registrations FR-004	check	eidolon: eid check compliance	a dcterms:valid or cached value needs resolvedAt; literals elsewhere are judgment
+0029-government-registrations FR-005	check	eidolon: eid check compliance	a verified recurring filing states the next due date as dcterms:valid
+0029-government-registrations FR-006	check	eidolon: eid check compliance	a primary source is stated; whether it is the government's own record is judgment
+0029-government-registrations FR-007	check	eidolon: eid check compliance	cadence no longer than ninety days, method automated or manual
+0029-government-registrations FR-008	check	eidolon: eid check compliance	no taxpayer identification number or email address in a registration's cached value
+0029-government-registrations FR-009	check	eidolon: eid compliance status	expiry within ninety days, or passed, unless a Decision names the registration
+0029-government-registrations FR-010	none	-	whether a registration was obtained by a Decision is not observable
+0029-government-registrations FR-011	none	-	no tool submits to a government; nothing to gate
+0029-government-registrations FR-012	check	eidolon: eid check compliance	an affirmation names what it affirms; a current one over a gap or open disposition fails in the status report
+0029-government-registrations FR-013	check	eidolon: eid check compliance	runs in make check on every push to the vault
+0029-government-registrations FR-014	check	eidolon: eid compliance status	weekly, in the compliance issue

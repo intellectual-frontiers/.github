@@ -1,0 +1,11 @@
+= Compare your barbers with a published count
+:type: exercise
+:minutes: 10
+:outcomes: O3
+
+Find a published count of barbers for your city or region: a licensing board, a census table or a trade association.
+Compare it with your estimate from the last unit.
+
+. Write the measured value, where it comes from, and what it leaves out.
+. Work out the gap as a ratio.
+. If the gap is more than a factor of three, name the factor you would revisit first and say why.

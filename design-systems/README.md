@@ -37,6 +37,7 @@ Each kind has a profile in
 | email | `email` | The messages the house sends by email | Layout data, and the tool that builds and checks a message |
 | media | `media` | The images that package a work for a platform | Asset formats, and the tool that lays out and renders them |
 | slides | `slides` | How a talk, lecture, workshop or briefing is presented on a screen | A slide stylesheet, and the builder and checker for decks |
+| course | `course` | How a long-form course is structured, paced, assessed and made accessible | A course schema, and the reader and checker for a course's source |
 | written voice | `written-voice` | How the house writes | Patterns a mechanical sweep looks for |
 | spoken voice | `spoken-voice` | How the voice changes for the ear | As written voice, over scripts |
 
@@ -50,6 +51,15 @@ kind; a print counterpart of a web system is a new system with its own
 slug. A new kind (motion, slides, sonic) is added by writing its profile
 in the spec and adding its concept, with a code, to the scheme. Nothing
 else moves.
+
+### Not yet covered
+
+What no kind governs yet, and what waits on people rather than code, is kept as open questions in the spec that
+owns it, so the console's backlog lists every one: [`0014-design-systems`](../spec-kit/specs/0014-design-systems/spec.md)
+(business documents and stationery, motion and sound, change records, other languages, dark tones, an accessibility
+statement), [`frontiers-brand`](frontiers-brand/spec.md) (the vector master, ink verification, the business cards),
+[`frontiers-email`](frontiers-email/spec.md) (where its images are served) and
+[`0027-course-works`](../spec-kit/specs/0027-course-works/spec.md) (course IRIs, the public course provider's terms).
 
 ## Why there's more than one of these
 

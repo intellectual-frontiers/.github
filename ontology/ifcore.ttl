@@ -128,6 +128,11 @@ ifcore:SpokenVoiceDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignS
     skos:notation "spoken-voice" ;
     skos:definition "How the house voice changes when a work is heard rather than read; always derived from a written-voice design system (0014-design-systems FR-034)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:CourseDesignSystemKind a skos:Concept ; skos:inScheme ifcore:DesignSystemKindScheme ; skos:prefLabel "course"@en ;
+    skos:notation "course" ;
+    skos:altLabel "courseware"@en , "long-form education"@en ;
+    skos:definition "How a long-form course is structured, paced, assessed and made accessible, and the delivery targets it is compiled to; it spans how a course looks and how it reads (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:WebInteractionModelScheme a skos:ConceptScheme ; rdfs:label "Web interaction model"@en ;
     rdfs:comment "What a web design system's pages are for (0014-design-systems FR-041): a read-mostly content site or a read-write web application, and the kinds of each. A web design system names every one it serves, by dcterms:type."@en ;
@@ -196,6 +201,17 @@ ifcore:JournalArticle a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeSch
 ifcore:Report a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "report"@en ;
     skos:definition "A standalone document of findings, set for print or PDF."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:Poster a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "poster"@en ;
+    skos:definition "A sign printed at large size and hung or mounted: an event, a book or a workshop."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RollUpBanner a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "roll-up banner"@en ;
+    skos:altLabel "pull-up banner"@en ;
+    skos:definition "A tall printed banner on a retractable stand, for a booth or a stage."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EventBadge a skos:Concept ; skos:inScheme ifcore:PrintDocumentTypeScheme ; skos:prefLabel "event badge"@en ;
+    skos:altLabel "name badge"@en ;
+    skos:definition "A small printed card naming its wearer at an event."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 ifcore:drawsFiguresWith a owl:ObjectProperty ; rdfs:domain ifcore:DesignSystem ; rdfs:range ifcore:DesignSystem ;
     rdfs:label "draws figures with"@en ;
@@ -225,6 +241,15 @@ ifcore:DecisionFlowchart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme 
     ifcore:hasAudience ifcore:Public .
 ifcore:HierarchyDiagram a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "hierarchy diagram"@en ;
     skos:definition "A root over its children."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BarChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "bar chart"@en ;
+    skos:definition "Values compared as bars, one per category, each labelled with its value."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LineChart a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "line chart"@en ;
+    skos:definition "One or more series over an ordered axis, usually time, each named at its end."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Timeline a skos:Concept ; skos:inScheme ifcore:FigureTypeScheme ; skos:prefLabel "timeline"@en ;
+    skos:definition "Events in order, each with its date."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:DeckTypeScheme a skos:ConceptScheme ; rdfs:label "Deck type"@en ;
@@ -279,6 +304,49 @@ ifcore:InvitationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; s
     ifcore:hasAudience ifcore:Public .
 ifcore:NotificationEmail a skos:Concept ; skos:inScheme ifcore:EmailTypeScheme ; skos:prefLabel "notification"@en ;
     skos:definition "A message about something its reader did or asked for: a confirmation, a receipt, a reminder."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CourseFormatScheme a skos:ConceptScheme ; rdfs:label "Course format"@en ;
+    skos:definition "How a course paces its learners (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SelfPacedCourse a skos:Concept ; skos:inScheme ifcore:CourseFormatScheme ; skos:prefLabel "self-paced"@en ;
+    skos:definition "A course a learner takes at their own pace, with every unit open from the start."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:InstructorPacedCourse a skos:Concept ; skos:inScheme ifcore:CourseFormatScheme ; skos:prefLabel "instructor-paced"@en ;
+    skos:altLabel "cohort"@en ;
+    skos:definition "A course a cohort takes together, with units released and due by week."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AssessmentItemTypeScheme a skos:ConceptScheme ; rdfs:label "Assessment item type"@en ;
+    skos:definition "The kinds of item a course design system's assessments ask, each graded automatically (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MultipleChoiceItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "multiple choice"@en ;
+    skos:definition "An item with one correct choice among several."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MultipleResponseItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "multiple response"@en ;
+    skos:altLabel "checkbox"@en ;
+    skos:definition "An item where the learner selects every correct choice among several."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NumericResponseItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "numeric response"@en ;
+    skos:definition "An item answered with a number, accepted within a stated tolerance."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TextMatchItem a skos:Concept ; skos:inScheme ifcore:AssessmentItemTypeScheme ; skos:prefLabel "text match"@en ;
+    skos:altLabel "text input"@en ;
+    skos:definition "An item answered with a short text, accepted if it matches one of the stated answers."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CourseDeliveryTargetScheme a skos:ConceptScheme ; rdfs:label "Course delivery target"@en ;
+    skos:definition "The forms a course design system compiles a course to, each for a place courses are delivered (0014-design-systems FR-052)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:StaticWebEdition a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "static web edition"@en ;
+    skos:definition "A course as a static web site anyone can read, its practice graded in the browser."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpenEdxOlxExport a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "Open edX OLX export"@en ;
+    skos:altLabel "OLX"@en ;
+    skos:definition "A course as an Open edX course export (Open Learning XML) that Studio imports."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Cmi5Package a skos:Concept ; skos:inScheme ifcore:CourseDeliveryTargetScheme ; skos:prefLabel "cmi5 package"@en ;
+    skos:definition "A course as a cmi5 course package an LMS imports, its pages reporting to the LMS by xAPI."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:DecorationMethodScheme a skos:ConceptScheme ; rdfs:label "Decoration method"@en ;
@@ -351,7 +419,7 @@ ifcore:FrontiersFigures a ifcore:DesignSystem ;
     dcterms:identifier "frontiers-figures" ;
     rdfs:label "Frontiers Figures"@en ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
-    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram ;
+    dcterms:type ifcore:FigureDesignSystemKind , ifcore:ProcessDiagram , ifcore:ComparisonDiagram , ifcore:CycleDiagram , ifcore:LayerDiagram , ifcore:RelationshipDiagram , ifcore:DecisionFlowchart , ifcore:HierarchyDiagram , ifcore:BarChart , ifcore:LineChart , ifcore:Timeline ;
     rdfs:comment "At design-systems/frontiers-figures/; its house rules are design-systems/frontiers-figures/spec.md. How every figure is drawn, in print, on the web and on slides: semantic SVG whose colors are figure roles, themed by a brand, in default, on-dark, grayscale and compact variants (0014-design-systems FR-032, FR-048)."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -395,6 +463,24 @@ ifcore:FrontiersEmail a ifcore:DesignSystem ;
     ifcore:designSystemStatus ifcore:DraftDesignSystem ;
     dcterms:type ifcore:EmailDesignSystemKind , ifcore:NewsletterEmail , ifcore:AnnouncementEmail , ifcore:InvitationEmail , ifcore:NotificationEmail ;
     rdfs:comment "At design-systems/frontiers-email/; its house rules are design-systems/frontiers-email/spec.md. Email built from Markdown by mail.py: 600px, table layout, styles inline, colors resolved from a brand's theme roles with a dark tone, and a plain-text alternative (0014-design-systems FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersCourse a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-course" ;
+    rdfs:label "Frontiers Course"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:CourseDesignSystemKind , ifcore:SelfPacedCourse , ifcore:InstructorPacedCourse , ifcore:MultipleChoiceItem , ifcore:MultipleResponseItem , ifcore:NumericResponseItem , ifcore:TextMatchItem , ifcore:StaticWebEdition , ifcore:OpenEdxOlxExport , ifcore:Cmi5Package ;
+    rdfs:comment "At design-systems/frontiers-course/; its house rules are design-systems/frontiers-course/spec.md. A course written as a directory of AsciiDoc, read by course.py into a model schema/course.schema.json describes, checked for outcome alignment, pacing, assessment and accessibility, and compiled by build.py to a static web edition, an Open edX OLX export and a cmi5 package, themed by a brand (0014-design-systems FR-052)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:FrontiersSignagePrint a ifcore:DesignSystem ;
+    dcterms:identifier "frontiers-signage-print" ;
+    rdfs:label "Frontiers Signage Print"@en ;
+    ifcore:designSystemStatus ifcore:DraftDesignSystem ;
+    dcterms:type ifcore:PrintDesignSystemKind , ifcore:Poster , ifcore:RollUpBanner , ifcore:EventBadge ;
+    rdfs:comment "At design-systems/frontiers-signage-print/; its house rules are design-systems/frontiers-signage-print/spec.md. Posters, a roll-up banner and event badges as vector PDF at trim size plus bleed, laid out by signage.py from a short job and themed by a brand (0014-design-systems FR-031)."@en ;
+    ifcore:drawsFiguresWith ifcore:FrontiersFigures ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:FrontiersMerchandise a ifcore:DesignSystem ;
@@ -662,6 +748,9 @@ ifcore:SpokenKind a ifcore:WorkKind ; rdfs:label "Spoken work"@en ; dcterms:iden
     ifcore:hasAudience ifcore:Public .
 ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterms:identifier "research" ;
     rdfs:comment "An area, pillar, note, paper, publication, disclosure, trademark record, or patent draft (0017-spoken-and-research-works FR-017)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CourseKind a ifcore:WorkKind ; rdfs:label "Course"@en ; dcterms:identifier "course" ;
+    rdfs:comment "A subject taught at length, over weeks, with outcomes, lessons and assessments; its source is AsciiDoc in frontiers-course's form (0027-course-works FR-001, FR-002)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
     rdfs:comment "The stage a Substantial Work currently occupies."@en .
@@ -1845,7 +1934,44 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
 
-# ───────────────────────── Compliance controls (0027-compliance-controls) ─────────────────────────
+# ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
+# Which environment every tool is guaranteed to run in. The repository is reused as
+# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
+# guaranteed against is not a fact here but its tools/reference-environment pin (0025 FR-008).
+
+ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
+    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+
+ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
+    dcterms:identifier "workspaces-host-v3" ;
+    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
+    ifcore:workspaceFlavor ifcore:BareMetalNixFlavor, ifcore:VirtualMachineNixFlavor, ifcore:ContainerImageFlavor, ifcore:DevcontainerFlavor, ifcore:CloudAgentSessionFlavor ;
+    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0025-tooling-environment FR-005)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
+# The flavors are ways to run the one reference environment, built from the same flake commit (0026 FR-001).
+# Which repositories carry a devcontainer, and what each lists, is held in each repository's .devcontainer/
+# files, never restated here (0001-eidolon-architecture FR-019).
+
+ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
+    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
+
+ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
+    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0026-workspaces FR-001 (FR-003)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BareMetalNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Bare-metal Linux with Nix"@en ;
+    skos:definition "Installed with Nix and home-manager directly on a Linux machine."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:VirtualMachineNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Linux virtual machine with Nix"@en ;
+    skos:definition "Installed with Nix and home-manager in a Linux virtual machine, including WSL on Windows and a Linux virtual machine on macOS."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ContainerImageFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "OCI container image"@en ;
+    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0025-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DevcontainerFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Devcontainer"@en ;
+    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0026-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CloudAgentSessionFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Cloud agent session"@en ;
+    skos:definition "A hosted session in which an AI agent works in the environment."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Compliance controls (0028-compliance-controls) ─────────────────────────
 # NIST OSCAL's model, reused rather than invented (0019-controlled-vocabulary FR-001): a framework is a
 # ControlCatalog (an OSCAL catalog) whose concepts are its controls, keyed by the framework's own identifier
 # in skos:notation (FR-001); a level or category is a skos:Collection (an OSCAL profile, FR-004); a legal
@@ -1856,17 +1982,17 @@ ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormSch
 # dcterms:valid (FR-012). AICPA's criteria are named by identifier only (FR-002). Boundaries are vault data.
 
 ifcore:ControlCatalog a owl:Class ; rdfs:subClassOf skos:ConceptScheme ; rdfs:label "Control catalog"@en ;
-    skos:definition "One compliance framework's controls (criteria, requirements, or practices), one SKOS concept each, keyed by the framework's own identifier (0027-compliance-controls FR-001)."@en ;
+    skos:definition "One compliance framework's controls (criteria, requirements, or practices), one SKOS concept each, keyed by the framework's own identifier (0028-compliance-controls FR-001)."@en ;
     skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/control/catalog/> ;
     rdfs:comment "Specializes skos:ConceptScheme (0019 FR-002); an OSCAL catalog. Its skos:notation is the short code a control map row uses before the colon (FR-005); each control's skos:notation is the framework's identifier. dcterms:source names the authoritative publication (FR-002); one ExternalRecordReference that ifcore:describes it tracks the publisher's current revision (FR-003). dcterms:type ifcore:NoPlanOfActionAllowed when the framework forbids an open plan of action (FR-013). A level or category selecting part of it is a skos:Collection that is dcterms:isPartOf it (FR-004)."@en .
 
 ifcore:ComplianceBoundary a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Compliance boundary"@en ;
-    skos:definition "One legal entity's systems and the controls they must meet (0027-compliance-controls FR-009)."@en ;
+    skos:definition "One legal entity's systems and the controls they must meet (0028-compliance-controls FR-009)."@en ;
     skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/implementation/ssp/> ;
     rdfs:comment "The system an OSCAL system security plan describes. Names exactly one legal entity by schema:provider, its baseline (ControlCatalogs or skos:Collections) by dcterms:conformsTo, and its systems by dcterms:hasPart. Its plan is generated, never kept as a separate document (FR-010); creating, retiring, or rebaselining it is a Decision (FR-011). Held in the vault (0001-eidolon-architecture FR-003)."@en .
 
 ifcore:ControlDispositionScheme a skos:ConceptScheme ; rdfs:label "Control disposition"@en ;
-    rdfs:comment "Why a boundary departs from a control in its baseline: the dcterms:type of a Decision that names the boundary and the control by schema:about and lapses on its dcterms:valid, no more than a year after it is decided (0027-compliance-controls FR-012)."@en ;
+    rdfs:comment "Why a boundary departs from a control in its baseline: the dcterms:type of a Decision that names the boundary and the control by schema:about and lapses on its dcterms:valid, no more than a year after it is decided (0028-compliance-controls FR-012)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:NotApplicableDisposition a skos:Concept ; skos:inScheme ifcore:ControlDispositionScheme ; skos:prefLabel "Not applicable"@en ;
     skos:definition "The control cannot apply within the boundary; the Decision says why."@en ; ifcore:hasAudience ifcore:Public .
@@ -1877,13 +2003,13 @@ ifcore:PlannedRemediationDisposition a skos:Concept ; skos:inScheme ifcore:Contr
     skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/poam/> ; ifcore:hasAudience ifcore:Public .
 
 ifcore:ControlBaselineRuleScheme a skos:ConceptScheme ; rdfs:label "Control baseline rule"@en ;
-    rdfs:comment "A rule a framework places on how its controls may be departed from; the dcterms:type of a ControlCatalog or collection (0027-compliance-controls FR-013)."@en ;
+    rdfs:comment "A rule a framework places on how its controls may be departed from; the dcterms:type of a ControlCatalog or collection (0028-compliance-controls FR-013)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:NoPlanOfActionAllowed a skos:Concept ; skos:inScheme ifcore:ControlBaselineRuleScheme ; skos:prefLabel "No plan of action allowed"@en ;
     skos:definition "Every control the framework selects must be met; no accepted-risk or planned-remediation disposition may cover one (FR-013)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:AssessmentKindScheme a skos:ConceptScheme ; rdfs:label "Assessment kind"@en ;
-    rdfs:comment "What an external party's assessment of a boundary is: the dcterms:type of the ExternalRecordReference that ifcore:describes the boundary and states by dcterms:valid when it stops being current; the report is never committed (0027-compliance-controls FR-023). An assessment a government system records is a registration instead (0028-government-registrations)."@en ;
+    rdfs:comment "What an external party's assessment of a boundary is: the dcterms:type of the ExternalRecordReference that ifcore:describes the boundary and states by dcterms:valid when it stops being current; the report is never committed (0028-compliance-controls FR-023). An assessment a government system records is a registration instead (0029-government-registrations)."@en ;
     skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/assessment-results/> ;
     ifcore:hasAudience ifcore:Public .
 ifcore:SOC2Type1Report a skos:Concept ; skos:inScheme ifcore:AssessmentKindScheme ; skos:prefLabel "SOC 2 Type 1 report"@en ;
@@ -1894,7 +2020,7 @@ ifcore:SOC2Type2Report a skos:Concept ; skos:inScheme ifcore:AssessmentKindSchem
 ifcore:TrustServicesCriteria a ifcore:ControlCatalog ; rdfs:label "AICPA Trust Services Criteria (SOC 2)"@en ;
     skos:notation "soc2" ;
     dcterms:source <https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022> ;
-    rdfs:comment "The criteria a SOC 2 examination reports against. AICPA holds copyright in their text, so each control here is its identifier alone (0027-compliance-controls FR-002); read the text at the source. The categories are collections (FR-004): Security is in every SOC 2 examination, and which others a boundary includes is 0027 OQ-2."@en ;
+    rdfs:comment "The criteria a SOC 2 examination reports against. AICPA holds copyright in their text, so each control here is its identifier alone (0028-compliance-controls FR-002); read the text at the source. The categories are collections (FR-004): Security is in every SOC 2 examination, and which others a boundary includes is 0028 OQ-2."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:TrustServicesCriteriaRevision a ifcore:ExternalRecordReference ;
     ifcore:describes ifcore:TrustServicesCriteria ;
@@ -1909,7 +2035,7 @@ ifcore:CMMCLevel1 a ifcore:ControlCatalog ; rdfs:label "CMMC Level 1 (FAR 52.204
     skos:notation "cmmc-l1" ;
     dcterms:source <https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170> , <https://www.acquisition.gov/far/52.204-21> ;
     dcterms:type ifcore:NoPlanOfActionAllowed ;
-    rdfs:comment "The fifteen basic safeguarding requirements of FAR 52.204-21(b)(1)(i)-(xv), which 32 CFR 170.14(c)(2) makes CMMC Level 1, keyed by the identifiers 32 CFR 170.15(c)(1)(ii) uses. Each definition is the FAR's own text, a US Government work (0027-compliance-controls FR-002). Level 1 allows no plan of action (FR-013). Their NIST SP 800-171 identifiers are 0027 OQ-6."@en ;
+    rdfs:comment "The fifteen basic safeguarding requirements of FAR 52.204-21(b)(1)(i)-(xv), which 32 CFR 170.14(c)(2) makes CMMC Level 1, keyed by the identifiers 32 CFR 170.15(c)(1)(ii) uses. Each definition is the FAR's own text, a US Government work (0028-compliance-controls FR-002). Level 1 allows no plan of action (FR-013). Their NIST SP 800-171 identifiers are 0028 OQ-6."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:CMMCLevel1Revision a ifcore:ExternalRecordReference ;
     ifcore:describes ifcore:CMMCLevel1 ;
@@ -2038,7 +2164,7 @@ ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:pre
     ifcore:hasAudience ifcore:Public .
 
 
-# ───────────────────────── Government registrations (0028-government-registrations) ─────────────────────────
+# ───────────────────────── Government registrations (0029-government-registrations) ─────────────────────────
 # A registration is one ExternalRecordReference per entity per registration (FR-001), typed by a concept below,
 # describing the Organization that holds it, or the ComplianceBoundary an assessment or affirmation covers
 # (FR-003). The date it lapses, or the next filing is due, is its dcterms:valid, part of its cached value
@@ -2046,19 +2172,19 @@ ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:pre
 # vault data.
 
 ifcore:RegistrationKindScheme a skos:ConceptScheme ; rdfs:label "Registration kind"@en ;
-    rdfs:comment "What a government registration or recurring filing is; the dcterms:type of its ExternalRecordReference (0028-government-registrations FR-001)."@en ;
+    rdfs:comment "What a government registration or recurring filing is; the dcterms:type of its ExternalRecordReference (0029-government-registrations FR-001)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:FederalAwardRegistration a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Federal award registration"@en ;
     skos:definition "An entity's registration to do business with the US federal government in the System for Award Management, with the identifiers it assigns, its industry codes, and its representations and certifications; renewed yearly."@en ;
     rdfs:seeAlso <https://sam.gov/> ; ifcore:hasAudience ifcore:Public .
 ifcore:CybersecurityAffirmation a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Cybersecurity assessment and affirmation"@en ;
-    skos:definition "A cybersecurity assessment result, and the affirming official's affirmation of it, recorded in the US Department of Defense's Supplier Performance Risk System for one boundary; describes that boundary and names what it affirms by dcterms:conformsTo (0028 FR-003, FR-012)."@en ;
+    skos:definition "A cybersecurity assessment result, and the affirming official's affirmation of it, recorded in the US Department of Defense's Supplier Performance Risk System for one boundary; describes that boundary and names what it affirms by dcterms:conformsTo (0029 FR-003, FR-012)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:TaxExemptionDetermination a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Tax exemption determination"@en ;
-    skos:definition "A tax authority's determination that an organization is exempt from income tax; it does not lapse by date, so it carries no dcterms:valid (0028 FR-004)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A tax authority's determination that an organization is exempt from income tax; it does not lapse by date, so it carries no dcterms:valid (0029 FR-004)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AnnualInformationReturn a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Annual information return"@en ;
-    skos:definition "An exempt organization's annual return to the tax authority; dcterms:valid is the date the next one is due (0028 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "An exempt organization's annual return to the tax authority; dcterms:valid is the date the next one is due (0029 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:StateAnnualReport a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "State annual report"@en ;
-    skos:definition "A state's registration of an entity formed or qualified to do business there, kept in good standing by a periodic report; dcterms:valid is the date the next one is due (0028 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A state's registration of an entity formed or qualified to do business there, kept in good standing by a periodic report; dcterms:valid is the date the next one is due (0029 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:CharitableSolicitationRegistration a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Charitable solicitation registration"@en ;
     skos:definition "A state's registration of an organization that asks the public there for charitable contributions; dcterms:valid is the date it lapses unless renewed."@en ; ifcore:hasAudience ifcore:Public .

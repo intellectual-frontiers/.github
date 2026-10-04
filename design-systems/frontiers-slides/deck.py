@@ -132,7 +132,7 @@ def _figure(src: Path, brand: Path, dark: bool, fid: str) -> str:
     """A frontiers-figures figure themed by the brand and inlined, its stylesheet scoped to this figure alone."""
     svg = src.read_text(encoding="utf-8")
     theme = _module("figures_theme", SYSTEMS / "frontiers-figures" / "theme.py")
-    if theme and re.search(r'class="[^"]*\b[fsc]-[a-z-]+', svg):
+    if theme and re.search(r'class="[^"]*\b[fsc]-[a-z0-9-]+', svg):
         svg = theme.apply(svg, brand, "on-dark" if dark else "default")
         svg = re.sub(r"<style([^>]*)>(.*?)</style>",
                      lambda m: f"<style{m.group(1)}>" + re.sub(r"(^|})\s*([^{}@]+?)\s*{",
