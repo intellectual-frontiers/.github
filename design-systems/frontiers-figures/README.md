@@ -43,7 +43,7 @@ python3 design-systems/frontiers-figures/theme.py apply fig-2.1.svg \
 In this repository the same two steps are `agora check figures --scope fig-2.1.svg --brand frontiers-brand` and
 `agora figure build fig-2.1.svg --brand frontiers-brand -o fig-2.1.themed.svg`.
 
-- **Print:** render the themed figure with `rsvg-convert -f pdf`, with `fonts/` where fontconfig finds it.
+- **Print:** render the themed figure with an SVG renderer that reads its stylesheet and embeds fonts, with `fonts/` where that renderer finds it. The harness proves the figure sets its text in the shipped sans by rendering it with the `resvg-py` package from `fonts/` alone.
 - **The web:** inline the themed figure, or serve it as an image.
 - **A dark page or slide:** `--variant on-dark`. **One-color print:** `--variant grayscale`.
 - **A narrow slot:** draw it on the compact canvas (`width=svgkit.CANVAS["compact"]`).

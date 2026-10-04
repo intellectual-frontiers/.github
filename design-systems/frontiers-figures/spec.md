@@ -91,8 +91,8 @@ roles, and the light variations a figure may take, themed by any brand.
   check every fixture in `assurance/fixtures/fail/` fails with the problem
   `assurance/fixtures/expected.json` names; check every variant's contrast per FR-004 and its chart
   palette per FR-012, that a figure themed with the sans embedded carries every letter it sets
-  (where fontTools is installed), and that a themed figure parses; and, where `rsvg-convert` is installed, that a themed figure renders with
-  the brand's sans embedded and no other family.
+  (where fontTools is installed), and that a themed figure parses; and, where `resvg-py` is installed, that a themed figure
+  rendered with the shipped fonts and no other sets its text in them (it differs from the same figure rendered with no font).
 
 ## Out of scope
 
@@ -111,7 +111,7 @@ roles, and the light variations a figure may take, themed by any brand.
 
 ## Assumptions
 
-- A consumer's SVG renderer supports class selectors in an SVG `<style>` (browsers; librsvg 2.52 and
+- A consumer's SVG renderer supports class selectors in an SVG `<style>` (browsers; resvg, which `agora` renders with, and librsvg 2.52 and
   later), and finds `fonts/` through its font configuration.
 
 ## Open questions

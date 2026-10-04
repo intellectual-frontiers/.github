@@ -28,11 +28,11 @@ class Logs(unittest.TestCase):
         return main(list(argv), home=self.home, stdout=io.StringIO(), stderr=io.StringIO(), env={"PATH": "/usr/bin"}, **kw)
 
     def test_a_run_is_logged_with_surface_command_args_and_exit(self):
-        self.call("check", "environment", "--root", str(HOME))
+        self.call("check", "controls", "--root", str(HOME))
         self.call("check", "--suite", "no-such-suite")
         a, b = self.lines()
         self.assertEqual((a["surface"], a["command"], a["exit"]), ("cli", "check", 0))
-        self.assertEqual(a["args"]["sections"], ["environment"])
+        self.assertEqual(a["args"]["sections"], ["controls"])
         self.assertEqual((b["command"], b["exit"], b["args"]), ("check", 2, {}))
         self.assertIn("time", a)
 
@@ -70,7 +70,7 @@ class Logs(unittest.TestCase):
 
     def test_a_failure_to_log_never_fails_the_command(self):
         (self.home / ".agora").write_text("a file where a directory belongs")
-        self.assertEqual(self.call("environment", "show"), 0)
+        self.assertEqual(self.call("command", "list"), 0)
 
 
 class Hygiene(unittest.TestCase):

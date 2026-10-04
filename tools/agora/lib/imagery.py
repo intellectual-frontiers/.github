@@ -8,13 +8,15 @@ states, WebP files absent or off size, a master not catalogued, a share card abs
 reports a candidate piece's pixel_size and content_box for the catalog, whether it has real transparency, and
 how much of the drawn art carries color.
 
-Standard library and ImageMagick (`convert`, `identify`) only.
+Standard library and Pillow (a pinned package of the assurance and brand groups' locks; imported where it is used, so that
+a process holding no lock can still load this module). Pillow writes the WebP files, the PNGs and the icon, with the
+encoder it ships, so the bytes depend on its locked version and on nothing the host has (0025-tooling-environment FR-026).
 """
 from __future__ import annotations
 
 import colorsys
+import io
 import json
-import subprocess
 from pathlib import Path
 
 REQUIRED = ["id", "name", "file", "environment", "description", "visual_anchor", "route", "built_structures",
@@ -26,22 +28,32 @@ SHARE_CARD = ("images/share-card.png", 1200, 630)
 SATURATION_MIN, VALUE_MIN = 60 / 255, 40 / 255
 
 
-def magick(*args: str) -> bytes:
-    return subprocess.run(["convert", *args], check=True, capture_output=True).stdout
+def _image():
+    from PIL import Image
+    return Image
+
+
+def _open(path: Path):
+    """A file read to RGBA, closed again."""
+    Image = _image()
+    with Image.open(path) as im:
+        return im.convert("RGBA")
 
 
 def size(path: Path) -> list[int]:
-    out = subprocess.run(["identify", "-format", "%w %h", str(path)], check=True, capture_output=True, text=True).stdout
-    return [int(v) for v in out.split()]
+    with _image().open(path) as im:
+        return list(im.size)
 
 
 def measure(path: Path) -> dict:
-    w, h = size(path)
-    trim = magick(str(path), "-alpha", "extract", "-threshold", "6.3%", "-format", "%@", "info:").decode()
-    tw, rest = trim.split("x")
-    th, x, y = (int(v) for v in rest.split("+"))
-    alpha_min = float(magick(str(path), "-alpha", "extract", "-format", "%[fx:minima]", "info:").decode())
-    raw = magick(str(path), "-resize", "25%", "-alpha", "on", "rgba:-")
+    im = _open(path)
+    w, h = im.size
+    alpha = im.getchannel("A")
+    # The content box is where the alpha is above 6.3% of full (16 of 255), as the catalog has always stated it.
+    box = alpha.point(lambda v: 255 if v > 16 else 0).getbbox() or (0, 0, 0, 0)
+    alpha_min = alpha.getextrema()[0] / 255
+    small = im.convert("RGBa").resize((max(1, round(w * 0.25)), max(1, round(h * 0.25))), _image().LANCZOS).convert("RGBA")
+    raw = small.tobytes()
     drawn = colored = 0
     for i in range(0, len(raw), 4):
         r, g, b, a = raw[i:i + 4]
@@ -50,8 +62,27 @@ def measure(path: Path) -> dict:
         drawn += 1
         _, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         colored += s > SATURATION_MIN and v > VALUE_MIN
-    return {"pixel_size": [w, h], "content_box": [x, y, x + int(tw), y + th], "transparent": alpha_min < 16 / 255,
+    return {"pixel_size": [w, h], "content_box": list(box), "transparent": alpha_min < 16 / 255,
             "colored_share": colored / drawn if drawn else 0.0}
+
+
+def _resized(im, width: int, height: int):
+    """`im` resized to exactly width x height with Lanczos, premultiplied so a transparent edge does not bleed."""
+    return im.convert("RGBa").resize((width, height), _image().LANCZOS).convert("RGBA")
+
+
+def _flat_on(color: str, w: int, h: int, art, left: int, top: int):
+    """A w x h canvas of `color` with `art` composited at (left, top)."""
+    Image = _image()
+    canvas = Image.new("RGBA", (w, h), color)
+    canvas.alpha_composite(art, (left, top))
+    return canvas.convert("RGB")
+
+
+def _png(im) -> bytes:
+    buf = io.BytesIO()
+    im.save(buf, format="PNG", compress_level=9)
+    return buf.getvalue()
 
 
 def catalog(brand: Path) -> dict | None:
@@ -99,6 +130,7 @@ def build_icons(brand: Path, dest: Path | None = None) -> int:
     dest = dest or brand
     master = icon_master(brand)
     mw, mh = size(master)
+    art = _open(master)
     bg = surface(brand)
     for icon in app_icons(brand):
         w, h = icon["width"], icon["height"]
@@ -109,13 +141,25 @@ def build_icons(brand: Path, dest: Path | None = None) -> int:
         scale = min(fit, 1.0)
         out = dest / icon["file"]
         out.parent.mkdir(parents=True, exist_ok=True)
-        magick("-size", f"{w}x{h}", f"xc:{bg}", "(", str(master), "-resize", f"{round(mw * scale)}x{round(mh * scale)}!", ")",
-               "-gravity", "center", "-composite", "-strip", str(out))
+        aw, ah = round(mw * scale), round(mh * scale)
+        out.write_bytes(_png(_flat_on(bg, w, h, _resized(art, aw, ah), (w - aw) // 2, (h - ah) // 2)))
     ico = dest / "images" / "favicon.ico"
     ico.parent.mkdir(parents=True, exist_ok=True)
-    magick(str(master), "-background", "none", "-resize", "48x48", "-gravity", "center", "-extent", "48x48",
-           "-define", "icon:auto-resize=48,32,16", str(ico))
+    ico.write_bytes(favicon_bytes(master))
     return len(app_icons(brand)) + 1
+
+
+def favicon_bytes(master: Path) -> bytes:
+    """favicon.ico at 48, 32 and 16 px: the mark fitted inside 48x48 and centered on a transparent square."""
+    Image = _image()
+    im = _open(master)
+    s = min(48 / im.width, 48 / im.height)
+    fw, fh = max(1, round(im.width * s)), max(1, round(im.height * s))
+    square = Image.new("RGBA", (48, 48), (0, 0, 0, 0))
+    square.alpha_composite(_resized(im, fw, fh), ((48 - fw) // 2, (48 - fh) // 2))
+    buf = io.BytesIO()
+    square.save(buf, format="ICO", sizes=[(48, 48), (32, 32), (16, 16)])
+    return buf.getvalue()
 
 
 def build(brand: Path, dest: Path | None = None) -> dict:
@@ -127,14 +171,16 @@ def build(brand: Path, dest: Path | None = None) -> dict:
         for web in piece["web"]:
             out = dest / "imagery" / web["file"]
             out.parent.mkdir(parents=True, exist_ok=True)
-            magick(str(master), "-resize", f'{web["width"]}x{web["height"]}!', "-quality", "82",
-                   "-define", "webp:alpha-quality=90", "-define", "webp:method=6", str(out))
+            _resized(_open(master), web["width"], web["height"]).save(
+                out, format="WEBP", quality=82, alpha_quality=90, method=6)
     bg = surface(brand)
     logo = lockup(brand, "light" if luminance(bg) > 0.5 else "dark")
     path, w, h = SHARE_CARD
     (dest / path).parent.mkdir(parents=True, exist_ok=True)
-    magick("-size", f"{w}x{h}", f"xc:{bg}", "(", str(logo), "-resize", f"{w * 46 // 100}x", ")",
-           "-gravity", "center", "-composite", "-strip", str(dest / path))
+    art = _open(logo)
+    lw = w * 46 // 100
+    lh = max(1, round(art.height * lw / art.width))
+    (dest / path).write_bytes(_png(_flat_on(bg, w, h, _resized(art, lw, lh), (w - lw) // 2, (h - lh) // 2)))
     icons = build_icons(brand, dest) if app_icons(brand) else 0
     return {"webp": sum(len(p["web"]) for p in (cat or {}).get("pieces", [])), "share_card": path, "app_icons": icons}
 

@@ -68,10 +68,10 @@ class CommandsSection(unittest.TestCase):
 
     def test_a_section_or_generator_with_no_watched_paths_fails(self):  # 0041 FR-032
         m = self.home / "tools" / "agora" / "groups" / "spec" / "agora.toml"
-        m.write_text(m.read_text().replace('watch = ["tools/reference-environment", ".devcontainer/devcontainer.json"]\n', ""))
+        m.write_text(m.read_text().replace('watch = ["spec-kit/controls.tsv", "spec-kit/specs/**", "design-systems/*/spec.md", "ontology/ifcore.ttl"]\n', ""))
         code, found = self.findings()
         self.assertEqual(code, 1)
-        self.assertTrue(any("section environment declares no watched paths" in x for x in found))
+        self.assertTrue(any("section controls declares no watched paths" in x for x in found))
 
     def test_a_proposal_that_does_not_replay_fails(self):  # 0042 FR-029
         d = self.home / ".agora" / "proposals"
@@ -113,18 +113,22 @@ class Workflows(CommandsSection):
         self.assertTrue(any("tools/other.sh" in m for m in found))
 
 
-class ReferenceEnvironmentWorkflow(unittest.TestCase):
-    """0042 FR-022: doctor's exit 3 is a visible warning naming what is missing, and any other failure fails the job."""
+class AgoraWorkflow(unittest.TestCase):
+    """0042 FR-022: doctor's exit 3 is a visible warning naming what is missing, and any other failure fails the job; the
+    workflow that proves the generators and runs the tests installs no program and runs in no image."""
 
     def test_doctor_exit_3_is_a_warning_and_every_other_status_fails(self):
-        text = (HOME / ".github" / "workflows" / "reference-environment.yml").read_text()
+        self.assertFalse((HOME / ".github" / "workflows" / "reference-environment.yml").exists())
+        text = (HOME / ".github" / "workflows" / "agora.yml").read_text()
         step = text.split("- name: agora's doctor\n", 1)[1].split("      - name:", 1)[0]
         self.assertIn('-eq 3', step)
         self.assertIn("::warning", step)
         self.assertIn("missing: ", step)  # what doctor reports as missing is named in the warning
         self.assertIn('exit "$code"', step)
-        for command in ("./agora check --suite spec", "./agora fresh", "./agora test"):
+        for command in ("./agora fresh", "./agora test"):
             self.assertIn(command, text)
+        for gone in ("apt-get", "docker", "container:"):
+            self.assertNotIn(gone, text)
 
     def test_the_gap_is_recorded_as_an_open_question(self):
         spec = (HOME / "spec-kit" / "specs" / "0042-agora" / "spec.md").read_text()

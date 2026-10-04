@@ -6,7 +6,8 @@ frontiers-brand FR-017; 0042-agora FR-006).
 trace the raster master its "traced-from" names into one-color outlined SVG at its "file", then measure its finest
 detail and write it back to tokens.json. The trace is mechanical and repeatable: the master is composited on white,
 read as luminance, enlarged by "scale" (Lanczos), cut at "threshold" (the share of full ink a pixel needs to print) and
-traced by potrace, dropping specks smaller than "speckle-px" master pixels. Nothing is drawn, retouched or generated.
+traced by potrace's algorithm (the potracer package), dropping specks smaller than "speckle-px" master pixels. Nothing is
+drawn, retouched or generated.
 
 `set`: for the wordmark in the kit and every unit mark the brand's logo lists, set the name in the face its "set-from"
 names (a font in the brand's fonts/, at its optical size and weight, tracked by "tracking-em", one line per entry of
@@ -22,16 +23,18 @@ verified: true, after which goods may be ordered in it.
 GIMP palettes (a thread chart, a spot-color guide), by CIEDE2000, to propose an ink's matches; a match is a candidate
 until it is checked against the physical card.
 
-Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz for `set`. Every function returns what it
+Standard library and four pinned packages of the decoration group's lock, each imported where it is used: Pillow reads and
+cuts the masters, potracer traces them, resvg-py renders what is measured, uharfbuzz sets the type. No program of the host
+is run, so the bytes depend on the locked versions alone (0025-tooling-environment FR-026). Every function returns what it
 would write; the commands write it (`--dry-run` shows it).
 """
 from __future__ import annotations
 
 import html
+import io
 import json
 import math
 import re
-import subprocess
 import tempfile
 from pathlib import Path
 
@@ -41,10 +44,6 @@ KIT = "com.intellectualfrontiers.decoration"
 PERCENTILE = 2
 # The measure renders the artwork this many pixels wide.
 MEASURE_WIDTH = 2400
-
-
-def run(*args: str) -> bytes:
-    return subprocess.run(args, check=True, capture_output=True).stdout
 
 
 def dumps(tokens: dict) -> str:
@@ -66,22 +65,57 @@ def trace(brand: Path, tokens: dict) -> tuple[dict[Path, str], list[str]]:
     notes: list[str] = []
     for part in ("lockup", "icon"):
         art = kit[part]
+        if "traced-from" not in art:  # a part drawn by hand (the example brand's) is not made by this command
+            continue
         src = art["traced-from"]
         master = brand / src["file"]
-        width, height = (int(v) for v in run("identify", "-format", "%w %h", str(master)).split())
-        scale = int(src["scale"])
-        with tempfile.TemporaryDirectory() as tmp:
-            pbm = Path(tmp) / "art.pbm"
-            run("convert", str(master), "-background", "white", "-alpha", "remove", "-alpha", "off",
-                "-grayscale", "Rec709Luma", "-filter", "Lanczos", "-resize", f"{scale * 100}%",
-                "-threshold", f"{100 - float(src['threshold']) * 100:g}%", str(pbm))
-            svg = run("potrace", "--svg", "--turdsize", str(int(src["speckle-px"]) * scale * scale), "--output", "-",
-                      str(pbm)).decode()
+        width, height, svg = trace_master(master, int(src["scale"]), float(src["threshold"]), int(src["speckle-px"]))
         text = clean(svg, width, height, f"{brand.name} {part}, one color, traced from {src['file']}")
         files[brand / art["file"]] = text
         art["finest-detail"] = round(finest_of(text), 4)
         notes.append(f"{art['file']}: traced from {src['file']}, finest detail {art['finest-detail']}")
     return files, notes
+
+
+def trace_master(master: Path, scale: int, threshold: float, speckle_px: int) -> tuple[int, int, str]:
+    """The master's pixel size, and its trace as SVG: composited on white, read as Rec. 709 luminance, enlarged by `scale`
+    (Lanczos), inked where a pixel is not lighter than 1 - `threshold` of full, and traced by potrace's algorithm, dropping
+    specks of `speckle_px` master pixels or fewer."""
+    import numpy
+    import potrace
+    from PIL import Image
+
+    with Image.open(master) as raw:
+        art = raw.convert("RGBA")
+    width, height = art.size
+    flat = Image.new("RGBA", art.size, "white")
+    flat.alpha_composite(art)
+    gray = flat.convert("RGB").convert("L", matrix=(0.2126, 0.7152, 0.0722, 0))
+    big = gray.resize((width * scale, height * scale), Image.LANCZOS)
+    cut = (1 - threshold) * 255
+    light = numpy.asarray(big) > cut  # potracer takes the light pixels and traces the rest
+    curves = potrace.Bitmap(light).trace(turdsize=speckle_px * scale * scale, turnpolicy=potrace.POTRACE_TURNPOLICY_MINORITY,
+                                       alphamax=1.0, opticurve=True, opttolerance=0.2)
+    # Integer tenths of a bitmap pixel, drawn relative to the last rounded point, so that no rounding drifts.
+    tenth = lambda p: (round(p.x * 10), round(p.y * 10))  # noqa: E731
+    d = []
+    for curve in curves:
+        x, y = tenth(curve.start_point)
+        d.append(f"M{x} {y}")
+        for seg in curve.segments:
+            pts = [tenth(p) for p in ((seg.c, seg.end_point) if seg.is_corner else (seg.c1, seg.c2, seg.end_point))]
+            rel = []
+            for px, py in pts:
+                rel += [px - x, py - y]
+            if seg.is_corner:
+                d.append("l" + " ".join(map(str, rel[:2])) + "l" + " ".join(map(str, (pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]))))
+            else:
+                d.append("c" + " ".join(map(str, rel)))
+            x, y = pts[-1]
+        d.append("z")
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width * scale} {height * scale}">\n'
+           f'<g transform="scale(0.1)" fill="#000000" stroke="none">\n<path d="{"".join(d)}" fill-rule="evenodd"/>\n</g>\n</svg>\n')
+    return width, height, svg
 
 
 def typeset(brand: Path, spec: dict, title: str) -> str:
@@ -182,7 +216,7 @@ def _outline(font, glyph: int, dx: float, baseline: float, scale: float = 1) -> 
 
 
 def clean(svg: str, width: int, height: int, title: str) -> str:
-    """potrace's SVG, drawn in currentColor at the master's size, without its comment and metadata."""
+    """The trace's SVG, drawn in currentColor at the master's size, without its metadata."""
     viewbox = re.search(r'viewBox="([^"]+)"', svg).group(1)
     body = re.search(r"(<g .*</g>)", svg, re.S).group(1)
     body = body.replace('fill="#000000"', 'fill="currentColor"')
@@ -197,11 +231,14 @@ def finest_detail(svg: Path) -> float:
     across rows, columns and both diagonals (a diagonal run scaled by sqrt 2); a background run counts only where
     ink closes it on both sides, so the open ground around the artwork is not a gap.
     """
-    png = run("rsvg-convert", "--width", str(MEASURE_WIDTH), "--background-color", "white", str(svg))
-    pgm = subprocess.run(["convert", "png:-", "-threshold", "50%", "-depth", "8", "pgm:-"], input=png, check=True,
-                         capture_output=True).stdout
-    w, h, pixels = read_pgm(pgm)
-    ink = bytes(1 if v < 128 else 0 for v in pixels)
+    import resvg_py
+    from PIL import Image
+
+    png = bytes(resvg_py.svg_to_bytes(svg_path=str(svg), width=MEASURE_WIDTH, background="white", skip_system_fonts=True))
+    with Image.open(io.BytesIO(png)) as raw:
+        gray = raw.convert("L")  # the art is rendered on white, so there is no alpha to flatten
+    w, h = gray.size
+    ink = bytes(1 if v < 128 else 0 for v in gray.tobytes())
     best = [math.inf] * (w * h)
     lines: list[tuple[list[int], float]] = []
     lines += [(list(range(y * w, y * w + w)), 1.0) for y in range(h)]
@@ -228,12 +265,6 @@ def finest_detail(svg: Path) -> float:
             i = j
     widths = sorted(b for b in best if b != math.inf)
     return widths[int(len(widths) * PERCENTILE / 100)] / w
-
-
-def read_pgm(data: bytes) -> tuple[int, int, bytes]:
-    m = re.match(rb"P5\s+(\d+)\s+(\d+)\s+(\d+)\s", data)
-    w, h = int(m.group(1)), int(m.group(2))
-    return w, h, data[m.end():m.end() + w * h]
 
 
 def lab(hex_color: str) -> tuple[float, float, float]:

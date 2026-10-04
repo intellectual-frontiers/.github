@@ -47,7 +47,7 @@ themed by a brand.
 ## Making and checking
 
 - **FR-010**: A job MUST be JSON naming its format, tone and text, and its imagery piece by id or
-  `@first`. `media.py render` MUST lay it out and render it with `rsvg-convert` through `fonts/`, so the
+  `@first`. `media.py render` MUST lay it out and render it with `resvg-py` from `fonts/` alone (no font of the machine's), so the
   text is never set in a stand-in face.
 - **FR-011**: `media.py check` MUST report every rule here a job breaks, naming the requirement, and exit
   non-zero on any.
@@ -61,7 +61,7 @@ themed by a brand.
 - **FR-013**: `assurance/run.py` MUST check that `formats.json` holds no color and no text size below the
   minimum; and, under every brand here, that each tone's text roles meet 4.5:1, that a job of every
   format in `assurance/fixtures/pass/` passes the checks and renders at its format's size (transparent
-  where the format is) where `rsvg-convert` is installed, that every job in `assurance/fixtures/fail/` is
+  where the format is) where `resvg-py` is installed, that every job in `assurance/fixtures/fail/` is
   refused for the reason `assurance/fixtures/expected.json` names, and that the ontology registers this
   design system.
 

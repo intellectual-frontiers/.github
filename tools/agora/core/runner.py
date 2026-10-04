@@ -80,7 +80,7 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
             raise AgoraError("usage", f"--root: section {', '.join(bad)} is not relocatable (0041 FR-040)", exit=USAGE)
     skipped_unchanged: list[dict[str, str]] = []
     if changed:
-        paths = changed_paths(ctx.root, since)
+        paths = changed_paths(ctx, since)
         keep = []
         for s in chosen:
             run, why = section_changed(s.watch, paths)

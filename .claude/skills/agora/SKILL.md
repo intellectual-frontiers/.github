@@ -28,7 +28,7 @@ description: Use agora, this repository's command line, to read its specs, requi
 | `build` | writes derived output that is not itself the record |
 | `generate` | rewrites tracked generated files |
 | `decision` | changes what only a person decides: for a person, in the terminal or the editor; never over MCP |
-| `setup` | changes the clone's own environment (a lock, a pin, a running server) |
+| `setup` | changes the clone's own environment (a lock, a fetched toolchain entry, a running server) |
 
 A `decision` command is for a person: `ink record`, `proposal advance`, `spec set`. Do not run one for a person. To ask for a decision, draft it with `agora proposal new RESOURCE --reason TEXT --run COMMAND --field NAME=VALUE`; a person reviews it and runs `agora proposal advance ID`. A proposal is a tracked file under `.agora/proposals/`.
 
@@ -43,7 +43,6 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `decoration` | A brand's decoration kit: one-color artwork made mechanically from the masters and the brand's fonts (0014-design-systems FR-047) |
 | `design-system` | A design system: its spec, its entry in the ontology and its harness (0014-design-systems) |
 | `email` | An email written in Markdown and built by frontiers-email (0014-design-systems FR-040) |
-| `environment` | The reference environment pin (0025-tooling-environment FR-008) |
 | `figure` | A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044) |
 | `imagery` | A brand's imagery pool: its catalog, masters, WebP files and share card (0014-design-systems FR-043) |
 | `ink` | An ink of a brand's decoration kit: its spot color and thread, and who verified them (frontiers-brand FR-017) |
@@ -81,13 +80,11 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `design-system show` | `read` | terminal, editor, mcp | Show one design system: its registration, spec, harness and derivation | `agora design-system show DESIGN_SYSTEM` |
 | `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
-| `environment set` | `setup` | terminal | Move the reference environment pin and the devcontainer image tag together | `agora environment set COMMIT` |
-| `environment show` | `read` | terminal, editor, mcp | Show the reference environment pin and the devcontainer image tag | `agora environment show` |
 | `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
 | `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
 | `fresh` | `check` | terminal, editor, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
 | `imagery add` | `record` | terminal, editor, mcp | Add a master to a brand's pool: copy it byte for byte, measure it, and catalog it (then build its WebP files) | `agora imagery add BRAND --master TEXT --name TEXT --environment TEXT --description TEXT --visual-anchor TEXT --route TEXT [--built-structure TEXT] [--infrastructure-type TEXT] [--colored-element TEXT] [--water-form TEXT] [--metaphor TEXT] [--suggested-subject TEXT] [--supplied DATE] --generator TEXT` |
-| `imagery build` | `build` | terminal, editor, mcp | Write a brand's WebP files, share card and app icons from its masters and tokens | `agora imagery build BRAND` |
+| `imagery build` | `generate` | terminal, editor, mcp | Write a brand's WebP files, share card and app icons from its masters and tokens | `agora imagery build BRAND` |
 | `imagery list` | `read` | terminal, editor, mcp | List a brand's imagery pieces | `agora imagery list BRAND` |
 | `imagery show` | `read` | terminal, editor, mcp | Show one piece: its catalog entry, and what its master measures (pixel size, content box, transparency, color) | `agora imagery show PIECE` |
 | `ink list` | `read` | terminal, editor, mcp | List a brand's inks: each role's spot color and thread, and whether they were verified | `agora ink list BRAND` |
@@ -117,7 +114,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
 | `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
 | `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
-| `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner | `agora test` |
+| `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner, under the selftest group's locked packages | `agora test` |
 
 ### Arguments and options
 
@@ -167,7 +164,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `decoration show`
   - `brand` (BRAND): the brand
-  - `--measure` (flag): measure each SVG's finest detail again (needs rsvg-convert and ImageMagick; slow)
+  - `--measure` (flag): measure each SVG's finest detail again (slow)
 - `design-system list`
   - `--kind` (KIND): only design systems of this kind
 - `design-system new`
@@ -181,9 +178,6 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--out` (TEXT): the HTML file to write, and its .txt beside it; the message's name with .html by default
   - `--assets` (TEXT, required): the public https URL the brand's files (its logos/) are served from
   - `--brand` (BRAND): the brand that themes it (frontiers-brand by default)
-  - `--dry-run` (flag): validate, write nothing, show the change
-- `environment set`
-  - `commit` (COMMIT): the full commit of the reference environment
   - `--dry-run` (flag): validate, write nothing, show the change
 - `figure build`
   - `path` (PATH): the figure's SVG source
@@ -363,7 +357,6 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | `course` | Courses against frontiers-course's rules: outcomes taught and assessed, accessibility, limits, voice (course.py check) | PATH | none |
 | `design-systems` | Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039) | DESIGN_SYSTEM | `browser`, `python` |
 | `email` | Messages against frontiers-email's rules: subject, preheader, one button, https links, address, voice (mail.py check) | PATH | none |
-| `environment` | The reference environment pin and the devcontainer image tag agree (0025 FR-008) | none | `spec` |
 | `figures` | Figure sources against frontiers-figures' mechanical rules: canvas, role colors, label size, labels inside their boxes (figcheck.py) | PATH | none |
 | `imagery` | Each brand's imagery pool and share card: catalog, masters, WebP files, app icons (0014 FR-037, FR-043) | BRAND | `images` |
 | `media` | Media jobs against frontiers-media's rules: format, safe margin, title fit, lockup, voice (media.py check) | PATH | none |
@@ -383,6 +376,8 @@ A generated file carries a header naming its generator and must not be edited by
 | Generator | Writes | Rewritten by |
 | --- | --- | --- |
 | `agent-skill` | The agent skill, .claude/skills/agora/SKILL.md, from the registry (0041-command-line FR-037) | `agora skill generate` |
+| `brand-decoration` | A brand's decoration kit: the traced lockup and icon, the set wordmark and unit marks, and their measured finest detail in tokens.json | `agora decoration generate` |
+| `brand-imagery` | A brand's WebP files, share card, app icons and favicon, from its masters and tokens | `agora imagery build` |
 | `brand-specimen` | A brand's assurance specimen, from its tokens.json | `agora brand generate` |
 | `brand-theme` | A brand's brand.css and brand.tex, from its tokens.json | `agora brand generate` |
 | `openedx-sources` | A brand's Open edX package sources (everything but the built dist/), from its tokens.json, logos and fonts | `agora openedx generate` |
@@ -391,7 +386,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 48 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://environment/reference`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 47 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -412,7 +407,6 @@ A generated file carries a header naming its generator and must not be edited by
 | `design-system_show` | no |
 | `doctor` | no |
 | `email_build` | yes, dry run by default |
-| `environment_show` | no |
 | `figure_build` | yes, dry run by default |
 | `figure_generate` | yes, dry run by default |
 | `fresh` | no |

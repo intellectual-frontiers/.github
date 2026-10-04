@@ -147,8 +147,8 @@ themed by a brand so that the same design can be set in another brand's colors, 
 
 ## Assumptions
 
-- A TeX Live with XeLaTeX, LuaLaTeX and latexmk, and poppler-utils, are installed wherever the
-  harness or a pipeline runs.
+- A TeX Live with XeLaTeX, LuaLaTeX and latexmk, and the Python packages pypdf and pypdfium2, are installed
+  wherever the harness or a pipeline runs.
 
 ## Open questions
 

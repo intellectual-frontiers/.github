@@ -2,9 +2,11 @@
 # orchestrator that runs them (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-022): the browser harnesses
 # (web, slides, course and brand design systems) and the Open edX package in one job, the Python harnesses (print on
 # TeX Live, merchandise, figure, slides, course, media, signage, email and voice design systems) in another, each
-# under every brand here, and each brand's imagery pool and share card in a third. A job installs only the programs
-# outside Python its suite needs, then Python and uv; agora installs its own packages from its hashed lock
-# (0025-tooling-environment FR-011, FR-013).
+# under every brand here, and each brand's imagery pool and share card in a third. Every program a harness once needed
+# from the host (Node, poppler, librsvg, ImageMagick, potrace, git) is now a package in agora's hashed locks, which agora
+# installs itself (0042-agora FR-030; 0025-tooling-environment FR-011, FR-013, FR-022). Until the toolchain lock supplies them
+# (the next step), a job installs only what has no wheel: TeX Live for the print harness, Playwright with its Chromium and
+# Paragon, which the browser job fetches with the runner's own npm.
 name: design-systems
 
 on:
@@ -28,10 +30,6 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: ImageMagick (a brand without a favicon.ico draws one with `convert`)
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q imagemagick
       - name: Playwright and Chromium
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
@@ -49,17 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "22"
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: TeX Live, poppler, librsvg and ImageMagick
+      - name: TeX Live (the print harness; no wheel supplies it yet)
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils librsvg2-bin imagemagick
+          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
       - name: Python harnesses (print on TeX Live, merchandise, figures, and the rest)
         run: ./agora check --suite python
 
@@ -71,9 +66,5 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: ImageMagick
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q imagemagick
       - name: Brand imagery
         run: ./agora check --suite images

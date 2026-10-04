@@ -16,7 +16,7 @@ brand's web fonts, and token overrides under paragon/tokens/ that Paragon's `bui
 `write` writes the package's sources; `build` also runs Paragon's CLI (the paragon executable, such as
 node_modules/.bin/paragon) to write dist/, the CSS and files an Open edX instance or a managed host loads; `check`
 returns where the committed package differs from what `write` (and, given Paragon, `build`) would write, and every
-pair of built colors that misses 4.5:1. Standard library only; ImageMagick (`convert`) only for a brand without a
+pair of built colors that misses 4.5:1. Standard library only; Pillow (the locked package) only for a brand without a
 favicon.ico.
 """
 from __future__ import annotations
@@ -24,11 +24,14 @@ from __future__ import annotations
 import base64
 import filecmp
 import json
+import os
 import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+
+from agora.lib import node
 
 FONTS = Path("frontiers-course") / "web" / "fonts"  # inside design-systems/: the web fonts the package carries
 WEB_FONTS = {"Inter": ("inter-variable-latin.woff2", "400 800"), "Source Serif 4": ("source-serif-4-variable-latin.woff2", "400 500")}
@@ -192,10 +195,15 @@ def favicon(brand: Path) -> bytes:
     ico = brand / "images" / "favicon.ico"
     if ico.is_file():
         return ico.read_bytes()
-    if shutil.which("convert") is None:
-        raise MissingProgram("convert", "install ImageMagick from the host")
-    return subprocess.run(["convert", str(brand / "images" / "favicon.png"), "-define", "icon:auto-resize=48,32,16", "ico:-"],
-                          check=True, capture_output=True).stdout
+    try:
+        from PIL import Image
+    except ImportError:
+        raise MissingProgram("Pillow", "run it through agora, which holds the locked Pillow, or `pip install Pillow`") from None
+    import io
+    buf = io.BytesIO()
+    with Image.open(brand / "images" / "favicon.png") as im:
+        im.convert("RGBA").save(buf, format="ICO", sizes=[(48, 48), (32, 32), (16, 16)])
+    return buf.getvalue()
 
 
 def package_name(brand: Path) -> str:
@@ -248,7 +256,8 @@ def build(out: Path, paragon: Path) -> None:
     shutil.rmtree(out / "dist", ignore_errors=True)
     shutil.rmtree(out / "paragon" / "build", ignore_errors=True)
     (out / "dist" / "paragon").mkdir(parents=True)
-    run = lambda *a: subprocess.run([str(paragon), *a], cwd=out, check=True, capture_output=True, text=True)  # noqa: E731
+    env = node.with_node(dict(os.environ))  # Paragon's CLI is a Node script: it runs on the locked Node
+    run = lambda *a: subprocess.run([str(paragon), *a], cwd=out, check=True, capture_output=True, text=True, env=env)  # noqa: E731
     run("build-tokens", "--source", "./paragon/tokens/", "--build-dir", "./paragon/build", "-t", "light")
     run("build-scss", "--corePath", "./paragon/core.scss", "--themesPath", "./paragon/build/themes", "--outDir", "./dist")
     for f in sorted(out.glob("*")):

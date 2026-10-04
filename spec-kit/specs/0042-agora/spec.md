@@ -72,7 +72,8 @@ design systems' own harnesses, and what CI runs.
   - `brand`: `list`, `show` (read); `generate` (generate): a brand's theme
     files and its specimen.
   - `imagery`: `list BRAND`, `show PIECE` (read, including measurement);
-    `build BRAND` (build); `add BRAND --master` (record).
+    `build BRAND` (generate): the WebP files, share card, app icons and
+    favicon; `add BRAND --master` (record).
   - `decoration`: `show` (read); `generate [--only trace|set]` (generate).
   - `ink`: `list`, `show [--palette GPL...]` (read); `record --spot --thread
     --by --on` (decision).
@@ -172,12 +173,16 @@ design systems' own harnesses, and what CI runs.
   and `brand.tex` from its `tokens.json`), `brand-specimen` (its specimen),
   `openedx-sources` (a brand's Open edX package sources), `print-layout-docs`
   (the print design system's layout documentation from its layouts),
-  `profile-figure` (the organization profile's figures) and `agent-skill` (the
-  file that tells an AI agent how to use `agora`, FR-028).
+  `profile-figure` (the organization profile's figures), `brand-imagery` (a
+  brand's WebP files, share card, app icons and favicon from its masters and
+  tokens), `brand-decoration` (its traced lockup and icon, its set wordmark and
+  unit marks, and their measured finest detail in `tokens.json`) and
+  `agent-skill` (the file that tells an AI agent how to use `agora`, FR-028).
   Each names the command that rewrites its files (0041-command-line FR-035):
-  `brand generate` for `brand-theme` and `brand-specimen`, `openedx generate`
-  for `openedx-sources`, `figure generate` for `profile-figure`, `skill
-  generate` for `agent-skill`; the files of
+  `brand generate` for `brand-theme` and `brand-specimen`, `imagery build` for
+  `brand-imagery`, `decoration generate` for `brand-decoration`, `openedx
+  generate` for `openedx-sources`, `figure generate` for `profile-figure`,
+  `skill generate` for `agent-skill`; the files of
   `print-layout-docs` are rewritten by the print design system's own
   `latex/layout.py sync`, which `fresh` calls and which stays in the design
   system (FR-017). `fresh` MUST say that a generator needs a toolchain entry the cache lacks
@@ -229,8 +234,9 @@ design systems' own harnesses, and what CI runs.
   - Python packages from PyPI through uv: `Pillow` in place of ImageMagick's
     `convert` and `identify`; `pypdfium2` and `pypdf` in place of poppler's
     `pdfinfo`, `pdftotext`, `pdffonts`, `pdfimages` and `pdftoppm`; `resvg-py`
-    (or `cairosvg`) in place of `rsvg-convert`; `potracer` in place of
-    `potrace`; `nodejs-wheel-binaries` in place of a host Node (it supplies
+    in place of `rsvg-convert` for a PNG, and `reportlab` in place of it for the
+    signage design system's PDF (`cairosvg` is not used: it loads the host's
+    libcairo); `potracer` in place of `potrace`; `nodejs-wheel-binaries` in place of a host Node (it supplies
     `node`, `npm` and `npx`); and `dulwich` in place of `git` where a command
     only reads Git's state.
   - Toolchain entries: `tinytex` and `tex-packages` (a TinyTeX release and the
@@ -411,16 +417,23 @@ design systems' own harnesses, and what CI runs.
 - **OQ-1**: Whether `check` sections that need Node and Playwright can run
   their harnesses through `agora`'s own worker, or must always run the
   harness's documented command.
-- **OQ-2**: Whether each replacement FR-030 names reaches the fidelity and
-  licence the harnesses need: `pypdfium2` and `pypdf` for poppler's
-  `pdffonts` and `pdfimages` (PyMuPDF has an AGPL licence), `resvg-py` or
-  `cairosvg` for `rsvg-convert`, `potracer` for `potrace`, and TinyTeX with
-  pinned packages for the TeX Live the print design system uses. Each is
-  confirmed by the change that makes it, and the generated files it changes
-  are regenerated and proven in that change.
+- **OQ-2**: Whether TinyTeX with pinned packages reaches the fidelity the print
+  design system needs from TeX Live. The package replacements FR-030 names are
+  confirmed, each with the generated files it changed regenerated and proven by
+  `fresh`: `pypdfium2` (text layer) and `pypdf` (page size, fonts, images) for
+  poppler's readers, with PyMuPDF excluded for its AGPL licence; `resvg-py`
+  (MIT binding of the MPL-2.0 resvg) for PNG, with the design systems' fonts alone
+  and no font of the machine's; `reportlab` (BSD-3-Clause) for the sign's PDF, its
+  CFF faces converted to TrueType by `fontTools` because reportlab embeds only
+  TrueType outlines; `potracer` (GPL-2.0-or-later, used as a tool and never
+  shipped) for `potrace`, which reproduces the committed traces to within 0.03% of
+  their pixels and the same measured finest detail; `Pillow` (MIT-CMU) for
+  ImageMagick, whose WebP and PNG bytes differ once and are regenerated; and
+  `dulwich` (Apache-2.0 or GPL-2.0-or-later) for `git`. The `nodejs-wheel-binaries`
+  wheel's `bin/npm` and `bin/npx` are links that uv unpacks as copies that cannot
+  find their library, so npm is started as `node npm-cli.js`.
 - **OQ-3**: `agora` still declares its registry in manifests, its UI-less
-  views are not yet declared, it still has an `environment` noun, a check
-  section of that name and a resource for it, its register check still reads
+  views are not yet declared, its register check still reads
   the repository names from a workspace file instead of the ontology, and its
   packages are locked per group rather than in one `uv.lock`; moving to code
   (FR-001), declaring the editor views (FR-019) and removing what FR-011

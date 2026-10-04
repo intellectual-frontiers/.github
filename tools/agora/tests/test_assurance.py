@@ -1,6 +1,7 @@
 """The assurance group: harness discovery, the missing-harness failure, a missing program, streaming, and the sections
 (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-013, FR-014, FR-017; 0041-command-line FR-006, FR-033)."""
 import contextlib
+import importlib.util
 import io
 import os
 import shutil
@@ -113,18 +114,19 @@ class Discovery(Repo):
     def test_each_harness_carries_what_the_manifest_says_it_needs(self):
         found, _ = self.plan()
         browser = next(h for h in found if h.kind == "browser")
-        self.assertEqual(browser.programs, ["node", "chromium"])
+        self.assertEqual(browser.programs, ["chromium"])  # node is a package, not a program (0042 FR-030)
         m = self.manifest()
-        m["harnesses"]["print:python"] = {"programs": ["latexmk"], "optional": ["rsvg-convert"]}
+        m["harnesses"]["print:python"] = {"programs": ["latexmk"], "optional": ["xelatex"]}
         found, _ = self.plan(runner="python")
         printer = next(h for h in found if h.slug == "print")
-        self.assertEqual((printer.programs, printer.optional), (["latexmk"], ["rsvg-convert"]))
+        self.assertEqual((printer.programs, printer.optional), (["latexmk"], ["xelatex"]))
 
     def test_the_real_manifest_names_the_print_harness_programs_and_the_python_packages(self):
         m = Registry.load(HOME).groups["assurance"].manifest
         self.assertEqual(set(m["harnesses"]["frontiers-print:python"]["programs"]),
-                         {"latexmk", "xelatex", "lualatex", "pdfinfo", "pdffonts", "pdftotext", "pdfimages"})
-        self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml"})
+                         {"latexmk", "xelatex", "lualatex"})
+        self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml", "nodejs-wheel-binaries", "pypdf", "pypdfium2",
+                                              "reportlab", "resvg-py"})
         self.assertTrue(all(v.replace(".", "").isdigit() for v in m["packages"].values()))  # exact pins
 
 
@@ -278,13 +280,22 @@ class SuitesAndOptions(unittest.TestCase):
         self.assertIn("not a known", invocation.problem(ctx, "agora check openedx --scope no-such-brand") or "")
 
     def test_a_section_whose_programs_are_missing_is_skipped_with_exit_3_and_the_hint(self):
-        ctx = Ctx(self.reg, HOME, HOME, env={"PATH": "/nonexistent"})
+        import dataclasses
+        reg = Registry.load(HOME)
+        reg.sections["imagery"] = dataclasses.replace(reg.sections["imagery"], programs=("no-such-program-xyz",))
+        reg.groups["assurance"].programs["no-such-program-xyz"] = {"hint": "install the package that supplies it"}
+        ctx = Ctx(reg, HOME, HOME, env={"PATH": "/nonexistent"})
         with mock.patch.dict(os.environ, {"PATH": "/nonexistent"}):
             res = checkrun.run_check(ctx, ["imagery"], None, None, False, None)
         (s,) = res.data["sections"]
         self.assertEqual((s["status"], res.exit), ("skipped", 3))
-        self.assertIn("convert", s["reason"])
-        self.assertIn("install ImageMagick", s["reason"])
+        self.assertIn("no-such-program-xyz", s["reason"])
+        self.assertIn("install the package that supplies it", s["reason"])
+
+    def test_no_host_program_of_the_replaced_kind_is_declared(self):  # 0042 FR-030
+        programs = {p for g in self.reg.groups.values() for p in g.programs}
+        self.assertEqual(programs & {"node", "pdfinfo", "pdffonts", "pdftotext", "pdfimages", "rsvg-convert", "convert",
+                                     "identify", "potrace", "git"}, set())
 
 
 class Probe(unittest.TestCase):
@@ -299,7 +310,7 @@ class Probe(unittest.TestCase):
                 self.assertIsNone(find_program(reg, "no-such-program-xyz", {}))
 
 
-@unittest.skipUnless(shutil.which("convert") and shutil.which("identify"), "ImageMagick is not installed")
+@unittest.skipUnless(importlib.util.find_spec("PIL"), "Pillow is not installed")
 class Imagery(Repo):
     def test_the_real_brands_pass(self):
         for brand in assurance.brands(HOME):
@@ -419,38 +430,38 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class OpenedxWithoutImageMagick(unittest.TestCase):
-    """A brand without a favicon.ico needs `convert`; where the host lacks it the harness skips that brand, naming the
-    program and exiting 3, and is not a failure (0041 FR-006, FR-033; 0042 FR-013)."""
+class OpenedxWithoutPillow(unittest.TestCase):
+    """A brand without a favicon.ico needs Pillow; where the interpreter lacks it the harness skips that brand, naming the
+    package and exiting 3, and is not a failure (0041 FR-006, FR-033; 0042 FR-013, FR-030)."""
 
     def test_the_harness_exits_3_and_says_what_it_skipped(self):
         import subprocess
         import sys
-        p = subprocess.run([sys.executable, "design-systems/frontiers-brand/assurance/run.py"], cwd=HOME, capture_output=True, text=True,
-                           env={"PATH": "/nonexistent", "PYTHONDONTWRITEBYTECODE": "1"})
+        # -S: no site-packages, so the interpreter holds no Pillow, as the harness run on a bare Python would
+        p = subprocess.run([sys.executable, "-S", "design-systems/frontiers-brand/assurance/run.py"], cwd=HOME, capture_output=True,
+                           text=True, env={"PATH": "/nonexistent", "PYTHONDONTWRITEBYTECODE": "1"})
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("skipped example-brand: needs convert", p.stdout)
+        self.assertIn("skipped example-brand: needs Pillow", p.stdout)
         self.assertNotIn("FAIL", p.stdout)
 
-    def test_agora_reports_the_harness_as_skipped_with_the_hint(self):
-        from agora.lib import assurance
-        lines: list[str] = []
-        reg = Registry.load(HOME)
-        o = assurance.run_openedx(reg, "frontiers-brand", HOME, {"PATH": "/nonexistent"}, None, lines.append)
-        self.assertEqual(o.status, "skipped")
-        self.assertIn("convert", o.reason)
-        self.assertIn("install ImageMagick from the host", o.reason)
+    @unittest.skipUnless(importlib.util.find_spec("PIL"), "Pillow is not installed")
+    def test_with_pillow_the_brand_without_a_favicon_is_checked(self):
+        import subprocess
+        import sys
+        p = subprocess.run([sys.executable, "design-systems/frontiers-brand/assurance/run.py"], cwd=HOME, capture_output=True,
+                           text=True, env={"PATH": "/nonexistent", "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertNotIn("skipped", p.stdout)
 
-    def test_convert_is_declared_as_needed_by_the_openedx_check_and_the_brand_harness(self):
-        reg = Registry.load(HOME)
-        needed = reg.program("convert")["needed_by"]
-        self.assertTrue(any(n.startswith("check openedx") for n in needed))
-        self.assertTrue(any("frontiers-brand" in n for n in needed))
-        self.assertIn("convert", reg.groups["assurance"].manifest["harnesses"]["frontiers-brand:python"]["optional"])
+    def test_the_favicon_is_written_by_pillow_in_the_three_sizes(self):
+        if not importlib.util.find_spec("PIL"):
+            self.skipTest("Pillow is not installed")
+        from PIL import Image
+        with Image.open(io.BytesIO(openedx.favicon(HOME / "design-systems" / "example-brand"))) as ico:
+            self.assertEqual(sorted(ico.info["sizes"]), [(16, 16), (32, 32), (48, 48)])
 
-    def test_the_workflows_install_imagemagick_where_the_harness_needs_it(self):
-        text = (HOME / ".github" / "workflows" / "design-systems.yml").read_text()
-        browser, rest = text.split("  python:\n")
-        python_job = rest.split("  images:\n")[0]
-        self.assertIn("imagemagick", browser)
-        self.assertIn("imagemagick", python_job)
+    def test_the_workflows_install_none_of_the_replaced_programs(self):
+        text = "\n".join(l for l in (HOME / ".github" / "workflows" / "design-systems.yml").read_text().splitlines()
+                         if not l.lstrip().startswith("#"))  # a comment may name what is gone
+        for gone in ("imagemagick", "poppler-utils", "librsvg2-bin", "potrace"):
+            self.assertNotIn(gone, text)

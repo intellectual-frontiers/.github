@@ -165,9 +165,10 @@ tools/
 .claude/
   skills/agora/     SKILL.md, the agent skill agora generates from its registry
                     (0042-agora FR-028)
-tools/reference-environment, .devcontainer/
-                    files for an optional workspace that nothing requires and
-                    that are removed (0025 FR-025, 0026 OQ-1, 0042 OQ-3)
+.devcontainer/
+                    ws-repos.json: the repositories a register row may name
+                    (read by agora's register check until 0042 OQ-3 moves
+                    that to the ontology); no workspace is required (0025 FR-025)
 ontology/
   ifcore.ttl        core company ontology (the ifcore: namespace), including
                     agora's command set
@@ -288,9 +289,10 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
 - Run `./agora check` for every check, `./agora check --suite spec` for the
   spec, register and ontology checks, `./agora check --suite browser`, `python` or
   `images` for the design systems' harnesses, each brand's imagery and its Open edX
-  package (they need programs from the host: Node and Chromium, TeX Live and
-  poppler, ImageMagick; a harness whose program is missing is skipped, never
-  passed, and the run exits 3), `./agora check --changed` for only the sections whose
+  package (Node, the PDF readers, the SVG renderer, the image library and the tracer are
+  Python packages in agora's locks; Chromium and TeX Live have no wheel and still come from
+  the host until the toolchain lock supplies them, so a harness whose program is missing is
+  skipped, never passed, and the run exits 3), `./agora check --changed` for only the sections whose
   watched paths changed, `./agora fresh` to prove generated files are current,
   `./agora doctor` for what is missing, `./agora test` for its own tests, `./agora lock
   [GROUP]` to write the lock, and `./agora context RESOURCE` (such as
@@ -315,7 +317,6 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   | `layout` | `list`, `show`, `build` |
   | `figure`, `deck`, `email`, `media`, `sign` | `build`; `figure` also `generate` |
   | `course` | `show`, `build` |
-  | `environment` | `show`, `set` |
   | `proposal` | `list`, `show`, `new`, `advance` (decision) |
   | `skill` | `generate` |
   | `command` | `list`, `show` |
@@ -330,8 +331,13 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
 - The launcher needs only `uv` and Python 3. Python packages come from
   committed locks (`tools/agora/groups/<group>/agora.lock`, moving to uv's `uv.lock`), and
   `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
-  Python (TeX, Chromium, ImageMagick, potrace, rsvg-convert, Node) come from the
-  host, and `doctor` says which are missing (0025 FR-013, 0041).
+  Python come from Python packages in those locks wherever a wheel exists: Node
+  (`nodejs-wheel-binaries`), poppler's readers (`pypdfium2`, `pypdf`), rsvg-convert
+  (`resvg-py`, and `reportlab` for a sign's PDF), ImageMagick (`Pillow`), potrace
+  (`potracer`) and Git's reads (`dulwich`), so none of them is installed on the host
+  and a command's output never depends on one. Only TeX and Chromium, which have no
+  wheel, still come from the host until the toolchain lock supplies them, and `doctor`
+  says which are missing (0042 FR-030, 0025 FR-007, FR-013).
 - Git is the only record: `agora` never commits or pushes. What changes or runs
   something and is not worth a commit (a check, a build, a dry run, an MCP call)
   goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants
@@ -423,8 +429,8 @@ on every push that touches `design-systems/`.
       row in `spec-kit/enforcement.tsv`.
 - [ ] Any command you add is declared in `agora`'s registry and in the
       ontology, and `./agora check commands` passes; it declares its
-      prerequisites and installs nothing; it runs from a fresh clone in
-      workspaces-host (0025, 0041, 0042).
+      prerequisites and installs nothing; it runs from a fresh clone that has only
+      `python3` and `uv` (0025, 0041, 0042).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.

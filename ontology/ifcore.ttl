@@ -2055,7 +2055,7 @@ ifcore:DecisionCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCate
     skos:definition "Changes what only the authority in effect decides; never callable over MCP (0041-command-line FR-023)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SetupCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "setup"@en ;
     skos:notation "setup" ;
-    skos:definition "Changes the clone's own environment, such as a lock, a pin or a running server."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "Changes the clone's own environment, such as a lock, a fetched toolchain entry or a running server."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandVerbScheme a skos:ConceptScheme ; rdfs:label "Command verb"@en ;
     rdfs:comment "The fixed set of thirteen verbs an orchestrator's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
@@ -2176,9 +2176,6 @@ ifcore:SignResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme
 ifcore:CourseResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "course"@en ;
     skos:notation "course" ;
     skos:definition "A course built with the course design system."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:EnvironmentResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "environment"@en ;
-    skos:notation "environment" ;
-    skos:definition "The reference environment pin."@en ; ifcore:hasAudience ifcore:Public .
 
 # agora's commands (0042-agora FR-005, FR-006): noun, verb and category, one individual per command.
 ifcore:AgoraCheckCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "check"@en ;
@@ -2307,7 +2304,7 @@ ifcore:AgoraImageryShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     skos:definition "Shows one imagery piece, including its measurements."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraImageryBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery build"@en ;
     dcterms:identifier "imagery build" ;
-    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
     skos:definition "Builds a brand's imagery web files, app icons and share card."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraImageryAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery add"@en ;
     dcterms:identifier "imagery add" ;
@@ -2389,14 +2386,6 @@ ifcore:AgoraCourseBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "course build" ;
     ifcore:commandNoun ifcore:CourseResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
     skos:definition "Builds a course for a delivery target."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraEnvironmentShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "environment show"@en ;
-    dcterms:identifier "environment show" ;
-    ifcore:commandNoun ifcore:EnvironmentResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Shows the reference environment pin, where the repository has one, and the image tag CI still runs in (0042-agora FR-011, OQ-4)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraEnvironmentSetCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "environment set"@en ;
-    dcterms:identifier "environment set" ;
-    ifcore:commandNoun ifcore:EnvironmentResourceKind ; ifcore:commandVerb ifcore:SetCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Sets the reference environment pin in .workspaces-host/ws-host.env (0042-agora FR-011)."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Compliance controls (0028-compliance-controls) ─────────────────────────
 # NIST OSCAL's model, reused rather than invented (0019-controlled-vocabulary FR-001): a framework is a

@@ -6,7 +6,7 @@ from .helpers import HOME, TempRepo, run, run_json, spec_text
 
 class Sections(TempRepo):
     def test_a_valid_repository_passes_every_section(self):
-        doc = self.check("specs", "register", "controls", "ontology", "environment")
+        doc = self.check("specs", "register", "controls", "ontology")
         self.assertEqual((self.last_code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual(doc["audience"], "unstated")
 
@@ -142,15 +142,6 @@ class Sections(TempRepo):
         self.assertIn("ghost-web is registered but design-systems/ghost-web/ does not exist", found)
         self.assertIn("names no interaction model", found)
 
-    # environment ---------------------------------------------------------------------------------------------
-    def test_environment(self):
-        self.write("tools/reference-environment", "not a pin\n")
-        self.assertTrue(any("must hold one line" in m for m in self.findings("environment")))
-        self.write("tools/reference-environment", "github:o/r/" + "b" * 40 + "\n")
-        self.assertTrue(any("tagged sha-bbbbbbb" in m for m in self.findings("environment")))
-        self.root.joinpath("tools/reference-environment").unlink()
-        self.assertTrue(any("is missing" in m for m in self.findings("environment")))
-
     def test_findings_name_their_location_and_the_next_action(self):
         self.write("spec-kit/specs/0001-first/spec.md", spec_text("0001-first", status="Done"))
         doc = self.check("specs")
@@ -165,7 +156,7 @@ class Selection(unittest.TestCase):
         code, doc = run_json(["check", "--suite", "spec"])
         self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual([s["name"] for s in doc["data"]["sections"]],
-                         ["specs", "register", "controls", "ontology", "environment", "commands"])
+                         ["specs", "register", "controls", "ontology", "commands"])
         self.assertEqual(doc["audience"], "public")
 
     def test_a_suite_that_names_no_section_ran_nothing_and_fails(self):
@@ -187,10 +178,10 @@ class Selection(unittest.TestCase):
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 17)
+        self.assertEqual(doc["data"]["summary"]["run"], 16)
 
     def test_scope_and_options_must_apply(self):
-        self.assertEqual(run(["check", "environment", "--scope", "x"])[0], 2)
+        self.assertEqual(run(["check", "controls", "--scope", "x"])[0], 2)
         self.assertEqual(run(["check", "specs", "--runner", "browser"])[0], 2)
         self.assertEqual(run(["check", "specs", "--scope", "no-such-spec"])[0], 2)
 
@@ -201,8 +192,8 @@ class Selection(unittest.TestCase):
     def test_a_missing_program_skips_the_section_and_fails_the_run(self):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
-        reg.sections["environment"].programs = ("no-such-program-xyz",)
-        code, doc = run_json(["check", "environment"], registry=reg)
+        reg.sections["controls"].programs = ("no-such-program-xyz",)
+        code, doc = run_json(["check", "controls"], registry=reg)
         s = doc["data"]["sections"][0]
         self.assertEqual((code, s["status"], doc["data"]["status"]), (3, "skipped", "skipped"))
         self.assertIn("no-such-program-xyz", s["reason"])

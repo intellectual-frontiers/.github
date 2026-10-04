@@ -12,9 +12,10 @@ A job names its format (formats.json), its tone and its text:
 
 On an event badge the title is the wearer's name and the details their role and organization. `render` lays the text
 out in the brand's sans (measured in fonts/), places the lockup and any imagery piece no larger than the minimum
-print resolution allows, fills the bleed with the background, and renders the SVG to PDF with rsvg-convert through
-fonts/. `check` reports every rule a job breaks and exits non-zero on any. Needs Pillow and rsvg-convert; uses the
-house voice when it is beside this design system.
+print resolution allows, fills the bleed with the background, and draws the SVG's rectangles, text and images as a PDF
+with reportlab, the faces of fonts/ embedded and no other. `check` reports every rule a job breaks and exits non-zero on
+any. Needs the Python packages Pillow, fontTools and reportlab (`pip install Pillow fonttools reportlab`), or run it
+through `agora`, whose locked environment holds them; uses the house voice when it is beside this design system.
 """
 from __future__ import annotations
 
@@ -22,11 +23,9 @@ import argparse
 import base64
 import html
 import importlib.util
+import io
 import json
-import os
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -179,16 +178,94 @@ def layout(job: dict, brand: Path) -> dict:
             "safe": m, "bottom": bottom, "size": (W, H)}
 
 
+_REGISTERED: set[str] = set()
+
+
+def _truetype(face: Path) -> bytes:
+    """A face of fonts/ with its CFF outlines converted to TrueType ones (reportlab embeds TrueType outlines only), as
+    bytes. The face keeps its own name; the PDF carries only the glyphs a sign sets (reportlab cuts the face to them)."""
+    from fontTools import subset
+    from fontTools.pens.cu2quPen import Cu2QuPen
+    from fontTools.pens.ttGlyphPen import TTGlyphPen
+    from fontTools.ttLib import TTFont, newTable
+
+    font = TTFont(str(face))
+    opts = subset.Options()
+    opts.layout_features, opts.hinting, opts.notdef_outline, opts.name_IDs = [], False, True, ["*"]
+    sub = subset.Subsetter(opts)
+    sub.populate(unicodes=list(font.getBestCmap()))
+    sub.subset(font)
+    order = font.getGlyphOrder()
+    glyphs = {}
+    for name in order:
+        pen = TTGlyphPen(font.getGlyphSet())
+        font.getGlyphSet()[name].draw(Cu2QuPen(pen, 1.0, reverse_direction=True))
+        glyphs[name] = pen.glyph()
+    font["loca"] = newTable("loca")
+    font["glyf"] = glyf = newTable("glyf")
+    glyf.glyphOrder, glyf.glyphs = order, glyphs
+    del font["CFF "]
+    if "VORG" in font:
+        del font["VORG"]
+    glyf.compile(font)
+    maxp = font["maxp"]
+    maxp.tableVersion = 0x00010000
+    maxp.maxZones, maxp.maxTwilightPoints, maxp.maxStorage, maxp.maxFunctionDefs = 1, 0, 0, 0
+    maxp.maxInstructionDefs, maxp.maxStackElements, maxp.maxSizeOfInstructions, maxp.maxComponentElements = 0, 0, 0, 0
+    maxp.maxPoints = maxp.maxContours = maxp.maxCompositePoints = maxp.maxCompositeContours = maxp.maxComponentDepth = 0
+    maxp.recalc(font)
+    post = font["post"]
+    post.formatType, post.extraNames, post.mapping, post.glyphOrder = 2.0, [], {}, order
+    font.sfntVersion = "\x00\x01\x00\x00"
+    buf = io.BytesIO()
+    font.save(buf)
+    return buf.getvalue()
+
+
+def _pdf(svg: str, out: Path) -> None:
+    """The sign's SVG, which this module writes and holds to rectangles, text and images, as a one-page vector PDF the
+    size of its viewBox (72 to the inch). Text is set in the embedded faces of fonts/; a data-URI image is placed at
+    its box. The bytes depend on the locked packages alone (reportlab's invariant mode)."""
+    import base64 as b64
+    import xml.etree.ElementTree as ET
+    from PIL import Image
+    from reportlab.lib.colors import HexColor
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont as PdfFont
+    from reportlab.pdfgen import canvas
+
+    ns = "{http://www.w3.org/2000/svg}"
+    tree = ET.fromstring(svg)
+    page_w, page_h = (float(v) for v in tree.get("viewBox").split()[2:])
+    for name, face in (("Inter-Regular", "Inter-Regular.otf"), ("Inter-Bold", "Inter-Bold.otf")):
+        if name not in _REGISTERED:  # reportlab keeps a registered font for the life of the process
+            pdfmetrics.registerFont(PdfFont(name, io.BytesIO(_truetype(FONTS / face))))
+            _REGISTERED.add(name)
+    pdf = canvas.Canvas(str(out), pagesize=(page_w, page_h), pageCompression=1, invariant=1,
+                         initialFontName="Inter-Regular")
+    pdf.setTitle("")
+    for el in tree:
+        kind = el.tag.removeprefix(ns)
+        if kind == "rect":
+            pdf.setFillColor(HexColor(el.get("fill")))
+            pdf.rect(0, 0, float(el.get("width")), float(el.get("height")), stroke=0, fill=1)
+        elif kind == "text":
+            pdf.setFillColor(HexColor(el.get("fill")))
+            pdf.setFont("Inter-Bold" if el.get("font-weight") == "700" else "Inter-Regular", float(el.get("font-size")))
+            pdf.drawString(float(el.get("x")), page_h - float(el.get("y")), el.text or "")
+        elif kind == "image":
+            data = b64.b64decode(el.get("href").split(",", 1)[1])
+            w, h = float(el.get("width")), float(el.get("height"))
+            pdf.drawImage(ImageReader(Image.open(io.BytesIO(data))), float(el.get("x")), page_h - float(el.get("y")) - h, w, h,
+                          mask="auto")
+    pdf.showPage()
+    pdf.save()
+
+
 def render(job: dict, brand: Path, out: Path) -> dict:
     lay = layout(job, brand)
-    with tempfile.TemporaryDirectory() as tmp:
-        conf = Path(tmp) / "fonts.conf"
-        conf.write_text(f'<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><dir>{FONTS}</dir>'
-                        f"<cachedir>{tmp}/cache</cachedir></fontconfig>", encoding="utf-8")
-        src = Path(tmp) / "sign.svg"
-        src.write_text(lay["svg"], encoding="utf-8")
-        subprocess.run(["rsvg-convert", "--unlimited", "-f", "pdf", "-o", str(out), str(src)], check=True,
-                       env={**os.environ, "FONTCONFIG_FILE": str(conf)})
+    _pdf(lay["svg"], out)
     return lay
 
 

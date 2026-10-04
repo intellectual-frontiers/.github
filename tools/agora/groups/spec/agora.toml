@@ -1,5 +1,5 @@
 name = "spec"
-help = "Specs, requirements, the enforcement register, the ontology's terms and the reference environment pin"
+help = "Specs, requirements, the enforcement register, and the ontology's terms"
 
 [nouns.spec]
 help = "A spec: a numbered spec or a design system's spec (0020-spec-format)"
@@ -9,13 +9,6 @@ help = "One FR of a spec, and how it is enforced (0020-spec-format FR-011)"
 help = "A design system: its spec, its entry in the ontology and its harness (0014-design-systems)"
 [nouns.term]
 help = "A concept or scheme of the ontology (0019-controlled-vocabulary)"
-[nouns.environment]
-help = "The reference environment pin (0025-tooling-environment FR-008)"
-
-# Programs outside Python (0041-command-line FR-006): the host supplies them. The hint names the program.
-[programs.git]
-needed_by = ["check --changed"]
-hint = "install git from the host"
 
 [sections.specs]
 help = "Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034)"
@@ -39,7 +32,3 @@ help = "Ontology prefixes, and the design systems' registration, classification 
 watch = ["ontology/**", "design-systems/**"]
 relocatable = true
 
-[sections.environment]
-help = "The reference environment pin and the devcontainer image tag agree (0025 FR-008)"
-watch = ["tools/reference-environment", ".devcontainer/devcontainer.json"]
-relocatable = true

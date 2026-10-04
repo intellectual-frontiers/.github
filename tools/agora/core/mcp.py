@@ -31,7 +31,6 @@ KINDS: dict[str, tuple[str, str | None]] = {
     "term": ("term show", "term"),
     "command": ("command show", "command"),
     "proposal": ("proposal show", "proposal"),
-    "environment": ("environment show", None),
 }
 LISTED = ("spec", "design-system", "brand", "command", "proposal")  # requirement and term are too many: templates only
 
@@ -144,9 +143,6 @@ class Server:
             for ident in sorted(t.choices(ctx)) if t else []:
                 out.append({"uri": self.uri(kind, ident), "name": f"{kind} {ident}", "mimeType": "application/json",
                             "description": f"The {kind} {ident}, as {cmd.id} returns it"})
-        if self.readable("environment"):
-            out.append({"uri": self.uri("environment", "reference"), "name": "environment reference", "mimeType": "application/json",
-                        "description": "The reference environment pin and the devcontainer image tag"})
         return out
 
     def template_list(self) -> list[dict[str, Any]]:

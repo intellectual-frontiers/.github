@@ -1,7 +1,8 @@
 """Running each design system's assurance harness (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-017).
 
 A design system carries its harness inside its own directory and it runs on its own: `assurance/run.mjs` in a
-browser (Node, Playwright and Chromium) and `assurance/run.py` in Python. This module finds the harnesses, works out
+browser (Node, Playwright and Chromium) and `assurance/run.py` in Python. Node is the one the locked
+`nodejs-wheel-binaries` carries (lib/node.py), never the host's. This module finds the harnesses, works out
 which run, under which brand and with which programs, runs each as a subprocess of its documented command line and
 streams what it prints. It reads nothing from a harness but whether its source accepts `--brand`.
 
@@ -25,6 +26,7 @@ from typing import Any, Callable
 
 from agora.core.checks import find_program
 from agora.core.resource import MISSING
+from agora.lib import node
 
 Emit = Callable[[str], None]
 KEEP = 60  # lines of a harness's output kept for a failure's finding
@@ -122,27 +124,46 @@ def plan(root: Path, manifest: dict[str, Any], scope: str | None = None, brand: 
 
 
 def harness_env(env: dict[str, str], extra: dict[str, str] | None = None) -> dict[str, str]:
+    """What a harness runs under: the process's environment without agora's own variables, and with the locked node
+    first on PATH, so a harness that starts `node` finds it."""
     out = {k: v for k, v in env.items() if k not in LEAK}
     out.update(extra or {})
-    return out
+    return node.with_node(out)
+
+
+def _node_problem(env: dict[str, str]) -> str:
+    """Why no node can run, or an empty string."""
+    if node.node_path(env):
+        return ""
+    if node.override(env):
+        return f"{node.OVERRIDE} names {node.override(env)}, which is not a file"
+    return f"needs node, which comes from the package {node.PACKAGE}; run it through agora, whose locked environment holds it"
+
+
+def _argv(h: Harness, env: dict[str, str]) -> list[str]:
+    """The harness's command line, with `node` replaced by the node it runs on."""
+    return [node.node_path(env) or "node", *h.argv[1:]] if h.argv[0] == "node" else h.argv
 
 
 def run_one(registry: Any, h: Harness, root: Path, env: dict[str, str], emit: Emit) -> Outcome:
     """Run one harness, streaming its output through `emit`; a program it needs and the host lacks skips it (0041 FR-006)."""
     gone = [p for p in h.programs if find_program(registry, p, env) is None]
     emit(f"── {h.label}")
-    if gone:
+    no_node = _node_problem(env) if h.argv[0] == "node" else ""
+    if gone or no_node:
         hints = "; ".join(f"{p}: {registry.program(p).get('hint', 'install it from the host')}" for p in gone)
-        reason = f"needs {', '.join(gone)}, not on PATH ({hints})"
+        reason = "; ".join(x for x in (f"needs {', '.join(gone)}, not on PATH ({hints})" if gone else "", no_node) if x)
         emit(f"⏭️  {h.label}: skipped, {reason}")
         return Outcome(h, "skipped", reason=reason)
+    if node.override(env) and h.argv[0] == "node":
+        emit(f"   · node is {node.override(env)}, named by {node.OVERRIDE}, not the locked {node.PACKAGE}")
     for p in h.optional:
         if find_program(registry, p, env) is None:
             emit(f"   · {p} is not installed; {h.slug}'s harness checks without it and says what it did not exercise")
     start = time.monotonic()
     tail: deque[str] = deque(maxlen=KEEP)
     try:
-        proc = subprocess.Popen(h.argv, cwd=root, env=harness_env(env), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        proc = subprocess.Popen(_argv(h, env), cwd=root, env=harness_env(env), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 text=True, errors="replace")
     except OSError as e:
         emit(f"❎ {h.label}: could not start: {e}")
@@ -194,11 +215,10 @@ def run_openedx(registry: Any, brand: str, root: Path, env: dict[str, str], para
     script = root / "design-systems" / brand / "assurance" / "run.py"
     h = Harness(brand, "openedx", str(script.relative_to(root)), [sys.executable, str(script.relative_to(root))])
     extra = {"PARAGON": str(paragon)} if paragon else {}
-    gone = [p for p in ("node",) if paragon and find_program(registry, p, env) is None]
+    no_node = _node_problem(env) if paragon else ""
     emit(f"── {brand}'s Open edX package" + (f", rebuilt with {paragon}" if paragon else ""))
-    if gone:
-        hint = registry.program("node").get("hint", "install it from the host")
-        reason = f"needs node, not on PATH ({hint})"
+    if no_node:
+        reason = no_node
         emit(f"⏭️  {brand}'s Open edX package: skipped, {reason}")
         return Outcome(h, "skipped", reason=reason)
     start = time.monotonic()

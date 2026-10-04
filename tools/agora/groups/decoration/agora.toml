@@ -1,16 +1,24 @@
 name = "decoration"
 help = "A brand's decoration kit: the traced lockup and icon, and the wordmark and unit marks set in type"
 
-# The package `decoration generate --only set` imports, to one exact version, locked with hashes in agora.lock.
+# Python packages `decoration` imports (0041-command-line FR-003; 0042-agora FR-018), each to one exact version, locked with
+# hashes in agora.lock (0042-agora FR-030: these replace ImageMagick, potrace and rsvg-convert).
+#   Pillow      reads the raster masters, composites them on white, takes their luminance and enlarges them (Lanczos)
+#   potracer    traces the enlarged master with potrace's algorithm (a pure-Python port, GPL-2.0-or-later; used here as a
+#               tool, never shipped; it needs numpy, BSD-3-Clause)
+#   resvg-py    renders the artwork to measure its finest detail (MPL-2.0 resvg; the artwork has no text)
 #   uharfbuzz   shapes the wordmark's text with the font's own kerning and draws the glyph outlines
 [packages]
+Pillow = "12.3.0"
+potracer = "0.0.4"
+resvg-py = "0.5.0"
 uharfbuzz = "0.56.2"
-
-# potrace traces the raster masters. ImageMagick and rsvg-convert, which measuring needs too, are declared with the
-# assurance group's programs.
-[programs.potrace]
-needed_by = ["decoration generate (trace)"]
-hint = "install potrace from the host (the press persona carries it)"
 
 [nouns.decoration]
 help = "A brand's decoration kit: one-color artwork made mechanically from the masters and the brand's fonts (0014-design-systems FR-047)"
+
+[generators.brand-decoration]
+help = "A brand's decoration kit: the traced lockup and icon, the set wordmark and unit marks, and their measured finest detail in tokens.json"
+sources = ["design-systems/*/tokens.json", "design-systems/*/logos/*.png", "design-systems/*/fonts/**", "tools/agora/lib/decoration.py"]
+outputs = ["design-systems/*/logos/vector/**", "design-systems/*/logos/units/**", "design-systems/*/tokens.json"]
+command = "decoration generate"

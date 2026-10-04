@@ -20,13 +20,13 @@ class EveryCommand(unittest.TestCase):
 
     def test_every_command_without_required_arguments_returns_a_resource(self):  # 0041 FR-016
         # the commands that run the checks again, write tracked files, or run in a group's locked environment (tested apart)
-        skip = {"check", "test", "doctor", "lock", "environment set", "spec new", "fresh", "brand generate", "figure generate", "skill generate",
+        skip = {"check", "test", "doctor", "lock", "spec new", "fresh", "brand generate", "figure generate", "skill generate",
                 "mcp serve"}  # the last speaks on standard input
         for c in self.reg.commands.values():
             if c.id in skip or any(a.required for a in c.args) or any(o.required for o in c.options):
                 continue
             with self.subTest(command=c.id):
-                code, doc = run_json(c.id.split())
+                code, doc = run_json(c.id.split(), env={"AGORA_PLAN_GROUP": c.group})  # as the group's own process stands
                 self.assertEqual(code, 0)
                 self.assertEqual(sorted(doc), ["actions", "audience", "data", "id", "kind", "links", "schema"])
                 self.assertEqual(doc["audience"], "public")
@@ -100,14 +100,13 @@ class WritesLeaveGitAlone(TempRepo):
         control = sorted(public_controls(HOME))[0]
         for argv in (["spec", "new", "second"], ["spec", "set", "0001", "--status", "Adopted"],
                      ["requirement", "set", "0001/FR-001", "--mechanism", "none", "--note", "x"],
-                     ["requirement", "add", "0001/FR-001", "--control", control],
-                     ["environment", "set", "e" * 40]):
+                     ["requirement", "add", "0001/FR-001", "--control", control]):
             with self.subTest(argv=argv):
                 self.assertEqual(run_json(argv, home=self.root)[0], 0)
                 self.assertEqual(self.git("rev-parse", "HEAD"), head)
                 self.assertEqual(self.git("tag"), hooks)
                 self.assertEqual(self.git("diff", "--cached", "--name-only"), "")
-        self.assertIn("M tools/reference-environment", self.git("status", "--short"))
+        self.assertIn("M spec-kit/specs/0001-first/spec.md", self.git("status", "--short"))
 
     def test_dry_runs_change_nothing(self):
         shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
@@ -117,7 +116,7 @@ class WritesLeaveGitAlone(TempRepo):
         self.git("add", "-A")
         self.git("commit", "-q", "-m", "first")
         for argv in (["spec", "new", "second"], ["spec", "set", "0001", "--status", "Adopted"],
-                     ["requirement", "set", "0001/FR-001", "--mechanism", "none"], ["environment", "set", "e" * 40]):
+                     ["requirement", "set", "0001/FR-001", "--mechanism", "none"]):
             code, doc = run_json([*argv, "--dry-run"], home=self.root)
             self.assertEqual(code, 0)
             self.assertTrue(doc["data"]["dry_run"])
@@ -170,7 +169,7 @@ class Boundaries(unittest.TestCase):
 
     def test_sections_and_suites_must_be_the_ones_0042_declares(self):
         m = self.home / "tools" / "agora" / "agora.toml"
-        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "environment", "commands"]',
+        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "commands"]',
                                             'sections = ["specs", "register"]'))
         self.assertTrue(any("suite spec is" in x for x in self.findings()[1]))
 
