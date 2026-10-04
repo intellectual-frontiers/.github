@@ -26,7 +26,19 @@ jobs:
           echo "image=$image" >> "$GITHUB_OUTPUT"
           docker pull -q "$image"
       # A login shell, as a devcontainer opens one, so the environment's session variables are set (0025 FR-006).
-      - name: agora's doctor, the spec suite, every generator's output and agora's own tests
-        run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora doctor && ./agora check --suite spec && ./agora fresh && ./agora test'
+      # doctor exits 3 when a program outside Python is missing and 1 on a conflict (0041 FR-021). A missing program is
+      # shown as a warning, naming what is missing, and the job goes on: it is the environment falling short of
+      # 0025 FR-007, to be fixed in the environment, and no step here needs it. Exit 1 still fails the job (0042 FR-022).
+      - name: agora's doctor
+        run: |
+          code=0
+          docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora doctor' | tee doctor.txt || code=${PIPESTATUS[0]}
+          if [ "$code" -eq 3 ]; then
+            echo "::warning title=agora doctor::the reference environment lacks programs agora declares: $(sed -n 's/^missing: //p' doctor.txt) (0042 OQ-2)"
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+      - name: The spec suite, every generator's output and agora's own tests
+        run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora check --suite spec && ./agora fresh && ./agora test'
       - name: Every design system's harness (browser, TeX and imagery)
         run: docker run --rm --shm-size=1g -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora check --suite browser && ./agora check --suite python && ./agora check --suite images'

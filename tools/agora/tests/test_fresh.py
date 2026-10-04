@@ -22,12 +22,9 @@ class Declared(unittest.TestCase):
     def test_the_generators_are_the_ones_0042_names(self):  # 0042 FR-015
         self.assertEqual(sorted(self.reg.generators),
                          sorted(["brand-theme", "brand-specimen", "openedx-sources", "print-layout-docs", "profile-figure", "agent-skill"]))
-        self.assertEqual([n for n, g in self.reg.generators.items() if g.status == "planned"], ["agent-skill"])
 
     def test_every_generator_declares_its_sources_outputs_and_the_command_that_rewrites_it(self):  # 0041 FR-035
         for g in self.reg.generators.values():
-            if g.status == "planned":
-                continue
             with self.subTest(generator=g.name):
                 self.assertTrue(g.sources and g.outputs and callable(g.fn))
                 self.assertEqual(g.watch, g.sources + g.outputs)
@@ -42,13 +39,8 @@ class Declared(unittest.TestCase):
         ctx.env["AGORA_PLAN_GROUP"] = "assurance"
         self.assertFalse(generate.needs_worker(ctx, self.reg.generators["profile-figure"]))
 
-    def test_a_generator_declared_and_planned_is_a_conflict(self):
+    def test_the_registry_has_no_conflicts(self):
         self.assertEqual(self.reg.conflicts, [])
-        reg = Registry(HOME)
-        reg._load_planned({"generators": {"x": {}}})
-        reg.generators["y"] = Generator("y")
-        reg._load_planned({"generators": {"y": {}}})
-        self.assertIn("generator y is implemented and still listed as planned in the root manifest", reg.conflicts)
 
     def test_the_real_repository_is_fresh(self):  # 0042 FR-015: what is committed is what the generators write
         code, out, err = run(["fresh", *ALL])
@@ -153,16 +145,34 @@ class Fresh(Repo):
         code, doc = run_json(["fresh", "needs-a-program", "brand-theme"], home=self.root, registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "stale"))  # a stale generator still fails the run
 
-    def test_a_planned_generator_is_named_not_proved(self):
-        code, doc = self.go("fresh", "agent-skill")
-        self.assertEqual((code, doc["data"]["code"]), (1, "not-implemented"))
+    def test_with_none_named_every_generator_is_proved_and_none_is_left_out(self):
+        from agora.core.generate import Generated
         reg = Registry.load(self.root)
-        for n in ("profile-figure",):
-            del reg.generators[n]  # the one that needs its own environment
-        code, doc = run_json(["fresh"], home=self.root, registry=reg)
+        reg.generators["profile-figure"].fn = lambda ctx, scope: Generated()  # the one that needs its own environment
+        self.go("skill", "generate")
+        code, doc = run_json(["fresh"], home=self.root, registry=reg, env={"AGORA_PLAN_GROUP": "assurance"})
         self.assertEqual(code, 0, doc)
-        self.assertEqual([r["name"] for r in doc["data"]["not_run"]], ["agent-skill"])
+        self.assertEqual([r["name"] for r in doc["data"]["generators"]], list(reg.generators))
+        self.assertNotIn("not_run", doc["data"])
         self.assertEqual(self.go("fresh", "no-such-generator")[0], 2)
+
+    def test_the_agent_skill_is_proved_current_and_a_hand_edit_or_a_new_command_makes_it_stale(self):  # 0042 FR-028
+        self.go("skill", "generate")
+        self.assertEqual(self.fresh("agent-skill")[0], 0)
+        skill = self.root / ".claude" / "skills" / "agora" / "SKILL.md"
+        skill.write_text(skill.read_text() + "a hand edit\n")
+        code, doc = self.fresh("agent-skill")
+        (row,) = doc["data"]["generators"]
+        self.assertEqual((code, row["name"], row["status"]), (1, "agent-skill", "stale"))
+        self.assertEqual(row["stale"][0]["rewrite"], "agora skill generate")
+        self.go("skill", "generate")
+        self.assertEqual(self.fresh("agent-skill")[0], 0)
+        # a command the registry gains reaches the skill, and only regenerating puts it right
+        reg = Registry.load(self.root)
+        from agora.core.registry import Command
+        reg.add_command(Command(("spec", "frobnicate"), "read", "Frobnicates a spec", group="spec", fn=lambda ctx: None))
+        code, doc = run_json(["fresh", "agent-skill"], home=self.root, registry=reg)
+        self.assertEqual((code, doc["data"]["status"]), (1, "stale"))
 
     def test_changed_proves_only_generators_whose_inputs_or_outputs_changed(self):  # 0041 FR-032
         def git(*a):

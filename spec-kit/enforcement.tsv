@@ -935,28 +935,28 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-019	check	.github: agora test	tests check the JSON document's fields, its schema name and NDJSON streams
 0041-command-line FR-020	check	.github: agora test	tests check error resources in all three renderings, an unexpected exception, and --debug
 0041-command-line FR-021	check	.github: agora test	tests check exit statuses 0, 1, 2 and 3
-0041-command-line FR-022	check	.github: agora test	tests check the default surfaces by category; the surfaces themselves arrive with ui and mcp
-0041-command-line FR-023	none	-	no MCP server exists yet; agora check commands already rejects a decision command declared on MCP, and agora test will call one over the server and require refusal
-0041-command-line FR-024	check	.github: agora test	tests run the same commands through the terminal and through the console's library call and compare the resources they return; the MCP surface arrives with its server
+0041-command-line FR-022	check	.github: agora test	tests check the default surfaces by category, that the MCP server lists exactly the commands that declare mcp and are not decisions, and that the console offers only what declares ui
+0041-command-line FR-023	check	.github: agora test	tests call every decision command over MCP, over pipes and in process, and require refusal and no write; they declare a decision on mcp and show the server still refuses; agora check commands rejects the declaration
+0041-command-line FR-024	check	.github: agora test	tests run the same commands through the terminal, the console's library call and the MCP server and compare the resources they return
 0041-command-line FR-025	check	.github: agora check ui	check ui serves each UI inside the process, on the loopback interface only, fetches its pages and finds no remote reference; the browser needs no build step
 0041-command-line FR-026	check	.github: agora check ui	check ui proves Datastar is vendored as one file at its recorded version, the console's actions call the registry's commands, a write is refused without its dry-run preview and a decision without a confirmation; agora test runs the console in a browser-less client
-0041-command-line FR-027	none	-	no MCP server exists yet; agora test will check its tool list and schemas
+0041-command-line FR-027	check	.github: agora test	tests drive the server over pipes: initialize, tools/list with schemas from the typed arguments, tools/call of a read, of a write that defaults to a dry run and of a decision, resources, error resources, notifications, and that standard output holds only protocol
 0041-command-line FR-028	check	.github: agora test	tests run an isolated section in its own worker; agora doctor fails a plan needing two locks in one process
 0041-command-line FR-029	check	.github: agora test	tests run doctor against registry conflicts, a missing program and a lock that does not match
 0041-command-line FR-030	check	.github: agora doctor	doctor fails a lock that does not match its manifest's pins; tests run lock offline, with nothing pinned and with a dry run
 0041-command-line FR-031	check	.github: agora test	tests run sections, suites, scope and options; agora check commands compares suites with their sections
-0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone: modified, staged, untracked, and --since
-0041-command-line FR-033	check	.github: agora test	tests check that a planned or skipped section never passes and that a missing program fails the run
+0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone (modified, staged, untracked, --since) and, over every section and generator, that each declares watched paths that match files and that a change runs exactly those whose paths it touches; agora check commands fails a section or generator with none
+0041-command-line FR-033	check	.github: agora test	tests check that a skipped section never passes, that a suite naming no section ran nothing and fails, and that a missing program fails the run
 0041-command-line FR-034	check	.github: agora test	the runner's report is read by tests: a run that ran no test, or any failing one, fails
 0041-command-line FR-035	check	.github: agora fresh	each generator declares its sources, outputs and rewriting command in its manifest, and fresh proves the tracked files equal what it writes, so a hand edit fails; tests check the declarations and that each brand generator's files carry a header naming it
 0041-command-line FR-036	check	.github: agora test	tests run fresh against a fixture clone: current, a hand-edited file, a missing file, an unwritten file, a missing program (exit 3) and a generator in a locked group, and check it writes nothing
-0041-command-line FR-037	none	-	no agent files exist yet; agora fresh will prove them current
-0041-command-line FR-038	check	.github: agora test	tests run context for a spec and a requirement: deterministic, bounded, and saying what it left out
-0041-command-line FR-039	none	-	no proposals exist yet; agora test will check each proposal command
+0041-command-line FR-037	check	.github: agora fresh	the agent-skill generator writes .claude/skills/agora/SKILL.md from the registry and fresh proves it current; tests check it lists exactly the registry's commands, categories and surfaces and says a decision is for a person
+0041-command-line FR-038	check	.github: agora test	tests run context for every kind that has a provider (spec, requirement, design system, brand, term, command, proposal): the same parts in the same shape, deterministic, bounded, and saying what it left out
+0041-command-line FR-039	check	.github: agora test	tests run proposal new, list, show and advance in a fixture clone: validation as the command would, a dry run first, replay, accepted, a failing dry run leaving it open, and no commit; agora check commands fails a malformed proposal
 0041-command-line FR-040	check	.github: agora test	tests check the audience stamp, unstated under --root, and a write refusing --root
 0041-command-line FR-041	check	.github: agora test	tests run every write command in a fixture clone and check Git's HEAD, index and tags are untouched
-0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, and that the directory is ignored
-0041-command-line FR-043	none	-	no command exists yet; that none calls an AI is a review judgment of each command
+0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, that a read, a console page and an MCP resource read are not logged while a write, a check, a refused decision and a UI or MCP call that runs something are, and that the directory is ignored
+0041-command-line FR-043	none	-	that no command calls an AI model or service is a review judgment of each command; no check
 0041-command-line FR-044	none	-	a rule about what is not built; no check
 0041-command-line FR-045	check	.github: agora check commands	agora's launcher, code, manifests and its two specs are scanned for the names of the other repositories the register lists
 0042-agora FR-001	check	.github: agora check commands	the launcher, manifest name and audience, groups' manifests and locks are checked
@@ -964,25 +964,27 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
 0042-agora FR-004	check	.github: agora check commands	the registry and the ontology's command individuals are compared by words, noun, verb and category
 0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
-0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
+0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included; the README's command table is checked to name every noun
 0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
 0042-agora FR-008	check	.github: agora test	agora test validates every typed argument, including UI, and that a layout's alias resolves to its name
 0042-agora FR-009	check	.github: agora test	tests run design-system new against a fixture clone: refused without the spec, without the ontology entry, for a kind that is not the entry's; scaffolding, --dry-run and no overwrite
 0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
 0042-agora FR-011	check	.github: agora test	tests check environment set moves the pin and the image tag together, or neither
 0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
-0042-agora FR-013	check	.github: agora check commands	the declared sections are compared with this list; agora test runs each item check against the design systems' passing and failing fixtures, with and without --scope, and checks that a scope holding nothing fails and a design system with no passing fixture is skipped
-0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; a section not implemented yet is named in planned, not run; agora test checks that no item check is in a suite
-0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, openedx-sources, print-layout-docs and profile-figure; agent-skill is declared planned and fresh names it as not proved until the agent files are generated
-0042-agora FR-016	check	.github: agora check commands	check commands fails on a script outside design-systems/ and tools/agora/, and on a workflow that calls another tool; the references in documentation and specs are a review
+0042-agora FR-013	check	.github: agora check commands	the declared sections are compared with this list, each with watched paths; the README is checked to name every noun and repository-wide command, and proposals to be well formed; agora test runs each item check against the design systems' passing and failing fixtures, with and without --scope, and checks that a scope holding nothing is not a pass
+0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; agora test checks that no item check is in a suite and that a suite naming no section fails
+0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, openedx-sources, print-layout-docs, profile-figure and agent-skill, naming the command that rewrites each
+0042-agora FR-016	check	.github: agora check commands	check commands fails a script outside design-systems/ and tools/agora/, a workflow that calls another tool, and any file that refers to a script agora replaced
 0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review
 0042-agora FR-018	check	.github: agora doctor	doctor checks each group's lock and programs; tests check the spec suite's groups pin none
 0042-agora FR-019	check	.github: agora check ui	check ui serves both UIs and checks each page's markup, that its stylesheets and scripts are the design system's and the vendored Datastar, and that no page refers to a remote host
-0042-agora FR-020	none	-	no MCP server exists yet; agora test will check its tool list
-0042-agora FR-021	check	.github: agora test	tests check the log lines of the terminal and of the console (surface ui), the value kept out of them, and that .gitignore lists the log directory; the mcp surface arrives with its server
-0042-agora FR-022	check	.github: agora check commands	agora check commands fails a workflow that does not call ./agora or that calls another script under tools/; which suite each job runs is a review of the workflow
+0042-agora FR-020	check	.github: agora test	tests drive agora mcp serve over pipes and in process: the tool list is exactly the commands that declare mcp and are not decisions, a write defaults to a dry run, a decision is refused with decision-refused and proposal new as the next action, resources and templates are readable by URI, protocol revisions are negotiated, and standard output holds only protocol
+0042-agora FR-021	check	.github: agora test	tests check the log lines of the terminal, of the console (surface ui) and of the MCP server (surface mcp), the value kept out of them, that reads are not logged, and that .gitignore lists the log directory; proposals are tracked files, checked by agora check commands
+0042-agora FR-022	check	.github: agora check commands	agora check commands fails a workflow that does not call ./agora or that calls another script under tools/; which suite each job runs, and that reference-environment.yml shows doctor's exit 3 as a warning and fails on any other status, is a review of the workflow
 0042-agora FR-023	check	.github: agora test	tests run ui serve, link, stop and open in a fixture clone: the loopback address, the state file, a second serve refused, stopping, and a stale state file
 0042-agora FR-024	check	.github: agora check ui	check ui fetches the console's pages and an event stream, and every action on them names a command the registry exposes on ui; agora test runs reads, checks, a write with and without its preview and a decision with and without confirmation, and the log's surface
 0042-agora FR-025	check	.github: agora check ui	check ui fetches the assurance index and a design system's harness page, and that a path outside design-systems/ and a write are refused
 0042-agora FR-026	check	.github: agora check ui	check ui sends a request with a foreign host, a foreign origin and no Datastar header, and reads the security policy
 0042-agora FR-027	check	.github: agora check ui	check ui is the check; its browser part runs under --runner browser in the browser suite and is skipped, with the program's hint, where Chromium is missing
+0042-agora FR-028	check	.github: agora fresh	fresh proves the agent skill current and names agora skill generate when it is not; tests check it is written from the registry alone, deterministic, and lists every command, noun, section and generator
+0042-agora FR-029	check	.github: agora test	tests run proposal new, list, show and advance: the file's fields and id, validation, refusal of a command that is not record, generate or decision and of a proposal command, the dry run shown first, a failing dry run leaving the proposal open, and agora check commands failing a malformed one

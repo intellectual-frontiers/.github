@@ -1,3 +1,4 @@
+import json
 import re
 import shutil
 import tempfile
@@ -18,6 +19,7 @@ class CommandsSection(unittest.TestCase):
         (self.home / "ontology").mkdir()
         shutil.copy(HOME / "agora", self.home / "agora")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
+        shutil.copy(HOME / "README.md", self.home / "README.md")
         self.ttl = (HOME / "ontology" / "ifcore.ttl").read_text()
 
     def findings(self, ttl=None):
@@ -51,12 +53,34 @@ class CommandsSection(unittest.TestCase):
         for k in ("noun", "verb", "category"):
             self.assertIn(f"{k} is", text)
 
-    def test_a_planned_command_that_is_also_implemented(self):
-        m = self.home / "tools" / "agora" / "agora.toml"
-        m.write_text(m.read_text().replace('[planned.commands]\n', '[planned.commands]\n"spec show" = "read"\n'))
+    def test_a_readme_that_leaves_out_a_noun_or_a_command_fails(self):  # 0042 FR-013
+        readme = self.home / "README.md"
+        readme.write_text(readme.read_text().replace("| `skill` | `generate` |\n", ""))
         code, found = self.findings()
         self.assertEqual(code, 1)
-        self.assertTrue(any("implemented and still listed as planned" in x for x in found))
+        self.assertTrue(any("does not name the noun `skill`" in x for x in found))
+
+    def test_a_reference_to_a_script_agora_replaced_fails(self):  # 0042 FR-016
+        (self.home / "notes.md").write_text("run tools/spec_check.py to check\n")
+        code, found = self.findings()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("refers to tools/spec_check.py" in x for x in found))
+
+    def test_a_section_or_generator_with_no_watched_paths_fails(self):  # 0041 FR-032
+        m = self.home / "tools" / "agora" / "groups" / "spec" / "agora.toml"
+        m.write_text(m.read_text().replace('watch = ["tools/reference-environment", ".devcontainer/devcontainer.json"]\n', ""))
+        code, found = self.findings()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("section environment declares no watched paths" in x for x in found))
+
+    def test_a_proposal_that_does_not_replay_fails(self):  # 0042 FR-029
+        d = self.home / ".agora" / "proposals"
+        d.mkdir(parents=True)
+        (d / "0001-spec-set.json").write_text(json.dumps({"id": "0001-spec-set", "status": "open", "resource": "spec:0042", "reason": "x",
+                                                          "action": {"command": "spec show", "fields": {"spec": "0042"}}}))
+        code, found = self.findings()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("is a read command: only record, generate, decision" in x for x in found))
 
     def test_a_manifest_section_with_no_implementation(self):
         m = self.home / "tools" / "agora" / "groups" / "spec" / "agora.toml"
@@ -87,3 +111,21 @@ class Workflows(CommandsSection):
         self.assertEqual(code, 1)
         self.assertEqual([m for m in found if "other than agora" in m].__len__(), 1)
         self.assertTrue(any("tools/other.sh" in m for m in found))
+
+
+class ReferenceEnvironmentWorkflow(unittest.TestCase):
+    """0042 FR-022: doctor's exit 3 is a visible warning naming what is missing, and any other failure fails the job."""
+
+    def test_doctor_exit_3_is_a_warning_and_every_other_status_fails(self):
+        text = (HOME / ".github" / "workflows" / "reference-environment.yml").read_text()
+        step = text.split("- name: agora's doctor\n", 1)[1].split("      - name:", 1)[0]
+        self.assertIn('-eq 3', step)
+        self.assertIn("::warning", step)
+        self.assertIn("missing: ", step)  # what doctor reports as missing is named in the warning
+        self.assertIn('exit "$code"', step)
+        for command in ("./agora check --suite spec", "./agora fresh", "./agora test"):
+            self.assertIn(command, text)
+
+    def test_the_gap_is_recorded_as_an_open_question(self):
+        spec = (HOME / "spec-kit" / "specs" / "0042-agora" / "spec.md").read_text()
+        self.assertIn("potrace", spec.split("## Open questions")[1].split("## Key entities")[0])

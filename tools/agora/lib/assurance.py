@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from agora.core.checks import find_program
+from agora.core.resource import MISSING
 
 Emit = Callable[[str], None]
 KEEP = 60  # lines of a harness's output kept for a failure's finding
@@ -152,7 +153,15 @@ def run_one(registry: Any, h: Harness, root: Path, env: dict[str, str], emit: Em
         tail.append(line)
         emit(line)
     code = proc.wait()
+    if code == MISSING:
+        return _skipped_by_harness(h, start, code, tail)
     return Outcome(h, "passed" if code == 0 else "failed", time.monotonic() - start, code, list(tail))
+
+
+def _skipped_by_harness(h: Harness, start: float, code: int, tail: Any) -> Outcome:
+    """A harness's own word for a program the host lacks is exit 3, with a `skipped ...` line saying which (0041 FR-006)."""
+    reason = "; ".join(l.strip().removeprefix("skipped ") for l in tail if l.strip().startswith("skipped ")) or "needs a program the host lacks"
+    return Outcome(h, "skipped", time.monotonic() - start, code, list(tail), reason=reason)
 
 
 def summarize(outcomes: list[Outcome]) -> list[str]:
@@ -201,6 +210,8 @@ def run_openedx(registry: Any, brand: str, root: Path, env: dict[str, str], para
         tail.append(line.rstrip("\n"))
         emit(line.rstrip("\n"))
     code = proc.wait()
+    if code == MISSING:
+        return _skipped_by_harness(h, start, code, tail)
     return Outcome(h, "passed" if code == 0 else "failed", time.monotonic() - start, code, list(tail))
 
 

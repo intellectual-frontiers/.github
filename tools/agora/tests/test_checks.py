@@ -157,17 +157,16 @@ class Selection(unittest.TestCase):
         self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual([s["name"] for s in doc["data"]["sections"]],
                          ["specs", "register", "controls", "ontology", "environment", "commands", "ui"])
-        self.assertEqual(doc["data"]["planned"], [])
         self.assertEqual(doc["audience"], "public")
 
-    def test_a_planned_section_never_passes(self):
-        from agora.core.registry import Registry, Section
+    def test_a_suite_that_names_no_section_ran_nothing_and_fails(self):
+        from agora.core.registry import Registry
         reg = Registry.load(HOME)
-        reg.sections["ghost"] = Section("ghost", status="planned")
-        code, doc = run_json(["check", "ghost"], registry=reg)
-        self.assertEqual((code, doc["kind"], doc["data"]["code"]), (1, "error", "not-implemented"))
+        reg.suites["empty"] = {"sections": [], "options": {}}
+        code, doc = run_json(["check", "--suite", "empty"], registry=reg)
+        self.assertEqual((code, doc["kind"], doc["data"]["code"]), (1, "error", "empty"))
 
-    def test_plain_check_runs_every_implemented_section_and_lists_the_planned(self):
+    def test_plain_check_runs_every_section(self):
         from unittest import mock
         from agora.core.checks import SectionResult
         from agora.core.registry import Registry
@@ -180,8 +179,6 @@ class Selection(unittest.TestCase):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
         self.assertEqual(doc["data"]["summary"]["run"], 18)
-        self.assertEqual(doc["data"]["planned"], [])
-        self.assertNotIn("design-systems", [p["name"] for p in doc["data"]["planned"]])
 
     def test_scope_and_options_must_apply(self):
         self.assertEqual(run(["check", "environment", "--scope", "x"])[0], 2)

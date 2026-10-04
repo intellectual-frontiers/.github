@@ -146,10 +146,12 @@ class OtherCommands(unittest.TestCase):
         self.assertEqual(run_json(["term", "list", "--scheme", "Nope"])[0], 2)
 
     def test_command_list_and_show(self):
-        code, doc = run_json(["command", "list", "--status", "implemented"])
+        code, doc = run_json(["command", "list"])
         ids = [c["id"] for c in doc["data"]["commands"]]
         self.assertIn("check", ids)
-        self.assertNotIn("proposal list", ids)
+        self.assertIn("proposal list", ids)
+        self.assertIn("mcp serve", ids)
+        self.assertEqual(run_json(["command", "list", "--status", "planned"])[0], 2)  # nothing is planned: the option is gone
         self.assertIn("design-system list", ids)
         self.assertIn("brand list", ids)
         code, doc = run_json(["command", "list", "--category", "decision"])

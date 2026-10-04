@@ -17,7 +17,7 @@ from agora.core import files
 from agora.core.generate import Generated, orphans
 from agora.core.registry import context_for, generator
 from agora.core.resource import FAILED, MISSING, USAGE
-from agora.lib import assurance, brand_specimen, brand_theme, brands, decoration, imagery, openedx
+from agora.lib import assurance, brand_specimen, brand_theme, brands, decoration, imagery, openedx, specs
 
 
 # types -------------------------------------------------------------------------------------------------------------
@@ -137,10 +137,13 @@ def gen_specimen(ctx: Ctx, scope: str | None) -> Generated:
 @context_for("brand", "BRAND")
 def brand_context(ctx: Ctx, brand: str) -> dict[str, Any]:
     d = brands.detail(ctx.root, brand)
-    return {"resource": {"kind": "brand", "id": brand, "palette": d["palette"], "roles": d["roles"]},
-            "specs": [{"spec": "frontiers-brand" if (ctx.root / "design-systems" / brand / "spec.md").is_file() else "0014-design-systems"}],
-            "files": [{"path": f"design-systems/{brand}/tokens.json"}] + [{"path": g["path"]} for g in d["generated"]],
-            "links": [Link("brand", Call("brand show", {"brand": brand}))]}
+    res = brand_show(ctx, brand)
+    spec = brand if (ctx.root / "design-systems" / brand / "spec.md").is_file() else "0014-design-systems"
+    s = specs.resolve_spec(ctx.root, spec)
+    return {"resource": res.data, "specs": [{"name": spec, "status": s.status if s else "unknown"}], "requirements": [],
+            "files": [f"design-systems/{brand}/tokens.json"] + [g["path"] for g in d["generated"]],
+            "links": res.links, "actions": res.actions,
+            "omitted": [f"the requirements of {spec} (use context spec:{spec})"]}
 
 
 # imagery -----------------------------------------------------------------------------------------------------------
@@ -360,7 +363,11 @@ def gen_openedx(ctx: Ctx, scope: str | None) -> Generated:
     for n in [scope] if scope else assurance.openedx_brands(ctx.root):
         b = _brand_dir(ctx, n)
         out = b / "openedx"
-        for rel, data in openedx.rendered(b, openedx.package_name(b)).items():
+        try:
+            rendered = openedx.rendered(b, openedx.package_name(b))
+        except openedx.MissingProgram as e:
+            raise AgoraError("missing-program", f"{n}: {e}", exit=MISSING, detail={"program": e.program, "hint": e.hint}) from None
+        for rel, data in rendered.items():
             gd.files[out / rel] = data
             gd.calls[out / rel] = Call("openedx generate", {"brand": n})
         gd.owned.append((out, (*openedx.UNOWNED, "dist")))

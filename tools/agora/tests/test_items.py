@@ -112,9 +112,9 @@ class Sections(unittest.TestCase):
 
     def test_the_sections_belong_to_no_suite(self):  # 0042 FR-014 names no item check in a suite
         reg = Registry.load(HOME)
-        named = {n for s in reg.suites.values() for n in s["sections"] + s["planned"]}
+        named = {n for s in reg.suites.values() for n in s["sections"]}
         for n in ("figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"):
-            self.assertEqual(reg.sections[n].status, "implemented", n)
+            self.assertTrue(callable(reg.sections[n].fn), n)
             self.assertEqual((reg.sections[n].scope, reg.sections[n].many, reg.sections[n].isolated), ("PATH", True, True), n)
             self.assertNotIn(n, named)
         self.assertEqual(reg.validate(), [])
@@ -483,11 +483,11 @@ class Plumbing(unittest.TestCase):
         self.assertEqual(out["alias"], "-o")
         self.assertIn("[--out|-o TEXT]", doc["data"]["usage"])
 
-    def test_every_item_command_is_declared_in_the_ontology_and_none_is_planned(self):
+    def test_every_item_command_is_declared_in_the_ontology(self):
         reg = Registry.load(HOME)
         for c in ("deck build", "email build", "course show", "course build", "media build", "sign build", "figure build",
                   "layout list", "layout show", "layout build"):
-            self.assertEqual(reg.commands[c].status, "implemented", c)
+            self.assertTrue(callable(reg.commands[c].fn), c)
         self.assertEqual(reg.commands["media build"].programs, ("rsvg-convert",))
         self.assertEqual(reg.commands["sign build"].programs, ("rsvg-convert",))
         self.assertEqual(run_json(["check", "commands"])[0], 0)

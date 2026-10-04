@@ -28,6 +28,10 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
+      - name: ImageMagick (a brand without a favicon.ico draws one with `convert`)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q imagemagick
       - name: Playwright and Chromium
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
@@ -52,10 +56,10 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: TeX Live, poppler and librsvg
+      - name: TeX Live, poppler, librsvg and ImageMagick
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils librsvg2-bin
+          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils librsvg2-bin imagemagick
       - name: Python harnesses (print on TeX Live, merchandise, figures, and the rest)
         run: ./agora check --suite python
 

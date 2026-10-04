@@ -21,8 +21,6 @@ def problem(ctx: Ctx, text: str) -> str | None:
     cmd, rest = reg.lookup(tokens[1:])
     if cmd is None:
         return f"{' '.join(tokens[1:3])!r} is not a command in the {reg.name} registry"
-    if cmd.status == "planned":
-        return None  # declared in the registry's manifest; its arguments are not known yet
     home_ctx = replace(ctx, root=ctx.home)  # the commands run in this repository
     try:
         values = cli.parse_values(home_ctx, cmd, rest)

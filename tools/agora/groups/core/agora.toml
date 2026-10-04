@@ -6,7 +6,10 @@ help = "A command of this command line"
 
 [sections.commands]
 help = "The registry and the ontology list the same commands, with the same noun, verb and category (0042-agora FR-004)"
-watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl", ".github/workflows/**"]
+watch = ["agora", "tools/agora/**", "ontology/ifcore.ttl", ".github/workflows/**", ".agora/proposals/**", "README.md", ".gitignore"]
+
+[nouns.mcp]
+help = "The MCP server of this command line, for AI agents, over standard input and output (0041-command-line FR-027)"
 
 [nouns.ui]
 help = "A web UI of this command line, served inside its own process (0041-command-line FR-025)"

@@ -76,7 +76,6 @@ class Command:
     isolated: bool = False
     group: str = ""
     fn: Callable[..., Any] | None = None
-    status: str = "implemented"  # or "planned": declared in the root manifest, no code yet
 
     @property
     def id(self) -> str:
@@ -103,8 +102,6 @@ class Section:
     isolated: bool = False
     group: str = ""
     fn: Callable[..., Any] | None = None
-    status: str = "implemented"
-    step: str = ""
     many: bool = False  # `--scope` may be given more than once, and the function receives a list (0042 FR-013)
 
 
@@ -124,8 +121,6 @@ class Generator:
     programs: tuple[str, ...] = ()
     group: str = ""
     fn: Callable[..., Any] | None = None
-    status: str = "implemented"
-    step: str = ""
 
     @property
     def watch(self) -> tuple[str, ...]:
@@ -218,10 +213,8 @@ class Registry:
         reg.audience = rm.get("audience", "public")
         for gname in rm.get("groups", []):
             reg.load_group(home / "tools" / "agora" / "groups" / gname)
-        reg.suites = {k: {"sections": list(v.get("sections", [])), "planned": list(v.get("planned", [])),
-                          "options": dict(v.get("options", {}))}
+        reg.suites = {k: {"sections": list(v.get("sections", [])), "options": dict(v.get("options", {}))}
                       for k, v in rm.get("suites", {}).items()}
-        reg._load_planned(rm.get("planned", {}))
         return reg
 
     def load_group(self, path: Path, module: str | None = None) -> Group:
@@ -311,24 +304,6 @@ class Registry:
             self.conflicts.append(f"section {s.name} is declared twice")
         self.sections[s.name] = s
 
-    def _load_planned(self, planned: dict[str, Any]) -> None:
-        for cid, category in planned.get("commands", {}).items():
-            if cid in self.commands:
-                self.conflicts.append(f"command {cid!r} is implemented and still listed as planned in the root manifest")
-                continue
-            self.commands[cid] = Command(tuple(cid.split()), category, "planned: not implemented yet", status="planned")
-        for gname, gen in planned.get("generators", {}).items():
-            if gname in self.generators:
-                self.conflicts.append(f"generator {gname} is implemented and still listed as planned in the root manifest")
-                continue
-            self.generators[gname] = Generator(gname, gen.get("help", ""), status="planned", step=gen.get("step", ""))
-        for sname, s in planned.get("sections", {}).items():
-            if sname in self.sections:
-                self.conflicts.append(f"section {sname} is implemented and still listed as planned in the root manifest")
-                continue
-            self.sections[sname] = Section(sname, s.get("help", ""), (), s.get("scope"), tuple(s.get("options", ())),
-                                           status="planned", step=s.get("step", ""))
-
     # queries -------------------------------------------------------------------------------------------------
     def find(self, cid: str) -> Command | None:
         return self.commands.get(" ".join(cid.split()))
@@ -378,7 +353,7 @@ class Registry:
                     out.append(f"{c.id}: {verb!r} is not one of the fixed verbs (0041 FR-008)")
                 elif verb == "check":
                     out.append(f"{c.id}: a check runs only through check (0041 FR-010)")
-                if c.status == "implemented" and noun not in self.nouns:
+                if noun not in self.nouns:
                     out.append(f"{c.id}: noun {noun} is declared by no group manifest (0041 FR-007)")
             else:
                 out.append(f"{c.id}: a command is <noun> <verb> or one of the closed set (0041 FR-008, FR-010)")
@@ -387,20 +362,17 @@ class Registry:
             for s in self.surfaces_of(c):
                 if s not in SURFACES:
                     out.append(f"{c.id}: surface {s!r} is not ui or mcp (0041 FR-022)")
-            if c.status == "implemented":
-                for a in c.args:
-                    if a.type not in self.types and a.type != "TEXT":
-                        out.append(f"{c.id}: argument {a.name} has type {a.type}, which no group declares (0041 FR-013)")
-                for o in c.options:
-                    if o.type and o.type not in self.types and o.type != "TEXT":
-                        out.append(f"{c.id}: option {o.flag} has type {o.type}, which no group declares (0041 FR-013)")
+            for a in c.args:
+                if a.type not in self.types and a.type != "TEXT":
+                    out.append(f"{c.id}: argument {a.name} has type {a.type}, which no group declares (0041 FR-013)")
+            for o in c.options:
+                if o.type and o.type not in self.types and o.type != "TEXT":
+                    out.append(f"{c.id}: option {o.flag} has type {o.type}, which no group declares (0041 FR-013)")
         for sname, s in self.suites.items():
             for n in s["sections"]:
                 sec = self.sections.get(n)
                 if sec is None:
                     out.append(f"suite {sname} names section {n}, which is not declared (0041 FR-031)")
-                elif sec.status == "planned":
-                    out.append(f"suite {sname} runs section {n}, which is planned: list it under planned (0042 FR-014)")
         return out
 
     def plan_conflicts(self) -> list[str]:
@@ -408,9 +380,9 @@ class Registry:
         out = []
         with_pkgs = {g.name for g in self.groups.values() if g.packages}
         groups_of = lambda names: {self.sections[n].group for n in names if n in self.sections
-                                   and self.sections[n].status == "implemented" and not self.sections[n].isolated}
+                                   and not self.sections[n].isolated}
         invocations = {f"check --suite {k}": v["sections"] for k, v in self.suites.items()}
-        invocations["check"] = [n for n, s in self.sections.items() if s.status == "implemented"]
+        invocations["check"] = list(self.sections)
         for label, names in invocations.items():
             needs = groups_of(names) & with_pkgs
             if len(needs) > 1:

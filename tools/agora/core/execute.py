@@ -1,7 +1,8 @@
-"""Running a command for a UI (0041-command-line FR-024): the same library call as the terminal, and the same record.
+"""Running a command for a surface that has no command line, a UI or MCP (0041-command-line FR-024): the same library call as
+the terminal, and the same record.
 
 `cli.invoke` is the seam. A command of a group that pins packages runs in its own worker under that group's locked plan
-(0041 FR-028), the only process the UI starts for a command; everything else runs in this process.
+(0041 FR-028), the only process the surface starts for a command; everything else runs in this process.
 """
 from __future__ import annotations
 
@@ -14,9 +15,9 @@ from agora.core.registry import Command
 from agora.core.resource import FAILED, OK, AgoraError, Resource
 
 
-def new_ctx(registry: Any, home: Any, env: dict[str, str], *, dry_run: bool = False, no_log: bool = False,
+def new_ctx(registry: Any, home: Any, env: dict[str, str], *, surface: str = "ui", dry_run: bool = False, no_log: bool = False,
             on_section: Callable[[str, str, Any], None] | None = None) -> Ctx:
-    ctx = Ctx(registry, home, home, surface="ui", env=dict(env))
+    ctx = Ctx(registry, home, home, surface=surface, env=dict(env))
     ctx.offline = env.get(f"{registry.name.upper()}_OFFLINE") == "1"
     ctx.dry_run, ctx.no_log = dry_run, no_log
     ctx.on_section = on_section
@@ -46,6 +47,6 @@ def execute(ctx: Ctx, cmd: Command, values: dict[str, Any]) -> Iterator[Resource
         code = FAILED
         yield cli.internal_error(ctx, e, trace, cmd)
     finally:
-        if not ctx.no_log:
-            logs.write(ctx.home / reg.root_manifest.get("logs", ".agora/logs"), surface="ui", command=cmd.id,
+        if not ctx.no_log and (logs.worth_logging(cmd.category) or trace):
+            logs.write(ctx.home / reg.root_manifest.get("logs", ".agora/logs"), surface=ctx.surface, command=cmd.id,
                        args=cli.loggable(cmd, values), exit=code, dry_run=ctx.dry_run, trace=trace)

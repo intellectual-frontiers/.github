@@ -78,7 +78,9 @@ own harnesses, and what CI runs.
     profile's figure (FR-015). `course`: `show` (read), `build --target`
     (build).
   - `environment`: `show` (read); `set COMMIT` (setup).
-  - `proposal`: `list`, `show` (read); `new` (record); `advance` (decision).
+  - `proposal`: `list [--status]`, `show` (read); `new RESOURCE --reason
+    --run COMMAND --field NAME=VALUE...` (record); `advance` (decision): FR-029.
+  - `skill`: `generate` (generate): the agent skill (FR-028).
 - **FR-007**: A `decision` command MUST be one of these three: `spec set
   --status`, `ink record` and `proposal advance` (0041-command-line FR-014).
   None MAY be callable over MCP (0041-command-line FR-023). `spec set
@@ -123,7 +125,11 @@ own harnesses, and what CI runs.
   (0028-compliance-controls FR-005, FR-006), `ontology` (the ontology's
   prefixes and the design systems' registration, classification and
   derivation), `environment` (0025-tooling-environment FR-008), `commands`
-  (FR-004), `ui` (0041-command-line FR-025 and FR-026 for each UI declared),
+  (FR-004; and the registry's grammar, the workflows, the scripts, the boundary
+  of FR-003, that every section and generator declares watched paths that match
+  files (0041-command-line FR-032), the proposals of FR-029, and that the README
+  names every noun and repository-wide command), `ui` (0041-command-line
+  FR-025 and FR-026 for each UI declared),
   `design-systems [--scope SLUG] [--brand B] [--runner browser|python]` (each
   design system's harness under every brand, 0014-design-systems FR-015,
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
@@ -153,10 +159,11 @@ own harnesses, and what CI runs.
   `openedx-sources` (a brand's Open edX package sources), `print-layout-docs`
   (the print design system's layout documentation from its layouts),
   `profile-figure` (the organization profile's figures) and `agent-skill` (the
-  files that tell an AI agent how to use `agora`, 0041-command-line FR-037).
+  file that tells an AI agent how to use `agora`, FR-028).
   Each names the command that rewrites its files (0041-command-line FR-035):
   `brand generate` for `brand-theme` and `brand-specimen`, `openedx generate`
-  for `openedx-sources`, `figure generate` for `profile-figure`; the files of
+  for `openedx-sources`, `figure generate` for `profile-figure`, `skill
+  generate` for `agent-skill`; the files of
   `print-layout-docs` are rewritten by the print design system's own
   `latex/layout.py sync`, which `fresh` calls and which stays in the design
   system (FR-017). `fresh` MUST say that a generator needs a program the host
@@ -208,12 +215,29 @@ own harnesses, and what CI runs.
   the copy MUST be the version recorded.
 - **FR-020**: `agora mcp serve` MUST expose the commands that declare MCP and
   are not `decision` commands (FR-007; 0041-command-line FR-027). The default
-  exposure by category is 0041-command-line FR-022's.
+  exposure by category is 0041-command-line FR-022's. It MUST be written with
+  the standard library only, speak newline-delimited JSON-RPC 2.0 on standard
+  input and output, and support the MCP revisions its `VERSIONS` list in
+  `tools/agora/core/mcp.py` names, newest first, answering `initialize` with the
+  client's when it is one of them and with the newest otherwise. A tool is named
+  for its command with spaces made underscores (`spec_show`, `check`); a
+  call runs the command through the registry's library call with the surface
+  `mcp`; a write's `dry_run` defaults to true; and a call to a `decision`
+  command, which the tool list never names, is answered with an error resource
+  of code `decision-refused` whose next action is `proposal new`. Its resources
+  are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`,
+  `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`,
+  `agora://command/WORDS` (spaces as `+`), `agora://proposal/ID` and
+  `agora://environment/reference`, each the JSON resource of the `show`
+  command of its noun, and `agora://context/KIND:ID`, the resource `context`
+  returns.
 - **FR-021**: `agora` MUST write what is not worth a commit as NDJSON lines
   under `.agora/logs/`, which `.gitignore` MUST list, each line noting the
   surface (`cli`, `ui` or `mcp`) and the action (0041-command-line FR-042).
-  Proposals MUST be tracked files under `.agora/proposals/`
-  (0041-command-line FR-039).
+  Only what changes or runs something is logged, as 0041-command-line FR-042
+  states: no `read` command, console page or MCP resource read is. Proposals
+  MUST be tracked files under `.agora/proposals/` (0041-command-line FR-039,
+  FR-029).
 
 ## The web UIs
 
@@ -277,8 +301,40 @@ own harnesses, and what CI runs.
   python` and `--suite images` in separate jobs, each job installing only the
   programs outside Python it needs (0025-tooling-environment FR-011).
   `reference-environment.yml` MUST run, inside the pinned image, `./agora
-  doctor && ./agora check && ./agora fresh && ./agora test`
-  (0025-tooling-environment FR-010).
+  doctor`, `./agora check`, `./agora fresh` and `./agora test`
+  (0025-tooling-environment FR-010). The job MUST show `doctor`'s exit
+  status 3 (a program outside Python missing, 0041-command-line FR-021) as a
+  warning that names what is missing, so that a gap in the environment is seen
+  and does not fail a job whose other steps do not use the program, and MUST
+  fail on any other non-zero status.
+
+## The agent skill and proposals
+
+- **FR-028**: The `agent-skill` generator MUST write one file,
+  `.claude/skills/agora/SKILL.md`, the skill that tells an AI agent how to use
+  `agora` (0041-command-line FR-037), from the registry alone: the nouns, every
+  command with its category, surfaces, typed arguments, options and an
+  example, the categories, the check sections with their suites, the
+  generators with the commands that rewrite them, the typed arguments, how
+  to ask for `context`, and how MCP works. It MUST say that a `decision`
+  command is for a person and that an agent drafts one with `proposal new`. It
+  MUST carry a header naming the generator and the command that rewrites it,
+  MUST hold nothing that depends on the repository's specs or designs, so
+  that it changes only when the registry does, and `agora skill generate`
+  MUST write it, with `--dry-run`.
+- **FR-029**: A proposal MUST be the JSON file `<id>.json` in
+  `.agora/proposals/`, its id `NNNN-slug` with the next unused number and a slug
+  from its command and resource. It MUST hold `id`, `status` (`open` or
+  `accepted`), `resource` (`KIND:ID`, a kind `context` serves), `reason` and
+  `action`, a command's words and its fields by name, exactly as a link or an
+  action names them (0041-command-line FR-017). `proposal new` MUST validate
+  the action as the command would, refuse a command that is not `record`,
+  `generate` or `decision`, and refuse a `proposal` command. `proposal
+  advance ID` MUST refuse an accepted proposal, run the action's dry run and
+  refuse if it fails, show that dry run in its resource, and, unless it is run
+  with `--dry-run`, replay the action, mark the proposal accepted in its file
+  and say what to commit. A proposal is refused by deleting its file in a
+  commit.
 
 ## Out of scope
 
@@ -321,6 +377,21 @@ own harnesses, and what CI runs.
   and nothing is written, per FR-009.
 - A generated file hand-edited, such as a brand's `brand.css`: `agora fresh`
   fails and names `brand-theme`, per FR-015.
+- An agent calls `spec_set` over MCP: the tool is not listed, and the call is
+  answered with the error resource `decision-refused` whose next action is
+  `proposal new`, per FR-020 and FR-007.
+- An agent calls a write tool without `dry_run`: it is a dry run, per FR-020.
+- A client asks for a protocol revision the server does not know: the server
+  answers with its latest, per FR-020.
+- A person advances a proposal whose dry run fails: nothing is written and the
+  proposal stays open, per FR-029.
+- The `SKILL.md` is edited by hand, or a command is added without it being
+  regenerated: `agora fresh` fails and names `agent-skill`, per FR-015 and
+  FR-028.
+- A reference environment without a program `doctor` declares: the workflow
+  warns and names it and does not fail, per FR-022.
+- A console page is viewed or a `read` command run: nothing is logged, per
+  FR-021.
 
 ## Assumptions
 
@@ -335,6 +406,10 @@ own harnesses, and what CI runs.
 - **OQ-1**: Whether `check` sections that need Node and Playwright can run
   their harnesses through `agora`'s own worker, or must always run the
   harness's documented command.
+- **OQ-2**: The reference environment lacks `potrace`, which `decoration
+  generate --only trace` needs, so its `doctor` exits 3. The program belongs in
+  workspaces-host-v3's `press` persona (0025-tooling-environment FR-007); until
+  it is there, `reference-environment.yml` shows the gap as a warning (FR-022).
 
 ## Key entities
 
@@ -345,6 +420,8 @@ own harnesses, and what CI runs.
   job runs.
 - **A UI** — `console`, the registry browser, or `assurance`, the server of
   the design systems' in-browser harnesses; each runs inside `agora`.
+- **A proposal** — a tracked, replayable change an agent drafts for a person to
+  accept (FR-029).
 - **A generator** — brand-theme, brand-specimen, openedx-sources,
   print-layout-docs, profile-figure or agent-skill.
 

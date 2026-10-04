@@ -180,10 +180,20 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
     return out
 
 
+class MissingProgram(Exception):
+    """A program outside Python that the host lacks (0041-command-line FR-006): a harness reports it and exits 3."""
+
+    def __init__(self, program: str, hint: str):
+        super().__init__(f"needs {program}, which is not on PATH ({hint})")
+        self.program, self.hint = program, hint
+
+
 def favicon(brand: Path) -> bytes:
     ico = brand / "images" / "favicon.ico"
     if ico.is_file():
         return ico.read_bytes()
+    if shutil.which("convert") is None:
+        raise MissingProgram("convert", "install ImageMagick from the host")
     return subprocess.run(["convert", str(brand / "images" / "favicon.png"), "-define", "icon:auto-resize=48,32,16", "ico:-"],
                           check=True, capture_output=True).stdout
 

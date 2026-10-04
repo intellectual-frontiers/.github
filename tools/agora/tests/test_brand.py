@@ -110,7 +110,7 @@ class Ink(Repo):
     def test_only_ink_record_takes_a_person_to_write(self):  # 0042 FR-012
         reg = Registry.load(HOME)
         for c in reg.commands.values():
-            if c.status == "implemented" and c.id != "ink record":
+            if c.id != "ink record":
                 self.assertNotIn("--by", [o.flag for o in c.options] if c.id != "requirement set" else [], c.id)
 
     def test_the_log_never_holds_who_checked(self):  # 0041 FR-042

@@ -451,6 +451,31 @@ def context_spec(ctx: Ctx, ident: str) -> dict[str, Any]:
             "omitted": ["requirement text beyond its first %d characters (use requirement show)" % TEXT_LEN]}
 
 
+@context_for("design-system", "DESIGN_SYSTEM")
+def context_design_system(ctx: Ctx, ident: str) -> dict[str, Any]:
+    d = design_system_show(ctx, ident)
+    s = specs.resolve_spec(ctx.root, ident)
+    base = f"design-systems/{ident}"
+    files_ = [f"{base}/spec.md" if s else None, *(f"{base}/{h}" for h in design_systems.harness_files(ctx.root, ident)),
+              str(register.REGISTER), "ontology/ifcore.ttl"]
+    out: dict[str, Any] = {"resource": d.data, "specs": [], "requirements": [], "files": [f for f in files_ if f],
+                           "links": d.links, "actions": d.actions}
+    if s:
+        rows = register.register_rows(ctx.root)
+        out["specs"] = [{"name": s.name, "status": s.status}]
+        out["requirements"] = [{"id": f"{s.name}/{i}", "mechanism": rows.get(f"{s.name} {i}", {}).get("mechanism", "missing"),
+                                "text": t[:TEXT_LEN] + ("..." if len(t) > TEXT_LEN else "")} for i, t in s.requirements()]
+        out["omitted"] = ["requirement text beyond its first %d characters (use requirement show)" % TEXT_LEN]
+    return out
+
+
+@context_for("term", "TERM")
+def context_term(ctx: Ctx, ident: str) -> dict[str, Any]:
+    d = term_show(ctx, ident)
+    return {"resource": d.data, "specs": [{"name": "0019-controlled-vocabulary", "status": "see spec show"}], "requirements": [],
+            "files": ["ontology/ifcore.ttl"], "links": d.links, "actions": d.actions}
+
+
 @context_for("requirement", "REQUIREMENT")
 def context_requirement(ctx: Ctx, ident: str) -> dict[str, Any]:
     d = requirement_show(ctx, ident)
