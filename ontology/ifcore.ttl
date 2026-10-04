@@ -1981,8 +1981,8 @@ ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnviro
 ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
     rdfs:comment "The ways the optional workspace runs; a new one is added here and in 0026-workspaces FR-001 under its own spec (FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:DebianFamilyBareMetalFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Debian-family bare metal"@en ;
-    skos:definition "Installed directly on a machine running a Debian-family Linux distribution, Debian or Ubuntu, including Ubuntu under WSL on Windows, with VS Code as its graphical interface (0026-workspaces FR-001)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DebianFamilyBareMetalFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Debian-family Linux"@en ;
+    skos:definition "A Debian-family Linux distribution, Debian or Ubuntu, run on bare metal, under WSL on Windows, or inside a virtual machine or container (which is how macOS is supported), with VS Code as its graphical interface (0026-workspaces FR-001)."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Orchestrators (0041-command-line, 0042-agora) ─────────────────────────
 # A repository's orchestrator declares its commands in a registry in code (0041 FR-007); the public root's command set

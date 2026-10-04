@@ -8,21 +8,25 @@ Intellectual Frontiers repository with a workspace. A workspace is an
 optional convenience: nothing depends on one, no repository requires one,
 and every repository works from a clone with only `python3` and `uv`
 (0025-tooling-environment FR-024, FR-025). A person who chooses a workspace
-gets one opinionated environment with one flavor for now: bare metal on a
-Debian-family Linux distribution, including Ubuntu under WSL on Windows,
-with VS Code as its graphical interface. A repository MAY list the
+gets one opinionated environment with one flavor for now: a Debian-family
+Linux distribution, run on bare metal, under WSL on Windows, or inside a
+virtual machine or container (which is how macOS is supported), with VS Code
+as its graphical interface. A repository MAY list the
 repositories it works alongside in its own `.workspaces-host/ws-host.env`,
 and a single command, run first, signs the person in, clones what is
-missing and updates the rest without ever touching their work. Containers,
-Codespaces and other systems come later, each under its own spec.
+missing and updates the rest without ever touching their work. Hosted
+environments such as Codespaces, and other distributions, come later, each
+under its own spec.
 
 ## The flavor
 
 - **FR-001**: A workspace, which a person MAY choose and no repository
-  requires, MUST be one environment with one flavor: bare metal on a
-  Debian-family Linux distribution (Debian or Ubuntu), including Ubuntu under
-  WSL on Windows, with VS Code as the graphical interface. A person MAY work
-  in any other way, including none. The flavor MUST be recorded in the
+  requires, MUST be one environment with one flavor: a Debian-family Linux
+  distribution (Debian or Ubuntu) with VS Code as the graphical interface,
+  run on bare metal, under WSL on Windows, or inside a virtual machine or a
+  container. macOS is supported by running that Linux in a virtual machine or a
+  container, not by running on macOS itself. A person MAY work in any other
+  way, including none. The flavor MUST be recorded in the
   ontology's workspace flavor scheme (`ifcore:WorkspaceFlavorScheme`).
 - **FR-002**: A workspace MUST NOT be a dependency. A tool, a repository's
   file, a check or a contributor instruction MUST work from a clone on a host
@@ -32,8 +36,9 @@ Codespaces and other systems come later, each under its own spec.
   depend on a machine's distribution beyond FR-001's family.
 - **FR-003**: A new flavor MUST be added by adding its concept to the
   workspace flavor scheme and naming it in FR-001 under its own spec;
-  nothing else moves. Devcontainers, Codespaces, published images and other
-  operating systems are not flavors yet.
+  nothing else moves. Hosted environments such as Codespaces, published images
+  and other distributions are not flavors yet; a container or a virtual machine
+  that runs the flavor's distribution is the flavor, not another one.
 
 ## Each repository's needs
 
@@ -119,7 +124,8 @@ Codespaces and other systems come later, each under its own spec.
 
 - How workspaces-host works inside and its first-run command. Its own
   specs govern that.
-- Containers, Codespaces, published images, macOS and other distributions.
+- Hosted environments such as Codespaces, published images, running on macOS
+  itself and other distributions.
 - Editor choice beyond VS Code, which is named because the editor surface is
   its extension (0041-command-line FR-050, 0043-if-console).
 - Preparing a machine's programs for a repository's tools: the tools fetch
@@ -151,8 +157,8 @@ Codespaces and other systems come later, each under its own spec.
   warns and does not block, per FR-023.
 - A person whose git `pull.ff` is not `only`: `doctor` recommends it and offers
   the fix, never applying it, per FR-020.
-- A person on Ubuntu under WSL: the same install and the same first run, per
-  FR-001.
+- A person on Ubuntu under WSL, or in a Debian or Ubuntu virtual machine or
+  container on a Mac: the same install and the same first run, per FR-001.
 - A repository that is not yet cloned: `repo add` clones it at its place in
   the layout, per FR-015.
 - A step that works on one machine of the flavor but not another: a defect in
@@ -161,7 +167,8 @@ Codespaces and other systems come later, each under its own spec.
 ## Assumptions
 
 - A person who chooses a workspace uses a Debian-family Linux distribution
-  on bare metal or under WSL, with `python3` available and the ability to
+  on bare metal, under WSL, or in a virtual machine or container, with
+  `python3` available and the ability to
   install `uv`.
 - The repositories people work in are hosted on GitHub or on a GitLab host
   the person's configuration names.
@@ -176,8 +183,8 @@ Codespaces and other systems come later, each under its own spec.
 
 ## Key entities
 
-- **The flavor** — bare metal on a Debian-family distribution, including
-  WSL, with VS Code.
+- **The flavor** — a Debian-family distribution, on bare metal, under WSL or
+  in a virtual machine or container, with VS Code.
 - **A repository's needs** — the optional `.workspaces-host/ws-host.env`,
   naming its siblings.
 - **The first run** — `ws-host workspace advance`.
