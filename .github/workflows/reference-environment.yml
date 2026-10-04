@@ -26,7 +26,7 @@ jobs:
           echo "image=$image" >> "$GITHUB_OUTPUT"
           docker pull -q "$image"
       # A login shell, as a devcontainer opens one, so the environment's session variables are set (0025 FR-006).
-      - name: agora's doctor, the spec suite and agora's own tests
-        run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora doctor && ./agora check --suite spec && ./agora test'
+      - name: agora's doctor, the spec suite, every generator's output and agora's own tests
+        run: docker run --rm -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora doctor && ./agora check --suite spec && ./agora fresh && ./agora test'
       - name: Every design system's harness (browser, TeX and imagery)
         run: docker run --rm --shm-size=1g -v "$PWD":/work -w /work "${{ steps.image.outputs.image }}" bash -lc './agora check --suite browser && ./agora check --suite python && ./agora check --suite images'

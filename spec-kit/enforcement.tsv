@@ -948,8 +948,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone: modified, staged, untracked, and --since
 0041-command-line FR-033	check	.github: agora test	tests check that a planned or skipped section never passes and that a missing program fails the run
 0041-command-line FR-034	check	.github: agora test	the runner's report is read by tests: a run that ran no test, or any failing one, fails
-0041-command-line FR-035	none	-	no generator exists yet; agora fresh will check the headers
-0041-command-line FR-036	none	-	no fresh exists yet
+0041-command-line FR-035	check	.github: agora fresh	each generator declares its sources, outputs and rewriting command in its manifest, and fresh proves the tracked files equal what it writes, so a hand edit fails; tests check the declarations and that each brand generator's files carry a header naming it
+0041-command-line FR-036	check	.github: agora test	tests run fresh against a fixture clone: current, a hand-edited file, a missing file, an unwritten file, a missing program (exit 3) and a generator in a locked group, and check it writes nothing
 0041-command-line FR-037	none	-	no agent files exist yet; agora fresh will prove them current
 0041-command-line FR-038	check	.github: agora test	tests run context for a spec and a requirement: deterministic, bounded, and saying what it left out
 0041-command-line FR-039	none	-	no proposals exist yet; agora test will check each proposal command
@@ -966,15 +966,15 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
 0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
 0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
-0042-agora FR-008	none	-	no typed arguments exist yet; agora test will check each type
+0042-agora FR-008	none	-	BRAND, PIECE, INK and GENERATOR now exist and agora test validates every type; LAYOUT and UI do not exist yet
 0042-agora FR-009	none	-	design-system new does not exist yet; agora test will check that it refuses
 0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
 0042-agora FR-011	check	.github: agora test	tests check environment set moves the pin and the image tag together, or neither
-0042-agora FR-012	none	-	ink record does not exist yet; agora test will check no other command writes a name
+0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
 0042-agora FR-013	check	.github: agora check commands	the declared sections, implemented or planned, are compared with this list
 0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; a section not implemented yet is named in planned, not run
-0042-agora FR-015	none	-	generators are not declared yet; agora fresh will prove each
-0042-agora FR-016	none	-	the scripts exist until agora replaces them; agora check commands will fail on a script outside design-systems/ and tools/agora/
+0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, openedx-sources, print-layout-docs and profile-figure; agent-skill is declared planned and fresh names it as not proved until the agent files are generated
+0042-agora FR-016	check	.github: agora check commands	check commands fails on a script outside design-systems/ and tools/agora/, and on a workflow that calls another tool; the references in documentation and specs are a review
 0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review
 0042-agora FR-018	check	.github: agora doctor	doctor checks each group's lock and programs; tests check the spec suite's groups pin none
 0042-agora FR-019	none	-	no UI exists yet; agora check ui will check each UI

@@ -149,7 +149,8 @@ class OtherCommands(unittest.TestCase):
         code, doc = run_json(["command", "list", "--status", "implemented"])
         ids = [c["id"] for c in doc["data"]["commands"]]
         self.assertIn("check", ids)
-        self.assertNotIn("brand list", ids)
+        self.assertNotIn("course show", ids)
+        self.assertIn("brand list", ids)
         code, doc = run_json(["command", "list", "--category", "decision"])
         self.assertEqual([c["id"] for c in doc["data"]["commands"]], ["ink record", "proposal advance", "spec set"])
         code, doc = run_json(["command", "show", "requirement", "set"])
@@ -183,7 +184,8 @@ class OtherCommands(unittest.TestCase):
     def test_doctor_reports_and_changes_nothing(self):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
-        reg.groups["assurance"].programs = {}  # what the host lacks is its own test below; this one reads a healthy host
+        for g in ("assurance", "decoration"):
+            reg.groups[g].programs = {}  # what the host lacks is its own test below; this one reads a healthy host
         code, doc = run_json(["doctor"], registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])

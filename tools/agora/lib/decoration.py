@@ -1,44 +1,37 @@
 #!/usr/bin/env python3
-"""Make and measure a brand's decoration kit (0014-design-systems FR-047).
+"""A brand's decoration kit: make it, measure it, and record who verified its inks (0014-design-systems FR-047;
+frontiers-brand FR-017; 0042-agora FR-006).
 
-    python3 tools/brand_decoration.py trace design-systems/<brand>
-        For the lockup and the icon in the kit (tokens.json $extensions["com.intellectualfrontiers.decoration"]),
-        trace the raster master its "traced-from" names into one-color outlined SVG at its "file", then measure
-        its finest detail and write it back to tokens.json. The trace is mechanical and repeatable: the master is
-        composited on white, read as luminance, enlarged by "scale" (Lanczos), cut at "threshold" (the share of
-        full ink a pixel needs to print) and traced by potrace, dropping specks smaller than "speckle-px" master
-        pixels. Nothing is drawn, retouched or generated.
+`trace`: for the lockup and the icon in the kit (tokens.json $extensions["com.intellectualfrontiers.decoration"]),
+trace the raster master its "traced-from" names into one-color outlined SVG at its "file", then measure its finest
+detail and write it back to tokens.json. The trace is mechanical and repeatable: the master is composited on white,
+read as luminance, enlarged by "scale" (Lanczos), cut at "threshold" (the share of full ink a pixel needs to print) and
+traced by potrace, dropping specks smaller than "speckle-px" master pixels. Nothing is drawn, retouched or generated.
 
-    python3 tools/brand_decoration.py set design-systems/<brand>
-        For the wordmark in the kit and every unit mark the brand's logo lists, set the name in the face its "set-from" names (a font in the brand's fonts/,
-        at its optical size and weight, tracked by "tracking-em", one line per entry of "lines", baselines
-        "leading-em" apart and ink-aligned on the left) and write it as one-color outlined SVG at its "file", then
-        measure its finest detail and write it back to tokens.json. It is typesetting, shaped by HarfBuzz with the
-        font's own kerning: nothing is drawn. Needs the uharfbuzz package.
+`set`: for the wordmark in the kit and every unit mark the brand's logo lists, set the name in the face its "set-from"
+names (a font in the brand's fonts/, at its optical size and weight, tracked by "tracking-em", one line per entry of
+"lines", baselines "leading-em" apart and ink-aligned on the left) and write it as one-color outlined SVG at its
+"file", then measure its finest detail and write it back to tokens.json. It is typesetting, shaped by HarfBuzz with the
+font's own kerning: nothing is drawn. Needs the uharfbuzz package.
 
-    python3 tools/brand_decoration.py verify design-systems/<brand> --ink ROLE --spot NAME --thread NUMBER --by WHO --on DATE
-        Record that an ink's matches were checked against the physical guide and card (frontiers-brand FR-017,
-        briefs/ink-verification.md): its spot-color name and thread number as checked, who checked them and when,
-        and verified: true, after which goods may be ordered in it.
+`record_ink`: record that an ink's matches were checked against the physical guide and card (frontiers-brand FR-017,
+briefs/ink-verification.md): its spot-color name and thread number as checked, who checked them and when, and
+verified: true, after which goods may be ordered in it.
 
-    python3 tools/brand_decoration.py measure <svg> [...]
-        Print an SVG's finest detail: the thinnest line or gap, as a fraction of its width.
+`finest_detail`: an SVG's thinnest line or gap, as a fraction of its width. `match`: the nearest colors to a color in
+GIMP palettes (a thread chart, a spot-color guide), by CIEDE2000, to propose an ink's matches; a match is a candidate
+until it is checked against the physical card.
 
-    python3 tools/brand_decoration.py match <hex> <palette.gpl> [...]
-        The nearest colors to <hex> in GIMP palettes (a thread chart, a spot-color guide), by CIEDE2000, to
-        propose an ink's matches. A match is a candidate until it is checked against the physical card.
-
-Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz for `set`.
+Standard library, ImageMagick (`convert`), potrace and rsvg-convert; uharfbuzz for `set`. Every function returns what it
+would write; the commands write it (`--dry-run` shows it).
 """
 from __future__ import annotations
 
-import argparse
 import html
 import json
 import math
 import re
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
@@ -54,10 +47,23 @@ def run(*args: str) -> bytes:
     return subprocess.run(args, check=True, capture_output=True).stdout
 
 
-def trace(brand: Path) -> int:
-    tokens_path = brand / "tokens.json"
-    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+def dumps(tokens: dict) -> str:
+    return json.dumps(tokens, indent=2, ensure_ascii=False) + "\n"
+
+
+def finest_of(text: str) -> float:
+    """The finest detail of SVG text, measured from a scratch file."""
+    with tempfile.TemporaryDirectory() as tmp:
+        f = Path(tmp) / "art.svg"
+        f.write_text(text, encoding="utf-8")
+        return finest_detail(f)
+
+
+def trace(brand: Path, tokens: dict) -> tuple[dict[Path, str], list[str]]:
+    """The lockup's and the icon's traced SVG, and `tokens` updated with each one's finest detail."""
     kit = tokens["$extensions"][KIT]
+    files: dict[Path, str] = {}
+    notes: list[str] = []
     for part in ("lockup", "icon"):
         art = kit[part]
         src = art["traced-from"]
@@ -71,14 +77,11 @@ def trace(brand: Path) -> int:
                 "-threshold", f"{100 - float(src['threshold']) * 100:g}%", str(pbm))
             svg = run("potrace", "--svg", "--turdsize", str(int(src["speckle-px"]) * scale * scale), "--output", "-",
                       str(pbm)).decode()
-        out = brand / art["file"]
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(clean(svg, width, height, f"{brand.name} {part}, one color, traced from {src['file']}"),
-                       encoding="utf-8")
-        art["finest-detail"] = round(finest_detail(out), 4)
-        print(f"{art['file']}: traced from {src['file']}, finest detail {art['finest-detail']}")
-    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    return 0
+        text = clean(svg, width, height, f"{brand.name} {part}, one color, traced from {src['file']}")
+        files[brand / art["file"]] = text
+        art["finest-detail"] = round(finest_of(text), 4)
+        notes.append(f"{art['file']}: traced from {src['file']}, finest detail {art['finest-detail']}")
+    return files, notes
 
 
 def typeset(brand: Path, spec: dict, title: str) -> str:
@@ -122,29 +125,44 @@ def typeset(brand: Path, spec: dict, title: str) -> str:
             f'<path fill="currentColor" d="{" ".join(p for p in d if p)}"/>\n</svg>\n')
 
 
-def set_wordmark(brand: Path) -> int:
+def set_wordmark(brand: Path, tokens: dict) -> tuple[dict[Path, str], list[str]]:
     """The decoration kit's wordmark, and every unit mark tokens.json lists (frontiers-brand FR-017, FR-019)."""
-    tokens_path = brand / "tokens.json"
-    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+    files: dict[Path, str] = {}
+    notes: list[str] = []
     art = tokens["$extensions"].get(KIT, {}).get("wordmark")
     if art:
         spec = art["set-from"]
         name = " / ".join(l if isinstance(l, str) else l["text"] for l in spec["lines"])
-        out = brand / art["file"]
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(typeset(brand, spec, f"{brand.name} wordmark, one color, set in {spec['font']} "
-                                            f"(opsz {spec['opsz']}, wght {spec['wght']}): {name}"), encoding="utf-8")
-        art["finest-detail"] = round(finest_detail(out), 4)
-        print(f"{art['file']}: set from {spec['font']}, finest detail {art['finest-detail']}")
+        text = typeset(brand, spec, f"{brand.name} wordmark, one color, set in {spec['font']} "
+                                    f"(opsz {spec['opsz']}, wght {spec['wght']}): {name}")
+        files[brand / art["file"]] = text
+        art["finest-detail"] = round(finest_of(text), 4)
+        notes.append(f"{art['file']}: set from {spec['font']}, finest detail {art['finest-detail']}")
     for unit, mark in tokens["$extensions"]["com.intellectualfrontiers.logo"].get("units", {}).items():
         if unit.startswith("$"):
             continue
-        out = brand / mark["file"]
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(typeset(brand, mark["set-from"], f"{mark['name']}, one color, set in {mark['set-from']['font']}"), encoding="utf-8")
-        print(f"{mark['file']}: {mark['name']}")
-    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    return 0
+        files[brand / mark["file"]] = typeset(brand, mark["set-from"], f"{mark['name']}, one color, set in {mark['set-from']['font']}")
+        notes.append(f"{mark['file']}: {mark['name']}")
+    return files, notes
+
+
+def generate(brand: Path, only: str | None = None) -> tuple[dict[Path, str], list[str]]:
+    """The kit's files (traced and set SVG, and tokens.json with the measured finest details), and a line for each."""
+    tokens_path = brand / "tokens.json"
+    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
+    files: dict[Path, str] = {}
+    notes: list[str] = []
+    for what, fn in (("trace", trace), ("set", set_wordmark)):
+        if only in (None, what):
+            f, n = fn(brand, tokens)
+            files.update(f)
+            notes += n
+    files[tokens_path] = dumps(tokens)
+    return files, notes
+
+
+def kit_of(tokens: dict) -> dict:
+    return tokens.get("$extensions", {}).get(KIT, {})
 
 
 def _outline(font, glyph: int, dx: float, baseline: float, scale: float = 1) -> str:
@@ -255,8 +273,8 @@ def ciede2000(c1: tuple[float, float, float], c2: tuple[float, float, float]) ->
     return math.sqrt((dl / sl) ** 2 + (dc / sc) ** 2 + (dH / sh) ** 2 + rt * (dc / sc) * (dH / sh))
 
 
-def match(hex_color: str, palettes: list[str]) -> int:
-    target = lab(hex_color)
+def palette_colors(palettes: list[str | Path]) -> list[tuple[str, str, str]]:
+    """Every color of GIMP palettes as (palette name, color name, #rrggbb)."""
     found = []
     for pal in palettes:
         name = "?"
@@ -265,53 +283,23 @@ def match(hex_color: str, palettes: list[str]) -> int:
                 name = line.split(":", 1)[1].strip()
             m = re.match(r"\s*(\d+)\s+(\d+)\s+(\d+)\s+(.*)", line)
             if m:
-                rgb = "#%02x%02x%02x" % tuple(int(m.group(i)) for i in (1, 2, 3))
-                found.append((ciede2000(target, lab(rgb)), name, m.group(4).strip(), rgb))
-    for de, name, color, rgb in sorted(found)[:5]:
-        print(f"{de:5.1f}  {name}: {color} ({rgb})")
-    return 0
+                found.append((name, m.group(4).strip(), "#%02x%02x%02x" % tuple(int(m.group(i)) for i in (1, 2, 3))))
+    return found
 
 
-def verify(brand: Path, ink: str, spot: str, thread: str, by: str, on: str) -> int:
+def match(hex_color: str, palettes: list[str | Path], n: int = 5) -> list[dict]:
+    """The `n` nearest colors to `hex_color` in the palettes, by CIEDE2000."""
+    target = lab(hex_color)
+    found = sorted((ciede2000(target, lab(rgb)), name, color, rgb) for name, color, rgb in palette_colors(palettes))
+    return [{"delta-e": round(de, 1), "palette": name, "color": color, "rgb": rgb} for de, name, color, rgb in found[:n]]
+
+
+def record_ink(tokens: dict, ink: str, spot: str, thread: str, by: str, on: str) -> None:
+    """Mark an ink verified in `tokens`: its spot-color name and thread number as checked against the card, by whom, when."""
     import datetime
     datetime.date.fromisoformat(on)
-    tokens_path = brand / "tokens.json"
-    tokens = json.loads(tokens_path.read_text(encoding="utf-8"))
-    inks = tokens["$extensions"][KIT]["inks"]
-    if ink not in inks:
-        print(f"no ink {ink!r}; the kit's inks are {', '.join(inks)}", file=sys.stderr)
-        return 1
-    entry = inks[ink]
+    entry = kit_of(tokens)["inks"][ink]
     entry["spot"]["name"] = spot
     # A thread's color name belongs to its number; a different number checked against the card drops the old name.
     entry["thread"] = {"system": entry["thread"]["system"], "number": thread}
     entry.update({"verified": True, "verified-by": by, "verified-on": on})
-    tokens_path.write_text(json.dumps(tokens, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"{ink}: {spot} and thread {thread}, verified by {by} on {on}")
-    return 0
-
-
-def main(argv: list[str]) -> int:
-    if len(argv) >= 2 and argv[0] == "trace":
-        return max(trace(Path(p)) for p in argv[1:])
-    if len(argv) >= 2 and argv[0] == "set":
-        return max(set_wordmark(Path(p)) for p in argv[1:])
-    if len(argv) >= 2 and argv[0] == "verify":
-        ap = argparse.ArgumentParser(prog="brand_decoration.py verify")
-        ap.add_argument("brand", type=Path)
-        for flag in ("--ink", "--spot", "--thread", "--by", "--on"):
-            ap.add_argument(flag, required=True)
-        a = ap.parse_args(argv[1:])
-        return verify(a.brand, a.ink, a.spot, a.thread, a.by, a.on)
-    if len(argv) >= 2 and argv[0] == "measure":
-        for p in argv[1:]:
-            print(f"{p}: {finest_detail(Path(p)):.4f}")
-        return 0
-    if len(argv) >= 3 and argv[0] == "match":
-        return match(argv[1], argv[2:])
-    print(__doc__, file=sys.stderr)
-    return 2
-
-
-if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))

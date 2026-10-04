@@ -107,6 +107,30 @@ class Section:
 
 
 @dataclass
+class Generator:
+    """A generator (0041 FR-035): the sources it reads, the tracked files it writes, and the command that rewrites them.
+
+    `fn(ctx, scope) -> Generated` returns every file it writes, in memory (core/generate.py). `command` is the words of
+    the command that rewrites the files. `programs` are what it cannot run without: `fresh` says so, exit 3, when one is
+    missing."""
+
+    name: str
+    help: str = ""
+    sources: tuple[str, ...] = ()  # globs of what it reads
+    outputs: tuple[str, ...] = ()  # globs of the tracked files it writes
+    command: str = ""
+    programs: tuple[str, ...] = ()
+    group: str = ""
+    fn: Callable[..., Any] | None = None
+    status: str = "implemented"
+    step: str = ""
+
+    @property
+    def watch(self) -> tuple[str, ...]:
+        return self.sources + self.outputs
+
+
+@dataclass
 class Group:
     name: str
     help: str
@@ -144,6 +168,16 @@ def context_for(kind: str, type: str):
     return deco
 
 
+def generator(name: str):
+    """Implement a generator the group's manifest declares: `fn(ctx, scope) -> Generated`."""
+
+    def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
+        fn.__agora_generator__ = name
+        return fn
+
+    return deco
+
+
 def section(name: str):
     """Implement a check section the group's manifest declares: `fn(ctx, scope) -> SectionResult`."""
 
@@ -163,6 +197,7 @@ class Registry:
         self.groups: dict[str, Group] = {}
         self.commands: dict[str, Command] = {}
         self.sections: dict[str, Section] = {}
+        self.generators: dict[str, Generator] = {}
         self.types: dict[str, ArgType] = {}
         self.type_group: dict[str, str] = {}
         self.nouns: dict[str, str] = {}  # noun -> help
@@ -202,11 +237,20 @@ class Registry:
             self._add_section(Section(sname, s.get("help", ""), tuple(s.get("watch", ())), s.get("scope"),
                                       tuple(s.get("options", ())), tuple(s.get("programs", ())),
                                       bool(s.get("relocatable", False)), bool(s.get("isolated", False)), g.name))
+        for gname, gen in m.get("generators", {}).items():
+            if gname in self.generators:
+                self.conflicts.append(f"generator {gname} is declared twice")
+            self.generators[gname] = Generator(gname, gen.get("help", ""), tuple(gen.get("sources", ())),
+                                               tuple(gen.get("outputs", ())), gen.get("command", ""),
+                                               tuple(gen.get("programs", ())), g.name)
         mod = importlib.import_module(module or f"agora.groups.{g.name}.commands")
         self._collect(mod, g)
         for s in list(self.sections.values()):
             if s.group == g.name and s.fn is None:
                 self.conflicts.append(f"section {s.name} is declared in group {g.name}'s manifest but has no implementation")
+        for gen in self.generators.values():
+            if gen.group == g.name and gen.fn is None:
+                self.conflicts.append(f"generator {gen.name} is declared in group {g.name}'s manifest but has no implementation")
         return g
 
     def _collect(self, mod: Any, g: Group) -> None:
@@ -216,7 +260,7 @@ class Registry:
                 self.add_type(obj, g.name)
             elif callable(obj) and getattr(obj, "__module__", None) == mod.__name__:
                 if (hasattr(obj, "__agora_command__") or hasattr(obj, "__agora_section__")
-                        or hasattr(obj, "__agora_context__")):
+                        or hasattr(obj, "__agora_context__") or hasattr(obj, "__agora_generator__")):
                     found.append((obj.__code__.co_firstlineno, attr, obj))
         for _, _, fn in sorted(found, key=lambda t: t[0]):
             if hasattr(fn, "__agora_command__"):
@@ -227,6 +271,13 @@ class Registry:
                 if kind in self.contexts:
                     self.conflicts.append(f"context for {kind} is provided twice")
                 self.contexts[kind] = (tname, fn)
+            if hasattr(fn, "__agora_generator__"):
+                gen = self.generators.get(fn.__agora_generator__)
+                if gen is None or gen.group != g.name:
+                    self.conflicts.append(f"generator {fn.__agora_generator__} is implemented by group {g.name} "
+                                          "but not declared in its manifest")
+                else:
+                    gen.fn = fn
             if hasattr(fn, "__agora_section__"):
                 s = self.sections.get(fn.__agora_section__)
                 if s is None or s.group != g.name:
@@ -263,6 +314,11 @@ class Registry:
                 self.conflicts.append(f"command {cid!r} is implemented and still listed as planned in the root manifest")
                 continue
             self.commands[cid] = Command(tuple(cid.split()), category, "planned: not implemented yet", status="planned")
+        for gname, gen in planned.get("generators", {}).items():
+            if gname in self.generators:
+                self.conflicts.append(f"generator {gname} is implemented and still listed as planned in the root manifest")
+                continue
+            self.generators[gname] = Generator(gname, gen.get("help", ""), status="planned", step=gen.get("step", ""))
         for sname, s in planned.get("sections", {}).items():
             if sname in self.sections:
                 self.conflicts.append(f"section {sname} is implemented and still listed as planned in the root manifest")

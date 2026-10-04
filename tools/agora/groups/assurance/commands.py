@@ -1,5 +1,5 @@
 """The assurance checks: every design system's harness, each brand's imagery, and its Open edX package (0042-agora FR-013,
-FR-014, FR-017).
+FR-014, FR-017); and the organization profile's figure, which needs the same locked packages (FR-015).
 
 Thin: the rules live in agora.lib. Standard library only here; the harnesses run in this group's locked environment, as
 subprocesses of their own documented command lines.
@@ -9,8 +9,11 @@ from __future__ import annotations
 import subprocess
 import sys
 
-from agora.core import Ctx, Dynamic, Finding, SectionResult, section
-from agora.lib import assurance, imagery, openedx
+from agora.core import AgoraError, Ctx, Dynamic, Finding, Resource, SectionResult, command, next_command, section
+from agora.core import files
+from agora.core.generate import Generated
+from agora.core.registry import generator
+from agora.lib import assurance, imagery, openedx, profile_figure
 
 
 def _brands(ctx: Ctx) -> list[str]:
@@ -132,3 +135,26 @@ def check_openedx(ctx: Ctx, scope: str | None) -> SectionResult:
         res.status = "skipped"
         res.reason = "; ".join(f"{o.harness.slug}: {o.reason}" for o in skipped)
     return res
+
+
+# the profile's figure ----------------------------------------------------------------------------------------------
+def _figure(ctx: Ctx) -> dict:
+    try:
+        return profile_figure.render(ctx.root)
+    except profile_figure.FigureProblem as e:
+        raise AgoraError("figcheck", f"frontiers-figures rejects the profile's figure: {e}", exit=1) from None
+    except FileNotFoundError as e:
+        raise AgoraError("invalid-argument", f"the profile's figure needs {e.filename}, which this repository lacks", exit=1) from None
+
+
+@generator("profile-figure")
+def gen_profile_figure(ctx: Ctx, scope: str | None) -> Generated:
+    return Generated(files=_figure(ctx))
+
+
+@command("figure generate", category="generate",
+         help="Write the organization profile's figure: its semantic source and the themed default and on-dark images")
+def figure_generate(ctx: Ctx) -> Resource:
+    changes = files.apply(ctx, _figure(ctx))
+    return Resource("figure", "profile", {"dry_run": ctx.dry_run, "changes": changes},
+                    actions=[next_command("prove it current", "fresh", generators=["profile-figure"])])

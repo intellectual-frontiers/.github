@@ -19,7 +19,8 @@ class EveryCommand(unittest.TestCase):
         self.reg = Registry.load(HOME)
 
     def test_every_command_without_required_arguments_returns_a_resource(self):  # 0041 FR-016
-        skip = {"check", "test", "doctor", "lock", "environment set", "spec new"}
+        # the commands that run the checks again, write tracked files, or run in a group's locked environment (tested apart)
+        skip = {"check", "test", "doctor", "lock", "environment set", "spec new", "fresh", "brand generate", "figure generate"}
         for c in self.reg.commands.values():
             if c.status != "implemented" or c.id in skip or any(a.required for a in c.args) or any(o.required for o in c.options):
                 continue

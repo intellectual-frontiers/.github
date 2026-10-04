@@ -66,7 +66,7 @@ class Parser(unittest.TestCase):
         self.assertEqual(run(["spec", "show", "0020", "--dry-run"])[0], 2)
 
     def test_planned_commands_fail_plainly(self):
-        code, doc = run_json(["brand", "list"])
+        code, doc = run_json(["course", "show"])
         self.assertEqual((code, doc["data"]["code"]), (1, "not-implemented"))
 
     def test_a_missing_program_is_exit_3_with_the_hint(self):
@@ -124,7 +124,7 @@ class Completion(unittest.TestCase):
         w = self.complete("")
         for expected in ("check", "spec", "doctor", "command"):
             self.assertIn(expected, w)
-        self.assertNotIn("brand", w)  # planned, not implemented
+        self.assertNotIn("course", w)  # planned, not implemented
 
     def test_verbs_of_a_noun(self):
         self.assertEqual(self.complete("spec", ""), ["list", "new", "set", "show"])

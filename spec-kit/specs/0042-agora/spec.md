@@ -74,7 +74,9 @@ own harnesses, and what CI runs.
   - `openedx`: `generate` (generate); `build --paragon` (build).
   - `layout`: `list`, `show [--def]` (read); `build -o` (build).
   - `figure`, `deck`, `email`, `media`, `sign`: `build PATH --brand ...`
-    (build). `course`: `show` (read), `build --target` (build).
+    (build). `figure` also has `generate` (generate): the organization
+    profile's figure (FR-015). `course`: `show` (read), `build --target`
+    (build).
   - `environment`: `show` (read); `set COMMIT` (setup).
   - `proposal`: `list`, `show` (read); `new` (record); `advance` (decision).
 - **FR-007**: A `decision` command MUST be one of these three: `spec set
@@ -134,6 +136,15 @@ own harnesses, and what CI runs.
   (the print design system's layout documentation from its layouts),
   `profile-figure` (the organization profile's figures) and `agent-skill` (the
   files that tell an AI agent how to use `agora`, 0041-command-line FR-037).
+  Each names the command that rewrites its files (0041-command-line FR-035):
+  `brand generate` for `brand-theme` and `brand-specimen`, `openedx generate`
+  for `openedx-sources`, `figure generate` for `profile-figure`; the files of
+  `print-layout-docs` are rewritten by the print design system's own
+  `latex/layout.py sync`, which `fresh` calls and which stays in the design
+  system (FR-017). `fresh` MUST say that a generator needs a program the host
+  lacks, and exit 3, rather than report its files stale; and it MUST run a
+  generator whose group pins packages under that group's locked environment
+  (0041-command-line FR-002, FR-028).
 
 ## Replacing every script
 

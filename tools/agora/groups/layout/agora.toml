@@ -1,0 +1,9 @@
+name = "layout"
+help = "The print design system's layouts: the generated documentation of them"
+
+# `layout list`, `layout show` and `layout build` arrive here; the nouns are declared with the first command.
+
+[generators.print-layout-docs]
+help = "The print design system's layout and typeface catalogs inside its Markdown, from latex/layouts.json and latex/typefaces.json"
+sources = ["design-systems/frontiers-print/latex/layouts.json", "design-systems/frontiers-print/latex/typefaces.json", "design-systems/frontiers-print/latex/layout.py"]
+outputs = ["design-systems/frontiers-print/docs/*.md"]

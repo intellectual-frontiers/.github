@@ -1,0 +1,35 @@
+name = "brand"
+help = "A brand's theme and specimen, imagery pool, ink verification and Open edX package"
+
+# This group pins no package: the brand tools need only the standard library and the programs the host supplies
+# (ImageMagick for imagery, Node and Paragon for the Open edX build). Those programs are declared with the assurance
+# group's, whose checks need them too.
+
+[nouns.brand]
+help = "A brand design system: tokens.json and what is written from it (0014-design-systems FR-028)"
+[nouns.imagery]
+help = "A brand's imagery pool: its catalog, masters, WebP files and share card (0014-design-systems FR-043)"
+[nouns.ink]
+help = "An ink of a brand's decoration kit: its spot color and thread, and who verified them (frontiers-brand FR-017)"
+[nouns.openedx]
+help = "A brand's Open edX brand package (frontiers-brand FR-020)"
+
+# Generators (0041-command-line FR-035; 0042-agora FR-015): what each reads and writes, and the command that rewrites it.
+# `agora fresh` proves each current.
+[generators.brand-theme]
+help = "A brand's brand.css and brand.tex, from its tokens.json"
+sources = ["design-systems/*/tokens.json"]
+outputs = ["design-systems/*/brand.css", "design-systems/*/brand.tex"]
+command = "brand generate"
+
+[generators.brand-specimen]
+help = "A brand's assurance specimen, from its tokens.json"
+sources = ["design-systems/*/tokens.json"]
+outputs = ["design-systems/*/assurance/fixtures/specimen.html"]
+command = "brand generate"
+
+[generators.openedx-sources]
+help = "A brand's Open edX package sources (everything but the built dist/), from its tokens.json, logos and fonts"
+sources = ["design-systems/*/tokens.json", "design-systems/*/logos/**", "design-systems/*/images/**", "design-systems/frontiers-course/web/fonts/**"]
+outputs = ["design-systems/*/openedx/**"]
+command = "openedx generate"

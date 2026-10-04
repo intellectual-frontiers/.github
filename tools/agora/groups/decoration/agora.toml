@@ -1,0 +1,16 @@
+name = "decoration"
+help = "A brand's decoration kit: the traced lockup and icon, and the wordmark and unit marks set in type"
+
+# The package `decoration generate --only set` imports, to one exact version, locked with hashes in agora.lock.
+#   uharfbuzz   shapes the wordmark's text with the font's own kerning and draws the glyph outlines
+[packages]
+uharfbuzz = "0.56.2"
+
+# potrace traces the raster masters. ImageMagick and rsvg-convert, which measuring needs too, are declared with the
+# assurance group's programs.
+[programs.potrace]
+needed_by = ["decoration generate (trace)"]
+hint = "install potrace from the host (the press persona carries it)"
+
+[nouns.decoration]
+help = "A brand's decoration kit: one-color artwork made mechanically from the masters and the brand's fonts (0014-design-systems FR-047)"
