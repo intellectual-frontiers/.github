@@ -626,9 +626,10 @@ command set is 0042-agora.
   Python 3 interpreter with the standard library is present; nothing else is.
 - Each repository's orchestrator is used by one person at a time in one
   clone, and Git is the means of sharing and merging work.
-- People run on bare metal, on a Debian-family Linux distribution, including
-  one under WSL on Windows; other systems and determinism by generated
-  containers are for later specs.
+- People run a Debian-family Linux distribution on bare metal, under WSL on
+  Windows, or inside a virtual machine or container (which is how macOS is
+  supported); other distributions and determinism by generated container
+  files are for later specs.
 - A person who wants a graphical interface works in VS Code; the editor
   surface, IF Console, is the one graphical interface, and the command line
   needs none.
