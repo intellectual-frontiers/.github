@@ -5,7 +5,8 @@
 
 Prints every finding as `FAIL` or `WARN` with the file and the passage, and exits non-zero on any FAIL (on none
 with --draft, which reports every FAIL as a WARN). AsciiDoc (.adoc) and Markdown (.md) are read as their prose:
-comments, attribute lines, front matter, code and listing blocks are never swept. --patterns may be given more
+comments, attribute lines, front matter, code and listing blocks are never swept. A URL (http://, https://) or a
+mailto: address is never swept, in any text; the link text after it (an AsciiDoc `[...]`) is (FR-020). --patterns may be given more
 than once; later files add to earlier ones (a spoken-voice design system adds its own to these, FR-018). --terms
 adds shared-term files to this design system's terms.json (FR-016).
 
@@ -25,6 +26,9 @@ NEGATION = re.compile(r"\b(?:is|are|was|were) not\b|\bisn't\b|\baren't\b|\bwasn'
 PRONOUN_START = re.compile(r"^(?:it|that|this|they|he|she|these|those)(?:'s|'re| is| are)\b", re.I)
 PASSIVE = re.compile(r"\b(?:should|must|is to|are to|needs to|need to) be \w+ed\b", re.I)
 STEP = re.compile(r"^\s*(?:\.+|\d+\.)\s+(.*)$")
+# An address up to whitespace, a bracket or an angle bracket, never ending on the sentence's own punctuation; an
+# AsciiDoc macro's [link text] after it stays in the text.
+URL = re.compile(r"(?:https?://|mailto:)[^\s\[\]<>]*[^\s\[\]<>.,;:!?)'\"]", re.I)
 
 
 def load(paths: list[Path]) -> dict:
@@ -91,10 +95,11 @@ def prose(text: str, suffix: str) -> str:
 def sweep(text: str, patterns: dict, fixed: tuple[str, ...] = (), mode: str = "prose",
           terms: list[dict] | tuple = ()) -> tuple[list[str], list[str]]:
     """Every pattern the text breaks, as (fails, warns). `fixed` are passages a format dictates (a show's tagline);
-    they are removed first."""
+    they are removed first, then every URL and mailto: address, which a reader does not read as prose (FR-020)."""
     t = plain_quotes(text)
     for f in fixed:
         t = t.replace(plain_quotes(f), " ")
+    t = URL.sub(" ", t)
     low = t.lower()
     fails: list[str] = []
     warns: list[str] = []

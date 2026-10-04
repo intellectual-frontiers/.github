@@ -1,0 +1,3 @@
+= Go deeper
+
+Read https://example.org/native-alpha[how we delve into the numbers] before the next chapter.

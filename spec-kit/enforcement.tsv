@@ -662,6 +662,7 @@ frontiers-written-voice FR-016	check	.github: python3 design-systems/frontiers-w
 frontiers-written-voice FR-017	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	the sweep against fail and pass fixtures
 frontiers-written-voice FR-018	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	a derived voice keeps every inherited pattern
 frontiers-written-voice FR-019	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-written-voice FR-020	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	URLs and mailto: addresses left out of the sweep, link text after a URL still swept, against fixtures
 frontiers-spoken-voice FR-001	check	.github: python3 tools/spec_check.py	registration, kind and derivation from a written-voice design system
 frontiers-spoken-voice FR-002	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the inherited copy is identical to its source; no inherited pattern dropped or loosened
 frontiers-spoken-voice FR-003	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings; repeating the intro is the consumer's format check
