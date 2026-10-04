@@ -99,7 +99,29 @@ def check_format(root: Path, public: Path, cross_refs: bool = True) -> list[Find
                     for ident in expand(r.group("ids")):
                         if ident not in index[spec]:
                             findings.append(Finding("error", f"{rel}:{lineno}", f"cites {spec} {ident}, which does not exist"))
+        findings += check_loose_ids(strip_code(text), rel, seen, n)
     return findings
+
+
+LOOSE_ID = re.compile(r"\b(FR|SC|OQ)-(\d{3})\b")
+# How far before a bare identifier a spec name still claims it ("... FR-016 of that spec").
+CLAIM_WINDOW = 220
+
+
+def check_loose_ids(prose: str, rel: str, defined: set[str], n) -> list[Finding]:
+    """0020 FR-019: a bare `FR-NNN` is this spec's own unless a spec is named just before it."""
+    spans = [m.span() for m in n.ref.finditer(prose)]
+    claim = re.compile(n.spec_name)
+    out: list[Finding] = []
+    for m in LOOSE_ID.finditer(prose):
+        if any(a <= m.start() < b for a, b in spans):
+            continue
+        ident = f"{m.group(1)}-{m.group(2)}"
+        if ident in defined or claim.search(prose[max(0, m.start() - CLAIM_WINDOW):m.start()]):
+            continue
+        line = prose.count("\n", 0, m.start()) + 1
+        out.append(Finding("warning", f"{rel}:{line}", f"{ident} is not defined in this spec; name the spec it belongs to (0020 FR-019)"))
+    return out
 
 
 def check_sections(rel: str, text: str) -> list[Finding]:

@@ -113,6 +113,11 @@ where it departs from it.
   FR-011, FR-012, FR-013 (a missing citation, or a `.github:` command that is not in
   `agora`'s registry), or FR-018 (a
   Spec ID that does not match where the spec lives) MUST fail the check.
+- **FR-019**: A bare requirement identifier in a spec's prose (`FR-NNN`,
+  `SC-NNN` or `OQ-NNN` with no spec named just before it) MUST be one that
+  spec defines. One that it does not define cites another spec's
+  requirement without naming the spec, and the check MUST warn, naming the
+  identifier, so the citation is written as `<spec> FR-NNN`.
 
 ## Out of scope
 
@@ -122,6 +127,10 @@ where it departs from it.
   owns its own.
 
 ## Edge cases
+
+- A spec that cites a run of another spec's requirements ("0014-design-systems FR-015
+  and FR-017"): the spec named just before the run claims each identifier
+  in it, so none is warned about, per FR-019.
 
 - A spec that governs a screen people use, where user stories would help:
   it may carry them, per FR-004, in addition to Edge cases.
