@@ -258,11 +258,12 @@ is not stated here.
   certainty. A skill whose role, as its book defines it, is to draft,
   reconcile and execute without deciding is exempt from the duty to conclude
   and MUST say so in its front matter; 0009-press FR-017 governs it.
-- **FR-040**: A skill is a work of kind `skill` and a Substantial Work. It
-  MUST be related to the concept it operationalizes by `schema:isBasedOn`
-  (0007-work-and-assets FR-015) and MUST NOT reach a reader before the book
-  it realizes is announced (0015-work-packages FR-027), nor stand in its
-  place.
+- **FR-040**: A skill is a work of kind `skill` and a Substantial Work,
+  independent of any book it realizes. It MUST be related to the concept it
+  operationalizes by `schema:isBasedOn` (0007-work-and-assets FR-015) and
+  MUST NOT stand in the place of a book. It reaches readers by its own
+  publication decision (0015-work-packages FR-025) as soon as it is ready,
+  whatever the stage of the book it realizes.
 - **FR-041**: The named tools, tests, and frameworks of a book MUST also be
   queryable in the ontology, each individual carrying provenance to the exact
   source file and section it was extracted from and an explicit audience
@@ -375,9 +376,9 @@ is not stated here.
 - A change moves a table to the companion and also changes the page
   count: the news entry describes the move and says nothing of the page
   count, per FR-036.
-- A skill that realizes a book's method is ready before the book is
-  announced: it does not reach a reader until the book's announcement,
-  per FR-040.
+- A skill that realizes a book's method is ready before the book: its own
+  publication decision releases it, whatever the book's stage, per
+  FR-040.
 
 ## Assumptions
 

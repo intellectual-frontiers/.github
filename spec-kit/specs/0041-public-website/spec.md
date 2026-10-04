@@ -40,14 +40,19 @@ how addresses map to content, 0004-addressing.
   the company (0021-works-and-presentations FR-014, FR-015).
 - **FR-006**: The website MUST have, for each kind of work it shows, an
   index and a page per item: books, the Journal (0009-press), research
-  papers and notes, patents, trademarks, defensive disclosures, the
-  toolbox, the spoken works, ventures and companies, funds, and writing.
+  papers and notes, patents, trademarks, defensive disclosures, the toolbox,
+  the spoken works, ventures and companies, funds, the Network's hunts, and
+  writing.
 - **FR-007**: The toolbox MUST present every Public skill with its text,
-  and every book companion that is Public, as tools a reader can use.
+  every book companion that is Public, and the interactive tools the
+  previous website offered, as tools a reader can use; an interactive tool
+  keeps the address the previous website published.
 - **FR-008**: A book's page MUST show its front cover, its public record,
-  its status (0015 FR-031), its companion and its news. Every other image
-  on the website MUST come from the frontiers-brand imagery pool
-  (0014-design-systems FR-044); a work other than a book needs no image.
+  its status (0015 FR-031), its companion and its news. Every other image on
+  the website MUST come from the frontiers-brand imagery pool
+  (0014-design-systems FR-044), except the home page's picture, which is the
+  previous website's, read from its snapshot (FR-013); a work other than a
+  book needs no image.
 - **FR-009**: Writing published on a channel the company owns, and any
   work whose authoritative text lives elsewhere, MUST be shown as a
   reference that links to where it lives, never as a copy
@@ -71,18 +76,20 @@ how addresses map to content, 0004-addressing.
   generator MAY read that register from a snapshot of the previous
   website's data held in the vault: patents, trademarks, defensive
   disclosures, research areas, pillars, notes and papers, funds, ventures,
-  companies, owned channels, the company's own descriptive text, and the
-  previous website's record pages kept as an archive. A snapshot MUST be
+  companies, the Network's hunts, owned channels, the company's own
+  descriptive text, the home page's picture, and the previous website's
+  record pages kept as an archive. A snapshot MUST be
   refreshed only by a command, never edited by hand, and MUST hold only
   what the previous website published to the public.
 - **FR-014**: The generator MUST report every address the previous
   website's sitemap lists that the generated website neither serves nor
   redirects, so nothing it published is dropped unnoticed.
+- **FR-015**: Every page MUST load the analytics container the previous
+  website used, and no other tracking.
 
 ## Out of scope
 
 - Where the files are hosted and how they are deployed.
-- Analytics and tracking on the website.
 - The rules a crawler is given (robots and AI crawler rules), which are
   the decision authority's; the generator carries the previous website's
   rules unchanged.

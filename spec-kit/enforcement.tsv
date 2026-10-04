@@ -924,11 +924,12 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0041-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
 0041-public-website FR-005	review	0041-public-website FR-005	what the home page leads with is editorial judgment
 0041-public-website FR-006	check	eidolon: eid site check	every section index and item page exists
-0041-public-website FR-007	check	eidolon: eid site check	the toolbox lists every Public skill
-0041-public-website FR-008	check	eidolon: eid site check	every image is a book cover or comes from the imagery pool
+0041-public-website FR-007	check	eidolon: eid site check	the toolbox lists every Public skill and every interactive tool answers at its address
+0041-public-website FR-008	check	eidolon: eid site check	every image is a book cover, from the imagery pool, or the home picture
 0041-public-website FR-009	none	-	no check that a reference is not a copy
 0041-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
 0041-public-website FR-011	check	eidolon: eid site check	every patent address and patent redirect from the snapshot answers
 0041-public-website FR-012	check	eidolon: eid site check	the namespace files, their content types and the not-found page exist
 0041-public-website FR-013	none	-	eid site snapshot writes the snapshot; no check of a hand edit
 0041-public-website FR-014	check	eidolon: eid site parity	lists every previous sitemap address neither served nor redirected
+0041-public-website FR-015	check	eidolon: eid site check	every page carries the one analytics container
