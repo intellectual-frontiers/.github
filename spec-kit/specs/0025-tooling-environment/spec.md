@@ -35,7 +35,8 @@ lacks. How people enter the reference environment, in which flavor, is
 - **FR-003**: A tool MUST declare its prerequisites (each runtime,
   binary, or module it needs, and any version constraint) at its point
   of use: in its own header comment, or in the README of the directory
-  that holds it.
+  that holds it. A command line's manifest (0041-command-line FR-007) is
+  the declaration at the point of use for every command it declares.
 - **FR-004**: A tool MUST keep its prerequisites to the fewest that do
   the job, preferring a runtime's standard library to a third-party
   package. A tool MUST NOT install, download, or upgrade a prerequisite
@@ -89,8 +90,10 @@ lacks. How people enter the reference environment, in which flavor, is
   in 0026-workspaces, in the ontology (`ifcore:ReferenceEnvironment`),
   in the pin file (FR-008), in each repository's `.devcontainer/` files,
   and in contributor documentation. A tool's own code and comments MUST
-  NOT name it. When a successor to workspaces-host-v3 is adopted, these
-  change; no tool does.
+  NOT name it. A hint a tool gives for a missing prerequisite MUST name
+  only the workspaces-host-v3 persona or the program that supplies it
+  (0041-command-line FR-006), never the reference environment. When a
+  successor to workspaces-host-v3 is adopted, these change; no tool does.
 
 ## Locked Python packages
 
@@ -99,7 +102,8 @@ lacks. How people enter the reference environment, in which flavor, is
   those, when all of these hold: each package is declared at the command
   or command group that needs it (FR-003) and pinned to one exact
   version; the full resolution is committed in the repository as a lock
-  with a hash for every distribution; the packages are obtained only
+  with a hash for every distribution, one lock per command group or
+  command that pins packages (0041-command-line FR-002, FR-003); the packages are obtained only
   through uv, which the reference environment supplies, into uv's own
   cache and an environment uv creates for the run, never into an
   interpreter, virtual environment or site-packages the host owns; and
@@ -145,6 +149,9 @@ lacks. How people enter the reference environment, in which flavor, is
   each prerequisite moves into workspaces-host-v3's base profile or a
   persona, per FR-006 and FR-007, or, for a Python package, into a lock,
   per FR-013.
+- A command line whose manifest declares each group's packages and
+  programs: the manifest is the declaration at the point of use, per
+  FR-003, and a group's hint names a persona or a program, per FR-012.
 - A repository whose command line fetches its Python packages from a
   committed, hashed lock through uv: allowed, per FR-013; its typesetter
   and browser still come from the reference environment's personas, per

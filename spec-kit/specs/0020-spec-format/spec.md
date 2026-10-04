@@ -80,7 +80,10 @@ where it departs from it.
   command that enforces it. A `review` row MUST cite the requirement that
   defines the review. A row MUST NOT claim a mechanism that does not
   actually test the requirement it is listed against; citing a
-  requirement in a tool's comments is not enforcement.
+  requirement in a tool's comments is not enforcement. In the public
+  root, a `.github:` row's command MUST be an `agora` command (0042-agora),
+  and the check MUST verify that the command exists in `agora`'s registry,
+  not only that the row is well-formed.
 - **FR-014**: A requirement enforced by nothing MUST be recorded as
   `none`, not omitted or credited to a general expectation that someone
   will notice. The check MUST report every `none` row on every run.
@@ -99,14 +102,16 @@ where it departs from it.
 
 - **FR-015**: The public root MUST check its own specs and enforcement
   register on every push and pull request, with a checker held in the
-  public root itself, so that the check does not depend on access to the
-  vault.
+  public root itself, `agora check` (0042-agora FR-013), so that the check
+  does not depend on access to the vault.
 - **FR-016**: The vault MUST check its own specs and register against
   the same rules using the public root's checker, not a second
-  implementation of them.
+  implementation of them, by running `agora` with `--root` pointed at the
+  vault; the output is then not stamped public (0041-command-line FR-040).
 - **FR-017**: A spec or register that breaks FR-005, FR-006 (an edge case
   citing no requirement), FR-008 (a duplicated identifier), FR-009,
-  FR-011, FR-012, FR-013 (a missing command or citation), or FR-018 (a
+  FR-011, FR-012, FR-013 (a missing citation, or a `.github:` command that is not in
+  `agora`'s registry), or FR-018 (a
   Spec ID that does not match where the spec lives) MUST fail the check.
 
 ## Out of scope
@@ -126,6 +131,10 @@ where it departs from it.
 - A requirement enforced only by a check in the vault: the public
   register still names it, by repository and command, per FR-013; the
   public check cannot run it but can verify the row is well-formed.
+- A `.github:` row naming a command `agora` does not have: the check fails,
+  per FR-013 and FR-017.
+- The vault's specs checked with the public root's rules: `agora` runs with
+  `--root` and the output says its audience is unstated, per FR-016.
 - A design system's house rules: they are a spec in that design system's
   own directory, named by its slug, and every other requirement here
   applies to them, per FR-018.

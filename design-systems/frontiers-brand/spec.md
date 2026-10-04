@@ -83,11 +83,11 @@ restating them.
   icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the icon-only mark
   centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
   80% circle a platform may crop it to; and `images/favicon.ico` at 16, 32 and 48px. They are
-  written by `tools/brand_imagery.py build` and never edited by hand.
+  written by `agora imagery build` and never edited by hand.
 - **FR-019**: Each unit MAY be signed by its unit mark, where the unit and not the house signs a
   work (a Press colophon, a fund's document): the two-line wordmark in the lockup's face and
   setting (FR-004), with the unit's name beneath it at weight 600 and 62% of the wordmark's size,
-  set by `tools/brand_decoration.py set` as one-color SVG and listed under `logo.units`. It MUST be
+  set by `agora decoration generate --only set` as one-color SVG and listed under `logo.units`. It MUST be
   placed in its unit's color or the text color (FR-003), no narrower than 160px on screen or 1.2in in
   print, and MUST NOT be combined with the landscape.
 
@@ -111,16 +111,15 @@ restating them.
   finished cover or the logo, and MUST NOT be a near-duplicate of a piece already in the pool. How
   a piece is made and approved is in `imagery/README.md`.
 - **FR-016**: Its share card MUST be `images/share-card.png`, 1200×630, the light lockup centered
-  on the surface role, written by `tools/brand_imagery.py build`.
+  on the surface role, written by `agora imagery build`.
 
 ## Decoration kit
 
 - **FR-017**: Its decoration kit (0014-design-systems FR-047) MUST be the lockup and the icon, each
-  traced from its master (the 1229×362 light lockup and the icon file) by `tools/brand_decoration.py
-  trace`, with the threshold, enlargement and speck size it was traced at recorded beside it in
+  traced from its master (the 1229×362 light lockup and the icon file) by `agora decoration generate --only trace`, with the threshold, enlargement and speck size it was traced at recorded beside it in
   `tokens.json` as `traced-from`, so the trace is repeatable and nothing in it is drawn, retouched or
   generated; and a wordmark for goods too small for the trace's detail: the name on two lines,
-  "Intellectual" over "Frontiers", set by `tools/brand_decoration.py set` in
+  "Intellectual" over "Frontiers", set by `agora decoration generate --only set` in
   `fonts/InterVariable.ttf` at the lockup wordmark's optical size and weight (FR-004), its baselines
   0.88em apart as in the master and its lines aligned on the left, with the settings recorded beside
   it as `set-from`. The wordmark is tracked 0em, not the lockup's −0.04em, so the gaps between
@@ -129,13 +128,13 @@ restating them.
   more goods. A simplified landscape mark is not part of the kit until one is designed from the
   master by hand and this spec is amended. Every ink MUST be marked `verified: false` until its
   spot-color and thread match are checked against the physical guide and card, and MUST NOT be
-  ordered before then; the check is recorded by `tools/brand_decoration.py verify`, which writes the
+  ordered before then; the check is recorded by `agora ink record`, which writes the
   matches as checked, who checked them and when (`briefs/ink-verification.md`). A vector master that
   replaces the trace is commissioned to `briefs/vector-master.md`.
 
 ## Platform packages
 
-- **FR-020**: Its Open edX brand package MUST be `openedx/`, written by `tools/brand_openedx.py build`
+- **FR-020**: Its Open edX brand package MUST be `openedx/`, written by `agora openedx build`
   from `tokens.json` with Paragon 23 (the version the tool pins), in the shape of
   `openedx/brand-openedx`: its logos are its own lockup PNGs, wrapped unchanged in SVG where the
   interface asks for SVG, never redrawn (FR-009); its favicon and share card are FR-018's and

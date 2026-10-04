@@ -11,7 +11,7 @@ work's production pipeline keeps its own record.
 | `web/<id>-<width>.webp` | The master as WebP for the web, at half and full width. |
 | `catalog.json` | What each piece shows and can stand for, and its files. Its `fields` block defines every field. |
 
-`python3 tools/brand_imagery.py check design-systems/frontiers-brand` checks the pool;
+`agora check imagery --scope frontiers-brand` checks the pool;
 `build` writes the WebP files and the share card; `measure <png>` measures a candidate.
 
 ## Choosing a piece

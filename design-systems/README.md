@@ -122,9 +122,9 @@ primitive tokens in `tokens.json` (the Design Tokens Community Group format), an
 `brand.css` declares those roles as `--brand-*` custom properties for the web, `brand.tex` declares
 them as `brand-<role>` colors and font and logo commands for print, and `tokens.json` lists its logo
 files, favicon and share card, and optionally a **decoration kit** for physical goods (one-color vector logo
-and icon, and the spot-color and thread match of each ink). `tools/brand_theme.py` writes both theme files from `tokens.json`. A brand may
+and icon, and the spot-color and thread match of each ink). `agora brand generate` writes both theme files from `tokens.json`. A brand may
 also supply an **imagery pool** (`imagery/`): the approved artwork every design system it themes
-chooses from, catalogued in `imagery/catalog.json`. `tools/brand_imagery.py` builds and checks it.
+chooses from, catalogued in `imagery/catalog.json`. `agora imagery build` builds it and `agora check imagery` checks it.
 
 A **web** design system never holds a color literal. Its semantic tokens reference the roles
 (`--fc-primary: var(--brand-primary)`), every other color (a neutral, a tint, a rule, an overlay) is
@@ -155,7 +155,7 @@ lives, with the same layout and harness, outside this repository.
 
 Every web design system's harness runs under any brand vendored beside it
 (`node <slug>/assurance/run.mjs --brand <brand>`), and fails when the brand lacks a role it uses,
-names a font it doesn't ship, or makes text unreadable. `tools/run_assurance.sh` runs every web
+names a font it doesn't ship, or makes text unreadable. `agora check design-systems` runs every web
 design system here under every brand here, including [`example-brand`](example-brand/README.md), a
 deliberately different test brand that proves no web system depends on Intellectual Frontiers'
 own colors. Each print design system's `assurance/run.py` compiles its fixtures under every brand
@@ -233,7 +233,7 @@ design system guarantees. It needs nothing but a browser:
 | --- | --- |
 | See it work | Open `<slug>/assurance/index.html`. Tests that can run from `file://` do; tests that need `fetch` or iframes are reported as **skipped**, never as passed. |
 | Run everything | Serve the directory holding the design system (here, `design-systems/`: `python3 -m http.server`) and open `/<slug>/assurance/`. Serving the parent lets a derived system check its copies against the system it derives from, vendored beside it. |
-| Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` for one system, or `tools/run_assurance.sh` for all (needs Playwright and Chromium; exits non-zero on failure; `--shots DIR` writes screenshots of every fixture). CI runs `tools/run_assurance.sh` on every push that touches `design-systems/`. |
+| Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` for one system, or `agora check design-systems` for all (needs Playwright and Chromium for the browser harnesses; exits non-zero on failure; `--shots DIR` on a harness writes screenshots of every fixture). CI runs `agora check --suite browser`, `--suite python` and `--suite images` on every push that touches `design-systems/`. |
 
 Each harness has `fixtures/` (complete pages written to the system's markup contract, which are both the
 test subjects and reference renderings), `unit.js` and `integration.js` (the suites, plus `theme.js` in a web system and `contract.js` in a brand, each with a
@@ -291,7 +291,7 @@ system from this directory:
    `fixtures/`, `unit.js`, `integration.js` and an `index.html`, and make it pass.
 3. Write its `spec.md` (Spec ID: its slug) per 0014-design-systems FR-022
    and 0020-spec-format, and add a row for each requirement to
-   `spec-kit/enforcement.tsv`. Run `python3 tools/spec_check.py`.
+   `spec-kit/enforcement.tsv`. Run `./agora check --suite spec`.
 4. Register it in `ifcore.ttl` as an `ifcore:DesignSystem` individual with
    its slug (`dcterms:identifier`), a status, a kind (`dcterms:type`; a web system adds its
    interaction models, expression and densities) and anything it derives from
