@@ -49,7 +49,8 @@ same result there.
   environment beyond the image, its `ws-repos.json`, editor extensions,
   and the environment's first-run command (FR-008). Any package, tool,
   or setup step belongs in workspaces-host-v3 (0025-tooling-environment
-  FR-007).
+  FR-007), except Python packages a tool obtains from a lock
+  (0025-tooling-environment FR-013).
 
 ## Authentication and first run
 

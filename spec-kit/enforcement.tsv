@@ -755,6 +755,7 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0025-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
 0025-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
 0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
+0025-tooling-environment FR-013	check	eidolon: eid test	test_every_package_is_pinned, test_a_stale_lock_is_a_problem; the lock check runs in eid check
 0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
 0026-workspaces FR-002	none	-	FR-010 runs only the image flavor
 0026-workspaces FR-003	none	-	no check
