@@ -181,6 +181,11 @@ restating them.
 - **OQ-1**: The lockup and icon exist only as raster masters. A vector master, commissioned to
   `briefs/vector-master.md`, would let goods carry the landscape at small sizes and signs carry it
   large; until one is delivered, FR-017's trace and wordmark stand in.
+- **OQ-2**: Every ink in the decoration kit is still `verified: false`: its spot-color and thread
+  matches have not been checked against the physical guides (`briefs/ink-verification.md`), so no
+  goods can be ordered (FR-017).
+- **OQ-3**: The house's existing business cards are not yet loaded into this brand, as the reference
+  for its stationery (0014-design-systems OQ-1).
 
 ## Key entities
 

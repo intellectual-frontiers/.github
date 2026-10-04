@@ -74,7 +74,9 @@ alternative, themed by a brand in a light and a dark tone.
 
 ## Open questions
 
-None.
+- **OQ-1**: The public https address the brand's files are served from, which every message's
+  images are linked from (`mail.py --assets`, FR-007), is not decided; until it is, no message can be
+  built for sending.
 
 ## Key entities
 
