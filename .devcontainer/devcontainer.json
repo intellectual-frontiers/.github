@@ -9,8 +9,9 @@
   "remoteEnv": {
     "WS_REPOS_CONFIG": "${containerWorkspaceFolder}/.devcontainer/ws-repos.json"
   },
-  // Nothing is installed here (0026 FR-006). Login and cloning wait for the first attach, when a person is there to
-  // log in to GitHub (0026 FR-007, FR-008).
-  "postCreateCommand": "bash -lc 'doctor || true'",
+  // Nothing is installed here (0026 FR-006). On create, workspace-links.sh puts this checkout in the ~/workspaces layout
+  // ws-repos manages and links its sibling repositories beside it (0026 FR-015); login and cloning, by ws-repos ensure
+  // into ~/workspaces, wait for the first attach, when a person is there to log in to GitHub (0026 FR-007, FR-008).
+  "postCreateCommand": "bash -lc 'git config --global --add safe.directory \"*\" && sh .devcontainer/workspace-links.sh && (doctor || true)'",
   "postAttachCommand": "bash -lc 'ws-start'"
 }
