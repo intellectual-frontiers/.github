@@ -2,14 +2,26 @@
 % harness writes iflayout.def and defines \printdir, \iffontdir and \branddir (absolute) before this file.
 \documentclass{ifarticle}
 \setpaper{title}{A Fixture Article}
+\setpaper{subtitle}{A subtitle set in italics: it’s checked}
+\setpaper{author}{Shahid N. Shah}
+\setpaper{orcid}{0000-0002-1825-0097}
+\setpaper{affiliation}{Intellectual Frontiers (Fixture-Affiliation: A-B)}
+\setpaper{tag}{Working paper}
+\setpaper{revnumber}{1.0}
+\setpaper{revdate}{1 January 2026}
+\setpaper{keywords}{fixture, text-layer}
+\setpaper{cite}{Shah, S. (2026). A Fixture Article. Intellectual Frontiers Research, v1.0.}
 \begin{document}
 \def\themelog#1{\extractcolorspecs{#1}{\themelogmodel}{\themelogspec}\typeout{THEME #1=\themelogmodel:\themelogspec}}
 \themelog{ifink}\themelog{ifgray}\themelog{ifrule}\themelog{iftint}
+\makepapertitle{An abstract set in the sans.}{}{}
 \section{Introduction}
 Body text in the layout's typeface. It runs long enough to fill a paragraph across the column, with
 \textbf{bold} and \textit{italic} words and a link to \href{https://example.com}{a source}.
 {\color{brand-primary} A line in the primary color.} {\color{brand-secondary} A line in the secondary color.}
 {\ifsans\bfseries NOTE: A-B (C) 2026-10 \copyright{} 2026 Shahid, it’s “set in the sans”.}
+{\ifsans\itshape ORCID 0000-0002-1825-0097 NOTE: A-B (C) it’s}\par
+{\ifsans\bfseries\itshape ORCID 0000-0002-1825-0097 NOTE: A-B (C)}\par
 \section{Method}
 More text under a second heading.
 \end{document}
