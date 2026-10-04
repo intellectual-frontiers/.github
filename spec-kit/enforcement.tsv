@@ -801,7 +801,7 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0028-compliance-controls FR-020	none	-	whether an audience stands for a marking is judgment
 0028-compliance-controls FR-021	none	-	no system holding Controlled Unclassified Information is modelled yet
 0028-compliance-controls FR-022	check	eidolon: eid check compliance	a Grant to an Agreement naming a boundary states validUntil within a year of validFrom
-0028-compliance-controls FR-023	check	eidolon: eid check compliance	an assessment reference describes a boundary and states dcterms:valid; reports are kept out by eid check sensitive
+0028-compliance-controls FR-023	check	eidolon: eid check compliance	an assessment reference describes a boundary, and states dcterms:valid once verified; an unverified one fails eid compliance status; reports are kept out by eid check sensitive
 0028-compliance-controls FR-024	check	eidolon: eid check compliance	runs in make check on every push to the vault
 0028-compliance-controls FR-025	check	eidolon: eid compliance status	weekly; the compliance workflow keeps one compliance issue current
 0029-government-registrations FR-001	check	eidolon: eid check compliance	each registration reference carries exactly one registration kind
@@ -879,7 +879,7 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0036-risk-management-policy FR-005	review	0036-risk-management-policy FR-003	the assessment covers vendors and disruption
 0037-vendor-management-policy FR-001	check	eidolon: eid check compliance	vendor, data classes, owner role, Agreement, at most one criticality
 0037-vendor-management-policy FR-002	check	eidolon: eid check compliance	a critical vendor, or one holding declared-only classes, needs a Decision naming it
-0037-vendor-management-policy FR-003	check	eidolon: eid check compliance	a critical vendor holds assurance re-verified yearly with dcterms:valid; lapsing assurance is in eid compliance status
+0037-vendor-management-policy FR-003	check	eidolon: eid check compliance	a critical vendor holds assurance re-verified yearly, stating dcterms:valid once verified; unverified or lapsing assurance fails eid compliance status
 0037-vendor-management-policy FR-004	none	-	complementary user entity controls not yet recorded
 0037-vendor-management-policy FR-005	review	0037-vendor-management-policy FR-006	the yearly vendor review reads the agreement's terms
 0037-vendor-management-policy FR-006	review	0037-vendor-management-policy FR-006	defines the yearly vendor review
