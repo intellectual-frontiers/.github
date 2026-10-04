@@ -5,6 +5,8 @@ help = "Specs, requirements, the enforcement register, the ontology's terms and 
 help = "A spec: a numbered spec or a design system's spec (0020-spec-format)"
 [nouns.requirement]
 help = "One FR of a spec, and how it is enforced (0020-spec-format FR-011)"
+[nouns.design-system]
+help = "A design system: its spec, its entry in the ontology and its harness (0014-design-systems)"
 [nouns.term]
 help = "A concept or scheme of the ontology (0019-controlled-vocabulary)"
 [nouns.environment]

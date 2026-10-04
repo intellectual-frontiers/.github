@@ -17,7 +17,7 @@ DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
 SECTIONS = {"specs", "register", "controls", "ontology", "environment", "commands", "ui", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
 SUITES = {"spec": {"specs", "register", "controls", "ontology", "environment", "commands", "ui"},
-          "browser": {"design-systems --runner browser", "openedx"},
+          "browser": {"design-systems --runner browser", "openedx", "ui --runner browser"},
           "python": {"design-systems --runner python"},
           "images": {"imagery"}}
 
@@ -45,6 +45,9 @@ def check_layout(home: Path, registry) -> list[Finding]:
     gi = home / ".gitignore"
     if not logs or not gi.is_file() or f"{logs.rstrip('/')}/" not in gi.read_text(encoding="utf-8").split():
         f.append(Finding("error", ".gitignore", f"must list the log directory {logs or '(none named)'}/ (0042 FR-021)"))
+    ui_dir = registry.root_manifest.get("ui")
+    if not ui_dir or not gi.is_file() or f"{ui_dir.rstrip('/')}/" not in gi.read_text(encoding="utf-8").split():
+        f.append(Finding("error", ".gitignore", f"must list the web UIs' state directory {ui_dir or '(none named)'}/ (0042 FR-023)"))
     # FR-007: exactly the three decision commands; FR-013, FR-014: the sections and suites the spec declares.
     decisions = {c.id for c in registry.commands.values() if c.category == "decision"}
     if decisions != DECISIONS:

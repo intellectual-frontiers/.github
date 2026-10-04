@@ -156,7 +156,7 @@ agora               the command line: one launcher (needs uv and Python 3) that
 tools/
   agora/            agora's code: core, lib, groups/<group>/ (each with its
                     agora.toml, and an agora.lock where it pins packages),
-                    and tests/
+                    vendor/ (Datastar, the web UIs' interactivity), and tests/
   reference-environment
                     the workspaces-host-v3 commit every tool is guaranteed
                     to run in (0025-tooling-environment)
@@ -170,6 +170,7 @@ content/
   journal/          public content documents (the only content root)
 .agora/
   logs/             agora's untracked action logs (gitignored, 0041 FR-042)
+  ui/               the state of a running web UI: pid, port, address (gitignored)
   proposals/        changes proposed for a person to decide (tracked)
 design-systems/
   README.md         what a design system is, its kinds, and how to use any one
@@ -300,8 +301,15 @@ a prompt (0042-agora FR-002). It reads nothing outside this repository.
   host, and `doctor` says which are missing (0025 FR-013, 0041).
 - Git is the only record: `agora` never commits or pushes. What is not worth a
   commit goes to untracked logs in `.agora/logs/`.
-- `./agora ui open console` opens the local web UI; `./agora mcp serve` serves
-  its commands to an AI agent, except decisions, which only a person makes.
+- `./agora ui open console` opens the console, the local web UI for the registry:
+  each noun and command, each resource as a page, and a form and a run for every
+  command the `ui` surface exposes (a write shows its `--dry-run` first, a decision
+  needs your confirmation). `./agora ui open assurance` serves the design systems'
+  in-browser harnesses and lists each page per brand, in place of a bare static
+  server. `ui serve UI` runs one in the foreground, `ui link UI` prints its address and
+  `ui stop UI` stops it; `./agora check ui` proves both serve and render offline.
+  `./agora mcp serve` serves its commands to an AI agent, except decisions, which only
+  a person makes.
 - To add a command: spec first (0042), then its individual in the ontology, then
   its code in a group under `tools/agora/groups/`.
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .registry import Registry
 
@@ -20,6 +20,8 @@ class Ctx:
     env: dict[str, str] = field(default_factory=dict)
     values: dict[str, Any] = field(default_factory=dict)  # the parsed arguments, for logging
     section_options: dict[str, Any] = field(default_factory=dict)  # `check`'s --runner, --brand, --paragon, for the sections
+    no_log: bool = False  # a check that drives a UI keeps its own calls out of the action log
+    on_section: Callable[[str, str, Any], None] | None = None  # `check` reports each section as it starts and ends (a UI streams it)
 
     @property
     def relocated(self) -> bool:

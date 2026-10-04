@@ -156,15 +156,16 @@ class Selection(unittest.TestCase):
         code, doc = run_json(["check", "--suite", "spec"])
         self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual([s["name"] for s in doc["data"]["sections"]],
-                         ["specs", "register", "controls", "ontology", "environment", "commands"])
-        self.assertEqual(doc["data"]["planned"], [{"name": "ui", "reason": "planned: not implemented yet"}])
+                         ["specs", "register", "controls", "ontology", "environment", "commands", "ui"])
+        self.assertEqual(doc["data"]["planned"], [])
         self.assertEqual(doc["audience"], "public")
 
     def test_a_planned_section_never_passes(self):
-        for argv in (["check", "ui"],):
-            with self.subTest(argv=argv):
-                code, doc = run_json(argv)
-                self.assertEqual((code, doc["kind"], doc["data"]["code"]), (1, "error", "not-implemented"))
+        from agora.core.registry import Registry, Section
+        reg = Registry.load(HOME)
+        reg.sections["ghost"] = Section("ghost", status="planned")
+        code, doc = run_json(["check", "ghost"], registry=reg)
+        self.assertEqual((code, doc["kind"], doc["data"]["code"]), (1, "error", "not-implemented"))
 
     def test_plain_check_runs_every_implemented_section_and_lists_the_planned(self):
         from unittest import mock
@@ -172,14 +173,14 @@ class Selection(unittest.TestCase):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
         for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
-                  "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
+                  "merchandise", "ui"):  # the harnesses, item checks and UIs have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
             reg.sections[n].programs = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 17)
-        self.assertIn("ui", [p["name"] for p in doc["data"]["planned"]])
+        self.assertEqual(doc["data"]["summary"]["run"], 18)
+        self.assertEqual(doc["data"]["planned"], [])
         self.assertNotIn("design-systems", [p["name"] for p in doc["data"]["planned"]])
 
     def test_scope_and_options_must_apply(self):

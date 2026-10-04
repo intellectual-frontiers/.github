@@ -7,6 +7,7 @@ register_name = ".github"
 groups = ["core", "spec", "assurance", "brand", "decoration", "layout", "items"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
+ui = ".agora/ui"                # untracked state of a running web UI: its pid, port and address (0042 FR-023)
 
 # What the launcher needs from the host (0041 FR-001, FR-006). The hint names the program, never the reference environment.
 [prerequisites.uv]
@@ -17,11 +18,11 @@ hint = "install Python 3.11 or later from the host"
 # Suites (0041 FR-031; 0042 FR-014). `sections` is what the suite runs today; `planned` names what it will run once
 # implemented. A section appears in no suite it does not belong to, and none is left out silently.
 [suites.spec]
-sections = ["specs", "register", "controls", "ontology", "environment", "commands"]
-planned = ["ui"]
+sections = ["specs", "register", "controls", "ontology", "environment", "commands", "ui"]
+planned = []
 [suites.browser]
-sections = ["design-systems", "openedx"]
-options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems; openedx takes no runner
+sections = ["design-systems", "openedx", "ui"]
+options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems and the console in a browser; openedx takes no runner
 planned = []
 [suites.python]
 sections = ["design-systems"]
@@ -32,9 +33,7 @@ sections = ["imagery"]
 planned = []
 
 # Sections declared and not yet implemented: a name `check` rows may cite, which fails if run (it is reported as
-# planned, never as passed). A step that implements one moves it into its group's manifest.
-[planned.sections.ui]
-step = "ui"
+# planned, never as passed). A step that implements one moves it into its group's manifest. None is planned now.
 
 # Generators declared (0042-agora FR-015) and not yet implemented: `fresh` names them as planned and proves nothing for them.
 [planned.generators.agent-skill]
@@ -44,15 +43,8 @@ help = "The files that tell an AI agent how to use agora, from the registry (004
 # Commands declared in the ontology (0042 FR-004, FR-005, FR-006) and not yet implemented, with their categories. A
 # step that implements one deletes its line here; `check commands` fails if a command is in both places.
 [planned.commands]
-"ui serve" = "setup"
-"ui open" = "setup"
-"ui stop" = "setup"
-"ui link" = "read"
 "mcp serve" = "setup"
 "proposal list" = "read"
 "proposal show" = "read"
 "proposal new" = "record"
 "proposal advance" = "decision"
-"design-system list" = "read"
-"design-system show" = "read"
-"design-system new" = "generate"

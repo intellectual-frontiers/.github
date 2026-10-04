@@ -232,7 +232,7 @@ design system guarantees. It needs nothing but a browser:
 | To | Do |
 | --- | --- |
 | See it work | Open `<slug>/assurance/index.html`. Tests that can run from `file://` do; tests that need `fetch` or iframes are reported as **skipped**, never as passed. |
-| Run everything | Serve the directory holding the design system (here, `design-systems/`: `python3 -m http.server`) and open `/<slug>/assurance/`. Serving the parent lets a derived system check its copies against the system it derives from, vendored beside it. |
+| Run everything | Serve the directory holding the design system (here, `design-systems/`: `python3 -m http.server`) and open `/<slug>/assurance/`. Serving the parent lets a derived system check its copies against the system it derives from, vendored beside it. In this repository, `agora ui open assurance` serves `design-systems/` and lists each system's page once for every brand that themes it. |
 | Gate a change from a terminal or CI | `node <slug>/assurance/run.mjs` for one system, or `agora check design-systems` for all (needs Playwright and Chromium for the browser harnesses; exits non-zero on failure; `--shots DIR` on a harness writes screenshots of every fixture). CI runs `agora check --suite browser`, `--suite python` and `--suite images` on every push that touches `design-systems/`. |
 
 Each harness has `fixtures/` (complete pages written to the system's markup contract, which are both the
