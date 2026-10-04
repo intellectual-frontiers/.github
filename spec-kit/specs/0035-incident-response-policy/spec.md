@@ -67,9 +67,10 @@ incident happened and what it touched, never its specifics.
 ## Learning
 
 - **FR-009**: An incident of high or critical severity MUST be reviewed
-  within thirty days of being contained. The review states its cause and
-  the changes that prevent it from recurring. Each change is made as a
-  spec amendment or a disposition, never only as a note.
+  within thirty days of being contained. The review MUST be recorded as a
+  `Decision` that names the incident by `schema:about`, and states its
+  cause and the changes that prevent it from recurring. Each change is
+  made as a spec amendment or a disposition, never only as a note.
 - **FR-010**: This policy MUST be exercised at least once a year, through
   a walk-through of a plausible incident, and each exercise MUST be
   recorded as evidence (0028-compliance-controls FR-018).
