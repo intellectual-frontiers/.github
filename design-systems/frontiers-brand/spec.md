@@ -44,7 +44,7 @@ restating them.
 
 - **FR-004**: The house sans MUST be Inter and the house serif Source Serif 4, both under the SIL
   Open Font License, stated in `tokens.json` under `typeface`. The name "Intellectual Frontiers",
-  wherever it is set in running type, MUST be Inter Bold (`wordmark-weight`). The lockup's own
+  wherever it is set in running type, MUST be Inter Bold (`name-weight`). The lockup's own
   wordmark is drawn in Inter at its Display optical size, weight 850, tracked −0.04em, as measured
   against the master; a wordmark set apart from the lockup MUST be set in that face (FR-017). A design
   system it themes MAY add a family its medium needs (a monospace, a print heading face) and MUST
@@ -78,6 +78,18 @@ restating them.
   only as legibility at that size requires. A refreshed logo MUST ship as a new dated set of
   files beside the existing set, never replacing a file in place.
 - **FR-013**: The favicon MUST be `images/favicon.png`, a 64×64 rendering of the icon-only mark.
+
+- **FR-018**: Its app icons MUST be those `tokens.json` lists under `logo.app-icons`: an Apple touch
+  icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the icon-only mark
+  centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
+  80% circle a platform may crop it to; and `images/favicon.ico` at 16, 32 and 48px. They are
+  written by `tools/brand_imagery.py build` and never edited by hand.
+- **FR-019**: Each unit MAY be signed by its unit mark, where the unit and not the house signs a
+  work (a Press colophon, a fund's document): the two-line wordmark in the lockup's face and
+  setting (FR-004), with the unit's name beneath it at weight 600 and 62% of the wordmark's size,
+  set by `tools/brand_decoration.py set` as one-color SVG and listed under `logo.units`. It MUST be
+  placed in its unit's color or the text color (FR-003), no narrower than 160px on screen or 1.2in in
+  print, and MUST NOT be combined with the landscape.
 
 ## Imagery
 
@@ -117,7 +129,22 @@ restating them.
   more goods. A simplified landscape mark is not part of the kit until one is designed from the
   master by hand and this spec is amended. Every ink MUST be marked `verified: false` until its
   spot-color and thread match are checked against the physical guide and card, and MUST NOT be
-  ordered before then.
+  ordered before then; the check is recorded by `tools/brand_decoration.py verify`, which writes the
+  matches as checked, who checked them and when (`briefs/ink-verification.md`). A vector master that
+  replaces the trace is commissioned to `briefs/vector-master.md`.
+
+## Platform packages
+
+- **FR-020**: Its Open edX brand package MUST be `openedx/`, written by `tools/brand_openedx.py build`
+  from `tokens.json` with Paragon 23 (the version the tool pins), in the shape of
+  `openedx/brand-openedx`: its logos are its own lockup PNGs, wrapped unchanged in SVG where the
+  interface asks for SVG, never redrawn (FR-009); its favicon and share card are FR-018's and
+  FR-016's; its fonts are the web files of its font roles; and its token overrides map its roles
+  onto Paragon's (primary, secondary, accent as brand, success, info, warning, danger, paper as
+  light, text as dark and as body and headings, link, surface as background), with Paragon's grays
+  replaced by its text mixed into its surface at each gray's own luminance. Every built pair of
+  body, headings, link, muted text and each button's text on its background MUST meet 4.5:1, and
+  the committed `openedx/dist/` MUST be what the build writes.
 
 ## Out of scope
 
@@ -140,6 +167,8 @@ restating them.
 - A size between two shipped files: the nearest larger file is scaled down, per FR-008.
 - A work with no good match in the imagery pool: a new piece is made and approved per FR-015; a
   piece is never adapted for one work.
+- A managed Open edX host that takes only a theme URL, or only a logo and colors: it is given
+  `openedx/dist/` as it is, or the colors FR-020's token overrides name, per FR-020.
 - Goods too small for the trace's detail (a cap, a polo's left chest, a pen): the wordmark is used,
   per FR-017; the lockup and icon are never traced coarser for them.
 
@@ -149,13 +178,21 @@ restating them.
 
 ## Open questions
 
-None.
+- **OQ-1**: The lockup and icon exist only as raster masters. A vector master, commissioned to
+  `briefs/vector-master.md`, would let goods carry the landscape at small sizes and signs carry it
+  large; until one is delivered, FR-017's trace and wordmark stand in.
+- **OQ-2**: Every ink in the decoration kit is still `verified: false`: its spot-color and thread
+  matches have not been checked against the physical guides (`briefs/ink-verification.md`), so no
+  goods can be ordered (FR-017).
+- **OQ-3**: The house's existing business cards are not yet loaded into this brand, as the reference
+  for its stationery (0014-design-systems OQ-1).
 
 ## Key entities
 
 - **Brand color** — one of the five named colors and white in `tokens.json`.
 - **Unit color** — the one color identifying a business unit.
 - **Lockup** — the landscape and two-line wordmark as one fixed image, light or dark.
+- **Unit mark** — the wordmark with a unit's name beneath it, for a unit that signs a work.
 - **Icon-only mark** — the landscape cropped from the master, without the wordmark.
 - **Decoration kit** — the lockup and icon traced to one-color vector art and the wordmark set in
   the lockup's face, with each ink's spot-color and thread match, for goods.

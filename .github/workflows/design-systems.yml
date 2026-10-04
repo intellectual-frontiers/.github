@@ -6,9 +6,9 @@ name: design-systems
 
 on:
   push:
-    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", "tools/brand_openedx.py", ".github/workflows/design-systems.yml"]
   pull_request:
-    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", ".github/workflows/design-systems.yml"]
+    paths: ["design-systems/**", "tools/run_assurance.sh", "tools/brand_imagery.py", "tools/brand_decoration.py", "tools/brand_openedx.py", ".github/workflows/design-systems.yml"]
 
 permissions:
   contents: read
@@ -27,6 +27,11 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Browser harnesses
         run: tools/run_assurance.sh --browser
+      - name: Open edX brand package, rebuilt with Paragon
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q python3-pil
+          npm install --prefix "$RUNNER_TEMP/paragon" --no-audit --no-fund @openedx/paragon@23.23.0
+          PARAGON="$RUNNER_TEMP/paragon/node_modules/.bin/paragon" python3 design-systems/frontiers-brand/assurance/run.py
 
   tex:
     runs-on: ubuntu-latest
@@ -35,7 +40,7 @@ jobs:
       - name: TeX Live, poppler, Pillow and librsvg
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils python3-pil librsvg2-bin
+          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils python3-pil python3-fonttools python3-lxml librsvg2-bin
       - name: Python harnesses (print on TeX Live, merchandise, figures)
         run: tools/run_assurance.sh --tex
 

@@ -73,7 +73,7 @@ def semantic_problems(root) -> list[str]:
         if el.get("font-family") is not None:
             problems.append(f"<{tag}> font-family: the label's family comes from the theme")
         for c in (el.get("class") or "").split():
-            m = re.fullmatch(r"([fsc])-([a-z-]+)", c)
+            m = re.fullmatch(r"([fsc])-([a-z0-9-]+)", c)
             if not m or m.group(2) not in ROLES:
                 problems.append(f"<{tag}> class {c!r} is not a figure-role class")
     return problems

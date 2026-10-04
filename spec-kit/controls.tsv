@@ -1,4 +1,4 @@
-# Which control each requirement in this repository's specs addresses (0027-compliance-controls FR-005, FR-006).
+# Which control each requirement in this repository's specs addresses (0028-compliance-controls FR-005, FR-006).
 # control: <catalog notation>:<control notation>, as the ontology's ControlCatalogs declare them. A row says the
 # requirement's rule addresses the control, in full or in part; whether a boundary meets the control is the
 # assessor's judgment (0027 Assumptions). One row per requirement and control; the specs are never restated per framework.
@@ -40,9 +40,9 @@ requirement	control	note
 0023-domain-security FR-019	soc2:CC8.1	a DNS change that breaks the baseline is refused before deployment
 0023-domain-security FR-022	soc2:CC2.3	a published contact for reporting weaknesses
 0023-domain-security FR-023	soc2:CC7.2	certificate issuance watched for anomalies
-0027-compliance-controls FR-012	soc2:CC3.2	every departure from a control is a decided, lapsing risk record
-0027-compliance-controls FR-014	soc2:CC4.1	each run that shows a control operated is recorded
-0027-compliance-controls FR-015	soc2:CC4.1	the evidence ledger is tamper-evident
-0027-compliance-controls FR-019	soc2:C1.1	contract-protected information never enters any repository
-0027-compliance-controls FR-022	soc2:CC6.2	an assessor's access is granted for the engagement and ends
-0027-compliance-controls FR-025	soc2:CC4.2	gaps and lapsing dispositions reported weekly
+0028-compliance-controls FR-012	soc2:CC3.2	every departure from a control is a decided, lapsing risk record
+0028-compliance-controls FR-014	soc2:CC4.1	each run that shows a control operated is recorded
+0028-compliance-controls FR-015	soc2:CC4.1	the evidence ledger is tamper-evident
+0028-compliance-controls FR-019	soc2:C1.1	contract-protected information never enters any repository
+0028-compliance-controls FR-022	soc2:CC6.2	an assessor's access is granted for the engagement and ends
+0028-compliance-controls FR-025	soc2:CC4.2	gaps and lapsing dispositions reported weekly

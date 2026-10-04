@@ -1,0 +1,19 @@
+{
+  "edits": [
+    [
+      "units/02-checking-the-estimate/01-the-gap.adoc",
+      ":outcomes: O3",
+      ":outcomes: O1"
+    ],
+    [
+      "units/02-checking-the-estimate/02-compare.adoc",
+      ":outcomes: O3",
+      ":outcomes: O1"
+    ],
+    [
+      "units/02-checking-the-estimate/03-discuss.adoc",
+      ":outcomes: O2, O3",
+      ":outcomes: O2"
+    ]
+  ]
+}

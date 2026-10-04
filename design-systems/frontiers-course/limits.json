@@ -1,0 +1,35 @@
+{
+  "$description": "frontiers-course's limits (spec FR-005 to FR-012). Verbs are the observable verbs an outcome may begin with, after Anderson and Krathwohl's revision of Bloom's taxonomy; vague verbs name a state of mind no one can observe.",
+  "formats": ["self-paced", "instructor-paced"],
+  "lesson_types": {
+    "reading": {"max_minutes": 20, "wpm": 200},
+    "video": {"max_minutes": 12, "wpm": 150},
+    "exercise": {"max_minutes": 45},
+    "discussion": {"max_minutes": 20}
+  },
+  "item_types": ["multiple-choice", "multiple-response", "numeric", "text-match"],
+  "outcomes": [3, 8],
+  "lessons_per_unit": [1, 8],
+  "choices": [3, 5],
+  "minutes_tolerance": 0.3,
+  "minutes_slack": 2,
+  "week_effort": [0.5, 1.15],
+  "verbs": [
+    "analyze", "apply", "argue", "assess", "calculate", "choose", "classify", "compare", "compute", "construct",
+    "contrast", "convert", "create", "critique", "define", "demonstrate", "derive", "describe", "design", "diagram",
+    "differentiate", "distinguish", "draft", "estimate", "evaluate", "explain", "formulate", "identify", "implement",
+    "interpret", "judge", "justify", "list", "map", "measure", "model", "name", "organize", "plan", "predict",
+    "prioritize", "produce", "rank", "recall", "recommend", "select", "sketch", "solve", "state", "summarize", "test",
+    "trace", "translate", "use", "write"
+  ],
+  "vague_verbs": [
+    "understand", "know", "learn", "appreciate", "grasp", "comprehend", "realize", "believe", "internalize",
+    "be aware", "be familiar", "become familiar", "gain an understanding", "have an appreciation"
+  ],
+  "generic_link_text": ["click here", "here", "this link", "link", "read more", "more", "this page", "this"],
+  "sensory_only": [
+    "\\b(?:the|in) (?:red|green|blue|orange|yellow|purple) (?:one|line|box|button|bar|text|area|dot)s?\\b",
+    "\\b(?:on|to) the (?:left|right)\\b",
+    "\\bshown in (?:red|green|blue|orange|yellow|purple)\\b"
+  ]
+}

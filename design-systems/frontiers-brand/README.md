@@ -13,11 +13,15 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | `logos/` | The lockup as PNG in every size, light and dark; the icon-only mark. |
 | `logos/web/` | The lockup as WebP in every size below the master, light and dark. |
 | `logos/vector/` | The decoration kit: the lockup and icon as one-color SVG, traced from their masters by `tools/brand_decoration.py trace`, and the two-line wordmark for small goods, set by `tools/brand_decoration.py set`; listed in `tokens.json` with their finest detail and each ink's candidate spot-color and thread match. |
+| `briefs/` | Work only people can do: commissioning a vector master of the lockup (`vector-master.md`) and verifying the decoration kit's ink matches against physical guides (`ink-verification.md`). |
 | `fonts/` | Inter's variable font (SIL OFL 1.1), the face the lockup's wordmark is drawn in, for setting the kit's wordmark. |
+| `images/icons/`, `images/favicon.ico` | The app icons (Apple touch, 192, 512, maskable 512) and the multi-size favicon, written by `tools/brand_imagery.py build` from the icon-only mark. |
+| `logos/units/` | Each unit's mark: the wordmark with the unit's name, one-color SVG, set by `tools/brand_decoration.py set`. |
 | `images/favicon.png` | The icon-only mark at 64×64. |
 | `images/share-card.png` | The link-preview card, 1200×630: the light lockup on the surface. |
 | `imagery/` | The imagery pool: the approved frontier artwork every design system this brand themes chooses from, with `catalog.json` and WebP files for the web. See [`imagery/README.md`](imagery/README.md). |
-| `assurance/` | Tests that double as documentation: the brand contract every brand meets (`contract.js`), this brand's own rules (`unit.js`) and a specimen. `node assurance/run.mjs` runs them headlessly. |
+| `openedx/` | The brand's Open edX brand package (Paragon 23 design tokens, logos, favicon, fonts) with its build in `openedx/dist/`, written by `tools/brand_openedx.py build`. See [`openedx/README.md`](openedx/README.md). |
+| `assurance/` | Tests that double as documentation: the brand contract every brand meets (`contract.js`), this brand's own rules (`unit.js`) and a specimen. `node assurance/run.mjs` runs them headlessly; `python3 assurance/run.py` checks the Open edX package. |
 
 ## Using it
 

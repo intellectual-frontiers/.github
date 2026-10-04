@@ -423,7 +423,7 @@ any number of each kind.
   the tools that render them.
 - **FR-048**: Every figure a web, print or slide presentation carries MUST be
   drawn with a figure design system and themed by the same brand as the
-  presentation. A web, print or slides design system MUST name in the
+  presentation. A web, print, slides or course design system MUST name in the
   ontology, by `ifcore:drawsFiguresWith`, the figure design system its pages use,
   and MUST NOT define its own figure colors. A raster figure (a screenshot,
   a photograph) is a work's own asset and is exempt.
@@ -476,6 +476,27 @@ any number of each kind.
   checker over messages that must fail. It MUST be classified in the
   ontology, by `dcterms:type`, with every **email type** it sends. Its
   consumers are the tools and people that send the house's email.
+
+## Kind profile: course
+
+- **FR-052**: A course design system governs how a long-form course is
+  structured, paced, assessed and made accessible: its outcomes, units,
+  lessons and assessments, the effort each asks of a learner, and the
+  delivery targets it is compiled to. Its machine-readable form is a schema
+  for a course's model, its limits, and the tool that reads a course's
+  source into that model and checks it. A course's outcomes MUST each be
+  taught by a lesson and assessed by an item (constructive alignment), its
+  stated minutes MUST be honest for its text and video, and its lessons
+  MUST meet WCAG 2.2 AA in what a source can carry (alternative text,
+  captions, transcripts, headings, link text). It spans how a course looks
+  and how it reads: its figures come from a figure design system (FR-048),
+  its text and transcripts are checked against the house voice, and its
+  delivery targets are themed by a brand (FR-038, FR-044). Its harness
+  checks a fixture course that must pass and edits of it that must fail. It
+  MUST be classified in the ontology, by `dcterms:type`, with every
+  **course format** it supports, every **assessment item type** it
+  grades, and every **delivery target** it compiles to. Its consumers are works, their courses, and the platforms
+  courses are delivered on.
 
 ## Kind profile: written voice
 
@@ -583,7 +604,22 @@ any number of each kind.
 
 ## Open questions
 
-None.
+- **OQ-1**: No kind governs the house's own business documents (letterhead, proposals, invoices,
+  contracts, memos, one-pagers) or its stationery. The business cards the house already has are to
+  be loaded as the first of them. Whether this is one kind or two (documents, and stationery under
+  print) is not decided.
+- **OQ-2**: No kind governs motion and sound: animated titles and lower thirds, intro and outro
+  stings, caption styling burned into video, a podcast's music and loudness. A media design system
+  covers still images (FR-050) and a spoken-voice design system covers words (FR-034); whether
+  motion and sound are one kind or two is not decided.
+- **OQ-3**: Consumers pin each design system by commit (FR-026), but no design system records what
+  changed between commits or whether a change breaks a consumer. Whether each keeps a change record,
+  a version, or both is not decided.
+- **OQ-4**: No design system is checked in a language other than English or in a right-to-left
+  script; what each must support before a work is translated is not stated.
+- **OQ-5**: Whether every web design system must offer a dark tone, as figure, slides and email
+  design systems do, is not decided.
+- **OQ-6**: No spec requires an accessibility statement for the house's public web properties.
 
 ## Key entities
 

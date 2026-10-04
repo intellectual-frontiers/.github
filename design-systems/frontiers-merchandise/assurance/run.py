@@ -91,6 +91,15 @@ def run(brand_dir: Path) -> Result:
         problems = decoration.check(resolve(case["job"], brand), brand)
         r.check(any(case["expect"] in p for p in problems),
                 f"fail/{path.name} should break the rule about {case['expect']!r} under {brand_dir.name}; it reported: {'; '.join(problems) or 'nothing'}")
+    # An order in an unverified ink is refused; the same job as a proof is not (FR-008).
+    for ink, match in brand.kit["inks"].items():
+        if match.get("verified") is False:
+            job = {"product": "t-shirt", "location": "full-front", "method": "screen-printing", "artwork": brand.artwork()[0],
+                   "ink": ink, "substrate": "#ffffff", "width_in": 11.9}
+            ordered = decoration.check({**job, "order": True}, brand)
+            r.check(any("not verified" in p for p in ordered), f"an order in the unverified ink {ink} under {brand_dir.name} is not refused")
+            r.check(not any("not verified" in p for p in decoration.check(job, brand)), f"a proof in the unverified ink {ink} under {brand_dir.name} is refused")
+            break
     for slug, product in decoration.PRODUCTS["products"].items():
         fits = []
         for art in brand.artwork():

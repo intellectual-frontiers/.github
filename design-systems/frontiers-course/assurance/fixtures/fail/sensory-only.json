@@ -1,0 +1,9 @@
+{
+  "edits": [
+    [
+      "units/01-breaking-it-down/01-factors.adoc",
+      "== Why the errors cancel",
+      "The answer is the red bar.\n\n== Why the errors cancel"
+    ]
+  ]
+}

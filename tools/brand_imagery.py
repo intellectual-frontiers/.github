@@ -3,7 +3,8 @@
 
     python3 tools/brand_imagery.py build design-systems/<brand> [...]
         Write each piece's WebP files for the web (the widths imagery/catalog.json lists under "web") and
-        images/share-card.png (the brand's lockup centered on its surface, 1200x630).
+        images/share-card.png (the brand's lockup centered on its surface, 1200x630), and the app icons tokens.json
+        lists with images/favicon.ico (the icon-only mark on the surface, never enlarged).
 
     python3 tools/brand_imagery.py check design-systems/<brand> [...]
         Every catalog entry complete, its master present at pixel_size with real transparency and the
@@ -88,6 +89,41 @@ def luminance(hex_color: str) -> float:
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
 
 
+def icon_master(brand: Path) -> Path:
+    tokens = json.loads((brand / "tokens.json").read_text(encoding="utf-8"))
+    files = tokens["$extensions"]["com.intellectualfrontiers.logo"]["icon"]["files"]
+    return brand / max(files, key=lambda f: f["width"])["file"]
+
+
+def app_icons(brand: Path) -> list[dict]:
+    tokens = json.loads((brand / "tokens.json").read_text(encoding="utf-8"))
+    return tokens["$extensions"]["com.intellectualfrontiers.logo"].get("app-icons", {}).get("files", [])
+
+
+def build_icons(brand: Path) -> int:
+    """Each app icon (frontiers-brand FR-018): the icon-only mark centered on the brand's surface, inside the share of
+    the canvas its purpose keeps clear (a maskable icon's mark fits the 80% circle a platform may crop it to), never
+    enlarged past its master; and favicon.ico at 16, 32 and 48px."""
+    master = icon_master(brand)
+    mw, mh = size(master)
+    bg = surface(brand)
+    for icon in app_icons(brand):
+        w, h = icon["width"], icon["height"]
+        if icon["purpose"] == "maskable":
+            fit = 0.8 * min(w, h) / (mw ** 2 + mh ** 2) ** 0.5
+        else:
+            fit = 0.86 * min(w / mw, h / mh)
+        scale = min(fit, 1.0)
+        out = brand / icon["file"]
+        out.parent.mkdir(parents=True, exist_ok=True)
+        magick("-size", f"{w}x{h}", f"xc:{bg}", "(", str(master), "-resize", f"{round(mw * scale)}x{round(mh * scale)}!", ")",
+               "-gravity", "center", "-composite", "-strip", str(out))
+    ico = brand / "images" / "favicon.ico"
+    magick(str(master), "-background", "none", "-resize", "48x48", "-gravity", "center", "-extent", "48x48",
+           "-define", "icon:auto-resize=48,32,16", str(ico))
+    return len(app_icons(brand)) + 1
+
+
 def build(brand: Path) -> None:
     cat = catalog(brand)
     for piece in (cat or {}).get("pieces", []):
@@ -103,7 +139,8 @@ def build(brand: Path) -> None:
     (brand / path).parent.mkdir(parents=True, exist_ok=True)
     magick("-size", f"{w}x{h}", f"xc:{bg}", "(", str(logo), "-resize", f"{w * 46 // 100}x", ")",
            "-gravity", "center", "-composite", "-strip", str(brand / path))
-    print(f"built {brand}: {sum(len(p['web']) for p in (cat or {}).get('pieces', []))} WebP files, {path}")
+    icons = build_icons(brand) if app_icons(brand) else 0
+    print(f"built {brand}: {sum(len(p['web']) for p in (cat or {}).get('pieces', []))} WebP files, {path}, {icons} app icons")
 
 
 def check(brand: Path) -> list[str]:
@@ -113,6 +150,14 @@ def check(brand: Path) -> list[str]:
         problems.append(f"{path}: missing (python3 tools/brand_imagery.py build {brand})")
     elif size(brand / path) != [w, h]:
         problems.append(f"{path}: {size(brand / path)}, not [{w}, {h}]")
+    for icon in app_icons(brand):
+        f = brand / icon["file"]
+        if not f.is_file():
+            problems.append(f"{icon['file']}: missing (python3 tools/brand_imagery.py build {brand})")
+        elif size(f) != [icon["width"], icon["height"]]:
+            problems.append(f"{icon['file']}: {size(f)}, not [{icon['width']}, {icon['height']}]")
+    if app_icons(brand) and not (brand / "images" / "favicon.ico").is_file():
+        problems.append(f"images/favicon.ico: missing (python3 tools/brand_imagery.py build {brand})")
     cat = catalog(brand)
     if cat is None:
         return problems
