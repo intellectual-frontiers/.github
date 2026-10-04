@@ -181,7 +181,8 @@ class Registry:
         reg.audience = rm.get("audience", "public")
         for gname in rm.get("groups", []):
             reg.load_group(home / "tools" / "agora" / "groups" / gname)
-        reg.suites = {k: {"sections": list(v.get("sections", [])), "planned": list(v.get("planned", []))}
+        reg.suites = {k: {"sections": list(v.get("sections", [])), "planned": list(v.get("planned", [])),
+                          "options": dict(v.get("options", {}))}
                       for k, v in rm.get("suites", {}).items()}
         reg._load_planned(rm.get("planned", {}))
         return reg

@@ -84,3 +84,20 @@ def check_boundaries(home: Path, own_repo: str | None) -> list[Finding]:
                 if re.search(rf"(?<![\w./-]){re.escape(name)}(?![\w-])", line):
                     out.append(Finding("error", f"{f.relative_to(home)}:{n}", f"names another repository, {name} (0042 FR-003, 0041 FR-045)"))
     return out
+
+
+def check_workflows(home: Path) -> list[Finding]:
+    """0042 FR-022: every workflow calls agora, and no other tool of this repository's own (a path under tools/ but agora's)."""
+    out: list[Finding] = []
+    d = home / ".github" / "workflows"
+    for f in sorted(d.glob("*.y*ml")) if d.is_dir() else []:
+        text = f.read_text(encoding="utf-8")
+        rel = str(f.relative_to(home))
+        if not re.search(r"(?<![\w/-])\./agora(?![\w-])", text):
+            out.append(Finding("error", rel, f"a workflow calls {NAME}, as ./{NAME} (0042 FR-022)"))
+        for n, line in enumerate(text.splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue
+            for m in re.finditer(r"(?<![\w.-])tools/(?!agora(?:/|\b))[\w./-]+", line):
+                out.append(Finding("error", f"{rel}:{n}", f"calls {m.group(0)}, a tool of this repository other than {NAME} (0042 FR-022)"))
+    return out

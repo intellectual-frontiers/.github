@@ -11,7 +11,7 @@ from .resource import FAILED, MISSING, OK, USAGE, Action, AgoraError, Call, Reso
 
 
 def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: str | None, runner: str | None = None,
-                       brand: str | None = None, root_ctx: Ctx | None = None) -> list[str]:
+                       brand: str | None = None, paragon: str | None = None, root_ctx: Ctx | None = None) -> list[str]:
     """The section names `check` would run for these arguments, or an error resource (exit 2). Names are in
     declaration order, suite first."""
     reg = ctx.registry
@@ -21,6 +21,10 @@ def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: 
             raise AgoraError("invalid-argument", f"--suite {suite!r} is not a suite; the suites are {', '.join(reg.suites)}",
                              exit=USAGE, actions=[next_command("list the suites", "command show", command="check")])
         names += reg.suites[suite]["sections"]
+        for flag, value in (("runner", runner), ("brand", brand), ("paragon", paragon)):
+            fixed = reg.suites[suite].get("options", {}).get(flag)
+            if fixed and value is not None and value != fixed:
+                raise AgoraError("usage", f"--{flag} {value} conflicts with suite {suite}, which runs --{flag} {fixed}", exit=USAGE)
     names += [s for s in sections if s not in names]
     chosen = [reg.sections[n] for n in names]
     if scope is not None:
@@ -34,17 +38,21 @@ def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: 
             except ValueError as e:
                 raise AgoraError("invalid-argument", f"--scope: {e}. A {t.name} is {t.doc}", exit=USAGE,
                                  detail={"type": t.name, "value": scope}) from None
-    for flag, value in (("--runner", runner), ("--brand", brand)):
+    for flag, value in (("--runner", runner), ("--brand", brand), ("--paragon", paragon)):
         if value is not None and not any(flag in s.options for s in chosen):
             raise AgoraError("usage", f"{flag} applies to a section that declares it; none selected does", exit=USAGE)
     return names
 
 
 def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | None, changed: bool, since: str | None,
-              runner: str | None = None, brand: str | None = None) -> Resource:
+              runner: str | None = None, brand: str | None = None, paragon: str | None = None) -> Resource:
     reg = ctx.registry
     explicit = bool(sections or suite)
-    names = validate_selection(ctx, sections, suite, scope, runner, brand)
+    names = validate_selection(ctx, sections, suite, scope, runner, brand, paragon)
+    if suite:  # a suite may fix an option of its sections, such as the harness kind (0042 FR-014)
+        fixed = reg.suites[suite].get("options", {})
+        runner, brand, paragon = (v or fixed.get(k) for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon)))
+    ctx.section_options = {k: v for k, v in (("runner", runner), ("brand", brand), ("paragon", paragon)) if v}
     planned_rows: list[dict[str, str]] = []
     if not explicit:
         names = [n for n, s in reg.sections.items() if s.status == "implemented"]

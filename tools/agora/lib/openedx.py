@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-"""Write a brand's Open edX brand package from its tokens.json (frontiers-brand spec FR-020; 0014-design-systems
-FR-038).
-
-    python3 tools/brand_openedx.py write design-systems/<brand> [-o DIR] [--package NAME]
-    python3 tools/brand_openedx.py build design-systems/<brand> [-o DIR] --paragon PATH
-    python3 tools/brand_openedx.py check design-systems/<brand> [--paragon PATH]
+"""A brand's Open edX brand package: write its sources from tokens.json, build it with Paragon, and check it
+(frontiers-brand spec FR-020; 0014-design-systems FR-038).
 
 The package follows openedx/brand-openedx, the interface Open edX applications load a brand through, for
 Paragon 23's design tokens: logo.svg, logo-white.svg, logo-trademark.svg (the brand's own lockup PNGs, wrapped
@@ -18,26 +13,23 @@ brand's web fonts, and token overrides under paragon/tokens/ that Paragon's `bui
     color.bg.base, body, headings, link                                          surface, text, text, link
     typography.font.family.sans.serif and serif                                  the brand's font roles
 
-`write` writes the package's sources (DIR defaults to the brand's openedx/); `build` also runs Paragon's CLI
-(`PATH` is the paragon executable, e.g. node_modules/.bin/paragon) to write dist/, the CSS and files an Open edX
-instance or a managed host loads; `check` reports where the committed package differs from what `write` (and,
-with --paragon, `build`) would write, and every pair of built colors that misses 4.5:1. Standard library only;
-Pillow only for a brand without a favicon.ico.
+`write` writes the package's sources; `build` also runs Paragon's CLI (the paragon executable, such as
+node_modules/.bin/paragon) to write dist/, the CSS and files an Open edX instance or a managed host loads; `check`
+returns where the committed package differs from what `write` (and, given Paragon, `build`) would write, and every
+pair of built colors that misses 4.5:1. Standard library only; Pillow only for a brand without a favicon.ico.
 """
 from __future__ import annotations
 
-import argparse
 import base64
 import filecmp
 import json
 import re
 import shutil
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[3]
 FONTS = ROOT / "design-systems" / "frontiers-course" / "web" / "fonts"
 WEB_FONTS = {"Inter": ("inter-variable-latin.woff2", "400 800"), "Source Serif 4": ("source-serif-4-variable-latin.woff2", "400 500")}
 # Paragon 23's light grays (tokens/src/themes/light/global/color.json); each is replaced by the brand's text mixed
@@ -144,8 +136,8 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
                          f'  font-display: swap;\n  src: url("./fonts/{file}") format("woff2");\n}}\n')
     for lic in ("LICENSES.md", "OFL-1.1.txt"):
         out[f"paragon/fonts/{lic}"] = (FONTS / lic).read_bytes()
-    out["paragon/_fonts.scss"] = "// The brand's web fonts, served beside the built CSS (dist/fonts/). Written by tools/brand_openedx.py.\n" + "\n".join(faces)
-    out["paragon/core.scss"] = ("// Assembled by `paragon build-scss` into dist/core.css. Written by tools/brand_openedx.py.\n"
+    out["paragon/_fonts.scss"] = "// The brand's web fonts, served beside the built CSS (dist/fonts/). Written by `agora openedx generate`.\n" + "\n".join(faces)
+    out["paragon/core.scss"] = ("// Assembled by `paragon build-scss` into dist/core.css. Written by `agora openedx generate`.\n"
                                 '@use "./fonts";\n@use "./build/core/variables";\n')
     out["paragon/tokens/core/global/typography.json"] = {"typography": {"font": {"family": {
         "$type": "fontFamily",
@@ -160,7 +152,7 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
         "base": tok("$link-color", link), "inline": {"base": tok("$inline-link-color", link)}}}}
     out["package.json"] = {
         "name": package, "version": "1.0.0", "private": True,
-        "description": f"{name}'s Open edX brand package, written by tools/brand_openedx.py from its tokens.json.",
+        "description": f"{name}'s Open edX brand package, written by `agora openedx generate` from its tokens.json.",
         "exports": {"./*": "./dist/*"}, "files": ["dist"],
         "scripts": {"build": "make build", "build-tokens": "make build-tokens", "build-scss": "make build-scss"},
         "license": "SEE LICENSE IN LICENSE.md", "devDependencies": {"@openedx/paragon": PARAGON_VERSION}}
@@ -176,12 +168,12 @@ def files(brand: Path, package: str) -> dict[str, bytes | str]:
                          "`paragon/fonts/LICENSES.md`). The token files and build scripts may be reused freely.\n")
     out["README.md"] = (f"# {package}\n\n{name}'s brand for Open edX, in the shape of "
                         "[openedx/brand-openedx](https://github.com/openedx/brand-openedx) for Paragon 23's design tokens. "
-                        "Written by `tools/brand_openedx.py` from the brand's `tokens.json`; do not edit, rewrite it.\n\n"
+                        "Written by `agora openedx generate` from the brand's `tokens.json`; do not edit, rewrite it.\n\n"
                         "- `dist/` is the built package: `core.css` and `light.css` (with `.min.css` and maps), "
                         "`theme-urls.json`, the logos, favicon and fonts. A managed host that takes a theme by URL can be "
                         "given `dist/` as it is.\n"
-                        "- To rebuild: `npm install`, then `make build` (or `python3 tools/brand_openedx.py build "
-                        "design-systems/<brand> --paragon node_modules/.bin/paragon` from the repository).\n"
+                        "- To rebuild: `npm install`, then `make build` (or `agora openedx build "
+                        "<brand> --paragon node_modules/.bin/paragon` from the repository).\n"
                         "- To install in a Tutor instance: publish or pack this directory (`npm pack`) and install it in "
                         "place of `@openedx/brand-openedx`, as Tutor's MFE plugin documents.\n")
     return out
@@ -276,17 +268,17 @@ def check(brand: Path, out: Path, package: str, paragon: Path | None) -> list[st
 
         def walk(d, rel=""):
             for f in d.left_only:
-                problems.append(f"{rel}{f} is missing; run tools/brand_openedx.py {'build' if paragon else 'write'}")
+                problems.append(f"{rel}{f} is missing; run `agora openedx {'build' if paragon else 'generate'} {brand.name}`")
             for f in d.right_only:
-                problems.append(f"{rel}{f} is not written by tools/brand_openedx.py")
+                problems.append(f"{rel}{f} is not written by `agora openedx generate`")
             for f in d.diff_files:
-                problems.append(f"{rel}{f} differs from what tools/brand_openedx.py writes")
+                problems.append(f"{rel}{f} differs from what `agora openedx generate` writes")
             for name, sub in d.subdirs.items():
                 walk(sub, f"{rel}{name}/")
         if out.is_dir():
             walk(cmp)
         else:
-            problems.append(f"{out} does not exist; run tools/brand_openedx.py write")
+            problems.append(f"{out} does not exist; run `agora openedx generate {brand.name}`")
         if paragon:
             problems += contrast_problems(fresh / "dist")
     r = {k: role(json.loads((brand / "tokens.json").read_text(encoding="utf-8")), k) for k in ("text", "surface", "link")}
@@ -294,35 +286,3 @@ def check(brand: Path, out: Path, package: str, paragon: Path | None) -> list[st
         if contrast(r[fg], r["surface"]) < 4.5:
             problems.append(f"{fg} on surface is under 4.5:1")
     return problems
-
-
-def main(argv: list[str]) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["write", "build", "check"])
-    ap.add_argument("brand", type=Path)
-    ap.add_argument("-o", "--out", type=Path)
-    ap.add_argument("--package")
-    ap.add_argument("--paragon", type=Path)
-    args = ap.parse_args(argv)
-    brand = args.brand.resolve()
-    out = (args.out or brand / "openedx").resolve()
-    package = args.package or f"{brand.name}-openedx"
-    if args.cmd == "write":
-        write(brand, out, package)
-    elif args.cmd == "build":
-        if not args.paragon:
-            ap.error("build needs --paragon, the path of Paragon 23's CLI")
-        write(brand, out, package)
-        build(out, args.paragon.resolve())
-    else:
-        problems = check(brand, out, package, args.paragon.resolve() if args.paragon else None)
-        print(f"{'ok  ' if not problems else 'FAIL'} {brand.name}'s Open edX brand package{'' if args.paragon else ' (sources)'}")
-        for p in problems:
-            print(f"     ✗ {p}")
-        return 1 if problems else 0
-    print(f"wrote {out}")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))

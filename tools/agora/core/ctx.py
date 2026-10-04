@@ -19,6 +19,7 @@ class Ctx:
     debug: bool = False
     env: dict[str, str] = field(default_factory=dict)
     values: dict[str, Any] = field(default_factory=dict)  # the parsed arguments, for logging
+    section_options: dict[str, Any] = field(default_factory=dict)  # `check`'s --runner, --brand, --paragon, for the sections
 
     @property
     def relocated(self) -> bool:

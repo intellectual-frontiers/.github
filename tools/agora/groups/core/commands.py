@@ -17,6 +17,7 @@ from typing import Any
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
 from agora.core import plan
+from agora.core.checks import find_program
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
@@ -107,10 +108,11 @@ def command_show(ctx: Ctx, command: str) -> Resource:
                   Opt("--changed", None, "run only sections whose watched paths changed"),
                   Opt("--since", "TEXT", "with --changed, also what differs from this Git commit"),
                   Opt("--runner", "RUNNER", "design-systems: which harness"),
-                  Opt("--brand", "TEXT", "design-systems: one brand")])
+                  Opt("--brand", "BRAND", "design-systems: one brand"),
+                  Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)")])
 def check(ctx: Ctx, sections: list[str], scope: str | None, suite: str | None, changed: bool, since: str | None,
-          runner: str | None, brand: str | None) -> Resource:
-    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand)
+          runner: str | None, brand: str | None, paragon: str | None) -> Resource:
+    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon)
 
 
 # test --------------------------------------------------------------------------------------------------------------
@@ -164,7 +166,7 @@ def doctor(ctx: Ctx) -> Resource:
     programs = []
     for g in reg.groups.values():
         for prog, spec in sorted(g.programs.items()):
-            path = shutil.which(prog)
+            path = find_program(reg, prog, ctx.env)
             programs.append({"program": prog, "group": g.name, "needed by": spec.get("needed_by", []), "present": bool(path),
                              "path": path or "", "hint": spec.get("hint", "")})
             if not path:
@@ -205,7 +207,7 @@ def lock(ctx: Ctx, group: str | None) -> Resource:
         with tempfile.TemporaryDirectory() as d:
             inp, out = Path(d, "in.txt"), Path(d, "out.txt")
             inp.write_text("".join(f"{k}=={v}\n" for k, v in sorted(g.packages.items())), encoding="utf-8")
-            p = subprocess.run([uv, "pip", "compile", "--generate-hashes", "--no-header", "--quiet", "--python-version", "3.11", "-o", str(out),
+            p = subprocess.run([uv, "pip", "compile", "--generate-hashes", "--no-header", "--no-annotate", "--quiet", "--python-version", "3.11", "-o", str(out),
                                 str(inp)], capture_output=True, text=True)
             if p.returncode != 0:
                 raise AgoraError("lock", f"uv could not lock group {g.name}: {p.stderr.strip()[-400:]}", exit=FAILED)
@@ -246,6 +248,7 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
     reg = ctx.registry
     findings = [Finding("error", "tools/agora", p) for p in reg.validate()]
     findings += layout.check_layout(ctx.home, reg)
+    findings += layout.check_workflows(ctx.home)
     findings += layout.check_boundaries(ctx.home, reg.root_manifest.get("register_name"))
     ttl_path = ctx.home / "ontology" / "ifcore.ttl"
     onto = ontology.command_individuals(ttl_path.read_text(encoding="utf-8")) if ttl_path.is_file() else {}

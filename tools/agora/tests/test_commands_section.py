@@ -63,3 +63,27 @@ class CommandsSection(unittest.TestCase):
         m.write_text(m.read_text() + '\n[sections.ghost]\nhelp = "x"\n')
         code, found = self.findings()
         self.assertTrue(any("section ghost is declared" in x for x in found))
+
+
+class Workflows(CommandsSection):
+    """0042 FR-022: a workflow calls agora and no other tool of this repository's own."""
+
+    def workflow(self, text):
+        d = self.home / ".github" / "workflows"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "w.yml").write_text(text)
+        return self.findings()
+
+    def test_a_workflow_calling_agora_passes(self):
+        self.assertEqual(self.workflow("jobs:\n  a:\n    steps:\n      - run: ./agora check --suite spec\n"), (0, []))
+
+    def test_a_workflow_that_never_calls_agora_fails(self):
+        code, found = self.workflow("jobs:\n  a:\n    steps:\n      - run: echo hi\n")
+        self.assertEqual(code, 1)
+        self.assertTrue(any("calls agora, as ./agora" in m for m in found))
+
+    def test_a_workflow_calling_another_script_under_tools_fails_but_a_comment_may_name_one(self):
+        code, found = self.workflow("# was tools/run_assurance.sh\njobs:\n  a:\n    steps:\n      - run: ./agora check && tools/other.sh --x\n")
+        self.assertEqual(code, 1)
+        self.assertEqual([m for m in found if "other than agora" in m].__len__(), 1)
+        self.assertTrue(any("tools/other.sh" in m for m in found))
