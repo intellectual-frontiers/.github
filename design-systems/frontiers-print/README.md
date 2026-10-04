@@ -14,7 +14,7 @@ colors, typefaces and logo by loading that brand's `brand.tex` first, so the sam
 | `latex/layout.py` | Resolves a layout and typeface set into the `iflayout.def` the class reads: `python3 latex/layout.py emit two-column`. |
 | `fonts/` | The open-license fonts it sets, with `LICENSES.md`. |
 | `docs/` | Typography, the article layouts, and the journal design reference. |
-| `assurance/` | `run.py` compiles the fixtures under every brand beside this design system and checks page size, fonts, theme colors, logos, literals and that each PDF's text layer maps every glyph to its Unicode character. |
+| `assurance/` | `run.py` compiles the fixtures under every brand beside this design system and checks page size, fonts, theme colors, logos, literals, that each PDF's text layer maps every glyph to its Unicode character, and that no glyph a font lacks is dropped. |
 
 ## Using it
 

@@ -518,6 +518,7 @@ frontiers-print FR-016	check	eidolon: eid check covers	the series line's fit is 
 frontiers-print FR-017	check	eidolon: eid check covers	a back cover that spills onto a second page or reaches the barcode zone fails
 frontiers-print FR-018	check	eidolon: eid check books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
 frontiers-print FR-019	check	.github: python3 design-systems/frontiers-print/assurance/run.py	pdftotext of the compiled book and article fixtures fails on any U+E000-U+F8FF code point or a sample line that does not extract as set
+frontiers-print FR-020	check	.github: python3 design-systems/frontiers-print/assurance/run.py	the harness fails a build whose log has a missing character and a book or article whose code block, inline code or monospace text does not extract the sample symbols as set
 frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
 frontiers-merchandise FR-002	none	-	directory contents; no check
 frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed

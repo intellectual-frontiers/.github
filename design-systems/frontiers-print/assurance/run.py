@@ -116,6 +116,9 @@ def run(brand: Path, keep: Path | None) -> Result:
             text = subprocess.run(["pdftotext", "-enc", "UTF-8", str(pdf), "-"], capture_output=True, text=True).stdout
             pua = sorted({f"U+{ord(c):04X}" for c in text if 0xE000 <= ord(c) <= 0xF8FF})
             r.check(not pua, f"{name}: the text layer holds private-use code points {', '.join(pua)}; a font feature put glyphs in the PDF with no Unicode mapping")
+            # A glyph a font lacks falls back to another font and never vanishes (spec FR-020).
+            r.check("Missing character" not in log, f"{name}: a glyph is missing from its font and was dropped from the PDF:\n" + "\n".join(l for l in log.splitlines() if "Missing character" in l)[:600])
+            r.check(" ".join(text.split()).count("x ≈ y ≠ z ≤ w ≥ v → u ↔ t ✓ s") >= 3, f"{name}: the code symbols ≈ ≠ ≤ ≥ → ↔ ✓ do not extract as set in a code block, inline code and monospace text")
             flat_text = " ".join(text.split())
             r.check("NOTE: A-B (C) 2026-10 © 2026 Shahid, it’s “set in the sans”." in flat_text,
                     f"{name}: the sans sample line does not extract as the text that was set (a quote, colon, hyphen, parenthesis or letter-spacing is wrong in the text layer)")
