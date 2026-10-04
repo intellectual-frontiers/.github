@@ -117,6 +117,11 @@ This repository's tools install themselves. A computer needs only `python3`
    of the commands, findings in the Problems panel, a diff before any write.
    The command line is the core; the extension only runs it.
 
+Chromium on Linux also needs some system libraries. Install them once with
+`./agora system add --dry-run` to see exactly what it would run, then
+`./agora system add`, which asks before it uses `sudo` (0025 FR-021). No other
+command uses `sudo`, and `./agora doctor` tells you when they are missing.
+
 A prepared workspace (`workspaces-host`, on Debian or Ubuntu, including under
 WSL) is another way to set up a machine and clone the sibling repositories. It
 is a convenience: nothing here requires it (0026).

@@ -12,9 +12,10 @@ typesetter, a browser, a Java runtime, a Node runtime's packages) is listed
 in the repository's toolchain lock with a version, a download address and a
 checksum for each platform; the command line fetches it once into a
 per-user cache, verifies it, and uses that copy, never one it happens to find
-on the host unless the person says so. The one exception is a Linux
-browser's system libraries, which cannot be installed without root and are
-never installed by a tool. No repository requires a workspace, a container
+on the host unless the person says so. The one thing a
+fetch cannot supply is a Linux browser's system libraries, which need root: a
+documented, one-time `setup` command installs them, with `sudo`, only when a
+person runs it. No repository requires a workspace, a container
 or any other prepared environment; one MAY exist as a convenience a person
 chooses (0026-workspaces). This spec states the host's part, the Python
 locks, the toolchain lock, the cache, offline use, the opt-in override,
@@ -64,8 +65,9 @@ platform coverage, the exception, and what continuous integration needs.
   package (FR-013) where a package of acceptable fidelity and licence
   exists, and otherwise as a toolchain entry (FR-015). A repository MUST NOT
   close a gap with its own installer, install target, requirements file,
-  version manager, package-manager call or bootstrap script, and MUST NOT
-  tell a person to install a program by hand, except for the exception of
+  version manager, package-manager call (FR-021's setup command apart) or
+  bootstrap script, and MUST NOT
+  tell a person to install a program by hand, except for the one-time setup of
   FR-021.
 - **FR-008**: Retired. A repository holds no pin of a reference
   environment; what is pinned is each package and each toolchain entry
@@ -115,7 +117,7 @@ platform coverage, the exception, and what continuous integration needs.
 ## Host prerequisites
 
 - **FR-014**: The host MUST be required to supply `python3` (3.11 or later)
-  and `uv`, and nothing else, except for the exception of FR-021. A
+  and `uv`, and nothing else, except for the one-time setup of FR-021. A
   repository MUST NOT document or check for another host program as a
   prerequisite. A launcher MUST need no more than these two to print its
   help, to run `doctor`, and to run any command whose plan needs no
@@ -173,17 +175,25 @@ platform coverage, the exception, and what continuous integration needs.
   entry and the platform, and saying that an override (FR-019) is the way to
   use a program the person has. Windows is served through Linux under WSL.
 
-## The exception: a browser's system libraries
+## The one-time setup: a browser's system libraries
 
 - **FR-021**: A Chromium build the toolchain lock supplies runs on Linux
-  only when the host's shared libraries it links against are present, and a
-  tool cannot install them without administrator rights. A tool MUST NOT
-  install them. It MUST find which are missing before it starts the browser
-  and, if any are, MUST fail with exit status 3 and a message that names each
-  missing library and says that a person installs them once, with the host's
-  package manager, and never offers to run that command. `doctor` MUST report
-  the same, without failing a command that does not use the browser. This is
-  the only prerequisite beyond FR-014 that any repository may have.
+  only when the host's shared libraries it links against are present, and
+  installing them needs administrator rights. The launcher MUST therefore have
+  one `setup` command for them (the `system` noun's `add`,
+  0041-command-line FR-069), the only command that may run `sudo`. It MUST
+  install the package list the repository pins for the host's distribution
+  family (the `apt` list on Debian and Ubuntu at least; on any other family it
+  MUST say that the family has no list and name the libraries to install by
+  hand), MUST print exactly what it will run (`--dry-run` prints it and runs
+  nothing) and ask before it runs `sudo`, and MUST never be run implicitly by
+  another command. A command that needs the browser MUST find which libraries
+  are missing before it starts it and, if any are, fail with exit status 3
+  naming each library and that setup command. `doctor` MUST report the same
+  with that command as its hint, without failing a command that does not use
+  the browser, and the repository's README MUST document it. This is the only
+  prerequisite beyond FR-014 that any repository may have, and the only use of
+  `sudo`.
 
 ## Updating and generated files
 
@@ -199,7 +209,7 @@ platform coverage, the exception, and what continuous integration needs.
 
 - **FR-022**: A repository's CI MUST NOT contain a step that installs a
   program, a library or a browser with the host's package manager or that
-  fetches one outside the launcher, and MUST NOT run a job whose purpose is
+  fetches one outside the launcher (FR-021's setup command apart), and MUST NOT run a job whose purpose is
   to prove a prepared environment. A job that needs a program runs the
   launcher, which fetches the entry as FR-017 states.
 - **FR-023**: CI MAY restore and save the cache the launcher fills (uv's
@@ -240,8 +250,8 @@ platform coverage, the exception, and what continuous integration needs.
 
 - A tool that needs a headless browser: the browser is a toolchain entry,
   fetched into the cache and verified, per FR-015 through FR-017; on Linux
-  its system libraries are the one thing a person installs, and the tool
-  names them, per FR-021.
+  its system libraries are installed once by the documented `setup` command,
+  which a person runs and which asks before `sudo`, per FR-021.
 - A tool that needs a typesetting toolchain: it is a toolchain entry named
   by the commands that need it, not a program found on the host, per FR-007
   and FR-015.
@@ -269,8 +279,12 @@ platform coverage, the exception, and what continuous integration needs.
   directory: allowed as a convenience and read by nothing of the
   repository's own, per FR-025.
 - A host that lacks a library Chromium links against: the browser is not
-  started, exit status 3 names each library, and nothing is installed, per
-  FR-021.
+  started, exit status 3 names each library and the setup command, and
+  nothing is installed by the failing command, per FR-021.
+- A host of a distribution family with no pinned list: the setup command says
+  so and names the libraries, per FR-021.
+- The setup command run with `--dry-run`: it prints the `sudo` commands and
+  runs nothing, per FR-021.
 - Two machines of one platform: the same locked versions give the same
   generated files, per FR-026.
 
@@ -289,9 +303,9 @@ platform coverage, the exception, and what continuous integration needs.
 ## Open questions
 
 - **OQ-1**: Whether a stock CI runner already holds the shared libraries a
-  Chromium build links against; if it does not, FR-021's exception applies to
-  CI and the provider's own way of supplying them is recorded here, outside
-  any repository's workflow steps.
+  Chromium build links against; if it does not, the CI job runs the
+  setup command of FR-021, the one place `sudo` is allowed there, and this is
+  recorded here.
 - **OQ-2**: How the toolchain lock covers macOS: which entries upstream
   builds for `macos-arm64` and `macos-x86_64`, and which commands then fail
   there under FR-020.
