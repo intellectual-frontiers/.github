@@ -980,6 +980,17 @@ ifcore:Illustration a ifcore:ClaimKind ; rdfs:label "Illustration"@en ; ifcore:h
 ifcore:claimKind a owl:ObjectProperty ; rdfs:range ifcore:ClaimKind ;
     rdfs:comment "What kind of claim a published fact or creative work is making."@en .
 
+ifcore:ClaimLabel a owl:Class ; rdfs:label "Claim label"@en ;
+    rdfs:comment "How settled one research claim is: one of six, a closed set (0017-spoken-and-research-works FR-021). Distinct from ifcore:ClaimKind, which says what sort of claim any Press output makes (0009-press FR-001); a section may carry one of each."@en .
+ifcore:ObservationLabel a ifcore:ClaimLabel ; rdfs:label "observation"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HypothesisLabel a ifcore:ClaimLabel ; rdfs:label "hypothesis"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EvidenceLabel a ifcore:ClaimLabel ; rdfs:label "evidence"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:InferenceLabel a ifcore:ClaimLabel ; rdfs:label "inference"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RecommendationLabel a ifcore:ClaimLabel ; rdfs:label "recommendation"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UnknownLabel a ifcore:ClaimLabel ; rdfs:label "unknown"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:claimLabel a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:range ifcore:ClaimLabel ;
+    rdfs:comment "The one label a research claim carries (0017-spoken-and-research-works FR-021); functional, so a claim carries at most one."@en .
+
 ifcore:VoicePrinciple a owl:Class ; rdfs:label "Voice principle"@en .
 ifcore:EvidenceLed a ifcore:VoicePrinciple ; rdfs:label "Evidence-led"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Practical a ifcore:VoicePrinciple ; rdfs:label "Practical"@en ; ifcore:hasAudience ifcore:Public .
