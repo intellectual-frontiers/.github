@@ -46,3 +46,94 @@ requirement	control	note
 0028-compliance-controls FR-019	soc2:C1.1	contract-protected information never enters any repository
 0028-compliance-controls FR-022	soc2:CC6.2	an assessor's access is granted for the engagement and ends
 0028-compliance-controls FR-025	soc2:CC4.2	gaps and lapsing dispositions reported weekly
+0030-policies FR-001	soc2:CC5.3	control activities are deployed through policies held as specs
+0030-policies FR-002	soc2:CC5.3	each policy cites the requirements that carry it out
+0030-policies FR-005	soc2:CC5.3	a policy is approved by the decision authority
+0030-policies FR-006	soc2:CC5.3	each policy is reviewed at least yearly
+0030-policies FR-010	soc2:CC2.2	everyone a policy binds acknowledges it
+0030-policies FR-010	soc2:CC1.4	policies acknowledged before first access
+0031-access-control-policy FR-001	soc2:CC6.1	one account per person; service accounts owned
+0031-access-control-policy FR-001	cmmc-l1:IA.L1-b.1.v	users, processes, and devices identified
+0031-access-control-policy FR-002	soc2:CC6.1	a second factor on every non-public system
+0031-access-control-policy FR-002	cmmc-l1:IA.L1-b.1.vi	authentication before access
+0031-access-control-policy FR-003	soc2:CC6.3	least privilege; separate administrative accounts
+0031-access-control-policy FR-003	cmmc-l1:AC.L1-b.1.ii	access limited to the functions a role needs
+0031-access-control-policy FR-004	soc2:CC6.2	access granted only on an approved request
+0031-access-control-policy FR-004	cmmc-l1:AC.L1-b.1.i	access limited to authorized users
+0031-access-control-policy FR-005	soc2:CC6.2	access removed within a day of leaving
+0031-access-control-policy FR-005	soc2:CC6.3	access removed when a role no longer needs it
+0031-access-control-policy FR-006	soc2:CC6.2	access reviewed every ninety days
+0031-access-control-policy FR-006	soc2:CC6.3	unneeded access found by review is removed
+0031-access-control-policy FR-007	cmmc-l1:AC.L1-b.1.iii	connections to outside systems listed and approved
+0031-access-control-policy FR-007	soc2:CC6.6	connections to outside systems controlled
+0031-access-control-policy FR-008	cmmc-l1:AC.L1-b.1.iv	only Public information posted on public systems
+0031-access-control-policy FR-009	soc2:CC6.1	credentials managed, never shared; tokens scoped and expiring
+0032-endpoint-and-media-policy FR-001	soc2:CC6.8	devices enrolled in management before access
+0032-endpoint-and-media-policy FR-002	soc2:CC6.8	device encryption, lock, support, and updates
+0032-endpoint-and-media-policy FR-002	cmmc-l1:SI.L1-b.1.xii	operating system flaws corrected within fourteen days
+0032-endpoint-and-media-policy FR-003	soc2:CC6.8	malicious code protection on every device
+0032-endpoint-and-media-policy FR-003	cmmc-l1:SI.L1-b.1.xiii	protection from malicious code
+0032-endpoint-and-media-policy FR-003	cmmc-l1:SI.L1-b.1.xiv	protection updated with each release
+0032-endpoint-and-media-policy FR-003	cmmc-l1:SI.L1-b.1.xv	periodic and real-time scans
+0032-endpoint-and-media-policy FR-005	soc2:CC6.5	media sanitized or destroyed before disposal
+0032-endpoint-and-media-policy FR-005	cmmc-l1:MP.L1-b.1.vii	media holding federal contract information sanitized
+0032-endpoint-and-media-policy FR-006	soc2:CC6.4	physical access limited at premises
+0032-endpoint-and-media-policy FR-006	cmmc-l1:PE.L1-b.1.viii	physical access limited to authorized people
+0032-endpoint-and-media-policy FR-006	cmmc-l1:PE.L1-b.1.ix	visitors escorted, access logged, access devices controlled
+0033-systems-and-data-policy FR-001	soc2:CC6.1	an inventory of every system and its data
+0033-systems-and-data-policy FR-002	soc2:C1.1	every system declares its data class
+0033-systems-and-data-policy FR-003	soc2:CC6.1	the inventory reconciled yearly
+0033-systems-and-data-policy FR-004	soc2:CC6.7	Confidential data encrypted in transit and at rest
+0033-systems-and-data-policy FR-006	soc2:C1.2	data deleted after its retention period
+0033-systems-and-data-policy FR-007	soc2:CC6.6	no system holding Confidential data reachable without sign-in
+0033-systems-and-data-policy FR-007	cmmc-l1:SC.L1-b.1.x	communications monitored and controlled at the boundary
+0033-systems-and-data-policy FR-008	cmmc-l1:SC.L1-b.1.xi	publicly accessible components separated
+0033-systems-and-data-policy FR-009	soc2:CC7.2	sign-ins and administrative actions logged and anomalies alerted
+0034-secure-development-policy FR-001	soc2:CC8.1	every change version-controlled and checked before deployment
+0034-secure-development-policy FR-002	soc2:CC8.1	production separated from development
+0034-secure-development-policy FR-003	soc2:CC7.1	systems scanned for vulnerabilities monthly
+0034-secure-development-policy FR-003	cmmc-l1:SI.L1-b.1.xv	periodic scans of systems
+0034-secure-development-policy FR-004	soc2:CC7.1	vulnerabilities fixed within a time set by severity
+0034-secure-development-policy FR-004	cmmc-l1:SI.L1-b.1.xii	flaws identified, reported, and corrected in time
+0034-secure-development-policy FR-005	soc2:CC2.3	outside reports of weaknesses acknowledged
+0035-incident-response-policy FR-002	soc2:CC2.2	everyone knows to report a suspected incident
+0035-incident-response-policy FR-003	soc2:CC7.3	each incident recorded and evaluated
+0035-incident-response-policy FR-004	soc2:CC7.3	each incident triaged within a day
+0035-incident-response-policy FR-005	soc2:CC7.4	notification deadlines tracked from discovery
+0035-incident-response-policy FR-007	soc2:CC7.4	incidents contained; exposed credentials rotated
+0035-incident-response-policy FR-009	soc2:CC7.5	serious incidents reviewed and the cause removed
+0035-incident-response-policy FR-010	soc2:CC7.4	the response exercised yearly
+0036-risk-management-policy FR-001	soc2:CC3.1	risks recorded against a boundary's commitments
+0036-risk-management-policy FR-001	soc2:CC3.2	each risk rated and treated
+0036-risk-management-policy FR-002	soc2:CC3.2	accepted risks decided and lapsing
+0036-risk-management-policy FR-003	soc2:CC3.4	risks reassessed on significant change
+0036-risk-management-policy FR-004	soc2:CC3.3	fraud considered in every assessment
+0036-risk-management-policy FR-005	soc2:CC9.1	disruption risks considered
+0036-risk-management-policy FR-005	soc2:CC9.2	vendor risks considered
+0037-vendor-management-policy FR-001	soc2:CC9.2	every vendor holding company data registered
+0037-vendor-management-policy FR-002	soc2:CC9.2	critical vendors assessed before use
+0037-vendor-management-policy FR-003	soc2:CC9.2	vendor assurance held and re-verified yearly
+0037-vendor-management-policy FR-005	soc2:CC9.2	vendor terms cover confidentiality and breach notice
+0037-vendor-management-policy FR-006	soc2:CC9.2	critical vendors reviewed yearly
+0038-personnel-security-policy FR-001	soc2:CC1.1	a code of conduct acknowledged on joining and yearly
+0038-personnel-security-policy FR-002	soc2:CC1.1	conflicts of interest disclosed and decided
+0038-personnel-security-policy FR-003	soc2:CC1.5	breaches handled through a documented process
+0038-personnel-security-policy FR-005	soc2:CC1.4	people screened before access to sensitive systems
+0038-personnel-security-policy FR-006	soc2:CC1.5	security responsibilities stated for each role
+0038-personnel-security-policy FR-007	soc2:CC1.4	security training on joining and yearly
+0038-personnel-security-policy FR-007	soc2:CC2.2	training communicates the policies
+0039-business-continuity-policy FR-001	soc2:CC9.1	recovery objectives for every system
+0039-business-continuity-policy FR-002	soc2:A1.1	capacity and availability monitored
+0039-business-continuity-policy FR-003	soc2:A1.2	backups kept apart from their systems
+0039-business-continuity-policy FR-003	soc2:CC7.5	backups support recovery
+0039-business-continuity-policy FR-005	soc2:A1.3	restores tested yearly
+0039-business-continuity-policy FR-006	soc2:CC9.1	recovery walked through yearly
+0040-security-program-policy FR-001	soc2:CC5.1	one program of control activities across every boundary
+0040-security-program-policy FR-001	soc2:CC5.2	technology controls included in the program
+0040-security-program-policy FR-002	soc2:CC1.3	every security responsibility held by a role
+0040-security-program-policy FR-003	soc2:CC1.2	oversight of the program at least yearly
+0040-security-program-policy FR-003	soc2:CC4.1	the program evaluated yearly
+0040-security-program-policy FR-004	soc2:CC2.1	decisions drawn from generated, current information
+0040-security-program-policy FR-005	soc2:CC2.2	policies available to everyone they bind
+0040-security-program-policy FR-006	soc2:CC2.3	commitments and a reporting channel for customers
+0040-security-program-policy FR-007	soc2:CC4.1	independent assessment of every boundary

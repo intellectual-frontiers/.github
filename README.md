@@ -235,6 +235,17 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 | [0028](spec-kit/specs/0028-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
 | [0029](spec-kit/specs/0029-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
+| [0030](spec-kit/specs/0030-policies/spec.md) | Policies: thin specs that cite the rules carrying them out, approved by adoption, reviewed yearly, acknowledged without personal detail |
+| [0031](spec-kit/specs/0031-access-control-policy/spec.md) | Access control: one account per person, second factors, least privilege, ninety-day access reviews |
+| [0032](spec-kit/specs/0032-endpoint-and-media-policy/spec.md) | Endpoints and media: managed devices, malicious code protection, media sanitization, physical access |
+| [0033](spec-kit/specs/0033-systems-and-data-policy/spec.md) | Systems and data: the system inventory, data classes and their handling, separation from the internet, logs |
+| [0034](spec-kit/specs/0034-secure-development-policy/spec.md) | Secure development: version-controlled changes, vulnerability fix times, software bills of materials |
+| [0035](spec-kit/specs/0035-incident-response-policy/spec.md) | Incident response: reporting, records, notification deadlines, containment, and review |
+| [0036](spec-kit/specs/0036-risk-management-policy/spec.md) | Risk management: the risk register, yearly and triggered assessments, lapsing acceptances |
+| [0037](spec-kit/specs/0037-vendor-management-policy/spec.md) | Vendor management: the vendor register, vendor assurance by reference, terms, reviews, and exit |
+| [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
+| [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
+| [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example

@@ -2188,3 +2188,50 @@ ifcore:StateAnnualReport a skos:Concept ; skos:inScheme ifcore:RegistrationKindS
     skos:definition "A state's registration of an entity formed or qualified to do business there, kept in good standing by a periodic report; dcterms:valid is the date the next one is due (0029 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:CharitableSolicitationRegistration a skos:Concept ; skos:inScheme ifcore:RegistrationKindScheme ; skos:prefLabel "Charitable solicitation registration"@en ;
     skos:definition "A state's registration of an organization that asks the public there for charitable contributions; dcterms:valid is the date it lapses unless renewed."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Policies (0030-policies) ─────────────────────────
+# Each policy is a spec whose slug ends in -policy (FR-001), represented as a dcterms:Policy, reused from Dublin Core
+# rather than declared (0019-controlled-vocabulary FR-001), with its Spec ID as dcterms:identifier (FR-003). Its
+# reviews are Decisions naming it by schema:about and lapsing by dcterms:valid within a year (FR-006); a departure
+# names a boundary too (FR-012). Acknowledgments are never facts here (FR-011). Reviews are vault data.
+
+ifcore:AccessControlPolicy a dcterms:Policy ; rdfs:label "Access control policy"@en ;
+    dcterms:identifier "0031-access-control-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0031-access-control-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EndpointAndMediaPolicy a dcterms:Policy ; rdfs:label "Endpoint and media policy"@en ;
+    dcterms:identifier "0032-endpoint-and-media-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0032-endpoint-and-media-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SystemsAndDataPolicy a dcterms:Policy ; rdfs:label "Systems and data policy"@en ;
+    dcterms:identifier "0033-systems-and-data-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0033-systems-and-data-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SecureDevelopmentPolicy a dcterms:Policy ; rdfs:label "Secure development policy"@en ;
+    dcterms:identifier "0034-secure-development-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0034-secure-development-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:IncidentResponsePolicy a dcterms:Policy ; rdfs:label "Incident response policy"@en ;
+    dcterms:identifier "0035-incident-response-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0035-incident-response-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RiskManagementPolicy a dcterms:Policy ; rdfs:label "Risk management policy"@en ;
+    dcterms:identifier "0036-risk-management-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0036-risk-management-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:VendorManagementPolicy a dcterms:Policy ; rdfs:label "Vendor management policy"@en ;
+    dcterms:identifier "0037-vendor-management-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0037-vendor-management-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PersonnelSecurityPolicy a dcterms:Policy ; rdfs:label "Personnel security policy"@en ;
+    dcterms:identifier "0038-personnel-security-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0038-personnel-security-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BusinessContinuityPolicy a dcterms:Policy ; rdfs:label "Business continuity policy"@en ;
+    dcterms:identifier "0039-business-continuity-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0039-business-continuity-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SecurityProgramPolicy a dcterms:Policy ; rdfs:label "Security program policy"@en ;
+    dcterms:identifier "0040-security-program-policy" ;
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0040-security-program-policy/spec.md> ;
+    ifcore:hasAudience ifcore:Public .
