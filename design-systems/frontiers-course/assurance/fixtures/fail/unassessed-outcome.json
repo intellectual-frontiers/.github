@@ -1,0 +1,14 @@
+{
+  "edits": [
+    [
+      "units/02-checking-the-estimate/04-final.adoc",
+      "type=multiple-choice,assesses=O3",
+      "type=multiple-choice,assesses=O1"
+    ],
+    [
+      "units/02-checking-the-estimate/04-final.adoc",
+      "type=numeric,assesses=O3",
+      "type=numeric,assesses=O1"
+    ]
+  ]
+}

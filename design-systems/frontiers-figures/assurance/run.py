@@ -21,7 +21,11 @@ Needs Python 3 and Pillow; rsvg-convert and pdffonts are optional. Exits non-zer
 from __future__ import annotations
 
 import argparse
+import base64
+import html
+import io
 import json
+import re
 import os
 import shutil
 import subprocess
@@ -235,6 +239,21 @@ def run(brand: Path, keep: Path | None) -> Result:
                     r.check(tree.find("{http://www.w3.org/2000/svg}style") is not None, f"{variant}/{p.name}: no stylesheet")
                 except ET.ParseError as e:
                     r.check(False, f"{variant}/{p.name} does not parse once themed: {e}")
+        try:
+            from fontTools.ttLib import TTFont
+        except ImportError:
+            TTFont = None
+        for p in figs[:3] if TTFont else []:
+            svg = p.read_text(encoding="utf-8")
+            embedded = theme.apply(svg, brand, "default", embed_fonts=True)
+            faces = re.findall(r"font-weight:(\d+);font-style:(\w+);src:url\(data:font/woff;base64,([A-Za-z0-9+/=]+)\)", embedded)
+            r.check(bool(faces), f"{p.name}: themed with --embed-fonts but carries no font (FR-006)")
+            cmaps = {(w, st): set(TTFont(io.BytesIO(base64.b64decode(d))).getBestCmap()) for w, st, d in faces}
+            for m in re.finditer(r"<text\b([^>]*)>(.*?)</text>", svg, re.S):
+                bold = bool(re.search(r'font-weight="(?:bold|[6-9]00)"', m.group(1)))
+                key = ("700" if bold else "400", "italic" if 'font-style="italic"' in m.group(1) else "normal")
+                missing = {c for c in html.unescape(m.group(2)) if ord(c) not in cmaps.get(key, set())}
+                r.check(not missing, f"{p.name}: the embedded {key} face lacks {sorted(missing)} (FR-006)")
         if shutil.which("rsvg-convert") and shutil.which("pdffonts"):
             sample = root / "default" / figs[0].name
             pdf = root / "sample.pdf"

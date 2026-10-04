@@ -49,9 +49,10 @@ same result there.
   environment beyond the image, its `ws-repos.json`, editor extensions,
   the environment's first-run command (FR-008), and, where the
   environment does not yet do it, the linking FR-015 requires
-  (`.devcontainer/workspace-links.sh`, identical in every repository). Any package, tool,
-  or setup step belongs in workspaces-host-v3 (0025-tooling-environment
-  FR-007).
+  (`.devcontainer/workspace-links.sh`, identical in every repository).
+  Any package, tool, or setup step belongs in workspaces-host-v3
+  (0025-tooling-environment FR-007), except Python packages a tool
+  obtains from a lock (0025-tooling-environment FR-013).
 
 ## Authentication and first run
 

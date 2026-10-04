@@ -72,7 +72,8 @@ supplies a decoration kit.
 - **FR-008**: A one-color lockup, icon or wordmark MUST be decorated in exactly one ink, a color role in the
   kit's inks: by its spot-color match for screen and pad printing, by its thread match for
   embroidery, and by its own value for direct-to-garment printing. Laser engraving and debossing MUST
-  use no ink.
+  use no ink. A job sent to a decorator (`"order": true`) MUST use only an
+  ink whose matches the brand has verified against the physical guide and card; a proof MAY use any.
 - **FR-009**: An ink MUST reach at least 3:1 contrast with the goods' color (the substrate), as WCAG
   2.2 measures non-text contrast: a dark role on light goods, a light role on dark goods.
 

@@ -230,6 +230,7 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
 | [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
 | [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -287,21 +288,24 @@ declaration (0002, 0013). `content/` is the only content root (0004).
 ### Brand assets and design systems
 
 [`design-systems/frontiers-brand/`](design-systems/frontiers-brand/) holds the
-palette, unit colors, typefaces, logo (light and dark), icon and favicon.
-[`design-systems/frontiers-nature-web/`](design-systems/frontiers-nature-web/) is the
-public, editorial web design system: tokens, CSS, fonts, the hero and diagram
-images, and share card.
-[`design-systems/frontiers-console-web/`](design-systems/frontiers-console-web/) is the
-web design system for operator (admin) and documentation surfaces. Both web
-systems derive from `frontiers-brand`; every public house rule about how Intellectual
-Frontiers looks, reads or sounds (print, figures, written and spoken voice)
-belongs in a design system of its kind here too (0014). Every design system
+palette, unit colors, typefaces, logo (light and dark), icon, app icons, unit marks,
+the imagery pool, the share card and the decoration kit; it themes every other design
+system. The others, one directory each and listed with their kinds in
+[`design-systems/README.md`](design-systems/README.md): the web
+(`frontiers-nature-web`, `frontiers-console-web`), print (`frontiers-print`,
+`frontiers-signage-print`), figures (`frontiers-figures`), slides (`frontiers-slides`),
+media (`frontiers-media`), email (`frontiers-email`), courses (`frontiers-course`), merchandise
+(`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
+`frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
+looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system
 carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
 runs it on every push that touches `design-systems/`.
 
 - Logos: `design-systems/frontiers-brand/logos/` (PNG; WebP in `logos/web/`).
   Use the `-dark-` variants on dark backgrounds.
-- Images: `design-systems/frontiers-nature-web/images/`.
+- Pictures: the brand's imagery pool, `design-systems/frontiers-brand/imagery/`; app icons and the share card in
+  `design-systems/frontiers-brand/images/`; figures are drawn with `design-systems/frontiers-figures/` (the
+  profile's are made by `profile/figures/make.py`).
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one

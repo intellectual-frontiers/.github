@@ -1,0 +1,21 @@
+{
+  "name": "frontiers-brand-openedx",
+  "version": "1.0.0",
+  "private": true,
+  "description": "frontiers-brand's Open edX brand package, written by tools/brand_openedx.py from its tokens.json.",
+  "exports": {
+    "./*": "./dist/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "make build",
+    "build-tokens": "make build-tokens",
+    "build-scss": "make build-scss"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "devDependencies": {
+    "@openedx/paragon": "23.23.0"
+  }
+}

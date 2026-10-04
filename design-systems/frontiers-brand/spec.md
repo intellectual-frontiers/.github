@@ -129,7 +129,22 @@ restating them.
   more goods. A simplified landscape mark is not part of the kit until one is designed from the
   master by hand and this spec is amended. Every ink MUST be marked `verified: false` until its
   spot-color and thread match are checked against the physical guide and card, and MUST NOT be
-  ordered before then.
+  ordered before then; the check is recorded by `tools/brand_decoration.py verify`, which writes the
+  matches as checked, who checked them and when (`briefs/ink-verification.md`). A vector master that
+  replaces the trace is commissioned to `briefs/vector-master.md`.
+
+## Platform packages
+
+- **FR-020**: Its Open edX brand package MUST be `openedx/`, written by `tools/brand_openedx.py build`
+  from `tokens.json` with Paragon 23 (the version the tool pins), in the shape of
+  `openedx/brand-openedx`: its logos are its own lockup PNGs, wrapped unchanged in SVG where the
+  interface asks for SVG, never redrawn (FR-009); its favicon and share card are FR-018's and
+  FR-016's; its fonts are the web files of its font roles; and its token overrides map its roles
+  onto Paragon's (primary, secondary, accent as brand, success, info, warning, danger, paper as
+  light, text as dark and as body and headings, link, surface as background), with Paragon's grays
+  replaced by its text mixed into its surface at each gray's own luminance. Every built pair of
+  body, headings, link, muted text and each button's text on its background MUST meet 4.5:1, and
+  the committed `openedx/dist/` MUST be what the build writes.
 
 ## Out of scope
 
@@ -152,6 +167,8 @@ restating them.
 - A size between two shipped files: the nearest larger file is scaled down, per FR-008.
 - A work with no good match in the imagery pool: a new piece is made and approved per FR-015; a
   piece is never adapted for one work.
+- A managed Open edX host that takes only a theme URL, or only a logo and colors: it is given
+  `openedx/dist/` as it is, or the colors FR-020's token overrides name, per FR-020.
 - Goods too small for the trace's detail (a cap, a polo's left chest, a pen): the wordmark is used,
   per FR-017; the lockup and icon are never traced coarser for them.
 
@@ -161,7 +178,14 @@ restating them.
 
 ## Open questions
 
-None.
+- **OQ-1**: The lockup and icon exist only as raster masters. A vector master, commissioned to
+  `briefs/vector-master.md`, would let goods carry the landscape at small sizes and signs carry it
+  large; until one is delivered, FR-017's trace and wordmark stand in.
+- **OQ-2**: Every ink in the decoration kit is still `verified: false`: its spot-color and thread
+  matches have not been checked against the physical guides (`briefs/ink-verification.md`), so no
+  goods can be ordered (FR-017).
+- **OQ-3**: The house's existing business cards are not yet loaded into this brand, as the reference
+  for its stationery (0014-design-systems OQ-1).
 
 ## Key entities
 
