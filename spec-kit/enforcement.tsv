@@ -555,7 +555,7 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0020-spec-format FR-010	none	-	no check ties a status change to a Decision
 0020-spec-format FR-011	check	.github: agora check register	one row per FR, none for missing FRs
 0020-spec-format FR-012	check	.github: agora check register	mechanism value only; the choice is not verified
-0020-spec-format FR-013	check	.github: agora check register	form of command or citation; that a .github: command exists in agora's registry waits on agora check commands
+0020-spec-format FR-013	check	.github: agora check register	form of command or citation, and that a .github: row's command exists in agora's registry with sections, suite and options it declares
 0020-spec-format FR-014	check	.github: agora check register	every run lists none rows
 0020-spec-format FR-015	check	.github: agora check --suite spec	spec-check.yml runs the spec suite on every push and pull request
 0020-spec-format FR-016	check	eidolon: eid check specs	runs the public root's agora with --root (0041 FR-040)
@@ -914,69 +914,69 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0040-security-program-policy FR-005	none	-	publication to the people bound is not observed (0030 OQ-2)
 0040-security-program-policy FR-006	none	-	where commitments are published is 0040 OQ-2
 0040-security-program-policy FR-007	check	eidolon: eid compliance status	an assessment no longer current is reported; whether one exists is judgment
-0041-command-line FR-001	none	-	the launcher does not exist yet; agora test will run it from a clean clone
-0041-command-line FR-002	none	-	the dependency plan does not exist yet; agora test will check plans from the registry
-0041-command-line FR-003	none	-	no lock exists yet; agora doctor will check locks against pins
-0041-command-line FR-004	none	-	offline mode does not exist yet; agora test will run a command offline with a cold cache
-0041-command-line FR-005	none	-	the core does not exist yet; agora test will import it with no package installed
-0041-command-line FR-006	none	-	no program declaration exists yet; agora doctor will report programs and hints
-0041-command-line FR-007	none	-	no registry exists yet; agora check commands will read it
-0041-command-line FR-008	none	-	no registry exists yet; agora check commands will check each command's grammar and verb
+0041-command-line FR-001	check	.github: agora test	the launcher is POSIX sh, executable, and runs from any directory in the clone; agora check commands checks its form
+0041-command-line FR-002	check	.github: agora test	each group's plan is computed from the registry; groups without packages run on the plain interpreter, the spec suite's groups pin none
+0041-command-line FR-003	check	.github: agora doctor	doctor fails a group whose lock lacks a hash, a pin, or the manifest's stamp; a hash mismatch stops the run
+0041-command-line FR-004	check	.github: agora test	tests run lock and a cold-cache plan offline, by flag and by environment, and the launcher offline
+0041-command-line FR-005	check	.github: agora test	tests parse every core, lib and group module's imports and run the core with no site-packages
+0041-command-line FR-006	check	.github: agora test	tests run a command and a section whose program is missing, and doctor reporting the hint
+0041-command-line FR-007	check	.github: agora check commands	the registry loads from the manifests and agrees with its declarations, and with the ontology
+0041-command-line FR-008	check	.github: agora check commands	the registry's grammar: a command is noun and verb from the fixed set, or one of the closed set
 0041-command-line FR-009	none	-	verb meanings are a review judgment of each command; no check
-0041-command-line FR-010	none	-	no registry exists yet; agora check commands will reject a noun-less command outside the closed set and any noun check command
-0041-command-line FR-011	none	-	no registry exists yet; agora check commands will check the ui and mcp words
-0041-command-line FR-012	none	-	no command list exists yet; agora test will check it against the registry
-0041-command-line FR-013	none	-	no typed arguments exist yet; agora test will check each type
-0041-command-line FR-014	none	-	no categories exist yet; agora check commands will require exactly one per command
-0041-command-line FR-015	none	-	no write command exists yet; agora test will run each with --dry-run and compare the tree
-0041-command-line FR-016	none	-	no resources exist yet; agora test will check every command's resource
-0041-command-line FR-017	none	-	no actions exist yet; agora test will generate each action's command line
-0041-command-line FR-018	none	-	no renderings exist yet; agora test will compare the three renderings of each resource
-0041-command-line FR-019	none	-	no JSON output exists yet; agora test will check the schema and NDJSON of each command
-0041-command-line FR-020	none	-	no error resources exist yet; agora test will check each failure path
-0041-command-line FR-021	none	-	no exit statuses exist yet; agora test will check each
-0041-command-line FR-022	none	-	no surface declarations exist yet; agora check commands will check the defaults by category
-0041-command-line FR-023	none	-	no MCP server exists yet; agora test will call a decision command over it and require refusal
+0041-command-line FR-010	check	.github: agora check commands	the registry rejects a noun-less command outside the closed set and any noun check command
+0041-command-line FR-011	check	.github: agora check commands	the registry accepts only the ui and mcp control words as a second word outside the verbs
+0041-command-line FR-012	check	.github: agora test	tests compare command list and show with the registry, and completion with it
+0041-command-line FR-013	check	.github: agora test	tests run every type's validation, completion and error, and the input schemas generated from them
+0041-command-line FR-014	check	.github: agora check commands	the registry requires exactly one category from the seven for every command
+0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run and that a dry run leaves a clone's tree unchanged
+0041-command-line FR-016	check	.github: agora test	tests run every command that takes no required argument and check its resource
+0041-command-line FR-017	check	.github: agora test	tests generate links' and actions' command lines from their calls
+0041-command-line FR-018	check	.github: agora test	tests compare the three renderings of resources
+0041-command-line FR-019	check	.github: agora test	tests check the JSON document's fields, its schema name and NDJSON streams
+0041-command-line FR-020	check	.github: agora test	tests check error resources in all three renderings, an unexpected exception, and --debug
+0041-command-line FR-021	check	.github: agora test	tests check exit statuses 0, 1, 2 and 3
+0041-command-line FR-022	check	.github: agora test	tests check the default surfaces by category; the surfaces themselves arrive with ui and mcp
+0041-command-line FR-023	none	-	no MCP server exists yet; agora check commands already rejects a decision command declared on MCP, and agora test will call one over the server and require refusal
 0041-command-line FR-024	none	-	no surfaces exist yet; agora test will compare a command's result on each
 0041-command-line FR-025	none	-	no UI exists yet; agora check ui will serve each UI and check it
 0041-command-line FR-026	none	-	no UI exists yet; agora check ui will check Datastar is vendored and no remote request is made
 0041-command-line FR-027	none	-	no MCP server exists yet; agora test will check its tool list and schemas
-0041-command-line FR-028	none	-	no isolated worker exists yet; agora doctor will fail on a plan needing two locks
-0041-command-line FR-029	none	-	no doctor exists yet
-0041-command-line FR-030	none	-	no lock command exists yet; agora doctor will check a lock against its pins
-0041-command-line FR-031	none	-	no check exists yet; agora check commands will check the sections and suites declared
-0041-command-line FR-032	none	-	no --changed exists yet; agora test will check it against a fixture clone
-0041-command-line FR-033	none	-	no check exists yet; agora test will check that a skipped section fails the run
-0041-command-line FR-034	none	-	no test command exists yet
+0041-command-line FR-028	check	.github: agora test	tests run an isolated section in its own worker; agora doctor fails a plan needing two locks in one process
+0041-command-line FR-029	check	.github: agora test	tests run doctor against registry conflicts, a missing program and a lock that does not match
+0041-command-line FR-030	check	.github: agora doctor	doctor fails a lock that does not match its manifest's pins; tests run lock offline, with nothing pinned and with a dry run
+0041-command-line FR-031	check	.github: agora test	tests run sections, suites, scope and options; agora check commands compares suites with their sections
+0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone: modified, staged, untracked, and --since
+0041-command-line FR-033	check	.github: agora test	tests check that a planned or skipped section never passes and that a missing program fails the run
+0041-command-line FR-034	check	.github: agora test	the runner's report is read by tests: a run that ran no test, or any failing one, fails
 0041-command-line FR-035	none	-	no generator exists yet; agora fresh will check the headers
 0041-command-line FR-036	none	-	no fresh exists yet
 0041-command-line FR-037	none	-	no agent files exist yet; agora fresh will prove them current
-0041-command-line FR-038	none	-	no context command exists yet; agora test will check it
+0041-command-line FR-038	check	.github: agora test	tests run context for a spec and a requirement: deterministic, bounded, and saying what it left out
 0041-command-line FR-039	none	-	no proposals exist yet; agora test will check each proposal command
-0041-command-line FR-040	none	-	no audience stamp exists yet; agora test will check every command's output and --root
-0041-command-line FR-041	none	-	no command exists yet; agora test will run each write command against a fixture clone and check Git is untouched
-0041-command-line FR-042	none	-	no logging exists yet; agora test will check the log lines and that the directory is ignored
+0041-command-line FR-040	check	.github: agora test	tests check the audience stamp, unstated under --root, and a write refusing --root
+0041-command-line FR-041	check	.github: agora test	tests run every write command in a fixture clone and check Git's HEAD, index and tags are untouched
+0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, and that the directory is ignored
 0041-command-line FR-043	none	-	no command exists yet; that none calls an AI is a review judgment of each command
 0041-command-line FR-044	none	-	a rule about what is not built; no check
-0041-command-line FR-045	none	-	agora check commands will scan agora's own files for another repository's name once it exists
-0042-agora FR-001	none	-	agora does not exist yet; agora check commands will check the launcher, manifest and layout
-0042-agora FR-002	none	-	the name is a decision; agora check commands will check the launcher's name
-0042-agora FR-003	none	-	agora check commands will scan agora's files for any other repository's name and read of another repository
-0042-agora FR-004	none	-	agora check commands will compare the registry with the ontology's command individuals
-0042-agora FR-005	none	-	agora check commands will compare the registry with the ontology's command individuals
-0042-agora FR-006	none	-	agora check commands will compare the registry with the ontology's command individuals
-0042-agora FR-007	none	-	agora check commands will check that exactly these commands are decisions and none is on MCP
+0041-command-line FR-045	check	.github: agora check commands	agora's launcher, code, manifests and its two specs are scanned for the names of the other repositories the register lists
+0042-agora FR-001	check	.github: agora check commands	the launcher, manifest name and audience, groups' manifests and locks are checked
+0042-agora FR-002	check	.github: agora check commands	the launcher's and manifest's name is checked; the choice is a decision
+0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
+0042-agora FR-004	check	.github: agora check commands	the registry and the ontology's command individuals are compared by words, noun, verb and category
+0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
+0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
+0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
 0042-agora FR-008	none	-	no typed arguments exist yet; agora test will check each type
 0042-agora FR-009	none	-	design-system new does not exist yet; agora test will check that it refuses
-0042-agora FR-010	none	-	no spec or requirement command exists yet; agora test will check what they write
-0042-agora FR-011	none	-	environment set does not exist yet; agora test will check both files move together
+0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
+0042-agora FR-011	check	.github: agora test	tests check environment set moves the pin and the image tag together, or neither
 0042-agora FR-012	none	-	ink record does not exist yet; agora test will check no other command writes a name
-0042-agora FR-013	none	-	the check sections do not exist yet; agora check commands will compare the manifests with this list
-0042-agora FR-014	none	-	suites are not declared yet; agora check commands will compare them with this list
+0042-agora FR-013	check	.github: agora check commands	the declared sections, implemented or planned, are compared with this list
+0042-agora FR-014	check	.github: agora check commands	the declared suites are compared with this list; a section not implemented yet is named in planned, not run
 0042-agora FR-015	none	-	generators are not declared yet; agora fresh will prove each
 0042-agora FR-016	none	-	the scripts exist until agora replaces them; agora check commands will fail on a script outside design-systems/ and tools/agora/
 0042-agora FR-017	none	-	agora check design-systems will call each harness; that a harness runs on its own is checked by that harness's README command in CI
-0042-agora FR-018	none	-	no group exists yet; agora doctor will check each group's lock and programs
+0042-agora FR-018	check	.github: agora doctor	doctor checks each group's lock and programs; tests check the spec suite's groups pin none
 0042-agora FR-019	none	-	no UI exists yet; agora check ui will check each UI
 0042-agora FR-020	none	-	no MCP server exists yet; agora test will check its tool list
 0042-agora FR-021	none	-	no logging exists yet; agora test will check the log lines and that .gitignore lists the directory
