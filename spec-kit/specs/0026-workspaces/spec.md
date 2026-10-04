@@ -42,8 +42,9 @@ other systems come later, each under its own spec.
   environment (0025-tooling-environment FR-008). A repository MAY ship its own
   kits beside it, in `.workspaces-host/kits/` (0041-command-line FR-061).
 - **FR-017**: By default every repository MUST list the public root
-  (`.github`), the vault (`eidolon`), and `www.intellectualfrontiers.com`
-  in `WS_HOST_REPOS`, so a session started from any of them has all three.
+  (`.github`), the vault (`eidolon`), `www.intellectualfrontiers.com` and the
+  environment itself (`workspaces-host`) in `WS_HOST_REPOS`, so a session
+  started from any of them has all four.
 - **FR-018**: A repository MUST add nothing to the environment beyond that
   file and its kits. Any package, tool, or setup step belongs in
   workspaces-host (0025-tooling-environment FR-007), except Python
