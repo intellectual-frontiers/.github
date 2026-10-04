@@ -298,8 +298,12 @@ it does, what it never does, and how it is built.
   and a filter, or by a completion resource that 0041-command-line states.
   Until then the extension uses the noun's `list` command (FR-013).
 - **OQ-2**: Whether the test suite also runs the extension inside a real VS
-  Code in CI, which needs a VS Code build as a toolchain entry
-  (0025-tooling-environment FR-016), or only against the stand-in (FR-028).
+  Code. The stand-in (FR-028) is what runs today. A VS Code build can be had
+  as a toolchain entry with a checksum (it downloads from the vendor's update
+  address, which is reachable), but it needs a display server to start, and a
+  display server is a program the host would have to supply
+  (0025-tooling-environment FR-014), so no real-VS-Code run exists until a
+  display server can be a locked entry or VS Code runs headless.
 - **OQ-3**: Whether a file open in the editor maps to a resource for `Copy
   Context` through a `file` resource kind each orchestrator declares, or the
   person always chooses the resource (FR-018).

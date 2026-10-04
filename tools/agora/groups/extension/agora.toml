@@ -1,0 +1,17 @@
+name = "extension"
+help = "The IF Console VS Code extension: its package built into build/, and its manifest, lint and unit tests checked (0043-if-console)"
+
+# Python packages the extension's build and tests use (0041-command-line FR-003), each to one exact version, locked with hashes in
+# agora.lock. Found by reading the code:
+#   nodejs-wheel-binaries  the Node that runs the extension's tests under node's own test runner, and runs vsce to pack the .vsix
+#                          (0043-if-console FR-027): no Node from the host
+[packages]
+nodejs-wheel-binaries = "22.20.0"
+
+[nouns.extension]
+help = "The IF Console VS Code extension, built from tools/if-console/ (0043-if-console)"
+
+[sections.extension]
+help = "The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), and its unit tests under node's test runner (0043-if-console FR-028)"
+watch = ["tools/if-console/**", "tools/agora/lib/extension.py", "tools/agora/groups/extension/**", ".if-console.env"]
+isolated = true  # its own locked environment, beside the other groups' (0041-command-line FR-028)

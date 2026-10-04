@@ -24,9 +24,19 @@ PARAGON_VERSION = "23.23.0"
 REGISTRY = "https://registry.npmjs.org/"
 
 
-def lock_sha256() -> str:
-    lock = NPM_DIR / "package-lock.json"
+def lock_sha256(npm_dir: Path | None = None) -> str:
+    lock = (npm_dir or NPM_DIR) / "package-lock.json"
     return hashlib.sha256(lock.read_bytes()).hexdigest() if lock.is_file() else "0" * 64
+
+
+def lock_hash_problems(npm_dir: Path, label: str) -> list[str]:
+    """Every package of an npm lock carries its version and integrity hash (0025 FR-015)."""
+    try:
+        packages = json.loads((npm_dir / "package-lock.json").read_text(encoding="utf-8")).get("packages", {})
+    except (OSError, ValueError) as e:
+        return [f"{label}/package-lock.json cannot be read: {e}"]
+    return [f"{label}/package-lock.json: {name} has no version and integrity hash" for name, p in packages.items()
+            if name and not p.get("link") and not (p.get("integrity") and p.get("version"))]
 
 
 def lock_problems() -> list[str]:
@@ -64,10 +74,10 @@ def env(r: Resolved, path: Path, platform: str) -> dict[str, str]:
     return {"PLAYWRIGHT_MODULE": str(path)}
 
 
-def install(tc: Toolchain, scratch: Path, platform: str) -> None:
+def install(tc: Toolchain, scratch: Path, platform: str, npm_dir: Path | None = None) -> None:
     """`npm ci` from the committed lock, by the node a Python package supplies, into the scratch directory."""
     for name in ("package.json", "package-lock.json"):
-        shutil.copyfile(NPM_DIR / name, scratch / name)
+        shutil.copyfile((npm_dir or NPM_DIR) / name, scratch / name)
     exe = node.locate(HOME, dict(tc.env), offline=tc.offline)
     argv = node.npm_argv("ci", "--ignore-scripts", "--no-audit", "--no-fund", env={**tc.env, node.OVERRIDE: exe})
     if argv is None:

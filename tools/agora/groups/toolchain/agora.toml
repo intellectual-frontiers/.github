@@ -9,4 +9,4 @@ help = "The one prerequisite beyond python3 and uv: a browser's shared libraries
 
 [sections.toolchain]
 help = "The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025)"
-watch = ["tools/agora/toolchain/**", "tools/agora/npm/**", "tools/agora/core/toolchain.py", "tools/agora/core/system.py", "tools/agora/groups/*/agora.lock", "tools/agora/groups/*/agora.toml", ".github/workflows/**", "tools/agora/**/*.py"]
+watch = ["tools/agora/toolchain/**", "tools/agora/npm/**", "tools/if-console/package.json", "tools/if-console/package-lock.json", "tools/agora/core/toolchain.py", "tools/agora/core/system.py", "tools/agora/groups/*/agora.lock", "tools/agora/groups/*/agora.toml", ".github/workflows/**", "tools/agora/**/*.py"]

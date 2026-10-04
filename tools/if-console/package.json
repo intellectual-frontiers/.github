@@ -1,0 +1,320 @@
+{
+  "name": "if-console",
+  "displayName": "Intellectual Frontiers Console",
+  "description": "IF Console: the secondary interface of every repository's command line. Commands, checks, findings, previews and decisions in VS Code, through each repository's own launcher.",
+  "version": "0.1.0",
+  "publisher": "intellectual-frontiers",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/intellectual-frontiers/.github.git",
+    "directory": "tools/if-console"
+  },
+  "engines": {
+    "vscode": "^1.101.0",
+    "node": ">=22"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "if-console",
+    "orchestrator",
+    "check",
+    "mcp"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "workspaceContains:.if-console.env",
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "IF Console runs each repository's own command line, so it runs nothing in a workspace you have not trusted."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "IF Console runs a command line that lives in a clone on this machine."
+    }
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "if-console",
+          "title": "IF Console",
+          "icon": "media/if-console.svg"
+        }
+      ]
+    },
+    "views": {
+      "if-console": [
+        {
+          "id": "if-console.commands",
+          "name": "Command lines",
+          "contextualTitle": "IF Console"
+        },
+        {
+          "id": "if-console.chores",
+          "name": "Chores",
+          "contextualTitle": "IF Console"
+        },
+        {
+          "id": "if-console.checks",
+          "name": "Checks",
+          "contextualTitle": "IF Console"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "if-console.commands",
+        "contents": "No folder in this window declares a command line for IF Console. A repository declares its own with a .if-console.env file at its root.\n[Refresh](command:if-console.refresh)",
+        "when": "!if-console.hasRepository && !if-console.untrusted"
+      },
+      {
+        "view": "if-console.commands",
+        "contents": "This workspace is not trusted, so IF Console runs nothing. Trusting it is a decision only you can make.\n[Trust this workspace](command:if-console.trust)",
+        "when": "if-console.untrusted"
+      }
+    ],
+    "commands": [
+      {
+        "command": "if-console.runCommand",
+        "title": "Run Command",
+        "category": "IF Console",
+        "icon": "$(play)"
+      },
+      {
+        "command": "if-console.check",
+        "title": "Check",
+        "category": "IF Console",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "if-console.fresh",
+        "title": "Fresh",
+        "category": "IF Console",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "if-console.test",
+        "title": "Test",
+        "category": "IF Console",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "if-console.doctor",
+        "title": "Doctor",
+        "category": "IF Console",
+        "icon": "$(pulse)"
+      },
+      {
+        "command": "if-console.showCommandLine",
+        "title": "Show Command Line",
+        "category": "IF Console",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "if-console.getHelp",
+        "title": "Get Help",
+        "category": "IF Console",
+        "icon": "$(question)"
+      },
+      {
+        "command": "if-console.copyContext",
+        "title": "Copy Context",
+        "category": "IF Console",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "if-console.openView",
+        "title": "Open View",
+        "category": "IF Console",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "if-console.refresh",
+        "title": "Refresh",
+        "category": "IF Console",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "if-console.showOutput",
+        "title": "Show Output",
+        "category": "IF Console"
+      },
+      {
+        "command": "if-console.trust",
+        "title": "Trust This Workspace",
+        "category": "IF Console",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "if-console.activateNode",
+        "title": "Open Entry",
+        "category": "IF Console"
+      },
+      {
+        "command": "if-console.runSection",
+        "title": "Run This Check Section",
+        "category": "IF Console",
+        "icon": "$(play)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "if-console.runCommand",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.check",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.fresh",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.test",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.doctor",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.showCommandLine",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.getHelp",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.copyContext",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.openView",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.refresh",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.showOutput",
+          "when": "if-console.hasRepository || if-console.untrusted"
+        },
+        {
+          "command": "if-console.trust",
+          "when": "if-console.untrusted"
+        },
+        {
+          "command": "if-console.activateNode",
+          "when": "false"
+        },
+        {
+          "command": "if-console.runSection",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "if-console.refresh",
+          "when": "view == if-console.commands || view == if-console.chores || view == if-console.checks",
+          "group": "navigation"
+        },
+        {
+          "command": "if-console.runCommand",
+          "when": "view == if-console.commands",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "if-console.copyContext",
+          "when": "view == if-console.commands && viewItem == resource",
+          "group": "inline"
+        },
+        {
+          "command": "if-console.runSection",
+          "when": "view == if-console.checks && viewItem == section",
+          "group": "inline"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "if-console",
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "check",
+              "test",
+              "fresh",
+              "doctor"
+            ],
+            "description": "A repository-wide command of the repository's command line."
+          },
+          "section": {
+            "type": "string",
+            "description": "For check: one section."
+          },
+          "suite": {
+            "type": "string",
+            "description": "For check: one named suite of sections."
+          },
+          "changed": {
+            "type": "boolean",
+            "description": "For check: only what changed."
+          },
+          "folder": {
+            "type": "string",
+            "description": "The workspace folder's name, when a window holds several repositories."
+          }
+        }
+      }
+    ],
+    "configuration": {
+      "title": "IF Console",
+      "properties": {
+        "if-console.launchers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "application",
+          "markdownDescription": "Launcher file names to try at the root of a workspace folder that declares none in its own `.if-console.env`. Only your own user settings are read; a workspace cannot name what IF Console runs."
+        },
+        "if-console.checkOnSave": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "markdownDescription": "After a file is saved, run `check --changed` for its repository and show the findings in Problems."
+        }
+      }
+    },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "if-console.servers",
+        "label": "IF Console"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@vscode/vsce": "4.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

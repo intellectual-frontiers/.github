@@ -1,0 +1,6 @@
+test/**
+scripts/**
+node_modules/**
+package-lock.json
+.vscodeignore
+**/*.map

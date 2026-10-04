@@ -7,8 +7,6 @@ from typing import Any
 
 from .ctx import Ctx
 
-DIFF_LINES = 60
-
 
 def _read(path: Path) -> str | bytes | None:
     if not path.is_file():
@@ -51,7 +49,7 @@ def apply(ctx: Ctx, changes: dict[Path, str | bytes | None], root: Path | None =
         out.append({"path": rel, "change": "delete" if new is None else "create" if old is None else "modify",
                     "added": sum(1 for l in diff if l.startswith("+") and not l.startswith("+++")),
                     "removed": sum(1 for l in diff if l.startswith("-") and not l.startswith("---")),
-                    "diff": diff[:DIFF_LINES] + ([f"... {len(diff) - DIFF_LINES} more lines"] if len(diff) > DIFF_LINES else [])})
+                    "diff": diff})  # the whole unified diff: JSON omits nothing (0041 FR-018), so an editor can show it (0043 FR-014)
         if ctx.dry_run:
             continue
         if new is None:
