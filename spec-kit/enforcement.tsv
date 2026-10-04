@@ -420,6 +420,12 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-029	none	-	skill labeling and study-kit results are not checked
 0017-spoken-and-research-works FR-030	none	-	paper-build.sh labels a working paper by construction; no check
 0017-spoken-and-research-works FR-031	check	eidolon: eid paper check	fails a published paper with no promotion brief
+0017-spoken-and-research-works FR-032	none	-	basis statements and their wording are judgment; no check covers them
+0017-spoken-and-research-works FR-033	none	-	a record's licence, copyright holder, and DOI are judgment; no check covers them
+0017-spoken-and-research-works FR-034	none	-	a section's single claim and a note's single pillar are judgment; no check covers them
+0017-spoken-and-research-works FR-035	none	-	editorial independence of a spoken work is judgment; no check covers it
+0017-spoken-and-research-works FR-036	none	-	what matters to a reasonable listener is judgment; no check covers it
+0017-spoken-and-research-works FR-037	none	-	alternatives offered and marketing claims are judgment; no check covers them
 frontiers-console-web FR-001	none	-	registration and derivation are not checked
 frontiers-console-web FR-002	none	-	rule of judgment; no check possible
 frontiers-console-web FR-003	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, Inter shipped, no color literal
