@@ -7,7 +7,7 @@ from .registry import WRITES, Command, Registry
 
 
 def command_data(reg: Registry, c: Command) -> dict[str, Any]:
-    """One command: noun, verb, category, arguments, surfaces, dependency group and programs (0041 FR-012)."""
+    """One command: noun, verb, category, arguments, surfaces, dependency group and toolchain entries (0041 FR-012)."""
     args = [{"name": a.name, "type": a.type, "help": a.help, "required": a.required, "words": a.words, "many": a.many} for a in c.args]
     opts = [{"flag": o.flag, "type": o.type or "flag", "help": o.help, "multiple": o.multiple, "required": o.required,
              **({"alias": o.alias} if o.alias else {})} for o in c.options]
@@ -20,7 +20,7 @@ def command_data(reg: Registry, c: Command) -> dict[str, Any]:
     return {
         "id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "help": c.help, "group": c.group or None,
         "arguments": args, "options": opts, "usage": usage,
-        "surfaces": ["terminal", *reg.surfaces_of(c)], "programs": list(c.programs), "isolated": c.isolated,
+        "surfaces": ["terminal", *reg.surfaces_of(c)], "toolchain": list(c.toolchain), "isolated": c.isolated,
         "relocatable": c.relocatable,
     }
 

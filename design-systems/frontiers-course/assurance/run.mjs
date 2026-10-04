@@ -23,7 +23,7 @@ const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1
 const brand = opt("--brand") || "frontiers-brand";
 
 function loadPlaywright() {
-  const candidates = [process.env.PLAYWRIGHT_MODULE, process.cwd(), "/opt/node-tools/node_modules", ...(process.env.NODE_PATH || "").split(path.delimiter)].filter(Boolean);
+  const candidates = [process.env.PLAYWRIGHT_MODULE, process.cwd(), ...(process.env.NODE_PATH || "").split(path.delimiter)].filter(Boolean);
   for (const base of candidates) {
     try { return createRequire(path.join(base, "noop.js"))("playwright"); } catch { /* try the next location */ }
   }
@@ -32,7 +32,8 @@ function loadPlaywright() {
 }
 function findChromium() {
   if (process.env.CHROMIUM) return process.env.CHROMIUM;
-  const base = process.env.PLAYWRIGHT_BROWSERS_PATH || "/opt/pw-browsers";
+  const base = process.env.PLAYWRIGHT_BROWSERS_PATH;
+  if (!base) return undefined; // Playwright's own lookup
   try {
     for (const dir of fs.readdirSync(base).filter((d) => d.startsWith("chromium-")).sort().reverse()) {
       const exe = path.join(base, dir, "chrome-linux", "chrome");

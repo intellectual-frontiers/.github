@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from . import completion, logs, plan, render
-from .checks import find_program
 from .ctx import Ctx
 from .registry import WRITES, Command, Opt, Registry
 from .resource import FAILED, MISSING, OK, USAGE, Action, AgoraError, Call, Link, Resource, next_command
@@ -166,11 +165,10 @@ def loggable(cmd: Command, values: dict[str, Any]) -> dict[str, Any]:
 
 
 def check_programs(ctx: Ctx, cmd: Command) -> None:
-    for prog in cmd.programs:
-        if find_program(ctx.registry, prog, ctx.env) is None:
-            hint = ctx.registry.program(prog).get("hint", f"install {prog} on the host")
-            raise AgoraError("missing-program", f"{cmd.id} needs {prog}, which is not on PATH", exit=MISSING,
-                             detail={"program": prog, "hint": hint}, actions=[next_command("see what is missing", "doctor")])
+    """A command's toolchain entries are obtained before it runs: fetched on first use, unless offline, and the libraries a
+    browser links must be present (0025-tooling-environment FR-017, FR-018, FR-021)."""
+    if cmd.toolchain and not (cmd.toolchain_unless and ctx.values.get(cmd.toolchain_unless)):
+        ctx.toolchain().use(cmd.toolchain)
 
 
 def _ensure_plan(ctx: Ctx, cmd: Command, tokens: list[str]) -> None:

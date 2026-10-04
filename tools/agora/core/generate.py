@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any
 
 from . import plan
-from .checks import program_missing
 from .ctx import Ctx
 from .files import _read, norm
 from .registry import Generator
@@ -122,10 +121,17 @@ def _worker(ctx: Ctx, gen: Generator) -> dict[str, Any]:
 def prove(ctx: Ctx, gen: Generator) -> dict[str, Any]:
     """One generator's row for `fresh`: status fresh, stale or skipped, with every stale file and its rewriting command."""
     row: dict[str, Any] = {"name": gen.name, "group": gen.group, "status": "fresh", "files": 0, "stale": [], "reason": ""}
-    missing = program_missing(ctx, gen.programs)
-    if missing:
-        hints = "; ".join(f"{m}: {ctx.registry.program(m).get('hint', 'install it on the host')}" for m in missing)
-        return {**row, "status": "skipped", "reason": f"needs {', '.join(missing)}, which is not on PATH ({hints})"}
+    if gen.toolchain:
+        tc = ctx.toolchain()
+        stood_in = tc.overridden_in(gen.toolchain)
+        if stood_in:
+            what = "; ".join(f"{e.variable}={p} stands in for {e.name}" for e, p in stood_in)
+            return {**row, "status": "skipped", "reason": f"{what}: the proof would be of that program, not the locked one, so "
+                    "the output is not called current (0025-tooling-environment FR-019)"}
+        try:
+            tc.use(gen.toolchain)
+        except AgoraError as e:
+            return {**row, "status": "skipped", "reason": e.message}
     try:
         if needs_worker(ctx, gen):
             return _worker(ctx, gen)

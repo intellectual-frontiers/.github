@@ -1,12 +1,15 @@
-# Runs every design system's assurance harness on every push and pull request that touches a design system or the
-# orchestrator that runs them (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-022): the browser harnesses
-# (web, slides, course and brand design systems) and the Open edX package in one job, the Python harnesses (print on
-# TeX Live, merchandise, figure, slides, course, media, signage, email and voice design systems) in another, each
-# under every brand here, and each brand's imagery pool and share card in a third. Every program a harness once needed
-# from the host (Node, poppler, librsvg, ImageMagick, potrace, git) is now a package in agora's hashed locks, which agora
-# installs itself (0042-agora FR-030; 0025-tooling-environment FR-011, FR-013, FR-022). Until the toolchain lock supplies them
-# (the next step), a job installs only what has no wheel: TeX Live for the print harness, Playwright with its Chromium and
-# Paragon, which the browser job fetches with the runner's own npm.
+# Runs every design system's assurance harness on every push and pull request that touches a design system, the
+# orchestrator that runs them or the toolchain lock (0014-design-systems FR-015, FR-017, FR-039; 0042-agora FR-022): the
+# browser harnesses (web, slides, course and brand design systems) and the Open edX package in one job, the Python
+# harnesses (print on TeX, merchandise, figure, slides, course, media, signage, email and voice design systems) in
+# another, each under every brand here, and each brand's imagery pool and share card in a third.
+#
+# A job is a stock runner given only Python and uv (0025-tooling-environment FR-011, FR-022): agora installs the locked
+# Python packages itself and fetches, verifies and caches every other program it runs (TinyTeX and its packages, Chromium,
+# Playwright and Paragon from the npm lock) the first time a command needs it. The restored cache only saves the fetch; a
+# run with an empty cache passes, only slower (0025 FR-023). The one step beyond that is the documented one-time setup,
+# `./agora system add --yes`, which installs Chromium's shared libraries with sudo when the runner lacks any, and does
+# nothing when it lacks none (0025 FR-021).
 name: design-systems
 
 on:
@@ -23,25 +26,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "22"
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: Playwright and Chromium
-        run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
-          npx playwright install --with-deps chromium
-      - name: Browser harnesses
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/agora
+          key: agora-toolchain-${{ runner.os }}-${{ hashFiles('tools/agora/toolchain/**', 'tools/agora/npm/package-lock.json', 'tools/agora/core/toolchain.py') }}
+      - name: Chromium's system libraries (one-time setup; nothing to do when the runner has them)
+        run: ./agora system add --yes
+      - name: Browser harnesses and the Open edX package, rebuilt with Paragon
         run: ./agora check --suite browser
-      - name: Open edX brand package, rebuilt with Paragon
-        run: |
-          npm install --prefix "$RUNNER_TEMP/paragon" --no-audit --no-fund @openedx/paragon@23.23.0
-          ./agora check openedx --scope frontiers-brand
-        env:
-          PARAGON: ${{ runner.temp }}/paragon/node_modules/.bin/paragon
 
   python:
     runs-on: ubuntu-latest
@@ -51,11 +47,11 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
-      - name: TeX Live (the print harness; no wheel supplies it yet)
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
-      - name: Python harnesses (print on TeX Live, merchandise, figures, and the rest)
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/agora
+          key: agora-toolchain-${{ runner.os }}-${{ hashFiles('tools/agora/toolchain/**', 'tools/agora/core/toolchain.py') }}
+      - name: Python harnesses (print on TinyTeX, merchandise, figures, and the rest)
         run: ./agora check --suite python
 
   images:

@@ -47,7 +47,8 @@ def check_design_systems(ctx: Ctx, scope: str | None) -> SectionResult:
         what = f" of kind {opts['runner']}" if opts.get("runner") else ""
         findings.append(Finding("error", f"design-systems/{scope}" if scope else "design-systems",
                                 f"no assurance harness{what} to run: nothing was checked"))
-    outcomes = [assurance.run_one(ctx.registry, h, ctx.home, _env(ctx), _progress) for h in harnesses]
+    tc = ctx.toolchain()
+    outcomes = [assurance.run_one(tc, h, ctx.home, _env(ctx), _progress) for h in harnesses]
     for slug in missing:
         _progress(f"❎ {slug} has no assurance harness, assurance/run.mjs or assurance/run.py (0014-design-systems FR-015)")
     findings += [Finding("error", o.harness.script, assurance.failure_message(o)) for o in outcomes if o.status == "failed"]
@@ -101,11 +102,21 @@ def check_openedx(ctx: Ctx, scope: str | None) -> SectionResult:
     findings: list[Finding] = []
     notes: list[str] = []
     rows = []
-    paragon = assurance.paragon_path(ctx.section_options.get("paragon"), _env(ctx))
+    paragon = assurance.paragon_path(ctx.section_options.get("paragon"))
+    tc = ctx.toolchain()
+    env = tc.clean_env()
     if paragon is not None and not paragon.is_file():
-        findings.append(Finding("error", str(paragon), "Paragon's CLI is not a file; give the paragon executable "
-                                "(--paragon, or PARAGON in the environment), such as node_modules/.bin/paragon"))
+        findings.append(Finding("error", str(paragon), "Paragon's CLI is not a file; --paragon gives the paragon executable "
+                                "of your own (without it, agora uses the one its npm lock installs)"))
         paragon = None
+    elif paragon is None:
+        try:
+            resolved = tc.use(["npm-packages"])
+        except AgoraError as e:
+            return SectionResult("openedx", "skipped", reason=e.message)
+        paragon, env = resolved.path_of("paragon"), resolved.env()
+        for entry, path in tc.overridden_in(["npm-packages"]):
+            _progress(f"   · {entry.name} is {path}, named by {entry.variable}, not the locked entry")
     with_package = assurance.openedx_brands(ctx.home)
     if scope is not None and scope not in with_package:
         findings.append(Finding("error", f"design-systems/{scope}", f"{scope} has no Open edX package: no openedx/ directory"))
@@ -118,7 +129,7 @@ def check_openedx(ctx: Ctx, scope: str | None) -> SectionResult:
             findings.append(Finding("error", f"design-systems/{name}/assurance", f"{name} has an Open edX package and no "
                                     "assurance/run.py to check it (frontiers-brand FR-020)"))
             continue
-        o = assurance.run_openedx(ctx.registry, name, ctx.home, _env(ctx), paragon, _progress)
+        o = assurance.run_openedx(name, ctx.home, env, paragon, _progress)
         outcomes.append(o)
         rows.append(o.to_dict())
         if o.status == "failed":
@@ -126,9 +137,6 @@ def check_openedx(ctx: Ctx, scope: str | None) -> SectionResult:
     notes += assurance.summarize(outcomes)
     if not outcomes and not findings:
         findings.append(Finding("error", "design-systems", "no brand has an Open edX package: nothing was checked"))
-    if paragon is None and outcomes and not any(f.level == "error" for f in findings):
-        findings.append(Finding("warning", "design-systems", "Paragon's CLI was not given (--paragon, or PARAGON in the "
-                                "environment): the package sources were checked, dist/ was not rebuilt or checked"))
     res = SectionResult.from_findings("openedx", findings, notes, {"paragon": str(paragon) if paragon else None, "brands": rows})
     skipped = [o for o in outcomes if o.status == "skipped"]
     if res.status == "passed" and skipped:

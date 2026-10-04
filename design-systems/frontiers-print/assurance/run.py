@@ -18,9 +18,10 @@ default layout) with that brand as the theme, and checks:
   - no style file holds a color literal: every color is a role or a mix of roles (0014-design-systems FR-044).
 
 Needs Python 3 with the packages pypdf and pypdfium2 (`pip install pypdf pypdfium2`; they read the PDF: its page size,
-fonts, images and text layer), and latexmk with XeLaTeX and LuaLaTeX. In this repository `agora` supplies the packages
-from its locked environment and the TeX toolchain from its own cache. Exits non-zero on any failure. This file is the
-harness and its documentation.
+fonts, images and text layer), and XeLaTeX and LuaLaTeX on PATH (any TeX Live 2025 or later; the harness runs each engine
+again itself until the cross-references settle, so it needs no latexmk and no Perl). In this repository `agora` supplies
+the packages from its locked environment and TeX from its own toolchain cache. Exits non-zero on any failure. This file is
+the harness and its documentation.
 """
 from __future__ import annotations
 
@@ -40,13 +41,17 @@ import layout  # noqa: E402  (this design system's own layout resolver)
 # Fixture -> engine, page size in points, and which theme role or mix of roles each style-file color must carry.
 # A role mix is written as xcolor writes it: "text!72!surface" is 72% text, 28% surface.
 FIXTURES = {
-    "book": ("-xelatex", (504.0, 661.68), {
+    "book": ("xelatex", (504.0, 661.68), {
         "ifink": "text", "ifaccent": "accent", "iflink": "link", "ifsubtitle": "tertiary", "ifseries": "primary",
         "ifnote": "info", "iftip": "success", "ifimportant": "warning", "ifwarning": "danger",
         "ifgray": "text!72!surface", "iflabel": "text!50!surface", "ifrule": "text!15!surface", "iftint": "text!4!surface"}),
-    "article": ("-lualatex", (612.0, 792.0), {
+    "article": ("lualatex", (612.0, 792.0), {
         "ifink": "text", "ifgray": "text!70!surface", "ifrule": "text!22!surface", "iftint": "text!4!surface"}),
 }
+
+
+MAX_PASSES = 4
+RERUN = re.compile(r"Rerun to get|Label\(s\) may have changed|Please rerun|rerun LaTeX")
 
 
 class Result:
@@ -118,8 +123,17 @@ def build(name: str, brand: Path, work: Path) -> subprocess.CompletedProcess:
     if name == "article":
         (work / "iflayout.def").write_text(layout.emit(layout.resolve("")), encoding="utf-8")
         shutil.copy(SYSTEM / "latex" / "ifarticle.cls", work / "ifarticle.cls")
-    return subprocess.run(["latexmk", engine, "-interaction=nonstopmode", "-halt-on-error", "main.tex"],
-                          cwd=work, capture_output=True, text=True)
+    return typeset(engine, work)
+
+
+def typeset(engine: str, work: Path) -> subprocess.CompletedProcess:
+    """Run the engine on main.tex again, up to MAX_PASSES times, until its log no longer asks for another run."""
+    for _ in range(MAX_PASSES):
+        proc = subprocess.run([engine, "-interaction=nonstopmode", "-halt-on-error", "main.tex"], cwd=work, capture_output=True, text=True)
+        log = work / "main.log"
+        if proc.returncode != 0 or not log.is_file() or not RERUN.search(log.read_text(encoding="utf-8", errors="replace")):
+            break
+    return proc
 
 
 def run(brand: Path, keep: Path | None) -> Result:

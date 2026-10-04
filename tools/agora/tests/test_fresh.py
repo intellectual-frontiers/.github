@@ -135,21 +135,23 @@ class Fresh(Repo):
         subprocess.run(["python3", "design-systems/frontiers-print/latex/layout.py", "sync", str(doc_md)], cwd=self.root, check=True)
         self.assertEqual(self.fresh("print-layout-docs")[0], 0)
 
-    def test_a_generator_whose_program_is_missing_says_so_and_exits_3_not_stale(self):  # 0042 FR-015
+    def test_a_generator_whose_toolchain_entry_cannot_be_had_says_so_and_exits_3_not_stale(self):  # 0042 FR-015
+        from unittest import mock
+        from agora.core import toolchain
         reg = Registry.load(self.root)
         g = reg.generators["brand-theme"]
-        reg.generators["needs-a-program"] = Generator("needs-a-program", "x", g.sources, g.outputs, g.command,
-                                                      ("no-such-program-xyz",), "brand", g.fn)
-        from unittest import mock
-        with mock.patch("agora.core.generate.needs_worker", return_value=False):
-            code, doc = run_json(["fresh", "needs-a-program"], home=self.root, registry=reg)
-        (row,) = doc["data"]["generators"]
-        self.assertEqual((code, row["status"], row["stale"]), (3, "skipped", []))
-        self.assertIn("needs no-such-program-xyz", row["reason"])
-        css = self.brand / "brand.css"
-        css.write_text("hand edited")
-        with mock.patch("agora.core.generate.needs_worker", return_value=False):
-            code, doc = run_json(["fresh", "needs-a-program", "brand-theme"], home=self.root, registry=reg)
+        reg.generators["needs-a-tool"] = Generator("needs-a-tool", "x", g.sources, g.outputs, g.command,
+                                                   ("no-such-tool",), "brand", g.fn)
+        nobuild = toolchain.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
+        with mock.patch("agora.core.generate.needs_worker", return_value=False), \
+                mock.patch.object(toolchain, "discover", lambda: {"no-such-tool": nobuild}):
+            code, doc = run_json(["fresh", "needs-a-tool"], home=self.root, registry=reg)
+            (row,) = doc["data"]["generators"]
+            self.assertEqual((code, row["status"], row["stale"]), (3, "skipped", []))
+            self.assertIn("no-such-tool 1.0", row["reason"])
+            css = self.brand / "brand.css"
+            css.write_text("hand edited")
+            code, doc = run_json(["fresh", "needs-a-tool", "brand-theme"], home=self.root, registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "stale"))  # a stale generator still fails the run
 
     def test_with_none_named_every_generator_is_proved_and_none_is_left_out(self):

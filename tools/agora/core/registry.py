@@ -72,7 +72,8 @@ class Command:
     options: tuple[Opt, ...] = ()
     relocatable: bool = False
     surfaces: tuple[str, ...] | None = None  # None: the default by category
-    programs: tuple[str, ...] = ()
+    toolchain: tuple[str, ...] = ()  # the toolchain entries its plan names (0041 FR-066); fetched on first use
+    toolchain_unless: str = ""  # an option whose use stands in for them: a program of the person's own, named explicitly
     isolated: bool = False
     group: str = ""
     fn: Callable[..., Any] | None = None
@@ -97,7 +98,9 @@ class Section:
     watch: tuple[str, ...] = ()
     scope: str | None = None  # the typed argument --scope takes, where the section supports it
     options: tuple[str, ...] = ()  # check options beyond --scope/--suite/--changed it accepts
-    programs: tuple[str, ...] = ()
+    toolchain: tuple[str, ...] = ()  # entries it needs whatever its options; a section that needs them only for some harnesses
+    #                                  leaves this empty and its group's manifest names them per runner and harness
+    toolchain_unless: str = ""  # a check option whose use stands in for them (a program of the person's own, named explicitly)
     relocatable: bool = False
     isolated: bool = False
     group: str = ""
@@ -110,15 +113,15 @@ class Generator:
     """A generator (0041 FR-035): the sources it reads, the tracked files it writes, and the command that rewrites them.
 
     `fn(ctx, scope) -> Generated` returns every file it writes, in memory (core/generate.py). `command` is the words of
-    the command that rewrites the files. `programs` are what it cannot run without: `fresh` says so, exit 3, when one is
-    missing."""
+    the command that rewrites the files. `toolchain` are the entries it cannot run without: `fresh` says so, exit 3, when
+    one cannot be had, and refuses to call its output current while a person's own program stands in for one (0025 FR-019)."""
 
     name: str
     help: str = ""
     sources: tuple[str, ...] = ()  # globs of what it reads
     outputs: tuple[str, ...] = ()  # globs of the tracked files it writes
     command: str = ""
-    programs: tuple[str, ...] = ()
+    toolchain: tuple[str, ...] = ()
     group: str = ""
     fn: Callable[..., Any] | None = None
 
@@ -133,7 +136,6 @@ class Group:
     help: str
     path: Path
     packages: dict[str, str] = field(default_factory=dict)
-    programs: dict[str, dict[str, Any]] = field(default_factory=dict)
     nouns: dict[str, str] = field(default_factory=dict)
     manifest: dict[str, Any] = field(default_factory=dict)
 
@@ -144,12 +146,12 @@ class Group:
 
 def command(name: str, *, category: str, help: str = "", args: tuple[Arg, ...] | list[Arg] = (),
             options: tuple[Opt, ...] | list[Opt] = (), relocatable: bool = False, surfaces: tuple[str, ...] | None = None,
-            programs: tuple[str, ...] = (), isolated: bool = False):
+            toolchain: tuple[str, ...] = (), toolchain_unless: str = "", isolated: bool = False):
     """Declare a command. The function is `fn(ctx, **values) -> Resource`, thin: it calls library code (0041 FR-024)."""
 
     def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
         fn.__agora_command__ = Command(tuple(name.split()), category, help, tuple(args), tuple(options), relocatable,
-                                       surfaces, tuple(programs), isolated, "", fn)
+                                       surfaces, tuple(toolchain), toolchain_unless, isolated, "", fn)
         return fn
 
     return deco
@@ -219,7 +221,7 @@ class Registry:
 
     def load_group(self, path: Path, module: str | None = None) -> Group:
         m = tomllib.loads((path / "agora.toml").read_text(encoding="utf-8"))
-        g = Group(m["name"], m.get("help", ""), path, dict(m.get("packages", {})), dict(m.get("programs", {})),
+        g = Group(m["name"], m.get("help", ""), path, dict(m.get("packages", {})),
                   {k: v.get("help", "") for k, v in m.get("nouns", {}).items()}, m)
         if g.name in self.groups:
             self.conflicts.append(f"group {g.name} is declared twice")
@@ -230,7 +232,7 @@ class Registry:
             self.nouns[noun] = help_
         for sname, s in m.get("sections", {}).items():
             self._add_section(Section(sname, s.get("help", ""), tuple(s.get("watch", ())), s.get("scope"),
-                                      tuple(s.get("options", ())), tuple(s.get("programs", ())),
+                                      tuple(s.get("options", ())), tuple(s.get("toolchain", ())), s.get("toolchain_unless", ""),
                                       bool(s.get("relocatable", False)), bool(s.get("isolated", False)), g.name,
                                       many=bool(s.get("scope_many", False))))
         for gname, gen in m.get("generators", {}).items():
@@ -238,7 +240,7 @@ class Registry:
                 self.conflicts.append(f"generator {gname} is declared twice")
             self.generators[gname] = Generator(gname, gen.get("help", ""), tuple(gen.get("sources", ())),
                                                tuple(gen.get("outputs", ())), gen.get("command", ""),
-                                               tuple(gen.get("programs", ())), g.name)
+                                               tuple(gen.get("toolchain", ())), g.name)
         mod = importlib.import_module(module or f"agora.groups.{g.name}.commands")
         self._collect(mod, g)
         for s in list(self.sections.values()):
@@ -310,12 +312,6 @@ class Registry:
 
     def surfaces_of(self, c: Command) -> tuple[str, ...]:
         return c.surfaces if c.surfaces is not None else default_surfaces(c.category)
-
-    def program(self, name: str) -> dict[str, Any]:
-        for g in self.groups.values():
-            if name in g.programs:
-                return g.programs[name]
-        return {}
 
     def first_words(self) -> list[str]:
         return sorted({c.words[0] for c in self.commands.values()})

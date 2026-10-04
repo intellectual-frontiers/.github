@@ -147,8 +147,9 @@ themed by a brand so that the same design can be set in another brand's colors, 
 
 ## Assumptions
 
-- A TeX Live with XeLaTeX, LuaLaTeX and latexmk, and the Python packages pypdf and pypdfium2, are installed
-  wherever the harness or a pipeline runs.
+- XeLaTeX and LuaLaTeX of TeX Live 2025 or later, and the Python packages pypdf and pypdfium2, are installed
+  wherever the harness or a pipeline runs; `agora` supplies them (its `tinytex` and `tex-packages` entries and its locked
+  packages), and the harness needs no `latexmk`.
 
 ## Open questions
 

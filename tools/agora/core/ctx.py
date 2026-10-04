@@ -23,6 +23,15 @@ class Ctx:
     no_log: bool = False  # a check that drives a surface keeps its own calls out of the action log
     on_section: Callable[[str, str, Any], None] | None = None  # `check` reports each section as it starts and ends (a surface may stream it)
 
+    def toolchain(self):
+        """The toolchain lock for this invocation: its entries, the per-user cache, this environment, offline or not."""
+        from .toolchain import Toolchain
+
+        cached = self.__dict__.get("_toolchain")
+        if cached is None:
+            cached = self.__dict__["_toolchain"] = Toolchain(env=self.env, offline=self.offline)
+        return cached
+
     @property
     def relocated(self) -> bool:
         return self.root.resolve() != self.home.resolve()

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from . import worker
-from .checks import SectionResult, changed_paths, program_missing, section_changed
+from .checks import SectionResult, changed_paths, section_changed
 from .ctx import Ctx
 from .registry import Section
 from .resource import FAILED, MISSING, OK, USAGE, Action, AgoraError, Call, Resource, next_command
@@ -90,10 +90,9 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
     tell = ctx.on_section or (lambda event, name, result: None)  # a surface that streams hears of each section
     for s in chosen:
         tell("start", s.name, None)
-        missing = program_missing(ctx, s.programs)
-        if missing:
-            hints = "; ".join(f"{m}: {reg.program(m).get('hint', 'install it on the host')}" for m in missing)
-            results.append(SectionResult(s.name, "skipped", reason=f"needs {', '.join(missing)}, which is not on PATH ({hints})"))
+        lacking = _toolchain_problem(ctx, s)
+        if lacking:
+            results.append(SectionResult(s.name, "skipped", reason=lacking))
         else:
             mine = _scope_for(s, scopes)
             if worker.needs_worker(ctx, s):
@@ -115,6 +114,18 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
     res = Resource("check", label, data, text=_text, exit=FAILED if failed else MISSING if skipped else OK)
     res.actions = [next_command(f"run {r.name} again", "check", sections=[r.name]) for r in failed + skipped]
     return res
+
+
+def _toolchain_problem(ctx: Ctx, s: Section) -> str:
+    """Why a section whose toolchain entries cannot be had does not run (it is skipped, exit 3), or an empty string; an entry
+    the cache lacks is fetched here, on first use, unless offline (0025-tooling-environment FR-017, FR-018)."""
+    if not s.toolchain or (s.toolchain_unless and ctx.section_options.get(s.toolchain_unless)):
+        return ""
+    try:
+        ctx.toolchain().use(s.toolchain)
+    except AgoraError as e:
+        return e.message
+    return ""
 
 
 def _scope_for(s: Section, scopes: list[str]) -> Any:

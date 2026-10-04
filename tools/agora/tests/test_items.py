@@ -204,7 +204,7 @@ class FakeSystems(unittest.TestCase):
         empty = self.root / "empty"
         empty.mkdir()
         reg = Registry.load(self.root)
-        self.assertEqual((reg.commands["media build"].programs, reg.commands["sign build"].programs), ((), ()))
+        self.assertEqual((reg.commands["media build"].toolchain, reg.commands["sign build"].toolchain), ((), ()))
         with mock.patch.dict(os.environ, {"PATH": str(empty)}):
             code, doc = self.go("media", "build", str(job))
         self.assertEqual(code, 0, doc)
@@ -475,7 +475,7 @@ class Plumbing(unittest.TestCase):
         for c in ("deck build", "email build", "course show", "course build", "media build", "sign build", "figure build",
                   "layout list", "layout show", "layout build"):
             self.assertTrue(callable(reg.commands[c].fn), c)
-        self.assertEqual((reg.commands["media build"].programs, reg.commands["sign build"].programs), ((), ()))
+        self.assertEqual((reg.commands["media build"].toolchain, reg.commands["sign build"].toolchain), ((), ()))
         self.assertEqual(run_json(["check", "commands"])[0], 0)
 
 

@@ -341,18 +341,18 @@ def openedx_generate(ctx: Ctx, brand: str) -> Resource:
 
 @command("openedx build", category="build",
          help="Write a brand's Open edX package sources and build dist/ with Paragon's CLI",
-         args=[Arg("brand", "BRAND", "the brand")],
-         options=[Opt("--paragon", "TEXT", "Paragon's CLI, such as node_modules/.bin/paragon (PARAGON in the environment otherwise)")])
+         args=[Arg("brand", "BRAND", "the brand")], toolchain=("npm-packages",), toolchain_unless="paragon",
+         options=[Opt("--paragon", "TEXT", "Paragon's CLI of your own, such as node_modules/.bin/paragon (the npm lock's is used otherwise)")])
 def openedx_build(ctx: Ctx, brand: str, paragon: str | None) -> Resource:
     if node.node_path(ctx.env) is None:
         raise AgoraError("missing-program", "openedx build needs node, which comes from the package " + node.PACKAGE
                          + (f"; {node.OVERRIDE} names {node.override(ctx.env)}, which is not a file" if node.override(ctx.env) else ""),
                          exit=MISSING, detail={"package": node.PACKAGE})
-    cli = assurance.paragon_path(paragon, ctx.env)
-    if cli is None or not cli.is_file():
-        raise AgoraError("missing-program", "Paragon's CLI was " + ("not a file: " + str(cli) if cli else "not given")
-                         + "; give the paragon executable (--paragon, or PARAGON in the environment)", exit=MISSING,
-                         detail={"program": "paragon", "hint": f"npm install @openedx/paragon@{openedx.PARAGON_VERSION}, then use node_modules/.bin/paragon"})
+    cli = assurance.paragon_path(paragon) if paragon else ctx.toolchain().use(["npm-packages"]).path_of("paragon")
+    if not cli.is_file():
+        raise AgoraError("missing-program", f"Paragon's CLI is not a file: {cli}; --paragon gives the paragon executable of your own "
+                         "(without it, agora uses the one its npm lock installs)", exit=MISSING,
+                         detail={"program": "paragon", "entry": "npm-packages"})
     b = _brand_dir(ctx, brand)
     got = openedx.built(b, openedx.package_name(b), cli)
     out = b / "openedx"

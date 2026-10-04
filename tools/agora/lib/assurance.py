@@ -24,8 +24,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
-from agora.core.checks import find_program
-from agora.core.resource import MISSING
+from agora.core.resource import MISSING, AgoraError
 from agora.lib import node
 
 Emit = Callable[[str], None]
@@ -40,8 +39,7 @@ class Harness:
     script: str  # relative to the root
     argv: list[str]
     brand: str | None = None  # the brand a themed browser harness runs under
-    programs: list[str] = field(default_factory=list)  # needed: its absence skips the harness
-    optional: list[str] = field(default_factory=list)  # the harness checks without them and says so
+    toolchain: list[str] = field(default_factory=list)  # entries it needs: fetched on first use; what cannot be had skips it
 
     @property
     def label(self) -> str:
@@ -88,10 +86,11 @@ def accepts_brand(script: Path) -> bool:
         return False
 
 
-def _needs(manifest: dict[str, Any], slug: str, kind: str) -> tuple[list[str], list[str]]:
+def _needs(manifest: dict[str, Any], slug: str, kind: str) -> list[str]:
+    """The toolchain entries a harness needs: its kind's, and its own (the manifest's `runners` and `harnesses`)."""
     runner = manifest.get("runners", {}).get(kind, {})
     own = manifest.get("harnesses", {}).get(f"{slug}:{kind}", {})
-    return (list(dict.fromkeys([*runner.get("programs", []), *own.get("programs", [])])), list(own.get("optional", [])))
+    return list(dict.fromkeys([*runner.get("toolchain", []), *own.get("toolchain", [])]))
 
 
 def plan(root: Path, manifest: dict[str, Any], scope: str | None = None, brand: str | None = None,
@@ -107,19 +106,18 @@ def plan(root: Path, manifest: dict[str, Any], scope: str | None = None, brand: 
             missing.append(slug)
             continue
         if py.is_file() and runner in (None, "python"):
-            need, opt = _needs(manifest, slug, "python")
             argv = [sys.executable, str(py.relative_to(root))]
             if brand and accepts_brand(py):
                 argv += ["--brand", brand]
-            out.append(Harness(slug, "python", str(py.relative_to(root)), argv, None, need, opt))
+            out.append(Harness(slug, "python", str(py.relative_to(root)), argv, None, _needs(manifest, slug, "python")))
         if mjs.is_file() and runner in (None, "browser"):
-            need, opt = _needs(manifest, slug, "browser")
+            need = _needs(manifest, slug, "browser")
             rel = str(mjs.relative_to(root))
             if slug in known:
-                out.append(Harness(slug, "browser", rel, ["node", rel], None, need, opt))
+                out.append(Harness(slug, "browser", rel, ["node", rel], None, need))
             else:
                 for b in [brand] if brand else known:
-                    out.append(Harness(slug, "browser", rel, ["node", rel, "--brand", b], b, need, opt))
+                    out.append(Harness(slug, "browser", rel, ["node", rel, "--brand", b], b, need))
     return out, missing
 
 
@@ -145,25 +143,32 @@ def _argv(h: Harness, env: dict[str, str]) -> list[str]:
     return [node.node_path(env) or "node", *h.argv[1:]] if h.argv[0] == "node" else h.argv
 
 
-def run_one(registry: Any, h: Harness, root: Path, env: dict[str, str], emit: Emit) -> Outcome:
-    """Run one harness, streaming its output through `emit`; a program it needs and the host lacks skips it (0041 FR-006)."""
-    gone = [p for p in h.programs if find_program(registry, p, env) is None]
+def run_one(tc: Any, h: Harness, root: Path, env: dict[str, str], emit: Emit) -> Outcome:
+    """Run one harness, streaming its output through `emit`. The toolchain entries it needs are obtained first (fetched on
+    first use unless offline); what cannot be had skips it, naming the entry and the command that fixes it, which makes the
+    run exit 3 (0041 FR-004, FR-006; 0025-tooling-environment FR-017, FR-018, FR-021)."""
     emit(f"── {h.label}")
+    resolved = None
+    problem = ""
+    if h.toolchain:
+        try:
+            resolved = tc.use(h.toolchain)
+        except AgoraError as e:
+            problem = e.message
     no_node = _node_problem(env) if h.argv[0] == "node" else ""
-    if gone or no_node:
-        hints = "; ".join(f"{p}: {registry.program(p).get('hint', 'install it from the host')}" for p in gone)
-        reason = "; ".join(x for x in (f"needs {', '.join(gone)}, not on PATH ({hints})" if gone else "", no_node) if x)
+    if problem or no_node:
+        reason = "; ".join(x for x in (problem, no_node) if x)
         emit(f"⏭️  {h.label}: skipped, {reason}")
         return Outcome(h, "skipped", reason=reason)
     if node.override(env) and h.argv[0] == "node":
         emit(f"   · node is {node.override(env)}, named by {node.OVERRIDE}, not the locked {node.PACKAGE}")
-    for p in h.optional:
-        if find_program(registry, p, env) is None:
-            emit(f"   · {p} is not installed; {h.slug}'s harness checks without it and says what it did not exercise")
+    for entry, path in tc.overridden_in(h.toolchain):
+        emit(f"   · {entry.name} is {path}, named by {entry.variable}, not the locked entry")
+    run_env = harness_env(resolved.env() if resolved else tc.clean_env())
     start = time.monotonic()
     tail: deque[str] = deque(maxlen=KEEP)
     try:
-        proc = subprocess.Popen(_argv(h, env), cwd=root, env=harness_env(env), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        proc = subprocess.Popen(_argv(h, env), cwd=root, env=run_env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 text=True, errors="replace")
     except OSError as e:
         emit(f"❎ {h.label}: could not start: {e}")
@@ -210,17 +215,17 @@ def openedx_brands(root: Path) -> list[str]:
     return [b for b in brands(root) if (root / "design-systems" / b / "openedx").is_dir()]
 
 
-def run_openedx(registry: Any, brand: str, root: Path, env: dict[str, str], paragon: Path | None, emit: Emit) -> Outcome:
-    """The brand's own Open edX harness, assurance/run.py, with PARAGON set when Paragon's CLI is given."""
+def run_openedx(brand: str, root: Path, env: dict[str, str], paragon: Path | None, emit: Emit) -> Outcome:
+    """The brand's own Open edX harness, assurance/run.py, with PARAGON set when Paragon's CLI is available. `env` is what
+    the harness runs under: the toolchain's environment, with the locked node first on PATH."""
     script = root / "design-systems" / brand / "assurance" / "run.py"
     h = Harness(brand, "openedx", str(script.relative_to(root)), [sys.executable, str(script.relative_to(root))])
     extra = {"PARAGON": str(paragon)} if paragon else {}
     no_node = _node_problem(env) if paragon else ""
     emit(f"── {brand}'s Open edX package" + (f", rebuilt with {paragon}" if paragon else ""))
     if no_node:
-        reason = no_node
-        emit(f"⏭️  {brand}'s Open edX package: skipped, {reason}")
-        return Outcome(h, "skipped", reason=reason)
+        emit(f"⏭️  {brand}'s Open edX package: skipped, {no_node}")
+        return Outcome(h, "skipped", reason=no_node)
     start = time.monotonic()
     tail: deque[str] = deque(maxlen=KEEP)
     proc = subprocess.Popen(h.argv, cwd=root, env=harness_env(env, extra), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -235,6 +240,6 @@ def run_openedx(registry: Any, brand: str, root: Path, env: dict[str, str], para
     return Outcome(h, "passed" if code == 0 else "failed", time.monotonic() - start, code, list(tail))
 
 
-def paragon_path(option: str | None, env: dict[str, str]) -> Path | None:
-    value = option or env.get("PARAGON")
-    return Path(value).expanduser().resolve() if value else None
+def paragon_path(option: str | None) -> Path | None:
+    """Paragon's CLI the person named with --paragon, a program of their own (the locked one is the default)."""
+    return Path(option).expanduser().resolve() if option else None

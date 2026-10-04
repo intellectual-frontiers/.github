@@ -121,7 +121,7 @@ class EveryDeclaration(unittest.TestCase):
         ran: list[str] = []
         for n, s in reg.sections.items():
             s.fn = lambda ctx, scope, n=n: (ran.append(n), SectionResult(n))[1]
-            s.programs = ()
+            s.toolchain = ()
         for n, s in reg.sections.items():
             hit = next(f for pat in s.watch if not pat.startswith(".agora/") for f in self.files if glob_regex(pat).match(f))
             want = [x for x in reg.sections if section_changed(reg.sections[x].watch, [hit])[0]]
@@ -141,7 +141,7 @@ class EveryDeclaration(unittest.TestCase):
         from agora.core.generate import Generated
         for n, g in reg.generators.items():
             g.fn = lambda ctx, scope, n=n: (proved.append(n), Generated())[1]
-            g.programs = ()
+            g.toolchain = ()
         for n, g in reg.generators.items():
             hit = next(f for pat in g.watch for f in self.files if glob_regex(pat).match(f))
             want = [x for x in reg.generators if section_changed(reg.generators[x].watch, [hit])[0]]

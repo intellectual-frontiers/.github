@@ -2176,6 +2176,12 @@ ifcore:SignResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme
 ifcore:CourseResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "course"@en ;
     skos:notation "course" ;
     skos:definition "A course built with the course design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ToolchainResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "toolchain"@en ;
+    skos:notation "toolchain" ;
+    skos:definition "A program outside Python that a command needs, pinned and verified, fetched once into a per-user cache (0041-command-line FR-066, FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "system"@en ;
+    skos:notation "system" ;
+    skos:definition "The shared libraries a browser links, which only an administrator can install (0041-command-line FR-069; 0025-tooling-environment FR-021)."@en ; ifcore:hasAudience ifcore:Public .
 
 # agora's commands (0042-agora FR-005, FR-006): noun, verb and category, one individual per command.
 ifcore:AgoraCheckCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "check"@en ;
@@ -2209,7 +2215,27 @@ ifcore:AgoraCommandListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
 ifcore:AgoraCommandShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "command show"@en ;
     dcterms:identifier "command show" ;
     ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Shows one command with its arguments, surfaces and programs."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "Shows one command with its arguments, surfaces, group and toolchain entries."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain list"@en ;
+    dcterms:identifier "toolchain list" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the toolchain entries, their versions and whether the cache holds each (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain show"@en ;
+    dcterms:identifier "toolchain show" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one toolchain entry: addresses and checksums per platform, what it provides and its cache state (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain add"@en ;
+    dcterms:identifier "toolchain add" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Fetches, verifies and unpacks toolchain entries into the per-user cache and runs each one's functional check (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system list"@en ;
+    dcterms:identifier "system list" ;
+    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the shared libraries a browser links, the pinned package that holds each and which are present (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSystemAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system add"@en ;
+    dcterms:identifier "system add" ;
+    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Installs the browser's missing shared libraries through sudo, after printing what it runs and asking; the only command that runs sudo (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraMcpServeCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "mcp serve"@en ;
     dcterms:identifier "mcp serve" ;
     ifcore:commandNoun ifcore:McpResourceKind ; ifcore:commandVerb ifcore:ServeCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
