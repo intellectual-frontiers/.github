@@ -80,8 +80,8 @@ package records and Decisions, not stated here.
 
 ## Open questions
 
-- **OQ-1**: Which managed Open edX provider, or a self-hosted instance,
-  runs the house's courses is not decided; FR-007 records it when it is.
+None. Which platforms run the house's courses is a standing decision kept in
+the vault; each run names its platform in a Decision, per FR-007.
 
 ## Key entities
 
