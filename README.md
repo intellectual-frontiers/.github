@@ -103,25 +103,28 @@ The longer essay is
 
 ### Start working
 
-Everything this repository's tools need is already in the workspace. There
-is nothing to install and no `make install` (0024, 0025). Pick one:
+This repository's tools install themselves. A computer needs only `python3`
+(3.11 or later) and [`uv`](https://docs.astral.sh/uv/); there is no
+`make install` and no environment to prepare (0024, 0025).
 
-1. **In your browser, nothing installed** (the default on macOS and
-   Windows 11): [Open in GitHub Codespaces](https://codespaces.new/intellectual-frontiers/.github).
-2. **On your own computer, in a container:** install
-   [VS Code](https://code.visualstudio.com/) and
-   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on
-   Windows, with its WSL 2 backend), then
-   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/intellectual-frontiers/.github).
-3. **On Linux or in a VM, without containers:** install
-   [workspaces-host-v3](https://intellectual-frontiers.github.io/workspaces-host-v3/)
-   and activate the `press` persona.
+1. Install `python3` and `uv`.
+2. Clone this repository and run `./agora doctor`, then `./agora check`.
+   `agora` fetches the Python packages its commands need from hashed locks,
+   and every other program (a typesetter, a browser) into a per-user cache,
+   verified by checksum, the first time a command needs it. Nothing found on
+   your computer is used unless you opt in by name.
+3. Optionally, work in VS Code with the IF Console extension (0043): a tree
+   of the commands, findings in the Problems panel, a diff before any write.
+   The command line is the core; the extension only runs it.
 
-Whichever you pick, **log in to GitHub first.** When the workspace opens,
-it asks you to (`gh auth login`); in a Codespace you are already logged
-in. It then clones `.github`, `eidolon` and `www.intellectualfrontiers.com`
-beside each other, from
-[`.devcontainer/ws-repos.json`](.devcontainer/ws-repos.json).
+Chromium on Linux also needs some system libraries. Install them once with
+`./agora system add --dry-run` to see exactly what it would run, then
+`./agora system add`, which asks before it uses `sudo` (0025 FR-021). No other
+command uses `sudo`, and `./agora doctor` tells you when they are missing.
+
+A prepared workspace (`workspaces-host`, on Debian or Ubuntu, including under
+WSL) is another way to set up a machine and clone the sibling repositories. It
+is a convenience: nothing here requires it (0026).
 
 ### Three repositories, one Eidolon
 
@@ -150,18 +153,31 @@ spec-kit/
   enforcement.tsv   what enforces each requirement, or none (0020-spec-format)
   controls.tsv      which compliance control each requirement addresses
                     (0028-compliance-controls)
+agora               the orchestrator: one launcher (needs only uv and Python 3)
+                    that runs every check, build and record in this repository
+                    (0041-command-line, 0042-agora); CI calls only it
 tools/
-  spec_check.py     checks specs and the register; CI runs it on every push
-  reference-environment
-                    the workspaces-host-v3 commit every tool is guaranteed
-                    to run in (0025-tooling-environment)
-.devcontainer/      the workspace this repository opens in, and the
-                    repositories it clones beside it (0026-workspaces)
+  agora/            agora's code: core, lib, groups/<group>/ (each with its
+                    agora.toml, and an agora.lock where it pins packages, until
+                    each moves to code and uv.lock, 0042 OQ-3), and tests/
+  if-console/       the IF Console VS Code extension's source (0043-if-console);
+                    built by agora, no runtime dependencies
+.claude/
+  skills/agora/     SKILL.md, the agent skill agora generates from its registry
+                    (0042-agora FR-028)
+.devcontainer/
+                    ws-repos.json: the repositories a register row may name
+                    (read by agora's register check until 0042 OQ-3 moves
+                    that to the ontology); no workspace is required (0025 FR-025)
 ontology/
-  ifcore.ttl        core company ontology (the ifcore: namespace)
+  ifcore.ttl        core company ontology (the ifcore: namespace), including
+                    agora's command set
   ifweb.ttl         web content shapes (the ifweb: namespace)
 content/
   journal/          public content documents (the only content root)
+.agora/
+  logs/             agora's untracked action logs (gitignored, 0041 FR-042)
+  proposals/        changes proposed for a person to decide (tracked)
 design-systems/
   README.md         what a design system is, its kinds, and how to use any one
   <identity>-<kind>/ one self-contained design system per directory, of one
@@ -197,7 +213,7 @@ of it. If you want to add something, ask which layer it is missing from.
 - Add a row to [`spec-kit/enforcement.tsv`](spec-kit/enforcement.tsv) for
   every new `FR-NNN`: `check`, `gate`, `review`, or `none`, and what does it.
   Record `none` honestly; the check lists every one on every run.
-- Run `python3 tools/spec_check.py` before you push; CI runs it too.
+- Run `./agora check --suite spec` before you push; CI runs it too.
 - Cite other specs by ID and FR (for example, "0001 FR-016"). Do not restate
   their rules.
 - When a spec changes the meaning of an earlier one, amend the earlier spec in
@@ -230,8 +246,8 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0022](spec-kit/specs/0022-domain-names/spec.md) | Domain names: assets apart from what they serve; registry facts by reference; DNS as code |
 | [0023](spec-kit/specs/0023-domain-security/spec.md) | Domain security: a baseline every domain carries, checked automatically, departed from only by decision |
 | [0024](spec-kit/specs/0024-persistent-addresses/spec.md) | Persistent addresses: published and printed URLs, the ontology's namespaces, and identifiers that outlive them |
-| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools run anywhere their prerequisites are met, and always in workspaces-host-v3 |
-| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: one environment in several flavors; each repository's devcontainer, repository list, and GitHub login |
+| [0025](spec-kit/specs/0025-tooling-environment/spec.md) | Tooling environment: tools install themselves; a host needs only python3 and uv; hashed Python locks and a toolchain lock fetched into a verified per-user cache; no workspace required |
+| [0026](spec-kit/specs/0026-workspaces/spec.md) | Workspaces: an optional convenience; one flavor, Debian-family bare metal with VS Code; sibling repositories, fast-forward-only updates, and trust |
 | [0027](spec-kit/specs/0027-course-works/spec.md) | Course works: a subject taught at length as a work, its bible, its source in frontiers-course's form, and where it runs as a Decision |
 | [0028](spec-kit/specs/0028-compliance-controls/spec.md) | Compliance controls: frameworks as control catalogs, a boundary per legal entity, requirements mapped to controls, departures by decision, evidence, and assessors |
 | [0029](spec-kit/specs/0029-government-registrations/spec.md) | Government registrations: federal award, cybersecurity affirmation, tax and state filings held by reference, with expiry reported |
@@ -246,6 +262,9 @@ of it. If you want to add something, ask which layer it is missing from.
 | [0038](spec-kit/specs/0038-personnel-security-policy/spec.md) | Personnel security: conduct, conflicts of interest, screening, training, joining and leaving |
 | [0039](spec-kit/specs/0039-business-continuity-policy/spec.md) | Business continuity: recovery objectives, separated backups, restore tests, copies of the Eidolon |
 | [0040](spec-kit/specs/0040-security-program-policy/spec.md) | Security program: the policies as one program, yearly oversight, communication, independent assessment |
+| [0041](spec-kit/specs/0041-command-line/spec.md) | A repository's orchestrator: launcher and uv's files, a registry in code, typed commands, resources in three renderings, surfaces (the command line, IF Console, MCP) by category, a toolchain lock, Git as the only record |
+| [0042](spec-kit/specs/0042-agora/spec.md) | agora: the public root's orchestrator, its command set, checks, generators, toolchain, and CI |
+| [0043](spec-kit/specs/0043-if-console/spec.md) | Intellectual Frontiers Console (IF Console): the VS Code extension that is every orchestrator's secondary interface |
 
 Each design system's house rules are a spec too, kept in its own directory
 and named by its slug rather than a number: for example
@@ -258,6 +277,104 @@ rather than per-feature documents, so there is no `plan.md`, `tasks.md`, or
 feature branch; the ontology plays the data model's part, open questions
 (`OQ-N`) replace inline clarification markers, and the enforcement register
 replaces Spec Kit's consistency analysis. 0020 states each difference.
+
+### The orchestrator
+
+`agora` (the public square) is this repository's one orchestrator: every
+check, build and record runs through it, and CI calls nothing else. The name
+says what it is for, an orchestrator for what is public; it differs from any
+other orchestrator's name at a glance and by any one typo, and it reads well in
+a prompt (0042-agora FR-002). It reads nothing outside this repository.
+
+- Run `./agora check` for every check, `./agora check --suite spec` for the
+  spec, register and ontology checks, `./agora check --suite browser`, `python` or
+  `images` for the design systems' harnesses, each brand's imagery and its Open edX
+  package (the programs they need are fetched once, pinned and verified: see below; a
+  harness whose program cannot be had, offline with a cold cache or for lack of a browser
+  library, is skipped naming what it needs and the command that supplies it, never passed,
+  and the run exits 3), `./agora check --changed` for only the sections whose
+  watched paths changed, `./agora fresh` to prove generated files are current,
+  `./agora doctor` for what is missing, `./agora test` for its own tests, `./agora lock
+  [GROUP]` to write the lock, and `./agora context RESOURCE` (such as
+  `context spec:0020`) for what an agent needs to work on one resource. Every command
+  takes `--json` and, if it writes, `--dry-run`.
+- A command is `agora <noun> <verb> [ID] [--options]`. `agora command list` and
+  `agora command show COMMAND` list every command with its category, arguments and
+  surfaces, and `.claude/skills/agora/SKILL.md` says the same to an AI agent; both
+  come from the registry. By noun (a `decision` command is for a person):
+
+  | Noun | Commands |
+  | --- | --- |
+  | `spec` | `list`, `show`, `new`, `set --status` (decision) |
+  | `requirement` | `list`, `show`, `set`, `add --control` |
+  | `term` | `list`, `show` |
+  | `design-system` | `list`, `show`, `new --kind` |
+  | `brand` | `list`, `show`, `generate` |
+  | `imagery` | `list`, `show`, `build`, `add` |
+  | `decoration` | `show`, `generate` |
+  | `ink` | `list`, `show`, `record` (decision) |
+  | `openedx` | `generate`, `build` |
+  | `layout` | `list`, `show`, `build` |
+  | `figure`, `deck`, `email`, `media`, `sign` | `build`; `figure` also `generate` |
+  | `course` | `show`, `build` |
+  | `proposal` | `list`, `show`, `new`, `advance` (decision) |
+  | `skill` | `generate` |
+  | `command` | `list`, `show` |
+  | `toolchain` | `list`, `show`, `add` (setup: fetches and verifies the pinned programs) |
+  | `system` | `list`, `add` (setup: the one command that runs `sudo`; asks first) |
+  | `mcp` | `serve` |
+
+- The design systems' own scripts stay in their directories and `agora` calls them:
+  `agora deck build`, `email build`, `course build`, `media build`, `sign build` and
+  `figure build` build what they build, `agora layout list|show|build` reads the print
+  layouts, and `agora check figures|voice|slides|email|course|media|signage|merchandise
+  --scope PATH` checks a piece of work with a design system's own rules (with no
+  `--scope`, each checks that design system's passing fixtures).
+- The launcher needs only `uv` and Python 3. Python packages come from
+  committed locks (`tools/agora/groups/<group>/agora.lock`, moving to uv's `uv.lock`), and
+  `AGORA_OFFLINE=1` (or `--offline`) makes it download nothing; programs outside
+  Python come from Python packages in those locks wherever a wheel exists: Node
+  (`nodejs-wheel-binaries`), poppler's readers (`pypdfium2`, `pypdf`), rsvg-convert
+  (`resvg-py`, and `reportlab` for a sign's PDF), ImageMagick (`Pillow`), potrace
+  (`potracer`) and Git's reads (`dulwich`), so none of them is installed on the host
+  and a command's output never depends on one (0042 FR-030, 0025 FR-007, FR-013).
+- What has no wheel is the **toolchain lock**, declared in `tools/agora/toolchain/`:
+  `tinytex` (TinyTeX, TeX Live 2025: XeLaTeX and LuaLaTeX), `tex-packages` (the extra
+  TeX Live packages the print design system loads, each container pinned by its
+  checksum from TeX Live's frozen 2025 repository), `chromium` (Playwright's pinned
+  build) and `npm-packages` (Playwright for Node and Paragon, from
+  `tools/agora/npm/package-lock.json`, installed with `npm ci` by the Node the locked
+  package supplies). Each has a version, an address and a SHA-256 per platform and a
+  functional check. A command that needs one fetches it into a per-user cache the first
+  time (`~/.cache/agora/toolchain`, or `AGORA_TOOLCHAIN_CACHE`), verifies the checksum
+  before unpacking, and uses that copy, never one found on the host. `agora toolchain
+  list|show|add` reads and prepares the cache while online; `--offline` uses only the
+  cache and fails naming the entry and `agora toolchain add`. A program of your own
+  stands in for an entry only if you name it, with `AGORA_<ENTRY>` (`AGORA_TINYTEX`,
+  `AGORA_TEX_PACKAGES`, `AGORA_CHROMIUM`, `AGORA_NPM_PACKAGES`); `doctor` lists each one
+  and `fresh` will not call a generator's output current while one stands in (0025
+  FR-015 to FR-020).
+- The one thing a fetch cannot supply is Chromium's shared libraries on Linux, which need
+  administrator rights. `agora system list` shows which are missing; `agora system add
+  --dry-run` prints exactly what it would run (`apt` on Debian and Ubuntu; on another
+  family it names the libraries and stops); `agora system add` asks before it runs
+  `sudo`, and `agora system add --yes` skips the question (for CI). It is the only
+  command that uses `sudo`, it is never run by another command, and it is not offered
+  over MCP: a command that needs the browser fails naming each library and this command
+  (0025 FR-021).
+- Git is the only record: `agora` never commits or pushes. What changes or runs
+  something and is not worth a commit (a check, a build, a dry run, an MCP call)
+  goes to untracked logs in `.agora/logs/`; reads are not logged. An agent that wants
+  a decision made drafts it with `agora proposal new`, a tracked file in
+  `.agora/proposals/` that a person accepts with `agora proposal advance`.
+- The graphical interface is the VS Code extension `workspaces-host` ships: it shows
+  the resources agora returns, and runs their actions by calling agora, with a modal
+  confirmation a person must click for any decision (0041 FR-050, FR-051). agora runs
+  no server. `./agora mcp serve` serves its commands and the repository's resources to an AI agent
+  over standard input and output, a write a dry run unless it says otherwise, and never
+  a decision, which only a person makes.
+- To add a command: spec first (0042), then its individual in the ontology, then
+  its code in a group under `tools/agora/groups/`.
 
 ### Editing the ontology
 
@@ -313,14 +430,15 @@ media (`frontiers-media`), email (`frontiers-email`), courses (`frontiers-course
 (`frontiers-merchandise`) and the house voice (`frontiers-written-voice`,
 `frontiers-spoken-voice`). Every public house rule about how Intellectual Frontiers
 looks, reads or sounds belongs in a design system of its kind here too (0014). Every design system
-carries an `assurance/` harness; `tools/run_assurance.sh` runs them all, and CI
-runs it on every push that touches `design-systems/`.
+carries an `assurance/` harness that runs on its own; `agora check design-systems`
+runs them all, and CI runs `agora check --suite browser`, `--suite python` and `--suite images`
+on every push that touches `design-systems/`.
 
 - Logos: `design-systems/frontiers-brand/logos/` (PNG; WebP in `logos/web/`).
   Use the `-dark-` variants on dark backgrounds.
 - Pictures: the brand's imagery pool, `design-systems/frontiers-brand/imagery/`; app icons and the share card in
   `design-systems/frontiers-brand/images/`; figures are drawn with `design-systems/frontiers-figures/` (the
-  profile's are made by `profile/figures/make.py`).
+  profile's are written by `agora figure generate`, the `profile-figure` generator).
 - Consumers **vendor a pinned copy** and never edit it downstream; change a
   design system only by amending its own source (0014).
 - Reference assets from here by path rather than copying them, so there is one
@@ -331,10 +449,12 @@ runs it on every push that touches `design-systems/`.
 ### Before you commit
 
 - [ ] A spec exists for the change, and any spec it affects is amended.
-- [ ] `python3 tools/spec_check.py` passes, and every new requirement has a
+- [ ] `./agora check --suite spec` passes, and every new requirement has a
       row in `spec-kit/enforcement.tsv`.
-- [ ] Any tool you add declares its prerequisites and installs nothing; it
-      runs from a fresh clone in workspaces-host-v3 (0025).
+- [ ] Any command you add is declared in `agora`'s registry and in the
+      ontology, and `./agora check commands` passes; it declares its
+      prerequisites and installs nothing; it runs from a fresh clone that has only
+      `python3` and `uv` (0025, 0041, 0042).
 - [ ] The ontology represents it, with an audience on every fact.
 - [ ] No sensitive fact appears as a literal; nothing non-public is asserted.
 - [ ] No duplicated facts; references point at the single source.

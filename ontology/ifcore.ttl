@@ -831,6 +831,9 @@ ifcore:DesignPattern a ifcore:NoteType ; rdfs:label "Design pattern"@en ; ifcore
 ifcore:OperatingTheory a ifcore:NoteType ; rdfs:label "Operating theory"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Note a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Note or paper"@en ;
     rdfs:comment "Where a finding is recorded (0006 FR-003), and the entity a research activity generates via prov:wasGeneratedBy (0007-work-and-assets FR-002). A peer-reviewed paper additionally carries a DOI (FR-004)."@en .
+ifcore:LandscapeReview a owl:Class ; rdfs:subClassOf ifcore:Note ; rdfs:label "Landscape review"@en ;
+    rdfs:comment "A research record that shows how an organization is likely to fare against others on a complex task, by letting the reader place their own numbers against a peer spread (0017-spoken-and-research-works FR-017). A kind of note, so a check can find it by type."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
 ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
 
@@ -979,6 +982,17 @@ ifcore:Framework a ifcore:ClaimKind ; rdfs:label "Framework"@en ; ifcore:hasAudi
 ifcore:Illustration a ifcore:ClaimKind ; rdfs:label "Illustration"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:claimKind a owl:ObjectProperty ; rdfs:range ifcore:ClaimKind ;
     rdfs:comment "What kind of claim a published fact or creative work is making."@en .
+
+ifcore:ClaimLabel a owl:Class ; rdfs:label "Claim label"@en ;
+    rdfs:comment "How settled one research claim is: one of six, a closed set (0017-spoken-and-research-works FR-021). Distinct from ifcore:ClaimKind, which says what sort of claim any Press output makes (0009-press FR-001); a section may carry one of each."@en .
+ifcore:ObservationLabel a ifcore:ClaimLabel ; rdfs:label "observation"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HypothesisLabel a ifcore:ClaimLabel ; rdfs:label "hypothesis"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EvidenceLabel a ifcore:ClaimLabel ; rdfs:label "evidence"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:InferenceLabel a ifcore:ClaimLabel ; rdfs:label "inference"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RecommendationLabel a ifcore:ClaimLabel ; rdfs:label "recommendation"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UnknownLabel a ifcore:ClaimLabel ; rdfs:label "unknown"@en ; ifcore:hasAudience ifcore:Public .
+ifcore:claimLabel a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:range ifcore:ClaimLabel ;
+    rdfs:comment "The one label a research claim carries (0017-spoken-and-research-works FR-021); functional, so a claim carries at most one."@en .
 
 ifcore:VoicePrinciple a owl:Class ; rdfs:label "Voice principle"@en .
 ifcore:EvidenceLed a ifcore:VoicePrinciple ; rdfs:label "Evidence-led"@en ; ifcore:hasAudience ifcore:Public .
@@ -1936,41 +1950,468 @@ ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormSch
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
-# Which environment every tool is guaranteed to run in. The repository is reused as
-# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002); the commit each Eidolon repository is
-# guaranteed against is not a fact here but its tools/reference-environment pin (0025 FR-008).
+# Every tool installs itself: a host supplies only python3 and uv (0025 FR-014); Python packages come from hashed uv
+# locks and every other program from a toolchain lock fetched into a per-user cache (0025 FR-013, FR-015). A reference
+# environment is an optional convenience, never required (0025 FR-005, FR-025). The repository is reused as
+# schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002). Which entries a repository's toolchain lock holds is
+# declared in that repository's orchestrator code, not restated here (0001-eidolon-architecture FR-019).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
-    rdfs:comment "The provisioned environment whose base profile every tool in an Eidolon repository is guaranteed to run in unmodified, while staying runnable anywhere its declared prerequisites are met (0025-tooling-environment FR-002, FR-005, FR-006). Exactly one is in force at a time; a successor replaces this individual rather than adding a second (FR-012)."@en .
+    rdfs:comment "An optional, prepared environment, a release of its repository on a Debian-family host, that a person MAY choose as a convenience. No tool, check, workflow or hint of an Eidolon repository requires it, and a tool runs on a host that has only python3 and uv (0025-tooling-environment FR-005, FR-014, FR-025)."@en .
 
-ifcore:WorkspacesHostV3 a ifcore:ReferenceEnvironment ;
-    dcterms:identifier "workspaces-host-v3" ;
-    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host-v3> ;
-    ifcore:workspaceFlavor ifcore:BareMetalNixFlavor, ifcore:VirtualMachineNixFlavor, ifcore:ContainerImageFlavor, ifcore:DevcontainerFlavor, ifcore:CloudAgentSessionFlavor ;
-    rdfs:comment "A Nix flake and home-manager configuration that provisions the same shell and tools in every flavor. With the personas a repository's devcontainer names, it is the reference environment (0025-tooling-environment FR-005)."@en ;
+ifcore:ToolchainEntry a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Toolchain entry"@en ;
+    skos:definition "A program a command needs that has no Python wheel, pinned in a repository's toolchain lock with a version and, for each platform, an address and a SHA-256, fetched once into a per-user cache and verified before use (0025-tooling-environment FR-015, FR-016, FR-017)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002). The entries themselves are declared in each orchestrator's code (0041-command-line FR-066) and are not individuals here."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:WorkspacesHost a ifcore:ReferenceEnvironment ;
+    dcterms:identifier "workspaces-host" ;
+    schema:codeRepository <https://github.com/intellectual-frontiers/workspaces-host> ;
+    ifcore:workspaceFlavor ifcore:DebianFamilyBareMetalFlavor ;
+    rdfs:comment "Prepares a person's machine, clones and updates their repositories without touching their work, and checks health (0026-workspaces FR-008). Its orchestrator is ws-host. It is an optional convenience and the reference environment a person MAY choose (0025-tooling-environment FR-005); nothing depends on it."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
-# The flavors are ways to run the one reference environment, built from the same flake commit (0026 FR-001).
-# Which repositories carry a devcontainer, and what each lists, is held in each repository's .devcontainer/
-# files, never restated here (0001-eidolon-architecture FR-019).
+# The flavor is the one way the optional workspace is run (0026 FR-001). What each repository lists is held in
+# its own .workspaces-host/ws-host.env, never restated here (0001-eidolon-architecture FR-019).
 
 ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
-    rdfs:comment "A flavor the reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
+    rdfs:comment "A flavor the optional reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
 
 ifcore:WorkspaceFlavorScheme a skos:ConceptScheme ; rdfs:label "Workspace flavor"@en ;
-    rdfs:comment "The ways the reference environment runs, each from the same flake commit; a new one is added here and in 0026-workspaces FR-001 (FR-003)."@en ;
+    rdfs:comment "The ways the optional workspace runs; a new one is added here and in 0026-workspaces FR-001 under its own spec (FR-003)."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:BareMetalNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Bare-metal Linux with Nix"@en ;
-    skos:definition "Installed with Nix and home-manager directly on a Linux machine."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:VirtualMachineNixFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Linux virtual machine with Nix"@en ;
-    skos:definition "Installed with Nix and home-manager in a Linux virtual machine, including WSL on Windows and a Linux virtual machine on macOS."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:ContainerImageFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "OCI container image"@en ;
-    skos:definition "The published Linux container image, run directly; the flavor continuous integration uses (0025-tooling-environment FR-010)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:DevcontainerFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Devcontainer"@en ;
-    skos:definition "The published image opened through a repository's .devcontainer/ files, locally or in GitHub Codespaces; the default starting point on macOS and Windows 11 (0026-workspaces FR-011)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:CloudAgentSessionFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Cloud agent session"@en ;
-    skos:definition "A hosted session in which an AI agent works in the environment."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DebianFamilyBareMetalFlavor a skos:Concept ; skos:inScheme ifcore:WorkspaceFlavorScheme ; skos:prefLabel "Debian-family bare metal"@en ;
+    skos:definition "Installed directly on a machine running a Debian-family Linux distribution, Debian or Ubuntu, including Ubuntu under WSL on Windows, with VS Code as its graphical interface (0026-workspaces FR-001)."@en ; ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Orchestrators (0041-command-line, 0042-agora) ─────────────────────────
+# A repository's orchestrator declares its commands in a registry in code (0041 FR-007); the public root's command set
+# is also declared here, one individual per command, and `agora check commands` fails when the registry and these
+# individuals disagree (0042 FR-004). The schemes reuse SKOS rather than declaring new classes (0019-controlled-vocabulary
+# FR-001); a command is a schema:Action and its orchestrator a schema:SoftwareApplication (0019 FR-002).
+
+ifcore:Orchestrator a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Orchestrator"@en ;
+    skos:definition "The one launcher and registry of commands through which a repository's behavior runs, for people, CI and AI agents alike (0041-command-line FR-001, FR-007)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002). Each of its commands is an ifcore:Command naming it by ifcore:commandOf."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:Command a owl:Class ; rdfs:subClassOf schema:Action ; rdfs:label "Command"@en ;
+    skos:definition "One command of an orchestrator: its words, the kind of resource it acts on, its verb, and its category (0041-command-line FR-008, FR-014)."@en ;
+    rdfs:comment "Specializes schema:Action (0019 FR-002). Its words are dcterms:identifier, for example spec show. A command with no noun is one of the closed repository-wide set (0041 FR-010) and has no ifcore:commandNoun; a command whose second word is not in the verb scheme (the mcp control word, 0041 FR-011) or that is repository-wide has no ifcore:commandVerb, except check, which carries the verb check. Every command has exactly one category."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:commandOf a owl:ObjectProperty ; rdfs:subPropertyOf schema:isPartOf ; rdfs:domain ifcore:Command ; rdfs:range ifcore:Orchestrator ;
+    rdfs:comment "The orchestrator a command belongs to (0042-agora FR-004)."@en .
+ifcore:commandNoun a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
+    rdfs:comment "The kind of resource a command acts on, a concept in ifcore:ResourceKindScheme (0041-command-line FR-008). No established property names it (0019-controlled-vocabulary FR-004)."@en .
+ifcore:commandVerb a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
+    rdfs:comment "A command's verb, a concept in ifcore:CommandVerbScheme (0041-command-line FR-008). No established property names it (0019-controlled-vocabulary FR-004)."@en .
+ifcore:commandCategory a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;
+    rdfs:comment "A command's one category, a concept in ifcore:CommandCategoryScheme, which decides what it may do and which surfaces expose it by default (0041-command-line FR-014, FR-022). No established property names it (0019-controlled-vocabulary FR-004)."@en .
+
+ifcore:Agora a ifcore:Orchestrator ; rdfs:label "agora"@en ;
+    dcterms:identifier "agora" ;
+    skos:definition "The public root's orchestrator, named for the public square (0042-agora FR-001, FR-002)."@en ;
+    rdfs:comment "Public only: it reads and depends on no other repository (0042 FR-003). Its commands are the ifcore:Command individuals below that name it by ifcore:commandOf."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EditorExtension a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Editor extension"@en ;
+    skos:definition "A program that runs inside an editor and operates orchestrators only through their command lines, holding no behavior of its own (0041-command-line FR-050)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:drives a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range ifcore:Orchestrator ;
+    rdfs:comment "An orchestrator whose commands an editor extension offers by running its command line (0043-if-console FR-003). The extension finds orchestrators by each repository's own declaration (0043 FR-004), so a repository states its own individual here only where its own ontology holds it. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+ifcore:providesSurface a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range skos:Concept ;
+    rdfs:comment "The command surface an extension is (0043-if-console FR-001), a concept in ifcore:CommandSurfaceScheme. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+
+ifcore:IfConsole a ifcore:EditorExtension ; rdfs:label "Intellectual Frontiers Console"@en ;
+    dcterms:identifier "if-console" ;
+    skos:altLabel "IF Console"@en ;
+    skos:definition "The one VS Code extension that is the secondary interface for every orchestrator: a tree of nouns, commands and resources, findings in the Problems panel, checks as tasks and tests, quick picks from typed arguments, a diff before any write, a modal confirmation for a decision, and each repository's MCP server registered (0043-if-console FR-001, FR-008 through FR-022)."@en ;
+    rdfs:comment "Public, held in the public root at tools/if-console/ (0043 FR-002). It drives the public root's orchestrator, and discovers any other by that repository's own declaration (0043 FR-004). It collects no telemetry and opens no network connection (0043 FR-023)."@en ;
+    ifcore:providesSurface ifcore:EditorCommandSurface ;
+    ifcore:drives ifcore:Agora ;
+    ifcore:hasAudience ifcore:Public .
+
+
+ifcore:CommandCategoryScheme a skos:ConceptScheme ; rdfs:label "Command category"@en ;
+    rdfs:comment "The seven categories every command has exactly one of; a category decides what a command may do and which surfaces expose it by default (0041-command-line FR-014, FR-022)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ReadCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "read"@en ;
+    skos:notation "read" ;
+    skos:definition "Changes nothing: it returns a resource describing the repository."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CheckCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "check"@en ;
+    skos:notation "check" ;
+    skos:definition "Verifies something and changes nothing tracked."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RecordCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "record"@en ;
+    skos:notation "record" ;
+    skos:definition "Appends a fact to the tracked record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BuildCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "build"@en ;
+    skos:notation "build" ;
+    skos:definition "Writes derived output that is not itself the record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:GenerateCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "generate"@en ;
+    skos:notation "generate" ;
+    skos:definition "Rewrites tracked files wholly derived from a declared source, proven current by fresh."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DecisionCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "decision"@en ;
+    skos:notation "decision" ;
+    skos:definition "Changes what only the authority in effect decides; never callable over MCP (0041-command-line FR-023)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SetupCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategoryScheme ; skos:prefLabel "setup"@en ;
+    skos:notation "setup" ;
+    skos:definition "Changes the clone's own environment, such as a lock, a fetched toolchain entry or a running server."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:CommandVerbScheme a skos:ConceptScheme ; rdfs:label "Command verb"@en ;
+    rdfs:comment "The fixed set of thirteen verbs an orchestrator's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ListCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "list"@en ;
+    skos:notation "list" ;
+    skos:definition "Many resources of a kind, with filters."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ShowCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "show"@en ;
+    skos:notation "show" ;
+    skos:definition "One resource in full."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:StatusCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "status"@en ;
+    skos:notation "status" ;
+    skos:definition "The state of a resource over time."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CheckCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "check"@en ;
+    skos:notation "check" ;
+    skos:definition "Verifies; the one verb that only the noun-less check command carries, because a check runs only through check (0041-command-line FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BuildCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "build"@en ;
+    skos:notation "build" ;
+    skos:definition "Writes derived output that is not itself the record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:GenerateCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "generate"@en ;
+    skos:notation "generate" ;
+    skos:definition "Writes tracked files wholly derived from a declared source."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AddCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "add"@en ;
+    skos:notation "add" ;
+    skos:definition "Puts an item into a collection."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SetCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "set"@en ;
+    skos:notation "set" ;
+    skos:definition "Changes one field of an existing resource."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RecordCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "record"@en ;
+    skos:notation "record" ;
+    skos:definition "Appends a fact to the tracked record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NewCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "new"@en ;
+    skos:notation "new" ;
+    skos:definition "Creates a resource."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AdvanceCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "advance"@en ;
+    skos:notation "advance" ;
+    skos:definition "Moves a resource to its next state."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PublishCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "publish"@en ;
+    skos:notation "publish" ;
+    skos:definition "Sends something outside the clone."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ServeCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "serve"@en ;
+    skos:notation "serve" ;
+    skos:definition "Runs until stopped."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:CommandSurfaceScheme a skos:ConceptScheme ; rdfs:label "Command surface"@en ;
+    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The terminal is the core; the editor is served by the IF Console extension (0043-if-console), not by a command; and MCP is for agents. No web UI is a surface."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TerminalCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "terminal"@en ;
+    skos:notation "cli" ;
+    skos:definition "The command line, the core interface; every command is callable here (0041-command-line FR-022)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EditorCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "editor"@en ;
+    skos:notation "editor" ;
+    skos:definition "The secondary interface, the IF Console VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050, 0043-if-console FR-003)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "MCP"@en ;
+    skos:notation "mcp" ;
+    skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:ResourceKindScheme a skos:ConceptScheme ; rdfs:label "Resource kind"@en ;
+    rdfs:comment "The kinds of resource an orchestrator's commands act on, which are its nouns (0041-command-line FR-008, FR-016). A repository-wide command's own resource has its command's name as its kind, and an error has the kind error; neither is a noun."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CommandResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "command"@en ;
+    skos:notation "command" ;
+    skos:definition "A command in the registry."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:McpResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "mcp"@en ;
+    skos:notation "mcp" ;
+    skos:definition "The MCP server agora serves."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ProposalResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "proposal"@en ;
+    skos:notation "proposal" ;
+    skos:definition "A tracked, replayable change proposed for a person to decide (0041-command-line FR-039)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SpecResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "spec"@en ;
+    skos:notation "spec" ;
+    skos:definition "A spec, numbered or a design system's."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RequirementResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "requirement"@en ;
+    skos:notation "requirement" ;
+    skos:definition "One requirement of a spec, with its enforcement and control rows."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TermResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "term"@en ;
+    skos:notation "term" ;
+    skos:definition "A concept of the ontology's controlled vocabulary."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DesignSystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "design-system"@en ;
+    skos:notation "design-system" ;
+    skos:definition "A design system registered in the ontology."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BrandResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "brand"@en ;
+    skos:notation "brand" ;
+    skos:definition "A brand design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ImageryResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "imagery"@en ;
+    skos:notation "imagery" ;
+    skos:definition "A brand's imagery pool and its pieces."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DecorationResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "decoration"@en ;
+    skos:notation "decoration" ;
+    skos:definition "A brand's decoration kit."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:InkResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "ink"@en ;
+    skos:notation "ink" ;
+    skos:definition "One ink of a brand's decoration kit."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OpenedxResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "openedx"@en ;
+    skos:notation "openedx" ;
+    skos:definition "A brand's Open edX package."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LayoutResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "layout"@en ;
+    skos:notation "layout" ;
+    skos:definition "A print layout of the print design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
+    skos:notation "skill" ;
+    skos:definition "The skill file that tells an AI agent how to use the orchestrator, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FigureResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "figure"@en ;
+    skos:notation "figure" ;
+    skos:definition "A figure drawn with the figure design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DeckResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "deck"@en ;
+    skos:notation "deck" ;
+    skos:definition "A slide deck built with the slides design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EmailResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "email"@en ;
+    skos:notation "email" ;
+    skos:definition "An email built with the email design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:MediaResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "media"@en ;
+    skos:notation "media" ;
+    skos:definition "A media asset built with the media design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SignResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "sign"@en ;
+    skos:notation "sign" ;
+    skos:definition "A sign built with the signage design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CourseResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "course"@en ;
+    skos:notation "course" ;
+    skos:definition "A course built with the course design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ToolchainResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "toolchain"@en ;
+    skos:notation "toolchain" ;
+    skos:definition "A program outside Python that a command needs, pinned and verified, fetched once into a per-user cache (0041-command-line FR-066, FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "system"@en ;
+    skos:notation "system" ;
+    skos:definition "The shared libraries a browser links, which only an administrator can install (0041-command-line FR-069; 0025-tooling-environment FR-021)."@en ; ifcore:hasAudience ifcore:Public .
+
+# agora's commands (0042-agora FR-005, FR-006): noun, verb and category, one individual per command.
+ifcore:AgoraCheckCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "check"@en ;
+    dcterms:identifier "check" ;
+    ifcore:commandVerb ifcore:CheckCommandVerb ; ifcore:commandCategory ifcore:CheckCommandCategory ;
+    skos:definition "Runs the checks: sections, suites, one scope, or only what changed (0041-command-line FR-031, FR-032)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraFreshCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "fresh"@en ;
+    dcterms:identifier "fresh" ;
+    ifcore:commandCategory ifcore:CheckCommandCategory ;
+    skos:definition "Proves every generator's tracked output current, writing nothing (0041-command-line FR-036)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraTestCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "test"@en ;
+    dcterms:identifier "test" ;
+    ifcore:commandCategory ifcore:CheckCommandCategory ;
+    skos:definition "Runs agora's own tests (0041-command-line FR-034)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDoctorCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "doctor"@en ;
+    dcterms:identifier "doctor" ;
+    ifcore:commandCategory ifcore:CheckCommandCategory ;
+    skos:definition "Reports what agora needs and what is present, and fails on registry conflicts (0041-command-line FR-029)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraLockCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "lock"@en ;
+    dcterms:identifier "lock" ;
+    ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Writes a group's lock from its pinned packages (0041-command-line FR-030)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraContextCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "context"@en ;
+    dcterms:identifier "context" ;
+    ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Returns what an agent needs to work on one resource (0041-command-line FR-038)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraCommandListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "command list"@en ;
+    dcterms:identifier "command list" ;
+    ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the registry's commands."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraCommandShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "command show"@en ;
+    dcterms:identifier "command show" ;
+    ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one command with its arguments, surfaces, group and toolchain entries."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain list"@en ;
+    dcterms:identifier "toolchain list" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the toolchain entries, their versions and whether the cache holds each (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain show"@en ;
+    dcterms:identifier "toolchain show" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one toolchain entry: addresses and checksums per platform, what it provides and its cache state (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraToolchainAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain add"@en ;
+    dcterms:identifier "toolchain add" ;
+    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Fetches, verifies and unpacks toolchain entries into the per-user cache and runs each one's functional check (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system list"@en ;
+    dcterms:identifier "system list" ;
+    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the shared libraries a browser links, the pinned package that holds each and which are present (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSystemAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system add"@en ;
+    dcterms:identifier "system add" ;
+    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Installs the browser's missing shared libraries through sudo, after printing what it runs and asking; the only command that runs sudo (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraMcpServeCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "mcp serve"@en ;
+    dcterms:identifier "mcp serve" ;
+    ifcore:commandNoun ifcore:McpResourceKind ; ifcore:commandVerb ifcore:ServeCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
+    skos:definition "Serves the commands that declare MCP, except decisions (0041-command-line FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraProposalListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "proposal list"@en ;
+    dcterms:identifier "proposal list" ;
+    ifcore:commandNoun ifcore:ProposalResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists proposals."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraProposalShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "proposal show"@en ;
+    dcterms:identifier "proposal show" ;
+    ifcore:commandNoun ifcore:ProposalResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one proposal."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraProposalNewCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "proposal new"@en ;
+    dcterms:identifier "proposal new" ;
+    ifcore:commandNoun ifcore:ProposalResourceKind ; ifcore:commandVerb ifcore:NewCommandVerb ; ifcore:commandCategory ifcore:RecordCommandCategory ;
+    skos:definition "Records a proposal, a replayable change for a person to decide."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraProposalAdvanceCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "proposal advance"@en ;
+    dcterms:identifier "proposal advance" ;
+    ifcore:commandNoun ifcore:ProposalResourceKind ; ifcore:commandVerb ifcore:AdvanceCommandVerb ; ifcore:commandCategory ifcore:DecisionCommandCategory ;
+    skos:definition "Accepts a proposal and replays its action, after showing its dry run."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSpecListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "spec list"@en ;
+    dcterms:identifier "spec list" ;
+    ifcore:commandNoun ifcore:SpecResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists specs."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSpecShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "spec show"@en ;
+    dcterms:identifier "spec show" ;
+    ifcore:commandNoun ifcore:SpecResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one spec."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSpecNewCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "spec new"@en ;
+    dcterms:identifier "spec new" ;
+    ifcore:commandNoun ifcore:SpecResourceKind ; ifcore:commandVerb ifcore:NewCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Creates a spec in the form 0020-spec-format states, with the next unused number (0042-agora FR-010)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSpecSetCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "spec set"@en ;
+    dcterms:identifier "spec set" ;
+    ifcore:commandNoun ifcore:SpecResourceKind ; ifcore:commandVerb ifcore:SetCommandVerb ; ifcore:commandCategory ifcore:DecisionCommandCategory ;
+    skos:definition "Moves a spec between Draft, Adopted and Superseded (0042-agora FR-007)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraRequirementListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "requirement list"@en ;
+    dcterms:identifier "requirement list" ;
+    ifcore:commandNoun ifcore:RequirementResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists requirements, by spec or enforcement mechanism."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraRequirementShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "requirement show"@en ;
+    dcterms:identifier "requirement show" ;
+    ifcore:commandNoun ifcore:RequirementResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one requirement with its register and control rows."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraRequirementSetCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "requirement set"@en ;
+    dcterms:identifier "requirement set" ;
+    ifcore:commandNoun ifcore:RequirementResourceKind ; ifcore:commandVerb ifcore:SetCommandVerb ; ifcore:commandCategory ifcore:RecordCommandCategory ;
+    skos:definition "Records a requirement's enforcement mechanism, who set it and why."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraRequirementAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "requirement add"@en ;
+    dcterms:identifier "requirement add" ;
+    ifcore:commandNoun ifcore:RequirementResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:RecordCommandCategory ;
+    skos:definition "Adds a control to a requirement in the control map."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraTermListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "term list"@en ;
+    dcterms:identifier "term list" ;
+    ifcore:commandNoun ifcore:TermResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists ontology terms, by concept scheme."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraTermShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "term show"@en ;
+    dcterms:identifier "term show" ;
+    ifcore:commandNoun ifcore:TermResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one ontology term."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDesignSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "design-system list"@en ;
+    dcterms:identifier "design-system list" ;
+    ifcore:commandNoun ifcore:DesignSystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists design systems."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDesignSystemShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "design-system show"@en ;
+    dcterms:identifier "design-system show" ;
+    ifcore:commandNoun ifcore:DesignSystemResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDesignSystemNewCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "design-system new"@en ;
+    dcterms:identifier "design-system new" ;
+    ifcore:commandNoun ifcore:DesignSystemResourceKind ; ifcore:commandVerb ifcore:NewCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Creates a design system, refusing unless its spec and ontology entry exist (0042-agora FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraBrandListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "brand list"@en ;
+    dcterms:identifier "brand list" ;
+    ifcore:commandNoun ifcore:BrandResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists brands."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraBrandShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "brand show"@en ;
+    dcterms:identifier "brand show" ;
+    ifcore:commandNoun ifcore:BrandResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraBrandGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "brand generate"@en ;
+    dcterms:identifier "brand generate" ;
+    ifcore:commandNoun ifcore:BrandResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes a brand's theme files and specimen from its tokens."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraImageryListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery list"@en ;
+    dcterms:identifier "imagery list" ;
+    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists a brand's imagery pieces."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraImageryShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery show"@en ;
+    dcterms:identifier "imagery show" ;
+    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one imagery piece, including its measurements."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraImageryBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery build"@en ;
+    dcterms:identifier "imagery build" ;
+    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Builds a brand's imagery web files, app icons and share card."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraImageryAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "imagery add"@en ;
+    dcterms:identifier "imagery add" ;
+    ifcore:commandNoun ifcore:ImageryResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:RecordCommandCategory ;
+    skos:definition "Adds a master piece to a brand's imagery pool."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDecorationShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "decoration show"@en ;
+    dcterms:identifier "decoration show" ;
+    ifcore:commandNoun ifcore:DecorationResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows a brand's decoration kit."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDecorationGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "decoration generate"@en ;
+    dcterms:identifier "decoration generate" ;
+    ifcore:commandNoun ifcore:DecorationResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Traces the decoration kit's vector marks and sets its wordmarks."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraInkListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ink list"@en ;
+    dcterms:identifier "ink list" ;
+    ifcore:commandNoun ifcore:InkResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists a brand's inks."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraInkShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ink show"@en ;
+    dcterms:identifier "ink show" ;
+    ifcore:commandNoun ifcore:InkResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one ink, optionally matched against palettes."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraInkRecordCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ink record"@en ;
+    dcterms:identifier "ink record" ;
+    ifcore:commandNoun ifcore:InkResourceKind ; ifcore:commandVerb ifcore:RecordCommandVerb ; ifcore:commandCategory ifcore:DecisionCommandCategory ;
+    skos:definition "Records the physical verification of an ink's spot color and thread, and who checked it (0042-agora FR-012)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraOpenedxGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "openedx generate"@en ;
+    dcterms:identifier "openedx generate" ;
+    ifcore:commandNoun ifcore:OpenedxResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes a brand's Open edX package sources."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraOpenedxBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "openedx build"@en ;
+    dcterms:identifier "openedx build" ;
+    ifcore:commandNoun ifcore:OpenedxResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a brand's Open edX package with Paragon."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraLayoutListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "layout list"@en ;
+    dcterms:identifier "layout list" ;
+    ifcore:commandNoun ifcore:LayoutResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists print layouts."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraLayoutShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "layout show"@en ;
+    dcterms:identifier "layout show" ;
+    ifcore:commandNoun ifcore:LayoutResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one print layout and, on request, its definition."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraLayoutBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "layout build"@en ;
+    dcterms:identifier "layout build" ;
+    ifcore:commandNoun ifcore:LayoutResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a print layout's document."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraFigureBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure build"@en ;
+    dcterms:identifier "figure build" ;
+    ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a figure from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraFigureGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure generate"@en ;
+    dcterms:identifier "figure generate" ;
+    ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes the organization profile's figure from frontiers-figures and the brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSkillGenerateCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "skill generate"@en ;
+    dcterms:identifier "skill generate" ;
+    ifcore:commandNoun ifcore:SkillResourceKind ; ifcore:commandVerb ifcore:GenerateCommandVerb ; ifcore:commandCategory ifcore:GenerateCommandCategory ;
+    skos:definition "Writes the agent skill, .claude/skills/agora/SKILL.md, from the registry (0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraDeckBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "deck build"@en ;
+    dcterms:identifier "deck build" ;
+    ifcore:commandNoun ifcore:DeckResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a deck from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraEmailBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "email build"@en ;
+    dcterms:identifier "email build" ;
+    ifcore:commandNoun ifcore:EmailResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a email from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraMediaBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "media build"@en ;
+    dcterms:identifier "media build" ;
+    ifcore:commandNoun ifcore:MediaResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a media from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraSignBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "sign build"@en ;
+    dcterms:identifier "sign build" ;
+    ifcore:commandNoun ifcore:SignResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a sign from a source file under a brand."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraCourseShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "course show"@en ;
+    dcterms:identifier "course show" ;
+    ifcore:commandNoun ifcore:CourseResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows a course."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraCourseBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "course build"@en ;
+    dcterms:identifier "course build" ;
+    ifcore:commandNoun ifcore:CourseResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds a course for a delivery target."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Compliance controls (0028-compliance-controls) ─────────────────────────
 # NIST OSCAL's model, reused rather than invented (0019-controlled-vocabulary FR-001): a framework is a

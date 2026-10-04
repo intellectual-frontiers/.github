@@ -9,7 +9,7 @@ polos, caps, mugs, tumblers, pens and totes. Its rules are [`spec.md`](spec.md);
 | --- | --- |
 | `data/methods.json` | Each decoration method (screen printing, embroidery, pad printing, laser engraving, direct-to-garment printing, debossing): its kind of ink, most inks, finest line or gap, and whether it can reproduce imagery. |
 | `data/products.json` | Each product, its category, the methods allowed on it, and each imprint location's largest artwork in inches. |
-| `decoration.py` | These rules as a checker: give it a decoration job and a brand, and it names every rule the job breaks. |
+| `decoration.py` | These rules as a checker: give it a decoration job and a brand, and it names every rule the job breaks. In this repository: `agora check merchandise --scope job.json --brand SLUG`. |
 | `assurance/` | Fixture jobs that must pass and must fail, and `run.py`, which checks them under every brand here. |
 
 ## Using it
@@ -31,6 +31,8 @@ and check it before sending it to a decorator:
 ```
 python3 design-systems/frontiers-merchandise/decoration.py job.json --brand design-systems/example-brand
 ```
+
+In this repository: `agora check merchandise --scope job.json --brand example-brand`.
 
 `artwork` is `lockup`, `icon`, or `imagery:<id>` (a piece of the brand's imagery pool, only by
 direct-to-garment printing). `ink` is a role in the kit's `inks`, left out for laser engraving and

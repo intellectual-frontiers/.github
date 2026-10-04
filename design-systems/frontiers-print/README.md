@@ -11,10 +11,10 @@ colors, typefaces and logo by loading that brand's `brand.tex` first, so the sam
 | `latex/preamble.tex` | The book interior and cover: `\input` it inside `\documentclass{book}` (XeLaTeX). |
 | `latex/ifarticle.cls` | The journal article class (LuaLaTeX). |
 | `latex/layouts.json`, `latex/typefaces.json` | The article layouts and typeface sets: the only place their numbers live. |
-| `latex/layout.py` | Resolves a layout and typeface set into the `iflayout.def` the class reads: `python3 latex/layout.py emit two-column`. |
+| `latex/layout.py` | Resolves a layout and typeface set into the `iflayout.def` the class reads: `python3 latex/layout.py emit two-column`. In this repository: `agora layout list`, `agora layout show LAYOUT [--def]` and `agora layout build LAYOUT -o iflayout.def`, which take a layout's alias too. |
 | `fonts/` | The open-license fonts it sets, with `LICENSES.md`. |
 | `docs/` | Typography, the article layouts, and the journal design reference. |
-| `assurance/` | `run.py` compiles the fixtures under every brand beside this design system and checks page size, fonts, theme colors, logos and literals. |
+| `assurance/` | `run.py` compiles the fixtures under every brand beside this design system and checks page size, fonts, theme colors, logos, literals, that each PDF's text layer maps every glyph to its Unicode character, and that no glyph a font lacks is dropped. |
 
 ## Using it
 
@@ -30,4 +30,4 @@ colors, typefaces and logo by loading that brand's `brand.tex` first, so the sam
    name their directory in `IF_FONTS_LICENSED`.
 
 Run the harness with `python3 assurance/run.py` (every brand beside it) or `--brand <slug>`; `--keep
-<dir>` keeps the PDFs. It needs TeX Live with XeLaTeX, LuaLaTeX and latexmk, and poppler-utils.
+<dir>` keeps the PDFs. It needs XeLaTeX and LuaLaTeX on PATH (TeX Live 2025 or later; the harness runs each engine again until the cross-references settle, so no latexmk), and the Python packages `pypdf` and `pypdfium2` (`pip install pypdf pypdfium2`), which read the PDFs; `agora` runs it in its locked environment, with TeX from its own toolchain cache (`agora check design-systems --scope frontiers-print`).

@@ -45,6 +45,7 @@
   Extension=.otf,
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+  RawFeature={-calt},
 ]
 \newfontfamily\ifmono{SourceCodePro}[
   Path=\iffontdir,
@@ -52,10 +53,10 @@
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
 ]
-\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular]
-\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium]
-\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold]
-\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold]
+\newfontfamily\ifsansregular{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Regular, RawFeature={-calt}]
+\newfontfamily\ifsansmedium{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Medium, RawFeature={-calt}]
+\newfontfamily\ifsanssemibold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-SemiBold, RawFeature={-calt}]
+\newfontfamily\ifsansbold{\ifsansstem}[Path=\iffontdir, Extension=.otf, UprightFont=*-Bold, RawFeature={-calt}]
 \newfontfamily\iffjallaone{FjallaOne}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular]
 \newfontfamily\ifjacketsans{RobotoCondensed}[Path=\iffontdir, Extension=.ttf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]
 \newfontfamily\iftryaimono{MartianMonoCondensed}[
@@ -70,6 +71,33 @@
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
   Scale=0.92,
 ]
+
+% A glyph the current font lacks falls back to STIX Two Math, then Inter, and never vanishes (spec FR-020). XeLaTeX has no
+% font fallback, so each symbol a family in use can lack is an active character that checks the current font first.
+\usepackage{newunicodechar}
+\font\ifsymprobea="[\iffontdir STIXTwoMath-Regular.otf]" at 10pt
+\font\ifsymprobeb="[\iffontdir Inter-Regular.ttf]" at 10pt
+\newfontfamily\ifsymfonta{STIXTwoMath-Regular.otf}[Path=\iffontdir]
+\newfontfamily\ifsymfontb{Inter-Regular.ttf}[Path=\iffontdir]
+\newcommand{\ifsymfallback}[1]{%
+  \iffontchar\font"#1 \char"#1 \else
+    \iffontchar\ifsymprobea"#1 {\ifsymfonta\char"#1 }\else {\ifsymfontb\char"#1 }\fi
+  \fi}
+\newunicodechar{≈}{\ifsymfallback{2248}}
+\newunicodechar{≠}{\ifsymfallback{2260}}
+\newunicodechar{≤}{\ifsymfallback{2264}}
+\newunicodechar{≥}{\ifsymfallback{2265}}
+\newunicodechar{≡}{\ifsymfallback{2261}}
+\newunicodechar{∞}{\ifsymfallback{221E}}
+\newunicodechar{∑}{\ifsymfallback{2211}}
+\newunicodechar{√}{\ifsymfallback{221A}}
+\newunicodechar{∂}{\ifsymfallback{2202}}
+\newunicodechar{∆}{\ifsymfallback{2206}}
+\newunicodechar{→}{\ifsymfallback{2192}}
+\newunicodechar{←}{\ifsymfallback{2190}}
+\newunicodechar{↔}{\ifsymfallback{2194}}
+\newunicodechar{✓}{\ifsymfallback{2713}}
+\newunicodechar{✗}{\ifsymfallback{2717}}
 
 \renewcommand{\normalsize}{\fontsize{10.5pt}{14.7pt}\selectfont}
 \normalsize

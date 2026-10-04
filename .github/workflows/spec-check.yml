@@ -1,5 +1,6 @@
 # Checks this repository's specs and enforcement register on every push and
-# pull request (0020-spec-format FR-015). Standard library only; no installs.
+# pull request (0020-spec-format FR-015). A stock runner with Python and uv
+# set up; the spec suite needs no package and no other program (0042-agora FR-014, FR-022).
 name: spec-check
 
 on:
@@ -17,5 +18,6 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Specs, enforcement register, and ontology prefixes
-        run: python3 tools/spec_check.py
+      - uses: astral-sh/setup-uv@v7
+      - name: Specs, enforcement register, controls, ontology and commands
+        run: ./agora check --suite spec

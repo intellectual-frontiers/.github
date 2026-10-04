@@ -55,6 +55,16 @@ stated here.
   kept, because such a document can hold credentials.
 - **FR-010**: A spoken work MUST NOT bind Press to an event. The rules for
   events and partnerships are 0009-press FR-024.
+- **FR-035**: A sponsor, vendor, employer, partner, portfolio company, guest,
+  or distribution outlet MUST NOT control a spoken work's conclusions,
+  questions, guest selection, criticism, or editorial judgment. A guest MAY
+  correct factual errors in their own biography, company facts, numbers, or
+  quotations and MUST NOT receive general approval or a veto.
+- **FR-036**: A commercial relationship that matters to a reasonable
+  listener's interpretation of a spoken work MUST be disclosed; a payment
+  that buys no appearance and no say over content is recorded privately.
+- **FR-037**: A spoken work MUST offer meaningful alternatives where it
+  recommends, and MUST NOT make a marketing claim it cannot support.
 
 ## Anthologies
 
@@ -99,12 +109,23 @@ stated here.
 ## Research records
 
 - **FR-017**: Research is a work kind, `research`. A record MUST be exactly one
-  of an area, a pillar, a note, a paper, a publication, a defensive
-  disclosure, a trademark record, or a patent draft, and each MUST correspond
-  to its class in 0006-research-and-ip: an area to `ifcore:ResearchArea`, a
-  pillar to `ifcore:ResearchPillar`, a note or paper to `ifcore:Note`, a
-  disclosure to `ifcore:DefensiveDisclosure`, a trademark record to
-  `ifcore:Trademark`.
+  of an area, a pillar, a note, a landscape review, a paper, a
+  publication, a defensive disclosure, a trademark record, or a patent
+  draft, and each MUST correspond to its class in 0006-research-and-ip: an
+  area to `ifcore:ResearchArea`, a pillar to `ifcore:ResearchPillar`, a
+  note or paper to `ifcore:Note`, a landscape review to `ifcore:LandscapeReview`
+  (a subclass of `ifcore:Note`), a disclosure to
+  `ifcore:DefensiveDisclosure`, a trademark record to `ifcore:Trademark`.
+  A landscape review shows how an organization is likely to fare against
+  others on a complex task by letting the reader place their own numbers
+  against a peer spread. It MUST state its reference class (which
+  organizations, which task, which scope and period) and the decision it
+  serves. It MUST show a spread, never a single headline figure, when its
+  evidence is heterogeneous; each number MUST carry its source, date, and
+  the setting it came from. It MUST NOT state a commercial consequence
+  without a public source. A vendor's own page is evidence of its process
+  only. A landscape review MUST carry the date it is as of and the date by
+  which it is reviewed, and an undated review MUST NOT be published.
 - **FR-018**: The live source of every prose record MUST be AsciiDoc
   (0015-work-packages FR-009). Typed metadata MUST live in the document
   header or in a data file beside the source, and MUST NOT duplicate a fact
@@ -115,6 +136,11 @@ stated here.
   one-paragraph summary, per 0006-research-and-ip FR-003. A paper MUST have an
   abstract, a status statement, hypotheses each with a practical test, and
   references.
+- **FR-034**: A research section states one claim and its support, short and
+  exact; a record MUST NOT be a guide, workshop, or Rolebook, and a section
+  MUST NOT be padded to a length. A note belongs to exactly one pillar and a
+  pillar to one area; a note that bears on another pillar links to it
+  instead of repeating.
 - **FR-020**: A publication — a peer-reviewed article published elsewhere —
   MUST be held as a reference carrying its authors, journal, date, DOI, and
   address exactly as the DOI registry records them, per
@@ -124,15 +150,25 @@ stated here.
   inference, recommendation, unknown. The label MUST be true to the evidence.
   A claim label states how settled a research claim is; it is distinct from
   the claim kinds of 0009-press FR-001, which state what sort of claim any
-  Press output makes, and a section MAY carry both.
+  Press output makes, and a section MAY carry both. The six labels are the
+  `ifcore:ClaimLabel` individuals; a check reads the set from the ontology.
 - **FR-022**: A section labeled hypothesis, inference, or recommendation MUST
   state what would weaken or overturn it. A section labeled evidence MUST
   carry its source and the date it was checked. A section labeled unknown MUST
   name what evidence would resolve it. A record whose claims are not validated
   MUST say so near its top, in plain words, and MUST NOT present a hypothesis
   as a finding.
+- **FR-032**: A research record MAY rest a judgment, recommendation,
+  inference, definition, instrument, hypothesis, or open question on its
+  author's experience, and MUST then state the basis (roles, years, kinds of
+  cases) once near its top, in words the named author wrote or confirmed. An
+  agent MAY draft a basis statement and MUST NOT write or confirm it. A
+  section labeled observation or evidence MUST carry a citation, a
+  supporting source, or a confirmed basis. An author's basis MUST NOT carry
+  a quantitative claim the author cannot back.
 - **FR-023**: Every external fact in a record MUST be checked against its
-  source before it goes in, and every reference MUST carry the date it was
+  source before it goes in. A reference a public DOI registry resolves needs
+  no separate checked date; every other reference carries the date it was
   checked or a plain note that it could not be. A record tied to dated events
   MUST carry the date its facts were checked and the date it must next be
   re-read.
@@ -150,6 +186,13 @@ stated here.
   disclosed. When new evidence changes a claim, the record MUST change in the
   same commit, keeping the earlier claim in its revision record if it was ever
   published, and MUST carry a visible correction where a reader must know.
+- **FR-033**: A research record's licence and copyright holder MUST be
+  stated in its header and recorded by a Decision (0008-decision-records)
+  before the record is published; until then its printed form MUST read all
+  rights reserved. A licence on a record's text and figures MUST NOT license
+  the company's names and marks, and code and tools that accompany a record
+  are licensed separately. Minting a DOI is a person's act, and a DOI MUST
+  be minted only for a version the person is ready to have cited.
 - **FR-026**: A record's slug MUST NOT change once published. A rename MUST
   leave a redirect entry.
 - **FR-027**: A record's links to books, named ideas, episodes, other
@@ -162,7 +205,14 @@ stated here.
   instrument; the record states the claim, the evidence, and the instrument as
   it was tested. A tool MUST define each measure the way the record defines it,
   show its inputs and its formula, and say what the measure does not show, and
-  MUST NOT send a user's data anywhere unless the user chooses.
+  MUST NOT send a user's data anywhere unless the user chooses. A companion
+  instrument MUST name the record and the `:revnumber:` it implements. A
+  change to an instrument that alters what it measures, asks, or decides MUST
+  be made in the record first, as a revision (FR-025), and then carried to
+  the companion; a companion MUST NOT fix a method the record has not
+  corrected. A companion page cites the record's sections by their current
+  full titles in quotation marks, never by number. A replication result MUST
+  NOT be published without the permission of whoever supplied it.
 - **FR-029**: A record that teaches an actionable method MAY make it available
   as a skill, an MCP tool, or both, under 0016-press-production FR-039 and
   FR-040. A skill built on an untested hypothesis MUST ship labeled with the
@@ -174,7 +224,9 @@ stated here.
   quality of the best professional journals of its kind. The paper's source
   and printed form MUST carry only what a reader needs to read, judge, and cite
   it; editorial records MUST sit beside it, never in it. A paper unpublished
-  elsewhere MUST be labeled a working paper.
+  elsewhere MUST be labeled a working paper. A change to the paper design MUST
+  be made once, in the shared design, and reviewed on rendered pages of at
+  least one two-column and one single-column paper.
 - **FR-031**: A research record carries no promotion (0016-press-production
   FR-044), and it MUST have a promotion brief before release
   (0016-press-production FR-046). Any text that summarizes a research claim
@@ -223,15 +275,15 @@ stated here.
 
 ## Open questions
 
-- **OQ-1**: Whether the claim label vocabulary of FR-021 is to be established
-  as an ontology class beside `ifcore:ClaimKind`, or the two axes are to be
-  merged, is not decided.
 - **OQ-2**: The lifecycle stage of a recurring spoken program's individual
   episode, where each episode is its own work, is not stated.
 - **OQ-3**: Whether a guest's request to remove a quotation obliges a new
   printing of a formal release that already carries it is not stated;
   FR-013 requires removal only from the next running release, and FR-014
   lets a retail volume change only through printings.
+- **OQ-4**: Whether a landscape review, an `ifcore:LandscapeReview` and so an
+  `ifcore:Note`, also carries a note type (0006-research-and-ip FR-003: a design
+  pattern or an operating theory) is not decided.
 
 ## Key entities
 
@@ -245,8 +297,9 @@ stated here.
   year ends.
 - **A research record** — a work of kind `research` that is an area, pillar,
   note, paper, publication, disclosure, trademark record, or patent draft.
-- **A claim label** — one of observation, hypothesis, evidence, inference,
-  recommendation, unknown: how settled a research claim is.
+- **A claim label (`ifcore:ClaimLabel`)** — one of observation, hypothesis,
+  evidence, inference, recommendation, unknown: how settled a research claim
+  is.
 - **A patent draft** — a not-yet-filed patent held as a Substantial Work
   through filing and closed once filed.
 

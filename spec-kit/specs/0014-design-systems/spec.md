@@ -145,7 +145,9 @@ any number of each kind.
   WCAG 2.2 AA. A brand that lacks an optional part the system requires (an
   imagery pool, a decoration kit) cannot theme that system: the harness
   MUST report it as such and MUST NOT count it as a pass. This repository's
-  CI MUST run every such design system here under every brand here. A brand outside this repository is proven against
+  CI MUST run every such design system here under every brand here, through
+  `agora check design-systems` (0042-agora FR-022), which runs each harness
+  under every brand while each harness still runs on its own (FR-015). A brand outside this repository is proven against
   a design system by running that system's harness under it where both are
   vendored.
 - **FR-040**: A page MUST be rendered with exactly one web design system
@@ -243,7 +245,11 @@ any number of each kind.
   - needs nothing to run beyond what its kind profile names;
   - never reports a test it did not run as passed, and says how to run it;
   - is runnable headlessly, so it can gate a change in a terminal or CI,
-    and fails (non-zero) on any failing test.
+    and fails (non-zero) on any failing test;
+  - runs on its own, by the command its README documents, without any
+    other tool of this repository, and is also run by `agora check
+    design-systems` (0042-agora FR-017), which calls it and never replaces
+    it.
 - **FR-027**: A design system's harness MUST cover, at minimum: every
   requirement of its spec whose register row is `check` (FR-022); that its machine-readable form agrees with
   its rules where both state the same thing; and, for a derived system, that
@@ -252,7 +258,8 @@ any number of each kind.
   assets or harness is complete only when its harness passes. A harness
   file that is not specific to one design system (a runner) is copied into
   each system, not shared, so each directory remains self-contained per
-  FR-005.
+  FR-005. `agora check design-systems` runs every harness, and each
+  harness MUST still run on its own (FR-015).
 
 ## Kind profile: brand
 

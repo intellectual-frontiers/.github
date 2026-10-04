@@ -104,8 +104,21 @@ themed by a brand so that the same design can be set in another brand's colors, 
   `assurance/fixtures/article.tex` under every brand vendored beside this design system, or one
   named with `--brand`, and fail when a build fails, a page is not the size FR-005 or FR-007 sets, a
   font in the output is not embedded or not one `fonts/` ships, a color FR-003 names is not the
-  theme's role or mix of roles, the theme's lockups and icon are not placed in the book, or a style
-  file holds a color literal.
+  theme's role or mix of roles, the theme's lockups and icon are not placed in the book, a style
+  file holds a color literal, a PDF's text layer breaks FR-019, or a build drops a glyph its font lacks (FR-020).
+- **FR-019**: A PDF this design system builds MUST map every glyph to its Unicode character in its
+  text layer, so that copying, searching and screen readers return the text that was set. The house
+  sans (Inter) MUST be set without contextual alternates (`calt`) in the book interior and in every
+  article typeface set, because those alternates are emitted with no Unicode mapping, and an article
+  MUST set Inter from its TrueType files, because LuaTeX embeds the OpenType files with widths that
+  make the text extract letter-spaced. A compiled
+  sample's extracted text MUST hold no code point in U+E000–U+F8FF, MUST give typographic quotes as
+  themselves, and MUST give sans-set text as the string that was set, without added spaces.
+- **FR-020**: A glyph a font lacks MUST fall back to another font this design system ships and never
+  vanish from the PDF. The main, sans and monospace families of an article fall back to STIX Two Math
+  and Inter, and the book interior's families do the same for the technical symbols `≈ ≠ ≤ ≥ ≡ ∞ ∑ √ ∂ ∆ → ← ↔ ✓ ✗`.
+  A build that logs a missing character fails the assurance check, and a code block, inline code and
+  monospace text MUST extract those symbols as set.
 
 ## Out of scope
 
@@ -127,10 +140,16 @@ themed by a brand so that the same design can be set in another brand's colors, 
 - A work with no good match in the theme's imagery pool: a new piece is added to the brand's pool
   (frontiers-brand FR-015); the cover never adapts or retouches a piece, per FR-015.
 
+- A heading, box or running head sets a colon, hyphen or parenthesis between capitals in the sans: the
+  contextual alternate is off, so it extracts as the plain character, per FR-019.
+- A code block or inline code sets `≈`, `≠`, `≤`, `≥` or `→`, which the monospace face lacks: the symbol is set
+  from the fallback font and extracts as itself, per FR-020.
+
 ## Assumptions
 
-- A TeX Live with XeLaTeX, LuaLaTeX and latexmk, and poppler-utils, are installed wherever the
-  harness or a pipeline runs.
+- XeLaTeX and LuaLaTeX of TeX Live 2025 or later, and the Python packages pypdf and pypdfium2, are installed
+  wherever the harness or a pipeline runs; `agora` supplies them (its `tinytex` and `tex-packages` entries and its locked
+  packages), and the harness needs no `latexmk`.
 
 ## Open questions
 
@@ -145,6 +164,9 @@ None.
 
 - **SC-001**: `python3 assurance/run.py` exits zero with every brand here beside this design system.
 - **SC-002**: The same fixture set under two brands differs only in the values the theme supplies.
+- **SC-003**: No PDF built by this design system extracts a private-use code point or letter-spaced
+  sans text.
+- **SC-004**: No build logs a missing character, and no technical symbol in code or text is dropped.
 
 ## Review & acceptance checklist
 
