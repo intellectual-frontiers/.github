@@ -81,7 +81,7 @@ def command_list(ctx: Ctx, category: str | None) -> Resource:
     for c in sorted(reg.commands.values(), key=lambda c: c.id):
         if category and c.category != category:
             continue
-        rows.append({"id": c.id, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
+        rows.append({"id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
                      "help": c.help})
     res = Resource("command-list", "all", {"count": len(rows), "commands": rows},
                    links=[Link("command", Call("command show", {"command": r["id"]})) for r in rows])
@@ -94,10 +94,10 @@ def command_list(ctx: Ctx, category: str | None) -> Resource:
 def command_show(ctx: Ctx, command: str) -> Resource:
     reg = ctx.registry
     c = reg.commands[command]
-    d = command_data(reg, c)
+    d = command_data(reg, c, ctx)
     res = Resource("command", c.id, d)
-    res.columns["arguments"] = ["name", "type", "required", "help"]
-    res.columns["options"] = ["flag", "type", "help"]
+    res.columns["arguments"] = ["name", "type", "required", "help", "choices"]
+    res.columns["options"] = ["flag", "type", "help", "choices"]
     res.links = [Link("noun", Call("command list", {"category": c.category}))]
     return res
 
@@ -289,6 +289,9 @@ def doctor(ctx: Ctx) -> Resource:
     res.columns["groups"] = ["group", "packages", "lock", "in cache", "plan"]
     if problems or missing:
         res.actions = [next_command("run the doctor again", "doctor")]
+    # What can be fetched, as actions an editor lists as chores (0043 FR-019): each entry not yet in the cache.
+    res.actions += [next_command(f"fetch {r['entry']}", "toolchain add", entries=[r["entry"]]) for r in toolchain_rows
+                    if r["cache"] == "not fetched" and not ctx.offline]
     return res
 
 

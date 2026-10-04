@@ -18,6 +18,7 @@ class CommandsSection(unittest.TestCase):
         shutil.copytree(HOME / "tools" / "agora", self.home / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
         (self.home / "ontology").mkdir()
         shutil.copy(HOME / "agora", self.home / "agora")
+        shutil.copy(HOME / ".if-console.env", self.home / ".if-console.env")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
         shutil.copy(HOME / "README.md", self.home / "README.md")
         self.ttl = (HOME / "ontology" / "ifcore.ttl").read_text()

@@ -134,6 +134,7 @@ class Boundaries(unittest.TestCase):
         (self.home / ".devcontainer").mkdir()
         shutil.copy(HOME / ".devcontainer" / "ws-repos.json", self.home / ".devcontainer" / "ws-repos.json")
         shutil.copy(HOME / "agora", self.home / "agora")
+        shutil.copy(HOME / ".if-console.env", self.home / ".if-console.env")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")
         shutil.copy(HOME / "README.md", self.home / "README.md")
 

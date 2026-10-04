@@ -172,13 +172,13 @@ class Selection(unittest.TestCase):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
         for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
-                  "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
+                  "merchandise", "extension"):  # the harnesses, the extension and item checks have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
             reg.sections[n].toolchain = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 17)
+        self.assertEqual(doc["data"]["summary"]["run"], 18)
 
     def test_scope_and_options_must_apply(self):
         self.assertEqual(run(["check", "controls", "--scope", "x"])[0], 2)

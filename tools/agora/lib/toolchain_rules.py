@@ -61,10 +61,11 @@ def lock_findings(home: Path, registry: Any) -> list[Finding]:
     the npm lock agrees with the entries (FR-015)."""
     from agora import toolchain as declared  # noqa: F401  (the package: its entries are what the npm lock must agree with)
     from agora.core import plan
-    from agora.toolchain import chromium, npm_packages
+    from agora.toolchain import chromium, npm_packages, vsce
 
     out = [Finding("error", f"tools/agora/groups/{g.name}", p) for g in registry.groups.values() for p in plan.lock_problems(g)]
     out += [Finding("error", "tools/agora/npm", p) for p in npm_packages.lock_problems()]
+    out += [Finding("error", "tools/if-console", p) for p in vsce.lock_problems()]
     if chromium.PLAYWRIGHT_VERSION != npm_packages.PLAYWRIGHT_VERSION:
         out.append(Finding("error", "tools/agora/toolchain/chromium.py",
                            f"Chromium is Playwright {chromium.PLAYWRIGHT_VERSION}'s build and the npm lock's Playwright is "

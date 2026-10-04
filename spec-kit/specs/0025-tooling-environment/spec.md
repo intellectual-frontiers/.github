@@ -232,6 +232,23 @@ platform coverage, the exception, and what continuous integration needs.
   `.workspaces-host/` directory) MAY be present and is read only by the
   workspace's own tools.
 
+## Repositories that build on the public root
+
+- **FR-027**: A repository that builds on the public root MUST use the public
+  root's toolchain entries and pinned versions for anything both need, and MUST
+  obtain them by running the public root's command line (`toolchain show NAME
+  --json` and `toolchain add NAME --json`, which return each entry's installed
+  `path`, the `env` a consumer sets, the programs it `provides`, its `version`
+  and its cache state), so that each program is installed once at one version.
+  It MUST NOT declare or download its own copy of an entry the public root
+  provides, and declares only what the public root does not provide.
+- **FR-028**: The public root's command line MUST expose its pinned Python
+  packages and its node version (`toolchain list --json`, in `data.packages`
+  and `data.node`), so that another repository can read the pins it shares.
+- **FR-029**: A repository that builds on the public root MUST check that every
+  pin it shares (a Python package, the node version, a toolchain entry's
+  version) equals the public root's, and fail naming each that differs.
+
 ## Out of scope
 
 - What workspaces-host contains and how it is built. Its own constitution and

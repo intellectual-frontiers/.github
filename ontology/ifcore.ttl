@@ -2155,6 +2155,9 @@ ifcore:OpenedxResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindSch
 ifcore:LayoutResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "layout"@en ;
     skos:notation "layout" ;
     skos:definition "A print layout of the print design system."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExtensionResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "extension"@en ;
+    skos:notation "extension" ;
+    skos:definition "The IF Console editor extension's package, built from tools/if-console/ (0043-if-console FR-027)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
     skos:notation "skill" ;
     skos:definition "The skill file that tells an AI agent how to use the orchestrator, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
@@ -2376,6 +2379,10 @@ ifcore:AgoraLayoutBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "layout build" ;
     ifcore:commandNoun ifcore:LayoutResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
     skos:definition "Builds a print layout's document."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraExtensionBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "extension build"@en ;
+    dcterms:identifier "extension build" ;
+    ifcore:commandNoun ifcore:ExtensionResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
+    skos:definition "Builds the IF Console extension's .vsix into build/, with Node from the locked package and the extension's own lock (0042-agora FR-032)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraFigureBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure build"@en ;
     dcterms:identifier "figure build" ;
     ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
