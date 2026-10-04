@@ -41,6 +41,15 @@ class Sections(TempRepo):
         self.write("spec-kit/specs/0001-first/spec.md", spec_text("0001-first", extra="See 0001-first FR-009.\n"))
         self.assertTrue(any("cites 0001-first FR-009, which does not exist" in m for m in self.findings("specs")))
 
+    def test_specs_loose_identifier_is_warned_unless_a_spec_claims_it(self):
+        filler = "A sentence that keeps the spec's own name out of reach. " * 6
+        extra = f"{filler}\nA rule, per FR-007.\n{filler}\nAnother, per 0001-first FR-001. A further rule of 0001-first, per FR-009.\n"
+        self.write("spec-kit/specs/0001-first/spec.md", spec_text("0001-first", extra=extra))
+        found = "\n".join(self.findings("specs"))
+        self.assertIn("FR-007 is not defined in this spec; name the spec it belongs to", found)
+        self.assertNotIn("FR-009 is not defined", found)
+        self.assertNotIn("FR-001 is not defined", found)
+
     def test_specs_edge_case_without_requirement(self):
         self.write("spec-kit/specs/0001-first/spec.md", spec_text("0001-first").replace("- A case, per FR-001.", "- A case with no citation."))
         self.assertTrue(any("edge case cites no requirement" in m for m in self.findings("specs")))

@@ -561,6 +561,7 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0020-spec-format FR-016	check	eidolon: eid check specs	runs the public root's agora with --root (0041 FR-040)
 0020-spec-format FR-017	check	.github: agora check --suite spec	exit status is non-zero on any listed breach
 0020-spec-format FR-018	check	.github: agora check specs	Spec ID must match its directory, numbered or design system
+0020-spec-format FR-019	check	.github: agora check specs	warns on a bare identifier the spec does not define; the vault's eid check specs runs the same rule through agora --root
 0021-works-and-presentations FR-001	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-002	none	-	draft; ontology terms not yet written
 0021-works-and-presentations FR-003	none	-	draft; nothing checks it yet
