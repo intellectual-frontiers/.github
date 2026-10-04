@@ -846,8 +846,8 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0032-endpoint-and-media-policy FR-005	none	-	disposal records wait on the evidence ledger (0028 OQ-1)
 0032-endpoint-and-media-policy FR-006	none	-	the company holds no premises
 0032-endpoint-and-media-policy FR-007	none	-	whether a boundary holds premises is not yet recorded
-0033-systems-and-data-policy FR-001	none	-	the system inventory is not yet built (0028 OQ-3)
-0033-systems-and-data-policy FR-002	none	-	the data classification scheme is not yet in the ontology
+0033-systems-and-data-policy FR-001	check	eidolon: eid check compliance	each system's data class, owner role, provider, recovery objectives, and boundary; a boundary part missing from the inventory fails eid compliance status; connections are not yet modelled
+0033-systems-and-data-policy FR-002	check	eidolon: eid check compliance	exactly one class from ifcore:DataClassScheme as dcterms:accessRights
 0033-systems-and-data-policy FR-003	review	0033-systems-and-data-policy FR-003	defines the yearly reconciliation
 0033-systems-and-data-policy FR-004	none	-	each system's encryption is its own configuration
 0033-systems-and-data-policy FR-005	none	-	waits on the system inventory
@@ -864,22 +864,22 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0034-secure-development-policy FR-007	none	-	no tool makes an attestation; nothing to gate
 0035-incident-response-policy FR-001	none	-	a definition; incident records not yet built
 0035-incident-response-policy FR-002	none	-	reporting is a person's act
-0035-incident-response-policy FR-003	none	-	incident records not yet in the ontology
-0035-incident-response-policy FR-004	none	-	incident records not yet in the ontology
-0035-incident-response-policy FR-005	none	-	notification obligations not yet in the ontology
+0035-incident-response-policy FR-003	check	eidolon: eid check compliance	boundary, discovery date, severity from the scheme, containment before closing, affected systems in the inventory
+0035-incident-response-policy FR-004	check	eidolon: eid compliance status	an incident more than a day old with no severity or owner role fails
+0035-incident-response-policy FR-005	check	eidolon: eid compliance status	each obligation's shape is checked by eid check compliance; its deadline from discovery is reported until a Decision names it
 0035-incident-response-policy FR-006	none	-	a person's decision; no tool notifies
 0035-incident-response-policy FR-007	none	-	containment is a person's act
 0035-incident-response-policy FR-008	none	-	evidence retention waits on the evidence ledger (0028 OQ-1)
-0035-incident-response-policy FR-009	review	0035-incident-response-policy FR-009	defines the post-incident review
+0035-incident-response-policy FR-009	check	eidolon: eid compliance status	a high or critical incident contained over thirty days ago with no review Decision fails
 0035-incident-response-policy FR-010	review	0035-incident-response-policy FR-010	defines the yearly exercise
-0036-risk-management-policy FR-001	none	-	the risk register is not yet in the ontology
-0036-risk-management-policy FR-002	none	-	risk acceptances wait on the risk register
+0036-risk-management-policy FR-001	check	eidolon: eid check compliance	boundary, owner role, one treatment; ratings checked once the scale exists (0036 OQ-1)
+0036-risk-management-policy FR-002	check	eidolon: eid compliance status	an accepted risk with no current Decision fails; eid check compliance checks each lapses within a year
 0036-risk-management-policy FR-003	review	0036-risk-management-policy FR-003	defines the yearly and triggered assessment
 0036-risk-management-policy FR-004	review	0036-risk-management-policy FR-003	the assessment covers fraud
 0036-risk-management-policy FR-005	review	0036-risk-management-policy FR-003	the assessment covers vendors and disruption
-0037-vendor-management-policy FR-001	none	-	the vendor register is not yet in the ontology
-0037-vendor-management-policy FR-002	none	-	waits on the vendor register
-0037-vendor-management-policy FR-003	none	-	vendor assurance references wait on the vendor register
+0037-vendor-management-policy FR-001	check	eidolon: eid check compliance	vendor, data classes, owner role, Agreement, at most one criticality
+0037-vendor-management-policy FR-002	check	eidolon: eid check compliance	a critical vendor, or one holding declared-only classes, needs a Decision naming it
+0037-vendor-management-policy FR-003	check	eidolon: eid check compliance	a critical vendor holds assurance re-verified yearly with dcterms:valid; lapsing assurance is in eid compliance status
 0037-vendor-management-policy FR-004	none	-	complementary user entity controls not yet recorded
 0037-vendor-management-policy FR-005	review	0037-vendor-management-policy FR-006	the yearly vendor review reads the agreement's terms
 0037-vendor-management-policy FR-006	review	0037-vendor-management-policy FR-006	defines the yearly vendor review
@@ -893,7 +893,7 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0038-personnel-security-policy FR-007	none	-	training records are held outside the Eidolon (0038 OQ-2)
 0038-personnel-security-policy FR-008	review	0031-access-control-policy FR-006	the access review finds access a leaver kept
 0038-personnel-security-policy FR-009	check	eidolon: eid check sensitive	partly: catches secrets and markings, not personnel records
-0039-business-continuity-policy FR-001	none	-	recovery objectives wait on the system inventory (0039 OQ-2)
+0039-business-continuity-policy FR-001	check	eidolon: eid check compliance	each system states both recovery objectives as durations
 0039-business-continuity-policy FR-002	none	-	each system's monitoring is its own configuration
 0039-business-continuity-policy FR-003	none	-	each system's backups are its own configuration
 0039-business-continuity-policy FR-004	none	-	outside copies not yet set up (0039 OQ-1)

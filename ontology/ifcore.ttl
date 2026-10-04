@@ -8,6 +8,7 @@
 @prefix prov:    <http://www.w3.org/ns/prov#> .
 @prefix schema:  <https://schema.org/> .
 @prefix org:     <http://www.w3.org/ns/org#> .
+@prefix dpv:     <https://w3id.org/dpv#> .
 
 # Intellectual Frontiers — core ontology (PUBLIC).
 #
@@ -2235,3 +2236,112 @@ ifcore:SecurityProgramPolicy a dcterms:Policy ; rdfs:label "Security program pol
     dcterms:identifier "0040-security-program-policy" ;
     dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0040-security-program-policy/spec.md> ;
     ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Registers the policies keep (0033, 0035 – 0037, 0039) ─────────────────────────
+# The system inventory (0033-systems-and-data-policy), the vendor register (0037-vendor-management-policy), the risk
+# register (0036-risk-management-policy), and incident records with their notification obligations
+# (0035-incident-response-policy). Established terms are reused first (0019-controlled-vocabulary FR-001): a data class
+# is dcterms:accessRights; a provider is schema:provider; a criticality, treatment or kind is dcterms:type; a risk's
+# ratings and an incident's severity are the W3C Data Privacy Vocabulary's dpv:hasLikelihood, dpv:hasImpact, and
+# dpv:hasSeverity; the boundary a risk or incident concerns is schema:about. Entries are vault data; anything naming a
+# person, or sensitive under 0001-eidolon-architecture FR-016, is held only by RestrictedDataReference.
+
+ifcore:DecisionAuthorityRole a org:Role ; rdfs:label "Decision authority"@en ;
+    skos:definition "The decision authority in effect (0001-eidolon-architecture FR-029): the owner role of anything no delegation assigns elsewhere (0030-policies FR-008)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ownerRole a owl:ObjectProperty ; rdfs:subPropertyOf dcterms:relation ; rdfs:range org:Role ; rdfs:label "owner role"@en ;
+    rdfs:comment "The role answerable for a system, a vendor, a risk, or an incident: it approves access to a system (0031-access-control-policy FR-004), reviews it (FR-006), and owns a vendor, risk, or incident record (0033 FR-001, 0036 FR-001, 0037 FR-001, 0035 FR-004). Specializes dcterms:relation (0019 FR-002); W3C ORG's org:Role names a role, not a person, so no personal detail is needed."@en .
+
+ifcore:DataClassScheme a skos:ConceptScheme ; rdfs:label "Data class"@en ;
+    rdfs:comment "The data classification every system declares as its highest class, and a vendor states for what it holds, by dcterms:accessRights (0033-systems-and-data-policy FR-002, 0037 FR-001). Controlled Unclassified Information is not a class here; holding it needs a Decision under 0028-compliance-controls FR-021. Each class's ifcore:retentionPeriod is 0033 OQ-1."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PublicData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Public"@en ; skos:notation "public" ;
+    skos:definition "May be published."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:InternalData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Internal"@en ; skos:notation "internal" ;
+    skos:definition "The company's own, not for publication."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ConfidentialData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Confidential"@en ; skos:notation "confidential" ;
+    skos:definition "The company's or a customer's, whose disclosure would harm them."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RestrictedData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Restricted"@en ; skos:notation "restricted" ;
+    skos:definition "Sensitive under 0001-eidolon-architecture FR-016."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FederalContractInformationData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Federal contract information"@en ; skos:notation "fci" ;
+    skos:definition "Information a federal contract provides or generates that is not for public release, as FAR 52.204-21 defines it."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HealthInformationData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Health information"@en ; skos:notation "health" ;
+    skos:definition "Information a business associate agreement or health privacy law protects."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ConfidentialOrAboveData a skos:Collection ; rdfs:label "Confidential or above"@en ;
+    skos:member ifcore:ConfidentialData, ifcore:RestrictedData, ifcore:FederalContractInformationData, ifcore:HealthInformationData ;
+    rdfs:comment "The classes 0033 FR-004, FR-007, FR-009 and 0032-endpoint-and-media-policy FR-005 say \"Confidential or above\" of."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DeclaredOnlyData a skos:Collection ; rdfs:label "Held only where declared"@en ;
+    skos:member ifcore:RestrictedData, ifcore:FederalContractInformationData, ifcore:HealthInformationData ;
+    rdfs:comment "The classes held only in systems whose inventory entry declares them (0033 FR-005), whose vendors need an onboarding Decision (0037 FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:retentionPeriod a owl:DatatypeProperty ; rdfs:domain skos:Concept ; rdfs:range xsd:duration ; rdfs:label "retention period"@en ;
+    rdfs:comment "How long data of a class is kept before it is deleted, unless a contract overrides it or a legal hold keeps it (0033 FR-006). No class states one yet (0033 OQ-1)."@en .
+
+ifcore:InformationSystem a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Information system"@en ;
+    skos:definition "Something that stores or processes the company's or a customer's data within a compliance boundary (0033-systems-and-data-policy FR-001)."@en ;
+    skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/implementation/component-definition/> ;
+    rdfs:comment "An entry in the system inventory, named by each boundary it is part of (dcterms:hasPart, 0028-compliance-controls FR-009). Its highest data class is dcterms:accessRights, a concept in ifcore:DataClassScheme; its owner is ifcore:ownerRole; what hosts or supplies it is schema:provider, an ifcore:VendorService; its recovery objectives are ifcore:recoveryTimeObjective and ifcore:recoveryPointObjective (0039-business-continuity-policy FR-001). An account, address, or configuration value is held only by reference."@en .
+ifcore:recoveryTimeObjective a owl:DatatypeProperty ; rdfs:domain ifcore:InformationSystem ; rdfs:range xsd:duration ; rdfs:label "recovery time objective"@en ;
+    rdfs:comment "How long the system may be unavailable (0039 FR-001)."@en .
+ifcore:recoveryPointObjective a owl:DatatypeProperty ; rdfs:domain ifcore:InformationSystem ; rdfs:range xsd:duration ; rdfs:label "recovery point objective"@en ;
+    rdfs:comment "How much recent data the system's loss may cost (0039 FR-001)."@en .
+
+ifcore:VendorService a owl:Class ; rdfs:subClassOf schema:Service, ifcore:Fact ; rdfs:label "Vendor service"@en ;
+    skos:definition "One service an outside organization provides that holds the company's data or that a boundary depends on: an entry in the vendor register (0037-vendor-management-policy FR-001)."@en ;
+    rdfs:comment "Specializes schema:Service (0019 FR-002). The vendor is schema:provider, an ifcore:Organization; the data classes it holds are dcterms:accessRights; its owner is ifcore:ownerRole; the Agreement its terms are in is dcterms:rights; ifcore:CriticalVendor, when it is critical, is its dcterms:type. Its assurance is an ExternalRecordReference that ifcore:describes it, typed from ifcore:AssessmentKindScheme (FR-003). schema:endDate closes the entry once access is revoked and deletion confirmed (FR-007). The account at the vendor is a RestrictedDataReference."@en .
+
+ifcore:VendorCriticalityScheme a skos:ConceptScheme ; rdfs:label "Vendor criticality"@en ;
+    rdfs:comment "How much a vendor matters to the boundaries using it (0037-vendor-management-policy FR-001). A vendor with no concept here is not critical; the other levels are 0037 OQ-1."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CriticalVendor a skos:Concept ; skos:inScheme ifcore:VendorCriticalityScheme ; skos:prefLabel "Critical"@en ;
+    skos:definition "Assessed and decided on before use, its assurance held by reference and re-verified yearly, and reviewed yearly (0037 FR-002, FR-003, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ISO27001Certificate a skos:Concept ; skos:inScheme ifcore:AssessmentKindScheme ; skos:prefLabel "ISO/IEC 27001 certificate"@en ;
+    skos:definition "A certification body's certificate that an organization's information security management system conforms to ISO/IEC 27001."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FedRAMPAuthorization a skos:Concept ; skos:inScheme ifcore:AssessmentKindScheme ; skos:prefLabel "FedRAMP authorization"@en ;
+    skos:definition "A US federal authorization of a cloud service under the Federal Risk and Authorization Management Program."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:Risk a owl:Class ; rdfs:subClassOf dpv:Risk, ifcore:Fact ; rdfs:label "Risk"@en ;
+    skos:definition "Something that could stop a boundary meeting its commitments, rated and treated: an entry in the risk register (0036-risk-management-policy FR-001)."@en ;
+    rdfs:comment "Specializes dpv:Risk (0019 FR-002). The boundary it affects is schema:about; its ratings are dpv:hasLikelihood and dpv:hasImpact, concepts in ifcore:RiskRatingScheme (whose scale is 0036 OQ-1); its owner is ifcore:ownerRole; its treatment is dcterms:type from ifcore:RiskTreatmentScheme; the controls mitigating it are dcterms:relation. An accepted risk is named by a Decision lapsing within a year (FR-002). How it could be exploited, when sensitive, is held only by reference."@en .
+ifcore:RiskRatingScheme a skos:ConceptScheme ; rdfs:label "Risk rating"@en ;
+    rdfs:comment "The scale a risk's likelihood and impact are rated on (0036-risk-management-policy FR-001). Its levels, and the rating above which a risk may not be accepted, are not yet stated (0036 OQ-1)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RiskTreatmentScheme a skos:ConceptScheme ; rdfs:label "Risk treatment"@en ;
+    rdfs:comment "What the company does about a risk (0036-risk-management-policy FR-001)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MitigateRisk a skos:Concept ; skos:inScheme ifcore:RiskTreatmentScheme ; skos:prefLabel "Mitigate"@en ;
+    skos:definition "Reduce it, by controls the risk names by dcterms:relation."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AcceptRisk a skos:Concept ; skos:inScheme ifcore:RiskTreatmentScheme ; skos:prefLabel "Accept"@en ;
+    skos:definition "Live with it, under a Decision that lapses within a year (0036 FR-002)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TransferRisk a skos:Concept ; skos:inScheme ifcore:RiskTreatmentScheme ; skos:prefLabel "Transfer"@en ;
+    skos:definition "Move it to another party, by insurance or contract."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AvoidRisk a skos:Concept ; skos:inScheme ifcore:RiskTreatmentScheme ; skos:prefLabel "Avoid"@en ;
+    skos:definition "Stop doing what gives rise to it."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:Incident a owl:Class ; rdfs:subClassOf schema:Event, ifcore:Fact ; rdfs:label "Incident"@en ;
+    skos:definition "An event that compromises, or may have compromised, the confidentiality, integrity, or availability of a system or data in a boundary (0035-incident-response-policy FR-001)."@en ;
+    rdfs:comment "Specializes schema:Event (0019 FR-002). The boundary is schema:about; the systems affected are dcterms:relation; the data classes involved are dcterms:accessRights; its severity is dpv:hasSeverity, a concept in ifcore:IncidentSeverityScheme; its owner is ifcore:ownerRole; when it was discovered, contained, and closed are ifcore:discoveredOn, ifcore:containedOn, and ifcore:closedOn; the obligations it may trigger are ifcore:mayTrigger (FR-003 – FR-005). A Decision naming it and an obligation records whether to notify (FR-006); a Decision naming it records its review (FR-009). Its details are held only by reference."@en .
+ifcore:IncidentSeverityScheme a skos:ConceptScheme ; rdfs:label "Incident severity"@en ;
+    rdfs:comment "How serious an incident is (0035-incident-response-policy FR-003); each level's definition is 0035 OQ-2."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:LowSeverity a skos:Concept, dpv:Severity ; skos:inScheme ifcore:IncidentSeverityScheme ; skos:prefLabel "Low"@en ; skos:notation "1" ; ifcore:hasAudience ifcore:Public .
+ifcore:MediumSeverity a skos:Concept, dpv:Severity ; skos:inScheme ifcore:IncidentSeverityScheme ; skos:prefLabel "Medium"@en ; skos:notation "2" ; ifcore:hasAudience ifcore:Public .
+ifcore:HighSeverity a skos:Concept, dpv:Severity ; skos:inScheme ifcore:IncidentSeverityScheme ; skos:prefLabel "High"@en ; skos:notation "3" ;
+    skos:definition "Reviewed within thirty days of containment (0035 FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CriticalSeverity a skos:Concept, dpv:Severity ; skos:inScheme ifcore:IncidentSeverityScheme ; skos:prefLabel "Critical"@en ; skos:notation "4" ;
+    skos:definition "Reviewed within thirty days of containment (0035 FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:discoveredOn a owl:DatatypeProperty ; rdfs:subPropertyOf dcterms:date ; rdfs:domain ifcore:Incident ; rdfs:range xsd:date ; rdfs:label "discovered on"@en ;
+    rdfs:comment "When the incident was discovered; every notification deadline runs from it (0035 FR-005)."@en .
+ifcore:containedOn a owl:DatatypeProperty ; rdfs:subPropertyOf dcterms:date ; rdfs:domain ifcore:Incident ; rdfs:range xsd:date ; rdfs:label "contained on"@en .
+ifcore:closedOn a owl:DatatypeProperty ; rdfs:subPropertyOf dcterms:date ; rdfs:domain ifcore:Incident ; rdfs:range xsd:date ; rdfs:label "closed on"@en .
+
+ifcore:NotificationObligation a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Notification obligation"@en ;
+    skos:definition "A duty to tell someone of an incident within a set time (0035-incident-response-policy FR-005)."@en ;
+    skos:closeMatch <http://www.w3.org/ns/odrl/2/Duty> ;
+    rdfs:comment "Its source (a contract, an Agreement, a law, or a regulation) is dcterms:source; what triggers it and whom it requires notice to are dcterms:description; its deadline from an incident's ifcore:discoveredOn is ifcore:noticeWithin."@en .
+ifcore:mayTrigger a owl:ObjectProperty ; rdfs:subPropertyOf dcterms:relation ; rdfs:domain ifcore:Incident ; rdfs:range ifcore:NotificationObligation ; rdfs:label "may trigger"@en ;
+    rdfs:comment "An obligation this incident may trigger, found at triage (0035 FR-004). It stays open in the status report until a Decision names the incident and the obligation (FR-005, FR-006)."@en .
+ifcore:noticeWithin a owl:DatatypeProperty ; rdfs:domain ifcore:NotificationObligation ; rdfs:range xsd:duration ; rdfs:label "notice within"@en ;
+    rdfs:comment "How long after discovery notice is due (0035 FR-005)."@en .
