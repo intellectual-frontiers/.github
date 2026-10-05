@@ -27,6 +27,12 @@ What `agora` fetches for itself, because it has no Python wheel. Each entry is o
 |linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
 |-
 
+|`extension-build`
+|typescript-6.0.3+esbuild-0.28.2+eslint-10.12.0+vsce-4.0.0
+|TypeScript, esbuild and ESLint, which check and bundle the IF Console extension, vsce, which packs it, and @vscode/test-electron, which tests it in a real VS Code: installed with npm ci from tools/if-console's lock
+|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|-
+
 |`jre`
 |21.0.12.1+1
 |a Temurin Java runtime
@@ -49,12 +55,6 @@ What `agora` fetches for itself, because it has no Python wheel. Each entry is o
 |2026.03
 |TinyTeX (TeX Live 2025): XeLaTeX, LuaLaTeX and their formats
 |linux-x86_64, macos-arm64, macos-x86_64
-|-
-
-|`vsce`
-|4.0.0
-|@vscode/vsce 4.0.0, which packs the IF Console extension, and @vscode/test-electron 3.1.0, which tests it in a real VS Code, installed with npm ci from tools/if-console's lock
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
 |-
 
 |`vscode`
@@ -82,6 +82,9 @@ Only when you name it. Each entry has a variable, and `doctor` lists every one t
 |`AGORA_CHROMIUM`
 |a Chromium or Chrome program
 
+|`AGORA_EXTENSION_BUILD`
+|a directory holding node_modules with the extension's build packages
+
 |`AGORA_JRE`
 |the java program
 
@@ -93,9 +96,6 @@ Only when you name it. Each entry has a variable, and `doctor` lists every one t
 
 |`AGORA_TINYTEX`
 |a directory holding xelatex and lualatex
-
-|`AGORA_VSCE`
-|a directory holding node_modules with @vscode/vsce and @vscode/test-electron
 
 |`AGORA_VSCODE`
 |a VS Code program

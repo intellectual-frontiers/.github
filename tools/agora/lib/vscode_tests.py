@@ -1,7 +1,7 @@
 """The IF Console extension's tests inside a real VS Code (0043-if-console FR-032; 0042-agora FR-013).
 
 `check extension --runner vscode` starts the display server (`Xvfb`, installed with VS Code's libraries by `system add`) on a free
-display for this one run, runs `tools/if-console/test/vscode/run.js` on the package's Node with the toolchain's VS Code and
+display for this one run, runs `test/vscode/run.js` of the staged, bundled extension on the package's Node with the toolchain's VS Code and
 @vscode/test-electron, reads the report it writes, and stops the display server. Standard library only.
 """
 from __future__ import annotations
@@ -69,15 +69,15 @@ class Display:
                 self.proc.kill()
 
 
-def run(home: Path, node: str, code: str, code_cli: str, test_electron: str, vsix: str, env: dict[str, str],
+def run(home: Path, ext: Path, node: str, code: str, code_cli: str, test_electron: str, vsix: str, env: dict[str, str],
         folders: list[tuple[str, str]] | None = None, suite: str | None = None,
         screenshots: Path | None = None) -> tuple[list[Finding], list[str], list[dict]]:
-    """Run the tests. Returns findings (one per failed test), notes for a person, and every test's name, status and seconds.
+    """Run the tests of the extension staged and built at `ext` (lib/extension.py), against the real command line of the clone at `home`.
+    Returns findings (one per failed test), notes for a person, and every test's name, status and seconds.
 
     With `suite` (a directory whose index.js exports run(), see test/vscode/run.js) only that suite runs, once, in a trusted workspace
     holding this clone and `folders` (name, path), the caller's own tests of the extension for a workspace of its own.
     With `screenshots` (a folder) only the screenshots scenario runs, and writes its PNG files there (0043 FR-045)."""
-    ext = home / DIR
     began = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="agora-vscode-") as tmp, Display(Path(tmp) / "fb" if screenshots else None) as display:
         report = Path(tmp) / "report.json"

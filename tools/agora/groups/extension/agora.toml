@@ -3,8 +3,8 @@ help = "The IF Console VS Code extension: its package built into build/, and its
 
 # Python packages the extension's build and tests use (0041-command-line FR-003), each to one exact version, locked with hashes in
 # agora.lock. Found by reading the code:
-#   nodejs-wheel-binaries  the Node that runs the extension's tests under node's own test runner, and runs vsce to pack the .vsix
-#                          (0043-if-console FR-027): no Node from the host
+#   nodejs-wheel-binaries  the Node that runs tsc, ESLint, esbuild and the extension's tests under node's own test runner, and runs vsce to pack
+#                          the .vsix (0043-if-console FR-027, FR-035): no Node from the host
 [packages]
 nodejs-wheel-binaries = "22.20.0"
 
@@ -15,9 +15,9 @@ view = "builds"
 title = "Extension"
 
 [sections.extension]
-help = "The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032)"
+help = "The IF Console extension's manifest, contributions and activation, its source rules (no other repository's tool named, imports only VS Code and Node built-ins), its TypeScript type-checked (strict) and linted (ESLint), its codicon ids against the locked package, its bundle, its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032, FR-035)"
 watch = ["tools/if-console/**", "tools/agora/lib/extension.py", "tools/agora/groups/extension/**", ".if-console.env"]
-toolchain_optional = ["vscode", "vsce"]  # the vscode runner fetches them when it can; without them it is skipped and says why
+toolchain_optional = ["vscode", "extension-build"]  # fetched when it can be; without them the parts that need them are skipped and say why
 options = ["--runner"]  # node (the unit tests against a stand-in for the VS Code API) or vscode (a real VS Code under a display server)
 isolated = true  # its own locked environment, beside the other groups' (0041-command-line FR-028)
 

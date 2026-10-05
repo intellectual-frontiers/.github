@@ -1,26 +1,34 @@
-"""The IF Console extension's checks and build (0043-if-console FR-027, FR-028; 0042-agora FR-013, FR-032).
+"""The IF Console extension's checks and build (0043-if-console FR-027, FR-028, FR-035; 0042-agora FR-013, FR-032).
 
-`check extension` reads the manifest and the code, lints the code and runs the extension's own unit tests under Node's built-in
-test runner with a stand-in for the VS Code API. `extension build` packs the .vsix with the pinned vsce. Node is the one the
-`nodejs-wheel-binaries` package supplies; nothing is taken from the host. Standard library only.
+The extension is TypeScript. `check extension` reads the manifest and the code, type-checks it with `tsc` (strict), lints it with ESLint
+(typescript-eslint's recommended and type-checked rules), checks the codicon ids this command line may name against the locked
+`@vscode/codicons`, bundles it with esbuild, and runs its unit tests under Node's built-in runner and its tests in a real VS Code.
+`extension build` does the first four and packs the .vsix with the pinned vsce. Node is the one the `nodejs-wheel-binaries` package
+supplies and every other program is in the extension's own npm lock (toolchain entry `extension-build`); nothing is taken from the host.
+The programs run in a staged copy of the extension, beside the lock's `node_modules`, so that nothing is written into the repository.
+Standard library only.
 """
 from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import zipfile
 from pathlib import Path
+from typing import Any
 
 from agora.core.checks import Finding
 
 DIR = "tools/if-console"
 SETTINGS = {"if-console.launchers", "if-console.checkOnSave"}  # 0043 FR-024
 COMMAND_PREFIX = "if-console."
-ALLOWED_REQUIRES = {"vscode", "path", "fs", "crypto", "child_process"}  # what the code may require beyond its own files
+MAIN = "./dist/extension.js"
+SKIP = shutil.ignore_patterns("node_modules", "dist", "out", "build")  # what is made, never what is kept
+ALLOWED_REQUIRES = {"vscode", "path", "fs", "crypto", "child_process"}  # what the code may import beyond its own files
 
 
-def _read_json(path: Path, rel: str, out: list[Finding]):
+def _read_json(path: Path, rel: str, out: list[Finding]) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
@@ -28,9 +36,14 @@ def _read_json(path: Path, rel: str, out: list[Finding]):
         return None
 
 
+def sources(ext: Path, suffixes: tuple[str, ...] = (".ts",)) -> list[Path]:
+    """The extension's own files under src/ with these suffixes, in a stable order."""
+    return sorted(p for p in (ext / "src").rglob("*") if p.is_file() and p.suffix in suffixes)
+
+
 def manifest_findings(home: Path) -> list[Finding]:
-    """package.json: identity, contributions, activation, trust, settings, and that every contributed command is registered
-    in the code (0043 FR-001, FR-006, FR-010, FR-024, FR-027, FR-030)."""
+    """package.json: identity, contributions, activation, trust, settings, the bundle it runs, and that every contributed command is registered
+    in the code (0043 FR-001, FR-006, FR-010, FR-024, FR-027, FR-030, FR-035)."""
     ext = home / DIR
     rel = f"{DIR}/package.json"
     out: list[Finding] = []
@@ -44,11 +57,12 @@ def manifest_findings(home: Path) -> list[Finding]:
         err("displayName must be Intellectual Frontiers Console (0043 FR-001)")
     if not re.fullmatch(r"\^\d+\.\d+\.\d+", str(pkg.get("engines", {}).get("vscode", ""))):
         err("engines.vscode must state the VS Code version it needs, as ^MAJOR.MINOR.PATCH (0043 FR-030)")
-    main = pkg.get("main", "")
-    if not main or not (ext / main).is_file():
-        err(f"main {main!r} is not a file")
+    if pkg.get("main") != MAIN:
+        err(f"main is {pkg.get('main')!r}; it is the one file esbuild bundles, {MAIN} (0043 FR-035)")
+    if not (ext / "src" / "extension.ts").is_file():
+        err("src/extension.ts, the bundle's entry, is missing (0043 FR-035)")
     if pkg.get("dependencies"):
-        err("has runtime dependencies; the extension ships none (0043 FR-027)")
+        err("has runtime dependencies; the extension ships none (0043 FR-027, FR-035)")
     for name, version in (pkg.get("devDependencies") or {}).items():
         if not re.fullmatch(r"\d+\.\d+\.\d+", version):
             err(f"devDependency {name} is {version!r}; every package is pinned to one exact version (0043 FR-027)")
@@ -80,7 +94,7 @@ def manifest_findings(home: Path) -> list[Finding]:
         err("must contribute an activity-bar view container (0043 FR-008)")
     if "if-console.servers" not in [m["id"] for m in c.get("mcpServerDefinitionProviders", [])]:
         err("must declare the MCP server definition provider if-console.servers (0043 FR-022)")
-    src = "\n".join(p.read_text(encoding="utf-8") for p in sorted((ext / "src").glob("*.js")))
+    src = "\n".join(p.read_text(encoding="utf-8") for p in sources(ext))
     registered = set(re.findall(r"\bcmd\('(\w+)'", src))
     for cmd in (x["command"] for x in c.get("commands", [])):
         if cmd.removeprefix(COMMAND_PREFIX) not in registered:
@@ -88,30 +102,32 @@ def manifest_findings(home: Path) -> list[Finding]:
     for name in registered:
         if f"{COMMAND_PREFIX}{name}" not in [x["command"] for x in c.get("commands", [])]:
             err(f"the code registers {COMMAND_PREFIX}{name}, which package.json does not contribute")
-    ignore = (ext / ".vscodeignore")
-    if not ignore.is_file() or "test/**" not in ignore.read_text(encoding="utf-8"):
-        out.append(Finding("error", f"{DIR}/.vscodeignore", "must exclude test/** from the package"))
+    ignore = ext / ".vscodeignore"
+    kept = ignore.read_text(encoding="utf-8").split() if ignore.is_file() else []
+    for need in ("src/**", "test/**", "**/*.map"):
+        if need not in kept:
+            out.append(Finding("error", f"{DIR}/.vscodeignore", f"must exclude {need} from the package (0043 FR-035)"))
+    tsconfig = _read_json(ext / "tsconfig.json", f"{DIR}/tsconfig.json", out)
+    if tsconfig is not None and tsconfig.get("compilerOptions", {}).get("strict") is not True:
+        out.append(Finding("error", f"{DIR}/tsconfig.json", "compilerOptions.strict must be true (0043 FR-035)"))
     return out
 
 
-def lint_findings(home: Path, node: str, forbidden_names: list[str]) -> list[Finding]:
-    """The code parses (`node --check`), requires only VS Code, a few Node built-ins and its own files, and names no other
-    repository or orchestrator (0043 FR-002, FR-028)."""
+def source_findings(home: Path, forbidden_names: list[str]) -> list[Finding]:
+    """The code names no other repository or orchestrator (0043 FR-002, FR-004), and imports only VS Code, a few Node built-ins and its own
+    files (0043 FR-027). Parsing, types and style are `tsc`'s and ESLint's."""
     ext = home / DIR
     out: list[Finding] = []
-    files = sorted(p for p in ext.rglob("*") if p.is_file() and "node_modules" not in p.parts
-                   and p.suffix in (".js", ".json", ".md", ".svg", ".env", "") and p.name != "package-lock.json")
+    files = sorted(p for p in ext.rglob("*") if p.is_file() and not (set(p.parts) & {"node_modules", "dist", "out"})
+                   and p.suffix in (".ts", ".js", ".mjs", ".json", ".md", ".svg", ".env", "") and p.name != "package-lock.json")
     for f in files:
         rel = str(f.relative_to(home))
-        if f.suffix == ".js":
-            done = subprocess.run([node, "--check", str(f)], capture_output=True, text=True)
-            if done.returncode != 0:
-                out.append(Finding("error", rel, "does not parse: " + (done.stderr.strip().splitlines() or ["?"])[0]))
-            if f.parent.name == "src":
-                for m in re.finditer(r"require\(\s*['\"]([^'\"]+)['\"]\s*\)", f.read_text(encoding="utf-8")):
-                    if not (m.group(1).startswith("./") or m.group(1) in ALLOWED_REQUIRES):
-                        out.append(Finding("error", rel, f"requires {m.group(1)}, which is not a Node built-in the extension may use or one of its own files (0043 FR-027)"))
         text = f.read_text(encoding="utf-8", errors="replace")
+        if f.suffix == ".ts" and f.relative_to(ext).parts[0] == "src":
+            for m in re.finditer(r"""(?:\bfrom\s+|\bimport\s+|\brequire\(\s*)['"]([^'"]+)['"]""", text):
+                name = m.group(1)
+                if not (name.startswith(".") or name in ALLOWED_REQUIRES or (f.parts[-2] == "webview" and name.startswith("@vscode-elements/elements/"))):
+                    out.append(Finding("error", rel, f"imports {name}, which is not a Node built-in the extension may use, VS Code, or one of its own files (0043 FR-027)"))
         for n, line in enumerate(text.splitlines(), 1):
             for name in forbidden_names:
                 if re.search(rf"(?<![\w./-]){re.escape(name)}(?![\w-])", line, re.I):
@@ -119,23 +135,130 @@ def lint_findings(home: Path, node: str, forbidden_names: list[str]) -> list[Fin
     return out
 
 
-def run_tests(home: Path, node: str, env: dict[str, str], launcher_root: Path) -> tuple[list[Finding], list[str]]:
-    """The unit tests under node's own runner, and the headless drive of a real launcher at `launcher_root`."""
-    ext = home / DIR
-    tests = sorted(str(p.relative_to(ext)) for p in (ext / "test").glob("*.test.js"))
-    if not tests:
-        return [Finding("error", f"{DIR}/test", "holds no *.test.js file (0043 FR-028)")], []
-    run_env = {**env, "IF_CONSOLE_REAL_ROOT": str(launcher_root), "NODE_OPTIONS": ""}
-    done = subprocess.run([node, "--test", "--test-reporter=tap", *tests], cwd=ext, env=run_env, capture_output=True, text=True)
-    out = done.stdout
-    counts = {k: int(m.group(1)) for k in ("tests", "pass", "fail", "skipped") if (m := re.search(rf"^# {k} (\d+)", out, re.M))}
+def codicon_findings(home: Path, mapping: Path, version: str) -> list[Finding]:
+    """The codicon ids a command line may name (lib/codicons.txt, 0041 FR-072) are the glyph map of the locked @vscode/codicons: the same ids,
+    from the same version (0043 FR-035)."""
+    pinned = home / "tools" / "agora" / "lib" / "codicons.txt"
+    rel = "tools/agora/lib/codicons.txt"
+    try:
+        raw = json.loads(mapping.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        return [Finding("error", rel, f"the locked @vscode/codicons has no readable glyph map: {e}")]
+    locked = {name for names in raw.values() for name in names}
+    text = pinned.read_text(encoding="utf-8")
+    listed = {l.strip() for l in text.splitlines() if l.strip() and not l.startswith("#")}
+    out: list[Finding] = []
+    try:
+        integrity = json.loads((home / DIR / "package-lock.json").read_text(encoding="utf-8"))["packages"]["node_modules/@vscode/codicons"]["integrity"]
+    except (OSError, ValueError, KeyError):
+        integrity = ""
+    if f"@vscode/codicons {version}" not in text or not integrity or integrity not in text:
+        out.append(Finding("error", rel, f"does not name @vscode/codicons {version} and the integrity hash the extension's lock holds for it ({integrity or 'none'})"))
+    for name in sorted(listed - locked):
+        out.append(Finding("error", rel, f"{name} is not a codicon of @vscode/codicons {version}"))
+    for name in sorted(locked - listed):
+        out.append(Finding("error", rel, f"{name} is a codicon of @vscode/codicons {version} that the list lacks; replace the list from the package"))
+    return out
+
+
+# ---- the staged copy and the programs run in it ---------------------------------------------------------------------
+
+def stage(home: Path, modules: Path, into: Path) -> Path:
+    """A copy of the extension beside the lock's node_modules (linked), where tsc, ESLint and esbuild run and write what they make.
+    Nothing is written into the repository."""
+    dest = into / "if-console"
+    shutil.copytree(home / DIR, dest, ignore=SKIP)
+    (dest / "node_modules").symlink_to(modules, target_is_directory=True)
+    return dest
+
+
+def _run(node: str, env: dict[str, str], cwd: Path, *argv: str) -> subprocess.CompletedProcess:
+    return subprocess.run([node, *argv], cwd=cwd, env={**env, "NODE_OPTIONS": ""}, capture_output=True, text=True)
+
+
+def _where(stage_dir: Path, path: str) -> str:
+    """A path a program printed, as the repository's own."""
+    p = Path(path)
+    try:
+        return f"{DIR}/{p.resolve().relative_to(stage_dir.resolve())}"
+    except ValueError:
+        return f"{DIR}/{path.removeprefix('./')}"
+
+
+TSC_LINE = re.compile(r"^(?P<file>[^\s(][^(]*)\((?P<line>\d+),(?P<col>\d+)\): error (?P<code>TS\d+): (?P<message>.*)$")
+
+
+def typecheck(stage_dir: Path, node: str, tsc: str, env: dict[str, str]) -> list[Finding]:
+    """`tsc --noEmit` on the extension host's code and the tests, and on the webview's own code (strict, 0043 FR-035). A type error fails."""
+    out: list[Finding] = []
+    for project in (".", "src/webview"):
+        done = _run(node, env, stage_dir, tsc, "--noEmit", "--pretty", "false", "-p", project)
+        found = False
+        for line in done.stdout.splitlines():
+            m = TSC_LINE.match(line)
+            if m:
+                found = True
+                out.append(Finding("error", f"{_where(stage_dir, m['file'])}:{m['line']}", f"type error {m['code']}: {m['message']}"))
+        if done.returncode != 0 and not found:
+            out.append(Finding("error", f"{DIR}/tsconfig.json", "tsc failed: " + (done.stdout + done.stderr).strip()[-400:]))
+    return out
+
+
+def lint(stage_dir: Path, node: str, eslint: str, env: dict[str, str]) -> list[Finding]:
+    """ESLint on the extension's TypeScript (recommended and type-checked rules) and its JavaScript. A warning fails too: the rules are errors
+    or they are off (0043 FR-035)."""
+    done = _run(node, env, stage_dir, eslint, ".", "--format", "json", "--max-warnings", "0")
+    try:
+        report = json.loads(done.stdout)
+    except ValueError:
+        return [Finding("error", f"{DIR}/eslint.config.mjs", "ESLint did not run: " + (done.stdout + done.stderr).strip()[-400:])]
+    out: list[Finding] = []
+    for entry in report:
+        for m in entry.get("messages", []):
+            rule = f" ({m['ruleId']})" if m.get("ruleId") else ""
+            out.append(Finding("error", f"{_where(stage_dir, entry['filePath'])}:{m.get('line', 1)}", f"lint{rule}: {m['message']}"))
+    if done.returncode != 0 and not out:
+        out.append(Finding("error", f"{DIR}/eslint.config.mjs", "ESLint failed: " + (done.stdout + done.stderr).strip()[-400:]))
+    return out
+
+
+def bundle(stage_dir: Path, node: str, env: dict[str, str]) -> list[Finding]:
+    """esbuild: dist/extension.js (the manifest's main), dist/webview.js and the codicon font, minified, with their source maps."""
+    done = _run(node, env, stage_dir, "esbuild.mjs", "bundle")
+    if done.returncode != 0 or not (stage_dir / "dist" / "extension.js").is_file():
+        return [Finding("error", f"{DIR}/esbuild.mjs", "esbuild could not bundle the extension: " + (done.stderr or done.stdout).strip()[-500:])]
+    return []
+
+
+def compile_tests(stage_dir: Path, node: str, env: dict[str, str]) -> list[Finding]:
+    """esbuild compiles the tests and the code they load, each file apart, into out/: what node's runner runs, and what the real-VS-Code
+    scenarios' fixture loads."""
+    if not list((stage_dir / "test").glob("*.test.ts")):
+        return [Finding("error", f"{DIR}/test", "holds no *.test.ts file (0043 FR-028)")]
+    built = _run(node, env, stage_dir, "esbuild.mjs", "test")
+    if built.returncode != 0:
+        return [Finding("error", f"{DIR}/test", "esbuild could not compile the tests: " + (built.stderr or built.stdout).strip()[-400:])]
+    return []
+
+
+def run_tests(stage_dir: Path, node: str, env: dict[str, str], launcher_root: Path) -> tuple[list[Finding], list[str]]:
+    """The unit tests (TypeScript, compiled to out/ by esbuild) under node's own runner, with the bundle's own test among them, and the headless
+    drive of a real launcher at `launcher_root`."""
+    failed_build = compile_tests(stage_dir, node, env)
+    if failed_build:
+        return failed_build, []
+    tests = sorted(str(p.relative_to(stage_dir)) for p in (stage_dir / "out" / "test").glob("*.test.js"))
+    done = subprocess.run([node, "--test", "--test-reporter=tap", *tests], cwd=stage_dir,
+                          env={**env, "IF_CONSOLE_REAL_ROOT": str(launcher_root), "NODE_OPTIONS": ""}, capture_output=True, text=True)
+    text = done.stdout
+    counts = {k: int(m.group(1)) for k in ("tests", "pass", "fail", "skipped") if (m := re.search(rf"^# {k} (\d+)", text, re.M))}
     findings: list[Finding] = []
     if done.returncode != 0 or counts.get("fail", 1):
-        failed = re.findall(r"^\s*not ok \d+ - (.+)$", out, re.M)
+        failed = re.findall(r"^\s*not ok \d+ - (.+)$", text, re.M)
         for name in failed[:20] or ["the test run"]:
             findings.append(Finding("error", f"{DIR}/test", f"fails: {name}"))
         if not failed:
-            findings.append(Finding("error", f"{DIR}/test", "the run failed: " + (done.stderr.strip() or out.strip())[-400:]))
+            findings.append(Finding("error", f"{DIR}/test", "the run failed: " + (done.stderr.strip() or text.strip())[-400:]))
     return findings, [f"node's test runner: {counts.get('pass', 0)} of {counts.get('tests', 0)} passed, {counts.get('skipped', 0)} skipped"]
 
 
@@ -144,11 +267,12 @@ def vsix_name(home: Path) -> str:
     return f"{pkg['name']}-{pkg['version']}.vsix"
 
 
-def package(home: Path, node: str, vsce: str, out: Path, env: dict[str, str]) -> subprocess.CompletedProcess:
-    """Pack the .vsix from tools/if-console/ into `out` with vsce. No dependency is bundled: there is none (0043 FR-027)."""
+def package(stage_dir: Path, node: str, vsce: str, out: Path, env: dict[str, str]) -> subprocess.CompletedProcess:
+    """Pack the .vsix from the staged, bundled extension into `out` with vsce. No dependency is bundled: there is none (0043 FR-027, FR-035);
+    .vscodeignore leaves out the sources, the tests, the source maps and the lock."""
     out.parent.mkdir(parents=True, exist_ok=True)
     return subprocess.run([node, vsce, "package", "--no-dependencies", "--skip-license", "--allow-missing-repository",
-                           "--no-rewrite-relative-links", "--out", str(out)], cwd=home / DIR, env=env, capture_output=True, text=True)
+                           "--no-rewrite-relative-links", "--out", str(out)], cwd=stage_dir, env=env, capture_output=True, text=True)
 
 
 def contents(vsix: Path) -> list[dict]:

@@ -1,7 +1,6 @@
 'use strict';
 // The screenshots scenario (0043-if-console FR-045): open what the extension shows, in the theme the run chose, and capture each to a PNG.
 // Every file is named <theme>-<what>.png. A scenario that fails to open a view fails, so a missing screenshot is never silent.
-const assert = require('assert');
 const path = require('path');
 const vscode = require('vscode');
 const { test } = require('./harness');

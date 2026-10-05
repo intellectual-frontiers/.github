@@ -215,12 +215,14 @@ it does, what it never does, and how it is built.
   (0025-tooling-environment FR-015). It MUST have no runtime npm dependency:
   what ships is its own code, and the packages in the lock are build and test
   tools only. The build MUST produce one `.vsix` under `build/`.
-- **FR-028**: The extension MUST carry tests that run under Node's built-in
-  test runner with a stand-in for the VS Code API and a fake launcher that
-  replays recorded resources, covering discovery (FR-004 through FR-007),
-  every feature of FR-008 through FR-022 and FR-031, the refusals of FR-015,
-  and the absence of network and telemetry calls (FR-023), and `agora check
-  extension` MUST run them (the `node` runner) and a lint of the code
+- **FR-028**: The extension MUST carry tests, written in TypeScript like the
+  code (FR-035) and run under Node's built-in test runner with a stand-in for
+  the VS Code API and a fake launcher that replays recorded resources,
+  covering discovery (FR-004 through FR-007), every feature of FR-008 through
+  FR-022 and FR-031, the refusals of FR-015, and the absence of network and
+  telemetry calls (FR-023), and `agora check extension` MUST run them (the
+  `node` runner), with a test that loads the bundle of FR-035 under the
+  stand-in and activates it, and the type check and lint of FR-035
   (0042-agora FR-013). The stand-in shows that the code does what the tests
   expect of VS Code; FR-032's tests show that VS Code does what the code expects.
 - **FR-029**: A person installs the extension from the `.vsix` that FR-027
@@ -316,12 +318,29 @@ knowledge (FR-003).
   names, and linted by ESLint, and MUST be built by `agora extension build` with
   nothing on the host but `python3` and `uv`: Node comes from the locked Python
   package `nodejs-wheel-binaries` (FR-027), and `typescript`, `esbuild`,
-  `eslint`, `@types/vscode`, `@vscode-elements/elements` and `@vscode/codicons`
-  come from the extension's own npm lock, every one at one exact version with
-  its integrity hash (0025-tooling-environment FR-015). `agora check extension`
-  MUST fail on a type error and on a lint error. The packages are for the build:
-  the manifest has no `dependencies`, and the `.vsix` holds the bundle, the
-  media and the codicon font, and no `node_modules`.
+  `eslint`, `typescript-eslint`, `@types/vscode`, `@vscode-elements/elements`,
+  `@vscode/codicons`, `@vscode/vsce` and `@vscode/test-electron` come from the
+  extension's own npm lock, the toolchain entry `extension-build`, every one at
+  one exact version with its integrity hash (0025-tooling-environment FR-015).
+  `@types/vscode` MUST be the version of the manifest's `engines.vscode`, so
+  that the code cannot use an interface that VS Code lacks. `agora extension
+  build` MUST type-check the code, lint it, bundle it and then pack it, and
+  `agora check extension` MUST fail on a type error and on a lint error: ESLint
+  runs the recommended rules and the type-checked recommended rules of
+  `typescript-eslint`, and a warning fails it. The bundle MUST be a production
+  build whose source maps are left out of the `.vsix`. The code MUST be in
+  modules that each hold one concern: `src/model/` (the typed wire shape,
+  including the presentation of 0041-command-line FR-064, and the pure logic
+  that reads it), `src/services/` (discovery, the launcher with cancellation
+  tokens, a cache of what each repository's launcher said about itself that
+  its file watchers empty, trust, and a log that is a VS Code log output
+  channel), `src/views/`, `src/commands/`, `src/webview/` (its own bundle) and
+  `src/test-mode.ts` (FR-033). A use of `any` MUST say why. `agora check
+  extension` MUST also fail where the codicon ids that the command line may name
+  (0041-command-line FR-072) are not the glyph map of the locked
+  `@vscode/codicons`. The packages are for the build: the manifest has no
+  `dependencies`, and the `.vsix` holds the bundle, the media and the codicon
+  font, and no `node_modules`, source or source map.
 - **FR-036**: The extension MUST contribute one activity-bar container with a
   monochrome icon (an SVG that draws in `currentColor` and no other color), and
   in it, in this order: a Home view (FR-037); one view for each entry of

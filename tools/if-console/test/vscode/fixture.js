@@ -3,7 +3,7 @@
 // the files its recorded findings and changes name, so that a check places a diagnostic and a write has a file to diff.
 const fs = require('fs');
 const path = require('path');
-const { makeRepo, secondCommandLine } = require('../support/fake-launcher');
+const { makeRepo, secondCommandLine } = require('../../out/test/support/fake-launcher');
 
 function make() {
   const k = secondCommandLine('other');
