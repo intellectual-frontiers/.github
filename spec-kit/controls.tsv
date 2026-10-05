@@ -137,3 +137,9 @@ requirement	control	note
 0040-security-program-policy FR-005	soc2:CC2.2	policies available to everyone they bind
 0040-security-program-policy FR-006	soc2:CC2.3	commitments and a reporting channel for customers
 0040-security-program-policy FR-007	soc2:CC4.1	independent assessment of every boundary
+0045-elenchus-works FR-009	soc2:CC4.1	a control that no probe showed operating is reported as an exception, never as met
+0045-elenchus-works FR-011	soc2:CC4.1	every control in a baseline is tested, or reported as not tested
+0045-elenchus-works FR-014	soc2:CC4.1	each evaluation recorded in the evidence ledger
+0045-elenchus-works FR-028	soc2:CC4.1	evaluations performed on a monthly schedule, overdue ones reported
+0045-elenchus-works FR-018	soc2:CC4.2	every deficiency has a remedy or is named to the decision authority
+0045-elenchus-works FR-027	soc2:CC4.2	deficiencies communicated to the decision authority at close
