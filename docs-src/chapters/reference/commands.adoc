@@ -245,10 +245,10 @@ The IF Console VS Code extension, built from tools/if-console/ (0043-if-console)
 |===
 |Usage |Category |Where it runs |What it does
 
-|`agora extension build`
+|`agora extension build [--modules TEXT]`
 |build
 |terminal, editor, mcp
-|Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock
+|Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock; or, with --modules DIR, write its compiled modules for another repository's tests
 
 |`agora extension test [--suite TEXT] [--screenshots TEXT] [--workspace TEXT] [--report TEXT]`
 |check
