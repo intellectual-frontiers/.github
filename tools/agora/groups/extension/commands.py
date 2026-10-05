@@ -139,9 +139,12 @@ def extension_test(ctx: Ctx, suite: str | None, screenshots: str | None, workspa
 
 
 @command("extension build", category="build", toolchain=("extension-build",),
-         help="Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock")
-def extension_build_command(ctx: Ctx) -> Resource:
+         help="Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock; or, with --modules DIR, write its compiled modules for another repository's tests",
+         options=[Opt("--modules", "TEXT", "instead of the .vsix, write the unbundled compiled modules (src/ and test/support/, one CommonJS file per module) into this folder, for tests that load them")])
+def extension_build_command(ctx: Ctx, modules: str | None = None) -> Resource:
     exe = _node(ctx)
+    if modules:
+        return _modules(ctx, exe, Path(modules).expanduser().resolve())
     problems = extension.manifest_findings(ctx.home)
     if problems:
         raise AgoraError("invalid-extension", "the extension's package.json is not valid: " + "; ".join(f.message for f in problems[:3]),
@@ -167,3 +170,20 @@ def extension_build_command(ctx: Ctx) -> Resource:
         data["bytes"] = out.stat().st_size
         data["files"] = extension.contents(out)
     return Resource("extension", "if-console", data, actions=[next_command("check the extension", "check", sections=["extension"])])
+
+
+def _modules(ctx: Ctx, exe: str, dest: Path) -> Resource:
+    """`extension build --modules DIR` (0043-if-console FR-047): the unbundled compiled modules, built in the staged copy with the locked toolchain."""
+    data = {"modules": str(dest), "dry_run": ctx.dry_run, "changes": [{"path": str(dest), "change": "modify" if dest.exists() else "create", "added": 0,
+                                                                        "removed": 0, "diff": []}]}
+    if not ctx.dry_run:
+        resolved = ctx.toolchain().use(["extension-build"])
+        with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
+            stage_dir = extension.stage(ctx.home, resolved.path_of("extension-modules"), Path(tmp))
+            found = extension.compile_tests(stage_dir, exe, resolved.env())
+            if found:
+                raise AgoraError("invalid-extension", "the extension's modules did not build: " + "; ".join(f.message for f in found[:3]), exit=FAILED,
+                                 detail={"findings": [f"{f.where}: {f.message}" for f in found]})
+            dest.mkdir(parents=True, exist_ok=True)
+            data["files"] = extension.export_modules(stage_dir, dest)
+    return Resource("extension", "modules", data)

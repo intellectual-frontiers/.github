@@ -59,6 +59,52 @@ class ExtensionRules(unittest.TestCase):
         self.assertEqual(doc["data"]["changes"][0]["path"], doc["data"]["vsix"])
 
 
+class Modules(unittest.TestCase):
+    """`extension build --modules DIR` (0043 FR-047): the compiled modules for another repository's tests."""
+
+    def test_the_export_copies_the_source_modules_and_the_stub_and_not_the_unit_tests(self):
+        with tempfile.TemporaryDirectory() as t:
+            stage, dest = Path(t, "stage"), Path(t, "dest")
+            for rel in ("src/app.js", "src/model/wire.js", "test/support/vscode-stub.js", "test/app.test.js"):
+                f = stage / "out" / rel
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_text("x")
+            (dest / "src").mkdir(parents=True)
+            (dest / "src" / "stale.js").write_text("old")
+            files = extension.export_modules(stage, dest)
+            self.assertEqual(files, ["src/app.js", "src/model/wire.js", "test/support/vscode-stub.js"])
+            self.assertFalse((dest / "src" / "stale.js").exists())
+            self.assertFalse((dest / "test" / "app.test.js").exists())
+
+    def test_the_command_builds_in_the_staged_copy_and_writes_into_the_folder(self):
+        with tempfile.TemporaryDirectory() as t:
+            dest = Path(t, "mods")
+            seen = {}
+
+            def export(stage_dir, to):
+                seen["to"] = to
+                return ["src/app.js"]
+            with mock.patch("agora.core.worker.needs_worker", return_value=False), \
+                    mock.patch.object(Toolchain, "use", lambda _t, names: FakeTools()), \
+                    mock.patch.object(extension, "stage", return_value=Path("/stage")), \
+                    mock.patch.object(extension, "compile_tests", return_value=[]) as compiled, \
+                    mock.patch.object(extension, "export_modules", export), \
+                    mock.patch("agora.groups.extension.commands._node", return_value="/n/node"):
+                code, doc = run_json(["extension", "build", "--modules", str(dest), "--no-log"], env={"AGORA_PLAN_GROUP": "extension"})
+            self.assertEqual(code, 0, doc)
+            self.assertEqual((seen["to"], doc["data"]["files"]), (dest.resolve(), ["src/app.js"]))
+            self.assertTrue(compiled.called)
+            self.assertNotIn("vsix", doc["data"])
+
+    def test_dry_run_names_the_folder_and_writes_nothing(self):
+        with tempfile.TemporaryDirectory() as t:
+            dest = Path(t, "mods")
+            done = subprocess.run([str(HOME / "agora"), "extension", "build", "--modules", str(dest), "--dry-run", "--json", "--no-log"], capture_output=True, text=True)
+            doc = json.loads(done.stdout)
+            self.assertEqual((doc["data"]["modules"], doc["data"]["dry_run"]), (str(dest.resolve()), True))
+            self.assertFalse(dest.exists())
+
+
 class FakeTools:
     """What the toolchain hands over, without a cache: every program is a path under /x, and the extension's staging and programs are patched out."""
 

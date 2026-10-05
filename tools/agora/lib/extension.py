@@ -241,6 +241,19 @@ def compile_tests(stage_dir: Path, node: str, env: dict[str, str]) -> list[Findi
     return []
 
 
+def export_modules(stage_dir: Path, dest: Path) -> list[str]:
+    """Copy the compiled modules (out/src, one CommonJS file per module, and out/test/support, the stand-in for the VS Code API and the
+    other test support) into `dest`, emptying `src` and `test` there first. Gives the files written, relative to `dest`. 0043 FR-047."""
+    written: list[str] = []
+    for part in ("src", Path("test") / "support"):
+        source, target = stage_dir / "out" / part, dest / part
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(source, target)
+        written += sorted(str(p.relative_to(dest)) for p in target.rglob("*") if p.is_file())
+    return written
+
+
 def run_tests(stage_dir: Path, node: str, env: dict[str, str], launcher_root: Path) -> tuple[list[Finding], list[str]]:
     """The unit tests (TypeScript, compiled to out/ by esbuild) under node's own runner, with the bundle's own test among them, and the headless
     drive of a real launcher at `launcher_root`."""

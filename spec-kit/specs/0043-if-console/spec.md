@@ -570,6 +570,17 @@ knowledge (FR-003).
   what needs them, then the views its command line declares, and reviews each in
   light, dark and high-contrast screenshots before it ships (FR-036, FR-045).
 
+- **FR-047**: A repository whose own tests load the extension's modules (not
+  the bundle, and not in a VS Code) MUST be able to get them from this one
+  without naming it. `agora extension build --modules DIR` MUST, instead of
+  the `.vsix`, compile the extension in the staged copy of FR-035 with the
+  locked toolchain and write into DIR the unbundled CommonJS tree that esbuild
+  makes, one file per module: `src/` (the extension host's code, not the
+  webview's) and `test/support/` (the compiled stand-in for the VS Code API and
+  the other test support), emptying those two folders in DIR first and leaving
+  the extension's own unit tests out. It MUST take `--dry-run`, which names DIR
+  and writes nothing, and MUST write nothing into this repository.
+
 ## Review & acceptance checklist
 
 - [x] Every requirement is testable (MUST / MUST NOT), not aspirational

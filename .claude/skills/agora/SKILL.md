@@ -86,7 +86,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `docs generate` | `generate` | terminal, editor, mcp | Write the guide's reference chapters from the registry, the help topics, the toolchain, the checks and the design systems | `agora docs generate` |
 | `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
-| `extension build` | `build` | terminal, editor, mcp | Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock | `agora extension build` |
+| `extension build` | `build` | terminal, editor, mcp | Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock; or, with --modules DIR, write its compiled modules for another repository's tests | `agora extension build [--modules TEXT]` |
 | `extension test` | `check` | terminal, editor, mcp | Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named, or capture its screenshots | `agora extension test [--suite TEXT] [--screenshots TEXT] [--workspace TEXT] [--report TEXT]` |
 | `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
 | `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
@@ -199,6 +199,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--brand` (BRAND): the brand that themes it (frontiers-brand by default)
   - `--dry-run` (flag): validate, write nothing, show the change
 - `extension build`
+  - `--modules` (TEXT): instead of the .vsix, write the unbundled compiled modules (src/ and test/support/, one CommonJS file per module) into this folder, for tests that load them
   - `--dry-run` (flag): validate, write nothing, show the change
 - `extension test`
   - `--suite` (TEXT): the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does

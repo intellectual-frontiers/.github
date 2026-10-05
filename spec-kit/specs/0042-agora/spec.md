@@ -349,7 +349,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   extension's package from `tools/if-console/` into `build/`, with Node from
   the locked `nodejs-wheel-binaries` and the extension's own `package-lock.json`
   (0043-if-console FR-027), by type-checking, linting and bundling it and then
-  packing it, as 0043-if-console FR-035 states, and MUST take `--dry-run`. `agora extension test --suite DIR
+  packing it, as 0043-if-console FR-035 states, and MUST take `--dry-run`; with
+  `--modules DIR` it MUST instead write the extension's compiled modules into DIR
+  (0043-if-console FR-047). `agora extension test --suite DIR
   [--workspace [NAME=]DIR]...` MUST run another repository's tests of the
   extension in a real VS Code as 0043-if-console FR-034 states, and `agora
   extension test --screenshots DIR` MUST capture the extension's screens as
