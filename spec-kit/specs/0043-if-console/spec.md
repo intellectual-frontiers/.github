@@ -107,11 +107,13 @@ it does, what it never does, and how it is built.
   the editor. The extension MUST add no style to a rendering beyond VS Code's
   theme variables around it.
 - **FR-012**: The extension MUST offer, in the command palette, `IF Console:
-  Run Command`, which lists every command that declares the editor surface,
-  grouped by repository and noun, with its category, and the repository-wide
-  commands as their own entries (`IF Console: Check`, `Fresh`, `Test`,
-  `Doctor`, `Show Command Line`, `Get Help`, `Learn`, `Copy Context`, `Open View`). It
-  MUST list no command that the editor surface does not expose
+  Run Command…`, which lists every command that declares the editor surface,
+  grouped by repository and noun, each with the command's own id, the title and
+  icon its `command list` gives it (0041-command-line FR-064) and its category,
+  and the repository-wide commands as their own entries (`IF Console: Run
+  Check…`, `Prove Generated Files`, `Run Tests`, `Check Health`, `Show Command
+  Line…`, `Get Help…`, `Learn a Topic…`, `Copy Context…`, `Open Page…`, `Find
+  Resource…`). It MUST list no command that the editor surface does not expose
   (0041-command-line FR-022).
 - **FR-013**: The extension MUST build the input for a command from the
   command's typed arguments: one step for each argument, a quick pick where
@@ -138,7 +140,8 @@ it does, what it never does, and how it is built.
 - **FR-016**: The extension MUST show a status bar item for the active
   workspace folder's repository, giving its orchestrator, its audience and a
   plain-words state taken from `doctor` (well, needs attention, or something
-  missing), that opens the `doctor` resource when chosen, and MUST show an
+  missing), that opens Home with what needs a person in view when chosen
+  (FR-039), and MUST show an
   audience other than the one the person expects as the launcher states it,
   never as the extension decides (0041-command-line FR-040, FR-054).
 - **FR-017**: The extension MUST write to an output channel "IF Console", for
@@ -156,15 +159,14 @@ it does, what it never does, and how it is built.
   Get Help` assembles `context` and `doctor`, with secrets removed, into the
   report 0041-command-line FR-057 describes. Neither MUST send anything
   anywhere.
-- **FR-019**: The extension MUST offer a Chores view, one place for what a
-  person routinely does in a repository: the repository-wide commands, the open
-  proposals (`proposal list --status open`, each to be read and then decided
-  or left, FR-015), the sections whose last check found something, the
-  generators `fresh` reports stale (each with its rewriting command and its
-  dry-run diff, FR-014), the toolchain entries `doctor` reports absent (each
-  with `toolchain add`), and a "Get Help" entry. The Chores view MUST be built
-  from the launcher's own resources and MUST add no chore the launcher does
-  not have a command for (FR-003).
+- **FR-019**: What the first design's Chores view listed is Home's (FR-037):
+  the repository-wide commands are in the palette and the views, the open
+  proposals (`proposal list --status open`, each to be read and then decided or
+  left, FR-015), the sections whose last check found something, the generators
+  `fresh` reports stale (each with its rewriting command and its dry-run diff,
+  FR-014), the toolchain entries `doctor` reports absent (each with its fetch
+  command) and a "Get help" group. Home MUST be built from the launcher's own
+  resources and MUST add nothing the launcher has no command for (FR-003).
 - **FR-020**: The extension MUST show a stream (NDJSON,
   0041-command-line FR-019) as VS Code progress with the stream's own words,
   MUST let a person cancel it, ending the launcher's process, and MUST show
@@ -191,9 +193,14 @@ it does, what it never does, and how it is built.
   or send a resource, a log line or a finding to any service. The only network
   traffic in a session is what a launcher itself makes when a command needs it.
 - **FR-024**: The extension's settings MUST be only: `if-console.launchers`
-  (FR-004), and, as an option a person turns on, `if-console.checkOnSave`,
-  which runs `check --changed --json` for the saved file's repository and
-  shows the findings as FR-009 states. Neither MAY change what a command does.
+  (FR-004); as an option a person turns on, `if-console.checkOnSave`, which
+  runs `check --changed --json` for the saved file's repository and shows the
+  findings as FR-009 states; `if-console.showAllCommands`, which shows the view
+  of every command (FR-036); and `if-console.rowLimit`, the most rows of one
+  kind a view lists. Each MUST have the scope `application` and a
+  `markdownDescription` (FR-040), and none MAY change what a command does. The
+  extension writes none of them (FR-026): the view-title toggle of the view of
+  every command lasts for the session.
 - **FR-025**: The extension MUST say everything it says to a person in plain
   language, the first line of a resource's text rendering being the label
   where one is needed (0041-command-line FR-054); MUST use VS Code's theme
@@ -278,8 +285,8 @@ it does, what it never does, and how it is built.
   extension showed, in order: each modal's message, detail, whether it was
   modal and its buttons, each quick pick's title and items, and each webview's
   page; and (c) reads a snapshot, taken on demand and changing nothing, of the
-  repositories found, the entries of the three views and the MCP servers it
-  registers. Outside test mode the object MUST NOT exist and the modal MUST be
+  repositories found, the entries of its views, the badges, the status bar's
+  text, the tests of the Test Explorer and the MCP servers it registers. Outside test mode the object MUST NOT exist and the modal MUST be
   VS Code's own. The hook MUST affect no other prompt: quick picks and input
   boxes are driven by VS Code's own commands in the tests, and no source other
   than the hook's own file MAY read the extension mode.
@@ -349,12 +356,27 @@ knowledge (FR-003).
   its `list` describes; a Checks view; and an All commands view, the tree of
   every noun and command (FR-008), which is collapsed and hidden by default. A
   repository whose `command list` has no `presentation` MUST still be served
-  by Home, Checks and All commands, which the person can show.
+  by Home, Checks and All commands, which the person can show. A view cannot
+  be added while the extension runs, so the manifest holds a fixed pool of
+  sixteen view slots after Home, each shown only while a view is planned into
+  it and titled when the command lines are read; a view declared by more than
+  one command line is one view, its entries grouped by repository, and a noun
+  with a `view` but no `list` shows the commands the editor offers for it. A
+  noun's rows are read when its group is opened, are listed up to the setting
+  `if-console.rowLimit`, and the rest are found by the Find Resource quick
+  pick.
 - **FR-037**: The Home view MUST list what needs a person, each as a row with a
   status (FR-038) and an action, from the launcher's own resources: the check
   sections whose last run failed, the open proposals, the generated files
   `fresh` reports stale, the toolchain entries and libraries `doctor` reports
-  absent, and the state `doctor` gives. It MUST use `viewsWelcome` content, with
+  absent, and the state `doctor` gives, read from the rows and lists that
+  `doctor`'s data has (`conflicts`, `missing`, `toolchain` rows whose `cache`
+  or `state` is not ready with their `hint` or `fix`, `prerequisites`, the
+  system libraries and `state`) and from its actions; a workspace that is not
+  trusted is a row too. A row's label is a short sentence in plain words, its
+  muted description is the exact command line that fixes it, its tooltip says
+  why, its inline buttons run it and copy its command line, and the count of
+  rows that need a person is the view's badge. It MUST use `viewsWelcome` content, with
   the one action that fixes it, for: no command line declared; a workspace not
   trusted (FR-006); and a missing toolchain or library. Home MUST add no item
   that the launcher has no command for (FR-003, FR-019).
@@ -367,7 +389,10 @@ knowledge (FR-003).
   `testing.iconSkipped`; `info` `info` with `notificationsInfoIcon.foreground`;
   `muted` `circle-small-filled` with `disabledForeground`. A row's tooltip MUST
   be a `MarkdownString` with codicons, the row's `tooltip` fields as key facts
-  and command links for its actions. Rows MUST have inline hover actions (the
+  and command links for its actions; what a launcher returned is inserted only
+  escaped, and a link carries a handle that the extension issued, so that
+  nothing a launcher says can become a link that runs a command; a row's
+  `badge` is its decoration's badge. Rows MUST have inline hover actions (the
   `inline` group of `view/item/context`) and context menus in the groups
   `navigation`, `1_run`, `2_copy` and `9_cutcopypaste` in that order; views
   MUST have title actions with icons and a badge of a count where there is one;
@@ -378,15 +403,21 @@ knowledge (FR-003).
   Console: Show Home"), an icon, and a `when` or `enablement` clause so that
   only the commands that can run now are offered; the commands a launcher
   declares MUST be offered by the title its `command list` gives them
-  (0041-command-line FR-064), not one the extension made. The extension MAY bind
-  keys for its top few commands, and MUST bind none that runs a decision or a
-  write (FR-015). The status bar item MUST show an icon, the orchestrator and
-  its state (FR-016), a `MarkdownString` tooltip with the audience and what
-  needs a person, and open Home when chosen.
+  (0041-command-line FR-064), not one the extension made: the quick pick of
+  Run Command shows each command's own title and icon beside its id. The
+  extension binds keys for Home, Run Check, Learn and Copy Context, and MUST
+  bind none that runs a decision or a write (FR-015). The status bar item MUST
+  show an icon, the orchestrator and, when something needs a person, how many
+  things (FR-016), a `MarkdownString` tooltip with the audience, the health
+  and what needs a person, each with its command line and a button that runs
+  it, and open Home with the first suggestion revealed when chosen, never a
+  silent refresh.
 - **FR-040**: The extension MUST use VS Code's own surfaces before drawing its
   own: the Testing API (a controller with run profiles, a test for each check
   section, and for each reference that a spec or register names whose enforcing
-  action is a check, a test item with a range at its line), the Problems panel
+  action is a check, a test item with a range at its line; two run profiles,
+  Run and Run with `--changed`; and a child test with a range at the line of
+  each finding of a failed section), the Problems panel
   (FR-009), a `FileDecorationProvider` that badges files and their folders that
   have findings, `vscode.diff` for the dry-run diff of a write (FR-014), a
   `LogOutputChannel` for the output channel (FR-017), and settings that each
@@ -396,7 +427,8 @@ knowledge (FR-003).
   resource's `text`, its `facts` and its actions as command links; Go to
   Definition, to the `path` and `line` the resource gives; a CodeLens above the
   reference that shows its `lens` fields with a Run for the resource's `check`
-  action; and a document link that opens the resource's page (FR-042). Each
+  action, which runs it through the one path every command takes; and a
+  document link that opens the resource's page (FR-042). Each
   runs only the launcher's `show` command, only in a trusted workspace, and the
   extension MUST hold no pattern, file name or field of its own for them.
 - **FR-042**: A resource MUST open in one panel for the window, a webview that
@@ -580,6 +612,19 @@ knowledge (FR-003).
   the other test support), emptying those two folders in DIR first and leaving
   the extension's own unit tests out. It MUST take `--dry-run`, which names DIR
   and writes nothing, and MUST write nothing into this repository.
+
+- **FR-048**: Every suggestion the extension shows, in Home, the status bar, a
+  notification, a welcome view or the results of a check, MUST be actionable:
+  it MUST say what is wrong in plain words, give the exact command line that
+  fixes it (one that can be pasted in a terminal, 0041-command-line FR-055) and
+  a button that runs it through the one path every command takes (FR-013 to
+  FR-015), or, where no command does, say what the person must do themselves.
+  It MUST NOT point at "below", "above" or "a suggestion" that the person
+  cannot see. A message about a result that needs a person MUST have a button
+  that runs the first fix, named for it, and a "Show all" button that opens
+  Home with that suggestion revealed. A command line gives every suggestion an
+  action (0041-command-line FR-017), so that there is a command to run; where
+  one gives none, the suggestion says what the person does.
 
 ## Review & acceptance checklist
 

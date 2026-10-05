@@ -7,7 +7,10 @@ finds a repository's launcher by that repository's own `.if-console.env`, and th
 
 What it gives you:
 
-* A tree of nouns, commands and resources, and a Chores view of what needs doing.
+* Home, which lists what needs you: failed checks, open proposals, generated files that are out of date, toolchain entries not fetched yet. Each row says what is wrong in plain words, shows the exact command line that fixes it and has a Run button.
+* A view for each kind of thing this repository's command line declares (specs, design systems, builds, the toolchain, proposals), with a status icon, a short description and a hover with the key facts on every row.
+* Checks as a view and in the Test Explorer, with findings on the files that have them.
+* In the spec files, a hover on a requirement's number that shows its words and what enforces it, Go to Definition, and a Run above it.
 * Findings in the Problems panel, at their file and line.
 * Every command from the palette, with a quick pick from each typed argument.
 * A diff of what a write would change, before it is made.

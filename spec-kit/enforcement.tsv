@@ -1050,19 +1050,19 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-009	check	.github: agora check extension	diagnostics tests: file:line, severity, source, cleared per section, unplaced findings in the output
 0043-if-console FR-010	check	.github: agora check extension	task provider and Test Controller tests; a skipped section is skipped, never passed
 0043-if-console FR-011	check	.github: agora check extension	webview tests: policy, link classification, one own script
-0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun; the real VS Code run lists the manifest's palette entries
+0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun, each with the command line's own title and icon; the manifest test reads the palette titles; the real VS Code run lists the manifest's palette entries
 0043-if-console FR-013	check	.github: agora check extension	form tests: choices from the type or the noun's list, retry on a refused value, the whole line before running
 0043-if-console FR-014	check	.github: agora check extension	executor and diff tests: dry run first, diff from a virtual document, apply only on acceptance, failed dry run stops
 0043-if-console FR-015	check	.github: agora check extension	tests: modal required, exactly true, forged nodes ignored, no API export, no decision in the manifest's tasks or keys
-0043-if-console FR-016	check	.github: agora check extension	status bar tests: orchestrator, audience as stated, state from doctor
+0043-if-console FR-016	check	.github: agora check extension	status bar tests: orchestrator and the count of what needs a person, audience as stated, the health from doctor, a tooltip with each suggestion's command line, a click that opens Home focused on the suggestions
 0043-if-console FR-017	check	.github: agora check extension	launcher tests: the one-line command, exit status, stderr, stream lines, IF_CONSOLE=1, no stdout contents
 0043-if-console FR-018	check	.github: agora check extension	tests: Copy Context and the help report remove secrets and send nothing
-0043-if-console FR-019	check	.github: agora check extension	Chores tests: derived from categories and the launcher's own resources
+0043-if-console FR-019	check	.github: agora check extension	Home tests: derived from the launcher's own resources and categories (the Chores view of the first design is Home)
 0043-if-console FR-020	check	.github: agora check extension	launcher tests: stream progress and cancel end the process
 0043-if-console FR-021	check	.github: agora check extension	tests: a newer schema is not shown and an update is offered
 0043-if-console FR-022	check	.github: agora check extension	MCP tests: registered for a trusted repository with mcp serve; absent API said in the output
 0043-if-console FR-023	check	.github: agora check extension	tests scan the code for network and telemetry and watch a whole session for connections
-0043-if-console FR-024	check	.github: agora check extension	manifest tests: only the two settings, application scope; checkOnSave test
+0043-if-console FR-024	check	.github: agora check extension	manifest tests: the four settings, each with application scope and a markdownDescription; checkOnSave test; the manifest check of agora check extension
 0043-if-console FR-025	none	-	plain language is a review of each message; theme icons and accessibility labels are set in the code and not tested for reading
 0043-if-console FR-026	check	.github: agora check extension	tests scan the code for any write and a session leaves the clone unchanged
 0043-if-console FR-027	check	.github: agora check toolchain	the lock of tools/if-console is checked (hashes, exact pins, no runtime dependency); agora extension build is tested by agora test
@@ -1074,18 +1074,19 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-033	check	.github: agora check extension	unit tests: the hook exists only in test mode and answers once; the real VS Code run answers a decision modal through it, and the never-tests scan the source for any other path
 0043-if-console FR-034	check	.github: agora test	test_extension: extension test runs the suite it is given in a workspace of this clone and the folders named, fails on a failed test and exits 3 where the display server is missing
 0043-if-console FR-035	check	.github: agora check extension	agora check extension type-checks (tsc, strict), lints (ESLint, type-checked rules) and bundles the TypeScript, reads the manifest's main, the package's ignore rules and the codicon list against the locked glyph map, and loads the bundle under the stand-in; agora check toolchain reads the npm lock; agora extension build is tested by agora test
-0043-if-console FR-036	none	-	not built yet; agora check extension will read the manifest's views and the real VS Code run will list them
-0043-if-console FR-037	none	-	not built yet; agora check extension will test Home and its welcome content with the stand-in and in a real VS Code
-0043-if-console FR-038	none	-	not built yet; agora check extension will test the row mapping and the menus with the stand-in and read the manifest
-0043-if-console FR-039	none	-	not built yet; agora check extension will read the manifest's commands, titles, icons and keybindings and test the status bar
-0043-if-console FR-040	none	-	not built yet; agora check extension will test the Testing API, decorations, diff and log with the stand-in and a real VS Code
-0043-if-console FR-041	none	-	not built yet; agora check extension will test the hover, definition, lens and links against the real launcher
+0043-if-console FR-036	check	.github: agora check extension	agora check extension reads the manifest's views (Home, the pool of slots, Checks, All commands hidden by default) and the activity-bar icon; the view plan tests (merged by id, grouped by repository, the pool's size); the real VS Code run lists the views and rows
+0043-if-console FR-037	check	.github: agora check extension	home tests derive each suggestion from the launcher's resources (checks, proposals, fresh, doctor, trust) and prove each is actionable; the manifest test reads Home's welcome content; the real VS Code run shows Home with the exact command lines
+0043-if-console FR-038	check	.github: agora check extension	row tests map each status to its codicon and theme color; the view tests read the label, description, tooltip (escaped Markdown, handles only), badge, inline and context menus; agora check extension reads the menu groups
+0043-if-console FR-039	check	.github: agora check extension	agora check extension reads every command's category, icon, verb-and-object title and when or enablement, and that no key runs a write or a decision; the palette and status bar tests; the real VS Code run registers each
+0043-if-console FR-040	check	.github: agora check extension	Testing API tests (two run profiles, finding children with ranges, reference tests), the file decoration tests, the dry-run diff and progress tests, the log channel; the real VS Code run lists the tests
+0043-if-console FR-041	check	.github: agora check extension	language tests for the hover, definition, CodeLens and document links from the references' own patterns and show; the real VS Code run drives them in a fixture and in this repository's register
 0043-if-console FR-042	none	-	not built yet; agora check extension will test the panel's policy and sections, and the screenshots will show it in three themes
 0043-if-console FR-043	none	-	not built yet; agora check extension will test Learn in the panel with the stand-in and a real VS Code
 0043-if-console FR-044	none	-	not built yet; agora check extension will read the manifest and the package's files
 0043-if-console FR-045	check	.github: agora check extension	the node test of the screenshot helper reads a screen dump to a PNG; agora test drives extension test --screenshots (the folder, the usage errors, the files); the scenario runs in a real VS Code with agora extension test --screenshots
-0043-if-console FR-046	none	-	not built yet; agora check extension will run the ported tests of the guarantees against the redesigned code
+0043-if-console FR-046	check	.github: agora check extension	every test of FR-028 and FR-032 was ported to the redesigned code and passes: the trust, dry-run, decision, MCP, discovery and test-hook tests; the vault's headless harness and real VS Code suite run against it
 0043-if-console FR-047	check	.github: agora test	test_extension Modules: the export copies src and test/support and not the unit tests, the command builds in the staged copy and writes the folder, and its dry run writes nothing
+0043-if-console FR-048	check	.github: agora check extension	tests derive every suggestion and prove each says what is wrong, gives its command line and runs it or says what the person does, and none says see below; the notification tests; the manifest check reads the welcome content
 0044-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
 0044-public-website FR-002	none	-	repository topology; no check
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents

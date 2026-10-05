@@ -7,6 +7,7 @@ import { actionsOf, checkSchema, linksOf } from '../model/wire';
 import { BaseProvider, CATEGORY_ICON, icon, messageNode, Node, speak, stateNodes } from './node';
 
 export const MAX_RESOURCES = 200;
+const VIEW = 'if-console.commands';
 
 export class CommandsProvider extends BaseProvider {
   getTreeItem(node: Node): vscode.TreeItem {
@@ -22,21 +23,22 @@ export class CommandsProvider extends BaseProvider {
         break;
       case 'noun':
         item = new vscode.TreeItem(d.noun ?? '', vscode.TreeItemCollapsibleState.Collapsed);
-        item.iconPath = icon('symbol-namespace');
-        item.description = d.help ?? '';
+        item.iconPath = icon(node.repo.nounDecl(d.noun ?? '')?.icon ?? 'symbol-namespace');
+        item.description = node.repo.nounDecl(d.noun ?? '')?.title ?? d.help ?? '';
         break;
       case 'command':
         item = new vscode.TreeItem(d.command?.id ?? '', vscode.TreeItemCollapsibleState.None);
         item.description = d.command?.category;
-        item.tooltip = d.command?.help;
-        item.iconPath = icon(CATEGORY_ICON[d.command?.category ?? ''] ?? 'play');
+        item.tooltip = [d.command?.title, d.command?.help].filter(Boolean).join(': ');
+        item.iconPath = icon(d.command?.icon ?? CATEGORY_ICON[d.command?.category ?? ''] ?? 'play');
+        item.contextValue = 'command runnable';
         item.command = { command: 'if-console.activateNode', title: 'Run', arguments: [node] };
         break;
       case 'resource':
         item = new vscode.TreeItem(d.label ?? '', vscode.TreeItemCollapsibleState.Collapsed);
         item.iconPath = icon('symbol-file');
         item.description = d.rel ?? '';
-        item.contextValue = 'resource';
+        item.contextValue = 'resource contextual';
         break;
       case 'more':
         item = new vscode.TreeItem(d.text ?? '', vscode.TreeItemCollapsibleState.None);
@@ -46,7 +48,7 @@ export class CommandsProvider extends BaseProvider {
         item = new vscode.TreeItem(d.label ?? '', vscode.TreeItemCollapsibleState.Collapsed);
         item.description = d.rel;
         item.iconPath = icon('link');
-        item.contextValue = 'resource';
+        item.contextValue = 'resource contextual';
         break;
       case 'action': {
         const a = d.action;
@@ -74,16 +76,16 @@ export class CommandsProvider extends BaseProvider {
         if (repo.state !== 'ready') return stateNodes(repo);
         const { nouns, repoWide } = repo.nouns();
         const out: Node[] = [];
-        if (repoWide.length) out.push(new Node('wide', repo, { commands: repoWide }));
-        for (const [noun, commands] of nouns) out.push(new Node('noun', repo, { noun, commands }));
+        if (repoWide.length) out.push(new Node('wide', repo, { view: VIEW, commands: repoWide }));
+        for (const [noun, commands] of nouns) out.push(new Node('noun', repo, { view: VIEW, noun, commands }));
         return out;
       }
-      case 'wide': return (node.data.commands ?? []).map((c) => new Node('command', repo, { command: c }));
+      case 'wide': return (node.data.commands ?? []).map((c) => new Node('command', repo, { view: VIEW, command: c }));
       case 'noun': {
-        const out = (node.data.commands ?? []).map((c) => new Node('command', repo, { command: c }));
+        const out = (node.data.commands ?? []).map((c) => new Node('command', repo, { view: VIEW, command: c }));
         const links = await repo.resources(node.data.noun ?? '', MAX_RESOURCES + 1);
-        for (const l of links.slice(0, MAX_RESOURCES)) out.push(new Node('resource', repo, { link: l, label: firstValue(l.fields) || l.command, rel: l.rel }));
-        if (links.length > MAX_RESOURCES) out.push(new Node('more', repo, { text: `Only the first ${MAX_RESOURCES} are shown; use Run Command to choose any.` }));
+        for (const l of links.slice(0, MAX_RESOURCES)) out.push(new Node('resource', repo, { view: VIEW, link: l, label: firstValue(l.fields) || l.command, rel: l.rel }));
+        if (links.length > MAX_RESOURCES) out.push(new Node('more', repo, { view: VIEW, text: `Only the first ${MAX_RESOURCES} are shown; use Run Command to choose any.` }));
         return out;
       }
       case 'resource': case 'link': return this.resourceChildren(node);
@@ -101,8 +103,8 @@ export class CommandsProvider extends BaseProvider {
     if (!r.doc || r.error) return [messageNode(repo, r.error ? r.error.message : `${repo.program} did not return this resource.`)];
     const check = checkSchema(r.doc);
     if (!check.ok) return [messageNode(repo, check.message)];
-    const out = linksOf(r.doc).slice(0, MAX_RESOURCES).map((l) => new Node('link', repo, { link: l, label: firstValue(l.fields) || l.command, rel: l.rel }));
-    out.push(...actionsOf(r.doc).map((a) => new Node('action', repo, { action: a })));
+    const out = linksOf(r.doc).slice(0, MAX_RESOURCES).map((l) => new Node('link', repo, { view: VIEW, link: l, label: firstValue(l.fields) || l.command, rel: l.rel }));
+    out.push(...actionsOf(r.doc).map((a) => new Node('action', repo, { view: VIEW, action: a })));
     return out.length ? out : [messageNode(repo, 'This resource has no links or actions.')];
   }
 }

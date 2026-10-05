@@ -4,6 +4,7 @@ import type { App } from '../app';
 import type { CommandSummary } from '../model/wire';
 import type { Repository } from '../services/repository';
 import * as testMode from '../test-mode';
+import { CATEGORY_ICON } from '../views/node';
 
 const NO_REPOSITORY = 'No folder in this window declares a command line for IF Console (a .if-console.env file at its root).';
 
@@ -30,7 +31,9 @@ export async function pickCommand(repo: Repository, filter?: (c: CommandSummary)
     const kept = cmds.filter((c) => !filter || filter(c));
     if (!kept.length) return;
     items.push({ label, kind: vscode.QuickPickItemKind.Separator });
-    for (const c of kept) items.push({ label: c.id, description: c.category, detail: c.help, id: c.id });
+    // The label is the command's own id and its title (the palette title the command line gives it) is beside it; a person can type either.
+    for (const c of kept) items.push({ label: c.id, description: [c.title, c.category].filter(Boolean).join(' \u00b7 '), detail: c.help,
+      iconPath: new vscode.ThemeIcon(c.icon ?? CATEGORY_ICON[c.category] ?? 'play'), id: c.id });
   };
   add(`${repo.name}: repository-wide`, repoWide);
   for (const [noun, cmds] of nouns) add(`${repo.name}: ${noun}`, cmds);

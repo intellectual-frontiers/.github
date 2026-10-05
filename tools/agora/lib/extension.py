@@ -21,7 +21,14 @@ from typing import Any
 from agora.core.checks import Finding
 
 DIR = "tools/if-console"
-SETTINGS = {"if-console.launchers", "if-console.checkOnSave"}  # 0043 FR-024
+SETTINGS = {"if-console.launchers", "if-console.checkOnSave", "if-console.showAllCommands", "if-console.rowLimit"}  # 0043 FR-024
+CATEGORY = "IF Console"  # 0043 FR-039
+# The first word of a command's title is a verb (0043 FR-039); the title is a verb and an object.
+VERBS = {"Show", "Run", "Prove", "Check", "Get", "Learn", "Copy", "Open", "Find", "Refresh", "Stop", "Trust", "Follow"}
+# The only commands a key may run: each reads, none writes or decides (0043 FR-015, FR-039).
+KEYBINDABLE = {"if-console.showHome", "if-console.check", "if-console.checkChanged", "if-console.learn", "if-console.copyContext", "if-console.doctor"}
+MENU_GROUPS = ("inline", "navigation", "1_run", "2_copy", "9_cutcopypaste")  # 0043 FR-038, in this order
+VIEWS_ENTRIES = ("if-console.home", "if-console.checks", "if-console.commands")  # 0043 FR-036
 COMMAND_PREFIX = "if-console."
 MAIN = "./dist/extension.js"
 SKIP = shutil.ignore_patterns("node_modules", "dist", "out", "build")  # what is made, never what is kept
@@ -39,6 +46,12 @@ def _read_json(path: Path, rel: str, out: list[Finding]) -> Any:
 def sources(ext: Path, suffixes: tuple[str, ...] = (".ts",)) -> list[Path]:
     """The extension's own files under src/ with these suffixes, in a stable order."""
     return sorted(p for p in (ext / "src").rglob("*") if p.is_file() and p.suffix in suffixes)
+
+
+def _slot_count(ext: Path) -> int:
+    """How many view slots the code plans into (SLOTS in src/model/viewplan.ts), which the manifest must hold exactly."""
+    m = re.search(r"export const SLOTS = (\d+)", (ext / "src" / "model" / "viewplan.ts").read_text(encoding="utf-8"))
+    return int(m.group(1)) if m else 0
 
 
 def manifest_findings(home: Path) -> list[Finding]:
@@ -72,14 +85,17 @@ def manifest_findings(home: Path) -> list[Finding]:
     if "workspaceContains:.if-console.env" not in pkg.get("activationEvents", []):
         err("activationEvents must include workspaceContains:.if-console.env (0043 FR-004)")
     c = pkg.get("contributes", {})
-    if c.get("keybindings"):
-        err("binds keys; a person binds their own, and no key may run a decision (0043 FR-015)")
+    for k in c.get("keybindings", []):
+        if k.get("command") not in KEYBINDABLE:
+            err(f"binds a key to {k.get('command')}; a key may run only {sorted(KEYBINDABLE)}, never a write or a decision (0043 FR-015, FR-039)")
     props = c.get("configuration", {}).get("properties", {})
     if set(props) != SETTINGS:
         err(f"settings are {sorted(props)}; they are only {sorted(SETTINGS)} (0043 FR-024)")
     for key, p in props.items():
         if p.get("scope") != "application":
             err(f"setting {key} must have scope application, so no workspace can set it (0043 FR-004, FR-024)")
+        if not p.get("markdownDescription"):
+            err(f"setting {key} must have a markdownDescription (0043 FR-040)")
     ids = [x["command"] for x in c.get("commands", [])] + [v["id"] for vs in c.get("views", {}).values() for v in vs]
     ids += [t["type"] for t in c.get("taskDefinitions", [])] + list(props)
     for i in ids:
@@ -88,8 +104,44 @@ def manifest_findings(home: Path) -> list[Finding]:
     if [t["type"] for t in c.get("taskDefinitions", [])] != ["if-console"]:
         err("must contribute the task type if-console (0043 FR-010)")
     views = [v["id"] for v in c.get("views", {}).get("if-console", [])]
-    if views != ["if-console.commands", "if-console.chores", "if-console.checks"]:
-        err(f"the views are {views}; they are Command lines, Chores and Checks (0043 FR-008, FR-019)")
+    slots = _slot_count(ext)
+    want = ["if-console.home", *[f"if-console.view.{i}" for i in range(slots)], "if-console.checks", "if-console.commands"]
+    if views != want:
+        err(f"the views are {views}; they are Home, a pool of {slots} view slots (the views each command line declares), Checks and All commands, in that order (0043 FR-036)")
+    for v in c.get("views", {}).get("if-console", []):
+        if v["id"] == "if-console.commands" and "allCommands" not in v.get("when", ""):
+            err("All commands must be hidden by default and shown by the setting or the view-title toggle (0043 FR-036)")
+    welcome = " ".join(w.get("contents", "") for w in c.get("viewsWelcome", []) if w.get("view") == "if-console.home")
+    whens = " ".join(w.get("when", "") for w in c.get("viewsWelcome", []) if w.get("view") == "if-console.home")
+    for pattern, what in ((r"!if-console\.hasRepository", "no command line found"), (r"(?<![!\w])if-console\.untrusted", "an untrusted workspace"),
+                          (r"(?<![!\w])if-console\.toolchainMissing", "a missing toolchain")):
+        if not re.search(pattern, whens):
+            err(f"Home needs welcome content for {what} (0043 FR-037)")
+    if "](command:" not in welcome:
+        err("Home's welcome content must have buttons (0043 FR-037)")
+    palette = {m["command"]: m for m in c.get("menus", {}).get("commandPalette", [])}
+    for cmd_ in c.get("commands", []):
+        name = cmd_["command"]
+        if cmd_.get("category") != CATEGORY:
+            err(f"{name} must have the category {CATEGORY} (0043 FR-039)")
+        if not cmd_.get("icon"):
+            err(f"{name} must have an icon (0043 FR-039)")
+        words = cmd_.get("title", "").rstrip("\u2026").split()
+        if len(words) < 2 or words[0] not in VERBS:
+            err(f"{name}'s title {cmd_.get('title')!r} must be a verb and an object, the verb one of {sorted(VERBS)} (0043 FR-039)")
+        if not cmd_.get("enablement") and not palette.get(name, {}).get("when"):
+            err(f"{name} must have an enablement or a palette `when`, so that only what can run now is offered (0043 FR-039)")
+    seen_groups: set[str] = set()
+    for menu, entries in c.get("menus", {}).items():
+        for m in entries:
+            if menu == "view/item/context":
+                group = m.get("group", "").split("@")[0]
+                if group not in MENU_GROUPS:
+                    err(f"the menu entry {m.get('command')} is in the group {group!r}; a row's menus use {list(MENU_GROUPS)} (0043 FR-038)")
+                seen_groups.add(group)
+    for g in MENU_GROUPS:
+        if g not in seen_groups:
+            err(f"no row menu uses the group {g} (0043 FR-038)")
     if not c.get("viewsContainers", {}).get("activitybar"):
         err("must contribute an activity-bar view container (0043 FR-008)")
     if "if-console.servers" not in [m["id"] for m in c.get("mcpServerDefinitionProviders", [])]:
@@ -102,6 +154,9 @@ def manifest_findings(home: Path) -> list[Finding]:
     for name in registered:
         if f"{COMMAND_PREFIX}{name}" not in [x["command"] for x in c.get("commands", [])]:
             err(f"the code registers {COMMAND_PREFIX}{name}, which package.json does not contribute")
+    icon = ext / "media" / "if-console.svg"
+    if icon.is_file() and re.search(r'(?:fill|stroke|stop-color)="(?!none|currentColor)[^"]+"|#[0-9a-fA-F]{3,8}\b', icon.read_text(encoding="utf-8")):
+        err("the activity-bar icon must draw in currentColor and no other color (0043 FR-036)")
     ignore = ext / ".vscodeignore"
     kept = ignore.read_text(encoding="utf-8").split() if ignore.is_file() else []
     for need in ("src/**", "test/**", "**/*.map"):
