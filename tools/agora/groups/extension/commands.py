@@ -45,6 +45,7 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
     names = sorted(known_repositories(home) - {own} | {ctx.registry.name})
     findings = extension.manifest_findings(home)
     findings += extension.source_findings(home, names)
+    findings += extension.recommendation_findings(home)
     notes = ["manifest and source rules read tools/if-console/"]
     data: dict = {}
     unrun = ""

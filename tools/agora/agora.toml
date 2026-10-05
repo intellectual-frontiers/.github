@@ -20,7 +20,12 @@ hint = "install Python 3.11 or later from the host"
 title = "Specs"
 icon = "book"
 order = 20
-description = "Specs, their requirements and the ontology's terms"
+description = "Specs and their requirements"
+[views.ontology]
+title = "Ontology"
+icon = "type-hierarchy"
+order = 25
+description = "Classes, properties, individuals, concept schemes and concepts: browse and search"
 [views.design-systems]
 title = "Design systems"
 icon = "symbol-color"

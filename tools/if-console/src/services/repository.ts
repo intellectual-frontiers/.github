@@ -2,7 +2,7 @@
 // command's description, its health from `doctor`, and the last check's results. Nothing is run until the workspace is trusted; a launcher
 // that does not answer `command list` with a document this extension understands is not shown as an orchestrator, and the log says why.
 import type * as vscode from 'vscode';
-import { argvFromFields, valuesFromList, nounForArgument, commandLine, type Step } from '../model/forms';
+import { argvFromFields, dest, valuesFromList, nounForArgument, commandLine, type Step } from '../model/forms';
 import type { ListDecl, NounDecl } from '../model/presentation';
 import { rowsOf, type Row } from '../model/rows';
 import { doctorState, commandDetail, commandList, exposed, linksOf, nounsOf, WireError, type CommandDetail, type CommandList, type CommandSummary, type Doc, type Finding, type Health, type Link, type Nouns } from '../model/wire';
@@ -151,6 +151,17 @@ export class Repository {
     const p = decl ? this.launcher.run(decl.command.split(/\s+/)).then((r) => (r.doc && !r.error ? rowsOf(noun, decl, r.doc) : [])) : Promise.resolve([]);
     this.registry.rows.set(noun, p);
     return p;
+  }
+
+  /** The rows of a noun's `list` that match a text, by the option its declaration names as `search` and in the order the command line gives them
+   * (its ranking); not kept, because the text is the person's. */
+  async search(noun: string, text: string): Promise<Row[]> {
+    const decl = this.listDecl(noun);
+    if (!decl?.search) return [];
+    const detail = await this.detail(decl.command);
+    if (!detail.options.some((o) => dest(o.flag) === decl.search)) return [];
+    const r = await this.launcher.run(argvFromFields(detail, { [decl.search]: text }));
+    return r.doc && !r.error ? rowsOf(noun, decl, r.doc) : [];
   }
 
   /** The resource a noun's `show` command gives for an id, or null where the launcher gives none; asked once until the launcher changes. */

@@ -2313,9 +2313,9 @@ ifcore:SpecResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme
 ifcore:RequirementResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "requirement"@en ;
     skos:notation "requirement" ;
     skos:definition "One requirement of a spec, with its enforcement and control rows."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:TermResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "term"@en ;
-    skos:notation "term" ;
-    skos:definition "A concept of the ontology's controlled vocabulary."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OntologyResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "ontology"@en ;
+    skos:notation "ontology" ;
+    skos:definition "A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:DesignSystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "design-system"@en ;
     skos:notation "design-system" ;
     skos:definition "A design system registered in the ontology."@en ; ifcore:hasAudience ifcore:Public .
@@ -2480,14 +2480,14 @@ ifcore:AgoraRequirementAddCommand a ifcore:Command ; ifcore:commandOf ifcore:Ago
     dcterms:identifier "requirement add" ;
     ifcore:commandNoun ifcore:RequirementResourceKind ; ifcore:commandVerb ifcore:AddCommandVerb ; ifcore:commandCategory ifcore:RecordCommandCategory ;
     skos:definition "Adds a control to a requirement in the control map."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraTermListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "term list"@en ;
-    dcterms:identifier "term list" ;
-    ifcore:commandNoun ifcore:TermResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Lists ontology terms, by concept scheme."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraTermShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "term show"@en ;
-    dcterms:identifier "term show" ;
-    ifcore:commandNoun ifcore:TermResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Shows one ontology term."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraOntologyListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ontology list"@en ;
+    dcterms:identifier "ontology list" ;
+    ifcore:commandNoun ifcore:OntologyResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists the ontology's terms by kind or concept scheme, or the ones that match a text, ranked."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraOntologyShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "ontology show"@en ;
+    dcterms:identifier "ontology show" ;
+    ifcore:commandNoun ifcore:OntologyResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one ontology term: its meaning, relations, statements, the terms that reference it and the requirements that cite it."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraDesignSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "design-system list"@en ;
     dcterms:identifier "design-system list" ;
     ifcore:commandNoun ifcore:DesignSystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;

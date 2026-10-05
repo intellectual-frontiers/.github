@@ -20,6 +20,10 @@ export interface ListDecl {
   status?: string;
   statusMap: Record<string, Status>;
   badge?: string;
+  /** The row field whose value is the row's own codicon id, for a row with no status (a kind of resource with an icon for each of its kinds). */
+  icon?: string;
+  /** The option (by its name, `match` for `--match`) of the list command that narrows its rows to the ones that match a text. */
+  search?: string;
   tooltip: string[];
 }
 
@@ -51,7 +55,7 @@ function listOf(v: unknown): ListDecl | undefined {
   const statusMap: Record<string, Status> = {};
   for (const [k, s] of Object.entries(asObject(o.status_map))) if (isStatus(s)) statusMap[k] = s;
   return { command, rows, id, label, description: optString(o.description), status: optString(o.status), statusMap,
-    badge: optString(o.badge), tooltip: asStrings(o.tooltip) };
+    badge: optString(o.badge), icon: optString(o.icon), search: optString(o.search), tooltip: asStrings(o.tooltip) };
 }
 
 function nounOf(v: unknown): NounDecl | null {

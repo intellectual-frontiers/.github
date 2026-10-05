@@ -1,5 +1,5 @@
 name = "spec"
-help = "Specs, requirements, the enforcement register, and the ontology's terms"
+help = "Specs, requirements, the enforcement register, and the ontology"
 
 [nouns.spec]
 help = "A spec: a numbered spec or a design system's spec (0020-spec-format)"
@@ -62,19 +62,21 @@ Draft = "pending"
 Adopted = "ok"
 Active = "ok"
 Superseded = "muted"
-[nouns.term]
-help = "A concept or scheme of the ontology (0019-controlled-vocabulary)"
-icon = "symbol-keyword"
-view = "specs"
-title = "Term"
+[nouns.ontology]
+help = "A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037)"
+icon = "type-hierarchy"
+view = "ontology"
+title = "Ontology"
 
-[nouns.term.list]
-command = "term list"
+[nouns.ontology.list]
+command = "ontology list"
 rows = "terms"
-id = "id"
-label = "id"
-description = "label"
-tooltip = ["kind", "scheme"]
+id = "curie"
+label = "label"
+description = "curie"
+icon = "icon"
+search = "match"
+tooltip = ["kind", "summary", "scheme", "notation"]
 
 [sections.specs]
 help = "Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034)"
@@ -122,10 +124,10 @@ title = "Set Spec Status…"
 icon = "verified"
 [commands."spec show"]
 title = "Show Spec…"
-[commands."term list"]
-title = "List Terms"
-[commands."term show"]
-title = "Show Term…"
+[commands."ontology list"]
+title = "List Ontology Terms"
+[commands."ontology show"]
+title = "Show Ontology Term…"
 
 # A requirement named in a spec or a register (`0020 FR-013`) is a resource an editor can show on hover and open (0041-command-line FR-064).
 [references.requirement]

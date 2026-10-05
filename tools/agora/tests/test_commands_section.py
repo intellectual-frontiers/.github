@@ -47,7 +47,7 @@ class CommandsSection(unittest.TestCase):
 
     def test_a_category_noun_or_verb_that_differs(self):
         ttl = self.ttl.replace('dcterms:identifier "spec show" ;\n    ifcore:commandNoun ifcore:SpecResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory',
-                               'dcterms:identifier "spec show" ;\n    ifcore:commandNoun ifcore:TermResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory')
+                               'dcterms:identifier "spec show" ;\n    ifcore:commandNoun ifcore:OntologyResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory')
         self.assertNotEqual(ttl, self.ttl)
         code, found = self.findings(ttl)
         self.assertEqual(code, 1)

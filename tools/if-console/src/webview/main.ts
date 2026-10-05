@@ -171,6 +171,10 @@ function fileLink(file: FileRef, text: string): HTMLElement {
   return h('a', { class: 'file', href: '#', title: L('openFile'), onclick: (e) => { e.preventDefault(); send({ type: 'file', path: file.path, line: file.line }); } }, icon('go-to-file', 12), text);
 }
 
+function refLink(ref: number, text: string): HTMLElement {
+  return h('a', { class: 'ref', href: '#', title: L('open'), onclick: (e) => { e.preventDefault(); send({ type: 'open', ref }); } }, text);
+}
+
 function copyButton(text: string): HTMLElement {
   const b = iconButton('copy', L('copy'), () => { send({ type: 'copy', text }); b.setAttribute('icon', 'check'); setTimeout(() => b.setAttribute('icon', 'copy'), 1200); }, 'copy-btn');
   return b;
@@ -202,7 +206,7 @@ function cellNode(c: Cell): Node {
     case 'color': { const sw = h('span', { class: 'swatch', 'aria-hidden': 'true' }); sw.style.background = c.text; return h('span', { class: 'color' }, sw, h('code', {}, c.text)); }
     case 'empty': return h('span', { class: 'muted' }, c.text);
     case 'bool': return h('span', { class: `bool ${c.on ? 'yes' : 'no'}` }, c.text);
-    default: return document.createTextNode(c.text);
+    default: return c.open !== undefined ? refLink(c.open, c.text) : document.createTextNode(c.text);
   }
 }
 

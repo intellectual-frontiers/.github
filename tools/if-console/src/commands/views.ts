@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import type { App } from '../app';
 import { actionsOf } from '../model/wire';
 import { lookOf } from '../model/status';
+import type { NounDecl } from '../model/presentation';
 import type { Repository } from '../services/repository';
 import { CATEGORY_ICON, Node } from '../views/node';
 import type { ContextCommands } from './context';
@@ -90,10 +91,51 @@ export class ViewCommands {
     const all = (await Promise.all((slots.length ? slots : this.app.slots.filter((s) => s.plan)).map((s) => s.allRows()))).flat();
     if (!all.length) { void vscode.window.showInformationMessage(t('No view lists resources yet.')); return null; }
     const picked = await this.app.ui.pick({ title: 'Find a resource', placeholder: t('Type to search by name, description or kind'),
-      items: all.map((x) => ({ label: `$(${x.row.status ? lookOf(x.row.status).icon : x.decl.icon}) ${x.row.label}`, description: [x.row.description, x.decl.title].filter(Boolean).join(' · '),
+      items: all.map((x) => ({ label: `$(${x.row.status ? lookOf(x.row.status).icon : x.row.icon || x.decl.icon}) ${x.row.label}`, description: [x.row.description, x.decl.title].filter(Boolean).join(' · '),
         detail: x.row.facts.map((f) => `${f.key}: ${f.value}`).join('  '), value: x })) });
     if (picked === undefined || Array.isArray(picked)) return null;
     return this.app.fromView(view, () => this.app.opener.openRow(picked.repo, picked.row.noun, picked.row.id));
+  }
+
+  /** The nouns any view lists whose `list` declares `search`, in every repository: what the Search action can ask (0043 FR-049). */
+  private searchTargets(): Array<{ repo: Repository; decl: NounDecl }> {
+    const out: Array<{ repo: Repository; decl: NounDecl }> = [];
+    for (const slot of this.app.slots) {
+      for (const entry of slot.plan?.entries ?? []) {
+        for (const decl of entry.nouns) if (entry.source.listDecl(decl.noun)?.search !== undefined) out.push({ repo: entry.source, decl });
+      }
+    }
+    return out;
+  }
+
+  /** Search: asks for a text, runs the list command with its `search` option and the text in every repository that lists the noun, and shows the
+   * rows in the order the command line ranked them, to open one. A second argument is the text, for a caller that has it (a test, a link). */
+  async searchView(_node: unknown, given?: unknown): Promise<unknown> {
+    const targets = this.searchTargets();
+    if (!targets.length) { void vscode.window.showInformationMessage(t('No view can be searched.')); return null; }
+    const nouns = [...new Map(targets.map((x) => [x.decl.noun, x.decl])).values()];
+    let decl = nouns[0] ?? targets[0]?.decl;
+    if (!decl) return null;
+    if (nouns.length > 1) {
+      const chosen = await this.app.ui.pick({ title: t('Search'), placeholder: t('What do you want to search?'), items: nouns.map((n) => ({ label: `$(${n.icon}) ${n.title}`, value: n })) });
+      if (chosen === undefined || Array.isArray(chosen)) return null;
+      decl = chosen;
+    }
+    const mine = targets.filter((x) => x.decl.noun === decl.noun);
+    const text = typeof given === 'string' ? given : await this.app.ui.input({ title: t('Search {0}', decl.title), prompt: t('Text to find in names, descriptions, identifiers and notations'), placeholder: t('Type, then press Enter') });
+    if (text === undefined || text.trim() === '') return null;
+    const found = (await Promise.all(mine.map(async (x) => (await x.repo.search(x.decl.noun, text.trim())).map((row) => ({ repo: x.repo, decl: x.decl, row }))))).flat();
+    if (!found.length) {
+      const button = t('Show all');
+      const said = await vscode.window.showInformationMessage(t('Nothing in {0} matches “{1}”.', decl.title, text.trim()), button);
+      return said === button ? this.findResource(undefined) : null;
+    }
+    const several = new Set(found.map((x) => x.repo.key)).size > 1;
+    const picked = await this.app.ui.pick({ title: t('Search {0}: {1}', decl.title, text.trim()), placeholder: t('{0} found; type to narrow them', String(found.length)),
+      items: found.map((x) => ({ label: `$(${x.row.status ? lookOf(x.row.status).icon : x.row.icon || x.decl.icon}) ${x.row.label}`,
+        description: [several ? x.repo.name : '', x.row.description].filter(Boolean).join(' · '), detail: x.row.facts.map((f) => `${f.key}: ${f.value}`).join('  '), value: x })) });
+    if (picked === undefined || Array.isArray(picked)) return null;
+    return this.app.opener.openRow(picked.repo, picked.row.noun, picked.row.id);
   }
 
   /** A command of the noun a group stands for, from the palette's quick pick limited to that noun. */

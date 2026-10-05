@@ -17,7 +17,7 @@ CODICONS = Path(__file__).resolve().parent.parent / "lib" / "codicons.txt"
 ID = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
 TITLE = re.compile(r"[A-Z][A-Za-z0-9 /'-]*…?")
 MAX_TITLE = 40
-LIST_KEYS = ("command", "rows", "id", "label", "description", "status", "status_map", "badge", "tooltip")
+LIST_KEYS = ("command", "rows", "id", "label", "description", "status", "status_map", "badge", "icon", "search", "tooltip")
 NOUN_KEYS = ("icon", "view", "title", "list")
 REF_KEYS = ("noun", "pattern", "value", "files", "text", "facts", "lens", "definition")
 
@@ -117,6 +117,8 @@ def _list_problems(reg: Registry, noun: str, lst: Any) -> list[str]:
             out.append(f"{who}: the status {v!r} (for {k!r}) is not one of {', '.join(STATUSES)} (0041 FR-064)")
     if lst.get("status_map") and not lst.get("status"):
         out.append(f"{who}: a status_map needs the status field it maps (0041 FR-072)")
+    if lst.get("search") is not None and (c is None or not any(o.dest == lst["search"] and o.type == "TEXT" and not o.required for o in c.options)):
+        out.append(f"{who}: search {lst.get('search')!r} is not an option of {lst.get('command')} that takes text and is not required (0041 FR-072)")
     if not isinstance(lst.get("tooltip", []), list):
         out.append(f"{who}: tooltip is a list of fields (0041 FR-072)")
     return out
@@ -198,11 +200,15 @@ def data_problems(ctx: Any) -> list[str]:
         if not rows:
             continue
         sample[noun] = rows[0]
-        fields = [lst[k] for k in ("id", "label", "description", "status", "badge") if lst.get(k)] + list(lst.get("tooltip", []))
+        fields = [lst[k] for k in ("id", "label", "description", "status", "badge", "icon") if lst.get(k)] + list(lst.get("tooltip", []))
         for f in dict.fromkeys(fields):
             missing = [i for i, r in enumerate(rows) if not isinstance(r, dict) or f not in r]
             if missing:
                 out.append(f"{who}: the field {f!r} is absent from {len(missing)} of {len(rows)} rows of {lst['command']} (0041 FR-072)")
+        if lst.get("icon"):
+            bad = sorted({str(r.get(lst["icon"])) for r in rows if isinstance(r, dict)} - codicons())
+            if bad:
+                out.append(f"{who}: the icon field {lst['icon']!r} of {lst['command']} holds {', '.join(bad)}, which is not a codicon id of the glyph map (0041 FR-072)")
         if lst.get("status"):
             known = lst.get("status_map") or {}
             for v in sorted({str(r.get(lst["status"])) for r in rows if isinstance(r, dict)}):
