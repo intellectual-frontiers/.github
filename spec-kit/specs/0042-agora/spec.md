@@ -408,6 +408,34 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   MUST be tracked files under `.agora/proposals/` (0041-command-line FR-039,
   FR-029).
 
+- **FR-038**: The repository's `.vscode/extensions.json` MUST recommend only
+  extensions this spec has vetted, and each extension for browsing and
+  visualizing the Turtle files of the ontology MUST meet all of: an OSI-approved
+  licence; a release or commit within the last twelve months; use with no
+  network for the files of the workspace; no telemetry, or telemetry that
+  honours VS Code's own `telemetry.telemetryLevel`; no program to install beyond
+  Python and `uv` (0041-command-line FR-070), a program needing Java or another
+  runtime being reported to the decision authority and never added; and no
+  automatic download of code. Vetted at the versions in parentheses:
+  recommended are `faubulous.mentor` (0.5.10, GPL-3.0: the ontology's classes,
+  properties, individuals and concepts as a tree, references, SPARQL over the
+  workspace; TypeScript only; talks to a remote endpoint only when one is
+  configured) and `zazuko.vscode-rdf-sketch` (1.1.3, MIT, Zazuko: renders the
+  graph of an open file as a diagram; no dependencies, no network).
+  `stardog-union.stardog-rdf-grammars` (Apache-2.0, a grammar with no code)
+  stays recommended in the repository that already recommends it for syntax
+  colors. Not recommended: Strixonomy (0.28.1, MIT, known earlier as OntoCode;
+  no telemetry found, offline, but a native 60 MB language server binary in the
+  package that cannot be audited here, from one maintainer, 28 releases in
+  months; acceptable only if the decision authority approves the binary),
+  RDF Studio (1.2.0, MIT; sent an `x-user-email` header on every HTTP request
+  and is installed from GitHub releases, not a marketplace), Semantic Web
+  Language Server (0.0.17, MIT; checks GitHub for updates in the background
+  and downloads a native binary), OntoGraph lite (0.3.9, Apache-2.0; needs a
+  Java 21 runtime for its reasoner), Turtle Sense (0.0.10, no licence stated,
+  last published May 2024) and ttl-pawikan (0.1.2, MIT; syntax only, already
+  covered by the recommended ones). A recommendation in `.vscode/extensions.json` that this requirement does not name is a defect.
+
 ## Continuous integration
 
 - **FR-022**: Every workflow in `.github/workflows/` MUST call `agora` and no
