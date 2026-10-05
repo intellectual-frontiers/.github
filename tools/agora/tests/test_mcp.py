@@ -227,7 +227,7 @@ class InProcess(unittest.TestCase):
                                  ("agora://requirement/0041/FR-023", "requirement", "0041-command-line/FR-023"),
                                  ("agora://design-system/frontiers-brand", "design-system", "frontiers-brand"),
                                  ("agora://brand/frontiers-brand", "brand", "frontiers-brand"),
-                                 ("agora://term/ReadCommandCategory", "term", "ReadCommandCategory"),
+                                 ("agora://ontology/ifcore:ReadCommandCategory", "ontology", "ifcore:ReadCommandCategory"),
                                  ("agora://command/spec+show", "command", "spec show"),
                                  ("agora://context/spec:0020", "context", "spec:0020-spec-format")):
             with self.subTest(uri=uri):

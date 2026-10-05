@@ -215,6 +215,7 @@ export class App {
       const view = this.treeViews.get(slotId(i));
       if (view) { view.title = p?.title ?? ''; view.description = undefined; view.message = undefined; }
       void vscode.commands.executeCommand('setContext', `if-console.slot.${i}`, p !== null);
+      void vscode.commands.executeCommand('setContext', `if-console.search.${i}`, p?.entries.some((e) => e.nouns.some((n) => e.source.listDecl(n.noun)?.search !== undefined)) ?? false);
     });
   }
 

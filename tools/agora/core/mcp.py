@@ -28,11 +28,11 @@ KINDS: dict[str, tuple[str, str | None]] = {
     "requirement": ("requirement show", "requirement"),
     "design-system": ("design-system show", "design_system"),
     "brand": ("brand show", "brand"),
-    "term": ("term show", "term"),
+    "ontology": ("ontology show", "term"),
     "command": ("command show", "command"),
     "proposal": ("proposal show", "proposal"),
 }
-LISTED = ("spec", "design-system", "brand", "command", "proposal")  # requirement and term are too many: templates only
+LISTED = ("spec", "design-system", "brand", "command", "proposal")  # requirement and ontology are too many: templates only
 
 
 def tool_name(c: Command) -> str:
@@ -148,7 +148,7 @@ class Server:
     def template_list(self) -> list[dict[str, Any]]:
         n = self.reg.name
         rows = [("requirement", f"{n}://requirement/{{spec}}/{{id}}", "A requirement, as requirement show returns it: SPEC/FR-NNN"),
-                ("term", f"{n}://term/{{id}}", "A concept or scheme of the ontology"),
+                ("ontology", f"{n}://ontology/{{id}}", "A term of the ontology by CURIE or IRI"),
                 ("spec", f"{n}://spec/{{id}}", "A spec by NNNN, NNNN-slug or a design system's slug"),
                 ("design-system", f"{n}://design-system/{{slug}}", "A design system"),
                 ("brand", f"{n}://brand/{{slug}}", "A brand"),

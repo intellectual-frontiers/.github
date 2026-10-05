@@ -80,7 +80,7 @@ test('FR-012, FR-015: the palette offers the repository-wide commands and Run Co
   assert.deepEqual(defs, ['check', 'test', 'fresh', 'doctor']);
   const hidden = manifest.contributes.menus.commandPalette.filter((m: Loose) => m.when === 'false').map((m: Loose) => m.command).sort();
   assert.deepEqual(hidden, ['if-console.activateNode', 'if-console.copyCommandLine', 'if-console.copyId', 'if-console.followLink', 'if-console.openRow', 'if-console.runNounCommand',
-    'if-console.runRowAction', 'if-console.runSection', 'if-console.runSuggestion']);
+    'if-console.runRowAction', 'if-console.runSection', 'if-console.runSuggestion', 'if-console.searchView']);
   for (const k of manifest.contributes.keybindings as Loose[]) assert.ok(!hidden.includes(k.command) && k.command !== 'if-console.runCommand', 'no key runs a command that can write or decide');
 });
 

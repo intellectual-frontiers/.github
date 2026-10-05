@@ -251,3 +251,55 @@ test('Show View lists Home, the views the command lines declared by their own ti
   assert.ok(manifest.contributes.commands.some((c: Loose) => c.command === 'if-console.showView' && c.title === 'Show View…'));
   b.cleanup();
 });
+
+// ---- Search (0043 FR-049) -------------------------------------------------------------------------------------------------------------
+
+function searchable() {
+  const list = JSON.parse(JSON.stringify(k.list));
+  const { status: _s, status_map: _m, ...rest } = list.data.presentation.nouns[0].list;
+  list.data.presentation.nouns[0].list = { ...rest, icon: 'glyph', search: 'match' };
+  const rows = (names: string[]) => names.map((n, i) => ({ id: `w${i + 1}`, name: n, kind: 'blue', state: 'ready', parts: 1, note: '', glyph: i ? 'symbol-property' : 'symbol-class' }));
+  return defaultDocs({
+    'command list': { doc: { ...list, links: [] } },
+    'command show widget list': { doc: k.detail('widget list', 'read', [], [{ flag: '--match', type: 'TEXT', help: 'a text', multiple: false, required: false }]) },
+    'widget list': { doc: k.doc('widget-list', 'all', { count: 3, widgets: rows(['Alpha', 'Beta', 'Gamma']) }) },
+    'widget list --match be': { doc: k.doc('widget-list', 'be', { count: 2, widgets: rows(['Beta', 'Alphabet']) }) },
+    'widget list --match zzz': { doc: k.doc('widget-list', 'zzz', { count: 0, widgets: [] }) },
+  });
+}
+
+test('FR-049: Search is a title action of a view only where a list declares search; it asks for a text, runs the list with the option and shows the rows in the order given', async () => {
+  const manifest = readManifest() as Loose;
+  const menu = manifest.contributes.menus['view/title'].filter((m: Loose) => m.command === 'if-console.searchView');
+  assert.equal(menu.length, 16, 'one for each slot of the pool');
+  assert.ok(menu.every((m: Loose, i: number) => m.when === `view == if-console.view.${i} && if-console.search.${i}`));
+  const plain = await boot();
+  assert.equal(plain.stub.calls.contexts.get('if-console.search.0'), false, 'a view whose lists declare no search has no Search');
+  plain.cleanup();
+  const b = await boot({ docs: searchable() });
+  assert.equal(b.stub.calls.contexts.get('if-console.search.0'), true);
+  b.stub.script.inputs.push('be');
+  let listed: Loose;
+  b.stub.script.quickPicks.push((items: Loose) => { listed = items; return items[1].label; });
+  const before = b.first.invocations().length;
+  await b.command('searchView');
+  const calls = b.first.invocations().slice(before).map((i: Loose) => i.argv.join(' '));
+  assert.ok(calls.includes('widget list --match be --json'), 'the list command, its declared option, the text: nothing the extension named itself');
+  assert.deepEqual(listed.map((i: Loose) => i.label), ['$(symbol-class) Beta', '$(symbol-property) Alphabet'], 'in the order the command line gave, each with its own icon');
+  assert.ok(calls.includes('widget show w2 --json'), `a choice opens its resource: ${calls.join(' / ')}`);
+  b.cleanup();
+});
+
+test('FR-049: a search that finds nothing says so and offers the unfiltered list; no text runs nothing', async () => {
+  const b = await boot({ docs: searchable() });
+  b.stub.script.inputs.push('zzz');
+  await b.command('searchView');
+  const said = b.stub.calls.messages.find((m: Loose) => m.kind === 'info' && /Nothing in Widget matches “zzz”/.test(m.text));
+  assert.ok(said, 'it says so in words');
+  assert.deepEqual(said.rest, ['Show all']);
+  const before = b.first.invocations().length;
+  b.stub.script.inputs.push('');
+  await b.command('searchView');
+  assert.equal(b.first.invocations().length, before, 'an empty text runs nothing');
+  b.cleanup();
+});

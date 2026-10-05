@@ -43,3 +43,11 @@ test('a row with no status field has no status; display reads lists, drops objec
 test('a badge is at most the two characters a decoration can hold: a count up to 99', () => {
   assert.deepEqual(['3', '99', '120', 'abc', ''].map(badgeText), ['3', '99', '99', 'ab', '']);
 });
+
+test('FR-038, FR-049: a row\'s own icon is the declared field\'s value where it is a codicon id; a status still wins in the view', () => {
+  const d = decl({ icon: 'glyph', search: 'match' });
+  assert.equal(d.search, 'match');
+  const rows = rowsOf('widget', d, doc([{ id: 'a', name: 'A', glyph: 'symbol-class' }, { id: 'b', name: 'B', glyph: 'Not An Icon' }, { id: 'c', name: 'C' }]));
+  assert.deepEqual(rows.map((r) => r.icon), ['symbol-class', '', '']);
+  assert.equal(rowsOf('widget', decl(), doc([{ id: 'a', name: 'A', glyph: 'symbol-class' }]))[0]?.icon, '', 'a list that declares no icon field has none');
+});

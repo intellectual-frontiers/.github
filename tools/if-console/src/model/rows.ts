@@ -16,6 +16,8 @@ export interface Row {
   /** The status field's own value ("Draft"), which a tooltip says beside the colored icon. */
   statusValue: string;
   badge: string;
+  /** The codicon the row's `icon` field gives, where the list declares one and the value is an id. */
+  icon: string;
   facts: Fact[];
 }
 
@@ -24,6 +26,12 @@ export function display(value: unknown, max = 400): string {
   const raw = Array.isArray(value) ? value.map((v) => (isObject(v) ? '' : asString(v))).filter(Boolean).join(', ') : isObject(value) ? '' : asString(value);
   const text = raw.replace(/\s+/g, ' ').trim();
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+/** A row's own codicon: the declared field's value where it is a codicon id (lowercase words and hyphens), else nothing. */
+export function iconOf(decl: ListDecl, raw: JsonObject): string {
+  const v = decl.icon ? display(raw[decl.icon]) : '';
+  return /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(v) ? v : '';
 }
 
 export function rowsOf(noun: string, decl: ListDecl, doc: Doc): Row[] {
@@ -39,7 +47,7 @@ export function rowsOf(noun: string, decl: ListDecl, doc: Doc): Row[] {
       if (value !== '') facts.push({ key, value });
     }
     out.push({ noun, id, label: display(raw[decl.label]) || id, description: decl.description ? display(raw[decl.description]) : '', status,
-      statusValue: decl.status ? display(raw[decl.status]) : '', badge: decl.badge ? display(raw[decl.badge]) : '', facts });
+      statusValue: decl.status ? display(raw[decl.status]) : '', badge: decl.badge ? display(raw[decl.badge]) : '', icon: iconOf(decl, raw), facts });
   }
   return out;
 }

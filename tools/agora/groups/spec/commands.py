@@ -1,4 +1,4 @@
-"""Specs, requirements, terms, and the check sections for them (0042-agora FR-006, FR-013).
+"""Specs, requirements, the ontology, and the check sections for them (0042-agora FR-006, FR-013).
 
 Thin: the rules live in agora.lib. Standard library only.
 """
@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, design_systems, ontology, register, specs
+from agora.lib import controls, design_systems, ontology, register, specs, terms
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -77,40 +77,43 @@ class _Requirement(ArgType):
         return Call("requirement show", {"requirement": value})
 
 
-def _terms(ctx: Ctx) -> list[dict[str, Any]]:
-    ttl = ctx.root / "ontology" / "ifcore.ttl"
-    return ontology.terms(ttl.read_text(encoding="utf-8")) if ttl.is_file() else []
+def _onto(ctx: Ctx) -> terms.Ontology:
+    return terms.load(ctx.root)
 
 
 class _Term(ArgType):
     name = "TERM"
-    doc = "a concept or scheme of the ontology by its local name, such as ReadCommandCategory"
+    doc = "a term of the ontology as a CURIE, such as ifcore:Agora, or its full IRI"
 
     def choices(self, ctx: Ctx) -> list[str]:
-        return [t["id"] for t in _terms(ctx)]
+        return sorted(_onto(ctx).by_curie)
 
     def validate(self, ctx: Ctx, value: str) -> str:
-        v = value[len("ifcore:"):] if value.startswith("ifcore:") else value
-        if v not in self.choices(ctx):
-            raise ValueError(f"{value!r} names no term")
-        return v
+        t = _onto(ctx).resolve(value)
+        if t is None:
+            near = _onto(ctx).nearest(value)
+            raise ValueError(f"{value!r} names no term of the ontology" + (f"; the nearest are {', '.join(near)}" if near else "; `ontology list --match TEXT` finds one"))
+        return t.curie
 
     def examples(self, ctx: Ctx) -> list[str]:
-        return ["ReadCommandCategory", "CommandCategoryScheme"]
+        return ["ifcore:Agora", "ifcore:ReadCommandCategory"]
 
 
 class _Scheme(ArgType):
     name = "SCHEME"
-    doc = "a concept scheme of the ontology by its local name, such as CommandCategoryScheme"
+    doc = "a concept scheme of the ontology as a CURIE, such as ifcore:CommandCategoryScheme, or by its local name"
 
     def choices(self, ctx: Ctx) -> list[str]:
-        return [t["id"] for t in _terms(ctx) if t["kind"] == "scheme"]
+        return sorted(t.curie for t in _onto(ctx).terms.values() if t.kind == "scheme")
 
     def validate(self, ctx: Ctx, value: str) -> str:
-        v = value[len("ifcore:"):] if value.startswith("ifcore:") else value
+        v = value if ":" in value else f"ifcore:{value}"
         if v not in self.choices(ctx):
-            raise ValueError(f"{value!r} names no scheme")
+            raise ValueError(f"{value!r} names no concept scheme of the ontology; `ontology list --kind scheme` lists them")
         return v
+
+    def examples(self, ctx: Ctx) -> list[str]:
+        return ["ifcore:CommandCategoryScheme"]
 
 
 class _Control(ArgType):
@@ -401,27 +404,52 @@ def requirement_add(ctx: Ctx, requirement: str, control: str, note: str | None) 
                     actions=[next_command("check the control map", "check", sections=["controls"])])
 
 
-# term --------------------------------------------------------------------------------------------------------------
-@command("term list", category="read", help="List the ontology's concepts and schemes", relocatable=True,
-         options=[Opt("--scheme", "SCHEME", "only the concepts of this scheme")])
-def term_list(ctx: Ctx, scheme: str | None) -> Resource:
-    rows = [{"id": t["id"], "kind": t["kind"], "scheme": t["scheme"], "label": t["label"], "notation": t["notation"]}
-            for t in _terms(ctx) if not scheme or t["scheme"] == scheme]
-    res = Resource("term-list", scheme or "all", {"count": len(rows), "scheme": scheme, "terms": rows},
-                   links=[Link("term", Call("term show", {"term": r["id"]})) for r in rows])
-    res.columns["terms"] = ["id", "kind", "scheme", "label", "notation"]
+# ontology ----------------------------------------------------------------------------------------------------------
+KIND_CHOICE = Choice("ONTOLOGY_KIND", terms.KINDS, "the kind of an ontology term (0042 FR-037)")
+
+
+def _term_text(res: Resource) -> str:
+    rows = res.data["terms"]
+    if not rows:
+        return "no term matches" + (f" {res.data['match']!r}" if res.data.get("match") else "")
+    w = max(len(r["curie"]) for r in rows)
+    return "\n".join(f"{r['curie']:<{w}}  {r['kind']:<10}  {r['label']}" for r in rows)
+
+
+@command("ontology list", category="read", help="List the ontology's classes, properties, individuals, schemes and concepts, or the ones that match a text",
+         relocatable=True,
+         options=[Opt("--kind", "ONTOLOGY_KIND", "only terms of this kind: class, property, individual, scheme or concept"),
+                  Opt("--scheme", "SCHEME", "only the concepts of this scheme"),
+                  Opt("--match", "TEXT", "only terms whose label, comment, CURIE, IRI or notation holds this text, best match first")])
+def ontology_list(ctx: Ctx, kind: str | None, scheme: str | None, match: str | None) -> Resource:
+    rows = _onto(ctx).listing(kind, scheme, match)
+    res = Resource("ontology-list", match or scheme or kind or "all",
+                   {"count": len(rows), "kind": kind, "scheme": scheme, "match": match, "terms": rows},
+                   links=[Link("term", Call("ontology show", {"term": r["curie"]})) for r in rows[:100]], text=_term_text)
+    if not rows:
+        res.actions.append(Action("List every term", Call("ontology list", {})))
+    res.columns["terms"] = ["curie", "kind", "label", "summary"]
     return res
 
 
-@command("term show", category="read", help="Show one concept or scheme", relocatable=True,
-         args=[Arg("term", "TERM", "the term's local name")])
-def term_show(ctx: Ctx, term: str) -> Resource:
-    t = next(t for t in _terms(ctx) if t["id"] == term)
-    res = Resource("term", term, dict(t))
-    if t["scheme"]:
-        res.links.append(Link("scheme", Call("term show", {"term": t["scheme"]})))
-    if t["kind"] == "scheme":
-        res.links.append(Link("concepts", Call("term list", {"scheme": term})))
+@command("ontology show", category="read", help="Show one term: its meaning, relations, statements, what references it and the requirements that cite it",
+         relocatable=True, args=[Arg("term", "TERM", "the term, as a CURIE or its full IRI")])
+def ontology_show(ctx: Ctx, term: str) -> Resource:
+    onto = _onto(ctx)
+    t = onto.resolve(term)
+    assert t is not None
+    data, found = onto.show(t, terms.citations(ctx.root, onto, t))
+    res = Resource("ontology", t.curie, data)
+    seen: set[tuple[str, str]] = set()
+    for rel, ident, noun in found:
+        if (ident, noun) not in seen:
+            seen.add((ident, noun))
+            res.links.append(Link(rel, Call("ontology show", {"term": ident}) if noun == "ontology" else Call("requirement show", {"requirement": ident})))
+    if t.kind == "scheme":
+        res.links.append(Link("concepts", Call("ontology list", {"scheme": t.curie})))
+    for key, cols in (("statements", ["predicate", "object", "kind"]), ("referenced_by", ["curie", "label", "kind", "predicate"]),
+                      ("specs", ["requirement", "how", "text"])):
+        res.columns[key] = cols
     return res
 
 
@@ -458,11 +486,19 @@ def context_design_system(ctx: Ctx, ident: str) -> dict[str, Any]:
     return out
 
 
-@context_for("term", "TERM")
-def context_term(ctx: Ctx, ident: str) -> dict[str, Any]:
-    d = term_show(ctx, ident)
-    return {"resource": d.data, "specs": [{"name": "0019-controlled-vocabulary", "status": "see spec show"}], "requirements": [],
-            "files": ["ontology/ifcore.ttl"], "links": d.links, "actions": d.actions}
+@context_for("ontology", "TERM")
+def context_ontology(ctx: Ctx, ident: str) -> dict[str, Any]:
+    d = ontology_show(ctx, ident)
+    rows = register.register_rows(ctx.root)
+    cited = d.data["specs"]
+    names_ = sorted({c["requirement"].split("/")[0] for c in cited})
+    reqs = [{"id": c["requirement"], "mechanism": rows.get(c["requirement"].replace("/", " "), {}).get("mechanism", "missing"), "text": c["text"]}
+            for c in cited]
+    out = {k: v for k, v in d.data.items() if k not in ("specs", "referenced_by", "statements", "individuals", "members")}
+    out["statements"] = d.data["statements"][:40]
+    return {"resource": out, "specs": [{"name": n, "status": (specs.resolve_spec(ctx.root, n).status if specs.resolve_spec(ctx.root, n) else "")} for n in names_],
+            "requirements": reqs, "files": [d.data["path"], str(register.REGISTER)], "links": d.links[:40], "actions": d.actions,
+            "omitted": ["the statements beyond the first 40, the terms that reference it, its individuals and members (use ontology show)"]}
 
 
 @context_for("requirement", "REQUIREMENT")

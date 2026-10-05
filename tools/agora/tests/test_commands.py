@@ -115,14 +115,14 @@ class SpecCommands(TempRepo):
 
 
 class OtherCommands(unittest.TestCase):
-    def test_term_list_and_show(self):
-        code, doc = run_json(["term", "list", "--scheme", "CommandCategoryScheme"])
+    def test_ontology_list_and_show(self):
+        code, doc = run_json(["ontology", "list", "--scheme", "CommandCategoryScheme"])
         self.assertEqual(sorted(t["notation"] for t in doc["data"]["terms"]),
                          ["build", "check", "decision", "generate", "read", "record", "setup"])
-        code, doc = run_json(["term", "show", "ifcore:ReadCommandCategory"])
-        self.assertEqual((doc["id"], doc["data"]["scheme"], doc["data"]["notation"]), ("ReadCommandCategory", "CommandCategoryScheme", "read"))
-        self.assertEqual(run_json(["term", "show", "Nope"])[0], 2)
-        self.assertEqual(run_json(["term", "list", "--scheme", "Nope"])[0], 2)
+        code, doc = run_json(["ontology", "show", "ifcore:ReadCommandCategory"])
+        self.assertEqual((doc["id"], doc["data"]["scheme"], doc["data"]["notation"]), ("ifcore:ReadCommandCategory", "ifcore:CommandCategoryScheme", "read"))
+        self.assertEqual(run_json(["ontology", "show", "Nope"])[0], 2)
+        self.assertEqual(run_json(["ontology", "list", "--scheme", "Nope"])[0], 2)
 
     def test_command_list_and_show(self):
         code, doc = run_json(["command", "list"])

@@ -47,6 +47,7 @@ export function registerCommands(app: App): Handlers {
       cmd('copyContext', (node) => context.copyContext(node));
       cmd('openView', () => run.openViewCommand());
       cmd('findResource', (node) => views.findResource(node));
+      cmd('searchView', (node, text) => views.searchView(node, text));
       cmd('refresh', () => app.refresh());
       cmd('showOutput', () => { app.log.show(true); });
       cmd('trust', () => manageTrust());

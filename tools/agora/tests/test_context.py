@@ -8,7 +8,7 @@ from .helpers import HOME, run, run_json
 
 # One resource of each kind that has a provider; a provider added without one here fails the first test.
 EXAMPLES = {"spec": "0020", "requirement": "0020/FR-013", "design-system": "frontiers-brand", "brand": "frontiers-brand",
-            "term": "ReadCommandCategory", "command": "spec show"}
+            "ontology": "ifcore:ReadCommandCategory", "command": "spec show"}
 NEEDS_A_CLONE = {"proposal"}  # tested with the proposals, in a clone that holds one
 
 
@@ -19,7 +19,7 @@ class Contexts(unittest.TestCase):
 
     def test_every_provider_has_an_example_here_and_a_type_that_validates_it(self):
         self.assertEqual(set(self.reg.contexts) - NEEDS_A_CLONE, set(EXAMPLES))
-        self.assertEqual(set(self.reg.contexts), {"spec", "requirement", "design-system", "brand", "term", "command", "proposal"})
+        self.assertEqual(set(self.reg.contexts), {"spec", "requirement", "design-system", "brand", "ontology", "command", "proposal"})
 
     def test_each_kind_returns_the_same_parts_in_the_same_shape(self):
         for kind, ident in EXAMPLES.items():
@@ -59,7 +59,7 @@ class Contexts(unittest.TestCase):
 
     def test_a_bare_id_the_kinds_can_tell_apart_and_a_wrong_one(self):
         self.assertEqual(run_json(["context", "0020/FR-013"])[1]["id"], "requirement:0020-spec-format/FR-013")
-        for bad in ("nonsense:1", "spec:9999", "brand:nope", "command:nope", "term:Nope"):
+        for bad in ("nonsense:1", "spec:9999", "brand:nope", "command:nope", "ontology:ifcore:Nope"):
             with self.subTest(bad=bad):
                 code, doc = run_json(["context", bad])
                 self.assertEqual((code, doc["kind"]), (2, "error"))

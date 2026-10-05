@@ -70,7 +70,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     (decision).
   - `requirement`: `list [--spec] [--mechanism]`, `show` (read); `set
     --mechanism --by --note` and `add --control` (record).
-  - `term`: `list [--scheme]`, `show` (read).
+  - `ontology`: `list [--kind] [--scheme] [--match]`, `show` (read): FR-037.
   - `design-system`: `list`, `show` (read); `new --kind` (generate).
   - `brand`: `list`, `show` (read); `generate` (generate): a brand's theme
     files and its specimen.
@@ -104,7 +104,8 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   only as 0020-spec-format FR-010 allows, and only at a person's direction.
 - **FR-008**: `agora` MUST take these typed arguments (0041-command-line
   FR-013): SPEC (`NNNN-slug`, `NNNN`, or a design system's slug), REQUIREMENT
-  (`<spec>/FR-NNN`), DESIGN_SYSTEM, BRAND, PIECE (`<brand>/<piece>`), INK
+  (`<spec>/FR-NNN`), TERM (a term of the ontology, as a CURIE such as
+  `ifcore:Agora` or its full IRI), SCHEME (a concept scheme of the ontology), DESIGN_SYSTEM, BRAND, PIECE (`<brand>/<piece>`), INK
   (`<brand>/<role>`), LAYOUT (a print layout's name or alias, as
   `layouts.json` gives them), SECTION, GENERATOR and ENTRY (a toolchain entry,
   FR-030).
@@ -128,6 +129,43 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 - **FR-012**: A person's name MUST be written to a tracked file only by `ink
   record --by`, which records who verified a spot color and a thread match
   (0041-command-line FR-042).
+
+- **FR-037**: `agora ontology list` and `agora ontology show` MUST read the
+  public ontology, `ontology/ifcore.ttl` and `ontology/ifweb.ttl`, with the
+  Turtle reader in `tools/agora/lib/` and no package beyond the standard
+  library, and MUST cover every class, object and datatype property, individual,
+  SKOS concept scheme and SKOS concept the two files declare, each by its
+  CURIE. `list` MUST give one row for each term with `curie`, `iri`, `label`,
+  `kind` (`class`, `property`, `individual`, `scheme` or `concept`), `icon` (the
+  codicon of its kind: `symbol-class`, `symbol-property`, `symbol-constant`,
+  `symbol-enum` for a scheme and `symbol-enum-member` for a concept), `summary`
+  (its comment's first sentence), `scheme` and `notation`, in the order classes,
+  properties, schemes, concepts, individuals, then by label. `--kind` and
+  `--scheme` MUST keep only the terms of that kind or the concepts of that
+  scheme. `--match TEXT` MUST keep only the terms whose label, comment,
+  CURIE, IRI or notation holds the text, without regard to case, and MUST rank
+  them: an exact CURIE or local name first, then an exact label, then a CURIE
+  or label that starts with the text, then a label or CURIE that holds it, then
+  its comment; a term that holds every word of the text in some field comes
+  last. `show TERM`, which takes a CURIE or a full IRI and refuses anything else
+  with the nearest CURIEs, MUST give its `label`, `kind`, `comment`, `type`,
+  `audience`, the file and line that declare it, its `superclasses` and
+  `subclasses` (or `domain`, `range`, `superproperties` and `subproperties` of
+  a property, `members` of a scheme and `individuals` of a class), the
+  `scheme` it belongs to, every statement about it in `statements` (rows of
+  `predicate`, `object` and the object's `kind`: `term`, `iri` or `literal`),
+  the terms that reference it in `referenced_by`, and the requirements that
+  cite it in `specs`: each requirement of any spec, in this repository, that
+  names its CURIE, its IRI or its label in backticks, or that its own comment
+  cites, with `requirement` (as REQUIREMENT takes it), `how` and `text`. Its
+  links MUST open each term it names with `ontology show` and each requirement
+  with `requirement show`, and the same JSON shape MUST be given by every
+  orchestrator that shows an ontology, so that the editor draws them alike.
+  `context ontology:TERM` MUST return it as one resource (0041-command-line
+  FR-038). `agora` MUST declare for the editor an `Ontology` view holding the
+  `ontology` noun, whose rows give `label`, `curie`, the kind's `icon` and the
+  option `--match` as `search` (0041-command-line FR-064): the ontology is read
+  in the editor and on the command line.
 
 ## Checks, suites and generators
 
@@ -386,7 +424,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   command, which the tool list never names, is answered with an error resource
   of code `decision-refused` whose next action is `proposal new`. Its resources
   are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`,
-  `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`,
+  `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://ontology/ID`,
   `agora://command/WORDS` (spaces as `+`), and `agora://proposal/ID`, each the JSON resource of the `show`
   command of its noun, and `agora://context/KIND:ID`, the resource `context`
   returns.

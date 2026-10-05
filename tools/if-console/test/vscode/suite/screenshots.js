@@ -86,6 +86,32 @@ test('Home and the views', async () => {
   await shot('view-all-commands');
 });
 
+test('the Ontology view, a search in it, and a class page', async () => {
+  await activate();
+  const slots = (await hook().describe()).views.slots;
+  const slot = slots.find((v) => v.title === 'Ontology');
+  if (!slot) throw new Error(`the Ontology view is not planned: ${slots.map((v) => v.title)}`);
+  await solo(slot.slot, [1]);
+  await shot('view-ontology');
+  await exec('list.focusDown');
+  await exec('list.showHover');
+  await sleep(1500);
+  await shot('ontology-row-tooltip');
+  await clear();
+  const mark = hook().shown.length;
+  exec('if-console.searchView', undefined, 'design system');
+  const pick = await nextQuickPick(mark, (s) => s.title === 'Search Ontology: design system', 'the search results');
+  await sleep(1000);
+  await shot('ontology-search');
+  await choose(pick, 'Design system');
+  await drawn(mark, 'the class page', (m) => m.tables >= 2);
+  await sleep(1800);
+  await shot('resource-class');
+  await hook().send({ type: 'scrollTo', section: 'statements' });
+  await sleep(900);
+  await shot('resource-class-statements');
+});
+
 test('the Test Explorer and the palette', async () => {
   await exec('workbench.view.testing.focus');
   await sleep(1500);

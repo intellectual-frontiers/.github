@@ -332,6 +332,13 @@
         "enablement": "if-console.hasRepository"
       },
       {
+        "command": "if-console.searchView",
+        "title": "%command.searchView.title%",
+        "category": "%category%",
+        "icon": "$(search-view)",
+        "enablement": "if-console.hasRepository"
+      },
+      {
         "command": "if-console.refresh",
         "title": "%command.refresh.title%",
         "category": "%category%",
@@ -532,6 +539,10 @@
         {
           "command": "if-console.followLink",
           "when": "false"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "false"
         }
       ],
       "view/title": [
@@ -579,6 +590,86 @@
           "command": "if-console.findResource",
           "when": "view =~ /^if-console\\.view\\.\\d+$/",
           "group": "navigation@1"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.0 && if-console.search.0",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.1 && if-console.search.1",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.2 && if-console.search.2",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.3 && if-console.search.3",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.4 && if-console.search.4",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.5 && if-console.search.5",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.6 && if-console.search.6",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.7 && if-console.search.7",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.8 && if-console.search.8",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.9 && if-console.search.9",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.10 && if-console.search.10",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.11 && if-console.search.11",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.12 && if-console.search.12",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.13 && if-console.search.13",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.14 && if-console.search.14",
+          "group": "navigation@0"
+        },
+        {
+          "command": "if-console.searchView",
+          "when": "view == if-console.view.15 && if-console.search.15",
+          "group": "navigation@0"
         },
         {
           "command": "if-console.refresh",

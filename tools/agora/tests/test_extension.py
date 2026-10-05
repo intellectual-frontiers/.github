@@ -29,6 +29,19 @@ class ExtensionRules(unittest.TestCase):
         shutil.copy(HOME / "design-systems" / "frontiers-brand" / "tokens.json", brand / "tokens.json")
         return Path(tmp.name), dest
 
+    def test_a_recommended_extension_must_be_one_FR_050_names_as_vetted(self):
+        self.assertEqual([f.message for f in extension.recommendation_findings(HOME)], [])
+        root, _ = self.copy()
+        spec = root / "spec-kit" / "specs" / "0043-if-console"
+        spec.mkdir(parents=True)
+        shutil.copy(HOME / "spec-kit" / "specs" / "0043-if-console" / "spec.md", spec / "spec.md")
+        (root / ".vscode").mkdir()
+        (root / ".vscode" / "extensions.json").write_text(json.dumps({"recommendations": ["faubulous.mentor", "someone.unvetted-thing"]}))
+        found = [f.message for f in extension.recommendation_findings(root)]
+        self.assertEqual(len(found), 1)
+        self.assertIn("someone.unvetted-thing", found[0])
+        self.assertEqual(extension.recommendation_findings(root / "tools"), [], "no recommendations, nothing to vet")
+
     def test_the_manifest_of_this_repository_is_valid(self):
         self.assertEqual([f.message for f in extension.manifest_findings(HOME)], [])
 

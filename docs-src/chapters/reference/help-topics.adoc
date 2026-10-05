@@ -411,6 +411,15 @@ The register is spec-kit/enforcement.tsv. A requirement is enforced by a check, 
 ./agora requirement set 0042-agora/FR-001 --mechanism check --by ".github: agora check commands"
 ----
 
+==== Find the ontology term a requirement needs
+
+The ontology comes second, after the spec. Search it by a word, a CURIE or a label before you add a term, so that an established one is reused; `show` gives a term's meaning, its relations, every statement about it and the requirements that already cite it. The IF Console shows the same in its Ontology view, with Search in its title.
+
+----
+./agora ontology list --match "design system"
+./agora ontology show ifcore:DesignSystem
+----
+
 ==== Check your work
 
 The checks read every spec and every row, and fail where a requirement has no row or a row names a command that does not exist.
@@ -428,6 +437,8 @@ Draft, Adopted and Superseded are a decision only a person makes. The command as
 * List the specs: `agora spec list`
 * List the requirements of a spec: `agora requirement list`
 * Start a new spec: `agora spec new`
+* List the ontology's classes: `agora ontology list --kind class`
+* Show one ontology term: `agora ontology show`
 * Check the specs and the register: `agora check specs register`
 
 [#help-start]

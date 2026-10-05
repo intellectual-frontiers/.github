@@ -40,6 +40,10 @@ everything must be `ifcore:Public`.
 * Reuse established vocabulary (PROV, schema.org, SKOS, Dublin Core) before inventing a term, and cite the spec and FR that justifies
 each addition in its `rdfs:comment`.
 * Never redefine in the vault what this ontology declares.
+* Look before you add. `./agora ontology list --match TEXT` finds a class, property, individual, concept scheme or concept by its label,
+comment, CURIE or notation, best match first, and `./agora ontology show ifcore:Agora` gives its meaning, its relations, every statement
+about it, the terms that reference it and the requirements that cite it. The IF Console shows the same in its Ontology view, where Search in the view's
+title runs the same match. The ontology is read there and on the command line; the website does not present it.
 
 === Facts and references
 

@@ -51,6 +51,7 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `layout` | An article layout of the print design system, from its layouts.json (frontiers-print FR-006) |
 | `mcp` | The MCP server of this command line, for AI agents, over standard input and output (0041-command-line FR-027) |
 | `media` | A media asset, a job rendered by frontiers-media (0014-design-systems FR-040) |
+| `ontology` | A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037) |
 | `openedx` | A brand's Open edX brand package (frontiers-brand FR-020) |
 | `proposal` | A tracked, replayable change drafted for a person to decide (0041-command-line FR-039; 0042-agora FR-029) |
 | `requirement` | One FR of a spec, and how it is enforced (0020-spec-format FR-011) |
@@ -58,7 +59,6 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `skill` | The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028) |
 | `spec` | A spec: a numbered spec or a design system's spec (0020-spec-format) |
 | `system` | The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069) |
-| `term` | A concept or scheme of the ontology (0019-controlled-vocabulary) |
 | `toolchain` | The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067) |
 
 ## Commands
@@ -105,6 +105,8 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `lock` | `setup` | terminal | Write a group's hashed lock from the packages its manifest pins, through uv | `agora lock [GROUP]` |
 | `mcp serve` | `setup` | terminal | Serve MCP over standard input and output until the client closes it: for AI agents | `agora mcp serve` |
 | `media build` | `build` | terminal, editor, mcp | Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009) | `agora media build PATH [--out\|-o TEXT] [--svg TEXT] [--brand BRAND]` |
+| `ontology list` | `read` | terminal, editor, mcp | List the ontology's classes, properties, individuals, schemes and concepts, or the ones that match a text | `agora ontology list [--kind ONTOLOGY_KIND] [--scheme SCHEME] [--match TEXT]` |
+| `ontology show` | `read` | terminal, editor, mcp | Show one term: its meaning, relations, statements, what references it and the requirements that cite it | `agora ontology show TERM` |
 | `openedx build` | `build` | terminal, editor, mcp | Write a brand's Open edX package sources and build dist/ with Paragon's CLI | `agora openedx build BRAND [--paragon TEXT]` |
 | `openedx generate` | `generate` | terminal, editor, mcp | Write a brand's Open edX package sources from its tokens.json, logos and fonts (not the built dist/) | `agora openedx generate BRAND` |
 | `proposal advance` | `decision` | terminal, editor | Accept a proposal: show its dry run, replay its action and mark it accepted | `agora proposal advance PROPOSAL` |
@@ -123,8 +125,6 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
 | `system ensure` | `setup` | terminal | Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system ensure [--yes]` |
 | `system list` | `read` | terminal, editor, mcp | List the shared libraries a browser and VS Code link and the display server VS Code's tests start under, the package that holds each on this host's distribution, and which are present | `agora system list` |
-| `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
-| `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
 | `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner, under the selftest group's locked packages | `agora test` |
 | `toolchain ensure` | `setup` | terminal, editor | Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check | `agora toolchain ensure [ENTRY...]` |
 | `toolchain list` | `read` | terminal, editor, mcp | List the toolchain entries: version, platforms and whether the cache holds each | `agora toolchain list` |
@@ -276,6 +276,12 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--svg` (TEXT): also write the SVG the PNG is rendered from
   - `--brand` (BRAND): the brand that themes it (frontiers-brand by default)
   - `--dry-run` (flag): validate, write nothing, show the change
+- `ontology list`
+  - `--kind` (ONTOLOGY_KIND): only terms of this kind: class, property, individual, scheme or concept
+  - `--scheme` (SCHEME): only the concepts of this scheme
+  - `--match` (TEXT): only terms whose label, comment, CURIE, IRI or notation holds this text, best match first
+- `ontology show`
+  - `term` (TERM): the term, as a CURIE or its full IRI
 - `openedx build`
   - `brand` (BRAND): the brand
   - `--paragon` (TEXT): Paragon's CLI of your own, such as node_modules/.bin/paragon (the npm lock's is used otherwise)
@@ -335,10 +341,6 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 - `system ensure`
   - `--yes` (flag): do not ask: for a person who has read what --dry-run prints, and for CI
   - `--dry-run` (flag): validate, write nothing, show the change
-- `term list`
-  - `--scheme` (SCHEME): only the concepts of this scheme
-- `term show`
-  - `term` (TERM): the term's local name
 - `toolchain ensure`
   - `entries` (ENTRY, zero or more): the entries; every one with a build for this platform when none is named
   - `--dry-run` (flag): validate, write nothing, show the change
@@ -367,6 +369,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `KIT_PART` | which part of the decoration kit: trace (the lockup and icon) or set (the wordmark and unit marks) | trace, set |
 | `LAYOUT` | a print layout's name or alias, from layouts.json: two-column, nature, jama | a value `<noun> list` or `--complete` offers |
 | `MECHANISM` | how a requirement is enforced (0020 FR-012) | check, gate, review, none |
+| `ONTOLOGY_KIND` | the kind of an ontology term (0042 FR-037) | class, property, scheme, concept, individual |
 | `PATH` | a path to a file or directory that exists, relative to where the command runs | design-systems/frontiers-slides/assurance/fixtures/pass/deck.md |
 | `PIECE` | an imagery piece as <brand>/<piece>, such as frontiers-brand/fog-coast-lighthouse-footbridge | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL` | a proposal as NNNN-slug, as `proposal list` shows them | a value `<noun> list` or `--complete` offers |
@@ -374,13 +377,13 @@ A value that fails its type is an error resource that names the type and gives e
 | `REQUIREMENT` | a requirement as <spec>/FR-NNN, such as 0020/FR-013 | 0020/FR-013, 0041-command-line/FR-008 |
 | `RESOURCE` | a resource as kind:id, such as spec:0020 or requirement:0020/FR-013 | spec:0020, requirement:0020/FR-013 |
 | `RUNNER` | which harness: browser or python for design-systems; node or vscode for extension | browser, python, node, vscode |
-| `SCHEME` | a concept scheme of the ontology by its local name, such as CommandCategoryScheme | a value `<noun> list` or `--complete` offers |
+| `SCHEME` | a concept scheme of the ontology as a CURIE, such as ifcore:CommandCategoryScheme, or by its local name | ifcore:CommandCategoryScheme |
 | `SECTION` | a check section, as `command show check` lists them | a value `<noun> list` or `--complete` offers |
 | `SLUG` | lowercase words joined by hyphens | agora, command-line |
 | `SPEC` | a spec as NNNN-slug or NNNN, or a design system's slug | 0020, 0020-spec-format, frontiers-brand |
 | `SPEC_STATUS` | a spec's status (0020 FR-009) | Draft, Adopted, Superseded |
 | `SUITE` | a named set of check sections | a value `<noun> list` or `--complete` offers |
-| `TERM` | a concept or scheme of the ontology by its local name, such as ReadCommandCategory | ReadCommandCategory, CommandCategoryScheme |
+| `TERM` | a term of the ontology as a CURIE, such as ifcore:Agora, or its full IRI | ifcore:Agora, ifcore:ReadCommandCategory |
 | `TOPIC` | a help topic, as `help` lists them: start, check, specs, ... | a value `<noun> list` or `--complete` offers |
 | `VARIANT` | a figure color variant of frontiers-figures: default, on-dark or grayscale | a value `<noun> list` or `--complete` offers |
 | `VOICE_MODE` | how the voice sweep reads a text: as prose or as a procedure's steps | prose, procedure |
@@ -429,7 +432,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 55 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 55 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://ontology/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -468,6 +471,8 @@ A generated file carries a header naming its generator and must not be edited by
 | `layout_list` | no |
 | `layout_show` | no |
 | `media_build` | yes, dry run by default |
+| `ontology_list` | no |
+| `ontology_show` | no |
 | `openedx_build` | yes, dry run by default |
 | `openedx_generate` | yes, dry run by default |
 | `proposal_list` | no |
@@ -483,8 +488,6 @@ A generated file carries a header naming its generator and must not be edited by
 | `spec_new` | yes, dry run by default |
 | `spec_show` | no |
 | `system_list` | no |
-| `term_list` | no |
-| `term_show` | no |
 | `test` | no |
 | `toolchain_list` | no |
 | `toolchain_show` | no |

@@ -20,6 +20,11 @@ def specs():
              "The register is spec-kit/enforcement.tsv. A requirement is enforced by a check, by a gate, by a review, or by "
              "nothing yet, and the row says which and names the command. Setting a row is a record, so it is a step you can "
              "preview before it is written.\n\n    ./agora requirement list --spec 0042\n    ./agora requirement set 0042-agora/FR-001 --mechanism check --by \".github: agora check commands\""),
+            ("Find the ontology term a requirement needs",
+             "The ontology comes second, after the spec. Search it by a word, a CURIE or a label before you add a term, so that an "
+             "established one is reused; `show` gives a term's meaning, its relations, every statement about it and the requirements "
+             "that already cite it. The IF Console shows the same in its Ontology view, with Search in its title.\n\n"
+             "    ./agora ontology list --match \"design system\"\n    ./agora ontology show ifcore:DesignSystem"),
             ("Check your work",
              "The checks read every spec and every row, and fail where a requirement has no row or a row names a command that "
              "does not exist.\n\n    ./agora check specs register"),
@@ -31,6 +36,8 @@ def specs():
             Step("List the specs", "spec list"),
             Step("List the requirements of a spec", "requirement list"),
             Step("Start a new spec", "spec new"),
+            Step("List the ontology's classes", "ontology list", {"kind": "class"}),
+            Step("Show one ontology term", "ontology show"),
             Step("Check the specs and the register", "check", {"sections": ["specs", "register"]}),
         ),
     }

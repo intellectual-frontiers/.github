@@ -153,7 +153,7 @@ def text(reg: Registry) -> str:
       "underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless "
       "you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, "
       "whose next action is `proposal new`. Resources are readable by URI: "
-      + ", ".join(f"`{name}://{u}`" for u in ("spec/ID", "requirement/SPEC/FR-NNN", "design-system/SLUG", "brand/SLUG", "term/ID",
+      + ", ".join(f"`{name}://{u}`" for u in ("spec/ID", "requirement/SPEC/FR-NNN", "design-system/SLUG", "brand/SLUG", "ontology/ID",
                                               "command/WORDS", "proposal/ID", "context/KIND:ID")) + ".")
     w("")
     w("| Tool | Writes |")

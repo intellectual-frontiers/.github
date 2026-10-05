@@ -13,11 +13,14 @@ First version.
 - **The views each command line declares** (for example Specs, Design systems, Builds, Toolchain), then **Checks**, with rows drawn from the
   command line's own declaration: a label, a muted description, a status as a colored codicon, a badge, a rich tooltip, inline buttons and
   grouped context menus. **All commands** is the tree of every noun and command, hidden until you show it.
+- **Search** in the title of a view whose command line declares a `search` option for its list (the Ontology view, for one): it asks for a
+  text, runs the list with that option, and shows the rows in the command line's own ranking, each with the icon of its kind; a choice opens
+  the term. A request that finds nothing says so and offers every row. A list may also name a row field for each row's own icon.
 - **The resource panel**: one panel for the window in which a resource, a Learn topic and a dry run open, drawn from the resource's JSON with
   VS Code Elements and the codicon font. It has history (back and forward), a breadcrumb, an *Open to the Side* choice, a header (codicon, title,
   kind and id, audience and status pills), an action toolbar (a primary action, icon buttons, an overflow menu with *Copy as JSON* and *Copy
   Context*, a decision styled apart and still behind its modal), and sections by the data's shape: a key-value grid, a sortable and filterable
-  table whose rows open, a stage ladder as a stepper, findings that open at their file and line, paragraphs, and link chips.
+  table whose rows open and whose cells that name another resource are links, a stage ladder as a stepper, findings that open at their file and line, paragraphs, and link chips.
 - **Learn**: a quick pick of the topics the command line lists, and a topic as numbered steps, each with the exact command line to copy and a
   Run button, a step you must do yourself marked as yours, and a link to the next topic.
 - **Dry run**: a write is run with `--dry-run` first; its change summary (files, lines added and removed) is in the panel with *Open Diff* for each

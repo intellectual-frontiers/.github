@@ -69,5 +69,6 @@
   "setting.checkOnSave.description": "After a file is saved, run `check --changed` for its repository and show the findings in **Problems**.",
   "setting.showAllCommands.description": "Show the **All commands** view, the tree of every noun, command and resource of every command line. It is hidden by default because **Home** and the views each command line declares are where daily work is; the *Show All Commands* action in Home's `…` menu shows it for this session only.",
   "setting.rowLimit.description": "The most rows of one kind a view lists before it says how many more there are. **Find Resource** searches all of them.",
-  "mcp.label": "IF Console"
+  "mcp.label": "IF Console",
+  "command.searchView.title": "Search Resources…"
 }
