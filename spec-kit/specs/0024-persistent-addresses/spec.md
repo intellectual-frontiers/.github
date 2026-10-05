@@ -7,7 +7,7 @@
 for as long as anyone may cite them: the web addresses its works and
 presentations are published at, the addresses printed in books, slides,
 and codes; the ontology's own namespace addresses, which every term the
-Eidolon defines depends on; and the persistent identifiers that let a
+Eidolon defines is named under and which stay identifiers only; and the persistent identifiers that let a
 citation survive an address changing. It extends 0022-domain-names,
 0023-domain-security, and 0021-works-and-presentations.
 
@@ -35,17 +35,16 @@ citation survive an address changing. It extends 0022-domain-names,
 
 ## The ontology's namespaces
 
-- **FR-005**: Each public ontology namespace (0001-eidolon-architecture
-  FR-007: `ifcore:` and `ifweb:`) MUST dereference: a request for its
-  ontology's address MUST answer with that ontology in Turtle, and MAY
-  answer with JSON-LD or an HTML page when those are asked for.
-- **FR-006**: A request for the private namespace's address (`ifpriv:`)
-  MUST answer as not found to a requester outside the vault circle, in
-  the single not-found shape of 0004-addressing FR-007, so that the
-  private ontology's existence reveals nothing beyond its prefix.
+- **FR-005**: Each ontology namespace address (0001-eidolon-architecture
+  FR-007: `ifcore:`, `ifweb:` and `ifpriv:`) MUST be an identifier only. The
+  web does not serve it: a request for it answers like any address the
+  website does not serve (0044-public-website FR-012), and the ontology is
+  read and searched in the IF Console (0043-if-console).
+- **FR-006**: A request for any namespace address, public or private, MUST
+  answer as not found, in the single not-found shape of 0004-addressing
+  FR-007, so that a namespace's existence reveals nothing beyond its prefix.
 - **FR-007**: A namespace address MUST NOT change once a term is declared
-  under it. Moving where the ontology is hosted MUST keep every namespace
-  address answering.
+  under it, wherever the ontology is kept.
 - **FR-008**: The domain that hosts a namespace MUST be a crown jewel
   domain under 0022-domain-names FR-021.
 
@@ -83,15 +82,15 @@ citation survive an address changing. It extends 0022-domain-names,
 - An address on a domain the company does not hold, such as a partner's
   site: it is not a published address, per FR-001; its upkeep is not the
   company's.
-- A request for the private ontology's address from outside the vault:
-  it answers not found, per FR-006.
+- A request for a namespace address, public or private: it answers not
+  found, and the ontology is read in the IF Console, per FR-005 and
+  FR-006.
 - A co-author without an ORCID iD, or one who does not consent: no
   identifier is recorded, per FR-010.
 
 ## Assumptions
 
-- The web property can answer a namespace address with Turtle and serve
-  permanent redirects.
+- The web property can serve permanent redirects.
 - Published addresses can be found from the ontology and from work
   package sources without reading any rendition.
 
@@ -112,7 +111,7 @@ citation survive an address changing. It extends 0022-domain-names,
   Eidolon asserts or a delivered work prints, kept answering for as long
   as the domain is held.
 - **A namespace address** — the address an ontology's terms are named
-  under, which must dereference to that ontology.
+  under: an identifier that never changes and is not served.
 - **A persistent identifier** — an identifier for a work, person, or
   organization that a registry keeps resolvable whatever its address.
 
@@ -122,8 +121,8 @@ citation survive an address changing. It extends 0022-domain-names,
   for longer than the check's cadence.
 - **SC-002**: No domain carrying a published address lapses or is
   transferred away.
-- **SC-003**: Each public namespace address answers with its ontology in
-  Turtle.
+- **SC-003**: Every namespace address answers not found, and no
+  namespace address has changed since a term was declared under it.
 - **SC-004**: Every registered persistent identifier is recorded on what
   it identifies.
 
