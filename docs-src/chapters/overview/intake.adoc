@@ -1,0 +1,44 @@
+[#intake]
+== Bringing in a new idea
+
+An intake starts when a person has an idea for something the company has no name, spec or place for yet: a new kind of work, a
+product line, a line of research. The first conversation decides what the idea is called, where it lives, and who decides each part.
+Work through the steps in order. Spec 0045, Elenchus works, is the worked example. It started as one sentence, a monthly compliance
+audit that fails what is not working, and became a work kind, a command group and a research pillar.
+
+=== The steps
+
+. *Read what exists before you propose anything.* Search the specs, the ontology and the vault for the idea. Elenchus found that
+the compliance specs (0028 to 0040) already held control catalogs, boundaries, an evidence ledger rule and a weekly status
+report, so the new spec states only what they do not, and cites the rest.
+. *Name it, and say why.* Offer several names and check each for a collision: a spec number, a product, a mark, a word that
+already means something here. Use the field's own term where one exists (0019 FR-001). Elenchus uses audit words (control test,
+exception, finding, plan of action) and keeps a house word only for the pattern itself. Put the reason for the name in the spec.
+. *Split the pattern from its implementation.* When a product carries the idea out, the pattern is a class and the
+implementation is a separate individual, related by `schema:isBasedOn`. Elenchus is the pattern, as Eidolon is, and
+Operational Truth® is the company's implementation of it.
+. *Decide the kind.* A work kind names a work's primary presentation form (0015 FR-005). A new kind needs its spec, then its
+`ifcore:WorkKind` individual, then a command group in the vault. Do not build ahead of that order (<<working-order>>).
+. *Take the next free spec number from the current `main`.* Fetch first. Another branch may have taken the number you meant to
+use. If it has, renumber yours and every reference to it before you merge.
+. *Check each fact yourself.* Read the source, record what you read and when, and mark what you could not verify and what you
+tried. A trademark's status comes from the registry's record and never from a literal in the ontology (0007 FR-012). A person's
+statement is recorded as theirs.
+. *Give a line of inquiry a research home.* A research pillar needs a stated question and a current record of what it has
+established (0006 FR-002). An area groups pillars and carries no question. Put a first pillar under an existing area; promote to a
+new area when sibling pillars exist. A pillar's record starts at the narrowest audience, and broadening it is a person's
+Decision.
+. *Leave to the person what is theirs.* Names, marks, who owns the rights, who operates the products, an audience change, and
+the close of a month's work are the decision authority's (0001 FR-029). Draft them, and record the person's answer.
+. *Run the checks, then integrate.* Run `./agora check`, and in the vault its own `eid check` and `eid test`. Fetch `main` and
+merge. If `main` was rewritten, replay your own commits onto it. Do not merge the old history back in.
+. *Record the intake.* In the vault, start from the intake record template (0002 FR-013). It states what came in, how each part
+was classified, what was left out and why, and where each part entered the lifecycle.
+
+=== Questions to settle with the person first
+
+* What is it called, and what must it not be confused with?
+* Is it a pattern, a product, or both?
+* Who owns the rights, and who builds and runs it?
+* Is it public, or does it start at the vault circle?
+* What would count as evidence that it works, and what would count against it?

@@ -39,6 +39,12 @@ At https://intellectual-frontiers.github.io/.github/ by the `pages` workflow, on
 Settings, Pages, Source to GitHub Actions once. Until then the deploy job fails and says so. You can build the same site anywhere
 with `./agora docs build`; the result is in `build/docs/`.
 
+=== How do I bring in a new idea or a new kind of work?
+Start with the chapter <<intake>>. It takes the idea from a first name to a spec, an ontology fact, a research home and a recorded
+intake, in that order, and uses spec 0045, Elenchus works, as its example. The short version: read what exists, name it, split the
+pattern from its implementation, write the spec before the ontology and the ontology before the code, check each fact yourself,
+and leave every decision that is the person's to the person.
+
 === How do I add a command?
 With an AI, spec first. The help topic `extend` has the steps and a prompt to start from.
 

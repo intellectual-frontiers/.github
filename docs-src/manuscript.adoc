@@ -26,6 +26,8 @@ include::chapters/overview/repositories.adoc[]
 
 include::chapters/overview/working-order.adoc[]
 
+include::chapters/overview/intake.adoc[]
+
 include::chapters/overview/orchestrator.adoc[]
 
 include::chapters/overview/brand-assets.adoc[]
