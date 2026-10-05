@@ -181,4 +181,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |The public website
 
+|`0045-elenchus-works`
+|Draft
+|Elenchus works
+
 |===
