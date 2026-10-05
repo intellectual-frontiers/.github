@@ -1059,8 +1059,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-016	check	eidolon: eid test	test_site checks the build's redirect and header lists and the not-found page
 0044-public-website FR-017	check	eidolon: eid test	test_site drives eid site serve: trailing slash, index and .html redirect with 307, unknown address 404
 0044-public-website FR-018	check	eidolon: eid check ontology	the destination's PublishingDestination record names its vendor service, strategy, configuration and deployment record files
-0044-public-website FR-019	gate	eidolon: eid site publish	preview unless --production, which needs --by and --because; no command changes DNS or routes
-0044-public-website FR-020	gate	eidolon: eid site publish	the publish builds and checks in the same run and uploads that build
+0044-public-website FR-019	none	-	a command that publishes the site is not built yet: preview unless --production, which needs --by and --because; no command changes DNS or routes
+0044-public-website FR-020	none	-	a command that publishes the site is not built yet: the publish builds and checks in the same run and uploads that build
 0044-public-website FR-021	check	eidolon: eid test	test_site: a publish against the fake API appends one deployment record with every field and no token
 0044-public-website FR-022	check	eidolon: eid test	test_site: the token never reaches the record, the output or a file
 0044-public-website FR-023	review	0044-public-website FR-023	the destination's script is reviewed to hand each request to the files
@@ -1114,3 +1114,4 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-console-protocol FR-008	check	.github: agora test	tests check a decision is refused without a person and never offered over MCP
 0043-console-protocol FR-009	check	.github: agora test	tests check a stream is one resource per line
 0043-console-protocol FR-010	check	.github: agora test	tests check mcp serve lists no decision
+0042-agora FR-038	none	-	no check reads .vscode/extensions.json; the recommendations are reviewed when they change
