@@ -3,8 +3,26 @@ help = "What an AI agent uses: the agent skill generated from the registry, and 
 
 [nouns.proposal]
 help = "A tracked, replayable change drafted for a person to decide (0041-command-line FR-039; 0042-agora FR-029)"
+icon = "git-pull-request"
+view = "proposals"
+title = "Proposal"
+
+[nouns.proposal.list]
+command = "proposal list"
+rows = "proposals"
+id = "id"
+label = "id"
+description = "resource"
+status = "status"
+tooltip = ["reason", "command"]
+
+[nouns.proposal.list.status_map]
+open = "pending"
+accepted = "ok"
 [nouns.skill]
 help = "The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028)"
+icon = "sparkle"
+title = "Agent skill"
 
 # The skill is written from the registry alone: the manifests and the code that declare it.
 [generators.agent-skill]
@@ -12,3 +30,17 @@ help = "The agent skill, .claude/skills/agora/SKILL.md, from the registry (0041-
 sources = ["tools/agora/agora.toml", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "tools/agora/core/registry.py", "tools/agora/core/describe.py", "tools/agora/core/types.py", "tools/agora/lib/skill.py"]
 outputs = [".claude/skills/agora/SKILL.md"]
 command = "skill generate"
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."proposal advance"]
+title = "Accept Proposal…"
+icon = "verified"
+[commands."proposal list"]
+title = "List Proposals"
+[commands."proposal new"]
+title = "Draft Proposal…"
+icon = "git-pull-request-create"
+[commands."proposal show"]
+title = "Show Proposal…"
+[commands."skill generate"]
+title = "Generate Agent Skill"

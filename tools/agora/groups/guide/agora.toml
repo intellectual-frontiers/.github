@@ -3,6 +3,9 @@ help = "Help topics and the guide: the one place the daily work is documented, a
 
 [nouns.docs]
 help = "The guide: the AsciiDoc book in docs-src/, its generated reference chapters and its four built editions (0042-agora FR-034)"
+icon = "library"
+view = "builds"
+title = "Guide"
 
 [sections.help]
 help = "Every help topic is well formed, its steps are actions of the registry, and it names only commands, topics and paths that exist (0042 FR-033; 0041 FR-065)"
@@ -14,3 +17,12 @@ help = "The guide's reference chapters: commands, checks, help topics, toolchain
 sources = ["tools/agora/agora.toml", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "tools/agora/help/*.py", "tools/agora/toolchain/*.py", "tools/agora/core/system.py", "tools/agora/core/registry.py", "tools/agora/lib/guide.py", "ontology/ifcore.ttl", "design-systems/*/spec.md", "spec-kit/specs/*/spec.md"]
 outputs = ["docs-src/chapters/reference/*.adoc"]
 command = "docs generate"
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."docs build"]
+title = "Build Guide"
+[commands."docs generate"]
+title = "Generate Guide Reference"
+[commands."help"]
+title = "Show Help"
+icon = "question"

@@ -3,8 +3,32 @@ help = "The print design system's layouts: listed, shown, built to the file its 
 
 [nouns.layout]
 help = "An article layout of the print design system, from its layouts.json (frontiers-print FR-006)"
+icon = "layout"
+view = "design-systems"
+title = "Layout"
+
+[nouns.layout.list]
+command = "layout list"
+rows = "layouts"
+id = "name"
+label = "name"
+description = "summary"
+status = "status"
+tooltip = ["aliases", "columns"]
+
+[nouns.layout.list.status_map]
+built = "ok"
+planned = "pending"
 
 [generators.print-layout-docs]
 help = "The print design system's layout and typeface catalogs inside its Markdown, from latex/layouts.json and latex/typefaces.json"
 sources = ["design-systems/frontiers-print/latex/layouts.json", "design-systems/frontiers-print/latex/typefaces.json", "design-systems/frontiers-print/latex/layout.py"]
 outputs = ["design-systems/frontiers-print/docs/*.md"]
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."layout build"]
+title = "Build Layout…"
+[commands."layout list"]
+title = "List Layouts"
+[commands."layout show"]
+title = "Show Layout…"

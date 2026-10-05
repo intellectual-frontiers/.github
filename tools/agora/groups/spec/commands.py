@@ -326,6 +326,19 @@ def requirement_list(ctx: Ctx, spec: str | None, mechanism: str | None) -> Resou
     return res
 
 
+def _enforcing_action(ctx: Ctx, by: str):
+    """The action that runs what a `check` or `gate` row names, when it is one of this command line's own: `check SECTION...`, `test` or `fresh`."""
+    words = by.partition(": ")[2].split()
+    if not words or words[0] != ctx.name:
+        return None
+    rest = words[1:]
+    if rest[:1] == ["check"] and all(w in ctx.registry.sections for w in rest[1:]):
+        return next_command("run the check that enforces it", "check", sections=rest[1:])
+    if rest in (["test"], ["fresh"]):
+        return next_command("run what enforces it", rest[0])
+    return None
+
+
 @command("requirement show", category="read", help="Show one requirement in full, with its enforcement and controls",
          relocatable=True, args=[Arg("requirement", "REQUIREMENT", "the requirement")])
 def requirement_show(ctx: Ctx, requirement: str) -> Resource:
@@ -337,10 +350,14 @@ def requirement_show(ctx: Ctx, requirement: str) -> Resource:
     ctl = [{"control": c["control"], "note": c["note"]} for c in register.control_rows(ctx.root) if c["requirement"] == f"{s.name} {ident}"]
     res = Resource("requirement", requirement, {"requirement": requirement, "spec": s.name, "id": ident, "text": text,
                                                 "mechanism": row.get("mechanism", "missing"), "by": row.get("by", ""),
-                                                "note": row.get("note", ""), "controls": ctl})
+                                                "note": row.get("note", ""), "controls": ctl, "path": s.rel,
+                                                "line": specs.line_of(s, ident)})
     res.links = [Link("spec", Call("spec show", {"spec": s.name}))]
+    run = _enforcing_action(ctx, row.get("by", "")) if row.get("mechanism") in ("check", "gate") else None
+    if run is not None:
+        res.actions.append(run)
     if row:
-        res.actions = [next_command("record its enforcement again", "requirement set", requirement=requirement,
+        res.actions += [next_command("record its enforcement again", "requirement set", requirement=requirement,
                                     mechanism=row["mechanism"], by=row["by"], **({"note": row["note"]} if row["note"] else {}))]
     return res
 

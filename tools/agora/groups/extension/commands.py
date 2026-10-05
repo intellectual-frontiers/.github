@@ -68,16 +68,20 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
 
 
 @command("extension test", category="check", toolchain=("vscode", "vsce"),
-         help="Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named",
-         options=[Opt("--suite", "TEXT", "the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does", required=True),
+         help="Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named, or capture its screenshots",
+         options=[Opt("--suite", "TEXT", "the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does"),
+                  Opt("--screenshots", "TEXT", "instead of a suite, open the extension's views and a resource page, Learn and a dry-run diff in Dark+, Light+ and High Contrast and write a PNG of each to this folder"),
                   Opt("--workspace", "TEXT", "a folder to add to the workspace after this clone; repeatable, as NAME=PATH or PATH", multiple=True),
                   Opt("--report", "TEXT", "also write every test's name, status and seconds to this JSON file")])
-def extension_test(ctx: Ctx, suite: str, workspace: list[str] | tuple[str, ...], report: str | None) -> Resource:
+def extension_test(ctx: Ctx, suite: str | None, screenshots: str | None, workspace: list[str] | tuple[str, ...], report: str | None) -> Resource:
     """Another repository's tests of the extension (0043-if-console FR-034). Nothing of the caller is named here: the suite and the folders are
     paths, and the suite loads the extension's own test support from IF_CONSOLE_EXTENSION_DIR."""
     exe = _node(ctx)
-    suite_dir = Path(suite).expanduser().resolve()
-    if not (suite_dir / "index.js").is_file():
+    if bool(suite) == bool(screenshots):
+        raise AgoraError("invalid-argument", "name one of --suite DIR (tests of your own) and --screenshots DIR (the extension's screenshots)", exit=USAGE)
+    shots = Path(screenshots).expanduser().resolve() if screenshots else None
+    suite_dir = Path(suite).expanduser().resolve() if suite else None
+    if suite_dir is not None and not (suite_dir / "index.js").is_file():
         raise AgoraError("invalid-argument", f"--suite {suite}: there is no index.js in it", exit=USAGE)
     folders: list[tuple[str, str]] = []
     for w in workspace:
@@ -92,12 +96,13 @@ def extension_test(ctx: Ctx, suite: str, workspace: list[str] | tuple[str, ...],
         raise AgoraError("toolchain-missing", f"the real VS Code did not run: {e.message}", exit=MISSING) from e
     try:
         findings, notes, rows = vscode_tests.run(ctx.home, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")), "",
-                                                 ctx.toolchain().clean_env(), folders, str(suite_dir))
+                                                 ctx.toolchain().clean_env(), folders, str(suite_dir) if suite_dir else None, screenshots=shots)
     except vscode_tests.DisplayError as e:
         raise AgoraError("no-display", f"the real VS Code did not run: {e}", exit=MISSING) from e
     if report:
         Path(report).expanduser().write_text(json.dumps({"tests": rows}, indent=2) + "\n", encoding="utf-8")
-    data = {"suite": str(suite_dir), "folders": [{"name": n, "path": p} for n, p in folders], "tests": rows, "notes": notes,
+    data = {"suite": str(suite_dir) if suite_dir else None, "screenshots": sorted(p.name for p in shots.glob("*.png")) if shots else None,
+            "folder": str(shots) if shots else None, "folders": [{"name": n, "path": p} for n, p in folders], "tests": rows, "notes": notes,
             "passed": sum(1 for t in rows if t["status"] == "passed"), "findings": [f"{f.where}: {f.message}" for f in findings]}
     if findings:
         raise AgoraError("tests-failed", "; ".join(f.message for f in findings[:3]), exit=FAILED, detail=data)

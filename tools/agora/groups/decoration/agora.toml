@@ -16,9 +16,18 @@ uharfbuzz = "0.56.2"
 
 [nouns.decoration]
 help = "A brand's decoration kit: one-color artwork made mechanically from the masters and the brand's fonts (0014-design-systems FR-047)"
+icon = "wand"
+view = "design-systems"
+title = "Decoration"
 
 [generators.brand-decoration]
 help = "A brand's decoration kit: the traced lockup and icon, the set wordmark and unit marks, and their measured finest detail in tokens.json"
 sources = ["design-systems/*/tokens.json", "design-systems/*/logos/*.png", "design-systems/*/fonts/**", "tools/agora/lib/decoration.py"]
 outputs = ["design-systems/*/logos/vector/**", "design-systems/*/logos/units/**", "design-systems/*/tokens.json"]
 command = "decoration generate"
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."decoration generate"]
+title = "Generate Decoration…"
+[commands."decoration show"]
+title = "Show Decoration…"

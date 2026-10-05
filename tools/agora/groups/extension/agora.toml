@@ -10,6 +10,9 @@ nodejs-wheel-binaries = "22.20.0"
 
 [nouns.extension]
 help = "The IF Console VS Code extension, built from tools/if-console/ (0043-if-console)"
+icon = "extensions"
+view = "builds"
+title = "Extension"
 
 [sections.extension]
 help = "The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032)"
@@ -17,3 +20,9 @@ watch = ["tools/if-console/**", "tools/agora/lib/extension.py", "tools/agora/gro
 toolchain_optional = ["vscode", "vsce"]  # the vscode runner fetches them when it can; without them it is skipped and says why
 options = ["--runner"]  # node (the unit tests against a stand-in for the VS Code API) or vscode (a real VS Code under a display server)
 isolated = true  # its own locked environment, beside the other groups' (0041-command-line FR-028)
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."extension build"]
+title = "Build Extension"
+[commands."extension test"]
+title = "Test Extension"

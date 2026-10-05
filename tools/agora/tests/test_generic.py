@@ -21,7 +21,7 @@ class EveryCommand(unittest.TestCase):
     def test_every_command_without_required_arguments_returns_a_resource(self):  # 0041 FR-016
         # the commands that run the checks again, write tracked files, or run in a group's locked environment (tested apart)
         skip = {"check", "test", "doctor", "lock", "spec new", "fresh", "brand generate", "figure generate", "skill generate",
-                "mcp serve"}  # the last speaks on standard input
+                "mcp serve", "extension test"}  # mcp serve speaks on standard input; extension test needs a real VS Code and one of its two options
         for c in self.reg.commands.values():
             if c.id in skip or any(a.required for a in c.args) or any(o.required for o in c.options):
                 continue

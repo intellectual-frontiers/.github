@@ -87,7 +87,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
 | `extension build` | `build` | terminal, editor, mcp | Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock | `agora extension build` |
-| `extension test` | `check` | terminal, editor, mcp | Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named | `agora extension test --suite TEXT [--workspace TEXT] [--report TEXT]` |
+| `extension test` | `check` | terminal, editor, mcp | Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named, or capture its screenshots | `agora extension test [--suite TEXT] [--screenshots TEXT] [--workspace TEXT] [--report TEXT]` |
 | `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
 | `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
 | `fresh` | `check` | terminal, editor, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
@@ -201,7 +201,8 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 - `extension build`
   - `--dry-run` (flag): validate, write nothing, show the change
 - `extension test`
-  - `--suite` (TEXT, required): the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does
+  - `--suite` (TEXT): the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does
+  - `--screenshots` (TEXT): instead of a suite, open the extension's views and a resource page, Learn and a dry-run diff in Dark+, Light+ and High Contrast and write a PNG of each to this folder
   - `--workspace` (TEXT): a folder to add to the workspace after this clone; repeatable, as NAME=PATH or PATH
   - `--report` (TEXT): also write every test's name, status and seconds to this JSON file
 - `figure build`

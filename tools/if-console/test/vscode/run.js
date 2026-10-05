@@ -26,7 +26,7 @@ const code = need('IF_CONSOLE_VSCODE');
 const cli = need('IF_CONSOLE_VSCODE_CLI');
 const external = process.env.IF_CONSOLE_VSCODE_SUITE ? path.resolve(process.env.IF_CONSOLE_VSCODE_SUITE) : null;
 const folders = JSON.parse(process.env.IF_CONSOLE_VSCODE_FOLDERS || '[]');
-const vsix = external ? (process.env.IF_CONSOLE_VSIX || '') : need('IF_CONSOLE_VSIX');   // only the untrusted scenario installs the package
+const vsix = external || process.env.IF_CONSOLE_SCREENSHOTS ? (process.env.IF_CONSOLE_VSIX || '') : need('IF_CONSOLE_VSIX');   // only the untrusted scenario installs the package
 const testElectron = need('IF_CONSOLE_TEST_ELECTRON');
 const realRoot = need('IF_CONSOLE_REAL_ROOT');
 const reportFile = need('IF_CONSOLE_VSCODE_REPORT');
@@ -44,13 +44,13 @@ function profile(base, name, extra) {
   return { dir, data, extensions: path.join(dir, 'extensions') };
 }
 
-async function trusted(base, workspace, env) {
+async function trusted(base, workspace, env, name = 'trusted', settings = {}) {
   const { runTests } = require(testElectron);
-  const p = profile(base, 'trusted');
+  const p = profile(base, name, settings);
   await runTests({
     vscodeExecutablePath: code, extensionDevelopmentPath: extension, extensionTestsPath: suite,
     launchArgs: [workspace, `--user-data-dir=${p.data}`, `--extensions-dir=${p.extensions}`, '--disable-gpu'],
-    extensionTestsEnv: { ...env, IF_CONSOLE_VSCODE_SCENARIO: 'trusted' },
+    extensionTestsEnv: { ...env, IF_CONSOLE_VSCODE_SCENARIO: name === 'trusted' ? 'trusted' : 'screenshots' },
   });
 }
 
@@ -78,12 +78,42 @@ function untrusted(base, workspace, env) {
   });
 }
 
+// The screenshots scenario (0043-if-console FR-045): the same fixture workspace as the trusted scenario, once for each of VS Code's own three
+// kinds of theme, the display server's screen read to a PNG after each view is open. IF_CONSOLE_SCREENSHOTS names the folder it writes.
+const THEMES = [['dark', 'Default Dark+'], ['light', 'Default Light+'], ['high-contrast', 'Default High Contrast']];
+
+async function screenshots(base, reports, failures) {
+  const out = path.resolve(process.env.IF_CONSOLE_SCREENSHOTS);
+  fs.mkdirSync(out, { recursive: true });
+  for (const [id, theme] of THEMES) {
+    const fixture = make();
+    const workspace = path.join(base, `${id}.code-workspace`);
+    fs.writeFileSync(workspace, JSON.stringify({ folders: [{ name: 'real', path: realRoot }, { name: 'fixture', path: fixture.root }, ...folders], settings: {} }));
+    const env = { IF_CONSOLE_VSCODE_REPORT_DIR: reports, IF_CONSOLE_REAL_ROOT: realRoot, IF_CONSOLE_EXTENSION_DIR: extension,
+      DBUS_SESSION_BUS_ADDRESS: '/dev/null', ELECTRON_DISABLE_SECURITY_WARNINGS: '1', IF_CONSOLE_FIXTURE_ROOT: fixture.root,
+      IF_CONSOLE_SCREENSHOTS: out, IF_CONSOLE_SCREEN_DUMP: need('IF_CONSOLE_SCREEN_DUMP'), IF_CONSOLE_SHOT_THEME: id };
+    try { await trusted(base, workspace, env, `screenshots-${id}`, { 'workbench.colorTheme': theme, 'window.autoDetectColorScheme': false,
+      'workbench.startupEditor': 'none', 'editor.minimap.enabled': false, 'window.commandCenter': false, 'workbench.tips.enabled': false,
+      'workbench.secondarySideBar.defaultVisibility': 'hidden', 'chat.disableAIFeatures': true, 'workbench.layoutControl.enabled': false }); }
+    catch (e) { failures.push(`${id}: ${e.message}`); }
+    fixture.cleanup();
+  }
+}
+
 (async () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'if-console-vscode-'));
   const reports = path.join(base, 'reports');
   fs.mkdirSync(reports);
   const fixtures = [];
   const failures = [];
+  if (process.env.IF_CONSOLE_SCREENSHOTS) {
+    await screenshots(base, reports, failures);
+    const shot = [];
+    for (const f of fs.readdirSync(reports).sort()) shot.push(...JSON.parse(fs.readFileSync(path.join(reports, f), 'utf8')).tests);
+    fs.writeFileSync(reportFile, JSON.stringify({ tests: shot, errors: failures }, null, 2));
+    fs.rmSync(base, { recursive: true, force: true });
+    process.exit(failures.length || shot.some((t) => t.status !== 'passed') || !shot.length ? 1 : 0);
+  }
   // Each scenario has its own fixture command line, so that what one launches cannot be mistaken for what another did.
   for (const [name, run] of external ? [['trusted', trusted]] : [['trusted', trusted], ['untrusted', untrusted]]) {
     const fixture = external ? null : make();
