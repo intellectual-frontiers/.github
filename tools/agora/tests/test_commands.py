@@ -173,7 +173,7 @@ class OtherCommands(unittest.TestCase):
         self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv", "python3"])
         self.assertNotIn("programs", doc["data"])  # no host program is declared: packages and toolchain entries supply them
         rows = {r["entry"]: r for r in doc["data"]["toolchain"]}
-        self.assertEqual(set(rows), {"tinytex", "tex-packages", "chromium", "npm-packages", "vsce", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
+        self.assertEqual(set(rows), {"tinytex", "tex-packages", "chromium", "npm-packages", "extension-build", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
         self.assertTrue(all(r["cache"] in ("ready", "not fetched") and r["needed by"] for r in rows.values()))
         self.assertTrue(any("browser" in n for n in rows["chromium"]["needed by"]))
         self.assertTrue(any("frontiers-print" in n for n in rows["tinytex"]["needed by"]))

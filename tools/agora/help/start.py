@@ -62,8 +62,8 @@ def check():
              "The harnesses run in a real browser or in Python, once under every brand. `agora help design-systems` has more.\n\n"
              "    ./agora check --suite browser\n    ./agora check --suite python\n    ./agora check --suite images"),
             ("If you changed the VS Code extension",
-             "The unit tests run on Node; the second suite runs the extension inside a real VS Code under a display server, which "
-             "needs the one-time `agora help start` setup.\n\n    ./agora check --suite extension"),
+             "The TypeScript is type-checked and linted and its unit tests run on Node; the second suite runs the extension inside a real VS Code "
+             "under a display server, which needs the one-time `agora help start` setup.\n\n    ./agora check --suite extension"),
             ("How to read the result",
              "A finding names a file and a line, and says what to edit. A section that could not run says why and exits with 3: "
              "it is skipped, never passed. Exit 1 means something you checked failed; exit 2 means the command was used wrongly."),

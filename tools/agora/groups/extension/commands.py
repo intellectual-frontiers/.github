@@ -12,6 +12,7 @@ from agora.core import AgoraError, Ctx, Finding, Opt, Resource, SectionResult, c
 from agora.core.resource import MISSING, FAILED, USAGE
 from agora.lib import extension, node, vscode_tests
 from agora.lib.register import known_repositories
+from agora.toolchain import extension_build
 
 
 def _node(ctx: Ctx) -> str:
@@ -20,6 +21,14 @@ def _node(ctx: Ctx) -> str:
         raise AgoraError("missing-program", "this needs node, which comes from the package " + node.PACKAGE, exit=MISSING,
                          detail={"package": node.PACKAGE})
     return found
+
+
+def _build_tools(ctx: Ctx, names: list[str]):
+    """The toolchain entries a step uses, or the reason they cannot be had (a cold cache offline, a missing library)."""
+    try:
+        return ctx.toolchain().use(names), ""
+    except AgoraError as e:
+        return None, e.message
 
 
 @section("extension")
@@ -35,39 +44,53 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
     own = ctx.registry.root_manifest.get("register_name", "")
     names = sorted(known_repositories(home) - {own} | {ctx.registry.name})
     findings = extension.manifest_findings(home)
-    findings += extension.lint_findings(home, exe, names)
-    notes = ["manifest and lint read tools/if-console/"]
+    findings += extension.source_findings(home, names)
+    notes = ["manifest and source rules read tools/if-console/"]
     data: dict = {}
-    if runner in (None, "node"):
-        tests, more = extension.run_tests(home, exe, ctx.toolchain().clean_env(), home)
-        findings, notes = findings + tests, notes + more
     unrun = ""
-    if runner in (None, "vscode"):
-        try:
-            r = ctx.toolchain().use(["vscode", "vsce"])
-        except AgoraError as e:
-            unrun, r = e.message, None
-        if r is not None:
-            with tempfile.TemporaryDirectory(prefix="agora-vsix-") as tmp:
-                vsix = Path(tmp) / extension.vsix_name(home)
-                built = extension.package(home, exe, str(r.path_of("vsce")), vsix, r.env())
-                if built.returncode != 0 or not vsix.is_file():
-                    findings.append(Finding("error", "tools/if-console", "vsce could not pack the extension for the VS Code tests: "
-                                            + (built.stderr or built.stdout).strip()[-300:]))
+    tools, why = _build_tools(ctx, ["extension-build"])
+    if tools is None:
+        unrun = why  # what could not run is skipped, never passed (0041 FR-033)
+    else:
+        with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
+            stage_dir = extension.stage(home, tools.path_of("extension-modules"), Path(tmp))
+            env = tools.env()
+            if runner in (None, "node"):
+                findings += extension.codicon_findings(home, tools.path_of("codicons-mapping"), extension_build.PACKAGES["@vscode/codicons"])
+                findings += extension.typecheck(stage_dir, exe, str(tools.path_of("tsc")), env)
+                findings += extension.lint(stage_dir, exe, str(tools.path_of("eslint")), env)
+                notes.append(f"tsc {extension_build.PACKAGES['typescript']} (strict) and ESLint {extension_build.PACKAGES['eslint']} (recommended, type-checked) ran on the TypeScript; the codicon list is the locked package's")
+            built = extension.bundle(stage_dir, exe, env)
+            findings += built
+            if not built and runner in (None, "node"):
+                tests, more = extension.run_tests(stage_dir, exe, ctx.toolchain().clean_env(), home)
+                findings, notes = findings + tests, notes + more
+            if not built and runner == "vscode":
+                findings += extension.compile_tests(stage_dir, exe, env)
+            if not built and runner in (None, "vscode"):
+                real, why = _build_tools(ctx, ["vscode", "extension-build"])
+                if real is None:
+                    unrun = why
                 else:
-                    try:
-                        f, more, rows = vscode_tests.run(home, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")),
-                                                         str(vsix), ctx.toolchain().clean_env())
-                        findings, notes, data = findings + f, notes + more, {"vscode": rows}
-                    except vscode_tests.DisplayError as e:
-                        unrun = str(e)
+                    vsix = Path(tmp) / extension.vsix_name(home)
+                    packed = extension.package(stage_dir, exe, str(real.path_of("vsce")), vsix, real.env())
+                    if packed.returncode != 0 or not vsix.is_file():
+                        findings.append(Finding("error", "tools/if-console", "vsce could not pack the extension for the VS Code tests: "
+                                                + (packed.stderr or packed.stdout).strip()[-300:]))
+                    else:
+                        try:
+                            f, more, rows = vscode_tests.run(home, stage_dir, exe, str(real.path_of("code")), str(real.path_of("code-cli")),
+                                                             str(real.path_of("vscode-test")), str(vsix), ctx.toolchain().clean_env())
+                            findings, notes, data = findings + f, notes + more, {"vscode": rows}
+                        except vscode_tests.DisplayError as e:
+                            unrun = str(e)
     result = SectionResult.from_findings("extension", findings, notes, data)
     if unrun and result.status == "passed":  # what could not run is skipped, never passed (0041 FR-033)
-        result.status, result.reason = "skipped", f"the vscode runner did not run: {unrun}"
+        result.status, result.reason = "skipped", f"part of the section did not run: {unrun}"
     return result
 
 
-@command("extension test", category="check", toolchain=("vscode", "vsce"),
+@command("extension test", category="check", toolchain=("vscode", "extension-build"),
          help="Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named, or capture its screenshots",
          options=[Opt("--suite", "TEXT", "the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does"),
                   Opt("--screenshots", "TEXT", "instead of a suite, open the extension's views and a resource page, Learn and a dry-run diff in Dark+, Light+ and High Contrast and write a PNG of each to this folder"),
@@ -91,14 +114,20 @@ def extension_test(ctx: Ctx, suite: str | None, screenshots: str | None, workspa
             raise AgoraError("invalid-argument", f"--workspace {w}: {path} is not a folder", exit=USAGE)
         folders.append((name if sep else path.name, str(path)))
     try:
-        r = ctx.toolchain().use(["vscode", "vsce"])
+        r = ctx.toolchain().use(["vscode", "extension-build"])
     except AgoraError as e:
         raise AgoraError("toolchain-missing", f"the real VS Code did not run: {e.message}", exit=MISSING) from e
-    try:
-        findings, notes, rows = vscode_tests.run(ctx.home, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")), "",
-                                                 ctx.toolchain().clean_env(), folders, str(suite_dir) if suite_dir else None, screenshots=shots)
-    except vscode_tests.DisplayError as e:
-        raise AgoraError("no-display", f"the real VS Code did not run: {e}", exit=MISSING) from e
+    with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
+        stage_dir = extension.stage(ctx.home, r.path_of("extension-modules"), Path(tmp))
+        built = extension.bundle(stage_dir, exe, r.env()) or extension.compile_tests(stage_dir, exe, r.env())
+        if built:
+            raise AgoraError("invalid-extension", "the extension did not build for the VS Code run: " + "; ".join(f.message for f in built[:3]), exit=FAILED,
+                             detail={"findings": [f"{f.where}: {f.message}" for f in built]})
+        try:
+            findings, notes, rows = vscode_tests.run(ctx.home, stage_dir, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")), "",
+                                                     ctx.toolchain().clean_env(), folders, str(suite_dir) if suite_dir else None, screenshots=shots)
+        except vscode_tests.DisplayError as e:
+            raise AgoraError("no-display", f"the real VS Code did not run: {e}", exit=MISSING) from e
     if report:
         Path(report).expanduser().write_text(json.dumps({"tests": rows}, indent=2) + "\n", encoding="utf-8")
     data = {"suite": str(suite_dir) if suite_dir else None, "screenshots": sorted(p.name for p in shots.glob("*.png")) if shots else None,
@@ -109,9 +138,9 @@ def extension_test(ctx: Ctx, suite: str | None, screenshots: str | None, workspa
     return Resource("extension", "test", data)
 
 
-@command("extension build", category="build", toolchain=("vsce",),
-         help="Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock")
-def extension_build(ctx: Ctx) -> Resource:
+@command("extension build", category="build", toolchain=("extension-build",),
+         help="Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock")
+def extension_build_command(ctx: Ctx) -> Resource:
     exe = _node(ctx)
     problems = extension.manifest_findings(ctx.home)
     if problems:
@@ -122,8 +151,17 @@ def extension_build(ctx: Ctx) -> Resource:
     data = {"vsix": rel, "dry_run": ctx.dry_run, "changes": [{"path": rel, "change": "modify" if out.exists() else "create", "added": 0,
                                                               "removed": 0, "diff": []}]}
     if not ctx.dry_run:
-        resolved = ctx.toolchain().use(["vsce"])
-        done = extension.package(ctx.home, exe, str(resolved.path_of("vsce")), out, resolved.env())
+        resolved = ctx.toolchain().use(["extension-build"])
+        env = resolved.env()
+        with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
+            stage_dir = extension.stage(ctx.home, resolved.path_of("extension-modules"), Path(tmp))
+            found = extension.typecheck(stage_dir, exe, str(resolved.path_of("tsc")), env)
+            found += extension.lint(stage_dir, exe, str(resolved.path_of("eslint")), env)
+            found += extension.bundle(stage_dir, exe, env)
+            if found:
+                raise AgoraError("invalid-extension", f"the extension does not build: {len(found)} problem{'s' if len(found) != 1 else ''}; first: " + "; ".join(f.message for f in found[:3]),
+                                 exit=FAILED, detail={"findings": [f"{f.where}: {f.message}" for f in found]})
+            done = extension.package(stage_dir, exe, str(resolved.path_of("vsce")), out, env)
         if done.returncode != 0 or not out.is_file():
             raise AgoraError("build", "vsce could not pack the extension: " + (done.stderr or done.stdout).strip()[-500:], exit=FAILED)
         data["bytes"] = out.stat().st_size

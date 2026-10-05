@@ -65,8 +65,8 @@ jobs:
       - name: Brand imagery
         run: ./agora check --suite images
 
-  # The IF Console extension (0043-if-console FR-028, FR-032): its unit tests on Node, and its tests inside a real VS Code under a
-  # display server. VS Code's shared libraries and the display server are the documented one-time setup.
+  # The IF Console extension (0043-if-console FR-028, FR-032, FR-035): its TypeScript type-checked and linted, its unit tests on Node, and
+  # its tests inside a real VS Code under a display server. VS Code's shared libraries and the display server are the documented one-time setup.
   extension:
     runs-on: ubuntu-latest
     steps:
@@ -81,5 +81,5 @@ jobs:
           key: agora-toolchain-${{ runner.os }}-${{ hashFiles('tools/agora/toolchain/**', 'tools/if-console/package-lock.json', 'tools/agora/core/toolchain.py') }}
       - name: VS Code's system libraries and the display server (one-time setup; nothing to do when the runner has them)
         run: ./agora system add --yes
-      - name: The extension, on Node and in a real VS Code
+      - name: The extension, type-checked, linted, on Node and in a real VS Code
         run: ./agora check --suite extension

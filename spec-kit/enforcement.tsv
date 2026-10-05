@@ -1066,14 +1066,14 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-025	none	-	plain language is a review of each message; theme icons and accessibility labels are set in the code and not tested for reading
 0043-if-console FR-026	check	.github: agora check extension	tests scan the code for any write and a session leaves the clone unchanged
 0043-if-console FR-027	check	.github: agora check toolchain	the lock of tools/if-console is checked (hashes, exact pins, no runtime dependency); agora extension build is tested by agora test
-0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the unit tests under node (the node runner), the real VS Code tests (the vscode runner) and the lint
+0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the TypeScript unit tests under node (the node runner), the real VS Code tests (the vscode runner) and the type check and lint
 0043-if-console FR-029	none	-	no check; installation is a person's act
 0043-if-console FR-030	check	.github: agora check extension	the manifest's engine is checked; the features that need a newer VS Code are feature-detected and tested (MCP)
 0043-if-console FR-031	check	.github: agora check extension	Learn tests with the stand-in, and the real VS Code run lists a repository's help topics
 0043-if-console FR-032	check	.github: agora check extension	agora check extension --runner vscode runs the tests of tools/if-console/test/vscode/ in a real VS Code under Xvfb; a run that cannot start is skipped naming the cause
 0043-if-console FR-033	check	.github: agora check extension	unit tests: the hook exists only in test mode and answers once; the real VS Code run answers a decision modal through it, and the never-tests scan the source for any other path
 0043-if-console FR-034	check	.github: agora test	test_extension: extension test runs the suite it is given in a workspace of this clone and the folders named, fails on a failed test and exits 3 where the display server is missing
-0043-if-console FR-035	none	-	not built yet; agora check extension will run the type check and ESLint and read the lock; agora check toolchain will read the npm lock
+0043-if-console FR-035	check	.github: agora check extension	agora check extension type-checks (tsc, strict), lints (ESLint, type-checked rules) and bundles the TypeScript, reads the manifest's main, the package's ignore rules and the codicon list against the locked glyph map, and loads the bundle under the stand-in; agora check toolchain reads the npm lock; agora extension build is tested by agora test
 0043-if-console FR-036	none	-	not built yet; agora check extension will read the manifest's views and the real VS Code run will list them
 0043-if-console FR-037	none	-	not built yet; agora check extension will test Home and its welcome content with the stand-in and in a real VS Code
 0043-if-console FR-038	none	-	not built yet; agora check extension will test the row mapping and the menus with the stand-in and read the manifest

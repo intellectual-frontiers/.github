@@ -13,7 +13,7 @@ from unittest import mock
 from agora.core.resource import AgoraError
 from agora.core.toolchain import Toolchain
 from agora.lib import extension, vscode_tests
-from agora.toolchain import vsce
+from agora.toolchain import extension_build
 
 from .helpers import HOME, run_json
 
@@ -48,8 +48,8 @@ class ExtensionRules(unittest.TestCase):
         (ext / "package.json").write_text(json.dumps(pkg))
         self.assertTrue(any("if-console.nothing" in f.message for f in extension.manifest_findings(root)))
 
-    def test_the_lock_pins_the_build_tool_with_integrity_hashes(self):
-        self.assertEqual(vsce.lock_problems(), [])
+    def test_the_lock_pins_every_build_tool_at_one_version_with_integrity_hashes(self):
+        self.assertEqual(extension_build.lock_problems(), [])
 
     def test_build_dry_run_names_the_package_and_writes_nothing(self):
         done = subprocess.run([str(HOME / "agora"), "extension", "build", "--dry-run", "--json", "--no-log"], capture_output=True, text=True)
@@ -59,15 +59,30 @@ class ExtensionRules(unittest.TestCase):
         self.assertEqual(doc["data"]["changes"][0]["path"], doc["data"]["vsix"])
 
 
+class FakeTools:
+    """What the toolchain hands over, without a cache: every program is a path under /x, and the extension's staging and programs are patched out."""
+
+    def env(self, extra=None):
+        return {}
+
+    def path_of(self, name):
+        return Path("/x") / name
+
+
 class Runners(unittest.TestCase):
     """`check extension [--runner node|vscode]`: what could not run is skipped, never passed (0042 FR-013; 0043 FR-032)."""
 
-    def check(self, *argv, use=None, vscode=None):
+    def check(self, *argv, use=None, vscode=None, typecheck=None):
         patches = [mock.patch("agora.core.worker.needs_worker", return_value=False),
-                   mock.patch.object(extension, "lint_findings", return_value=[]),
+                   mock.patch.object(extension, "stage", return_value=Path("/stage")),
+                   mock.patch.object(extension, "source_findings", return_value=[]),
+                   mock.patch.object(extension, "codicon_findings", return_value=[]),
+                   mock.patch.object(extension, "typecheck", return_value=typecheck or []),
+                   mock.patch.object(extension, "lint", return_value=[]),
+                   mock.patch.object(extension, "bundle", return_value=[]),
+                   mock.patch.object(extension, "compile_tests", return_value=[]),
                    mock.patch.object(extension, "run_tests", return_value=([], ["node's test runner: 1 of 1 passed, 0 skipped"]))]
-        if use is not None:
-            patches.append(mock.patch.object(Toolchain, "use", use))
+        patches.append(mock.patch.object(Toolchain, "use", use or (lambda _toolchain, names: FakeTools())))
         if vscode is not None:
             patches.append(mock.patch.object(vscode_tests, "run", vscode))
         for p in patches:
@@ -81,50 +96,65 @@ class Runners(unittest.TestCase):
         self.assertEqual((code, sec["status"]), (3, "skipped"))
         self.assertIn("design-systems", sec["reason"])
 
-    def test_the_node_runner_never_touches_the_toolchain(self):
-        def refuse(self, names):
-            raise AssertionError("the node runner fetched " + ", ".join(names))
-        code, sec = self.check("--runner", "node", use=refuse)
+    def test_the_node_runner_uses_the_extensions_build_entry_and_never_vscode(self):
+        asked = []
+
+        def use(self, names):
+            asked.append(list(names))
+            return FakeTools()
+        code, sec = self.check("--runner", "node", use=use)
         self.assertEqual((code, sec["status"]), (0, "passed"))
+        self.assertEqual(asked, [["extension-build"]])
         self.assertTrue(any("node's test runner" in n for n in sec["notes"]))
+        self.assertTrue(any("tsc" in n and "ESLint" in n for n in sec["notes"]))
+
+    def test_a_type_error_fails_the_section_where_it_is(self):
+        from agora.core.checks import Finding
+        code, sec = self.check("--runner", "node", typecheck=[Finding("error", "tools/if-console/src/app.ts:3", "type error TS2322: nope")])
+        self.assertEqual((code, sec["status"]), (1, "failed"))
+        self.assertEqual(sec["findings"][0]["where"], "tools/if-console/src/app.ts:3")
+
+    def test_without_the_build_entry_the_section_is_skipped_naming_the_cause_and_what_could_run_is_still_said(self):
+        def lacking(self, names):
+            raise AgoraError("offline", "offline, and the toolchain cache lacks: extension-build", exit=3)
+        code, sec = self.check("--runner", "node", use=lacking)
+        self.assertEqual((code, sec["status"]), (3, "skipped"))
+        self.assertIn("extension-build", sec["reason"])
+        self.assertTrue(any("manifest and source rules" in n for n in sec["notes"]))
 
     def test_the_vscode_runner_skips_naming_the_cause_when_the_toolchain_cannot_be_had(self):
         def lacking(self, names):
-            raise AgoraError("system-libraries", "vscode needs system libraries this host lacks (Xvfb); run `agora system add` once", exit=3)
+            if "vscode" in names:
+                raise AgoraError("system-libraries", "vscode needs system libraries this host lacks (Xvfb); run `agora system add` once", exit=3)
+            return FakeTools()
         code, sec = self.check("--runner", "vscode", use=lacking)
         self.assertEqual((code, sec["status"]), (3, "skipped"))
         self.assertIn("agora system add", sec["reason"])
 
     def test_with_no_runner_a_part_that_could_not_run_makes_the_section_skipped_not_passed(self):
         def lacking(self, names):
-            raise AgoraError("offline", "offline, and the toolchain cache lacks: vscode 1.140.0", exit=3)
+            if "vscode" in names:
+                raise AgoraError("offline", "offline, and the toolchain cache lacks: vscode 1.140.0", exit=3)
+            return FakeTools()
         code, sec = self.check(use=lacking)
         self.assertEqual((code, sec["status"]), (3, "skipped"))
         self.assertTrue(any("node's test runner" in n for n in sec["notes"]), "what did run is still said")
 
     def test_no_display_server_is_a_skip_naming_the_setup_command(self):
-        class Resolved:
-            env = lambda self, extra=None: {}
-            def path_of(self, name):
-                return Path("/x") / name
         def display(*a, **kw):
             raise vscode_tests.DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system add` once")
         with mock.patch.object(extension, "package", return_value=mock.Mock(returncode=0)), \
                 mock.patch("pathlib.Path.is_file", return_value=True):
-            code, sec = self.check("--runner", "vscode", use=lambda self, names: Resolved(), vscode=display)
+            code, sec = self.check("--runner", "vscode", vscode=display)
         self.assertEqual((code, sec["status"]), (3, "skipped"))
         self.assertIn("Xvfb", sec["reason"])
 
     def test_a_failing_vscode_test_fails_the_section_with_its_reason(self):
-        class Resolved:
-            env = lambda self, extra=None: {}
-            def path_of(self, name):
-                return Path("/x") / name
         from agora.core.checks import Finding
         failing = lambda *a, **kw: ([Finding("error", "tools/if-console/test/vscode", "fails in a real VS Code: trusted: a thing")], ["real VS Code: 0 of 1 tests passed"], [])
         with mock.patch.object(extension, "package", return_value=mock.Mock(returncode=0)), \
                 mock.patch("pathlib.Path.is_file", return_value=True):
-            code, sec = self.check("--runner", "vscode", use=lambda self, names: Resolved(), vscode=failing)
+            code, sec = self.check("--runner", "vscode", vscode=failing)
         self.assertEqual((code, sec["status"]), (1, "failed"))
         self.assertIn("fails in a real VS Code", sec["findings"][0]["message"])
 
@@ -153,7 +183,7 @@ class VscodeRun(unittest.TestCase):
             def __enter__(self): return self
             def __exit__(self, *a): pass
         with mock.patch.object(vscode_tests, "Display", Display):
-            return vscode_tests.run(HOME, self.fake_node(report), "/c/code", "/c/bin/code", "/c/test-electron", "x.vsix", {"PATH": "/usr/bin:/bin"})
+            return vscode_tests.run(HOME, HOME / "tools" / "if-console", self.fake_node(report), "/c/code", "/c/bin/code", "/c/test-electron", "x.vsix", {"PATH": "/usr/bin:/bin"})
 
     def test_a_report_of_passed_tests_is_notes_and_rows_and_no_findings(self):
         findings, notes, rows = self.run_with({"tests": [{"name": "trusted: a", "status": "passed", "seconds": 1.5}], "errors": []})
@@ -190,16 +220,15 @@ class ExternalSuite(unittest.TestCase):
         (self.tmp / "suite" / "index.js").write_text("exports.run = async () => {};\n")
         (self.tmp / "other").mkdir()
 
-        class Resolved:
-            env = lambda self, extra=None: {}
-            def path_of(self, name):
-                return Path("/x") / name
-        self.resolved = Resolved()
+        self.resolved = FakeTools()
 
     def go(self, *argv, vscode, use=None):
         patches = [mock.patch("agora.core.worker.needs_worker", return_value=False),
                    mock.patch.object(Toolchain, "use", use or (lambda _toolchain, names: self.resolved)),
                    mock.patch.object(Toolchain, "clean_env", lambda _toolchain: {}),
+                   mock.patch.object(extension, "stage", return_value=Path("/stage")),
+                   mock.patch.object(extension, "bundle", return_value=[]),
+                   mock.patch.object(extension, "compile_tests", return_value=[]),
                    mock.patch("agora.groups.extension.commands._node", return_value="/n/node"),
                    mock.patch.object(vscode_tests, "run", vscode)]
         for p in patches:
@@ -210,7 +239,7 @@ class ExternalSuite(unittest.TestCase):
     def test_the_suite_and_folders_are_passed_on_and_a_pass_is_a_resource(self):
         seen = {}
 
-        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
+        def fake(home, ext, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
             seen.update(folders=folders, suite=suite, vsix=vsix, screenshots=screenshots)
             return [], ["real VS Code: 2 of 2 tests passed in 1.0s"], [{"name": "x: a", "status": "passed", "seconds": 1}, {"name": "x: b", "status": "passed", "seconds": 1}]
         report = self.tmp / "r.json"
@@ -225,7 +254,7 @@ class ExternalSuite(unittest.TestCase):
     def test_screenshots_are_a_run_of_their_own_into_a_folder_and_a_suite_with_them_is_a_usage_error(self):
         seen = {}
 
-        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
+        def fake(home, ext, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
             seen.update(suite=suite, screenshots=screenshots)
             screenshots.mkdir(parents=True, exist_ok=True)
             (screenshots / "dark-views.png").write_bytes(b"x")
@@ -261,3 +290,104 @@ class ExternalSuite(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SourceRules(unittest.TestCase):
+    """The TypeScript, its types and its codicon ids (0043 FR-035): what `check extension` reads and what it asks tsc and ESLint."""
+
+    def copy(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        dest = Path(tmp.name) / "tools" / "if-console"
+        shutil.copytree(HOME / "tools" / "if-console", dest, ignore=shutil.ignore_patterns("node_modules", "dist", "out"))
+        return Path(tmp.name), dest
+
+    def test_the_manifest_runs_the_bundle_and_the_package_leaves_out_what_is_not_the_bundle(self):
+        pkg = json.loads((HOME / "tools" / "if-console" / "package.json").read_text())
+        self.assertEqual(pkg["main"], "./dist/extension.js")
+        self.assertFalse(pkg.get("dependencies"))
+        kept = (HOME / "tools" / "if-console" / ".vscodeignore").read_text().split()
+        for need in ("src/**", "test/**", "**/*.map"):
+            self.assertIn(need, kept)
+
+    def test_a_main_that_is_not_the_bundle_a_loose_tsconfig_and_a_package_that_keeps_its_sources_are_each_found(self):
+        root, ext = self.copy()
+        pkg = json.loads((ext / "package.json").read_text())
+        pkg["main"] = "./src/extension.js"
+        (ext / "package.json").write_text(json.dumps(pkg))
+        tsconfig = json.loads((ext / "tsconfig.json").read_text())
+        tsconfig["compilerOptions"]["strict"] = False
+        (ext / "tsconfig.json").write_text(json.dumps(tsconfig))
+        (ext / ".vscodeignore").write_text("test/**\n")
+        found = " | ".join(f.message for f in extension.manifest_findings(root))
+        self.assertIn("main is './src/extension.js'", found)
+        self.assertIn("strict must be true", found)
+        self.assertIn("exclude src/**", found)
+        self.assertIn("exclude **/*.map", found)
+
+    def test_an_import_of_a_package_the_extension_does_not_carry_and_a_name_it_must_not_know_are_found(self):
+        root, ext = self.copy()
+        (ext / "src" / "bad.ts").write_text("import left from 'left-pad';\nimport * as http from 'http';\n// a name that must not be known\nexport const eid = 1;\n")
+        found = [f.message for f in extension.source_findings(root, ["eid"])]
+        self.assertTrue(any("imports left-pad" in m for m in found), found)
+        self.assertTrue(any("imports http" in m for m in found), found)
+        self.assertTrue(any("names eid" in m for m in found), found)
+        self.assertEqual(extension.source_findings(HOME, []), [])
+
+    def test_the_webview_may_import_vscode_elements_and_no_other_file_may(self):
+        root, ext = self.copy()
+        (ext / "src" / "webview" / "main.ts").write_text("import '@vscode-elements/elements/dist/vscode-button/index.js';\n")
+        self.assertEqual(extension.source_findings(root, []), [])
+        (ext / "src" / "app.ts").write_text("import '@vscode-elements/elements/dist/vscode-button/index.js';\n")
+        self.assertTrue(any("app.ts" in f.where for f in extension.source_findings(root, [])))
+
+    def test_the_codicon_list_is_the_locked_packages_glyph_map_and_says_which(self):
+        root, ext = self.copy()
+        (root / "tools" / "agora" / "lib").mkdir(parents=True)
+        listed = HOME / "tools" / "agora" / "lib" / "codicons.txt"
+        shutil.copyfile(listed, root / "tools" / "agora" / "lib" / "codicons.txt")
+        names = [l for l in listed.read_text().splitlines() if l and not l.startswith("#")]
+        mapping = Path(tempfile.mkdtemp()) / "mapping.json"
+        self.addCleanup(shutil.rmtree, mapping.parent, True)
+        mapping.write_text(json.dumps({"60000": names[:300], "60001": names[300:]}))
+        self.assertEqual(extension.codicon_findings(root, mapping, "0.0.45"), [])
+        mapping.write_text(json.dumps({"60000": names[:-1] + ["brand-new"]}))
+        found = " | ".join(f.message for f in extension.codicon_findings(root, mapping, "0.0.45"))
+        self.assertIn(f"{names[-1]} is not a codicon of @vscode/codicons 0.0.45", found)
+        self.assertIn("brand-new is a codicon of @vscode/codicons 0.0.45 that the list lacks", found)
+        self.assertIn("does not name @vscode/codicons 0.0.46", " | ".join(f.message for f in extension.codicon_findings(root, mapping, "0.0.46")))
+
+    def test_tsc_and_eslint_output_become_findings_at_the_repositorys_own_paths(self):
+        stage = Path("/tmp/agora-extension-x/if-console")
+        tsc = mock.Mock(returncode=2, stdout="src/app.ts(12,5): error TS2322: Type 'a' is not assignable to type 'b'.\n  more\n", stderr="")
+        with mock.patch.object(extension, "_run", return_value=tsc):
+            found = extension.typecheck(stage, "node", "tsc", {})
+        self.assertEqual(found[0].where, "tools/if-console/src/app.ts:12")
+        self.assertIn("TS2322", found[0].message)
+        report = json.dumps([{"filePath": str(stage / "src" / "x.ts"), "messages": [{"ruleId": "@typescript-eslint/no-explicit-any", "severity": 2, "message": "no any", "line": 4}]}])
+        with mock.patch.object(extension, "_run", return_value=mock.Mock(returncode=1, stdout=report, stderr="")):
+            lint = extension.lint(stage, "node", "eslint", {})
+        self.assertEqual((lint[0].where, "no-explicit-any" in lint[0].message), ("tools/if-console/src/x.ts:4", True))
+        with mock.patch.object(extension, "_run", return_value=mock.Mock(returncode=2, stdout="", stderr="boom")):
+            self.assertIn("did not run", extension.lint(stage, "node", "eslint", {})[0].message)
+            self.assertIn("tsc failed", extension.typecheck(stage, "node", "tsc", {})[0].message)
+
+    def test_the_staged_copy_holds_the_sources_beside_the_locked_modules_and_none_of_what_is_built(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        modules = Path(tmp.name) / "tree" / "node_modules"
+        modules.mkdir(parents=True)
+        staged = extension.stage(HOME, modules, Path(tmp.name) / "stage")
+        self.assertTrue((staged / "src" / "extension.ts").is_file())
+        self.assertTrue((staged / "esbuild.mjs").is_file())
+        self.assertEqual((staged / "node_modules").resolve(), modules.resolve())
+        self.assertFalse((staged / "dist").exists())
+
+    def test_the_build_entry_pins_the_engines_own_types_and_the_lock_agrees(self):
+        self.assertEqual(extension_build.PACKAGES["@types/vscode"], "1.101.0")
+        pkg = json.loads((HOME / "tools" / "if-console" / "package.json").read_text())
+        self.assertEqual(pkg["engines"]["vscode"], "^" + extension_build.PACKAGES["@types/vscode"])
+        pkg["engines"]["vscode"] = "^1.140.0"
+        real = (HOME / "tools" / "if-console" / "package.json")
+        with mock.patch.object(Path, "read_text", lambda self, *a, **k: json.dumps(pkg) if self == real else real.read_bytes().decode()):
+            self.assertTrue(any("@types/vscode is 1.101.0 and the engine is 1.140.0" in p for p in extension_build.lock_problems()))
