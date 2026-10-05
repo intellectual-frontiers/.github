@@ -6,6 +6,8 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov:    <http://www.w3.org/ns/prov#> .
 @prefix schema:  <https://schema.org/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
 # Intellectual Frontiers — web content ontology (PUBLIC).
 #
@@ -182,3 +184,42 @@ ifweb:PromotionPost a owl:Class, sh:NodeShape ;
     sh:property [ sh:path schema:about ; sh:maxCount 1 ] ;
     sh:property [ sh:path dcterms:references ; sh:minCount 1 ;
         sh:or ( [ sh:class ifcore:SubstantialWork ] [ sh:class ifcore:Presentation ] [ sh:class schema:Periodical ] [ sh:class schema:PublicationIssue ] [ sh:class schema:Article ] ) ] .
+
+# ───────────────────────── Publishing destinations (0044-public-website FR-016 – FR-023) ─────────────────────────
+
+ifweb:PublishingDestination a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifcore:Fact ;
+    rdfs:label "Publishing destination"@en ;
+    rdfs:comment "A host a web property's generated files are published to through one publishing command (0044-public-website FR-018). It names the vendor service that hosts it, its publishing strategy, the file holding its configuration and the file holding its deployment record (FR-021); the credentials it needs are read from the environment and named nowhere (FR-022). Pointing a domain at it is a Decision, not a property of it (FR-019)."@en ;
+    sh:targetClass ifweb:PublishingDestination ;
+    sh:property [ sh:path ifweb:destinationOf ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A publishing destination names the web property it publishes (0044 FR-018)." ] ;
+    sh:property [ sh:path ifweb:hostedBy ; sh:class ifcore:VendorService ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A publishing destination names the vendor service that hosts it (0044 FR-018)." ] ;
+    sh:property [ sh:path ifweb:publishingStrategy ; sh:class skos:Concept ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A publishing destination names its publishing strategy (0044 FR-018, FR-019)." ] ;
+    sh:property [ sh:path ifweb:publishingCommand ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ifweb:configurationFile ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A publishing destination names the file holding its configuration (0044 FR-018)." ] ;
+    sh:property [ sh:path ifweb:deploymentRecordFile ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A publishing destination names the file holding its deployment record (0044 FR-018, FR-021)." ] .
+
+ifweb:destinationOf a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ;
+    rdfs:comment "The web property whose generated files this destination serves (0044 FR-018)."@en .
+ifweb:hostedBy a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range ifcore:VendorService ;
+    rdfs:comment "The vendor service, in the vendor register, that hosts the destination (0044 FR-018; 0037-vendor-management-policy)."@en .
+ifweb:publishingStrategy a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range skos:Concept ;
+    rdfs:comment "How a publish reaches the destination's readers, a concept in ifweb:PublishingStrategyScheme (0044 FR-019)."@en .
+ifweb:publishingCommand a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+    rdfs:comment "The one command that publishes to the destination, as a person types it (0044 FR-018)."@en .
+ifweb:configurationFile a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+    rdfs:comment "The repository path of the file holding the destination's configuration: no credential is ever in it (0044 FR-018, FR-022)."@en .
+ifweb:deploymentRecordFile a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+    rdfs:comment "The repository path of the file every publish to the destination appends a record to (0044 FR-021)."@en .
+
+ifweb:PublishingStrategyScheme a skos:ConceptScheme ; rdfs:label "Publishing strategy"@en ;
+    ifcore:hasAudience ifcore:Public .
+ifweb:PreviewThenPromote a skos:Concept ; skos:inScheme ifweb:PublishingStrategyScheme ; skos:prefLabel "Preview, then promote"@en ;
+    skos:definition "Every publish makes a preview at the destination's own preview address; only a publish that names who decides and why is promoted to the destination's production, and pointing a domain at the destination is a separate Decision (0044 FR-019)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
