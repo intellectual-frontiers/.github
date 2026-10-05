@@ -535,7 +535,7 @@ The one prerequisite beyond python3 and uv: the shared libraries a browser and V
 |===
 |Usage |Category |Where it runs |What it does
 
-|`agora system add [--yes]`
+|`agora system ensure [--yes]`
 |setup
 |terminal
 |Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself
@@ -575,7 +575,7 @@ The programs outside Python that commands need: pinned, fetched once into a per-
 |===
 |Usage |Category |Where it runs |What it does
 
-|`agora toolchain add [ENTRY...]`
+|`agora toolchain ensure [ENTRY...]`
 |setup
 |terminal, editor
 |Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check

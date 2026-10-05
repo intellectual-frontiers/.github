@@ -263,7 +263,7 @@ def doctor(ctx: Ctx) -> Resource:
     toolchain_rows = []
     for e in tc.entries.values():
         state = tc.state(e)
-        hint = (f"fetched on first use, or `{reg.name} toolchain add {e.name}`" if state == "missing" else
+        hint = (f"fetched on first use, or `{reg.name} toolchain ensure {e.name}`" if state == "missing" else
                 f"set {e.variable} to a program of your own" if state == "no build" else "")
         toolchain_rows.append({"entry": e.name, "version": e.version, "platform": tc.platform,
                                "cache": "ready" if state == "ready" else "not fetched" if state == "missing" else state,
@@ -274,7 +274,7 @@ def doctor(ctx: Ctx) -> Resource:
     gone = system.missing(libs, fam)
     libraries = {"distribution": fam.label, "pinned list": "yes" if fam.packages else "none",
                  "missing": [f"{lib} ({pkg or 'no package listed'})" for lib, pkg in gone],
-                 "hint": f"run `{reg.name} system add` once (it asks before sudo; --dry-run prints what it runs)" if gone else ""}
+                 "hint": f"run `{reg.name} system ensure` once (it asks before sudo; --dry-run prints what it runs)" if gone else ""}
     if gone:
         missing.append("browser system libraries")
     # An opt-in override stands in for an entry or a package the person names (0025 FR-019): doctor lists each one that is set.
@@ -295,7 +295,7 @@ def doctor(ctx: Ctx) -> Resource:
     if problems or missing:
         res.actions = [next_command("run the doctor again", "doctor")]
     # What can be fetched, as actions an editor lists as chores (0043 FR-019): each entry not yet in the cache.
-    res.actions += [next_command(f"fetch {r['entry']}", "toolchain add", entries=[r["entry"]]) for r in toolchain_rows
+    res.actions += [next_command(f"fetch {r['entry']}", "toolchain ensure", entries=[r["entry"]]) for r in toolchain_rows
                     if r["cache"] == "not fetched" and not ctx.offline]
     return res
 

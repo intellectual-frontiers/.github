@@ -339,11 +339,11 @@ Nothing here loses your work. When something fails, read what it says first: it 
 
 ==== A program or library is missing
 
-Fetch the toolchain, and install the system libraries once.
+Ensure the toolchain is in the cache and the system libraries are installed, once.
 
 ----
-./agora toolchain add
-./agora system add --dry-run
+./agora toolchain ensure
+./agora system ensure --dry-run
 ----
 
 ==== A download did not match its fingerprint
@@ -379,7 +379,7 @@ What a command did is kept, untracked, under .agora/logs/, one line each, for yo
 
 * See what is wrong: `agora doctor`
 * Prove the generated files are current: `agora fresh`
-* Fetch the toolchain: `agora toolchain add`
+* Ensure the toolchain: `agora toolchain ensure`
 * List the system libraries and which are present: `agora system list`
 * Gather a report to paste: `agora context command:check`
 
@@ -454,8 +454,8 @@ From the root of your clone, ask agora how it finds your machine. It lists what 
 The browser and VS Code need a few shared libraries and a display server that only an administrator can install. One command does it, and it is the only command that uses sudo. It prints exactly what it will run and asks before it runs anything; with --dry-run it prints and stops.
 
 ----
-./agora system add --dry-run
-./agora system add
+./agora system ensure --dry-run
+./agora system ensure
 ----
 
 
@@ -466,7 +466,7 @@ On a distribution other than Debian or Ubuntu it names the libraries and stops, 
 agora keeps the programs outside Python in a toolchain: TeX, a browser, Java, VS Code and a few more, each at one exact version, checked against its fingerprint before it is used. This fetches all of them into your cache. If you skip it, each command fetches what it needs the first time. The files are large; they are fetched once.
 
 ----
-./agora toolchain add
+./agora toolchain ensure
 ----
 
 
@@ -492,8 +492,8 @@ Run the checks. `agora help check` says which.
 ==== Steps
 
 * See what agora needs and what is present: `agora doctor`
-* Install the system libraries (asks before it uses sudo): `agora system add` (asks for your password through sudo)
-* Fetch the toolchain: `agora toolchain add`
+* Ensure the system libraries (asks before it uses sudo): `agora system ensure` (asks for your password through sudo)
+* Ensure the toolchain: `agora toolchain ensure`
 * See the toolchain's state: `agora toolchain list`
 * List the commands: `agora command list`
 * Run the quick checks: `agora check --suite spec`
@@ -517,7 +517,7 @@ agora needs more than Python: TeX, a browser, Java, VS Code. It does not use the
 Each command fetches what it needs the first time, so this is only for fetching ahead of time. Every entry also runs its own small test after it is unpacked.
 
 ----
-./agora toolchain add
+./agora toolchain ensure
 ----
 
 ==== Offline
@@ -536,6 +536,6 @@ A few shared libraries and a display server cannot be fetched without administra
 
 * List the entries: `agora toolchain list`
 * Show one entry: `agora toolchain show`
-* Fetch every entry: `agora toolchain add`
+* Ensure every entry: `agora toolchain ensure`
 * List the system libraries and which are present: `agora system list`
 * See what is present: `agora doctor`

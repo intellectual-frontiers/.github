@@ -15,7 +15,7 @@ def toolchain():
              "    ./agora toolchain list\n    ./agora toolchain show chromium"),
             ("Fetch them",
              "Each command fetches what it needs the first time, so this is only for fetching ahead of time. Every entry also "
-             "runs its own small test after it is unpacked.\n\n    ./agora toolchain add"),
+             "runs its own small test after it is unpacked.\n\n    ./agora toolchain ensure"),
             ("Offline",
              "With --offline nothing is downloaded. A command that needs something not in the cache stops and names it; "
              "fetch it while you are online."),
@@ -29,7 +29,7 @@ def toolchain():
         "steps": (
             Step("List the entries", "toolchain list"),
             Step("Show one entry", "toolchain show"),
-            Step("Fetch every entry", "toolchain add"),
+            Step("Ensure every entry", "toolchain ensure"),
             Step("List the system libraries and which are present", "system list"),
             Step("See what is present", "doctor"),
         ),
@@ -174,7 +174,7 @@ def recover():
              "0 is success. 1 means what you checked failed. 2 means the command was used wrongly. 3 means something is missing: "
              "a package, a toolchain entry or a library, and the message names it."),
             ("A program or library is missing",
-             "Fetch the toolchain, and install the system libraries once.\n\n    ./agora toolchain add\n    ./agora system add --dry-run"),
+             "Ensure the toolchain is in the cache and the system libraries are installed, once.\n\n    ./agora toolchain ensure\n    ./agora system ensure --dry-run"),
             ("A download did not match its fingerprint",
              "agora deleted it and unpacked nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, "
              "something is wrong with the source, and the entry's pin should be looked at, not worked around."),
@@ -190,7 +190,7 @@ def recover():
         "steps": (
             Step("See what is wrong", "doctor"),
             Step("Prove the generated files are current", "fresh"),
-            Step("Fetch the toolchain", "toolchain add"),
+            Step("Ensure the toolchain", "toolchain ensure"),
             Step("List the system libraries and which are present", "system list"),
             Step("Gather a report to paste", "context", {"resource": "command:check"}),
         ),

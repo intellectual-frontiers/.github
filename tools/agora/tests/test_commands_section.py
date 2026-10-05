@@ -61,7 +61,7 @@ class CommandsSection(unittest.TestCase):
         readme.write_text("# only a title\n")
         code, found = self.findings()
         self.assertEqual(code, 1)
-        for want in ("does not link to the guide", "the one-time system add", "the help command"):
+        for want in ("does not link to the guide", "the one-time system ensure", "the help command"):
             self.assertTrue(any(want in x for x in found), want)
         readme.write_text(kept + "\nmore\n" * 130)
         code, found = self.findings()

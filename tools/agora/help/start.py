@@ -19,14 +19,14 @@ def start():
             ("3. Install the system libraries, once",
              "The browser and VS Code need a few shared libraries and a display server that only an administrator can install. "
              "One command does it, and it is the only command that uses sudo. It prints exactly what it will run and asks "
-             "before it runs anything; with --dry-run it prints and stops.\n\n    ./agora system add --dry-run\n    ./agora system add\n\n"
+             "before it runs anything; with --dry-run it prints and stops.\n\n    ./agora system ensure --dry-run\n    ./agora system ensure\n\n"
              "On a distribution other than Debian or Ubuntu it names the libraries and stops, and you install them with your own "
              "package manager."),
             ("4. Fetch the programs, once",
              "agora keeps the programs outside Python in a toolchain: TeX, a browser, Java, VS Code and a few more, each at one "
              "exact version, checked against its fingerprint before it is used. This fetches all of them into your cache. If you "
              "skip it, each command fetches what it needs the first time. The files are large; they are fetched once.\n\n"
-             "    ./agora toolchain add\n\nTo see what is there first:\n\n    ./agora toolchain list"),
+             "    ./agora toolchain ensure\n\nTo see what is there first:\n\n    ./agora toolchain list"),
             ("5. Look around",
              "Every command is listed, and each says what it does. The topics here are the rest of the learning.\n\n"
              "    ./agora command list\n    ./agora help"),
@@ -35,8 +35,8 @@ def start():
         ),
         "steps": (
             Step("See what agora needs and what is present", "doctor"),
-            Step("Install the system libraries (asks before it uses sudo)", "system add", note="asks for your password through sudo"),
-            Step("Fetch the toolchain", "toolchain add"),
+            Step("Ensure the system libraries (asks before it uses sudo)", "system ensure", note="asks for your password through sudo"),
+            Step("Ensure the toolchain", "toolchain ensure"),
             Step("See the toolchain's state", "toolchain list"),
             Step("List the commands", "command list"),
             Step("Run the quick checks", "check", {"suite": "spec"}),

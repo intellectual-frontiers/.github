@@ -559,7 +559,7 @@ knowledge (FR-003).
 - A decision modal in a test: answered through the test hook, which exists only
   in test mode; an installed extension has none, per FR-033.
 - A real VS Code run on a host with no display server: skipped with the cause
-  and `agora system add`, per FR-032.
+  and `agora system ensure`, per FR-032.
 
 ## Assumptions
 
@@ -580,7 +580,7 @@ knowledge (FR-003).
   Until then the extension uses the noun's `list` command (FR-013).
 - **OQ-2**: Answered by FR-032. VS Code is a toolchain entry with the vendor's
   checksum; the display server is `Xvfb`, which has no download and is
-  installed with VS Code's libraries by `system add` (0042-agora FR-030), so the
+  installed with VS Code's libraries by `system ensure` (0042-agora FR-030), so the
   host still needs only `python3` and `uv` and one documented `sudo` setup.
 - **OQ-3**: Whether a file open in the editor maps to a resource for `Copy
   Context` through a `file` resource kind each orchestrator declares, or the

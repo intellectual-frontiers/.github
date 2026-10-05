@@ -153,7 +153,7 @@ README_MAX_LINES = 120  # 0042 FR-036
 
 
 def check_readme(home: Path, registry) -> list[Finding]:
-    """0042 FR-036: the README is the short way in: it links to the guide, names the one-time `system add` and `help`, and stays short."""
+    """0042 FR-036: the README is the short way in: it links to the guide, names the one-time `system ensure` and `help`, and stays short."""
     readme = home / "README.md"
     if not readme.is_file():
         return [Finding("error", "README.md", "is missing (0042 FR-036)")]
@@ -161,7 +161,7 @@ def check_readme(home: Path, registry) -> list[Finding]:
     out = []
     if GUIDE_URL not in text:
         out.append(Finding("error", "README.md", f"does not link to the guide, {GUIDE_URL} (0042 FR-036)"))
-    for needle, why in (("agora system add", "the one-time system add"), ("agora help", "the help command")):
+    for needle, why in (("agora system ensure", "the one-time system ensure"), ("agora help", "the help command")):
         if needle not in text:
             out.append(Finding("error", "README.md", f"does not name {why}, `{needle}` (0042 FR-036)"))
     n = len(text.splitlines())

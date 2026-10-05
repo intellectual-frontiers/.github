@@ -42,8 +42,8 @@ class Help(unittest.TestCase):
             self.assertTrue(action["category"])
         lines = [s["line"] for s in d["steps"]]
         self.assertIn("agora doctor", lines)
-        self.assertIn("agora toolchain add", lines)  # a step that takes no value has a pasteable line
-        self.assertIn("agora system add", lines)
+        self.assertIn("agora toolchain ensure", lines)  # a step that takes no value has a pasteable line
+        self.assertIn("agora system ensure", lines)
         self.assertIn("agora check --suite spec", lines)
 
     def test_a_step_that_needs_a_value_a_person_gives_has_no_line_and_names_the_value(self):
