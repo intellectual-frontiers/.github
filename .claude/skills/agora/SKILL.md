@@ -10,7 +10,7 @@ description: Use agora, this repository's command line, to read its specs, requi
 
 ## How to call it
 
-- `agora <noun> <verb> [ID] [--options]`; the ID is the first word after the verb. Verbs: `list`, `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`, `new`, `advance`, `publish`, `serve`, `test`.
+- `agora <noun> <verb> [ID] [--options]`; the ID is the first word after the verb. Verbs: `list`, `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`, `new`, `advance`, `ensure`, `sync`, `publish`, `serve`, `test`.
 - Repository-wide commands take no noun: `check`, `context`, `doctor`, `fresh`, `help`, `lock`, `test`.
 - `--json` on any command gives one JSON document `{schema, audience, kind, id, data, links, actions}`; `links` and `actions` say what to run next. A failure is a resource of kind `error` with a stable `code` and the actions to take next.
 - Exit status: 0 success; 1 it ran and what it checked failed; 2 usage or an invalid argument; 3 a missing package, program or offline prerequisite.
