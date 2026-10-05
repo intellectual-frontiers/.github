@@ -33,11 +33,12 @@ import type { Node } from './views/node';
 import { ResourceProvider } from './views/resource-tree';
 import { StatusBar } from './views/status';
 import { CheckTests, type SectionOutcome } from './views/test-controller';
-import { createUi, DiffDocuments, SCHEME } from './views/ui';
-import { openHtmlView } from './views/webview';
+import { ResourcePanel, PANEL_TYPE, type PanelHost } from './views/panel';
+import { createUi, DiffDocuments, openDiff, SCHEME } from './views/ui';
+import { t } from './l10n';
 
 /** What the app needs of VS Code's extension context: where to put what it must dispose, and whether this is a test host. */
-export type AppContext = { subscriptions: vscode.Disposable[] } & NonNullable<Parameters<typeof testMode.install>[0]>;
+export type AppContext = { subscriptions: vscode.Disposable[]; extensionUri?: vscode.Uri } & NonNullable<Parameters<typeof testMode.install>[0]>;
 
 export interface AppDeps { fs?: DiscoveryFs; spawn?: SpawnFn; env?: NodeJS.ProcessEnv }
 
@@ -76,6 +77,10 @@ export class App {
   readonly tasks: TaskProvider;
   readonly language: ReferenceLanguage;
   readonly opener: ResourceOpener;
+  readonly panel: ResourcePanel;
+  /** Resolves once the repositories have been found for the first time (a panel VS Code restores is drawn only then). */
+  readonly ready: Promise<void>;
+  private markReady: () => void = () => undefined;
   private busy = false;
   private readonly sections = new Map<string, string[]>();
   /** The view that started the work in hand, so that its progress is shown there (0043 FR-038). */
@@ -89,8 +94,9 @@ export class App {
   constructor(readonly context: AppContext, private readonly deps: AppDeps = {}) {
     this.log = createLog();
     this.status = new StatusBar(this.handles);
-    this.ui = createUi({ docs: this.docs, log: this.log, where: () => this.origin, running: this.running,
-      showResult: (repo, detail, argv, real) => this.commands.showResult(repo, detail, argv, real) });
+    this.ui = createUi({ log: this.log, where: () => this.origin, running: this.running,
+      showResult: (repo, detail, argv, real) => this.commands.showResult(repo, detail, argv, real),
+      review: (repo, detail, changes) => this.panel.review(repo, detail, changes) });
     this.diagnostics = new Diagnostics((folder, file) => this.resolveFile(folder, file));
     this.decorations = new FileDecorations(this.diagnostics);
     this.homeView = new HomeProvider(this);
@@ -101,7 +107,9 @@ export class App {
     this.tests = new CheckTests(this);
     this.tasks = new TaskProvider(this);
     this.language = new ReferenceLanguage(this);
-    this.opener = new ResourceOpener({ render: (repo, title, argv) => this.renderHtml(repo, title, argv) }, this.log, (e) => this.fail(e));
+    this.ready = new Promise<void>((resolve) => { this.markReady = resolve; });
+    this.panel = new ResourcePanel(this.panelHost());
+    this.opener = new ResourceOpener({ render: (repo, _title, argv) => this.renderResource(repo, argv) }, this.log, (e) => this.fail(e));
   }
 
   /** The command handlers, made once the app exists. */
@@ -157,6 +165,7 @@ export class App {
     // The health the status bar states comes from `doctor`; it is cheap, and runs only for a trusted repository.
     for (const repo of repos) if (repo.state === 'ready') { await repo.runDoctor(); await this.loadProposals(repo); }
     this.refreshViews();
+    this.markReady();
     return repos;
   }
 
@@ -212,10 +221,10 @@ export class App {
   private updateBadges(): void {
     const home = this.treeViews.get(VIEW_IDS.home);
     const n = this.homeView.count();
-    if (home) home.badge = n ? { value: n, tooltip: `${n} ${n === 1 ? 'thing needs' : 'things need'} you` } : undefined;
+    if (home) home.badge = n ? { value: n, tooltip: t('{0} {1} you', n, n === 1 ? 'thing needs' : 'things need') } : undefined;
     const checks = this.treeViews.get(VIEW_IDS.checks);
     const failed = this.checksView.failed();
-    if (checks) checks.badge = failed ? { value: failed, tooltip: `${failed} check ${failed === 1 ? 'section' : 'sections'} failed` } : undefined;
+    if (checks) checks.badge = failed ? { value: failed, tooltip: t('{0} check {1} failed', failed, failed === 1 ? 'section' : 'sections') } : undefined;
   }
 
   private updateContexts(): void {
@@ -298,7 +307,7 @@ export class App {
 
   async updateNeeded(message: string): Promise<void> {
     this.log.info(message);
-    const pick = await vscode.window.showWarningMessage(message, 'Show Extensions');
+    const pick = await vscode.window.showWarningMessage(message, t('Show Extensions'));
     if (pick === 'Show Extensions') void vscode.commands.executeCommand('workbench.extensions.action.checkForUpdates');
   }
 
@@ -344,21 +353,42 @@ export class App {
     } finally { this.busy = false; }
   }
 
-  openHtml(repo: Repository, title: string, html: string, onStep?: (i: number) => Promise<unknown>): vscode.WebviewPanel {
-    return openHtmlView({ repo, title, html, log: this.log, onCommand: (words) => this.commands.runWords(repo, words), onStep });
+  /** A resource's renderer: the launcher's JSON for the command line, drawn in the one resource panel (0043 FR-042). */
+  private async renderResource(repo: Repository, argv: string[]): Promise<void> {
+    const r = await repo.launcher.run(argv);
+    if (r.failed || !r.doc) { this.log.info(`${argv.join(' ')}: the command line gave no resource (${r.failed ?? `exit ${String(r.exit)}`}).`); return; }
+    if (r.doc.kind === 'check') await this.handleCheck(repo, r.doc);   // its findings are also Problems, as when it runs from anywhere else
+    await this.panel.showDoc(repo, argv, r.doc);
   }
 
-  /** The page renderer of a resource: the launcher's own `--html` rendering in a webview (0043 FR-011). The resource panel replaces this. */
-  private async renderHtml(repo: Repository, title: string, argv: string[]): Promise<void> {
-    const r = await repo.launcher.run(argv, { format: 'html' });
-    if (r.failed || !r.stdout) { this.log.info(`${argv.join(' ')}: the command line gave no rendering (${r.failed ?? `exit ${String(r.exit)}`}).`); return; }
-    this.openHtml(repo, title, r.stdout);
+  /** What the panel asks of the extension, each the one path the same thing takes from anywhere else. */
+  private panelHost(): PanelHost {
+    return {
+      // Absent only where a test builds its own context: VS Code always gives the extension's own folder.
+      extensionUri: this.context.extensionUri ?? vscode.Uri.file(path.resolve(__dirname, '..')), log: this.log,
+      repoByKey: (key) => this.repoByKey(key),
+      whenReady: () => this.ready,
+      openRef: (repo, ref) => (ref.kind === 'row' ? this.opener.openRow(repo, ref.noun, ref.id) : this.opener.open(repo, ref.link)),
+      runAction: (repo, action) => this.fromView(undefined, () => this.commands.run.runAction(repo, action)),
+      copyContext: (repo, resource) => this.commands.context.copyContextOf(repo, resource),
+      copy: (text) => this.ui.copy(text),
+      openFile: async (repo, file, line) => {
+        const uri = await this.resolveFile(repo.folder, file);
+        if (!uri) return;
+        const at = new vscode.Position(Math.max(0, (line ?? 1) - 1), 0);
+        await vscode.window.showTextDocument(uri, { preview: true, selection: new vscode.Range(at, at) });
+      },
+      showDiff: (repo, detail, change) => openDiff(this.docs, repo, detail, change),
+      learn: () => this.commands.learn.learn(),
+      openTopic: (repo, topic) => this.commands.learn.openTopic(repo, topic),
+      fail: (e) => this.fail(e),
+    };
   }
 
   fail(e: unknown): void {
-    const words = e instanceof WireError ? e.message : `Something went wrong inside IF Console: ${e instanceof Error ? e.message : asString(e)}`;
+    const words = e instanceof WireError ? e.message : t('Something went wrong inside IF Console: {0}', e instanceof Error ? e.message : asString(e));
     this.log.error(words);
-    void Promise.resolve(vscode.window.showErrorMessage(words, 'Show Output')).then((p) => { if (p) this.log.show(true); });
+    void Promise.resolve(vscode.window.showErrorMessage(words, t('Show Output'))).then((p) => { if (p) this.log.show(true); });
   }
 
   // --- the test hook's snapshot (FR-033): what this holds, read-only ---------------------------------------------------------
@@ -386,6 +416,7 @@ export class App {
       status: this.status.last,
       revealed: this.revealed,
       tests: this.tests.describe(),
+      panel: this.panel.describe(),
       needs: this.repos.map((r) => ({ folder: r.folder.name, count: countOf(deriveHome(r).needs), items: deriveHome(r).needs.map((s) => ({ id: s.id, status: s.status, label: s.label, commandLine: s.commandLine, runnable: s.run !== null, yourself: s.yourself })) })),
       mcp: { supported: mcpSupported(), registered: this.mcp.disposable !== null,
         servers: definitions(this.repos).map((d) => ({ label: d.label, command: d.command, args: d.args })) },
@@ -395,7 +426,7 @@ export class App {
   // --- registration ------------------------------------------------------------------------------------------------------
   register(): void {
     const sub = (d: vscode.Disposable): number => this.context.subscriptions.push(d);
-    sub(this.log); sub(this.status); sub(this.diagnostics); sub(this.docs); sub(this.mcp); sub(this.tests); sub(this.watchers); sub(this.decorations); sub(this.language);
+    sub(this.panel); sub(this.log); sub(this.status); sub(this.diagnostics); sub(this.docs); sub(this.mcp); sub(this.tests); sub(this.watchers); sub(this.decorations); sub(this.language);
     sub(vscode.workspace.registerTextDocumentContentProvider(SCHEME, this.docs));
     sub(vscode.window.registerFileDecorationProvider(this.decorations));
     const tree = (id: string, provider: vscode.TreeDataProvider<Node>, collapseAll = false): void => {
@@ -407,6 +438,7 @@ export class App {
     this.slots.forEach((slot, i) => tree(slotId(i), slot, true));
     tree(VIEW_IDS.checks, this.checksView, true);
     tree(VIEW_IDS.commands, this.commandsView, true);
+    sub(vscode.window.registerWebviewPanelSerializer(PANEL_TYPE, { deserializeWebviewPanel: (panel, state) => this.panel.restore(panel, state) }));
     sub(vscode.tasks.registerTaskProvider('if-console', this.tasks));
     this.commands.register(sub);
     const again = (): void => { void this.refresh(); };
@@ -422,7 +454,7 @@ export class App {
     const declaration = vscode.workspace.createFileSystemWatcher('**/.if-console.env');
     sub(declaration); sub(declaration.onDidChange(again)); sub(declaration.onDidCreate(again)); sub(declaration.onDidDelete(again));
     this.mcp.start();
-    testMode.install(this.context, (o) => this.snapshot(o));
+    testMode.install(this.context, (o) => this.snapshot(o), (m) => this.panel.handle(m));
     sub({ dispose: () => testMode.uninstall() });
   }
 }

@@ -13,9 +13,10 @@ What it gives you:
 * In the spec files, a hover on a requirement's number that shows its words and what enforces it, Go to Definition, and a Run above it.
 * Findings in the Problems panel, at their file and line.
 * Every command from the palette, with a quick pick from each typed argument.
-* A diff of what a write would change, before it is made.
+* One panel for every resource, with back and forward, a breadcrumb and an Open to the Side choice: its header, its actions (a primary button, icon buttons, and a decision styled apart), and its sections drawn by the data's shape, which are a key-value grid, a sortable table whose rows open, a stage ladder, findings that open at their file and line, and links.
+* A write's change summary in that panel, before it is made, with each file as a diff, and Apply and Discard.
 * A modal confirmation for any decision, which only you can give.
-* Learn: the help topics, each shown with its steps as buttons.
+* Learn: the help topics, each shown in the same panel as numbered steps, each with its exact command line to copy and a Run button.
 * This repository's MCP server, registered with VS Code.
 
 It re-implements nothing, writes nothing itself, collects no telemetry and opens no network connection. It runs nothing in a

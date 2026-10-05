@@ -6,9 +6,9 @@ import * as path from 'path';
 import { boot, defaultDocs, k } from './support/boot';
 import { makeRepo } from './support/fake-launcher';
 import { createStub, folderOf, install } from './support/vscode-stub';
-import { EXT_ROOT } from './support/paths';
+import { readManifest } from './support/paths';
 
-const manifest = JSON.parse(fs.readFileSync(path.join(EXT_ROOT, 'package.json'), 'utf8'));
+const manifest = readManifest();
 const children = async (view: Loose, node?: Loose): Promise<Loose[]> => view.getChildren(node);
 const labels = async (view: Loose, nodes: Loose) => nodes.map((n: Loose) => view.getTreeItem(n).label);
 
@@ -206,8 +206,8 @@ test('FR-015: a decision from the tree runs only after the dry run, the diff and
   const noun = (await tree.getChildren(roots[0])).find((n: Loose) => n.kind === 'noun');
   const w1 = (await tree.getChildren(noun)).find((n: Loose) => n.kind === 'resource' && n.data.label === 'w1');
   const approve = (await tree.getChildren(w1)).find((n: Loose) => n.kind === 'action' && n.data.action.command === 'widget approve');
-  // the diff review: choose "Apply these changes"; the modal: dismiss it (undefined), as closing the dialog does
-  b.stub.script.quickPicks.push((items: Loose) => items[0].value);
+  // the review in the panel: Apply; the modal: dismiss it (undefined), as closing the dialog does
+  b.stub.script.reviews.push('apply');
   b.stub.script.warnings.push(undefined);
   await b.command('activateNode', approve);
   const ran = b.first.invocations().filter((i) => i.argv[0] === 'widget' && i.argv[1] === 'approve').map((i) => i.argv.join(' '));
@@ -218,7 +218,7 @@ test('FR-015: a decision from the tree runs only after the dry run, the diff and
   assert.match(modal.rest[0].detail, /Resource: w1/);
   assert.equal(modal.rest[0].modal, true);
   // now confirm
-  b.stub.script.quickPicks.push((items: Loose) => items[0].value);
+  b.stub.script.reviews.push('apply');
   b.stub.script.warnings.push('Make this decision');
   await b.command('activateNode', approve);
   const ran2 = b.first.invocations().filter((i) => i.argv[1] === 'approve').map((i) => i.argv.join(' '));
@@ -235,8 +235,7 @@ test('FR-014: the dry run\'s change opens in the diff editor, from a virtual doc
   const approve = (await tree.getChildren(w1)).find((n: Loose) => n.kind === 'action' && n.data.action.command === 'widget approve');
   fs.mkdirSync(path.join(b.first.root, 'widgets'));
   fs.writeFileSync(path.join(b.first.root, 'widgets', 'w1.txt'), 'old\n');
-  b.stub.script.quickPicks.push((items: Loose) => items[1].value);           // open the file's diff
-  b.stub.script.quickPicks.push(() => 'cancel');                  // then leave it
+  b.stub.script.reviews.push([{ type: 'diff', index: 0 }, 'discard']);   // open the file's diff in the panel, then leave it
   await b.command('activateNode', approve);
   const [left, right, title] = b.stub.calls.diffs[0];
   assert.equal(left.scheme, 'if-console-diff');

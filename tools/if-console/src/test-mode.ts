@@ -4,7 +4,8 @@
 // globalThis, through which a test
 //   - queues the answer to the next decision modal (true gives the modal's one button; anything else refuses it; with nothing queued the
 //     modal is refused), and reads what each modal would have shown;
-//   - reads what the extension showed (the quick picks' items and the webviews' pages), in the order shown;
+//   - reads what the extension showed (the quick picks' items and the panel's pages and models), in the order shown, and delivers a message to
+//     the panel as its page would (a click inside a webview cannot be made by a test);
 //   - reads a snapshot of what it holds: the repositories found, the views' entries and the MCP servers it would register.
 // Outside test mode the object does not exist and every function here does nothing; the modal is VS Code's own. The hook answers no other
 // prompt: quick picks and input boxes are driven by VS Code's own commands in the tests.
@@ -18,15 +19,18 @@ export interface TestHook {
   answers: boolean[];
   shown: Shown[];
   describe: (options?: Record<string, unknown>) => Promise<unknown>;
+  /** Delivers a message to the resource panel as its page would, where a test cannot click inside a webview. */
+  send: (message: unknown) => Promise<void>;
 }
 
 let hook: TestHook | null = null;
 
 export const active = (): boolean => hook !== null;
 
-export function install(extensionContext: { extensionMode?: vscode.ExtensionMode } | null | undefined, describe: (options?: Record<string, unknown>) => Promise<unknown>): TestHook | null {
+export function install(extensionContext: { extensionMode?: vscode.ExtensionMode } | null | undefined, describe: (options?: Record<string, unknown>) => Promise<unknown>,
+  send: (message: unknown) => Promise<void> = () => Promise.resolve()): TestHook | null {
   if (!extensionContext || extensionContext.extensionMode !== vscode.ExtensionMode.Test) return null;
-  hook = { answers: [], shown: [], describe };
+  hook = { answers: [], shown: [], describe, send };
   (globalThis as Record<symbol, unknown>)[KEY] = hook;
   return hook;
 }

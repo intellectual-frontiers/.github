@@ -24,6 +24,9 @@ class ExtensionRules(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         dest = Path(tmp.name) / "tools" / "if-console"
         shutil.copytree(HOME / "tools" / "if-console", dest, ignore=shutil.ignore_patterns("node_modules"))
+        brand = Path(tmp.name) / "design-systems" / "frontiers-brand"   # whose colors the banner must be (0043 FR-044)
+        brand.mkdir(parents=True)
+        shutil.copy(HOME / "design-systems" / "frontiers-brand" / "tokens.json", brand / "tokens.json")
         return Path(tmp.name), dest
 
     def test_the_manifest_of_this_repository_is_valid(self):
@@ -88,6 +91,75 @@ class ExtensionRules(unittest.TestCase):
         (ext / "media" / "if-console.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"><path stroke="#ff0000" d="M0 0"/></svg>')
         self.assertIn("currentColor and no other color", " | ".join(f.message for f in extension.manifest_findings(root)))
 
+    def test_the_marketplace_fields_the_readme_and_the_nls_file_are_each_checked(self):
+        """0043 FR-044: the icon, the banner in the brand's ink, categories, keywords, l10n, README screenshots, CHANGELOG and the nls file."""
+        def icon(p):
+            p["icon"] = "media/logo.svg"
+        self.assertIn("icon is 'media/logo.svg'", self.mutated(icon))
+
+        def banner(p):
+            p["galleryBanner"] = {"color": "#ff0000", "theme": "dark"}
+        self.assertIn("the brand's deep ink", self.mutated(banner))
+
+        def nothing(p):
+            p.pop("galleryBanner")
+            p["categories"] = ["Fun"]
+            p["keywords"] = ["one"]
+            p["l10n"] = "./i18n"
+        found = self.mutated(nothing)
+        for want in ("galleryBanner needs a color", "categories are ['Fun']", "keywords must name at least three words", "l10n must be ./l10n"):
+            self.assertIn(want, found)
+
+        def key(p):
+            p["displayName"] = "%nowhere%"
+        self.assertIn("has no entry for nowhere", self.mutated(key))
+
+        root, ext = self.copy()
+        nls = json.loads((ext / "package.nls.json").read_text())
+        nls["unused.key"] = "x"
+        (ext / "package.nls.json").write_text(json.dumps(nls))
+        (ext / "README.md").write_text("# IF Console\n\n![a](media/screenshots/missing.png)\n")
+        (ext / "CHANGELOG.md").write_text("# Changelog\n\n## 9.9.9\n")
+        found = " | ".join(f.message for f in extension.manifest_findings(root))
+        self.assertIn("unused.key is not used by package.json", found)
+        self.assertIn("shows media/screenshots/missing.png, which is not there", found)
+        self.assertIn("has no section for version", found)
+        (ext / "README.md").write_text("# IF Console\n")
+        self.assertIn("must show screenshots", " | ".join(f.message for f in extension.manifest_findings(root)))
+        big = ext / "media" / "screenshots" / "big.png"
+        big.write_bytes(b"x" * (extension.SCREENSHOT_MAX_BYTES + 1))
+        (ext / "README.md").write_text("![b](media/screenshots/big.png)\n")
+        self.assertIn("a screenshot in the package is at most", " | ".join(f.message for f in extension.manifest_findings(root)))
+
+    def test_the_icon_is_made_at_build_time_from_the_brands_mark_at_128_pixels_and_the_same_every_time(self):
+        """0043 FR-044: Pillow only, from design-systems/frontiers-brand; never tracked."""
+        from PIL import Image
+        import io
+
+        first = extension.icon_png(HOME)
+        self.assertEqual(first, extension.icon_png(HOME), "the same bytes every time")
+        im = Image.open(io.BytesIO(first))
+        self.assertEqual(im.size, (128, 128))
+        self.assertEqual(im.format, "PNG")
+        colors = extension.brand_colors(HOME)
+        self.assertEqual(im.convert("RGB").getpixel((64, 3))[:3], tuple(int(colors["deep-ink"][i:i + 2], 16) for i in (1, 3, 5)), "on the brand's deep ink")
+        self.assertFalse((HOME / "tools" / "if-console" / "media" / "icon.png").is_file() and "icon.png" in subprocess.run(
+            ["git", "ls-files", "tools/if-console/media/icon.png"], cwd=HOME, capture_output=True, text=True).stdout, "never tracked")
+        root, ext = self.copy()
+        self.assertEqual(extension.prepare(HOME, ext), [])
+        self.assertTrue(extension._is_png_128(ext / extension.ICON))
+
+    def test_the_l10n_bundle_holds_every_message_the_code_gives_t_and_nothing_else(self):
+        root, ext = self.copy()
+        (ext / "src" / "extra.ts").write_text("import { t } from './l10n';\nexport const a = t('A {0} of {1}', 1, 2), b = t(\"Don\\'t\"), c = t('Ellipsis \\u2026');\nconst text = 'not a message';\n")
+        messages = extension.write_l10n(ext)
+        bundle = json.loads((ext / "l10n" / "bundle.l10n.json").read_text())
+        self.assertEqual(sorted(bundle), messages)
+        for want in ("A {0} of {1}", "Learn", "Ellipsis \u2026"):
+            self.assertIn(want, bundle)
+        self.assertNotIn("not a message", bundle)
+        self.assertTrue(all(k == v for k, v in bundle.items()), "the English is the key and the value, which a translation replaces")
+
     def test_a_contributed_command_with_no_handler_is_found(self):
         root, ext = self.copy()
         pkg = json.loads((ext / "package.json").read_text())
@@ -133,7 +205,7 @@ class Modules(unittest.TestCase):
                 return ["src/app.js"]
             with mock.patch("agora.core.worker.needs_worker", return_value=False), \
                     mock.patch.object(Toolchain, "use", lambda _t, names: FakeTools()), \
-                    mock.patch.object(extension, "stage", return_value=Path("/stage")), \
+                    mock.patch.object(extension, "stage", return_value=Path("/stage")), mock.patch.object(extension, "prepare", return_value=[]), \
                     mock.patch.object(extension, "compile_tests", return_value=[]) as compiled, \
                     mock.patch.object(extension, "export_modules", export), \
                     mock.patch("agora.groups.extension.commands._node", return_value="/n/node"):
@@ -167,7 +239,7 @@ class Runners(unittest.TestCase):
 
     def check(self, *argv, use=None, vscode=None, typecheck=None):
         patches = [mock.patch("agora.core.worker.needs_worker", return_value=False),
-                   mock.patch.object(extension, "stage", return_value=Path("/stage")),
+                   mock.patch.object(extension, "stage", return_value=Path("/stage")), mock.patch.object(extension, "prepare", return_value=[]),
                    mock.patch.object(extension, "source_findings", return_value=[]),
                    mock.patch.object(extension, "codicon_findings", return_value=[]),
                    mock.patch.object(extension, "typecheck", return_value=typecheck or []),
@@ -319,7 +391,7 @@ class ExternalSuite(unittest.TestCase):
         patches = [mock.patch("agora.core.worker.needs_worker", return_value=False),
                    mock.patch.object(Toolchain, "use", use or (lambda _toolchain, names: self.resolved)),
                    mock.patch.object(Toolchain, "clean_env", lambda _toolchain: {}),
-                   mock.patch.object(extension, "stage", return_value=Path("/stage")),
+                   mock.patch.object(extension, "stage", return_value=Path("/stage")), mock.patch.object(extension, "prepare", return_value=[]),
                    mock.patch.object(extension, "bundle", return_value=[]),
                    mock.patch.object(extension, "compile_tests", return_value=[]),
                    mock.patch("agora.groups.extension.commands._node", return_value="/n/node"),

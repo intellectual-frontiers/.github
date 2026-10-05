@@ -8,3 +8,6 @@ node_modules/
 
 # The IF Console extension's package, built by `agora extension build` (0043-if-console FR-027).
 build/
+
+# What `agora extension build` makes at build time and never tracks: the extension's 128-pixel icon, from the brand's mark (0043-if-console FR-044).
+tools/if-console/media/icon.png

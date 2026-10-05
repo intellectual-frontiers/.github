@@ -1,5 +1,6 @@
 // Start the extension against the stand-in API and a fake second command line, as VS Code would.
 import { makeRepo, secondCommandLine, type FakeRepo, type Loose } from './fake-launcher';
+import * as path from 'path';
 import { createStub, folderOf, install, type Stub } from './vscode-stub';
 
 export const k = secondCommandLine('other');
@@ -46,7 +47,7 @@ export interface Booted {
   stub: Stub;
   first: FakeRepo;
   repos: FakeRepo[];
-  context: { subscriptions: Loose[] };
+  context: { subscriptions: Loose[]; extensionUri: Loose };
   exported: unknown;
   extension: Loose;
   restore: () => void;
@@ -65,7 +66,7 @@ export async function boot({ docs, trusted = true, second = null, config, mcp, w
   const restore = install(stub);
   // Loaded after the stand-in is installed, so that the extension's `vscode` is the stand-in.
   const extension = require('../../src/extension') as Loose;
-  const context: { subscriptions: Loose[] } = { subscriptions: [] };
+  const context: { subscriptions: Loose[]; extensionUri: Loose } = { subscriptions: [], extensionUri: stub.vscode.Uri.file(path.resolve(__dirname, '..', '..')) };
   const exported = await extension.activate(context);
   return { stub, first, repos, context, exported, extension, restore,
     command: (id, ...a) => stub.calls.registered.get(`if-console.${id}`)(...a),

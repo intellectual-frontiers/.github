@@ -1,6 +1,6 @@
 // The extension's build, run by the repository's own build and check of the extension on the Node of the locked package. Never run by hand:
 // the packages it imports come from the extension's own npm lock.
-//   node esbuild.mjs bundle   dist/extension.js (the extension host's one file) and dist/webview.js (the panels' own), minified, with their
+//   node esbuild.mjs bundle   dist/extension.js (the extension host's one file), dist/webview.js and dist/panel.css (the panel's own), minified, with their
 //                             source maps beside them, which the .vsix leaves out (.vscodeignore); and the codicon font in dist/codicons/
 //   node esbuild.mjs test     every file of src/ and test/ as its own CommonJS file in out/, so the unit tests load the code as separate modules
 import * as esbuild from 'esbuild';
@@ -21,7 +21,8 @@ if (mode === 'bundle') {
   rmSync('dist', { recursive: true, force: true });
   const common = { bundle: true, minify: true, sourcemap: true, sourcesContent: false, legalComments: 'none', logLevel: 'warning' };
   await esbuild.build({ ...common, entryPoints: ['src/extension.ts'], outfile: 'dist/extension.js', platform: 'node', format: 'cjs', target: 'node22', external: ['vscode'] });
-  await esbuild.build({ ...common, entryPoints: ['src/webview/main.ts'], outfile: 'dist/webview.js', platform: 'browser', format: 'iife', target: 'es2022' });
+  await esbuild.build({ ...common, entryPoints: ['src/webview/main.ts'], outfile: 'dist/webview.js', platform: 'browser', format: 'iife', target: 'es2022', external: ['vscode'] });
+  await esbuild.build({ ...common, entryPoints: ['src/webview/panel.css'], outfile: 'dist/panel.css', loader: { '.css': 'css' } });
   mkdirSync('dist/codicons', { recursive: true });
   for (const f of ['codicon.css', 'codicon.ttf']) cpSync(join('node_modules', '@vscode', 'codicons', 'dist', f), join('dist', 'codicons', f));
 } else if (mode === 'test') {

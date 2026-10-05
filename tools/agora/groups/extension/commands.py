@@ -54,6 +54,7 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
     else:
         with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
             stage_dir = extension.stage(home, tools.path_of("extension-modules"), Path(tmp))
+            findings += extension.prepare(home, stage_dir)
             env = tools.env()
             if runner in (None, "node"):
                 findings += extension.codicon_findings(home, tools.path_of("codicons-mapping"), extension_build.PACKAGES["@vscode/codicons"])
@@ -119,7 +120,7 @@ def extension_test(ctx: Ctx, suite: str | None, screenshots: str | None, workspa
         raise AgoraError("toolchain-missing", f"the real VS Code did not run: {e.message}", exit=MISSING) from e
     with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
         stage_dir = extension.stage(ctx.home, r.path_of("extension-modules"), Path(tmp))
-        built = extension.bundle(stage_dir, exe, r.env()) or extension.compile_tests(stage_dir, exe, r.env())
+        built = extension.prepare(ctx.home, stage_dir) or extension.bundle(stage_dir, exe, r.env()) or extension.compile_tests(stage_dir, exe, r.env())
         if built:
             raise AgoraError("invalid-extension", "the extension did not build for the VS Code run: " + "; ".join(f.message for f in built[:3]), exit=FAILED,
                              detail={"findings": [f"{f.where}: {f.message}" for f in built]})
@@ -158,7 +159,8 @@ def extension_build_command(ctx: Ctx, modules: str | None = None) -> Resource:
         env = resolved.env()
         with tempfile.TemporaryDirectory(prefix="agora-extension-") as tmp:
             stage_dir = extension.stage(ctx.home, resolved.path_of("extension-modules"), Path(tmp))
-            found = extension.typecheck(stage_dir, exe, str(resolved.path_of("tsc")), env)
+            found = extension.prepare(ctx.home, stage_dir)
+            found += extension.typecheck(stage_dir, exe, str(resolved.path_of("tsc")), env)
             found += extension.lint(stage_dir, exe, str(resolved.path_of("eslint")), env)
             found += extension.bundle(stage_dir, exe, env)
             if found:

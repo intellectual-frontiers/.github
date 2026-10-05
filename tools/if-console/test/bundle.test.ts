@@ -7,7 +7,7 @@ import * as path from 'path';
 import { defaultDocs } from './support/boot';
 import { makeRepo, type Loose } from './support/fake-launcher';
 import { createStub, folderOf, install } from './support/vscode-stub';
-import { EXT_ROOT } from './support/paths';
+import { EXT_ROOT, readManifest } from './support/paths';
 
 const bundle = path.join(EXT_ROOT, 'dist', 'extension.js');
 const skip = fs.existsSync(bundle) ? false : 'dist/extension.js has not been built';
@@ -21,7 +21,7 @@ test('FR-035: the bundle activates under the stand-in, registers every contribut
   const context: { subscriptions: Loose[] } = { subscriptions: [] };
   try {
     assert.equal(await ext.activate(context), undefined);
-    const manifest = JSON.parse(fs.readFileSync(path.join(EXT_ROOT, 'package.json'), 'utf8')) as Loose;
+    const manifest = readManifest() as Loose;
     assert.deepEqual([...stub.calls.registered.keys()].sort(), manifest.contributes.commands.map((c: Loose) => c.command).sort());
     assert.ok(fake.invocations().some((i) => i.argv.join(' ') === 'command list --json'), 'it asked the launcher for its command list');
     assert.deepEqual(Object.keys(ext).sort(), ['activate', 'deactivate']);

@@ -8,6 +8,7 @@ import { changesOf, type Change } from '../model/preview';
 import { DECISION, WRITES, type CommandDetail, type Doc, type ErrorInfo } from '../model/wire';
 import type { Cancellation, RunResult } from './launcher';
 import type { Repository } from './repository';
+import { t } from '../l10n';
 
 const MAX_RETRIES = 5;
 
@@ -86,7 +87,7 @@ export async function runForm(ui: Ui, repo: Repository, detailOrId: CommandDetai
     const line = repo.launcher.line(argv);
     const verb = WRITES.includes(detail.category) ? 'Show what it would change' : 'Run it';
     const choice = await ui.pick<'run' | 'copy'>({ title: `${detail.id}: ready`, placeholder: line,
-      items: [{ label: verb, description: line, value: 'run' }, { label: 'Copy the command line', description: 'to paste in a terminal', value: 'copy' }] });
+      items: [{ label: verb, description: line, value: 'run' }, { label: t('Copy the command line'), description: t('to paste in a terminal'), value: 'copy' }] });
     if (choice === undefined) return { ran: false, reason: 'cancelled' };
     if (choice === 'copy') { await ui.copy(line); return { ran: false, reason: 'copied' }; }
     const out = await runArgv(ui, repo, detail, argv);

@@ -5,9 +5,9 @@ import assert from 'node:assert/strict';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Loose } from './support/fake-launcher';
-import { EXT_ROOT } from './support/paths';
+import { EXT_ROOT, readManifest } from './support/paths';
 
-const manifest = JSON.parse(fs.readFileSync(path.join(EXT_ROOT, 'package.json'), 'utf8')) as Loose;
+const manifest = readManifest() as Loose;
 const c = manifest.contributes as Loose;
 const COMMANDS = c.commands as Loose[];
 

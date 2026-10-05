@@ -94,7 +94,7 @@ test('FR-041: a document link opens the resource\'s page, by a handle', async ()
   assert.match(links[0].target.toString(), /^command:if-console\.followLink\?/);
   const handle = JSON.parse(decodeURIComponent(links[0].target.toString().split('?')[1]))[0];
   await b.command('followLink', handle);
-  assert.ok(b.first.invocations().some((i: Loose) => i.argv.join(' ') === 'widget show w1 --html'));
+  assert.ok(b.first.invocations().some((i: Loose) => i.argv.join(' ') === 'widget show w1 --json'));
   assert.equal(b.stub.calls.webviews.length, 1);
   b.cleanup();
 });

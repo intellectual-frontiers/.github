@@ -22,7 +22,7 @@ export interface Handlers {
 
 export function registerCommands(app: App): Handlers {
   const run = new RunCommands(app);
-  const learn = new LearnCommands(app, run);
+  const learn = new LearnCommands(app);
   const context = new ContextCommands(app);
   const views = new ViewCommands(app, run, context);
   return {
@@ -34,6 +34,7 @@ export function registerCommands(app: App): Handlers {
         sub(vscode.commands.registerCommand(`if-console.${id}`, (...a: unknown[]) => Promise.resolve(fn(...a)).catch((e: unknown) => app.fail(e))));
       };
       cmd('showHome', (arg) => views.showHome(arg));
+      cmd('showView', () => views.showView());
       cmd('runCommand', () => run.runCommandPalette());
       cmd('check', () => run.runRepoWide('check', { form: true }));
       cmd('checkChanged', () => run.runRepoWide('check', { args: ['--changed'] }));

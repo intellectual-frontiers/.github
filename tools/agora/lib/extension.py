@@ -10,6 +10,7 @@ Standard library only.
 """
 from __future__ import annotations
 
+import io
 import json
 import re
 import shutil
@@ -35,6 +36,11 @@ SKIP = shutil.ignore_patterns("node_modules", "dist", "out", "build")  # what is
 ALLOWED_REQUIRES = {"vscode", "path", "fs", "crypto", "child_process"}  # what the code may import beyond its own files
 
 
+BRAND = "design-systems/frontiers-brand"  # whose mark and colors the extension's icon and banner are (0043 FR-044)
+ICON_SIZE = 128
+ICON = "media/icon.png"  # made at build time, never tracked (.gitignore)
+
+
 def _read_json(path: Path, rel: str, out: list[Finding]) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -54,16 +60,98 @@ def _slot_count(ext: Path) -> int:
     return int(m.group(1)) if m else 0
 
 
+def _nls(ext: Path, raw: Any, out: list[Finding]) -> Any:
+    """package.json with each `%key%` replaced by the English of package.nls.json, as VS Code shows it; a key with no entry, or an entry no key
+    uses, is a finding (0043 FR-044)."""
+    rel = f"{DIR}/package.nls.json"
+    nls = _read_json(ext / "package.nls.json", rel, out) or {}
+    used: set[str] = set()
+
+    def walk(v: Any) -> Any:
+        if isinstance(v, str):
+            m = re.fullmatch(r"%([^%]+)%", v)
+            if not m:
+                return v
+            used.add(m.group(1))
+            if m.group(1) not in nls:
+                out.append(Finding("error", rel, f"has no entry for {m.group(1)}, which package.json uses (0043 FR-044)"))
+            return nls.get(m.group(1), v)
+        if isinstance(v, list):
+            return [walk(x) for x in v]
+        if isinstance(v, dict):
+            return {k: walk(x) for k, x in v.items()}
+        return v
+
+    resolved = walk(raw)
+    for key in sorted(set(nls) - used):
+        out.append(Finding("error", rel, f"{key} is not used by package.json (0043 FR-044)"))
+    return resolved
+
+
+CATEGORIES = {"Programming Languages", "Snippets", "Linters", "Themes", "Debuggers", "Formatters", "Keymaps", "SCM Providers", "Other", "Extension Packs",
+              "Language Packs", "Data Science", "Machine Learning", "Visualization", "Notebooks", "Education", "Testing"}
+SCREENSHOT_MAX_BYTES = 300_000  # a screenshot in the package stays small (0043 FR-044)
+
+
+def _marketplace(home: Path, ext: Path, raw: Any, pkg: Any, err: Any, out: list[Finding]) -> None:
+    """What the marketplace shows without being published (0043 FR-044): the icon (made at build time, never tracked), the gallery banner in the
+    brand's own ink, categories and keywords, the l10n folder, a README that shows screenshots kept small, and a CHANGELOG."""
+    if raw.get("icon") != ICON:
+        err(f"icon is {raw.get('icon')!r}; it is {ICON}, the 128-pixel PNG `extension build` makes from the brand's mark (0043 FR-044)")
+    if (ext / ICON).exists() and not _is_png_128(ext / ICON):
+        err(f"{ICON} is not a 128-pixel PNG (0043 FR-044)")
+    banner = raw.get("galleryBanner") or {}
+    try:
+        ink = brand_colors(home)["deep-ink"]
+    except (OSError, KeyError, ValueError):
+        ink = None
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", str(banner.get("color", ""))) or banner.get("theme") not in ("dark", "light"):
+        err("galleryBanner needs a color (#rrggbb) and a theme, dark or light (0043 FR-044)")
+    elif ink and banner["color"].lower() != ink.lower():
+        err(f"galleryBanner.color is {banner['color']}; it is the brand's deep ink, {ink} (0043 FR-044)")
+    cats = raw.get("categories") or []
+    if not cats or not set(cats) <= CATEGORIES:
+        err(f"categories are {cats}; they are some of the marketplace's own (0043 FR-044)")
+    if len(raw.get("keywords") or []) < 3:
+        err("keywords must name at least three words a person would search for (0043 FR-044)")
+    if raw.get("l10n") != "./l10n":
+        err("l10n must be ./l10n, where the build writes the bundle of the code's strings (0043 FR-044)")
+    for name in ("README.md", "CHANGELOG.md"):
+        if not (ext / name).is_file():
+            out.append(Finding("error", f"{DIR}/{name}", "is missing (0043 FR-044)"))
+    readme = ext / "README.md"
+    if readme.is_file():
+        shown = re.findall(r"!\[[^\]]*\]\((media/screenshots/[^)\s]+)\)", readme.read_text(encoding="utf-8"))
+        if not shown:
+            out.append(Finding("error", f"{DIR}/README.md", "must show screenshots from media/screenshots/ (0043 FR-044, FR-045)"))
+        for rel_path in shown:
+            f = ext / rel_path
+            if not f.is_file():
+                out.append(Finding("error", f"{DIR}/README.md", f"shows {rel_path}, which is not there (0043 FR-044)"))
+            elif f.stat().st_size > SCREENSHOT_MAX_BYTES:
+                out.append(Finding("error", f"{DIR}/{rel_path}", f"is {f.stat().st_size} bytes; a screenshot in the package is at most {SCREENSHOT_MAX_BYTES} (0043 FR-044)"))
+    changelog = ext / "CHANGELOG.md"
+    if changelog.is_file() and raw.get("version") and f"## {raw['version']}" not in changelog.read_text(encoding="utf-8"):
+        out.append(Finding("error", f"{DIR}/CHANGELOG.md", f"has no section for version {raw['version']} (0043 FR-044)"))
+
+
+def _is_png_128(path: Path) -> bool:
+    data = path.read_bytes()[:24]
+    return data[:8] == b"\x89PNG\r\n\x1a\n" and int.from_bytes(data[16:20], "big") == 128 and int.from_bytes(data[20:24], "big") == 128
+
+
 def manifest_findings(home: Path) -> list[Finding]:
     """package.json: identity, contributions, activation, trust, settings, the bundle it runs, and that every contributed command is registered
     in the code (0043 FR-001, FR-006, FR-010, FR-024, FR-027, FR-030, FR-035)."""
     ext = home / DIR
     rel = f"{DIR}/package.json"
     out: list[Finding] = []
-    pkg = _read_json(ext / "package.json", rel, out)
-    if pkg is None:
+    raw = _read_json(ext / "package.json", rel, out)
+    if raw is None:
         return out
     err = lambda m: out.append(Finding("error", rel, m))
+    pkg = _nls(ext, raw, out)
+    _marketplace(home, ext, raw, pkg, err, out)
     if pkg.get("name") != "if-console":
         err(f"name is {pkg.get('name')!r}; the extension id is if-console (0043 FR-001)")
     if pkg.get("displayName") != "Intellectual Frontiers Console":
@@ -346,3 +434,91 @@ def package(stage_dir: Path, node: str, vsce: str, out: Path, env: dict[str, str
 def contents(vsix: Path) -> list[dict]:
     with zipfile.ZipFile(vsix) as z:
         return [{"path": i.filename, "bytes": i.file_size} for i in z.infolist()]
+
+
+# ---- what the marketplace shows (0043 FR-044) -----------------------------------------------------------------------------
+
+def brand_colors(home: Path) -> dict[str, str]:
+    """The palette of the brand whose mark the icon is: each color's name and its hex value, from tokens.json."""
+    tokens = json.loads((home / BRAND / "tokens.json").read_text(encoding="utf-8"))
+    return {k: v["$value"] for k, v in tokens["color"].items() if isinstance(v, dict) and "$value" in v}
+
+
+def icon_png(home: Path) -> bytes:
+    """The 128-pixel icon: the brand's mark, drawn in one color (the brand's warm paper) from the master's own ink, on the brand's deep ink.
+    Pillow only, from the brand's own files (design-systems/frontiers-brand, the largest icon master of its tokens); nothing is drawn by hand."""
+    from PIL import Image, ImageChops, ImageDraw  # a pinned package of this group's lock
+
+    from agora.lib import imagery
+
+    brand = home / BRAND
+    colors = brand_colors(home)
+    ink, paper = _rgb(colors["deep-ink"]), _rgb(colors["warm-paper"])
+    master = Image.open(imagery.icon_master(brand)).convert("RGBA")
+    box = master.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox() or (0, 0, *master.size)
+    mark = master.crop(box)
+    flat = Image.new("RGBA", mark.size, (255, 255, 255, 255))
+    flat.alpha_composite(mark)
+    # the master's own darkness is the mark's strength: darker ink, more paper; the master's transparency stays transparent
+    strength = ImageChops.multiply(flat.convert("L").point(lambda v: min(255, int((255 - v) * 1.7))), mark.getchannel("A"))
+    inner = round(ICON_SIZE * 0.78)
+    scale = min(inner / mark.width, inner / mark.height)
+    size = (max(1, round(mark.width * scale)), max(1, round(mark.height * scale)))
+    strength = strength.resize(size, Image.LANCZOS)
+    canvas = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+    ImageDraw.Draw(canvas).rounded_rectangle((0, 0, ICON_SIZE - 1, ICON_SIZE - 1), radius=ICON_SIZE // 6, fill=(*ink, 255))
+    layer = Image.new("RGBA", size, (*paper, 255))
+    layer.putalpha(strength)
+    canvas.alpha_composite(layer, ((ICON_SIZE - size[0]) // 2, (ICON_SIZE - size[1]) // 2))
+    out = io.BytesIO()
+    canvas.save(out, "PNG", optimize=True)
+    return out.getvalue()
+
+
+def _rgb(hex_value: str) -> tuple[int, int, int]:
+    h = hex_value.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def make_icon(home: Path, stage_dir: Path) -> list[Finding]:
+    """Write media/icon.png into the staged copy, from the brand's mark (0043 FR-044)."""
+    try:
+        data = icon_png(home)
+    except (OSError, KeyError, ValueError, ImportError) as e:
+        return [Finding("error", f"{DIR}/{ICON}", f"cannot be made from the brand's mark at {BRAND}: {e}")]
+    (stage_dir / ICON).write_bytes(data)
+    return []
+
+
+def _unescape(raw: str) -> str:
+    """A JavaScript string literal's text as the string it makes (the escapes this code base uses: \\u2026, quotes, newline)."""
+    return re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), raw).replace("\\'", "'").replace('\\"', '"').replace("\\n", "\n")
+
+
+L10N_CALL = re.compile(r"""\bt\(\s*(?:'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`)""")
+
+
+def l10n_messages(ext: Path) -> list[str]:
+    """Every message the code gives `t(...)`, each a literal in src/ (the build reads them from the source), in a stable order."""
+    found: set[str] = set()
+    for p in sources(ext):
+        for m in L10N_CALL.finditer(p.read_text(encoding="utf-8")):
+            found.add(_unescape(next(g for g in m.groups() if g is not None)))
+    return sorted(found)
+
+
+def write_l10n(stage_dir: Path) -> list[str]:
+    """l10n/bundle.l10n.json: each message the code gives `t(...)`, its own English as the key and the value, which a translation replaces
+    (0043 FR-044). Written into the staged copy."""
+    messages = l10n_messages(stage_dir)
+    out = stage_dir / "l10n"
+    out.mkdir(exist_ok=True)
+    (out / "bundle.l10n.json").write_text(json.dumps({m: m for m in messages}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return messages
+
+
+def prepare(home: Path, stage_dir: Path) -> list[Finding]:
+    """What is made at build time and never tracked, written into the staged copy: the 128-pixel icon and the l10n bundle (0043 FR-044)."""
+    found = make_icon(home, stage_dir)
+    write_l10n(stage_dir)
+    return found

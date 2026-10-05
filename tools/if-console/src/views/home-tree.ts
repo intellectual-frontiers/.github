@@ -7,6 +7,7 @@ import { BaseProvider, icon, Node, single, speak, stateNodes, statusIcon } from 
 import { findingItem } from './checks-tree';
 import { suggestionTooltip } from './tooltips';
 import type { Repository } from '../services/repository';
+import { t } from '../l10n';
 
 export const EVERYTHING_OK = 'Everything is in order. Nothing needs you.';
 
@@ -97,7 +98,7 @@ export class HomeProvider extends BaseProvider {
       return n;
     });
     if (!out.length && repo.state === 'ready') out.push(Object.assign(new Node('empty', repo, { text: EVERYTHING_OK }), { parent }));
-    if (help.length) { const g = new Node('group', repo, { label: 'Get help', view: 'if-console.home' }); g.parent = parent; out.push(g); }
+    if (help.length) { const g = new Node('group', repo, { label: t('Get help'), view: 'if-console.home' }); g.parent = parent; out.push(g); }
     return out;
   }
 }

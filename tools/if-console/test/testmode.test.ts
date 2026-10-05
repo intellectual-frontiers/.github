@@ -68,3 +68,17 @@ test('FR-033: the hook is the only test-mode path: nothing else in the source lo
   const users = walk(SRC_DIR).filter((f) => /ExtensionMode|if-console\.test/.test(fs.readFileSync(f, 'utf8'))).map((f) => path.relative(SRC_DIR, f));
   assert.deepEqual(users, ['test-mode.ts']);
 });
+
+test('FR-033, FR-042: in test mode the hook delivers a message to the panel as its page would, and a dry run\'s Apply is still a choice the test makes', async () => {
+  const { boot, action, defaultDocs } = require('./support/boot') as Loose;
+  const b = await boot({ docs: defaultDocs() });
+  const t = load(3);
+  let received: unknown = null;
+  t.testmode.uninstall();
+  const hook = t.testmode.install({ extensionMode: 3 }, async () => ({}), async (m: unknown) => { received = m; });
+  await hook.send({ type: 'back' });
+  assert.deepEqual(received, { type: 'back' }, 'the message reaches the panel\'s own handler');
+  assert.ok(action && b, 'the extension under test is the same one');
+  t.done();
+  b.cleanup();
+});

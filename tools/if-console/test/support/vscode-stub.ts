@@ -60,13 +60,13 @@ export interface StubOptions { folders?: Loose[]; trusted?: boolean; config?: Re
 export interface Stub {
   vscode: Loose;
   calls: Loose;
-  script: { quickPicks: Loose[]; inputs: Loose[]; warnings: Loose[]; infos: Loose[]; errors: Loose[] };
+  script: { reviews: Loose[]; quickPicks: Loose[]; inputs: Loose[]; warnings: Loose[]; infos: Loose[]; errors: Loose[] };
   diagnostics: Map<string, Loose>;
 }
 
 export function createStub(options: StubOptions = {}): Stub {
-  const calls: Loose = { contexts: new Map<string, Loose>(), progress: [], decorationProvider: null, languages: [], statusBar: [], treeViews: new Map<string, Loose>(), messages: [], commands: [], registered: new Map(), output: [], info: [], webviews: [], diffs: [], clipboard: [], tasks: null, mcp: null, textDocs: [], opened: [], watchers: [] };
-  const script = { quickPicks: [] as Loose[], inputs: [] as Loose[], warnings: [] as Loose[], infos: [] as Loose[], errors: [] as Loose[] };
+  const calls: Loose = { contexts: new Map<string, Loose>(), progress: [], decorationProvider: null, languages: [], statusBar: [], treeViews: new Map<string, Loose>(), messages: [], commands: [], registered: new Map(), output: [], info: [], webviews: [], serializers: [], diffs: [], clipboard: [], tasks: null, mcp: null, textDocs: [], opened: [], watchers: [] };
+  const script = { reviews: [] as Loose[], quickPicks: [] as Loose[], inputs: [] as Loose[], warnings: [] as Loose[], infos: [] as Loose[], errors: [] as Loose[] };
   const diagnostics = new Map<string, Loose>();
   const answer = (queue: Loose[], fallback: Loose): Loose => (queue.length ? queue.shift() : fallback);
   const folders = options.folders ?? [];
@@ -74,7 +74,7 @@ export function createStub(options: StubOptions = {}): Stub {
   const vscode: Loose = {
     EventEmitter, Uri, Position, Range, Location, Diagnostic, DiagnosticSeverity, ThemeIcon, TreeItem, TreeItemCollapsibleState, Task, CustomExecution, RelativePattern,
     TestMessage, ThemeColor, MarkdownString, FileDecoration, CodeLens, Hover, DocumentLink, TaskGroup: { Build: 'build', Test: 'test' }, StatusBarAlignment: { Left: 1, Right: 2 }, ProgressLocation: { Notification: 15, Window: 10 },
-    QuickPickItemKind: { Separator: -1, Default: 0 }, ExtensionMode: { Production: 1, Development: 2, Test: 3 }, ViewColumn: { Beside: -2 }, TestRunProfileKind: { Run: 1, Debug: 2, Coverage: 3 },
+    QuickPickItemKind: { Separator: -1, Default: 0 }, ExtensionMode: { Production: 1, Development: 2, Test: 3 }, ViewColumn: { Active: -1, Beside: -2 }, TestRunProfileKind: { Run: 1, Debug: 2, Coverage: 3 },
     window: {
       createOutputChannel: (name: string) => {
         const add = (l: string): void => { calls.output.push(l); };
@@ -96,11 +96,33 @@ export function createStub(options: StubOptions = {}): Stub {
       withProgress: (opts: Loose, fn: Loose) => { calls.progress.push(opts); return fn({ report: (v: Loose) => calls.info.push(v) }, { isCancellationRequested: false, onCancellationRequested: () => ({ dispose() { /* none */ } }) }); },
       createTreeView: (id: string, o: Loose) => { const v = { id, o, title: undefined as Loose, description: undefined as Loose, badge: undefined as Loose, message: undefined as Loose, revealed: [] as Loose[], reveal(n: Loose, opts: Loose) { v.revealed.push([n, opts]); return Promise.resolve(); }, dispose() { /* none */ } }; calls.treeViews.set(id, v); return v; },
       registerFileDecorationProvider: (p: Loose) => { calls.decorationProvider = p; return { dispose() { /* none */ } }; },
-      createWebviewPanel: (id: string, title: string, _col: Loose, opts: Loose) => {
-        const p: Loose = { id, title, opts, webview: { html: '', cspSource: 'vscode-resource:', onDidReceiveMessage: (fn: Loose) => { p.onMessage = fn; return { dispose() { /* none */ } }; } }, dispose() { /* none */ } };
+      createWebviewPanel: (id: string, title: string, column: Loose, opts: Loose) => {
+        const disposed: Array<() => void> = [];
+        let html = '';
+        const p: Loose = { id, title, column, opts, revealed: [] as Loose[], posted: [] as Loose[], disposed: false,
+          webview: { options: opts, cspSource: 'vscode-resource:', asWebviewUri: (u: Uri) => Uri.parse(`vscode-resource:${u.path}`),
+            // The page loads when its html is set, and says it is ready, as the real page does.
+            get html(): string { return html; },
+            set html(v: string) { html = v; setImmediate(() => { void p.onMessage?.({ type: 'ready' }); }); },
+            // A dry run's preview is answered from the script, as the person would by pressing its buttons.
+            postMessage: (m: Loose) => {
+              p.posted.push(m);
+              const view = m?.view;
+              if (m?.type === 'model' && view?.built?.mode === 'preview' && !view.settled && script.reviews.length) {
+                const a = script.reviews.shift();
+                const seq: Loose[] = Array.isArray(a) ? a : [a];
+                setImmediate(() => { void (async () => { for (const x of seq) await p.onMessage?.(typeof x === 'string' ? { type: x } : x); })(); });
+              }
+              return Promise.resolve(true);
+            },
+            onDidReceiveMessage: (fn: Loose) => { p.onMessage = fn; return { dispose() { /* none */ } }; } },
+          onDidDispose: (fn: () => void) => { disposed.push(fn); return { dispose() { /* none */ } }; },
+          reveal: (col: Loose, preserve: Loose) => { p.revealed.push([col, preserve]); },
+          dispose: () => { if (!p.disposed) { p.disposed = true; disposed.forEach((f) => f()); } } };
         calls.webviews.push(p);
         return p;
       },
+      registerWebviewPanelSerializer: (type: string, serializer: Loose) => { calls.serializers.push({ type, serializer }); return { dispose() { /* none */ } }; },
       showTextDocument: (d: Loose) => { calls.opened.push(d); return Promise.resolve(d); },
       activeTextEditor: undefined,
       onDidChangeActiveTextEditor: () => ({ dispose() { /* none */ } }),
@@ -139,6 +161,7 @@ export function createStub(options: StubOptions = {}): Stub {
       createDiagnosticCollection: () => ({ clear: () => diagnostics.clear(), set: (u: Uri, d: Loose) => diagnostics.set(u.toString(), d), get: (u: Uri) => diagnostics.get(u.toString()), dispose() { /* none */ } }) },
     tests: { createTestController: (id: string, label: string) => makeController(id, label, calls) },
     tasks: { registerTaskProvider: (type: string, provider: Loose) => { calls.tasks = { type, provider }; return { dispose() { /* none */ } }; } },
+    l10n: { t: (m: string, ...a: Loose[]) => m.replace(/\{(\d+)\}/g, (x: string, i: string) => (a[Number(i)] === undefined ? x : String(a[Number(i)]))) },
     env: { clipboard: { writeText: (t: string) => Promise.resolve(calls.clipboard.push(t)) } },
   };
   if (options.mcp !== false) {

@@ -54,9 +54,9 @@ def editor():
              "a Run button; the views below it (Specs, Design systems, Toolchain and the others this command line declares) list "
              "its resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the "
              "setting `if-console.showAllCommands`. The palette's IF Console commands run Check, Fresh, Test and Doctor, and "
-             "Learn shows these topics with a button for each step."),
+             "Learn shows these topics in one panel, each step with its command line to copy and a Run button."),
             ("Writes and decisions",
-             "A command that writes shows each file it would change as a diff first, and runs only if you accept. A decision "
+             "A command that writes shows what it would change in the resource panel first (each file can open as a diff), and runs only if you apply it. A decision "
              "asks in a dialog that names the command and what it changes."),
             ("Check the extension itself",
              "The unit tests run on Node. The real VS Code tests start VS Code under a display server, so run the one-time "

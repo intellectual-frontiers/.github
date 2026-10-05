@@ -50,7 +50,7 @@ test('FR-048: generated files out of date come with the rewriting command and a 
     { actions: [action('rewrite what theme writes', 'widget approve', 'decision', { widget: 'w1' })] });
   const b = await boot({ docs: defaultDocs({ fresh: { doc: fresh, exit: 1 }, 'command show fresh': { doc: k.detail('fresh', 'check', []) } }) });
   b.stub.script.warnings.push('Rewrite what theme writes');
-  b.stub.script.quickPicks.push((items: Loose) => items[0].value);   // the diff review: apply
+  b.stub.script.reviews.push('apply');   // the review in the panel: apply
   b.stub.script.warnings.push(undefined);                             // the decision's modal is dismissed
   await b.command('fresh');
   const [notice] = warnings(b);

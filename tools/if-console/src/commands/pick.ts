@@ -5,6 +5,7 @@ import type { CommandSummary } from '../model/wire';
 import type { Repository } from '../services/repository';
 import * as testMode from '../test-mode';
 import { CATEGORY_ICON } from '../views/node';
+import { t } from '../l10n';
 
 const NO_REPOSITORY = 'No folder in this window declares a command line for IF Console (a .if-console.env file at its root).';
 
@@ -37,7 +38,7 @@ export async function pickCommand(repo: Repository, filter?: (c: CommandSummary)
   };
   add(`${repo.name}: repository-wide`, repoWide);
   for (const [noun, cmds] of nouns) add(`${repo.name}: ${noun}`, cmds);
-  testMode.note('quickpick', { title: '', placeholder: 'Which command?', items: items.filter((i) => i.kind !== vscode.QuickPickItemKind.Separator).map((i) => i.label) });
-  const pick = await vscode.window.showQuickPick(items, { placeHolder: 'Which command?', matchOnDescription: true, matchOnDetail: true, ignoreFocusOut: true });
+  testMode.note('quickpick', { title: '', placeholder: t('Which command?'), items: items.filter((i) => i.kind !== vscode.QuickPickItemKind.Separator).map((i) => i.label) });
+  const pick = await vscode.window.showQuickPick(items, { placeHolder: t('Which command?'), matchOnDescription: true, matchOnDetail: true, ignoreFocusOut: true });
   return pick?.id ?? null;
 }
