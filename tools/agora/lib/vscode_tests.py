@@ -64,14 +64,21 @@ class Display:
                 self.proc.kill()
 
 
-def run(home: Path, node: str, code: str, code_cli: str, test_electron: str, vsix: str, env: dict[str, str]) -> tuple[list[Finding], list[str], list[dict]]:
-    """Run the tests. Returns findings (one per failed test), notes for a person, and every test's name, status and seconds."""
+def run(home: Path, node: str, code: str, code_cli: str, test_electron: str, vsix: str, env: dict[str, str],
+        folders: list[tuple[str, str]] | None = None, suite: str | None = None) -> tuple[list[Finding], list[str], list[dict]]:
+    """Run the tests. Returns findings (one per failed test), notes for a person, and every test's name, status and seconds.
+
+    With `suite` (a directory whose index.js exports run(), see test/vscode/run.js) only that suite runs, once, in a trusted workspace
+    holding this clone and `folders` (name, path), the caller's own tests of the extension for a workspace of its own."""
     ext = home / DIR
     began = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="agora-vscode-") as tmp, Display() as display:
         report = Path(tmp) / "report.json"
         run_env = {**env, "DISPLAY": display.name, "IF_CONSOLE_VSCODE": code, "IF_CONSOLE_VSCODE_CLI": code_cli, "IF_CONSOLE_VSIX": vsix, "IF_CONSOLE_TEST_ELECTRON": test_electron,
                    "IF_CONSOLE_REAL_ROOT": str(home), "IF_CONSOLE_VSCODE_REPORT": str(report), "NODE_OPTIONS": "", "HOME": env.get("HOME", tmp)}
+        if suite:
+            run_env["IF_CONSOLE_VSCODE_SUITE"] = suite
+            run_env["IF_CONSOLE_VSCODE_FOLDERS"] = json.dumps([{"name": n, "path": p} for n, p in folders or []])
         try:
             done = subprocess.run([node, str(ext / "test" / "vscode" / "run.js")], cwd=ext, env=run_env, capture_output=True, text=True,
                                   timeout=TIMEOUT)

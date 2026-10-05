@@ -177,4 +177,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Intellectual Frontiers Console
 
+|`0044-public-website`
+|Draft
+|The public website
+
 |===

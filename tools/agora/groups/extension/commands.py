@@ -4,11 +4,12 @@ Thin: the rules and the packing are agora.lib.extension. Node is the one the loc
 """
 from __future__ import annotations
 
+import json
 import tempfile
 from pathlib import Path
 
-from agora.core import AgoraError, Ctx, Finding, Resource, SectionResult, command, next_command, section
-from agora.core.resource import MISSING, FAILED
+from agora.core import AgoraError, Ctx, Finding, Opt, Resource, SectionResult, command, next_command, section
+from agora.core.resource import MISSING, FAILED, USAGE
 from agora.lib import extension, node, vscode_tests
 from agora.lib.register import known_repositories
 
@@ -64,6 +65,43 @@ def check_extension(ctx: Ctx, scope: str | None) -> SectionResult:
     if unrun and result.status == "passed":  # what could not run is skipped, never passed (0041 FR-033)
         result.status, result.reason = "skipped", f"the vscode runner did not run: {unrun}"
     return result
+
+
+@command("extension test", category="check", toolchain=("vscode", "vsce"),
+         help="Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named",
+         options=[Opt("--suite", "TEXT", "the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does", required=True),
+                  Opt("--workspace", "TEXT", "a folder to add to the workspace after this clone; repeatable, as NAME=PATH or PATH", multiple=True),
+                  Opt("--report", "TEXT", "also write every test's name, status and seconds to this JSON file")])
+def extension_test(ctx: Ctx, suite: str, workspace: list[str] | tuple[str, ...], report: str | None) -> Resource:
+    """Another repository's tests of the extension (0043-if-console FR-034). Nothing of the caller is named here: the suite and the folders are
+    paths, and the suite loads the extension's own test support from IF_CONSOLE_EXTENSION_DIR."""
+    exe = _node(ctx)
+    suite_dir = Path(suite).expanduser().resolve()
+    if not (suite_dir / "index.js").is_file():
+        raise AgoraError("invalid-argument", f"--suite {suite}: there is no index.js in it", exit=USAGE)
+    folders: list[tuple[str, str]] = []
+    for w in workspace:
+        name, sep, raw = w.partition("=")
+        path = Path(raw if sep else w).expanduser().resolve()
+        if not path.is_dir():
+            raise AgoraError("invalid-argument", f"--workspace {w}: {path} is not a folder", exit=USAGE)
+        folders.append((name if sep else path.name, str(path)))
+    try:
+        r = ctx.toolchain().use(["vscode", "vsce"])
+    except AgoraError as e:
+        raise AgoraError("toolchain-missing", f"the real VS Code did not run: {e.message}", exit=MISSING) from e
+    try:
+        findings, notes, rows = vscode_tests.run(ctx.home, exe, str(r.path_of("code")), str(r.path_of("code-cli")), str(r.path_of("vscode-test")), "",
+                                                 ctx.toolchain().clean_env(), folders, str(suite_dir))
+    except vscode_tests.DisplayError as e:
+        raise AgoraError("no-display", f"the real VS Code did not run: {e}", exit=MISSING) from e
+    if report:
+        Path(report).expanduser().write_text(json.dumps({"tests": rows}, indent=2) + "\n", encoding="utf-8")
+    data = {"suite": str(suite_dir), "folders": [{"name": n, "path": p} for n, p in folders], "tests": rows, "notes": notes,
+            "passed": sum(1 for t in rows if t["status"] == "passed"), "findings": [f"{f.where}: {f.message}" for f in findings]}
+    if findings:
+        raise AgoraError("tests-failed", "; ".join(f.message for f in findings[:3]), exit=FAILED, detail=data)
+    return Resource("extension", "test", data)
 
 
 @command("extension build", category="build", toolchain=("vsce",),

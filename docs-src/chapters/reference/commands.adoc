@@ -250,6 +250,11 @@ The IF Console VS Code extension, built from tools/if-console/ (0043-if-console)
 |terminal, editor, mcp
 |Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock
 
+|`agora extension test --suite TEXT [--workspace TEXT] [--report TEXT]`
+|check
+|terminal, editor, mcp
+|Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named
+
 |===
 
 === figure

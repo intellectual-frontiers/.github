@@ -178,5 +178,69 @@ class VscodeRun(unittest.TestCase):
         self.assertIn("agora system add", str(e.exception))
 
 
+class ExternalSuite(unittest.TestCase):
+    """`extension test --suite DIR --workspace [NAME=]DIR` (0043 FR-034): another repository's suite, run in a workspace of this clone and its folders."""
+
+    def setUp(self):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        self.tmp = Path(d.name)
+        (self.tmp / "suite").mkdir()
+        (self.tmp / "suite" / "index.js").write_text("exports.run = async () => {};\n")
+        (self.tmp / "other").mkdir()
+
+        class Resolved:
+            env = lambda self, extra=None: {}
+            def path_of(self, name):
+                return Path("/x") / name
+        self.resolved = Resolved()
+
+    def go(self, *argv, vscode, use=None):
+        patches = [mock.patch("agora.core.worker.needs_worker", return_value=False),
+                   mock.patch.object(Toolchain, "use", use or (lambda _toolchain, names: self.resolved)),
+                   mock.patch.object(Toolchain, "clean_env", lambda _toolchain: {}),
+                   mock.patch("agora.groups.extension.commands._node", return_value="/n/node"),
+                   mock.patch.object(vscode_tests, "run", vscode)]
+        for p in patches:
+            p.start()
+            self.addCleanup(p.stop)
+        return run_json(["extension", "test", *argv, "--no-log"], env={"AGORA_PLAN_GROUP": "extension"})
+
+    def test_the_suite_and_folders_are_passed_on_and_a_pass_is_a_resource(self):
+        seen = {}
+
+        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None):
+            seen.update(folders=folders, suite=suite, vsix=vsix)
+            return [], ["real VS Code: 2 of 2 tests passed in 1.0s"], [{"name": "x: a", "status": "passed", "seconds": 1}, {"name": "x: b", "status": "passed", "seconds": 1}]
+        report = self.tmp / "r.json"
+        code, doc = self.go("--suite", str(self.tmp / "suite"), "--workspace", f"other={self.tmp / 'other'}", "--workspace", str(self.tmp / "suite"),
+                            "--report", str(report), vscode=fake)
+        self.assertEqual(code, 0, doc)
+        self.assertEqual(seen["suite"], str((self.tmp / "suite").resolve()))
+        self.assertEqual([n for n, _ in seen["folders"]], ["other", "suite"], "NAME=PATH names a folder; a bare path is named by its last part")
+        self.assertEqual(doc["data"]["passed"], 2)
+        self.assertEqual(json.loads(report.read_text())["tests"][0]["name"], "x: a")
+
+    def test_a_failed_test_exits_1_naming_it(self):
+        from agora.core.checks import Finding
+        failing = lambda *a, **kw: ([Finding("error", "x", "fails in a real VS Code: x: a: nope")], [], [{"name": "x: a", "status": "failed", "seconds": 1}])
+        code, doc = self.go("--suite", str(self.tmp / "suite"), vscode=failing)
+        self.assertEqual(code, 1)
+        self.assertIn("nope", json.dumps(doc))
+
+    def test_no_display_server_exits_3_naming_the_setup_command(self):
+        def display(*a, **kw):
+            raise vscode_tests.DisplayError("Xvfb is not installed; run `agora system add` once")
+        code, doc = self.go("--suite", str(self.tmp / "suite"), vscode=display)
+        self.assertEqual(code, 3)
+        self.assertIn("agora system add", json.dumps(doc))
+
+    def test_a_suite_with_no_index_and_a_folder_that_is_not_one_are_usage_errors(self):
+        code, _ = self.go("--suite", str(self.tmp), vscode=lambda *a, **k: ([], [], []))
+        self.assertEqual(code, 2)
+        code, _ = self.go("--suite", str(self.tmp / "suite"), "--workspace", str(self.tmp / "nope"), vscode=lambda *a, **k: ([], [], []))
+        self.assertEqual(code, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

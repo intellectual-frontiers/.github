@@ -2099,6 +2099,9 @@ ifcore:PublishCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbSchem
 ifcore:ServeCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "serve"@en ;
     skos:notation "serve" ;
     skos:definition "Runs until stopped."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TestCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "test"@en ;
+    skos:notation "test" ;
+    skos:definition "Runs a resource's tests in a place its own check does not, writing nothing."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandSurfaceScheme a skos:ConceptScheme ; rdfs:label "Command surface"@en ;
     rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The terminal is the core; the editor is served by the IF Console extension (0043-if-console), not by a command; and MCP is for agents. No web UI is a surface."@en ;
@@ -2390,6 +2393,10 @@ ifcore:AgoraExtensionBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Ago
     dcterms:identifier "extension build" ;
     ifcore:commandNoun ifcore:ExtensionResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
     skos:definition "Builds the IF Console extension's .vsix into build/, with Node from the locked package and the extension's own lock (0042-agora FR-032)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraExtensionTestCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "extension test"@en ;
+    dcterms:identifier "extension test" ;
+    ifcore:commandNoun ifcore:ExtensionResourceKind ; ifcore:commandVerb ifcore:TestCommandVerb ; ifcore:commandCategory ifcore:CheckCommandCategory ;
+    skos:definition "Runs a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace of this clone and the folders named (0043-if-console FR-034)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraFigureBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure build"@en ;
     dcterms:identifier "figure build" ;
     ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
