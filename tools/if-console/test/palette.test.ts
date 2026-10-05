@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { Loose } from './support/fake-launcher';
-import { boot, defaultDocs, k, action } from './support/boot';
+import { boot, defaultDocs, k } from './support/boot';
 
 test('FR-012, FR-013: Run Command lists every editor command grouped by repository and noun, and builds the form from the typed arguments', async () => {
   const b = await boot();
@@ -14,6 +14,9 @@ test('FR-012, FR-013: Run Command lists every editor command grouped by reposito
   assert.deepEqual(seps, ['other: repository-wide', 'other: widget']);
   const ids = listed.filter((i: Loose) => i.kind !== -1).map((i: Loose) => i.id);
   assert.deepEqual(ids, ['check', 'doctor', 'fresh', 'widget list', 'widget show', 'widget new', 'widget approve']);
+  const withTitle = listed.find((i: Loose) => i.id === 'widget show');
+  assert.match(withTitle.description, /^Show Widget\u2026 \u00b7 read$/, 'the command line\'s own palette title is beside the command');
+  assert.equal(withTitle.iconPath.id, 'eye', 'with its own icon');
   assert.ok(!ids.includes('secret tool') && !ids.includes('mcp serve'));
   const last = b.stub.calls.messages.filter((m: Loose) => m.kind === 'quickpick').at(-1);
   assert.equal(last.items[0].description, './other widget new w9', 'the last step shows the whole command line');
@@ -56,18 +59,6 @@ test('FR-024: with checkOnSave on, saving a file runs `check --changed` for its 
   await off.stub.calls.onSave({ uri: { fsPath: `${off.first.root}/a.md` } });
   assert.equal(off.first.invocations().length, n);
   off.cleanup();
-});
-
-test('FR-019: the generators `fresh` reports stale are chores, each with its rewriting action, run through the dry-run diff', async () => {
-  const fresh = k.doc('fresh', 'all', { status: 'stale', generators: [] }, { actions: [action('rewrite what theme writes', 'widget approve', 'decision', { widget: 'w1' })] });
-  const b = await boot({ docs: defaultDocs({ 'fresh': { doc: fresh, exit: 1 }, 'command show fresh': { doc: k.detail('fresh', 'check', []) } }) });
-  b.stub.script.warnings.push(undefined);
-  await b.command('fresh');
-  const view = b.context.subscriptions.find((s) => s.id === 'if-console.chores').o.treeDataProvider;
-  const groups = await view.getChildren((await view.getChildren())[0]);
-  const attention = await view.getChildren(groups.find((g: Loose) => view.getTreeItem(g).label === 'Needs attention'));
-  assert.ok((await Promise.all(attention.map((n: Loose) => view.getTreeItem(n).label))).includes('rewrite what theme writes'));
-  b.cleanup();
 });
 
 test('FR-021: a document in a newer form than the extension knows is never shown; an update is offered', async () => {

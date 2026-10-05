@@ -50,9 +50,11 @@ def editor():
              "VS Code asks whether you trust the folder. IF Console runs nothing until you do, because it runs this repository's "
              "own command line. That choice is VS Code's own and is yours."),
             ("Find your way",
-             "Open the IF Console view in the activity bar: Command lines lists every command, Chores lists what needs doing, and "
-             "Checks lists the sections. The palette's IF Console commands run Check, Fresh, Test and Doctor, and Learn shows "
-             "these topics with a button for each step."),
+             "Open the IF Console view in the activity bar. Home lists what needs you, each with the command line that fixes it and "
+             "a Run button; the views below it (Specs, Design systems, Toolchain and the others this command line declares) list "
+             "its resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the "
+             "setting `if-console.showAllCommands`. The palette's IF Console commands run Check, Fresh, Test and Doctor, and "
+             "Learn shows these topics with a button for each step."),
             ("Writes and decisions",
              "A command that writes shows each file it would change as a diff first, and runs only if you accept. A decision "
              "asks in a dialog that names the command and what it changes."),

@@ -54,9 +54,9 @@ test('FR-003: sources require only VS Code, Node\'s built-ins the extension need
   for (const [name, version] of Object.entries(manifest.devDependencies ?? {}) as Array<[string, string]>) assert.match(version, /^\d+\.\d+\.\d+$/, `${name} is pinned to one exact version`);
 });
 
-test('FR-024: the settings are only if-console.launchers and if-console.checkOnSave, and neither can be set by a workspace', () => {
+test('FR-024: the settings are the four the spec lists, none can be set by a workspace, and none changes what a command does', () => {
   const props = manifest.contributes.configuration.properties;
-  assert.deepEqual(Object.keys(props).sort(), ['if-console.checkOnSave', 'if-console.launchers']);
+  assert.deepEqual(Object.keys(props).sort(), ['if-console.checkOnSave', 'if-console.launchers', 'if-console.rowLimit', 'if-console.showAllCommands']);
   for (const p of Object.values(props) as Loose[]) assert.equal(p.scope, 'application');
   assert.equal(props['if-console.checkOnSave'].default, false);
 });
@@ -74,13 +74,14 @@ test('FR-001, FR-006, FR-030: the manifest names the extension, declares no supp
 });
 
 test('FR-012, FR-015: the palette offers the repository-wide commands and Run Command; no command, keybinding or task runs a decision directly', () => {
-  const titles = manifest.contributes.commands.filter((c: Loose) => !/activateNode|runSection/.test(c.command)).map((c: Loose) => c.title);
-  for (const want of ['Run Command', 'Check', 'Fresh', 'Test', 'Doctor', 'Show Command Line', 'Get Help', 'Copy Context', 'Open View']) assert.ok(titles.includes(want), want);
-  assert.equal(manifest.contributes.keybindings, undefined, 'the extension binds no key; a person binds a task or a command themselves');
+  const titles = manifest.contributes.commands.map((c: Loose) => c.title);
+  for (const want of ['Run Command\u2026', 'Run Check\u2026', 'Prove Generated Files', 'Run Tests', 'Check Health', 'Show Command Line\u2026', 'Get Help\u2026', 'Copy Context\u2026', 'Open Page\u2026']) assert.ok(titles.includes(want), want);
   const defs = manifest.contributes.taskDefinitions[0].properties.command.enum;
   assert.deepEqual(defs, ['check', 'test', 'fresh', 'doctor']);
   const hidden = manifest.contributes.menus.commandPalette.filter((m: Loose) => m.when === 'false').map((m: Loose) => m.command).sort();
-  assert.deepEqual(hidden, ['if-console.activateNode', 'if-console.runSection']);
+  assert.deepEqual(hidden, ['if-console.activateNode', 'if-console.copyCommandLine', 'if-console.copyId', 'if-console.followLink', 'if-console.openRow', 'if-console.runNounCommand',
+    'if-console.runRowAction', 'if-console.runSection', 'if-console.runSuggestion']);
+  for (const k of manifest.contributes.keybindings as Loose[]) assert.ok(!hidden.includes(k.command) && k.command !== 'if-console.runCommand', 'no key runs a command that can write or decide');
 });
 
 test('FR-023, FR-003, FR-026: a whole session opens no connection and runs no program but the launcher', async () => {

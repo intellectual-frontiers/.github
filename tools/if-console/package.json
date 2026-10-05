@@ -52,177 +52,422 @@
     "views": {
       "if-console": [
         {
-          "id": "if-console.commands",
-          "name": "Command lines",
+          "id": "if-console.home",
+          "name": "Home",
           "contextualTitle": "IF Console"
         },
         {
-          "id": "if-console.chores",
-          "name": "Chores",
-          "contextualTitle": "IF Console"
+          "id": "if-console.view.0",
+          "name": "Section 1",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.0",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.1",
+          "name": "Section 2",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.1",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.2",
+          "name": "Section 3",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.2",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.3",
+          "name": "Section 4",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.3",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.4",
+          "name": "Section 5",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.4",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.5",
+          "name": "Section 6",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.5",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.6",
+          "name": "Section 7",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.6",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.7",
+          "name": "Section 8",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.7",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.8",
+          "name": "Section 9",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.8",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.9",
+          "name": "Section 10",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.9",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.10",
+          "name": "Section 11",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.10",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.11",
+          "name": "Section 12",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.11",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.12",
+          "name": "Section 13",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.12",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.13",
+          "name": "Section 14",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.13",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.14",
+          "name": "Section 15",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.14",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.view.15",
+          "name": "Section 16",
+          "contextualTitle": "IF Console",
+          "when": "if-console.slot.15",
+          "visibility": "collapsed"
         },
         {
           "id": "if-console.checks",
           "name": "Checks",
-          "contextualTitle": "IF Console"
+          "contextualTitle": "IF Console",
+          "when": "if-console.hasRepository",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "if-console.commands",
+          "name": "All commands",
+          "contextualTitle": "IF Console",
+          "when": "if-console.allCommands",
+          "visibility": "collapsed"
         }
       ]
     },
     "viewsWelcome": [
       {
+        "view": "if-console.home",
+        "contents": "No folder in this window declares a command line for IF Console. A repository declares its own with a `.if-console.env` file at its root, or you can name a launcher yourself in your settings.\n[Refresh](command:if-console.refresh)\n[Name a launcher in settings](command:workbench.action.openSettings?%5B%22if-console.launchers%22%5D)",
+        "when": "!if-console.hasRepository && !if-console.untrusted && !if-console.unavailable"
+      },
+      {
+        "view": "if-console.home",
+        "contents": "This workspace is not trusted, so IF Console runs nothing. Trusting it is a decision only you can make.\n[Trust this workspace](command:if-console.trust)",
+        "when": "if-console.untrusted"
+      },
+      {
+        "view": "if-console.home",
+        "contents": "A command line was found but it did not start, so there is nothing to show yet. The output says why.\n[Show Output](command:if-console.showOutput)\n[Refresh](command:if-console.refresh)",
+        "when": "!if-console.hasRepository && !if-console.untrusted && if-console.unavailable && !if-console.toolchainMissing"
+      },
+      {
+        "view": "if-console.home",
+        "contents": "A command line was found but a program or library it needs is not on this machine yet. Run its `doctor` command in a terminal to see which, and the command that fetches it.\n[Open a terminal](command:workbench.action.terminal.new)\n[Show Output](command:if-console.showOutput)\n[Refresh](command:if-console.refresh)",
+        "when": "!if-console.hasRepository && !if-console.untrusted && if-console.toolchainMissing"
+      },
+      {
         "view": "if-console.commands",
-        "contents": "No folder in this window declares a command line for IF Console. A repository declares its own with a .if-console.env file at its root.\n[Refresh](command:if-console.refresh)",
+        "contents": "No folder in this window declares a command line for IF Console.\n[Refresh](command:if-console.refresh)",
         "when": "!if-console.hasRepository && !if-console.untrusted"
       },
       {
         "view": "if-console.commands",
-        "contents": "This workspace is not trusted, so IF Console runs nothing. Trusting it is a decision only you can make.\n[Trust this workspace](command:if-console.trust)",
+        "contents": "This workspace is not trusted, so IF Console runs nothing.\n[Trust this workspace](command:if-console.trust)",
         "when": "if-console.untrusted"
       }
     ],
     "commands": [
       {
-        "command": "if-console.runCommand",
-        "title": "Run Command",
+        "command": "if-console.showHome",
+        "title": "Show Home",
         "category": "IF Console",
-        "icon": "$(play)"
+        "icon": "$(home)"
+      },
+      {
+        "command": "if-console.runCommand",
+        "title": "Run Command…",
+        "category": "IF Console",
+        "icon": "$(play)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.check",
-        "title": "Check",
+        "title": "Run Check…",
         "category": "IF Console",
-        "icon": "$(checklist)"
+        "icon": "$(checklist)",
+        "enablement": "if-console.hasRepository"
+      },
+      {
+        "command": "if-console.checkChanged",
+        "title": "Run Check on Changes",
+        "category": "IF Console",
+        "icon": "$(diff)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.fresh",
-        "title": "Fresh",
+        "title": "Prove Generated Files",
         "category": "IF Console",
-        "icon": "$(sync)"
+        "icon": "$(sync)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.test",
-        "title": "Test",
+        "title": "Run Tests",
         "category": "IF Console",
-        "icon": "$(beaker)"
+        "icon": "$(beaker)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.doctor",
-        "title": "Doctor",
+        "title": "Check Health",
         "category": "IF Console",
-        "icon": "$(pulse)"
+        "icon": "$(pulse)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.showCommandLine",
-        "title": "Show Command Line",
+        "title": "Show Command Line…",
         "category": "IF Console",
-        "icon": "$(terminal)"
+        "icon": "$(terminal)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.getHelp",
-        "title": "Get Help",
+        "title": "Get Help…",
         "category": "IF Console",
-        "icon": "$(question)"
+        "icon": "$(question)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.learn",
-        "title": "Learn",
+        "title": "Learn a Topic…",
         "category": "IF Console",
-        "icon": "$(book)"
+        "icon": "$(book)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.copyContext",
-        "title": "Copy Context",
+        "title": "Copy Context…",
         "category": "IF Console",
-        "icon": "$(copy)"
+        "icon": "$(sparkle)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.openView",
-        "title": "Open View",
+        "title": "Open Page…",
         "category": "IF Console",
-        "icon": "$(browser)"
+        "icon": "$(browser)",
+        "enablement": "if-console.hasRepository"
+      },
+      {
+        "command": "if-console.findResource",
+        "title": "Find Resource…",
+        "category": "IF Console",
+        "icon": "$(search)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.refresh",
-        "title": "Refresh",
+        "title": "Refresh Views",
         "category": "IF Console",
         "icon": "$(refresh)"
       },
       {
         "command": "if-console.showOutput",
         "title": "Show Output",
-        "category": "IF Console"
+        "category": "IF Console",
+        "icon": "$(output)"
       },
       {
         "command": "if-console.trust",
-        "title": "Trust This Workspace",
+        "title": "Trust This Workspace…",
         "category": "IF Console",
-        "icon": "$(shield)"
+        "icon": "$(shield)",
+        "enablement": "if-console.untrusted"
+      },
+      {
+        "command": "if-console.cancelRun",
+        "title": "Stop Running Command",
+        "category": "IF Console",
+        "icon": "$(debug-stop)",
+        "enablement": "if-console.running"
+      },
+      {
+        "command": "if-console.toggleAllCommands",
+        "title": "Show All Commands",
+        "category": "IF Console",
+        "icon": "$(list-tree)",
+        "enablement": "if-console.hasRepository"
       },
       {
         "command": "if-console.activateNode",
         "title": "Open Entry",
-        "category": "IF Console"
+        "category": "IF Console",
+        "icon": "$(play)"
       },
       {
         "command": "if-console.runSection",
-        "title": "Run This Check Section",
+        "title": "Run Check Section",
         "category": "IF Console",
         "icon": "$(play)"
+      },
+      {
+        "command": "if-console.runSuggestion",
+        "title": "Run Suggestion",
+        "category": "IF Console",
+        "icon": "$(play)"
+      },
+      {
+        "command": "if-console.openRow",
+        "title": "Open Resource",
+        "category": "IF Console",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "if-console.runRowAction",
+        "title": "Run Resource Action…",
+        "category": "IF Console",
+        "icon": "$(play)"
+      },
+      {
+        "command": "if-console.runNounCommand",
+        "title": "Run Command for This Kind…",
+        "category": "IF Console",
+        "icon": "$(play)"
+      },
+      {
+        "command": "if-console.copyCommandLine",
+        "title": "Copy Command Line",
+        "category": "IF Console",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "if-console.copyId",
+        "title": "Copy Identifier",
+        "category": "IF Console",
+        "icon": "$(key)"
+      },
+      {
+        "command": "if-console.followLink",
+        "title": "Follow Link",
+        "category": "IF Console",
+        "icon": "$(link)"
       }
     ],
     "menus": {
       "commandPalette": [
         {
+          "command": "if-console.showHome",
+          "when": "if-console.hasRepository || if-console.untrusted || if-console.unavailable"
+        },
+        {
           "command": "if-console.runCommand",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.check",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
+        },
+        {
+          "command": "if-console.checkChanged",
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.fresh",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.test",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.doctor",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.showCommandLine",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.getHelp",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.learn",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.copyContext",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.openView",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository"
+        },
+        {
+          "command": "if-console.findResource",
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.refresh",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository || if-console.untrusted || if-console.unavailable"
         },
         {
           "command": "if-console.showOutput",
-          "when": "if-console.hasRepository || if-console.untrusted"
+          "when": "if-console.hasRepository || if-console.untrusted || if-console.unavailable"
         },
         {
           "command": "if-console.trust",
           "when": "if-console.untrusted"
+        },
+        {
+          "command": "if-console.cancelRun",
+          "when": "if-console.running"
+        },
+        {
+          "command": "if-console.toggleAllCommands",
+          "when": "if-console.hasRepository"
         },
         {
           "command": "if-console.activateNode",
@@ -231,30 +476,208 @@
         {
           "command": "if-console.runSection",
           "when": "false"
+        },
+        {
+          "command": "if-console.runSuggestion",
+          "when": "false"
+        },
+        {
+          "command": "if-console.openRow",
+          "when": "false"
+        },
+        {
+          "command": "if-console.runRowAction",
+          "when": "false"
+        },
+        {
+          "command": "if-console.runNounCommand",
+          "when": "false"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "false"
+        },
+        {
+          "command": "if-console.copyId",
+          "when": "false"
+        },
+        {
+          "command": "if-console.followLink",
+          "when": "false"
         }
       ],
       "view/title": [
         {
+          "command": "if-console.cancelRun",
+          "when": "view =~ /^if-console\\.(home|view\\.\\d+|checks|commands)$/ && if-console.running",
+          "group": "navigation@0"
+        },
+        {
           "command": "if-console.refresh",
-          "when": "view == if-console.commands || view == if-console.chores || view == if-console.checks",
-          "group": "navigation"
+          "when": "view == if-console.home",
+          "group": "navigation@1"
+        },
+        {
+          "command": "if-console.learn",
+          "when": "view == if-console.home && if-console.hasRepository",
+          "group": "navigation@2"
+        },
+        {
+          "command": "if-console.toggleAllCommands",
+          "when": "view == if-console.home && if-console.hasRepository",
+          "group": "9_more@1"
+        },
+        {
+          "command": "if-console.showOutput",
+          "when": "view == if-console.home",
+          "group": "9_more@2"
+        },
+        {
+          "command": "if-console.check",
+          "when": "view == if-console.checks",
+          "group": "navigation@1"
+        },
+        {
+          "command": "if-console.checkChanged",
+          "when": "view == if-console.checks",
+          "group": "navigation@2"
+        },
+        {
+          "command": "if-console.refresh",
+          "when": "view == if-console.checks",
+          "group": "navigation@3"
+        },
+        {
+          "command": "if-console.findResource",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "if-console.refresh",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/",
+          "group": "navigation@2"
         },
         {
           "command": "if-console.runCommand",
           "when": "view == if-console.commands",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "if-console.refresh",
+          "when": "view == if-console.commands",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [
         {
-          "command": "if-console.copyContext",
-          "when": "view == if-console.commands && viewItem == resource",
-          "group": "inline"
+          "command": "if-console.runSuggestion",
+          "when": "view == if-console.home && viewItem =~ /^suggestion/ && viewItem =~ /\\brunnable\\b/",
+          "group": "inline@1"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "view == if-console.home && viewItem =~ /^suggestion/ && viewItem =~ /\\bcopyable\\b/",
+          "group": "inline@2"
+        },
+        {
+          "command": "if-console.runSuggestion",
+          "when": "view == if-console.home && viewItem =~ /^suggestion/ && viewItem =~ /\\brunnable\\b/",
+          "group": "1_run@1"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "view == if-console.home && viewItem =~ /^suggestion/ && viewItem =~ /\\bcopyable\\b/",
+          "group": "2_copy@1"
         },
         {
           "command": "if-console.runSection",
-          "when": "view == if-console.checks && viewItem == section",
+          "when": "view == if-console.checks && viewItem =~ /^section/",
+          "group": "inline@1"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "view == if-console.checks && viewItem =~ /^section/",
+          "group": "inline@2"
+        },
+        {
+          "command": "if-console.runSection",
+          "when": "view == if-console.checks && viewItem =~ /^section/",
+          "group": "1_run@1"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "view == if-console.checks && viewItem =~ /^section/",
+          "group": "2_copy@1"
+        },
+        {
+          "command": "if-console.copyId",
+          "when": "view == if-console.checks && viewItem =~ /^section/",
+          "group": "9_cutcopypaste@1"
+        },
+        {
+          "command": "if-console.openRow",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "inline@1"
+        },
+        {
+          "command": "if-console.runRowAction",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "inline@2"
+        },
+        {
+          "command": "if-console.copyContext",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bcontextual\\b/",
+          "group": "inline@3"
+        },
+        {
+          "command": "if-console.openRow",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "if-console.runRowAction",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "1_run@1"
+        },
+        {
+          "command": "if-console.copyCommandLine",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "2_copy@1"
+        },
+        {
+          "command": "if-console.copyContext",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bcontextual\\b/",
+          "group": "2_copy@2"
+        },
+        {
+          "command": "if-console.copyId",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /\\bopenable\\b/",
+          "group": "9_cutcopypaste@1"
+        },
+        {
+          "command": "if-console.runNounCommand",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /^noun/",
+          "group": "inline@1"
+        },
+        {
+          "command": "if-console.runNounCommand",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /^noun/",
+          "group": "1_run@1"
+        },
+        {
+          "command": "if-console.activateNode",
+          "when": "view =~ /^if-console\\.view\\.\\d+$/ && viewItem =~ /^command/",
+          "group": "1_run@1"
+        },
+        {
+          "command": "if-console.copyContext",
+          "when": "view == if-console.commands && viewItem =~ /\\bcontextual\\b/",
           "group": "inline"
+        },
+        {
+          "command": "if-console.copyContext",
+          "when": "view == if-console.commands && viewItem =~ /\\bcontextual\\b/",
+          "group": "2_copy@1"
         }
       ]
     },
@@ -304,13 +727,31 @@
           },
           "default": [],
           "scope": "application",
+          "order": 1,
           "markdownDescription": "Launcher file names to try at the root of a workspace folder that declares none in its own `.if-console.env`. Only your own user settings are read; a workspace cannot name what IF Console runs."
         },
         "if-console.checkOnSave": {
           "type": "boolean",
           "default": false,
           "scope": "application",
-          "markdownDescription": "After a file is saved, run `check --changed` for its repository and show the findings in Problems."
+          "order": 2,
+          "markdownDescription": "After a file is saved, run `check --changed` for its repository and show the findings in **Problems**."
+        },
+        "if-console.showAllCommands": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "order": 3,
+          "markdownDescription": "Show the **All commands** view, the tree of every noun, command and resource of every command line. It is hidden by default because **Home** and the views each command line declares are where daily work is; the *Show All Commands* action in Home's `…` menu shows it for this session only."
+        },
+        "if-console.rowLimit": {
+          "type": "number",
+          "default": 200,
+          "minimum": 10,
+          "maximum": 5000,
+          "scope": "application",
+          "order": 4,
+          "markdownDescription": "The most rows of one kind a view lists before it says how many more there are. **Find Resource** searches all of them."
         }
       }
     },
@@ -318,6 +759,28 @@
       {
         "id": "if-console.servers",
         "label": "IF Console"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "if-console.showHome",
+        "key": "ctrl+alt+i h",
+        "when": "if-console.hasRepository"
+      },
+      {
+        "command": "if-console.check",
+        "key": "ctrl+alt+i c",
+        "when": "if-console.hasRepository"
+      },
+      {
+        "command": "if-console.learn",
+        "key": "ctrl+alt+i l",
+        "when": "if-console.hasRepository"
+      },
+      {
+        "command": "if-console.copyContext",
+        "key": "ctrl+alt+i x",
+        "when": "if-console.hasRepository"
       }
     ]
   },

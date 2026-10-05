@@ -95,7 +95,7 @@ def toolchain_show(ctx: Ctx, entry: str) -> Resource:
 
 
 # toolchain add -----------------------------------------------------------------------------------------------------
-@command("toolchain add", category="setup", surfaces=("editor",),  # widened to the editor (0041 FR-022): the Chores view fetches an entry
+@command("toolchain add", category="setup", surfaces=("editor",),  # widened to the editor (0041 FR-022): Home offers to fetch an entry
          help="Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check",
          args=[Arg("entries", "ENTRY", "the entries; every one with a build for this platform when none is named", many=True)])
 def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:

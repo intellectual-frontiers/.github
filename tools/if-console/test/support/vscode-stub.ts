@@ -21,6 +21,8 @@ export class Uri {
   static file(p: string): Uri { return new Uri('file', p); }
   static parse(s: string): Uri { const m = /^([a-z][a-z0-9+.-]*):(.*)$/i.exec(s) ?? ['', 'file', s]; return new Uri(m[1] as string, m[2] as string, s); }
   static joinPath(base: Uri, ...parts: string[]): Uri { return new Uri(base.scheme, path.join(base.path, ...parts)); }
+  static from(c: { scheme: string; path?: string; query?: string }): Uri { const u = new Uri(c.scheme, c.path ?? ''); u.query = c.query ?? ''; return u; }
+  query = '';
 }
 class Position { constructor(public line: number, public character: number) {} }
 class Range {
@@ -30,7 +32,18 @@ class Range {
 class Location { constructor(public uri: Uri, public range: Loose) {} }
 class Diagnostic { source?: string; constructor(public range: Range, public message: string, public severity: number) {} }
 const DiagnosticSeverity = { Error: 0, Warning: 1, Information: 2, Hint: 3 };
-class ThemeIcon { constructor(public id: string) {} }
+class ThemeIcon { constructor(public id: string, public color?: Loose) {} }
+class ThemeColor { constructor(public id: string) {} }
+class MarkdownString {
+  value: string; isTrusted: Loose; supportHtml = false;
+  constructor(value = '', public supportThemeIcons = false) { this.value = value; }
+  appendMarkdown(v: string): MarkdownString { this.value += v; return this; }
+  appendText(v: string): MarkdownString { this.value += v; return this; }
+}
+class FileDecoration { propagate = false; constructor(public badge?: string, public tooltip?: string, public color?: Loose) {} }
+class CodeLens { command?: Loose; constructor(public range: Range, command?: Loose) { this.command = command; } }
+class Hover { constructor(public contents: Loose, public range?: Range) {} }
+class DocumentLink { tooltip?: string; constructor(public range: Range, public target?: Uri) {} }
 class TreeItem { collapsibleState: number; [k: string]: Loose; constructor(public label: Loose, state?: number) { this.collapsibleState = state === undefined ? 0 : state; } }
 const TreeItemCollapsibleState = { None: 0, Collapsed: 1, Expanded: 2 };
 class Task { constructor(public definition: Loose, public scope: Loose, public name: string, public source: string, public execution: Loose) {} [k: string]: Loose }
@@ -52,7 +65,7 @@ export interface Stub {
 }
 
 export function createStub(options: StubOptions = {}): Stub {
-  const calls: Loose = { messages: [], commands: [], registered: new Map(), output: [], info: [], webviews: [], diffs: [], clipboard: [], tasks: null, mcp: null, textDocs: [], opened: [], watchers: [] };
+  const calls: Loose = { contexts: new Map<string, Loose>(), progress: [], decorationProvider: null, languages: [], statusBar: [], treeViews: new Map<string, Loose>(), messages: [], commands: [], registered: new Map(), output: [], info: [], webviews: [], diffs: [], clipboard: [], tasks: null, mcp: null, textDocs: [], opened: [], watchers: [] };
   const script = { quickPicks: [] as Loose[], inputs: [] as Loose[], warnings: [] as Loose[], infos: [] as Loose[], errors: [] as Loose[] };
   const diagnostics = new Map<string, Loose>();
   const answer = (queue: Loose[], fallback: Loose): Loose => (queue.length ? queue.shift() : fallback);
@@ -60,14 +73,14 @@ export function createStub(options: StubOptions = {}): Stub {
   const config = options.config ?? {};
   const vscode: Loose = {
     EventEmitter, Uri, Position, Range, Location, Diagnostic, DiagnosticSeverity, ThemeIcon, TreeItem, TreeItemCollapsibleState, Task, CustomExecution, RelativePattern,
-    TestMessage, TaskGroup: { Build: 'build', Test: 'test' }, StatusBarAlignment: { Left: 1, Right: 2 }, ProgressLocation: { Notification: 15 },
-    QuickPickItemKind: { Separator: -1, Default: 0 }, ExtensionMode: { Production: 1, Development: 2, Test: 3 }, ViewColumn: { Beside: -2 }, TestRunProfileKind: { Run: 1 },
+    TestMessage, ThemeColor, MarkdownString, FileDecoration, CodeLens, Hover, DocumentLink, TaskGroup: { Build: 'build', Test: 'test' }, StatusBarAlignment: { Left: 1, Right: 2 }, ProgressLocation: { Notification: 15, Window: 10 },
+    QuickPickItemKind: { Separator: -1, Default: 0 }, ExtensionMode: { Production: 1, Development: 2, Test: 3 }, ViewColumn: { Beside: -2 }, TestRunProfileKind: { Run: 1, Debug: 2, Coverage: 3 },
     window: {
       createOutputChannel: (name: string) => {
         const add = (l: string): void => { calls.output.push(l); };
         return { name, appendLine: add, info: add, warn: add, error: add, show() { /* nothing to show */ }, dispose() { /* nothing to free */ } };
       },
-      createStatusBarItem: () => ({ text: '', tooltip: '', command: '', visible: false, show() { this.visible = true; }, hide() { this.visible = false; }, dispose() { /* none */ } }),
+      createStatusBarItem: () => { const item = { text: '', tooltip: '' as Loose, command: '' as Loose, backgroundColor: undefined as Loose, visible: false, show() { this.visible = true; }, hide() { this.visible = false; }, dispose() { /* none */ } }; calls.statusBar.push(item); return item; },
       showQuickPick: (items: Loose[], opts: Loose) => {
         calls.messages.push({ kind: 'quickpick', title: opts?.title, items });
         let a = answer(script.quickPicks, undefined);
@@ -80,8 +93,9 @@ export function createStub(options: StubOptions = {}): Stub {
       showInformationMessage: (text: string, ...rest: Loose[]) => { calls.messages.push({ kind: 'info', text, rest }); return Promise.resolve(answer(script.infos, undefined)); },
       showWarningMessage: (text: string, ...rest: Loose[]) => { calls.messages.push({ kind: 'warning', text, rest }); return Promise.resolve(answer(script.warnings, undefined)); },
       showErrorMessage: (text: string, ...rest: Loose[]) => { calls.messages.push({ kind: 'error', text, rest }); return Promise.resolve(answer(script.errors, undefined)); },
-      withProgress: (_opts: Loose, fn: Loose) => fn({ report: (v: Loose) => calls.info.push(v) }, { isCancellationRequested: false, onCancellationRequested: () => ({ dispose() { /* none */ } }) }),
-      createTreeView: (id: string, o: Loose) => ({ id, o, dispose() { /* none */ } }),
+      withProgress: (opts: Loose, fn: Loose) => { calls.progress.push(opts); return fn({ report: (v: Loose) => calls.info.push(v) }, { isCancellationRequested: false, onCancellationRequested: () => ({ dispose() { /* none */ } }) }); },
+      createTreeView: (id: string, o: Loose) => { const v = { id, o, title: undefined as Loose, description: undefined as Loose, badge: undefined as Loose, message: undefined as Loose, revealed: [] as Loose[], reveal(n: Loose, opts: Loose) { v.revealed.push([n, opts]); return Promise.resolve(); }, dispose() { /* none */ } }; calls.treeViews.set(id, v); return v; },
+      registerFileDecorationProvider: (p: Loose) => { calls.decorationProvider = p; return { dispose() { /* none */ } }; },
       createWebviewPanel: (id: string, title: string, _col: Loose, opts: Loose) => {
         const p: Loose = { id, title, opts, webview: { html: '', cspSource: 'vscode-resource:', onDidReceiveMessage: (fn: Loose) => { p.onMessage = fn; return { dispose() { /* none */ } }; } }, dispose() { /* none */ } };
         calls.webviews.push(p);
@@ -109,12 +123,20 @@ export function createStub(options: StubOptions = {}): Stub {
       },
       fs: { readFile: (uri: Uri) => fsp.readFile(uri.fsPath) },
       openTextDocument: (o: Loose) => { calls.textDocs.push(o); return Promise.resolve(o); },
+      textDocuments: [] as Loose[],
+      onDidOpenTextDocument: (fn: Loose) => { calls.onOpen = fn; return { dispose() { /* none */ } }; },
+      asRelativePath: (u: Loose) => path.basename(u.fsPath ?? String(u)),
     },
     commands: {
       registerCommand: (id: string, fn: Loose) => { calls.registered.set(id, fn); return { dispose() { /* none */ } }; },
-      executeCommand: (id: string, ...args: Loose[]) => { calls.commands.push({ id, args }); if (id === 'vscode.diff') calls.diffs.push(args); return Promise.resolve(undefined); },
+      executeCommand: (id: string, ...args: Loose[]) => { calls.commands.push({ id, args }); if (id === 'vscode.diff') calls.diffs.push(args); if (id === 'setContext') calls.contexts.set(args[0], args[1]); return Promise.resolve(undefined); },
     },
-    languages: { createDiagnosticCollection: () => ({ clear: () => diagnostics.clear(), set: (u: Uri, d: Loose) => diagnostics.set(u.toString(), d), get: (u: Uri) => diagnostics.get(u.toString()), dispose() { /* none */ } }) },
+    languages: {
+      registerHoverProvider: (selector: Loose, p: Loose) => { calls.languages.push({ kind: 'hover', selector, p }); return { dispose() { /* none */ } }; },
+      registerDefinitionProvider: (selector: Loose, p: Loose) => { calls.languages.push({ kind: 'definition', selector, p }); return { dispose() { /* none */ } }; },
+      registerCodeLensProvider: (selector: Loose, p: Loose) => { calls.languages.push({ kind: 'codelens', selector, p }); return { dispose() { /* none */ } }; },
+      registerDocumentLinkProvider: (selector: Loose, p: Loose) => { calls.languages.push({ kind: 'links', selector, p }); return { dispose() { /* none */ } }; },
+      createDiagnosticCollection: () => ({ clear: () => diagnostics.clear(), set: (u: Uri, d: Loose) => diagnostics.set(u.toString(), d), get: (u: Uri) => diagnostics.get(u.toString()), dispose() { /* none */ } }) },
     tests: { createTestController: (id: string, label: string) => makeController(id, label, calls) },
     tasks: { registerTaskProvider: (type: string, provider: Loose) => { calls.tasks = { type, provider }; return { dispose() { /* none */ } }; } },
     env: { clipboard: { writeText: (t: string) => Promise.resolve(calls.clipboard.push(t)) } },
@@ -128,11 +150,16 @@ export function createStub(options: StubOptions = {}): Stub {
 
 function makeController(id: string, label: string, calls: Loose): Loose {
   const items = new Map<string, Loose>();
-  const collection = { replace(list: Loose[]) { items.clear(); for (const i of list) items.set(i.id, i); }, add(i: Loose) { items.set(i.id, i); }, forEach(fn: Loose) { items.forEach((v) => fn(v)); },
-    [Symbol.iterator]: () => items.entries() };
-  const c: Loose = { id, label, items: collection, runs: [] as Loose[],
-    createTestItem(i: string, l: string) { const kids = new Map<string, Loose>(); return { id: i, label: l, children: { add: (k: Loose) => kids.set(k.id, k), forEach: (fn: Loose) => kids.forEach((v) => fn(v)) } }; },
-    createRunProfile(_l: string, _kind: number, handler: Loose) { c.handler = handler; return { dispose() { /* none */ } }; },
+  const collection = { replace(list: Loose[]) { items.clear(); for (const i of list) items.set(i.id, i); }, add(i: Loose) { items.set(i.id, i); }, get(i: string) { return items.get(i); },
+    forEach(fn: Loose) { items.forEach((v) => fn(v)); }, [Symbol.iterator]: () => items.entries() };
+  const c: Loose = { id, label, items: collection, runs: [] as Loose[], profiles: [] as Loose[],
+    createTestItem(i: string, l: string, uri?: Loose) {
+      const kids = new Map<string, Loose>();
+      return { id: i, label: l, uri, range: undefined as Loose, description: undefined as Loose,
+        children: { add: (k: Loose) => kids.set(k.id, k), replace: (list: Loose[]) => { kids.clear(); for (const k of list) kids.set(k.id, k); }, delete: (k: string) => kids.delete(k), forEach: (fn: Loose) => kids.forEach((v) => fn(v)),
+          get size() { return kids.size; } } };
+    },
+    createRunProfile(l: string, kind: number, handler: Loose, isDefault?: boolean) { c.profiles.push({ label: l, kind, handler, isDefault }); if (!c.handler) c.handler = handler; return { dispose() { /* none */ } }; },
     createTestRun() {
       const r: Loose = { log: [] as Loose[], enqueued: (t: Loose) => r.log.push(['enqueued', t.id]), started: (t: Loose) => r.log.push(['started', t.id]), passed: (t: Loose) => r.log.push(['passed', t.id]),
         failed: (t: Loose, m: Loose) => r.log.push(['failed', t.id, m]), skipped: (t: Loose) => r.log.push(['skipped', t.id]), errored: (t: Loose, m: Loose) => r.log.push(['errored', t.id, m]),

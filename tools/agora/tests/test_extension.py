@@ -41,6 +41,53 @@ class ExtensionRules(unittest.TestCase):
         self.assertIn("scope application", found)
         self.assertIn("untrustedWorkspaces", found)
 
+    def mutated(self, change):
+        root, ext = self.copy()
+        pkg = json.loads((ext / "package.json").read_text())
+        change(pkg)
+        (ext / "package.json").write_text(json.dumps(pkg))
+        return " | ".join(f.message for f in extension.manifest_findings(root))
+
+    def test_the_redesigned_consoles_manifest_rules_each_find_what_they_name(self):
+        """0043 FR-036 to FR-039, FR-024, FR-040: the views, the welcome content, the commands, the keys, the menus' groups and the settings."""
+        def views(p):
+            p["contributes"]["views"]["if-console"].reverse()
+        self.assertIn("the views are", self.mutated(views))
+
+        def shown(p):
+            p["contributes"]["views"]["if-console"][-1].pop("when")
+        self.assertIn("All commands must be hidden by default", self.mutated(shown))
+
+        def key(p):
+            p["contributes"]["keybindings"].append({"command": "if-console.runCommand", "key": "ctrl+alt+i r"})
+        self.assertIn("a key may run only", self.mutated(key))
+
+        def setting(p):
+            p["contributes"]["configuration"]["properties"]["if-console.rowLimit"].pop("markdownDescription")
+        self.assertIn("must have a markdownDescription", self.mutated(setting))
+
+        def command(p):
+            c = p["contributes"]["commands"][1]
+            c["category"], c["icon"], c["title"] = "Other", "", "Stuff"
+            p["contributes"]["menus"]["commandPalette"] = [m for m in p["contributes"]["menus"]["commandPalette"] if m["command"] != c["command"]]
+            c.pop("enablement", None)
+        found = self.mutated(command)
+        for want in ("must have the category IF Console", "must have an icon", "must be a verb and an object", "must have an enablement or a palette `when`"):
+            self.assertIn(want, found)
+
+        def welcome(p):
+            p["contributes"]["viewsWelcome"] = [w for w in p["contributes"]["viewsWelcome"] if "untrusted" not in w["when"] or "!" in w["when"]]
+        self.assertIn("welcome content for an untrusted workspace", self.mutated(welcome))
+
+        def group(p):
+            p["contributes"]["menus"]["view/item/context"][0]["group"] = "somewhere@1"
+        self.assertIn("a row's menus use", self.mutated(group))
+
+    def test_the_activity_bar_icon_draws_in_current_color_and_no_other(self):
+        root, ext = self.copy()
+        (ext / "media" / "if-console.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"><path stroke="#ff0000" d="M0 0"/></svg>')
+        self.assertIn("currentColor and no other color", " | ".join(f.message for f in extension.manifest_findings(root)))
+
     def test_a_contributed_command_with_no_handler_is_found(self):
         root, ext = self.copy()
         pkg = json.loads((ext / "package.json").read_text())
