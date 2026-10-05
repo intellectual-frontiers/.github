@@ -11,6 +11,7 @@ import type { RunResult } from '../services/launcher';
 import type { Repository } from '../services/repository';
 import { Node } from '../views/node';
 import { chooseRepo, pickCommand } from './pick';
+import { t } from '../l10n';
 
 export class RunCommands {
   constructor(private readonly app: App) {}
@@ -31,7 +32,7 @@ export class RunCommands {
   async runRepoWide(name: string, { form, args }: { form?: boolean; args?: string[] } = {}): Promise<executor.Outcome | null> {
     const repo = await chooseRepo(this.app);
     if (!repo) return null;
-    if (!repo.has(name)) { void vscode.window.showInformationMessage(`${repo.name} has no "${name}" command.`); return null; }
+    if (!repo.has(name)) { void vscode.window.showInformationMessage(t('{0} has no "{1}" command.', repo.name, name)); return null; }
     if (form) return this.runForm(repo, name);
     try { const detail = await repo.detail(name); return await executor.runArgv(this.app.ui, repo, detail, [name, ...(args ?? [])]); } catch (e) { this.app.fail(e); return null; }
   }
@@ -53,7 +54,7 @@ export class RunCommands {
 
   async runAction(repo: Repository, action: Action): Promise<executor.Outcome | null> {
     if (!action.enabled) {
-      void vscode.window.showInformationMessage(`${action.label} cannot run now: ${action.reason || 'the command line says it is unavailable'}.`);
+      void vscode.window.showInformationMessage(t('{0} cannot run now: {1}.', action.label, action.reason || 'the command line says it is unavailable'));
       return null;
     }
     try {
@@ -91,12 +92,12 @@ export class RunCommands {
     if (doc.kind === 'check') {
       const r = await this.app.handleCheck(repo, doc);
       const s = r.summary;
-      await this.tell(repo, `${repo.name} check: ${s.passed ?? 0} passed, ${s.failed ?? 0} failed, ${s.skipped ?? 0} skipped.`, ['checks']);
+      await this.tell(repo, t('{0} check: {1} passed, {2} failed, {3} skipped.', repo.name, s.passed ?? 0, s.failed ?? 0, s.skipped ?? 0), ['checks']);
       return;
     }
-    if (doc.kind === 'doctor') { repo.doctor = doc; this.app.refreshViews(); await this.tell(repo, `${repo.name} doctor: ${repo.health}.`, ['toolchain', 'health']); }
-    if (doc.kind === 'fresh') { repo.fresh = doc; this.app.refreshViews(); await this.tell(repo, `${repo.name} fresh: ${asStatus(doc)}.`, ['generated']); }
-    if (WRITES.includes(detail.category)) { repo.forgetResources(); await this.afterWrite(repo, detail, doc); return; }
+    if (doc.kind === 'doctor') { repo.doctor = doc; this.app.refreshViews(); await this.tell(repo, t('{0} doctor: {1}.', repo.name, repo.health), ['toolchain', 'health']); }
+    if (doc.kind === 'fresh') { repo.fresh = doc; this.app.refreshViews(); await this.tell(repo, t('{0} fresh: {1}.', repo.name, asStatus(doc)), ['generated']); }
+    if (WRITES.includes(detail.category)) { repo.forgetResources(); await this.app.panel.refreshCurrent(); await this.afterWrite(repo, detail, doc); return; }
     await this.app.opener.argv(repo, detail, argv);
   }
 
@@ -106,17 +107,17 @@ export class RunCommands {
     const needs = deriveHome(repo).needs.filter((s) => groups.includes(s.group) && s.counts);
     const first = needs[0];
     if (!first) { void vscode.window.showInformationMessage(headline); return; }
-    const more = needs.length > 1 ? ` (and ${needs.length - 1} more)` : '';
-    const line = first.commandLine ? ` Run ${first.commandLine}.` : first.yourself ? ` You: ${first.yourself}` : '';
+    const more = needs.length > 1 ? t(' (and {0} more)', needs.length - 1) : '';
+    const line = first.commandLine ? t(' Run {0}.', first.commandLine) : first.yourself ? t(' You: {0}', first.yourself) : '';
     const buttons = [...(first.run ? [first.runLabel || 'Run'] : []), 'Show all'];
-    const pick = await vscode.window.showWarningMessage(`${headline} ${first.label}${more}.${line}`, ...buttons);
+    const pick = await vscode.window.showWarningMessage(t('{0} {1}{2}.{3}', headline, first.label, more, line), ...buttons);
     if (pick === 'Show all') await this.app.showHome(true);
     else if (pick !== undefined && pick === (first.runLabel || 'Run')) await this.app.fromView(undefined, () => this.runSuggestion(repo, first));
   }
 
   private async afterWrite(repo: Repository, detail: CommandDetail, doc: Doc): Promise<void> {
     const next = actionsOf(doc).filter((a) => a.enabled).slice(0, 3);
-    const pick = await vscode.window.showInformationMessage(`${repo.name}: ${detail.id} is done.`, ...next.map((a) => a.label));
+    const pick = await vscode.window.showInformationMessage(t('{0}: {1} is done.', repo.name, detail.id), ...next.map((a) => a.label));
     const hit = next.find((a) => a.label === pick);
     if (hit) await this.runAction(repo, hit);
     repo.forgetResources();
@@ -141,7 +142,7 @@ export class RunCommands {
       const got = await collect(this.app.ui, detail, (s) => repo.choicesFor(s), null);
       if (got.cancelled) return;
       const line = repo.launcher.line(argvFromFields(detail, got.values));
-      const pick = await vscode.window.showInformationMessage(line, 'Copy');
+      const pick = await vscode.window.showInformationMessage(line, t('Copy'));
       if (pick === 'Copy') await this.app.ui.copy(line);
     } catch (e) { this.app.fail(e); }
   }
@@ -149,7 +150,7 @@ export class RunCommands {
   async openViewCommand(): Promise<void> {
     const repo = await chooseRepo(this.app);
     if (!repo) return;
-    const id = await pickCommand(repo, (c) => c.category === 'read');
+    const id = await pickCommand(repo, (c) => c.category === 'read' || c.category === 'check');
     if (!id) return;
     try {
       const detail = await repo.detail(id);

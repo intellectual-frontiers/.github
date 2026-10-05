@@ -1,6 +1,7 @@
 'use strict';
 // The screenshots scenario (0043-if-console FR-045): open what the extension shows, in the theme the run chose, and capture each to a PNG.
 // Every file is named <theme>-<what>.png. A scenario that fails to open a view fails, so a missing screenshot is never silent.
+const assert = require('assert');
 const path = require('path');
 const vscode = require('vscode');
 const { test } = require('./harness');
@@ -71,8 +72,8 @@ test('Home and the views', async () => {
   await exec('list.showHover');
   await sleep(1500);
   await shot('row-tooltip');
-  await solo(slot('Things'), [0]);
-  await shot('view-things');
+  await solo(slot('Widgets'), [0]);
+  await shot('view-widgets');
   await solo(slot('Design systems'), [0]);
   await shot('view-design-systems');
   await solo(slot('Toolchain'), [1]);
@@ -93,6 +94,10 @@ test('the Test Explorer and the palette', async () => {
   await sleep(1200);
   await shot('palette');
   await exec('workbench.action.closeQuickOpen');
+  await exec('workbench.action.quickOpen', '>Focus on');
+  await sleep(1200);
+  await shot('palette-focus');
+  await exec('workbench.action.closeQuickOpen');
 });
 
 test('a hover, a CodeLens and a link in a spec', async () => {
@@ -112,34 +117,97 @@ test('a hover, a CodeLens and a link in a spec', async () => {
   await shot('spec-hover', 1500);
 });
 
-test('a resource page', async () => {
+// A page the way a person opens it: Open Page… from the palette, the repository, the command, and each argument chosen in its quick pick.
+async function openPage(folder, command, ...choices) {
   const mark = hook().shown.length;
+  const name = folder === 'real' ? (await hook().describe()).repositories.find((r) => r.folder === 'real').name : 'other';
   const done = exec('if-console.openView');
-  await choose(await nextQuickPick(mark, (s) => /repository/i.test(s.placeholder), 'the repository choice'), (await hook().describe()).repositories.find((r) => r.folder === 'real').name);
-  await choose(await nextQuickPick(mark, (s) => s.placeholder === 'Which command?', 'the command choice'), 'brand list');
-  for (let i = 0; i < 4 && !hook().shown.slice(mark).some((s) => s.kind === 'webview'); i += 1) {
-    const last = await waitFor(() => hook().shown.slice(mark).filter((s) => s.kind === 'quickpick').pop(), 'a step');
-    if (hook().shown.slice(mark).some((s) => s.kind === 'webview')) break;
-    await choose(last, last.items[0]);
-    await sleep(800);
+  await choose(await nextQuickPick(mark, (s) => /repository/i.test(s.placeholder), 'the repository choice'), name);
+  await choose(await nextQuickPick(mark, (s) => s.placeholder === 'Which command?', 'the command choice'), command);
+  for (let i = 0; i < choices.length; i += 1) {
+    const pick = await waitFor(() => hook().shown.slice(mark).filter((s) => s.kind === 'quickpick' && (s.title || '').startsWith(`${command}: `))[i], `the step ${i + 1} of ${command}`);
+    await choose(pick, choices[i]);
   }
-  await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the resource page');
-  await shot('resource-page', 2500);
   await done;
+  return mark;
+}
+
+// The page has drawn what the extension sent it: the page says so, through the extension, and a test waits for it.
+const drawn = (mark, what, test) => waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary && test(s.summary)), `the page drawing ${what}`);
+const clear = async () => { await exec('workbench.action.closeAllEditors'); await sleep(400); };
+
+test('a resource with a table', async () => {
+  await clear();
+  const mark = await openPage('fixture', 'widget list');
+  await drawn(mark, 'the table', (m) => m.tables === 1);
+  await sleep(1800);
+  await shot('resource-table');
+});
+
+test('a resource of the real command line: a brand, with its palette and files', async () => {
+  await clear();
+  const mark = await openPage('real', 'brand show', 'frontiers-brand');
+  await drawn(mark, 'the brand', (m) => m.kv > 3);
+  await sleep(1800);
+  await shot('resource-brand');
+});
+
+test('a resource with a stage ladder, a table, findings and a decision', async () => {
+  await clear();
+  const mark = await openPage('fixture', 'release show', 'r1');
+  await drawn(mark, 'the stage ladder', (m) => m.stages === 4);
+  await sleep(1800);
+  await shot('resource-stages');
+  await hook().send({ type: 'scrollTo', section: 'needs_a_person' });
+  await sleep(900);
+  await shot('resource-findings');
+});
+
+test('a check\'s result with its findings', async () => {
+  await clear();
+  const mark = await openPage('fixture', 'check', '(none)');
+  await drawn(mark, 'the check result', (m) => m.findings >= 1);
+  await sleep(1800);
+  await shot('check-findings');
+});
+
+test('a decision: its dry run in the panel, before the modal', async () => {
+  await clear();
+  const mark = await openPage('fixture', 'widget show', 'w1');
+  const page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the widget page');
+  const decision = page.model.built.actions.find((a) => a.decision);
+  assert.ok(decision, 'the page has a decision');
+  await drawn(mark, 'the toolbar', (m) => m.decisions === 1);
+  await sleep(1500);
+  await shot('resource-decision');
+  const before = hook().shown.length;
+  const running = hook().send({ type: 'run', action: decision.id });
+  await waitFor(() => hook().shown.slice(before).find((s) => s.kind === 'webview' && s.model.built.mode === 'preview'), 'the dry run in the panel');
+  await drawn(before, 'the changes', (m) => m.mode === 'preview');
+  await sleep(1800);
+  await shot('dry-run-summary');
+  await hook().send({ type: 'discard' });
+  await running;
 });
 
 test('Learn', async () => {
+  await clear();
   const mark = hook().shown.length;
   exec('if-console.learn');
   const pick = await nextQuickPick(mark, (s) => s.title === 'Learn', 'the Learn quick pick');
   await sleep(800);
   await shot('learn-topics');
   await choose(pick, 'start');
-  await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the topic page');
-  await shot('learn-topic', 2500);
+  await drawn(mark, 'the topic', (m) => m.mode === 'topic');
+  await sleep(1800);
+  await shot('learn-topic');
+  await hook().send({ type: 'scrollTo', section: 'steps' });
+  await sleep(1000);
+  await shot('learn-steps');
 });
 
-test('a dry run opens a diff', async () => {
+test('a dry run opens the changes in the panel and the diff in the diff editor', async () => {
+  await clear();
   const command = 'site generate';
   const mark = hook().shown.length;
   exec('if-console.runCommand');
@@ -152,10 +220,12 @@ test('a dry run opens a diff', async () => {
   await sleep(600);
   await shot('command-line');
   await choose(line, 'Show what it would change');
-  const review = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'quickpick' && s.title === `${command}: what would change`), 'the changes');
-  await sleep(600);
+  await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview' && s.model.built.mode === 'preview'), 'the changes in the panel');
+  await drawn(mark, 'the changes', (m) => m.mode === 'preview');
+  await sleep(1800);
   await shot('dry-run-changes');
-  await choose(review, 'site/index.txt');
+  await hook().send({ type: 'diff', index: 0 });
   await waitFor(() => vscode.window.tabGroups.all.flatMap((g) => g.tabs).some((t) => t.input instanceof vscode.TabInputTextDiff), 'the diff editor');
   await shot('dry-run-diff', 2000);
+  await hook().send({ type: 'discard' });
 });

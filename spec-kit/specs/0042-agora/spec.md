@@ -348,8 +348,10 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   carries (0043-if-console FR-004). `agora extension build` MUST build the
   extension's package from `tools/if-console/` into `build/`, with Node from
   the locked `nodejs-wheel-binaries` and the extension's own `package-lock.json`
-  (0043-if-console FR-027), by type-checking, linting and bundling it and then
-  packing it, as 0043-if-console FR-035 states, and MUST take `--dry-run`; with
+  (0043-if-console FR-027), by type-checking, linting and bundling it, making its
+  128-pixel icon and its language bundle (with Pillow from the extension group's
+  lock, from `frontiers-brand`'s mark: 0043-if-console FR-044) and then packing
+  it, as 0043-if-console FR-035 states, and MUST take `--dry-run`; with
   `--modules DIR` it MUST instead write the extension's compiled modules into DIR
   (0043-if-console FR-047). `agora extension test --suite DIR
   [--workspace [NAME=]DIR]...` MUST run another repository's tests of the
@@ -362,9 +364,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   commands` MUST fail one that FR-072 of that spec refuses.
 - **FR-019**: `agora` MUST declare two editor views in code, `console` and
   `assurance`, and MUST run no server (0041-command-line FR-011). A view is a
-  `read` command's resource and its HTML rendering that the IF Console
-  extension lists for `agora` (0041-command-line FR-050, 0043-if-console
-  FR-011). `console` MUST be a registry
+  `read` command's resource, which the IF Console extension draws in its panel
+  (0041-command-line FR-050, 0043-if-console FR-042) and whose HTML rendering
+  is for a person's browser (0041-command-line FR-018). `console` MUST be a registry
   browser: the nouns, the commands under each, and a page for each command;
   its markup and style MUST come from `frontiers-console-web`. `assurance`
   MUST list each design system's assurance page, once for every brand that

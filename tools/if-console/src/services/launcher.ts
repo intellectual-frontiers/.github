@@ -1,4 +1,4 @@
-// Running a repository's launcher (0043-if-console FR-003, FR-017, FR-020): every call is `<launcher> ... --json` (or `--html`), with
+// Running a repository's launcher (0043-if-console FR-003, FR-017, FR-020): every call is `<launcher> ... --json`, with
 // the repository's root as the working directory and IF_CONSOLE=1 in the environment, so that the launcher logs the surface `editor`
 // (0041-command-line FR-042). Nothing else is ever run.
 import * as childProcess from 'child_process';
@@ -14,10 +14,7 @@ export interface Cancellation {
   onCancellationRequested(listener: () => void): { dispose(): void };
 }
 
-export type Format = 'json' | 'html' | 'text';
-
 export interface RunOptions {
-  format?: Format;
   /** Ends the process (SIGTERM) when it is cancelled. */
   token?: Cancellation;
   /** Sees each complete document of a stream as it arrives. */
@@ -63,11 +60,11 @@ export class Launcher {
     this.env = env ?? process.env;
   }
 
-  line(argv: string[], format?: Format): string { return commandLine(this.program, [...argv, ...(format ? [`--${format}`] : [])]); }
+  line(argv: string[]): string { return commandLine(this.program, argv); }
 
   /** Run one command. Resolves a result; never rejects for a non-zero exit. */
-  run(argv: string[], { format = 'json', token, onDocument }: RunOptions = {}): Promise<RunResult> {
-    const full = [...argv, ...(format === 'text' ? [] : [`--${format}`])];
+  run(argv: string[], { token, onDocument }: RunOptions = {}): Promise<RunResult> {
+    const full = [...argv, '--json'];
     const shown = commandLine(this.program, full);
     this.log(`$ ${shown}`);
     return new Promise<RunResult>((resolve) => {
@@ -93,9 +90,7 @@ export class Launcher {
         this.log(cancelled ? `cancelled (${shown})` : `exit ${String(exit)}${failed ? `: ${failed}` : ''}`);
         let docs: Doc[] = [];
         let problem: string | null = failed ?? null;
-        if (format === 'json') {
-          try { docs = parseDocuments(stdout); } catch (e) { problem = problem ?? (e instanceof Error ? e.message : String(e)); }
-        }
+        try { docs = parseDocuments(stdout); } catch (e) { problem = problem ?? (e instanceof Error ? e.message : String(e)); }
         const doc = docs.length ? docs[docs.length - 1] ?? null : null;
         resolve({ exit, stdout, stderr, docs, doc, error: errorOf(doc), cancelled, failed: problem });
       };
@@ -104,7 +99,6 @@ export class Launcher {
       child.stdout?.on('data', (b: Buffer) => {
         const text = b.toString('utf8');
         stdout += text;
-        if (format !== 'json') return;
         pending += text;
         let nl: number;
         while ((nl = pending.indexOf('\n')) >= 0) {

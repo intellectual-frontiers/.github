@@ -13,6 +13,7 @@ import { actionsOf, type Action, type Doc } from '../model/wire';
 import type { Handles } from '../services/handles';
 import type { Repository } from '../services/repository';
 import { link, markdown } from './tooltips';
+import { t } from '../l10n';
 
 /** What the features need of the extension. */
 export interface LanguageHost {
@@ -149,7 +150,7 @@ export class ReferenceLanguage implements vscode.Disposable {
     const icon = noun?.icon ?? 'symbol-misc';
     lens.command = check
       ? { title: `$(${icon}) ${words} \u00b7 $(play) Run`, command: 'if-console.followLink', arguments: [this.host.handles.issue({ kind: 'action', repoKey: repo.key, action: check })], tooltip: check.cli ?? check.label }
-      : { title: `$(${icon}) ${words}`, command: 'if-console.followLink', arguments: [this.host.handles.issue({ kind: 'open', repoKey: repo.key, noun: match.decl.noun, id: match.value })], tooltip: 'Open this resource' };
+      : { title: `$(${icon}) ${words}`, command: 'if-console.followLink', arguments: [this.host.handles.issue({ kind: 'open', repoKey: repo.key, noun: match.decl.noun, id: match.value })], tooltip: t('Open this resource') };
     return lens;
   }
 

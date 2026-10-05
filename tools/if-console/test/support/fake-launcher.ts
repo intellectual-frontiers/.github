@@ -17,7 +17,7 @@ export interface FakeRepo {
   cleanup(): void;
 }
 
-/** `docs` maps a command line (the words before --json) to {doc, exit, stderr, delayMs, lines, hang, html}. */
+/** `docs` maps a command line (the words before --json) to {doc, exit, stderr, delayMs, lines, hang}. */
 export function makeRepo({ docs, declare = true, launcherName = 'other' }: { name?: string; docs: Record<string, Loose>; declare?: boolean; launcherName?: string; audience?: string }): FakeRepo {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'if-console-'));
   const table = path.join(root, '.fake-docs.json');
@@ -27,14 +27,12 @@ export function makeRepo({ docs, declare = true, launcherName = 'other' }: { nam
 const fs = require('fs');
 const argv = process.argv.slice(2);
 const dry = argv.includes('--dry-run');
-const format = argv.includes('--html') ? 'html' : 'json';
-const key = argv.filter((a) => a !== '--json' && a !== '--html').join(' ');
+const key = argv.filter((a) => a !== '--json').join(' ');
 fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify({ argv, cwd: process.cwd(), IF_CONSOLE: process.env.IF_CONSOLE, dry }) + '\\n');
 const docs = JSON.parse(fs.readFileSync(${JSON.stringify(table)}, 'utf8'));
 const hit = docs[key] || docs[key.replace(' --dry-run', '')] || docs['*'];
 if (!hit) { process.stderr.write('no recorded answer for ' + key + '\\n'); process.exit(2); }
 if (hit.stderr) process.stderr.write(hit.stderr);
-if (format === 'html') { process.stdout.write(hit.html || '<html><body>recorded</body></html>'); process.exit(hit.exit || 0); }
 if (hit.lines) { let i = 0; const next = () => { if (i < hit.lines.length) { process.stdout.write(JSON.stringify(hit.lines[i++]) + '\\n'); setTimeout(next, hit.delayMs || 0); } else process.exit(hit.exit || 0); }; next(); }
 else if (hit.hang) { setInterval(() => {}, 1000); }
 else { process.stdout.write(typeof hit.doc === 'string' ? hit.doc : JSON.stringify(hit.doc, null, 2) + '\\n'); process.exit(hit.exit || 0); }
@@ -61,8 +59,8 @@ export function secondCommandLine(orch = 'other') {
     cmd('widget approve', 'decision', ['terminal', 'editor'], 'Approve a widget'), cmd('mcp serve', 'setup', ['terminal'], 'Serve MCP'),
     cmd('secret tool', 'setup', ['terminal'], 'Not for the editor')],
     presentation: {
-      views: [{ id: 'things', title: 'Things', icon: 'package', order: 20, description: 'Widgets and what is done to them' }, { id: 'unused', title: 'Unused', icon: 'folder', order: 30, description: '' }],
-      nouns: [{ noun: 'widget', title: 'Widget', icon: 'symbol-event', view: 'things',
+      views: [{ id: 'widgets', title: 'Widgets', icon: 'package', order: 20, description: 'Widgets and what is done to them' }, { id: 'unused', title: 'Unused', icon: 'folder', order: 30, description: '' }],
+      nouns: [{ noun: 'widget', title: 'Widget', icon: 'symbol-event', view: 'widgets',
         list: { command: 'widget list', rows: 'widgets', id: 'id', label: 'name', description: 'kind', status: 'state', badge: 'parts', tooltip: ['kind', 'note'],
           status_map: { ready: 'ok', broken: 'error', draft: 'pending' } } }],
       references: [{ id: 'widget', noun: 'widget', pattern: '\\bwidget[ /](w\\d+)\\b', value: '$1', files: ['docs/**/*.md'], text: 'note', facts: ['kind', 'state'], lens: ['kind', 'state'],

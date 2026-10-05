@@ -114,8 +114,7 @@ test('real: each check section is a test, run by check SECTION (a skipped one is
 test('real: a write is run with --dry-run, its diff opens in the diff editor, and it is written only after acceptance', { skip, timeout: 120000 }, async () => {
   const s = await start();
   const out = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'ifc-out-')), 'iflayout.def');
-  s.stub.script.quickPicks.push((items: Loose) => items[1].value);   // open the diff
-  s.stub.script.quickPicks.push('apply');
+  s.stub.script.reviews.push([{ type: 'diff', index: 0 }, 'apply']);   // open the diff in the panel, then apply
   const detail = await s.repo.detail('layout build');
   const executor = require('../src/services/executor') as Loose;
   const result = await executor.runArgv(s.app.ui, s.repo, detail, ['layout', 'build', 'two-column', '--out', out]);
@@ -137,7 +136,7 @@ test('real: a decision is refused without the modal: after the dry run and the d
   const spec = path.join(ROOT, 'spec-kit', 'specs', '0043-if-console', 'spec.md');
   const before = sha(spec);
   const detail = await s.repo.detail('spec set');
-  s.stub.script.quickPicks.push('apply');
+  s.stub.script.reviews.push('apply');
   s.stub.script.warnings.push(undefined);                      // the modal is dismissed
   const executor = require('../src/services/executor') as Loose;
   const result = await executor.runArgv(s.app.ui, s.repo, detail, ['spec', 'set', '0043-if-console', '--status', 'Adopted']);

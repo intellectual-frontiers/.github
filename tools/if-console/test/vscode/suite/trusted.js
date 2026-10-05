@@ -47,7 +47,9 @@ test('Home, the views each command line declares, Checks and All commands are po
   const declared = realList().presentation.views.map((v) => v.title);
   const slots = snap.views.slots.map((v) => v.title);
   for (const t of declared) assert.ok(slots.includes(t), `the view ${t} is planned`);
-  assert.ok(slots.includes('Things'), 'and the fixture\'s');
+  assert.ok(slots.includes('Widgets'), 'and the fixture\'s');
+  assert.strictEqual(slots.length, new Set([...declared, 'Widgets']).size, 'a slot is planned only for a view some command line declares: no unused slot is shown');
+  assert.ok(!slots.some((t) => /^Section \d+$/.test(t) || t === 'Things'), 'and none is titled by its number');
   assert.deepStrictEqual(slots, [...slots].sort((a, b) => snap.views.slots.find((v) => v.title === a).order - snap.views.slots.find((v) => v.title === b).order), 'in the order they ask for');
   const specs = snap.views.slots.find((v) => v.title === 'Specs');
   assert.deepStrictEqual(specs.entries.map((n) => n.label), ['Requirement', 'Spec', 'Term'], 'the nouns whose view it is');
@@ -58,11 +60,11 @@ test('Home, the views each command line declares, Checks and All commands are po
   assert.strictEqual(spec.children[0].description, all[0].title, 'the muted description is the declared field');
   const draft = spec.children.find((r, i) => all[i] && all[i].status === 'Draft');
   assert.strictEqual(draft.status, 'testing.iconQueued', 'a Draft is waiting');
-  const things = snap.views.slots.find((v) => v.title === 'Things');
-  assert.deepStrictEqual(things.entries.map((n) => n.label), ['Widget', 'Site']);
+  const things = snap.views.slots.find((v) => v.title === 'Widgets');
+  assert.deepStrictEqual(things.entries.map((n) => n.label), ['Widget', 'Release', 'Site']);
   assert.deepStrictEqual(things.entries[0].children.map((r) => [r.label, r.description, r.status]), [['First widget', 'blue', 'testing.iconPassed'], ['Second widget', 'red', 'testing.iconFailed'],
     ['Third widget', 'green', 'testing.iconQueued']]);
-  assert.deepStrictEqual(things.entries[1].children.map((r) => r.label), ['Generate Site\u2026'], 'a noun with no list shows its commands, titled by the command line');
+  assert.deepStrictEqual(things.entries[2].children.map((r) => r.label), ['Generate Site\u2026'], 'a noun with no list shows its commands, titled by the command line');
 
   const commands = entry(snap.views.commands, 'real');
   assert.ok(commands, 'the first command line is in All commands');
@@ -70,7 +72,7 @@ test('Home, the views each command line declares, Checks and All commands are po
   for (const noun of editorNouns()) assert.ok(labels(commands).includes(noun), `the noun ${noun} is listed`);
   const wide = commands.children.find((c) => c.label === 'Repository-wide').children.map((c) => c.label);
   for (const want of ['check', 'doctor', 'fresh', 'test']) assert.ok(wide.includes(want), `${want} is a repository-wide command`);
-  assert.deepStrictEqual(labels(entry(snap.views.commands, 'fixture')), ['Repository-wide', 'site', 'period', 'widget']);
+  assert.deepStrictEqual(labels(entry(snap.views.commands, 'fixture')), ['Repository-wide', 'site', 'period', 'widget', 'release']);
 
   const sections = reference('command', 'show', 'check').data.arguments.find((a) => a.name === 'sections').choices;
   assert.deepStrictEqual(labels(entry(snap.views.checks, 'real')), sections, 'the Checks view lists the check sections');
@@ -121,16 +123,19 @@ async function throughForm(command) {
   return { mark, done };
 }
 
+// The change summary is in the resource panel: the page draws it (the page itself says what it drew), a file opens as a diff, and Apply is the
+// person's choice, which a test makes through the hook as the click it cannot make inside a webview.
 async function reviewThenApply(command, mark) {
-  const review = (s) => s.kind === 'quickpick' && s.title === `${command}: what would change`;
-  const reviews = () => hook().shown.slice(mark).filter(review);
-  const first = await waitFor(() => reviews()[0], 'the changes');
-  assert.ok(first.items.some((l) => l.includes('site/index.txt')), 'the change names its file');
-  await choose(first, 'site/index.txt');
+  const previews = () => hook().shown.slice(mark).filter((s) => s.kind === 'webview' && s.model.built.mode === 'preview');
+  const first = await waitFor(() => previews()[0], 'the changes in the panel');
+  assert.ok(first.model.built.sections[0].changes.some((c) => c.path === 'site/index.txt'), 'the change names its file');
+  assert.ok(first.model.built.header.title.length > 0 && first.model.built.preview.apply);
+  const drawn = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary && s.summary.mode === 'preview'), 'the page drawing the summary');
+  assert.ok(drawn.summary.changes >= 1 && drawn.summary.icons > 0, 'the real page drew a row for the changed file, with its icons');
+  await hook().send({ type: 'diff', index: 0 });
   await waitFor(() => vscode.window.tabGroups.all.flatMap((g) => g.tabs).some((t) => t.input instanceof vscode.TabInputTextDiff
     && t.input.original.scheme === 'if-console-diff' && t.input.modified.scheme === 'if-console-diff'), 'the diff editor');
-  const again = await waitFor(() => (reviews().length > 1 ? reviews()[reviews().length - 1] : null), 'the choice after the diff');
-  await choose(again, 'Apply these changes');
+  await hook().send({ type: 'apply' });
 }
 
 const calls = (command) => fixtureLog().filter((l) => l.argv.slice(0, command.split(' ').length).join(' ') === command);
@@ -168,19 +173,71 @@ test('a decision whose modal is not given does not run', async () => {
   assert.deepStrictEqual(made.map((l) => l.dry), [true], 'only the dry run happened');
 });
 
-test('Learn lists the repository\'s help topics and shows one with its steps as buttons', async () => {
+test('Learn lists the repository\'s help topics and shows one in the panel with its steps, each with its command line and a Run', async () => {
   const mark = hook().shown.length;
   vscode.commands.executeCommand('if-console.learn');
   const pick = await nextQuickPick(mark, (s) => s.title === 'Learn', 'the Learn quick pick');
   const topics = reference('help').data.topics.map((t) => t.topic);
-  assert.deepStrictEqual(pick.items, topics, 'the quick pick is the topics `help` lists');
+  assert.deepStrictEqual(pick.items, topics.map((t) => `$(book) ${t}`), 'the quick pick is the topics `help` lists, each with a codicon');
   assert.ok(['start', 'check', 'specs', 'design-systems', 'brands', 'toolchain', 'editor', 'ai', 'extend', 'recover'].every((t) => topics.includes(t)));
   await choose(pick, 'start');
-  const page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the topic page');
+  const page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview' && s.model.built.mode === 'topic'), 'the topic page');
   const steps = reference('help', 'start').data.steps;
-  assert.strictEqual((page.html.match(/<button type="button" data-step=/g) || []).length, steps.length, 'a button for each step');
-  assert.ok(/<button[^>]*disabled/.test(page.html), 'a step that runs in a terminal is a disabled button that says so');
-  assert.ok(page.html.includes('<code>') && page.html.includes('doctor'), 'each step\'s command line is shown to paste');
+  const lesson = page.model.built.sections.find((x) => x.type === 'lesson');
+  assert.strictEqual(lesson.steps.length, steps.length, 'a numbered step for each step the topic has');
+  assert.ok(lesson.steps.some((x) => x.run !== undefined) && lesson.steps.some((x) => x.run === undefined && x.reason), 'a step the editor runs has a Run, one that runs in a terminal says so');
+  assert.ok(lesson.steps.every((x) => /^\S+ \S+/.test(x.line)), 'each step\'s command line is shown to copy');
+  assert.strictEqual(page.model.built.next.topic, topics[topics.indexOf('start') + 1], 'it leads on to the next topic');
+  const drawn = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary && s.summary.mode === 'topic'), 'the page drawing the topic');
+  assert.strictEqual(drawn.summary.steps, steps.length, 'the real page drew each step');
+  assert.ok(drawn.summary.runs >= 1 && drawn.summary.codeLines >= steps.length, 'with its command lines and Run buttons');
+});
+
+test('a resource opens in the one panel: a table whose rows open, a stage ladder, findings, and a decision apart from the other actions', async () => {
+  const open = async (command, argvWords) => {
+    const mark = hook().shown.length;
+    const done = vscode.commands.executeCommand('if-console.openView');
+    await choose(await nextQuickPick(mark, (s) => /repository/i.test(s.placeholder), 'the repository choice'), FIXTURE);
+    await choose(await nextQuickPick(mark, (s) => s.placeholder === 'Which command?', 'the command choice'), command);
+    for (const word of argvWords) await choose(await nextQuickPick(mark, (s) => (s.title || '').startsWith(`${command}: `), `the ${word[0]} step`), word[1]);
+    await done;
+    return mark;
+  };
+  let mark = await open('widget list', []);
+  let page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the table page');
+  const table = page.model.built.sections.find((x) => x.type === 'table');
+  assert.strictEqual(table.rows.length, 3);
+  assert.ok(table.rows.every((r) => r.open !== undefined), 'each row opens its widget');
+  let drawn = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary.tables === 1), 'the page drawing the table');
+  assert.strictEqual(drawn.summary.rows, 3, 'the three rows, drawn by VS Code Elements');
+  const tabs = () => vscode.window.tabGroups.all.flatMap((g) => g.tabs).filter((t) => t.input instanceof vscode.TabInputWebview);
+  assert.strictEqual(tabs().length, 1, 'one webview tab');
+  // the person chooses a row: it opens in the same panel
+  mark = hook().shown.length;
+  await hook().send({ type: 'open', ref: table.rows[0].open });
+  page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview' && s.model.built.header.title === 'w1'), 'the row\'s page');
+  assert.strictEqual(tabs().length, 1, 'still one webview tab: the panel was revealed, not duplicated');
+  assert.deepStrictEqual(page.model.nav.crumbs.map((c) => c.label), ['Widget list', 'w1']);
+  assert.ok(page.model.built.actions.some((a) => a.decision) && page.model.built.actions.some((a) => a.primary), 'a primary action and a decision');
+  drawn = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary.title === 'w1'), 'the page drawing the resource');
+  assert.strictEqual(drawn.summary.decisions, 1, 'the decision is drawn apart');
+  await hook().send({ type: 'back' });
+  assert.strictEqual((await waitFor(() => hook().shown.slice(mark).filter((s) => s.kind === 'webview').pop(), 'back')).model.built.header.title, 'Widget list');
+  // a stage ladder, and findings
+  mark = await open('release show', [['release', 'r1']]);
+  page = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'webview'), 'the release page');
+  assert.ok(page.model.built.sections.some((x) => x.type === 'stages' && x.stages.length === 4), 'the ladder is a stepper');
+  assert.ok(page.model.built.sections.some((x) => x.type === 'findings'), 'what needs a person is findings');
+  drawn = await waitFor(() => hook().shown.slice(mark).find((s) => s.kind === 'rendered' && s.summary.stages === 4), 'the page drawing the stages');
+  assert.ok(drawn.summary.findings >= 2 && drawn.summary.kv > 3 && drawn.summary.tables >= 1);
+  // hidden behind another editor and shown again: VS Code keeps nothing of the page alive (retainContextWhenHidden is off), and the page comes back
+  // from the state it saved, then from the model the extension sends it
+  const hidden = hook().shown.length;
+  await vscode.window.showTextDocument(vscode.Uri.file(path.join(process.env.IF_CONSOLE_FIXTURE_ROOT, 'docs', 'guide.md')), { viewColumn: vscode.ViewColumn.Active, preview: false });
+  await sleep(1200);
+  await vscode.commands.executeCommand('workbench.action.previousEditor');
+  await waitFor(() => hook().shown.slice(hidden).find((s) => s.kind === 'rendered' && s.summary.stages === 4 && s.summary.title === 'Spring guide'), 'the page drawn again after it was hidden');
+  assert.strictEqual(tabs().length, 1, 'still the one panel');
 });
 
 test('the files a reference names have a hover, a definition, a CodeLens and links, from the command line\'s own `show`', async () => {

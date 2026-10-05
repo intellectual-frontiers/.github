@@ -45,6 +45,17 @@ function fixtureLog() {
   return fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
 }
 
-const manifest = () => JSON.parse(fs.readFileSync(path.join(vscode.extensions.getExtension('intellectual-frontiers.if-console').extensionPath, 'package.json'), 'utf8'));
+// package.json with its %key% strings read from package.nls.json, as VS Code shows them.
+const manifest = () => {
+  const dir = vscode.extensions.getExtension('intellectual-frontiers.if-console').extensionPath;
+  const raw = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+  const nls = JSON.parse(fs.readFileSync(path.join(dir, 'package.nls.json'), 'utf8'));
+  const walk = (v) => {
+    if (typeof v === 'string') { const m = /^%(.+)%$/.exec(v); return m ? nls[m[1]] ?? v : v; }
+    if (Array.isArray(v)) return v.map(walk);
+    return v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x)])) : v;
+  };
+  return walk(raw);
+};
 
 module.exports = { KEY, hook, sleep, waitFor, nextQuickPick, choose, reference, fixtureLog, manifest };

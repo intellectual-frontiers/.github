@@ -7,6 +7,7 @@ import { asArray, asObject, asString, asStrings, firstValue } from './json';
 import type { Status } from './presentation';
 import { SEVERITY } from './status';
 import { actionsOf, WRITES, type Action, type CommandSummary, type Doc, type Finding, type Link } from './wire';
+import { t } from '../l10n';
 
 /** What running a suggestion does. A `words` run is a command the launcher offers, run through the one path every command takes. */
 export type Run =
@@ -71,13 +72,13 @@ function checkItems(src: HomeSource): Suggestion[] {
   for (const [section, r] of src.checks) {
     const problems = r.findings.filter((f) => f.level === 'error' || f.level === 'warning').length;
     if (r.status === 'failed') {
-      out.push(make({ id: `check:${section}`, group: 'checks', status: 'error', label: `${section}: ${plural(problems || 1, 'problem')} to fix`,
-        why: `The last check of "${section}" failed. Open each finding, make the change it names, then run the check again.`,
-        commandLine: src.line(['check', section]), run: { kind: 'section', section }, runLabel: `Run check ${section} again`, findings: r.findings }));
+      out.push(make({ id: `check:${section}`, group: 'checks', status: 'error', label: t('{0}: {1} to fix', section, plural(problems || 1, 'problem')),
+        why: t('The last check of "{0}" failed. Open each finding, make the change it names, then run the check again.', section),
+        commandLine: src.line(['check', section]), run: { kind: 'section', section }, runLabel: t('Run check {0} again', section), findings: r.findings }));
     } else if (r.status === 'passed' && problems > 0) {
       out.push(make({ id: `check:${section}`, group: 'checks', status: 'warning', label: `${section}: ${plural(problems, 'warning')}`,
-        why: `The check of "${section}" passed with warnings. They do not block anything; fix them when you can.`,
-        commandLine: src.line(['check', section]), run: { kind: 'section', section }, runLabel: `Run check ${section} again`, findings: r.findings }));
+        why: t('The check of "{0}" passed with warnings. They do not block anything; fix them when you can.', section),
+        commandLine: src.line(['check', section]), run: { kind: 'section', section }, runLabel: t('Run check {0} again', section), findings: r.findings }));
     }
   }
   if (src.has('check') && src.checks.size === 0) {
@@ -89,9 +90,9 @@ function checkItems(src: HomeSource): Suggestion[] {
 
 // --- proposals ---------------------------------------------------------------------------------------------------------
 const proposalItems = (src: HomeSource): Suggestion[] => (src.proposals ?? []).map((l) => make({
-  id: `proposal:${firstValue(l.fields) ?? l.command}`, group: 'proposals', status: 'pending', label: `${firstValue(l.fields) ?? 'A proposal'} waits for your decision`,
-  why: 'A change was drafted for a person to decide. Read it, then accept it or leave it; only you can decide.',
-  commandLine: l.cli, run: { kind: 'resource', link: l }, runLabel: 'Open proposal' }));
+  id: `proposal:${firstValue(l.fields) ?? l.command}`, group: 'proposals', status: 'pending', label: t('{0} waits for your decision', firstValue(l.fields) ?? 'A proposal'),
+  why: t('A change was drafted for a person to decide. Read it, then accept it or leave it; only you can decide.'),
+  commandLine: l.cli, run: { kind: 'resource', link: l }, runLabel: t('Open proposal') }));
 
 // --- generated files ---------------------------------------------------------------------------------------------------
 function freshItems(src: HomeSource): Suggestion[] {
@@ -106,14 +107,14 @@ function freshItems(src: HomeSource): Suggestion[] {
   for (const a of actionsOf(fresh)) {
     if (!a.enabled || !WRITES.includes(a.category)) continue;
     out.push(make({ id: `fresh:${a.command}:${JSON.stringify(a.fields)}`, group: 'generated', status: 'warning', label: capital(a.label),
-      why: `${files ? plural(files, 'generated file') : 'A generated file'} no longer matches its source. Running this rewrites it; you see what would change first.`,
+      why: t('{0} no longer matches its source. Running this rewrites it; you see what would change first.', files ? plural(files, 'generated file') : 'A generated file'),
       commandLine: a.cli, run: { kind: 'action', action: a }, runLabel: capital(a.label) }));
   }
   if (!out.length && asString(fresh.data.status) === 'stale') {
-    out.push(make({ id: 'fresh:stale', group: 'generated', status: 'warning', label: `${plural(files || stale.length, 'generated file')} out of date`,
-      why: 'A generated file no longer matches its source, and the command line offers no single command that rewrites it.',
-      commandLine: src.line(['fresh']), run: { kind: 'words', words: ['fresh'] }, runLabel: 'Prove again',
-      yourself: 'Regenerate the files named in the fresh report with the command it gives for each.' }));
+    out.push(make({ id: 'fresh:stale', group: 'generated', status: 'warning', label: t('{0} out of date', plural(files || stale.length, 'generated file')),
+      why: t('A generated file no longer matches its source, and the command line offers no single command that rewrites it.'),
+      commandLine: src.line(['fresh']), run: { kind: 'words', words: ['fresh'] }, runLabel: t('Prove again'),
+      yourself: t('Regenerate the files named in the fresh report with the command it gives for each.') }));
   }
   return out;
 }
@@ -146,7 +147,7 @@ function doctorItems(src: HomeSource): Suggestion[] {
   const out: Suggestion[] = [];
   const actions = actionsOf(doctor).filter((a) => a.enabled && a.command !== 'doctor');
   const used = new Set<Action>();
-  const doctorAgain = { run: { kind: 'words', words: ['doctor'] } as Run, runLabel: 'Run doctor again', commandLine: src.line(['doctor']) };
+  const doctorAgain = { run: { kind: 'words', words: ['doctor'] } as Run, runLabel: t('Run doctor again'), commandLine: src.line(['doctor']) };
 
   for (const row of asArray(d.toolchain).map(asObject)) {
     const entry = asString(row.entry ?? row.name);
@@ -168,17 +169,17 @@ function doctorItems(src: HomeSource): Suggestion[] {
   }
   for (const a of actions) {
     if (used.has(a)) continue;
-    out.push(make({ id: `doctor:${a.command}:${JSON.stringify(a.fields)}`, group: 'health', status: 'warning', label: capital(a.label), why: 'Doctor suggests it.',
+    out.push(make({ id: `doctor:${a.command}:${JSON.stringify(a.fields)}`, group: 'health', status: 'warning', label: capital(a.label), why: t('Doctor suggests it.'),
       commandLine: a.cli, run: { kind: 'action', action: a }, runLabel: capital(a.label) }));
   }
   for (const p of [...asArray(d.conflicts), ...asArray(d.toolchain_problems)]) {
     const text = asString(p).trim();
-    if (text) out.push(make({ id: `conflict:${text}`, group: 'health', status: 'error', label: text.length > 140 ? `${text.slice(0, 139)}…` : text, why: 'Doctor found a problem in how this repository is set up.',
-      ...doctorAgain, yourself: 'Correct what it names in the files it names, then run doctor again.' }));
+    if (text) out.push(make({ id: `conflict:${text}`, group: 'health', status: 'error', label: text.length > 140 ? `${text.slice(0, 139)}…` : text, why: t('Doctor found a problem in how this repository is set up.'),
+      ...doctorAgain, yourself: t('Correct what it names in the files it names, then run doctor again.') }));
   }
   for (const p of asArray(d.prerequisites).map(asObject)) {
     if (p.present === false) {
-      out.push(make({ id: `prerequisite:${asString(p.name)}`, group: 'health', status: 'error', label: `${asString(p.name)} is not installed`, why: 'This command line needs it on this machine.',
+      out.push(make({ id: `prerequisite:${asString(p.name)}`, group: 'health', status: 'error', label: t('{0} is not installed', asString(p.name)), why: t('This command line needs it on this machine.'),
         ...doctorAgain, yourself: asString(p.hint) || `Install ${asString(p.name)}, then run doctor again.` }));
     }
   }
@@ -189,20 +190,20 @@ function doctorItems(src: HomeSource): Suggestion[] {
     const cmd = commandIn(hint, src);
     const found = cmd ? offered(src, cmd.words) : null;
     const editor = found !== null && found.surfaces.includes('editor');
-    out.push(make({ id: 'libraries', group: 'toolchain', status: 'warning', label: `${plural(gone.length, 'system library', 'system libraries')} missing: ${gone.slice(0, 3).join(', ')}${gone.length > 3 ? ', …' : ''}`,
-      why: 'A browser this command line fetches needs them on this machine. They are installed once with your administrator password.',
+    out.push(make({ id: 'libraries', group: 'toolchain', status: 'warning', label: t('{0} missing: {1}{2}', plural(gone.length, 'system library', 'system libraries'), gone.slice(0, 3).join(', '), gone.length > 3 ? ', …' : ''),
+      why: t('A browser this command line fetches needs them on this machine. They are installed once with your administrator password.'),
       commandLine: cmd?.line ?? null, run: editor && cmd ? { kind: 'words', words: cmd.words } : doctorAgain.run, runLabel: editor && cmd ? capital(cmd.words.join(' ')) : doctorAgain.runLabel,
       yourself: editor ? null : `${cmd ? 'Run it in a terminal, since it asks before using your administrator rights.' : 'Install them with your system’s package manager.'} ${hint}`.trim() }));
   }
   for (const m of asStrings(d.missing)) {
     if (/system librar/i.test(m) || out.some((i) => i.id === `toolchain:${m}`)) continue;
-    out.push(make({ id: `missing:${m}`, group: 'health', status: 'warning', label: `${m} is missing`, why: 'Doctor reports it absent.', ...doctorAgain, yourself: 'Set it up as the command line says, then run doctor again.' }));
+    out.push(make({ id: `missing:${m}`, group: 'health', status: 'warning', label: t('{0} is missing', m), why: t('Doctor reports it absent.'), ...doctorAgain, yourself: t('Set it up as the command line says, then run doctor again.') }));
   }
   for (const row of asArray(d.state).map(asObject)) {
     const level = asString(row.level);
     if (level === 'ok' || !level) continue;
     const status: Status = level === 'error' ? 'error' : level === 'warning' ? 'warning' : 'info';
-    out.push(make({ id: `state:${asString(row.label)}`, group: 'health', status, label: `${asString(row.label)}: ${asString(row.note)}`.trim(), why: 'Doctor reports the state of this clone.',
+    out.push(make({ id: `state:${asString(row.label)}`, group: 'health', status, label: `${asString(row.label)}: ${asString(row.note)}`.trim(), why: t('Doctor reports the state of this clone.'),
       ...doctorAgain, yourself: asString(row.advice) || 'Look at it, then run doctor again.' }));
   }
   return out;
@@ -214,21 +215,21 @@ export interface HomeItems { needs: Suggestion[]; help: Suggestion[] }
 export function deriveHome(src: HomeSource): HomeItems {
   const needs: Suggestion[] = [];
   if (src.state === 'untrusted') {
-    needs.push(make({ id: 'trust', group: 'trust', status: 'warning', label: `Trust this workspace to use ${src.program}`,
-      why: src.reason, run: { kind: 'ext', command: 'if-console.trust' }, runLabel: 'Trust this workspace…',
-      yourself: 'Trusting a workspace is a decision only you can make; VS Code asks you.' }));
+    needs.push(make({ id: 'trust', group: 'trust', status: 'warning', label: t('Trust this workspace to use {0}', src.program),
+      why: src.reason, run: { kind: 'ext', command: 'if-console.trust' }, runLabel: t('Trust this workspace…'),
+      yourself: t('Trusting a workspace is a decision only you can make; VS Code asks you.') }));
   } else if (src.state === 'update') {
-    needs.push(make({ id: 'update', group: 'trust', status: 'warning', label: `Update IF Console to read ${src.program}`, why: `${src.program} answers in a newer form than this extension reads. ${src.reason}`,
-      run: { kind: 'ext', command: 'workbench.extensions.action.checkForUpdates' }, runLabel: 'Check for updates', yourself: 'Update the IF Console extension.' }));
+    needs.push(make({ id: 'update', group: 'trust', status: 'warning', label: t('Update IF Console to read {0}', src.program), why: t('{0} answers in a newer form than this extension reads. {1}', src.program, src.reason),
+      run: { kind: 'ext', command: 'workbench.extensions.action.checkForUpdates' }, runLabel: t('Check for updates'), yourself: t('Update the IF Console extension.') }));
   } else if (src.state === 'ready') {
     needs.push(...checkItems(src), ...proposalItems(src), ...freshItems(src), ...doctorItems(src));
   }
   needs.sort((a, b) => SEVERITY[a.status] - SEVERITY[b.status]);
   const help: Suggestion[] = [];
   if (src.state === 'ready') {
-    if (src.has('help')) help.push(make({ id: 'help:learn', group: 'help', status: 'muted', label: 'Learn how this works', why: 'The help topics of this command line, each with its steps as buttons.', run: { kind: 'ext', command: 'if-console.learn' }, runLabel: 'Learn', counts: false }));
-    help.push(make({ id: 'help:report', group: 'help', status: 'muted', label: 'Copy a report to ask for help', why: 'Doctor and, if you choose, a resource, with passwords and keys removed. Nothing is sent anywhere.', run: { kind: 'ext', command: 'if-console.getHelp' }, runLabel: 'Get help', counts: false }));
-    if (src.has('context')) help.push(make({ id: 'help:context', group: 'help', status: 'muted', label: 'Copy what an AI agent needs to know', why: 'The context of a resource you choose, with passwords and keys removed.', run: { kind: 'ext', command: 'if-console.copyContext' }, runLabel: 'Copy context', counts: false }));
+    if (src.has('help')) help.push(make({ id: 'help:learn', group: 'help', status: 'muted', label: t('Learn how this works'), why: t('The help topics of this command line, each with its steps as buttons.'), run: { kind: 'ext', command: 'if-console.learn' }, runLabel: t('Learn'), counts: false }));
+    help.push(make({ id: 'help:report', group: 'help', status: 'muted', label: t('Copy a report to ask for help'), why: t('Doctor and, if you choose, a resource, with passwords and keys removed. Nothing is sent anywhere.'), run: { kind: 'ext', command: 'if-console.getHelp' }, runLabel: t('Get help'), counts: false }));
+    if (src.has('context')) help.push(make({ id: 'help:context', group: 'help', status: 'muted', label: t('Copy what an AI agent needs to know'), why: t('The context of a resource you choose, with passwords and keys removed.'), run: { kind: 'ext', command: 'if-console.copyContext' }, runLabel: t('Copy context'), counts: false }));
   }
   return { needs, help };
 }

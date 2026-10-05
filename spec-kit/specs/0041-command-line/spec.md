@@ -176,7 +176,8 @@ command set is 0042-agora.
   agent's tools.
 - **FR-018**: A resource MUST have three renderings, and no more: text
   (the default, for people), JSON (`--json`, on every command) and HTML
-  (`--html`, used by the editor's webviews and by nothing else). All three
+  (`--html`, for a person's browser or another tool that wants a page; the editor draws
+  the JSON and never asks for it). All three
   MUST be views of the same resource, and MUST NOT differ in what they say:
   nothing may appear in one that the resource does not carry. Text MAY omit
   fields a person does not need; JSON MUST NOT.
@@ -228,7 +229,7 @@ command set is 0042-agora.
   interface for every orchestrator beside the command line, which is the core.
   It MUST hold no behavior of its own: it discovers each trusted repository's
   orchestrator launcher, runs `<name> command list --json` and `<name> <noun>
-  <verb> ... --json` or `--html`, renders the resources they return, and runs a
+  <verb> ... --json`, renders the resources they return, and runs a
   resource's actions by invoking the orchestrator, and does nothing else. It
   MUST show a status that says in plain words whether things are well, the
   orchestrators and their audiences, an action as a button with a way to show

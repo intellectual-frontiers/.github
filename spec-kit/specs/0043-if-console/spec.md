@@ -37,8 +37,8 @@ it does, what it never does, and how it is built.
   `tools/agora/` and each design system's own directory, is where this
   repository keeps code (0042-agora FR-016).
 - **FR-003**: The extension MUST run a repository's commands only by invoking
-  that repository's launcher with `--json` (or `--html` for a rendering,
-  FR-011) and MUST NOT re-implement a command, a check, a type's validation or
+  that repository's launcher with `--json` (what the panel of FR-042 draws is
+  that JSON, never a page the launcher rendered) and MUST NOT re-implement a command, a check, a type's validation or
   a rule: what a resource says, a type accepts and an action does is whatever
   the launcher returns (0041-command-line FR-013, FR-024). A chore that a
   command does not yet do MUST be added to the orchestrator first, by its own
@@ -100,12 +100,15 @@ it does, what it never does, and how it is built.
   section in VS Code's Test Explorer as a test, run by `check SECTION --json`,
   with a section that the launcher reports as skipped shown as skipped and
   never as passed (0041-command-line FR-033).
-- **FR-011**: The extension MUST show a `read` command's HTML rendering
-  (`--html`) in a webview that loads local resources only, runs no script from
-  outside it, and follows only links that name a command or a file in the
-  clone, so that a view an orchestrator declares (0042-agora FR-019) opens in
-  the editor. The extension MUST add no style to a rendering beyond VS Code's
-  theme variables around it.
+- **FR-011**: Every webview the extension opens (the resource panel, FR-042)
+  MUST load local resources only, from the extension's own files, under a
+  Content Security Policy with a nonce that allows no remote source and no
+  inline script or style but its own, run no script from outside it, follow
+  only links that name a command the launcher gave the panel, or a file in the
+  clone, and draw nothing but VS Code's theme variables. A command line's
+  `--html` rendering remains for terminals and other tools; the extension
+  never asks for it and keeps no page path for it.
+
 - **FR-012**: The extension MUST offer, in the command palette, `IF Console:
   Run Command…`, which lists every command that declares the editor surface,
   grouped by repository and noun, each with the command's own id, the title and
@@ -126,7 +129,9 @@ it does, what it never does, and how it is built.
   `check`) runs, the extension MUST run it with `--dry-run --json` and show
   each file the change would touch as a diff in VS Code's diff editor, taken
   from the dry run's resource (0041-command-line FR-015), and MUST run the
-  command for real only after the person accepts that diff. A command whose
+  command for real only after the person accepts that diff, in the resource
+  panel (FR-042), which shows the change summary (each file, its lines added
+  and removed) with Open Diff for each file, Apply and Discard. A command whose
   dry run fails MUST NOT be run for real, and the dry run's error MUST be
   shown.
 - **FR-015**: A `decision` command MUST run only after a modal confirmation
@@ -245,16 +250,13 @@ it does, what it never does, and how it is built.
 
 - **FR-031**: The extension MUST offer `IF Console: Learn`, a quick pick of the
   topics that the repository's `help` command lists (0041-command-line FR-065),
-  from each repository whose command list has `help`, grouped by repository
-  when a window holds several; and MUST show the topic chosen as any other
-  resource (FR-008): its plain words, its sections, and its steps as buttons
-  that run each step through the one path every command takes (FR-013 to
-  FR-015). A topic is a resource of kind `help` whose data has `topic`,
-  `summary`, `plain`, `sections` (a heading and its words each) and `steps`, and
-  whose actions are the steps in order. A step whose command the launcher does
-  not offer to the editor, or which it says cannot run now, MUST be a disabled
-  button that says why, with its command line shown to paste in a terminal. The
-  extension MUST carry no topic and no step of its own (FR-003).
+  each with a codicon and its summary, from each repository whose command list
+  has `help`, grouped by repository when a window holds several; and MUST show
+  the topic chosen in the resource panel as FR-043 states. A topic is a
+  resource of kind `help` whose data has `topic`, `summary`, `plain`,
+  `sections` (a heading and its words each) and `steps`, and whose actions are
+  the steps in order. The extension MUST carry no topic and no step of its own
+  (FR-003).
 
 ## Tested in a real VS Code
 
@@ -283,8 +285,11 @@ it does, what it never does, and how it is built.
   `true` gives the modal's one button, anything else refuses it, an answer is
   used once and with none queued the modal is refused; (b) reads what the
   extension showed, in order: each modal's message, detail, whether it was
-  modal and its buttons, each quick pick's title and items, and each webview's
-  page; and (c) reads a snapshot, taken on demand and changing nothing, of the
+  modal and its buttons, each quick pick's title and items, and each panel's
+  page and the model it drew; (c) delivers a message to the panel as if its
+  page had sent it, where the person's click inside a webview cannot be made by
+  a test (it runs no action by itself: a dry run's Apply is still the person's
+  choice in the test, and a decision still meets its modal); and (d) reads a snapshot, taken on demand and changing nothing, of the
   repositories found, the entries of its views, the badges, the status bar's
   text, the tests of the Test Explorer and the MCP servers it registers. Outside test mode the object MUST NOT exist and the modal MUST be
   VS Code's own. The hook MUST affect no other prompt: quick picks and input
@@ -431,32 +436,57 @@ knowledge (FR-003).
   document link that opens the resource's page (FR-042). Each
   runs only the launcher's `show` command, only in a trusted workspace, and the
   extension MUST hold no pattern, file name or field of its own for them.
-- **FR-042**: A resource MUST open in one panel for the window, a webview that
-  loads local resources only under a strict Content Security Policy with a
-  nonce (FR-011), with history (back and forward) and a breadcrumb. It MUST
-  show a header with the noun's codicon, the title, the kind, an audience pill
-  (FR-016) and status pills; an action toolbar with one primary button, the
-  other actions as icon buttons, and a `decision` styled apart and still behind
-  its modal (FR-015); and sections chosen by the data's shape: a key-value grid
-  for scalars, a sortable table for a list of objects, a stepper for a list of
-  stages, and a list of findings that opens each at its `file:line`. It MUST be
-  built from `@vscode-elements/elements` and the codicon font, from the
-  extension's own files, with VS Code's theme variables only, and MUST be
-  legible in light, dark and high-contrast themes.
-- **FR-043**: Learn (FR-031) MUST use the same panel and components as FR-042: a
-  topic as numbered steps, each with a run button that goes through the one
-  path every command takes, or disabled with the reason and the command line to
-  copy, and the topic's sections and plain words.
+- **FR-042**: A resource MUST open in one panel for the window: a singleton
+  webview (opening another resource reveals it and shows that one; it never
+  opens a second), with `retainContextWhenHidden` off and its state kept with
+  `setState` and `getState` so that it comes back as it was, that loads local
+  resources only under a strict Content Security Policy with a nonce (FR-011),
+  with history (back and forward), a breadcrumb, and an Open to the Side
+  choice. It MUST be drawn from the resource's JSON (the `data`, `links` and
+  `actions` of 0041-command-line FR-019), never from a page the launcher
+  rendered, with `@vscode-elements/elements` and the codicon font from the
+  extension's own files, with VS Code's theme variables only, legible in
+  light, dark and high-contrast themes, and usable by keyboard with labels for
+  a screen reader. It MUST show:
+  - a header with the noun's codicon (from the presentation, FR-036), the
+    title, the kind and id, an audience pill (FR-016), status pills in the
+    fixed vocabulary's colors (FR-038) and, where the data gives one, when the
+    resource was last run;
+  - an action toolbar with one primary button, the other actions as icon
+    buttons with tooltips and an overflow menu that also has Copy as JSON and
+    Copy Context; a `decision` styled apart (a shield icon and the word
+    Decision) and still going through the dry run and the modal (FR-014,
+    FR-015); an action that cannot run now disabled and saying why;
+  - sections chosen by the data's shape: a key-value grid for scalars, a
+    sortable, filterable table for a list of objects whose rows that have a
+    `show` command open in the panel, a stepper for a list of stages, a list
+    of findings grouped by section with a severity icon that opens each at its
+    `file:line`, Markdown-safe paragraphs for long text, and links as chips;
+    and an empty state with guidance for a section with nothing in it.
+- **FR-043**: Learn (FR-031) MUST use the same panel and components as FR-042:
+  a topic as numbered steps, each with its words, the exact command line in a
+  code block with a Copy button, and a Run button that goes through the one
+  path every command takes (FR-013 to FR-015), or, where the launcher does not
+  offer the command to the editor or says it cannot run now, a disabled
+  button that says why; a step a person must do themselves marked as theirs;
+  and a link to the next topic.
 - **FR-044**: The extension's manifest and package MUST carry what the
-  marketplace shows without being published (FR-029): a 128-pixel PNG `icon`, a
-  `galleryBanner`, `categories` and `keywords`, a `README.md` that shows
-  screenshots of FR-045, a `CHANGELOG.md`, and every user-facing string through
-  `vscode.l10n` and `package.nls.json`.
+  marketplace shows without being published (FR-029): a 128-pixel PNG `icon`
+  that `extension build` makes at build time from the monochrome mark of the
+  organization's brand with Pillow (no hand-drawn art, and not tracked), a
+  `galleryBanner`, `categories` and `keywords`, a `README.md` that shows the
+  screenshots of FR-045 kept small under `tools/if-console/media/screenshots/`,
+  a `CHANGELOG.md`, `package.nls.json` for the manifest's strings, and every
+  user-facing string of the code through `vscode.l10n`, with the bundle of
+  those strings written at build time. A view of the manifest's pool that no
+  command line declares MUST NOT be shown or offered in the palette.
 - **FR-045**: `agora extension test --screenshots DIR` MUST run the extension in
   a real VS Code under the display server of FR-032, once for each of VS Code's
   `Default Dark+`, `Default Light+` and `Default High Contrast` themes, open
   each view, the command palette, a resource page, Learn, the command line a
-  form ends with, the changes of a dry run and its diff, and the Problems panel,
+  form ends with, the changes of a dry run in the panel and its diff, a resource
+  with a table, one with a stage ladder, a check's findings, a decision, and
+  the Problems panel,
   and write a PNG of the whole window of each as `DIR/<theme>-<what>.png`, with
   `dark`, `light` and `high-contrast` as the themes. The capture MUST read the
   display server's own screen dump and need no program beyond it and Node. A
@@ -573,8 +603,8 @@ knowledge (FR-003).
 - **Presentation** — what a command line says about how its nouns are listed
   and titled, in `command list` (FR-036, FR-038; 0041-command-line FR-064).
 - **Home** — the first view, what needs a person (FR-037).
-- **The resource panel** — the one webview in which a resource and a Learn topic
-  open (FR-042, FR-043).
+- **The resource panel** — the one webview in which a resource, a Learn topic
+  and a dry run's changes open (FR-014, FR-042, FR-043).
 - **The test hook** — the one object, present only in VS Code's test mode,
   through which a test answers a decision's modal (FR-033).
 - **The Chores view** — the repository-wide commands and what needs a person,

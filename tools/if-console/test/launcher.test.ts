@@ -81,10 +81,10 @@ test('FR-005: a launcher that does not exist or prints no document is reported, 
   repo.cleanup();
 });
 
-test('FR-003: --html is asked for only as a rendering, and the text is returned as is', async () => {
-  const repo = makeRepo({ docs: { 'widget show w1': { doc: k.doc('widget', 'w1', {}), html: '<p>w1</p>' } } });
-  const r = await launcherFor(repo, []).run(['widget', 'show', 'w1'], { format: 'html' });
-  assert.equal(r.stdout, '<p>w1</p>');
-  assert.deepEqual(repo.invocations()[0].argv, ['widget', 'show', 'w1', '--html']);
+test('FR-003: every call asks for --json and nothing else is ever asked for', async () => {
+  const repo = makeRepo({ docs: { 'widget show w1': { doc: k.doc('widget', 'w1', {}) } } });
+  const r = await launcherFor(repo, []).run(['widget', 'show', 'w1']);
+  assert.equal(r.doc?.id, 'w1');
+  assert.deepEqual(repo.invocations()[0].argv, ['widget', 'show', 'w1', '--json']);
   repo.cleanup();
 });

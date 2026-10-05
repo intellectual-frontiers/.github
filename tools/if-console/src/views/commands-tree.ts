@@ -5,6 +5,7 @@ import { argvFromFields } from '../model/forms';
 import { firstValue } from '../model/json';
 import { actionsOf, checkSchema, linksOf } from '../model/wire';
 import { BaseProvider, CATEGORY_ICON, icon, messageNode, Node, speak, stateNodes } from './node';
+import { t } from '../l10n';
 
 export const MAX_RESOURCES = 200;
 const VIEW = 'if-console.commands';
@@ -100,7 +101,7 @@ export class CommandsProvider extends BaseProvider {
     let detail;
     try { detail = await repo.detail(link.command); } catch (e) { return [messageNode(repo, e instanceof Error ? e.message : String(e))]; }
     const r = await repo.launcher.run(argvFromFields(detail, link.fields));
-    if (!r.doc || r.error) return [messageNode(repo, r.error ? r.error.message : `${repo.program} did not return this resource.`)];
+    if (!r.doc || r.error) return [messageNode(repo, r.error ? r.error.message : t('{0} did not return this resource.', repo.program))];
     const check = checkSchema(r.doc);
     if (!check.ok) return [messageNode(repo, check.message)];
     const out = linksOf(r.doc).slice(0, MAX_RESOURCES).map((l) => new Node('link', repo, { view: VIEW, link: l, label: firstValue(l.fields) || l.command, rel: l.rel }));

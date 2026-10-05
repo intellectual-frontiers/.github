@@ -9,11 +9,25 @@ import type { Repository } from '../services/repository';
 import { CATEGORY_ICON, Node } from '../views/node';
 import type { ContextCommands } from './context';
 import type { RunCommands } from './run';
+import { t } from '../l10n';
 
 export class ViewCommands {
   constructor(private readonly app: App, private readonly run: RunCommands, private readonly context: ContextCommands) {}
 
   showHome(arg: unknown): Promise<void> { return this.app.showHome(arg === 'suggestions'); }
+
+  /** The views this window has, by the titles the command lines gave them (VS Code names the pool's own Focus commands from the manifest, so a
+   * person finds a view here by its real title). */
+  async showView(): Promise<void> {
+    const planned = this.app.slots.filter((s) => s.plan !== null);
+    const items = [
+      { label: `$(home) ${t('Home')}`, description: t('What needs you'), id: 'if-console.home' },
+      ...planned.map((s) => ({ label: `$(${s.plan?.icon ?? 'folder'}) ${s.plan?.title ?? ''}`, description: s.plan?.description ?? '', id: s.viewId })),
+      { label: `$(checklist) ${t('Checks')}`, description: t('Each check section and its findings'), id: 'if-console.checks' },
+    ];
+    const picked = await vscode.window.showQuickPick(items, { placeHolder: t('Which view?'), matchOnDescription: true, ignoreFocusOut: true });
+    if (picked) await vscode.commands.executeCommand(`${picked.id}.focus`);
+  }
 
   runSuggestion(node: unknown): Promise<unknown> {
     if (!(node instanceof Node) || node.kind !== 'suggestion' || !node.data.suggestion) return Promise.resolve(null);
@@ -31,8 +45,8 @@ export class ViewCommands {
   async rowActions(repo: Repository, noun: string, id: string, view?: string): Promise<unknown> {
     const shown = await repo.show(noun, id);
     const actions = shown ? actionsOf(shown) : [];
-    if (!actions.length) { void vscode.window.showInformationMessage(`${id} has no actions the editor offers.`); return null; }
-    const picked = await this.app.ui.pick({ title: `${noun} ${id}`, placeholder: 'Which action?',
+    if (!actions.length) { void vscode.window.showInformationMessage(t('{0} has no actions the editor offers.', id)); return null; }
+    const picked = await this.app.ui.pick({ title: `${noun} ${id}`, placeholder: t('Which action?'),
       items: actions.map((a) => ({ label: `$(${a.enabled ? CATEGORY_ICON[a.category] ?? 'play' : 'circle-slash'}) ${a.label}`,
         description: a.enabled ? a.category : `unavailable: ${a.reason}`, detail: a.cli ?? (a.needs.length ? `asks for ${a.needs.join(', ')}` : undefined), value: a })) });
     if (picked === undefined || Array.isArray(picked)) return null;
@@ -59,14 +73,14 @@ export class ViewCommands {
   async copyCommandLine(node: unknown): Promise<void> {
     if (!(node instanceof Node)) return;
     const line = this.commandLineOf(node);
-    if (!line) { void vscode.window.showInformationMessage('This one needs a value only you can give, so it has no single command line. Run it and it asks.'); return; }
+    if (!line) { void vscode.window.showInformationMessage(t('This one needs a value only you can give, so it has no single command line. Run it and it asks.')); return; }
     await this.app.ui.copy(line);
   }
 
   async copyId(node: unknown): Promise<void> {
     if (!(node instanceof Node)) return;
     const id = node.data.row?.id ?? node.data.name ?? (node.data.link ? Object.values(node.data.link.fields)[0] : undefined);
-    if (typeof id === 'string' && id) { await vscode.env.clipboard.writeText(id); void vscode.window.showInformationMessage(`${id} is on the clipboard.`); }
+    if (typeof id === 'string' && id) { await vscode.env.clipboard.writeText(id); void vscode.window.showInformationMessage(t('{0} is on the clipboard.', id)); }
   }
 
   /** A quick pick over every row of the view a node belongs to (or of every view), to open one. */
@@ -74,8 +88,8 @@ export class ViewCommands {
     const view = node instanceof Node ? node.data.view : undefined;
     const slots = this.app.slots.filter((s) => s.plan && (!view || s.viewId === view));
     const all = (await Promise.all((slots.length ? slots : this.app.slots.filter((s) => s.plan)).map((s) => s.allRows()))).flat();
-    if (!all.length) { void vscode.window.showInformationMessage('No view lists resources yet.'); return null; }
-    const picked = await this.app.ui.pick({ title: 'Find a resource', placeholder: 'Type to search by name, description or kind',
+    if (!all.length) { void vscode.window.showInformationMessage(t('No view lists resources yet.')); return null; }
+    const picked = await this.app.ui.pick({ title: 'Find a resource', placeholder: t('Type to search by name, description or kind'),
       items: all.map((x) => ({ label: `$(${x.row.status ? lookOf(x.row.status).icon : x.decl.icon}) ${x.row.label}`, description: [x.row.description, x.decl.title].filter(Boolean).join(' · '),
         detail: x.row.facts.map((f) => `${f.key}: ${f.value}`).join('  '), value: x })) });
     if (picked === undefined || Array.isArray(picked)) return null;
@@ -108,7 +122,7 @@ export class ViewCommands {
 
   cancelRun(): void {
     const n = this.app.running.cancelAll();
-    if (!n) void vscode.window.showInformationMessage('Nothing is running.');
+    if (!n) void vscode.window.showInformationMessage(t('Nothing is running.'));
   }
 
   toggleAllCommands(): void {

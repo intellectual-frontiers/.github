@@ -7,7 +7,7 @@ import * as net from 'net';
 import * as fs from 'fs';
 import * as path from 'path';
 import { boot } from './support/boot';
-import { EXT_ROOT, SRC_DIR } from './support/paths';
+import { SRC_DIR, readManifest } from './support/paths';
 
 /** Every TypeScript file of the extension's code, the webview's own bundle included. */
 function walk(dir: string): string[] {
@@ -17,7 +17,7 @@ function walk(dir: string): string[] {
   });
 }
 const sources = walk(SRC_DIR).map((p) => ({ f: path.relative(SRC_DIR, p), text: fs.readFileSync(p, 'utf8') }));
-const manifest = JSON.parse(fs.readFileSync(path.join(EXT_ROOT, 'package.json'), 'utf8')) as Loose;
+const manifest = readManifest() as Loose;
 const strip = (t: Loose) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 test('FR-023: no source uses a network module, an HTTP or socket call, a remote resource or VS Code\'s telemetry', () => {
