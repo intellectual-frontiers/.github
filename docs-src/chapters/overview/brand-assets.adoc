@@ -1,0 +1,26 @@
+[#brand-assets]
+== Brand assets and design systems
+
+`design-systems/frontiers-brand/` holds the palette, the unit colors, the typefaces, the logo (light and dark), the icon, the app
+icons, the unit marks, the imagery pool, the share card and the decoration kit. It themes every other design system. The others each
+have a directory, listed with their kinds in <<reference-design-systems>>: the web, print, figures, slides, media, email, courses,
+merchandise and the house voice. Every public house rule about how Intellectual Frontiers looks, reads or sounds belongs in a design
+system of its kind here too (spec 0014).
+
+Every design system carries an `assurance/` harness that runs on its own, by the means its README documents. `agora check
+design-systems` runs them all, and CI runs `agora check --suite browser`, `--suite python` and `--suite images` on every push that
+touches `design-systems/`.
+
+* *Logos* are in `design-systems/frontiers-brand/logos/`, as PNG, with WebP in `logos/web/`. Use the `-dark-` variants on dark
+backgrounds.
+* *Pictures* are the brand's imagery pool, `design-systems/frontiers-brand/imagery/`. The app icons and the share card are in
+`design-systems/frontiers-brand/images/`. Figures are drawn with `design-systems/frontiers-figures/`; the profile's are written by `agora
+figure generate`.
+* Consumers *vendor a pinned copy* and never edit it downstream. Change a design system only by amending its own source (spec 0014).
+* Reference assets by path rather than copying them, so there is one source of truth. In `profile/README.md` the images use absolute
+`raw.githubusercontent.com` URLs on `main`, because GitHub does not resolve relative paths on the organization profile page.
+
+This guide follows its own rule. Its logo and pictures are the brand's, copied from `design-systems/frontiers-brand/` into the built
+site by `agora docs build`, and nothing is drawn for it.
+
+The help topics `design-systems` and `brands` say how to check a design system, start one, and regenerate a brand's files.

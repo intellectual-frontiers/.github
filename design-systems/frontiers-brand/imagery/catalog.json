@@ -1,5 +1,5 @@
 {
-  "$description": "frontiers-brand's imagery pool (0014-design-systems FR-043; frontiers-brand FR-015): every approved piece of artwork a design system it themes may choose from, what each shows and can stand for, and its files. Which work uses which piece is that work's own record, never this file's. Checked by tools/brand_imagery.py check.",
+  "$description": "frontiers-brand's imagery pool (0014-design-systems FR-043; frontiers-brand FR-015): every approved piece of artwork a design system it themes may choose from, what each shows and can stand for, and its files. Which work uses which piece is that work's own record, never this file's. Checked by `agora check imagery`.",
   "fields": {
     "id": "stable slug, environment first and then the anchor; the master's file name without .png",
     "name": "a short human name",
@@ -17,7 +17,7 @@
     "source": "where the approved piece came from",
     "pixel_size": "[width, height] of the master",
     "content_box": "[left, top, right, bottom] pixel bounds of the drawn art (alpha > 16); a renderer that needs the art alone trims to it",
-    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by tools/brand_imagery.py build"
+    "web": "the master as WebP for the web, one file per width, each [file, width, height]; written by `agora imagery build`"
   },
   "environments": [
     "mountain-alpine",

@@ -1,0 +1,37 @@
+# Runs agora's own proofs on a stock runner given only Python and uv (0025-tooling-environment FR-010, FR-011; 0042-agora
+# FR-022): that every generator's tracked output is current (`fresh`), and agora's own tests. Every package they need comes
+# from agora's hashed locks, which agora installs itself; no program is installed here (0042-agora FR-030), and the toolchain
+# lock is fetched into the cache only by the jobs that run a check needing it (design-systems.yml).
+name: agora
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  proofs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v7
+      # doctor exits 3 when python3 or uv is missing or a browser library is; that is a warning naming what is missing, and the
+      # job goes on. Exit 1 (a conflict) fails the job (0041-command-line FR-021).
+      - name: agora's doctor
+        run: |
+          code=0
+          ./agora doctor | tee doctor.txt || code=${PIPESTATUS[0]}
+          if [ "$code" -eq 3 ]; then
+            echo "::warning title=agora doctor::agora reports something missing on this runner: $(sed -n 's/^missing: //p' doctor.txt)"
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+      - name: Every generator's output is current
+        run: ./agora fresh
+      - name: agora's own tests
+        run: ./agora test

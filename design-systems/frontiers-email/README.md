@@ -6,7 +6,7 @@ brand. Its rules are [`spec.md`](spec.md); governed by [`0014-design-systems`](.
 
 | Path | What it is |
 | --- | --- |
-| `mail.py` | `python3 mail.py build MESSAGE.md -o OUT.html --assets https://.../brand` writes the HTML and `OUT.txt`; `python3 mail.py check MESSAGE.md` reports every rule a message breaks. Standard library only. |
+| `mail.py` | `python3 mail.py build MESSAGE.md -o OUT.html --assets https://.../brand` writes the HTML and `OUT.txt`; `python3 mail.py check MESSAGE.md` reports every rule a message breaks. Standard library only. In this repository: `agora email build PATH --assets https://.../brand` and `agora check email --scope PATH`. |
 | `email.json` | The message types, width, the roles each tone uses, and the limits. |
 | `assurance/` | `python3 assurance/run.py`: messages built and checked under every brand, and messages that must fail. |
 

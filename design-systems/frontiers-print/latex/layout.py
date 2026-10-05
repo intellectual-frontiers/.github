@@ -53,11 +53,12 @@ def resolve_typeface(canon, override=''):
         sys.exit(f"typeface: set '{name}' is missing font files: {', '.join(missing)}")
     return name
 
-def _fontspec(fam):
+def _fontspec(fam, sans=False):
     d = FONT_DIRS[fam['dir']]
     o = [f"Path={d}/", f"Extension={fam['ext']}", f"UprightFont={fam['regular']}", f"BoldFont={fam['bold']}", f"ItalicFont={fam['italic']}", f"BoldItalicFont={fam['bolditalic']}"]
     if fam.get('scale', 1) != 1: o.append(f"Scale={fam['scale']}")
     if fam.get('features'): o.append(fam['features'])
+    if sans: o.append('RawFeature={-calt}')  # contextual alternates reach the PDF without a Unicode mapping
     return fam['regular'], ','.join(o)
 
 def emit(canon, typeface=''):
@@ -75,8 +76,8 @@ def emit(canon, typeface=''):
     tf = resolve_typeface(canon, typeface); st = TF['sets'][tf]
     d('typeface', tf)
     for role, key in (('main', 'main'), ('sans', 'sans')):
-        name, opts = _fontspec(st[key]); d(role + 'font', name); d(role + 'opts', opts)
-    for role in ('main', 'sans'):
+        name, opts = _fontspec(st[key], sans=(key == 'sans')); d(role + 'font', name); d(role + 'opts', opts)
+    for role in ('main', 'sans', 'mono'):
         d('fb' + role, ','.join('"[' + str(FONT_DIRS['house'] / f) + ']"' for f in TF['fallback'][role]))
     return '\n'.join(o) + '\n'
 

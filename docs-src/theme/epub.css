@@ -1,0 +1,15 @@
+/* The guide's EPUB. An e-reader controls size, spacing and often the color scheme, so this sets only intent: a serif body, the brand's
+   blue for headings and links, plain code blocks. Colors are frontiers-brand's (frontier-blue #214ea2, warm-paper #f3f0e8). */
+body { font-family: Georgia, "Noto Serif", serif; color: #121820; }
+h1, h2, h3, h4, h5, h6 { font-family: Georgia, "Noto Serif", serif; color: #214ea2; font-weight: bold; line-height: 1.2; }
+a, a:link { color: #214ea2; }
+code, pre, tt, kbd { font-family: "DejaVu Sans Mono", monospace; }
+pre { background: #f3f0e8; border: 1px solid #e3dfd3; border-radius: 4px; padding: 0.6em 0.8em; overflow-wrap: break-word; white-space: pre-wrap; }
+code { background: #f3f0e8; border-radius: 3px; padding: 0.1em 0.3em; }
+pre code { background: transparent; padding: 0; }
+blockquote { border-left: 3px solid #214ea2; margin-left: 0; padding-left: 1em; color: #4b5563; }
+.admonitionblock { border-left: 3px solid #214ea2; padding: 0.4em 0.8em; margin: 1em 0; background: #eef2fa; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #dfe3e8; padding: 0.4em 0.6em; text-align: left; vertical-align: top; }
+th { background: #f3f0e8; font-weight: bold; }
+img { max-width: 100%; }

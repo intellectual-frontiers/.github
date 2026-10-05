@@ -1,0 +1,16 @@
+[#before-you-commit]
+== Before you commit
+
+* A spec exists for the change, and any spec it affects is amended.
+* `./agora check --suite spec` passes, and every new requirement has a row in `spec-kit/enforcement.tsv`.
+* Any command you add is declared in `agora`'s registry and in the ontology, and `./agora check commands` passes. It declares its
+prerequisites and installs nothing, and it runs from a fresh clone that has only `python3` and `uv` (specs 0025, 0041 and 0042).
+* The ontology represents it, with an audience on every fact.
+* No sensitive fact appears as a literal, and nothing non-public is asserted.
+* No fact is duplicated; references point at the single source.
+* Prefixes and the "IF" naming follow spec 0001, FR-006 and FR-007.
+* Logos and images are referenced, not copied, and the design system is unedited downstream.
+* Prose is in neutral company voice, outside the signed essays in `content/journal/`.
+* `./agora fresh` passes, so that every generated file, this guide's reference and the agent skill included, is current.
+
+The help topic `check` lists what to run before you push.

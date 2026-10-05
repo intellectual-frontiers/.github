@@ -307,7 +307,7 @@ NEJM: PMC9743802, PMC9644642, PMC9634863, PMC9634866. Nature: s41586-020-2649-2,
 1. Measure the reference journal's interior full-text pages (the production pipeline has a measuring tool).
 2. Add an entry to `latex/layouts.json`: `cols`, `sidebar` and `sidebar_side`, `geometry` (a `geometry` package option string), type sizes, `span_in` (sidebar width, 0 for none), `col_in` and `wide_in` (widths for tables and figures), and the text fields (`summary`, `modeled_on`, `best_for`, optional `caution`). Mark it `built` only after the next two steps.
 3. Build representative papers in the layout and read the pages. A layout is released when it builds for every paper and the rendered pages meet 0017 FR-030.
-4. Run `python3 latex/layout.py sync docs/paper-layouts.md docs/paper-design-reference.md` so the catalogs here match.
+4. Run `python3 latex/layout.py sync docs/paper-layouts.md docs/paper-design-reference.md` so the catalogs here match (`agora fresh print-layout-docs` proves they do).
 5. Record why in this file, and update the guide table above.
 
 A change to the design itself (type, headings, boxes) is made once in `latex/ifarticle.cls` or the article converter, for every layout, and reviewed on rendered pages of one two-column and one sidebar paper first (0017 FR-030).

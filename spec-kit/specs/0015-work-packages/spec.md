@@ -112,8 +112,8 @@ property fetches them are decisions outside this spec.
   identical bytes, and a difference MUST fail the check. A generated
   content document MUST NOT be hand-edited.
 - **FR-021**: A generated content document's audience MUST NOT be broader
-  than the audience of the work it renders, except a companion page or a
-  news record of an announced work, per FR-030.
+  than the audience of the work it renders, except a companion page, a
+  news record or show notes of an announced work, per FR-030.
 
 ## Lifecycle, decisions, and audience
 
@@ -166,9 +166,10 @@ property fetches them are decisions outside this spec.
     show-notes page (0017-spoken-and-research-works FR-016);
   - a skill: its name and its description;
   - a course: its code, its format and the work it is derived from.
-- **FR-030**: A companion page and a news record generated from an
-  announced work MUST carry the Public audience. No other content document
-  generated from an announced work that is not Public may carry it.
+- **FR-030**: A companion page, a news record, and a released episode's
+  show-notes page generated from an announced work MUST carry the Public
+  audience. No other content document generated from an announced work that
+  is not Public may carry it.
 - **FR-031**: A consumer MUST show an announced work's status as one of
   three, derived from the work's records and never asserted: *available*,
   when a delivery record or reference for one of its presentations is

@@ -30,6 +30,7 @@
 
 \directlua{luaotfload.add_fallback("ifsymmain", {\ifLfbmain})}
 \directlua{luaotfload.add_fallback("ifsymsans", {\ifLfbsans})}
+\directlua{luaotfload.add_fallback("ifsymmono", {\ifLfbmono})}
 \edef\ifLtmp{\noexpand\setmainfont{\ifLmainfont}[\ifLmainopts,RawFeature={fallback=ifsymmain}]}\ifLtmp
 \edef\ifLtmp{\noexpand\setsansfont{\ifLsansfont}[\ifLsansopts,RawFeature={fallback=ifsymsans}]}\ifLtmp
 \edef\ifLtmp{\noexpand\newfontfamily\noexpand\ifsans{\ifLsansfont}[\ifLsansopts,RawFeature={fallback=ifsymsans}]}\ifLtmp
@@ -38,6 +39,14 @@
   UprightFont=*-Regular, BoldFont=*-Bold,
   ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
   Scale=0.92,
+  RawFeature={fallback=ifsymmono},
+]
+\setmonofont{SourceCodePro}[
+  Path=\iffontdir, Extension=.ttf,
+  UprightFont=*-Regular, BoldFont=*-Bold,
+  ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic,
+  Scale=0.92,
+  RawFeature={fallback=ifsymmono},
 ]
 
 \RequirePackage{amsmath}

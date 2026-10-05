@@ -1,0 +1,34 @@
+[#first-day]
+== Your first day
+
+You need two things on your machine: Python 3.11 or later, and https://docs.astral.sh/uv/[uv]. There is no `make install` and
+no environment to prepare. Everything else, from the Python packages to a typesetter and a browser, `agora` fetches into a cache
+that belongs to you the first time a command needs it, checks against a fixed fingerprint before it unpacks anything, and uses
+from there. It never uses a program it finds on your machine unless you name it.
+
+The first day is a handful of commands: see what is present, install the system libraries once, fetch the toolchain, and run the
+checks. The help topic `start` gives them in order with what to expect from each: run
+`./agora help start`, or open Learn in VS Code. The topic `check` says what to run before you push, and `recover` says what to do
+when something fails. <<reference-help>> lists every topic.
+
+A prepared workspace is another way to set up a machine and clone the sibling repositories. It is a convenience. Nothing here
+requires it.
+
+=== Where things are
+
+[source]
+----
+profile/            the public organization landing page
+spec-kit/specs/     one testable spec per NNNN-slug
+spec-kit/           enforcement.tsv and controls.tsv: what enforces each requirement
+agora               the launcher: the one command line (needs only uv and Python 3)
+tools/agora/        agora's code: core, lib, groups, help topics, the toolchain, tests
+tools/if-console/   the IF Console VS Code extension's source
+ontology/           ifcore.ttl, the core company ontology, and ifweb.ttl
+content/            public content documents
+design-systems/     one self-contained design system per directory
+docs-src/           this guide, in AsciiDoc
+docs/               the guide's one hand-written page, index.html
+.agora/             agora's untracked logs, and tracked proposals
+.github/workflows/  the workflows, which call agora and nothing else
+----

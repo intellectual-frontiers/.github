@@ -27,8 +27,13 @@ Body text in the theme's serif. It runs long enough to fill a paragraph and test
 \href{https://example.com}{a link}. {\color{brand-primary} A line in the primary color.}
 {\color{brand-secondary} A line in the secondary color.}
 \section{A Section}
+{\ifsans\bfseries NOTE: A-B (C) 2026-10 \copyright{} 2026 Shahid, it’s “set in the sans”.}\par
 {\ifsans A line in the interior sans.} More body text follows the section heading so the page has
 a heading, its text, and the running head the design sets.
+\begin{ifcode}
+x ≈ y ≠ z ≤ w ≥ v → u ↔ t ✓ s
+\end{ifcode}
+Inline code: \ifcodespan{x ≈ y ≠ z ≤ w ≥ v → u ↔ t ✓ s} and monospace {\ttfamily x ≈ y ≠ z ≤ w ≥ v → u ↔ t ✓ s}.
 \subsection{A Subsection in the Sans's Bold Italic}
 More body text under the subsection.
 \iffigcaption{Figure 1.1: A caption in the sans's italic.}
