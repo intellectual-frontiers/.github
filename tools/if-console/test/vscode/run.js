@@ -9,6 +9,12 @@
 //   IF_CONSOLE_TEST_ELECTRON  the @vscode/test-electron package
 //   IF_CONSOLE_REAL_ROOT      the clone whose own command line is the first one of the workspace
 //   IF_CONSOLE_VSCODE_REPORT  where the report is written
+// A caller that has its own tests for the extension in a workspace of its own (for another command line, say) names them with two more,
+// and then only that one suite runs, once, in a trusted workspace holding the clone and those folders (no fixture, no untrusted run):
+//   IF_CONSOLE_VSCODE_FOLDERS a JSON array of {name, path}: the folders added to the workspace after the clone's
+//   IF_CONSOLE_VSCODE_SUITE   a directory whose index.js exports run(), as suite/index.js does; it may load this directory's suite/harness
+//                             and suite/support (the host's IF_CONSOLE_EXTENSION_DIR is this extension's directory) and calls
+//                             runAll(its own name, IF_CONSOLE_VSCODE_REPORT_DIR) to write its report
 const cp = require('child_process');
 const fs = require('fs');
 const os = require('os');
@@ -18,12 +24,14 @@ const { make } = require('./fixture');
 const need = (name) => { if (!process.env[name]) { console.error(`${name} is not set`); process.exit(2); } return process.env[name]; };
 const code = need('IF_CONSOLE_VSCODE');
 const cli = need('IF_CONSOLE_VSCODE_CLI');
-const vsix = need('IF_CONSOLE_VSIX');
+const external = process.env.IF_CONSOLE_VSCODE_SUITE ? path.resolve(process.env.IF_CONSOLE_VSCODE_SUITE) : null;
+const folders = JSON.parse(process.env.IF_CONSOLE_VSCODE_FOLDERS || '[]');
+const vsix = external ? (process.env.IF_CONSOLE_VSIX || '') : need('IF_CONSOLE_VSIX');   // only the untrusted scenario installs the package
 const testElectron = need('IF_CONSOLE_TEST_ELECTRON');
 const realRoot = need('IF_CONSOLE_REAL_ROOT');
 const reportFile = need('IF_CONSOLE_VSCODE_REPORT');
 const extension = path.resolve(__dirname, '..', '..');
-const suite = path.join(__dirname, 'suite', 'index.js');
+const suite = external ? path.join(external, 'index.js') : path.join(__dirname, 'suite', 'index.js');
 
 function profile(base, name, extra) {
   const dir = path.join(base, name);
@@ -77,13 +85,15 @@ function untrusted(base, workspace, env) {
   const fixtures = [];
   const failures = [];
   // Each scenario has its own fixture command line, so that what one launches cannot be mistaken for what another did.
-  for (const [name, run] of [['trusted', trusted], ['untrusted', untrusted]]) {
-    const fixture = make();
-    fixtures.push(fixture);
+  for (const [name, run] of external ? [['trusted', trusted]] : [['trusted', trusted], ['untrusted', untrusted]]) {
+    const fixture = external ? null : make();
+    if (fixture) fixtures.push(fixture);
     const workspace = path.join(base, `${name}.code-workspace`);
-    fs.writeFileSync(workspace, JSON.stringify({ folders: [{ name: 'real', path: realRoot }, { name: 'fixture', path: fixture.root }], settings: {} }));
-    const env = { IF_CONSOLE_VSCODE_REPORT_DIR: reports, IF_CONSOLE_FIXTURE_ROOT: fixture.root, IF_CONSOLE_REAL_ROOT: realRoot,
-      DBUS_SESSION_BUS_ADDRESS: '/dev/null', ELECTRON_DISABLE_SECURITY_WARNINGS: '1' };
+    const held = [{ name: 'real', path: realRoot }, ...(fixture ? [{ name: 'fixture', path: fixture.root }] : []), ...folders];
+    fs.writeFileSync(workspace, JSON.stringify({ folders: held, settings: {} }));
+    const env = { IF_CONSOLE_VSCODE_REPORT_DIR: reports, IF_CONSOLE_REAL_ROOT: realRoot, IF_CONSOLE_EXTENSION_DIR: extension,
+      DBUS_SESSION_BUS_ADDRESS: '/dev/null', ELECTRON_DISABLE_SECURITY_WARNINGS: '1',
+      ...(fixture ? { IF_CONSOLE_FIXTURE_ROOT: fixture.root } : {}) };
     try { await run(base, workspace, env); } catch (e) { failures.push(`${name}: ${e.message}`); }
   }
   const results = [];

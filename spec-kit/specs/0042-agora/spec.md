@@ -342,7 +342,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   carries (0043-if-console FR-004). `agora extension build` MUST build the
   extension's package from `tools/if-console/` into `build/`, with Node from
   the locked `nodejs-wheel-binaries` and the extension's own `package-lock.json`
-  (0043-if-console FR-027), and MUST take `--dry-run`.
+  (0043-if-console FR-027), and MUST take `--dry-run`. `agora extension test --suite DIR
+  [--workspace [NAME=]DIR]...` MUST run another repository's tests of the
+  extension in a real VS Code as 0043-if-console FR-034 states.
 - **FR-019**: `agora` MUST declare two editor views in code, `console` and
   `assurance`, and MUST run no server (0041-command-line FR-011). A view is a
   `read` command's resource and its HTML rendering that the IF Console

@@ -96,7 +96,7 @@ command set is 0042-agora.
   set, and the ID, where the command takes one, is always the first
   positional argument after the verb. The verbs MUST be exactly: `list`,
   `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`,
-  `new`, `advance`, `publish`, `serve`. A verb MUST be one word; a
+  `new`, `advance`, `publish`, `serve`, `test`. A verb MUST be one word; a
   hyphenated or compound verb MUST NOT be used. A verb outside the set MUST
   NOT be added except by amending this spec.
 - **FR-009**: The verbs MUST mean: `list` (many resources of a kind, with
@@ -107,8 +107,9 @@ command set is 0042-agora.
   item into a collection); `set` (change one field of an existing resource);
   `record` (append a fact to the tracked record); `new` (create a resource);
   `advance` (move a resource to its next state); `publish` (send something
-  outside the clone); `serve` (run until stopped). `check` is not a noun's
-  verb: FR-010.
+  outside the clone); `serve` (run until stopped); `test` (run a resource's
+  tests in a place its own check does not, writing nothing). `check` is not a
+  noun's verb: FR-010.
 - **FR-010**: A small closed set of repository-wide commands MUST take no
   noun: `check`, `fresh`, `test`, `doctor`, `lock`, `context` and `help`, with
   the arguments FR-031, FR-036, FR-014, FR-030, FR-038 and FR-065 state; and an

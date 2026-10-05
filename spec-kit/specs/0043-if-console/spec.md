@@ -282,6 +282,22 @@ it does, what it never does, and how it is built.
   boxes are driven by VS Code's own commands in the tests, and no source other
   than the hook's own file MAY read the extension mode.
 
+- **FR-034**: A repository that has its own command line, and tests of the extension
+  against it, MUST be able to run those tests in a real VS Code without this
+  repository naming it. `agora extension test --suite DIR [--workspace
+  [NAME=]DIR]... [--report FILE]` MUST run the suite in DIR (an `index.js` that
+  exports `run()`) once, in a trusted workspace whose first folder is this
+  repository and whose next folders are the `--workspace` folders, with the
+  same VS Code, display server and `@vscode/test-electron` as FR-032, and with
+  none of FR-032's fixtures. The extension host MUST be given the extension's
+  directory (`IF_CONSOLE_EXTENSION_DIR`), so that the suite can load the
+  extension's own `test/vscode/suite/harness.js` and `support.js` and the
+  hook of FR-033, and the folders (`IF_CONSOLE_VSCODE_FOLDERS`, a JSON array of
+  `name` and `path`). The command MUST fail (exit 1) on a failed test and MUST exit 3,
+  naming the cause and the command that fixes it, where VS Code, the display
+  server or a library is missing (FR-032). It MUST name no repository: the suite
+  and the folders are paths.
+
 ## Out of scope
 
 - The commands a repository's orchestrator has: each orchestrator's spec states
