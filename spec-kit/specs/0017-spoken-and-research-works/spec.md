@@ -113,7 +113,8 @@ stated here.
   publication, a defensive disclosure, a trademark record, or a patent
   draft, and each MUST correspond to its class in 0006-research-and-ip: an
   area to `ifcore:ResearchArea`, a pillar to `ifcore:ResearchPillar`, a
-  note, landscape review, or paper to `ifcore:Note`, a disclosure to
+  note or paper to `ifcore:Note`, a landscape review to `ifcore:LandscapeReview`
+  (a subclass of `ifcore:Note`), a disclosure to
   `ifcore:DefensiveDisclosure`, a trademark record to `ifcore:Trademark`.
   A landscape review shows how an organization is likely to fare against
   others on a complex task by letting the reader place their own numbers
@@ -280,9 +281,9 @@ stated here.
   printing of a formal release that already carries it is not stated;
   FR-013 requires removal only from the next running release, and FR-014
   lets a retail volume change only through printings.
-- **OQ-4**: Which note type (0006-research-and-ip FR-003) a landscape review
-  carries, since it is held as an `ifcore:Note` but is neither a design
-  pattern nor an operating theory, is not decided.
+- **OQ-4**: Whether a landscape review, an `ifcore:LandscapeReview` and so an
+  `ifcore:Note`, also carries a note type (0006-research-and-ip FR-003: a design
+  pattern or an operating theory) is not decided.
 
 ## Key entities
 

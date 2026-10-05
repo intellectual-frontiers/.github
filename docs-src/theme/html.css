@@ -1,0 +1,91 @@
+/* The guide's HTML pages, single and multi-page. It styles Asciidoctor's stock HTML5 class names and takes its colors and type from the
+   brand's own theme (design-systems/frontiers-brand/brand.css, copied beside the site by `agora docs build`). */
+@import url("__ASSETS__/brand.css");
+@font-face {
+  font-family: "Inter";
+  src: url("__ASSETS__/InterVariable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --bg: var(--brand-surface, #ffffff);
+  --text: var(--brand-text, #121820);
+  --text-soft: #4b5563;
+  --accent: var(--brand-primary, #214ea2);
+  --accent-soft: #eef2fa;
+  --border: #dfe3e8;
+  --code-bg: #f3f0e8;
+  --code-border: #e3dfd3;
+  --content-max: 800px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121820;
+    --text: #f3f0e8;
+    --text-soft: #b9c0ca;
+    --accent: #8fb0ee;
+    --accent-soft: #1b2636;
+    --border: #2b3544;
+    --code-bg: #1a222d;
+    --code-border: #2b3544;
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+#header, #content, #footer { max-width: var(--content-max); margin: 0 auto; padding: 0 24px; }
+#header { padding-top: 48px; }
+#header .details { color: var(--text-soft); font-size: 0.95em; }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.01em; color: var(--text); line-height: 1.25; }
+#header h1 { font-size: 2.1em; margin-bottom: 8px; }
+.sect1 > h2 { font-size: 1.6em; margin-top: 2.2em; padding-top: 0.4em; border-top: 1px solid var(--border); }
+.sect2 > h3 { font-size: 1.25em; margin-top: 1.8em; }
+.sect3 > h4 { font-size: 1.05em; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+p, ul, ol, dl { max-width: 72ch; }
+
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: 0.1em 0.35em; font-size: 0.9em; overflow-wrap: anywhere; }
+
+.listingblock pre, .literalblock pre { max-width: 100%; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; }
+.listingblock pre code, .literalblock pre code { background: none; border: none; padding: 0; font-size: 0.88em; overflow-wrap: normal; }
+
+.admonitionblock { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 1.4em 0; }
+.admonitionblock table { width: 100%; table-layout: fixed; }
+.admonitionblock td.icon { width: 1%; white-space: nowrap; vertical-align: top; }
+.admonitionblock .title { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.04em; }
+
+table.tableblock { border-collapse: collapse; width: 100%; margin: 1.4em 0; }
+table.tableblock td, table.tableblock th { overflow-wrap: anywhere; }
+table.tableblock th, table.tableblock td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+table.tableblock thead { background: var(--code-bg); font-weight: 600; font-size: 0.9em; color: var(--text-soft); }
+
+.imageblock img { max-width: 100%; height: auto; border-radius: 8px; }
+.imageblock .title { color: var(--text-soft); font-size: 0.9em; }
+
+#toc { border: 1px solid var(--border); border-radius: 10px; background: var(--code-bg); padding: 16px 20px; margin: 20px 0 32px; max-height: 60vh; overflow-y: auto; }
+#toctitle { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); margin-bottom: 8px; }
+#toc ul { list-style: none; padding-left: 1.1em; margin: 0.3em 0; }
+#toc > ul { padding-left: 0; }
+#toc a { font-size: 0.95em; line-height: 1.9; }
+
+#footer { border-top: 1px solid var(--border); color: var(--text-soft); font-size: 0.88em; padding: 24px; text-align: center; }
+
+@media (max-width: 640px) { #header, #content, #footer { padding: 0 16px; } }

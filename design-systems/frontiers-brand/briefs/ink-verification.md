@@ -16,7 +16,7 @@ physical ink, so each stays `verified: false` until checked, and `frontiers-merc
 3. If the named match is the closest, record it. If another chip or thread is closer, record that one instead.
 4. Record it with the tool, which writes the match, who checked it and when into `tokens.json`:
 
-       python3 tools/brand_decoration.py verify design-systems/frontiers-brand --ink primary \
+       agora ink record frontiers-brand/primary \
            --spot "7686 C" --thread 3332 --by "A. Checker" --on 2026-10-10
 
 5. Commit the change. The ink is then orderable.

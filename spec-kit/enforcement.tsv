@@ -7,7 +7,7 @@ requirement	mechanism	by	note
 0001-eidolon-architecture FR-004	none	-	
 0001-eidolon-architecture FR-005	none	-	
 0001-eidolon-architecture FR-006	none	-	
-0001-eidolon-architecture FR-007	check	.github: python3 tools/spec_check.py	spec_check.py rejects a bare if: prefix in ontology files
+0001-eidolon-architecture FR-007	check	.github: agora check ontology	agora check ontology rejects a bare if: prefix in ontology files
 0001-eidolon-architecture FR-008	none	-	a membership review exists in the vault; not citable from the public root
 0001-eidolon-architecture FR-009	none	-	a membership review exists in the vault; not citable from the public root
 0001-eidolon-architecture FR-010	none	-	
@@ -34,7 +34,7 @@ requirement	mechanism	by	note
 0001-eidolon-architecture FR-031	none	-	
 0001-eidolon-architecture FR-032	none	-	
 0001-eidolon-architecture FR-033	none	-	
-0001-eidolon-architecture FR-034	check	.github: python3 tools/spec_check.py	rejects dated provenance lines in specs
+0001-eidolon-architecture FR-034	check	.github: agora check specs	rejects dated provenance lines in specs
 0001-eidolon-architecture FR-035	none	-	no commit-msg hook or check
 0001-eidolon-architecture FR-036	none	-	remediation duty; secret scan detects but does not enforce rewrite
 0001-eidolon-architecture FR-037	none	-	ordering rule; content @type check covers only content kinds
@@ -264,55 +264,55 @@ requirement	mechanism	by	note
 0013-web-content-kinds FR-013	check	eidolon: eid check content	shape checks both point to a SubstantialWork, not that they name the same one
 0014-design-systems FR-001	none	-	definition; nothing to test
 0014-design-systems FR-002	none	-	permission; nothing to test
-0014-design-systems FR-003	check	.github: python3 tools/spec_check.py	slug must end with a kind code read from ifcore.ttl; directory contents not checked
+0014-design-systems FR-003	check	.github: agora check ontology	slug must end with a kind code read from ifcore.ttl; directory contents not checked
 0014-design-systems FR-004	none	-	check-content scans content/ only, by construction; no check
 0014-design-systems FR-005	none	-	console-assurance covers only the vendored frontiers-console-web copy
 0014-design-systems FR-006	none	-	no check that each system has README.md, rules.md and assurance/
 0014-design-systems FR-007	none	-	rule of judgment; no check possible
 0014-design-systems FR-008	none	-	no check that Datastar is opt-in per page
-0014-design-systems FR-009	check	.github: tools/run_assurance.sh	both web harnesses check layers, @import, remote URL and framework
-0014-design-systems FR-010	check	.github: python3 tools/spec_check.py	every design-systems/ directory has an individual with its dcterms:identifier and every identifier a directory; status, kind and derivation not checked
+0014-design-systems FR-009	check	.github: agora check design-systems	both web harnesses check layers, @import, remote URL and framework
+0014-design-systems FR-010	check	.github: agora check ontology	every design-systems/ directory has an individual with its dcterms:identifier and every identifier a directory; status, kind and derivation not checked
 0014-design-systems FR-011	none	-	no check that a README omits status
 0014-design-systems FR-012	none	-	scoping statement; nothing to test
 0014-design-systems FR-013	none	-	README content is a judgment; no check
 0014-design-systems FR-014	none	-	re-vendoring is a consumer expectation; no check
-0014-design-systems FR-015	check	.github: tools/run_assurance.sh	fails when a design system has no assurance/run.mjs or its harness fails; CI: design-systems.yml
+0014-design-systems FR-015	check	.github: agora check design-systems	fails when a design system has neither assurance/run.mjs nor assurance/run.py or its harness fails; CI: design-systems.yml
 0014-design-systems FR-016	none	-	no check of a web harness coverage
-0014-design-systems FR-017	check	.github: tools/run_assurance.sh	CI runs every harness on every push touching design-systems/
+0014-design-systems FR-017	check	.github: agora check design-systems	CI runs every harness on every push touching design-systems/
 0014-design-systems FR-018	none	-	no check that a registered kind has a profile, or that a kind never changes
 0014-design-systems FR-019	none	-	what a profile states is a judgment; no check
 0014-design-systems FR-020	none	-	no check of derivation records or cycles
 0014-design-systems FR-021	none	-	no design system derives from another yet; nothing checks a derived copy
-0014-design-systems FR-022	none	-	spec_check checks each design system spec against 0020, but a missing spec.md only warns
+0014-design-systems FR-022	none	-	agora check specs checks each design system spec against 0020, but a missing spec.md only warns
 0014-design-systems FR-023	none	-	spec-amendment discipline; no check
 0014-design-systems FR-025	none	-	no check of what a design system directory holds
 0014-design-systems FR-026	none	-	consumers record pins (www VENDORED.txt, eidolon console/vendor/PIN) in two formats; no check
 0014-design-systems FR-027	none	-	no check of harness coverage of check rules
-0014-design-systems FR-028	check	.github: tools/run_assurance.sh	every brand runs contract.js: roles, brand.css agreement, theme layer, role contrast, logo files
+0014-design-systems FR-028	check	.github: agora check design-systems	every brand runs contract.js: roles, brand.css agreement, theme layer, role contrast, logo files
 0014-design-systems FR-029	none	-	web layout; no check
-0014-design-systems FR-030	check	.github: tools/run_assurance.sh	web harnesses run headlessly in Chromium; file:// skipping not checked in CI
+0014-design-systems FR-030	check	.github: agora check design-systems	web harnesses run headlessly in Chromium; file:// skipping not checked in CI
 0014-design-systems FR-031	none	-	print profile; no system of this kind yet
-0014-design-systems FR-032	check	.github: python3 tools/spec_check.py	each figure DesignSystem names a figure type; the profile's rules are checked by each figure system's harness
+0014-design-systems FR-032	check	.github: agora check ontology	each figure DesignSystem names a figure type; the profile's rules are checked by each figure system's harness
 0014-design-systems FR-033	none	-	written-voice profile; no system of this kind yet
 0014-design-systems FR-034	none	-	spoken-voice profile; no system of this kind yet
 0014-design-systems FR-035	none	-	removal discipline; no check that a removed system leaves no ontology individual
-0014-design-systems FR-036	check	.github: tools/run_assurance.sh	contract.js: every brand token has $value and every alias resolves; theme.js: each web tokens.json mirrors tokens.css with {role.*} aliases
-0014-design-systems FR-037	check	.github: tools/run_assurance.sh	contract.js: every role present with its type, brand.css declares exactly the roles, logo extension lists light and dark lockups, icon, favicon
-0014-design-systems FR-038	check	.github: tools/run_assurance.sh	theme.js: roles used exist in the theme, font families shipped, no theme color as a literal; that logos come from the theme is not checked outside fixtures
-0014-design-systems FR-039	check	.github: tools/run_assurance.sh	runs every web design system under every brand; a missing role or failed contrast fails the run
+0014-design-systems FR-036	check	.github: agora check design-systems	contract.js: every brand token has $value and every alias resolves; theme.js: each web tokens.json mirrors tokens.css with {role.*} aliases
+0014-design-systems FR-037	check	.github: agora check design-systems	contract.js: every role present with its type, brand.css declares exactly the roles, logo extension lists light and dark lockups, icon, favicon
+0014-design-systems FR-038	check	.github: agora check design-systems	theme.js: roles used exist in the theme, font families shipped, no theme color as a literal; that logos come from the theme is not checked outside fixtures
+0014-design-systems FR-039	check	.github: agora check design-systems	runs every web design system under every brand; a missing role or failed contrast fails the run
 0014-design-systems FR-040	none	-	one design system and theme per page is a consumer fact; www enforces it for its own areas
-0014-design-systems FR-041	check	.github: python3 tools/spec_check.py	each web DesignSystem names an interaction model, exactly one expression and a density
-0014-design-systems FR-042	check	.github: python3 tools/spec_check.py	each print DesignSystem names a print document type
-0014-design-systems FR-043	check	.github: tools/run_assurance.sh --images	each brand's imagery catalog, masters, WebP files and share card, by tools/brand_imagery.py check
-0014-design-systems FR-044	check	.github: tools/run_assurance.sh	each web harness's theme suite and each print harness fail on a color literal
-0014-design-systems FR-045	check	.github: tools/run_assurance.sh	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
-0014-design-systems FR-046	check	.github: python3 tools/spec_check.py	each merchandise DesignSystem names a decoration method and a product category
-0014-design-systems FR-047	check	.github: tools/run_assurance.sh	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
-0014-design-systems FR-048	check	.github: python3 tools/spec_check.py	each web, print, slides and course DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
-0014-design-systems FR-049	check	.github: python3 tools/spec_check.py	a slides design system names a deck type and its figure design system; its harness checks the rest
-0014-design-systems FR-050	check	.github: python3 tools/spec_check.py	a media design system names a media asset type; its harness checks the rest
-0014-design-systems FR-051	check	.github: python3 tools/spec_check.py	an email design system names an email type; its harness checks the rest
-0014-design-systems FR-052	check	.github: python3 tools/spec_check.py	a course design system names a course format, an assessment item type, a delivery target and its figure design system; its harness checks the rest
+0014-design-systems FR-041	check	.github: agora check ontology	each web DesignSystem names an interaction model, exactly one expression and a density
+0014-design-systems FR-042	check	.github: agora check ontology	each print DesignSystem names a print document type
+0014-design-systems FR-043	check	.github: agora check imagery	each brand's imagery catalog, masters, WebP files and share card, by agora check imagery
+0014-design-systems FR-044	check	.github: agora check design-systems	each web harness's theme suite and each print harness fail on a color literal
+0014-design-systems FR-045	check	.github: agora check design-systems	frontiers-merchandise's run.py checks fixture jobs and the decoration kit under every brand
+0014-design-systems FR-046	check	.github: agora check ontology	each merchandise DesignSystem names a decoration method and a product category
+0014-design-systems FR-047	check	.github: agora check design-systems	each brand's Decoration kit suite: one-color SVG in currentColor, a spot and thread match per ink; that it was not traced is a review judgment
+0014-design-systems FR-048	check	.github: agora check ontology	each web, print, slides and course DesignSystem names its figure design system; that a consumer places only themed figures is the consumer's own check
+0014-design-systems FR-049	check	.github: agora check ontology	a slides design system names a deck type and its figure design system; its harness checks the rest
+0014-design-systems FR-050	check	.github: agora check ontology	a media design system names a media asset type; its harness checks the rest
+0014-design-systems FR-051	check	.github: agora check ontology	an email design system names an email type; its harness checks the rest
+0014-design-systems FR-052	check	.github: agora check ontology	a course design system names a course format, an assessment item type, a delivery target and its figure design system; its harness checks the rest
 0015-work-packages FR-001	none	-	definition; nothing to test
 0015-work-packages FR-002	check	eidolon: eid check works	works.py: package without ontology file and ontology file without package both fail
 0015-work-packages FR-003	check	eidolon: eid check works	package and individual must both exist; URL-path stability unchecked
@@ -341,10 +341,10 @@ requirement	mechanism	by	note
 0015-work-packages FR-026	none	-	no check
 0015-work-packages FR-027	check	eidolon: eid check works	works.py: an announcedTo needs an announcing Decision; eid work announce writes both
 0015-work-packages FR-028	gate	eidolon: eid work advance	advance to Review records the announcement unless --hold; announce refuses before Review
-0015-work-packages FR-029	check	eidolon: eid site check	the generator reads only the listed facts; the leak check fails a page showing any other
-0015-work-packages FR-030	check	eidolon: eid fresh	the generator gives companion and news pages of an announced work the Public audience
+0015-work-packages FR-029	check	eidolon: eid check site	the generator reads only the listed facts; the leak check fails a page showing any other
+0015-work-packages FR-030	check	eidolon: eid fresh	the generator gives an announced work's companion, news and show-notes pages the Public audience
 0015-work-packages FR-031	none	-	status derived by eid site build; no check of other consumers
-0015-work-packages FR-032	check	eidolon: eid site check	the leak check fails a page carrying a non-public work's source text
+0015-work-packages FR-032	check	eidolon: eid check site	the leak check fails a page carrying a non-public work's source text
 0016-press-production FR-001	none	-	house voice is a judgment; no check
 0016-press-production FR-002	check	eidolon: eid check spoken	audit record required for episodes past draft and anthology chapters; not books
 0016-press-production FR-003	none	-	separate-reader audit of AI text is not checked
@@ -369,7 +369,7 @@ requirement	mechanism	by	note
 0016-press-production FR-022	check	eidolon: eid check distribute	isbn.py fails invalid or duplicate ISBN-13s; eid release final also refuses a placeholder
 0016-press-production FR-023	none	-	cover series line is by construction in jacket-to-latex.py; no check
 0016-press-production FR-024	check	eidolon: eid check works	works.py fails a manuscript without a whole-number :edition:
-0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut
+0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut, an unsorted open issue, a gate group with no check recorded after the manuscript last changed, and a release validation that does not pass at the current commit
 0016-press-production FR-026	none	-	attribution of authorship is not checked
 0016-press-production FR-027	none	-	reserved human acts are not mechanically enforced
 0016-press-production FR-028	none	-	praise quote and cover art origin are not checked
@@ -434,86 +434,86 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-037	none	-	alternatives offered and marketing claims are judgment; no check covers them
 frontiers-console-web FR-001	none	-	registration and derivation are not checked
 frontiers-console-web FR-002	none	-	rule of judgment; no check possible
-frontiers-console-web FR-003	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, Inter shipped, no color literal
-frontiers-console-web FR-004	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness: no @import, remote URL, framework; classic script; runs on vendored copy
+frontiers-console-web FR-003	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	Theme suite under every brand: roles present, Inter shipped, no color literal
+frontiers-console-web FR-004	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness: no @import, remote URL, framework; classic script; runs on vendored copy
 frontiers-console-web FR-005	none	-	provenance of code; no check possible
-frontiers-console-web FR-006	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks layer order declared once in reset.css and one layer per file
-frontiers-console-web FR-007	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	Theme: tokens.json mirrors tokens.css exactly, theme values as {role.*} aliases
-frontiers-console-web FR-008	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness Layouts suite checks each layout and runtime reflow
-frontiers-console-web FR-009	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
-frontiers-console-web FR-010	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness checks changing --fc-sidebar-width moves the page
-frontiers-console-web FR-011	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	partial: tabs, sync, TOC, copy, toast, accordion tested; not every component
-frontiers-console-web FR-012	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	partial: table sort/filter/count/empty, stats, badges, hints, run log tested
-frontiers-console-web FR-013	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness tests Ctrl+K, /, arrows, cancelable selection
+frontiers-console-web FR-006	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness checks layer order declared once in reset.css and one layer per file
+frontiers-console-web FR-007	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	Theme: tokens.json mirrors tokens.css exactly, theme values as {role.*} aliases
+frontiers-console-web FR-008	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness Layouts suite checks each layout and runtime reflow
+frontiers-console-web FR-009	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness checks drawer, collapse, TOC breakpoints, no overflow from 320px
+frontiers-console-web FR-010	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness checks changing --fc-sidebar-width moves the page
+frontiers-console-web FR-011	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	partial: tabs, sync, TOC, copy, toast, accordion tested; not every component
+frontiers-console-web FR-012	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	partial: table sort/filter/count/empty, stats, badges, hints, run log tested
+frontiers-console-web FR-013	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness tests Ctrl+K, /, arrows, cancelable selection
 frontiers-console-web FR-014	none	-	no test that a badge carries text
-frontiers-console-web FR-015	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	harness tests token and rendered contrast, ring 3:1, icon-button names
-frontiers-console-web FR-016	check	.github: node design-systems/frontiers-console-web/assurance/run.mjs	partial: single classic script tested; no-script degradation untested
+frontiers-console-web FR-015	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	harness tests token and rendered contrast, ring 3:1, icon-button names
+frontiers-console-web FR-016	check	.github: agora check design-systems --runner browser --scope frontiers-console-web	partial: single classic script tested; no-script degradation untested
 frontiers-console-web FR-017	none	-	documentation completeness; no check possible
 frontiers-console-web FR-018	none	-	harness runs, but nothing checks which suites it covers
 frontiers-console-web FR-019	none	-	no check
-frontiers-console-web FR-020	none	-	no console page carries a figure yet; the ontology link is checked by spec_check (0014-design-systems FR-048)
-frontiers-figures FR-001	check	.github: python3 tools/spec_check.py	registration and figure types
+frontiers-console-web FR-020	none	-	no console page carries a figure yet; the ontology link is checked by agora check ontology (0014-design-systems FR-048)
+frontiers-figures FR-001	check	.github: agora check ontology	registration and figure types
 frontiers-figures FR-002	none	-	directory contents; no check
-frontiers-figures FR-003	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	fail fixtures: literal color, font name, kept stylesheet, unknown class; every drawn figure passes figcheck
-frontiers-figures FR-004	check	.github: tools/run_assurance.sh	run.py under every brand and variant: every role resolves; text 4.5:1 and graphics 3:1 on every background role
-frontiers-figures FR-005	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every figure type drawn on both canvases; every color variant themes and parses; that a variant changes nothing else is a review judgment
-frontiers-figures FR-006	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	a themed figure renders with only the brand's sans embedded where rsvg-convert is installed
-frontiers-figures FR-007	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: canvas, minimum size, tracking; title and label sizes are the kit's
-frontiers-figures FR-008	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: labels inside their boxes and the canvas, measured in the brand's sans
-frontiers-figures FR-009	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	figcheck: em dashes and straight quotes; box radius and marker are the kit's
-frontiers-figures FR-010	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	every layout draws a figure that passes
-frontiers-figures FR-011	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-figures FR-012	check	.github: python3 design-systems/frontiers-figures/assurance/run.py	series contrast, color-blind and grayscale distinctness, sequential order and steps; direct labels by the layouts
-frontiers-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
-frontiers-brand FR-002	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: names and values
-frontiers-brand FR-003	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: each unit has its color
-frontiers-brand FR-004	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: Inter, Source Serif 4, wordmark weight 700
-frontiers-brand FR-005	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: palette inks and unit colors on white and Warm Paper
-frontiers-brand FR-006	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files and Frontiers palette: sizes load as stated; light and dark, PNG and WebP; names state sizes
-frontiers-brand FR-007	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: icon files load at their stated size; crop provenance not checked
-frontiers-brand FR-008	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: minimum sizes stated
-frontiers-brand FR-009	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Specimen: light lockups on light, dark on dark; redrawing or recoloring not checked
+frontiers-figures FR-003	check	.github: agora check design-systems --runner python --scope frontiers-figures	fail fixtures: literal color, font name, kept stylesheet, unknown class; every drawn figure passes figcheck
+frontiers-figures FR-004	check	.github: agora check design-systems --runner python --scope frontiers-figures	run.py under every brand and variant: every role resolves; text 4.5:1 and graphics 3:1 on every background role
+frontiers-figures FR-005	check	.github: agora check design-systems --runner python --scope frontiers-figures	every figure type drawn on both canvases; every color variant themes and parses; that a variant changes nothing else is a review judgment
+frontiers-figures FR-006	check	.github: agora check design-systems --runner python --scope frontiers-figures	a themed figure rendered with only the shipped fonts sets its text in them, where resvg-py is installed
+frontiers-figures FR-007	check	.github: agora check design-systems --runner python --scope frontiers-figures	figcheck: canvas, minimum size, tracking; title and label sizes are the kit's
+frontiers-figures FR-008	check	.github: agora check design-systems --runner python --scope frontiers-figures	figcheck: labels inside their boxes and the canvas, measured in the brand's sans
+frontiers-figures FR-009	check	.github: agora check design-systems --runner python --scope frontiers-figures	figcheck: em dashes and straight quotes; box radius and marker are the kit's
+frontiers-figures FR-010	check	.github: agora check design-systems --runner python --scope frontiers-figures	every layout draws a figure that passes
+frontiers-figures FR-011	check	.github: agora check design-systems --runner python --scope frontiers-figures	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-figures FR-012	check	.github: agora check design-systems --runner python --scope frontiers-figures	series contrast, color-blind and grayscale distinctness, sequential order and steps; direct labels by the layouts
+frontiers-brand FR-001	none	-	layout and registration; agora check ontology checks the slug and registration only
+frontiers-brand FR-002	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: names and values
+frontiers-brand FR-003	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: each unit has its color
+frontiers-brand FR-004	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: Inter, Source Serif 4, wordmark weight 700
+frontiers-brand FR-005	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: palette inks and unit colors on white and Warm Paper
+frontiers-brand FR-006	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files and Frontiers palette: sizes load as stated; light and dark, PNG and WebP; names state sizes
+frontiers-brand FR-007	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files: icon files load at their stated size; crop provenance not checked
+frontiers-brand FR-008	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: minimum sizes stated
+frontiers-brand FR-009	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Specimen: light lockups on light, dark on dark; redrawing or recoloring not checked
 frontiers-brand FR-010	none	-	clear space is a placement judgment; no check
 frontiers-brand FR-011	none	-	how a new size is made; no check
 frontiers-brand FR-012	none	-	imagery judgment; no check
-frontiers-brand FR-013	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Logo files: the favicon loads at its stated size
-frontiers-brand FR-014	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
-frontiers-brand FR-015	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
-frontiers-brand FR-016	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: the share card is 1200x630; Logo files: it loads at its stated size
-frontiers-brand FR-017	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Decoration kit (and frontiers-merchandise's harness refusing orders in unverified inks): lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
-frontiers-brand FR-018	check	.github: tools/run_assurance.sh --images	brand_imagery.py check: every app icon and favicon.ico present at its size; Logo files: each loads at its size
-frontiers-brand FR-019	check	.github: node design-systems/frontiers-brand/assurance/run.mjs	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
-frontiers-brand FR-020	check	.github: PARAGON=… python3 design-systems/frontiers-brand/assurance/run.py	brand_openedx.py check: the package and dist/ are what the tool and Paragon write; built pairs meet 4.5:1 (CI browser job)
+frontiers-brand FR-013	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files: the favicon loads at its stated size
+frontiers-brand FR-014	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: theme roles map onto the palette; Brand contract: brand.css declares exactly the roles
+frontiers-brand FR-015	check	.github: agora check imagery	agora check imagery: catalog, environments, transparency, sizes; the drawing rules are a judgment at approval
+frontiers-brand FR-016	check	.github: agora check imagery	agora check imagery: the share card is 1200x630; Logo files: it loads at its stated size
+frontiers-brand FR-017	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Decoration kit (and frontiers-merchandise's harness refusing orders in unverified inks): lockup, icon and wordmark one-color SVG in currentColor, finest detail, a spot-color and thread match per ink; that each is the recorded trace or setting and that inks are verified are not checked
+frontiers-brand FR-018	check	.github: agora check imagery	agora check imagery: every app icon and favicon.ico present at its size; Logo files: each loads at its size
+frontiers-brand FR-019	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
+frontiers-brand FR-020	check	.github: agora check openedx --scope frontiers-brand	agora check openedx: the package and dist/ are what the tool and Paragon write; built pairs meet 4.5:1 (CI browser job)
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
-frontiers-nature-web FR-003	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
-frontiers-nature-web FR-004	check	.github: tools/run_assurance.sh	Theme suite under every brand: roles present, families shipped, no color literal; Hero suite: imagery from the theme
-frontiers-nature-web FR-005	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Design tokens and Rendered contrast suites
-frontiers-nature-web FR-006	none	-	semantic use of unit colours is a judgment; figures are frontiers-figures' (spec_check checks the ontology link)
-frontiers-nature-web FR-007	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: bundle.txt order and files
-frontiers-nature-web FR-008	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: layers, @import, remote URL, framework, !important; the order statement itself is not checked
-frontiers-nature-web FR-009	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: every font file fonts.css references exists; Page frame: fonts load
-frontiers-nature-web FR-010	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Stylesheet discipline: chrome.js defines if-shelf, no modules or network; Datastar opt-in not checked
-frontiers-nature-web FR-011	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract and Page frame: one main, one h1, page capped at 72rem
-frontiers-nature-web FR-012	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract: header, labelled primary nav, current section; Page frame: sticky header
-frontiers-nature-web FR-013	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract: breadcrumbs ordered, first home, one current; fold attributes not checked
-frontiers-nature-web FR-014	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Page frame: section menu popover opens and closes
-frontiers-nature-web FR-015	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Page frame: footer columns at 390, 767, 768 and 1280px
-frontiers-nature-web FR-016	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Markup contract: labelled navs, unique ids, anchors, alt, nothing external; class names not checked
-frontiers-nature-web FR-017	check	.github: node design-systems/frontiers-nature-web/assurance/run.mjs	Page frame: no horizontal overflow at 320 to 1280px
+frontiers-nature-web FR-003	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
+frontiers-nature-web FR-004	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Theme suite under every brand: roles present, families shipped, no color literal; Hero suite: imagery from the theme
+frontiers-nature-web FR-005	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Design tokens and Rendered contrast suites
+frontiers-nature-web FR-006	none	-	semantic use of unit colours is a judgment; figures are frontiers-figures' (agora check ontology checks the ontology link)
+frontiers-nature-web FR-007	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Stylesheet discipline: bundle.txt order and files
+frontiers-nature-web FR-008	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Stylesheet discipline: layers, @import, remote URL, framework, !important; the order statement itself is not checked
+frontiers-nature-web FR-009	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Stylesheet discipline: every font file fonts.css references exists; Page frame: fonts load
+frontiers-nature-web FR-010	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Stylesheet discipline: chrome.js defines if-shelf, no modules or network; Datastar opt-in not checked
+frontiers-nature-web FR-011	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract and Page frame: one main, one h1, page capped at 72rem
+frontiers-nature-web FR-012	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: header, labelled primary nav, current section; Page frame: sticky header
+frontiers-nature-web FR-013	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: breadcrumbs ordered, first home, one current; fold attributes not checked
+frontiers-nature-web FR-014	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: section menu popover opens and closes
+frontiers-nature-web FR-015	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: footer columns at 390, 767, 768 and 1280px
+frontiers-nature-web FR-016	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: labelled navs, unique ids, anchors, alt, nothing external; class names not checked
+frontiers-nature-web FR-017	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: no horizontal overflow at 320 to 1280px
 frontiers-nature-web FR-018	none	-	navigation data drives the chrome in a consumer; no check here
 frontiers-nature-web FR-019	none	-	layout attributes are implemented by a consumer; no check here
 frontiers-nature-web FR-020	none	-	registry contents not checked
-frontiers-nature-web FR-021	check	.github: tools/run_assurance.sh	Hero suite under every brand: the artwork is from the theme's pool, uncropped, uncovered; text AA; fits 320 to 1280px
-frontiers-print FR-001	none	-	registration and classification; spec_check checks the slug, registration and classification only
+frontiers-nature-web FR-021	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Hero suite under every brand: the artwork is from the theme's pool, uncropped, uncovered; text AA; fits 320 to 1280px
+frontiers-print FR-001	none	-	registration and classification; agora check ontology checks the slug, registration and classification only
 frontiers-print FR-002	none	-	directory contents; no check
-frontiers-print FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: every named color reaches each build as its role or mix of roles, logos placed, no color literal in a style file
-frontiers-print FR-004	check	.github: python3 design-systems/frontiers-print/assurance/run.py	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; the book sets the sans in Regular, Bold, Italic and Bold Italic; LICENSES.md coverage not checked
-frontiers-print FR-005	check	.github: python3 design-systems/frontiers-print/assurance/run.py	book page size 7 x 9.19 in; the book's sans styles are the theme's font-sans; margins not checked
+frontiers-print FR-003	check	.github: agora check design-systems --runner python --scope frontiers-print	run.py under every brand: every named color reaches each build as its role or mix of roles, logos placed, no color literal in a style file
+frontiers-print FR-004	check	.github: agora check design-systems --runner python --scope frontiers-print	every font in each PDF is embedded and shipped in fonts/; an unshipped serif or sans stops the build; the book sets the sans in Regular, Bold, Italic and Bold Italic; LICENSES.md coverage not checked
+frontiers-print FR-005	check	.github: agora check design-systems --runner python --scope frontiers-print	book page size 7 x 9.19 in; the book's sans styles are the theme's font-sans; margins not checked
 frontiers-print FR-006	none	-	the cover fixture sets the title in the theme sans; Fjalla One and Roboto Condensed use is not checked
-frontiers-print FR-007	check	.github: python3 design-systems/frontiers-print/assurance/run.py	article builds on LuaLaTeX in the default layout at US Letter
-frontiers-print FR-008	check	.github: python3 design-systems/frontiers-print/assurance/run.py	the default set's sans is Inter in the article PDF; licensed-set fallback is not exercised by the harness
-frontiers-print FR-009	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any of its checks
+frontiers-print FR-007	check	.github: agora check design-systems --runner python --scope frontiers-print	article builds on LuaLaTeX in the default layout at US Letter
+frontiers-print FR-008	check	.github: agora check design-systems --runner python --scope frontiers-print	the default set's sans is Inter in the article PDF; licensed-set fallback is not exercised by the harness
+frontiers-print FR-009	check	.github: agora check design-systems --runner python --scope frontiers-print	agora check design-systems runs run.py, which exits non-zero on any of its checks
 frontiers-print FR-010	review	frontiers-print FR-010	cover structure and reading order are judged at cover review; the pipeline's covercheck checks type overlaps
 frontiers-print FR-011	none	-	lockup placement is the renderer's; not checked
 frontiers-print FR-012	check	eidolon: eid check covers	the renderer refuses a title line wider than the box; casing and line composition are judged at review
@@ -523,21 +523,23 @@ frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check
 frontiers-print FR-016	check	eidolon: eid check covers	the series line's fit is checked; its color and the back-cover rule are not
 frontiers-print FR-017	check	eidolon: eid check covers	a back cover that spills onto a second page or reaches the barcode zone fails
 frontiers-print FR-018	check	eidolon: eid check books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
-frontiers-merchandise FR-001	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite: the ontology classifies it by every method and category its data governs
+frontiers-print FR-019	check	.github: agora check design-systems --runner python --scope frontiers-print	pdftotext of the compiled book and article fixtures fails on any U+E000-U+F8FF code point or a sample line that does not extract as set
+frontiers-print FR-020	check	.github: agora check design-systems --runner python --scope frontiers-print	the harness fails a build whose log has a missing character and a book or article whose code block, inline code or monospace text does not extract the sample symbols as set
+frontiers-merchandise FR-001	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	data suite: the ontology classifies it by every method and category its data governs
 frontiers-merchandise FR-002	none	-	directory contents; no check
-frontiers-merchandise FR-003	check	.github: tools/run_assurance.sh	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
-frontiers-merchandise FR-004	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fixture jobs exercise each method's limits; the table and methods.json agreeing is a review judgment
-frontiers-merchandise FR-005	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	data suite and fixture jobs; the table and products.json agreeing is a review judgment
-frontiers-merchandise FR-006	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: method not allowed, imagery by a spot method, unknown location
-frontiers-merchandise FR-007	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: too wide, too tall, below the brand minimum, finer than the method holds
-frontiers-merchandise FR-008	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixtures: ink not in the kit, ink on a method that uses none
-frontiers-merchandise FR-009	check	.github: python3 design-systems/frontiers-merchandise/assurance/run.py	fail fixture: dark ink on dark goods
-frontiers-merchandise FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-example-brand FR-001	none	-	layout and registration; spec_check checks the slug and registration only
-example-brand FR-002	check	.github: tools/run_assurance.sh	Brand contract here, and every web design system run themed by it
-example-brand FR-003	check	.github: node design-systems/example-brand/assurance/run.mjs	Logo files: light and dark lockups, icon and favicon load at their stated sizes
-example-brand FR-004	check	.github: tools/run_assurance.sh --images	brand_imagery.py check and the Imagery suite: the piece is catalogued and loads at its sizes
-example-brand FR-005	check	.github: node design-systems/example-brand/assurance/run.mjs	Decoration kit suite: one-color SVG, finest detail, spot and thread matches
+frontiers-merchandise FR-003	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	run.py under every brand: jobs take artwork and inks from the kit; a brand without a kit is reported, not passed
+frontiers-merchandise FR-004	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	fixture jobs exercise each method's limits; the table and methods.json agreeing is a review judgment
+frontiers-merchandise FR-005	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	data suite and fixture jobs; the table and products.json agreeing is a review judgment
+frontiers-merchandise FR-006	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	fail fixtures: method not allowed, imagery by a spot method, unknown location
+frontiers-merchandise FR-007	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	fail fixtures: too wide, too tall, below the brand minimum, finer than the method holds
+frontiers-merchandise FR-008	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	fail fixtures: ink not in the kit, ink on a method that uses none
+frontiers-merchandise FR-009	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	fail fixture: dark ink on dark goods
+frontiers-merchandise FR-010	check	.github: agora check design-systems --runner python --scope frontiers-merchandise	agora check design-systems runs run.py, which exits non-zero on any failure
+example-brand FR-001	none	-	layout and registration; agora check ontology checks the slug and registration only
+example-brand FR-002	check	.github: agora check design-systems --runner browser --scope example-brand	Brand contract here, and every web design system run themed by it
+example-brand FR-003	check	.github: agora check design-systems --runner browser --scope example-brand	Logo files: light and dark lockups, icon and favicon load at their stated sizes
+example-brand FR-004	check	.github: agora check imagery	agora check imagery and the Imagery suite: the piece is catalogued and loads at its sizes
+example-brand FR-005	check	.github: agora check design-systems --runner browser --scope example-brand	Decoration kit suite: one-color SVG, finest detail, spot and thread matches
 0019-controlled-vocabulary FR-001	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established one could replace
 0019-controlled-vocabulary FR-002	review	0019-controlled-vocabulary FR-007	recurring review flags a term an established class could replace
 0019-controlled-vocabulary FR-003	review	0019-controlled-vocabulary FR-007	recurring review flags an invented term with an established equivalent
@@ -551,20 +553,21 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0020-spec-format FR-002	none	-	no check looks for plan or tasks files
 0020-spec-format FR-003	none	-	inline clarification markers are not scanned for
 0020-spec-format FR-004	none	-	a permission, not a constraint a check can test
-0020-spec-format FR-005	check	.github: python3 tools/spec_check.py	sections present, ordered, and non-empty
-0020-spec-format FR-006	check	.github: python3 tools/spec_check.py	each edge case must cite FR or SC; whether it resolves is unchecked
+0020-spec-format FR-005	check	.github: agora check specs	sections present, ordered, and non-empty
+0020-spec-format FR-006	check	.github: agora check specs	each edge case must cite FR or SC; whether it resolves is unchecked
 0020-spec-format FR-007	none	-	whether an assumption asserts a fact is judgment
-0020-spec-format FR-008	check	.github: python3 tools/spec_check.py	catches duplicates only; renumbering is not detected
-0020-spec-format FR-009	check	.github: python3 tools/spec_check.py	status value and successor existence
+0020-spec-format FR-008	check	.github: agora check specs	catches duplicates only; renumbering is not detected
+0020-spec-format FR-009	check	.github: agora check specs	status value and successor existence
 0020-spec-format FR-010	none	-	no check ties a status change to a Decision
-0020-spec-format FR-011	check	.github: python3 tools/spec_check.py	one row per FR, none for missing FRs
-0020-spec-format FR-012	check	.github: python3 tools/spec_check.py	mechanism value only; the choice is not verified
-0020-spec-format FR-013	check	.github: python3 tools/spec_check.py	form of command or citation; its truth is not verified
-0020-spec-format FR-014	check	.github: python3 tools/spec_check.py	every run lists none rows
-0020-spec-format FR-015	check	.github: .github/workflows/spec-check.yml	runs on every push and pull request
-0020-spec-format FR-016	check	eidolon: eid check specs	loads the public root's tools/spec_check.py
-0020-spec-format FR-017	check	.github: python3 tools/spec_check.py	exit status is non-zero on any listed breach
-0020-spec-format FR-018	check	.github: python3 tools/spec_check.py	Spec ID must match its directory, numbered or design system
+0020-spec-format FR-011	check	.github: agora check register	one row per FR, none for missing FRs
+0020-spec-format FR-012	check	.github: agora check register	mechanism value only; the choice is not verified
+0020-spec-format FR-013	check	.github: agora check register	form of command or citation, and that a .github: row's command exists in agora's registry with sections, suite and options it declares
+0020-spec-format FR-014	check	.github: agora check register	every run lists none rows
+0020-spec-format FR-015	check	.github: agora check --suite spec	spec-check.yml runs the spec suite on every push and pull request
+0020-spec-format FR-016	check	eidolon: eid check specs	runs the public root's agora with --root (0041 FR-040)
+0020-spec-format FR-017	check	.github: agora check --suite spec	exit status is non-zero on any listed breach
+0020-spec-format FR-018	check	.github: agora check specs	Spec ID must match its directory, numbered or design system
+0020-spec-format FR-019	check	.github: agora check specs	warns on a bare identifier the spec does not define; the vault's eid check specs runs the same rule through agora --root
 0021-works-and-presentations FR-001	none	-	draft; nothing checks it yet
 0021-works-and-presentations FR-002	none	-	draft; ontology terms not yet written
 0021-works-and-presentations FR-003	none	-	draft; nothing checks it yet
@@ -655,135 +658,136 @@ example-brand FR-005	check	.github: node design-systems/example-brand/assurance/
 0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
 0024-persistent-addresses FR-010	none	-	consent is a person's; nothing checks it
 0024-persistent-addresses FR-011	none	-	no organization identifier held yet (OQ-3)
-frontiers-written-voice FR-001	check	.github: python3 tools/spec_check.py	registration and kind; that no rule names a person or holds source material is a review judgment
+frontiers-written-voice FR-001	check	.github: agora check ontology	registration and kind; that no rule names a person or holds source material is a review judgment
 frontiers-written-voice FR-002	none	-	directory contents; no check
 frontiers-written-voice FR-003	none	-	style authority; applied by a human read
-frontiers-written-voice FR-004	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	throat-clearing and announcement openings; whether a piece starts with its point is a human read
+frontiers-written-voice FR-004	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	throat-clearing and announcement openings; whether a piece starts with its point is a human read
 frontiers-written-voice FR-005	none	-	person and voice; a human read
-frontiers-written-voice FR-006	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	plain-word swaps warn; specificity is a human read
-frontiers-written-voice FR-007	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	hedge phrases; whether uncertainty is real is a human read
-frontiers-written-voice FR-008	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	banned words, hedges, stock openings and closings refused by the sweep
-frontiers-written-voice FR-009	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	announcement openings and wrap-up asides; headings as claims are a human read
+frontiers-written-voice FR-006	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	plain-word swaps warn; specificity is a human read
+frontiers-written-voice FR-007	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	hedge phrases; whether uncertainty is real is a human read
+frontiers-written-voice FR-008	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	banned words, hedges, stock openings and closings refused by the sweep
+frontiers-written-voice FR-009	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	announcement openings and wrap-up asides; headings as claims are a human read
 frontiers-written-voice FR-010	none	-	literary prose and humor; a human read
 frontiers-written-voice FR-011	none	-	contrarian claims and useful conclusions; a human read
-frontiers-written-voice FR-012	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
-frontiers-written-voice FR-013	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	Not-X fragments warn; rhythm and paragraph jobs are a human read
-frontiers-written-voice FR-014	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	procedure mode: instruction and sentence length, passive instructions
+frontiers-written-voice FR-012	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
+frontiers-written-voice FR-013	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	Not-X fragments warn; rhythm and paragraph jobs are a human read
+frontiers-written-voice FR-014	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	procedure mode: instruction and sentence length, passive instructions
 frontiers-written-voice FR-015	none	-	presentation form; a human read
-frontiers-written-voice FR-016	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	every shared term is in ifcore.ttl under its label; avoided variants refused
-frontiers-written-voice FR-017	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	the sweep against fail and pass fixtures
-frontiers-written-voice FR-018	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	a derived voice keeps every inherited pattern
-frontiers-written-voice FR-019	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-written-voice FR-020	check	.github: python3 design-systems/frontiers-written-voice/assurance/run.py	URLs and mailto: addresses left out of the sweep, link text after a URL still swept, against fixtures
-frontiers-spoken-voice FR-001	check	.github: python3 tools/spec_check.py	registration, kind and derivation from a written-voice design system
-frontiers-spoken-voice FR-002	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the inherited copy is identical to its source; no inherited pattern dropped or loosened
-frontiers-spoken-voice FR-003	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings; repeating the intro is the consumer's format check
+frontiers-written-voice FR-016	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	every shared term is in ifcore.ttl under its label; avoided variants refused
+frontiers-written-voice FR-017	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	the sweep against fail and pass fixtures
+frontiers-written-voice FR-018	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	a derived voice keeps every inherited pattern
+frontiers-written-voice FR-019	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-written-voice FR-020	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	URLs and mailto: addresses left out of the sweep, link text after a URL still swept, against fixtures
+frontiers-spoken-voice FR-001	check	.github: agora check ontology	registration, kind and derivation from a written-voice design system
+frontiers-spoken-voice FR-002	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	the inherited copy is identical to its source; no inherited pattern dropped or loosened
+frontiers-spoken-voice FR-003	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	announcement openings; repeating the intro is the consumer's format check
 frontiers-spoken-voice FR-004	none	-	writing for one hearing; a read-aloud judgment
-frontiers-spoken-voice FR-005	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	announcement openings and filler refused by the sweep; fake banter is a human read
+frontiers-spoken-voice FR-005	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	announcement openings and filler refused by the sweep; fake banter is a human read
 frontiers-spoken-voice FR-006	none	-	transitions and repetition; a human read
-frontiers-spoken-voice FR-007	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	story labels refused; naming a real party is the consumer's check
+frontiers-spoken-voice FR-007	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	story labels refused; naming a real party is the consumer's check
 frontiers-spoken-voice FR-008	none	-	humor and performance punctuation; a human read
-frontiers-spoken-voice FR-009	check	.github: python3 design-systems/frontiers-spoken-voice/assurance/run.py	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
-frontiers-spoken-voice FR-010	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-slides FR-001	check	.github: python3 tools/spec_check.py	registration, deck types and figure design system
+frontiers-spoken-voice FR-009	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
+frontiers-spoken-voice FR-010	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-slides FR-001	check	.github: agora check ontology	registration, deck types and figure design system
 frontiers-slides FR-002	none	-	directory contents; no check
-frontiers-slides FR-003	check	.github: tools/run_assurance.sh --browser	Canvas and layouts: every slide 1920x1080, nothing outside its slide or under its footer
-frontiers-slides FR-004	check	.github: tools/run_assurance.sh --browser	Stylesheet discipline: no color literal; deck.py check refuses a color in a slide's text
-frontiers-slides FR-005	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: known layout, title first, quote attribution; the browser harness checks every layout renders
-frontiers-slides FR-006	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: headline present and within its word limit; that it states a claim is a human read
-frontiers-slides FR-007	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check refuses an SVG that is not frontiers-figures' semantic SVG
-frontiers-slides FR-008	check	.github: tools/run_assurance.sh --browser	Type and contrast: 24px minimum, 4.5:1 in both tones, on-dark figure variant
-frontiers-slides FR-009	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: alternative text; notes read aloud is a human judgment
-frontiers-slides FR-010	check	.github: tools/run_assurance.sh --browser	Viewer: one slide at a time, keys, hash, notes; deck.py build is checked by run.py
-frontiers-slides FR-011	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: points, words and slides against limits.json
-frontiers-slides FR-012	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check: speaker notes on content, figure and two-column slides
-frontiers-slides FR-013	check	.github: python3 design-systems/frontiers-slides/assurance/run.py	deck.py check sweeps slide text and notes with the house voice
-frontiers-slides FR-014	check	.github: tools/run_assurance.sh --browser	run_assurance.sh runs run.mjs under every brand, which exits non-zero on any failure
-frontiers-slides FR-015	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-media FR-001	check	.github: python3 tools/spec_check.py	registration and media asset types
+frontiers-slides FR-003	check	.github: agora check design-systems --runner browser --scope frontiers-slides	Canvas and layouts: every slide 1920x1080, nothing outside its slide or under its footer
+frontiers-slides FR-004	check	.github: agora check design-systems --runner browser --scope frontiers-slides	Stylesheet discipline: no color literal; deck.py check refuses a color in a slide's text
+frontiers-slides FR-005	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check: known layout, title first, quote attribution; the browser harness checks every layout renders
+frontiers-slides FR-006	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check: headline present and within its word limit; that it states a claim is a human read
+frontiers-slides FR-007	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check refuses an SVG that is not frontiers-figures' semantic SVG
+frontiers-slides FR-008	check	.github: agora check design-systems --runner browser --scope frontiers-slides	Type and contrast: 24px minimum, 4.5:1 in both tones, on-dark figure variant
+frontiers-slides FR-009	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check: alternative text; notes read aloud is a human judgment
+frontiers-slides FR-010	check	.github: agora check design-systems --runner browser --scope frontiers-slides	Viewer: one slide at a time, keys, hash, notes; deck.py build is checked by run.py
+frontiers-slides FR-011	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check: points, words and slides against limits.json
+frontiers-slides FR-012	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check: speaker notes on content, figure and two-column slides
+frontiers-slides FR-013	check	.github: agora check design-systems --runner python --scope frontiers-slides	deck.py check sweeps slide text and notes with the house voice
+frontiers-slides FR-014	check	.github: agora check design-systems --runner browser --scope frontiers-slides	agora check design-systems runs run.mjs under every brand, which exits non-zero on any failure
+frontiers-slides FR-015	check	.github: agora check design-systems --runner python --scope frontiers-slides	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-media FR-001	check	.github: agora check ontology	registration and media asset types
 frontiers-media FR-002	none	-	directory contents; no check
-frontiers-media FR-003	check	.github: python3 design-systems/frontiers-media/assurance/run.py	formats.json holds no color; pictures and logo come from the brand
-frontiers-media FR-004	check	.github: python3 design-systems/frontiers-media/assurance/run.py	every format rendered at its size, transparent where it is
-frontiers-media FR-005	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: safe margin, the thumbnail's clear corner, text the format carries
-frontiers-media FR-006	check	.github: python3 design-systems/frontiers-media/assurance/run.py	each tone's text roles meet 4.5:1 under every brand
-frontiers-media FR-007	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: the piece exists, the lockup is at least 100px; never enlarged by construction
-frontiers-media FR-008	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check: title words, fit within the size range, 24px minimum
-frontiers-media FR-009	check	.github: python3 design-systems/frontiers-media/assurance/run.py	media.py check sweeps the text with the written voice
-frontiers-media FR-010	check	.github: python3 design-systems/frontiers-media/assurance/run.py	every pass job renders through fonts/
-frontiers-media FR-011	check	.github: python3 design-systems/frontiers-media/assurance/run.py	fail fixtures refused for their reason
+frontiers-media FR-003	check	.github: agora check design-systems --runner python --scope frontiers-media	formats.json holds no color; pictures and logo come from the brand
+frontiers-media FR-004	check	.github: agora check design-systems --runner python --scope frontiers-media	every format rendered at its size, transparent where it is
+frontiers-media FR-005	check	.github: agora check design-systems --runner python --scope frontiers-media	media.py check: safe margin, the thumbnail's clear corner, text the format carries
+frontiers-media FR-006	check	.github: agora check design-systems --runner python --scope frontiers-media	each tone's text roles meet 4.5:1 under every brand
+frontiers-media FR-007	check	.github: agora check design-systems --runner python --scope frontiers-media	media.py check: the piece exists, the lockup is at least 100px; never enlarged by construction
+frontiers-media FR-008	check	.github: agora check design-systems --runner python --scope frontiers-media	media.py check: title words, fit within the size range, 24px minimum
+frontiers-media FR-009	check	.github: agora check design-systems --runner python --scope frontiers-media	media.py check sweeps the text with the written voice
+frontiers-media FR-010	check	.github: agora check design-systems --runner python --scope frontiers-media	every pass job renders through fonts/
+frontiers-media FR-011	check	.github: agora check design-systems --runner python --scope frontiers-media	fail fixtures refused for their reason
 frontiers-media FR-012	none	-	the fixed layouts; seen in the renders
-frontiers-media FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-course FR-001	check	.github: python3 tools/spec_check.py	registration, course formats, item types and delivery targets; run.py checks the classification and drawsFiguresWith
+frontiers-media FR-013	check	.github: agora check design-systems --runner python --scope frontiers-media	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-course FR-001	check	.github: agora check ontology	registration, course formats, item types and delivery targets; run.py checks the classification and drawsFiguresWith
 frontiers-course FR-002	none	-	directory contents; no check
-frontiers-course FR-003	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py model reads the pass course; a table, a missing title and misplaced videos are refused
-frontiers-course FR-004	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
-frontiers-course FR-005	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: outcome count, observable verbs, no vague verbs, one sentence
-frontiers-course FR-006	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: untaught, unassessed and unknown outcomes; units end with an assessment; one graded
-frontiers-course FR-007	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: unique ids, choice counts, correct counts, feedback, answer keys
-frontiers-course FR-008	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: minutes by type, honest minutes, week order and weekly effort
-frontiers-course FR-009	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check: alternative text, captions, heading levels, link text, color or position alone
-frontiers-course FR-010	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check sweeps text under written voice and transcripts under spoken voice
-frontiers-course FR-011	check	.github: python3 design-systems/frontiers-course/assurance/run.py	course.py check runs figcheck over a lesson's SVG figures
-frontiers-course FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-course FR-013	check	.github: python3 design-systems/frontiers-course/assurance/run.py	each target is refused for a failing course and is byte-identical across two builds
-frontiers-course FR-014	check	.github: python3 design-systems/frontiers-course/assurance/run.py; node design-systems/frontiers-course/assurance/run.mjs	run.py: no color literal, role contrast under every brand, lang, one h1, alternative text, links resolve; run.mjs: phone and desktop width, rendered contrast, fonts, skip link
-frontiers-course FR-015	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs grades every fixture item right and wrong; run.mjs answers every item by its key in Chromium
-frontiers-course FR-016	check	.github: python3 design-systems/frontiers-course/assurance/run.py	js.test.mjs runs cmi5.js against a mock LMS; cmi5.xml validated against CourseStructure.xsd; every AU's page and objectives
-frontiers-course FR-017	check	.github: python3 design-systems/frontiers-course/assurance/run.py	the tarball's structure, every url_name, static file, transcript, problem type and the grading policy
-frontiers-course FR-018	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, and run.mjs under every brand
-frontiers-email FR-001	check	.github: python3 tools/spec_check.py	registration and email types
+frontiers-course FR-003	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py model reads the pass course; a table, a missing title and misplaced videos are refused
+frontiers-course FR-004	check	.github: agora check design-systems --runner python --scope frontiers-course	the pass model validates and is deterministic; the validator reports known departures; a bad code is refused
+frontiers-course FR-005	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check: outcome count, observable verbs, no vague verbs, one sentence
+frontiers-course FR-006	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check: untaught, unassessed and unknown outcomes; units end with an assessment; one graded
+frontiers-course FR-007	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check: unique ids, choice counts, correct counts, feedback, answer keys
+frontiers-course FR-008	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check: minutes by type, honest minutes, week order and weekly effort
+frontiers-course FR-009	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check: alternative text, captions, heading levels, link text, color or position alone
+frontiers-course FR-010	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check sweeps text under written voice and transcripts under spoken voice
+frontiers-course FR-011	check	.github: agora check design-systems --runner python --scope frontiers-course	course.py check runs figcheck over a lesson's SVG figures
+frontiers-course FR-012	check	.github: agora check design-systems --scope frontiers-course	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-course FR-013	check	.github: agora check design-systems --runner python --scope frontiers-course	each target is refused for a failing course and is byte-identical across two builds
+frontiers-course FR-014	check	.github: agora check design-systems --scope frontiers-course	run.py: no color literal, role contrast under every brand, lang, one h1, alternative text, links resolve; run.mjs: phone and desktop width, rendered contrast, fonts, skip link
+frontiers-course FR-015	check	.github: agora check design-systems --runner python --scope frontiers-course	js.test.mjs grades every fixture item right and wrong; run.mjs answers every item by its key in Chromium
+frontiers-course FR-016	check	.github: agora check design-systems --runner python --scope frontiers-course	js.test.mjs runs cmi5.js against a mock LMS; cmi5.xml validated against CourseStructure.xsd; every AU's page and objectives
+frontiers-course FR-017	check	.github: agora check design-systems --runner python --scope frontiers-course	the tarball's structure, every url_name, static file, transcript, problem type and the grading policy
+frontiers-course FR-018	check	.github: agora check design-systems --scope frontiers-course	agora check design-systems runs run.py, and run.mjs under every brand
+frontiers-email FR-001	check	.github: agora check ontology	registration and email types
 frontiers-email FR-002	none	-	directory contents; no check
-frontiers-email FR-003	check	.github: python3 design-systems/frontiers-email/assurance/run.py	email.json holds no color; built colors come from the brand
-frontiers-email FR-004	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: a known type; unsubscribe by type
-frontiers-email FR-005	check	.github: python3 design-systems/frontiers-email/assurance/run.py	pass fixtures parse and build
-frontiers-email FR-006	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: heading, subject, preheader, one call to action, words
-frontiers-email FR-007	check	.github: python3 design-systems/frontiers-email/assurance/run.py	https links; lockup sized, described, at least 100px, served from --assets
-frontiers-email FR-008	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check: postal address; unsubscribe link for subscriber types
-frontiers-email FR-009	check	.github: python3 design-systems/frontiers-email/assurance/run.py	each tone's contrast under every brand; dark stylesheet present
-frontiers-email FR-010	check	.github: python3 design-systems/frontiers-email/assurance/run.py	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
-frontiers-email FR-011	check	.github: python3 design-systems/frontiers-email/assurance/run.py	mail.py check sweeps subject, preheader and text
-frontiers-email FR-012	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
-frontiers-signage-print FR-001	check	.github: python3 tools/spec_check.py	registration, document types and figure design system
+frontiers-email FR-003	check	.github: agora check design-systems --runner python --scope frontiers-email	email.json holds no color; built colors come from the brand
+frontiers-email FR-004	check	.github: agora check design-systems --runner python --scope frontiers-email	mail.py check: a known type; unsubscribe by type
+frontiers-email FR-005	check	.github: agora check design-systems --runner python --scope frontiers-email	pass fixtures parse and build
+frontiers-email FR-006	check	.github: agora check design-systems --runner python --scope frontiers-email	mail.py check: heading, subject, preheader, one call to action, words
+frontiers-email FR-007	check	.github: agora check design-systems --runner python --scope frontiers-email	https links; lockup sized, described, at least 100px, served from --assets
+frontiers-email FR-008	check	.github: agora check design-systems --runner python --scope frontiers-email	mail.py check: postal address; unsubscribe link for subscriber types
+frontiers-email FR-009	check	.github: agora check design-systems --runner python --scope frontiers-email	each tone's contrast under every brand; dark stylesheet present
+frontiers-email FR-010	check	.github: agora check design-systems --runner python --scope frontiers-email	600px table layout, inline font and color, no custom property, link or script, size, plain text with every link
+frontiers-email FR-011	check	.github: agora check design-systems --runner python --scope frontiers-email	mail.py check sweeps subject, preheader and text
+frontiers-email FR-012	check	.github: agora check design-systems --runner python --scope frontiers-email	agora check design-systems runs run.py, which exits non-zero on any failure
+frontiers-signage-print FR-001	check	.github: agora check ontology	registration, document types and figure design system
 frontiers-signage-print FR-002	none	-	directory contents; no check
-frontiers-signage-print FR-003	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	formats.json holds no color; pictures and logo come from the brand
-frontiers-signage-print FR-004	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	every format renders to one page of trim plus bleed; bleed at least 3mm
-frontiers-signage-print FR-005	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: safe margin and the banner's hidden band
-frontiers-signage-print FR-006	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	each tone's contrast under every brand
-frontiers-signage-print FR-007	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: lockup and picture at 150 pixels per inch or more
-frontiers-signage-print FR-008	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check: title words and fit, details count and fit, 9pt minimum
-frontiers-signage-print FR-009	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	signage.py check sweeps the text with the written voice
-frontiers-signage-print FR-010	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	only the sans embedded in every rendered PDF
-frontiers-signage-print FR-011	check	.github: python3 design-systems/frontiers-signage-print/assurance/run.py	fail fixtures refused for their reason
+frontiers-signage-print FR-003	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	formats.json holds no color; pictures and logo come from the brand
+frontiers-signage-print FR-004	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	every format renders to one page of trim plus bleed; bleed at least 3mm
+frontiers-signage-print FR-005	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	signage.py check: safe margin and the banner's hidden band
+frontiers-signage-print FR-006	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	each tone's contrast under every brand
+frontiers-signage-print FR-007	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	signage.py check: lockup and picture at 150 pixels per inch or more
+frontiers-signage-print FR-008	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	signage.py check: title words and fit, details count and fit, 9pt minimum
+frontiers-signage-print FR-009	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	signage.py check sweeps the text with the written voice
+frontiers-signage-print FR-010	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	only the sans embedded in every rendered PDF
+frontiers-signage-print FR-011	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	fail fixtures refused for their reason
 frontiers-signage-print FR-012	none	-	no sign layout places a figure yet; a consumer placing one uses frontiers-figures
-frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assurance.sh runs run.py, which exits non-zero on any failure
+frontiers-signage-print FR-013	check	.github: agora check design-systems --runner python --scope frontiers-signage-print	agora check design-systems runs run.py, which exits non-zero on any failure
 0025-tooling-environment FR-001	none	-	scope; nothing lists a repository's tools
-0025-tooling-environment FR-002	none	-	the FR-011 runs would catch a breach once every tool has one
-0025-tooling-environment FR-003	none	-	no check reads a tool's declared prerequisites
-0025-tooling-environment FR-004	none	-	no check scans tools for installs at run time
-0025-tooling-environment FR-005	none	-	names the environment; nothing tests it
-0025-tooling-environment FR-006	check	.github: .github/workflows/reference-environment.yml	spec_check and the browser harnesses; the TeX and imagery harnesses wait on workspaces-host-v3
-0025-tooling-environment FR-007	none	-	no check looks for installers or bootstrap scripts
-0025-tooling-environment FR-008	check	.github: python3 tools/spec_check.py	the pin's form and the devcontainer image's tag; that images exist is caught by reference-environment.yml's pull
-0025-tooling-environment FR-009	check	.github: .github/workflows/reference-environment.yml	a pin move runs every in-environment job before merge
-0025-tooling-environment FR-010	check	.github: .github/workflows/reference-environment.yml	runs on every push and pull request, in the devcontainer's image
-0025-tooling-environment FR-011	check	.github: .github/workflows/spec-check.yml	spec_check runs on a stock runner with only Python; design-systems.yml does the same for the harnesses with Node and Playwright
-0025-tooling-environment FR-012	none	-	no check scans tools for the environment's name
-0025-tooling-environment FR-013	check	eidolon: eid test	test_every_package_is_pinned, test_a_stale_lock_is_a_problem; the lock check runs in eid check
+0025-tooling-environment FR-002	check	.github: agora check toolchain	fails code that runs a program of the host or looks one up on PATH (only python3 and uv); a host program is used only through an AGORA_<ENTRY> override, which agora test covers
+0025-tooling-environment FR-003	none	-	each command, section, generator, runner and harness declares its toolchain entries in the registry and check toolchain fails a name that is not an entry; nothing compares the declaration with what the code runs
+0025-tooling-environment FR-004	check	.github: agora check toolchain	fails code that imports a network module outside the toolchain machinery, and any package-manager call; the toolchain machinery's fetch is covered by agora test
+0025-tooling-environment FR-005	none	-	a reference environment is optional; nothing tests that none is required; see FR-025
+0025-tooling-environment FR-006	none	-	the workflows run only the launcher on a runner given Python and uv (agora check toolchain), and a cold-cache run is the proof; no local check runs a command from a bare clone
+0025-tooling-environment FR-007	check	.github: agora check toolchain	fails a workflow step that installs with a package manager, a bootstrap or installer in code, and a package-manager call from a command; agora check commands fails a script outside tools/agora/ and the design systems
+0025-tooling-environment FR-008	check	.github: agora test	tests: no repository file pins a reference environment, and agora has no command, section or resource for one
+0025-tooling-environment FR-009	none	-	a pin move is a review judgment of the change; fresh then proves what it affects once the toolchain exists
+0025-tooling-environment FR-010	none	-	agora check commands fails a workflow that does not call ./agora or calls another tool of the repository; nothing checks that every tool a change touches has a job whose paths cover it
+0025-tooling-environment FR-011	check	.github: agora check toolchain	fails a workflow step that installs a program, pulls an image or runs in a container, and one that sets up Node or another runtime; the one permitted sudo step is ./agora system add
+0025-tooling-environment FR-012	check	.github: agora check toolchain	fails code, messages and hints that name a reference environment; the register check's read of a workspace file is the open item of 0042 OQ-3
+0025-tooling-environment FR-013	none	-	agora has not yet moved to pyproject.toml and one uv.lock (0042 OQ-3); doctor will check hashes and the lock against pyproject.toml
 0026-workspaces FR-001	none	-	no check compares the flavor scheme with FR-001
-0026-workspaces FR-002	none	-	FR-010 runs only the image flavor
+0026-workspaces FR-002	none	-	agora check toolchain will fail a tool that depends on a workspace (0042 FR-013); the stock-runner jobs prove it once moved
 0026-workspaces FR-003	none	-	no check
-0026-workspaces FR-004	check	.github: python3 tools/spec_check.py	the devcontainer's image tag matches the pin; which image a repository needs is not checked
-0026-workspaces FR-005	none	-	no check reads ws-repos.json
-0026-workspaces FR-006	none	-	no check reads devcontainer.json
-0026-workspaces FR-007	none	-	the first-run command will gate clones on a login; it does not exist yet
-0026-workspaces FR-008	none	-	no check reads devcontainer.json
+0026-workspaces FR-007	none	-	workspaces-host will gate clones on a login; no check here
+0026-workspaces FR-008	none	-	no check; workspaces-host tests workspace advance
 0026-workspaces FR-009	none	-	documentation judgment
-0026-workspaces FR-010	none	-	no check reads the README
-0026-workspaces FR-011	none	-	documentation judgment
-0026-workspaces FR-012	none	-	no check inspects the image manifest
-0026-workspaces FR-013	none	-	no check
-0026-workspaces FR-014	none	-	no check
-0026-workspaces FR-015	none	-	no check; verified by hand with the devcontainer CLI, where ws-repos ensure pulls the linked checkout and clones only the rest
+0026-workspaces FR-015	none	-	no check; workspaces-host tests the layout
+0026-workspaces FR-016	none	-	no check reads .workspaces-host/ws-host.env; the file is optional (0025 FR-025)
+0026-workspaces FR-017	none	-	no check reads .workspaces-host/ws-host.env
+0026-workspaces FR-018	none	-	no check; agora check toolchain will fail a tool that reads a workspace file (0042 FR-013)
+0026-workspaces FR-019	none	-	no check; workspaces-host tests that unpushed work survives repo advance
+0026-workspaces FR-020	none	-	no check
+0026-workspaces FR-021	none	-	no check; workspaces-host tests that cloning trusts nothing
+0026-workspaces FR-022	none	-	no check; workspaces-host tests that trust is never transitive
+0026-workspaces FR-023	none	-	no check; workspaces-host tests the link and the recorded commit
+0026-workspaces FR-024	none	-	no check; workspaces-host tests that it writes nothing into a clone
 0027-course-works FR-001	none	-	whether a work teaches at length is judgment
 0027-course-works FR-002	check	eidolon: eid check works	works.py fails a course package without course/course.adoc
 0027-course-works FR-003	check	eidolon: eid check works	works.py fails a course package without course-bible.md
@@ -795,8 +799,8 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0028-compliance-controls FR-002	none	-	whether a publisher holds copyright in a control's text is judgment; the catalog's dcterms:source is checked with FR-001
 0028-compliance-controls FR-003	check	eidolon: eid check compliance	exactly one revision reference per catalog, re-verified at least yearly; overdue ones are in the status report
 0028-compliance-controls FR-004	check	eidolon: eid check compliance	a collection is part of one catalog and selects only that catalog's controls
-0028-compliance-controls FR-005	check	.github: python3 tools/spec_check.py	each control map row's shape, requirement, and control; the vault's map through eid check specs
-0028-compliance-controls FR-006	check	.github: python3 tools/spec_check.py	a row naming a missing requirement or control fails; whether the rule truly addresses the control is judgment
+0028-compliance-controls FR-005	check	.github: agora check controls	each control map row's shape, requirement, and control; the vault's map through eid check specs
+0028-compliance-controls FR-006	check	.github: agora check controls	a row naming a missing requirement or control fails; whether the rule truly addresses the control is judgment
 0028-compliance-controls FR-007	check	eidolon: eid compliance status	gaps per boundary, weekly (compliance workflow)
 0028-compliance-controls FR-008	check	eidolon: eid compliance status	controls whose every mapped requirement is enforced by none
 0028-compliance-controls FR-009	check	eidolon: eid check compliance	one provider, a baseline of catalogs or collections, and an audience on each boundary
@@ -918,18 +922,165 @@ frontiers-signage-print FR-013	check	.github: tools/run_assurance.sh	run_assuran
 0040-security-program-policy FR-005	none	-	publication to the people bound is not observed (0030 OQ-2)
 0040-security-program-policy FR-006	none	-	where commitments are published is 0040 OQ-2
 0040-security-program-policy FR-007	check	eidolon: eid compliance status	an assessment no longer current is reported; whether one exists is judgment
-0041-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
-0041-public-website FR-002	none	-	repository topology; no check
-0041-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
-0041-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
-0041-public-website FR-005	review	0041-public-website FR-005	what the home page leads with is editorial judgment
-0041-public-website FR-006	check	eidolon: eid site check	every section index and item page exists
-0041-public-website FR-007	check	eidolon: eid site check	the toolbox lists every Public skill and every interactive tool answers at its address
-0041-public-website FR-008	check	eidolon: eid site check	every image is a book cover, from the imagery pool, or the home picture
-0041-public-website FR-009	none	-	no check that a reference is not a copy
-0041-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
-0041-public-website FR-011	check	eidolon: eid site check	every patent address and patent redirect from the snapshot answers
-0041-public-website FR-012	check	eidolon: eid site check	the namespace files, their content types and the not-found page exist
-0041-public-website FR-013	none	-	eid site snapshot writes the snapshot; no check of a hand edit
-0041-public-website FR-014	check	eidolon: eid site parity	lists every previous sitemap address neither served nor redirected
-0041-public-website FR-015	check	eidolon: eid site check	every page carries the one analytics container
+0041-command-line FR-001	check	.github: agora test	the launcher is POSIX sh, executable, and runs from any directory in the clone; agora check commands checks its form
+0041-command-line FR-002	none	-	agora still plans from per-group manifests (0042 OQ-3); the plan from pyproject.toml groups is not checked
+0041-command-line FR-003	none	-	agora still keeps per-group locks (0042 OQ-3); doctor does not yet check uv.lock against pyproject.toml
+0041-command-line FR-004	check	.github: agora test	tests run lock and a cold-cache plan offline, by flag and by environment, the launcher offline, and the toolchain cache offline (cold and warm)
+0041-command-line FR-005	check	.github: agora test	tests parse every core, lib and group module's imports and run the core with no site-packages
+0041-command-line FR-006	check	.github: agora test	tests: no group declares a host program, a toolchain entry that cannot be had is exit 3 naming it and the AGORA_<ENTRY> override, and a hint names only an entry or package
+0041-command-line FR-007	none	-	agora still loads its registry from manifests (0042 OQ-3); the registry in code is not checked
+0041-command-line FR-008	check	.github: agora check commands	the registry's grammar: a command is noun and verb from the fixed set, or one of the closed set
+0041-command-line FR-009	none	-	verb meanings are a review judgment of each command; no check
+0041-command-line FR-010	check	.github: agora check commands	the registry rejects a noun-less command outside the closed set and any noun check command
+0041-command-line FR-011	check	.github: agora check commands	the registry accepts only the mcp control word as a second word outside the verbs, and no ui command
+0041-command-line FR-012	check	.github: agora test	tests compare command list and show with the registry, and completion with it
+0041-command-line FR-013	check	.github: agora test	tests run every type's validation, completion and error, and the input schemas generated from them
+0041-command-line FR-014	check	.github: agora check commands	the registry requires exactly one category from the seven for every command
+0041-command-line FR-015	check	.github: agora test	tests check every write command takes --dry-run, that a dry run leaves a clone's tree unchanged and carries the whole unified diff for each file; the editor's diff of it is tested by agora check extension (0043 FR-014)
+0041-command-line FR-016	check	.github: agora test	tests run every command that takes no required argument and check its resource
+0041-command-line FR-017	check	.github: agora test	tests generate links' and actions' command lines from their calls
+0041-command-line FR-018	check	.github: agora test	tests compare the three renderings of resources
+0041-command-line FR-019	check	.github: agora test	tests check the JSON document's fields, its schema name and NDJSON streams
+0041-command-line FR-020	check	.github: agora test	tests check error resources in all three renderings, an unexpected exception, and --debug
+0041-command-line FR-021	check	.github: agora test	tests check exit statuses 0, 1, 2 and 3
+0041-command-line FR-022	check	.github: agora test	tests check the default surfaces by category, and that the MCP server lists exactly the commands that declare mcp and are not decisions
+0041-command-line FR-023	check	.github: agora test	tests call every decision command over MCP, over pipes and in process, and require refusal and no write; they declare a decision on mcp and show the server still refuses; agora check commands rejects the declaration
+0041-command-line FR-024	check	.github: agora test	tests run the same commands through the terminal and the MCP server and compare the resources they return
+0041-command-line FR-027	check	.github: agora test	tests drive the server over pipes: initialize, tools/list with schemas from the typed arguments, tools/call of a read, of a write that defaults to a dry run and of a decision, resources, error resources, notifications, and that standard output holds only protocol
+0041-command-line FR-028	check	.github: agora test	tests run an isolated section in its own worker; agora doctor fails a plan needing two locks in one process
+0041-command-line FR-029	none	-	agora doctor does not yet report toolchain entries, overrides or browser libraries, nor check module-level imports or uv.lock (0042 OQ-3)
+0041-command-line FR-030	none	-	agora lock still writes per-group locks (0042 OQ-3); not checked against uv.lock
+0041-command-line FR-031	check	.github: agora test	tests run sections, suites, scope and options; agora check commands compares suites with their sections
+0041-command-line FR-032	check	.github: agora test	tests run --changed against a fixture clone (modified, staged, untracked, --since) and, over every section and generator, that each declares watched paths that match files and that a change runs exactly those whose paths it touches; agora check commands fails a section or generator with none
+0041-command-line FR-033	check	.github: agora test	tests check that a skipped section never passes, that a suite naming no section ran nothing and fails, and that a missing program fails the run
+0041-command-line FR-034	check	.github: agora test	the runner's report is read by tests: a run that ran no test, or any failing one, fails
+0041-command-line FR-035	check	.github: agora fresh	each generator declares its sources, outputs and rewriting command, and fresh proves the tracked files equal what it writes, so a hand edit fails; tests check the declarations and that each brand generator's files carry a header naming it
+0041-command-line FR-036	check	.github: agora test	tests run fresh against a fixture clone: current, a hand-edited file, a missing file, an unwritten file, a missing program (exit 3) and a generator in a locked group, and check it writes nothing
+0041-command-line FR-037	check	.github: agora fresh	the agent-skill generator writes .claude/skills/agora/SKILL.md from the registry and fresh proves it current; tests check it lists exactly the registry's commands, categories and surfaces and says a decision is for a person
+0041-command-line FR-038	check	.github: agora test	tests run context for every kind that has a provider (spec, requirement, design system, brand, term, command, proposal): the same parts in the same shape, deterministic, bounded, and saying what it left out
+0041-command-line FR-039	check	.github: agora test	tests run proposal new, list, show and advance in a fixture clone: validation as the command would, a dry run first, replay, accepted, a failing dry run leaving it open, and no commit; agora check commands fails a malformed proposal
+0041-command-line FR-040	check	.github: agora test	tests check the audience stamp, unstated under --root, and a write refusing --root
+0041-command-line FR-041	check	.github: agora test	tests run every write command in a fixture clone and check Git's HEAD, index and tags are untouched
+0041-command-line FR-042	check	.github: agora test	tests check the log lines, a value kept out of them, that a read and an MCP resource read are not logged while a write, a check, a refused decision and an MCP call that runs something are, and that the directory is ignored; the editor surface from IF_CONSOLE is not yet tested (0043 FR-017)
+0041-command-line FR-043	none	-	that no command calls an AI model or service is a review judgment of each command; no check
+0041-command-line FR-044	none	-	a rule about what is not built; no check
+0041-command-line FR-045	check	.github: agora check commands	agora's launcher, code, manifests and its two specs are scanned for the names of the other repositories the register lists
+0041-command-line FR-046	none	-	no check sorts an orchestrator's configuration into behavior and information; workspaces-host will test its own
+0041-command-line FR-047	none	-	no check; workspaces-host tests its environment-file parser
+0041-command-line FR-048	none	-	no check; workspaces-host tests that it reads no other orchestrator's files
+0041-command-line FR-049	none	-	no check scans an orchestrator for YAML or a format it does not own
+0041-command-line FR-050	check	.github: agora check extension	the extension's own tests (node test runner, a stand-in VS Code API, a fake launcher) cover what it runs, shows and never does (0043 FR-028)
+0041-command-line FR-051	check	.github: agora check extension	tests check that a decision runs only after the dry run, the diff and a modal confirmation, that a forged tree node runs nothing and that the extension exports no API
+0041-command-line FR-052	check	.github: agora check extension	tests check that no launcher runs in an untrusted workspace and the manifest declares no untrusted-workspace support
+0041-command-line FR-053	check	.github: agora check extension	tests check that a newer schema is never shown and an update is offered
+0041-command-line FR-054	none	-	no check of a text rendering's first line; workspaces-host will test its own
+0041-command-line FR-055	none	-	no check of displayed commands; workspaces-host will test its own
+0041-command-line FR-056	none	-	no check; workspaces-host tests that a skipped repository is reported with its reason
+0041-command-line FR-057	none	-	no check; workspaces-host tests its help report
+0041-command-line FR-058	none	-	retired: a program comes from a package or a toolchain entry (FR-066)
+0041-command-line FR-059	none	-	retired: the only fetch is a toolchain entry into the cache
+0041-command-line FR-060	none	-	retired: doctor prints each entry's and package's version (FR-029)
+0041-command-line FR-061	check	.github: agora check extension	tests check that a launcher runs only in a trusted workspace; trust here is VS Code's own per-folder trust (0043 FR-006); a recorded per-repository trust is an environment orchestrator's
+0041-command-line FR-062	check	.github: agora check extension	tests check that reading .if-console.env needs no trust and that only the declaring launcher runs
+0041-command-line FR-063	none	-	no check; workspaces-host tests that unpushed work survives an update and that a skipped repository exits 0
+0041-command-line FR-064	check	.github: agora test	tests check command list and show, the typed arguments' choices, actions (cli null and needs where a value is needed), links and check data; agora check extension reads them from the real launcher
+0041-command-line FR-065	none	-	agora provides no help command (it is a MAY); the extension runs an orchestrator's help like any read command and its actions as buttons, tested with a fake launcher
+0042-agora FR-001	none	-	agora still declares its name, audience, groups and suites in manifests (OQ-3); the move to code is not checked
+0042-agora FR-002	check	.github: agora check commands	the launcher's and manifest's name is checked; the choice is a decision
+0042-agora FR-003	check	.github: agora check commands	agora's files are scanned for the names of the other repositories the register lists; the audience stamp is tested
+0042-agora FR-004	check	.github: agora check commands	the registry and the ontology's command individuals are compared by words, noun, verb and category
+0042-agora FR-005	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included
+0042-agora FR-006	check	.github: agora check commands	the registry and the ontology's command individuals are compared, categories included; the guide's generated command reference is proved current by fresh and names every noun
+0042-agora FR-007	check	.github: agora check commands	the decision commands are exactly the three named and none is declared on MCP
+0042-agora FR-008	none	-	agora test validates the typed arguments it has; ENTRY replaces VERSION when the toolchain moves in (OQ-3)
+0042-agora FR-009	check	.github: agora test	tests run design-system new against a fixture clone: refused without the spec, without the ontology entry, for a kind that is not the entry's; scaffolding, --dry-run and no overwrite
+0042-agora FR-010	check	.github: agora test	tests check spec new writes only a spec and requirement set and add only the register and the control map
+0042-agora FR-011	check	.github: agora test	tests: the registry has no environment noun, command, section or resource, and no tools/reference-environment file exists
+0042-agora FR-012	check	.github: agora test	tests check ink record writes the name to the brand's tokens.json and keeps it out of the log, and that no other command takes a person's name
+0042-agora FR-013	check	.github: agora check commands	agora check commands compares the section list with 0042 and checks the README's link to the guide; check help and the extension runners are tested by agora test
+0042-agora FR-014	check	.github: agora check commands	agora check commands compares the suites with 0042, the spec suite including help and the extension and vscode suites
+0042-agora FR-015	check	.github: agora fresh	fresh proves brand-theme, brand-specimen, brand-imagery, brand-decoration, openedx-sources, print-layout-docs, profile-figure, agent-skill and reference-docs, naming the command that rewrites each
+0042-agora FR-016	check	.github: agora check commands	check commands fails a script outside design-systems/ and tools/agora/, a workflow that calls another tool, and any file that refers to a script agora replaced; tools/if-console/ is not yet allowed by it
+0042-agora FR-017	check	.github: agora check design-systems	agora check design-systems runs each harness as a subprocess of its own command line, without agora's environment, so a harness that needs agora fails; that its scripts stay in design-systems/<slug>/ is a review
+0042-agora FR-018	none	-	doctor reports python3, uv, each lock, each toolchain entry's cache state for the platform and every override with a hint naming an entry; agora still keeps per-group locks (OQ-3)
+0042-agora FR-019	none	-	the editor views are not declared yet (OQ-3)
+0042-agora FR-020	check	.github: agora test	tests drive agora mcp serve over pipes and in process: the tool list is exactly the commands that declare mcp and are not decisions, a write defaults to a dry run, a decision is refused with decision-refused and proposal new as the next action, resources and templates are readable by URI, protocol revisions are negotiated, and standard output holds only protocol
+0042-agora FR-021	check	.github: agora test	tests check the log lines of the terminal and of the MCP server (surface mcp), the value kept out of them, that reads are not logged, and that .gitignore lists the log directory; proposals are tracked files, checked by agora check commands
+0042-agora FR-022	check	.github: agora check toolchain	agora check toolchain and agora check commands enforce the workflow rules, with pages.yml's three GitHub actions allowed and nothing else installed; design-systems.yml runs the launcher, the caches and ./agora system add
+0042-agora FR-028	check	.github: agora fresh	fresh proves the agent skill current and names agora skill generate when it is not; tests check it is written from the registry alone, deterministic, and lists every command, noun, section and generator
+0042-agora FR-029	check	.github: agora test	tests run proposal new, list, show and advance: the file's fields and id, validation, refusal of a command that is not record, generate or decision and of a proposal command, the dry run shown first, a failing dry run leaving the proposal open, and agora check commands failing a malformed one
+0025-tooling-environment FR-014	check	.github: agora check toolchain	fails code that looks for any host program other than python3 and uv on PATH; documentation is a judgment of each README; doctor reports python3 and uv and a missing one exits 3
+0025-tooling-environment FR-015	check	.github: agora check toolchain	fails an entry that is not declared in tools/agora/toolchain, a package.json that does not pin exactly the declared packages, and a package-lock.json package without a version and an integrity hash
+0025-tooling-environment FR-016	check	.github: agora check toolchain	fails an entry with no version, summary, provided program or functional check, an address that is not https or floats, a checksum that is not a SHA-256, a range or floating version, or a need that is not an entry; agora toolchain add runs each check
+0025-tooling-environment FR-017	check	.github: agora test	tests fetch an entry from a local archive, verify the checksum before unpacking, unpack into a directory named for entry, version and platform, leave nothing after an interrupted or mismatched fetch, refuse a member that leaves the directory, and name entry, address and both checksums
+0025-tooling-environment FR-018	check	.github: agora test	tests run offline with a cold cache (exit 3 naming each entry, its version, the platform and agora toolchain add) and with a warm one (no download), by flag and by AGORA_OFFLINE
+0025-tooling-environment FR-019	check	.github: agora test	tests: a host program is never used without AGORA_<ENTRY>; an override is said by the harness, listed by doctor, and fresh does not call a generator current under one
+0025-tooling-environment FR-020	check	.github: agora check toolchain	fails an entry without linux-x86_64 or with an unknown platform; agora test covers exit 3 naming the entry, the platform and the override for a platform with no build
+0025-tooling-environment FR-021	check	.github: agora test	tests: system list and system add print exactly the apt commands (t64 names where they apply), --dry-run runs nothing, sudo is asked for and refused without a terminal or --yes, another family names the libraries, it is refused over MCP, no other code runs sudo, and a command that needs the browser fails naming each library and agora system add
+0025-tooling-environment FR-022	check	.github: agora check toolchain	fails a workflow step that installs a program, library or browser, fetches one outside the launcher, or runs in an image; ./agora system add is the one allowed sudo step
+0025-tooling-environment FR-023	none	-	a cache is an optimization; design-systems.yml restores the toolchain cache keyed on the entries and the npm lock, and a cold-cache run passes (verified by hand, not by a check)
+0025-tooling-environment FR-024	none	-	documentation judgment of each README
+0025-tooling-environment FR-025	none	-	check toolchain fails code that names a reference environment; agora register still reads .devcontainer/ws-repos.json, which 0042 OQ-3 records
+0025-tooling-environment FR-026	none	-	agora fresh proves generated files on one host; nothing compares two hosts
+0025-tooling-environment FR-027	check	.github: agora test	tests check that toolchain show and add return path, env, provides, version and state; that another repository uses them is checked in that repository
+0025-tooling-environment FR-028	check	.github: agora test	tests check that toolchain list returns the pinned packages and the node version
+0025-tooling-environment FR-029	none	-	the comparison runs in the repository that builds on this one; this repository has no such consumer to check
+0041-command-line FR-066	check	.github: agora check toolchain	fails an entry declared outside tools/agora/toolchain, a command, section, generator, runner or harness that names an entry that does not exist; doctor and the plan are computed from the registry
+0041-command-line FR-067	check	.github: agora test	tests drive toolchain list, show and add (fetch, check, dry-run, offline refusal, failing check); agora check commands compares them with the ontology
+0041-command-line FR-068	check	.github: agora check toolchain	fails an entry whose fields are incomplete, whose address is not https, whose version is a range or floating tag, or that lacks linux-x86_64; that a change of an entry is a commit of its own is a review judgment
+0041-command-line FR-069	check	.github: agora test	tests drive system list and add with a stand-in sudo: the exact commands, --dry-run, the question, --yes, another family, refusal over MCP and no surface but the terminal
+0042-agora FR-030	check	.github: agora test	tests prove each package replacement (test_packages, the harness and command tests), the toolchain entries and their declarations (test_toolchain) and fresh proves the files they write; the browser and print harnesses ran from an empty cache (verified by hand)
+0042-agora FR-031	check	.github: agora check extension	agora lists its commands to the editor by command list; the extension's real-launcher tests drive them; agora declares no editor views yet (OQ-3)
+0042-agora FR-032	check	.github: agora check commands	.if-console.env must name ./agora (agora check commands); agora extension build is tested by agora test and run by hand
+0042-agora FR-033	check	.github: agora check help	the help section fails a topic with no summary or sections, a step whose command is not in the registry or whose fields it does not take, and a named command, topic or path that does not exist; tests drive help and the section
+0042-agora FR-034	check	.github: agora fresh	fresh proves reference-docs current and names docs generate; tests drive docs generate and docs build (the editions, the link check, a missing converter)
+0042-agora FR-035	check	.github: agora check commands	agora check commands checks docs/index.html uses only the brand's own assets and pages.yml calls ./agora docs build; the Pages deployment itself is the owner's setting and cannot be checked here
+0042-agora FR-036	check	.github: agora check commands	agora check commands fails a README without the link to the guide, the one-time system add and help, or over 120 lines
+0043-if-console FR-001	check	.github: agora check extension	the manifest is read: id, display name, prefixes, no API export
+0043-if-console FR-002	check	.github: agora check extension	the lint refuses another repository's or orchestrator's name in tools/if-console/; agora check commands allows the directory (0042 FR-016); public-only is otherwise a review
+0043-if-console FR-003	check	.github: agora check extension	tests check that child_process is used in one place, only to spawn a launcher with --json or --html
+0043-if-console FR-004	check	.github: agora check extension	discovery tests: declaration, rejected names, person-only setting
+0043-if-console FR-005	check	.github: agora check extension	handshake tests with a fake and the real launcher
+0043-if-console FR-006	check	.github: agora check extension	trust tests: nothing runs untrusted; the reason and the trust action are shown
+0043-if-console FR-007	check	.github: agora check extension	tests with two folders whose launchers share a name
+0043-if-console FR-008	check	.github: agora check extension	tree tests: nouns, commands, resources, links, actions, disabled with reason
+0043-if-console FR-009	check	.github: agora check extension	diagnostics tests: file:line, severity, source, cleared per section, unplaced findings in the output
+0043-if-console FR-010	check	.github: agora check extension	task provider and Test Controller tests; a skipped section is skipped, never passed
+0043-if-console FR-011	check	.github: agora check extension	webview tests: policy, link classification, one own script
+0043-if-console FR-012	check	.github: agora check extension	palette tests: only editor commands, grouped by repository and noun; the real VS Code run lists the manifest's palette entries
+0043-if-console FR-013	check	.github: agora check extension	form tests: choices from the type or the noun's list, retry on a refused value, the whole line before running
+0043-if-console FR-014	check	.github: agora check extension	executor and diff tests: dry run first, diff from a virtual document, apply only on acceptance, failed dry run stops
+0043-if-console FR-015	check	.github: agora check extension	tests: modal required, exactly true, forged nodes ignored, no API export, no decision in the manifest's tasks or keys
+0043-if-console FR-016	check	.github: agora check extension	status bar tests: orchestrator, audience as stated, state from doctor
+0043-if-console FR-017	check	.github: agora check extension	launcher tests: the one-line command, exit status, stderr, stream lines, IF_CONSOLE=1, no stdout contents
+0043-if-console FR-018	check	.github: agora check extension	tests: Copy Context and the help report remove secrets and send nothing
+0043-if-console FR-019	check	.github: agora check extension	Chores tests: derived from categories and the launcher's own resources
+0043-if-console FR-020	check	.github: agora check extension	launcher tests: stream progress and cancel end the process
+0043-if-console FR-021	check	.github: agora check extension	tests: a newer schema is not shown and an update is offered
+0043-if-console FR-022	check	.github: agora check extension	MCP tests: registered for a trusted repository with mcp serve; absent API said in the output
+0043-if-console FR-023	check	.github: agora check extension	tests scan the code for network and telemetry and watch a whole session for connections
+0043-if-console FR-024	check	.github: agora check extension	manifest tests: only the two settings, application scope; checkOnSave test
+0043-if-console FR-025	none	-	plain language is a review of each message; theme icons and accessibility labels are set in the code and not tested for reading
+0043-if-console FR-026	check	.github: agora check extension	tests scan the code for any write and a session leaves the clone unchanged
+0043-if-console FR-027	check	.github: agora check toolchain	the lock of tools/if-console is checked (hashes, exact pins, no runtime dependency); agora extension build is tested by agora test
+0043-if-console FR-028	check	.github: agora check extension	agora check extension runs the unit tests under node (the node runner), the real VS Code tests (the vscode runner) and the lint
+0043-if-console FR-029	none	-	no check; installation is a person's act
+0043-if-console FR-030	check	.github: agora check extension	the manifest's engine is checked; the features that need a newer VS Code are feature-detected and tested (MCP)
+0043-if-console FR-031	check	.github: agora check extension	Learn tests with the stand-in, and the real VS Code run lists a repository's help topics
+0043-if-console FR-032	check	.github: agora check extension	agora check extension --runner vscode runs the tests of tools/if-console/test/vscode/ in a real VS Code under Xvfb; a run that cannot start is skipped naming the cause
+0043-if-console FR-033	check	.github: agora check extension	unit tests: the hook exists only in test mode and answers once; the real VS Code run answers a decision modal through it, and the never-tests scan the source for any other path
+0044-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
+0044-public-website FR-002	none	-	repository topology; no check
+0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
+0044-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
+0044-public-website FR-005	review	0044-public-website FR-005	what the home page leads with is editorial judgment
+0044-public-website FR-006	check	eidolon: eid check site	every section index and item page exists
+0044-public-website FR-007	check	eidolon: eid check site	the toolbox lists every Public skill and every interactive tool answers at its address
+0044-public-website FR-008	check	eidolon: eid check site	every image is a book cover, from the imagery pool, or the home picture
+0044-public-website FR-009	none	-	no check that a reference is not a copy
+0044-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
+0044-public-website FR-011	check	eidolon: eid check site	every patent address and patent redirect from the snapshot answers
+0044-public-website FR-012	check	eidolon: eid check site	the namespace files, their content types and the not-found page exist
+0044-public-website FR-013	none	-	eid site generate writes the snapshot; no check of a hand edit
+0044-public-website FR-014	check	eidolon: eid site status	lists every previous sitemap address neither served nor redirected
+0044-public-website FR-015	check	eidolon: eid check site	every page carries the one analytics container

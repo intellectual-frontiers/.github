@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """frontiers-signage-print's assurance harness (spec FR-013): formats.json holds together; under every brand here,
-every tone's text meets 4.5:1, every job in fixtures/pass/ passes signage.py check and (where rsvg-convert and
-poppler are installed) renders to a one-page PDF of its trim plus bleed with only the sans embedded; every job in
+every tone's text meets 4.5:1, every job in fixtures/pass/ passes signage.py check and (where reportlab and pypdf
+are installed) renders to a one-page PDF of its trim plus bleed with only the sans embedded; every job in
 fixtures/fail/ is refused for the reason fixtures/expected.json names; and the ontology registers this design system.
 
     python3 assurance/run.py
 
-Needs Pillow; rendering needs rsvg-convert, pdfinfo and pdffonts.
+Needs the Python package Pillow; rendering also needs fonttools, reportlab and pypdf
+(`pip install Pillow fonttools reportlab pypdf`).
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
-import shutil
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -37,6 +37,22 @@ class Result:
             self.failed.append(what)
 
 
+def pdf_facts(path: Path) -> tuple[int, tuple[float, float], list[tuple[str, bool]]]:
+    """A PDF's page count, its first page's size in points, and each font it uses as (BaseFont, embedded), read with pypdf."""
+    from pypdf import PdfReader
+    reader = PdfReader(str(path))
+    page = reader.pages[0]
+    fonts: list[tuple[str, bool]] = []
+    for ref in (page["/Resources"].get("/Font") or {}).values():
+        font = ref.get_object()
+        base = str(font.get("/BaseFont", "")).lstrip("/")
+        face = font["/DescendantFonts"][0].get_object() if "/DescendantFonts" in font else font
+        desc = face.get("/FontDescriptor")
+        fonts.append((base, font.get("/Subtype") == "/Type3" or (desc is not None and any(
+            k in desc.get_object() for k in ("/FontFile", "/FontFile2", "/FontFile3")))))
+    return len(reader.pages), (float(page.mediabox.width), float(page.mediabox.height)), fonts
+
+
 def run_brand(brand: Path) -> Result:
     r = Result()
     tokens = signage._tokens(brand)
@@ -45,7 +61,7 @@ def run_brand(brand: Path) -> Result:
         for role in ("text", "kicker", "details"):
             c = signage.contrast(signage.color(roles[role], tokens), bg)
             r.check(c >= signage.DATA["min_contrast"], f"{tone}: {role} is {c:.2f}:1 under {brand.name} (FR-006)")
-    tools = all(shutil.which(t) for t in ("rsvg-convert", "pdfinfo", "pdffonts"))
+    tools = all(importlib.util.find_spec(m) for m in ("reportlab", "pypdf", "fontTools"))
     with tempfile.TemporaryDirectory() as tmp:
         for path in sorted((HERE / "fixtures" / "pass").glob("*.json")):
             job = json.loads(path.read_text(encoding="utf-8"))
@@ -54,15 +70,13 @@ def run_brand(brand: Path) -> Result:
             if tools:
                 out = Path(tmp) / f"{path.stem}.pdf"
                 signage.render(job, brand, out)
-                info = subprocess.run(["pdfinfo", str(out)], capture_output=True, text=True).stdout
+                pages, size, fonts = pdf_facts(out)
                 fmt = signage.FORMATS[job["format"]]
                 want = [fmt["trim"][0] + 2 * fmt["bleed"], fmt["trim"][1] + 2 * fmt["bleed"]]
-                size = [float(v) for v in re.search(r"Page size:\s+([\d.]+) x ([\d.]+)", info).groups()]
-                r.check(all(abs(a - b) < 0.6 for a, b in zip(size, want)), f"pass/{path.name} is {size}pt, not {want} (FR-004)")
-                r.check("Pages:           1" in info, f"pass/{path.name} is not one page (FR-004)")
-                fonts = subprocess.run(["pdffonts", str(out)], capture_output=True, text=True).stdout.splitlines()[2:]
-                names = {line.split()[0].split("+")[-1].split("-")[0] for line in fonts}
-                r.check(names <= {"Inter"} and all(" yes " in line for line in fonts), f"pass/{path.name} embeds {names} (FR-010)")
+                r.check(all(abs(a - b) < 0.6 for a, b in zip(size, want)), f"pass/{path.name} is {list(size)}pt, not {want} (FR-004)")
+                r.check(pages == 1, f"pass/{path.name} is not one page (FR-004)")
+                names = {base.split("+")[-1].split("-")[0] for base, _ in fonts}
+                r.check(names <= {"Inter"} and all(emb for _, emb in fonts), f"pass/{path.name} embeds {names} (FR-010)")
     covered = {json.loads(p.read_text(encoding="utf-8"))["format"] for p in (HERE / "fixtures" / "pass").glob("*.json")}
     r.check(covered == set(signage.FORMATS), f"fixtures/pass/ has no job for {sorted(set(signage.FORMATS) - covered)}")
     expected = json.loads((HERE / "fixtures" / "expected.json").read_text(encoding="utf-8"))
@@ -73,7 +87,7 @@ def run_brand(brand: Path) -> Result:
         want = expected.get(path.name, "")
         r.check(bool(want) and any(want in p for p in problems), f"fail/{path.name} under {brand.name} should be refused for {want!r}; it reported: {'; '.join(problems) or 'nothing'}")
     if not tools:
-        print("     · rsvg-convert or poppler is not installed; signs were checked, not rendered")
+        print("     · reportlab, fonttools or pypdf is not installed; signs were checked, not rendered")
     return r
 
 

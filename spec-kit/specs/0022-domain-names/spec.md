@@ -121,7 +121,7 @@ FR-016 through FR-025 to domain names.
   decision authority in effect.
 - **FR-019**: A reconciliation run under FR-018 MUST only report; it MUST
   NOT add, change, or remove a `DomainName` on its own. Acting on a report
-  follows FR-016 and FR-037 of 0001-eidolon-architecture.
+  follows 0001-eidolon-architecture FR-016 and FR-037.
 - **FR-020**: A domain name the decision authority has decided to let
   lapse MAY be left out of the catalog, despite FR-008, once that
   `Decision` is recorded under FR-016; the `Decision` itself MUST name

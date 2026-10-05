@@ -8,7 +8,7 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | --- | --- |
 | `patterns.json` | The banned words and phrases, hedges, stock openings and closings, announcement openings, wrap-up asides, plain-word swaps and limits the sweep checks. |
 | `terms.json` | The shared terms the house writes exactly as the ontology names them, each by its IRI, with the variants to avoid. |
-| `sweep.py` | The sweep: `python3 sweep.py FILE ...` over AsciiDoc, Markdown or text, `--mode procedure` for ASD-STE100 procedures, `--draft` to report without failing, `--patterns` and `--terms` to add a consumer's or a derived voice's own. Standard library only. |
+| `sweep.py` | The sweep: `python3 sweep.py FILE ...` over AsciiDoc, Markdown or text, `--mode procedure` for ASD-STE100 procedures, `--draft` to report without failing, `--patterns` and `--terms` to add a consumer's or a derived voice's own. Standard library only. In this repository: `agora check voice --scope PATH [--mode procedure] [--draft]`. |
 | `assurance/` | `python3 assurance/run.py`: the patterns and terms hold together, and fixture passages pass or are refused for the stated reason. |
 
 ## Using it

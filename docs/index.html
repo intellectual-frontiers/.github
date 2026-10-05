@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intellectual Frontiers Guide</title>
+<meta name="description" content="How the public root of Intellectual Frontiers works, and how to work in it with agora, its command line.">
+<link rel="icon" href="assets/favicon.png">
+<meta property="og:title" content="Intellectual Frontiers Guide">
+<meta property="og:image" content="assets/share-card.png">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  /* This page is the one hand-written page of the guide. Its colors and type are the brand's (assets/brand.css and its font). */
+  @font-face { font-family: "Inter"; src: url("assets/InterVariable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+  :root { --bg: var(--brand-surface, #fff); --text: var(--brand-text, #121820); --soft: #4b5563; --accent: var(--brand-primary, #214ea2);
+          --card: #f3f0e8; --border: #dfe3e8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121820; --text: #f3f0e8; --soft: #b9c0ca; --accent: #8fb0ee; --card: #1a222d; --border: #2b3544; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 0 16px 64px; }
+  header { padding: 32px 0 8px; }
+  header img { display: block; height: auto; max-width: 280px; width: 100%; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.15; letter-spacing: -0.02em; margin: 24px 0 12px; }
+  .lede { font-size: 1.15rem; color: var(--soft); max-width: 60ch; margin: 0 0 24px; }
+  .hero { display: block; width: 100%; height: auto; border-radius: 14px; margin: 8px 0 32px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 12px; }
+  .editions { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+  .editions a { display: block; height: 100%; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+                color: var(--text); text-decoration: none; }
+  .editions a:hover, .editions a:focus-visible { border-color: var(--accent); outline: none; }
+  .editions strong { display: block; color: var(--accent); font-size: 1.05rem; margin-bottom: 4px; }
+  .editions span { color: var(--soft); font-size: 0.93rem; }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 0.92rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  a { color: var(--accent); }
+  footer { margin-top: 48px; color: var(--soft); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.webp">
+      <img src="assets/logo.webp" alt="Intellectual Frontiers" width="672" height="189">
+    </picture>
+  </header>
+  <h1>The Intellectual Frontiers guide</h1>
+  <p class="lede">How the public root works, and how to work in it. One command line, <code>agora</code>, runs every check, build and record.
+    It needs only Python and <code>uv</code> on your machine.</p>
+  <img class="hero" src="assets/hero-small.webp" srcset="assets/hero-small.webp 724w, assets/hero.webp 1448w" sizes="(min-width: 960px) 928px, 100vw"
+       alt="A railway station on a mountain trestle: one of the approved frontier pictures of the brand" width="1448" height="1086">
+
+  <h2>Read it</h2>
+  <ul class="editions">
+    <li><a href="guide/index.html"><strong>The website</strong><span>One page per chapter, with the contents beside it.</span></a></li>
+    <li><a href="guide.html"><strong>One page</strong><span>The whole guide in a single page, to search or print.</span></a></li>
+    <li><a href="guide.pdf"><strong>PDF</strong><span>The same book, typeset, to keep or to print.</span></a></li>
+    <li><a href="guide.epub"><strong>EPUB</strong><span>The same book for an e-reader.</span></a></li>
+  </ul>
+
+  <h2>Start</h2>
+  <p>Install Python 3.11 or later and <a href="https://docs.astral.sh/uv/">uv</a>, clone the repository, and ask the command line to teach you.
+    The daily work is explained in one place, in the program, and in VS Code every step is a button.</p>
+<pre><code>./agora doctor
+./agora help start
+./agora check --suite spec</code></pre>
+
+  <footer>
+    <a href="https://github.com/intellectual-frontiers/.github">The repository</a>. The pictures are the brand's own, from
+    <code>design-systems/frontiers-brand/</code>; the reference chapters are generated from the code.
+  </footer>
+</main>
+</body>
+</html>

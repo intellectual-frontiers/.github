@@ -38,7 +38,7 @@ single ink, set by whoever orders the goods from the brand's ink roles (`tokens.
 
 The files go into `logos/vector/` beside the traced ones they replace, listed in `tokens.json`, and the brand's
 contract runs over them (`node assurance/run.mjs`): one-color files in `currentColor` with no raster, live text,
-gradient or filter; each one's finest detail is measured by `tools/brand_decoration.py measure`, and must meet the
+gradient or filter; each one's finest detail is measured by `agora decoration show`, and must meet the
 figures above. When they pass, FR-017 is amended to name the vector masters in place of the trace, and the
 merchandise and signage design systems pick them up with no change of their own.
 

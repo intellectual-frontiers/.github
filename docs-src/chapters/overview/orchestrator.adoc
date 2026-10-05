@@ -1,0 +1,61 @@
+[#orchestrator]
+== agora, the orchestrator
+
+`agora`, named for the public square, is this repository's one orchestrator. Every check, build and record runs through it, and CI calls
+nothing else. It reads nothing outside this repository. The name says what it is for, an orchestrator for what is public; it differs
+from any other orchestrator's name at a glance and by any one typo, and it reads well in a prompt (spec 0042, FR-002).
+
+=== One command line, three surfaces
+
+A command is `agora NOUN VERB [ID] [--options]`. <<reference-commands>> lists them all with their arguments, and `agora command show
+COMMAND` says the same from the registry. The command line is the core, and the only surface every command has. The other two run the same
+commands:
+
+* *IF Console*, the VS Code extension (<<vscode>>), shows the resources a command returns and runs their actions.
+* *MCP*, `agora mcp serve`, serves the commands that are not decisions to an AI agent over standard input and output. A write is a
+dry run unless the agent says otherwise.
+
+There is no web interface and agora runs no server.
+
+Every command returns a resource, and text, JSON and HTML are three views of it. `--json` gives the document an editor or an agent
+reads: its data, its links and its actions, each action with the command line that does it. A command that writes takes `--dry-run`
+and shows what it would change.
+
+=== Categories: what a command may do
+
+Each command has one category, and the category decides what it may do and where it is offered (<<reference-commands>> lists them).
+A *decision* command, which changes what only a person decides, is never offered over MCP, and the editor asks for it in a dialog. An
+agent that wants a decision made drafts a *proposal* instead, a tracked file in `.agora/proposals/` that a person reads and accepts with
+`agora proposal advance`. The help topic `ai` explains how.
+
+=== Git is the only record
+
+`agora` never commits or pushes and calls no AI model. What changes or runs something and is not worth a commit, such as a check, a
+build, a dry run or an MCP call, goes to untracked logs in `.agora/logs/`. Reads are not logged.
+
+=== Packages and the toolchain
+
+The launcher needs only `uv` and Python 3. Python packages come from hashed locks, one per command group, and programs outside Python
+come from Python packages in those locks wherever a wheel exists: Node, PDF readers, an SVG renderer, an image library, a tracer and
+Git's reads. So none of them is installed on the host, and a command's output never depends on one.
+
+What has no wheel is the *toolchain lock*, declared in `tools/agora/toolchain/` and listed in <<reference-toolchain>>: TeX, a
+browser, Java and AsciidoctorJ for this guide, VS Code for the extension's tests, and the npm packages that the browser harnesses
+and Paragon need. Each entry has a version, an address and a SHA-256 for each platform, and a small test. A command that needs one
+fetches it into a per-user cache the first time (`~/.cache/agora/toolchain`, or `AGORA_TOOLCHAIN_CACHE`), verifies the checksum before
+unpacking, and uses that copy, never one found on the host. `--offline` uses only the cache and fails naming the entry. A program of
+your own stands in for an entry only if you name it, with the entry's variable, and `fresh` will not call a generated file current
+while one stands in.
+
+The one thing a fetch cannot supply is the shared libraries a browser and VS Code link on Linux, and the display server VS Code's
+tests start under. They need administrator rights, so one command, `agora system add`, installs them. It prints exactly what it will
+run, asks before it uses `sudo`, and is the only command that does. It is never run by another command and never offered over MCP; a
+command that needs the libraries fails naming it. On Debian and Ubuntu the packages are pinned in the code; on another distribution it
+names the libraries and stops.
+
+=== Extending it
+
+Everything is extended with an AI, in Python, by adding a file. Spec first, then the ontology, then the code: a command in a group
+under `tools/agora/groups/`, a help topic in `tools/agora/help/`, a toolchain entry in `tools/agora/toolchain/`. The registry finds
+each by presence, and nothing else lists them. The help topic `extend` has the steps, and the four checks it names say whether the
+change is sound.

@@ -1,0 +1,23 @@
+/* The multi-page site's layout: the contents beside the page, above it on a phone. The content itself is html.css. */
+body.site { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100vh; }
+.site-nav { background: var(--code-bg); border-right: 1px solid var(--border); padding: 20px 18px 40px; position: sticky; top: 0; align-self: start;
+  max-height: 100vh; overflow-y: auto; font-size: 0.93em; }
+.site-nav .brand { display: block; margin-bottom: 14px; }
+.site-nav .brand img { display: block; height: auto; max-width: 168px; }
+.site-nav .part { margin: 16px 0 4px; text-transform: uppercase; letter-spacing: .04em; font-size: 0.78em; color: var(--text-soft); font-weight: 700; }
+.site-nav ul { list-style: none; margin: 0; padding: 0; }
+.site-nav li a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--text); }
+.site-nav li a:hover { background: var(--accent-soft); text-decoration: none; }
+.site-nav li a.current { background: var(--accent); color: var(--bg); }
+.site-main { padding: 24px 0 64px; min-width: 0; }
+.site-main #content { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+.site-main .pager { display: flex; justify-content: space-between; gap: 16px; max-width: 800px; margin: 40px auto 0; padding: 16px 24px 0; border-top: 1px solid var(--border); }
+.site-main .pager a { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; }
+.site-main .pager a:hover { border-color: var(--accent); background: var(--accent-soft); text-decoration: none; }
+.site-main footer { max-width: 800px; margin: 32px auto 0; padding: 0 24px; color: var(--text-soft); font-size: 0.88em; }
+.site-main img { max-width: 100%; height: auto; border-radius: 10px; }
+@media (max-width: 860px) {
+  body.site { display: block; }
+  .site-nav { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .site-nav details > summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+}

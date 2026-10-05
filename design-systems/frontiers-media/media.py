@@ -13,9 +13,10 @@ A job names its format (formats.json), its tone (light or dark) and its text:
 `title` is the asset's claim (the name, on a lower third), `kicker` a short line above it, `byline` a line below it
 (the role, on a lower third), and `imagery` a piece of the brand's imagery pool by id, `@first`, or left out.
 `render` lays the text out in the brand's sans (measured in fonts/), places the piece no larger than its master and
-the lockup no smaller than the brand's minimum, and renders the SVG to PNG with rsvg-convert through fonts/.
-`check` reports every rule a job breaks and exits non-zero on any. Needs Pillow (to measure) and rsvg-convert (to
-render); uses the house voice when it is beside this design system.
+the lockup no smaller than the brand's minimum, and renders the SVG to PNG with resvg through fonts/ alone (no font
+of the machine's). `check` reports every rule a job breaks and exits non-zero on any. Needs the Python packages Pillow
+(to measure) and resvg-py (to render): `pip install Pillow resvg-py`, or run it through `agora`, whose locked environment
+holds them. Uses the house voice when it is beside this design system.
 """
 from __future__ import annotations
 
@@ -24,10 +25,7 @@ import base64
 import html
 import importlib.util
 import json
-import os
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -105,7 +103,7 @@ def fit_title(text: str, fmt: dict, max_w: float) -> tuple[float, list[str]] | N
 
 
 def _data(path: Path) -> str:
-    """A file as a data URI: librsvg reads no file outside the SVG's own folder."""
+    """A file as a data URI, so the SVG stands alone."""
     kind = {".png": "png", ".webp": "webp", ".jpg": "jpeg", ".jpeg": "jpeg"}[path.suffix.lower()]
     return f"data:image/{kind};base64," + base64.b64encode(path.read_bytes()).decode()
 
@@ -210,16 +208,15 @@ def layout(job: dict, brand: Path) -> dict:
     return {"svg": svg, "boxes": boxes, "problems": problems, "px": px, "ink": ink, "margin": m, "size": (W, H)}
 
 
+def rasterize(svg: str) -> bytes:
+    """The SVG as PNG bytes at its own size, set in the fonts of fonts/ and no others (resvg-py)."""
+    import resvg_py
+    return bytes(resvg_py.svg_to_bytes(svg_string=svg, font_dirs=[str(FONTS)], skip_system_fonts=True))
+
+
 def render(job: dict, brand: Path, out: Path, svg_out: Path | None = None) -> dict:
     lay = layout(job, brand)
-    with tempfile.TemporaryDirectory() as tmp:
-        conf = Path(tmp) / "fonts.conf"
-        conf.write_text(f'<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><dir>{FONTS}</dir>'
-                        f"<cachedir>{tmp}/cache</cachedir></fontconfig>", encoding="utf-8")
-        src = Path(tmp) / "asset.svg"
-        src.write_text(lay["svg"], encoding="utf-8")
-        subprocess.run(["rsvg-convert", "--unlimited", "-o", str(out), str(src)], check=True,
-                       env={**os.environ, "FONTCONFIG_FILE": str(conf)})
+    out.write_bytes(rasterize(lay["svg"]))
     if svg_out:
         svg_out.write_text(lay["svg"], encoding="utf-8")
     return lay

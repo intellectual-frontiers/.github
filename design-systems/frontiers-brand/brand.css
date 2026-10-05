@@ -1,7 +1,7 @@
 /*
  * frontiers-brand's theme for the web (0014-design-systems FR-028, FR-037): every role in tokens.json under "role",
  * as a custom property, and nothing else. Load it before a web design system's stylesheets.
- * Written by tools/brand_theme.py from tokens.json; do not edit.
+ * Written by agora's brand-theme generator from tokens.json; do not edit: run `agora brand generate frontiers-brand`.
  */
 @layer theme {
   :root {

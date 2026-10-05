@@ -1,0 +1,7 @@
+name = "vcs"
+help = "Reads of Git's state, through the pinned dulwich package, for --changed; no command of its own"
+
+# dulwich reads the repository (status, and the tree of a commit) so that no `git` program is needed
+# (0042-agora FR-030). Apache-2.0 OR GPL-2.0-or-later; used under Apache-2.0.
+[packages]
+dulwich = "1.2.17"

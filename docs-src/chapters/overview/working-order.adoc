@@ -1,0 +1,63 @@
+[#working-order]
+== The working order
+
+Spec, then ontology, then everything else (spec 0001, FR-037). Do not build ahead of it. If you want to add something, ask which layer
+it is missing from.
+
+. *Spec.* Add or amend a spec first.
+. *Ontology.* Represent the new concept in `ontology/`.
+. *Implementation.* Only then write content, code, or process.
+
+=== Writing a spec
+
+The steps are in the help topic `specs`. The rules are these.
+
+* A spec is `spec-kit/specs/NNNN-slug/spec.md`; take the next unused number.
+* Follow spec 0020, the format: title, `Spec ID`, `Status`, `Input`, then requirements as `FR-NNN` (`MUST`, `MAY` or `MUST NOT`),
+then `Out of scope` (optional), `Edge cases`, `Assumptions`, `Open questions`, `Key entities`, `Success criteria` and the review
+checklist. Each edge case cites the requirement that resolves it; one that nothing resolves is an open question.
+* Never renumber or reuse a requirement number; a new one takes the next unused number in its spec.
+* Status is `Draft` (in force, open to amendment), `Adopted` (amended only by the decision authority or with its approval), or
+`Superseded by NNNN-slug`. Only the decision authority moves a spec between them, in a commit that says so.
+* Add a row to `spec-kit/enforcement.tsv` for every new `FR-NNN`: `check`, `gate`, `review` or `none`, and what does it. Record `none`
+honestly; the check lists every one on every run.
+* Cite other specs by ID and FR, for example "0001 FR-016". Do not restate their rules.
+* When a spec changes the meaning of an earlier one, amend the earlier spec in the same commit.
+* Decisions that need a record follow the pattern in spec 0008.
+
+The format is derived from https://github.com/github/spec-kit[GitHub Spec Kit]'s spec template, not a full use of Spec Kit. Specs here
+are standing rules rather than per-feature documents, so there is no `plan.md`, `tasks.md` or feature branch. The ontology plays the
+data model's part, open questions (`OQ-N`) replace inline clarification markers, and the enforcement register replaces Spec Kit's
+consistency analysis. Spec 0020 states each difference. A design system's house rules are a spec too, kept in its own directory and
+named by its slug rather than a number.
+
+=== Editing the ontology
+
+* Prefixes are `ifcore:` (core), `ifweb:` (web content shapes) and `ifpriv:` (private vault). Never a bare `if:`. In prose, branding
+and documentation the acronym is always *IF* (spec 0001, FR-006, FR-007).
+* Every fact declares its audience. An undeclared audience defaults to the most restrictive (FR-011, FR-012). In this repository,
+everything must be `ifcore:Public`.
+* Reuse established vocabulary (PROV, schema.org, SKOS, Dublin Core) before inventing a term, and cite the spec and FR that justifies
+each addition in its `rdfs:comment`.
+* Never redefine in the vault what this ontology declares.
+
+=== Facts and references
+
+* A fact has exactly one authoritative source. Everywhere else holds a reference, never a duplicate value (FR-019).
+* When the authoritative source is outside our control, a registry or a counterparty's record, use an `ExternalRecordReference` with
+its primary-source location and, if a cached value is held, its last-verified date, cadence and method (FR-022, FR-024). Overdue
+references default to the founder (FR-025).
+* A sensitive fact uses a `RestrictedDataReference`. It has no field that can hold the value, and never holds a credential (FR-021, FR-023).
+
+=== The sensitivity test
+
+Before committing any fact, apply FR-016. A fact is sensitive, and so may not appear as a literal here or in the vault, if it is (a) a
+third party's confidential information we are bound to protect, (b) personally identifying information about a real individual, (c)
+something whose wider internal visibility creates legal or security risk, or (d) a personal financial term of an individual inside the
+company. If unclear, treat it as sensitive (FR-018). This repository is public: nothing of any other classification may be asserted
+here, however it is labeled (FR-002).
+
+=== Content documents
+
+Pages under `content/` are single, strictly parsed HTML5 files carrying a JSON-LD block typed against the ontology, with an
+`ifcore:hasAudience` declaration (specs 0002 and 0013). `content/` is the only content root (spec 0004).
