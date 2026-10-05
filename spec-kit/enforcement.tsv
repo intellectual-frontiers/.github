@@ -1071,6 +1071,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-031	check	.github: agora check extension	Learn tests with the stand-in, and the real VS Code run lists a repository's help topics
 0043-if-console FR-032	check	.github: agora check extension	agora check extension --runner vscode runs the tests of tools/if-console/test/vscode/ in a real VS Code under Xvfb; a run that cannot start is skipped naming the cause
 0043-if-console FR-033	check	.github: agora check extension	unit tests: the hook exists only in test mode and answers once; the real VS Code run answers a decision modal through it, and the never-tests scan the source for any other path
+0043-if-console FR-034	check	.github: agora test	test_extension: extension test runs the suite it is given in a workspace of this clone and the folders named, fails on a failed test and exits 3 where the display server is missing
 0044-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
 0044-public-website FR-002	none	-	repository topology; no check
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents

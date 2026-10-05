@@ -10,7 +10,7 @@ description: Use agora, this repository's command line, to read its specs, requi
 
 ## How to call it
 
-- `agora <noun> <verb> [ID] [--options]`; the ID is the first word after the verb. Verbs: `list`, `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`, `new`, `advance`, `publish`, `serve`.
+- `agora <noun> <verb> [ID] [--options]`; the ID is the first word after the verb. Verbs: `list`, `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`, `new`, `advance`, `publish`, `serve`, `test`.
 - Repository-wide commands take no noun: `check`, `context`, `doctor`, `fresh`, `help`, `lock`, `test`.
 - `--json` on any command gives one JSON document `{schema, audience, kind, id, data, links, actions}`; `links` and `actions` say what to run next. A failure is a resource of kind `error` with a stable `code` and the actions to take next.
 - Exit status: 0 success; 1 it ran and what it checked failed; 2 usage or an invalid argument; 3 a missing package, program or offline prerequisite.
@@ -87,6 +87,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `doctor` | `check` | terminal, editor, mcp | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
 | `extension build` | `build` | terminal, editor, mcp | Build the IF Console extension's .vsix into build/ from tools/if-console/, with Node from the locked package and the extension's own lock | `agora extension build` |
+| `extension test` | `check` | terminal, editor, mcp | Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named | `agora extension test --suite TEXT [--workspace TEXT] [--report TEXT]` |
 | `figure build` | `build` | terminal, editor, mcp | Theme a figure's semantic SVG with a brand: its colors by role and its type in the brand's sans (frontiers-figures FR-004) | `agora figure build PATH [--brand BRAND] [--variant VARIANT] [--embed-fonts] [--out\|-o TEXT]` |
 | `figure generate` | `generate` | terminal, editor, mcp | Write the organization profile's figure: its semantic source and the themed default and on-dark images | `agora figure generate` |
 | `fresh` | `check` | terminal, editor, mcp | Prove every generator's tracked output current, writing nothing | `agora fresh [GENERATOR...] [--changed]` |
@@ -199,6 +200,10 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `extension build`
   - `--dry-run` (flag): validate, write nothing, show the change
+- `extension test`
+  - `--suite` (TEXT, required): the directory of the tests: an index.js that exports run(), as tools/if-console/test/vscode/suite does
+  - `--workspace` (TEXT): a folder to add to the workspace after this clone; repeatable, as NAME=PATH or PATH
+  - `--report` (TEXT): also write every test's name, status and seconds to this JSON file
 - `figure build`
   - `path` (PATH): the figure's SVG source
   - `--brand` (BRAND): the brand that themes it (frontiers-brand by default)
@@ -422,7 +427,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 54 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 55 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://term/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -446,6 +451,7 @@ A generated file carries a header naming its generator and must not be edited by
 | `doctor` | no |
 | `email_build` | yes, dry run by default |
 | `extension_build` | yes, dry run by default |
+| `extension_test` | no |
 | `figure_build` | yes, dry run by default |
 | `figure_generate` | yes, dry run by default |
 | `fresh` | no |
