@@ -105,7 +105,7 @@ Four commands say whether a change is sound. Run the first three before every pu
 
 ==== The quick checks
 
-The spec suite needs nothing but Python and uv. It checks the specs, the enforcement register, the controls, the ontology, the toolchain, the commands and the help topics.
+The spec suite needs nothing but ws-host. It checks the specs, the enforcement register, the controls, the ontology, the toolchain, the commands and the help topics.
 
 ----
 ./agora check --suite spec
@@ -138,14 +138,6 @@ The harnesses run in a real browser or in Python, once under every brand. `agora
 ./agora check --suite images
 ----
 
-==== If you changed the VS Code extension
-
-The TypeScript is type-checked and linted and its unit tests run on Node; the second suite runs the extension inside a real VS Code under a display server, which needs the one-time `agora help start` setup.
-
-----
-./agora check --suite extension
-----
-
 ==== How to read the result
 
 A finding names a file and a line, and says what to edit. A section that could not run says why and exits with 3: it is skipped, never passed. Exit 1 means something you checked failed; exit 2 means the command was used wrongly.
@@ -156,7 +148,6 @@ A finding names a file and a line, and says what to edit. A section that could n
 * Run agora's own tests: `agora test`
 * Prove the generated files are current: `agora fresh`
 * Run only what you changed: `agora check --changed`
-* Check the VS Code extension: `agora check --suite extension`
 
 [#help-design-systems]
 === design-systems
@@ -204,43 +195,33 @@ A harness must run on its own, by the means its README documents, without agora.
 [#help-editor]
 === editor
 
-_Working in VS Code with IF Console: install it, find your way, and learn by doing._
+_Working in VS Code with the Workspaces Console: install it, find your way, and learn by doing._
 
-IF Console is a VS Code extension that shows this command line in the editor: a tree of commands, findings in the Problems panel, a diff before anything is written, and a confirmation only you can give. It adds nothing a command does not do.
+The Workspaces Console is a VS Code extension that shows this command line in the editor: a tree of commands, findings in the Problems panel, a diff before anything is written, and a confirmation only you can give. It adds nothing a command does not do. ws-host houses it.
 
-==== Build and install it
+==== Install it
 
-Build the package, then in VS Code open the Extensions view, choose the three-dots menu, Install from VSIX, and pick the file in build/.
+ws-host installs it from its release when it sets up VS Code.
 
 ----
-./agora extension build
+ws-host vscode ensure
 ----
 
 ==== Trust
 
-VS Code asks whether you trust the folder. IF Console runs nothing until you do, because it runs this repository's own command line. That choice is VS Code's own and is yours.
+VS Code asks whether you trust the folder. The Console runs nothing until you do, because it runs this repository's own command line. That choice is VS Code's own and is yours.
 
 ==== Find your way
 
-Open the IF Console view in the activity bar. Home lists what needs you, each with the command line that fixes it and a Run button; the views below it (Specs, Design systems, Toolchain and the others this command line declares) list its resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the setting `if-console.showAllCommands`. The palette's IF Console commands run Check, Fresh, Test and Doctor, and Learn shows these topics in one panel, each step with its command line to copy and a Run button.
+Open the Workspaces Console view in the activity bar. Home lists what needs you, each with the command line that fixes it and a Run button; the views below it (Specs, Design systems and the others this command line declares) list its resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the setting `workspaces-console.showAllCommands`. The palette's Workspaces Console commands run Check, Fresh, Test and Doctor, and Learn shows these topics in one panel, each step with its command line to copy and a Run button.
 
 ==== Writes and decisions
 
 A command that writes shows what it would change in the resource panel first (each file can open as a diff), and runs only if you apply it. A decision asks in a dialog that names the command and what it changes.
 
-==== Check the extension itself
-
-The unit tests run on Node. The real VS Code tests start VS Code under a display server, so run the one-time setup in `agora help start` first.
-
-----
-./agora check extension
-----
-
 ==== Steps
 
-* Build the extension: `agora extension build`
-* Check the extension: `agora check extension`
-* Check it inside a real VS Code: `agora check --suite vscode`
+* See what is present: `agora doctor`
 
 [#help-extend]
 === extend
@@ -339,16 +320,16 @@ Nothing here loses your work. When something fails, read what it says first: it 
 
 ==== A program or library is missing
 
-Ensure the toolchain is in the cache and the system libraries are installed, once.
+Ensure the toolchain is installed and the system libraries are present, once.
 
 ----
-./agora toolchain ensure
-./agora system ensure --dry-run
+ws-host toolchain ensure --provider agora --all
+ws-host system ensure --dry-run
 ----
 
 ==== A download did not match its fingerprint
 
-agora deleted it and unpacked nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, something is wrong with the source, and the entry's pin should be looked at, not worked around.
+ws-host installed nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, something is wrong with the source, and the entry's pin should be looked at, not worked around.
 
 ==== A generated file is stale
 
@@ -379,8 +360,6 @@ What a command did is kept, untracked, under .agora/logs/, one line each, for yo
 
 * See what is wrong: `agora doctor`
 * Prove the generated files are current: `agora fresh`
-* Ensure the toolchain: `agora toolchain ensure`
-* List the system libraries and which are present: `agora system list`
 * Gather a report to paste: `agora context command:check`
 
 [#help-specs]
@@ -413,7 +392,7 @@ The register is spec-kit/enforcement.tsv. A requirement is enforced by a check, 
 
 ==== Find the ontology term a requirement needs
 
-The ontology comes second, after the spec. Search it by a word, a CURIE or a label before you add a term, so that an established one is reused; `show` gives a term's meaning, its relations, every statement about it and the requirements that already cite it. The IF Console shows the same in its Ontology view, with Search in its title.
+The ontology comes second, after the spec. Search it by a word, a CURIE or a label before you add a term, so that an established one is reused; `show` gives a term's meaning, its relations, every statement about it and the requirements that already cite it. The Workspaces Console shows the same in its Ontology view, with Search in its title.
 
 ----
 ./agora ontology list --match "design system"
@@ -446,48 +425,46 @@ Draft, Adopted and Superseded are a decision only a person makes. The command as
 
 _Your first day: what to install, what to run once, and how to look around._
 
-agora is this repository's one command line. It needs only Python and uv on your machine. Everything else it needs, it fetches itself, checks against a fixed fingerprint, and keeps in a cache that belongs to you.
+agora is this repository's one command line. It needs only ws-host on your machine. ws-host brings Python and uv, installs everything else agora needs, checks each program against a fixed fingerprint, and keeps one copy that belongs to you.
 
-==== 1. Install two things yourself
+==== 1. Install ws-host yourself
 
-Install Python 3.11 or later and uv (https://docs.astral.sh/uv/). Nothing else is needed from your machine, and agora never uses a program it finds there unless you tell it to by name.
+Install ws-host (https://github.com/intellectual-frontiers/workspaces-host) and follow its first-run steps. Nothing else is needed from your machine, and agora never uses a program it finds there.
 
-==== 2. See that it runs
+==== 2. Let ws-host run this clone
 
-From the root of your clone, ask agora how it finds your machine. It lists what is present and what is not, and fails only on a real problem.
+A repository cannot enable itself: you do it, once, from the root of your clone.
+
+----
+ws-host provider add .
+----
+
+==== 3. See that it runs
+
+Ask agora how it finds your machine. It lists what is present and what is not, and fails only on a real problem.
 
 ----
 ./agora doctor
 ----
 
-==== 3. Install the system libraries, once
+==== 4. Install the system libraries, once
 
-The browser and VS Code need a few shared libraries and a display server that only an administrator can install. One command does it, and it is the only command that uses sudo. It prints exactly what it will run and asks before it runs anything; with --dry-run it prints and stops.
-
-----
-./agora system ensure --dry-run
-./agora system ensure
-----
-
-
-On a distribution other than Debian or Ubuntu it names the libraries and stops, and you install them with your own package manager.
-
-==== 4. Fetch the programs, once
-
-agora keeps the programs outside Python in a toolchain: TeX, a browser, Java, VS Code and a few more, each at one exact version, checked against its fingerprint before it is used. This fetches all of them into your cache. If you skip it, each command fetches what it needs the first time. The files are large; they are fetched once.
+The browser needs a few shared libraries that only an administrator can install. ws-host does it, and it is the only command that uses sudo. It prints exactly what it will run and asks before it runs anything; with --dry-run it prints and stops.
 
 ----
-./agora toolchain ensure
+ws-host system ensure --dry-run
+ws-host system ensure
 ----
 
+==== 5. Fetch the programs, once
 
-To see what is there first:
+agora keeps the programs outside Python as a toolchain: TeX, a browser, Java, Node and a few more, each at one exact version, checked against its fingerprint before it is used. Each command has ws-host install what it needs the first time; to fetch them all ahead of time:
 
 ----
-./agora toolchain list
+ws-host toolchain ensure --provider agora --all
 ----
 
-==== 5. Look around
+==== 6. Look around
 
 Every command is listed, and each says what it does. The topics here are the rest of the learning.
 
@@ -496,57 +473,62 @@ Every command is listed, and each says what it does. The topics here are the res
 ./agora help
 ----
 
-==== 6. Before you push
+==== 7. Before you push
 
 Run the checks. `agora help check` says which.
 
 ==== Steps
 
 * See what agora needs and what is present: `agora doctor`
-* Ensure the system libraries (asks before it uses sudo): `agora system ensure` (asks for your password through sudo)
-* Ensure the toolchain: `agora toolchain ensure`
-* See the toolchain's state: `agora toolchain list`
 * List the commands: `agora command list`
 * Run the quick checks: `agora check --suite spec`
 
 [#help-toolchain]
 === toolchain
 
-_The programs agora fetches for itself, and how to see, fetch and trust them._
+_The programs ws-host installs for agora, and how to see, fetch and trust them._
 
-agora needs more than Python: TeX, a browser, Java, VS Code. It does not use the ones on your machine. It fetches each one at a fixed version, checks its fingerprint before it unpacks anything, and keeps it in a cache that belongs to you.
+agora needs more than Python: TeX, a browser, Java, Node. It does not use the ones on your machine. ws-host installs each one at a fixed version, checks its fingerprint before it unpacks anything, and keeps it in a store that belongs to you, with one copy for every repository that pins it.
 
 ==== See the entries
 
 ----
-./agora toolchain list
-./agora toolchain show chromium
+ws-host provider show agora
+ws-host toolchain show chromium --provider agora
 ----
+
+
+The entries are the files in .workspaces-host/toolchain.d/ of this clone.
 
 ==== Fetch them
 
-Each command fetches what it needs the first time, so this is only for fetching ahead of time. Every entry also runs its own small test after it is unpacked.
+Each command has ws-host install what it needs the first time, so this is only for fetching ahead of time.
 
 ----
-./agora toolchain ensure
+ws-host toolchain ensure --provider agora --all
+----
+
+==== Check that they work
+
+Every entry has its own small test, which runs on what is installed.
+
+----
+./agora check toolchain --functional
 ----
 
 ==== Offline
 
-With --offline nothing is downloaded. A command that needs something not in the cache stops and names it; fetch it while you are online.
-
-==== Use a program of your own
-
-Only when you ask for it, by name: set the entry's variable, such as AGORA_JRE, to the program. doctor lists every one that is set, and fresh will not call a generated file current when one stood in.
+With --offline nothing is downloaded. A command that needs something not in the store stops and names it; install it while you are online.
 
 ==== The system libraries
 
-A few shared libraries and a display server cannot be fetched without administrator rights. `agora help start` explains the one command that installs them.
+A few shared libraries cannot be fetched without administrator rights. `agora help start` explains the one command that installs them.
+
+==== Change a pin
+
+Edit the entry's file, run `ws-host toolchain generate agora`, and commit what it writes: the lock beside the entries is generated, and `agora check toolchain` fails when it is not current.
 
 ==== Steps
 
-* List the entries: `agora toolchain list`
-* Show one entry: `agora toolchain show`
-* Ensure every entry: `agora toolchain ensure`
-* List the system libraries and which are present: `agora system list`
+* Check the toolchain's declarations: `agora check toolchain`
 * See what is present: `agora doctor`

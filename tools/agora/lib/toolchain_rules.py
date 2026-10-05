@@ -16,34 +16,37 @@ FORBIDDEN_STEP = re.compile(
     r"(?<![\w/.-])(?:apt-get|apt|aptitude|dpkg|brew|yum|dnf|pacman|apk|snap|choco|winget|pip3?|pipx|npm|npx|yarn|pnpm|corepack|"
     r"gem|bundle|cargo|go\s+install|curl|wget|docker|podman|sudo)(?![\w/.-])"
     r"|uses:\s*actions/setup-(?:node|java|ruby|go|dotnet)|uses:\s*docker://|^\s*(?:-\s*)?(?:container|services|image):")
-ALLOWED_STEP = re.compile(r"\./agora\s+system\s+ensure\b")  # the documented one-time setup, the only place `sudo` is allowed
+ALLOWED_STEP = re.compile(r"ws-host\s+system\s+ensure\b")  # the documented one-time setup, the only place `sudo` is allowed
 HOST_PROGRAMS = tuple("""git convert identify magick pdftotext pdfinfo pdffonts pdfimages pdftoppm rsvg-convert potrace latexmk
                          xelatex lualatex pdflatex node npm npx chromium chrome java asciidoctor""".split())
 HOST_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(re.escape(p) for p in HOST_PROGRAMS) + r")[\"']")
 WHICH_CALL = re.compile(r"shutil\.which\(\s*[\"']([\w.-]+)[\"']")
-# Xvfb is the display server `system ensure` installs for VS Code's tests; it has no download (0042 FR-030).
-WHICH_ALLOWED = ("uv", "python3", "Xvfb")
-# Where a download may be made: only the toolchain machinery, which verifies what it fetches (0025 FR-004, FR-017).
+# uv and python3 come from the provider's environment, and ws-host is the prerequisite that supplies it (0025 FR-014).
+WHICH_ALLOWED = ("uv", "python3", "ws-host", "node")
+# Where a download may be made: nowhere in agora; `ws-host` fetches and verifies what a provider pins (0025 FR-004, FR-017).
 NETWORK_IMPORT = re.compile(r"^\s*(?:import|from)\s+(?:urllib\.request|http\.client|requests|httpx|ftplib|socket)\b")
-NETWORK_ALLOWED = ("tools/agora/core/toolchain.py",)
+NETWORK_ALLOWED: tuple[str, ...] = ()
 INSTALLERS = "apt-get apt dpkg brew yum dnf pip pip3 pipx npm npx gem cargo".split()
 INSTALL_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(INSTALLERS) + r")[\"']")
-WORKSPACE_WORDS = re.compile(r"workspaces[-]host|ws[-]host\.env|reference environment", re.I)
 SELF = "tools/agora/lib/toolchain_rules.py"
 
 
-def entry_findings(entries: dict[str, tcore.Entry], registry: Any) -> list[Finding]:
-    """Every entry's fields (FR-016, FR-020), and that every toolchain a command, section, generator, runner or harness
-    names is an entry."""
-    out = [Finding("error", "tools/agora/toolchain", p) for p in tcore.problems(entries)]
-    names = set(entries)
+def entry_findings(declared: dict[str, dict[str, Any]], registry: Any) -> list[Finding]:
+    """That every toolchain a command, section, generator, runner or harness names is an entry (or a group of entries), and that every entry's
+    `needs` names an entry. The fields of an entry are `ws-host`'s to check (`generated_findings`)."""
+    out: list[Finding] = []
+    names = set(declared) | set(tcore.GROUPS)
 
     def named(where: str, wanted: Any) -> None:
         for n in wanted:
             if n not in names:
-                out.append(Finding("error", where, f"names toolchain entry {n!r}, which is not declared in tools/agora/toolchain "
+                out.append(Finding("error", where, f"names toolchain entry {n!r}, which is not declared in .workspaces-host/toolchain.d "
                                    "(0041-command-line FR-066)"))
 
+    for n, e in declared.items():
+        for need in e.get("needs", []):
+            if need not in declared:
+                out.append(Finding("error", f".workspaces-host/toolchain.d/{n}.toml", f"needs {need!r}, which is not an entry"))
     for c in registry.commands.values():
         named(f"command {c.id}", c.toolchain + c.toolchain_optional)
     for s in registry.sections.values():
@@ -57,20 +60,26 @@ def entry_findings(entries: dict[str, tcore.Entry], registry: Any) -> list[Findi
     return out
 
 
+def generated_findings(home: Path, env: Any = None) -> list[Finding]:
+    """What `ws-host` finds wrong with the declarations, and the generated mise files that are not what the entries say now (0008-providers FR-005, FR-006)."""
+    doc = tcore.ask(["toolchain", "generate", "--root", str(home), "--dry-run"], env)
+    data = doc.get("data", {})
+    if doc.get("_exit", 0) != 0:
+        return [Finding("error", ".workspaces-host", data.get("plain") or data.get("message") or "ws-host could not read the declarations")]
+    return [Finding("error", f, "is not what the entries say now; run `ws-host toolchain generate agora` and commit it") for f in data.get("stale", [])]
+
+
 def lock_findings(home: Path, registry: Any) -> list[Finding]:
-    """The hashed locks: each group's `agora.lock` carries a hash for every file of every package (0025 FR-013, FR-015), and
-    the npm lock agrees with the entries (FR-015)."""
-    from agora import toolchain as declared  # noqa: F401  (the package: its entries are what the npm lock must agree with)
+    """The hashed locks: each group's `agora.lock` carries a hash for every file of every package (0025 FR-013), and Chromium is the build of the Playwright
+    that is pinned (0025 FR-009)."""
     from agora.core import plan
-    from agora.toolchain import chromium, extension_build, npm_packages
 
     out = [Finding("error", f"tools/agora/groups/{g.name}", p) for g in registry.groups.values() for p in plan.lock_problems(g)]
-    out += [Finding("error", "tools/agora/npm", p) for p in npm_packages.lock_problems()]
-    out += [Finding("error", "tools/if-console", p) for p in extension_build.lock_problems()]
-    if chromium.PLAYWRIGHT_VERSION != npm_packages.PLAYWRIGHT_VERSION:
-        out.append(Finding("error", "tools/agora/toolchain/chromium.py",
-                           f"Chromium is Playwright {chromium.PLAYWRIGHT_VERSION}'s build and the npm lock's Playwright is "
-                           f"{npm_packages.PLAYWRIGHT_VERSION}; they move together (0025 FR-009)"))
+    declared = tcore.declared(home)
+    chrome, play = declared.get("chromium", {}).get("version"), declared.get("playwright", {}).get("version")
+    if chrome and play and chrome != play:
+        out.append(Finding("error", ".workspaces-host/toolchain.d/chromium.toml",
+                           f"Chromium is Playwright {chrome}'s build and the pinned Playwright is {play}; they move together (0025 FR-009)"))
     return out
 
 
@@ -115,7 +124,4 @@ def code_findings(home: Path) -> list[Finding]:
                 if m.group(1) not in WHICH_ALLOWED:
                     out.append(Finding("error", f"{rel}:{n}", f"looks for {m.group(1)} on PATH; only python3 and uv come "
                                        "from the host (0025 FR-014)"))
-            if WORKSPACE_WORDS.search(line):
-                out.append(Finding("error", f"{rel}:{n}", "names a reference environment; no tool, message or hint may "
-                                   "(0025-tooling-environment FR-012)"))
     return out

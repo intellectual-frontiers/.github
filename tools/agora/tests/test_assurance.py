@@ -19,7 +19,7 @@ from agora.groups.assurance import commands
 from agora.lib import assurance, imagery, openedx
 
 from .helpers import HOME, run_json
-from .toolchain_fixture import entry as fixture_entry, make_tar, toolchain as fixture_toolchain
+from .toolchain_fixture import FakeHost
 
 TOKENS = '{"$extensions": {"com.intellectualfrontiers.logo": {}}}'
 PASS = "import sys\nprint('ok')\n"
@@ -42,12 +42,11 @@ class Repo(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.reg = Registry.load(HOME)
-        # the toolchain lock for these tests: the cache is a temp directory, and `no-such-tool` has no build anywhere
-        self.nobuild = tcore.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
-        self.tc = fixture_toolchain({"no-such-tool": self.nobuild}, self.root / "tc-cache", env=dict(os.environ))
-
-    def add_entry(self, e):
-        self.tc.entries[e.name] = e
+        # the toolchain for these tests: a stand-in ws-host, and `no-such-tool` has no build anywhere
+        self.host = FakeHost(self.root)
+        self.host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
+        self.host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")
+        self.tc = self.host.toolchain(env=self.host.env())
 
     def ds(self, slug, *, brand=False, py=None, mjs=None):
         d = self.root / "design-systems" / slug
@@ -122,20 +121,20 @@ class Discovery(Repo):
     def test_each_harness_carries_what_the_manifest_says_it_needs(self):
         found, _ = self.plan()
         browser = next(h for h in found if h.kind == "browser")
-        self.assertEqual(browser.toolchain, ["chromium", "npm-packages"])  # node is a package, not an entry (0042 FR-030)
+        self.assertEqual(browser.toolchain, ["chromium", "playwright"])
         m = self.manifest()
         m["harnesses"]["print:python"] = {"toolchain": ["tinytex"]}
         found, _ = self.plan(runner="python")
         printer = next(h for h in found if h.slug == "print")
-        self.assertEqual(printer.toolchain, ["tinytex"])
+        self.assertEqual(printer.toolchain, ["node", "tinytex"])
 
     def test_the_real_manifest_names_the_print_harness_toolchain_and_the_python_packages(self):
         m = Registry.load(HOME).groups["assurance"].manifest
         self.assertEqual(m["harnesses"]["frontiers-print:python"]["toolchain"], ["tinytex", "tex-packages"])
-        self.assertEqual(m["runners"]["browser"]["toolchain"], ["chromium", "npm-packages"])
-        self.assertEqual(m["runners"]["python"]["toolchain"], [])
+        self.assertEqual(m["runners"]["browser"]["toolchain"], ["chromium", "playwright"])
+        self.assertEqual(m["runners"]["python"]["toolchain"], ["node"])
         self.assertNotIn("programs", m)  # no host program is declared (0042 FR-030)
-        self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml", "nodejs-wheel-binaries", "pypdf", "pypdfium2",
+        self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml", "pypdf", "pypdfium2",
                                               "reportlab", "resvg-py"})
         self.assertTrue(all(v.replace(".", "").isdigit() for v in m["packages"].values()))  # exact pins
 
@@ -167,38 +166,32 @@ class Running(Repo):
         o, lines = self.run_one(h)
         self.assertEqual(o.status, "skipped")
         self.assertIn("no-such-tool 1.0", o.reason)
-        self.assertIn("AGORA_NO_SUCH_TOOL", o.reason)
         self.assertFalse(any("must not run" in l for l in lines))
 
     def test_offline_with_a_cold_cache_skips_the_harness_naming_the_entry_and_the_command_that_fetches_it(self):
-        archive = self.root / "t.tar.gz"
-        self.add_entry(fixture_entry("cold-tool", archive, make_tar(archive, {"bin/cold-tool": b"x"})))
-        self.tc.offline = True
+        self.host.add("cold-tool", ready=False, files={"bin/cold-tool": b"x"})
+        self.tc = self.host.toolchain(offline=True)
         h = self.harness("a", "raise SystemExit('must not run')\n", ["cold-tool"])
         o, _ = self.run_one(h)
         self.assertEqual(o.status, "skipped")
         self.assertIn("cold-tool 1.0", o.reason)
-        self.assertIn("agora toolchain ensure cold-tool", o.reason)
+        self.assertIn("ws-host toolchain ensure cold-tool --provider agora", o.reason)
 
     def test_an_entry_is_fetched_on_first_use_and_its_environment_reaches_the_harness(self):
-        archive = self.root / "t.tar.gz"
-        self.add_entry(fixture_entry("warm-tool", archive, make_tar(archive, {"bin/warm-tool": b"x"}),
-                                     env=lambda r, path, platform: {"WARM_TOOL_HOME": str(path)}))
+        self.host.add("warm-tool", ready=False, files={"bin/warm-tool": b"x"}, env={"WARM_TOOL_HOME": "{dir}"})
+        self.tc = self.host.toolchain()
         h = self.harness("a", "import os\nprint('HOME=' + os.environ.get('WARM_TOOL_HOME', ''))\n", ["warm-tool"])
         o, _ = self.run_one(h)
         self.assertEqual(o.status, "passed")
-        self.assertTrue(any(l.startswith("HOME=") and "warm-tool-1.0" in l for l in o.tail), o.tail)
+        self.assertTrue(any(l.startswith("HOME=") and "warm-tool" in l for l in o.tail), o.tail)
+        self.assertIn("toolchain ensure warm-tool --provider agora", self.host.asked())
 
-    def test_an_override_is_said_and_the_hosts_own_settings_do_not_reach_the_harness(self):
-        archive = self.root / "t.tar.gz"
-        self.add_entry(fixture_entry("warm-tool", archive, make_tar(archive, {"bin/warm-tool": b"x"})))
-        mine = self.root / "mine"
-        mine.mkdir()
-        self.tc.env = {**os.environ, "AGORA_WARM_TOOL": str(mine), "CHROMIUM": "/host/chromium", "PLAYWRIGHT_BROWSERS_PATH": "/host/pw"}
+    def test_the_hosts_own_settings_do_not_reach_the_harness(self):
+        self.host.add("warm-tool", files={"bin/warm-tool": b"x"})
+        self.tc = self.host.toolchain(env=self.host.env(CHROMIUM="/host/chromium", PLAYWRIGHT_BROWSERS_PATH="/host/pw"))
         h = self.harness("a", "import os\nprint('SEEN', os.environ.get('CHROMIUM'), os.environ.get('PLAYWRIGHT_BROWSERS_PATH'))\n", ["warm-tool"])
         o, lines = self.run_one(h)
         self.assertEqual(o.status, "passed")
-        self.assertTrue(any("warm-tool is" in l and "AGORA_WARM_TOOL" in l for l in lines))
         self.assertIn("SEEN None None", o.tail)
 
     def test_a_harness_runs_without_agoras_environment(self):
@@ -270,7 +263,6 @@ class DesignSystemsSection(Repo):
         (self.root / "design-systems" / "b" / "assurance" / "run.mjs").write_text("//")
         r, _ = self.section(runner="browser")
         self.assertEqual(r.status, "skipped")
-        self.assertIn("AGORA_NO_SUCH_TOOL", r.reason)
 
 
 class SuitesAndOptions(unittest.TestCase):
@@ -313,9 +305,11 @@ class SuitesAndOptions(unittest.TestCase):
         import dataclasses
         reg = Registry.load(HOME)
         reg.sections["imagery"] = dataclasses.replace(reg.sections["imagery"], toolchain=("no-such-tool",))
-        nobuild = tcore.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})
-        ctx = Ctx(reg, HOME, HOME, env=dict(os.environ))
-        with mock.patch.object(tcore, "discover", lambda: {"no-such-tool": nobuild}):
+        with tempfile.TemporaryDirectory() as tmp:
+            host = FakeHost(Path(tmp))
+            host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")
+            ctx = Ctx(reg, HOME, HOME, env=host.env())
+            ctx.__dict__["_toolchain"] = host.toolchain()
             res = checkrun.run_check(ctx, ["imagery"], None, None, False, None)
         (s,) = res.data["sections"]
         self.assertEqual((s["status"], res.exit), ("skipped", 3))
@@ -379,12 +373,10 @@ class OpenedxSection(Repo):
 
     def locked_paragon(self):
         """The npm tree, as a local archive holding a stand-in Paragon, so that the lock is used with no network."""
-        archive = self.root / "npm.tar.gz"
-        sha = make_tar(archive, {"node_modules/.bin/paragon": b"#!/bin/sh\n"})
-        self.add_entry(fixture_entry("npm-packages", archive, sha, provides={"paragon": "node_modules/.bin/paragon", "playwright": "x"},
-                                     env=lambda r, path, platform: {"PLAYWRIGHT_MODULE": str(path)}))
+        self.host.add("paragon", ready=False, files={"node_modules/.bin/paragon": b"#!/bin/sh\n"}, provides={"paragon": "node_modules/.bin/paragon"})
+        self.tc = self.host.toolchain(offline=self.tc.offline)
 
-    def test_without_paragon_the_one_the_npm_lock_installs_is_used(self):
+    def test_without_paragon_the_pinned_one_is_used(self):
         self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")
         self.locked_paragon()
         r, err = self.section()
@@ -399,8 +391,8 @@ class OpenedxSection(Repo):
         self.tc.offline = True
         r, _ = self.section()
         self.assertEqual(r.status, "skipped")
-        self.assertIn("npm-packages", r.reason)
-        self.assertIn("agora toolchain ensure npm-packages", r.reason)
+        self.assertIn("paragon", r.reason)
+        self.assertIn("ws-host toolchain ensure paragon --provider agora", r.reason)
 
     def test_paragon_comes_from_the_option_and_not_from_the_hosts_environment(self):
         self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")

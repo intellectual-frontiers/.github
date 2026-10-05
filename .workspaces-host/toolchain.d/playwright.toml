@@ -1,0 +1,8 @@
+name = "playwright"
+version = "1.50.0"
+summary = "Playwright for Node, for the design systems' browser harnesses"
+kind = "npm"
+package = "playwright"
+needs = ["node", "chromium"]
+provides = { playwright = "node_modules/playwright/index.js" }
+env = { PLAYWRIGHT_MODULE = "{dir}" }

@@ -164,24 +164,25 @@ class OtherCommands(unittest.TestCase):
         self.assertTrue(any("requirements" in o for o in d["omitted"]) or len(d["requirements"]) <= 60)
 
     def test_doctor_reports_and_changes_nothing(self):
-        from unittest import mock
-        from agora.core import system
-        with mock.patch.object(system, "loads", lambda lib: True):  # a healthy host: the browser's libraries load
-            code, doc = run_json(["doctor"])
+        import tempfile
+        from pathlib import Path
+        from .toolchain_fixture import FakeHost
+        with tempfile.TemporaryDirectory() as tmp:
+            host = FakeHost(Path(tmp))
+            for name in ("tinytex", "chromium", "playwright", "jre", "asciidoctor", "node"):
+                host.add(name, ready=name != "chromium")
+            code, doc = run_json(["doctor"], env=host.env())
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
-        self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv", "python3"])
+        self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["ws-host"])
         self.assertNotIn("programs", doc["data"])  # no host program is declared: packages and toolchain entries supply them
         rows = {r["entry"]: r for r in doc["data"]["toolchain"]}
-        self.assertEqual(set(rows), {"tinytex", "tex-packages", "chromium", "npm-packages", "extension-build", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
-        self.assertTrue(all(r["cache"] in ("ready", "not fetched") and r["needed by"] for r in rows.values()))
+        self.assertEqual(set(rows), {"tinytex", "chromium", "playwright", "jre", "asciidoctor", "node"})
+        self.assertEqual(rows["chromium"]["cache"], "not installed")
+        self.assertIn("ws-host toolchain ensure chromium --provider agora", rows["chromium"]["hint"])
         self.assertTrue(any("browser" in n for n in rows["chromium"]["needed by"]))
         self.assertTrue(any("frontiers-print" in n for n in rows["tinytex"]["needed by"]))
-
-    def test_doctor_lists_every_opt_in_override_that_is_set(self):  # 0025 FR-019
-        code, doc = run_json(["doctor"], env={"AGORA_NODE": "/no/such/node"})
-        self.assertEqual(doc["data"]["overrides"], [{"entry": "node", "variable": "AGORA_NODE", "path": "/no/such/node", "present": False}])
-        self.assertEqual(run_json(["doctor"])[1]["data"]["overrides"], [])
+        self.assertNotIn("overrides", doc["data"])  # there is no override of a toolchain entry (0025 FR-019)
 
     def test_doctor_fails_on_a_registry_conflict(self):
         from agora.core.registry import Command, Registry

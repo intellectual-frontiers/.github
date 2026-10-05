@@ -233,12 +233,12 @@ def write(brand: Path, out: Path, package: str) -> None:
 UNOWNED = ("node_modules", "package-lock.json")
 
 
-def built(brand: Path, package: str, paragon: Path) -> dict[str, bytes | str]:
+def built(brand: Path, package: str, paragon: Path, env: dict[str, str] | None = None) -> dict[str, bytes | str]:
     """The sources and the built dist/ as Paragon's CLI writes them, from a scratch directory, by path inside the package."""
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "pkg"
         write(brand, out, package)
-        build(out, paragon)
+        build(out, paragon, env)
         got: dict[str, bytes | str] = {}
         for f in sorted(out.rglob("*")):
             rel = f.relative_to(out)
@@ -251,12 +251,12 @@ def built(brand: Path, package: str, paragon: Path) -> dict[str, bytes | str]:
         return got
 
 
-def build(out: Path, paragon: Path) -> None:
+def build(out: Path, paragon: Path, env: dict[str, str] | None = None) -> None:
     """Paragon's build-tokens and build-scss, then the files dist/ carries, as the Makefile does."""
     shutil.rmtree(out / "dist", ignore_errors=True)
     shutil.rmtree(out / "paragon" / "build", ignore_errors=True)
     (out / "dist" / "paragon").mkdir(parents=True)
-    env = node.with_node(dict(os.environ))  # Paragon's CLI is a Node script: it runs on the locked Node
+    env = dict(os.environ if env is None else env)  # Paragon's CLI is a Node script: it runs on the Node the environment puts first on PATH
     run = lambda *a: subprocess.run([str(paragon), *a], cwd=out, check=True, capture_output=True, text=True, env=env)  # noqa: E731
     run("build-tokens", "--source", "./paragon/tokens/", "--build-dir", "./paragon/build", "-t", "light")
     run("build-scss", "--corePath", "./paragon/core.scss", "--themesPath", "./paragon/build/themes", "--outDir", "./dist")

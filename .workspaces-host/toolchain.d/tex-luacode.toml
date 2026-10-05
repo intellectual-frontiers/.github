@@ -1,0 +1,11 @@
+name = "tex-luacode"
+version = "77677"
+summary = "the TeX Live 2025 package luacode, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/luacode.tar.xz"
+sha256 = "63d15329afca2b7dba467abeab4399062ae8a1fa3127172cf2579f9efaa98848"

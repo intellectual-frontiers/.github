@@ -1,0 +1,11 @@
+name = "tex-newunicodechar"
+version = "77677"
+summary = "the TeX Live 2025 package newunicodechar, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/newunicodechar.tar.xz"
+sha256 = "e819735ecd3bfd6711520e949a21aa59eadcb7709adb34d4dd1ccac1f3f22285"

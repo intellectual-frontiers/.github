@@ -1,9 +1,0 @@
-{
-  "name": "agora-npm-tree",
-  "private": true,
-  "description": "The one npm tree agora needs: Playwright for Node, for the design systems' browser harnesses, and Paragon, for the Open edX package's build (0042-agora FR-030). Installed with `npm ci` from package-lock.json by the Node that the nodejs-wheel-binaries package supplies, into agora's toolchain cache and never into the repository.",
-  "dependencies": {
-    "@openedx/paragon": "23.23.0",
-    "playwright": "1.50.0"
-  }
-}

@@ -1,0 +1,15 @@
+name = "asciidoctor-pdf"
+version = "2.3.27"
+summary = "asciidoctorj-pdf 2.3.27, the PDF converter for the asciidoctor entry's AsciidoctorJ"
+kind = "archive"
+strip = 0
+needs = ["jre", "asciidoctor"]
+provides = { asciidoctor-pdf = "asciidoctorj-pdf-2.3.27.jar" }
+
+[platforms.linux-x64]
+url = "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj-pdf/2.3.27/asciidoctorj-pdf-2.3.27.jar"
+sha256 = "f7a3d702e7a4bc86d420c7b59a25d81a7e927dea1579a515c5a704341f3b5463"
+
+[platforms.linux-arm64]
+url = "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj-pdf/2.3.27/asciidoctorj-pdf-2.3.27.jar"
+sha256 = "f7a3d702e7a4bc86d420c7b59a25d81a7e927dea1579a515c5a704341f3b5463"

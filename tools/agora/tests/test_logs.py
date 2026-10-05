@@ -76,8 +76,9 @@ class Logs(unittest.TestCase):
 class Hygiene(unittest.TestCase):
     def test_agora_names_no_other_repository(self):  # 0042 FR-003: the names come from the register, as data
         import re
+        from agora.lib.layout import PREREQUISITES
         from agora.lib.register import known_repositories
-        names = known_repositories(HOME) - {Registry.load(HOME).root_manifest["register_name"]}
+        names = known_repositories(HOME) - {Registry.load(HOME).root_manifest["register_name"]} - PREREQUISITES  # ws-host is the prerequisite (0042 FR-003)
         self.assertTrue(names)
         bad = re.compile("|".join(rf"(?<![\w./-]){re.escape(n)}(?![\w-])" for n in names) + r"|\b" + "vau" + r"lt\b", re.I)
         files = [HOME / "agora"] + [f for f in (HOME / "tools" / "agora").rglob("*") if f.is_file() and f.suffix in (".py", ".toml", "")]

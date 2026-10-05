@@ -1,0 +1,6 @@
+name = "uv"
+version = "0.12.23"
+summary = "uv, which runs agora against its hashed locks"
+kind = "tool"
+tool = "uv"
+bin = ".mise-bins"

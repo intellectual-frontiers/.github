@@ -1,0 +1,16 @@
+name = "chromium"
+version = "1.50.0"
+summary = "Chromium 133, Playwright 1.50.0's pinned build (revision 1155)"
+kind = "archive"
+strip = 1
+provides = { chrome = "chrome" }
+env = { CHROMIUM = "{dir}/chrome" }
+system = ["libasound2t64|libasound2", "libatk-bridge2.0-0t64|libatk-bridge2.0-0", "libatk1.0-0t64|libatk1.0-0", "libatspi2.0-0t64|libatspi2.0-0", "libcairo2", "libcups2t64|libcups2", "libdbus-1-3", "libdrm2", "libgbm1", "libglib2.0-0t64|libglib2.0-0", "libnspr4", "libnss3", "libpango-1.0-0", "libx11-6", "libxcb1", "libxcomposite1", "libxdamage1", "libxext6", "libxfixes3", "libxkbcommon0", "libxrandr2"]
+
+[platforms.linux-x64]
+url = "https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1155/chromium-linux.zip"
+sha256 = "cadb84ee9dd3b3a5ce435175c2e39c585c90457292358534acf6e6f2f1fa248d"
+
+[platforms.linux-arm64]
+url = "https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1155/chromium-linux-arm64.zip"
+sha256 = "61110a15751b15e502806963f2604682a315cbf10fe55827625df879de1b574f"

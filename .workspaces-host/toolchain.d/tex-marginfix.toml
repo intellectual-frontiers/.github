@@ -1,0 +1,11 @@
+name = "tex-marginfix"
+version = "77677"
+summary = "the TeX Live 2025 package marginfix, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/marginfix.tar.xz"
+sha256 = "7fa32c7db9de8b412d0090dbd2b395d0639ca5cf343aec6a425ec5594615353b"

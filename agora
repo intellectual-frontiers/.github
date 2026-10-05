@@ -1,8 +1,10 @@
 #!/bin/sh
 # agora, the public root's command line (0041-command-line FR-001, 0042-agora FR-001).
-# POSIX sh. Needs uv and Python 3.11 or later from the host; runs from a fresh clone with no other step, from any
-# working directory inside it. Everything else is tools/agora/: this file only finds the clone, finds the prerequisites,
-# and hands over. A command that needs packages is re-run by agora under its group's hashed lock (core/plan.py).
+# POSIX sh. Needs ws-host (https://github.com/intellectual-frontiers/workspaces-host), which supplies Python, uv and every program agora
+# pins in .workspaces-host/; ws-host runs agora in agora's own environment, so no program of the host takes part (0025-tooling-environment FR-014).
+# Enable this clone once with `ws-host provider add .`; a repository cannot enable itself. Everything else is tools/agora/: this file
+# only finds the clone, finds ws-host, and hands over. A command that needs packages is re-run by agora under its group's hashed lock
+# (core/plan.py), and one that needs a program outside Python has ws-host install it from the lock on first use.
 #
 #   AGORA_OFFLINE=1 or --offline   never download anything; a command needing something not cached fails saying what
 #   --complete WORD...             completion candidates for the words typed so far
@@ -11,8 +13,8 @@ set -eu
 
 here=$(cd "$(dirname "$0")" && pwd -P)
 
-if ! command -v uv >/dev/null 2>&1; then
-  echo "agora: uv is needed and is not on PATH; install uv (https://docs.astral.sh/uv/) from the host" >&2
+if ! command -v ws-host >/dev/null 2>&1; then
+  echo "agora: ws-host is needed and is not on PATH; install it (https://github.com/intellectual-frontiers/workspaces-host), then run: ws-host provider add $here" >&2
   exit 3
 fi
 
@@ -26,5 +28,5 @@ PYTHONPATH="$here/tools${PYTHONPATH:+:$PYTHONPATH}"
 export PYTHONPATH PYTHONDONTWRITEBYTECODE=1
 
 # No packages: the plain standard-library interpreter, through uv so that no host site-packages is involved.
-exec uv run --no-project --no-python-downloads --python ">=3.11" ${offline:+"$offline"} \
-  python -m agora "$@"
+exec ws-host provider run agora --ensure uv --ensure python ${offline:+"$offline"} -- \
+  uv run --no-project --no-python-downloads --python ">=3.11" ${offline:+"$offline"} python -m agora "$@"

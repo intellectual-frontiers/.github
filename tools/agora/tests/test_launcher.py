@@ -11,7 +11,15 @@ from .helpers import HOME
 LAUNCHER = HOME / "agora"
 
 
-@unittest.skipUnless(shutil.which("uv"), "uv is not installed")
+def _enabled() -> bool:
+    """ws-host is here and has this clone enabled as a provider (0025 FR-006)."""
+    if not shutil.which("ws-host"):
+        return False
+    p = subprocess.run(["ws-host", "provider", "show", "agora", "--json"], capture_output=True, text=True)
+    return p.returncode == 0
+
+
+@unittest.skipUnless(_enabled(), "ws-host is not installed or has not enabled this clone")
 class Launcher(unittest.TestCase):
     def run_agora(self, *argv, cwd=HOME, env=None):
         return subprocess.run([str(LAUNCHER), *argv], capture_output=True, text=True, cwd=cwd,
@@ -41,7 +49,19 @@ class Launcher(unittest.TestCase):
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(json.loads(p.stdout)["data"]["status"], "passed")
 
-    def test_without_uv_it_says_so_and_exits_3(self):
-        p = subprocess.run(["/bin/sh", str(LAUNCHER), "doctor"], capture_output=True, text=True, env={"PATH": "/nonexistent"})
+    def test_without_ws_host_it_says_so_and_exits_3(self):
+        bare = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, bare, True)
+        for tool in ("dirname", "sh"):
+            (bare / tool).symlink_to(shutil.which(tool))
+        p = subprocess.run(["/bin/sh", str(LAUNCHER), "doctor"], capture_output=True, text=True, env={"PATH": str(bare)})
         self.assertEqual(p.returncode, 3)
-        self.assertIn("uv is needed", p.stderr)
+        self.assertIn("ws-host is needed", p.stderr)
+        self.assertIn("ws-host provider add", p.stderr)
+
+    def test_a_clone_that_is_not_enabled_exits_3_naming_the_command(self):
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, True)
+        p = self.run_agora("doctor", env={"XDG_CONFIG_HOME": str(home), "XDG_DATA_HOME": str(home / "d"), "XDG_STATE_HOME": str(home / "s")})
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("ws-host provider add", p.stdout + p.stderr)

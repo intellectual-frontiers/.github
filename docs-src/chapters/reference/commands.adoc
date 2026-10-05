@@ -237,26 +237,6 @@ An email written in Markdown and built by frontiers-email (0014-design-systems F
 
 |===
 
-=== extension
-
-The IF Console VS Code extension, built from tools/if-console/ (0043-if-console)
-
-[cols="4,2,2,4"]
-|===
-|Usage |Category |Where it runs |What it does
-
-|`agora extension build [--modules TEXT]`
-|build
-|terminal, editor, mcp
-|Build the IF Console extension's .vsix into build/ from tools/if-console/: type-check, lint, bundle and pack it, with Node from the locked package and the extension's own lock; or, with --modules DIR, write its compiled modules for another repository's tests
-
-|`agora extension test [--suite TEXT] [--screenshots TEXT] [--workspace TEXT] [--report TEXT]`
-|check
-|terminal, editor, mcp
-|Run a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace holding this clone and the folders named, or capture its screenshots
-
-|===
-
 === figure
 
 A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044)
@@ -547,51 +527,6 @@ A spec: a numbered spec or a design system's spec (0020-spec-format)
 
 |===
 
-=== system
-
-The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069)
-
-[cols="4,2,2,4"]
-|===
-|Usage |Category |Where it runs |What it does
-
-|`agora system ensure [--yes]`
-|setup
-|terminal
-|Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself
-
-|`agora system list`
-|read
-|terminal, editor, mcp
-|List the shared libraries a browser and VS Code link and the display server VS Code's tests start under, the package that holds each on this host's distribution, and which are present
-
-|===
-
-=== toolchain
-
-The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067)
-
-[cols="4,2,2,4"]
-|===
-|Usage |Category |Where it runs |What it does
-
-|`agora toolchain ensure [ENTRY...]`
-|setup
-|terminal, editor
-|Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check
-
-|`agora toolchain list`
-|read
-|terminal, editor, mcp
-|List the toolchain entries: version, platforms and whether the cache holds each
-
-|`agora toolchain show ENTRY`
-|read
-|terminal, editor, mcp
-|Show one entry: version, addresses and checksums per platform, what it provides, and the cache
-
-|===
-
 === Typed arguments
 
 A value that fails its type is an error that names the type and gives examples.
@@ -630,10 +565,6 @@ A value that fails its type is an error that names the type and gives examples.
 
 |`DESIGN_SYSTEM`
 |a design system's slug, a directory of design-systems/
-|a value `the noun's list command` offers
-
-|`ENTRY`
-|a toolchain entry, as `toolchain list` names them: tinytex, chromium, ...
 |a value `the noun's list command` offers
 
 |`GENERATOR`
@@ -693,8 +624,8 @@ A value that fails its type is an error that names the type and gives examples.
 |a value `the noun's list command` offers
 
 |`RUNNER`
-|which harness: browser or python for design-systems; node or vscode for extension
-|browser, python, node, vscode
+|which harness: browser or python for design-systems
+|browser, python
 
 |`SCHEME`
 |a concept scheme of the ontology as a CURIE, such as ifcore:CommandCategoryScheme, or by its local name
