@@ -2058,7 +2058,7 @@ ifcore:SetupCommandCategory a skos:Concept ; skos:inScheme ifcore:CommandCategor
     skos:definition "Changes the clone's own environment, such as a lock, a fetched toolchain entry or a running server."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandVerbScheme a skos:ConceptScheme ; rdfs:label "Command verb"@en ;
-    rdfs:comment "The fixed set of thirteen verbs an orchestrator's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
+    rdfs:comment "The fixed set of sixteen verbs an orchestrator's commands use, each one word; a verb is added only by amending 0041-command-line (FR-008, FR-009)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:ListCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "list"@en ;
     skos:notation "list" ;
@@ -2093,6 +2093,12 @@ ifcore:NewCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; 
 ifcore:AdvanceCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "advance"@en ;
     skos:notation "advance" ;
     skos:definition "Moves a resource to its next state."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EnsureCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "ensure"@en ;
+    skos:notation "ensure" ;
+    skos:definition "Makes a machine or a workspace match its description, doing only what is missing and safe to repeat."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SyncCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "sync"@en ;
+    skos:notation "sync" ;
+    skos:definition "Brings a local copy of something shared up to date, by fast-forward alone."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:PublishCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "publish"@en ;
     skos:notation "publish" ;
     skos:definition "Sends something outside the clone."@en ; ifcore:hasAudience ifcore:Public .

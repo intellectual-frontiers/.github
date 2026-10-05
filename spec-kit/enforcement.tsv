@@ -776,13 +776,13 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0026-workspaces FR-002	none	-	agora check toolchain will fail a tool that depends on a workspace (0042 FR-013); the stock-runner jobs prove it once moved
 0026-workspaces FR-003	none	-	no check
 0026-workspaces FR-007	none	-	workspaces-host will gate clones on a login; no check here
-0026-workspaces FR-008	none	-	no check; workspaces-host tests workspace advance
+0026-workspaces FR-008	none	-	no check; workspaces-host tests workspace ensure
 0026-workspaces FR-009	none	-	documentation judgment
 0026-workspaces FR-015	none	-	no check; workspaces-host tests the layout
 0026-workspaces FR-016	none	-	no check reads .workspaces-host/ws-host.env; the file is optional (0025 FR-025)
 0026-workspaces FR-017	none	-	no check reads .workspaces-host/ws-host.env
 0026-workspaces FR-018	none	-	no check; agora check toolchain will fail a tool that reads a workspace file (0042 FR-013)
-0026-workspaces FR-019	none	-	no check; workspaces-host tests that unpushed work survives repo advance
+0026-workspaces FR-019	none	-	no check; workspaces-host tests that unpushed work survives repo sync
 0026-workspaces FR-020	none	-	no check
 0026-workspaces FR-021	none	-	no check; workspaces-host tests that cloning trusts nothing
 0026-workspaces FR-022	none	-	no check; workspaces-host tests that trust is never transitive
@@ -1032,6 +1032,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-070	review	0041-command-line FR-070	whether Python could do the work is judged in review; the approval is a recorded Decision
 0041-command-line FR-071	none	-	no check yet that only the maintainer tool runs its approved program
 0041-command-line FR-072	check	.github: agora check commands	the registry check fails an unknown icon, a missing or malformed title, an undeclared view, a status outside the vocabulary, a reference pattern only Python reads, and, against the data the list commands return, an absent field or an unmapped status; tests drive each (test_presentation)
+0041-command-line FR-073	none	-	no check here; workspaces-host tests update, update --check and that no ws-host command is called advance for an ensure or a sync
 0042-agora FR-030	check	.github: agora test	tests prove each package replacement (test_packages, the harness and command tests), the toolchain entries and their declarations (test_toolchain) and fresh proves the files they write; the browser and print harnesses ran from an empty cache (verified by hand)
 0042-agora FR-031	check	.github: agora check extension	agora lists its commands to the editor by command list; the extension's real-launcher tests drive them; agora declares no editor views yet (OQ-3)
 0042-agora FR-032	check	.github: agora check commands	.if-console.env must name ./agora (agora check commands); agora extension build is tested by agora test and run by hand; the presentation and titles it declares for the editor are checked by agora check commands (0041 FR-072)

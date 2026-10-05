@@ -96,7 +96,7 @@ command set is 0042-agora.
   set, and the ID, where the command takes one, is always the first
   positional argument after the verb. The verbs MUST be exactly: `list`,
   `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`,
-  `new`, `advance`, `publish`, `serve`, `test`. A verb MUST be one word; a
+  `new`, `advance`, `ensure`, `sync`, `publish`, `serve`, `test`. A verb MUST be one word; a
   hyphenated or compound verb MUST NOT be used. A verb outside the set MUST
   NOT be added except by amending this spec.
 - **FR-009**: The verbs MUST mean: `list` (many resources of a kind, with
@@ -106,13 +106,17 @@ command set is 0042-agora.
   derived from a declared source, which FR-036 proves current); `add` (put an
   item into a collection); `set` (change one field of an existing resource);
   `record` (append a fact to the tracked record); `new` (create a resource);
-  `advance` (move a resource to its next state); `publish` (send something
+  `advance` (move a resource to its next state); `ensure` (make a machine or a
+  workspace match its description, doing only what is missing and safe to
+  repeat); `sync` (bring a local copy of something shared up to date, by
+  fast-forward alone, FR-063); `publish` (send something
   outside the clone); `serve` (run until stopped); `test` (run a resource's
   tests in a place its own check does not, writing nothing). `check` is not a
   noun's verb: FR-010.
 - **FR-010**: A small closed set of repository-wide commands MUST take no
-  noun: `check`, `fresh`, `test`, `doctor`, `lock`, `context` and `help`, with
-  the arguments FR-031, FR-036, FR-014, FR-030, FR-038 and FR-065 state; and an
+  noun: `check`, `fresh`, `test`, `doctor`, `lock`, `context`, `help` and
+  `update`, with the arguments FR-031, FR-036, FR-014, FR-030, FR-038, FR-065
+  and FR-073 state; and an
   environment orchestrator MAY also have `workspace`, a noun whose commands
   prepare the person's machine (FR-063). An orchestrator MAY omit any of the
   repository-wide commands but MUST NOT add another without amending this
@@ -329,6 +333,15 @@ command set is 0042-agora.
   reference or an overview MUST link to the topic, or MUST be generated from
   the same code and proven current by `fresh` (FR-036), so that documentation
   does not drift from behavior. `help` with no topic MUST list the topics.
+- **FR-073**: An environment orchestrator MAY provide `update`, which brings the
+  orchestrator's own copy to its newest version by fast-forward alone (FR-063),
+  leaving a copy with changes not committed, diverged commits or no shared
+  branch exactly as it was and saying why in plain words, with exit status 0.
+  `update --check` MUST only look, change nothing and say what is new. A
+  command that brings a person's machine or workspace into its described state
+  MUST be `<noun> ensure`, and one that brings a copy of something shared up to
+  date MUST be `<noun> sync`; neither MAY be called `advance`, which is for
+  moving a resource to its next state (FR-009).
 
 ## Behavior and information
 

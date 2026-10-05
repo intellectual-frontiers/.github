@@ -65,14 +65,14 @@ under its own spec.
   needs a login the person lacks MUST fail at once with git's own reason and
   the action that signs in, not report success (0041-command-line FR-063).
 - **FR-008**: The first thing a person who chose a workspace runs MUST be
-  `ws-host workspace advance`: it checks the sign-in, clones the repositories
+  `ws-host workspace ensure`: it checks the sign-in, clones the repositories
   that are missing, fast-forwards the rest, and runs `doctor`. It MUST be safe
   to run as often as the person likes, and MUST install no program a
   repository's tools need.
 - **FR-009**: Contributor documentation MUST state the path that needs no
   workspace first (install `python3` and `uv`, then run the launcher,
   0025-tooling-environment FR-024), and MAY then state the workspace's
-  one-line install and `ws-host workspace advance` as another way.
+  one-line install and `ws-host workspace ensure` as another way.
 
 ## Updating without harm
 
@@ -187,7 +187,7 @@ under its own spec.
   in a virtual machine or container, with VS Code.
 - **A repository's needs** — the optional `.workspaces-host/ws-host.env`,
   naming its siblings.
-- **The first run** — `ws-host workspace advance`.
+- **The first run** — `ws-host workspace ensure`.
 - **Trust** — a person's explicit act, recorded as a link, that lets a
   repository's code run.
 
@@ -196,7 +196,7 @@ under its own spec.
 - **SC-001**: A person on a fresh Debian or Ubuntu machine who chooses a
   workspace goes from a repository's README to a working session, with every
   listed repository cloned, by running one install line and `ws-host
-  workspace advance`.
+  workspace ensure`.
 - **SC-002**: The same repository's tools pass with and without a workspace.
 - **SC-003**: No update changes a clone that holds work the person has not
   pushed.
