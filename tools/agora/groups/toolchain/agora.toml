@@ -3,10 +3,42 @@ help = "The toolchain lock: the programs outside Python that commands need, fetc
 
 [nouns.toolchain]
 help = "The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067)"
+icon = "tools"
+view = "toolchain"
+title = "Toolchain entry"
+
+[nouns.toolchain.list]
+command = "toolchain list"
+rows = "entries"
+id = "name"
+label = "name"
+description = "version"
+status = "state"
+tooltip = ["summary", "size"]
+
+[nouns.toolchain.list.status_map]
+ready = "ok"
+missing = "warning"
+override = "info"
+"no build" = "muted"
 
 [nouns.system]
 help = "The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069)"
+icon = "server-environment"
+view = "toolchain"
+title = "System libraries"
 
 [sections.toolchain]
 help = "The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025)"
 watch = ["tools/agora/toolchain/**", "tools/agora/npm/**", "tools/if-console/package.json", "tools/if-console/package-lock.json", "tools/agora/core/toolchain.py", "tools/agora/core/system.py", "tools/agora/groups/*/agora.lock", "tools/agora/groups/*/agora.toml", ".github/workflows/**", "tools/agora/**/*.py"]
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."system list"]
+title = "List System Libraries"
+[commands."toolchain add"]
+title = "Fetch Toolchain"
+icon = "cloud-download"
+[commands."toolchain list"]
+title = "List Toolchain"
+[commands."toolchain show"]
+title = "Show Toolchain Entry…"

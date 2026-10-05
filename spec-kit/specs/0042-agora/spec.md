@@ -344,7 +344,13 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   the locked `nodejs-wheel-binaries` and the extension's own `package-lock.json`
   (0043-if-console FR-027), and MUST take `--dry-run`. `agora extension test --suite DIR
   [--workspace [NAME=]DIR]...` MUST run another repository's tests of the
-  extension in a real VS Code as 0043-if-console FR-034 states.
+  extension in a real VS Code as 0043-if-console FR-034 states, and `agora
+  extension test --screenshots DIR` MUST capture the extension's screens as
+  0043-if-console FR-045 states. `agora` MUST declare in its manifests, for the
+  editor, a view for the groups of its nouns, an icon for each noun, the fields
+  of each list's rows, and a palette title for every command the editor
+  surface exposes, as 0041-command-line FR-064 states, and `agora check
+  commands` MUST fail one that FR-072 of that spec refuses.
 - **FR-019**: `agora` MUST declare two editor views in code, `console` and
   `assurance`, and MUST run no server (0041-command-line FR-011). A view is a
   `read` command's resource and its HTML rendering that the IF Console

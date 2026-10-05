@@ -271,6 +271,55 @@ command set is 0042-agora.
   `level`, `where`, `message` and `next`. A field MAY be added without
   raising a schema version (FR-019); none MAY be renamed or removed without it.
 
+  An orchestrator MUST also say how its resources are presented, so that the
+  editor draws views, rows, icons and a palette without holding any
+  orchestrator's knowledge. This is added to the shape above; it raises no
+  schema version, and an editor MUST work, with plainer views, from a document
+  that lacks it. `command list` MUST add to its `data` an object
+  `presentation`, and each command row, and `command show`, MUST add `title`
+  and, where the command has one, `icon`:
+
+  - `title`: the command's title in the editor's command palette, a verb and an
+    object in capitals ("Show Spec…"), at most 40 characters, ending with an
+    ellipsis exactly when the command asks for a value before it can run. Every
+    command that declares the `editor` surface MUST have one. `icon` is a
+    codicon id.
+  - `presentation.views`: the views the orchestrator asks for, in order, each
+    with `id` (lowercase words joined by hyphens, unique in the orchestrator),
+    `title`, `icon` (a codicon id), `order` (an integer; 10 is the editor's own
+    Home, so a view's is above it) and, optionally, `description`.
+  - `presentation.nouns`: one object for each noun, with `noun`, `title`
+    (singular, for people), `icon` (a codicon id), optionally `view` (the `id`
+    of a view above, in which the noun's resources are listed; a noun with none
+    is listed only in the editor's tree of every command) and, where the
+    noun has a `list` command that asks for nothing, `list`:
+    `command` (its words), `rows` (the key of `data` that holds its rows), `id`
+    (the row field that is the argument of the noun's `show` command),
+    `label` (the field shown as the row's text), and optionally `description`
+    (a muted field after it), `status` (a field whose value is the row's
+    status), `status_map` (an object from that field's values to the statuses
+    below, required where a value is not already one of them), `badge` (a field
+    shown as the row's count) and `tooltip` (fields listed in its hover).
+  - A status is one of a fixed vocabulary, never free text: `ok`, `warning`,
+    `error`, `pending`, `skipped`, `info`, `muted`. An editor maps each to a
+    codicon and a theme color of its own (`ok` to the passed test icon, `error`
+    to the failed, and so on); an orchestrator names neither. The statuses a
+    `check` resource carries are mapped by this rule: `passed` is `ok`,
+    `failed` is `error`, `skipped` is `skipped`, and a finding's `level` of
+    `error`, `warning` or `info` is that status.
+  - `presentation.references`: the patterns in files that name a resource, each
+    with `id`, `noun` (whose `show` command gives the resource), `pattern` (a
+    regular expression that Python and JavaScript read alike, with groups),
+    `value` (the argument of the `show` command, written with `$1`, `$2` for
+    the pattern's groups), `files` (globs, relative to the repository), and
+    optionally `text` (the field of the shown resource that is its words),
+    `facts` and `lens` (fields listed in a hover and in a short line above the
+    reference) and `definition` (the fields `path` and `line` of the shown
+    resource, where a person can go to its definition).
+
+  An orchestrator MAY declare `list` rows only for commands that are `read`
+  commands the editor surface exposes (FR-022).
+
 - **FR-065**: An orchestrator MAY provide `help [TOPIC]` (read), the one place
   its daily-work documentation lives. A topic MUST be code, in plain language
   (FR-054), and MUST be a resource whose steps are actions (FR-017) the editor
@@ -566,6 +615,21 @@ command set is 0042-agora.
   name the program. Its hint and its error, when the program is missing, MUST
   name that program (an exception to 0025-tooling-environment FR-012). No
   other command MAY run the program or depend on the maintainer tool.
+
+- **FR-072**: An orchestrator that emits `presentation` and `title` (FR-064)
+  MUST check its own declarations, in the check of its registry, and MUST fail
+  on: an icon that is not a codicon id of the glyph map it pins (a file
+  generated from the `@vscode/codicons` package, named with its version and
+  integrity hash); a noun or command with no icon or title where FR-064
+  requires one; a `view` no declaration holds; a view or noun field that FR-064
+  does not name; a title that is not a verb and an object, is over 40
+  characters, or whose ellipsis disagrees with whether the command asks for a
+  value; a `list` whose command is not a `read` command offered to the editor
+  or asks for a value; a `status_map` value outside the vocabulary; a
+  `references` pattern that only Python reads or that lacks a group its `value`
+  names; and, against the data the commands return, a `list` field that is
+  absent from a row, a status value that nothing maps, and a reference field
+  that the shown resource lacks.
 
 ## Out of scope
 

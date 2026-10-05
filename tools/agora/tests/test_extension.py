@@ -149,6 +149,7 @@ class VscodeRun(unittest.TestCase):
     def run_with(self, report):
         class Display:
             name = ":77"
+            def __init__(self, fbdir=None): pass
             def __enter__(self): return self
             def __exit__(self, *a): pass
         with mock.patch.object(vscode_tests, "Display", Display):
@@ -209,8 +210,8 @@ class ExternalSuite(unittest.TestCase):
     def test_the_suite_and_folders_are_passed_on_and_a_pass_is_a_resource(self):
         seen = {}
 
-        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None):
-            seen.update(folders=folders, suite=suite, vsix=vsix)
+        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
+            seen.update(folders=folders, suite=suite, vsix=vsix, screenshots=screenshots)
             return [], ["real VS Code: 2 of 2 tests passed in 1.0s"], [{"name": "x: a", "status": "passed", "seconds": 1}, {"name": "x: b", "status": "passed", "seconds": 1}]
         report = self.tmp / "r.json"
         code, doc = self.go("--suite", str(self.tmp / "suite"), "--workspace", f"other={self.tmp / 'other'}", "--workspace", str(self.tmp / "suite"),
@@ -220,6 +221,22 @@ class ExternalSuite(unittest.TestCase):
         self.assertEqual([n for n, _ in seen["folders"]], ["other", "suite"], "NAME=PATH names a folder; a bare path is named by its last part")
         self.assertEqual(doc["data"]["passed"], 2)
         self.assertEqual(json.loads(report.read_text())["tests"][0]["name"], "x: a")
+
+    def test_screenshots_are_a_run_of_their_own_into_a_folder_and_a_suite_with_them_is_a_usage_error(self):
+        seen = {}
+
+        def fake(home, node, code, cli, electron, vsix, env, folders=None, suite=None, screenshots=None):
+            seen.update(suite=suite, screenshots=screenshots)
+            screenshots.mkdir(parents=True, exist_ok=True)
+            (screenshots / "dark-views.png").write_bytes(b"x")
+            return [], [], [{"name": "screenshots-dark: the views", "status": "passed", "seconds": 1}]
+        out = self.tmp / "shots"
+        code, doc = self.go("--screenshots", str(out), vscode=fake)
+        self.assertEqual(code, 0, doc)
+        self.assertEqual((seen["suite"], seen["screenshots"]), (None, out.resolve()))
+        self.assertEqual(doc["data"]["screenshots"], ["dark-views.png"])
+        self.assertEqual(self.go("--screenshots", str(out), "--suite", str(self.tmp / "suite"), vscode=fake)[0], 2)
+        self.assertEqual(self.go(vscode=fake)[0], 2, "one of the two is named")
 
     def test_a_failed_test_exits_1_naming_it(self):
         from agora.core.checks import Finding

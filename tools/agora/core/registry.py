@@ -202,6 +202,10 @@ class Registry:
         self.types: dict[str, ArgType] = {}
         self.type_group: dict[str, str] = {}
         self.nouns: dict[str, str] = {}  # noun -> help
+        self.noun_meta: dict[str, dict[str, Any]] = {}  # noun -> how it is presented: icon, view, title, list (0041 FR-064)
+        self.command_meta: dict[str, dict[str, Any]] = {}  # command id -> its palette title and icon, with the group that declares it
+        self.views: dict[str, dict[str, Any]] = {}  # view id -> title, icon, order, description (the root manifest's)
+        self.references: dict[str, dict[str, Any]] = {}  # id -> a pattern in files that names a resource (0041 FR-064)
         self.suites: dict[str, dict[str, Any]] = {}
         self.conflicts: list[str] = []
         self.contexts: dict[str, tuple[str, Callable[..., Any]]] = {}  # kind -> (id type, provider)
@@ -221,6 +225,7 @@ class Registry:
         from . import help as helping
 
         reg.topics = helping.discover()
+        reg.views = {k: dict(v) for k, v in rm.get("views", {}).items()}
         reg.suites = {k: {"sections": list(v.get("sections", [])), "options": dict(v.get("options", {}))}
                       for k, v in rm.get("suites", {}).items()}
         return reg
@@ -236,6 +241,15 @@ class Registry:
             if noun in self.nouns:
                 self.conflicts.append(f"noun {noun} is declared by two groups")
             self.nouns[noun] = help_
+            self.noun_meta[noun] = {k: v for k, v in m["nouns"][noun].items() if k != "help"}
+        for cid, meta in m.get("commands", {}).items():
+            if cid in self.command_meta:
+                self.conflicts.append(f"command {cid} is presented by two manifests")
+            self.command_meta[cid] = {**meta, "group": g.name}
+        for rid, ref in m.get("references", {}).items():
+            if rid in self.references:
+                self.conflicts.append(f"reference {rid} is declared twice")
+            self.references[rid] = dict(ref)
         for sname, s in m.get("sections", {}).items():
             self._add_section(Section(sname, s.get("help", ""), tuple(s.get("watch", ())), s.get("scope"),
                                       tuple(s.get("options", ())), tuple(s.get("toolchain", ())), s.get("toolchain_unless", ""),
@@ -375,7 +389,9 @@ class Registry:
                 sec = self.sections.get(n)
                 if sec is None:
                     out.append(f"suite {sname} names section {n}, which is not declared (0041 FR-031)")
-        return out
+        from . import presentation
+
+        return out + presentation.problems(self)
 
     def plan_conflicts(self) -> list[str]:
         """0041 FR-029: an invocation whose plan needs two locks without isolation."""

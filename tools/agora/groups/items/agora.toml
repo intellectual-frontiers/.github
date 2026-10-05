@@ -17,14 +17,29 @@ resvg-py = "0.5.0"
 
 [nouns.deck]
 help = "A slide deck written in Markdown and built by frontiers-slides (0014-design-systems FR-040)"
+icon = "preview"
+view = "builds"
+title = "Deck"
 [nouns.email]
 help = "An email written in Markdown and built by frontiers-email (0014-design-systems FR-040)"
+icon = "mail"
+view = "builds"
+title = "Email"
 [nouns.course]
 help = "A course written in AsciiDoc, read and built by frontiers-course (0014-design-systems FR-040)"
+icon = "book"
+view = "builds"
+title = "Course"
 [nouns.media]
 help = "A media asset, a job rendered by frontiers-media (0014-design-systems FR-040)"
+icon = "device-camera-video"
+view = "builds"
+title = "Media"
 [nouns.sign]
 help = "A printed sign, a job rendered by frontiers-signage-print (0014-design-systems FR-040)"
+icon = "megaphone"
+view = "builds"
+title = "Sign"
 
 # The item checks take `--scope PATH` (more than once) to the work they check. With none, each checks the passing fixtures
 # of the design system whose script it runs (0042-agora FR-013). Each runs in its own process under this group's lock, so
@@ -91,3 +106,19 @@ scope = "PATH"
 scope_many = true
 isolated = true
 options = ["--brand"]
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."course build"]
+title = "Build Course…"
+[commands."course show"]
+title = "Show Course…"
+[commands."deck build"]
+title = "Build Deck…"
+[commands."email build"]
+title = "Build Email…"
+[commands."figure build"]
+title = "Build Figure…"
+[commands."media build"]
+title = "Build Media…"
+[commands."sign build"]
+title = "Build Sign…"

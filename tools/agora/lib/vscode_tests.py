@@ -17,6 +17,7 @@ from agora.core.checks import Finding
 
 DIR = "tools/if-console"
 TIMEOUT = 900  # seconds for the whole run, VS Code started twice included
+SCREEN = "1440x900x24"  # the display's size and depth: the window of a screenshot is the whole of it
 
 
 class DisplayError(Exception):
@@ -33,16 +34,20 @@ def _free_display() -> int:
 class Display:
     """A virtual display server for one run: started on a free display, stopped when the run ends."""
 
-    def __init__(self) -> None:
+    def __init__(self, fbdir: Path | None = None) -> None:
         self.proc: subprocess.Popen[bytes] | None = None
         self.name = ""
+        self.fbdir = fbdir  # with a folder, the server keeps its screen there as an X window dump a screenshot reads (0043 FR-045)
 
     def __enter__(self) -> "Display":
         program = shutil.which("Xvfb")
         if not program:
             raise DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system add` once")
         n = _free_display()
-        self.proc = subprocess.Popen([program, f":{n}", "-screen", "0", "1280x1024x24", "-nolisten", "tcp"],
+        if self.fbdir:
+            self.fbdir.mkdir(parents=True, exist_ok=True)
+        extra = ["-fbdir", str(self.fbdir)] if self.fbdir else []
+        self.proc = subprocess.Popen([program, f":{n}", "-screen", "0", SCREEN, "-nolisten", "tcp", *extra],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.name = f":{n}"
         end = time.monotonic() + 15
@@ -65,17 +70,23 @@ class Display:
 
 
 def run(home: Path, node: str, code: str, code_cli: str, test_electron: str, vsix: str, env: dict[str, str],
-        folders: list[tuple[str, str]] | None = None, suite: str | None = None) -> tuple[list[Finding], list[str], list[dict]]:
+        folders: list[tuple[str, str]] | None = None, suite: str | None = None,
+        screenshots: Path | None = None) -> tuple[list[Finding], list[str], list[dict]]:
     """Run the tests. Returns findings (one per failed test), notes for a person, and every test's name, status and seconds.
 
     With `suite` (a directory whose index.js exports run(), see test/vscode/run.js) only that suite runs, once, in a trusted workspace
-    holding this clone and `folders` (name, path), the caller's own tests of the extension for a workspace of its own."""
+    holding this clone and `folders` (name, path), the caller's own tests of the extension for a workspace of its own.
+    With `screenshots` (a folder) only the screenshots scenario runs, and writes its PNG files there (0043 FR-045)."""
     ext = home / DIR
     began = time.monotonic()
-    with tempfile.TemporaryDirectory(prefix="agora-vscode-") as tmp, Display() as display:
+    with tempfile.TemporaryDirectory(prefix="agora-vscode-") as tmp, Display(Path(tmp) / "fb" if screenshots else None) as display:
         report = Path(tmp) / "report.json"
         run_env = {**env, "DISPLAY": display.name, "IF_CONSOLE_VSCODE": code, "IF_CONSOLE_VSCODE_CLI": code_cli, "IF_CONSOLE_VSIX": vsix, "IF_CONSOLE_TEST_ELECTRON": test_electron,
                    "IF_CONSOLE_REAL_ROOT": str(home), "IF_CONSOLE_VSCODE_REPORT": str(report), "NODE_OPTIONS": "", "HOME": env.get("HOME", tmp)}
+        if screenshots:
+            screenshots.mkdir(parents=True, exist_ok=True)
+            run_env["IF_CONSOLE_SCREENSHOTS"] = str(screenshots)
+            run_env["IF_CONSOLE_SCREEN_DUMP"] = str(Path(tmp) / "fb" / "Xvfb_screen0")
         if suite:
             run_env["IF_CONSOLE_VSCODE_SUITE"] = suite
             run_env["IF_CONSOLE_VSCODE_FOLDERS"] = json.dumps([{"name": n, "path": p} for n, p in folders or []])

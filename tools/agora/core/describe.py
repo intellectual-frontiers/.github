@@ -38,7 +38,10 @@ def command_data(reg: Registry, c: Command, ctx: Any = None) -> dict[str, Any]:
     usage = " ".join([reg.name, *c.words] + [(a.type + "..." if a.many else a.type if a.required else f"[{a.type}]") if not a.many else f"[{a.type}...]" for a in c.args]
                      + [f"[{o.flag}{'|' + o.alias if o.alias else ''}{' ' + o.type if o.type else ''}]" if not o.required else f"{o.flag} {o.type}"
                         for o in c.options])
+    from .presentation import of_command
+
     return {
+        **of_command(reg, c.id),
         "id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "help": c.help, "group": c.group or None,
         "arguments": args, "options": opts, "usage": usage,
         "surfaces": ["terminal", *reg.surfaces_of(c)], "programs": list(c.toolchain), "toolchain": list(c.toolchain), "isolated": c.isolated,
