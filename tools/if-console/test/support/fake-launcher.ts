@@ -52,13 +52,21 @@ export const doc = (orch: string, kind: string, id: string, data: Loose, extra?:
 
 /** A small second command line with its own nouns, a list, a decision, a write with a diff, and a check with a finding. */
 export function secondCommandLine(orch = 'other') {
-  const cmd = (id: string, category: string, surfaces: string[], help: string, extra?: Loose): Loose => ({ id, category, group: 'g', surfaces, help, ...(extra ?? {}) });
+  const titles: Record<string, [string, string]> = { 'widget list': ['List Widgets', 'list-unordered'], 'widget show': ['Show Widget\u2026', 'eye'], 'widget new': ['New Widget\u2026', 'add'], 'check': ['Run Check', 'checklist'] };
+  const cmd = (id: string, category: string, surfaces: string[], help: string, extra?: Loose): Loose => ({ id, category, group: 'g', surfaces, help, ...(titles[id] ? { title: titles[id][0], icon: titles[id][1] } : {}), ...(extra ?? {}) });
   const ed = ['terminal', 'editor', 'mcp'];
   const list = doc(orch, 'command-list', 'all', { count: 9, commands: [
     cmd('check', 'check', ed, 'Run checks'), cmd('doctor', 'check', ed, 'Report health'), cmd('fresh', 'check', ed, 'Prove generators'),
     cmd('widget list', 'read', ed, 'List widgets'), cmd('widget show', 'read', ed, 'Show a widget'), cmd('widget new', 'record', ed, 'Add a widget'),
     cmd('widget approve', 'decision', ['terminal', 'editor'], 'Approve a widget'), cmd('mcp serve', 'setup', ['terminal'], 'Serve MCP'),
-    cmd('secret tool', 'setup', ['terminal'], 'Not for the editor')] });
+    cmd('secret tool', 'setup', ['terminal'], 'Not for the editor')],
+    presentation: {
+      views: [{ id: 'things', title: 'Things', icon: 'package', order: 20, description: 'Widgets and what is done to them' }, { id: 'unused', title: 'Unused', icon: 'folder', order: 30, description: '' }],
+      nouns: [{ noun: 'widget', title: 'Widget', icon: 'symbol-event', view: 'things',
+        list: { command: 'widget list', rows: 'widgets', id: 'id', label: 'name', description: 'kind', status: 'state', badge: 'parts', tooltip: ['kind', 'note'],
+          status_map: { ready: 'ok', broken: 'error', draft: 'pending' } } }],
+      references: [{ id: 'widget', noun: 'widget', pattern: '\\bwidget[ /](w\\d+)\\b', value: '$1', files: ['docs/**/*.md'], text: 'note', facts: ['kind', 'state'], lens: ['kind', 'state'],
+        definition: ['path', 'line'] }] } });
   const arg = (name: string, type: string, extra?: Loose): Loose => ({ name, type, help: `the ${name}`, required: true, words: false, many: false, ...(extra ?? {}) });
   const detail = (id: string, category: string, args: Loose[], opts?: Loose[]): Loose => doc(orch, 'command', id, { id, noun: id.split(' ')[1] ? id.split(' ')[0] : null, verb: id.split(' ')[1] ?? id, category, help: `${id} help`,
     group: 'g', arguments: args, options: [...(opts ?? []), ...(category === 'read' || category === 'check' ? [] : [{ flag: '--dry-run', type: 'flag', help: 'x', multiple: false, required: false }])],

@@ -21,8 +21,13 @@ test('FR-001, FR-015: activating returns nothing, so the extension exports no AP
 test('FR-005, FR-016, SC-001: a trusted repository shows its orchestrator, audience and health in the status bar', async () => {
   const b = await boot();
   const bar = b.context.subscriptions.find((s) => s.item);
-  assert.match(bar.item.text, /other - private - something missing/);
-  assert.equal(bar.item.command, 'if-console.doctor');
+  assert.match(bar.item.text, /^\$\(warning\) other 1$/, 'the icon, the orchestrator and how many things need a person');
+  assert.deepEqual(bar.item.command.arguments, ['suggestions']);
+  assert.equal(bar.item.command.command, 'if-console.showHome', 'choosing it opens Home focused on the suggestions, never a silent refresh');
+  const tip = bar.item.tooltip.value.replace(/\\/g, '');
+  assert.match(tip, /audience private \(as the command line states it\); health: something missing/);
+  assert.match(tip, /big is not fetched yet/, 'the tooltip says what needs a person, with its command line and a button that runs it');
+  assert.match(tip, /Fetch big/);
   assert.ok(bar.item.visible);
   assert.deepEqual(b.first.invocations()[0].argv, ['command', 'list', '--json']);
   b.cleanup();
@@ -33,7 +38,7 @@ test('FR-006: in an untrusted workspace no launcher runs, and the reason is show
   assert.deepEqual(b.first.invocations(), []);
   const bar = b.context.subscriptions.find((s) => s.item);
   assert.match(bar.item.text, /not trusted/);
-  assert.match(bar.item.tooltip, /does not trust this workspace/);
+  assert.match(bar.item.tooltip.value, /does not trust this workspace/);
   const views = b.stub.calls.registered;
   await b.command('runCommand');
   assert.deepEqual(b.first.invocations(), [], 'the palette runs nothing either');
@@ -57,7 +62,7 @@ test('FR-008: the tree lists nouns, then the editor\'s commands and the noun\'s 
   assert.deepEqual(await labels(tree, widget), ['widget list', 'widget show', 'widget new', 'widget approve', 'w1', 'w2']);
   const w1 = widget.find((n: Loose) => n.kind === 'resource' && n.data.label === 'w1');
   const under = await children(tree, w1);
-  assert.deepEqual(await labels(tree, under), ['w2', 'approve it', 'rename', 'blocked']);
+  assert.deepEqual(await labels(tree, under), ['w2', 'approve it', 'rename', 'blocked', 'run its check']);
   const items = under.map((n: Loose) => tree.getTreeItem(n));
   assert.equal(items[0].description, 'owner');
   assert.equal(items[1].description, 'decision');
@@ -74,7 +79,7 @@ test('FR-007: two folders whose launchers share a name are two repositories, eac
   const tree = b.context.subscriptions.find((s) => s.id === 'if-console.commands').o.treeDataProvider;
   const roots = await children(tree);
   assert.equal(roots.length, 2);
-  assert.deepEqual(roots.map((r: Loose) => tree.getTreeItem(r).description.split(' - ')[0]), ['first', 'second']);
+  assert.deepEqual(roots.map((r: Loose) => tree.getTreeItem(r).description.split(' \u00b7 ')[0]), ['first', 'second']);
   assert.ok(b.repos[1].invocations().length > 0);
   b.cleanup();
 });
@@ -245,31 +250,17 @@ test('FR-014: the dry run\'s change opens in the diff editor, from a virtual doc
   b.cleanup();
 });
 
-test('FR-019: the Chores view is built from the launcher\'s own resources and categories', async () => {
-  const b = await boot();
-  const view = b.context.subscriptions.find((s) => s.id === 'if-console.chores').o.treeDataProvider;
-  const repo = (await view.getChildren())[0];
-  const groups = await view.getChildren(repo);
-  const names = groups.map((g: Loose) => view.getTreeItem(g).label);
-  assert.deepEqual(names, ['This repository', 'Needs attention', 'Record and propose', 'Decide', 'Get help']);
-  const attention = await view.getChildren(groups[1]);
-  const text = (await labels(view, attention)).join('|');
-  assert.match(text, /fetch big/, 'a toolchain entry doctor reports absent comes with its own action');
-  const record = await labels(view, await view.getChildren(groups[2]));
-  assert.deepEqual(record, ['widget new']);
-  b.cleanup();
-});
-
 test('FR-010: the Checks view shows each section\'s last state and, for a failed one, its findings', async () => {
   const b = await boot();
   const view = b.context.subscriptions.find((s) => s.id === 'if-console.checks').o.treeDataProvider;
-  const repo = (await view.getChildren())[0];
-  let sections = await view.getChildren(repo);
+  let sections = await view.getChildren();     // one repository in the window: its sections, with no repository above them
   assert.deepEqual(sections.map((s: Loose) => view.getTreeItem(s).description), ['not run yet', 'not run yet', 'not run yet']);
   await b.command('runSection', sections[0]);
-  sections = await view.getChildren(repo);
+  sections = await view.getChildren();
   const first = view.getTreeItem(sections[0]);
-  assert.equal(first.description, 'failed');
+  assert.equal(first.description, '2 findings');
+  assert.equal(first.iconPath.id, 'error');
+  assert.equal(first.iconPath.color.id, 'testing.iconFailed');
   const findings = await view.getChildren(sections[0]);
   assert.equal(findings.length, 2);
   assert.match(view.getTreeItem(findings[0]).description, /docs\/guide\.md:3/);

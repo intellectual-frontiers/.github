@@ -3,8 +3,9 @@
 import * as vscode from 'vscode';
 import type { App } from '../app';
 import { argvFromFields, collect } from '../model/forms';
+import { deriveHome, EXT_COMMANDS, type Run, type Suggestion } from '../model/home';
 import { firstValue } from '../model/json';
-import { actionsOf, checkSchema, exposed, WRITES, type Action, type CommandDetail, type Doc } from '../model/wire';
+import { actionsOf, checkSchema, exposed, WRITES, type Action, type CommandDetail, type CommandSummary, type Doc } from '../model/wire';
 import * as executor from '../services/executor';
 import type { RunResult } from '../services/launcher';
 import type { Repository } from '../services/repository';
@@ -14,10 +15,10 @@ import { chooseRepo, pickCommand } from './pick';
 export class RunCommands {
   constructor(private readonly app: App) {}
 
-  async runCommandPalette(): Promise<executor.Outcome | null> {
-    const repo = await chooseRepo(this.app);
+  async runCommandPalette(known?: Repository, filter?: (c: CommandSummary) => boolean): Promise<executor.Outcome | null> {
+    const repo = known ?? await chooseRepo(this.app);
     if (!repo) return null;
-    const id = await pickCommand(repo);
+    const id = await pickCommand(repo, filter);
     return id ? this.runForm(repo, id) : null;
   }
 
@@ -27,12 +28,27 @@ export class RunCommands {
     try { return await executor.runForm(this.app.ui, repo, id, presets, only); } catch (e) { this.app.fail(e); return null; }
   }
 
-  async runRepoWide(name: string, { form }: { form?: boolean } = {}): Promise<executor.Outcome | null> {
+  async runRepoWide(name: string, { form, args }: { form?: boolean; args?: string[] } = {}): Promise<executor.Outcome | null> {
     const repo = await chooseRepo(this.app);
     if (!repo) return null;
     if (!repo.has(name)) { void vscode.window.showInformationMessage(`${repo.name} has no "${name}" command.`); return null; }
     if (form) return this.runForm(repo, name);
-    try { const detail = await repo.detail(name); return await executor.runArgv(this.app.ui, repo, detail, [name]); } catch (e) { this.app.fail(e); return null; }
+    try { const detail = await repo.detail(name); return await executor.runArgv(this.app.ui, repo, detail, [name, ...(args ?? [])]); } catch (e) { this.app.fail(e); return null; }
+  }
+
+  /** What a suggestion runs: a command the launcher offers, a check section, a resource to open, or one of the few commands of the editor. */
+  async runRun(repo: Repository, run: Run): Promise<unknown> {
+    switch (run.kind) {
+      case 'action': return this.runAction(repo, run.action);
+      case 'words': return this.runWords(repo, run.words);
+      case 'section': return this.app.runSectionsShown(repo, [run.section]);
+      case 'resource': return this.app.opener.open(repo, run.link);
+      case 'ext': return EXT_COMMANDS.includes(run.command) ? vscode.commands.executeCommand(run.command) : null;
+    }
+  }
+
+  async runSuggestion(repo: Repository, s: Suggestion): Promise<unknown> {
+    return s.run ? this.runRun(repo, s.run) : null;
   }
 
   async runAction(repo: Repository, action: Action): Promise<executor.Outcome | null> {
@@ -52,33 +68,21 @@ export class RunCommands {
     if (!(node instanceof Node)) return null;
     const repo = node.repo;
     const d = node.data;
-    switch (node.kind) {
-      case 'command': return d.command ? this.runForm(repo, d.command.id) : null;
-      case 'resource': case 'link': return d.link ? this.openResource(repo, d.link) : null;
-      case 'action': return d.action ? this.runAction(repo, d.action) : null;
-      case 'section': return d.name ? this.app.runSections(repo, [d.name]) : null;
-      case 'chore': {
-        const c = d.chore;
-        if (!c) return null;
-        if (c.kind === 'command') return this.runForm(repo, c.command);
-        if (c.kind === 'action') return this.runAction(repo, c.action);
-        if (c.kind === 'section') return this.app.runSections(repo, [c.section]);
-        if (c.kind === 'resource') return this.openResource(repo, c.link);
-        if (c.kind === 'ext') return vscode.commands.executeCommand(c.command);
-        return null;
+    return this.app.fromView(d.view, async () => {
+      switch (node.kind) {
+        case 'command': return d.command ? this.runForm(repo, d.command.id) : null;
+        case 'resource': case 'link': return d.link ? this.app.opener.open(repo, d.link) : null;
+        case 'action': return d.action ? this.runAction(repo, d.action) : null;
+        case 'section': return d.name ? this.app.runSectionsShown(repo, [d.name]) : null;
+        case 'suggestion': return d.suggestion ? this.runSuggestion(repo, d.suggestion) : null;
+        case 'row': return d.row ? this.app.opener.openRow(repo, d.row.noun, d.row.id) : null;
+        default: return null;
       }
-      default: return null;
-    }
+    });
   }
 
-  async openResource(repo: Repository, link: { command: string; fields: Record<string, unknown> }): Promise<void> {
-    try {
-      const detail = await repo.detail(link.command);
-      await this.openView(repo, detail, argvFromFields(detail, link.fields));
-    } catch (e) { this.app.fail(e); }
-  }
-
-  /** A command's own result: a check's findings into Problems, a write's next steps, or a read's HTML rendering. */
+  /** A command's own result: a check's findings into Problems, a write's next steps, or a read's HTML rendering. A problem is always shown with
+   * the command that fixes it and a button that runs it (0043 FR-048), never as a pointer to somewhere else. */
   async showResult(repo: Repository, detail: CommandDetail, argv: string[], real: RunResult): Promise<void> {
     const doc = real.doc;
     if (!doc) return;
@@ -87,15 +91,27 @@ export class RunCommands {
     if (doc.kind === 'check') {
       const r = await this.app.handleCheck(repo, doc);
       const s = r.summary;
-      const text = `${repo.name} check: ${s.passed ?? 0} passed, ${s.failed ?? 0} failed, ${s.skipped ?? 0} skipped.`;
-      const pick = await (s.failed ? vscode.window.showWarningMessage(text, 'Show Problems') : vscode.window.showInformationMessage(text));
-      if (pick === 'Show Problems') void vscode.commands.executeCommand('workbench.actions.view.problems');
+      await this.tell(repo, `${repo.name} check: ${s.passed ?? 0} passed, ${s.failed ?? 0} failed, ${s.skipped ?? 0} skipped.`, ['checks']);
       return;
     }
-    if (doc.kind === 'doctor') { repo.doctor = doc; this.app.refreshViews(); }
-    if (doc.kind === 'fresh') { repo.fresh = doc; this.app.refreshViews(); }
-    if (WRITES.includes(detail.category)) { await this.afterWrite(repo, detail, doc); return; }
-    await this.openView(repo, detail, argv);
+    if (doc.kind === 'doctor') { repo.doctor = doc; this.app.refreshViews(); await this.tell(repo, `${repo.name} doctor: ${repo.health}.`, ['toolchain', 'health']); }
+    if (doc.kind === 'fresh') { repo.fresh = doc; this.app.refreshViews(); await this.tell(repo, `${repo.name} fresh: ${asStatus(doc)}.`, ['generated']); }
+    if (WRITES.includes(detail.category)) { repo.forgetResources(); await this.afterWrite(repo, detail, doc); return; }
+    await this.app.opener.argv(repo, detail, argv);
+  }
+
+  /** A message about a result. Where something needs a person it says what, gives the exact command line, and has the button that runs the fix
+   * and the one that shows all of it in Home; where nothing does it is only said. */
+  async tell(repo: Repository, headline: string, groups: Suggestion['group'][]): Promise<void> {
+    const needs = deriveHome(repo).needs.filter((s) => groups.includes(s.group) && s.counts);
+    const first = needs[0];
+    if (!first) { void vscode.window.showInformationMessage(headline); return; }
+    const more = needs.length > 1 ? ` (and ${needs.length - 1} more)` : '';
+    const line = first.commandLine ? ` Run ${first.commandLine}.` : first.yourself ? ` You: ${first.yourself}` : '';
+    const buttons = [...(first.run ? [first.runLabel || 'Run'] : []), 'Show all'];
+    const pick = await vscode.window.showWarningMessage(`${headline} ${first.label}${more}.${line}`, ...buttons);
+    if (pick === 'Show all') await this.app.showHome(true);
+    else if (pick !== undefined && pick === (first.runLabel || 'Run')) await this.app.fromView(undefined, () => this.runSuggestion(repo, first));
   }
 
   private async afterWrite(repo: Repository, detail: CommandDetail, doc: Doc): Promise<void> {
@@ -103,14 +119,8 @@ export class RunCommands {
     const pick = await vscode.window.showInformationMessage(`${repo.name}: ${detail.id} is done.`, ...next.map((a) => a.label));
     const hit = next.find((a) => a.label === pick);
     if (hit) await this.runAction(repo, hit);
+    repo.forgetResources();
     this.app.refreshViews();
-  }
-
-  /** A read command's HTML rendering in a webview (FR-011). */
-  async openView(repo: Repository, detail: CommandDetail, argv: string[]): Promise<void> {
-    const r = await repo.launcher.run(argv, { format: 'html' });
-    if (r.failed || !r.stdout) { this.app.log.info(`${detail.id}: the command line gave no rendering (${r.failed ?? `exit ${String(r.exit)}`}).`); return; }
-    this.app.openHtml(repo, `${repo.name}: ${argv.join(' ')}`, r.stdout);
   }
 
   /** A command named by words (from a link): run it through the one path, with its values already given. */
@@ -144,7 +154,7 @@ export class RunCommands {
     try {
       const detail = await repo.detail(id);
       const got = await collect(this.app.ui, detail, (s) => repo.choicesFor(s), null);
-      if (!got.cancelled) await this.openView(repo, detail, argvFromFields(detail, got.values));
+      if (!got.cancelled) await this.app.opener.argv(repo, detail, argvFromFields(detail, got.values));
     } catch (e) { this.app.fail(e); }
   }
 
@@ -155,3 +165,8 @@ export class RunCommands {
     return id === undefined ? null : `${kind}:${id}`;
   }
 }
+
+const asStatus = (doc: Doc): string => {
+  const d = doc.data;
+  return typeof d.status === 'string' ? d.status : 'done';
+};

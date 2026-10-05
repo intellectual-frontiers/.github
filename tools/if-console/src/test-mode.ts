@@ -17,14 +17,14 @@ export interface Shown { kind: string; [field: string]: unknown }
 export interface TestHook {
   answers: boolean[];
   shown: Shown[];
-  describe: () => Promise<unknown>;
+  describe: (options?: Record<string, unknown>) => Promise<unknown>;
 }
 
 let hook: TestHook | null = null;
 
 export const active = (): boolean => hook !== null;
 
-export function install(extensionContext: { extensionMode?: vscode.ExtensionMode } | null | undefined, describe: () => Promise<unknown>): TestHook | null {
+export function install(extensionContext: { extensionMode?: vscode.ExtensionMode } | null | undefined, describe: (options?: Record<string, unknown>) => Promise<unknown>): TestHook | null {
   if (!extensionContext || extensionContext.extensionMode !== vscode.ExtensionMode.Test) return null;
   hook = { answers: [], shown: [], describe };
   (globalThis as Record<symbol, unknown>)[KEY] = hook;

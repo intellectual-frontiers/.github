@@ -2,7 +2,9 @@
 // command's description, its health from `doctor`, and the last check's results. Nothing is run until the workspace is trusted; a launcher
 // that does not answer `command list` with a document this extension understands is not shown as an orchestrator, and the log says why.
 import type * as vscode from 'vscode';
-import { valuesFromList, nounForArgument, commandLine, type Step } from '../model/forms';
+import { argvFromFields, valuesFromList, nounForArgument, commandLine, type Step } from '../model/forms';
+import type { ListDecl, NounDecl } from '../model/presentation';
+import { rowsOf, type Row } from '../model/rows';
 import { doctorState, commandDetail, commandList, exposed, linksOf, nounsOf, WireError, type CommandDetail, type CommandList, type CommandSummary, type Doc, type Finding, type Health, type Link, type Nouns } from '../model/wire';
 import { Launcher, type RunResult, type SpawnFn } from './launcher';
 import { RegistryCache } from './registry';
@@ -35,6 +37,8 @@ export class Repository {
   readonly registry = new RegistryCache();
   state: RepoState = 'unloaded';
   reason = '';
+  /** The launcher could not start because something it needs is not on this machine yet (its exit status says missing). */
+  missing = false;
   doctor: Doc | null = null;
   readonly checks = new Map<string, CheckRecord>();   // section -> its last result
   fresh: Doc | null = null;
@@ -65,6 +69,7 @@ export class Repository {
     const r = await this.launcher.run(['command', 'list']);
     if (r.failed || !r.doc) {
       this.state = 'unavailable';
+      this.missing = r.exit === 3;
       this.reason = `${this.program} did not answer "command list" (${r.failed ?? `exit ${String(r.exit)}`}).`;
       this.log(this.reason);
       return this;
@@ -119,6 +124,48 @@ export class Repository {
     }
     const found = this.registry.nounValues.get(noun) ?? [];
     return found.length ? found : null;
+  }
+
+  /** What the views read from the launcher's lists and shows is out of date once a command has written: it is asked again. */
+  forgetResources(): void {
+    this.registry.rows.clear();
+    this.registry.shown.clear();
+    this.registry.nounValues.clear();
+  }
+
+  /** The noun's presentation, where the command line declares one. */
+  nounDecl(noun: string): NounDecl | null { return this.list?.presentation.nouns.find((n) => n.noun === noun) ?? null; }
+
+  /** A noun's `list` declaration, only where its command is a read command the editor offers (0041 FR-064). */
+  listDecl(noun: string): ListDecl | null {
+    const l = this.nounDecl(noun)?.list;
+    const c = l ? this.command(l.command) : null;
+    return l && c && exposed(c) && c.category === 'read' ? l : null;
+  }
+
+  /** The rows a noun's `list` returns, read by its own declaration; asked once until the launcher changes. */
+  rows(noun: string): Promise<Row[]> {
+    const held = this.registry.rows.get(noun);
+    if (held) return held;
+    const decl = this.listDecl(noun);
+    const p = decl ? this.launcher.run(decl.command.split(/\s+/)).then((r) => (r.doc && !r.error ? rowsOf(noun, decl, r.doc) : [])) : Promise.resolve([]);
+    this.registry.rows.set(noun, p);
+    return p;
+  }
+
+  /** The resource a noun's `show` command gives for an id, or null where the launcher gives none; asked once until the launcher changes. */
+  show(noun: string, id: string): Promise<Doc | null> {
+    const key = `${noun}\n${id}`;
+    const held = this.registry.shown.get(key);
+    if (held) return held;
+    const p = this.has(`${noun} show`) ? this.detail(`${noun} show`).then(async (detail) => {
+      const arg = detail.arguments[0];
+      if (!arg) return null;
+      const r = await this.launcher.run(argvFromFields(detail, { [arg.name]: id }));
+      return r.doc && !r.error ? r.doc : null;
+    }, () => null) : Promise.resolve(null);
+    this.registry.shown.set(key, p);
+    return p;
   }
 
   async runDoctor(): Promise<RunResult> {

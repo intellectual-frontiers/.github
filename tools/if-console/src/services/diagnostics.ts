@@ -27,6 +27,10 @@ interface Placed { uri: vscode.Uri; diagnostics: vscode.Diagnostic[] }
 export class Diagnostics implements vscode.Disposable {
   private readonly collection = vscode.languages.createDiagnosticCollection('if-console');
   private readonly bySection = new Map<string, Map<string, Placed>>();   // `${folderKey}\n${section}` -> uriString -> placed
+  private readonly emitter = new vscode.EventEmitter<vscode.Uri[]>();
+  /** Fires with the files whose findings changed, so that their decorations are drawn again. */
+  readonly onDidChange = this.emitter.event;
+  private shown = new Map<string, { uri: vscode.Uri; errors: number; warnings: number }>();
 
   constructor(private readonly resolve: ResolveFile) {}
 
@@ -65,8 +69,19 @@ export class Diagnostics implements vscode.Disposable {
       }
     }
     this.collection.clear();
-    for (const { uri, diagnostics } of merged.values()) this.collection.set(uri, diagnostics);
+    const was = this.shown;
+    this.shown = new Map();
+    for (const { uri, diagnostics } of merged.values()) {
+      this.collection.set(uri, diagnostics);
+      this.shown.set(uri.toString(), { uri, errors: diagnostics.filter((d) => d.severity === vscode.DiagnosticSeverity.Error).length,
+        warnings: diagnostics.filter((d) => d.severity !== vscode.DiagnosticSeverity.Error).length });
+    }
+    const changed = [...was.values(), ...this.shown.values()].map((x) => x.uri);
+    if (changed.length) this.emitter.fire(changed);
   }
+
+  /** How many errors and other findings the checks reported at a file, or null where none. */
+  countsFor(uri: vscode.Uri): { errors: number; warnings: number } | null { return this.shown.get(uri.toString()) ?? null; }
 
   count(): number {
     let n = 0;
@@ -74,5 +89,5 @@ export class Diagnostics implements vscode.Disposable {
     return n;
   }
 
-  dispose(): void { this.collection.dispose(); }
+  dispose(): void { this.collection.dispose(); this.emitter.dispose(); }
 }

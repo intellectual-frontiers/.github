@@ -38,7 +38,8 @@ test('FR-064: the presentation is read from command list: views in their order, 
 });
 
 test('FR-064: a command list without presentation gives an empty one, and the commands carry their title and icon where they have them', () => {
-  const plain = wire.commandList(wire.readDoc(k.list) as wire.Doc);
+  const bare: Loose = { ...k.list, data: { count: k.list.data.count, commands: k.list.data.commands } };
+  const plain = wire.commandList(wire.readDoc(bare) as wire.Doc);
   assert.deepEqual(plain.presentation, presentation.NO_PRESENTATION);
   const titled: Loose = { ...k.list, data: { ...k.list.data, commands: [{ id: 'widget show', category: 'read', group: 'g', surfaces: ['editor'], help: 'x', title: 'Show Widget…', icon: 'eye' },
     { id: 'check', category: 'check', group: 'g', surfaces: ['editor'], help: 'y' }] } };

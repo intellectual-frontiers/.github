@@ -33,33 +33,68 @@ test('activates in a trusted workspace holding this clone and a fixture command 
   assert.ok(fixtureLog().length > 0 && fixtureLog().every((l) => l.IF_CONSOLE === '1'), 'every invocation said it came from the editor');
 });
 
-test('the three views are populated from the command lines', async () => {
-  const snap = await hook().describe();
+test('Home, the views each command line declares, Checks and All commands are populated from the command lines', async () => {
+  const snap = await hook().describe({ rows: true });
+  const home = entry(snap.views.home, 'real');
+  assert.ok(home, 'Home has one group for each command line');
+  assert.ok(labels(home).includes('Get help'));
+  assert.ok(home.children.find((g) => g.label === 'Get help').children.some((c) => c.label === 'Learn how this works'), 'Learn is in Get help');
+  const fixtureHome = labels(entry(snap.views.home, 'fixture'));
+  for (const want of ['Nothing checked yet', 'Generated files not proved yet', 'Get help']) assert.ok(fixtureHome.includes(want), want);
+  const row = entry(snap.views.home, 'fixture').children.find((c) => c.label === 'Nothing checked yet');
+  assert.strictEqual(row.description, './other check --changed', 'the exact command line is the muted description');
+
+  const declared = realList().presentation.views.map((v) => v.title);
+  const slots = snap.views.slots.map((v) => v.title);
+  for (const t of declared) assert.ok(slots.includes(t), `the view ${t} is planned`);
+  assert.ok(slots.includes('Things'), 'and the fixture\'s');
+  assert.deepStrictEqual(slots, [...slots].sort((a, b) => snap.views.slots.find((v) => v.title === a).order - snap.views.slots.find((v) => v.title === b).order), 'in the order they ask for');
+  const specs = snap.views.slots.find((v) => v.title === 'Specs');
+  assert.deepStrictEqual(specs.entries.map((n) => n.label), ['Requirement', 'Spec', 'Term'], 'the nouns whose view it is');
+  const spec = specs.entries.find((n) => n.label === 'Spec');
+  const all = reference('spec', 'list').data.specs;
+  assert.strictEqual(spec.children.length, Math.min(all.length, 200) + (all.length > 200 ? 1 : 0));
+  assert.strictEqual(spec.children[0].label, all[0].name);
+  assert.strictEqual(spec.children[0].description, all[0].title, 'the muted description is the declared field');
+  const draft = spec.children.find((r, i) => all[i] && all[i].status === 'Draft');
+  assert.strictEqual(draft.status, 'testing.iconQueued', 'a Draft is waiting');
+  const things = snap.views.slots.find((v) => v.title === 'Things');
+  assert.deepStrictEqual(things.entries.map((n) => n.label), ['Widget', 'Site']);
+  assert.deepStrictEqual(things.entries[0].children.map((r) => [r.label, r.description, r.status]), [['First widget', 'blue', 'testing.iconPassed'], ['Second widget', 'red', 'testing.iconFailed'],
+    ['Third widget', 'green', 'testing.iconQueued']]);
+  assert.deepStrictEqual(things.entries[1].children.map((r) => r.label), ['Generate Site\u2026'], 'a noun with no list shows its commands, titled by the command line');
+
   const commands = entry(snap.views.commands, 'real');
-  assert.ok(commands, 'the first command line is in the Command lines view');
+  assert.ok(commands, 'the first command line is in All commands');
   assert.ok(labels(commands).includes('Repository-wide'));
   for (const noun of editorNouns()) assert.ok(labels(commands).includes(noun), `the noun ${noun} is listed`);
   const wide = commands.children.find((c) => c.label === 'Repository-wide').children.map((c) => c.label);
   for (const want of ['check', 'doctor', 'fresh', 'test']) assert.ok(wide.includes(want), `${want} is a repository-wide command`);
   assert.deepStrictEqual(labels(entry(snap.views.commands, 'fixture')), ['Repository-wide', 'site', 'period', 'widget']);
 
-  const chores = entry(snap.views.chores, 'real');
-  assert.ok(labels(chores).includes('Needs attention') && labels(chores).includes('Get help'));
-  assert.ok(chores.children.find((g) => g.label === 'Get help').children.some((c) => c.label === 'Learn'), 'Learn is a chore');
-
   const sections = reference('command', 'show', 'check').data.arguments.find((a) => a.name === 'sections').choices;
   assert.deepStrictEqual(labels(entry(snap.views.checks, 'real')), sections, 'the Checks view lists the check sections');
   assert.deepStrictEqual(labels(entry(snap.views.checks, 'fixture')), ['docs', 'links']);
+  assert.strictEqual(typeof snap.badges.home, 'number');
+  const real = snap.repositories.find((r) => r.folder === 'real');
+  assert.ok(snap.status.text.includes(real.name), 'the status bar has the orchestrator');
+  assert.match(snap.status.tooltip, /audience public/);
+  assert.deepStrictEqual(snap.tests.profiles, ['Run', 'Run with --changed']);
+  const roots = snap.tests.items.map((t) => t.label);
+  assert.ok(roots.some((l) => l.startsWith(real.name)) && roots.some((l) => l.startsWith('other')), `a test for each repository: ${roots}`);
 });
 
 test('every command of the manifest is registered', async () => {
   const want = manifest().contributes.commands.map((c) => c.command).sort();
   const have = (await vscode.commands.getCommands(true)).filter((c) => c.startsWith('if-console.'));
-  const forViews = /^if-console\.(commands|chores|checks)\.(focus|open|removeView|resetViewLocation|toggleVisibility)$/;   // VS Code's own, for each view
+  const forViews = /^if-console\.(home|view\.\d+|checks|commands)\.(focus|open|removeView|resetViewLocation|toggleVisibility)$/;   // VS Code's own, for each view
   assert.deepStrictEqual(have.filter((c) => !forViews.test(c)).sort(), want, 'the commands VS Code has are exactly the manifest\'s');
   const palette = manifest().contributes.menus.commandPalette.filter((m) => m.when !== 'false').map((m) => m.command);
-  for (const id of ['if-console.runCommand', 'if-console.check', 'if-console.fresh', 'if-console.test', 'if-console.doctor', 'if-console.showCommandLine',
-    'if-console.getHelp', 'if-console.learn', 'if-console.copyContext', 'if-console.openView']) assert.ok(palette.includes(id), `${id} is in the palette`);
+  for (const id of ['if-console.showHome', 'if-console.runCommand', 'if-console.check', 'if-console.fresh', 'if-console.test', 'if-console.doctor', 'if-console.showCommandLine',
+    'if-console.getHelp', 'if-console.learn', 'if-console.copyContext', 'if-console.openView', 'if-console.findResource']) assert.ok(palette.includes(id), `${id} is in the palette`);
+  const titles = Object.fromEntries(manifest().contributes.commands.map((c) => [c.command, `${c.category}: ${c.title}`]));
+  assert.strictEqual(titles['if-console.showHome'], 'IF Console: Show Home');
+  assert.ok((await vscode.commands.getCommands(true)).includes('workbench.view.extension.if-console'), 'the activity-bar container is VS Code\'s');
 });
 
 test('a check produces Problems diagnostics at the finding\'s file and line', async () => {
@@ -146,6 +181,58 @@ test('Learn lists the repository\'s help topics and shows one with its steps as 
   assert.strictEqual((page.html.match(/<button type="button" data-step=/g) || []).length, steps.length, 'a button for each step');
   assert.ok(/<button[^>]*disabled/.test(page.html), 'a step that runs in a terminal is a disabled button that says so');
   assert.ok(page.html.includes('<code>') && page.html.includes('doctor'), 'each step\'s command line is shown to paste');
+});
+
+test('the files a reference names have a hover, a definition, a CodeLens and links, from the command line\'s own `show`', async () => {
+  const file = vscode.Uri.file(path.join(process.env.IF_CONSOLE_FIXTURE_ROOT, 'docs', 'guide.md'));
+  const doc = await vscode.workspace.openTextDocument(file);
+  await vscode.window.showTextDocument(doc);
+  const at = new vscode.Position(4, 10);   // "The widget w1 is blue, and widget/w2 is red."
+  const hovers = await waitFor(async () => { const h = await vscode.commands.executeCommand('vscode.executeHoverProvider', file, at); return h.length ? h : null; }, 'the hover');
+  const md = hovers.flatMap((h) => h.contents).map((c) => c.value).join('\n').replace(/\\/g, '');
+  assert.match(md, /The first one\./, 'the resource\'s words');
+  assert.match(md, /kind:\*\* blue/);
+  assert.match(md, /command:if-console\.followLink/, 'its actions are links');
+  const defs = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', file, at);
+  assert.strictEqual(defs.length, 1);
+  assert.strictEqual(defs[0].range.start.line, 4, 'the line the resource says, 5');
+  const lenses = await vscode.commands.executeCommand('vscode.executeCodeLensProvider', file, 10);
+  assert.strictEqual(lenses.length, 2, 'one for each reference');
+  assert.ok(lenses.some((l) => l.command && /blue \u00b7 ready \u00b7 \$\(play\) Run/.test(l.command.title)), JSON.stringify(lenses.map((l) => l.command && l.command.title)));
+  const links = await vscode.commands.executeCommand('vscode.executeLinkProvider', file, 10);
+  assert.ok(links.filter((l) => String(l.target).startsWith('command:if-console.followLink')).length === 2);
+  const snap = await hook().describe();
+  const guide = snap.tests.items.find((t) => t.label === 'guide.md' || t.id.startsWith('file:'));
+  assert.ok(guide && guide.children.length === 2 && guide.children[0].line === 4, 'each reference whose resource has a check is a test at its line');
+  // a real spec: the requirement a row of the register names
+  const realFile = vscode.Uri.file(path.join(process.env.IF_CONSOLE_REAL_ROOT, 'spec-kit', 'enforcement.tsv'));
+  const text = (await vscode.workspace.openTextDocument(realFile)).getText().split('\n');
+  const line = text.findIndex((l) => l.startsWith('0043-if-console FR-001\t'));
+  assert.ok(line > 0);
+  const realHover = await waitFor(async () => { const h = await vscode.commands.executeCommand('vscode.executeHoverProvider', realFile, new vscode.Position(line, 5)); return h.length ? h : null; }, 'the requirement\'s hover', 90000);
+  const realMd = realHover.flatMap((h) => h.contents).map((c) => c.value).join('\n').replace(/\\/g, '');
+  assert.match(realMd, /The extension MUST be one extension named/, 'the requirement\'s own text');
+  const realDefs = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', realFile, new vscode.Position(line, 5));
+  assert.ok(realDefs[0].uri.fsPath.endsWith(path.join('0043-if-console', 'spec.md')), 'its definition is the spec');
+});
+
+test('Find Resource lists every row of every view, the command line\'s own labels and descriptions', async () => {
+  const mark = hook().shown.length;
+  vscode.commands.executeCommand('if-console.findResource');
+  const pick = await nextQuickPick(mark, (s) => s.title === 'Find a resource', 'the Find Resource quick pick');
+  assert.ok(pick.items.some((l) => l.includes('First widget')), 'a row of the fixture\'s view');
+  assert.ok(pick.items.some((l) => l.includes('0043-if-console')), 'a spec of this repository\'s own');
+  assert.ok(pick.items.length > 1000, `all the rows, not the first few: ${pick.items.length}`);
+  await vscode.commands.executeCommand('workbench.action.closeQuickOpen');
+});
+
+test('the status bar says what needs a person and a click on it opens Home with that in view', async () => {
+  const snap = await hook().describe();
+  assert.match(snap.status.tooltip, /Show all/);
+  await vscode.commands.executeCommand('if-console.showHome', 'suggestions');
+  const after = await waitFor(async () => (await hook().describe()).revealed, 'the suggestion Home revealed');
+  const labels = (await hook().describe()).needs.flatMap((n) => n.items.map((i) => i.label));
+  assert.ok(labels.includes(after), `Home revealed ${after}, one of ${labels}`);
 });
 
 test('the MCP server is registered for the repository whose command list has it', async () => {

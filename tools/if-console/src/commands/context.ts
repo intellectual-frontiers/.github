@@ -14,6 +14,8 @@ export class ContextCommands {
 
   /** The `kind:id` a context is wanted for: the one a row of a view stands for, or the person's choice. */
   async pickResource(repo: Repository, node: Node | null): Promise<string | null> {
+    const row = node?.data.row;
+    if (row) return `${row.noun}:${row.id}`;
     const link = node?.data.link;
     if (link) {
       const kind = link.command.split(/\s+/)[0] ?? '';
@@ -62,6 +64,12 @@ export class ContextCommands {
     if (!repo.has('context')) { void vscode.window.showInformationMessage(`${repo.name} has no "context" command.`); return; }
     const resource = await this.pickResource(repo, row);
     if (!resource) return;
+    await this.copyContextOf(repo, resource);
+  }
+
+  /** `context RESOURCE`, with secrets removed, to where the person chooses. */
+  async copyContextOf(repo: Repository, resource: string): Promise<void> {
+    if (!repo.has('context')) { void vscode.window.showInformationMessage(`${repo.name} has no "context" command.`); return; }
     const r = await repo.launcher.run(['context', resource]);
     if (!r.doc || r.error) { void vscode.window.showErrorMessage(r.error ? r.error.message : `${repo.program} gave no context for ${resource}.`); return; }
     await this.deliver(redact(JSON.stringify(r.doc, null, 2), process.env.HOME), 'json');

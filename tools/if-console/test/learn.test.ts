@@ -63,13 +63,13 @@ test('FR-031: a repository whose command list has no help is not offered, and Le
   b.cleanup();
 });
 
-test('FR-031: Learn is in the palette and a chore', async () => {
+test('FR-031: Learn is in the palette and in Home\'s Get help, where the command line has help', async () => {
   const manifest = require('../../package.json');
-  assert.ok(manifest.contributes.commands.some((c: Loose) => c.command === 'if-console.learn' && c.title === 'Learn'));
+  assert.ok(manifest.contributes.commands.some((c: Loose) => c.command === 'if-console.learn' && c.title === 'Learn a Topic\u2026'));
   assert.ok(manifest.contributes.menus.commandPalette.some((m: Loose) => m.command === 'if-console.learn' && /hasRepository/.test(m.when)));
-  const { deriveChores } = require('../src/model/chores') as Loose;
-  const repo = (has: Loose) => ({ list: { commands: [] }, editorCommands: () => [], has: (id: Loose) => has.includes(id), checks: new Map(), proposals: [], doctor: null, fresh: null });
-  const help = (r: Loose) => deriveChores(r).find((g: Loose) => g.id === 'help').items.map((i: Loose) => i.label);
-  assert.deepEqual(help(repo(['help'])), ['Learn', 'Get Help', 'Copy Context']);
-  assert.deepEqual(help(repo([])), ['Get Help', 'Copy Context']);
+  const { deriveHome } = require('../src/model/home') as Loose;
+  const repo = (has: Loose) => ({ name: 'o', program: './o', state: 'ready', reason: '', checks: new Map(), proposals: [], doctor: null, fresh: null, has: (id: Loose) => has.includes(id), command: () => null, line: (a: string[]) => a.join(' ') });
+  const help = (r: Loose) => deriveHome(r).help.map((i: Loose) => i.run.command);
+  assert.deepEqual(help(repo(['help', 'context'])), ['if-console.learn', 'if-console.getHelp', 'if-console.copyContext']);
+  assert.deepEqual(help(repo([])), ['if-console.getHelp']);
 });

@@ -9,6 +9,7 @@ import type { CommandDetail, Doc } from '../model/wire';
 import type { Ui } from '../services/executor';
 import type { Cancellation, RunResult } from '../services/launcher';
 import type { Log } from '../services/log';
+import type { Running } from '../services/running';
 import type { Repository } from '../services/repository';
 import * as testMode from '../test-mode';
 
@@ -44,11 +45,15 @@ export async function readText(repo: Repository, file: string): Promise<string |
 export interface UiParts {
   docs: DiffDocuments;
   log: Log;
+  /** The view that started the work now, if one did, so that its progress shows there (FR-038). */
+  where?: () => string | null;
+  /** The commands running, which a Stop action in a view's title ends. */
+  running?: Running;
   /** What to do with a command's result once it has run. */
   showResult: (repo: Repository, detail: CommandDetail, argv: string[], real: RunResult) => Promise<void>;
 }
 
-export function createUi({ docs, log, showResult }: UiParts): Ui {
+export function createUi({ docs, log, showResult, where, running }: UiParts): Ui {
   const ui: Ui = {
     async pick<V>({ title, placeholder, items, canPickMany }: { title?: string; placeholder?: string; items: Array<PickItem<V>>; canPickMany?: boolean }): Promise<V | V[] | undefined> {
       const shown = items.map((i) => ({ label: i.label, description: i.description, detail: i.detail, value: i.value, picked: false }));
@@ -69,9 +74,19 @@ export function createUi({ docs, log, showResult }: UiParts): Ui {
     },
 
     progress<T>(title: string, fn: (token: Cancellation, report: (doc: Doc) => void) => Promise<T>): Promise<T> {
+      const view = where ? where() : null;
+      const said = (progress: vscode.Progress<{ message?: string }>) => (doc: Doc): void => { const w = streamWords(doc); if (w) progress.report({ message: w }); };
+      // Work a view started is shown in that view, and ended by the Stop action in its title; any other is a notification with its own Cancel.
+      if (view && running) {
+        const source = running.begin();
+        return Promise.resolve(vscode.window.withProgress({ location: { viewId: view }, title }, (progress) => {
+          const sub = source.token.onCancellationRequested(() => log.info('The person cancelled the command; its process was ended.'));
+          return fn(source.token, said(progress)).finally(() => { sub.dispose(); running.done(source); });
+        }));
+      }
       return Promise.resolve(vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title, cancellable: true }, (progress, token) => {
         const sub = token.onCancellationRequested(() => log.info('The person cancelled the command; its process was ended.'));
-        return fn(token, (doc) => { const w = streamWords(doc); if (w) progress.report({ message: w }); }).finally(() => { sub.dispose(); });
+        return fn(token, said(progress)).finally(() => { sub.dispose(); });
       }));
     },
 
@@ -85,8 +100,8 @@ export function createUi({ docs, log, showResult }: UiParts): Ui {
     /** Each file the change would touch as a diff, from the dry run's resource, and a choice to apply it or not (FR-014). */
     async reviewChanges({ repo, detail, changes }): Promise<boolean> {
       const items: Array<PickItem<string | number>> = [{ label: '$(check) Apply these changes', description: summaryOf(changes), value: 'apply' },
-        ...changes.map((c, i) => ({ label: `$(diff) ${c.path}`, description: `${labelOfChange(c)}, +${c.added} -${c.removed}`, value: i })),
-        { label: '$(close) Do not apply', value: 'cancel' }];
+        ...changes.map((c, i) => ({ label: `$(diff) ${c.path}`, description: `${labelOfChange(c)}, +${c.added} -${c.removed}`, detail: `Open the diff of ${c.path}`, value: i })),
+        { label: '$(discard) Discard (change nothing)', description: 'nothing is written', value: 'cancel' }];
       for (;;) {
         const picked = await ui.pick<string | number>({ title: `${detail.id}: what would change`, placeholder: 'Open a file to see its diff, then apply or leave it', items });
         if (picked === undefined || picked === 'cancel') return false;
