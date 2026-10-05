@@ -49,10 +49,12 @@ under its own spec.
   own tools read it; no tool of the repository does, and none requires it
   (0025-tooling-environment FR-025).
 - **FR-017**: A repository that carries the file MUST list by default the
-  public root (`.github`), the vault (`eidolon`),
-  `www.intellectualfrontiers.com` and the environment itself
-  (`workspaces-host`) in `WS_HOST_REPOS`, so a session started from any of
-  them in a workspace has all four.
+  public root (`.github`) and the environment itself (`workspaces-host`) in
+  `WS_HOST_REPOS`, so a session started from it in a workspace has both, and
+  MAY list any other repository it is worked alongside. The environment
+  orchestrator and its repository MUST know only the public repositories: a
+  repository that is not public is named only in its own configuration, never
+  in a public specification or in the environment's code, tests or guide.
 - **FR-018**: A repository MUST add nothing to a workspace beyond that file.
   Any package or program its tools need comes from the repository's own locks
   and toolchain (0025-tooling-environment FR-007), never from a workspace.
