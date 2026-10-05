@@ -67,10 +67,11 @@ how addresses map to content, 0004-addressing.
   address the previous website published, and every address the previous
   website redirected to a patent page MUST keep redirecting there
   (0024-persistent-addresses FR-002).
-- **FR-012**: The website MUST answer `/ontology/core` and `/ontology/web`
-  with the public root's Turtle, and `/ontology/private` as not found
-  (0024-persistent-addresses FR-005, FR-006). An address the website
-  does not serve MUST answer with one not-found page (0004-addressing
+- **FR-012**: The website MUST NOT serve the ontology: no ontology file, and
+  no page at a namespace's address, which answers like any address the
+  website does not serve. The ontology is read and searched in the IF
+  Console (0043-if-console). An address the website does not serve MUST
+  answer with one not-found page and a not-found status (0004-addressing
   FR-007).
 - **FR-013**: Until a register's records are held in the public root, the
   generator MAY read that register from a snapshot of the previous
@@ -87,9 +88,50 @@ how addresses map to content, 0004-addressing.
 - **FR-015**: Every page MUST load the analytics container the previous
   website used, and no other tracking.
 
+## Publishing and testing
+
+- **FR-016**: The generated website MUST be plain files that any static host
+  can serve, with its routing stated in the files themselves: a redirect
+  list, a header list, and the one not-found page. Every page MUST answer at
+  its address without a trailing slash; the same address with a trailing
+  slash, an `index` or an `.html` ending MUST redirect to it; and an address
+  that matches no file and no redirect MUST answer with the not-found page
+  and a not-found status.
+- **FR-017**: A command MUST serve the generated website on the person's own
+  computer applying exactly FR-016's routing, so what a person tests locally
+  is what every publishing destination serves. A destination MUST be
+  configured to route as FR-016 states, or it is not used.
+- **FR-018**: The website MUST be published to a destination only through
+  that destination's publishing command. Each destination MUST be described
+  in the ontology before it is used: the vendor service that hosts it, its
+  publishing strategy, the file holding its configuration, and the file
+  holding its deployment record (0037-vendor-management-policy for the
+  vendor).
+- **FR-019**: A publish MUST make a preview, reachable only at the
+  destination's own preview address, unless the person states that it is to
+  be promoted to the destination's production, naming who decides and why.
+  Pointing a domain the company holds at a destination is the decision
+  authority's recorded Decision (0022-domain-names), and no publishing
+  command does it.
+- **FR-020**: A publish MUST first run the website's own check (FR-004) and
+  refuse to upload when it fails, and MUST upload exactly the files that
+  were checked.
+- **FR-021**: Each publish MUST append to the destination's deployment
+  record: when, the source commit, preview or production, the destination's
+  version identifier, the preview address, a checksum over every uploaded
+  file's content, and for a promotion who decided and why. A deployment
+  record MUST NOT hold a credential, a token or a signed address.
+- **FR-022**: The credentials a publish needs MUST be read from the
+  environment when it runs and MUST NOT be written to any file, record or
+  output.
+- **FR-023**: Code that runs at a destination MUST be only what the
+  destination requires in order to serve the files; it MUST NOT decide what
+  is served, which FR-016's files and routing alone decide.
+
 ## Out of scope
 
-- Where the files are hosted and how they are deployed.
+- Which destination hosts the website, and the domain cutover to it,
+  which are the decision authority's Decisions (FR-018, FR-019).
 - The rules a crawler is given (robots and AI crawler rules), which are
   the decision authority's; the generator carries the previous website's
   rules unchanged.
@@ -108,13 +150,22 @@ how addresses map to content, 0004-addressing.
   FR-013.
 - An essay published on the founder's own website: the website shows it
   as a reference to that address, per FR-009.
+- A request for a namespace address such as `/ontology/core`: it answers
+  with the not-found page, and the ontology is read in the IF Console, per
+  FR-012.
+- A publish whose check fails: nothing is uploaded, per FR-020.
+- A publish with no promotion stated: only a preview is made, and the
+  domain keeps serving what it served, per FR-019.
+- A destination whose host requires a script even to serve plain files:
+  the script only hands each request to the files, per FR-023.
 
 ## Assumptions
 
 - The previous website published only what the company had decided to
   make public, so its snapshot may be treated as Public (FR-013).
-- A static host can serve a redirect list, a content type per address,
-  and a not-found page, so FR-011 and FR-012 need no running server.
+- A static host can serve a redirect list, a header list and a not-found
+  page with a not-found status, so FR-011, FR-012 and FR-016 need no
+  running server.
 
 ## Open questions
 
@@ -135,6 +186,11 @@ how addresses map to content, 0004-addressing.
   tools a reader can use.
 - **A snapshot** — the previous website's published data, held in the
   vault until each register moves into the public root.
+- **A publishing destination** — a host the website's files are published
+  to through one command, described in the ontology by its vendor service,
+  strategy, configuration file and deployment record.
+- **A deployment record** — the destination's file of every publish made
+  to it.
 
 ## Success criteria
 
@@ -146,6 +202,10 @@ how addresses map to content, 0004-addressing.
   with the family's page or a permanent redirect to it.
 - **SC-004**: Every address the previous website's sitemap lists is
   served, redirected, or named in the generator's report.
+- **SC-005**: No generated file is an ontology file, and every namespace
+  address answers not found.
+- **SC-006**: Every publish is in its destination's deployment record, and
+  every production publish names who decided and why.
 
 ## Review & acceptance checklist
 

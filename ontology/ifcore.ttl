@@ -1170,8 +1170,8 @@ ifcore:CrownJewelAccessControl a skos:Concept ; skos:inScheme ifcore:DomainSecur
     skos:notation "crown-jewel-access" ; skos:definition "At least two people can administer the accounts holding a crown jewel domain (0023 FR-026)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:PublishedAddressesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Published addresses"@en ;
     skos:notation "published-addresses" ; skos:definition "Every published address on the domain answers, or redirects permanently (0024-persistent-addresses FR-002)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:NamespaceResolvesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Namespace resolution"@en ;
-    skos:notation "namespace" ; skos:definition "Each public ontology namespace answers with Turtle, and the private one answers not found (0024 FR-005, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NamespaceResolvesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Namespace not served"@en ;
+    skos:notation "namespace" ; skos:definition "Every ontology namespace address, public or private, answers not found: a namespace is an identifier, and the ontology is read in the IF Console (0024 FR-005, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:DomainCriticalityScheme a skos:ConceptScheme ; rdfs:label "Domain criticality"@en ;
     rdfs:comment "How much breaks if a domain is lost (0022-domain-names FR-021). A crown jewel carries this concept as a second dcterms:type beside its role; every other domain is standard and carries none. Anything that needs a domain to work names it by dcterms:requires (FR-024), reused from Dublin Core rather than declared here (0019-controlled-vocabulary FR-001)."@en ;
