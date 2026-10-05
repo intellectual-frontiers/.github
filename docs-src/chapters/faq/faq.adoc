@@ -12,7 +12,7 @@ Because then its output would depend on your machine. A program of yours stands 
 
 === Why is there one command that uses sudo?
 A browser and VS Code link a few system libraries, and a display server is needed to start VS Code, that only an administrator can
-install. One documented command, `agora system add`, does it once. It prints what it will run and asks first, and no other command
+install. One documented command, `agora system ensure`, does it once. It prints what it will run and asks first, and no other command
 uses `sudo`.
 
 === Why is there no web console?

@@ -86,9 +86,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     (build). `figure` also has `generate` (generate): the organization
     profile's figure (FR-015). `course`: `show` (read), `build --target`
     (build).
-  - `toolchain`: `list`, `show ENTRY` (read); `add [ENTRY...]` (setup): the
+  - `toolchain`: `list`, `show ENTRY` (read); `ensure [ENTRY...]` (setup): the
     toolchain lock (FR-030; 0041-command-line FR-067).
-  - `system`: `list` (read); `add` (setup, `sudo`): the browser's system
+  - `system`: `list` (read); `ensure` (setup, `sudo`): the browser's system
     libraries (FR-030; 0041-command-line FR-069).
   - `extension`: `show` (read); `build` (build): the IF Console extension's
     package (FR-032; 0043-if-console).
@@ -273,7 +273,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     `package-lock.json`) holding `playwright` for Node and `@openedx/paragon`. The
     browser's and VS Code's Linux system libraries,
     and the display server `Xvfb` that VS Code is started under, are installed
-    once by the `system` noun's `add` (0041-command-line FR-069), whose package
+    once by the `system` noun's `ensure` (0041-command-line FR-069), whose package
     list for Debian and Ubuntu is pinned in `agora`'s code, and which the
     README and `help start` document. `agora` starts the display server itself,
     on a free display, for the one run, and stops it.
@@ -290,7 +290,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   the person must do themselves, such as installing `python3`, MUST be said in
   words and not given as a step. `help` with no topic MUST list the topics.
   The topics MUST include `start` (the first day: `python3` and `uv` from the
-  host, `system add`, `toolchain add`), `check` (what to run before pushing),
+  host, `system ensure`, `toolchain ensure`), `check` (what to run before pushing),
   `specs` (writing a spec and its register rows), `design-systems`, `brands`,
   `toolchain`, `editor` (IF Console), `ai` (agents, MCP and proposals),
   `extend` (adding a command or a group with an AI) and `recover` (what to do
@@ -328,10 +328,10 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   served at `https://intellectual-frontiers.github.io/.github/`.
 - **FR-036**: The `README.md` MUST be short: what the repository is, the flow in
   a few numbered steps (install `python3` and `uv`, run `./agora help start`,
-  `./agora system add` once, `./agora toolchain add`, `./agora check`), the
+  `./agora system ensure` once, `./agora toolchain ensure`, `./agora check`), the
   link to the guide, and a paragraph for contributors; and everything else it
   once held MUST be in the guide. The section `commands` MUST fail when the
-  README lacks the link to the guide, the one-time `system add` and the
+  README lacks the link to the guide, the one-time `system ensure` and the
   `help` command, or is longer than 120 lines.
 
 ## Surfaces
@@ -410,7 +410,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   `spec-check.yml` MUST run `./agora check --suite spec`. `design-systems.yml`
   MUST run `./agora check --suite browser`, `--suite python`, `--suite images`
   and `--suite extension` in separate jobs, each that needs a browser's or
-  VS Code's libraries or a display server after `./agora system add --yes`.
+  VS Code's libraries or a display server after `./agora system ensure --yes`.
   `pages.yml` MUST build the guide with `./agora docs build` and MAY use
   GitHub's own `actions/configure-pages`, `actions/upload-pages-artifact` and
   `actions/deploy-pages`, which publish and install nothing (FR-035). A workflow that runs `agora` in a
@@ -514,7 +514,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   skipped or failed with the reason and the other editions are still built,
   per FR-034.
 - A VS Code test run on a host without a display server or VS Code's libraries:
-  the section is skipped naming `agora system add` and the status is 3, never
+  the section is skipped naming `agora system ensure` and the status is 3, never
   passed, per FR-013 and FR-030.
 - Pages not enabled for the repository: the deploy job fails and says the
   owner must set the Pages source to GitHub Actions, per FR-035.

@@ -2,7 +2,7 @@
 
 The address and the SHA-256 are the ones the vendor's update service publishes for this version, which it serves by version, not
 as `latest`. The Linux build is a tarball and the macOS build a zip. VS Code also links shared libraries a fetch cannot supply;
-`system add` installs them once (0025-tooling-environment FR-021), and a display server is needed to start it (see `xvfb`).
+`system ensure` installs them once (0025-tooling-environment FR-021), and a display server is needed to start it (see `xvfb`).
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def check(r: Resolved) -> str:
     gone = system.missing(system.vscode_libraries(r.platform), system.family())
     if gone:
         raise ToolchainError(f"VS Code's system libraries are missing ({', '.join(sorted(lib for lib, _ in gone))}); "
-                             "run `agora system add`", entries=[NAME], fetchable=False)
+                             "run `agora system ensure`", entries=[NAME], fetchable=False)
     code, text = run_program([str(r.path_of("code-cli")), "--version", "--user-data-dir", str(r.toolchain.cache / "vscode-check")], r.env(), timeout=120)
     if code != 0 or VERSION not in text:
         raise ToolchainError(f"VS Code did not report version {VERSION}: {text[-400:]}", entries=[NAME], fetchable=False)

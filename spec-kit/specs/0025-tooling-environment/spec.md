@@ -181,7 +181,7 @@ platform coverage, the exception, and what continuous integration needs.
 - **FR-021**: A Chromium build the toolchain lock supplies runs on Linux
   only when the host's shared libraries it links against are present, and
   installing them needs administrator rights. The launcher MUST therefore have
-  one `setup` command for them (the `system` noun's `add`,
+  one `setup` command for them (the `system` noun's `ensure`,
   0041-command-line FR-069), the only command that may run `sudo`. It MUST
   install the package list the repository pins for the host's distribution
   family (the `apt` list on Debian and Ubuntu at least; on any other family it
@@ -238,7 +238,7 @@ platform coverage, the exception, and what continuous integration needs.
 - **FR-027**: A repository that builds on the public root MUST use the public
   root's toolchain entries and pinned versions for anything both need, and MUST
   obtain them by running the public root's command line (`toolchain show NAME
-  --json` and `toolchain add NAME --json`, which return each entry's installed
+  --json` and `toolchain ensure NAME --json`, which return each entry's installed
   `path`, the `env` a consumer sets, the programs it `provides`, its `version`
   and its cache state), so that each program is installed once at one version.
   It MUST NOT declare or download its own copy of an entry the public root

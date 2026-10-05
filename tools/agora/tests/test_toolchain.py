@@ -175,10 +175,10 @@ class Offline(Base):
                 tc.ensure(["tool"])
         err = cm.exception
         self.assertEqual((err.code, err.exit), ("offline", 3))
-        for text in ("tool 9.9", PLATFORM, "agora toolchain add tool"):
+        for text in ("tool 9.9", PLATFORM, "agora toolchain ensure tool"):
             self.assertIn(text, err.message)
         self.assertEqual(err.detail["entries"], ["tool"])
-        self.assertEqual(err.resource().actions[0].call.command, "toolchain add")
+        self.assertEqual(err.resource().actions[0].call.command, "toolchain ensure")
 
     def test_offline_names_every_missing_entry(self):
         a, b = self.tar_entry("a"), self.tar_entry("b")
@@ -186,7 +186,7 @@ class Offline(Base):
             self.tc(a, b, offline=True).ensure(["a", "b"])
         self.assertIn("a 1.0", cm.exception.message)
         self.assertIn("b 1.0", cm.exception.message)
-        self.assertIn("agora toolchain add a b", cm.exception.message)
+        self.assertIn("agora toolchain ensure a b", cm.exception.message)
 
     def test_offline_with_a_warm_cache_uses_only_the_cache(self):
         e = self.tar_entry()
@@ -216,7 +216,7 @@ class Offline(Base):
             with self.assertRaises(ToolchainError) as cm:
                 self.tc(e).ensure(["gone"])
         self.assertEqual(cm.exception.exit, 3)
-        self.assertIn("agora toolchain add gone", cm.exception.message)
+        self.assertIn("agora toolchain ensure gone", cm.exception.message)
 
 
 class Override(Base):
@@ -362,8 +362,8 @@ class SystemLibraries(Base):
         self.assertEqual((err.code, err.exit), ("system-libraries", 3))
         self.assertIn("libfoo.so.1", err.message)
         self.assertNotIn("libbar.so.2", err.message)
-        self.assertIn("agora system add", err.message)
-        self.assertEqual(err.resource().actions[0].call.command, "system add")
+        self.assertIn("agora system ensure", err.message)
+        self.assertEqual(err.resource().actions[0].call.command, "system ensure")
 
     def test_with_every_library_present_the_entry_is_used(self):
         e = self.tar_entry(needs_system=lambda p: ("libfoo.so.1",))
@@ -413,7 +413,7 @@ class Families(unittest.TestCase):
 
 
 class SystemCommands(unittest.TestCase):
-    """`system list` and `system add` (0041 FR-069; 0025 FR-021): what they print, what they ask, what they run."""
+    """`system list` and `system ensure` (0041 FR-069; 0025 FR-021): what they print, what they ask, what they run."""
 
     def setUp(self):
         self.env = {"AGORA_TOOLCHAIN_CACHE": tempfile.mkdtemp()}
@@ -445,67 +445,67 @@ class SystemCommands(unittest.TestCase):
         self.assertFalse(rows["libgbm.so.1"]["present"])
         self.assertEqual(rows["libasound.so.2"]["package"], "libasound2t64")
         self.assertEqual(doc["data"]["missing"], len(rows) - 1)
-        self.assertEqual(doc["actions"][0]["command"], "system add")
+        self.assertEqual(doc["actions"][0]["command"], "system ensure")
 
     def test_dry_run_prints_exactly_what_it_would_run_and_runs_nothing(self):
-        code, doc = run_json(["system", "add", "--dry-run"], env=self.env)
+        code, doc = run_json(["system", "ensure", "--dry-run"], env=self.env)
         self.assertEqual(code, 0)
         self.assertEqual(self.ran, [])
         cmds = doc["data"]["commands"]
         self.assertEqual(cmds[0], "sudo apt-get update")
         self.assertTrue(cmds[1].startswith("sudo apt-get install -y --no-install-recommends libasound2t64 "))
         self.assertFalse(doc["data"]["ran"])
-        text = run(["system", "add", "--dry-run"], env=self.env)[1]
+        text = run(["system", "ensure", "--dry-run"], env=self.env)[1]
         self.assertIn("sudo apt-get update", text)
 
     def test_without_yes_and_no_terminal_it_refuses_and_runs_nothing(self):
-        code, doc = run_json(["system", "add"], env=self.env)
+        code, doc = run_json(["system", "ensure"], env=self.env)
         self.assertEqual((code, doc["data"]["code"]), (2, "not-confirmed"))
         self.assertEqual(self.ran, [])
-        self.assertIn("system add --yes", doc["data"]["message"])
+        self.assertIn("system ensure --yes", doc["data"]["message"])
 
     def test_at_a_terminal_it_asks_after_showing_the_commands_and_a_no_runs_nothing(self):
         asked = []
         with mock.patch.object(tcmd, "INTERACTIVE", lambda: True), mock.patch.object(tcmd, "ASK", lambda q: asked.append(q) or "n"):
-            code, doc = run_json(["system", "add"], env=self.env)
+            code, doc = run_json(["system", "ensure"], env=self.env)
         self.assertEqual((code, self.ran), (2, []))
         self.assertEqual(len(asked), 1)
         self.assertIn("not confirmed", doc["data"]["message"])
 
     def test_at_a_terminal_a_yes_runs_the_commands_in_order(self):
         with mock.patch.object(tcmd, "INTERACTIVE", lambda: True), mock.patch.object(tcmd, "ASK", lambda q: "y"):
-            code, doc = run_json(["system", "add"], env=self.env)
+            code, doc = run_json(["system", "ensure"], env=self.env)
         self.assertEqual(code, 0)
         self.assertEqual([c[:3] for c in self.ran], [["sudo", "apt-get", "update"], ["sudo", "apt-get", "install"]])
         self.assertTrue(doc["data"]["ran"])
 
     def test_yes_skips_the_question(self):
         with mock.patch.object(tcmd, "ASK", side_effect=AssertionError("asked")):
-            code, doc = run_json(["system", "add", "--yes"], env=self.env)
+            code, doc = run_json(["system", "ensure", "--yes"], env=self.env)
         self.assertEqual((code, len(self.ran)), (0, 2))
         self.assertEqual(doc["data"]["message"], "installed")
 
     def test_as_root_no_sudo_is_run_and_it_says_so(self):
         with mock.patch("os.geteuid", lambda: 0):
-            code, doc = run_json(["system", "add", "--dry-run"], env=self.env)
+            code, doc = run_json(["system", "ensure", "--dry-run"], env=self.env)
         self.assertEqual(doc["data"]["commands"][0], "apt-get update")
         self.assertIn("no sudo is needed", doc["data"]["message"])
 
     def test_a_failing_install_is_an_error_naming_the_command(self):
         with mock.patch.object(tcmd, "RUN", lambda argv, **kw: mock.Mock(returncode=100)):
-            code, doc = run_json(["system", "add", "--yes"], env=self.env)
+            code, doc = run_json(["system", "ensure", "--yes"], env=self.env)
         self.assertEqual((code, doc["data"]["code"]), (1, "install-failed"))
         self.assertIn("apt-get update", doc["data"]["message"])
 
     def test_nothing_is_run_when_every_library_loads(self):
         self.present = set(system.APT_LIBRARIES) | set(system.APT_VSCODE_EXTRA)
-        code, doc = run_json(["system", "add", "--yes"], env=self.env)
+        code, doc = run_json(["system", "ensure", "--yes"], env=self.env)
         self.assertEqual((code, self.ran), (0, []))
         self.assertIn("nothing to install", doc["data"]["message"])
 
     def test_another_family_names_the_libraries_and_stops(self):
         with mock.patch.object(system, "os_release", lambda *a, **k: FEDORA):
-            code, doc = run_json(["system", "add", "--yes"], env=self.env)
+            code, doc = run_json(["system", "ensure", "--yes"], env=self.env)
         self.assertEqual((code, doc["data"]["code"]), (3, "no-list"))
         self.assertEqual(self.ran, [])
         self.assertIn("libnss3.so", doc["data"]["message"])
@@ -513,18 +513,18 @@ class SystemCommands(unittest.TestCase):
 
     def test_it_is_refused_over_mcp_and_listed_on_no_surface_but_the_terminal(self):
         reg = Registry.load(HOME)
-        self.assertEqual(reg.surfaces_of(reg.commands["system add"]), ())
-        self.assertEqual(reg.surfaces_of(reg.commands["toolchain add"]), ("editor",))  # widened to the editor, never MCP (0041 FR-022)
-        for words in ("system add", "toolchain add"):
+        self.assertEqual(reg.surfaces_of(reg.commands["system ensure"]), ())
+        self.assertEqual(reg.surfaces_of(reg.commands["toolchain ensure"]), ("editor",))  # widened to the editor, never MCP (0041 FR-022)
+        for words in ("system ensure", "toolchain ensure"):
             self.assertEqual(reg.commands[words].category, "setup")
         ctx = Ctx(reg, HOME, HOME, surface="mcp", env=dict(self.env))
         from agora.core.resource import AgoraError
         with self.assertRaises(AgoraError) as cm:
-            tcmd.system_add(ctx, True)
+            tcmd.system_ensure(ctx, True)
         self.assertEqual(cm.exception.code, "refused")
         self.assertEqual(self.ran, [])
 
-    def test_system_add_is_the_only_command_that_can_run_sudo(self):
+    def test_system_ensure_is_the_only_command_that_can_run_sudo(self):
         import re
         hits = []
         for path in (HOME / "tools" / "agora").rglob("*.py"):
@@ -576,7 +576,7 @@ class ToolchainCommands(unittest.TestCase):
         self.assertEqual(code, 2)
 
     def test_add_fetches_what_it_needs_and_runs_each_functional_check(self):
-        code, doc = run_json(["toolchain", "add", "beta"], env=self.env)
+        code, doc = run_json(["toolchain", "ensure", "beta"], env=self.env)
         self.assertEqual(code, 0, doc)
         rows = {r["entry"]: r for r in doc["data"]["entries"]}
         self.assertEqual([r["did"] for r in rows.values()], ["fetched", "fetched"])
@@ -585,20 +585,20 @@ class ToolchainCommands(unittest.TestCase):
         self.assertTrue((self.dir / "cache" / f"beta-1.0-{tcore.host_platform()}").is_dir())
 
     def test_add_with_no_name_fetches_every_entry_and_a_second_run_only_checks(self):
-        self.assertEqual(run_json(["toolchain", "add"], env=self.env)[0], 0)
-        code, doc = run_json(["toolchain", "add"], env=self.env)
+        self.assertEqual(run_json(["toolchain", "ensure"], env=self.env)[0], 0)
+        code, doc = run_json(["toolchain", "ensure"], env=self.env)
         self.assertEqual(code, 0)
         self.assertEqual({r["did"] for r in doc["data"]["entries"]}, {"already in the cache"})
         self.assertTrue(all(r["check"].startswith("passed") for r in doc["data"]["entries"]))
 
     def test_add_dry_run_fetches_nothing(self):
-        code, doc = run_json(["toolchain", "add", "--dry-run"], env=self.env)
+        code, doc = run_json(["toolchain", "ensure", "--dry-run"], env=self.env)
         self.assertEqual(code, 0)
         self.assertEqual({r["did"] for r in doc["data"]["entries"]}, {"would fetch"})
         self.assertFalse((self.dir / "cache").exists())
 
     def test_add_does_not_fetch_an_entry_a_persons_own_program_stands_in_for(self):
-        code, doc = run_json(["toolchain", "add", "alpha"], env={**self.env, "AGORA_ALPHA": "/mine/alpha"})
+        code, doc = run_json(["toolchain", "ensure", "alpha"], env={**self.env, "AGORA_ALPHA": "/mine/alpha"})
         self.assertEqual(code, 0)
         (row,) = doc["data"]["entries"]
         self.assertEqual((row["before"], row["did"]), ("override", "override"))
@@ -606,26 +606,26 @@ class ToolchainCommands(unittest.TestCase):
         self.assertFalse((self.dir / "cache").exists())
 
     def test_add_refuses_to_run_offline(self):
-        code, doc = run_json(["toolchain", "add", "--offline"], env=self.env)
+        code, doc = run_json(["toolchain", "ensure", "--offline"], env=self.env)
         self.assertEqual((code, doc["data"]["code"]), (3, "offline"))
-        code, doc = run_json(["toolchain", "add"], env={**self.env, "AGORA_OFFLINE": "1"})
+        code, doc = run_json(["toolchain", "ensure"], env={**self.env, "AGORA_OFFLINE": "1"})
         self.assertEqual(code, 3)
 
     def test_add_reports_a_functional_check_that_fails_and_exits_1(self):
         def bad(r):
             raise ToolchainError("it did not compile anything", entries=["alpha"], fetchable=False)
         self.entries["alpha"] = dataclasses.replace(self.a, check=bad)
-        code, doc = run_json(["toolchain", "add", "alpha"], env=self.env)
+        code, doc = run_json(["toolchain", "ensure", "alpha"], env=self.env)
         self.assertEqual(code, 1)
         self.assertIn("FAILED: it did not compile anything", doc["data"]["entries"][0]["check"])
 
     def test_add_names_the_system_libraries_a_browser_check_needs_and_exits_3(self):
         self.entries["alpha"] = dataclasses.replace(self.a, needs_system=lambda p: ("libfoo.so.1",))
         with mock.patch.object(system, "loads", lambda lib: False):
-            code, doc = run_json(["toolchain", "add", "alpha"], env=self.env)
+            code, doc = run_json(["toolchain", "ensure", "alpha"], env=self.env)
         self.assertEqual(code, 3)
-        self.assertIn("agora system add", doc["data"]["entries"][0]["check"])
-        self.assertEqual(doc["actions"][0]["command"], "system add")
+        self.assertIn("agora system ensure", doc["data"]["entries"][0]["check"])
+        self.assertEqual(doc["actions"][0]["command"], "system ensure")
 
     def test_a_check_that_needs_an_entry_fetches_it_on_first_use_unless_offline(self):
         from agora.core import runner
@@ -637,7 +637,7 @@ class ToolchainCommands(unittest.TestCase):
         (s,) = res.data["sections"]
         self.assertEqual((s["status"], res.exit), ("skipped", 3))
         self.assertIn("alpha 1.0", s["reason"])
-        self.assertIn("agora toolchain add alpha", s["reason"])
+        self.assertIn("agora toolchain ensure alpha", s["reason"])
 
     def test_doctor_reports_each_entry_the_system_libraries_and_every_override(self):
         with mock.patch.object(system, "loads", lambda lib: True):
@@ -645,7 +645,7 @@ class ToolchainCommands(unittest.TestCase):
         d = doc["data"]
         rows = {r["entry"]: r for r in d["toolchain"]}
         self.assertEqual(rows["alpha"]["cache"], "not fetched")
-        self.assertIn("agora toolchain add alpha", rows["alpha"]["hint"])
+        self.assertIn("agora toolchain ensure alpha", rows["alpha"]["hint"])
         self.assertEqual(rows["beta"]["cache"], "override")
         self.assertEqual(d["overrides"], [{"entry": "beta", "variable": "AGORA_BETA", "path": "/my/beta", "present": False}])
         self.assertEqual(d["toolchain cache"], str(self.dir / "cache"))
@@ -660,7 +660,7 @@ class ToolchainCommands(unittest.TestCase):
         with mock.patch.object(system, "loads", lambda lib: False), mock.patch.object(system, "os_release", lambda *a, **k: UBUNTU_2404):
             code, doc = run_json(["doctor"], env=self.env)
         self.assertEqual((code, doc["data"]["status"]), (3, "missing"))
-        self.assertIn("agora system add", doc["data"]["system libraries"]["hint"])
+        self.assertIn("agora system ensure", doc["data"]["system libraries"]["hint"])
         self.assertIn("libnss3.so (libnss3)", doc["data"]["system libraries"]["missing"])
 
 
@@ -703,11 +703,11 @@ class CheckSection(unittest.TestCase):
         self.workflow("# apt-get install x is a comment\njobs:\n  j:\n    steps:\n"
                       "      - uses: actions/checkout@v7\n      - uses: actions/setup-python@v7\n      - uses: astral-sh/setup-uv@v7\n"
                       "      - uses: actions/cache@v5\n        with:\n          key: k-${{ hashFiles('tools/agora/npm/package-lock.json') }}\n"
-                      "      - run: ./agora system add --yes\n      - run: ./agora check --suite browser\n")
+                      "      - run: ./agora system ensure --yes\n      - run: ./agora check --suite browser\n")
         self.assertEqual(self.wf(), [])
 
     def test_sudo_is_allowed_only_through_the_setup_command(self):
-        self.workflow("jobs:\n  j:\n    steps:\n      - run: sudo ./agora system add --yes\n")
+        self.workflow("jobs:\n  j:\n    steps:\n      - run: sudo ./agora system ensure --yes\n")
         self.assertEqual(self.wf(), [])
         self.workflow("jobs:\n  j:\n    steps:\n      - run: sudo rm -rf x\n")
         self.assertTrue(self.wf())

@@ -5,5 +5,5 @@ provides and a functional check. The registry finds them by presence (0041-comma
 entry and deleting it removes one. A module imports only the standard library at module level (0041 FR-005).
 
 An entry's address, checksum or version changes only in a commit of its own that passes its functional check
-(`agora toolchain add NAME`) and the checks that use it (0041 FR-068, 0025-tooling-environment FR-009).
+(`agora toolchain ensure NAME`) and the checks that use it (0041 FR-068, 0025-tooling-environment FR-009).
 """

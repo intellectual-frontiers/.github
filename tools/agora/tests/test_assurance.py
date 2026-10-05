@@ -178,7 +178,7 @@ class Running(Repo):
         o, _ = self.run_one(h)
         self.assertEqual(o.status, "skipped")
         self.assertIn("cold-tool 1.0", o.reason)
-        self.assertIn("agora toolchain add cold-tool", o.reason)
+        self.assertIn("agora toolchain ensure cold-tool", o.reason)
 
     def test_an_entry_is_fetched_on_first_use_and_its_environment_reaches_the_harness(self):
         archive = self.root / "t.tar.gz"
@@ -400,7 +400,7 @@ class OpenedxSection(Repo):
         r, _ = self.section()
         self.assertEqual(r.status, "skipped")
         self.assertIn("npm-packages", r.reason)
-        self.assertIn("agora toolchain add npm-packages", r.reason)
+        self.assertIn("agora toolchain ensure npm-packages", r.reason)
 
     def test_paragon_comes_from_the_option_and_not_from_the_hosts_environment(self):
         self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")

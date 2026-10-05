@@ -104,7 +104,7 @@ Only when you name it. Each entry has a variable, and `doctor` lists every one t
 
 === System libraries
 
-A browser and VS Code link shared libraries, and VS Code's tests need a display server, that a fetch cannot supply. `agora system add` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other command uses `sudo`. The packages are pinned for Debian and Ubuntu; on another distribution it names the libraries and stops.
+A browser and VS Code link shared libraries, and VS Code's tests need a display server, that a fetch cannot supply. `agora system ensure` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other command uses `sudo`. The packages are pinned for Debian and Ubuntu; on another distribution it names the libraries and stops.
 
 [cols="2,2"]
 |===

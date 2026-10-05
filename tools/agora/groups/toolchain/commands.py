@@ -1,8 +1,8 @@
-"""The toolchain lock's commands: `toolchain list|show|add`, `system list|add`, and the `toolchain` check section
+"""The toolchain lock's commands: `toolchain list|show|ensure`, `system list|ensure`, and the `toolchain` check section
 (0041-command-line FR-066 to FR-069; 0042-agora FR-013, FR-030; 0025-tooling-environment FR-015 to FR-021).
 
 Thin: the machinery is agora.core.toolchain and agora.core.system, the section's rules agora.lib.toolchain_rules. Standard
-library only. `system add` is the only command in this command line that runs `sudo`.
+library only. `system ensure` is the only command in this command line that runs `sudo`.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from agora.lib import toolchain_rules
 ENTRY = Dynamic("ENTRY", "a toolchain entry, as `toolchain list` names them: tinytex, chromium, ...",
                 lambda c: list(c.toolchain().entries))
 
-# What `system add` runs commands with and asks the person with: replaced by the tests, never by a command.
+# What `system ensure` runs commands with and asks the person with: replaced by the tests, never by a command.
 RUN: Callable[..., Any] = subprocess.run
 ASK: Callable[[str], str] = input
 INTERACTIVE: Callable[[], bool] = lambda: sys.stdin.isatty()
@@ -72,7 +72,7 @@ def toolchain_list(ctx: Ctx) -> Resource:
     res = Resource("toolchain-list", "all", {"platform": tc.platform, "cache": str(tc.cache), "count": len(rows), "entries": rows,
                                              **pins},
                    links=[Link("entry", Call("toolchain show", {"entry": r["name"]})) for r in rows],
-                   actions=[next_command("fetch every entry", "toolchain add")])
+                   actions=[next_command("fetch every entry", "toolchain ensure")])
     res.columns["entries"] = ["name", "version", "state", "size", "platforms"]
     return res
 
@@ -89,22 +89,22 @@ def toolchain_show(ctx: Ctx, entry: str) -> Resource:
             "programs": dict(e.provides(tc.platform)) if e.archives(tc.platform) else {}, "needs": list(e.needs),
             "override": f"{e.variable}={e.override_hint or 'a program of your own'}", **_consumer(tc, e),
             "system libraries": libs or "none", "platforms": platforms}
-    res = Resource("toolchain-entry", e.name, data, actions=[next_command(f"fetch {e.name}", "toolchain add", entries=[e.name])])
+    res = Resource("toolchain-entry", e.name, data, actions=[next_command(f"fetch {e.name}", "toolchain ensure", entries=[e.name])])
     res.columns["platforms"] = ["platform", "form", "size", "url", "sha256"]
     return res
 
 
-# toolchain add -----------------------------------------------------------------------------------------------------
-@command("toolchain add", category="setup", surfaces=("editor",),  # widened to the editor (0041 FR-022): Home offers to fetch an entry
+# toolchain ensure -----------------------------------------------------------------------------------------------------
+@command("toolchain ensure", category="setup", surfaces=("editor",),  # widened to the editor (0041 FR-022): Home offers to fetch an entry
          help="Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check",
          args=[Arg("entries", "ENTRY", "the entries; every one with a build for this platform when none is named", many=True)])
-def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:
+def toolchain_ensure(ctx: Ctx, entries: list[str]) -> Resource:
     tc = ctx.toolchain()
     names = entries or [n for n, e in tc.entries.items() if e.archives(tc.platform)]
     wanted = tc.expand(names)
     if ctx.offline:
-        raise AgoraError("offline", "toolchain add downloads, so it cannot run offline; run it without --offline", exit=MISSING,
-                         actions=[next_command("fetch online", "toolchain add", entries=entries)])
+        raise AgoraError("offline", "toolchain ensure downloads, so it cannot run offline; run it without --offline", exit=MISSING,
+                         actions=[next_command("fetch online", "toolchain ensure", entries=entries)])
     rows: list[dict[str, Any]] = []
     status = OK
     for name in wanted:
@@ -140,7 +140,7 @@ def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:
                 gone = tc.libraries_missing([row["entry"]], system.loads)
                 if gone:
                     row["check"] = (f"not run: needs system libraries this host lacks ({', '.join(sorted(gone[row['entry']]))}); "
-                                    "run `agora system add`")
+                                    "run `agora system ensure`")
                     status = max(status, MISSING)
                 elif e.check is None:
                     row["check"] = "no check"
@@ -151,11 +151,11 @@ def toolchain_add(ctx: Ctx, entries: list[str]) -> Resource:
                 status = max(status, FAILED)
     for row in rows:  # where each now is and the environment a consumer sets (0025 FR-027)
         row.update({k: v for k, v in _consumer(tc, tc.get(row["entry"])).items() if k not in ("version", "state")})
-    res = Resource("toolchain-add", " ".join(entries) or "all", {"platform": tc.platform, "cache": str(tc.cache),
+    res = Resource("toolchain-ensure", " ".join(entries) or "all", {"platform": tc.platform, "cache": str(tc.cache),
                                                                  "dry_run": ctx.dry_run, "entries": rows}, exit=status)
     res.columns["entries"] = ["entry", "version", "before", "did", "bytes", "seconds", "check"]
     if any("system libraries" in r["check"] for r in rows):
-        res.actions.append(next_command("install the browser's system libraries", "system add"))
+        res.actions.append(next_command("install the browser's system libraries", "system ensure"))
     return res
 
 
@@ -164,7 +164,7 @@ def _needed(tc: toolchain.Toolchain) -> tuple[system.Family, tuple[str, ...]]:
     return system.family(), system.needed(tc.entries, tc.platform)
 
 
-def _system_add_text(res: Resource) -> str:
+def _system_ensure_text(res: Resource) -> str:
     """The commands one to a line, exactly as they are run, so that what a person is asked about is what they read."""
     d = res.data
     out = [f"distribution: {d['distribution']}", f"dry_run: {'yes' if d['dry_run'] else 'no'}"]
@@ -189,17 +189,17 @@ def system_list(ctx: Ctx) -> Resource:
             for lib in libs]
     res = Resource("system-list", "all", {"distribution": fam.label, "pinned list": fam.name if fam.packages else "none",
                                           "missing": len(gone), "libraries": rows},
-                   actions=[next_command("install the missing libraries", "system add")] if gone else [])
+                   actions=[next_command("install the missing libraries", "system ensure")] if gone else [])
     res.columns["libraries"] = ["library", "package", "present"]
     return res
 
 
-@command("system add", category="setup",
+@command("system ensure", category="setup",
          help="Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself",
          options=[Opt("--yes", None, "do not ask: for a person who has read what --dry-run prints, and for CI")])
-def system_add(ctx: Ctx, yes: bool) -> Resource:
+def system_ensure(ctx: Ctx, yes: bool) -> Resource:
     if ctx.surface == "mcp":
-        raise AgoraError("refused", "system add runs sudo and is never run over MCP (0041-command-line FR-069)", exit=USAGE)
+        raise AgoraError("refused", "system ensure runs sudo and is never run over MCP (0041-command-line FR-069)", exit=USAGE)
     tc = ctx.toolchain()
     fam, libs = _needed(tc)
     gone = system.missing(libs, fam)
@@ -207,7 +207,7 @@ def system_add(ctx: Ctx, yes: bool) -> Resource:
     if not gone:
         return Resource("system-add", "nothing", {**base, "missing": [], "commands": [], "ran": False,
                                                   "message": "every shared library the browser links is present; nothing to install"},
-                        text=_system_add_text)
+                        text=_system_ensure_text)
     names = [{"library": lib, "package": pkg or "(no list)"} for lib, pkg in gone]
     if not fam.packages:
         raise AgoraError("no-list", f"agora pins no package list for {fam.label}; install the packages that provide these "
@@ -218,16 +218,16 @@ def system_add(ctx: Ctx, yes: bool) -> Resource:
     res = Resource("system-add", "install", {**base, "missing": names, "commands": shown, "ran": False,
                                              "message": "these commands install them" + ("" if system.uses_sudo(cmds) else
                                                                                          " (you are root: no sudo is needed)")},
-                    text=_system_add_text)
+                    text=_system_ensure_text)
     if ctx.dry_run:
         res.data["message"] += "; --dry-run runs nothing"
         return res
     if not yes:
         if not INTERACTIVE():
-            raise AgoraError("not-confirmed", "system add asks before it runs sudo and there is no terminal to ask on; read "
-                             "`system add --dry-run`, then run `system add --yes`", exit=USAGE, detail={"commands": shown},
-                             actions=[next_command("see what it would run", "system add", dry_run=True)])
-        print("system add will run:\n" + "\n".join(f"  {line}" for line in shown), file=sys.stderr)
+            raise AgoraError("not-confirmed", "system ensure asks before it runs sudo and there is no terminal to ask on; read "
+                             "`system ensure --dry-run`, then run `system ensure --yes`", exit=USAGE, detail={"commands": shown},
+                             actions=[next_command("see what it would run", "system ensure", dry_run=True)])
+        print("system ensure will run:\n" + "\n".join(f"  {line}" for line in shown), file=sys.stderr)
         if ASK("run these commands? [y/N] ").strip().lower() not in ("y", "yes"):
             res.data["message"] = "not confirmed; nothing was run"
             res.exit = USAGE

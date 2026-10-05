@@ -76,7 +76,7 @@ command set is 0042-agora.
   (offline with a cold cache, or no build for the platform) MUST fail with an
   error resource that says what is missing; the one
   thing it may ask a person to install is what 0025-tooling-environment FR-021
-  names, through the `system` noun's `add` (FR-069).
+  names, through the `system` noun's `ensure` (FR-069).
 
 ## The registry and the grammar
 
@@ -408,7 +408,7 @@ command set is 0042-agora.
   for the platform), every opt-in override that is set
   (0025-tooling-environment FR-019), and the system libraries a browser entry
   needs (0025-tooling-environment FR-021), with hints (FR-006) that name the
-  `system` noun's `add` for a missing library. It MUST also
+  `system` noun's `ensure` for a missing library. It MUST also
   check the registry and fail on any conflict: two commands with one name; two
   toolchain entries with one name (FR-066); a command in two groups; a type
   declared twice with different meanings; a non-isolated invocation whose plan
@@ -590,10 +590,11 @@ command set is 0042-agora.
   cache) MUST be part of the core and use the standard library only.
 - **FR-067**: An orchestrator that has a toolchain entry MUST have the noun
   `toolchain`, with `list` and `show ENTRY` (`read`, reporting version, the
-  platforms, and the cache state of the host's platform) and `add [ENTRY...]`
-  (`setup`, which fetches and verifies the named entries, or every entry the
-  host's platform supports when none is named, into the cache; it MUST refuse
-  to run offline, and MUST take `--dry-run`, FR-015). `toolchain add` is the
+  platforms, and the cache state of the host's platform) and `ensure [ENTRY...]`
+  (`setup`, which makes the cache hold the named entries, or every entry the
+  host's platform supports when none is named, fetching and verifying only
+  what is missing, so that running it again changes nothing (FR-009); it MUST refuse
+  to run offline, and MUST take `--dry-run`, FR-015). `toolchain ensure` is the
   command that prepares the cache while online (FR-004).
 - **FR-068**: A toolchain entry's checksum, its address and its version MUST
   change only in a commit of their own that passes the entry's functional
@@ -603,14 +604,15 @@ command set is 0042-agora.
   platform `linux-x86_64` (0025-tooling-environment FR-020).
 - **FR-069**: An orchestrator whose toolchain has a browser entry MUST have the
   noun `system`, with `list` (`read`: the pinned packages for the host's
-  distribution family and which are present) and `add` (`setup`: installs the
-  missing ones with the host's package manager through `sudo`). `add` is the
+  distribution family and which are present) and `ensure` (`setup`: makes the host
+  hold them, installing only the missing ones with the host's package manager
+  through `sudo`, and nothing when none is missing, FR-009). `ensure` is the
   only command that may run `sudo`. It MUST print exactly the commands it will
   run, take `--dry-run` (FR-015) that prints them and runs nothing, ask the
   person before running `sudo`, refuse to run under MCP (FR-022) and be run by
   no other command. The package lists are pinned per distribution family in
   the orchestrator's code (FR-046): `apt` on Debian and Ubuntu at least, and on
-  another family `add` MUST say that no list exists and name the libraries.
+  another family `ensure` MUST say that no list exists and name the libraries.
 - **FR-070**: Python comes first. Before a change adds a program outside
   Python — a toolchain entry, a Python package that only wraps one, or a host
   program for a maintainer tool (FR-071) — it MUST show that the Python

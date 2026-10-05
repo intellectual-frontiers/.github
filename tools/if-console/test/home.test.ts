@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import type { Loose } from './support/fake-launcher';
 import { commandIn, countOf, deriveHome, type HomeSource } from '../src/model/home';
 
-const exposed = new Set(['check', 'fresh', 'doctor', 'toolchain add', 'proposal show', 'help', 'context']);
+const exposed = new Set(['check', 'fresh', 'doctor', 'toolchain ensure', 'proposal show', 'help', 'context']);
 
 function source(over: Partial<HomeSource> = {}): HomeSource {
   return {
@@ -75,27 +75,27 @@ test('stale generated files come with the rewriting action, which runs through t
 test('doctor: a toolchain entry not fetched is fetched by its own action; one with a hint that names an offered command runs it; one with neither says what to do', () => {
   const d = doc('doctor', { status: 'missing', conflicts: [], missing: [], toolchain: [
     { entry: 'chromium', cache: 'not fetched', 'needed by': ['check x'], hint: '' },
-    { entry: 'jre', cache: 'not fetched', hint: 'fetched on first use, or `other toolchain add jre`' },
+    { entry: 'jre', cache: 'not fetched', hint: 'fetched on first use, or `other toolchain ensure jre`' },
     { entry: 'weird', cache: 'no build', hint: 'set AGORA_WEIRD to a program of your own' },
-    { entry: 'fine', cache: 'ready' }] }, [act('fetch chromium', 'toolchain add', 'setup', { entries: ['chromium'] }, 'other toolchain add chromium')]);
+    { entry: 'fine', cache: 'ready' }] }, [act('fetch chromium', 'toolchain ensure', 'setup', { entries: ['chromium'] }, 'other toolchain ensure chromium')]);
   const needs = deriveHome(source({ doctor: d })).needs;
   const byId = (id: string) => needs.find((x) => x.id === id) as Loose;
   assert.equal(needs.filter((x) => x.group === 'toolchain').length, 3);
   assert.equal(byId('toolchain:chromium').run.kind, 'action');
-  assert.equal(byId('toolchain:chromium').commandLine, 'other toolchain add chromium');
+  assert.equal(byId('toolchain:chromium').commandLine, 'other toolchain ensure chromium');
   assert.match(byId('toolchain:chromium').why, /Needed by: check x/);
-  assert.deepEqual(byId('toolchain:jre').run, { kind: 'words', words: ['toolchain', 'add', 'jre'] });
-  assert.equal(byId('toolchain:jre').commandLine, './other toolchain add jre');
+  assert.deepEqual(byId('toolchain:jre').run, { kind: 'words', words: ['toolchain', 'ensure', 'jre'] });
+  assert.equal(byId('toolchain:jre').commandLine, './other toolchain ensure jre');
   assert.equal(byId('toolchain:weird').run.kind, 'words', 'doctor again');
   assert.match(byId('toolchain:weird').yourself, /AGORA_WEIRD/);
 });
 
 test('doctor: system libraries that only a terminal installs are a command line to copy and what the person does themselves; conflicts and a missing prerequisite say how to fix them', () => {
   const d = doc('doctor', { status: 'failed', conflicts: ['two commands are named check'], missing: ['uv'], toolchain: [], prerequisites: [{ name: 'uv', present: false, hint: 'install uv from https://example.test' }],
-    'system libraries': { missing: ['libx (pkg-x)', 'liby (pkg-y)'], hint: 'run `other system add` once (it asks before sudo)' } });
+    'system libraries': { missing: ['libx (pkg-x)', 'liby (pkg-y)'], hint: 'run `other system ensure` once (it asks before sudo)' } });
   const needs = deriveHome(source({ doctor: d })).needs;
   const libs = needs.find((x) => x.id === 'libraries') as Loose;
-  assert.equal(libs.commandLine, './other system add');
+  assert.equal(libs.commandLine, './other system ensure');
   assert.match(libs.yourself, /terminal/);
   assert.match(libs.label, /2 system libraries missing: libx \(pkg-x\), liby \(pkg-y\)/);
   const conflict = needs.find((x) => x.group === 'health' && x.status === 'error' && x.label.includes('two commands')) as Loose;
@@ -116,7 +116,7 @@ test('an untrusted workspace and a command line that answers in a newer form are
 
 test('FR-048: every suggestion says what is wrong in plain words and is either runnable or says what the person does themselves; none points elsewhere', () => {
   const d = doc('doctor', { status: 'failed', conflicts: ['x conflicts'], missing: ['thing'], toolchain: [{ entry: 'a', cache: 'not fetched' }, { entry: 'b', cache: 'no build', hint: 'set B' }],
-    prerequisites: [{ name: 'uv', present: false, hint: 'install uv' }], 'system libraries': { missing: ['libz'], hint: 'run `other system add`' },
+    prerequisites: [{ name: 'uv', present: false, hint: 'install uv' }], 'system libraries': { missing: ['libz'], hint: 'run `other system ensure`' },
     state: [{ label: 'repository', level: 'warning', note: '3 commits behind', advice: 'pull it' }] });
   const link = { rel: 'proposal', command: 'proposal show', fields: { proposal: 'p1' }, cli: './other proposal show p1' };
   const everything = [
@@ -144,6 +144,6 @@ test('what needs a person is sorted worst first, and Get help is its own group, 
 });
 
 test('a command in backticks in a hint is read with the orchestrator\'s own name replaced by the launcher\'s path', () => {
-  assert.deepEqual(commandIn('run `other system add` once', { name: 'other', program: './other' }), { line: './other system add', words: ['system', 'add'] });
+  assert.deepEqual(commandIn('run `other system ensure` once', { name: 'other', program: './other' }), { line: './other system ensure', words: ['system', 'ensure'] });
   assert.equal(commandIn('no command here', { name: 'other', program: './other' }), null);
 });

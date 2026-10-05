@@ -377,7 +377,7 @@ class OpenEdx(Repo):
         code, doc = self.go("openedx", "build", "mini-brand", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "offline"))
         self.assertIn("npm-packages", doc["data"]["message"])
-        self.assertIn("agora toolchain add npm-packages", doc["data"]["message"])
+        self.assertIn("agora toolchain ensure npm-packages", doc["data"]["message"])
         # a Paragon of the person's own is named explicitly, and stands in for the lock: nothing is fetched or asked for
         code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
