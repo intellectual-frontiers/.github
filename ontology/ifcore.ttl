@@ -753,6 +753,9 @@ ifcore:ResearchKind a ifcore:WorkKind ; rdfs:label "Research record"@en ; dcterm
 ifcore:CourseKind a ifcore:WorkKind ; rdfs:label "Course"@en ; dcterms:identifier "course" ;
     rdfs:comment "A subject taught at length, over weeks, with outcomes, lessons and assessments; its source is AsciiDoc in frontiers-course's form (0027-course-works FR-001, FR-002)."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:ElenchusKind a ifcore:WorkKind ; rdfs:label "Elenchus"@en ; dcterms:identifier "elenchus" ;
+    rdfs:comment "A monthly trial in which every control in every compliance boundary's baseline is charged with not operating and tried by a probe that tries to refute the charge; its source is AsciiDoc findings and its Verdict is generated (0045-elenchus-works FR-001, FR-024)."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:workLifecycleStage a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range ifcore:WorkLifecycleStage ;
     rdfs:comment "The stage a Substantial Work currently occupies."@en .
 
@@ -1825,6 +1828,176 @@ ifcore:GraceCordovano a ifcore:Person ;
 
 ifcore:UnblockHealth schema:founder ifcore:GraceCordovano, ifcore:ShahidNehalShah .
 
+# ───────────────────────── Operational Truth and its family (0045-elenchus-works; 0011-studios FR-015) ─────────────────────────
+# Operational Truth is the company's productized implementation of the Elenchus pattern. Opsfolio is the portfolio's name
+# and the compliance system of record in it; surveilr gathers the evidence, Fleetfolio holds the asset and boundary
+# inventory and tests exposure, Qualityfolio manages the tests, and Spry runs executable Markdown. Each is an Intellectual
+# Frontiers Studios product and each name is a trademark the company holds. Intellectual Frontiers LLC is the rights-holder
+# of every one (0005-holding-and-family-office FR-001); the company that builds and operates them is a vault fact.
+
+ifcore:OperationalTruth a ifcore:Organization ;
+    rdfs:label "Operational Truth"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    schema:isBasedOn ifcore:Elenchus ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "The company's productized implementation of the Elenchus pattern: intent held as code is compared continuously with evidence collected from the operation itself, and the difference is reported as a truth gap or as unmanaged risk. Written Operational Truth® where it names this implementation and operational truth, in lowercase, where it names the general idea (0045-elenchus-works FR-040). Carried out by the Opsfolio family. Its license and current status are not yet recorded (0011-studios FR-015)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Opsfolio a ifcore:Organization ;
+    rdfs:label "Opsfolio"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:relation ifcore:OperationalTruth ;
+    schema:url "https://opsfolio.com"^^xsd:anyURI ;
+    rdfs:comment "The portfolio name of the Operational Truth family, and the compliance system of record in it. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Surveilr a ifcore:Organization ;
+    rdfs:label "surveilr"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:isPartOf ifcore:Opsfolio ;
+    schema:url "https://surveilr.com"^^xsd:anyURI ;
+    rdfs:comment "The Resource Surveillance & Integration Engine for Operational Truth: it ingests files, command output, mail and issue trackers into a local-first SQLite database, the RSSD, that SQL can query. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015); whether its records are tamper-evident is 0045-elenchus-works OQ-7."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Fleetfolio a ifcore:Organization ;
+    rdfs:label "Fleetfolio"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:isPartOf ifcore:Opsfolio ;
+    schema:url "https://fleetfolio.dev"^^xsd:anyURI ;
+    rdfs:comment "Evidence-based asset and boundary management, endpoint detection and penetration-test orchestration, built on surveilr: it reconciles the assets that are expected with the assets observed. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Qualityfolio a ifcore:Organization ;
+    rdfs:label "Qualityfolio"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:isPartOf ifcore:Opsfolio ;
+    schema:url "https://qualityfolio.dev"^^xsd:anyURI ;
+    rdfs:comment "The test management layer of surveilr: tests are written as Markdown with YAML front matter in Git, run from the command line or a pipeline, and their results are kept as evidence that expected tests are compared with. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Spry a ifcore:Organization ;
+    rdfs:label "Spry"@en ;
+    ifcore:portfolioCategory ifcore:SoftwareCategory ;
+    ifcore:builtBy ifcore:Studios ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    dcterms:isPartOf ifcore:Opsfolio ;
+    dcterms:license "MIT"@en ;
+    schema:url "https://sprymd.org"^^xsd:anyURI ;
+    rdfs:comment "Markdown as a programmable medium: every fenced code block of a Markdown document runs, so that a runbook, a data pipeline or a piece of compliance evidence is one document. In operation, per its public site on 2026-10-04. The license is the one its site states; it grants use of the code and does not grant the mark, which the company holds (ifcore:SpryTrademark). Which entity holds the copyright in its code is not yet confirmed."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:OperationalTruthTrademark a ifcore:Trademark ;
+    rdfs:label "Operational Truth (trademark)"@en ;
+    schema:about ifcore:OperationalTruth ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration confirmed by the founder, who states that the USPTO record names Intellectual Frontiers as its owner. Serial number, registration number and status not independently verified: the USPTO's search needs a browser, and three trademark indexes tried on 2026-10-04 returned nothing. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioTrademark a ifcore:Trademark ;
+    rdfs:label "Opsfolio (trademark)"@en ;
+    schema:about ifcore:Opsfolio ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FleetfolioTrademark a ifcore:Trademark ;
+    rdfs:label "Fleetfolio (trademark)"@en ;
+    schema:about ifcore:Fleetfolio ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:QualityfolioTrademark a ifcore:Trademark ;
+    rdfs:label "Qualityfolio (trademark)"@en ;
+    schema:about ifcore:Qualityfolio ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SurveilrTrademark a ifcore:Trademark ;
+    rdfs:label "surveilr (trademark)"@en ;
+    schema:about ifcore:Surveilr ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SpryTrademark a ifcore:Trademark ;
+    rdfs:label "Spry (trademark)"@en ;
+    schema:about ifcore:Spry ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProgrammableMarkdownTrademark a ifcore:Trademark ;
+    rdfs:label "Programmable Markdown (trademark)"@en ;
+    schema:about ifcore:Spry ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "The name Spry's public site gives as its maintainer and as its idea of Markdown as a programmable medium. Registration being prepared, per the founder. No USPTO record has been verified. The registry record, once attached as an ExternalRecordReference, is the sole canonical source for its status (0007-work-and-assets FR-012); this individual MUST NOT carry a literal status until then."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# The USPTO's record of each mark is its sole canonical status (0007-work-and-assets FR-012). None is verified yet: the USPTO's
+# search runs only in a browser, so each reference below is unresolved until a person records its serial number.
+
+ifcore:OperationalTruthTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Operational Truth trademark"@en ;
+    ifcore:describes ifcore:OperationalTruthTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration confirmed by the founder; the number and status are to be recorded as the cached value, with resolvedAt, on first verification against the USPTO record."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Opsfolio trademark"@en ;
+    ifcore:describes ifcore:OpsfolioTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FleetfolioTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Fleetfolio trademark"@en ;
+    ifcore:describes ifcore:FleetfolioTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:QualityfolioTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Qualityfolio trademark"@en ;
+    ifcore:describes ifcore:QualityfolioTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SurveilrTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the surveilr trademark"@en ;
+    ifcore:describes ifcore:SurveilrTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SpryTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Spry trademark"@en ;
+    ifcore:describes ifcore:SpryTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProgrammableMarkdownTrademarkRecord a ifcore:ExternalRecordReference ;
+    rdfs:label "USPTO record of the Programmable Markdown trademark"@en ;
+    ifcore:describes ifcore:ProgrammableMarkdownTrademark ;
+    ifcore:primarySource "https://tmsearch.uspto.gov/"^^xsd:anyURI ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "Registration being prepared. On first verification, record the application's serial number and status as the cached value, with resolvedAt."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 # ───────────────────────── Network (0012-network) ─────────────────────────
 
 ifcore:SearchStage a owl:Class ; rdfs:label "Search stage"@en ;
@@ -2640,6 +2813,54 @@ ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:pre
     skos:member ifcore:TSC-P1-1, ifcore:TSC-P2-1, ifcore:TSC-P3-1, ifcore:TSC-P3-2, ifcore:TSC-P4-1, ifcore:TSC-P4-2, ifcore:TSC-P4-3, ifcore:TSC-P5-1, ifcore:TSC-P5-2, ifcore:TSC-P6-1, ifcore:TSC-P6-2, ifcore:TSC-P6-3, ifcore:TSC-P6-4, ifcore:TSC-P6-5, ifcore:TSC-P6-6, ifcore:TSC-P6-7, ifcore:TSC-P7-1, ifcore:TSC-P8-1 ;
     ifcore:hasAudience ifcore:Public .
 
+
+# ───────────────────────── Elenchus (0045-elenchus-works) ─────────────────────────
+# A control test tries to show that one control operates in one boundary and names the probe that carries it out; the test plan
+# is every control test written and not retired; a Verdict states one outcome for each control in each boundary. Control tests and
+# Verdicts are facts of the repository that holds the boundary, never of this ontology (0001-eidolon-architecture FR-003).
+
+ifcore:Elenchus a owl:Class ; rdfs:label "Elenchus"@en ;
+    skos:definition "A pattern in which a claim is tried by trying to refute it, so that a claim of compliance stands only if the evidence survives the attempt (0045-elenchus-works FR-002)."@en ;
+    rdfs:comment "The general pattern, in the way ifcore:Eidolon is. Greek ἔλεγχος, cross-examination that aims at refutation. The company's productized implementation of it is ifcore:OperationalTruth, related to it by schema:isBasedOn; the work kind that holds one month's trial is ifcore:ElenchusKind."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ControlTest a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Control test"@en ;
+    skos:definition "One test of whether one control operates in one boundary, with the probe that carries it out (0045-elenchus-works FR-003)."@en ;
+    rdfs:comment "Ends in an exception unless a probe run in the period showed the control operated (FR-009). Names exactly one control by ifcore:testsControl (FR-004), the boundary or boundaries it applies to by schema:about, its ifcore:probeKind and ifcore:probe, its ifcore:cadence, the role that owns the control by ifcore:ownerRole, and its ifcore:fixture (FR-008). Its severity is not yet defined (0045 OQ-2). The test plan is every control test written and not retired."@en .
+ifcore:testsControl a owl:ObjectProperty ; rdfs:domain ifcore:ControlTest ; rdfs:range skos:Concept ;
+    rdfs:comment "The one control a control test concerns, a concept of a ControlCatalog (0028-compliance-controls FR-001)."@en .
+ifcore:probeKind a owl:ObjectProperty ; rdfs:domain ifcore:ControlTest ; rdfs:range skos:Concept ;
+    rdfs:comment "One of ifcore:ControlTestProbeKindScheme."@en .
+ifcore:probe a owl:DatatypeProperty ; rdfs:domain ifcore:ControlTest ; rdfs:range xsd:string ;
+    rdfs:comment "What the probe runs or asks: a command, a ledger query, the role and review, or the reference it reads."@en .
+ifcore:cadence a owl:DatatypeProperty ; rdfs:domain ifcore:ControlTest ; rdfs:range xsd:duration ;
+    rdfs:comment "The longest period a passing result stays good; evidence older than this ends the control test in an exception (0045 FR-009)."@en .
+ifcore:fixture a owl:DatatypeProperty ; rdfs:domain ifcore:ControlTest ; rdfs:range xsd:string ;
+    rdfs:comment "A stated condition in which the probe returns an exception, which the repository's check runs the probe against (0045 FR-008)."@en .
+
+ifcore:ControlTestProbeKindScheme a skos:ConceptScheme ; rdfs:label "Control test probe kind"@en ;
+    rdfs:comment "How a control test is carried out (0045-elenchus-works FR-006). The first three are evidence collected from the operation; a review is a person's attestation (FR-039)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CheckProbe a skos:Concept ; skos:inScheme ifcore:ControlTestProbeKindScheme ; skos:prefLabel "check"@en ;
+    skos:definition "A command of a repository's orchestrator that verifies and changes nothing tracked; it shows the control operated when it succeeds."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LedgerProbe a skos:Concept ; skos:inScheme ifcore:ControlTestProbeKindScheme ; skos:prefLabel "ledger"@en ;
+    skos:definition "A query of the evidence ledger for an entry of a named run, passing, made within the control test's cadence."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReviewProbe a skos:Concept ; skos:inScheme ifcore:ControlTestProbeKindScheme ; skos:prefLabel "review"@en ;
+    skos:definition "A review done by a named role and recorded in the ledger within the control test's cadence."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReferenceProbe a skos:Concept ; skos:inScheme ifcore:ControlTestProbeKindScheme ; skos:prefLabel "reference"@en ;
+    skos:definition "An ExternalRecordReference whose dcterms:valid date has not passed."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:VerdictOutcomeScheme a skos:ConceptScheme ; rdfs:label "Verdict outcome"@en ;
+    rdfs:comment "The one outcome each control reaches in each boundary in an Elenchus (0045-elenchus-works FR-016). An exception and a not-tested outcome are the truth gap."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoExceptionOutcome a skos:Concept ; skos:inScheme ifcore:VerdictOutcomeScheme ; skos:prefLabel "no exception"@en ;
+    skos:definition "Every control test for the control in the boundary showed the control operated."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExceptionOutcome a skos:Concept ; skos:inScheme ifcore:VerdictOutcomeScheme ; skos:prefLabel "exception"@en ;
+    skos:definition "At least one control test for the control in the boundary ended in an exception."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NotTestedOutcome a skos:Concept ; skos:inScheme ifcore:VerdictOutcomeScheme ; skos:prefLabel "not tested"@en ;
+    skos:definition "No control test applies to the control in the boundary."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExcusedOutcome a skos:Concept ; skos:inScheme ifcore:VerdictOutcomeScheme ; skos:prefLabel "excused"@en ;
+    skos:definition "A disposition for the control in the boundary was in force on the date the Elenchus closed."@en ; ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Government registrations (0029-government-registrations) ─────────────────────────
 # A registration is one ExternalRecordReference per entity per registration (FR-001), typed by a concept below,

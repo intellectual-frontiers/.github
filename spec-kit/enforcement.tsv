@@ -808,8 +808,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0028-compliance-controls FR-011	check	eidolon: eid check compliance	each boundary is named by schema:about on a Decision that is not a disposition
 0028-compliance-controls FR-012	check	eidolon: eid check compliance	one boundary, one disposition, and a dcterms:valid within a year of decidedAt
 0028-compliance-controls FR-013	check	eidolon: eid check compliance	no accepted-risk or planned-remediation disposition on a control a NoPlanOfActionAllowed baseline selects
-0028-compliance-controls FR-014	none	-	evidence ledger not yet built; where it lives is 0028 OQ-1
-0028-compliance-controls FR-015	none	-	evidence ledger not yet built (0028 OQ-1)
+0028-compliance-controls FR-014	none	-	the vault keeps its ledger in evidence/ (0028 OQ-1) and eid check elenchus checks each entry's kind, outcome and audience; that every run is recorded is not checked
+0028-compliance-controls FR-015	check	eidolon: eid check elenchus	verifies the ledger's chain: a removed, inserted or altered entry, and an altered kept output
 0028-compliance-controls FR-016	none	-	evidence ledger not yet built (0028 OQ-1)
 0028-compliance-controls FR-017	none	-	evidence ledger not yet built (0028 OQ-1)
 0028-compliance-controls FR-018	none	-	evidence ledger not yet built (0028 OQ-1)
@@ -1103,3 +1103,43 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-013	none	-	eid site generate writes the snapshot; no check of a hand edit
 0044-public-website FR-014	check	eidolon: eid site status	lists every previous sitemap address neither served nor redirected
 0044-public-website FR-015	check	eidolon: eid check site	every page carries the one analytics container
+0045-elenchus-works FR-001	none	-	whether a work is of this kind is judgment
+0045-elenchus-works FR-002	none	-	vocabulary; no check of the words a record uses
+0045-elenchus-works FR-003	check	eidolon: eid check elenchus	every field but severity, which has no scale yet (0044 OQ-2)
+0045-elenchus-works FR-004	check	eidolon: eid check elenchus	a control test names exactly one control, in the baseline of each boundary it applies to
+0045-elenchus-works FR-005	none	-	copyright and restricted information are judgment; no check
+0045-elenchus-works FR-006	check	eidolon: eid check elenchus	one probe kind from the scheme; a check probe names a section the vault can run; a reference probe names an ExternalRecordReference
+0045-elenchus-works FR-007	none	-	a probe's read-only behavior is judgment; no check
+0045-elenchus-works FR-008	none	-	no check runs a fixture yet
+0045-elenchus-works FR-009	none	-	no check yet
+0045-elenchus-works FR-010	none	-	no check yet
+0045-elenchus-works FR-011	none	-	no check of baseline coverage yet
+0045-elenchus-works FR-012	none	-	permission rule; nothing to check
+0045-elenchus-works FR-013	none	-	no check compares a control test with its history yet
+0045-elenchus-works FR-014	none	-	no check yet
+0045-elenchus-works FR-015	none	-	no check that a Verdict is computed from its sources
+0045-elenchus-works FR-016	none	-	no check yet
+0045-elenchus-works FR-017	none	-	no check yet
+0045-elenchus-works FR-018	none	-	no check yet
+0045-elenchus-works FR-019	none	-	no check yet
+0045-elenchus-works FR-020	none	-	no check yet
+0045-elenchus-works FR-021	none	-	no check compares the Elenchus with the status report
+0045-elenchus-works FR-022	none	-	permission rule; nothing to check
+0045-elenchus-works FR-023	check	eidolon: eid check elenchus	an Elenchus's slug is a calendar month
+0045-elenchus-works FR-024	check	eidolon: eid check elenchus	an open Elenchus's verdict.auto.json regenerates from its own ledger head and date; its OSCAL shape is not validated
+0045-elenchus-works FR-025	none	-	wording is judgment; no check
+0045-elenchus-works FR-026	none	-	no check yet
+0045-elenchus-works FR-027	check	eidolon: eid check elenchus	a closed Elenchus's verdict matches the digest in its closing Decision; that a person closed it is not checked
+0045-elenchus-works FR-028	check	eidolon: eid check elenchus	an Elenchus states when it closes, and one open past that date is reported as overdue
+0045-elenchus-works FR-029	none	-	no check yet
+0045-elenchus-works FR-030	none	-	no check yet
+0045-elenchus-works FR-031	none	-	no check yet
+0045-elenchus-works FR-032	none	-	no check yet
+0045-elenchus-works FR-033	none	-	access is granted by a person; no check
+0045-elenchus-works FR-034	none	-	no check yet
+0045-elenchus-works FR-035	none	-	presentation is judgment; no check
+0045-elenchus-works FR-036	check	eidolon: eid check elenchus	control test shape, the ledger's chain, slugs and verdicts; fixtures and retired records are not yet checked
+0045-elenchus-works FR-037	none	-	eid elenchus new, record, generate and advance exist; no check that nothing else changes a control test
+0045-elenchus-works FR-038	none	-	no check yet
+0045-elenchus-works FR-039	none	-	no check yet
+0045-elenchus-works FR-040	none	-	wording is judgment; no check
