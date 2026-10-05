@@ -8,6 +8,7 @@ import { lookOf } from '../model/status';
 import type { Handles } from '../services/handles';
 import type { Repository } from '../services/repository';
 import { link, markdown } from './tooltips';
+import { t } from '../l10n';
 
 export interface StatusModel {
   text: string;
@@ -51,7 +52,7 @@ export class StatusBar implements vscode.Disposable {
     const tip = this.tooltip(repo, m, needs);
     this.item.tooltip = tip;
     this.item.backgroundColor = m.tone ? new vscode.ThemeColor(m.tone === 'error' ? 'statusBarItem.errorBackground' : 'statusBarItem.warningBackground') : undefined;
-    this.item.accessibilityInformation = { label: `IF Console: ${m.text.replace(/\$\([^)]+\)\s*/g, '')}. Choose to open Home with what needs you.`, role: 'button' };
+    this.item.accessibilityInformation = { label: t('IF Console: {0}. Choose to open Home with what needs you.', m.text.replace(/\$\([^)]+\)\s*/g, '')), role: 'button' };
     if (m.hidden) this.item.hide(); else this.item.show();
     this.last = { text: m.text, tooltip: tip.value, visible: !m.hidden };
     return m;

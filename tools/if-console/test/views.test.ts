@@ -1,6 +1,7 @@
 // The views (0043-if-console FR-036, FR-037, FR-038), each provider driven under the stand-in: Home, the views a command line declares, Checks and
 // All commands.
 import test from 'node:test';
+import { readManifest } from './support/paths';
 import assert from 'node:assert/strict';
 import type { Loose } from './support/fake-launcher';
 import { boot, defaultDocs, k } from './support/boot';
@@ -11,7 +12,7 @@ const text = (md: Loose): string => md.value.replace(/\\/g, '');
 
 test('FR-036: Home is first, then a view for each view the command line declares (titled at run time), then Checks, then All commands, hidden', async () => {
   const b = await boot();
-  const manifest = require('../../package.json') as Loose;
+  const manifest = readManifest() as Loose;
   const ids = manifest.contributes.views['if-console'].map((v: Loose) => v.id);
   assert.equal(ids[0], 'if-console.home');
   assert.deepEqual(ids.slice(-2), ['if-console.checks', 'if-console.commands']);
@@ -19,7 +20,7 @@ test('FR-036: Home is first, then a view for each view the command line declares
   const entries = manifest.contributes.views['if-console'];
   assert.match(entries.at(-1).when, /allCommands/, 'All commands is hidden until the setting or the toggle shows it');
   const first = b.stub.calls.treeViews.get('if-console.view.0');
-  assert.equal(first.title, 'Things', 'the slot takes the declared title');
+  assert.equal(first.title, 'Widgets', 'the slot takes the declared title');
   assert.equal(first.description, undefined, 'a view\'s header carries its title only');
   assert.equal(b.stub.calls.treeViews.get('if-console.view.1').title, '', 'a view that holds no noun with something to show is not planned: the second slot is empty');
   assert.equal(b.stub.calls.contexts.get('if-console.slot.0'), true);
@@ -110,7 +111,7 @@ test('a click on a row opens its resource through the one service; a forged node
   await b.command('openRow', rows[0]);
   const calls = b.first.invocations().slice(before).map((i: Loose) => i.argv.join(' '));
   assert.ok(calls.includes('command show widget show --json'));
-  assert.ok(calls.includes('widget show w1 --html'), 'the launcher\'s own rendering, in one place');
+  assert.ok(calls.includes('widget show w1 --json'), 'the resource, as JSON, in one place');
   assert.equal(b.stub.calls.webviews.length, 1);
   b.cleanup();
 });
@@ -135,7 +136,7 @@ test('a noun\'s rows are capped at the row limit with the count of the rest, and
 
 test('a noun with no list shows the commands the editor offers for it, titled and iconed as the command line gives', async () => {
   const list = k.list;
-  list.data.presentation.nouns.push({ noun: 'site', title: 'Site', icon: 'globe', view: 'things' });
+  list.data.presentation.nouns.push({ noun: 'site', title: 'Site', icon: 'globe', view: 'widgets' });
   list.data.commands.push({ id: 'site generate', category: 'generate', group: 'g', surfaces: ['terminal', 'editor'], help: 'Write the site', title: 'Generate Site…', icon: 'sync' });
   const b = await boot({ docs: defaultDocs({ 'command list': { doc: list } }) });
   const view = provider(b, 'if-console.view.0');
@@ -228,7 +229,7 @@ test('after a command has written, the rows and resources the views hold are ask
   assert.equal(repo.registry.rows.size, 1, 'the rows were read');
   const lists = () => b.first.invocations().filter((i: Loose) => i.argv.join(' ') === 'widget list --json').length;
   assert.equal(lists(), 1);
-  b.stub.script.quickPicks.push((items: Loose) => items[0].value);   // apply the changes
+  b.stub.script.reviews.push('apply');   // apply the changes
   b.stub.script.warnings.push('Make this decision');
   const detail = await repo.detail('widget approve');
   const executor = require('../src/services/executor') as Loose;
@@ -236,5 +237,17 @@ test('after a command has written, the rows and resources the views hold are ask
   assert.equal(repo.registry.rows.size, 0, 'a write forgets what the views read');
   await view.getChildren((await view.getChildren())[0]);
   assert.equal(lists(), 2);
+  b.cleanup();
+});
+
+test('Show View lists Home, the views the command lines declared by their own titles, and Checks, and focuses the one chosen', async () => {
+  const b = await boot();
+  b.stub.script.quickPicks.push('if-console.view.0');
+  await b.command('showView');
+  const pick = b.stub.calls.messages.find((m: Loose) => m.kind === 'quickpick');
+  assert.deepEqual(pick.items.map((i: Loose) => i.label), ['$(home) Home', '$(package) Widgets', '$(checklist) Checks'], 'the real titles, not the pool\'s numbers');
+  assert.ok(b.stub.calls.commands.some((c: Loose) => c.id === 'if-console.view.0.focus'), 'the view was focused');
+  const manifest = readManifest() as Loose;
+  assert.ok(manifest.contributes.commands.some((c: Loose) => c.command === 'if-console.showView' && c.title === 'Show View…'));
   b.cleanup();
 });

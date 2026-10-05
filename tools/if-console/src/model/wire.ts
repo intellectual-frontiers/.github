@@ -2,6 +2,7 @@
 // orchestrator: it reads documents and says what they hold.
 import { asArray, asBool, asObject, asString, asStrings, isObject, type JsonObject } from './json';
 import { NO_PRESENTATION, presentationOf, type Presentation } from './presentation';
+import { t } from '../l10n';
 
 export const DECISION = 'decision';
 /** Every category but read and check (0041 FR-015). */
@@ -96,11 +97,11 @@ export function readDoc(value: unknown): Doc | null {
 /** A newer version is "update needed" (0043 FR-021). */
 export function checkSchema(doc: Doc | null, table: Record<string, number[]> = SUPPORTED): SchemaCheck {
   const s = parseSchema(doc?.schema);
-  if (!s) return { ok: false, code: 'schema', message: 'The command line answered with something this extension does not recognize as one of its documents.' };
+  if (!s) return { ok: false, code: 'schema', message: t('The command line answered with something this extension does not recognize as one of its documents.') };
   const known = table[s.kind] ?? table.default ?? [1];
   if (!known.includes(s.version)) {
     return { ok: false, code: 'update', schema: s,
-      message: `This command line answers in a newer form (${doc?.schema ?? ''}) than this extension understands. Update the IF Console extension to read it.` };
+      message: t('This command line answers in a newer form ({0}) than this extension understands. Update the IF Console extension to read it.', doc?.schema ?? '') };
   }
   return { ok: true, schema: s };
 }

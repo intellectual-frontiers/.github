@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import type { Suggestion } from '../model/home';
 import type { NounDecl, Status } from '../model/presentation';
 import type { Row } from '../model/rows';
-import { lookOf } from '../model/status';
+import { CATEGORY_ICON, lookOf } from '../model/status';
 import type { Action, CommandSummary, Finding, Link } from '../model/wire';
 import type { Handles } from '../services/handles';
 import type { CheckRecord, Repository } from '../services/repository';
@@ -62,7 +62,7 @@ export function statusIcon(status: Status): vscode.ThemeIcon {
   return icon(look.icon, look.color);
 }
 
-export const CATEGORY_ICON: Record<string, string> = { read: 'eye', check: 'checklist', record: 'note', build: 'tools', generate: 'sync', decision: 'law', setup: 'gear' };
+export { CATEGORY_ICON };
 
 export const messageNode = (repo: Repository, text: string): Node => new Node('message', repo, { text });
 

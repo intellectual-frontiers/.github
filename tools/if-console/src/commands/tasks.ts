@@ -6,6 +6,7 @@ import { asString } from '../model/json';
 import { checkResult, checkSchema, exposed, type Doc } from '../model/wire';
 import { CancelSource } from '../services/cancellation';
 import type { Repository } from '../services/repository';
+import { t } from '../l10n';
 
 export const COMMANDS = ['check', 'test', 'fresh', 'doctor'];
 
@@ -64,12 +65,12 @@ export class TaskTerminal implements vscode.Pseudoterminal {
 
   private async start(): Promise<void> {
     const argv = argvOf(this.def);
-    this.write(`$ ${this.repo.launcher.line(argv, 'json')}`);
+    this.write(`$ ${this.repo.launcher.line([...argv, '--json'])}`);
     if (!this.host.trusted()) { this.write('IF Console runs nothing in a workspace that is not trusted.'); this.closeEmitter.fire(1); return; }
     const r = await this.repo.launcher.run(argv, { token: this.cancel.token,
       onDocument: (d) => this.write(asString(d.data.message || d.data.step || d.id)) });
     if (r.cancelled) { this.write('Cancelled.'); this.closeEmitter.fire(1); return; }
-    if (!r.doc || r.error) { this.write(r.error ? r.error.message : `${this.repo.program} gave no result (${r.failed ?? `exit ${String(r.exit)}`}).`); this.closeEmitter.fire(r.exit || 1); return; }
+    if (!r.doc || r.error) { this.write(r.error ? r.error.message : t('{0} gave no result ({1}).', this.repo.program, r.failed ?? `exit ${String(r.exit)}`)); this.closeEmitter.fire(r.exit || 1); return; }
     const ok = checkSchema(r.doc);
     if (!ok.ok) { this.write(ok.message); this.closeEmitter.fire(1); return; }
     if (r.doc.kind === 'check') await this.host.handleCheck(this.repo, r.doc);
@@ -88,7 +89,7 @@ export class TaskProvider implements vscode.TaskProvider {
   private make(repo: Repository, def: TaskDef): vscode.Task {
     const task = new vscode.Task({ ...def, folder: repo.folder.name }, repo.folder, labelOf(repo, def), 'if-console',
       new vscode.CustomExecution(() => Promise.resolve(new TaskTerminal(this.host, repo, def))));
-    task.detail = repo.launcher.line(argvOf(def), 'json');
+    task.detail = repo.launcher.line([...argvOf(def), '--json']);
     if (def.command === 'test') task.group = vscode.TaskGroup.Test;
     if (def.command === 'check') task.group = vscode.TaskGroup.Build;
     return task;

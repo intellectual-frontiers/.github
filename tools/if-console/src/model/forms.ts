@@ -4,6 +4,7 @@
 import { asString } from './json';
 import type { CommandDetail, Doc, Opt } from './wire';
 import { linksOf } from './wire';
+import { t } from '../l10n';
 
 /** Flags the extension decides, never the person. */
 export const CONTROLLED = new Set(['--dry-run', '--json', '--html']);
@@ -96,7 +97,7 @@ async function askStep(ui: FormUi, detail: CommandDetail, step: Step, state: { v
   if (choices && choices.length) {
     // "(none)" is `null`, not `undefined`: the interface answers `undefined` for a pick that was dismissed, which cancels the form.
     const items: Array<PickItem<string | null>> = choices.map((c) => ({ label: c, value: c }));
-    if (!step.required) items.unshift({ label: '(none)', description: 'leave this out', value: null });
+    if (!step.required) items.unshift({ label: t('(none)'), description: t('leave this out'), value: null });
     const picked = await ui.pick({ title: where, placeholder: [step.help, note].filter(Boolean).join(' - ') || `Choose a ${step.type}`, items, canPickMany: step.many });
     if (picked === undefined) return { cancelled: true };
     if (Array.isArray(picked)) return { value: picked.filter((v): v is string => v !== null) };
@@ -127,7 +128,7 @@ export async function collect(ui: FormUi, detail: CommandDetail, lookup: Lookup 
     else delete state.values[step.key];
   }
   if (!only && !wanted && optional.length) {
-    const more = await ui.pick<Step>({ title: `${detail.id}: more settings`, placeholder: 'Choose any settings to add, or none',
+    const more = await ui.pick<Step>({ title: `${detail.id}: more settings`, placeholder: t('Choose any settings to add, or none'),
       items: optional.map((s) => ({ label: s.label, description: s.help, value: s })), canPickMany: true });
     if (more === undefined) return { cancelled: true };
     for (const step of Array.isArray(more) ? more : [more]) {

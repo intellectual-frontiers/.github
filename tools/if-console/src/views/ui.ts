@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import type { PickItem } from '../model/forms';
 import { asString } from '../model/json';
-import { labelOfChange, sides, summaryOf } from '../model/preview';
+import { sides, summaryOf, type Change } from '../model/preview';
 import type { CommandDetail, Doc } from '../model/wire';
 import type { Ui } from '../services/executor';
 import type { Cancellation, RunResult } from '../services/launcher';
@@ -12,6 +12,7 @@ import type { Log } from '../services/log';
 import type { Running } from '../services/running';
 import type { Repository } from '../services/repository';
 import * as testMode from '../test-mode';
+import { t } from '../l10n';
 
 export const SCHEME = 'if-console-diff';
 
@@ -43,17 +44,18 @@ export async function readText(repo: Repository, file: string): Promise<string |
 }
 
 export interface UiParts {
-  docs: DiffDocuments;
   log: Log;
   /** The view that started the work now, if one did, so that its progress shows there (FR-038). */
   where?: () => string | null;
   /** The commands running, which a Stop action in a view's title ends. */
   running?: Running;
+  /** Shows a dry run's changes in the resource panel and resolves to the person's choice to apply them or not. */
+  review: (repo: Repository, detail: CommandDetail, changes: Change[]) => Promise<boolean>;
   /** What to do with a command's result once it has run. */
   showResult: (repo: Repository, detail: CommandDetail, argv: string[], real: RunResult) => Promise<void>;
 }
 
-export function createUi({ docs, log, showResult, where, running }: UiParts): Ui {
+export function createUi({ log, showResult, where, running, review }: UiParts): Ui {
   const ui: Ui = {
     async pick<V>({ title, placeholder, items, canPickMany }: { title?: string; placeholder?: string; items: Array<PickItem<V>>; canPickMany?: boolean }): Promise<V | V[] | undefined> {
       const shown = items.map((i) => ({ label: i.label, description: i.description, detail: i.detail, value: i.value, picked: false }));
@@ -70,7 +72,7 @@ export function createUi({ docs, log, showResult, where, running }: UiParts): Ui
       Promise.resolve(vscode.window.showInputBox({ title, prompt, placeHolder: placeholder, value, ignoreFocusOut: true, validateInput: validate })),
     async copy(text: string): Promise<void> {
       await vscode.env.clipboard.writeText(text);
-      void vscode.window.showInformationMessage('The command line is on the clipboard.');
+      void vscode.window.showInformationMessage(t('The command line is on the clipboard.'));
     },
 
     progress<T>(title: string, fn: (token: Cancellation, report: (doc: Doc) => void) => Promise<T>): Promise<T> {
@@ -93,28 +95,12 @@ export function createUi({ docs, log, showResult, where, running }: UiParts): Ui
     async showFailure(repo: Repository, detail: CommandDetail, r: RunResult): Promise<void> {
       const words = r.error ? r.error.message : r.failed ? `${repo.program} could not run "${detail.id}": ${r.failed}` : `"${detail.id}" did not finish (exit ${String(r.exit)}).`;
       log.error(`${detail.id}: ${words}`);
-      const pick = await vscode.window.showErrorMessage(words, 'Show Output');
+      const pick = await vscode.window.showErrorMessage(words, t('Show Output'));
       if (pick === 'Show Output') log.show(true);
     },
 
-    /** Each file the change would touch as a diff, from the dry run's resource, and a choice to apply it or not (FR-014). */
-    async reviewChanges({ repo, detail, changes }): Promise<boolean> {
-      const items: Array<PickItem<string | number>> = [{ label: '$(check) Apply these changes', description: summaryOf(changes), value: 'apply' },
-        ...changes.map((c, i) => ({ label: `$(diff) ${c.path}`, description: `${labelOfChange(c)}, +${c.added} -${c.removed}`, detail: `Open the diff of ${c.path}`, value: i })),
-        { label: '$(discard) Discard (change nothing)', description: 'nothing is written', value: 'cancel' }];
-      for (;;) {
-        const picked = await ui.pick<string | number>({ title: `${detail.id}: what would change`, placeholder: 'Open a file to see its diff, then apply or leave it', items });
-        if (picked === undefined || picked === 'cancel') return false;
-        if (picked === 'apply') return true;
-        const c = typeof picked === 'number' ? changes[picked] : undefined;
-        if (!c) return false;
-        const before = c.change === 'create' ? '' : await readText(repo, c.path);
-        const s = sides(c, before);
-        const left = docs.put('before', c.path, s.before);
-        const right = docs.put('after', c.path, s.after);
-        await vscode.commands.executeCommand('vscode.diff', left, right, `${path.basename(c.path)} (before, after) - dry run of ${detail.id}`);
-      }
-    },
+    /** The change summary in the resource panel, with Apply and Discard, and each file as a diff on request (FR-014, FR-042). */
+    reviewChanges: ({ repo, detail, changes }): Promise<boolean> => review(repo, detail, changes),
 
     /** A write whose dry run lists no files (a fetch, for example): show what it said and ask. */
     async reviewWithoutFiles({ detail, doc }): Promise<boolean> {
@@ -130,7 +116,7 @@ export function createUi({ docs, log, showResult, where, running }: UiParts): Ui
       const what = changes.length ? summaryOf(changes) : 'The dry run lists no files.';
       const resource = argv.slice(detail.words.length).filter((a) => !a.startsWith('-')).join(' ') || '(none)';
       const message = `${repo.name}: ${detail.id} is a decision only you can make.`;
-      const options = { modal: true, detail: `Command: ${line}\nResource: ${resource}\nWhat it changes: ${what}\n\n${detail.help}` };
+      const options = { modal: true, detail: t('Command: {0}\nResource: {1}\nWhat it changes: {2}\n\n{3}', line, resource, what, detail.help) };
       const button = 'Make this decision';
       // In VS Code's test mode only, a test answers the modal through the hook (0043 FR-033); otherwise VS Code shows it.
       if (testMode.active()) return testMode.answerModal({ message, modal: options.modal, detail: options.detail, buttons: [button] }, button) === button;
@@ -141,4 +127,13 @@ export function createUi({ docs, log, showResult, where, running }: UiParts): Ui
     showResult,
   };
   return ui;
+}
+
+/** One file of a dry run as VS Code's diff editor: the file as it is now against the file as the change would leave it. Nothing is written. */
+export async function openDiff(docs: DiffDocuments, repo: Repository, detail: Pick<CommandDetail, 'id'>, c: Change): Promise<void> {
+  const before = c.change === 'create' ? '' : await readText(repo, c.path);
+  const s = sides(c, before);
+  const left = docs.put('before', c.path, s.before);
+  const right = docs.put('after', c.path, s.after);
+  await vscode.commands.executeCommand('vscode.diff', left, right, `${path.basename(c.path)} (before, after) - dry run of ${detail.id}`);
 }
