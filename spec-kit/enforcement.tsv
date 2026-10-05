@@ -1085,6 +1085,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-if-console FR-044	none	-	not built yet; agora check extension will read the manifest and the package's files
 0043-if-console FR-045	check	.github: agora check extension	the node test of the screenshot helper reads a screen dump to a PNG; agora test drives extension test --screenshots (the folder, the usage errors, the files); the scenario runs in a real VS Code with agora extension test --screenshots
 0043-if-console FR-046	none	-	not built yet; agora check extension will run the ported tests of the guarantees against the redesigned code
+0043-if-console FR-047	check	.github: agora test	test_extension Modules: the export copies src and test/support and not the unit tests, the command builds in the staged copy and writes the folder, and its dry run writes nothing
 0044-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
 0044-public-website FR-002	none	-	repository topology; no check
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
