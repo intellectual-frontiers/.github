@@ -94,7 +94,8 @@ platform coverage, the exception, and what continuous integration needs.
   directory) and in contributor documentation. A tool's code, comments,
   messages and hints MUST NOT name one. A hint for a missing prerequisite
   MUST name only the Python package or the toolchain entry that supplies
-  it (0041-command-line FR-006).
+  it (0041-command-line FR-006), or, for a maintainer tool, the approved
+  host program it runs (0041-command-line FR-071).
 
 ## Locked Python packages
 
