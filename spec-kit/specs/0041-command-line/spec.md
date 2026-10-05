@@ -65,7 +65,8 @@ command set is 0042-agora.
   package installed. `doctor` MUST enforce this (FR-029).
 - **FR-006**: A program outside Python that a command needs (a typesetter,
   a browser, a Java runtime, a Node runtime) MUST come from a Python package
-  or from a toolchain entry (FR-066), never from the host. An orchestrator
+  or from a toolchain entry (FR-066), never from the host, except a
+  maintainer tool's approved program (FR-071). An orchestrator
   MUST NOT use a program found on the host unless the person names it in an
   opt-in override, per entry (0025-tooling-environment FR-019), and MUST NOT
   install one with the host's package manager. The registry MUST declare each
@@ -546,6 +547,24 @@ command set is 0042-agora.
   no other command. The package lists are pinned per distribution family in
   the orchestrator's code (FR-046): `apt` on Debian and Ubuntu at least, and on
   another family `add` MUST say that no list exists and name the libraries.
+- **FR-070**: Python comes first. Before a change adds a program outside
+  Python — a toolchain entry, a Python package that only wraps one, or a host
+  program for a maintainer tool (FR-071) — it MUST show that the Python
+  standard library and the packages already used cannot do the work, and MUST
+  ask the decision authority (0001-eidolon-architecture FR-029) to approve the
+  program before it is used. The approval is recorded as a Decision
+  (0008-decision-records) naming the program, what it does that Python cannot,
+  and the commands that run it. Where the work can be done by a program
+  already approved, that program MUST be used rather than a new one, so the
+  set of programs stays as small as the work allows.
+- **FR-071**: A maintainer tool is a command a person runs to bring material
+  in from outside the repositories, such as reading another repository's
+  source. Its output is committed, and no build, check, test, generator or
+  served page needs it to run. A maintainer tool MAY run a program found on
+  the host, if that program was approved under FR-070. Its registry entry MUST
+  name the program. Its hint and its error, when the program is missing, MUST
+  name that program (an exception to 0025-tooling-environment FR-012). No
+  other command MAY run the program or depend on the maintainer tool.
 
 ## Out of scope
 
@@ -565,6 +584,12 @@ command set is 0042-agora.
 - A command needs a program the host also has on its `PATH`: it is not used
   and the entry from the cache is, unless the person opted in with an
   override, which the resource names, per FR-006 and FR-029.
+- A tool would be easier to write with a program outside Python that
+  Python's standard library or an existing package can also do: Python is
+  used and the program is not added, per FR-070.
+- A maintainer tool must read another repository's TypeScript, which no
+  Python package can evaluate: the decision authority approves a host
+  program for it, and only that tool runs it, per FR-070 and FR-071.
 - A command needs a toolchain entry the cache lacks and the machine is online:
   it fetches and verifies it once, then runs, per FR-066 and FR-067.
 - A browser's system libraries are missing on Linux: the command fails with
