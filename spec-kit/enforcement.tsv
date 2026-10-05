@@ -339,7 +339,7 @@ requirement	mechanism	by	note
 0015-work-packages FR-024	check	eidolon: eid check works	Public without a broadening Decision fails; other defaults unchecked
 0015-work-packages FR-025	check	eidolon: eid check works	Public work needs a broadensAudienceTo Public Decision; decider authority unchecked
 0015-work-packages FR-026	none	-	no check
-0015-work-packages FR-027	check	eidolon: eid check works	works.py: an announcedTo needs an announcing Decision; eid work announce writes both
+0015-work-packages FR-027	check	eidolon: eid check works	works.py: an announcedTo needs an announcing Decision; eid work publish --announce writes both
 0015-work-packages FR-028	gate	eidolon: eid work advance	advance to Review records the announcement unless --hold; announce refuses before Review
 0015-work-packages FR-029	check	eidolon: eid check site	the generator reads only the listed facts; the leak check fails a page showing any other
 0015-work-packages FR-030	check	eidolon: eid fresh	the generator gives an announced work's companion, news and show-notes pages the Public audience
