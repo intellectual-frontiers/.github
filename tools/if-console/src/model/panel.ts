@@ -55,7 +55,8 @@ export interface KeyValue {
 }
 
 export interface Column { key: string; label: string; numeric: boolean }
-export interface Cell { text: string; kind: CellKind; on?: boolean; status?: Status; file?: FileRef; sort: string | number }
+/** `open`: where the cell's text names another resource the row does not itself open, the index of its reference: the cell is a link. */
+export interface Cell { text: string; kind: CellKind; on?: boolean; status?: Status; file?: FileRef; sort: string | number; open?: number }
 export interface TableRow { cells: Cell[]; open?: number; label: string }
 
 export type StageState = 'done' | 'current' | 'todo' | 'blocked' | 'skipped';
@@ -313,8 +314,15 @@ function tableOf(key: string, title: string, rows: JsonObject[], ctx: BuildConte
       const id = cellText(r[noun.list.id]);
       if (id !== '') open = refs.add({ kind: 'row', noun: noun.noun, id });
     }
+    let opener: Cell | undefined;
     if (open === undefined) {
-      for (const c of cells) { const hit = byValue.get(c.text); if (hit) { open = refs.add({ kind: 'link', link: hit }); break; } }
+      for (const c of cells) { const hit = byValue.get(c.text); if (hit) { open = refs.add({ kind: 'link', link: hit }); opener = c; break; } }
+    }
+    // The other cells that name a resource are links of their own: a statement's object, a reference's predicate.
+    for (const c of cells) {
+      if (c === opener) continue;
+      const hit = byValue.get(c.text);
+      if (hit && c.kind === 'text') c.open = refs.add({ kind: 'link', link: hit });
     }
     const first = cells.find((c) => c.kind !== 'empty');
     const row: TableRow = { cells, label: first?.text ?? '' };
@@ -429,6 +437,12 @@ function statusPills(doc: Doc, ctx: BuildContext): Pill[] {
   return out;
 }
 
+/** The codicon a resource's own data gives for its header, by the field its noun's `list` declares as `icon` (0041 FR-064; 0043 FR-049). */
+function ownIcon(noun: NounDecl | undefined, doc: Doc): string | undefined {
+  const v = noun?.list?.icon ? asString(doc.data[noun.list.icon]) : '';
+  return /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(v) ? v : undefined;
+}
+
 export function buildResource(doc: Doc, ctx: BuildContext): Built {
   const refs = new Refs();
   const actions = actionsOf(doc);
@@ -447,6 +461,7 @@ export function buildResource(doc: Doc, ctx: BuildContext): Built {
   const subtitleKey = SUBTITLE_KEYS.find((k) => typeof doc.data[k] === 'string' && asString(doc.data[k]) !== '' && asString(doc.data[k]).length <= 300);
   const sections: Section[] = [];
   const skip = new Set<string>(subtitleKey ? [subtitleKey] : []);
+  if (noun?.list?.icon && ownIcon(noun, doc)) skip.add(noun.list.icon);   // the header draws it
   const isCheck = doc.kind === 'check' && Array.isArray(doc.data.sections);
   if (isCheck) {
     const result = checkResult(doc);
@@ -479,7 +494,7 @@ export function buildResource(doc: Doc, ctx: BuildContext): Built {
   });
   const rowOpened = refs.list.filter((r) => r.kind === 'row').length > 0 || sections.some((s) => s.type === 'table' && s.rows.some((r) => r.open !== undefined));
   if (chips.length && !(rowOpened && chips.length > 12)) sections.push({ type: 'chips', id: 'related', title: t('Related'), icon: 'link', chips });
-  const header: Header = { icon: noun?.icon ?? look?.icon ?? 'symbol-misc', title, kind, id: doc.id, audience: doc.audience, pills, subtitle: subtitleKey ? asString(doc.data[subtitleKey]) : '' };
+  const header: Header = { icon: ownIcon(noun, doc) ?? noun?.icon ?? look?.icon ?? 'symbol-misc', title, kind, id: doc.id, audience: doc.audience, pills, subtitle: subtitleKey ? asString(doc.data[subtitleKey]) : '' };
   return { mode: 'resource', header, actions: actionViews(actions), sections, held: { actions, refs: refs.list } };
 }
 

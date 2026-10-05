@@ -369,7 +369,8 @@ knowledge (FR-003).
   with a `view` but no `list` shows the commands the editor offers for it. A
   noun's rows are read when its group is opened, are listed up to the setting
   `if-console.rowLimit`, and the rest are found by the Find Resource quick
-  pick.
+  pick or, where the noun's `list` declares `search`, by the Search action
+  (FR-049).
 - **FR-037**: The Home view MUST list what needs a person, each as a row with a
   status (FR-038) and an action, from the launcher's own resources: the check
   sections whose last run failed, the open proposals, the generated files
@@ -386,7 +387,8 @@ knowledge (FR-003).
   trusted (FR-006); and a missing toolchain or library. Home MUST add no item
   that the launcher has no command for (FR-003, FR-019).
 - **FR-038**: A row of a list MUST show its `label`, its `description` muted
-  after it, and a codicon colored by its status, as a `ThemeIcon` with a
+  after it, and a codicon colored by its status (a row with no status shows the
+  codicon its list's `icon` field gives, else its noun's), as a `ThemeIcon` with a
   `ThemeColor`, by this fixed mapping of 0041-command-line FR-064's statuses:
   `ok` `pass` with `testing.iconPassed`; `warning` `warning` with
   `list.warningForeground`; `error` `error` with `testing.iconFailed`; `pending`
@@ -655,6 +657,50 @@ knowledge (FR-003).
   Home with that suggestion revealed. A command line gives every suggestion an
   action (0041-command-line FR-017), so that there is a command to run; where
   one gives none, the suggestion says what the person does.
+
+- **FR-049**: Where a noun's `list` declares `search` (0041-command-line
+  FR-064), the view that holds it MUST have a title action Search, in the
+  `navigation` group beside Find Resource, that asks for text in an input box
+  and runs the `list` command with that option and the text, never by a name
+  of its own, and shows the rows it returns, in the order the command line
+  gave them (which is its ranking), in a quick pick of each row's icon, label,
+  description and tooltip facts, from which a choice opens the resource in the
+  panel; the Find Resource quick pick MUST remain for the rows already loaded.
+  The panel MUST draw a resource's header with the codicon its noun's `list`
+  `icon` field gives for that resource where its data has the field, and MUST
+  make a table cell a link when the cell's text is the first value of a `show`
+  link the document gives and the row opens another resource, so that a
+  statement's object and a table's other terms open the resource they name.
+  Where a command line's `list` declares `search`, a request that finds nothing
+  MUST say so in words and offer the unfiltered list.
+- **FR-050**: The repositories' `.vscode/extensions.json` MUST recommend only
+  extensions this spec has vetted, and each extension for browsing and
+  visualizing the Turtle files of the ontology MUST meet all of: an OSI-approved
+  licence; a release or commit within the last twelve months; use with no
+  network for the files of the workspace; no telemetry, or telemetry that
+  honours VS Code's own `telemetry.telemetryLevel`; no program to install beyond
+  Python and `uv` (0041-command-line FR-070), a program needing Java or another
+  runtime being reported to the decision authority and never added; and no
+  automatic download of code. Vetted at the versions in parentheses:
+  recommended are `faubulous.mentor` (0.5.10, GPL-3.0: the ontology's classes,
+  properties, individuals and concepts as a tree, references, SPARQL over the
+  workspace; TypeScript only; talks to a remote endpoint only when one is
+  configured) and `zazuko.vscode-rdf-sketch` (1.1.3, MIT, Zazuko: renders the
+  graph of an open file as a diagram; no dependencies, no network).
+  `stardog-union.stardog-rdf-grammars` (Apache-2.0, a grammar with no code)
+  stays recommended in the repository that already recommends it for syntax
+  colors. Not recommended: Strixonomy (0.28.1, MIT, known earlier as OntoCode;
+  no telemetry found, offline, but a native 60 MB language server binary in the
+  package that cannot be audited here, from one maintainer, 28 releases in
+  months; acceptable only if the decision authority approves the binary),
+  RDF Studio (1.2.0, MIT; sent an `x-user-email` header on every HTTP request
+  and is installed from GitHub releases, not a marketplace), Semantic Web
+  Language Server (0.0.17, MIT; checks GitHub for updates in the background
+  and downloads a native binary), OntoGraph lite (0.3.9, Apache-2.0; needs a
+  Java 21 runtime for its reasoner), Turtle Sense (0.0.10, no licence stated,
+  last published May 2024) and ttl-pawikan (0.1.2, MIT; syntax only, already
+  covered by the recommended ones). `agora check extension` MUST fail a
+  recommendation in `.vscode/extensions.json` that this requirement does not name.
 
 ## Review & acceptance checklist
 

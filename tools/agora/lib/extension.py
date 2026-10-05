@@ -25,7 +25,7 @@ DIR = "tools/if-console"
 SETTINGS = {"if-console.launchers", "if-console.checkOnSave", "if-console.showAllCommands", "if-console.rowLimit"}  # 0043 FR-024
 CATEGORY = "IF Console"  # 0043 FR-039
 # The first word of a command's title is a verb (0043 FR-039); the title is a verb and an object.
-VERBS = {"Show", "Run", "Prove", "Check", "Get", "Learn", "Copy", "Open", "Find", "Refresh", "Stop", "Trust", "Follow"}
+VERBS = {"Show", "Run", "Prove", "Check", "Get", "Learn", "Copy", "Open", "Find", "Refresh", "Stop", "Trust", "Follow", "Search"}
 # The only commands a key may run: each reads, none writes or decides (0043 FR-015, FR-039).
 KEYBINDABLE = {"if-console.showHome", "if-console.check", "if-console.checkChanged", "if-console.learn", "if-console.copyContext", "if-console.doctor"}
 MENU_GROUPS = ("inline", "navigation", "1_run", "2_copy", "9_cutcopypaste")  # 0043 FR-038, in this order
@@ -278,6 +278,23 @@ def source_findings(home: Path, forbidden_names: list[str]) -> list[Finding]:
     return out
 
 
+def recommendation_findings(home: Path) -> list[Finding]:
+    """Each extension `.vscode/extensions.json` recommends is named, in backticks, in 0043's FR-050, where it was vetted (0043 FR-050)."""
+    f = home / ".vscode" / "extensions.json"
+    if not f.is_file():
+        return []
+    out: list[Finding] = []
+    raw = _read_json(f, ".vscode/extensions.json", out)
+    spec = home / "spec-kit" / "specs" / "0043-if-console" / "spec.md"
+    text = spec.read_text(encoding="utf-8") if spec.is_file() else ""
+    m = re.search(r"- \*\*FR-050\*\*:.*?(?=\n- \*\*FR-|\n## )", text, re.S)
+    vetted = set(re.findall(r"`([A-Za-z0-9-]+\.[A-Za-z0-9-]+)`", m.group(0))) if m else set()
+    for rec in (raw or {}).get("recommendations", []) if isinstance(raw, dict) else []:
+        if rec.lower() not in {v.lower() for v in vetted}:
+            out.append(Finding("error", ".vscode/extensions.json", f"recommends {rec}, which 0043-if-console FR-050 does not name as vetted (0043 FR-050)"))
+    return out
+
+
 def codicon_findings(home: Path, mapping: Path, version: str) -> list[Finding]:
     """The codicon ids a command line may name (lib/codicons.txt, 0041 FR-072) are the glyph map of the locked @vscode/codicons: the same ids,
     from the same version (0043 FR-035)."""
@@ -412,7 +429,8 @@ def run_tests(stage_dir: Path, node: str, env: dict[str, str], launcher_root: Pa
     if done.returncode != 0 or counts.get("fail", 1):
         failed = re.findall(r"^\s*not ok \d+ - (.+)$", text, re.M)
         for name in failed[:20] or ["the test run"]:
-            findings.append(Finding("error", f"{DIR}/test", f"fails: {name}"))
+            why = re.search(rf"not ok \d+ - {re.escape(name)}\n(?:.*\n)*?\s+(?:error|message): (.+(?:\n\s{{6,}}.+)*)", text)
+            findings.append(Finding("error", f"{DIR}/test", f"fails: {name}" + (f" ({' '.join(why.group(1).split())[:600]})" if why else "")))
         if not failed:
             findings.append(Finding("error", f"{DIR}/test", "the run failed: " + (done.stderr.strip() or text.strip())[-400:]))
     return findings, [f"node's test runner: {counts.get('pass', 0)} of {counts.get('tests', 0)} passed, {counts.get('skipped', 0)} skipped"]

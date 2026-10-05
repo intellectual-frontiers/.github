@@ -387,6 +387,26 @@ A media asset, a job rendered by frontiers-media (0014-design-systems FR-040)
 
 |===
 
+=== ontology
+
+A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037)
+
+[cols="4,2,2,4"]
+|===
+|Usage |Category |Where it runs |What it does
+
+|`agora ontology list [--kind ONTOLOGY_KIND] [--scheme SCHEME] [--match TEXT]`
+|read
+|terminal, editor, mcp
+|List the ontology's classes, properties, individuals, schemes and concepts, or the ones that match a text
+
+|`agora ontology show TERM`
+|read
+|terminal, editor, mcp
+|Show one term: its meaning, relations, statements, what references it and the requirements that cite it
+
+|===
+
 === openedx
 
 A brand's Open edX brand package (frontiers-brand FR-020)
@@ -547,26 +567,6 @@ The one prerequisite beyond python3 and uv: the shared libraries a browser and V
 
 |===
 
-=== term
-
-A concept or scheme of the ontology (0019-controlled-vocabulary)
-
-[cols="4,2,2,4"]
-|===
-|Usage |Category |Where it runs |What it does
-
-|`agora term list [--scheme SCHEME]`
-|read
-|terminal, editor, mcp
-|List the ontology's concepts and schemes
-
-|`agora term show TERM`
-|read
-|terminal, editor, mcp
-|Show one concept or scheme
-
-|===
-
 === toolchain
 
 The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067)
@@ -664,6 +664,10 @@ A value that fails its type is an error that names the type and gives examples.
 |how a requirement is enforced (0020 FR-012)
 |check, gate, review, none
 
+|`ONTOLOGY_KIND`
+|the kind of an ontology term (0042 FR-037)
+|class, property, scheme, concept, individual
+
 |`PATH`
 |a path to a file or directory that exists, relative to where the command runs
 |a value `the noun's list command` offers
@@ -693,7 +697,7 @@ A value that fails its type is an error that names the type and gives examples.
 |browser, python, node, vscode
 
 |`SCHEME`
-|a concept scheme of the ontology by its local name, such as CommandCategoryScheme
+|a concept scheme of the ontology as a CURIE, such as ifcore:CommandCategoryScheme, or by its local name
 |a value `the noun's list command` offers
 
 |`SECTION`
@@ -717,7 +721,7 @@ A value that fails its type is an error that names the type and gives examples.
 |a value `the noun's list command` offers
 
 |`TERM`
-|a concept or scheme of the ontology by its local name, such as ReadCommandCategory
+|a term of the ontology as a CURIE, such as ifcore:Agora, or its full IRI
 |a value `the noun's list command` offers
 
 |`TOPIC`

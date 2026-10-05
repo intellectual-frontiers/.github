@@ -52,7 +52,7 @@ export class ResourceProvider extends BaseProvider {
         if (!row) { item = new vscode.TreeItem(''); break; }
         item = new vscode.TreeItem(row.label, vscode.TreeItemCollapsibleState.None);
         item.description = row.description;
-        item.iconPath = row.status ? statusIcon(row.status) : icon(d.nounDecl?.icon ?? 'symbol-misc');
+        item.iconPath = row.status ? statusIcon(row.status) : icon(row.icon || d.nounDecl?.icon || 'symbol-misc');
         const opens = node.repo.has(`${row.noun} show`);
         item.tooltip = rowTooltip(row, d.nounDecl?.title ?? row.noun, node.repo.key, this.host.handles, opens);
         item.contextValue = ['row', opens ? 'openable' : '', node.repo.has('context') ? 'contextual' : ''].filter(Boolean).join(' ');

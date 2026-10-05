@@ -52,7 +52,15 @@ test('Home, the views each command line declares, Checks and All commands are po
   assert.ok(!slots.some((t) => /^Section \d+$/.test(t) || t === 'Things'), 'and none is titled by its number');
   assert.deepStrictEqual(slots, [...slots].sort((a, b) => snap.views.slots.find((v) => v.title === a).order - snap.views.slots.find((v) => v.title === b).order), 'in the order they ask for');
   const specs = snap.views.slots.find((v) => v.title === 'Specs');
-  assert.deepStrictEqual(specs.entries.map((n) => n.label), ['Requirement', 'Spec', 'Term'], 'the nouns whose view it is');
+  assert.deepStrictEqual(specs.entries.map((n) => n.label), ['Requirement', 'Spec'], 'the nouns whose view it is');
+  const onto = snap.views.slots.find((v) => v.title === 'Ontology');
+  assert.ok(onto, 'the Ontology view is planned');
+  assert.deepStrictEqual(onto.entries.map((n) => n.label), ['Ontology'], 'one noun');
+  const terms = reference('ontology', 'list').data.terms;
+  const shown = onto.entries[0].children;
+  assert.strictEqual(shown[0].label, terms[0].label, 'the first row is the command line\'s first');
+  assert.strictEqual(shown[0].description, terms[0].curie, 'the muted description is the declared field');
+  assert.strictEqual(shown.length, Math.min(terms.length, 200) + (terms.length > 200 ? 1 : 0));
   const spec = specs.entries.find((n) => n.label === 'Spec');
   const all = reference('spec', 'list').data.specs;
   assert.strictEqual(spec.children.length, Math.min(all.length, 200) + (all.length > 200 ? 1 : 0));
@@ -281,6 +289,24 @@ test('Find Resource lists every row of every view, the command line\'s own label
   assert.ok(pick.items.some((l) => l.includes('0043-if-console')), 'a spec of this repository\'s own');
   assert.ok(pick.items.length > 1000, `all the rows, not the first few: ${pick.items.length}`);
   await vscode.commands.executeCommand('workbench.action.closeQuickOpen');
+});
+
+test('Search runs the ontology list with --match, shows the ranking the command line gave, and a choice opens the term', async () => {
+  const want = reference('ontology', 'list', '--match', 'design system').data.terms;
+  assert.ok(want.length > 3 && want[0].curie === 'ifcore:DesignSystem', 'the command line ranks the exact label first');
+  const mark = hook().shown.length;
+  vscode.commands.executeCommand('if-console.searchView', undefined, 'design system');
+  const pick = await nextQuickPick(mark, (s) => s.title === 'Search Ontology: design system', 'the search results');
+  assert.strictEqual(pick.items.length, want.length, 'every row the command line gave');
+  assert.ok(pick.items[0].includes(want[0].label), 'in its order, the best match first');
+  assert.ok(pick.items.slice(0, 5).every((l, i) => l.includes(want[i].label)), 'the first five are the command line\'s own, in its order');
+  const open = hook().shown.length;
+  await choose(pick, want[0].label);
+  const page = await waitFor(() => hook().shown.slice(open).find((s) => s.kind === 'webview' && s.model.built.header.title === want[0].label), 'the class page');
+  assert.strictEqual(page.model.built.header.icon, 'symbol-class', 'the header carries the icon of its kind');
+  assert.ok(page.model.built.sections.some((s) => s.id === 'statements' && s.type === 'table'), 'every statement about it');
+  assert.ok(page.model.built.sections.some((s) => s.id === 'specs'), 'and the requirements that cite it');
+  await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 });
 
 test('the status bar says what needs a person and a click on it opens Home with that in view', async () => {

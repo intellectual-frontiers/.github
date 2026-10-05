@@ -304,7 +304,12 @@ command set is 0042-agora.
     (a muted field after it), `status` (a field whose value is the row's
     status), `status_map` (an object from that field's values to the statuses
     below, required where a value is not already one of them), `badge` (a field
-    shown as the row's count) and `tooltip` (fields listed in its hover).
+    shown as the row's count), `icon` (a field whose value is a codicon id,
+    the row's own icon where it has no status, as a kind of resource has one
+    for each of its kinds), `search` (the name of an option of the `list`
+    command, taking text, that narrows the rows to the ones that match; the
+    editor then offers a Search action that asks for the text and runs the
+    `list` with it) and `tooltip` (fields listed in its hover).
   - A status is one of a fixed vocabulary, never free text: `ok`, `warning`,
     `error`, `pending`, `skipped`, `info`, `muted`. An editor maps each to a
     codicon and a theme color of its own (`ok` to the passed test icon, `error`
@@ -641,7 +646,9 @@ command set is 0042-agora.
   does not name; a title that is not a verb and an object, is over 40
   characters, or whose ellipsis disagrees with whether the command asks for a
   value; a `list` whose command is not a `read` command offered to the editor
-  or asks for a value; a `status_map` value outside the vocabulary; a
+  or asks for a value; a `search` that is not an option of that command taking
+  text and not required; a row `icon` value that is not a codicon id of the
+  glyph map; a `status_map` value outside the vocabulary; a
   `references` pattern that only Python reads or that lacks a group its `value`
   names; and, against the data the commands return, a `list` field that is
   absent from a row, a status value that nothing maps, and a reference field

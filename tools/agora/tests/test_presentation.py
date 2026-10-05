@@ -24,7 +24,7 @@ class Emitted(unittest.TestCase):
 
     def test_views_are_ordered_and_each_has_an_id_a_title_an_icon_and_an_order(self):
         views = self.p["views"]
-        self.assertEqual([v["id"] for v in views], ["specs", "design-systems", "builds", "toolchain", "proposals"])
+        self.assertEqual([v["id"] for v in views], ["specs", "ontology", "design-systems", "builds", "toolchain", "proposals"])
         self.assertTrue(all({"id", "title", "icon", "order"} <= set(v) for v in views))
         self.assertEqual([v["order"] for v in views], sorted(v["order"] for v in views))
 
@@ -86,12 +86,12 @@ class Checked(unittest.TestCase):
         def mutate(reg):
             reg.command_meta["spec show"]["title"] = "Show Spec"
             reg.command_meta["spec list"]["title"] = "List Specs…"
-            reg.command_meta["term list"]["title"] = "list terms, please."
+            reg.command_meta["ontology list"]["title"] = "list terms, please."
             del reg.command_meta["brand list"]["title"]
         text = self.found(mutate)
         self.assertIn("command spec show: the title 'Show Spec' needs an ellipsis", text)
         self.assertIn("command spec list: the title 'List Specs…' ends with an ellipsis though nothing is asked for", text)
-        self.assertIn("command term list: the title", text)
+        self.assertIn("command ontology list: the title", text)
         self.assertIn("command brand list: is offered to the editor and has no palette title", text)
 
     def test_a_list_that_needs_a_value_or_names_a_command_that_is_not_a_read_is_found(self):
@@ -118,6 +118,21 @@ class Checked(unittest.TestCase):
         text = " | ".join(presentation.data_problems(ctx))
         self.assertIn("the field 'no-such-field' is absent from", text)
         self.assertIn("status 'Draft' of spec list is mapped to no status", text)
+
+    def test_a_search_that_is_no_text_option_and_a_row_icon_that_is_no_codicon_are_found(self):
+        def mutate(reg):
+            reg.noun_meta["ontology"]["list"] = {**reg.noun_meta["ontology"]["list"], "search": "kind"}
+        self.assertIn("search 'kind' is not an option of ontology list that takes text", self.found(mutate))
+        reg = loaded()
+        reg.noun_meta = copy.deepcopy(reg.noun_meta)
+        reg.noun_meta["ontology"]["list"]["icon"] = "label"   # a field whose values are labels, not codicon ids
+        ctx = execute.new_ctx(reg, HOME, dict(os.environ), no_log=True)
+        self.assertIn("is not a codicon id of the glyph map", " | ".join(presentation.data_problems(ctx)))
+
+    def test_the_ontology_noun_declares_its_icon_field_and_its_search_option(self):
+        _, doc = run_json(["command", "list"])
+        noun = next(n for n in doc["data"]["presentation"]["nouns"] if n["noun"] == "ontology")
+        self.assertEqual((noun["view"], noun["list"]["icon"], noun["list"]["search"]), ("ontology", "icon", "match"))
 
     def test_the_codicon_list_is_the_glyph_map_of_the_pinned_package(self):
         icons = presentation.codicons()

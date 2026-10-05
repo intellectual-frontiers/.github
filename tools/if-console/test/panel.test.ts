@@ -248,6 +248,30 @@ test('FR-042: a table\'s rows open the resource their command line shows: by the
   assert.equal(built.header.title, 'Widget list');
 });
 
+test('FR-049: a resource\'s header takes the icon its list\'s icon field gives, and a cell that names another resource is a link of its own', () => {
+  const presentation = { views: [], references: [], nouns: [{ noun: 'term', title: 'Term', icon: 'type-hierarchy', view: 'terms', list: { command: 'term list', rows: 'terms', id: 'curie', label: 'label', icon: 'icon', statusMap: {}, tooltip: [] } }] };
+  const shown = doc('term', 'x:Subject', { curie: 'x:Subject', label: 'subject', icon: 'symbol-constant',
+    statements: [{ predicate: 'x:commandOf', object: 'x:Orchestrator', kind: 'term' }, { predicate: 'rdfs:label', object: 'subject', kind: 'literal' }],
+    referenced_by: [{ curie: 'x:Thing', predicate: 'x:commandOf' }] },
+  { links: [{ rel: 'object', command: 'term show', fields: { term: 'x:Orchestrator' }, cli: 'o term show x:Orchestrator' }, { rel: 'referenced by', command: 'term show', fields: { term: 'x:Thing' }, cli: 'o term show x:Thing' },
+    { rel: 'predicate', command: 'term show', fields: { term: 'x:commandOf' }, cli: 'o term show x:commandOf' }] });
+  const built = buildResource(shown, ctx({ presentation }));
+  assert.equal(built.header.icon, 'symbol-constant', 'the resource\'s own icon, not its noun\'s');
+  const details = built.sections.find((s: Loose) => s.id === 'details') as Loose;
+  assert.ok(!details.items.some((i: Loose) => i.key === 'icon'), 'the header draws it, so the details do not say it again');
+  const statements = built.sections.find((s: Loose) => s.id === 'statements') as Loose;
+  const ref = (n: number): Loose => built.held.refs[n] as Loose;
+  const [predicate, object] = statements.rows[0].cells;
+  assert.equal(ref(statements.rows[0].open).link.fields.term, 'x:commandOf', 'the row opens its first term');
+  assert.equal(predicate.open, undefined);
+  assert.equal(ref(object.open).link.fields.term, 'x:Orchestrator', 'and the object is a link of its own');
+  assert.equal(statements.rows[1].open, undefined, 'a literal opens nothing');
+  const by = built.sections.find((s: Loose) => s.id === 'referenced_by') as Loose;
+  assert.equal(ref(by.rows[0].cells[1].open).link.fields.term, 'x:commandOf');
+  const plain = buildResource(doc('term', 'x:Subject', { curie: 'x:Subject', label: 'subject', icon: 'not an icon' }), ctx({ presentation }));
+  assert.equal(plain.header.icon, 'type-hierarchy', 'a value that is no codicon id is not used');
+});
+
 test('FR-042: a check\'s findings are grouped by section with the section\'s status, each at its file:line when the file is in the clone', () => {
   const checks = readDoc(k.check([{ name: 'docs', status: 'failed', findings: [k.finding, { level: 'warning', where: 'general', message: 'no file', next: 'say more' }], notes: [], data: {} },
     { name: 'links', status: 'passed', findings: [], notes: [], data: {} }, { name: 'slow', status: 'skipped', findings: [], notes: [], data: {}, reason: 'not fetched' }])) as Loose;
