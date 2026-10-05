@@ -181,7 +181,7 @@ def toolchain_chapter(reg: Registry, entries: dict[str, Any]) -> str:
         lines += [f"|`{e.variable}`", f"|{_cell(e.override_hint or 'a program of your own')}", ""]
     lines += ["|===", "", "=== System libraries", "",
               f"A browser and VS Code link shared libraries, and VS Code's tests need a display server, that a fetch cannot supply. "
-              f"`{name} system add` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other "
+              f"`{name} system ensure` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other "
               "command uses `sudo`. The packages are pinned for Debian and Ubuntu; on another distribution it names the libraries "
               "and stops.", "", '[cols="2,2"]', "|===", "|Library or program |Debian and Ubuntu package", ""]
     packages = {**system.APT_LIBRARIES, **system.APT_VSCODE_EXTRA}

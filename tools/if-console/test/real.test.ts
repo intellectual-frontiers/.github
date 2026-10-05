@@ -39,8 +39,8 @@ test('real: the declaration at the root is found, `command list` is accepted, an
   assert.ok(nouns.has('spec') && nouns.has('toolchain'));
   assert.ok(['check', 'doctor', 'fresh', 'test'].every((c) => repoWide.some((x: Loose) => x.id === c)));
   const exposed = repo.editorCommands().map((c: Loose) => c.id);
-  assert.ok(!exposed.includes('lock') && !exposed.includes('mcp serve') && !exposed.includes('system add'), 'a command the editor does not expose is not offered');
-  assert.ok(exposed.includes('toolchain add'), 'a setup command the launcher widens to the editor is offered');
+  assert.ok(!exposed.includes('lock') && !exposed.includes('mcp serve') && !exposed.includes('system ensure'), 'a command the editor does not expose is not offered');
+  assert.ok(exposed.includes('toolchain ensure'), 'a setup command the launcher widens to the editor is offered');
   assert.ok(s.spawns.every(([file]) => file === repo.launcher.file));
   assert.match(s.stub.calls.output.join('\n'), /command list --json/);
   s.done();

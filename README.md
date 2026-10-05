@@ -20,7 +20,7 @@ program it finds on your machine unless you name it.
 1. Install `python3` and `uv`, and clone this repository.
 2. Run `./agora help start`. The daily work is documented in one place, the program, and in VS Code every step is a button
    ([IF Console](tools/if-console/), Learn).
-3. Once per machine, run `./agora system add --dry-run` to see, then `./agora system add`, which installs the few system libraries and
+3. Once per machine, run `./agora system ensure --dry-run` to see, then `./agora system ensure`, which installs the few system libraries and
    the display server that a browser and VS Code need. It asks before it uses `sudo`, and it is the only command that does.
 4. Work spec first: the spec, then the ontology, then everything else. `./agora help specs` has the steps.
 5. Before you push, run `./agora check --suite spec`, `./agora test` and `./agora fresh`. `./agora help check` says what else.

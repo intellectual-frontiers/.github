@@ -16,12 +16,12 @@ FORBIDDEN_STEP = re.compile(
     r"(?<![\w/.-])(?:apt-get|apt|aptitude|dpkg|brew|yum|dnf|pacman|apk|snap|choco|winget|pip3?|pipx|npm|npx|yarn|pnpm|corepack|"
     r"gem|bundle|cargo|go\s+install|curl|wget|docker|podman|sudo)(?![\w/.-])"
     r"|uses:\s*actions/setup-(?:node|java|ruby|go|dotnet)|uses:\s*docker://|^\s*(?:-\s*)?(?:container|services|image):")
-ALLOWED_STEP = re.compile(r"\./agora\s+system\s+add\b")  # the documented one-time setup, the only place `sudo` is allowed
+ALLOWED_STEP = re.compile(r"\./agora\s+system\s+ensure\b")  # the documented one-time setup, the only place `sudo` is allowed
 HOST_PROGRAMS = tuple("""git convert identify magick pdftotext pdfinfo pdffonts pdfimages pdftoppm rsvg-convert potrace latexmk
                          xelatex lualatex pdflatex node npm npx chromium chrome java asciidoctor""".split())
 HOST_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(re.escape(p) for p in HOST_PROGRAMS) + r")[\"']")
 WHICH_CALL = re.compile(r"shutil\.which\(\s*[\"']([\w.-]+)[\"']")
-# Xvfb is the display server `system add` installs for VS Code's tests; it has no download (0042 FR-030).
+# Xvfb is the display server `system ensure` installs for VS Code's tests; it has no download (0042 FR-030).
 WHICH_ALLOWED = ("uv", "python3", "Xvfb")
 # Where a download may be made: only the toolchain machinery, which verifies what it fetches (0025 FR-004, FR-017).
 NETWORK_IMPORT = re.compile(r"^\s*(?:import|from)\s+(?:urllib\.request|http\.client|requests|httpx|ftplib|socket)\b")
@@ -76,7 +76,7 @@ def lock_findings(home: Path, registry: Any) -> list[Finding]:
 
 def workflow_findings(home: Path) -> list[Finding]:
     """No workflow installs a program with a package manager, fetches one outside the launcher or runs in an image (FR-022);
-    `./agora system add` is the one documented step that may use `sudo`, and may only be run through the launcher."""
+    `./agora system ensure` is the one documented step that may use `sudo`, and may only be run through the launcher."""
     out: list[Finding] = []
     d = home / ".github" / "workflows"
     for f in sorted(d.glob("*.y*ml")) if d.is_dir() else []:

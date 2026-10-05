@@ -67,10 +67,10 @@ class WireShape(unittest.TestCase):
         self.assertGreater(len(change["diff"]), 60)
         self.assertFalse(any("more lines" in l for l in change["diff"]))
 
-    def test_the_declaration_names_the_launcher_and_toolchain_add_is_offered_to_the_editor(self):
+    def test_the_declaration_names_the_launcher_and_toolchain_ensure_is_offered_to_the_editor(self):
         self.assertIn("IF_CONSOLE_LAUNCHER=./agora", (HOME / ".if-console.env").read_text().splitlines())
         _, doc = run_json(["command", "list"])
-        row = next(c for c in doc["data"]["commands"] if c["id"] == "toolchain add")
+        row = next(c for c in doc["data"]["commands"] if c["id"] == "toolchain ensure")
         self.assertIn("editor", row["surfaces"])
         self.assertNotIn("mcp", row["surfaces"])
 

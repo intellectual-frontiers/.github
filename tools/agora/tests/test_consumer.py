@@ -32,7 +32,7 @@ class ConsumerShape(unittest.TestCase):
         self.assertEqual((d["state"], d["path"], d["env"], d["provides"]), ("missing", None, {}, {}))
 
     def test_add_returns_the_same_fields_for_each_entry(self):
-        _, doc = run_json(["toolchain", "add", "chromium", "--dry-run"])
+        _, doc = run_json(["toolchain", "ensure", "chromium", "--dry-run"])
         row = doc["data"]["entries"][0]
         self.assertTrue({"path", "env", "provides"} <= set(row))
 

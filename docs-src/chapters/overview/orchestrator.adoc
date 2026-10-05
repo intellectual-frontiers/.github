@@ -48,7 +48,7 @@ your own stands in for an entry only if you name it, with the entry's variable, 
 while one stands in.
 
 The one thing a fetch cannot supply is the shared libraries a browser and VS Code link on Linux, and the display server VS Code's
-tests start under. They need administrator rights, so one command, `agora system add`, installs them. It prints exactly what it will
+tests start under. They need administrator rights, so one command, `agora system ensure`, installs them. It prints exactly what it will
 run, asks before it uses `sudo`, and is the only command that does. It is never run by another command and never offered over MCP; a
 command that needs the libraries fails naming it. On Debian and Ubuntu the packages are pinned in the code; on another distribution it
 names the libraries and stops.

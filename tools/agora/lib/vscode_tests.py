@@ -1,6 +1,6 @@
 """The IF Console extension's tests inside a real VS Code (0043-if-console FR-032; 0042-agora FR-013).
 
-`check extension --runner vscode` starts the display server (`Xvfb`, installed with VS Code's libraries by `system add`) on a free
+`check extension --runner vscode` starts the display server (`Xvfb`, installed with VS Code's libraries by `system ensure`) on a free
 display for this one run, runs `test/vscode/run.js` of the staged, bundled extension on the package's Node with the toolchain's VS Code and
 @vscode/test-electron, reads the report it writes, and stops the display server. Standard library only.
 """
@@ -42,7 +42,7 @@ class Display:
     def __enter__(self) -> "Display":
         program = shutil.which("Xvfb")
         if not program:
-            raise DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system add` once")
+            raise DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system ensure` once")
         n = _free_display()
         if self.fbdir:
             self.fbdir.mkdir(parents=True, exist_ok=True)

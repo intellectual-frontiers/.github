@@ -9,7 +9,7 @@ module is everything else:
     downloaded, its SHA-256 verified before anything is unpacked, unpacked into a scratch directory beside the cache and
     renamed into place, so an interrupted fetch leaves nothing a later run could use (FR-017);
   - offline (`AGORA_OFFLINE=1` or `--offline`) nothing is downloaded: an entry the cache lacks ends the command with exit
-    status 3 naming it, its version, the platform and `agora toolchain add` (FR-018);
+    status 3 naming it, its version, the platform and `agora toolchain ensure` (FR-018);
   - a program found on the host is never used in an entry's place unless the person names it in the entry's variable,
     `AGORA_<ENTRY>`; `doctor` lists each one and `fresh` will not call a generator current under one (FR-019);
   - `Resolved` says where an entry's programs are and the environment they run in, which never carries what the host's own
@@ -49,7 +49,7 @@ PLATFORMS = ("linux-x86_64", "linux-aarch64", "macos-arm64", "macos-x86_64")
 REQUIRED_PLATFORM = "linux-x86_64"
 FORMS = ("tar.gz", "tar.xz", "zip", "file", "npm-lock")
 MARKER = ".agora-entry.json"
-FETCH_COMMAND = "toolchain add"
+FETCH_COMMAND = "toolchain ensure"
 FLOATING = ("latest", "stable", "head", "main", "master", "next", "nightly")
 # What the host's own settings would otherwise add to a program's behavior (a TeX tree, a Playwright browser path, a Node
 # search path): none of it reaches a program agora runs (0025 FR-019).
@@ -406,7 +406,7 @@ class Toolchain:
 
     def use(self, names: tuple[str, ...] | list[str]) -> Resolved:
         """What a command that runs the named entries does first: `ensure` them, then find, before anything starts, which
-        shared libraries a browser links that this host lacks, and fail naming each and `agora system add` (0025 FR-021)."""
+        shared libraries a browser links that this host lacks, and fail naming each and `agora system ensure` (0025 FR-021)."""
         from . import system
 
         resolved = self.ensure(names)
@@ -414,8 +414,8 @@ class Toolchain:
         if gone:
             libs = sorted({lib for v in gone.values() for lib in v})
             err = ToolchainError(f"{', '.join(gone)} needs system libraries this host lacks ({', '.join(libs)}); run "
-                                 "`agora system add` once to install them", code="system-libraries", fetchable=False)
-            err.actions = [next_command("install the system libraries", "system add")]
+                                 "`agora system ensure` once to install them", code="system-libraries", fetchable=False)
+            err.actions = [next_command("install the system libraries", "system ensure")]
             err.detail = {"entries": list(gone), "libraries": libs}
             raise err
         return resolved

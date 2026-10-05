@@ -1,7 +1,7 @@
 """The one prerequisite beyond python3 and uv: the shared libraries a Linux Chromium links against (0025-tooling-environment
 FR-021; 0041-command-line FR-069). Standard library only.
 
-Installing them needs administrator rights, so the `system` noun's `add` is the only command that runs `sudo`. This module
+Installing them needs administrator rights, so the `system` noun's `ensure` is the only command that runs `sudo`. This module
 reads (which libraries load here) and plans (the exact commands `add` prints and, with the person's yes, runs). The package
 list is pinned here for each distribution family: `apt` on Debian and Ubuntu; on any other family there is no list, and
 `add` names the libraries and stops.
@@ -118,7 +118,7 @@ def missing(libraries: tuple[str, ...], fam: Family, probe: Callable[[str], bool
 
 
 def commands(gone: list[tuple[str, str]], fam: Family, *, root: bool | None = None) -> list[list[str]]:
-    """The exact commands `system add` runs, in order: none when nothing is missing or no list is pinned. `sudo` leads each
+    """The exact commands `system ensure` runs, in order: none when nothing is missing or no list is pinned. `sudo` leads each
     unless the process already is root."""
     packages = sorted({pkg for _, pkg in gone if pkg})
     if not packages or not fam.install:

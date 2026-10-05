@@ -35,8 +35,8 @@ watch = ["tools/agora/toolchain/**", "tools/agora/npm/**", "tools/if-console/pac
 # How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
 [commands."system list"]
 title = "List System Libraries"
-[commands."toolchain add"]
-title = "Fetch Toolchain"
+[commands."toolchain ensure"]
+title = "Ensure Toolchain"
 icon = "cloud-download"
 [commands."toolchain list"]
 title = "List Toolchain"

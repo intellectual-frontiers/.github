@@ -121,12 +121,12 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `spec new` | `generate` | terminal, editor, mcp | Create a spec in the form 0020 FR-005 states, with the next unused number | `agora spec new SLUG [--title TEXT]` |
 | `spec set` | `decision` | terminal, editor | Move a spec between Draft, Adopted and Superseded, only as 0020 FR-010 allows | `agora spec set SPEC --status SPEC_STATUS [--superseded-by SPEC]` |
 | `spec show` | `read` | terminal, editor, mcp | Show one spec: status, requirements and how they are enforced | `agora spec show SPEC` |
-| `system add` | `setup` | terminal | Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system add [--yes]` |
+| `system ensure` | `setup` | terminal | Install the missing shared libraries and the display server with the host's package manager through sudo: prints what it runs, asks first, never runs by itself | `agora system ensure [--yes]` |
 | `system list` | `read` | terminal, editor, mcp | List the shared libraries a browser and VS Code link and the display server VS Code's tests start under, the package that holds each on this host's distribution, and which are present | `agora system list` |
 | `term list` | `read` | terminal, editor, mcp | List the ontology's concepts and schemes | `agora term list [--scheme SCHEME]` |
 | `term show` | `read` | terminal, editor, mcp | Show one concept or scheme | `agora term show TERM` |
 | `test` | `check` | terminal, editor, mcp | Run agora's own tests with the standard library's runner, under the selftest group's locked packages | `agora test` |
-| `toolchain add` | `setup` | terminal, editor | Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check | `agora toolchain add [ENTRY...]` |
+| `toolchain ensure` | `setup` | terminal, editor | Fetch, verify and unpack the entries (every one the host's platform has, when none is named) into the cache, and run each one's functional check | `agora toolchain ensure [ENTRY...]` |
 | `toolchain list` | `read` | terminal, editor, mcp | List the toolchain entries: version, platforms and whether the cache holds each | `agora toolchain list` |
 | `toolchain show` | `read` | terminal, editor, mcp | Show one entry: version, addresses and checksums per platform, what it provides, and the cache | `agora toolchain show ENTRY` |
 
@@ -332,14 +332,14 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `spec show`
   - `spec` (SPEC): the spec
-- `system add`
+- `system ensure`
   - `--yes` (flag): do not ask: for a person who has read what --dry-run prints, and for CI
   - `--dry-run` (flag): validate, write nothing, show the change
 - `term list`
   - `--scheme` (SCHEME): only the concepts of this scheme
 - `term show`
   - `term` (TERM): the term's local name
-- `toolchain add`
+- `toolchain ensure`
   - `entries` (ENTRY, zero or more): the entries; every one with a build for this platform when none is named
   - `--dry-run` (flag): validate, write nothing, show the change
 - `toolchain show`

@@ -290,11 +290,11 @@ class Runners(unittest.TestCase):
     def test_the_vscode_runner_skips_naming_the_cause_when_the_toolchain_cannot_be_had(self):
         def lacking(self, names):
             if "vscode" in names:
-                raise AgoraError("system-libraries", "vscode needs system libraries this host lacks (Xvfb); run `agora system add` once", exit=3)
+                raise AgoraError("system-libraries", "vscode needs system libraries this host lacks (Xvfb); run `agora system ensure` once", exit=3)
             return FakeTools()
         code, sec = self.check("--runner", "vscode", use=lacking)
         self.assertEqual((code, sec["status"]), (3, "skipped"))
-        self.assertIn("agora system add", sec["reason"])
+        self.assertIn("agora system ensure", sec["reason"])
 
     def test_with_no_runner_a_part_that_could_not_run_makes_the_section_skipped_not_passed(self):
         def lacking(self, names):
@@ -307,7 +307,7 @@ class Runners(unittest.TestCase):
 
     def test_no_display_server_is_a_skip_naming_the_setup_command(self):
         def display(*a, **kw):
-            raise vscode_tests.DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system add` once")
+            raise vscode_tests.DisplayError("Xvfb, the display server VS Code's tests start under, is not installed; run `agora system ensure` once")
         with mock.patch.object(extension, "package", return_value=mock.Mock(returncode=0)), \
                 mock.patch("pathlib.Path.is_file", return_value=True):
             code, sec = self.check("--runner", "vscode", vscode=display)
@@ -371,7 +371,7 @@ class VscodeRun(unittest.TestCase):
             with self.assertRaises(vscode_tests.DisplayError) as e:
                 with vscode_tests.Display():
                     pass
-        self.assertIn("agora system add", str(e.exception))
+        self.assertIn("agora system ensure", str(e.exception))
 
 
 class ExternalSuite(unittest.TestCase):
@@ -441,10 +441,10 @@ class ExternalSuite(unittest.TestCase):
 
     def test_no_display_server_exits_3_naming_the_setup_command(self):
         def display(*a, **kw):
-            raise vscode_tests.DisplayError("Xvfb is not installed; run `agora system add` once")
+            raise vscode_tests.DisplayError("Xvfb is not installed; run `agora system ensure` once")
         code, doc = self.go("--suite", str(self.tmp / "suite"), vscode=display)
         self.assertEqual(code, 3)
-        self.assertIn("agora system add", json.dumps(doc))
+        self.assertIn("agora system ensure", json.dumps(doc))
 
     def test_a_suite_with_no_index_and_a_folder_that_is_not_one_are_usage_errors(self):
         code, _ = self.go("--suite", str(self.tmp), vscode=lambda *a, **k: ([], [], []))

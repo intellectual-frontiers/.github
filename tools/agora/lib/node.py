@@ -64,7 +64,7 @@ def npm_argv(*args: str, env: dict[str, str] | None = None) -> list[str] | None:
 
 
 def locate(home: Path, env: dict[str, str] | None = None, *, offline: bool = False) -> str:
-    """The node a core command that holds no package runs, as `toolchain add` does to install the npm tree: the person's
+    """The node a core command that holds no package runs, as `toolchain ensure` does to install the npm tree: the person's
     override, the package's own where this interpreter has it, else the package's in the locked environment of the group
     that pins it (created by uv from the committed lock, as for any command that needs it). Raises a ToolchainError."""
     import subprocess
@@ -83,7 +83,7 @@ def locate(home: Path, env: dict[str, str] | None = None, *, offline: bool = Fal
     group = next((g.name for g in reg.groups.values() if PACKAGE in {p.lower() for p in g.packages}), None)
     if group is None:
         raise ToolchainError(f"no group of this command line pins {PACKAGE}, the package that supplies node", fetchable=False)
-    py = plan.prepare(reg, group, offline=offline, command="toolchain add")
+    py = plan.prepare(reg, group, offline=offline, command="toolchain ensure")
     done = subprocess.run([str(py), "-c", "from agora.lib import node; print(node.wheel_node() or '')"], capture_output=True,
                           text=True, env={**env, "PYTHONPATH": str(home / "tools"), "PYTHONDONTWRITEBYTECODE": "1"})
     path = done.stdout.strip()

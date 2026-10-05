@@ -2,7 +2,7 @@
 
 The address is the one Playwright itself downloads its Chromium from, for the revision that the pinned Playwright (the npm
 lock's `playwright`) names in its `browsers.json`. A Linux Chromium also links shared libraries a fetch cannot supply: the
-`system` noun's `add` installs them once (0025-tooling-environment FR-021).
+`system` noun's `ensure` installs them once (0025-tooling-environment FR-021).
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def check(r: Resolved) -> str:
     gone = system.missing(system.chromium_libraries(r.platform), system.family())
     if gone:
         raise ToolchainError(f"Chromium's system libraries are missing ({', '.join(sorted(lib for lib, _ in gone))}); "
-                             "run `agora system add`", entries=[NAME], fetchable=False)
+                             "run `agora system ensure`", entries=[NAME], fetchable=False)
     with tempfile.TemporaryDirectory(prefix="agora-check-") as tmp:
         page = Path(tmp) / "page.html"
         page.write_text("<!doctype html><title>check</title><h1>loaded</h1>", encoding="utf-8")

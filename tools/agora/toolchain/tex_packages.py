@@ -6,7 +6,7 @@ verified before it is unpacked, which `tlmgr` run against a mirror does not give
 mirror moves on). They unpack into one tree that this entry puts on TEXMFHOME.
 
 To add a package: find its name (`tlmgr info`, or the file the log says is missing), add its row (name, revision, SHA-256 of
-the container, bytes) and its dependencies that TinyTeX lacks, and commit it alone with `agora toolchain add tex-packages`
+the container, bytes) and its dependencies that TinyTeX lacks, and commit it alone with `agora toolchain ensure tex-packages`
 passing (0041-command-line FR-068).
 """
 from __future__ import annotations
