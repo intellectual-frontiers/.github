@@ -149,11 +149,13 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   files (0041-command-line FR-032), the proposals of FR-029, and that the README
   links to the guide, FR-036), `help` (FR-033: every topic is well formed and
   names only commands, topics and paths that exist),
-  `extension [--runner node|vscode]` (the IF Console extension's lint and its
-  tests, 0043-if-console FR-028: `node` runs the unit tests under Node's test
-  runner against a stand-in for the VS Code API, `vscode` runs the tests inside
-  a real VS Code under a display server, 0043-if-console FR-032, and with no
-  runner both run, a runner that cannot start being skipped, never passed),
+  `extension [--runner node|vscode]` (the IF Console extension's manifest and
+  source rules, its TypeScript type-checked and linted and its codicon ids
+  checked against the locked package, 0043-if-console FR-035, and its tests,
+  0043-if-console FR-028: `node` runs the unit tests under Node's test runner
+  against a stand-in for the VS Code API, `vscode` runs the tests inside a real
+  VS Code under a display server, 0043-if-console FR-032, and with no runner
+  both run, a runner that cannot start being skipped, never passed),
   `design-systems [--scope SLUG] [--brand B] [--runner browser|python]` (each
   design system's harness under every brand, 0014-design-systems FR-015,
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
@@ -257,6 +259,10 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     guide (FR-034); `vscode` (the stable VS Code tarball for Linux, and the zip
     for macOS, at the address and SHA-256 the vendor publishes for the
     version), for the extension's tests (0043-if-console FR-032);
+    `extension-build` (the npm lock of `tools/if-console/`: TypeScript,
+    esbuild, ESLint, `@types/vscode`, VS Code Elements, `@vscode/codicons`,
+    `@vscode/vsce` and `@vscode/test-electron`), which type-checks, lints,
+    bundles, packs and tests the extension (0043-if-console FR-027, FR-035);
     `tinytex` and `tex-packages` (a TinyTeX release and the
     TeX Live packages the harnesses need that it lacks, each package's container pinned
     by its own checksum from TeX Live's frozen 2025 repository, supplying XeLaTeX and
@@ -342,7 +348,8 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   carries (0043-if-console FR-004). `agora extension build` MUST build the
   extension's package from `tools/if-console/` into `build/`, with Node from
   the locked `nodejs-wheel-binaries` and the extension's own `package-lock.json`
-  (0043-if-console FR-027), and MUST take `--dry-run`. `agora extension test --suite DIR
+  (0043-if-console FR-027), by type-checking, linting and bundling it and then
+  packing it, as 0043-if-console FR-035 states, and MUST take `--dry-run`. `agora extension test --suite DIR
   [--workspace [NAME=]DIR]...` MUST run another repository's tests of the
   extension in a real VS Code as 0043-if-console FR-034 states, and `agora
   extension test --screenshots DIR` MUST capture the extension's screens as

@@ -314,7 +314,7 @@ class Declarations(unittest.TestCase):
 
     def test_the_real_entries_are_complete_and_pinned(self):
         entries = tcore.discover()
-        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages", "vsce", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
+        self.assertEqual(set(entries), {"tinytex", "tex-packages", "chromium", "npm-packages", "extension-build", "jre", "asciidoctor", "asciidoctor-pdf", "vscode"})
         self.assertEqual(tcore.problems(entries), [])
         for e in entries.values():
             self.assertIn("linux-x86_64", e.platforms, e.name)

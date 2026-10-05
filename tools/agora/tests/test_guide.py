@@ -172,7 +172,7 @@ class Reference(unittest.TestCase):
             self.assertIn(f"=== {n}\n", commands, n)
         self.assertEqual(files, guide.reference_files(reg, HOME, entries()), "deterministic")
         toolchain = files[HOME / "docs-src/chapters/reference/toolchain.adoc"]
-        for e in ("jre", "asciidoctor", "asciidoctor-pdf", "vscode", "vsce"):
+        for e in ("jre", "asciidoctor", "asciidoctor-pdf", "vscode", "extension-build"):
             self.assertIn(f"|`{e}`", toolchain)
         self.assertIn("Xvfb", toolchain)
         topics = files[HOME / "docs-src/chapters/reference/help-topics.adoc"]

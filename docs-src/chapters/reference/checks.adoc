@@ -37,7 +37,7 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |none
 
 |`extension`
-|The IF Console extension's manifest, contributions and activation, its code's lint (no network, telemetry or write; names no other repository's tool), its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032)
+|The IF Console extension's manifest, contributions and activation, its source rules (no other repository's tool named, imports only VS Code and Node built-ins), its TypeScript type-checked (strict) and linted (ESLint), its codicon ids against the locked package, its bundle, its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032, FR-035)
 |none
 |`extension`, `vscode`
 
