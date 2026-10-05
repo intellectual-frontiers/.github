@@ -4,9 +4,9 @@ const { runAll } = require('./harness');
 
 async function run() {
   const scenario = process.env.IF_CONSOLE_VSCODE_SCENARIO;
-  if (!['trusted', 'untrusted'].includes(scenario)) throw new Error(`unknown scenario ${scenario}`);
+  if (!['trusted', 'untrusted', 'screenshots'].includes(scenario)) throw new Error(`unknown scenario ${scenario}`);
   require(`./${scenario}`);
-  await runAll(scenario, process.env.IF_CONSOLE_VSCODE_REPORT_DIR);
+  await runAll(scenario === 'screenshots' ? `screenshots-${process.env.IF_CONSOLE_SHOT_THEME}` : scenario, process.env.IF_CONSOLE_VSCODE_REPORT_DIR);
 }
 
 module.exports = { run };

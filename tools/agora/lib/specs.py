@@ -196,6 +196,15 @@ class Spec:
         return out
 
 
+def line_of(spec: "Spec", ident: str) -> int | None:
+    """The 1-based line of the item that states a requirement or criterion, where the spec says it."""
+    for n, line in enumerate(spec.text.splitlines(), 1):
+        m = ITEM.match(line)
+        if m and m.group(1) == ident:
+            return n
+    return None
+
+
 def find_specs(root: Path) -> list[Spec]:
     return [Spec(f.parent.name, f, root, f.read_text(encoding="utf-8")) for f in spec_files(root)]
 

@@ -3,12 +3,78 @@ help = "Specs, requirements, the enforcement register, and the ontology's terms"
 
 [nouns.spec]
 help = "A spec: a numbered spec or a design system's spec (0020-spec-format)"
+icon = "file-text"
+view = "specs"
+title = "Spec"
+
+[nouns.spec.list]
+command = "spec list"
+rows = "specs"
+id = "name"
+label = "name"
+description = "title"
+status = "status"
+badge = "requirements"
+tooltip = ["kind", "path"]
+
+[nouns.spec.list.status_map]
+Draft = "pending"
+Adopted = "ok"
+Superseded = "muted"
 [nouns.requirement]
 help = "One FR of a spec, and how it is enforced (0020-spec-format FR-011)"
+icon = "checklist"
+view = "specs"
+title = "Requirement"
+
+[nouns.requirement.list]
+command = "requirement list"
+rows = "requirements"
+id = "requirement"
+label = "requirement"
+description = "mechanism"
+status = "mechanism"
+tooltip = ["text", "by", "note"]
+
+[nouns.requirement.list.status_map]
+check = "ok"
+gate = "ok"
+review = "info"
+none = "warning"
 [nouns.design-system]
 help = "A design system: its spec, its entry in the ontology and its harness (0014-design-systems)"
+icon = "symbol-color"
+view = "design-systems"
+title = "Design system"
+
+[nouns.design-system.list]
+command = "design-system list"
+rows = "design systems"
+id = "slug"
+label = "slug"
+description = "kind"
+status = "status"
+badge = "requirements"
+tooltip = ["spec", "harness"]
+
+[nouns.design-system.list.status_map]
+Draft = "pending"
+Adopted = "ok"
+Active = "ok"
+Superseded = "muted"
 [nouns.term]
 help = "A concept or scheme of the ontology (0019-controlled-vocabulary)"
+icon = "symbol-keyword"
+view = "specs"
+title = "Term"
+
+[nouns.term.list]
+command = "term list"
+rows = "terms"
+id = "id"
+label = "id"
+description = "label"
+tooltip = ["kind", "scheme"]
 
 [sections.specs]
 help = "Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034)"
@@ -32,3 +98,42 @@ help = "Ontology prefixes, and the design systems' registration, classification 
 watch = ["ontology/**", "design-systems/**"]
 relocatable = true
 
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."design-system list"]
+title = "List Design Systems"
+[commands."design-system new"]
+title = "New Design System…"
+[commands."design-system show"]
+title = "Show Design System…"
+[commands."requirement add"]
+title = "Add Control…"
+[commands."requirement list"]
+title = "List Requirements"
+[commands."requirement set"]
+title = "Set Enforcement…"
+[commands."requirement show"]
+title = "Show Requirement…"
+[commands."spec list"]
+title = "List Specs"
+[commands."spec new"]
+title = "New Spec…"
+[commands."spec set"]
+title = "Set Spec Status…"
+icon = "verified"
+[commands."spec show"]
+title = "Show Spec…"
+[commands."term list"]
+title = "List Terms"
+[commands."term show"]
+title = "Show Term…"
+
+# A requirement named in a spec or a register (`0020 FR-013`) is a resource an editor can show on hover and open (0041-command-line FR-064).
+[references.requirement]
+noun = "requirement"
+pattern = '\b(\d{4})(?:-[a-z0-9-]+)?[ /](FR-\d{3})\b'
+value = "$1/$2"
+files = ["spec-kit/specs/**/*.md", "spec-kit/enforcement.tsv", "spec-kit/controls.tsv"]
+text = "text"
+facts = ["mechanism", "by", "note"]
+lens = ["mechanism", "by"]
+definition = ["path", "line"]

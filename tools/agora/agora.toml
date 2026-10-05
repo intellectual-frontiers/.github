@@ -14,6 +14,34 @@ hint = "install uv (https://docs.astral.sh/uv/) from the host"
 [prerequisites.python3]
 hint = "install Python 3.11 or later from the host"
 
+# The views an editor shows for this command line, each holding the nouns that name it in their `view` (0041-command-line FR-064). The
+# editor's own Home (order 10), Checks and All commands views are not declared here.
+[views.specs]
+title = "Specs"
+icon = "book"
+order = 20
+description = "Specs, their requirements and the ontology's terms"
+[views.design-systems]
+title = "Design systems"
+icon = "symbol-color"
+order = 30
+description = "Brands, imagery, inks, decoration and layouts"
+[views.builds]
+title = "Builds"
+icon = "package"
+order = 40
+description = "Decks, emails, courses, media, signs, figures, the guide and the extension"
+[views.toolchain]
+title = "Toolchain"
+icon = "tools"
+order = 50
+description = "The programs and system libraries commands need"
+[views.proposals]
+title = "Proposals"
+icon = "git-pull-request"
+order = 60
+description = "Changes drafted for a person to decide"
+
 # Suites (0041 FR-031; 0042 FR-014): the sections each runs. A section appears in no suite it does not belong to.
 [suites.spec]
 sections = ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"]

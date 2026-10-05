@@ -12,12 +12,33 @@ nodejs-wheel-binaries = "22.20.0"
 
 [nouns.brand]
 help = "A brand design system: tokens.json and what is written from it (0014-design-systems FR-028)"
+icon = "paintcan"
+view = "design-systems"
+title = "Brand"
+
+[nouns.brand.list]
+command = "brand list"
+rows = "brands"
+id = "name"
+label = "name"
+description = "inks"
+badge = "pieces"
+tooltip = ["palette", "roles", "lockups"]
 [nouns.imagery]
 help = "A brand's imagery pool: its catalog, masters, WebP files and share card (0014-design-systems FR-043)"
+icon = "file-media"
+view = "design-systems"
+title = "Imagery"
 [nouns.ink]
 help = "An ink of a brand's decoration kit: its spot color and thread, and who verified them (frontiers-brand FR-017)"
+icon = "edit"
+view = "design-systems"
+title = "Ink"
 [nouns.openedx]
 help = "A brand's Open edX brand package (frontiers-brand FR-020)"
+icon = "mortar-board"
+view = "design-systems"
+title = "Open edX package"
 
 # Generators (0041-command-line FR-035; 0042-agora FR-015): what each reads and writes, and the command that rewrites it.
 # `agora fresh` proves each current.
@@ -44,3 +65,30 @@ help = "A brand's Open edX package sources (everything but the built dist/), fro
 sources = ["design-systems/*/tokens.json", "design-systems/*/logos/**", "design-systems/*/images/**", "design-systems/frontiers-course/web/fonts/**"]
 outputs = ["design-systems/*/openedx/**"]
 command = "openedx generate"
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."brand generate"]
+title = "Generate Brand Files"
+[commands."brand list"]
+title = "List Brands"
+[commands."brand show"]
+title = "Show Brand…"
+[commands."imagery add"]
+title = "Add Imagery…"
+[commands."imagery build"]
+title = "Build Imagery…"
+[commands."imagery list"]
+title = "List Imagery…"
+[commands."imagery show"]
+title = "Show Imagery…"
+[commands."ink list"]
+title = "List Inks…"
+[commands."ink record"]
+title = "Record Ink…"
+icon = "verified"
+[commands."ink show"]
+title = "Show Ink…"
+[commands."openedx build"]
+title = "Build Open edX Package…"
+[commands."openedx generate"]
+title = "Generate Open edX Sources…"

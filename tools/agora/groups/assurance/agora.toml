@@ -61,9 +61,16 @@ toolchain_unless = "paragon"  # Paragon's CLI, from the npm lock, unless --parag
 
 [nouns.figure]
 help = "A figure drawn with frontiers-figures and themed by a brand (0014-design-systems FR-044)"
+icon = "graph"
+view = "builds"
+title = "Figure"
 
 [generators.profile-figure]
 help = "The organization profile's figure: its semantic source and the themed default and on-dark images"
 sources = ["design-systems/frontiers-figures/**", "design-systems/frontiers-brand/tokens.json", "design-systems/frontiers-brand/fonts/**", "tools/agora/lib/profile_figure.py"]
 outputs = ["profile/figures/*.svg"]
 command = "figure generate"
+
+# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
+[commands."figure generate"]
+title = "Generate Profile Figure"

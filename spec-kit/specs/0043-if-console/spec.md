@@ -298,6 +298,127 @@ it does, what it never does, and how it is built.
   server or a library is missing (FR-032). It MUST name no repository: the suite
   and the folders are paths.
 
+## The redesigned console
+
+The console is redesigned to look and work like the extensions people use most
+(a Home view, rows with status icons, hover actions, a testing view, native
+diffs), while holding every guarantee it has. These requirements add to the
+requirements above and, where they differ from FR-008 (the tree), FR-012 (the
+palette), FR-019 (the Chores view), FR-024 (the settings) and the manifest rules
+that FR-015 and FR-027 imply, they govern once the register names a check for
+them: until then the rows say so, and the extension as built holds. The command
+line states what each view and row is through `presentation`
+(0041-command-line FR-064), so the extension stays free of any orchestrator's
+knowledge (FR-003).
+
+- **FR-035**: The extension MUST be written in TypeScript with the compiler's
+  `strict` option, bundled by esbuild into the one file its manifest's `main`
+  names, and linted by ESLint, and MUST be built by `agora extension build` with
+  nothing on the host but `python3` and `uv`: Node comes from the locked Python
+  package `nodejs-wheel-binaries` (FR-027), and `typescript`, `esbuild`,
+  `eslint`, `@types/vscode`, `@vscode-elements/elements` and `@vscode/codicons`
+  come from the extension's own npm lock, every one at one exact version with
+  its integrity hash (0025-tooling-environment FR-015). `agora check extension`
+  MUST fail on a type error and on a lint error. The packages are for the build:
+  the manifest has no `dependencies`, and the `.vsix` holds the bundle, the
+  media and the codicon font, and no `node_modules`.
+- **FR-036**: The extension MUST contribute one activity-bar container with a
+  monochrome icon (an SVG that draws in `currentColor` and no other color), and
+  in it, in this order: a Home view (FR-037); one view for each entry of
+  `presentation.views` (0041-command-line FR-064) of each repository, in that
+  order, holding the nouns whose `view` is its `id`, each noun's resources as
+  its `list` describes; a Checks view; and an All commands view, the tree of
+  every noun and command (FR-008), which is collapsed and hidden by default. A
+  repository whose `command list` has no `presentation` MUST still be served
+  by Home, Checks and All commands, which the person can show.
+- **FR-037**: The Home view MUST list what needs a person, each as a row with a
+  status (FR-038) and an action, from the launcher's own resources: the check
+  sections whose last run failed, the open proposals, the generated files
+  `fresh` reports stale, the toolchain entries and libraries `doctor` reports
+  absent, and the state `doctor` gives. It MUST use `viewsWelcome` content, with
+  the one action that fixes it, for: no command line declared; a workspace not
+  trusted (FR-006); and a missing toolchain or library. Home MUST add no item
+  that the launcher has no command for (FR-003, FR-019).
+- **FR-038**: A row of a list MUST show its `label`, its `description` muted
+  after it, and a codicon colored by its status, as a `ThemeIcon` with a
+  `ThemeColor`, by this fixed mapping of 0041-command-line FR-064's statuses:
+  `ok` `pass` with `testing.iconPassed`; `warning` `warning` with
+  `list.warningForeground`; `error` `error` with `testing.iconFailed`; `pending`
+  `circle-outline` with `testing.iconQueued`; `skipped` `circle-slash` with
+  `testing.iconSkipped`; `info` `info` with `notificationsInfoIcon.foreground`;
+  `muted` `circle-small-filled` with `disabledForeground`. A row's tooltip MUST
+  be a `MarkdownString` with codicons, the row's `tooltip` fields as key facts
+  and command links for its actions. Rows MUST have inline hover actions (the
+  `inline` group of `view/item/context`) and context menus in the groups
+  `navigation`, `1_run`, `2_copy` and `9_cutcopypaste` in that order; views
+  MUST have title actions with icons and a badge of a count where there is one;
+  work in progress MUST show as progress in the view that started it
+  (`withProgress` at its view id) and be cancellable (FR-020).
+- **FR-039**: Every command the extension contributes MUST have the category
+  `IF Console`, a title that is a verb and an object (the palette shows "IF
+  Console: Show Home"), an icon, and a `when` or `enablement` clause so that
+  only the commands that can run now are offered; the commands a launcher
+  declares MUST be offered by the title its `command list` gives them
+  (0041-command-line FR-064), not one the extension made. The extension MAY bind
+  keys for its top few commands, and MUST bind none that runs a decision or a
+  write (FR-015). The status bar item MUST show an icon, the orchestrator and
+  its state (FR-016), a `MarkdownString` tooltip with the audience and what
+  needs a person, and open Home when chosen.
+- **FR-040**: The extension MUST use VS Code's own surfaces before drawing its
+  own: the Testing API (a controller with run profiles, a test for each check
+  section, and for each reference that a spec or register names whose enforcing
+  action is a check, a test item with a range at its line), the Problems panel
+  (FR-009), a `FileDecorationProvider` that badges files and their folders that
+  have findings, `vscode.diff` for the dry-run diff of a write (FR-014), a
+  `LogOutputChannel` for the output channel (FR-017), and settings that each
+  carry a `markdownDescription` and the scope `application` (FR-024).
+- **FR-041**: For each of `presentation.references` (0041-command-line FR-064)
+  the extension MUST provide, in the files it names, a hover that shows the
+  resource's `text`, its `facts` and its actions as command links; Go to
+  Definition, to the `path` and `line` the resource gives; a CodeLens above the
+  reference that shows its `lens` fields with a Run for the resource's `check`
+  action; and a document link that opens the resource's page (FR-042). Each
+  runs only the launcher's `show` command, only in a trusted workspace, and the
+  extension MUST hold no pattern, file name or field of its own for them.
+- **FR-042**: A resource MUST open in one panel for the window, a webview that
+  loads local resources only under a strict Content Security Policy with a
+  nonce (FR-011), with history (back and forward) and a breadcrumb. It MUST
+  show a header with the noun's codicon, the title, the kind, an audience pill
+  (FR-016) and status pills; an action toolbar with one primary button, the
+  other actions as icon buttons, and a `decision` styled apart and still behind
+  its modal (FR-015); and sections chosen by the data's shape: a key-value grid
+  for scalars, a sortable table for a list of objects, a stepper for a list of
+  stages, and a list of findings that opens each at its `file:line`. It MUST be
+  built from `@vscode-elements/elements` and the codicon font, from the
+  extension's own files, with VS Code's theme variables only, and MUST be
+  legible in light, dark and high-contrast themes.
+- **FR-043**: Learn (FR-031) MUST use the same panel and components as FR-042: a
+  topic as numbered steps, each with a run button that goes through the one
+  path every command takes, or disabled with the reason and the command line to
+  copy, and the topic's sections and plain words.
+- **FR-044**: The extension's manifest and package MUST carry what the
+  marketplace shows without being published (FR-029): a 128-pixel PNG `icon`, a
+  `galleryBanner`, `categories` and `keywords`, a `README.md` that shows
+  screenshots of FR-045, a `CHANGELOG.md`, and every user-facing string through
+  `vscode.l10n` and `package.nls.json`.
+- **FR-045**: `agora extension test --screenshots DIR` MUST run the extension in
+  a real VS Code under the display server of FR-032, once for each of VS Code's
+  `Default Dark+`, `Default Light+` and `Default High Contrast` themes, open
+  each view, the command palette, a resource page, Learn, the command line a
+  form ends with, the changes of a dry run and its diff, and the Problems panel,
+  and write a PNG of the whole window of each as `DIR/<theme>-<what>.png`, with
+  `dark`, `light` and `high-contrast` as the themes. The capture MUST read the
+  display server's own screen dump and need no program beyond it and Node. A
+  view that cannot be opened MUST fail the run, so that a screenshot is never
+  missing without notice. The files are for a person to review and are not
+  tracked.
+- **FR-046**: The redesign MUST keep every guarantee of FR-004 to FR-007, FR-014
+  to FR-017, FR-022, FR-023, FR-026 and FR-033: trust gating by VS Code's own
+  trust, a dry run before a write, a decision only behind a modal and never
+  over MCP, no network and no telemetry, MCP registration, discovery by
+  `.if-console.env` and the test hook, and every test of FR-028 and FR-032 MUST
+  pass against it, ported to the new code.
+
 ## Out of scope
 
 - The commands a repository's orchestrator has: each orchestrator's spec states
@@ -348,6 +469,12 @@ it does, what it never does, and how it is built.
 - A host with no Node installed: the extension is still built, with Node from
   the locked wheel, per FR-027.
 - Another extension asks this one for its API: it exports none, per FR-015.
+- A launcher whose `command list` has no `presentation`: Home, Checks and All
+  commands serve it with plain rows, and nothing is invented for it, per FR-036.
+- A high-contrast theme: the panel and the rows use theme variables and colors
+  only, so they stay legible, per FR-042.
+- A view that cannot be opened in the screenshots run: the run fails and names
+  it, per FR-045.
 - A decision modal in a test: answered through the test hook, which exists only
   in test mode; an installed extension has none, per FR-033.
 - A real VS Code run on a host with no display server: skipped with the cause
@@ -392,6 +519,11 @@ it does, what it never does, and how it is built.
   can give (FR-015).
 - **Learn** — the quick pick of a repository's help topics, each shown as a
   resource with its steps as buttons (FR-031).
+- **Presentation** — what a command line says about how its nouns are listed
+  and titled, in `command list` (FR-036, FR-038; 0041-command-line FR-064).
+- **Home** — the first view, what needs a person (FR-037).
+- **The resource panel** — the one webview in which a resource and a Learn topic
+  open (FR-042, FR-043).
 - **The test hook** — the one object, present only in VS Code's test mode,
   through which a test answers a decision's modal (FR-033).
 - **The Chores view** — the repository-wide commands and what needs a person,
@@ -414,6 +546,10 @@ it does, what it never does, and how it is built.
 - **SC-006**: A person learns the daily work from Learn without reading the
   guide, and the extension's behavior is shown in a real VS Code, not only in
   a stand-in for its API.
+
+- **SC-007**: A person who opens a trusted repository sees Home first, with
+  what needs them, then the views its command line declares, and reviews each in
+  light, dark and high-contrast screenshots before it ships (FR-036, FR-045).
 
 ## Review & acceptance checklist
 

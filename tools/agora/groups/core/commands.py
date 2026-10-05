@@ -16,7 +16,7 @@ from typing import Any
 
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
-from agora.core import generate, plan, system
+from agora.core import generate, plan, presentation, system
 from agora.core.checks import changed_paths, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
@@ -83,8 +83,8 @@ def command_list(ctx: Ctx, category: str | None) -> Resource:
         if category and c.category != category:
             continue
         rows.append({"id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
-                     "help": c.help})
-    res = Resource("command-list", "all", {"count": len(rows), "commands": rows},
+                     "help": c.help, **presentation.of_command(reg, c.id)})
+    res = Resource("command-list", "all", {"count": len(rows), "commands": rows, "presentation": presentation.emit(reg)},
                    links=[Link("command", Call("command show", {"command": r["id"]})) for r in rows])
     res.columns["commands"] = ["id", "category", "group", "surfaces"]
     return res
@@ -379,6 +379,7 @@ def check_commands(ctx: Ctx, scope: str | None) -> SectionResult:
     findings += layout.check_readme(ctx.home, reg)
     findings += layout.check_guide_files(ctx.home)
     findings += layout.check_proposals(ctx)
+    findings += [Finding("error", "tools/agora", p) for p in presentation.data_problems(ctx)]
     ttl_path = ctx.home / "ontology" / "ifcore.ttl"
     onto = ontology.command_individuals(ttl_path.read_text(encoding="utf-8")) if ttl_path.is_file() else {}
     for cid, c in sorted(reg.commands.items()):
