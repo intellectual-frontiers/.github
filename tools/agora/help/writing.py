@@ -23,7 +23,7 @@ def specs():
             ("Find the ontology term a requirement needs",
              "The ontology comes second, after the spec. Search it by a word, a CURIE or a label before you add a term, so that an "
              "established one is reused; `show` gives a term's meaning, its relations, every statement about it and the requirements "
-             "that already cite it. The IF Console shows the same in its Ontology view, with Search in its title.\n\n"
+             "that already cite it. The Workspaces Console shows the same in its Ontology view, with Search in its title.\n\n"
              "    ./agora ontology list --match \"design system\"\n    ./agora ontology show ifcore:DesignSystem"),
             ("Check your work",
              "The checks read every spec and every row, and fail where a requirement has no row or a row names a command that "

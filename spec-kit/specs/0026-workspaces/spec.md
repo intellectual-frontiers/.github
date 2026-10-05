@@ -3,36 +3,34 @@
 **Spec ID:** 0026-workspaces
 **Status:** Draft
 
-**Input:** How a person MAY choose to prepare a machine and work in an
-Intellectual Frontiers repository with a workspace. A workspace is an
-optional convenience: nothing depends on one, no repository requires one,
-and every repository works from a clone with only `python3` and `uv`
-(0025-tooling-environment FR-024, FR-025). A person who chooses a workspace
-gets one opinionated environment with one flavor for now: a Debian-family
-Linux distribution, run on bare metal, under WSL on Windows, or inside a
-virtual machine or container (which is how macOS is supported), with VS Code
-as its graphical interface. A repository MAY list the
-repositories it works alongside in its own `.workspaces-host/ws-host.env`,
-and a single command, run first, signs the person in, clones what is
-missing and updates the rest without ever touching their work. Hosted
-environments such as Codespaces, and other distributions, come later, each
-under its own spec.
+**Input:** How a person prepares a machine and works in an Intellectual
+Frontiers repository with `ws-host`. `ws-host` is the one prerequisite of every
+repository's tools (0025-tooling-environment FR-005, FR-014); the workspace is
+what it sets up for a person: the repositories laid out in one folder, the
+editor's workspace file, and one first-run command. A repository's tools need
+`ws-host`, never the layout: each works from a clone wherever it lives
+(0025-tooling-environment FR-024, FR-025). The environment has one flavor for now: a
+Debian-family Linux distribution, run on bare metal, under WSL on Windows, or
+inside a virtual machine or container (which is how macOS is supported), with
+VS Code as its graphical interface. A repository MAY list the repositories it
+works alongside in its own `.workspaces-host/ws-host.env`, and a single
+command, run first, signs the person in, clones what is missing and updates the
+rest without ever touching their work. Hosted environments such as Codespaces,
+and other distributions, come later, each under its own spec.
 
 ## The flavor
 
-- **FR-001**: A workspace, which a person MAY choose and no repository
-  requires, MUST be one environment with one flavor: a Debian-family Linux
+- **FR-001**: A workspace MUST be one environment with one flavor: a Debian-family Linux
   distribution (Debian or Ubuntu) with VS Code as the graphical interface,
   run on bare metal, under WSL on Windows, or inside a virtual machine or a
   container. macOS is supported by running that Linux in a virtual machine or a
-  container, not by running on macOS itself. A person MAY work in any other
-  way, including none. The flavor MUST be recorded in the
+  container, not by running on macOS itself. The flavor MUST be recorded in the
   ontology's workspace flavor scheme (`ifcore:WorkspaceFlavorScheme`).
-- **FR-002**: A workspace MUST NOT be a dependency. A tool, a repository's
-  file, a check or a contributor instruction MUST work from a clone on a host
-  that has only `python3` and `uv`, and anything that works only inside a
-  workspace is a defect in the tool, fixed in the tool
-  (0025-tooling-environment FR-006, FR-025). A workspace's own tools MUST NOT
+- **FR-002**: The workspace layout MUST NOT be a dependency. A tool, a
+  repository's file, a check or a contributor instruction MUST work from a
+  clone wherever it lives on a host that has `ws-host`, and anything that works
+  only inside `~/workspaces` is a defect in the tool, fixed in the tool
+  (0025-tooling-environment FR-006, FR-025). `ws-host`'s own tools MUST NOT
   depend on a machine's distribution beyond FR-001's family.
 - **FR-003**: A new flavor MUST be added by adding its concept to the
   workspace flavor scheme and naming it in FR-001 under its own spec;
@@ -71,10 +69,10 @@ under its own spec.
   that are missing, fast-forwards the rest, and runs `doctor`. It MUST be safe
   to run as often as the person likes, and MUST install no program a
   repository's tools need.
-- **FR-009**: Contributor documentation MUST state the path that needs no
-  workspace first (install `python3` and `uv`, then run the launcher,
-  0025-tooling-environment FR-024), and MAY then state the workspace's
-  one-line install and `ws-host workspace ensure` as another way.
+- **FR-009**: Contributor documentation MUST state the path from a clone first
+  (install `ws-host`, enable the clone with `ws-host provider add`, then run
+  the launcher, 0025-tooling-environment FR-024), and MAY then state `ws-host
+  workspace ensure` as the way to have every repository cloned and updated.
 
 ## Updating without harm
 
@@ -98,7 +96,7 @@ under its own spec.
   `repo set ID --trusted`, a `decision` command that only a person gives, in the
   terminal or through the editor's modal confirmation and never over MCP
   (0041-command-line FR-023, FR-051). Trust lets the editor extension run the
-  repository's launcher (0043-if-console FR-006).
+  repository's launcher (0043-console-protocol FR-003).
 - **FR-022**: Trust MUST NOT be transitive: a repository named by another
   repository's `WS_HOST_REPOS` is cloned and not trusted. The organizations a
   person trusts by default (`WS_HOST_TRUSTED`) MUST be settable only in the
@@ -129,7 +127,7 @@ under its own spec.
 - Hosted environments such as Codespaces, published images, running on macOS
   itself and other distributions.
 - Editor choice beyond VS Code, which is named because the editor surface is
-  its extension (0041-command-line FR-050, 0043-if-console).
+  its extension (0041-command-line FR-050, 0043-console-protocol).
 - Preparing a machine's programs for a repository's tools: the tools fetch
   their own (0025-tooling-environment FR-015).
 
@@ -137,8 +135,8 @@ under its own spec.
 
 - A repository whose tools need typesetting: they fetch it themselves
   through the toolchain lock, so the workspace adds nothing, per FR-018.
-- A person who does not use a workspace: every repository works from a
-  clone with `python3` and `uv`, per FR-002.
+- A clone outside the workspace layout: its tools work, because they need
+  `ws-host` and not the layout, per FR-002.
 - A repository with no `.workspaces-host/ws-host.env`: it is not wrong; a
   workspace simply has no siblings to clone for it, per FR-016.
 - A person who has not signed in: the first run asks for the sign-in before it
@@ -168,10 +166,9 @@ under its own spec.
 
 ## Assumptions
 
-- A person who chooses a workspace uses a Debian-family Linux distribution
-  on bare metal, under WSL, or in a virtual machine or container, with
-  `python3` available and the ability to
-  install `uv`.
+- A person uses a Debian-family Linux distribution on bare metal, under WSL, or
+  in a virtual machine or container, and can run the one-line install of
+  `ws-host`.
 - The repositories people work in are hosted on GitHub or on a GitLab host
   the person's configuration names.
 - A person can copy and paste a line into a terminal and click a button in
@@ -195,11 +192,10 @@ under its own spec.
 
 ## Success criteria
 
-- **SC-001**: A person on a fresh Debian or Ubuntu machine who chooses a
-  workspace goes from a repository's README to a working session, with every
+- **SC-001**: A person on a fresh Debian or Ubuntu machine goes from a repository's README to a working session, with every
   listed repository cloned, by running one install line and `ws-host
   workspace ensure`.
-- **SC-002**: The same repository's tools pass with and without a workspace.
+- **SC-002**: The same repository's tools pass from a clone inside the workspace layout and from one outside it.
 - **SC-003**: No update changes a clone that holds work the person has not
   pushed.
 - **SC-004**: No repository is trusted by being cloned or by being listed.

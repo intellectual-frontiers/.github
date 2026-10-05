@@ -36,11 +36,6 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |PATH
 |none
 
-|`extension`
-|The IF Console extension's manifest, contributions and activation, its source rules (no other repository's tool named, imports only VS Code and Node built-ins), its TypeScript type-checked (strict) and linted (ESLint), its codicon ids against the locked package, its bundle, its unit tests under node's test runner, and its tests in a real VS Code under a display server (0043-if-console FR-028, FR-032, FR-035)
-|none
-|`extension`, `vscode`
-
 |`figures`
 |Figure sources against frontiers-figures' mechanical rules: canvas, role colors, label size, labels inside their boxes (figcheck.py)
 |PATH
@@ -97,7 +92,7 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |`spec`
 
 |`toolchain`
-|The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025)
+|agora's toolchain declarations are valid, complete and current with their generated mise files, no workflow installs a program, and no command takes a program from the host (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022); --functional also runs each installed entry's own check
 |none
 |`spec`
 
@@ -117,9 +112,6 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |`browser`
 |`design-systems`, `openedx` (with --runner browser)
 
-|`extension`
-|`extension`
-
 |`images`
 |`imagery`
 
@@ -128,9 +120,6 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 
 |`spec`
 |`specs`, `register`, `controls`, `ontology`, `toolchain`, `commands`, `help`
-
-|`vscode`
-|`extension` (with --runner vscode)
 
 |===
 

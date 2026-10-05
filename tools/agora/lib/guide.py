@@ -14,7 +14,6 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Callable
 
-from agora.core import system
 from agora.core.describe import command_data
 from agora.core.registry import CATEGORIES, Registry
 from agora.core.types import ArgType, Choice, Dynamic, Pattern
@@ -165,28 +164,24 @@ def help_chapter(reg: Registry) -> str:
 
 
 def toolchain_chapter(reg: Registry, entries: dict[str, Any]) -> str:
-    name = reg.name
+    """The toolchain as `.workspaces-host/toolchain.d/` declares it: `entries` maps each entry's name to its parsed file."""
     lines = [header(), "[#reference-toolchain]", "== The toolchain", "",
-             f"What `{name}` fetches for itself, because it has no Python wheel. Each entry is one exact version with an address and a "
-             "SHA-256 for every platform it is built for, fetched into a per-user cache, checked before anything is unpacked, and "
-             f"tested after. `{name} toolchain list` shows what your cache holds, and `{name} help toolchain` explains the work.", "",
+             f"What `{reg.name}` runs on and has no Python wheel for. Each entry is one file in `.workspaces-host/toolchain.d/`: one exact version "
+             "with an address and a SHA-256 for every platform it is built for. `ws-host` reads those files, installs from the lock only, checks "
+             "each download before anything is unpacked, and keeps one copy of a program for every repository that pins it. "
+             "`ws-host toolchain list` shows what your machine holds, and "
+             f"`{reg.name} help toolchain` explains the work.", "",
              '[cols="1,1,4,2,1"]', "|===", "|Entry |Version |What it is |Platforms |Needs", ""]
-    for e in sorted(entries.values(), key=lambda e: e.name):
-        lines += [f"|`{e.name}`", f"|{_cell(e.version)}", f"|{_cell(e.summary)}", f"|{_cell(', '.join(sorted(e.platforms)))}",
-                  f"|{_cell(', '.join(e.needs) or '-')}", ""]
-    lines += ["|===", "", "=== Using a program of your own", "",
-              "Only when you name it. Each entry has a variable, and `doctor` lists every one that is set:", "",
-              '[cols="1,3"]', "|===", "|Variable |Stands in for", ""]
-    for e in sorted(entries.values(), key=lambda e: e.name):
-        lines += [f"|`{e.variable}`", f"|{_cell(e.override_hint or 'a program of your own')}", ""]
+    for name, e in sorted(entries.items()):
+        lines += [f"|`{name}`", f"|{_cell(str(e.get('version', '')))}", f"|{_cell(str(e.get('summary', '')))}",
+                  f"|{_cell(', '.join(sorted(e.get('platforms', {}))) or e.get('kind', ''))}", f"|{_cell(', '.join(e.get('needs', [])) or '-')}", ""]
     lines += ["|===", "", "=== System libraries", "",
-              f"A browser and VS Code link shared libraries, and VS Code's tests need a display server, that a fetch cannot supply. "
-              f"`{name} system ensure` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other "
-              "command uses `sudo`. The packages are pinned for Debian and Ubuntu; on another distribution it names the libraries "
-              "and stops.", "", '[cols="2,2"]', "|===", "|Library or program |Debian and Ubuntu package", ""]
-    packages = {**system.APT_LIBRARIES, **system.APT_VSCODE_EXTRA}
-    for lib in sorted(packages):
-        lines += [f"|`{lib}`", f"|`{packages[lib]}`", ""]
+              "A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `ws-host system ensure` "
+              "installs them once with `sudo`: it says what it will run and asks first, and no other command uses `sudo`. The names are for Debian and "
+              "Ubuntu; on another distribution it names the libraries and stops.", "", '[cols="2,2"]', "|===", "|Entry |Packages", ""]
+    for name, e in sorted(entries.items()):
+        if e.get("system"):
+            lines += [f"|`{name}`", f"|{_cell(', '.join(f'`{p}`' for p in e['system']))}", ""]
     lines += ["|===", ""]
     return "\n".join(lines)
 

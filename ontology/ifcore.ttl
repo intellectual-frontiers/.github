@@ -1171,7 +1171,7 @@ ifcore:CrownJewelAccessControl a skos:Concept ; skos:inScheme ifcore:DomainSecur
 ifcore:PublishedAddressesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Published addresses"@en ;
     skos:notation "published-addresses" ; skos:definition "Every published address on the domain answers, or redirects permanently (0024-persistent-addresses FR-002)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:NamespaceResolvesControl a skos:Concept ; skos:inScheme ifcore:DomainSecurityControlScheme ; skos:prefLabel "Namespace not served"@en ;
-    skos:notation "namespace" ; skos:definition "Every ontology namespace address, public or private, answers not found: a namespace is an identifier, and the ontology is read in the IF Console (0024 FR-005, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:notation "namespace" ; skos:definition "Every ontology namespace address, public or private, answers not found: a namespace is an identifier, and the ontology is read in the Workspaces Console (0024 FR-005, FR-006)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:DomainCriticalityScheme a skos:ConceptScheme ; rdfs:label "Domain criticality"@en ;
     rdfs:comment "How much breaks if a domain is lost (0022-domain-names FR-021). A crown jewel carries this concept as a second dcterms:type beside its role; every other domain is standard and carries none. Anything that needs a domain to work names it by dcterms:requires (FR-024), reused from Dublin Core rather than declared here (0019-controlled-vocabulary FR-001)."@en ;
@@ -2191,15 +2191,14 @@ ifcore:EditorExtension a owl:Class ; rdfs:subClassOf schema:SoftwareApplication 
     rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:drives a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range ifcore:Orchestrator ;
-    rdfs:comment "An orchestrator whose commands an editor extension offers by running its command line (0043-if-console FR-003). The extension finds orchestrators by each repository's own declaration (0043 FR-004), so a repository states its own individual here only where its own ontology holds it. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+    rdfs:comment "An orchestrator whose commands an editor extension offers by running its command line (0043-console-protocol FR-003). The extension finds orchestrators by each repository's own declaration (0043-console-protocol FR-001), so a repository states its own individual here only where its own ontology holds it. No established property names it (0019-controlled-vocabulary FR-004)."@en .
 ifcore:providesSurface a owl:ObjectProperty ; rdfs:domain ifcore:EditorExtension ; rdfs:range skos:Concept ;
-    rdfs:comment "The command surface an extension is (0043-if-console FR-001), a concept in ifcore:CommandSurfaceScheme. No established property names it (0019-controlled-vocabulary FR-004)."@en .
+    rdfs:comment "The command surface an extension is (0043-console-protocol FR-001), a concept in ifcore:CommandSurfaceScheme. No established property names it (0019-controlled-vocabulary FR-004)."@en .
 
-ifcore:IfConsole a ifcore:EditorExtension ; rdfs:label "Intellectual Frontiers Console"@en ;
-    dcterms:identifier "if-console" ;
-    skos:altLabel "IF Console"@en ;
-    skos:definition "The one VS Code extension that is the secondary interface for every orchestrator: a tree of nouns, commands and resources, findings in the Problems panel, checks as tasks and tests, quick picks from typed arguments, a diff before any write, a modal confirmation for a decision, and each repository's MCP server registered (0043-if-console FR-001, FR-008 through FR-022)."@en ;
-    rdfs:comment "Public, held in the public root at tools/if-console/ (0043 FR-002). It drives the public root's orchestrator, and discovers any other by that repository's own declaration (0043 FR-004). It collects no telemetry and opens no network connection (0043 FR-023)."@en ;
+ifcore:WorkspacesConsole a ifcore:EditorExtension ; rdfs:label "Workspaces Console"@en ;
+    dcterms:identifier "workspaces-console" ;
+    skos:definition "The one VS Code extension that is the secondary interface for every orchestrator: a tree of nouns, commands and resources, findings in the Problems panel, checks as tasks and tests, quick picks from typed arguments, a diff before any write, a modal confirmation for a decision, and each repository's MCP server registered (0043-console-protocol)."@en ;
+    rdfs:comment "Public, held in the workspaces-host repository, which houses it and builds it. It drives the public root's orchestrator, and discovers any other by that repository's own declaration (0043-console-protocol FR-001). It collects no telemetry and opens no network connection."@en ;
     ifcore:providesSurface ifcore:EditorCommandSurface ;
     ifcore:drives ifcore:Agora ;
     ifcore:hasAudience ifcore:Public .
@@ -2281,16 +2280,22 @@ ifcore:ServeCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme 
 ifcore:TestCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "test"@en ;
     skos:notation "test" ;
     skos:definition "Runs a resource's tests in a place its own check does not, writing nothing."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RemoveCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "remove"@en ;
+    skos:notation "remove" ;
+    skos:definition "Takes an item out of a collection, or an installed thing off a machine: the inverse of add."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RunCommandVerb a skos:Concept ; skos:inScheme ifcore:CommandVerbScheme ; skos:prefLabel "run"@en ;
+    skos:notation "run" ;
+    skos:definition "Runs a program of the resource, in the environment the resource defines, and passes its output and status through."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:CommandSurfaceScheme a skos:ConceptScheme ; rdfs:label "Command surface"@en ;
-    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The terminal is the core; the editor is served by the IF Console extension (0043-if-console), not by a command; and MCP is for agents. No web UI is a surface."@en ;
+    rdfs:comment "The three surfaces an orchestrator's commands are exposed on; a category decides which by default (0041-command-line FR-011, FR-022). The terminal is the core; the editor is served by the Workspaces Console extension (0043-console-protocol), not by a command; and MCP is for agents. No web UI is a surface."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:TerminalCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "terminal"@en ;
     skos:notation "cli" ;
     skos:definition "The command line, the core interface; every command is callable here (0041-command-line FR-022)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:EditorCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "editor"@en ;
     skos:notation "editor" ;
-    skos:definition "The secondary interface, the IF Console VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050, 0043-if-console FR-003)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The secondary interface, the Workspaces Console VS Code extension, which renders resources and runs their actions by invoking the orchestrator and holds no behavior of its own (0041-command-line FR-050, 0043-console-protocol FR-003)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "MCP"@en ;
     skos:notation "mcp" ;
     skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .
@@ -2337,9 +2342,6 @@ ifcore:OpenedxResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindSch
 ifcore:LayoutResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "layout"@en ;
     skos:notation "layout" ;
     skos:definition "A print layout of the print design system."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:ExtensionResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "extension"@en ;
-    skos:notation "extension" ;
-    skos:definition "The IF Console editor extension's package, built from tools/if-console/ (0043-if-console FR-027)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:SkillResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "skill"@en ;
     skos:notation "skill" ;
     skos:definition "The skill file that tells an AI agent how to use the orchestrator, generated from its registry (0041-command-line FR-037, 0042-agora FR-028)."@en ; ifcore:hasAudience ifcore:Public .
@@ -2364,13 +2366,6 @@ ifcore:SignResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme
 ifcore:CourseResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "course"@en ;
     skos:notation "course" ;
     skos:definition "A course built with the course design system."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:ToolchainResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "toolchain"@en ;
-    skos:notation "toolchain" ;
-    skos:definition "A program outside Python that a command needs, pinned and verified, fetched once into a per-user cache (0041-command-line FR-066, FR-067)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:SystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "system"@en ;
-    skos:notation "system" ;
-    skos:definition "The shared libraries a browser links, which only an administrator can install (0041-command-line FR-069; 0025-tooling-environment FR-021)."@en ; ifcore:hasAudience ifcore:Public .
-
 # agora's commands (0042-agora FR-005, FR-006): noun, verb and category, one individual per command.
 ifcore:AgoraCheckCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "check"@en ;
     dcterms:identifier "check" ;
@@ -2408,26 +2403,6 @@ ifcore:AgoraCommandShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "command show" ;
     ifcore:commandNoun ifcore:CommandResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
     skos:definition "Shows one command with its arguments, surfaces, group and toolchain entries."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraToolchainListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain list"@en ;
-    dcterms:identifier "toolchain list" ;
-    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Lists the toolchain entries, their versions and whether the cache holds each (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraToolchainShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain show"@en ;
-    dcterms:identifier "toolchain show" ;
-    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Shows one toolchain entry: addresses and checksums per platform, what it provides and its cache state (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraToolchainEnsureCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "toolchain ensure"@en ;
-    dcterms:identifier "toolchain ensure" ;
-    ifcore:commandNoun ifcore:ToolchainResourceKind ; ifcore:commandVerb ifcore:EnsureCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Makes the per-user cache hold the toolchain entries, fetching, verifying and unpacking only what is missing and running each one's functional check (0041-command-line FR-067)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system list"@en ;
-    dcterms:identifier "system list" ;
-    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
-    skos:definition "Lists the shared libraries a browser links, the pinned package that holds each and which are present (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraSystemEnsureCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "system ensure"@en ;
-    dcterms:identifier "system ensure" ;
-    ifcore:commandNoun ifcore:SystemResourceKind ; ifcore:commandVerb ifcore:EnsureCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
-    skos:definition "Makes the host hold the browser's shared libraries, installing only the missing ones through sudo, after printing what it runs and asking; the only command that runs sudo (0041-command-line FR-069)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraMcpServeCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "mcp serve"@en ;
     dcterms:identifier "mcp serve" ;
     ifcore:commandNoun ifcore:McpResourceKind ; ifcore:commandVerb ifcore:ServeCommandVerb ; ifcore:commandCategory ifcore:SetupCommandCategory ;
@@ -2568,14 +2543,6 @@ ifcore:AgoraLayoutBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora 
     dcterms:identifier "layout build" ;
     ifcore:commandNoun ifcore:LayoutResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
     skos:definition "Builds a print layout's document."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraExtensionBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "extension build"@en ;
-    dcterms:identifier "extension build" ;
-    ifcore:commandNoun ifcore:ExtensionResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;
-    skos:definition "Builds the IF Console extension's .vsix into build/, with Node from the locked package and the extension's own lock (0042-agora FR-032)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:AgoraExtensionTestCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "extension test"@en ;
-    dcterms:identifier "extension test" ;
-    ifcore:commandNoun ifcore:ExtensionResourceKind ; ifcore:commandVerb ifcore:TestCommandVerb ; ifcore:commandCategory ifcore:CheckCommandCategory ;
-    skos:definition "Runs a caller's own tests of the IF Console extension inside a real VS Code, in a trusted workspace of this clone and the folders named (0043-if-console FR-034)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraFigureBuildCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "figure build"@en ;
     dcterms:identifier "figure build" ;
     ifcore:commandNoun ifcore:FigureResourceKind ; ifcore:commandVerb ifcore:BuildCommandVerb ; ifcore:commandCategory ifcore:BuildCommandCategory ;

@@ -109,16 +109,14 @@ def check_openedx(ctx: Ctx, scope: str | None) -> SectionResult:
     env = tc.clean_env()
     if paragon is not None and not paragon.is_file():
         findings.append(Finding("error", str(paragon), "Paragon's CLI is not a file; --paragon gives the paragon executable "
-                                "of your own (without it, agora uses the one its npm lock installs)"))
+                                "of your own (without it, agora uses the pinned one)"))
         paragon = None
     elif paragon is None:
         try:
-            resolved = tc.use(["npm-packages"])
+            resolved = tc.use(["paragon"])
         except AgoraError as e:
             return SectionResult("openedx", "skipped", reason=e.message)
         paragon, env = resolved.path_of("paragon"), resolved.env()
-        for entry, path in tc.overridden_in(["npm-packages"]):
-            _progress(f"   · {entry.name} is {path}, named by {entry.variable}, not the locked entry")
     with_package = assurance.openedx_brands(ctx.home)
     if scope is not None and scope not in with_package:
         findings.append(Finding("error", f"design-systems/{scope}", f"{scope} has no Open edX package: no openedx/ directory"))

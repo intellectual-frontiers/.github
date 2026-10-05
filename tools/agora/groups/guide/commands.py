@@ -9,6 +9,7 @@ from typing import Any
 
 from agora.core import (AgoraError, Arg, Call, Ctx, Dynamic, Finding, Link, Opt, Resource, SectionResult, command, files, next_command,
                         section)
+from agora.core import toolchain
 from agora.core.generate import Generated
 from agora.core.registry import generator
 from agora.core.resource import FAILED, MISSING, OK
@@ -64,7 +65,7 @@ def check_help(ctx: Ctx, scope: str | None) -> SectionResult:
 @generator(guide.GENERATOR)
 def gen_reference(ctx: Ctx, scope: str | None) -> Generated:
     gd = Generated()
-    for path, text in guide.reference_files(ctx.registry, ctx.home, ctx.toolchain().entries).items():
+    for path, text in guide.reference_files(ctx.registry, ctx.home, toolchain.declared(ctx.home)).items():
         gd.files[path] = text
     return gd
 

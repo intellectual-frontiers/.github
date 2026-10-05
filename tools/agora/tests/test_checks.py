@@ -172,13 +172,13 @@ class Selection(unittest.TestCase):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
         for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
-                  "merchandise", "extension"):  # the harnesses, the extension and item checks have their own tests; this one proves the selection
+                  "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
             reg.sections[n].toolchain = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 19)
+        self.assertEqual(doc["data"]["summary"]["run"], 18)
 
     def test_scope_and_options_must_apply(self):
         self.assertEqual(run(["check", "controls", "--scope", "x"])[0], 2)
@@ -190,15 +190,16 @@ class Selection(unittest.TestCase):
         self.assertEqual((code, doc["data"]["code"]), (2, "usage"))
 
     def test_a_toolchain_entry_that_cannot_be_had_skips_the_section_and_fails_the_run(self):
-        from unittest import mock
-        from agora.core import toolchain
+        import tempfile
+        from pathlib import Path
         from agora.core.registry import Registry
+        from .toolchain_fixture import FakeHost
         reg = Registry.load(HOME)
         reg.sections["controls"].toolchain = ("no-such-tool",)
-        nobuild = toolchain.Entry("no-such-tool", "1.0", "x", {}, lambda p: {})  # no build for any platform
-        with mock.patch.object(toolchain, "discover", lambda: {"no-such-tool": nobuild}):
-            code, doc = run_json(["check", "controls"], registry=reg)
+        with tempfile.TemporaryDirectory() as tmp:
+            host = FakeHost(Path(tmp))
+            host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")  # no build for any platform
+            code, doc = run_json(["check", "controls"], registry=reg, env=host.env())
         s = doc["data"]["sections"][0]
         self.assertEqual((code, s["status"], doc["data"]["status"]), (3, "skipped", "skipped"))
         self.assertIn("no-such-tool", s["reason"])
-        self.assertIn("AGORA_NO_SUCH_TOOL", s["reason"])

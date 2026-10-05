@@ -1,0 +1,15 @@
+name = "asciidoctor"
+version = "3.0.1"
+summary = "AsciidoctorJ 3.0.1 (Asciidoctor 2.0.26, asciidoctor-epub3 2.2.0) on the jre"
+kind = "archive"
+strip = 1
+needs = ["jre"]
+provides = { asciidoctor = "lib/asciidoctorj-3.0.1.jar", asciidoctor-jruby = "lib/jruby-complete-9.4.14.0.jar" }
+
+[platforms.linux-x64]
+url = "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip"
+sha256 = "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf"
+
+[platforms.linux-arm64]
+url = "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip"
+sha256 = "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf"

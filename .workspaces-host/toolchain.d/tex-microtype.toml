@@ -1,0 +1,11 @@
+name = "tex-microtype"
+version = "78231"
+summary = "the TeX Live 2025 package microtype, revision 78231, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/microtype.tar.xz"
+sha256 = "57b380b27006b34c5cc8fe20a0ceb0e3da848f397c5607b40f2c270055197ebe"

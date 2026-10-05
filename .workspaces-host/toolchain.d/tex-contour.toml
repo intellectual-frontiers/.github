@@ -1,0 +1,11 @@
+name = "tex-contour"
+version = "77677"
+summary = "the TeX Live 2025 package contour, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/contour.tar.xz"
+sha256 = "eba00e2e57f443fdc1fedf4c78cd1edf9a9db07132dd1aeac77ada68ac54ec01"

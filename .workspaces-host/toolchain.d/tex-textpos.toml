@@ -1,0 +1,11 @@
+name = "tex-textpos"
+version = "77677"
+summary = "the TeX Live 2025 package textpos, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/textpos.tar.xz"
+sha256 = "0948cc29ff8bcea56667362073c96c8ae381c4d719ede44690885fbb24439e36"

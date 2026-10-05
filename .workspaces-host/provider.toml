@@ -1,0 +1,4 @@
+name = "agora"
+summary = "The public Intellectual Frontiers root: specs, ontology, design systems and their builds"
+launcher = "./agora"
+protocol = 1

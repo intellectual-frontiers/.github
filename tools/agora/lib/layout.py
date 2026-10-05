@@ -13,16 +13,14 @@ from .register import known_repositories
 
 NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
-# 0042 FR-013: the check sections, and FR-014: the suites, as `sections`. The `extension` section, and its suite, come with
-# the step that adds them.
-SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "help", "extension", "design-systems", "imagery", "openedx",
+PREREQUISITES = {"workspaces-host"}  # the one repository agora may name: its program, `ws-host`, is the prerequisite (0042 FR-003; 0025 FR-005)
+# 0042 FR-013: the check sections, and FR-014: the suites, as `sections`.
+SECTIONS = {"specs", "register", "controls", "ontology", "toolchain", "commands", "help", "design-systems", "imagery", "openedx",
             "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
 SUITES = {"spec": {"specs", "register", "controls", "ontology", "toolchain", "commands", "help"},
           "browser": {"design-systems --runner browser", "openedx"},
           "python": {"design-systems --runner python"},
-          "images": {"imagery"},
-          "extension": {"extension"},
-          "vscode": {"extension"}}
+          "images": {"imagery"}}
 
 
 def check_layout(home: Path, registry) -> list[Finding]:
@@ -39,9 +37,15 @@ def check_layout(home: Path, registry) -> list[Finding]:
         f.append(Finding("error", "tools/agora/agora.toml", f"the command line's name is {registry.name!r}; it must be {NAME!r} (0042 FR-002)"))
     if registry.audience != "public":
         f.append(Finding("error", "tools/agora/agora.toml", f"the audience is {registry.audience!r}; it must be 'public' (0042 FR-001)"))
-    decl = home / ".if-console.env"  # 0042 FR-032: the repository's own declaration of its launcher for the editor
-    if not decl.is_file() or f"IF_CONSOLE_LAUNCHER=./{NAME}" not in decl.read_text(encoding="utf-8").splitlines():
-        f.append(Finding("error", ".if-console.env", f"must hold the line IF_CONSOLE_LAUNCHER=./{NAME} (0042 FR-032)"))
+    decl = home / ".workspaces-host" / "provider.toml"  # 0042 FR-032: the repository's own declaration of its launcher, for ws-host and the Workspaces Console
+    try:
+        import tomllib
+
+        spec = tomllib.loads(decl.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        spec = {}
+    if spec.get("name") != NAME or spec.get("launcher") != f"./{NAME}" or spec.get("protocol") != 1:
+        f.append(Finding("error", ".workspaces-host/provider.toml", f"must declare name = \"{NAME}\", launcher = \"./{NAME}\" and protocol = 1 (0042 FR-032)"))
     for name, g in registry.groups.items():
         if not (g.path / "agora.toml").is_file():
             f.append(Finding("error", f"tools/agora/groups/{name}", "a group has an agora.toml (0042 FR-001)"))
@@ -75,7 +79,7 @@ def check_layout(home: Path, registry) -> list[Finding]:
 def check_boundaries(home: Path, own_repo: str | None) -> list[Finding]:
     """0042 FR-003, 0041 FR-045: no other repository's name as a literal in agora's launcher, code, manifests or specs. The
     names are data, from the workspace's register of repositories."""
-    names = sorted(known_repositories(home) - {own_repo or ""})
+    names = sorted(known_repositories(home) - {own_repo or ""} - PREREQUISITES)
     if not names:
         return []
     files = [home / NAME] + [p for p in sorted((home / "tools" / NAME).rglob("*")) if p.is_file()
