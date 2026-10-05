@@ -1,0 +1,11 @@
+name = "tex-xurl"
+version = "77677"
+summary = "the TeX Live 2025 package xurl, revision 77677, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/xurl.tar.xz"
+sha256 = "6f5ab54b384710ed7a9c1f43cb6f4fbb8e7f8564a545ec16c565375ceb4dd95e"

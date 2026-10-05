@@ -1,9 +1,10 @@
-"""agora's toolchain lock: the programs outside Python that its commands need, one module per entry (0042-agora FR-030).
+"""What agora knows of its toolchain entries beyond what `.workspaces-host/toolchain.d/` declares: one module per entry, holding its `NAME` and, where it has
+them, its functional `check` and the `argv` that starts a program (0042-agora FR-030).
 
-Each module declares an `ENTRY` (core/toolchain.py): name, version, an `https` address and SHA-256 per platform, what it
-provides and a functional check. The registry finds them by presence (0041-command-line FR-066), so adding a module adds an
-entry and deleting it removes one. A module imports only the standard library at module level (0041 FR-005).
+The declarations themselves (version, address, checksum, what an entry needs and sets) are data that `ws-host` reads and installs from
+(0008-providers in workspaces-host); a module here imports only the standard library (0041-command-line FR-005) and holds no address, no checksum and no version.
+The registry finds modules by presence (0041-command-line FR-066), so adding one adds a check and deleting one removes it.
 
-An entry's address, checksum or version changes only in a commit of its own that passes its functional check
-(`agora toolchain ensure NAME`) and the checks that use it (0041 FR-068, 0025-tooling-environment FR-009).
+An entry's address, checksum or version changes only in a commit of its own that passes its functional check (`agora check toolchain --functional`)
+and the checks that use it (0041 FR-068, 0025-tooling-environment FR-009).
 """

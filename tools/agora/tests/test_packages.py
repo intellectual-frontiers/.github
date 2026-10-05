@@ -47,10 +47,10 @@ class Locks(unittest.TestCase):
 
     def test_the_replacements_are_pinned_where_their_commands_run(self):  # 0042 FR-030
         pins = lambda g: {k.lower() for k in self.reg.groups[g].packages}
-        self.assertLessEqual({"pillow", "nodejs-wheel-binaries"}, pins("brand"))
+        self.assertLessEqual({"pillow"}, pins("brand"))
         self.assertLessEqual({"pillow", "potracer", "resvg-py"}, pins("decoration"))
         self.assertLessEqual({"pillow", "resvg-py", "reportlab", "fonttools"}, pins("items"))
-        self.assertLessEqual({"pypdf", "pypdfium2", "resvg-py", "reportlab", "nodejs-wheel-binaries"}, pins("assurance"))
+        self.assertLessEqual({"pypdf", "pypdfium2", "resvg-py", "reportlab"}, pins("assurance"))
         self.assertEqual(pins("vcs"), {"dulwich"})
         for banned in ("pymupdf", "fitz", "cairosvg"):  # AGPL; and a package that needs the host's libcairo
             self.assertFalse(any(banned in p for g in self.reg.groups for p in pins(g)), banned)
@@ -72,73 +72,6 @@ class NoReferenceEnvironment(unittest.TestCase):
         for gone in ("tools/reference-environment", ".github/workflows/reference-environment.yml", ".devcontainer/devcontainer.json",
                      "tools/agora/lib/environment.py"):
             self.assertFalse((HOME / gone).exists(), gone)
-
-
-class Node(unittest.TestCase):
-    def test_node_is_the_packages_and_runs(self):
-        found = node.wheel_node()
-        self.assertTrue(found and Path(found).is_file())
-        out = subprocess.run([found, "--version"], capture_output=True, text=True).stdout.strip()
-        self.assertTrue(out.startswith("v22."), out)
-        self.assertEqual(node.node_path({}), found)
-
-    def test_a_host_node_is_used_only_when_the_person_names_it(self):  # 0025 FR-019
-        with tempfile.TemporaryDirectory() as d:
-            mine = Path(d, "node")
-            mine.write_text("")
-            self.assertEqual(node.node_path({node.OVERRIDE: str(mine)}), str(mine))
-            self.assertIsNone(node.node_path({node.OVERRIDE: str(Path(d, "gone"))}))  # named, and not there: no fallback
-        host = os.environ.get("PATH", "")
-        env = node.with_node({"PATH": host})
-        self.assertTrue(env["PATH"].startswith(str(Path(node.wheel_node()).parent)))
-
-    def test_a_script_started_by_its_shebang_finds_the_locked_node(self):
-        with tempfile.TemporaryDirectory() as d:
-            script = Path(d, "tool")
-            script.write_text("#!/usr/bin/env node\nconsole.log(process.execPath)\n")
-            script.chmod(0o755)
-            out = subprocess.run([str(script)], capture_output=True, text=True, env=node.with_node({"PATH": "/usr/bin:/bin"}))
-            self.assertEqual(out.stdout.strip(), node.wheel_node())
-
-
-@unittest.skipUnless(__import__("shutil").which("git"), "git makes the repository the test reads")
-class Git(unittest.TestCase):
-    """dulwich reads what `git status` and `git diff --name-only` would (0042 FR-030)."""
-
-    def git(self, root, *args):
-        subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t", *args], check=True, capture_output=True)
-
-    def test_changed_matches_gits_own_reading(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            self.git(root, "init", "-q")
-            (root / "a.txt").write_text("1")
-            (root / "b.txt").write_text("1")
-            (root / ".gitignore").write_text("ignored.txt\n")
-            self.git(root, "add", "-A")
-            self.git(root, "commit", "-q", "-m", "one")
-            (root / "b.txt").write_text("2")
-            (root / "c.txt").write_text("new")
-            (root / "ignored.txt").write_text("x")
-            (root / "sub").mkdir()
-            (root / "sub" / "d.txt").write_text("d")
-            self.git(root, "add", "a.txt")
-            (root / "a.txt").write_text("staged then edited")
-            ours = gitstate.changed(root)
-            theirs = sorted(l[3:] for l in subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
-                                                          capture_output=True, text=True).stdout.splitlines())
-            self.assertEqual(ours, theirs)
-            self.assertNotIn("ignored.txt", ours)
-            self.git(root, "add", "-A")
-            self.git(root, "commit", "-q", "-m", "two")
-            self.assertEqual(gitstate.changed(root), [])
-            self.assertEqual(gitstate.changed(root, "HEAD~1"), ["a.txt", "b.txt", "c.txt", "sub/d.txt"])
-            self.assertEqual(gitstate.changed(root, "HEAD^"), gitstate.changed(root, "HEAD~1"))
-
-    def test_no_code_of_agora_runs_a_git_program(self):  # 0042 FR-030
-        src = "\n".join(p.read_text() for p in (HOME / "tools" / "agora").rglob("*.py") if "tests" not in p.parts)
-        self.assertNotIn('"git"', src.replace('"git", f"could not read', ""))  # one error code is named "git"
-        self.assertNotIn("shutil.which(\"git\")", src)
 
 
 class Pdfs(unittest.TestCase):

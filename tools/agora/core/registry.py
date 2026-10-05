@@ -16,7 +16,7 @@ from typing import Any, Callable
 
 from .types import ArgType
 
-VERBS = ("list", "show", "status", "check", "build", "generate", "add", "set", "record", "new", "advance", "ensure", "sync", "publish", "serve", "test")
+VERBS = ("list", "show", "status", "check", "build", "generate", "add", "set", "record", "new", "advance", "ensure", "sync", "publish", "serve", "test", "remove", "run")
 NOUNLESS = ("check", "fresh", "test", "doctor", "lock", "context", "help")  # 0041 FR-010
 CONTROL_WORDS = {"mcp": ("serve",)}  # 0041 FR-011
 CATEGORIES = ("read", "check", "record", "build", "generate", "decision", "setup")  # 0041 FR-014

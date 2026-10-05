@@ -1,0 +1,11 @@
+name = "tex-fvextra"
+version = "78177"
+summary = "the TeX Live 2025 package fvextra, revision 78177, from the frozen repository"
+kind = "archive"
+strip = 0
+needs = ["tinytex"]
+env = { TEXMFHOME = "{dir}" }
+
+[platforms.linux-x64]
+url = "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/archive/fvextra.tar.xz"
+sha256 = "dda52979465c78211c0654eb1766e39da2fc3d26b769a2f6f4e0ac80784a56eb"

@@ -246,7 +246,7 @@ class NoHostPrograms(Repo):
         reg = Registry.load(HOME)
         for cid in ("imagery build", "imagery show", "imagery add", "decoration generate", "decoration show"):
             self.assertEqual(reg.commands[cid].toolchain, (), cid)
-        self.assertEqual(reg.commands["openedx build"].toolchain, ("npm-packages",))  # Paragon, from the npm lock
+        self.assertEqual(reg.commands["openedx build"].toolchain, ("paragon",))  # Paragon, pinned in the toolchain
         self.assertIn("Pillow", reg.groups["brand"].packages)
         self.assertTrue({"Pillow", "potracer", "resvg-py", "uharfbuzz"} <= set(reg.groups["decoration"].packages))
 
@@ -372,28 +372,40 @@ class OpenEdx(Repo):
         self.assertGreater(len(doc["data"]["changes"]), 10)
         self.assertEqual(tree(self.root), before)
 
-    def test_openedx_build_without_paragon_uses_the_npm_lock_and_names_it_when_it_cannot(self):
-        offline = {"AGORA_OFFLINE": "1", "AGORA_TOOLCHAIN_CACHE": str(self.root / "cold-cache")}
+    def test_openedx_build_without_paragon_uses_the_pinned_one_and_names_it_when_it_cannot(self):
+        from .toolchain_fixture import FakeHost
+        (self.root / "host").mkdir()
+        host = FakeHost(self.root / "host")
+        host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
+        host.add("paragon", ready=False, needs=("node",), provides={"paragon": "node_modules/.bin/paragon"})
+        offline = host.env(AGORA_OFFLINE="1")
         code, doc = self.go("openedx", "build", "mini-brand", env=offline)
-        self.assertEqual((code, doc["data"]["code"]), (3, "offline"))
-        self.assertIn("npm-packages", doc["data"]["message"])
-        self.assertIn("agora toolchain ensure npm-packages", doc["data"]["message"])
-        # a Paragon of the person's own is named explicitly, and stands in for the lock: nothing is fetched or asked for
+        self.assertEqual((code, doc["data"]["code"]), (3, "toolchain"))
+        self.assertIn("paragon", doc["data"]["message"])
+        self.assertIn("ws-host toolchain ensure paragon --provider agora", doc["data"]["message"])
+        # a Paragon of the person's own is named explicitly, and stands in for the pinned one: nothing is installed or asked for
         code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
         self.assertIn("paragon", doc["data"]["message"].lower())
 
-    @unittest.skipUnless(shutil.which("node"), "needs node")
     def test_openedx_build_runs_paragons_cli_in_a_scratch_copy_and_writes_dist(self):
         cli = self.root / "paragon"
         cli.write_text("#!/bin/sh\nset -e\ncase \"$1\" in\n  build-tokens) mkdir -p paragon/build/themes/light; echo t > paragon/build/themes/light/light.css ;;\n"
                        "  build-scss) mkdir -p dist/themes/light; echo '/* Built on today */' > dist/core.css; echo l > dist/themes/light/light.css ;;\nesac\n")
         cli.chmod(0o755)
+        from .toolchain_fixture import FakeHost
+        import tempfile
+        from pathlib import Path
+        hosttmp = tempfile.TemporaryDirectory()
+        self.addCleanup(hosttmp.cleanup)
+        host = FakeHost(Path(hosttmp.name))
+        host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
+        env = host.env()
         before = tree(self.root)
-        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", str(cli), "--dry-run")
+        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", str(cli), "--dry-run", env=env)
         self.assertEqual(code, 0, doc)
         self.assertEqual(tree(self.root), before)
-        self.assertEqual(self.go("openedx", "build", "mini-brand", "--paragon", str(cli))[0], 0)
+        self.assertEqual(self.go("openedx", "build", "mini-brand", "--paragon", str(cli), env=env)[0], 0)
         self.assertTrue((self.brand / "openedx" / "dist" / "core.css").is_file())
         self.assertTrue((self.brand / "openedx" / "dist" / "logo.svg").is_file())
         self.assertFalse((self.brand / "openedx" / "paragon" / "build").exists())
@@ -408,22 +420,22 @@ class OpenEdx(Repo):
         with Image.open(io.BytesIO(openedx.favicon(self.brand))) as ico:
             self.assertEqual(sorted(ico.info["sizes"]), [(16, 16), (32, 32), (48, 48)])
 
-    def test_paragon_runs_on_the_locked_node_not_the_hosts(self):  # 0042 FR-030
+    def test_paragon_runs_on_the_pinned_node_not_the_hosts(self):  # 0042 FR-030
         cli = self.root / "paragon"
         cli.write_text("#!/usr/bin/env node\nrequire('fs').writeFileSync('node-used.txt', process.execPath)\n")
         cli.chmod(0o755)
+        pinned = self.root / "pinned-bin"
+        pinned.mkdir()
+        (pinned / "node").write_text("#!/bin/sh\necho pinned > node-used.txt\n")
+        (pinned / "node").chmod(0o755)
         out = self.root / "pkg"
         out.mkdir()
-        from unittest import mock
-        with mock.patch.dict(os.environ, {"PATH": "/usr/bin:/bin"}):
-            try:
-                openedx.build(out, cli)
-            except (OSError, Exception):
-                pass  # the stand-in writes no CSS; only which node ran it matters
-        used = (out / "node-used.txt").read_text()
-        from agora.lib import node
-        self.assertEqual(used, node.wheel_node())
-        self.assertNotEqual(used, shutil.which("node", path="/usr/bin:/bin:/opt/node22/bin") or "")
+        env = {"PATH": f"{pinned}:/usr/bin:/bin"}
+        try:
+            openedx.build(out, cli, env)
+        except (OSError, Exception):
+            pass  # the stand-in writes no CSS; only which node ran it matters
+        self.assertEqual((out / "node-used.txt").read_text().strip(), "pinned")
 
 
 class Types(Repo):

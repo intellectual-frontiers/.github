@@ -1,44 +1,7 @@
 name = "toolchain"
-help = "The toolchain lock: the programs outside Python that commands need, fetched once into a per-user cache and verified; and the one setup command that installs a browser's system libraries with sudo (0041-command-line FR-066 to FR-069; 0042-agora FR-030)"
-
-[nouns.toolchain]
-help = "The programs outside Python that commands need: pinned, fetched once into a per-user cache and verified (0041-command-line FR-067)"
-icon = "tools"
-view = "toolchain"
-title = "Toolchain entry"
-
-[nouns.toolchain.list]
-command = "toolchain list"
-rows = "entries"
-id = "name"
-label = "name"
-description = "version"
-status = "state"
-tooltip = ["summary", "size"]
-
-[nouns.toolchain.list.status_map]
-ready = "ok"
-missing = "warning"
-override = "info"
-"no build" = "muted"
-
-[nouns.system]
-help = "The one prerequisite beyond python3 and uv: the shared libraries a browser and VS Code link, and the display server VS Code's tests start under, installed once with sudo (0041-command-line FR-069)"
-icon = "server-environment"
-view = "toolchain"
-title = "System libraries"
+help = "The one check of the programs outside Python that commands need: what `.workspaces-host/` declares and ws-host installs, and that each works (0041-command-line FR-066, FR-068; 0042-agora FR-030)"
 
 [sections.toolchain]
-help = "The toolchain lock is complete, https, pinned and hashed; no workflow installs a program, and nothing requires a host program or a workspace (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022, FR-025)"
-watch = ["tools/agora/toolchain/**", "tools/agora/npm/**", "tools/if-console/package.json", "tools/if-console/package-lock.json", "tools/agora/core/toolchain.py", "tools/agora/core/system.py", "tools/agora/groups/*/agora.lock", "tools/agora/groups/*/agora.toml", ".github/workflows/**", "tools/agora/**/*.py"]
-
-# How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
-[commands."system list"]
-title = "List System Libraries"
-[commands."toolchain ensure"]
-title = "Ensure Toolchain"
-icon = "cloud-download"
-[commands."toolchain list"]
-title = "List Toolchain"
-[commands."toolchain show"]
-title = "Show Toolchain Entry…"
+help = "agora's toolchain declarations are valid, complete and current with their generated mise files, no workflow installs a program, and no command takes a program from the host (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022); --functional also runs each installed entry's own check"
+watch = [".workspaces-host/**", "tools/agora/toolchain/**", "tools/agora/core/toolchain.py", "tools/agora/groups/*/agora.lock", "tools/agora/groups/*/agora.toml", ".github/workflows/**", "tools/agora/**/*.py"]
+options = ["--functional"]

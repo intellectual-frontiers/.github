@@ -35,8 +35,8 @@ class WireShape(unittest.TestCase):
 
     def test_an_action_that_needs_a_value_has_no_pasteable_line_and_names_what_it_needs(self):
         reg = Registry.load(HOME)
-        full = Resource("x", "x", actions=[Action("a", Call("spec set", {"spec": "0043-if-console", "status": "Adopted"})),
-                                           Action("b", Call("spec set", {"spec": "0043-if-console"}))]).to_dict(reg)
+        full = Resource("x", "x", actions=[Action("a", Call("spec set", {"spec": "0043-console-protocol", "status": "Adopted"})),
+                                           Action("b", Call("spec set", {"spec": "0043-console-protocol"}))]).to_dict(reg)
         a, b = full["actions"]
         self.assertIn("cli", a)
         self.assertNotIn("needs", a)
@@ -67,12 +67,13 @@ class WireShape(unittest.TestCase):
         self.assertGreater(len(change["diff"]), 60)
         self.assertFalse(any("more lines" in l for l in change["diff"]))
 
-    def test_the_declaration_names_the_launcher_and_toolchain_ensure_is_offered_to_the_editor(self):
-        self.assertIn("IF_CONSOLE_LAUNCHER=./agora", (HOME / ".if-console.env").read_text().splitlines())
+    def test_the_declaration_names_the_launcher(self):
+        import tomllib
+        d = tomllib.loads((HOME / ".workspaces-host" / "provider.toml").read_text())
+        self.assertEqual((d["name"], d["launcher"], d["protocol"]), ("agora", "./agora", 1))
         _, doc = run_json(["command", "list"])
-        row = next(c for c in doc["data"]["commands"] if c["id"] == "toolchain ensure")
-        self.assertIn("editor", row["surfaces"])
-        self.assertNotIn("mcp", row["surfaces"])
+        ids = {c["id"] for c in doc["data"]["commands"]}
+        self.assertFalse({"toolchain ensure", "system ensure", "extension build"} & ids)  # ws-host's, not agora's (0041 FR-067)
 
 
 if __name__ == "__main__":

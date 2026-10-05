@@ -3,7 +3,7 @@
 [#reference-toolchain]
 == The toolchain
 
-What `agora` fetches for itself, because it has no Python wheel. Each entry is one exact version with an address and a SHA-256 for every platform it is built for, fetched into a per-user cache, checked before anything is unpacked, and tested after. `agora toolchain list` shows what your cache holds, and `agora help toolchain` explains the work.
+What `agora` runs on and has no Python wheel for. Each entry is one file in `.workspaces-host/toolchain.d/`: one exact version with an address and a SHA-256 for every platform it is built for. `ws-host` reads those files, installs from the lock only, checks each download before anything is unpacked, and keeps one copy of a program for every repository that pins it. `ws-host toolchain list` shows what your machine holds, and `agora help toolchain` explains the work.
 
 [cols="1,1,4,2,1"]
 |===
@@ -12,192 +12,122 @@ What `agora` fetches for itself, because it has no Python wheel. Each entry is o
 |`asciidoctor`
 |3.0.1
 |AsciidoctorJ 3.0.1 (Asciidoctor 2.0.26, asciidoctor-epub3 2.2.0) on the jre
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|linux-arm64, linux-x64
 |jre
 
 |`asciidoctor-pdf`
 |2.3.27
 |asciidoctorj-pdf 2.3.27, the PDF converter for the asciidoctor entry's AsciidoctorJ
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|linux-arm64, linux-x64
 |jre, asciidoctor
 
 |`chromium`
 |1.50.0
 |Chromium 133, Playwright 1.50.0's pinned build (revision 1155)
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
-|-
-
-|`extension-build`
-|typescript-6.0.3+esbuild-0.28.2+eslint-10.12.0+vsce-4.0.0
-|TypeScript, esbuild and ESLint, which check and bundle the IF Console extension, vsce, which packs it, and @vscode/test-electron, which tests it in a real VS Code: installed with npm ci from tools/if-console's lock
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|linux-arm64, linux-x64
 |-
 
 |`jre`
 |21.0.12.1+1
 |a Temurin Java runtime
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|linux-arm64, linux-x64
 |-
 
-|`npm-packages`
-|1.50.0+paragon-23.23.0
-|Playwright 1.50.0 for Node and Paragon 23.23.0, installed with npm ci from the committed lock
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|`node`
+|22.20.0
+|Node.js
+|tool
 |-
 
-|`tex-packages`
-|2026.03
-|the TeX Live 2025 packages the print design system loads that TinyTeX lacks, pinned by checksum
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|`paragon`
+|23.23.0
+|Paragon, for the Open edX package's build
+|npm
+|node
+
+|`playwright`
+|1.50.0
+|Playwright for Node, for the design systems' browser harnesses
+|npm
+|node, chromium
+
+|`python`
+|3.13.16
+|Python, for agora and its command groups
+|tool
+|-
+
+|`tex-contour`
+|77677
+|the TeX Live 2025 package contour, revision 77677, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-fvextra`
+|78177
+|the TeX Live 2025 package fvextra, revision 78177, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-luacode`
+|77677
+|the TeX Live 2025 package luacode, revision 77677, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-marginfix`
+|77677
+|the TeX Live 2025 package marginfix, revision 77677, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-microtype`
+|78231
+|the TeX Live 2025 package microtype, revision 78231, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-newunicodechar`
+|77677
+|the TeX Live 2025 package newunicodechar, revision 77677, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-textpos`
+|77677
+|the TeX Live 2025 package textpos, revision 77677, from the frozen repository
+|linux-x64
+|tinytex
+
+|`tex-xurl`
+|77677
+|the TeX Live 2025 package xurl, revision 77677, from the frozen repository
+|linux-x64
 |tinytex
 
 |`tinytex`
 |2026.03
 |TinyTeX (TeX Live 2025): XeLaTeX, LuaLaTeX and their formats
-|linux-x86_64, macos-arm64, macos-x86_64
+|linux-x64
 |-
 
-|`vscode`
-|1.140.0
-|VS Code 1.140.0, the stable build the IF Console extension's tests run in
-|linux-aarch64, linux-x86_64, macos-arm64, macos-x86_64
+|`uv`
+|0.12.23
+|uv, which runs agora against its hashed locks
+|tool
 |-
-
-|===
-
-=== Using a program of your own
-
-Only when you name it. Each entry has a variable, and `doctor` lists every one that is set:
-
-[cols="1,3"]
-|===
-|Variable |Stands in for
-
-|`AGORA_ASCIIDOCTOR`
-|an asciidoctor program
-
-|`AGORA_ASCIIDOCTOR_PDF`
-|a jar of asciidoctorj-pdf
-
-|`AGORA_CHROMIUM`
-|a Chromium or Chrome program
-
-|`AGORA_EXTENSION_BUILD`
-|a directory holding node_modules with the extension's build packages
-
-|`AGORA_JRE`
-|the java program
-
-|`AGORA_NPM_PACKAGES`
-|a directory holding node_modules with playwright and @openedx/paragon
-
-|`AGORA_TEX_PACKAGES`
-|a TeX tree (its texmf-dist) holding the same packages
-
-|`AGORA_TINYTEX`
-|a directory holding xelatex and lualatex
-
-|`AGORA_VSCODE`
-|a VS Code program
 
 |===
 
 === System libraries
 
-A browser and VS Code link shared libraries, and VS Code's tests need a display server, that a fetch cannot supply. `agora system ensure` installs them once with `sudo`: it prints exactly what it will run and asks first, and no other command uses `sudo`. The packages are pinned for Debian and Ubuntu; on another distribution it names the libraries and stops.
+A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `ws-host system ensure` installs them once with `sudo`: it says what it will run and asks first, and no other command uses `sudo`. The names are for Debian and Ubuntu; on another distribution it names the libraries and stops.
 
 [cols="2,2"]
 |===
-|Library or program |Debian and Ubuntu package
+|Entry |Packages
 
-|`Xvfb`
-|`xvfb`
-
-|`libX11.so.6`
-|`libx11-6`
-
-|`libXcomposite.so.1`
-|`libxcomposite1`
-
-|`libXdamage.so.1`
-|`libxdamage1`
-
-|`libXext.so.6`
-|`libxext6`
-
-|`libXfixes.so.3`
-|`libxfixes3`
-
-|`libXrandr.so.2`
-|`libxrandr2`
-
-|`libasound.so.2`
-|`libasound2`
-
-|`libatk-1.0.so.0`
-|`libatk1.0-0`
-
-|`libatk-bridge-2.0.so.0`
-|`libatk-bridge2.0-0`
-
-|`libatspi.so.0`
-|`libatspi2.0-0`
-
-|`libcairo.so.2`
-|`libcairo2`
-
-|`libcups.so.2`
-|`libcups2`
-
-|`libdbus-1.so.3`
-|`libdbus-1-3`
-
-|`libdrm.so.2`
-|`libdrm2`
-
-|`libexpat.so.1`
-|`libexpat1`
-
-|`libgbm.so.1`
-|`libgbm1`
-
-|`libgio-2.0.so.0`
-|`libglib2.0-0`
-
-|`libglib-2.0.so.0`
-|`libglib2.0-0`
-
-|`libgobject-2.0.so.0`
-|`libglib2.0-0`
-
-|`libgtk-3.so.0`
-|`libgtk-3-0`
-
-|`libnspr4.so`
-|`libnspr4`
-
-|`libnss3.so`
-|`libnss3`
-
-|`libnssutil3.so`
-|`libnss3`
-
-|`libpango-1.0.so.0`
-|`libpango-1.0-0`
-
-|`libsmime3.so`
-|`libnss3`
-
-|`libudev.so.1`
-|`libudev1`
-
-|`libxcb.so.1`
-|`libxcb1`
-
-|`libxkbcommon.so.0`
-|`libxkbcommon0`
-
-|`libxkbfile.so.1`
-|`libxkbfile1`
+|`chromium`
+|`libasound2t64\|libasound2`, `libatk-bridge2.0-0t64\|libatk-bridge2.0-0`, `libatk1.0-0t64\|libatk1.0-0`, `libatspi2.0-0t64\|libatspi2.0-0`, `libcairo2`, `libcups2t64\|libcups2`, `libdbus-1-3`, `libdrm2`, `libgbm1`, `libglib2.0-0t64\|libglib2.0-0`, `libnspr4`, `libnss3`, `libpango-1.0-0`, `libx11-6`, `libxcb1`, `libxcomposite1`, `libxdamage1`, `libxext6`, `libxfixes3`, `libxkbcommon0`, `libxrandr2`
 
 |===

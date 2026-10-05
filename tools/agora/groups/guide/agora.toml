@@ -14,7 +14,7 @@ relocatable = false
 
 [generators.reference-docs]
 help = "The guide's reference chapters: commands, checks, help topics, toolchain, design systems and specs"
-sources = ["tools/agora/agora.toml", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "tools/agora/help/*.py", "tools/agora/toolchain/*.py", "tools/agora/core/system.py", "tools/agora/core/registry.py", "tools/agora/lib/guide.py", "ontology/ifcore.ttl", "design-systems/*/spec.md", "spec-kit/specs/*/spec.md"]
+sources = ["tools/agora/agora.toml", "tools/agora/groups/*/agora.toml", "tools/agora/groups/*/commands.py", "tools/agora/help/*.py", "tools/agora/toolchain/*.py", "tools/agora/core/registry.py", "tools/agora/lib/guide.py", "ontology/ifcore.ttl", "design-systems/*/spec.md", "spec-kit/specs/*/spec.md"]
 outputs = ["docs-src/chapters/reference/*.adoc"]
 command = "docs generate"
 

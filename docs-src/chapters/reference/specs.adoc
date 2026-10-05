@@ -173,9 +173,9 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |agora, the public root's command line
 
-|`0043-if-console`
+|`0043-console-protocol`
 |Draft
-|Intellectual Frontiers Console
+|What a provider owes the Workspaces Console
 
 |`0044-public-website`
 |Draft

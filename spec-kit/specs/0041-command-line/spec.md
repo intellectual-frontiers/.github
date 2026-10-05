@@ -11,28 +11,32 @@ that declares its commands in a registry found by presence, takes typed
 arguments, returns every result as a resource rendered as text, JSON or HTML,
 reports errors as resources, and never decides for a person what only a
 person decides. Its behavior is code and its information is a small
-environment-style file. It needs only `python3` and `uv` on the host: it
-obtains its Python packages from hashed uv locks and every other program from
-a toolchain lock, into a per-user cache, verified, and runs offline on
-request. It records nothing outside Git. Its surfaces are the command line,
-which is the core; the Intellectual Frontiers Console, one VS Code
-extension that is the secondary interface for every orchestrator
-(0043-if-console); and an MCP server for agents. An orchestrator that
-prepares a person's machine and clones their repositories is an environment
-orchestrator, an optional convenience (0026-workspaces). This spec states
-those rules for any repository. Names such as `agora` and `ws-host` are
-examples of orchestrator names, not part of any rule; the public root's
-command set is 0042-agora.
+environment-style file. It needs only `ws-host` on the host (0025-tooling-environment):
+`ws-host` runs it in its own environment with Python and `uv`, the orchestrator
+obtains its Python packages from hashed uv locks, and `ws-host` installs every
+other program from the orchestrator's toolchain, into one store, verified, and
+runs offline on request. It records nothing outside Git. Its surfaces are the command line,
+which is the core; the Workspaces Console, one VS Code extension that is
+the secondary interface for every orchestrator (0043-console-protocol, and
+workspaces-host's Console specification); and an MCP server for agents.
+`ws-host` is the environment orchestrator every other orchestrator assumes: it
+prepares a person's machine, clones their repositories, installs toolchains and
+runs the Workspaces Console (0026-workspaces). This spec states those rules for
+any repository. Names such as `agora` and `ws-host` are examples of
+orchestrator names, not part of any rule; the public root's command set is
+0042-agora.
 
 ## The launcher and its dependency plan
 
 - **FR-001**: A repository's orchestrator MUST be one executable launcher at
   the repository root, named for the orchestrator, written in POSIX `sh`,
-  that needs only `uv` and a Python 3 interpreter from the host
-  (0025-tooling-environment FR-014). It MUST run from a fresh clone with no
-  step beyond the clone (0025-tooling-environment FR-006), from any working
-  directory inside the clone, and MUST find the repository from its own
-  location.
+  that needs only `ws-host` from the host (0025-tooling-environment FR-014),
+  and hands over to `ws-host provider run`, which runs the command in the
+  repository's own environment with Python and `uv`. It MUST run from a fresh
+  clone that a person has enabled as a provider (0025-tooling-environment
+  FR-006), from any working directory inside the clone, MUST find the
+  repository from its own location, and MUST exit 3 naming the one command
+  that fixes it where `ws-host` is missing or the clone is not enabled.
 - **FR-002**: Every command MUST declare, in code, the packages it needs as
   names of dependency groups in the repository's `pyproject.toml`, and the
   launcher MUST compute the dependency plan for the requested command before
@@ -52,7 +56,7 @@ command set is 0042-agora.
   environment variable named for the orchestrator with the suffix `_OFFLINE`
   is `1`, or `--offline` is given, it MUST NOT download anything, and a
   command whose plan needs something not already in uv's cache or the
-  toolchain cache MUST fail with an error resource naming the package and its
+  `ws-host` store MUST fail with an error resource naming the package and its
   group, or the toolchain entry, and the command that prepares it while online
   (FR-020, FR-067).
 - **FR-005**: The orchestrator's core (its registry, parser, typed arguments,
@@ -66,17 +70,16 @@ command set is 0042-agora.
 - **FR-006**: A program outside Python that a command needs (a typesetter,
   a browser, a Java runtime, a Node runtime) MUST come from a Python package
   or from a toolchain entry (FR-066), never from the host, except a
-  maintainer tool's approved program (FR-071). An orchestrator
-  MUST NOT use a program found on the host unless the person names it in an
-  opt-in override, per entry (0025-tooling-environment FR-019), and MUST NOT
-  install one with the host's package manager. The registry MUST declare each
-  such program, the commands that need it, and the package or toolchain entry
-  that supplies it, and a hint MUST name only that package or entry
-  (0025-tooling-environment FR-012). A command whose entry cannot be obtained
-  (offline with a cold cache, or no build for the platform) MUST fail with an
-  error resource that says what is missing; the one
-  thing it may ask a person to install is what 0025-tooling-environment FR-021
-  names, through the `system` noun's `ensure` (FR-069).
+  maintainer tool's approved program (FR-071). An orchestrator MUST NOT use a
+  program found on the host, and MUST NOT install one with the host's package
+  manager. The registry MUST declare each such program, the commands that need
+  it, and the package or toolchain entry that supplies it, and a hint MUST name
+  only that package or entry, or `ws-host` (0025-tooling-environment FR-012). A
+  command whose entry cannot be obtained (offline with a cold store, or no build
+  for the platform) MUST fail with an error resource that says what is missing;
+  the one thing it may ask a person to install is what
+  0025-tooling-environment FR-021 names, through `ws-host system ensure`
+  (FR-069).
 
 ## The registry and the grammar
 
@@ -96,7 +99,7 @@ command set is 0042-agora.
   set, and the ID, where the command takes one, is always the first
   positional argument after the verb. The verbs MUST be exactly: `list`,
   `show`, `status`, `check`, `build`, `generate`, `add`, `set`, `record`,
-  `new`, `advance`, `ensure`, `sync`, `publish`, `serve`, `test`. A verb MUST be one word; a
+  `new`, `advance`, `ensure`, `sync`, `publish`, `serve`, `test`, `remove`, `run`. A verb MUST be one word; a
   hyphenated or compound verb MUST NOT be used. A verb outside the set MUST
   NOT be added except by amending this spec.
 - **FR-009**: The verbs MUST mean: `list` (many resources of a kind, with
@@ -111,7 +114,8 @@ command set is 0042-agora.
   repeat); `sync` (bring a local copy of something shared up to date, by
   fast-forward alone, FR-063); `publish` (send something
   outside the clone); `serve` (run until stopped); `test` (run a resource's
-  tests in a place its own check does not, writing nothing). `check` is not a
+  tests in a place its own check does not, writing nothing); `remove` (take an item out of a collection or an installed thing off a machine, the inverse
+  of `add`); `run` (run a program of the resource, in the environment the resource defines, and pass its output and status through). `check` is not a
   noun's verb: FR-010.
 - **FR-010**: A small closed set of repository-wide commands MUST take no
   noun: `check`, `fresh`, `test`, `doctor`, `lock`, `context`, `help` and
@@ -125,7 +129,7 @@ command set is 0042-agora.
 - **FR-011**: The one noun that serves a surface is `mcp` (FR-027), whose
   command takes the surface's own control word (`serve`) and is the only
   command whose second word may be outside FR-008's set. The editor
-  (FR-050) is served by the IF Console extension (0043-if-console), not by a
+  (FR-050) is served by the Workspaces Console extension (0043-console-protocol), not by a
   command of the orchestrator; the orchestrator needs no `ui` command and no
   server for it.
 - **FR-012**: The registry MUST be readable through the orchestrator itself:
@@ -161,7 +165,7 @@ command set is 0042-agora.
   does, writes nothing, and returns the change it would make as a resource
   (what files, and for each a unified diff of what would change) with exit
   status 0 when the real run would succeed, so that the editor can show the
-  change as a diff before it is made (0043-if-console FR-014).
+  change as a diff before it is made (0043-console-protocol FR-007).
 
 ## Resources, links and actions
 
@@ -229,21 +233,20 @@ command set is 0042-agora.
 ## The editor surface
 
 - **FR-050**: The editor surface MUST be one VS Code extension, the
-  Intellectual Frontiers Console (IF Console, 0043-if-console), the secondary
+  Workspaces Console (workspaces-host's Console specification), the secondary
   interface for every orchestrator beside the command line, which is the core.
   It MUST hold no behavior of its own: it discovers each trusted repository's
-  orchestrator launcher, runs `<name> command list --json` and `<name> <noun>
-  <verb> ... --json`, renders the resources they return, and runs a
-  resource's actions by invoking the orchestrator, and does nothing else. It
-  MUST show a status that says in plain words whether things are well, the
-  orchestrators and their audiences, an action as a button with a way to show
-  its command (FR-055), a quick-pick for a typed argument (FR-013), a check's
-  findings in the editor's problems list, a stream (FR-019) as progress, and an
-  HTML rendering in a panel that loads local resources only and runs no script
-  from outside it. The extension is built from its source in the repository
-  that holds it, with a Node runtime from a Python package and the lock of its
-  own packages (0025-tooling-environment FR-015), so that no program is needed
-  on the host to build it.
+  orchestrator launcher (0043-console-protocol FR-001), runs `<name> command
+  list --json` and `<name> <noun> <verb> ... --json`, renders the resources
+  they return, and runs a resource's actions by invoking the orchestrator, and
+  does nothing else. It MUST show a status that says in plain words whether
+  things are well, the orchestrators and their audiences, an action as a
+  button with a way to show its command (FR-055), a quick-pick for a typed
+  argument (FR-013), a check's findings in the editor's problems list, a
+  stream (FR-019) as progress, and an HTML rendering in a panel that loads
+  local resources only and runs no script from outside it. The extension is
+  built from its source in the repository that holds it, from its own packages
+  and lock, so that no program is needed on the host to build it.
 - **FR-051**: A `decision` action in the editor MUST require a modal
   confirmation that only a person can give. An AI agent working inside the
   editor MUST NOT be able to trigger a `decision` through any editor command,
@@ -406,14 +409,12 @@ command set is 0042-agora.
   process MUST NOT ever hold two dependency groups: `check` with sections from
   several groups MUST run each section's group in its own worker.
 - **FR-029**: `doctor` MUST report what the orchestrator needs and what is
-  present: the launcher's prerequisites (`python3` and `uv`), whether
-  `uv.lock` matches `pyproject.toml`, whether each group's packages are in
-  uv's cache (so offline runs work), the state of each toolchain entry in the
-  cache for the host's platform (absent, fetched and verified, or unavailable
-  for the platform), every opt-in override that is set
-  (0025-tooling-environment FR-019), and the system libraries a browser entry
-  needs (0025-tooling-environment FR-021), with hints (FR-006) that name the
-  `system` noun's `ensure` for a missing library. It MUST also
+  present: the launcher's prerequisite (`ws-host`), whether `uv.lock` matches
+  `pyproject.toml`, whether each group's packages are in uv's cache (so offline
+  runs work), and the state of each toolchain entry as `ws-host` says it
+  (installed, or not installed yet), with hints (FR-006) that name `ws-host
+  toolchain ensure` for a missing entry and `ws-host system ensure` for a
+  missing library (0025-tooling-environment FR-021). It MUST also
   check the registry and fail on any conflict: two commands with one name; two
   toolchain entries with one name (FR-066); a command in two groups; a type
   declared twice with different meanings; a non-isolated invocation whose plan
@@ -510,7 +511,7 @@ command set is 0042-agora.
   untracked logs in a directory the orchestrator's code names, which the
   repository ignores, each line noting the time, the surface (`cli`, `editor`
   or `mcp`; `editor` when the environment variable `IF_CONSOLE` is `1`,
-  0043-if-console FR-017), the command, its typed arguments and its exit status. A `read`
+  0043-console-protocol FR-006), the command, its typed arguments and its exit status. A `read`
   command, a page viewed in the editor and a resource read over MCP change
   nothing and MUST NOT be logged; a refused call to a command that is not
   `read` (a decision over MCP, an invalid argument) MUST be. A log line MUST
@@ -523,7 +524,9 @@ command set is 0042-agora.
   NOT lock, queue or reconcile concurrent writers.
 - **FR-045**: A repository's orchestrator MUST NOT read, fetch or depend on
   the code or data of another repository, except a repository the person
-  names with `--root` (FR-040), and except that an environment orchestrator
+  names with `--root` (FR-040), except that it MAY run `ws-host`, the
+  environment orchestrator it assumes (0025-tooling-environment FR-005), and
+  except that an environment orchestrator
   MAY read the `.workspaces-host/` directory of a repository the person
   trusts (FR-061) and MAY clone repositories that a person's configuration or
   a listed repository's environment file names as data (FR-062). It MUST treat
@@ -553,8 +556,8 @@ command set is 0042-agora.
 - **FR-058**: Retired. A program a command needs comes from a package or a
   toolchain entry (FR-066), not from a kit a person installs.
 - **FR-059**: Retired. The only fetch an orchestrator makes is of a toolchain
-  entry into the toolchain cache (0025-tooling-environment FR-017), and it
-  uses no package manager and no `sudo` (the one `sudo` command is FR-069).
+  entry into the `ws-host` store (0025-tooling-environment FR-017), and it
+  uses no package manager and no `sudo` (the one `sudo` command is `ws-host system ensure`, 0025-tooling-environment FR-021).
 - **FR-060**: Retired. `doctor` prints the version of each toolchain entry
   and package (FR-029).
 - **FR-061**: A repository's launcher MUST run from the editor only when the
@@ -565,8 +568,8 @@ command set is 0042-agora.
   not to its content: the commit at which it was granted MUST be recorded, and
   the environment orchestrator's `doctor` MUST warn, without blocking, when the
   repository's launcher has changed since.
-- **FR-062**: Reading a repository's `.workspaces-host/ws-host.env` and its
-  `.if-console.env` (0043-if-console FR-004) is reading information and MUST
+- **FR-062**: Reading a repository's `.workspaces-host/provider.toml`
+  (0043-console-protocol FR-001) is reading information and MUST
   need no trust; running that repository's launcher from the editor MUST need
   trust (FR-052, FR-061). A person's own configuration, and no repository's
   file, MUST be what names the organizations whose repositories are trusted.
@@ -585,39 +588,34 @@ command set is 0042-agora.
 
 ## The toolchain
 
-- **FR-066**: An orchestrator MUST declare each toolchain entry in code
-  (FR-046), found by presence in a toolchain package (FR-007), with the fields
-  0025-tooling-environment FR-016 names, and each command MUST declare in its
-  registry entry which toolchain entries and packages its plan names, so that
-  the plan, `doctor` and the offline check are computed from the registry
-  alone (FR-002). A toolchain module MUST import only the standard library at
-  module level (FR-005), and the toolchain machinery (fetch, verify, unpack,
-  cache) MUST be part of the core and use the standard library only.
-- **FR-067**: An orchestrator that has a toolchain entry MUST have the noun
-  `toolchain`, with `list` and `show ENTRY` (`read`, reporting version, the
-  platforms, and the cache state of the host's platform) and `ensure [ENTRY...]`
-  (`setup`, which makes the cache hold the named entries, or every entry the
-  host's platform supports when none is named, fetching and verifying only
-  what is missing, so that running it again changes nothing (FR-009); it MUST refuse
-  to run offline, and MUST take `--dry-run`, FR-015). `toolchain ensure` is the
-  command that prepares the cache while online (FR-004).
+- **FR-066**: An orchestrator MUST declare each toolchain entry as data in
+  `.workspaces-host/toolchain.d/<name>.toml`, the fields
+  0025-tooling-environment FR-016 names and `ws-host` reads, and each command MUST declare in its registry entry which
+  toolchain entries and packages its plan names, so that the plan, `doctor` and
+  the offline check are computed from the registry alone (FR-002). A module
+  under the orchestrator's toolchain package holds only an entry's functional
+  check and the way its program is started, and MUST import only the standard
+  library at module level (FR-005). The fetching, verifying, unpacking and
+  storing are `ws-host`'s, not the orchestrator's.
+- **FR-067**: An orchestrator MUST NOT have the nouns `provider`, `toolchain`
+  or `system`: they are `ws-host`'s, which
+  installs an entry on first use when a command's plan names it, refuses to
+  fetch offline (FR-004), and answers `provider show NAME` with each entry's
+  version, state, installed path and environment, so that an orchestrator
+  finds what it pinned. The command that prepares the store while online is
+  `ws-host toolchain ensure --provider NAME`.
 - **FR-068**: A toolchain entry's checksum, its address and its version MUST
   change only in a commit of their own that passes the entry's functional
-  check (0025-tooling-environment FR-009, FR-016), and the registry's
-  `check` MUST fail on an entry whose fields are incomplete, whose address is
-  not `https`, whose version is a range or a floating tag, or that lacks the
-  platform `linux-x86_64` (0025-tooling-environment FR-020).
-- **FR-069**: An orchestrator whose toolchain has a browser entry MUST have the
-  noun `system`, with `list` (`read`: the pinned packages for the host's
-  distribution family and which are present) and `ensure` (`setup`: makes the host
-  hold them, installing only the missing ones with the host's package manager
-  through `sudo`, and nothing when none is missing, FR-009). `ensure` is the
-  only command that may run `sudo`. It MUST print exactly the commands it will
-  run, take `--dry-run` (FR-015) that prints them and runs nothing, ask the
-  person before running `sudo`, refuse to run under MCP (FR-022) and be run by
-  no other command. The package lists are pinned per distribution family in
-  the orchestrator's code (FR-046): `apt` on Debian and Ubuntu at least, and on
-  another family `ensure` MUST say that no list exists and name the libraries.
+  check (0025-tooling-environment FR-009, FR-016), and the registry's `check`
+  MUST fail on an entry that `ws-host` rejects, whose
+  generated `mise` files are not current, or that lacks the platform
+  `linux-x64` (0025-tooling-environment FR-020).
+- **FR-069**: Retired. `ws-host system ensure` installs the shared libraries
+  that entries list in their `system` key; it is the
+  only command that may run `sudo`, prints exactly what it will run, takes
+  `--dry-run` (FR-015), asks before running `sudo` and refuses to run under MCP
+  (FR-022).
+
 - **FR-070**: Python comes first. Before a change adds a program outside
   Python — a toolchain entry, a Python package that only wraps one, or a host
   program for a maintainer tool (FR-071) — it MUST show that the Python
@@ -666,23 +664,22 @@ command set is 0042-agora.
 ## Edge cases
 
 - A command needs a package or a toolchain entry and the machine is offline
-  with a cold cache: it fails with an error resource naming the package and
+  with a cold store: it fails with an error resource naming the package and
   group, or the entry, per FR-004 and FR-020; it does not fall back to
   downloading.
 - A command needs a program the host also has on its `PATH`: it is not used
-  and the entry from the cache is, unless the person opted in with an
-  override, which the resource names, per FR-006 and FR-029.
+  and the entry from the store is, per FR-006.
 - A tool would be easier to write with a program outside Python that
   Python's standard library or an existing package can also do: Python is
   used and the program is not added, per FR-070.
 - A maintainer tool must read another repository's TypeScript, which no
   Python package can evaluate: the decision authority approves a host
   program for it, and only that tool runs it, per FR-070 and FR-071.
-- A command needs a toolchain entry the cache lacks and the machine is online:
-  it fetches and verifies it once, then runs, per FR-066 and FR-067.
+- A command needs a toolchain entry the store lacks and the machine is online:
+  `ws-host` fetches and verifies it once, then it runs, per FR-066 and FR-067.
 - A browser's system libraries are missing on Linux: the command fails with
-  exit status 3 naming each library and the setup command, and installs
-  nothing, per FR-006, FR-021 and FR-069.
+  exit status 3 naming the setup command, and installs nothing, per FR-006 and
+  0025-tooling-environment FR-021.
 - An agent asks to accept a proposal over MCP: the call is refused and the
   tool is not listed, per FR-023; the person advances it in the terminal or
   the editor, per FR-039.
@@ -744,7 +741,7 @@ command set is 0042-agora.
   supported); other distributions and determinism by generated container
   files are for later specs.
 - A person who wants a graphical interface works in VS Code; the editor
-  surface, IF Console, is the one graphical interface, and the command line
+  surface, the Workspaces Console, is the one graphical interface, and the command line
   needs none.
 - A person without technical knowledge can copy and paste a line into a
   terminal and click a button, and nothing more.
@@ -765,10 +762,11 @@ command set is 0042-agora.
 
 - **An orchestrator** — a repository's launcher and the registry of commands
   behind it; the only way its behavior is run.
-- **An environment orchestrator** — an optional orchestrator that prepares a
-  person's machine and clones their repositories (0026-workspaces).
-- **A toolchain entry** — a program with no wheel, declared in code with an
-  address and checksum per platform and fetched into the cache
+- **An environment orchestrator** — the orchestrator every other one assumes:
+  it prepares a person's machine, clones their repositories and installs their
+  toolchains (0026-workspaces).
+- **A toolchain entry** — a program with no wheel, declared as data with an
+  address and checksum per platform and installed by `ws-host` into its store
   (0025-tooling-environment FR-016).
 - **The registry** — the commands, nouns, verbs, categories, surfaces,
   dependency groups and arguments the orchestrator's code declares.
@@ -776,7 +774,7 @@ command set is 0042-agora.
   links and actions.
 - **A category** — read, check, record, build, generate, decision or setup;
   what a command may do and where it is exposed.
-- **A surface** — the terminal (the core), the editor (IF Console), or MCP.
+- **A surface** — the terminal (the core), the editor (the Workspaces Console), or MCP.
 - **A dependency group** — the commands that share one set of packages in
   `pyproject.toml` and `uv.lock`.
 - **A section and a suite** — a named check, and a named set of them.

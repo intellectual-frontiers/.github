@@ -24,7 +24,7 @@ class Emitted(unittest.TestCase):
 
     def test_views_are_ordered_and_each_has_an_id_a_title_an_icon_and_an_order(self):
         views = self.p["views"]
-        self.assertEqual([v["id"] for v in views], ["specs", "ontology", "design-systems", "builds", "toolchain", "proposals"])
+        self.assertEqual([v["id"] for v in views], ["specs", "ontology", "design-systems", "builds", "proposals"])
         self.assertTrue(all({"id", "title", "icon", "order"} <= set(v) for v in views))
         self.assertEqual([v["order"] for v in views], sorted(v["order"] for v in views))
 

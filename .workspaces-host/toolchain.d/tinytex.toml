@@ -1,0 +1,10 @@
+name = "tinytex"
+version = "2026.03"
+summary = "TinyTeX (TeX Live 2025): XeLaTeX, LuaLaTeX and their formats"
+kind = "archive"
+strip = 1
+
+[platforms.linux-x64]
+url = "https://github.com/rstudio/tinytex-releases/releases/download/v2026.03/TinyTeX-v2026.03.tar.gz"
+sha256 = "3bb654f650582508155ea2027fc0fd6b2fdc3cd7413f986a66714662cff8bdc2"
+bin = "bin/x86_64-linux"

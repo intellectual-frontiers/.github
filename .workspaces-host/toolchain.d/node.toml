@@ -1,0 +1,6 @@
+name = "node"
+version = "22.20.0"
+summary = "Node.js"
+kind = "tool"
+tool = "node"
+bin = "bin"

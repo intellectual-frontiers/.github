@@ -16,7 +16,7 @@ from typing import Any
 
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
-from agora.core import generate, plan, presentation, system
+from agora.core import generate, plan, presentation, toolchain
 from agora.core.checks import changed_paths, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
@@ -33,8 +33,7 @@ COMMAND = Dynamic("COMMAND", "a command's words, as `command list` shows them", 
 CATEGORY = Choice("CATEGORY", CATEGORIES, "a command category")
 GENERATOR = Dynamic("GENERATOR", "a generator, as `fresh` proves it: brand-theme, brand-specimen, ...", lambda c: list(c.registry.generators))
 VOICE_MODE = Choice("VOICE_MODE", ("prose", "procedure"), "how the voice sweep reads a text: as prose or as a procedure's steps")
-RUNNER = Choice("RUNNER", ("browser", "python", "node", "vscode"),
-                "which harness: browser or python for design-systems; node or vscode for extension")
+RUNNER = Choice("RUNNER", ("browser", "python"), "which harness: browser or python for design-systems")
 
 
 class _Resource(Dynamic):
@@ -121,7 +120,7 @@ def context_command(ctx: Ctx, ident: str) -> dict[str, Any]:
                   Opt("--suite", "SUITE", "run a named set of sections"),
                   Opt("--changed", None, "run only sections whose watched paths changed"),
                   Opt("--since", "TEXT", "with --changed, also what differs from this Git commit"),
-                  Opt("--runner", "RUNNER", "design-systems: browser or python; extension: node or vscode"),
+                  Opt("--runner", "RUNNER", "design-systems: browser or python"),
                   Opt("--brand", "BRAND", "design-systems: one brand"),
                   Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)"),
                   Opt("--mode", "VOICE_MODE", "voice: sweep as prose or as a procedure (prose by default)"),
@@ -237,9 +236,8 @@ def doctor(ctx: Ctx) -> Resource:
         groups.append({"group": g.name, "packages": [f"{k}=={v}" for k, v in sorted(g.packages.items())] or "none",
                        "lock": ("ok" if g.packages and not lp else "problem" if lp else "none needed"),
                        "in cache": in_cache or "n/a", "plan": plan.plan_for(reg, g.name).describe()})
-    # The toolchain lock (0025 FR-015 to FR-021): each entry's cache state on this platform, the commands that need it, the
-    # browser's system libraries and every opt-in override that is set (FR-019). An entry not yet fetched is not a fault:
-    # a command that needs it fetches it on first use.
+    # The toolchain (0025 FR-015): each entry's state as ws-host says it and the commands that need it. An entry not yet installed is not a
+    # fault: a command that needs it has ws-host install it on first use.
     tc = ctx.toolchain()
     needed_by: dict[str, list[str]] = {}
     for c in reg.commands.values():
@@ -251,7 +249,7 @@ def doctor(ctx: Ctx) -> Resource:
         for n in sec.toolchain:
             needed_by.setdefault(n, []).append(f"check {sec.name}")
         for n in sec.toolchain_optional:
-            needed_by.setdefault(n, []).append(f"check {sec.name} (the vscode runner)")
+            needed_by.setdefault(n, []).append(f"check {sec.name} (when it can)")
     for g in reg.groups.values():
         for kind, label in (("runners", "check design-systems --runner"), ("harnesses", "check design-systems")):
             for key, spec in g.manifest.get(kind, {}).items():
@@ -261,42 +259,29 @@ def doctor(ctx: Ctx) -> Resource:
         for n in gen.toolchain:
             needed_by.setdefault(n, []).append(f"fresh {gen.name}")
     toolchain_rows = []
-    for e in tc.entries.values():
-        state = tc.state(e)
-        hint = (f"fetched on first use, or `{reg.name} toolchain ensure {e.name}`" if state == "missing" else
-                f"set {e.variable} to a program of your own" if state == "no build" else "")
-        toolchain_rows.append({"entry": e.name, "version": e.version, "platform": tc.platform,
-                               "cache": "ready" if state == "ready" else "not fetched" if state == "missing" else state,
-                               "needed by": sorted(needed_by.get(e.name, [])), "hint": hint})
-        if state == "no build":
-            missing.append(e.name)
-    fam, libs = system.family(), system.needed(tc.entries, tc.platform)
-    gone = system.missing(libs, fam)
-    libraries = {"distribution": fam.label, "pinned list": "yes" if fam.packages else "none",
-                 "missing": [f"{lib} ({pkg or 'no package listed'})" for lib, pkg in gone],
-                 "hint": f"run `{reg.name} system ensure` once (it asks before sudo; --dry-run prints what it runs)" if gone else ""}
-    if gone:
-        missing.append("browser system libraries")
-    # An opt-in override stands in for an entry or a package the person names (0025 FR-019): doctor lists each one that is set.
-    overrides = [{"entry": e.name, "variable": e.variable, "path": str(p), "present": p.exists()} for e, p in tc.overrides()]
-    if node.override(ctx.env):
-        overrides.append({"entry": "node", "variable": node.OVERRIDE, "path": node.override(ctx.env),
-                          "present": Path(node.override(ctx.env)).is_file()})
+    try:
+        entries = tc.entries
+    except toolchain.ToolchainError as e:
+        entries = {}
+        missing.append("ws-host's answer about this provider")
+        problems_note = e.message
+    else:
+        problems_note = ""
+    for e in entries.values():
+        toolchain_rows.append({"entry": e.name, "version": e.version, "platform": toolchain.platform_name(),
+                               "cache": "ready" if e.state == "ready" else "not installed",
+                               "needed by": sorted(needed_by.get(e.name, [])),
+                               "hint": "" if e.state == "ready" else (f"installed on first use, or `ws-host toolchain ensure {e.name} --provider agora`")})
     status = "failed" if problems else "missing" if missing else "ok"
-    data = {"status": status, "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows, "system libraries": libraries,
-            "toolchain cache": str(tc.cache), "overrides": overrides,
-            "conflicts": problems, "missing": missing, "offline": ctx.offline,
+    data = {"status": status, "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows,
+            "conflicts": problems, "missing": missing, "offline": ctx.offline, **({"note": problems_note} if problems_note else {}),
             "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)
     res.columns["prerequisites"] = ["name", "present", "version", "hint"]
     res.columns["toolchain"] = ["entry", "version", "cache", "needed by", "hint"]
-    res.columns["overrides"] = ["entry", "variable", "path", "present"]
     res.columns["groups"] = ["group", "packages", "lock", "in cache", "plan"]
     if problems or missing:
         res.actions = [next_command("run the doctor again", "doctor")]
-    # What can be fetched, as actions an editor lists as chores (0043 FR-019): each entry not yet in the cache.
-    res.actions += [next_command(f"fetch {r['entry']}", "toolchain ensure", entries=[r["entry"]]) for r in toolchain_rows
-                    if r["cache"] == "not fetched" and not ctx.offline]
     return res
 
 

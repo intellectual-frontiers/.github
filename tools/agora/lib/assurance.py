@@ -126,16 +126,14 @@ def harness_env(env: dict[str, str], extra: dict[str, str] | None = None) -> dic
     first on PATH, so a harness that starts `node` finds it."""
     out = {k: v for k, v in env.items() if k not in LEAK}
     out.update(extra or {})
-    return node.with_node(out)
+    return out
 
 
 def _node_problem(env: dict[str, str]) -> str:
     """Why no node can run, or an empty string."""
     if node.node_path(env):
         return ""
-    if node.override(env):
-        return f"{node.OVERRIDE} names {node.override(env)}, which is not a file"
-    return f"needs node, which comes from the package {node.PACKAGE}; run it through agora, whose locked environment holds it"
+    return "needs node, an entry of the toolchain that ws-host installs: `ws-host toolchain ensure node --provider agora`"
 
 
 def _argv(h: Harness, env: dict[str, str]) -> list[str]:
@@ -160,10 +158,6 @@ def run_one(tc: Any, h: Harness, root: Path, env: dict[str, str], emit: Emit) ->
         reason = "; ".join(x for x in (problem, no_node) if x)
         emit(f"⏭️  {h.label}: skipped, {reason}")
         return Outcome(h, "skipped", reason=reason)
-    if node.override(env) and h.argv[0] == "node":
-        emit(f"   · node is {node.override(env)}, named by {node.OVERRIDE}, not the locked {node.PACKAGE}")
-    for entry, path in tc.overridden_in(h.toolchain):
-        emit(f"   · {entry.name} is {path}, named by {entry.variable}, not the locked entry")
     run_env = harness_env(resolved.env() if resolved else tc.clean_env())
     start = time.monotonic()
     tail: deque[str] = deque(maxlen=KEEP)

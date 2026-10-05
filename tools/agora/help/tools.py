@@ -4,68 +4,62 @@ from __future__ import annotations
 from agora.core.help import Step, topic
 
 
-@topic("toolchain", "The programs agora fetches for itself, and how to see, fetch and trust them.")
+@topic("toolchain", "The programs ws-host installs for agora, and how to see, fetch and trust them.")
 def toolchain():
     return {
-        "plain": ("agora needs more than Python: TeX, a browser, Java, VS Code. It does not use the ones on your machine. It fetches "
-                  "each one at a fixed version, checks its fingerprint before it unpacks anything, and keeps it in a cache that "
-                  "belongs to you."),
+        "plain": ("agora needs more than Python: TeX, a browser, Java, Node. It does not use the ones on your machine. ws-host installs "
+                  "each one at a fixed version, checks its fingerprint before it unpacks anything, and keeps it in a store that "
+                  "belongs to you, with one copy for every repository that pins it."),
         "sections": (
             ("See the entries",
-             "    ./agora toolchain list\n    ./agora toolchain show chromium"),
+             "    ws-host provider show agora\n    ws-host toolchain show chromium --provider agora\n\nThe entries are the files in "
+             ".workspaces-host/toolchain.d/ of this clone."),
             ("Fetch them",
-             "Each command fetches what it needs the first time, so this is only for fetching ahead of time. Every entry also "
-             "runs its own small test after it is unpacked.\n\n    ./agora toolchain ensure"),
+             "Each command has ws-host install what it needs the first time, so this is only for fetching ahead of time.\n\n"
+             "    ws-host toolchain ensure --provider agora --all"),
+            ("Check that they work",
+             "Every entry has its own small test, which runs on what is installed.\n\n    ./agora check toolchain --functional"),
             ("Offline",
-             "With --offline nothing is downloaded. A command that needs something not in the cache stops and names it; "
-             "fetch it while you are online."),
-            ("Use a program of your own",
-             "Only when you ask for it, by name: set the entry's variable, such as AGORA_JRE, to the program. doctor lists every "
-             "one that is set, and fresh will not call a generated file current when one stood in."),
+             "With --offline nothing is downloaded. A command that needs something not in the store stops and names it; "
+             "install it while you are online."),
             ("The system libraries",
-             "A few shared libraries and a display server cannot be fetched without administrator rights. `agora help start` "
-             "explains the one command that installs them."),
+             "A few shared libraries cannot be fetched without administrator rights. `agora help start` explains the one command "
+             "that installs them."),
+            ("Change a pin",
+             "Edit the entry's file, run `ws-host toolchain generate agora`, and commit what it writes: the lock beside the entries is "
+             "generated, and `agora check toolchain` fails when it is not current."),
         ),
         "steps": (
-            Step("List the entries", "toolchain list"),
-            Step("Show one entry", "toolchain show"),
-            Step("Ensure every entry", "toolchain ensure"),
-            Step("List the system libraries and which are present", "system list"),
+            Step("Check the toolchain's declarations", "check", {"sections": ["toolchain"]}),
             Step("See what is present", "doctor"),
         ),
     }
 
 
-@topic("editor", "Working in VS Code with IF Console: install it, find your way, and learn by doing.")
+@topic("editor", "Working in VS Code with the Workspaces Console: install it, find your way, and learn by doing.")
 def editor():
     return {
-        "plain": ("IF Console is a VS Code extension that shows this command line in the editor: a tree of commands, findings in the "
-                  "Problems panel, a diff before anything is written, and a confirmation only you can give. It adds nothing a "
-                  "command does not do."),
+        "plain": ("The Workspaces Console is a VS Code extension that shows this command line in the editor: a tree of commands, "
+                  "findings in the Problems panel, a diff before anything is written, and a confirmation only you can give. It adds "
+                  "nothing a command does not do. ws-host houses it."),
         "sections": (
-            ("Build and install it",
-             "Build the package, then in VS Code open the Extensions view, choose the three-dots menu, Install from VSIX, and pick "
-             "the file in build/.\n\n    ./agora extension build"),
+            ("Install it",
+             "ws-host installs it from its release when it sets up VS Code.\n\n    ws-host vscode ensure"),
             ("Trust",
-             "VS Code asks whether you trust the folder. IF Console runs nothing until you do, because it runs this repository's "
+             "VS Code asks whether you trust the folder. The Console runs nothing until you do, because it runs this repository's "
              "own command line. That choice is VS Code's own and is yours."),
             ("Find your way",
-             "Open the IF Console view in the activity bar. Home lists what needs you, each with the command line that fixes it and "
-             "a Run button; the views below it (Specs, Design systems, Toolchain and the others this command line declares) list "
-             "its resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the "
-             "setting `if-console.showAllCommands`. The palette's IF Console commands run Check, Fresh, Test and Doctor, and "
-             "Learn shows these topics in one panel, each step with its command line to copy and a Run button."),
+             "Open the Workspaces Console view in the activity bar. Home lists what needs you, each with the command line that fixes "
+             "it and a Run button; the views below it (Specs, Design systems and the others this command line declares) list its "
+             "resources; Checks lists the sections. All commands, the tree of every command, is hidden until you turn on the "
+             "setting `workspaces-console.showAllCommands`. The palette's Workspaces Console commands run Check, Fresh, Test and "
+             "Doctor, and Learn shows these topics in one panel, each step with its command line to copy and a Run button."),
             ("Writes and decisions",
              "A command that writes shows what it would change in the resource panel first (each file can open as a diff), and runs only if you apply it. A decision "
              "asks in a dialog that names the command and what it changes."),
-            ("Check the extension itself",
-             "The unit tests run on Node. The real VS Code tests start VS Code under a display server, so run the one-time "
-             "setup in `agora help start` first.\n\n    ./agora check extension"),
         ),
         "steps": (
-            Step("Build the extension", "extension build"),
-            Step("Check the extension", "check", {"sections": ["extension"]}),
-            Step("Check it inside a real VS Code", "check", {"suite": "vscode"}),
+            Step("See what is present", "doctor"),
         ),
     }
 
@@ -174,9 +168,9 @@ def recover():
              "0 is success. 1 means what you checked failed. 2 means the command was used wrongly. 3 means something is missing: "
              "a package, a toolchain entry or a library, and the message names it."),
             ("A program or library is missing",
-             "Ensure the toolchain is in the cache and the system libraries are installed, once.\n\n    ./agora toolchain ensure\n    ./agora system ensure --dry-run"),
+             "Ensure the toolchain is installed and the system libraries are present, once.\n\n    ws-host toolchain ensure --provider agora --all\n    ws-host system ensure --dry-run"),
             ("A download did not match its fingerprint",
-             "agora deleted it and unpacked nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, "
+             "ws-host installed nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, "
              "something is wrong with the source, and the entry's pin should be looked at, not worked around."),
             ("A generated file is stale",
              "fresh names the command that rewrites it. Run that command, review the change, and commit it.\n\n    ./agora fresh"),
@@ -190,8 +184,6 @@ def recover():
         "steps": (
             Step("See what is wrong", "doctor"),
             Step("Prove the generated files are current", "fresh"),
-            Step("Ensure the toolchain", "toolchain ensure"),
-            Step("List the system libraries and which are present", "system list"),
             Step("Gather a report to paste", "context", {"resource": "command:check"}),
         ),
     }

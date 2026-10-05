@@ -123,11 +123,6 @@ def prove(ctx: Ctx, gen: Generator) -> dict[str, Any]:
     row: dict[str, Any] = {"name": gen.name, "group": gen.group, "status": "fresh", "files": 0, "stale": [], "reason": ""}
     if gen.toolchain:
         tc = ctx.toolchain()
-        stood_in = tc.overridden_in(gen.toolchain)
-        if stood_in:
-            what = "; ".join(f"{e.variable}={p} stands in for {e.name}" for e, p in stood_in)
-            return {**row, "status": "skipped", "reason": f"{what}: the proof would be of that program, not the locked one, so "
-                    "the output is not called current (0025-tooling-environment FR-019)"}
         try:
             tc.use(gen.toolchain)
         except AgoraError as e:

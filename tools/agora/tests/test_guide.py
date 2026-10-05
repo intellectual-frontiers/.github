@@ -42,8 +42,7 @@ class Help(unittest.TestCase):
             self.assertTrue(action["category"])
         lines = [s["line"] for s in d["steps"]]
         self.assertIn("agora doctor", lines)
-        self.assertIn("agora toolchain ensure", lines)  # a step that takes no value has a pasteable line
-        self.assertIn("agora system ensure", lines)
+        self.assertIn("agora command list", lines)  # a step that takes no value has a pasteable line
         self.assertIn("agora check --suite spec", lines)
 
     def test_a_step_that_needs_a_value_a_person_gives_has_no_line_and_names_the_value(self):
@@ -158,8 +157,8 @@ class Reference(unittest.TestCase):
 
     def test_every_chapter_carries_the_generator_header_and_names_what_it_documents(self):
         reg = Registry.load(HOME)
-        from agora.core.toolchain import discover as entries
-        files = guide.reference_files(reg, HOME, entries())
+        from agora.core.toolchain import declared
+        files = guide.reference_files(reg, HOME, declared(HOME))
         self.assertEqual(sorted(p.name for p in files),
                          ["checks.adoc", "commands.adoc", "design-systems.adoc", "help-topics.adoc", "specs.adoc", "toolchain.adoc"])
         for path, text in files.items():
@@ -170,11 +169,11 @@ class Reference(unittest.TestCase):
             self.assertIn(f"agora {c}", commands, c)
         for n in reg.nouns:
             self.assertIn(f"=== {n}\n", commands, n)
-        self.assertEqual(files, guide.reference_files(reg, HOME, entries()), "deterministic")
+        self.assertEqual(files, guide.reference_files(reg, HOME, declared(HOME)), "deterministic")
         toolchain = files[HOME / "docs-src/chapters/reference/toolchain.adoc"]
-        for e in ("jre", "asciidoctor", "asciidoctor-pdf", "vscode", "extension-build"):
+        for e in ("jre", "asciidoctor", "asciidoctor-pdf", "chromium", "tinytex"):
             self.assertIn(f"|`{e}`", toolchain)
-        self.assertIn("Xvfb", toolchain)
+        self.assertIn("libnss3", toolchain)
         topics = files[HOME / "docs-src/chapters/reference/help-topics.adoc"]
         for t in reg.topics:
             self.assertIn(f"=== {t}\n", topics)
@@ -338,33 +337,31 @@ class Build(unittest.TestCase):
     def test_the_converters_are_toolchain_entries_never_the_host(self):  # 0042 FR-034
         reg = Registry.load(HOME)
         self.assertEqual(reg.commands["docs build"].toolchain, ("jre", "asciidoctor"))
-        from agora.core.toolchain import discover as entries
-        e = entries()
-        self.assertEqual(e["asciidoctor-pdf"].needs, ("jre", "asciidoctor"))
-        self.assertEqual(e["asciidoctor"].needs, ("jre",))
+        from agora.core.toolchain import declared
+        e = declared(HOME)
+        self.assertEqual(e["asciidoctor-pdf"]["needs"], ["jre", "asciidoctor"])
+        self.assertEqual(e["asciidoctor"]["needs"], ["jre"])
 
 
 class Pins(unittest.TestCase):
-    """The jre and asciidoctor entries are the pins other repositories' toolchains hold, so one cache can serve both (0042 FR-030)."""
+    """The jre and asciidoctor entries are the pins other providers' toolchains hold, so one copy in ws-host's store can serve both (0042 FR-030)."""
 
     def test_the_versions_and_addresses_are_the_agreed_ones(self):
-        from agora.toolchain import asciidoctor, jre
-        self.assertEqual(jre.ENTRY.version, "21.0.12.1+1")
-        self.assertEqual(jre.ENTRY.platforms["linux-x86_64"][0].sha256, "2413149700df0f7d440500a84a8f764c535f21e5a5e87d38328b64eec2c5b500")
-        self.assertEqual(asciidoctor.ENTRY.version, "3.0.1")
-        a = asciidoctor.ENTRY.platforms["linux-x86_64"][0]
-        self.assertEqual(a.sha256, "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf")
-        self.assertEqual(a.url, "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip")
-        self.assertEqual(set(jre.ENTRY.platforms), {"linux-x86_64", "linux-aarch64", "macos-arm64", "macos-x86_64"})
+        from agora.core.toolchain import declared
+        d = declared(HOME)
+        jre, asciidoctor = d["jre"], d["asciidoctor"]
+        self.assertEqual(jre["version"], "21.0.12.1+1")
+        self.assertEqual(jre["platforms"]["linux-x64"]["sha256"], "2413149700df0f7d440500a84a8f764c535f21e5a5e87d38328b64eec2c5b500")
+        self.assertEqual(asciidoctor["version"], "3.0.1")
+        a = asciidoctor["platforms"]["linux-x64"]
+        self.assertEqual(a["sha256"], "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf")
+        self.assertEqual(a["url"], "https://repo1.maven.org/maven2/org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip")
+        self.assertEqual(set(jre["platforms"]), {"linux-x64", "linux-arm64"})
 
-    def test_vscode_is_pinned_by_version_with_the_vendors_checksum_for_each_platform(self):
-        from agora.toolchain import vscode
-        self.assertEqual(vscode.ENTRY.version, "1.140.0")
-        for p, archives in vscode.ENTRY.platforms.items():
-            (a,) = archives
-            self.assertTrue(a.url.startswith("https://vscode.download.prss.microsoft.com/dbazure/download/stable/" + vscode.COMMIT + "/"), p)
-            self.assertEqual(len(a.sha256), 64)
-        self.assertEqual(set(vscode.ENTRY.platforms), {"linux-x86_64", "linux-aarch64", "macos-arm64", "macos-x86_64"})
+    def test_chromium_is_the_pinned_playwrights_build(self):
+        from agora.core.toolchain import declared
+        d = declared(HOME)
+        self.assertEqual(d["chromium"]["version"], d["playwright"]["version"])
 
 
 if __name__ == "__main__":

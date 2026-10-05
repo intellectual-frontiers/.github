@@ -1,0 +1,6 @@
+name = "python"
+version = "3.13.16"
+summary = "Python, for agora and its command groups"
+kind = "tool"
+tool = "python"
+bin = "bin"

@@ -4,15 +4,13 @@ name = "agora"
 audience = "public"
 # The name this repository's rows carry in the enforcement register (0020-spec-format FR-013): data, not a literal in code.
 register_name = ".github"
-groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "extension", "guide", "agent", "vcs", "selftest"]
+groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layout", "items", "guide", "agent", "vcs", "selftest"]
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
-# What the launcher needs from the host (0041 FR-001, FR-006). The hint names what supplies it.
-[prerequisites.uv]
-hint = "install uv (https://docs.astral.sh/uv/) from the host"
-[prerequisites.python3]
-hint = "install Python 3.11 or later from the host"
+# What the launcher needs from the host (0041-command-line FR-001, FR-006): ws-host, which supplies Python, uv and every toolchain entry.
+[prerequisites.ws-host]
+hint = "install ws-host (https://github.com/intellectual-frontiers/workspaces-host), then run `ws-host provider add` on this clone"
 
 # The views an editor shows for this command line, each holding the nouns that name it in their `view` (0041-command-line FR-064). The
 # editor's own Home (order 10), Checks and All commands views are not declared here.
@@ -35,12 +33,7 @@ description = "Brands, imagery, inks, decoration and layouts"
 title = "Builds"
 icon = "package"
 order = 40
-description = "Decks, emails, courses, media, signs, figures, the guide and the extension"
-[views.toolchain]
-title = "Toolchain"
-icon = "tools"
-order = 50
-description = "The programs and system libraries commands need"
+description = "Decks, emails, courses, media, signs, figures and the guide"
 [views.proposals]
 title = "Proposals"
 icon = "git-pull-request"
@@ -56,11 +49,6 @@ options = { runner = "browser" }  # the suite runs the browser harnesses of desi
 [suites.python]
 sections = ["design-systems"]
 options = { runner = "python" }
-[suites.extension]
-sections = ["extension"]
-[suites.vscode]
-sections = ["extension"]
-options = { runner = "vscode" }  # the extension's tests inside a real VS Code under a display server
 
 [suites.images]
 sections = ["imagery"]

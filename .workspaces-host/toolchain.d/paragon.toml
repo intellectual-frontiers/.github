@@ -1,0 +1,7 @@
+name = "paragon"
+version = "23.23.0"
+summary = "Paragon, for the Open edX package's build"
+kind = "npm"
+package = "@openedx/paragon"
+needs = ["node"]
+provides = { paragon = "node_modules/.bin/paragon" }
