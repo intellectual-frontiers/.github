@@ -330,7 +330,7 @@ requirement	mechanism	by	note
 0015-work-packages FR-015	check	eidolon: eid check ontology	DeliveryRecord shape requires 40-hex sourceCommit; artifact metadata unchecked
 0015-work-packages FR-016	none	-	cuts write records but deliver nothing; no delivery command exists
 0015-work-packages FR-017	check	eidolon: eid check ontology	DeliveryRecord shape: location, commit, date, checksum, audience, no signed URL
-0015-work-packages FR-018	gate	eidolon: eid release final	release.py refuses a final cut before Deploy; review PDFs are watermarked
+0015-work-packages FR-018	gate	eidolon: eid cut new --review	a review cut's PDF is watermarked "Review <date>"; a final cut (eid cut new --final) is refused before the Deploy stage, the publication decision
 0015-work-packages FR-019	none	-	generator writes to content/ by design; no check
 0015-work-packages FR-020	check	eidolon: eid fresh	regenerates content and fails if the tree differs
 0015-work-packages FR-021	check	eidolon: eid fresh	generator copies the work audience; fresh fails on a hand-edited one
@@ -351,7 +351,7 @@ requirement	mechanism	by	note
 0016-press-production FR-004	check	eidolon: eid check works	works.py fails a book package without manuscript.adoc; jacket and figures unchecked
 0016-press-production FR-005	none	-	book bible contents and order of update are not checked
 0016-press-production FR-006	check	eidolon: eid check works	works.py fails a chapter heading with no [[id]] or a duplicate id
-0016-press-production FR-007	gate	eidolon: eid release final	release.py cut refuses a final cut while issues.yml has an open blocker
+0016-press-production FR-007	gate	eidolon: eid cut new --final	a final cut is refused while issues.yml has an open blocker
 0016-press-production FR-008	check	eidolon: eid check works	works.py fails a -volume-N slug with no book-series package or no schema:isPartOf
 0016-press-production FR-009	none	-	series bible contents are not checked
 0016-press-production FR-010	none	-	no command requires volumes to be cut together
@@ -366,10 +366,10 @@ requirement	mechanism	by	note
 0016-press-production FR-019	none	-	jacket category line derivation is not checked
 0016-press-production FR-020	none	-	author credit and publisher line are not checked against the author record
 0016-press-production FR-021	check	eidolon: eid check distribute	validate_distribution fails a BISAC code not in bisac_codes.py (error from Deploy)
-0016-press-production FR-022	check	eidolon: eid check distribute	isbn.py fails invalid or duplicate ISBN-13s; eid release final also refuses a placeholder
+0016-press-production FR-022	check	eidolon: eid check distribute	isbn.py fails invalid or duplicate ISBN-13s; eid cut new --final also refuses a placeholder
 0016-press-production FR-023	none	-	cover series line is by construction in jacket-to-latex.py; no check
 0016-press-production FR-024	check	eidolon: eid check works	works.py fails a manuscript without a whole-number :edition:
-0016-press-production FR-025	gate	eidolon: eid release final	release.py cut needs a clean commit, never overwrites, refuses a second final cut, an unsorted open issue, a gate group with no check recorded after the manuscript last changed, and a release validation that does not pass at the current commit
+0016-press-production FR-025	gate	eidolon: eid cut new --final	a final cut needs a clean commit, never overwrites, refuses a second final cut, an unsorted open issue, a gate group with no check recorded after the manuscript last changed, and a release validation that does not pass at the current commit
 0016-press-production FR-026	none	-	attribution of authorship is not checked
 0016-press-production FR-027	none	-	reserved human acts are not mechanically enforced
 0016-press-production FR-028	none	-	praise quote and cover art origin are not checked
@@ -390,7 +390,7 @@ requirement	mechanism	by	note
 0016-press-production FR-043	review	0009-press FR-027	quarterly surface review covers the website text audit
 0016-press-production FR-044	none	-	promotion in a work's source is not detected
 0016-press-production FR-045	none	-	promotion record pairing is not checked
-0016-press-production FR-046	check	eidolon: eid paper check	fails a published paper with no promotion-brief.md; other kinds unchecked
+0016-press-production FR-046	check	eidolon: eid check promotion	fails a published work of any kind with no complete promotion brief (a book keeps it in jacket.yml, the rest in promotion-brief.md); a work at Distribute or later owes one, as a warning
 0016-press-production FR-047	none	-	promotion outrunning the work is judgment
 0016-press-production FR-048	check	eidolon: eid check editorial	issues.py check fails a category or gate group outside the closed sets
 0016-press-production FR-049	none	-	Rolebook five answers and kicker use are not checked
@@ -413,19 +413,19 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-016	none	-	no show-notes generator or check exists
 0017-spoken-and-research-works FR-017	check	eidolon: eid check works	works.py fails a research package without exactly one typed record source
 0017-spoken-and-research-works FR-018	check	eidolon: eid check works	works.py requires the record source as <type>.adoc; research-check checks header
-0017-spoken-and-research-works FR-019	check	eidolon: eid paper check	fails a hypothesis heading with no practical test
+0017-spoken-and-research-works FR-019	check	eidolon: eid check research-papers	fails a hypothesis heading with no practical test
 0017-spoken-and-research-works FR-020	none	-	research-check states DOI-registry matching is not built
-0017-spoken-and-research-works FR-021	check	eidolon: eid paper check	fails a claim label outside the closed set or not above a heading
-0017-spoken-and-research-works FR-022	check	eidolon: eid paper check	fails a hypothesis/inference/recommendation with no falsifier, or no status section
-0017-spoken-and-research-works FR-023	check	eidolon: eid paper check	fails an undated reference, an evidence section without checked=, an overdue review-by
-0017-spoken-and-research-works FR-024	check	eidolon: eid paper check	fails a patent-family copy held in the repository
+0017-spoken-and-research-works FR-021	check	eidolon: eid check research-papers	fails a claim label outside the closed set or not above a heading
+0017-spoken-and-research-works FR-022	check	eidolon: eid check research-papers	fails a hypothesis/inference/recommendation with no falsifier, or no status section
+0017-spoken-and-research-works FR-023	check	eidolon: eid check research-papers	fails an undated reference, an evidence section without checked=, an overdue review-by
+0017-spoken-and-research-works FR-024	check	eidolon: eid check research-papers	fails a patent-family copy held in the repository
 0017-spoken-and-research-works FR-025	none	-	research-check only requires revisions.md to exist; claim history unchecked
 0017-spoken-and-research-works FR-026	none	-	research-check states slug stability is not built
-0017-spoken-and-research-works FR-027	check	eidolon: eid paper check	fails an unresolved cross-reference or image in a paper; outside links unchecked
+0017-spoken-and-research-works FR-027	check	eidolon: eid check research-papers	fails an unresolved cross-reference or image in a paper; outside links unchecked
 0017-spoken-and-research-works FR-028	none	-	companion tool behavior is not checked
 0017-spoken-and-research-works FR-029	none	-	skill labeling and study-kit results are not checked
 0017-spoken-and-research-works FR-030	none	-	paper-build.sh labels a working paper by construction; no check
-0017-spoken-and-research-works FR-031	check	eidolon: eid paper check	fails a published paper with no promotion brief
+0017-spoken-and-research-works FR-031	check	eidolon: eid check research-papers	fails a published paper with no promotion brief
 0017-spoken-and-research-works FR-032	none	-	basis statements and their wording are judgment; no check covers them
 0017-spoken-and-research-works FR-033	none	-	a record's licence, copyright holder, and DOI are judgment; no check covers them
 0017-spoken-and-research-works FR-034	none	-	a section's single claim and a note's single pillar are judgment; no check covers them
@@ -519,7 +519,7 @@ frontiers-print FR-011	none	-	lockup placement is the renderer's; not checked
 frontiers-print FR-012	check	eidolon: eid check covers	the renderer refuses a title line wider than the box; casing and line composition are judged at review
 frontiers-print FR-013	none	-	subtitle setting is the renderer's; not checked
 frontiers-print FR-014	none	-	author setting is the renderer's; not checked
-frontiers-print FR-015	check	eidolon: python3 tools/render/frontier-art.py check	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
+frontiers-print FR-015	check	eidolon: eid check cover-artwork	every cover's artwork is a piece of the theme's pool, used by one work unless a reuse is recorded
 frontiers-print FR-016	check	eidolon: eid check covers	the series line's fit is checked; its color and the back-cover rule are not
 frontiers-print FR-017	check	eidolon: eid check covers	a back cover that spills onto a second page or reaches the barcode zone fails
 frontiers-print FR-018	check	eidolon: eid check books	the pipeline renders every figure through frontiers-figures' theme and checks it with figcheck.py
@@ -609,8 +609,8 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0022-domain-names FR-014	none	-	secret scanning not configured; nothing checks it
 0022-domain-names FR-015	none	-	no check for DNS records in the ontology
 0022-domain-names FR-016	none	-	no check that acquisition or lapse carries a Decision
-0022-domain-names FR-017	check	eidolon: eid domain security	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
-0022-domain-names FR-018	check	eidolon: eid domain security	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
+0022-domain-names FR-017	check	eidolon: eid domain status	reports expiry within sixty days from the registry's RDAP record; weekly in the vault
+0022-domain-names FR-018	check	eidolon: eid domain status	reports domains in the account but not the catalog; needs CLOUDFLARE_API_TOKEN, else unchecked
 0022-domain-names FR-019	none	-	domain-security only issues GET requests; nothing tests that
 0022-domain-names FR-020	none	-	no check that an omitted domain has a lapse Decision
 0022-domain-names FR-021	check	eidolon: eid check domains	the namespace's domain and the web property's domain must be marked crown jewels
@@ -619,40 +619,40 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0022-domain-names FR-024	none	-	what depends on a domain is recorded by hand; completeness is unchecked
 0022-domain-names FR-025	check	eidolon: eid check domains	a lapse Decision for a domain something requires or a published address uses fails
 0022-domain-names FR-026	check	eidolon: eid check domains	warns for each Public brand with no defensive-registration Decision
-0023-domain-security FR-001	check	eidolon: eid domain security	evaluates every domain against every control
+0023-domain-security FR-001	check	eidolon: eid domain status	evaluates every domain against every control
 0023-domain-security FR-002	check	eidolon: eid check domains	an exception names a DomainName and lapses by dcterms:valid within a year
 0023-domain-security FR-003	none	-	domain security check not yet built
-0023-domain-security FR-004	check	eidolon: eid domain security	RDAP status, or the registrar's lock through the API
-0023-domain-security FR-005	check	eidolon: eid domain security	needs CLOUDFLARE_API_TOKEN, else unchecked
-0023-domain-security FR-006	check	eidolon: eid domain security	DS at the registry, from RDAP or DNS
-0023-domain-security FR-007	check	eidolon: eid domain security	registrant email or telephone in RDAP not behind a privacy service
-0023-domain-security FR-008	check	eidolon: eid domain security	nameservers against the zone's own, or the provider's suffix without the API
-0023-domain-security FR-009	check	eidolon: eid domain security	null MX, fail-all SPF, reject DMARC
-0023-domain-security FR-010	check	eidolon: eid domain security	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-011	check	eidolon: eid domain security	MTA-STS record and enforce-mode policy, TLS-RPT address
-0023-domain-security FR-012	check	eidolon: eid domain security	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
-0023-domain-security FR-013	check	eidolon: eid domain security	valid TLS, HTTP to HTTPS, HSTS of at least a year
-0023-domain-security FR-014	check	eidolon: eid domain security	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-015	check	eidolon: eid domain security	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
-0023-domain-security FR-016	check	eidolon: eid domain security	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
-0023-domain-security FR-017	check	eidolon: eid domain security	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
-0023-domain-security FR-018	check	eidolon: eid domain security	the workflow keeps one domain-security issue with the latest report
+0023-domain-security FR-004	check	eidolon: eid domain status	RDAP status, or the registrar's lock through the API
+0023-domain-security FR-005	check	eidolon: eid domain status	needs CLOUDFLARE_API_TOKEN, else unchecked
+0023-domain-security FR-006	check	eidolon: eid domain status	DS at the registry, from RDAP or DNS
+0023-domain-security FR-007	check	eidolon: eid domain status	registrant email or telephone in RDAP not behind a privacy service
+0023-domain-security FR-008	check	eidolon: eid domain status	nameservers against the zone's own, or the provider's suffix without the API
+0023-domain-security FR-009	check	eidolon: eid domain status	null MX, fail-all SPF, reject DMARC
+0023-domain-security FR-010	check	eidolon: eid domain status	SPF -all, DMARC quarantine or reject with rua; DKIM needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-011	check	eidolon: eid domain status	MTA-STS record and enforce-mode policy, TLS-RPT address
+0023-domain-security FR-012	check	eidolon: eid domain status	CAA naming a CA with iodef, or forbidding issuance; which CAs is 0023 OQ-1
+0023-domain-security FR-013	check	eidolon: eid domain status	valid TLS, HTTP to HTTPS, HSTS of at least a year
+0023-domain-security FR-014	check	eidolon: eid domain status	CNAME targets that no longer resolve; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-015	check	eidolon: eid domain status	members without a second factor and a non-expiring token fail; the ninety-day review is a person's
+0023-domain-security FR-016	check	eidolon: eid domain status	members' email domains against the account's; needs CLOUDFLARE_API_TOKEN
+0023-domain-security FR-017	check	eidolon: eid domain status	weekly, on catalog change, and on a dns-changed dispatch (domain-security workflow)
+0023-domain-security FR-018	check	eidolon: eid domain status	the workflow keeps one domain-security issue with the latest report
 0023-domain-security FR-019	none	-	DNS-as-code gate not yet built (0022 OQ-1)
-0023-domain-security FR-020	check	eidolon: eid domain security	a new domain is checked within the week
+0023-domain-security FR-020	check	eidolon: eid domain status	a new domain is checked within the week
 0023-domain-security FR-021	none	-	permission boundary on a tool not yet built
-0023-domain-security FR-022	check	eidolon: eid domain security	security.txt with a Contact and an unexpired Expires on each primary domain
-0023-domain-security FR-023	check	eidolon: eid domain security	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
-0023-domain-security FR-024	check	eidolon: eid domain security	registered look-alikes of Public primary domains, report only
-0023-domain-security FR-025	check	eidolon: eid domain security	crown jewel expiry at least two years out, from RDAP
-0023-domain-security FR-026	check	eidolon: eid domain security	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
+0023-domain-security FR-022	check	eidolon: eid domain status	security.txt with a Contact and an unexpired Expires on each primary domain
+0023-domain-security FR-023	check	eidolon: eid domain status	certificate transparency issuers against CAA; unserved hostnames need CLOUDFLARE_API_TOKEN
+0023-domain-security FR-024	check	eidolon: eid domain status	registered look-alikes of Public primary domains, report only
+0023-domain-security FR-025	check	eidolon: eid domain status	crown jewel expiry at least two years out, from RDAP
+0023-domain-security FR-026	check	eidolon: eid domain status	at least two administrators, with CLOUDFLARE_API_TOKEN; the kind of second factor is unchecked
 0023-domain-security FR-027	none	-	billing review is a person's, with FR-015's
 0023-domain-security FR-028	none	-	which subdomain sends bulk mail is not observable
 0024-persistent-addresses FR-001	none	-	definition; the checks below find published addresses by it
-0024-persistent-addresses FR-002	check	eidolon: eid domain security	every published address answers below 400 after redirects
+0024-persistent-addresses FR-002	check	eidolon: eid domain status	every published address answers below 400 after redirects
 0024-persistent-addresses FR-003	check	eidolon: eid check domains	no lapse Decision for a domain carrying a published address (0022 FR-025)
-0024-persistent-addresses FR-004	check	eidolon: eid domain security	weekly in the vault's domain-security workflow
-0024-persistent-addresses FR-005	check	eidolon: eid domain security	each public namespace answers 200 with Turtle
-0024-persistent-addresses FR-006	check	eidolon: eid domain security	the private namespace answers 404
+0024-persistent-addresses FR-004	check	eidolon: eid domain status	weekly in the vault's domain-security workflow
+0024-persistent-addresses FR-005	check	eidolon: eid domain status	each public namespace answers 200 with Turtle
+0024-persistent-addresses FR-006	check	eidolon: eid domain status	the private namespace answers 404
 0024-persistent-addresses FR-007	none	-	a namespace address change is caught only by FR-005's check
 0024-persistent-addresses FR-008	check	eidolon: eid check domains	see 0022 FR-021
 0024-persistent-addresses FR-009	none	-	no DOIs registered yet (OQ-2)
