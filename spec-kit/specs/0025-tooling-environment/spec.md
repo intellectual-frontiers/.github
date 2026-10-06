@@ -142,6 +142,9 @@ coverage, the exception, and what continuous integration needs.
   environment the host owns. It verifies the archive's SHA-256 before
   unpacking, and a checksum that does not match installs nothing and fails with
   an error that names the entry. Fetching needs no administrator rights.
+  A fetch, an install and the first preparation of a group's packages MUST show that
+  they are working: at a terminal a spinner with the seconds and what has come, a ✅ or ❌ line when it took a while, and where there
+  is no terminal one plain line when it starts, on standard error, so a long download never looks stuck.
 - **FR-018**: A launcher MUST run offline on request (0041-command-line
   FR-004): `ws-host` then uses only what the store already holds, and a command
   whose plan names an entry the store lacks MUST fail with exit status 3,
