@@ -65,18 +65,23 @@ def ws_host_command(env: Mapping[str, str] | None = None) -> list[str]:
     return found.split()
 
 
-def ask(args: list[str], env: Mapping[str, str] | None = None, timeout: int = 3600) -> dict[str, Any]:
-    """`ws-host ARGS --json`: the document it answers with, or a ToolchainError saying why it could not."""
+def ask(args: list[str], env: Mapping[str, str] | None = None, timeout: int = 3600, show_progress: bool = False) -> dict[str, Any]:
+    """`ws-host ARGS --json`: the document it answers with, or a ToolchainError saying why it could not. With `show_progress`, ws-host's standard
+    error is the person's own, so its spinner (at a terminal) or its one plain line per slow step (anywhere else) shows beside the answer and a
+    long download never looks stuck; the answer still comes on standard output only."""
     cmd = [*ws_host_command(env), *args, "--json"]
+    full = dict(os.environ if env is None else env)
+    if show_progress:
+        full["WS_HOST_PROGRESS"] = "always"
     try:
-        done = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=dict(os.environ if env is None else env))
+        done = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=None if show_progress else subprocess.PIPE, text=True, timeout=timeout, env=full)
     except (OSError, subprocess.TimeoutExpired) as e:
         raise WsHostMissing(f"ws-host could not be run: {e}")
     lines = [l for l in done.stdout.splitlines() if l.strip().startswith("{")]
     try:
         doc = json.loads(lines[-1])
     except (IndexError, ValueError):
-        raise ToolchainError(f"ws-host {' '.join(args)} gave no answer: {(done.stderr or done.stdout).strip()[-300:]}", code="ws-host-answer",
+        raise ToolchainError(f"ws-host {' '.join(args)} gave no answer: {(done.stderr or done.stdout or '').strip()[-300:]}", code="ws-host-answer",
                              exit=FAILED_EXIT, fetchable=False)
     doc["_exit"] = done.returncode
     return doc
@@ -296,8 +301,8 @@ class Toolchain:
             raise ToolchainError("offline, and not installed: " + ", ".join(f"{n} {self.entries[n].version}" for n in gone), entries=gone)
         for n in gone:
             e = self.entries[n]
-            self.announce(f"installing {n} {e.version} with ws-host")
-            doc = ask(["toolchain", "ensure", n, "--provider", PROVIDER] + (["--offline"] if self.offline else []), self.env)
+            self.announce(f"📦 installing {n} {e.version} with ws-host")
+            doc = ask(["toolchain", "ensure", n, "--provider", PROVIDER] + (["--offline"] if self.offline else []), self.env, show_progress=True)
             if doc.get("_exit", 1) != 0:
                 data = doc.get("data", {})
                 raise ToolchainError(data.get("plain") or data.get("message") or f"ws-host could not install {n}", entries=[n], fetchable=False,

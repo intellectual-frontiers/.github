@@ -107,8 +107,10 @@ def prepare(reg: Registry, group: str, *, offline: bool, command: str) -> Path:
     off = ["--offline"] if offline else []
     steps = [[uv, "venv", "--quiet", "--python", sys.executable, *off, str(env)],
              [uv, "pip", "sync", "--quiet", "--require-hashes", *off, "--python", str(env / "bin" / "python"), str(g.lock)]]
+    from . import progress
     for argv in steps:
-        p = subprocess.run(argv, capture_output=True, text=True)
+        with progress.step(f"📦 Preparing the packages group {group} needs", watch=cache):
+            p = subprocess.run(argv, capture_output=True, text=True)
         if p.returncode != 0:
             shutil.rmtree(env, ignore_errors=True)
             if offline:
