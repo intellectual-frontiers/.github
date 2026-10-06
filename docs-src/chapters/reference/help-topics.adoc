@@ -431,9 +431,9 @@ agora is this repository's one command line. It needs only ws-host on your machi
 
 Install ws-host (https://github.com/intellectual-frontiers/workspaces-host) and follow its first-run steps. Nothing else is needed from your machine, and agora never uses a program it finds there.
 
-==== 2. Let ws-host run this clone
+==== 2. Nothing to enable
 
-A repository cannot enable itself: you do it, once, from the root of your clone.
+ws-host uses this clone by itself: it comes from the intellectual-frontiers organization that ws-host trusts, and installing ws-host was your yes. A clone from another organization is the one case that asks you, once, from the root of the clone.
 
 ----
 ws-host provider add .
