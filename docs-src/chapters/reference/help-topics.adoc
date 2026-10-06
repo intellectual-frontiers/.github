@@ -201,7 +201,7 @@ The Workspaces Console is a VS Code extension that shows this command line in th
 
 ==== Install it
 
-ws-host installs it from its release when it sets up VS Code.
+ws-host builds it from its own source, on your computer, when it sets up VS Code.
 
 ----
 ws-host vscode ensure

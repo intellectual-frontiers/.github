@@ -44,7 +44,7 @@ def editor():
                   "nothing a command does not do. ws-host houses it."),
         "sections": (
             ("Install it",
-             "ws-host installs it from its release when it sets up VS Code.\n\n    ws-host vscode ensure"),
+             "ws-host builds it from its own source, on your computer, when it sets up VS Code.\n\n    ws-host vscode ensure"),
             ("Trust",
              "VS Code asks whether you trust the folder. The Console runs nothing until you do, because it runs this repository's "
              "own command line. That choice is VS Code's own and is yours."),
