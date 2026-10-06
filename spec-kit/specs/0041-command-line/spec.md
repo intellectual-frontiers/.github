@@ -662,6 +662,9 @@ orchestrator names, not part of any rule; the public root's command set is
 - **FR-075**: A command that builds MAY say what it made: `data.outputs`, a list of paths relative to the repository (a rendition, or a folder when it made
   several). An editor offers them to open. A path that is absolute or leaves the repository names nothing.
 
+- **FR-076**: A `presentation` view MAY carry `simple = true` to say it is an everyday view. An editor for newcomers shows only those (and its own Home and
+  Services) until the person asks for every view, and shows every view when no view declares it.
+
 ## Out of scope
 
 - The commands a particular repository's orchestrator has; each repository
