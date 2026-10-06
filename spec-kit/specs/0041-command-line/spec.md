@@ -652,6 +652,13 @@ orchestrator names, not part of any rule; the public root's command set is
   absent from a row, a status value that nothing maps, and a reference field
   that the shown resource lacks.
 
+- **FR-074**: An orchestrator MAY declare, in `presentation.services`, commands that go on running: for each, an `id`, a `title` for people, an `icon`, the
+  `command` that serves, the `prepare` command that builds what it serves (both in the command tree), and a `description`. Run with `--json`, a service
+  MUST print as its first line one document on one line whose `data.url` says where it answers, then go on running until it is ended by SIGTERM, ending
+  with exit status 0. An editor shows each in a Services view with Start, Stop and Open in Browser; when a service stops before it is up it runs `prepare`
+  once and starts it again. Starting and stopping a service is not a command of the person's choosing, so a service is not offered as a command to run; the
+  registry check (FR-072) MUST fail a service whose `command` or `prepare` is not in the command tree, or that has an unknown field or no title.
+
 ## Out of scope
 
 - The commands a particular repository's orchestrator has; each repository
