@@ -53,7 +53,7 @@ def problems(reg: Registry) -> list[str]:
         if not isinstance(v.get("order"), int):
             out.append(f"{who}: needs an integer order (0041 FR-072)")
         for k in v:
-            if k not in ("title", "icon", "order", "description"):
+            if k not in ("title", "icon", "order", "description", "simple"):
                 out.append(f"{who}: {k!r} is not a field of a view (0041 FR-064)")
     for noun in sorted(reg.nouns):
         meta = reg.noun_meta.get(noun, {})
@@ -153,7 +153,7 @@ def _reference_problems(reg: Registry, rid: str, ref: dict[str, Any]) -> list[st
 
 def emit(reg: Registry) -> dict[str, Any]:
     """The `presentation` of `command list` (0041 FR-064): everything an editor needs to draw this command line's views and rows."""
-    views = [{"id": vid, **{k: v[k] for k in ("title", "icon", "order", "description") if k in v}}
+    views = [{"id": vid, **{k: v[k] for k in ("title", "icon", "order", "description", "simple") if k in v}}
              for vid, v in sorted(reg.views.items(), key=lambda kv: (kv[1].get("order", 0), kv[0]))]
     nouns = []
     for noun in sorted(reg.nouns):
