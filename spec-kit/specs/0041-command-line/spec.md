@@ -659,6 +659,9 @@ orchestrator names, not part of any rule; the public root's command set is
   once and starts it again. Starting and stopping a service is not a command of the person's choosing, so a service is not offered as a command to run; the
   registry check (FR-072) MUST fail a service whose `command` or `prepare` is not in the command tree, or that has an unknown field or no title.
 
+- **FR-075**: A command that builds MAY say what it made: `data.outputs`, a list of paths relative to the repository (a rendition, or a folder when it made
+  several). An editor offers them to open. A path that is absolute or leaves the repository names nothing.
+
 ## Out of scope
 
 - The commands a particular repository's orchestrator has; each repository
