@@ -14,8 +14,9 @@ def start():
             ("1. Install ws-host yourself",
              "Install ws-host (https://github.com/intellectual-frontiers/workspaces-host) and follow its first-run steps. Nothing else is "
              "needed from your machine, and agora never uses a program it finds there."),
-            ("2. Let ws-host run this clone",
-             "A repository cannot enable itself: you do it, once, from the root of your clone.\n\n    ws-host provider add ."),
+            ("2. Nothing to enable",
+             "ws-host uses this clone by itself: it comes from the intellectual-frontiers organization that ws-host trusts, and installing ws-host was your yes. "
+             "A clone from another organization is the one case that asks you, once, from the root of the clone.\n\n    ws-host provider add ."),
             ("3. See that it runs",
              "Ask agora how it finds your machine. It lists what is present and what is not, and fails only on a real problem.\n\n"
              "    ./agora doctor"),
