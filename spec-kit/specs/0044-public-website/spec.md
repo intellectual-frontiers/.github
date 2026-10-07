@@ -48,7 +48,10 @@ how addresses map to content, 0004-addressing.
   previous website offered, as tools a reader can use; an interactive tool
   keeps the address the previous website published.
 - **FR-008**: A book's page MUST show its front cover, its public record,
-  its status (0015 FR-031), its companion and its news. Every other image on
+  its status (0015 FR-031), its companion and its news. Wherever the website
+  shows a book's cover, on its page and on every shelf of books, it MUST show
+  it as the standing 3D mockup composed from the approved front cover
+  (0016-press-production FR-028), not the flat cover. Every other image on
   the website MUST come from the frontiers-brand imagery pool
   (0014-design-systems FR-044), except the home page's picture, which is the
   previous website's, read from its snapshot (FR-013); a work other than a
