@@ -84,7 +84,11 @@ property fetches them are decisions outside this spec.
   A rendition that is not a text content document is a binary rendition.
 - **FR-014**: A binary rendition MUST NOT be tracked in Git in any Eidolon
   repository. A binary file that is an input rather than a generated output
-  — figure or cover artwork, a font — MAY be tracked.
+  — figure or cover artwork, a font — MAY be tracked. A book's cover mockup
+  composed from its approved cover art (0016-press-production FR-028) MAY
+  be tracked beside that art: its file name carries `.auto.` (FR-008), and
+  it MUST record the fingerprint of every input it is drawn from, so a check
+  can say without redrawing it whether it is current.
 - **FR-015**: A binary rendition MUST be reproducible from committed source
   and committed tooling at a recorded commit. The build MUST record that
   commit in the artifact's own metadata and in its delivery record.
@@ -209,7 +213,8 @@ property fetches them are decisions outside this spec.
 - A predecessor of the source kept in an older format: it sits in its
   own folder marked non-live and is never edited, per FR-007.
 - Cover artwork or a font inside a package: it is an input and may be
-  tracked; the cover or PDF built from it may not, per FR-014.
+  tracked; the cover or PDF built from it may not, per FR-014, except the
+  cover mockup with its recorded fingerprint.
 - A review copy shared before the publication decision: it is marked on
   its face as unpublished and uncorrected, per FR-018.
 - A work advanced to Review that its author is not ready to show: the
