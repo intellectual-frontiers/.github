@@ -190,12 +190,12 @@ requirement	mechanism	by	note
 0009-press FR-038	none	-	the imprint's name on public surfaces is not checked
 0009-press FR-039	none	-	promotion language about the imprint is editorial judgment
 0009-press FR-040	check	eidolon: eid check ontology	ifpriv:ImprintBookShape fails a book with no reader side or domain; eid check promotion names a missing statement in the brief (vault 0014-editorial-tools FR-065)
-0009-press FR-041	check	eidolon: eid check ontology	ifpriv:ConsequenceDomainShape fails a book's domain with no standing; experiment labeling is not checked
+0009-press FR-041	check	eidolon: eid check ontology	ifpriv:ConsequenceDomainShape fails a book's domain with no standing; test_imprint (eid test) proves an exploratory domain marks each book an experiment on the catalog and the website
 0009-press FR-042	none	-	both-sides statement is editorial judgment
 0009-press FR-043	none	-	what counts as evidence of Acquired Alpha is editorial judgment
 0009-press FR-044	none	-	vendor payments and disclosures are not recorded anywhere a check can read
 0009-press FR-045	none	-	tie to Native Alpha is editorial judgment
-0009-press FR-046	none	-	catalog grouping is not checked
+0009-press FR-046	check	eidolon: eid test	test_imprint: the catalog and the website's /books group by reader side, then domain, a book in several domains once
 0010-capital FR-001	none	-	rule of judgment; no check possible
 0010-capital FR-002	none	-	rule of judgment; no check possible
 0010-capital FR-003	none	-	rule of judgment; no check possible
