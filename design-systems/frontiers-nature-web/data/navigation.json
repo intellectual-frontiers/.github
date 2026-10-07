@@ -75,7 +75,7 @@
       "prefixes": ["/press", "/blogs"],
       "items": [
         { "to": "/press", "label": "Books & works" },
-        { "to": "/press/about", "label": "About IF Press" },
+        { "to": "/press/about", "label": "About Intellectual Frontiers Press" },
         { "to": "/blogs", "label": "Writing" },
         { "to": "/patent-summaries", "label": "Patent summaries" },
         { "to": "/press/ai-slop-check", "label": "AI Slop Check" },
@@ -124,7 +124,7 @@
     "/defensive-disclosures": { "label": "Defensive disclosures", "parent": "/ip" },
     "/submit-a-disclosure": { "label": "Submit a disclosure", "parent": "/ip" },
     "/press": { "label": "Press" },
-    "/press/about": { "label": "About IF Press", "parent": "/press" },
+    "/press/about": { "label": "About Intellectual Frontiers Press", "parent": "/press" },
     "/blogs": { "label": "Writing", "parent": "/press" },
     "/press/ai-slop-check": { "label": "AI Slop Check", "parent": "/press" },
     "/capital": { "label": "Capital" },

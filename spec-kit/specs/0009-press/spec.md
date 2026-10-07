@@ -3,7 +3,8 @@
 **Spec ID:** 0009-press
 **Status:** Draft
 
-**Input:** The behavioral rules Press's output follows: how a claim is
+**Input:** The behavioral rules Press's output follows: who the imprint
+publishes for and what puts a work on its list, how a claim is
 labeled, how Native Alpha gets made legible without being invented, how
 Press works with companies outside the parent, how publishing is read as
 evidence, how a Fieldbook ships as more than pages, and who owns the
@@ -35,6 +36,60 @@ ontology data and registers, not restated here.
   framework or an opinion under FR-001 and not an observable fact, until
   it has changed an actual decision, per 0003-intellectual-frontiers
   FR-016.
+
+## The imprint and its list
+
+- **FR-038**: The books Press publishes MUST be published under one
+  imprint. Its official name, internal short name, readership, slogan, and
+  thesis are ontology data (`ifcore:Imprint`), not restated here. A public
+  surface MUST name the imprint by its official name only. The internal
+  short name MAY be used in specs, records, and conversation inside the
+  firm, and MUST NOT appear on a public surface.
+- **FR-039**: The imprint's thesis MUST be labeled a framework under
+  FR-001, MUST name the work its argument is drawn from, per FR-029, and
+  MUST be read against the evidence ladder like any other publication,
+  per FR-014. Promotion MUST NOT describe the imprint as the leading,
+  definitive, or de facto imprint for its readership; a reader's
+  adoption of its terms or willingness to pay is evidence to record,
+  never a claim to make (0016-press-production FR-047).
+- **FR-040**: Every book Press publishes MUST name, in its promotion
+  brief (0016-press-production FR-046): the reader side it serves
+  (builder, buyer, or both); the decision to build, buy, or adopt that it
+  changes; who other than the reader bears the consequence of that
+  decision; and why the decision is costly to reverse. The reader side
+  and the consequence domain are also stated in the work's ontology
+  record.
+- **FR-041**: Each consequence domain the imprint publishes in MUST be
+  recorded in the ontology as core or exploratory. A book in an
+  exploratory domain is an experiment: it MUST still satisfy FR-040, MUST
+  be shown as an experiment wherever the list is presented, and its
+  reception MUST be read on the evidence ladder (FR-014) as evidence about
+  whether the imprint should enter that domain. A domain moves from
+  exploratory to core, or is dropped, only by a recorded Decision
+  (0008-decision-records).
+- **FR-042**: A book written for one reader side MUST state what the
+  other side will check: a builder-side book what a competent buyer will
+  ask to see as evidence, and a buyer-side book what a builder can
+  actually prove. A book written for both MUST state each.
+- **FR-043**: A buyer-side book's evaluation criteria MUST count a
+  seller's claim as Acquired Alpha (`ifcore:AcquiredAlpha`) only when the
+  evidence for it cost the seller something real and the buyer can check
+  it, per 0003-intellectual-frontiers FR-006. A demonstration, an analyst
+  placement, a badge, or expressed interest MUST NOT be presented as
+  evidence of Acquired Alpha.
+- **FR-044**: Press MUST NOT accept payment, sponsorship, placement, or
+  anything else of value from a vendor in a category a buyer-side book
+  evaluates, for that book or its promotion. Any relationship between the
+  author or the firm and a vendor a book names, including an IF Capital
+  or Studios company, MUST be disclosed in the book, and MUST NOT change
+  what the book concludes (FR-006).
+- **FR-045**: A builder-side book that addresses what to build MUST tie
+  its answer to the builder's Native Alpha as the ontology defines it
+  (`ifcore:NativeAlpha`), and MUST NOT redefine Native Alpha as knowing
+  what to build.
+- **FR-046**: Wherever the imprint's list is presented, its books MUST be
+  grouped by reader side and then by consequence domain, never by unit
+  (0021-works-and-presentations FR-014) and never by format alone.
 
 ## Voice
 
@@ -98,9 +153,10 @@ ontology data and registers, not restated here.
   Fieldbook teaches faithfully. It MUST NOT make the judgment, decision,
   or interpretation the book teaches a reader to make for themselves —
   legible and useful, never a substitute for the reader's own judgment.
-- **FR-018**: "AI Workforce" and "Labor as Code" MUST be used as defined,
-  consistent terms across every piece Press produces that uses them, the
-  same way "Native Alpha" already is.
+- **FR-018**: "AI Workforce", "Labor as Code", "Consequential Software",
+  and "Acquired Alpha" MUST be used as defined, consistent terms across
+  every piece Press produces that uses them, the same way "Native Alpha"
+  already is.
 
 ## Major works beyond books
 
@@ -210,6 +266,19 @@ ontology data and registers, not restated here.
 
 ## Edge cases
 
+- A book that serves builders and buyers in a domain the ontology records
+  as exploratory: it stays under the imprint as an experiment, satisfies
+  FR-040 and FR-042 like any other book, and is shown as an experiment,
+  per FR-041.
+- A buyer-side book evaluating a category in which an IF Capital company
+  competes: the relationship is disclosed in the book and does not change
+  its conclusion, per FR-044 and FR-006.
+- A vendor offers to sponsor the launch of a buyer-side book that
+  evaluates its category: the offer is refused, per FR-044.
+- A reader writes that the imprint is the best source for buyers of
+  consequential software: the remark is recorded as reception on the
+  evidence ladder and is not repeated in promotion as a claim, per FR-039.
+
 - A piece that mixes a measured result with the author's reading of it:
   each claim carries its own kind, so the result is an observable fact
   and the reading an opinion or a framework, per FR-001.
@@ -232,6 +301,10 @@ ontology data and registers, not restated here.
 
 ## Assumptions
 
+- Each book's reader side, decision, consequence bearer, and reversal
+  cost can be stated in a sentence each, so FR-040 can be met without a
+  new record kind.
+
 - Each claim in a piece can be assigned exactly one of the four claim
   kinds FR-001 names.
 - The ontology holds the Press levels, the claim kinds, and the evidence
@@ -251,8 +324,22 @@ ontology data and registers, not restated here.
   complete and the company owns its own voice.
 - **OQ-3**: No rule states whether FR-005 or FR-006 governs Press's help
   to a company that is both a Studios company and an IF Capital company.
+- **OQ-4**: Whether "Acquired Alpha" needs trademark clearance, as "Native
+  Alpha" has, is not decided; until it is, the term carries no mark.
 
 ## Key entities
+
+- **The imprint** — the official name under which Press publishes its
+  books, with an internal short name, one readership, a slogan, and a
+  thesis labeled a framework.
+- **A reader side** — builder, buyer, or both: whom a book serves in a
+  decision to build, buy, or adopt.
+- **A consequence domain** — a field in which those decisions carry
+  consequences for people other than the reader; core or exploratory.
+- **Consequential Software** and **Acquired Alpha** — defined terms naming
+  the software the imprint's readership builds and buys, and the advantage
+  a buyer gains by buying what another party has built, counted only on
+  evidence that cost the seller something.
 
 - **A claim kind** — observable fact, opinion, framework, or illustration;
   every claim Press publishes carries one.
@@ -296,6 +383,16 @@ ontology data and registers, not restated here.
   and no section is named for a unit.
 - **SC-012**: Every correction to a printed article appears in the next
   printed issue.
+
+- **SC-013**: Every book names its reader side, the decision it
+  changes, who bears the consequence, and why the decision is costly to
+  reverse; none is listed without them.
+- **SC-014**: Every book in an exploratory domain is shown as an
+  experiment, and no domain changes standing without a recorded Decision.
+- **SC-015**: No buyer-side book or its promotion was paid for, sponsored,
+  or placed by a vendor in the category it evaluates.
+- **SC-016**: No promotion calls the imprint the leading, definitive, or
+  de facto imprint for its readership.
 
 ## Review & acceptance checklist
 
