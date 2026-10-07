@@ -84,7 +84,7 @@ make the advantage stronger?). An advantage counts only once it has changed
 a real decision, and the evidence for it must have cost someone something.
 
 The work above is made by five units: **Research & IP** and **Studios**
-discover where the advantage is; **Press** (IF Publications) makes it
+discover where the advantage is; **Press** (Intellectual Frontiers Press) makes it
 legible; **Capital** funds what the evidence supports; and **Network** finds
 the people who can carry it. Everything we do is specified, typed in an
 ontology, and only then made: browse the

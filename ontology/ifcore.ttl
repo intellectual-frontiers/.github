@@ -610,8 +610,8 @@ ifcore:ResearchAndIp a ifcore:Unit ;
     ifcore:hasAudience ifcore:Public .
 ifcore:Press a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Press"@en ;
-    schema:alternateName "Intellectual Frontiers Publications"@en, "IF Publications"@en ;
-    rdfs:comment "The formal name governs specs and the ontology. The alternate name is for public-facing contexts (a website, a byline) where 'Press' risks being read as a press-and-media destination rather than the unit that creates books, spoken works, and research reports (0003-intellectual-frontiers FR-013)."@en ;
+    skos:hiddenLabel "IF Press"@en ;
+    rdfs:comment "The formal name is also the official public name, used on every public surface; the unit declares no public alternate name (0003-intellectual-frontiers FR-013; 0009-press FR-038). IF Press is the internal short name, for specs, records and conversation inside the firm, and never stands in for the official name in public."@en ;
     ifcore:job "Understand markets and explain the truth clearly"@en ;
     ifcore:question "What do we understand that is worth making clearer, more useful, and more durable?"@en ;
     ifcore:hasAudience ifcore:Public .
@@ -1043,6 +1043,112 @@ ifcore:LaborAsCode a owl:Class ; rdfs:label "Labor as Code"@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:ChasingNativeAlphaBook schema:publisher ifcore:Press .
+
+# ───────────────────────── The imprint and its list (0009-press FR-038 – FR-046) ─────────────────────────
+
+ifcore:Imprint a owl:Class ; rdfs:subClassOf schema:Brand ; rdfs:label "Imprint"@en ;
+    rdfs:comment "The name under which a unit publishes its books, with one readership, a slogan, and a thesis (0009-press FR-038). Its schema:name is its official name, the only one a public surface uses; skos:hiddenLabel holds an internal short name."@en .
+ifcore:imprintOf a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range ifcore:Unit .
+ifcore:imprintThesis a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range schema:Claim ;
+    rdfs:comment "The argument the imprint's list is built on, a claim labeled by kind (0009-press FR-039)."@en .
+ifcore:Readership a owl:Class ; rdfs:subClassOf schema:Audience ; rdfs:label "Readership"@en ;
+    rdfs:comment "The readers an imprint publishes for, related to it by schema:audience. Distinct from ifcore:Audience, which says who may see a fact, not whom a work is written for."@en .
+
+ifcore:IFPress a ifcore:Imprint ;
+    rdfs:label "Intellectual Frontiers Press"@en ;
+    schema:name "Intellectual Frontiers Press"@en ;
+    skos:hiddenLabel "IF Press"@en ;
+    ifcore:imprintOf ifcore:Press ;
+    schema:slogan "For builders and buyers of consequential software."@en ;
+    schema:audience ifcore:BuildersAndBuyersOfConsequentialSoftware ;
+    ifcore:imprintThesis ifcore:IFPressThesis ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BuildersAndBuyersOfConsequentialSoftware a ifcore:Readership ;
+    rdfs:label "Builders and buyers of consequential software"@en ;
+    schema:audienceType "The people who decide what consequential software to build and the people who decide what consequential software to buy or adopt."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:IFPressThesis a schema:Claim ;
+    rdfs:label "Intellectual Frontiers Press thesis"@en ;
+    schema:text "AI has made building software cheaper. It has not made it cheaper to know what is worth building, or to judge which of many offerings deserves a purchase whose consequences fall on other people. Builders find what to build in their Native Alpha; buyers seek Acquired Alpha, and count it only when the seller's proof cost the seller something. Intellectual Frontiers Press publishes for the people who carry those two decisions."@en ;
+    ifcore:claimKind ifcore:Framework ;
+    prov:wasDerivedFrom ifcore:ChasingNativeAlpha ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ConsequentialSoftware a owl:Class ; rdfs:label "Consequential Software"@en ;
+    skos:definition "Software, or a product or service that software runs, where a wrong decision to build, buy, or adopt it is costly or slow to reverse and its cost falls on people other than the one who decides: patients, warfighters, citizens, students, customers, or staff (0009-press FR-018)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AcquiredAlpha a owl:Class ; rdfs:label "Acquired Alpha"@en ;
+    skos:definition "An advantage a buyer gains by buying, adopting, or hiring what another party has built, strong enough to change a real decision. It counts only when the seller's evidence for it cost the seller something real (money, time, access, data, reputation, or a changed decision) and the buyer can check that evidence without relying on the seller's word (0003-intellectual-frontiers FR-006; 0009-press FR-018, FR-043)."@en ;
+    skos:scopeNote "The buyer's counterpart to ifcore:NativeAlpha. Native Alpha is carried by what the subject already has; an advantage that needs a capability the subject must acquire is not Native Alpha (0003-intellectual-frontiers FR-015), and when a buyer gains it by buying, adopting, or hiring what another party has built, it is Acquired Alpha. It means buying products, services, and capabilities, not buying a company. A demonstration, an analyst placement, a badge, or expressed interest is not evidence of Acquired Alpha."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ReaderSideScheme a skos:ConceptScheme ; rdfs:label "Reader side"@en ;
+    rdfs:comment "Whom a book serves in a decision to build, buy, or adopt consequential software (0009-press FR-040, FR-042). A book is exactly one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BuilderSide a skos:Concept ; skos:inScheme ifcore:ReaderSideScheme ; skos:prefLabel "builders"@en ;
+    skos:definition "Readers who decide what to build and build it: founders, engineers, product and technology leaders, manufacturers."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BuyerSide a skos:Concept ; skos:inScheme ifcore:ReaderSideScheme ; skos:prefLabel "buyers"@en ;
+    skos:definition "Readers who decide what to buy, adopt, fund, or hire, and live with it: executives, boards, investors, procurement, clinical and program owners."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BuilderAndBuyerSide a skos:Concept ; skos:inScheme ifcore:ReaderSideScheme ; skos:prefLabel "builders and buyers"@en ;
+    skos:definition "A book written for both sides of one decision, stating what each will ask of the other."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:readerSide a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain schema:CreativeWork ; rdfs:range skos:Concept ;
+    rdfs:comment "The one reader side a book serves, a concept of ifcore:ReaderSideScheme (0009-press FR-040)."@en .
+
+ifcore:DomainStandingScheme a skos:ConceptScheme ; rdfs:label "Domain standing"@en ;
+    rdfs:comment "Whether the imprint has committed to a consequence domain or is testing it (0009-press FR-041). Changed only by a recorded Decision."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CoreDomain a skos:Concept ; skos:inScheme ifcore:DomainStandingScheme ; skos:prefLabel "core"@en ;
+    skos:definition "A domain the imprint has committed to publishing in."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ExploratoryDomain a skos:Concept ; skos:inScheme ifcore:DomainStandingScheme ; skos:prefLabel "exploratory"@en ;
+    skos:definition "A domain the imprint is testing; each book in it is an experiment whose reception is read as evidence about entering the domain."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:domainStanding a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:range skos:Concept ;
+    rdfs:comment "A consequence domain's standing, a concept of ifcore:DomainStandingScheme (0009-press FR-041)."@en .
+
+ifcore:ConsequenceDomainScheme a skos:ConceptScheme ; rdfs:label "Consequence domain"@en ;
+    rdfs:comment "A field in which decisions to build, buy, or adopt software carry consequences for people other than the reader (0009-press FR-040, FR-041, FR-046)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HealthcareDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "healthcare and medical technology"@en ;
+    ifcore:domainStanding ifcore:CoreDomain ;
+    skos:definition "Care delivery, payment, and the devices and systems clinicians and patients depend on."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DefenseDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "defense and national security"@en ;
+    ifcore:domainStanding ifcore:CoreDomain ;
+    skos:definition "Systems warfighters and the programs that field them depend on."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PublicSectorDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "government and public buyers"@en ;
+    ifcore:domainStanding ifcore:CoreDomain ;
+    skos:definition "Public agencies as buyers, and the firms that sell to them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EnterpriseSoftwareDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "enterprise and AI-native software"@en ;
+    ifcore:domainStanding ifcore:CoreDomain ;
+    skos:definition "Business software and AI-native systems, and the technology leadership that decides what to build, buy, and hire."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AutomotiveRetailDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "automotive retail and service"@en ;
+    ifcore:domainStanding ifcore:ExploratoryDomain ;
+    skos:definition "Dealership operations and the systems that run them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchFundingDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "research funding and review"@en ;
+    ifcore:domainStanding ifcore:ExploratoryDomain ;
+    skos:definition "Research programs, the funders who choose among them, and the review that decides."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EducationDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "schools and education"@en ;
+    ifcore:domainStanding ifcore:ExploratoryDomain ;
+    skos:definition "Schools, the systems they run on, and the people who build and choose them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PublishingDomain a skos:Concept ; skos:inScheme ifcore:ConsequenceDomainScheme ; skos:prefLabel "publishing"@en ;
+    ifcore:domainStanding ifcore:ExploratoryDomain ;
+    skos:definition "Books and the editorial systems that make them."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:consequenceDomain a owl:ObjectProperty ; rdfs:domain schema:CreativeWork ; rdfs:range skos:Concept ;
+    rdfs:comment "The consequence domain a book addresses, a concept of ifcore:ConsequenceDomainScheme (0009-press FR-040)."@en .
+
+ifcore:ChasingNativeAlphaBook ifcore:readerSide ifcore:BuilderAndBuyerSide ;
+    ifcore:consequenceDomain ifcore:EnterpriseSoftwareDomain .
 
 # ───────────────────────── Owned channels (0009-press FR-028) ─────────────────────────
 

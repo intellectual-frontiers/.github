@@ -132,7 +132,8 @@ is not stated here.
   rendered pages.
 - **FR-019**: Jacket copy MUST follow the documented jacket pattern. Its
   category line MUST be derived from the book's real subject headings, never
-  independently authored.
+  independently authored. Its audience line MUST name readers on the
+  reader side the book's brief states (0009-press FR-040).
 - **FR-020**: Every book Press publishes MUST credit its author as the
   author record states and MUST carry the imprint's publisher line, never the
   author's own name in its place. A series kicker MUST be used only for the
@@ -306,7 +307,8 @@ is not stated here.
   headings a reader would use, the surfaces where the work will and will not
   be described, comparables or a note that there is no basis yet, the
   decisions a person still owes, and who checks each category and surface
-  live. A book keeps this as its distribution metadata; every other work
+  live. A book's brief MUST also carry the four statements 0009-press
+  FR-040 requires. A book keeps this as its distribution metadata; every other work
   keeps it beside its source. The brief is never a second copy of the work.
   The brief MUST state how the work will be found and by whom. Promotion
   MUST be deliberate and in good taste: no spam, manufactured urgency, or
