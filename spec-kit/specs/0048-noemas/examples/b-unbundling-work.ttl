@@ -1,0 +1,121 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/noema/unbundling-work#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example B: Unbundling Work as a research agenda (0048-noemas).
+# Illustrative only. A research agenda contains Noemas of several subtypes (a hypothesis, research questions, a theory and a
+# methodology); each is its own Noema, related to the others by dependsOn, buildsOn and refines. The abstract acceptance-testing
+# methodology is a Noema; the workflow that runs it, the test harness and an AI Workforce solution are Ergons, tied to it by
+# operationalizes, implements and informsDesignOf. The questions it answers:
+#   - What must be true for the agenda to hold?             dependsOn between the ideas, and the assumptions
+#   - Which ideas are still questions?                      the research-question subtype, with no accepted assessment: proposed
+#   - What carries the methodology out today?               operationalizes, from a workflow that is an Ergon, never the Noema itself
+
+ex:UnbundlingAgenda a ifcore:IntellectualConstruct ; rdfs:label "Unbundling work"@en ; dcterms:identifier "unbundling-work" ;
+    dcterms:type ifcore:ResearchAgendaType, ifcore:FrameworkType ;
+    dcterms:hasPart ex:Decomposable, ex:LiabilityQ, ex:CredentialsQ, ex:AIExecutes, ex:AcceptanceTesting, ex:OrgEconomics ; ifcore:hasAudience ifcore:Public .
+ex:Decomposable a ifcore:IntellectualConstruct ; rdfs:label "Professional work decomposes into testable capabilities"@en ; dcterms:identifier "decomposable" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+ex:LiabilityQ a ifcore:IntellectualConstruct ; rdfs:label "Who is liable for a decomposed task"@en ; dcterms:identifier "liability-question" ;
+    dcterms:type ifcore:ResearchQuestionType ; ifcore:hasAudience ifcore:Public .
+ex:CredentialsQ a ifcore:IntellectualConstruct ; rdfs:label "What a credential certifies when work is unbundled"@en ; dcterms:identifier "credentials-question" ;
+    dcterms:type ifcore:ResearchQuestionType ; ifcore:hasAudience ifcore:Public .
+ex:AIExecutes a ifcore:IntellectualConstruct ; rdfs:label "AI can execute a decomposed capability to an acceptance test"@en ; dcterms:identifier "ai-executes" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+ex:AcceptanceTesting a ifcore:IntellectualConstruct ; rdfs:label "Acceptance testing of delegated work"@en ; dcterms:identifier "acceptance-testing" ;
+    dcterms:type ifcore:MethodologyType ; ifcore:hasAudience ifcore:Public .
+ex:OrgEconomics a ifcore:IntellectualConstruct ; rdfs:label "Organizational economics of unbundling"@en ; dcterms:identifier "org-economics" ;
+    dcterms:type ifcore:TheoryType ; ifcore:hasAudience ifcore:Public .
+
+ex:ClaimDecompose a schema:Claim ; schema:text "Most professional work can be split into capabilities that are executed, tested and governed on their own."@en ; ifcore:hasAudience ifcore:Public .
+ex:ClaimAIExecutes a schema:Claim ; schema:text "An AI agent can carry out a decomposed capability so that it passes an independent acceptance test."@en ; ifcore:hasAudience ifcore:Public .
+
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+ex:Researcher a ifcore:Person ; dcterms:identifier "researcher" ; ifcore:hasAudience ifcore:Public .
+ex:LawFirmCo a ifcore:Company ; dcterms:identifier "law-firm-co" ; ifcore:hasAudience ifcore:Public .
+ex:TestHarness a schema:SoftwareApplication ; dcterms:identifier "test-harness" ; ifcore:hasAudience ifcore:Public .
+ex:DelegationWorkflow a ifcore:Workflow ; dcterms:identifier "delegation-workflow" ; ifcore:hasAudience ifcore:Public .
+ex:ContractReviewWorkforce a ifcore:AIWorkforce ; dcterms:identifier "contract-review-workforce" ; ifcore:hasAudience ifcore:Public .
+ex:Pilot a prov:Activity ; rdfs:label "A pilot delegating contract review to an agent"@en ; ifcore:hasAudience ifcore:Public .
+ex:PilotReport a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/unbundling/pilot"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+
+ex:AgendaNoema a ifcore:Noema ; ifcore:reflects ex:UnbundlingAgenda ;
+    skos:definition "An organized program of inquiry into whether professional work can be taken apart into independently executable, testable and governable capabilities."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:DecomposableNoema a ifcore:Noema ; ifcore:reflects ex:Decomposable ;
+    skos:definition "Professional work can be decomposed into capabilities that are testable on their own."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:LiabilityNoema a ifcore:Noema ; ifcore:reflects ex:LiabilityQ ;
+    skos:definition "When a task is carried out by a part that is not the credentialed professional, who answers for its result?"@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:CredentialsNoema a ifcore:Noema ; ifcore:reflects ex:CredentialsQ ;
+    skos:definition "What does a credential certify about work that has been unbundled?"@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:AIExecutesNoema a ifcore:Noema ; ifcore:reflects ex:AIExecutes ;
+    skos:definition "An AI agent can execute a decomposed capability well enough to pass an independent acceptance test."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:AcceptanceTestingNoema a ifcore:Noema ; ifcore:reflects ex:AcceptanceTesting ;
+    skos:definition "A method for accepting delegated work by testing its result against criteria fixed before the work starts."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:OrgEconomicsNoema a ifcore:Noema ; ifcore:reflects ex:OrgEconomics ;
+    skos:definition "A theory of how the cost of coordinating, testing and insuring tasks decides whether work is bought as a bundle or in parts."@en ;
+    prov:wasAttributedTo ex:Researcher ; ifcore:hasAudience ifcore:Public .
+
+ex:S1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:Decomposable ; ifcore:relationTo ex:ClaimDecompose ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:S2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:AIExecutes ; ifcore:relationTo ex:ClaimAIExecutes ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+
+# The agenda's ideas depend on and build on one another.
+ex:D1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:AIExecutes ; ifcore:relationTo ex:Decomposable ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:D2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:BuildsOn ; ifcore:relationFrom ex:AcceptanceTesting ; ifcore:relationTo ex:Decomposable ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:D3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Refines ; ifcore:relationFrom ex:OrgEconomics ; ifcore:relationTo ex:Decomposable ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:D4 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Explains ; ifcore:relationFrom ex:OrgEconomics ; ifcore:relationTo ex:Pilot ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:T1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Tests ; ifcore:relationFrom ex:Pilot ; ifcore:relationTo ex:AIExecutes ;
+    schema:validFrom "2026-05-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-05-12"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:P1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:Pilot ; ifcore:relationTo ex:AIExecutes ;
+    schema:validFrom "2026-05-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-05-12"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:Assume1 a ifcore:Assertion ; schema:about ex:AIExecutes ; ifcore:aspect ifcore:AssumptionAspect ;
+    dcterms:description "The acceptance criteria can be written before the work starts and without the agent's help."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Falsifier1 a ifcore:Assertion ; schema:about ex:Decomposable ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "A class of work whose parts cannot be tested apart from the whole would weaken it."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Falsifier2 a ifcore:Assertion ; schema:about ex:AIExecutes ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "A pass rate that does not rise with clearer criteria would weaken it."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:Design1 a ifcore:Assertion ; schema:about ex:AIExecutes ; ifcore:aspect ifcore:ExperimentalDesignAspect ;
+    dcterms:description "Delegate the same contract review to an agent and to a junior lawyer, and score both against one rubric."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:OpenQ1 a ifcore:Assertion ; schema:about ex:LiabilityQ ; ifcore:aspect ifcore:OpenQuestionAspect ;
+    dcterms:description "Whether a malpractice insurer would cover work delegated in parts is not known."@en ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+
+# Ergons that carry the ideas out. The abstract method is a Noema; the workflow and the tool are made things.
+ex:Op1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operationalizes ; ifcore:relationFrom ex:DelegationWorkflow ; ifcore:relationTo ex:AcceptanceTesting ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-05-12"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Op2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:TestHarness ; ifcore:relationTo ex:AcceptanceTesting ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:Op3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:InformsDesignOf ; ifcore:relationFrom ex:AIExecutes ; ifcore:relationTo ex:ContractReviewWorkforce ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:Op4 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:GeneratesEvidenceFor ; ifcore:relationFrom ex:ContractReviewWorkforce ; ifcore:relationTo ex:AIExecutes ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:Eng1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Researches ; ifcore:relationFrom ex:LawFirmCo ; ifcore:relationTo ex:UnbundlingAgenda ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:Eng2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Proposes ; ifcore:relationFrom ex:Researcher ; ifcore:relationTo ex:Decomposable ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .
+ex:Eng3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:ProvidesEvidenceFor ; ifcore:relationFrom ex:LawFirmCo ; ifcore:relationTo ex:AIExecutes ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotReport ; ifcore:hasAudience ifcore:Public .

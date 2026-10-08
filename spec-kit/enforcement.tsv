@@ -1174,3 +1174,79 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0046-distribution-platform FR-034	none	-	the platform is not built yet
 0046-distribution-platform FR-035	none	-	the platform is not built yet
 0046-distribution-platform FR-036	none	-	the application is not built yet
+0047-digital-reflections FR-001	check	.github: agora check ontology	fails a reflection typed as more than one kind or none, and any two kinds not declared disjoint
+0047-digital-reflections FR-002	check	.github: agora check ontology	fails a reflection that does not name exactly one subject by IRI and a relationship end that is a literal; matching by name elsewhere is not tested
+0047-digital-reflections FR-003	none	-	a permission and a prohibition on requiring fidelity; nothing to test
+0047-digital-reflections FR-004	check	.github: agora check ontology	fails a reflection with no audience; that stewardship is not ownership of the subject is judgment
+0047-digital-reflections FR-005	none	-	the capabilities are carried by terms the ontology already has and by Git; no check that a record uses them
+0047-digital-reflections FR-006	check	.github: agora check ontology	warns, never fails (FR-031), a reflection typed Eidolon whose subject resolves to another kind; agora test covers the rules
+0047-digital-reflections FR-007	check	.github: agora check ontology	warns, never fails (FR-031), a reflection typed Ergon whose subject resolves to another kind; agora test covers the rules
+0047-digital-reflections FR-008	check	.github: agora check ontology	fails an Ergon with no ifcore:purpose; naming whom it benefits and supporting a produced outcome with evidence are not tested
+0047-digital-reflections FR-009	check	.github: agora test	tests that a run is a prov:Activity of kind other, related by executes, and that an agent instance has no Ergon; a record made of an instance is reported by agora check ontology
+0047-digital-reflections FR-010	check	.github: agora test	tests that no rule classifies by physical, digital, human-made or natural; which criterion decides is judgment, stated in each rule's reason, which agora check ontology requires
+0047-digital-reflections FR-011	check	.github: agora check ontology	fails a rule that names no or several classes, no or an unknown kind, a class another rule names, or no reason or audience
+0047-digital-reflections FR-012	check	.github: agora test	tests the most specific rule deciding, disagreement and no rule giving undetermined; agora check ontology warns on a reflection of an undetermined subject
+0047-digital-reflections FR-013	check	.github: agora test	tests every subject class of the initial table against its kind, ideas included
+0047-digital-reflections FR-014	check	.github: agora test	tests a company with a creator is an Eidolon
+0047-digital-reflections FR-015	check	.github: agora test	tests a unit and its model, an agent design and its runtime, and a conflicting double type; agora check ontology checks the worked examples
+0047-digital-reflections FR-016	check	.github: agora check ontology	fails a relationship without exactly one type of the scheme, one start and one end by IRI
+0047-digital-reflections FR-017	check	.github: agora check ontology	fails a missing required type, a type with no family or no kinds, and an end whose resolved kind the type does not allow
+0047-digital-reflections FR-018	check	.github: agora check ontology	fails any hierarchy between relationship types; agora test shows the worked examples' queries infer no relationship from another
+0047-digital-reflections FR-019	check	.github: agora check ontology	fails a relationship with no label, no source unless a hypothesis or unknown, or a hypothesis or inference with no confidence
+0047-digital-reflections FR-020	check	.github: agora check ontology	fails a relationship that ends before it starts; that an ended or changed relationship is kept, not deleted, is held by Git and not tested
+0047-digital-reflections FR-021	check	.github: agora check ontology	fails a relationship whose end is a reflection record rather than a subject
+0047-digital-reflections FR-022	check	.github: agora check ontology	fails an assertion without exactly one label of the closed set or without a subject
+0047-digital-reflections FR-023	check	.github: agora check ontology	fails an observation or evidence with no source
+0047-digital-reflections FR-024	check	.github: agora check ontology	fails verification by anything that is not a person, with no date, or on a hypothesis, inference, recommendation or unknown
+0047-digital-reflections FR-025	check	.github: agora check ontology	fails a recommendation derived from nothing; that its sources are the right ones is judgment
+0047-digital-reflections FR-026	none	-	sensitivity is judgment (0001-eidolon-architecture FR-016); nothing tests an assertion for it
+0047-digital-reflections FR-027	check	.github: agora test	tests that abstract classes resolve to noema and instruments, claims and events to other; agora check ontology warns on a reflection of a subject of another kind
+0047-digital-reflections FR-028	check	.github: agora test	tests that a right, an invention and a product are separate kinds in the worked examples and that ownership is not derived from inventorship
+0047-digital-reflections FR-029	none	-	retired; 0048-noemas governs the third kind
+0047-digital-reflections FR-030	check	.github: agora test	tests that the class stays a subclass of ifcore:DigitalReflection and a legacy record stays served
+0047-digital-reflections FR-031	check	.github: agora check ontology	reports a reflection whose subject resolves to another kind, other or undetermined as a warning, and no tool rewrites; agora test proves it neither fails nor changes a file
+0047-digital-reflections FR-032	check	.github: agora check ontology	fails a replaced record whose replacement reflects another subject or is not derived from it; a register entry for a subject no person can decide is judgment
+0047-digital-reflections FR-033	none	-	what a commit contains is not checked
+0047-digital-reflections FR-034	check	.github: agora test	tests that the legacy and the new record are both found by ifcore:DigitalReflection, and the legacy by the first kind
+0047-digital-reflections FR-035	none	-	prose naming is judgment; no check reads prose for a product called an Eidolon
+0047-digital-reflections FR-036	check	.github: agora test	tests each failure this requirement lists; agora check ontology runs the checks
+0047-digital-reflections FR-037	check	.github: agora test	tests that an idea kept in a document stays a Noema, that the document is given no kind and that a record of it is reported; that a record is not its subject is otherwise judgment
+0047-digital-reflections FR-038	check	.github: agora check ontology	fails a state other than candidate with no reviewer, a reviewer who is not a person or has no date, and a state outside the scheme; that an agent's work is attributed to it is not tested
+0048-noemas FR-001	check	.github: agora check ontology	fails a Noema record that does not state the idea; that the subject is abstract is the rules' work, and agora test covers them
+0048-noemas FR-002	check	.github: agora test	tests that the Noema class declares no property of its own and that the shared properties sit on the parent
+0048-noemas FR-003	check	.github: agora test	tests that an idea in a document stays a Noema and the document is given no kind; whether a note is the idea or its document is OQ-3
+0048-noemas FR-004	none	-	what a record can answer is a design intent; FR-017 and FR-026 are the mechanisms and are enforced there
+0048-noemas FR-005	check	.github: agora check ontology	fails an intellectual construct with no subtype or a subtype outside the scheme; agora test covers the thirteen and an added one
+0048-noemas FR-006	none	-	containment is by dcterms:hasPart and nothing tests it
+0048-noemas FR-007	check	.github: agora check ontology	fails operationalizes, implements and informsDesignOf between kinds the type does not allow, so a methodology cannot be an Ergon and a workflow cannot be a Noema
+0048-noemas FR-008	check	.github: agora check ontology	fails a reflection of a claim, a hypothesis or finding that states none, and a states relationship to anything but a claim of kind other
+0048-noemas FR-009	check	.github: agora test	tests that a claim, an assertion and a Noema are three kinds of thing and a claim may be stated by two ideas
+0048-noemas FR-010	check	.github: agora check ontology	fails an assessment about a claim, which is a subject of kind other; that a claim carries no review state or evidence of its own is not tested
+0048-noemas FR-011	check	.github: agora check ontology	fails a scheme missing any of the six states
+0048-noemas FR-012	check	.github: agora check ontology	fails an assessment without exactly one state, a date or a Noema subject; agora test covers the current state and that a candidate changes nothing
+0048-noemas FR-013	check	.github: agora check ontology	fails an assessed state outside the epistemic scheme, so no lifecycle stage can be one; agora test shows the two share no concept
+0048-noemas FR-014	check	.github: agora check ontology	fails a proven, true, verified or lifecycle concept in the epistemic scheme
+0048-noemas FR-015	check	.github: agora check ontology	fails a supported, contested or falsified assessment with no source and a superseded one with no successor
+0048-noemas FR-016	check	.github: agora test	tests that support and contradiction coexist as separate sourced relationships and that nothing nets them off
+0048-noemas FR-017	check	.github: agora check ontology	fails an aspect outside the scheme and warns on a hypothesis with no falsification criterion; that each aspect says what it should is judgment
+0048-noemas FR-018	check	.github: agora check ontology	fails a revision or retraction derived from nothing; that the earlier assertion stays is tested by agora test
+0048-noemas FR-019	none	-	a deletion leaves nothing for a check to read; Git holds the history, and agora test shows a falsified Noema keeping what it had
+0048-noemas FR-020	check	.github: agora check ontology	fails an agent named as reviewer and a non-candidate with no reviewer; agora test covers that only accepted records count
+0048-noemas FR-021	check	.github: agora check ontology	fails a missing required relationship type
+0048-noemas FR-022	review	0019-controlled-vocabulary FR-007	vocabulary review flags a type that duplicates an established one
+0048-noemas FR-023	check	.github: agora test	tests that engagement types are in their own family, apart from the legal-right family, and that none leads to ownership
+0048-noemas FR-024	check	.github: agora check ontology	fails a relationship between ends whose kinds the type does not allow, including owns, assignsTo and licensesTo at a Noema
+0048-noemas FR-025	check	.github: agora test	tests that the research stage is derived, reached only by accepted records, and never required
+0048-noemas FR-026	check	.github: agora check ontology	fails an assertion whose aspect is outside the scheme; which commercial parts an idea has is its author's
+0048-noemas FR-027	check	.github: agora check ontology	fails demand evidence naming no Eidolon, naming a non-Eidolon or labelled other than observation or evidence, and a commercial hypothesis labelled as evidence
+0048-noemas FR-028	check	.github: agora test	tests that the aspect scheme has no citation, novelty or patentability aspect and that a guess does not reach the validation stage
+0048-noemas FR-029	check	.github: agora test	tests that patent families, rights and trademarks resolve to other and the invention to a Noema
+0048-noemas FR-030	check	.github: agora test	tests that the ontology holds no relationship from which these could be inferred and that the examples infer none
+0048-noemas FR-031	none	-	agent conduct; FR-020's review rules are what is checked
+0048-noemas FR-032	check	.github: agora test	tests reflection list and reflection show, and that they change nothing; agora check commands checks that the registry declares them
+0048-noemas FR-033	check	.github: agora check ontology	warns on two Noema subjects with one normalized label; agora test covers that a tool merges nothing
+0048-noemas FR-034	check	.github: agora test	tests the reasons a Noema is flagged for another look
+0048-noemas FR-035	check	.github: agora test	tests that the Eidolon and Ergon rules, records and checks behave as before and that the audit lists and changes nothing
+0048-noemas FR-036	check	.github: agora check ontology	warns, never fails, on a reflection whose kind disagrees with its subject's; agora test proves a check changes no file
+0048-noemas FR-037	check	.github: agora test	tests a fourth kind added in the ontology alone
+0048-noemas FR-038	check	.github: agora test	tests each failure this requirement lists; agora check ontology runs the checks

@@ -1,9 +1,31 @@
 [#what-it-is]
 == What an Eidolon is
 
-An *Eidolon* is a working digital reflection of a person, company, customer, product, or system. It is not a replica. It is enough
-grounded evidence for an AI to reason about the real thing accurately and flexibly. The concept is the founder's own authored
-research; the system in this repository is the company's first working instance of it.
+A *digital reflection* is a maintained, AI-readable record of one subject: its identity, context, relationships, evidence, provenance,
+history and lifecycle. It is not a replica and not necessarily a digital twin. It is enough grounded evidence for an AI to reason about
+the real subject accurately and flexibly. There are three kinds, and they are not interchangeable (specs 0047 and 0048):
+
+[cols="1,2,2"]
+|===
+|Kind |Its subject |Its central question
+
+|*Eidolon*
+|An independently identifiable real-world entity: a person, a company, an institution, a facility, an identifiable physical asset.
+|What exists?
+
+|*Ergon*
+|A deliberately created operational solution: a product, a service, a system, a workflow, an AI Workforce solution.
+|What is built?
+
+|*Noema*
+|An abstract intellectual construct: a concept, a hypothesis, a theory, a principle, a framework, a methodology, a research question.
+|What is conceived?
+|===
+
+The concept of the Eidolon is the founder's own authored research; the system in this repository is the company's first working
+instance of it, and the "Eidolon" of the next sections is that system, which holds reflections of all three kinds. The Ergon and the Noema
+are its counterparts. A reflection is always the record, never its subject: a Noema kept in a document is still a Noema, and an
+Eidolon of a person is not the person's profile page.
 
 === The problem
 
@@ -51,5 +73,98 @@ person would, and whether a person auditing it can find out why. How elegant the
 role) and a fact may belong to several; clearance for one does not imply another.
 * *A hard line between what we assert and what we merely watch.* A patent's status belongs to the patent office, not to our own
 saying-so. We hold a _reference_ with a verification date and cadence, not a copy of the value.
+
+[#two-kinds]
+=== Three kinds of reflection
+
+An Eidolon helps answer: what is this entity, what do we know about it and how do we know, what relationships does it have, what has
+changed, what matters now. An Ergon helps answer: why was this made, what problem is it for, how does it work, what does it depend on,
+who builds, owns, operates, buys and uses it, what does it promise, what shows that it works. A Noema helps answer: what is the idea,
+what motivated it, what does it assume, what supports and contradicts it, what would falsify it, what follows if it is correct, what
+could be built or tried from it, and how has our understanding changed. All three carry the same things: a stable identifier, types,
+assertions with sources and a label (observation, hypothesis, evidence, inference, recommendation or unknown), relationships with their
+dates, an audience, a review state and a steward of the record. A steward of a record does not thereby own, or have authority over,
+its subject.
+
+*To decide which a new subject is*, ask four questions of the subject, never of the record, and never "is it physical, digital,
+human-made or natural?", which decides nothing:
+
+[cols="1,2,2,2"]
+|===
+|Question |Eidolon |Ergon |Noema
+
+|Identity
+|An individual in the world with its own identity.
+|A design, a method or a kind of thing, with versions.
+|An idea, defined by what it means.
+
+|Purpose
+|Not made for a purpose of the record's owner.
+|Deliberately designed or assembled to accomplish one.
+|Conceived to explain, predict or guide; it can be false.
+
+|Abstraction
+|One particular: this device, this building, this company.
+|The design of many particulars: the model, the product.
+|A proposition, a construct, a method in the abstract.
+
+|Lifecycle
+|Exists before and apart from the record, and is observed.
+|Is specified, built, released and evolved.
+|Is proposed, investigated, supported or falsified, and revised.
+|===
+
+Then find the subject's class in the ontology's classification rules (`agora ontology list --match Rule`): the most specific rule
+decides. If none does, or two disagree, the kind is *undetermined*: do not guess. Type the subject more specifically, add a rule
+(spec first), or ask a person. A subject that is none of the three, such as an event, a legal right, a patent, a claim or an outcome,
+has the kind *other* and no reflection.
+
+The boundary cases are the useful ones:
+
+* A company is an Eidolon even though people formed it. A deployed device unit is an Eidolon; its model, its software and its
+intended capabilities are Ergons, joined by `instantiates`.
+* A methodology is a Noema. A deployed workflow that carries it out is an Ergon, joined to it by `operationalizes`; each run of the
+workflow is an event, not another Ergon. An AI Workforce is an idea (a Noema) and one deployment of it (an Ergon), with the
+organizations and people that develop, operate, buy and use the deployment as Eidolons.
+* A patent document, the right in it, the invention it describes and the product that practices it are four subjects: a document and a
+right (kind other), a Noema, and an Ergon. Who invented, who owns, who was assigned and who may license are four relationships, and
+none is inferred from another. Proposing, researching or adopting an idea is not owning it, and nobody owns an idea.
+
+*A claim is not a Noema.* A claim is one statement that something is the case (`schema:Claim`). A Noema is the construct and its
+history, and it _states_ claims; the same claim can be stated by several Noemas, and a patent claim belongs to its patent. An
+_assertion_ is a third thing: what a record says about its subject, with its label, source and review. Recording that a hypothesis
+states a claim does not assert that the claim is true.
+
+*A Noema can be wrong.* Its epistemic state (proposed, under investigation, supported, contested, falsified, superseded) is an
+assessment: dated, on a stated basis, and in force only when a person has accepted it. It is not proven, it is not its publication or
+approval stage, and a falsified hypothesis stays, with its evidence, its relationships and its history, as a research asset. Evidence
+for and against it are separate sourced relationships that sit side by side; nothing nets them off. What the idea assumes, predicts,
+would be refuted by, and where it is limited are assertions with an aspect.
+
+*An AI proposes; a person accepts.* An assertion or a record has a review state: candidate, reviewed, accepted or rejected, and none
+stated is a candidate. An AI agent's proposal is a candidate until a person reviews it, and only accepted records count toward a
+Noema's state or its research stage. Review is not verification: a hypothesis can be accepted as a hypothesis and is never verified.
+
+*Commercial use is one possible consequence, not a requirement.* The path from an observation to a compounding advantage (observation,
+conception, investigation, relevance, experimentation, operationalization, validation, compounding) is read from the accepted records
+and never stored or demanded. Demand evidence must name the identifiable Eidolons it came from; novelty, citations, patentability and
+technical elegance are not demand.
+
+Relationships join subjects, never records, and each has a type, a direction, a source, dates and a label for how settled it is. The
+worked examples are in `spec-kit/specs/0047-digital-reflections/examples/` (a customer account, a medical device, an AI Workforce
+solution, rights and inventions) and `spec-kit/specs/0048-noemas/examples/` (Native Alpha, Unbundling Work, engineering care delivery,
+the AI Workforce idea, and a hypothesis that is falsified). They are illustrative, invented, and checked with the ontology.
+
+Two commands read this for an agent or a person, and call no AI: `agora reflection list` (by kind, epistemic state or review state;
+`--review candidate` lists what awaits a person; `--duplicates`; `--audit`) and `agora reflection show` (one subject: its state,
+claims, evidence for and against, assumptions, falsifiers, research stage and why it may need another look). An agent that finds a
+candidate Noema in a document drafts it as a candidate, attributed to the agent, for a person to review.
+
+*A record typed with the wrong kind* is still served at its identifier. `agora check ontology` (and the private repository's check,
+which runs the same rules) reports it as needing review and changes nothing, and `agora reflection list --audit` shows how a whole
+repository's subjects classify. A person reviews each one: a new record of the right kind is made that reflects the same subject and is
+derived from the old record, and the old record stays and points to it, so identifiers and relationships do not change. A subject no one
+can decide stays as it is and goes on the repository's register of open questions. Changing the rules and moving records are separate
+commits. A further kind of reflection is added in the ontology alone, as a class, a kind concept and its rules.
 
 The longer essay is `content/journal/eidolons.html`.

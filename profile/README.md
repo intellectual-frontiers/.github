@@ -20,9 +20,12 @@ the strength of it. Most of the companies we have built are in healthcare.
   services are reorganized. The book *Chasing Native Alpha* shows
   executives how to find and fund it; the
   [original essay](https://www.shahidshah.com/writing/native-alpha) states the idea.
-- **Eidolons.** A working digital reflection of a person, company, product, or
-  system: enough grounded evidence for an AI to reason about the real thing
-  accurately. This repository is a working one, and the essay
+- **Eidolons, Ergons and Noemas.** Working digital reflections: enough grounded
+  evidence for an AI to reason about the real thing accurately. An Eidolon
+  reflects what exists (a person, a company, a facility, a device); an Ergon
+  reflects what is built (a product, a service, a system, a workflow); a Noema
+  reflects what is conceived (a concept, a hypothesis, a theory, a method),
+  with the evidence for it and against it. This repository is a working one, and the essay
   [Eidolons: A Working Digital Reflection](https://github.com/intellectual-frontiers/.github/blob/main/content/journal/eidolons.html)
   explains why.
 - **Intellectual Product-Led Growth.** How a knowledge-heavy organization turns
