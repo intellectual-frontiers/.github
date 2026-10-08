@@ -185,4 +185,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Elenchus works
 
+|`0046-distribution-platform`
+|Draft
+|The distribution platform
+
 |===
