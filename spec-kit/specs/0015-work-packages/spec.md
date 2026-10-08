@@ -93,8 +93,9 @@ property fetches them are decisions outside this spec.
   and committed tooling at a recorded commit. The build MUST record that
   commit in the artifact's own metadata and in its delivery record.
 - **FR-016**: A binary rendition MUST be delivered, by a deterministic
-  command, to storage outside every Eidolon repository. Which storage is
-  decided outside this spec.
+  command, to storage outside every Eidolon repository: the distribution
+  platform's archive (0046-distribution-platform FR-020). Which storage holds
+  the archive is 0046-distribution-platform OQ-1.
 - **FR-017**: Every delivered binary rendition MUST be represented by a
   delivery record — a `Reference` — carrying where the rendition lives, the
   source commit, the date delivered, and a checksum, and carrying its own

@@ -1076,6 +1076,13 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-021	check	eidolon: eid test	test_site: a publish against the fake API appends one deployment record with every field and no token
 0044-public-website FR-022	check	eidolon: eid test	test_site: the token never reaches the record, the output or a file
 0044-public-website FR-023	review	0044-public-website FR-023	the destination's script is reviewed to hand each request to the files
+0044-public-website FR-024	none	-	the application is not built yet; no check that the site is the generated pages plus the platform
+0044-public-website FR-025	none	-	the application is not built yet; no check that it serves a generated page byte for byte
+0044-public-website FR-026	none	-	the reserved-address list and the generator's collision refusal are not built yet
+0044-public-website FR-027	none	-	the application is not built yet; no check of its evaluation or its not-found answer
+0044-public-website FR-028	none	-	no image is built yet; no check that a static host alone serves the files
+0044-public-website FR-029	none	-	no command deploys the application's image yet
+0044-public-website FR-030	none	-	the application is not built yet; no command runs it locally
 0045-elenchus-works FR-001	none	-	whether a work is of this kind is judgment
 0045-elenchus-works FR-002	none	-	vocabulary; no check of the words a record uses
 0045-elenchus-works FR-003	check	eidolon: eid check elenchus	every field but severity, which has no scale yet (0044 OQ-2)
@@ -1127,3 +1134,39 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0043-console-protocol FR-009	check	.github: agora test	tests check a stream is one resource per line
 0043-console-protocol FR-010	check	.github: agora test	tests check mcp serve lists no decision
 0042-agora FR-038	none	-	no check reads .vscode/extensions.json; the recommendations are reviewed when they change
+0046-distribution-platform FR-001	none	-	a person reviews a new distribution feature against the spec; nothing checks it
+0046-distribution-platform FR-002	none	-	judgment; the dependency ledger is not built yet
+0046-distribution-platform FR-003	none	-	judgment; a vendor is not adopted without FR-004's Decision
+0046-distribution-platform FR-004	none	-	no check that an adopted vendor has its Decision and register entry
+0046-distribution-platform FR-005	none	-	no check of a vendor's boundary; reviewed with the Decision
+0046-distribution-platform FR-006	none	-	the dependency ledger is not built yet
+0046-distribution-platform FR-007	none	-	no disappearance test is recorded yet
+0046-distribution-platform FR-008	none	-	no export exists yet
+0046-distribution-platform FR-009	none	-	no image is built yet
+0046-distribution-platform FR-010	none	-	no check of host independence; the move is proved by FR-013's restore
+0046-distribution-platform FR-011	none	-	the platform is not built yet
+0046-distribution-platform FR-012	none	-	no host is described yet
+0046-distribution-platform FR-013	none	-	no backup or restore drill exists yet
+0046-distribution-platform FR-014	none	-	the platform is not built yet; no check of the two kinds of request
+0046-distribution-platform FR-015	none	-	the platform is not built yet; no check that private content has no public address
+0046-distribution-platform FR-016	none	-	the platform is not built yet; no check of the not-found answer
+0046-distribution-platform FR-017	none	-	the platform is not built yet; no access log exists
+0046-distribution-platform FR-018	none	-	the platform is not built yet; eid check sensitive catches marked credentials in repositories
+0046-distribution-platform FR-019	none	-	the platform is not built yet; no check of the publication Decision before serving
+0046-distribution-platform FR-020	none	-	no archive exists yet; no check of a rendition against its delivery record's checksum
+0046-distribution-platform FR-021	none	-	the platform is not built yet; no issued address exists
+0046-distribution-platform FR-022	none	-	agents are told not to take a person's acts; nothing checks the platform
+0046-distribution-platform FR-023	none	-	the platform is not built yet
+0046-distribution-platform FR-024	none	-	the platform is not built yet
+0046-distribution-platform FR-025	none	-	the platform is not built yet
+0046-distribution-platform FR-026	none	-	the platform is not built yet
+0046-distribution-platform FR-027	none	-	the platform is not built yet
+0046-distribution-platform FR-028	none	-	the platform is not built yet
+0046-distribution-platform FR-029	none	-	the platform is not built yet
+0046-distribution-platform FR-030	none	-	the platform is not built yet
+0046-distribution-platform FR-031	none	-	the platform is not built yet
+0046-distribution-platform FR-032	none	-	the platform is not built yet; eid check sensitive catches marked data in repositories
+0046-distribution-platform FR-033	none	-	the platform is not built yet
+0046-distribution-platform FR-034	none	-	the platform is not built yet
+0046-distribution-platform FR-035	none	-	the platform is not built yet
+0046-distribution-platform FR-036	none	-	the application is not built yet
