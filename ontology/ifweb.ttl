@@ -206,15 +206,15 @@ ifweb:PublishingDestination a owl:Class, sh:NodeShape ;
 
 ifweb:destinationOf a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ;
     rdfs:comment "The web property whose generated files this destination serves (0044 FR-018)."@en .
-ifweb:hostedBy a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range ifcore:VendorService ;
+ifweb:hostedBy a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifweb:PublishingDestination ifweb:ApplicationHost ) ] ; rdfs:range ifcore:VendorService ;
     rdfs:comment "The vendor service, in the vendor register, that hosts the destination (0044 FR-018; 0037-vendor-management-policy)."@en .
-ifweb:publishingStrategy a owl:ObjectProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range skos:Concept ;
+ifweb:publishingStrategy a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifweb:PublishingDestination ifweb:ApplicationHost ) ] ; rdfs:range skos:Concept ;
     rdfs:comment "How a publish reaches the destination's readers, a concept in ifweb:PublishingStrategyScheme (0044 FR-019)."@en .
-ifweb:publishingCommand a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+ifweb:publishingCommand a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifweb:PublishingDestination ifweb:ApplicationHost ) ] ; rdfs:range xsd:string ;
     rdfs:comment "The one command that publishes to the destination, as a person types it (0044 FR-018)."@en .
-ifweb:configurationFile a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+ifweb:configurationFile a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifweb:PublishingDestination ifweb:ApplicationHost ) ] ; rdfs:range xsd:string ;
     rdfs:comment "The repository path of the file holding the destination's configuration: no credential is ever in it (0044 FR-018, FR-022)."@en .
-ifweb:deploymentRecordFile a owl:DatatypeProperty ; rdfs:domain ifweb:PublishingDestination ; rdfs:range xsd:string ;
+ifweb:deploymentRecordFile a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifweb:PublishingDestination ifweb:ApplicationHost ) ] ; rdfs:range xsd:string ;
     rdfs:comment "The repository path of the file every publish to the destination appends a record to (0044 FR-021)."@en .
 
 ifweb:PublishingStrategyScheme a skos:ConceptScheme ; rdfs:label "Publishing strategy"@en ;
@@ -223,3 +223,41 @@ ifweb:PreviewThenPromote a skos:Concept ; skos:inScheme ifweb:PublishingStrategy
     skos:definition "Every publish makes a preview at the destination's own preview address; only a publish that names who decides and why is promoted to the destination's production, and pointing a domain at the destination is a separate Decision (0044 FR-019)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+
+# ───────────────────────── The application and its hosts (0044-public-website FR-024 – FR-030; 0046-distribution-platform) ─────────────────────────
+
+ifweb:Application a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf schema:SoftwareApplication, ifcore:Fact ;
+    rdfs:label "Application"@en ;
+    skos:definition "The program that serves a web property beyond its generated pages: what only identified readers may reach, and the delivery of renditions (0044-public-website FR-024)."@en ;
+    rdfs:comment "Specializes schema:SoftwareApplication (0019 FR-002). It names the web property it serves. It ships as one container image that any host able to run one can run (0046-distribution-platform FR-009, FR-010); where it runs is an ifweb:ApplicationHost, and it is in the system inventory (ifcore:InformationSystem) once a host runs it (0046 FR-012)."@en ;
+    sh:targetClass ifweb:Application ;
+    sh:property [ sh:path ifweb:applicationOf ; sh:class ifcore:EidolonComponent ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application names the web property it serves (0044 FR-024)." ] .
+
+ifweb:ApplicationHost a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf ifcore:Fact ;
+    rdfs:label "Application host"@en ;
+    rdfs:comment "A host that runs an application's container image (0044-public-website FR-029; 0046-distribution-platform FR-012). It is described here before it is used. It names the application it runs, its entry in the system inventory, its publishing strategy, the one command that deploys to it, the file holding its configuration and the file every deploy appends a record to; a vendor service hosts it unless the company runs it. The credentials a deploy needs are read from the environment and named nowhere (0044 FR-022)."@en ;
+    sh:targetClass ifweb:ApplicationHost ;
+    sh:property [ sh:path ifweb:hostOf ; sh:class ifweb:Application ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names the application it runs (0044 FR-029)." ] ;
+    sh:property [ sh:path ifweb:inventoryEntry ; sh:class ifcore:InformationSystem ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names its entry in the system inventory (0046 FR-012; 0033 FR-001)." ] ;
+    sh:property [ sh:path ifweb:hostedBy ; sh:class ifcore:VendorService ; sh:maxCount 1 ;
+                  sh:message "An application host's vendor service, when a vendor hosts it, is in the vendor register (0037-vendor-management-policy FR-001)." ] ;
+    sh:property [ sh:path ifweb:publishingStrategy ; sh:class skos:Concept ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names its publishing strategy (0044 FR-029, FR-019)." ] ;
+    sh:property [ sh:path ifweb:publishingCommand ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names the one command that deploys to it (0044 FR-029)." ] ;
+    sh:property [ sh:path ifweb:configurationFile ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names the file holding its configuration (0044 FR-029, FR-018)." ] ;
+    sh:property [ sh:path ifweb:deploymentRecordFile ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An application host names the file holding its deployment record (0044 FR-029, FR-021)." ] .
+
+ifweb:applicationOf a owl:ObjectProperty ; rdfs:domain ifweb:Application ; rdfs:range ifcore:EidolonComponent ;
+    rdfs:comment "The web property whose pages this application serves beyond (0044 FR-024)."@en .
+ifweb:hostOf a owl:ObjectProperty ; rdfs:domain ifweb:ApplicationHost ; rdfs:range ifweb:Application ;
+    rdfs:comment "The application this host runs (0044 FR-029)."@en .
+ifweb:inventoryEntry a owl:ObjectProperty ; rdfs:domain ifweb:ApplicationHost ; rdfs:range ifcore:InformationSystem ;
+    rdfs:comment "The host's entry in the system inventory, which carries its data class, owner role, provider and recovery objectives (0046 FR-012; 0033-systems-and-data-policy FR-001)."@en .
