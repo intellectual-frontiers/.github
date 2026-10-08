@@ -684,12 +684,271 @@ ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:NativeAlpha .
 
 # ───────────────────────── Eidolon, the concept (0007-work-and-assets FR-015) ─────────────────────────
 
-ifcore:Eidolon a owl:Class ; rdfs:label "Eidolon"@en ;
-    skos:definition "A working digital reflection of a person, company, customer, product, or system: not a replica, but enough grounded evidence for an AI to reason about the real thing accurately and flexibly."@en ;
-    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it."@en ;
+ifcore:Eidolon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Ergon ;
+    rdfs:label "Eidolon"@en ;
+    skos:definition "A digital reflection of what exists: a living, AI-readable record of a real-world entity that exists independently of its digital representation, such as a person, an organization, a company, an institution, a facility or an identifiable physical asset, capturing its identity, relationships, state, history and evolving context. Not a replica, but enough grounded evidence for an AI to reason about the real thing accurately and flexibly (0047-digital-reflections FR-006)."@en ;
+    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it. What is deliberately created (a product, a service, a system, a workflow) is reflected by an ifcore:Ergon, not an Eidolon (0047-digital-reflections FR-007)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:Eidolon .
+
+# ───────────────────────── Digital reflections: Eidolons and Ergons (0047-digital-reflections) ─────────────────────────
+
+ifcore:DigitalReflection a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Digital reflection"@en ;
+    skos:definition "A maintained, AI-readable record of exactly one subject, with identity, context, relationships, evidence, provenance, history and lifecycle. Not necessarily a digital twin: no simulation, synchronization or completeness is required (0047-digital-reflections FR-001, FR-003)."@en ;
+    rdfs:comment "The record, never the subject: the subject has its own identifier, named by ifcore:reflects, and its own types, which decide the record's kind through the ifcore:ClassificationRule individuals below. Its audience is the record's (ifcore:hasAudience); who stewards the record is ifcore:ownerRole, which says nothing of who owns the subject (FR-004)."@en .
+
+ifcore:Ergon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Eidolon ;
+    rdfs:label "Ergon"@en ;
+    skos:definition "A digital reflection of what is created: a living, AI-readable record of a deliberately built, designed or assembled product, service, system, workflow or solution, capturing its purpose, design, capabilities, dependencies, operational state, evolution and intended outcomes (0047-digital-reflections FR-007)."@en ;
+    rdfs:comment "Greek ἔργον, a work, a thing made to do a job. The company's own concept, the counterpart of ifcore:Eidolon. An instance, deployment or execution of an Ergon is not itself an Ergon (FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:reflects a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:DigitalReflection ;
+    rdfs:comment "The one subject a reflection is a record of, by its stable identifier, never by name (0047-digital-reflections FR-002)."@en .
+ifcore:purpose a owl:DatatypeProperty ; rdfs:domain ifcore:Ergon ; rdfs:range xsd:string ;
+    rdfs:comment "What an Ergon was made to accomplish, stated by whoever is the authority on its design (0047-digital-reflections FR-008). Whom it is for is schema:audience; the outcome it promises is related by ifcore:Intends."@en .
+
+# Classification: what a subject is, decided by its type, never by its record or its name (FR-010 – FR-013).
+
+ifcore:ReflectionKindScheme a skos:ConceptScheme ; rdfs:label "Reflection kind"@en ;
+    rdfs:comment "The kind a subject reflects as, resolved from its ifcore:ClassificationRule individuals (0047-digital-reflections FR-011, FR-012). Four, a closed set: an undetermined subject is never defaulted to either kind."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EidolonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Eidolon"@en ; skos:notation "eidolon" ;
+    skos:definition "The subject exists independently of its representation and is an individual in the world: a person, an organization, a place, an identifiable unit."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ErgonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Ergon"@en ; skos:notation "ergon" ;
+    skos:definition "The subject was deliberately built, designed or assembled to accomplish a purpose: a product model, a service, a system, a workflow, a solution."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OtherKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Other"@en ; skos:notation "other" ;
+    skos:definition "The subject is neither: an abstraction, a right, a claim, an event or an outcome. It keeps the types the ontology already gives it, and no Eidolon or Ergon is made of it (0047-digital-reflections FR-027). Not the name of a third kind of reflection, which is undecided (OQ-1)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UndeterminedKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Undetermined"@en ; skos:notation "undetermined" ;
+    skos:definition "No rule decides the subject, or the rules for its types disagree. A person decides; no reflection is made until then (0047-digital-reflections FR-012)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:ClassificationRule a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Classification rule"@en ;
+    rdfs:comment "One subject class and the one kind it reflects as. At most one rule names a class (0047-digital-reflections FR-011). The criteria are identity, purpose, abstraction level and lifecycle, never whether a thing is physical, digital, human-made or natural (FR-010); its rdfs:comment states which criterion decides."@en .
+ifcore:subjectClass a owl:ObjectProperty ; rdfs:domain ifcore:ClassificationRule ; rdfs:range rdfs:Class ;
+    rdfs:comment "The class of subjects the rule classifies; a subclass is decided by the most specific rule that matches it (0047 FR-012)."@en .
+ifcore:reflectedAs a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ClassificationRule ; rdfs:range skos:Concept ;
+    rdfs:comment "The kind, a concept of ifcore:ReflectionKindScheme."@en .
+
+# Subject classes the rules need and no established vocabulary names (each specializes an established class, per 0019 FR-002).
+ifcore:Workflow a owl:Class ; rdfs:subClassOf prov:Plan ; rdfs:label "Workflow"@en ;
+    rdfs:comment "A deliberately designed operating method. Each run of it is a prov:Activity related by ifcore:Executes, not another workflow (0047-digital-reflections FR-009)."@en .
+ifcore:Outcome a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "Outcome"@en ;
+    rdfs:comment "A result an Ergon intends or produces (0047-digital-reflections FR-008). Not an Ergon and not an Eidolon."@en .
+ifcore:Capability a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Capability"@en ;
+    rdfs:comment "An abstract ability an Ergon implements. The ability is not the Ergon that has it (0047-digital-reflections FR-027)."@en .
+ifcore:Invention a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Invention"@en ;
+    rdfs:comment "The idea a patent describes. Distinct from the patent document, the right in it, and any product that practices it (0047-digital-reflections FR-028)."@en .
+
+# The initial rules (FR-013). A class with no rule is undetermined; the ones marked so below are decided to be, with the reason.
+ifcore:RulePerson a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Person ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: an individual that exists apart from its record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleSchemaPerson a ifcore:ClassificationRule ; ifcore:subjectClass schema:Person ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: as ifcore:Person."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleOrganization a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Organization ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: an organization has an identity in the world apart from its record."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleCompany a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Company ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a legal entity is an Eidolon although people formed it; formation does not make it an Ergon (0047 FR-014)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleSchemaOrganization a ifcore:ClassificationRule ; ifcore:subjectClass schema:Organization ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: as ifcore:Organization."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleGovernmentOrganization a ifcore:ClassificationRule ; ifcore:subjectClass schema:GovernmentOrganization ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a government agency."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleMedicalOrganization a ifcore:ClassificationRule ; ifcore:subjectClass schema:MedicalOrganization ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a hospital organization or other care provider as an organization."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleHospital a ifcore:ClassificationRule ; ifcore:subjectClass schema:Hospital ; ifcore:reflectedAs ifcore:UndeterminedKind ;
+    rdfs:comment "Abstraction: schema:Hospital is both an organization and a building. Both are Eidolons, but they are two subjects (0047 FR-015); a person types each, so the one type decides neither."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RulePlace a ifcore:ClassificationRule ; ifcore:subjectClass schema:Place ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a place or physical facility is an individual in the world."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleCivicStructure a ifcore:ClassificationRule ; ifcore:subjectClass schema:CivicStructure ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a physical building such as a hospital building."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleRealProperty a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:RealProperty ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Identity: a particular parcel or building is an individual in the world."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleEquipment a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Equipment ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Abstraction: an item of equipment is an identifiable unit. The model it was made from is a separate Ergon (0047 FR-015)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleIndividualProduct a ifcore:ClassificationRule ; ifcore:subjectClass schema:IndividualProduct ; ifcore:reflectedAs ifcore:EidolonKind ;
+    rdfs:comment "Abstraction: a single identifiable unit, such as a medical device with a serial number. Its model and software are Ergons (0047 FR-015)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:RuleProductModel a ifcore:ClassificationRule ; ifcore:subjectClass schema:ProductModel ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose and abstraction: a design of units, made to do a job; each unit is an Eidolon related by ifcore:Instantiates."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleSoftwareApplication a ifcore:ClassificationRule ; ifcore:subjectClass schema:SoftwareApplication ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: software built to accomplish a purpose."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleWebApplication a ifcore:ClassificationRule ; ifcore:subjectClass schema:WebApplication ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: a software-as-a-service product."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleMobileApplication a ifcore:ClassificationRule ; ifcore:subjectClass schema:MobileApplication ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: as schema:SoftwareApplication."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleService a ifcore:ClassificationRule ; ifcore:subjectClass schema:Service ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: a commercial service offering, or an engineered care delivery program, is deliberately designed to do a job. A vendor service (ifcore:VendorService) is the vendor's Ergon."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleWorkflow a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Workflow ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose and abstraction: a designed operating method. Its executions are events (0047 FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleAIWorkforce a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:AIWorkforce ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: an AI Workforce solution, or an AI agent designed for a business purpose, as a design and operating contract. Its runtime instances, identities and activity are separate subjects (0047 FR-015, OQ-2)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:RuleRight a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Right ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a legal right is neither a person nor a thing made; it is a claim recognized by law (0047 FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleIntellectualProperty a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:IntellectualProperty ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: intellectual property as a right. A product that embodies it is a separate Ergon (0047 FR-028)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleNote a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Note ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a research finding or a hypothesis is knowledge, not an entity or a made thing."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleResearchPillar a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:ResearchPillar ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a standing line of inquiry."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleClaim a ifcore:ClassificationRule ; ifcore:subjectClass schema:Claim ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a claim, such as a patent claim or a thesis."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleConcept a ifcore:ClassificationRule ; ifcore:subjectClass skos:Concept ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a general concept, a theory, a model, a capability or an invention."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleActivity a ifcore:ClassificationRule ; ifcore:subjectClass prov:Activity ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Lifecycle: an event or an execution happens once and is over; it is not a thing that is maintained (0047 FR-009)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleOutcome a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Outcome ; ifcore:reflectedAs ifcore:OtherKind ;
+    rdfs:comment "Abstraction: a result, intended or realized (OQ-4)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:RuleDigitalAsset a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:DigitalAsset ; ifcore:reflectedAs ifcore:UndeterminedKind ;
+    rdfs:comment "Abstraction: an asset category that holds a software product (an Ergon), a web property, or a dataset. The category decides nothing; type the subject as what it is."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleUnit a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Unit ; ifcore:reflectedAs ifcore:UndeterminedKind ;
+    rdfs:comment "Identity and purpose conflict: a unit is a part of an organization (an Eidolon), designed to have exactly one job (an Ergon). A person decides; see the register of open questions."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleInformationSystem a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:InformationSystem ; ifcore:reflectedAs ifcore:UndeterminedKind ;
+    rdfs:comment "Abstraction: an inventory entry may be a design (a product used) or a deployment (this installation). A person types each entry as what it is."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleSoftwareAgent a ifcore:ClassificationRule ; ifcore:subjectClass prov:SoftwareAgent ; ifcore:reflectedAs ifcore:UndeterminedKind ;
+    rdfs:comment "Identity and lifecycle: a running instance of an AI agent (0047 OQ-2)."@en ; ifcore:hasAudience ifcore:Public .
+
+# Relationships (FR-016 – FR-021).
+
+ifcore:ReflectionRelationship a owl:Class ; rdfs:subClassOf ifcore:Assertion ; rdfs:label "Reflection relationship"@en ;
+    rdfs:comment "A typed, directional statement between two subjects, by identifier, with its source, its validity in time and how settled it is (0047-digital-reflections FR-016, FR-019). Stated between subjects, not between records, so that a record's change of kind leaves it untouched (FR-021)."@en .
+ifcore:relationType a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ; rdfs:range skos:Concept ;
+    rdfs:comment "One concept of ifcore:ReflectionRelationScheme."@en .
+ifcore:relationFrom a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ;
+    rdfs:comment "The subject the relationship starts from."@en .
+ifcore:relationTo a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ;
+    rdfs:comment "The subject the relationship points to."@en .
+ifcore:concerning a owl:ObjectProperty ; rdfs:domain ifcore:ReflectionRelationship ;
+    rdfs:comment "What an assignment or a license is of, when the relationship is between two parties about a third thing."@en .
+
+ifcore:RelationFamilyScheme a skos:ConceptScheme ; rdfs:label "Relationship family"@en ;
+    rdfs:comment "The six kinds of connection a reflection relationship can be. A relationship of one family is never inferred from another's (0047-digital-reflections FR-018)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OrganizationalFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Organizational"@en ; skos:notation "organizational" ;
+    skos:definition "Who is part of, or works for, an organization."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LegalRightFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Legal right"@en ; skos:notation "legal-right" ;
+    skos:definition "Ownership, inventorship, assignment and licensing: what the law recognizes, each separately."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OperationalFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Operational"@en ; skos:notation "operational" ;
+    skos:definition "Who builds, runs, deploys and uses something, and what an execution ran."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CommercialFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Commercial"@en ; skos:notation "commercial" ;
+    skos:definition "What is offered, bought and served."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TechnicalFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Technical"@en ; skos:notation "technical" ;
+    skos:definition "What one made thing depends on, integrates with and implements."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OutcomeFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Outcome"@en ; skos:notation "outcome" ;
+    skos:definition "What a made thing promises and what it has produced."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LineageFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Lineage"@en ; skos:notation "lineage" ;
+    skos:definition "What a thing was made from or is an instance of."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:relationFamily a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain skos:Concept ; rdfs:range skos:Concept ;
+    rdfs:comment "The one family of ifcore:RelationFamilyScheme a relationship type belongs to."@en .
+ifcore:fromKind a owl:ObjectProperty ; rdfs:domain skos:Concept ; rdfs:range skos:Concept ;
+    rdfs:comment "A kind of ifcore:ReflectionKindScheme the relationship type's starting subject may have; any one listed is allowed."@en .
+ifcore:toKind a owl:ObjectProperty ; rdfs:domain skos:Concept ; rdfs:range skos:Concept ;
+    rdfs:comment "A kind the relationship type's target subject may have; any one listed is allowed."@en .
+
+ifcore:ReflectionRelationScheme a skos:ConceptScheme ; rdfs:label "Reflection relationship type"@en ;
+    rdfs:comment "The types a ReflectionRelationship takes (0047-digital-reflections FR-017). Flat: no type is narrower than another, and legal ownership, inventorship, assignment, licensing, operation, development and use are never inferred from each other (FR-018). Concepts, so a new type is added without a new property."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:WorksFor a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "worksFor"@en ; skos:notation "worksFor" ;
+    skos:definition "A person is employed by, or works for, an organization."@en ; skos:closeMatch schema:worksFor ;
+    ifcore:relationFamily ifcore:OrganizationalFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Owns a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "owns"@en ; skos:notation "owns" ;
+    skos:definition "Legal ownership of a thing or a right. It says nothing of who invented, built, runs or uses it."@en ; skos:closeMatch schema:owns ;
+    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind, ifcore:ErgonKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:InventorOf a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "inventorOf"@en ; skos:notation "inventorOf" ;
+    skos:definition "A person conceived an invention. It says nothing of who owns it, to whom it was assigned, or who may license it."@en ;
+    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:AssignsTo a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "assignsTo"@en ; skos:notation "assignsTo" ;
+    skos:definition "A party transferred a right (named by ifcore:concerning) to another. A transfer, not an invention and not a license."@en ;
+    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:LicensesTo a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "licensesTo"@en ; skos:notation "licensesTo" ;
+    skos:definition "A party permits another to use a right (named by ifcore:concerning) without transferring it."@en ;
+    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Develops a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "develops"@en ; skos:notation "develops" ;
+    skos:definition "An organization or a person builds and changes a made thing. It does not imply that they own, operate or sell it."@en ;
+    ifcore:relationFamily ifcore:OperationalFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Operates a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "operates"@en ; skos:notation "operates" ;
+    skos:definition "An organization or a person runs a made thing, or an identifiable unit of one, and is responsible for it running. It does not imply ownership or development."@en ;
+    ifcore:relationFamily ifcore:OperationalFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind, ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Deploys a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "deploys"@en ; skos:notation "deploys" ;
+    skos:definition "An organization put a made thing into service in its own setting. Distinct from buying it and from using it."@en ;
+    ifcore:relationFamily ifcore:OperationalFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Uses a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "uses"@en ; skos:notation "uses" ;
+    skos:definition "A person, an organization or a made thing (a workflow) makes use of a made thing or of an identifiable unit. It does not imply ownership, a purchase or a license."@en ;
+    ifcore:relationFamily ifcore:OperationalFamily ; ifcore:fromKind ifcore:EidolonKind, ifcore:ErgonKind ; ifcore:toKind ifcore:EidolonKind, ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Executes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "executes"@en ; skos:notation "executes" ;
+    skos:definition "An event is one run of a designed method. The run is an event, not an Ergon."@en ;
+    ifcore:relationFamily ifcore:OperationalFamily ; ifcore:fromKind ifcore:OtherKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Offers a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "offers"@en ; skos:notation "offers" ;
+    skos:definition "An organization makes a product or a service available to others. It does not imply ownership or development."@en ; skos:relatedMatch schema:makesOffer ;
+    ifcore:relationFamily ifcore:CommercialFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Purchases a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "purchases"@en ; skos:notation "purchases" ;
+    skos:definition "A customer bought a product or a service. It does not imply the customer deployed or uses it."@en ;
+    ifcore:relationFamily ifcore:CommercialFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Serves a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "serves"@en ; skos:notation "serves" ;
+    skos:definition "A made thing is meant to benefit, or delivers to, a party."@en ;
+    ifcore:relationFamily ifcore:CommercialFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:DependsOn a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "dependsOn"@en ; skos:notation "dependsOn" ;
+    skos:definition "A made thing cannot work without another."@en ; skos:closeMatch dcterms:requires ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:IntegratesWith a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "integratesWith"@en ; skos:notation "integratesWith" ;
+    skos:definition "Two made things exchange data or calls. Neither need depend on the other."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Implements a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "implements"@en ; skos:notation "implements" ;
+    skos:definition "A made thing realizes an abstract capability."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Intends a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "intends"@en ; skos:notation "intends" ;
+    skos:definition "A made thing is meant to produce an outcome. A promise, not a result."@en ;
+    ifcore:relationFamily ifcore:OutcomeFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Produces a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "produces"@en ; skos:notation "produces" ;
+    skos:definition "A made thing has produced an outcome. A result, supported by an assertion labelled evidence (0047 FR-008)."@en ;
+    ifcore:relationFamily ifcore:OutcomeFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Instantiates a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "instantiates"@en ; skos:notation "instantiates" ;
+    skos:definition "An identifiable unit is made to a model, design or contract."@en ;
+    ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:EvolvesFrom a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "evolvesFrom"@en ; skos:notation "evolvesFrom" ;
+    skos:definition "A made thing is a later version of, or was derived from, another."@en ; skos:closeMatch prov:wasDerivedFrom ;
+    ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+
+# Assertions (FR-022 – FR-026): the label, source and verification of what a reflection holds about its subject.
+
+ifcore:Assertion a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Assertion"@en ;
+    rdfs:comment "One statement about a subject (schema:about), labelled by ifcore:claimLabel, sourced by dcterms:source, attributed by prov:wasAttributedTo, held with ifcore:confidenceLevel where it is not certain. Verified only when ifcore:verifiedBy names a person (0047-digital-reflections FR-022 to FR-025)."@en .
+ifcore:verifiedBy a owl:ObjectProperty ; rdfs:domain ifcore:Assertion ; rdfs:range ifcore:Person ;
+    rdfs:comment "The person who checked the assertion against its source. Never an AI agent (0047 FR-024)."@en .
+ifcore:verifiedOn a owl:DatatypeProperty ; rdfs:domain ifcore:Assertion ; rdfs:range xsd:date ;
+    rdfs:comment "When the person checked it. Required with ifcore:verifiedBy."@en .
+
+# The Decisions that justify the new terms (0019-controlled-vocabulary FR-004).
+
+ifcore:EidolonErgonSeparation a ifcore:Decision ;
+    rdfs:label "Eidolons reflect what exists and Ergons reflect what is created"@en ;
+    dcterms:subject ifcore:DigitalReflection, ifcore:Ergon, ifcore:reflects, ifcore:purpose, ifcore:ClassificationRule ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "A reflection of a company and a reflection of the software it sells answer different questions: the company's is about identity, relationships, state and what changed; the software's is about purpose, design, dependencies, outcomes and the evidence it works. Under one type the two collide, so a product's record would carry a legal identity and a person's would carry a roadmap, and a reader could not tell which questions a record can answer. Two kinds under one shared parent keep what both need (identity, sources, history, audience) in one place and let the kinds differ where they should. No established vocabulary names the pair: schema.org has Thing, Product, Service and Organization but no parent that is a maintained record of a subject, and a digital twin (ISO 23247) requires fidelity and synchronization that neither kind requires. The kind is decided by the subject's type through classification rules, not by the record, so that a wrong kind is found by a check and moved by a person, with no change to identifiers or relationships."@en ;
+    ifcore:consideredAlternative ifcore:EidolonErgonAltOneType, ifcore:EidolonErgonAltTwoWorlds ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EidolonErgonAltOneType a ifcore:Alternative ; rdfs:label "Keep one type, Eidolon, for every subject, with a subject-kind property"@en ;
+    ifcore:rejectionReason "A property can be left empty or set wrongly with nothing to say which questions the record answers, and every consumer must branch on it. Two disjoint classes make the difference queryable and checkable."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EidolonErgonAltTwoWorlds a ifcore:Alternative ; rdfs:label "Two unrelated top-level types with no shared parent"@en ;
+    ifcore:rejectionReason "Identity, sources, audience, history and stewardship are the same for both, and a reader that needs every reflection would have to know both. A shared parent states the common model once."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ReflectionRelationsAsConcepts a ifcore:Decision ;
+    rdfs:label "Relationship types are concepts of a flat scheme, and a relationship is a record between two subjects"@en ;
+    dcterms:subject ifcore:ReflectionRelationship, ifcore:ReflectionRelationScheme, ifcore:Assertion ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "A relationship needs a source, a validity in time and a degree of certainty, which a plain triple cannot carry, so it is a record. Its type is a concept of a scheme, with a family and the kinds its ends may have, so that adding a type adds a concept and not a property, and a check can test the ends. The scheme is flat on purpose: ownership, inventorship, assignment, licensing, operation, development and use are different facts, and a hierarchy between them is an invitation to infer one from another. The ends are subjects, not records, so that moving a record from one kind to the other changes no relationship. Where schema.org, Dublin Core or PROV has the relationship, the concept points to it with skos:closeMatch and is not a replacement for it."@en ;
+    ifcore:consideredAlternative ifcore:ReflectionRelationsAltProperties ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ReflectionRelationsAltProperties a ifcore:Alternative ; rdfs:label "One object property per relationship type, with sub-properties"@en ;
+    ifcore:rejectionReason "A property carries no provenance or validity without reification, a sub-property hierarchy lets a reasoner infer one right from another, and each type is a new property for 0019 FR-004 to justify."@en ;
+    ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── The method (0003-intellectual-frontiers FR-007, FR-008) ─────────────────────────
 
@@ -2146,7 +2405,8 @@ ifcore:ConfidenceLevel a owl:Class ; rdfs:label "Confidence level"@en .
 ifcore:Low a ifcore:ConfidenceLevel ; rdfs:label "Low"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:Medium a ifcore:ConfidenceLevel ; rdfs:label "Medium"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:High a ifcore:ConfidenceLevel ; rdfs:label "High"@en ; ifcore:hasAudience ifcore:Public .
-ifcore:confidenceLevel a owl:ObjectProperty ; rdfs:domain ifcore:EvidencePacket ; rdfs:range ifcore:ConfidenceLevel .
+ifcore:confidenceLevel a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifcore:EvidencePacket ifcore:Assertion ) ] ; rdfs:range ifcore:ConfidenceLevel ;
+    rdfs:comment "How sure an evidence packet's reading, or an assertion, is (0012-network FR-007; 0047-digital-reflections FR-019)."@en .
 
 ifcore:RelationshipMemory a owl:Class ; rdfs:label "Relationship memory"@en ;
     skos:definition "The compounding record of who did what and how it turned out, so the next search starts further along than the last one."@en ;

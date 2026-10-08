@@ -1170,3 +1170,39 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0046-distribution-platform FR-034	none	-	the platform is not built yet
 0046-distribution-platform FR-035	none	-	the platform is not built yet
 0046-distribution-platform FR-036	none	-	the application is not built yet
+0047-digital-reflections FR-001	check	.github: agora check ontology	fails a reflection typed both Eidolon and Ergon or one subclass of neither, and the pair not declared disjoint
+0047-digital-reflections FR-002	check	.github: agora check ontology	fails a reflection that does not name exactly one subject by IRI and a relationship end that is a literal; matching by name elsewhere is not tested
+0047-digital-reflections FR-003	none	-	a permission and a prohibition on requiring fidelity; nothing to test
+0047-digital-reflections FR-004	check	.github: agora check ontology	fails a reflection with no audience; that stewardship is not ownership of the subject is judgment
+0047-digital-reflections FR-005	none	-	the capabilities are carried by terms the ontology already has and by Git; no check that a record uses them
+0047-digital-reflections FR-006	check	.github: agora check ontology	warns, never fails (FR-031), a reflection typed Eidolon whose subject resolves to another kind; agora test covers the rules
+0047-digital-reflections FR-007	check	.github: agora check ontology	warns, never fails (FR-031), a reflection typed Ergon whose subject resolves to another kind; agora test covers the rules
+0047-digital-reflections FR-008	check	.github: agora check ontology	fails an Ergon with no ifcore:purpose; naming whom it benefits and supporting a produced outcome with evidence are not tested
+0047-digital-reflections FR-009	check	.github: agora test	tests that a run is a prov:Activity of kind other, related by executes, and that an agent instance has no Ergon; a record made of an instance is reported by agora check ontology
+0047-digital-reflections FR-010	check	.github: agora test	tests that no rule classifies by physical, digital, human-made or natural; which criterion decides is judgment, stated in each rule's reason, which agora check ontology requires
+0047-digital-reflections FR-011	check	.github: agora check ontology	fails a rule that names no or several classes, no or an unknown kind, a class another rule names, or no reason or audience
+0047-digital-reflections FR-012	check	.github: agora test	tests the most specific rule deciding, disagreement and no rule giving undetermined; agora check ontology warns on a reflection of an undetermined subject
+0047-digital-reflections FR-013	check	.github: agora test	tests every subject class of the initial table against its kind
+0047-digital-reflections FR-014	check	.github: agora test	tests a company with a creator is an Eidolon
+0047-digital-reflections FR-015	check	.github: agora test	tests a unit and its model, an agent design and its runtime, and a conflicting double type; agora check ontology checks the worked examples
+0047-digital-reflections FR-016	check	.github: agora check ontology	fails a relationship without exactly one type of the scheme, one start and one end by IRI
+0047-digital-reflections FR-017	check	.github: agora check ontology	fails a missing required type, a type with no family or no kinds, and an end whose resolved kind the type does not allow
+0047-digital-reflections FR-018	check	.github: agora check ontology	fails any hierarchy between relationship types; agora test shows the worked examples' queries infer no relationship from another
+0047-digital-reflections FR-019	check	.github: agora check ontology	fails a relationship with no label, no source unless a hypothesis or unknown, or a hypothesis or inference with no confidence
+0047-digital-reflections FR-020	check	.github: agora check ontology	fails a relationship that ends before it starts; that an ended or changed relationship is kept, not deleted, is held by Git and not tested
+0047-digital-reflections FR-021	check	.github: agora check ontology	fails a relationship whose end is a reflection record rather than a subject
+0047-digital-reflections FR-022	check	.github: agora check ontology	fails an assertion without exactly one label of the closed set or without a subject
+0047-digital-reflections FR-023	check	.github: agora check ontology	fails an observation or evidence with no source
+0047-digital-reflections FR-024	check	.github: agora check ontology	fails verification by anything that is not a person, with no date, or on a hypothesis, inference, recommendation or unknown
+0047-digital-reflections FR-025	check	.github: agora check ontology	fails a recommendation derived from nothing; that its sources are the right ones is judgment
+0047-digital-reflections FR-026	none	-	sensitivity is judgment (0001-eidolon-architecture FR-016); nothing tests an assertion for it
+0047-digital-reflections FR-027	check	.github: agora test	tests that abstract classes resolve to other; agora check ontology warns on a reflection of an other subject
+0047-digital-reflections FR-028	check	.github: agora test	tests that a right, an invention and a product are separate kinds in the worked examples and that ownership is not derived from inventorship
+0047-digital-reflections FR-029	none	-	a prohibition on creating a type; nothing to test
+0047-digital-reflections FR-030	check	.github: agora test	tests that the class stays a subclass of ifcore:DigitalReflection and a legacy record stays served
+0047-digital-reflections FR-031	check	.github: agora check ontology	reports a reflection whose subject resolves to another kind, other or undetermined as a warning, and no tool rewrites; agora test proves it neither fails nor changes a file
+0047-digital-reflections FR-032	check	.github: agora check ontology	fails a replaced record whose replacement reflects another subject or is not derived from it; a register entry for a subject no person can decide is judgment
+0047-digital-reflections FR-033	none	-	what a commit contains is not checked
+0047-digital-reflections FR-034	check	.github: agora test	tests that the legacy and the new record are both found by ifcore:DigitalReflection, and the legacy by the first kind
+0047-digital-reflections FR-035	none	-	prose naming is judgment; no check reads prose for a product called an Eidolon
+0047-digital-reflections FR-036	check	.github: agora test	tests each failure this requirement lists; agora check ontology runs the checks

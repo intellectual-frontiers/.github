@@ -1,0 +1,39 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/reflections/rights#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: the boundary (0047-digital-reflections FR-027, FR-028).
+# Everything here is invented. An invention, the patent family that protects it, the patent document and the product that
+# practices it are four subjects. The invention and the right are neither Eidolons nor Ergons. The inventor, the owner and
+# the assignee are Eidolons. Who invented it, who owns it, and who was assigned it are three relationships, and none is
+# derived from another: the second invention below has an inventor and no recorded owner, and that stays true until someone
+# records one. The question it answers:
+#   - Who owns this right?      only an owns relationship answers; an inventorOf relationship never does
+
+ex:Inventor a ifcore:Person ; dcterms:identifier "inventor" ; ifcore:hasAudience ifcore:Public .
+ex:Assignee a ifcore:Company ; dcterms:identifier "assignee" ; ifcore:hasAudience ifcore:Public .
+ex:MethodInvention a ifcore:Invention ; dcterms:identifier "method-invention" ; ifcore:hasAudience ifcore:Public .
+ex:MethodPatentFamily a ifcore:PatentFamily ; dcterms:identifier "method-patent-family" ; ifcore:hasAudience ifcore:Public .
+ex:SecondInvention a ifcore:Invention ; dcterms:identifier "second-invention" ; ifcore:hasAudience ifcore:Public .
+ex:SecondPatentFamily a ifcore:PatentFamily ; dcterms:identifier "second-patent-family" ; ifcore:hasAudience ifcore:Public .
+ex:PatentOffice a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/patent-office/records"^^xsd:anyURI ;
+    ifcore:verificationCadence "P6M"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+
+ex:InventorOfMethod a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:InventorOf ; ifcore:relationFrom ex:Inventor ; ifcore:relationTo ex:MethodInvention ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PatentOffice ; ifcore:hasAudience ifcore:Public .
+ex:InventorAssigns a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:AssignsTo ; ifcore:relationFrom ex:Inventor ; ifcore:relationTo ex:Assignee ;
+    ifcore:concerning ex:MethodPatentFamily ; schema:validFrom "2024-05-20"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PatentOffice ; ifcore:hasAudience ifcore:Public .
+ex:AssigneeOwnsFamily a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Owns ; ifcore:relationFrom ex:Assignee ; ifcore:relationTo ex:MethodPatentFamily ;
+    schema:validFrom "2024-05-20"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PatentOffice ; ifcore:hasAudience ifcore:Public .
+ex:InventorOfSecond a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:InventorOf ; ifcore:relationFrom ex:Inventor ; ifcore:relationTo ex:SecondInvention ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PatentOffice ; ifcore:hasAudience ifcore:Public .

@@ -1,9 +1,17 @@
 [#what-it-is]
 == What an Eidolon is
 
-An *Eidolon* is a working digital reflection of a person, company, customer, product, or system. It is not a replica. It is enough
-grounded evidence for an AI to reason about the real thing accurately and flexibly. The concept is the founder's own authored
-research; the system in this repository is the company's first working instance of it.
+A *digital reflection* is a maintained, AI-readable record of one subject: its identity, context, relationships, evidence, provenance,
+history and lifecycle. It is not a replica and not necessarily a digital twin. It is enough grounded evidence for an AI to reason about
+the real subject accurately and flexibly. There are two kinds, and they are not interchangeable (spec 0047):
+
+* An *Eidolon* reflects *what exists*: a person, a company, an institution, a facility, an identifiable physical asset. Its subject
+exists independently of the record.
+* An *Ergon* reflects *what is created*: a product, a service, a system, a workflow, a solution. Its subject was deliberately built to
+accomplish a purpose.
+
+The concept of the Eidolon is the founder's own authored research; the system in this repository is the company's first working
+instance of it, and the "Eidolon" of the next sections is that system, which holds reflections of both kinds. Ergon is its counterpart.
 
 === The problem
 
@@ -51,5 +59,62 @@ person would, and whether a person auditing it can find out why. How elegant the
 role) and a fact may belong to several; clearance for one does not imply another.
 * *A hard line between what we assert and what we merely watch.* A patent's status belongs to the patent office, not to our own
 saying-so. We hold a _reference_ with a verification date and cadence, not a copy of the value.
+
+[#two-kinds]
+=== Two kinds of reflection
+
+An Eidolon helps answer: what is this entity, what do we know about it and how do we know, what relationships does it have, what has
+changed, what matters now, what should a person or an AI do next. An Ergon helps answer: why was this made, what problem is it for,
+who is it for, how does it work, what does it depend on and offer, who builds, owns, operates, buys and uses it, what does it promise,
+what shows that it works, and how should it evolve. Both carry the same things: a stable identifier, types, assertions with sources
+and a label (observation, hypothesis, evidence, inference, recommendation or unknown), relationships with their dates, an audience,
+and a steward of the record. A steward of a record does not thereby own, or have authority over, its subject.
+
+*To decide which a new subject is*, ask four questions of the subject, never of the record, and never "is it physical, digital,
+human-made or natural?", which decides nothing:
+
+[cols="1,3"]
+|===
+|Question |It points to an Eidolon when... / an Ergon when...
+
+|Identity
+|It is an individual in the world with its own identity. / It is a design, a method or a kind of thing that has versions.
+
+|Purpose
+|It was not made for a purpose of the record's owner. / It was deliberately designed or assembled to accomplish one.
+
+|Abstraction
+|It is one particular (this device, this building, this company). / It is the design of many particulars (the model, the product).
+
+|Lifecycle
+|It exists before and apart from the record, and is observed. / It is specified, built, released and evolved.
+|===
+
+Then find the subject's class in the ontology's classification rules (`agora ontology list --match Rule`): the most specific rule
+decides. If none does, or two disagree, the kind is *undetermined*: do not guess. Type the subject more specifically, add a rule
+(spec first), or ask a person. A subject that is an idea, not an individual or a made thing (a theory, a hypothesis, a legal right,
+a patent claim, an invention) is neither kind and gets no reflection: whether it has a kind of its own is an open question (spec 0047
+OQ-1).
+
+The boundary cases are the useful ones:
+
+* A company is an Eidolon even though people formed it. A deployed device unit is an Eidolon; its model, its software and its
+intended capabilities are Ergons, joined by `instantiates`.
+* A workflow is an Ergon; each run of it is an event, not another Ergon. An AI agent's design and operating contract is an Ergon; its
+running instance, identity and activity are separate subjects.
+* A patent document, the right in it, the invention it describes and the product that practices it are four subjects. Who invented,
+who owns, who was assigned and who may license are four relationships, and none is inferred from another.
+
+Relationships join subjects, never records, and each has a type, a direction, a source, dates and a label for how settled it is. The
+worked examples are in `spec-kit/specs/0047-digital-reflections/examples/` and are checked with the ontology: a customer account (the
+company is an Eidolon, the software it bought an Ergon, and purchase, deployment, use and outcome are separate dated relationships),
+a medical device (the model and the unit apart), an AI Workforce solution (design, runtime, runs and outputs apart), and rights and
+inventions.
+
+*A record typed Eidolon whose subject is something made* is still served at its identifier. `agora check ontology` (and the private
+repository's check, which runs the same rules) reports it as needing review and changes nothing. A person reviews it: if it is an
+Ergon, a new Ergon record is made that reflects the same subject and is derived from the old record, and the old record stays and
+points to it, so identifiers and relationships do not change. A subject no one can decide stays as it is and goes on the repository's
+register of open questions. Changing the rules and moving records are separate commits.
 
 The longer essay is `content/journal/eidolons.html`.
