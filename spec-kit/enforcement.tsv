@@ -1081,7 +1081,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-026	none	-	the reserved-address list and the generator's collision refusal are not built yet
 0044-public-website FR-027	none	-	the application is not built yet; no check of its evaluation or its not-found answer
 0044-public-website FR-028	none	-	no image is built yet; no check that a static host alone serves the files
-0044-public-website FR-029	none	-	no command deploys the application's image yet
+0044-public-website FR-029	none	-	no command deploys the application's image yet; eid check ontology checks an ApplicationHost record's fields, and nothing yet checks a deploy goes to a described host
 0044-public-website FR-030	none	-	the application is not built yet; no command runs it locally
 0045-elenchus-works FR-001	none	-	whether a work is of this kind is judgment
 0045-elenchus-works FR-002	none	-	vocabulary; no check of the words a record uses
@@ -1145,7 +1145,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0046-distribution-platform FR-009	none	-	no image is built yet
 0046-distribution-platform FR-010	none	-	no check of host independence; the move is proved by FR-013's restore
 0046-distribution-platform FR-011	none	-	the platform is not built yet
-0046-distribution-platform FR-012	none	-	no host is described yet
+0046-distribution-platform FR-012	none	-	no host is described yet; eid check ontology checks an ApplicationHost record's fields, and nothing checks a host is described before it is used
 0046-distribution-platform FR-013	none	-	no backup or restore drill exists yet
 0046-distribution-platform FR-014	none	-	the platform is not built yet; no check of the two kinds of request
 0046-distribution-platform FR-015	none	-	the platform is not built yet; no check that private content has no public address
