@@ -1,0 +1,104 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/reflections/customer-account#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: a customer account (0047-digital-reflections).
+# Everything here is invented. A healthcare company is an Eidolon; the software it bought is an Ergon; what connects them is
+# a set of separate relationships (purchase, deployment, use, outcome), each with its source and its dates. The questions it
+# answers:
+#   - What does Meridian run, and since when?            relationships of type deploys from ex:MeridianHealth
+#   - Who builds the software, and who owns it?           develops and owns are two relationships, to two different parties
+#   - What did Meridian use before?                       uses, closed by schema:validThrough, still there
+#   - Did it work, and how do we know?                    produces, supported by an assertion labelled evidence that a person verified
+#   - What is only a guess about the account?             assertions labelled hypothesis, attributed to an AI agent, never verified
+
+# ── The subjects. Each is typed by what it is; the type decides which kind of record it gets. ──
+ex:MeridianHealth a ifcore:Company ; dcterms:identifier "meridian-health" ; ifcore:hasAudience ifcore:Public .
+ex:VendorCo a ifcore:Company ; dcterms:identifier "vendor-co" ; ifcore:hasAudience ifcore:Public .
+ex:CareConnect a schema:WebApplication ; dcterms:identifier "care-connect" ; ifcore:hasAudience ifcore:Public .
+ex:LegacyScheduler a schema:SoftwareApplication ; dcterms:identifier "legacy-scheduler" ; ifcore:hasAudience ifcore:Public .
+ex:HarborEHR a schema:SoftwareApplication ; dcterms:identifier "harbor-ehr" ; ifcore:hasAudience ifcore:Public .
+ex:ReducedNoShows a ifcore:Outcome ; dcterms:identifier "reduced-no-shows" ; ifcore:hasAudience ifcore:Public .
+ex:ClinicManager a ifcore:Person ; dcterms:identifier "clinic-manager" ; ifcore:hasAudience ifcore:Public .
+ex:Analyst a ifcore:Person ; dcterms:identifier "analyst" ; ifcore:hasAudience ifcore:Public .
+ex:AccountAgent a prov:SoftwareAgent ; ifcore:hasAudience ifcore:Public .
+ex:OutpatientClinics a schema:Audience ; schema:audienceType "outpatient clinics"@en ; ifcore:hasAudience ifcore:Public .
+
+# ── The two reflections. One subject each, named by identifier, never by name. ──
+ex:MeridianHealthEidolon a ifcore:Eidolon ;
+    ifcore:reflects ex:MeridianHealth ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:CareConnectErgon a ifcore:Ergon ;
+    ifcore:reflects ex:CareConnect ; ifcore:ownerRole ifcore:DecisionAuthorityRole ;
+    ifcore:purpose "Reduce missed outpatient appointments by reminding patients and rebooking the freed slots."@en ;
+    schema:audience ex:OutpatientClinics ;
+    ifcore:hasAudience ifcore:Public .
+
+# ── Where the facts come from. A contract is the customer's confidential information: held only by reference. ──
+ex:CareConnectProductPage a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/care-connect"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:MeridianContract a ifcore:RestrictedDataReference ;
+    ifcore:heldIn "the company's contract system"@en ;
+    ifcore:accessInstructions "Ask the decision authority; access is granted by role."@en ; ifcore:hasAudience ifcore:Public .
+ex:AdoptionReport a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/meridian/adoption-report"^^xsd:anyURI ;
+    ifcore:verificationCadence "P3M"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+
+# ── Relationships: typed, directional, between subjects. Develops, owns, purchases, deploys and uses are five different facts. ──
+ex:VendorDevelopsCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Develops ; ifcore:relationFrom ex:VendorCo ; ifcore:relationTo ex:CareConnect ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CareConnectProductPage ; ifcore:hasAudience ifcore:Public .
+ex:VendorOwnsCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Owns ; ifcore:relationFrom ex:VendorCo ; ifcore:relationTo ex:CareConnect ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CareConnectProductPage ; ifcore:hasAudience ifcore:Public .
+ex:VendorOffersCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Offers ; ifcore:relationFrom ex:VendorCo ; ifcore:relationTo ex:CareConnect ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CareConnectProductPage ; ifcore:hasAudience ifcore:Public .
+ex:MeridianPurchasesCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Purchases ; ifcore:relationFrom ex:MeridianHealth ; ifcore:relationTo ex:CareConnect ;
+    schema:validFrom "2025-03-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:MeridianContract ; ifcore:hasAudience ifcore:Public .
+ex:MeridianDeploysCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Deploys ; ifcore:relationFrom ex:MeridianHealth ; ifcore:relationTo ex:CareConnect ;
+    schema:validFrom "2025-04-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AdoptionReport ; ifcore:hasAudience ifcore:Public .
+ex:MeridianUsedLegacyScheduler a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Uses ; ifcore:relationFrom ex:MeridianHealth ; ifcore:relationTo ex:LegacyScheduler ;
+    schema:validFrom "2019-06-01"^^xsd:date ; schema:validThrough "2025-04-14"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AdoptionReport ; ifcore:hasAudience ifcore:Public .
+ex:MeridianUsesCareConnect a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Uses ; ifcore:relationFrom ex:MeridianHealth ; ifcore:relationTo ex:CareConnect ;
+    schema:validFrom "2025-04-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AdoptionReport ; ifcore:hasAudience ifcore:Public .
+ex:CareConnectIntegratesHarborEHR a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:IntegratesWith ; ifcore:relationFrom ex:CareConnect ; ifcore:relationTo ex:HarborEHR ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CareConnectProductPage ; ifcore:hasAudience ifcore:Public .
+ex:CareConnectDependsOnHarborEHR a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:CareConnect ; ifcore:relationTo ex:HarborEHR ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ;
+    prov:wasAttributedTo ex:AccountAgent ; ifcore:hasAudience ifcore:Public .
+ex:CareConnectIntendsFewerNoShows a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Intends ; ifcore:relationFrom ex:CareConnect ; ifcore:relationTo ex:ReducedNoShows ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CareConnectProductPage ; ifcore:hasAudience ifcore:Public .
+ex:CareConnectProducedFewerNoShows a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Produces ; ifcore:relationFrom ex:CareConnect ; ifcore:relationTo ex:ReducedNoShows ;
+    schema:validFrom "2025-09-30"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:AdoptionReport ;
+    ifcore:verifiedBy ex:Analyst ; ifcore:verifiedOn "2025-10-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# ── What is known about the account, kept apart: an observation, an AI hypothesis, and a recommendation built on them. ──
+ex:ConcernObservation a ifcore:Assertion ; schema:about ex:MeridianHealth ;
+    dcterms:description "The clinic manager says missed appointments cost the front desk the most time."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AdoptionReport ;
+    ifcore:verifiedBy ex:Analyst ; ifcore:verifiedOn "2025-10-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:CompetitorHypothesis a ifcore:Assertion ; schema:about ex:MeridianHealth ;
+    dcterms:description "Meridian may be evaluating a second scheduling product for its newest clinic."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ;
+    prov:wasAttributedTo ex:AccountAgent ; ifcore:hasAudience ifcore:Public .
+ex:NextStepRecommendation a ifcore:Assertion ; schema:about ex:MeridianHealth ;
+    dcterms:description "Ask the clinic manager whether the newest clinic's scheduling is in scope before the renewal call."@en ;
+    ifcore:claimLabel ifcore:RecommendationLabel ; prov:wasDerivedFrom ex:ConcernObservation, ex:CompetitorHypothesis ;
+    prov:wasAttributedTo ex:AccountAgent ; ifcore:hasAudience ifcore:Public .

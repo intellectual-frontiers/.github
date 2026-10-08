@@ -1,0 +1,84 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/reflections/medical-device#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: a medical device (0047-digital-reflections).
+# Everything here is invented. The model is something deliberately designed, so it is an Ergon. The unit on a hospital's
+# floor, with a serial number, a place, a condition and a service history, exists as an individual, so it is an Eidolon.
+# They are two subjects with two records, joined by instantiates. The questions it answers:
+#   - What is this unit, where is it, and what has been done to it?   the unit's Eidolon and its assertions
+#   - What was it made to do, and what shows that it does?            the model's Ergon, its purpose and its evidence
+#   - Which units are affected if the model's software changes?       instantiates, followed backwards from the model
+#   - Who owns it, and who is responsible for running it?             owns and operates, two relationships
+
+ex:VentriFlow200 a schema:ProductModel ; dcterms:identifier "ventriflow-200" ; ifcore:hasAudience ifcore:Public .
+ex:VentriFlowSoftware a schema:SoftwareApplication ; dcterms:identifier "ventriflow-software" ; ifcore:hasAudience ifcore:Public .
+ex:VentriFlowUnit0042 a schema:IndividualProduct ; dcterms:identifier "ventriflow-200-sn-0042" ; ifcore:hasAudience ifcore:Public .
+ex:StMarysHealth a schema:MedicalOrganization ; dcterms:identifier "st-marys-health" ; ifcore:hasAudience ifcore:Public .
+ex:StMarysMainBuilding a schema:CivicStructure ; dcterms:identifier "st-marys-main-building" ; ifcore:hasAudience ifcore:Public .
+ex:DeviceMaker a ifcore:Company ; dcterms:identifier "device-maker" ; ifcore:hasAudience ifcore:Public .
+ex:BiomedTech a ifcore:Person ; dcterms:identifier "biomed-tech" ; ifcore:hasAudience ifcore:Public .
+
+# The model: purpose, design, interfaces, verification and regulatory context are the Ergon's to carry.
+ex:VentriFlow200Ergon a ifcore:Ergon ;
+    ifcore:reflects ex:VentriFlow200 ;
+    ifcore:purpose "Deliver a programmed infusion rate to an adult patient and stop safely when the line is occluded."@en ;
+    ifcore:hasAudience ifcore:Public .
+ex:VentriFlowSoftwareErgon a ifcore:Ergon ;
+    ifcore:reflects ex:VentriFlowSoftware ;
+    ifcore:purpose "Run the pump's control loop and its alarm logic."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# The unit: identity, place, condition and service history are the Eidolon's to carry.
+ex:VentriFlowUnit0042Eidolon a ifcore:Eidolon ;
+    ifcore:reflects ex:VentriFlowUnit0042 ; ifcore:hasAudience ifcore:Public .
+ex:StMarysHealthEidolon a ifcore:Eidolon ;
+    ifcore:reflects ex:StMarysHealth ; ifcore:hasAudience ifcore:Public .
+ex:StMarysMainBuildingEidolon a ifcore:Eidolon ;
+    ifcore:reflects ex:StMarysMainBuilding ; ifcore:hasAudience ifcore:Public .
+
+# A regulator's record is the authority on clearance. It is held by reference with a re-verification cadence.
+ex:RegulatoryClearance a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/regulator/clearances/K000000"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:BenchTestReport a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/device-maker/reports/ventriflow-200-bench"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:ServiceLog a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/st-marys/biomed/service-log"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1M"^^xsd:duration ; ifcore:verificationMethod "automated" ; ifcore:hasAudience ifcore:Public .
+
+ex:ModelClearance a ifcore:Assertion ; schema:about ex:VentriFlow200 ;
+    dcterms:description "The model holds the clearance the regulator's record names."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:RegulatoryClearance ; ifcore:hasAudience ifcore:Public .
+ex:ModelVerification a ifcore:Assertion ; schema:about ex:VentriFlow200 ;
+    dcterms:description "Bench testing met the occlusion-stop requirement across the tested rate range."@en ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:BenchTestReport ;
+    ifcore:verifiedBy ex:BiomedTech ; ifcore:verifiedOn "2026-01-12"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:UnitLocation a ifcore:Assertion ; schema:about ex:VentriFlowUnit0042 ;
+    dcterms:description "In service on the fourth floor of the main building."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:ServiceLog ; ifcore:hasAudience ifcore:Public .
+ex:UnitServiceVisit a ifcore:Assertion ; schema:about ex:VentriFlowUnit0042 ;
+    dcterms:description "Occlusion sensor replaced and the unit re-tested."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:ServiceLog ;
+    ifcore:verifiedBy ex:BiomedTech ; ifcore:verifiedOn "2026-06-03"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:UnitInstantiatesModel a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Instantiates ; ifcore:relationFrom ex:VentriFlowUnit0042 ; ifcore:relationTo ex:VentriFlow200 ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:ServiceLog ; ifcore:hasAudience ifcore:Public .
+ex:ModelDependsOnSoftware a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:VentriFlow200 ; ifcore:relationTo ex:VentriFlowSoftware ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:BenchTestReport ; ifcore:hasAudience ifcore:Public .
+ex:MakerDevelopsModel a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Develops ; ifcore:relationFrom ex:DeviceMaker ; ifcore:relationTo ex:VentriFlow200 ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:RegulatoryClearance ; ifcore:hasAudience ifcore:Public .
+ex:HospitalOwnsUnit a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Owns ; ifcore:relationFrom ex:StMarysHealth ; ifcore:relationTo ex:VentriFlowUnit0042 ;
+    schema:validFrom "2024-11-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:ServiceLog ; ifcore:hasAudience ifcore:Public .
+ex:TechOperatesUnit a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Operates ; ifcore:relationFrom ex:BiomedTech ; ifcore:relationTo ex:VentriFlowUnit0042 ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .

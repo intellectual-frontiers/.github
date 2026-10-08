@@ -1,0 +1,93 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/reflections/ai-workforce#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: an AI Workforce solution (0047-digital-reflections).
+# Everything here is invented. The solution's design and operating contract (purpose, instructions, responsibilities, tools,
+# permissions, dependencies, acceptance tests, performance evidence) is an Ergon. The people and organizations around it are
+# Eidolons. A running instance, a run of the workflow, an audit event and an output are not Ergons: they are an agent, events and
+# an entity, typed as what they are. The questions it answers:
+#   - What is this solution for, and what is it allowed to do?        the Ergon's purpose and its dependencies
+#   - Who runs it, for whom, and who employs the person who runs it?   operates, deploys, worksFor, three relationships
+#   - What did it do on a given day?                                   executes, from each run
+#   - How do we know it is good enough?                                evidence assertions, verified by a person
+
+ex:ClaimsTriage a ifcore:AIWorkforce ; dcterms:identifier "claims-triage" ; ifcore:hasAudience ifcore:Public .
+ex:ClaimsPlatform a schema:SoftwareApplication ; dcterms:identifier "claims-platform" ; ifcore:hasAudience ifcore:Public .
+ex:LanguageModelService a schema:Service ; dcterms:identifier "language-model-service" ; ifcore:hasAudience ifcore:Public .
+ex:TriageWorkflow a ifcore:Workflow ; dcterms:identifier "triage-workflow" ; ifcore:hasAudience ifcore:Public .
+ex:RiverbendClinic a ifcore:Company ; dcterms:identifier "riverbend-clinic" ; ifcore:hasAudience ifcore:Public .
+ex:ManagedServicesCo a ifcore:Company ; dcterms:identifier "managed-services-co" ; ifcore:hasAudience ifcore:Public .
+ex:Operator a ifcore:Person ; dcterms:identifier "operator" ; ifcore:hasAudience ifcore:Public .
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+
+# The runtime: a running agent is a software agent, not the design (its kind is undetermined, 0047 OQ-2). A run is an event.
+ex:ClaimsTriageAgentProd1 a prov:SoftwareAgent ; ifcore:hasAudience ifcore:Public .
+ex:Run20261007n1 a prov:Activity ; prov:wasAssociatedWith ex:ClaimsTriageAgentProd1 ; ifcore:hasAudience ifcore:Public .
+ex:AuditEvent20261007n1 a prov:Activity ; prov:wasInformedBy ex:Run20261007n1 ; ifcore:hasAudience ifcore:Public .
+ex:TriageSummary20261007n1 a prov:Entity ; prov:wasGeneratedBy ex:Run20261007n1 ; ifcore:hasAudience ifcore:Public .
+
+ex:ClaimsTriageErgon a ifcore:Ergon ;
+    ifcore:reflects ex:ClaimsTriage ; ifcore:ownerRole ifcore:DecisionAuthorityRole ;
+    ifcore:purpose "Read each incoming claim, route it to the right queue and flag the ones a person must see first."@en ;
+    ifcore:hasAudience ifcore:Public .
+ex:TriageWorkflowErgon a ifcore:Ergon ;
+    ifcore:reflects ex:TriageWorkflow ;
+    ifcore:purpose "The operating method the solution follows: intake, classify, route, escalate."@en ;
+    ifcore:hasAudience ifcore:Public .
+ex:RiverbendClinicEidolon a ifcore:Eidolon ; ifcore:reflects ex:RiverbendClinic ; ifcore:hasAudience ifcore:Public .
+ex:ManagedServicesCoEidolon a ifcore:Eidolon ; ifcore:reflects ex:ManagedServicesCo ; ifcore:hasAudience ifcore:Public .
+ex:OperatorEidolon a ifcore:Eidolon ; ifcore:reflects ex:Operator ; ifcore:hasAudience ifcore:Public .
+
+ex:AcceptanceResults a ifcore:ExternalRecordReference ;
+    ifcore:primarySource "https://example.org/claims-triage/acceptance/v3"^^xsd:anyURI ;
+    ifcore:verificationCadence "P3M"^^xsd:duration ; ifcore:verificationMethod "automated" ; ifcore:hasAudience ifcore:Public .
+ex:PermissionsRecord a ifcore:RestrictedDataReference ;
+    ifcore:heldIn "the identity provider's role assignments"@en ;
+    ifcore:accessInstructions "Ask the system owner role; no credential is kept in this record."@en ; ifcore:hasAudience ifcore:Public .
+
+ex:AcceptanceEvidence a ifcore:Assertion ; schema:about ex:ClaimsTriage ;
+    dcterms:description "The solution passed the acceptance suite's routing cases on the last run."@en ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:AcceptanceResults ;
+    ifcore:verifiedBy ex:Reviewer ; ifcore:verifiedOn "2026-09-30"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:PermissionsObservation a ifcore:Assertion ; schema:about ex:ClaimsTriage ;
+    dcterms:description "The solution may read claims and write routing labels, and may not change a claim's amount."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .
+ex:ThroughputInference a ifcore:Assertion ; schema:about ex:ClaimsTriage ;
+    dcterms:description "At the current volume the solution probably removes about a day of manual routing a week."@en ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Medium ;
+    prov:wasAttributedTo ex:ClaimsTriageAgentProd1 ; ifcore:hasAudience ifcore:Public .
+
+ex:OperatorOperates a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Operates ; ifcore:relationFrom ex:Operator ; ifcore:relationTo ex:ClaimsTriage ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .
+ex:OperatorWorksFor a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:WorksFor ; ifcore:relationFrom ex:Operator ; ifcore:relationTo ex:ManagedServicesCo ;
+    schema:validFrom "2025-08-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:ClientPurchases a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Purchases ; ifcore:relationFrom ex:RiverbendClinic ; ifcore:relationTo ex:ClaimsTriage ;
+    schema:validFrom "2026-02-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .
+ex:ServiceCoDeploys a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Deploys ; ifcore:relationFrom ex:ManagedServicesCo ; ifcore:relationTo ex:ClaimsTriage ;
+    schema:validFrom "2026-03-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceResults ; ifcore:hasAudience ifcore:Public .
+ex:SolutionDependsOnModel a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:ClaimsTriage ; ifcore:relationTo ex:LanguageModelService ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceResults ; ifcore:hasAudience ifcore:Public .
+ex:SolutionUsesPlatform a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Uses ; ifcore:relationFrom ex:ClaimsTriage ; ifcore:relationTo ex:ClaimsPlatform ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .
+ex:SolutionFollowsWorkflow a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Uses ; ifcore:relationFrom ex:ClaimsTriage ; ifcore:relationTo ex:TriageWorkflow ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceResults ; ifcore:hasAudience ifcore:Public .
+ex:AgentInstantiatesSolution a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Instantiates ; ifcore:relationFrom ex:ClaimsTriageAgentProd1 ; ifcore:relationTo ex:ClaimsTriage ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .
+ex:RunExecutesWorkflow a ifcore:ReflectionRelationship ;
+    ifcore:relationType ifcore:Executes ; ifcore:relationFrom ex:Run20261007n1 ; ifcore:relationTo ex:TriageWorkflow ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PermissionsRecord ; ifcore:hasAudience ifcore:Public .

@@ -1,0 +1,152 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/noema/native-alpha#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example A: Native Alpha as a Noema (0048-noemas).
+# Illustrative only: the people, organizations, cases and dates are invented, and nothing here is the company's own record of
+# Native Alpha. It shows how a framework, its principle and its hypothesis are separate Noemas; how the claims they state are not
+# Noemas; how evidence for and against sits together; how an AI's proposal stays a candidate; and how the idea is traced from an
+# observation to a product, to a buyer's demand, and to a mark that is owned as a right and not as the idea. The questions it answers:
+#   - What is the idea, and what does it assume?             skos:definition, the assumption aspects
+#   - Does it hold up?                                       current state, and the supports and contradicts relationships
+#   - How far has it travelled toward use?                   noemas.trace: the stages reached by accepted records
+#   - Is anyone asking for it?                               demand evidence, which names the Eidolons it came from
+#   - Who owns it?                                           nobody owns an idea; only the mark and any patent are owned
+
+# ── The subjects: ideas are ifcore:IntellectualConstruct with a subtype; the rest are typed as what they are. ──
+ex:NativeAlpha a ifcore:IntellectualConstruct ; rdfs:label "Native Alpha"@en ; dcterms:identifier "native-alpha" ;
+    dcterms:type ifcore:ConceptType, ifcore:FrameworkType ; dcterms:hasPart ex:InsightMeetsProblem, ex:InsightAloneFails ; ifcore:hasAudience ifcore:Public .
+ex:InsightMeetsProblem a ifcore:IntellectualConstruct ; rdfs:label "Insight plus a real problem plus execution"@en ; dcterms:identifier "insight-meets-problem" ;
+    dcterms:type ifcore:PrincipleType ; ifcore:hasAudience ifcore:Public .
+ex:InsightAloneFails a ifcore:IntellectualConstruct ; rdfs:label "Insight alone does not compound"@en ; dcterms:identifier "insight-alone-fails" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+ex:NetworkOfInsight a ifcore:IntellectualConstruct ; rdfs:label "Shared insight compounds across customers"@en ; dcterms:identifier "network-of-insight" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+
+# ── Claims are statements a Noema states. They are not Noemas and have no reflection. ──
+ex:ClaimAdvantage a schema:Claim ; schema:text "An unusual insight connected to a real problem and carried out well yields an advantage others cannot easily copy."@en ; ifcore:hasAudience ifcore:Public .
+ex:ClaimInsufficient a schema:Claim ; schema:text "An unusual insight with no real problem or no execution yields no lasting advantage."@en ; ifcore:hasAudience ifcore:Public .
+ex:ClaimCompounds a schema:Claim ; schema:text "Insight shared across customers makes each later customer's result better."@en ; ifcore:hasAudience ifcore:Public .
+
+# ── People, organizations, a made thing and a right, each of its own kind. ──
+ex:ResearchCo a ifcore:Company ; dcterms:identifier "research-co" ; ifcore:hasAudience ifcore:Public .
+ex:ClientCo a ifcore:Company ; dcterms:identifier "client-co" ; ifcore:hasAudience ifcore:Public .
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+ex:ResearchAgent a prov:SoftwareAgent ; ifcore:hasAudience ifcore:Public .
+ex:DiscoveryMethod a ifcore:Workflow ; dcterms:identifier "discovery-method" ; ifcore:hasAudience ifcore:Public .
+ex:DiscoveryService a schema:Service ; dcterms:identifier "discovery-service" ; ifcore:hasAudience ifcore:Public .
+ex:NativeAlphaMark a ifcore:Trademark ; dcterms:identifier "native-alpha-mark" ; ifcore:hasAudience ifcore:Public .
+ex:CaseOne a prov:Activity ; rdfs:label "A review of one company's reorganized services"@en ; ifcore:hasAudience ifcore:Public .
+ex:CaseTwo a prov:Activity ; rdfs:label "A review of a technically unusual product with no buyer"@en ; ifcore:hasAudience ifcore:Public .
+ex:LateCounterexample a prov:Activity ; rdfs:label "A company with a real problem and good execution that gained no advantage"@en ; ifcore:hasAudience ifcore:Public .
+
+# ── Sources. ──
+ex:CaseNotes a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/native-alpha/case-notes"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:EngagementRecord a ifcore:RestrictedDataReference ; ifcore:heldIn "the engagement system"@en ;
+    ifcore:accessInstructions "Ask the decision authority; access is granted by role."@en ; ifcore:hasAudience ifcore:Public .
+
+# ── The Noema records. Each reflects one subject and says what the idea is. ──
+ex:NativeAlphaNoema a ifcore:Noema ; ifcore:reflects ex:NativeAlpha ;
+    skos:definition "The principle that an unusual insight can produce a commercially meaningful advantage when it is connected to a real problem and carried out well."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ;
+    ifcore:hasAudience ifcore:Public .
+ex:InsightMeetsProblemNoema a ifcore:Noema ; ifcore:reflects ex:InsightMeetsProblem ;
+    skos:definition "An advantage needs three things together: an insight others lack, a real problem it bears on, and execution that reaches the problem."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:InsightAloneFailsNoema a ifcore:Noema ; ifcore:reflects ex:InsightAloneFails ;
+    skos:definition "Novelty without a problem or without execution does not produce a lasting advantage."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+# Proposed by an AI agent from a document: a candidate, with no reviewer. It stays a candidate until a person reviews it.
+ex:NetworkOfInsightNoema a ifcore:Noema ; ifcore:reflects ex:NetworkOfInsight ;
+    skos:definition "Insight shared across customers may compound."@en ;
+    prov:wasAttributedTo ex:ResearchAgent ; ifcore:hasAudience ifcore:Public .
+
+# ── What each idea states. ──
+ex:S1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:InsightMeetsProblem ; ifcore:relationTo ex:ClaimAdvantage ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:S2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:InsightAloneFails ; ifcore:relationTo ex:ClaimInsufficient ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:S3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:NetworkOfInsight ; ifcore:relationTo ex:ClaimCompounds ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:hasAudience ifcore:Public .
+
+# ── Observation, conception, investigation: what prompted it, and the evidence for and against, side by side. ──
+ex:R1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:MotivatedBy ; ifcore:relationFrom ex:InsightMeetsProblem ; ifcore:relationTo ex:CaseOne ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:R2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:CaseOne ; ifcore:relationTo ex:InsightMeetsProblem ;
+    schema:validFrom "2026-02-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-12"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:R3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:CaseTwo ; ifcore:relationTo ex:InsightAloneFails ;
+    schema:validFrom "2026-02-20"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-22"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:R4 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Contradicts ; ifcore:relationFrom ex:LateCounterexample ; ifcore:relationTo ex:InsightMeetsProblem ;
+    schema:validFrom "2026-09-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-09-20"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:R5 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:BuildsOn ; ifcore:relationFrom ex:InsightAloneFails ; ifcore:relationTo ex:InsightMeetsProblem ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# ── The state is an assessment, dated and sourced. The AI's is a candidate and changes nothing. ──
+ex:AssessSupported a ifcore:EpistemicAssessment ; schema:about ex:InsightMeetsProblem ; ifcore:assessedState ifcore:SupportedState ;
+    dcterms:description "Two reviewed cases fit; no case yet contradicts."@en ; schema:validFrom "2026-03-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Medium ; dcterms:source ex:CaseNotes ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:AssessContestedByAgent a ifcore:EpistemicAssessment ; schema:about ex:InsightMeetsProblem ; ifcore:assessedState ifcore:ContestedState ;
+    dcterms:description "The agent reads the late counterexample as enough to contest the principle."@en ; schema:validFrom "2026-09-16"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:CaseNotes ; prov:wasAttributedTo ex:ResearchAgent ; ifcore:hasAudience ifcore:Public .
+
+# ── The parts of the idea: what it assumes, what would refute it, what follows, and the optional commercial parts. ──
+ex:Assume1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:AssumptionAspect ;
+    dcterms:description "The problem is one that buyers already feel and would pay to remove."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Falsifier1 a ifcore:Assertion ; schema:about ex:InsightAloneFails ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "A lasting advantage from an insight alone, with no identified problem and no execution, would weaken it."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Consequence1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:ConsequenceAspect ;
+    dcterms:description "If correct, research is worth funding only where a buyer's problem is identified first."@en ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Problem1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:ProblemAddressedAspect ;
+    dcterms:description "Executives cannot tell which of their unusual facts is worth building on."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Wedge1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:ProductWedgeAspect ;
+    dcterms:description "A short discovery engagement that ends in a ranked list of facts worth building on."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:CommercialGuess a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:CommercialHypothesisAspect ;
+    dcterms:description "Mid-size firms would pay for the discovery engagement."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; prov:wasAttributedTo ex:ResearchAgent ; ifcore:hasAudience ifcore:Public .
+ex:Obstacle1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:AdoptionObstacleAspect ;
+    dcterms:description "Buyers expect a deliverable, not a ranking."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+
+# ── Engagement is not ownership; the mark is owned as a right, not as the idea. ──
+ex:E1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Proposes ; ifcore:relationFrom ex:ResearchCo ; ifcore:relationTo ex:NativeAlpha ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:E2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Adopts ; ifcore:relationFrom ex:ClientCo ; ifcore:relationTo ex:NativeAlpha ;
+    schema:validFrom "2026-05-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:EngagementRecord ; ifcore:hasAudience ifcore:Public .
+ex:E3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Owns ; ifcore:relationFrom ex:ResearchCo ; ifcore:relationTo ex:NativeAlphaMark ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:CaseNotes ; ifcore:hasAudience ifcore:Public .
+
+# ── Relevance, operationalization, validation: the Ergons that carry the idea out, and demand from identifiable Eidolons. ──
+ex:O1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operationalizes ; ifcore:relationFrom ex:DiscoveryMethod ; ifcore:relationTo ex:NativeAlpha ;
+    schema:validFrom "2026-04-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:EngagementRecord ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:O2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:InformsDesignOf ; ifcore:relationFrom ex:InsightMeetsProblem ; ifcore:relationTo ex:DiscoveryService ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:EngagementRecord ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:O3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:DiscoveryService ; ifcore:relationTo ex:InsightMeetsProblem ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:EngagementRecord ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Demand1 a ifcore:Assertion ; schema:about ex:DiscoveryService ; ifcore:aspect ifcore:DemandEvidenceAspect ; ifcore:demonstratedBy ex:ClientCo ;
+    dcterms:description "A client paid for a second discovery engagement after the first."@en ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:EngagementRecord ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-07-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Source1 a ifcore:Assertion ; schema:about ex:InsightMeetsProblem ; ifcore:aspect ifcore:NativeAlphaSourceAspect ;
+    dcterms:description "The ranked list is hard to copy because it rests on the firm's own unusual facts."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+
+# The agent's proposal comes with a falsifier, also a candidate.
+ex:Falsifier2 a ifcore:Assertion ; schema:about ex:NetworkOfInsight ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "Later customers whose results are no better than the first customer's would weaken it."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; prov:wasAttributedTo ex:ResearchAgent ; ifcore:hasAudience ifcore:Public .
