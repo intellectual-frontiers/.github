@@ -1,0 +1,145 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/noema/care-delivery#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example C: engineering care delivery as a research agenda (0048-noemas).
+# Illustrative only. The agenda holds research questions, two competing explanations of one observation, economic assumptions and
+# an experiment. The two theories contradict each other and both stay: the question is contested because credible evidence and
+# argument stand on both sides, which is assessed and not computed. An engineered care delivery program is an Ergon; it generates
+# evidence for the ideas and a health system provides it. The commercial parts are optional and say what is guessed and what is
+# shown. The questions it answers:
+#   - Which explanation fits the variation in cost?          explains, from each competing theory, and contradicts between them
+#   - What would we run to tell them apart?                  the experimental design, tested by an experiment (an event)
+#   - Where might this become a product, and what is only a guess?   the commercial aspects, labelled hypothesis or evidence
+
+ex:CareAgenda a ifcore:IntellectualConstruct ; rdfs:label "Engineering care delivery"@en ; dcterms:identifier "engineering-care-delivery" ;
+    dcterms:type ifcore:ResearchAgendaType ; dcterms:hasPart ex:WhyCostVaries, ex:VariationIsWorkflow, ex:VariationIsIncentive, ex:WhichRedesign ; ifcore:hasAudience ifcore:Public .
+ex:WhyCostVaries a ifcore:IntellectualConstruct ; rdfs:label "Why the cost of the same care varies"@en ; dcterms:identifier "why-cost-varies" ;
+    dcterms:type ifcore:ResearchQuestionType ; ifcore:hasAudience ifcore:Public .
+ex:VariationIsWorkflow a ifcore:IntellectualConstruct ; rdfs:label "Variation comes from workflow"@en ; dcterms:identifier "variation-is-workflow" ;
+    dcterms:type ifcore:TheoryType, ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+ex:VariationIsIncentive a ifcore:IntellectualConstruct ; rdfs:label "Variation comes from incentives"@en ; dcterms:identifier "variation-is-incentive" ;
+    dcterms:type ifcore:TheoryType, ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+ex:WhichRedesign a ifcore:IntellectualConstruct ; rdfs:label "Which part of the care process to redesign first"@en ; dcterms:identifier "which-redesign" ;
+    dcterms:type ifcore:ResearchQuestionType ; ifcore:hasAudience ifcore:Public .
+
+ex:ClaimWorkflow a schema:Claim ; schema:text "Most of the variation in cost between sites is explained by differences in how the same care is organized."@en ; ifcore:hasAudience ifcore:Public .
+ex:ClaimIncentive a schema:Claim ; schema:text "Most of the variation in cost between sites is explained by differences in how the sites are paid."@en ; ifcore:hasAudience ifcore:Public .
+
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+ex:HealthSystem a schema:MedicalOrganization ; dcterms:identifier "health-system" ; ifcore:hasAudience ifcore:Public .
+ex:Payer a ifcore:Company ; dcterms:identifier "payer" ; ifcore:hasAudience ifcore:Public .
+ex:CareProgram a schema:Service ; dcterms:identifier "engineered-care-program" ; ifcore:hasAudience ifcore:Public .
+ex:CostVariation a prov:Activity ; rdfs:label "A study of cost variation across eight sites"@en ; ifcore:hasAudience ifcore:Public .
+ex:Pilot a prov:Activity ; rdfs:label "A pilot that standardizes one care pathway at three sites"@en ; ifcore:hasAudience ifcore:Public .
+ex:StudyData a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/care/variation-study"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:PilotData a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/care/pilot"^^xsd:anyURI ;
+    ifcore:verificationCadence "P3M"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+
+ex:AgendaNoema a ifcore:Noema ; ifcore:reflects ex:CareAgenda ;
+    skos:definition "A program of inquiry into how care delivery itself could be systematically engineered with technology, AI, incentives, workflows and organizational redesign."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:QuestionNoema a ifcore:Noema ; ifcore:reflects ex:WhyCostVaries ;
+    skos:definition "Why does the cost of delivering the same care vary so widely between sites?"@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:WorkflowNoema a ifcore:Noema ; ifcore:reflects ex:VariationIsWorkflow ;
+    skos:definition "Cost varies mainly because the same care is organized differently from site to site."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:IncentiveNoema a ifcore:Noema ; ifcore:reflects ex:VariationIsIncentive ;
+    skos:definition "Cost varies mainly because sites are paid differently for the same care."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:RedesignNoema a ifcore:Noema ; ifcore:reflects ex:WhichRedesign ;
+    skos:definition "Which part of the care process, if redesigned first, would change cost the most for the least disruption?"@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:S1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:VariationIsWorkflow ; ifcore:relationTo ex:ClaimWorkflow ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:S2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:VariationIsIncentive ; ifcore:relationTo ex:ClaimIncentive ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+
+# One observation, two competing explanations. Each explains it, and each contradicts the other.
+ex:M1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:MotivatedBy ; ifcore:relationFrom ex:WhyCostVaries ; ifcore:relationTo ex:CostVariation ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:StudyData ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:X1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Explains ; ifcore:relationFrom ex:VariationIsWorkflow ; ifcore:relationTo ex:CostVariation ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:X2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Explains ; ifcore:relationFrom ex:VariationIsIncentive ; ifcore:relationTo ex:CostVariation ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:C1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Contradicts ; ifcore:relationFrom ex:VariationIsIncentive ; ifcore:relationTo ex:VariationIsWorkflow ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:C2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Contradicts ; ifcore:relationFrom ex:VariationIsWorkflow ; ifcore:relationTo ex:VariationIsIncentive ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:Sup1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:Pilot ; ifcore:relationTo ex:VariationIsWorkflow ;
+    schema:validFrom "2026-08-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-08-05"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Con1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Contradicts ; ifcore:relationFrom ex:Pilot ; ifcore:relationTo ex:VariationIsIncentive ;
+    schema:validFrom "2026-08-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-08-05"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Sup2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:CostVariation ; ifcore:relationTo ex:VariationIsIncentive ;
+    schema:validFrom "2026-04-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:StudyData ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-05"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# Both explanations are contested, as of the day the pilot reported.
+ex:AssessWorkflow a ifcore:EpistemicAssessment ; schema:about ex:VariationIsWorkflow ; ifcore:assessedState ifcore:ContestedState ;
+    dcterms:description "The pilot favors it and the cost study fits the rival; neither settles it."@en ; schema:validFrom "2026-08-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-08-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:AssessIncentive a ifcore:EpistemicAssessment ; schema:about ex:VariationIsIncentive ; ifcore:assessedState ifcore:ContestedState ;
+    dcterms:description "The cost study fits it and the pilot does not."@en ; schema:validFrom "2026-08-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-08-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:Falsifier1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "Standardizing the pathway at a site without changing its pay leaves cost unchanged."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Falsifier2 a ifcore:Assertion ; schema:about ex:VariationIsIncentive ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "Cost falling at a site whose pay is unchanged and whose pathway was standardized would weaken it."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Econ1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:AssumptionAspect ;
+    dcterms:description "Sites would adopt a standard pathway if it lowered their cost without lowering their income."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:Design1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:ExperimentalDesignAspect ;
+    dcterms:description "Standardize one pathway at three sites and compare cost with matched sites whose pay and pathway stay the same."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-06-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Limit1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:LimitationAspect ;
+    dcterms:description "Three sites and one pathway cannot say whether the result holds in other kinds of care."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotData ; ifcore:hasAudience ifcore:Public .
+ex:Counter1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:CounterargumentAspect ;
+    dcterms:description "Sites that standardize may be those already motivated to cut cost, so the pilot may not generalize."@en ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+
+# The pilot tests the workflow theory; the program is the Ergon that runs; the health system provides the evidence.
+ex:T1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Tests ; ifcore:relationFrom ex:Pilot ; ifcore:relationTo ex:VariationIsWorkflow ;
+    schema:validFrom "2026-08-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotData ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-08-05"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:G1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:GeneratesEvidenceFor ; ifcore:relationFrom ex:CareProgram ; ifcore:relationTo ex:VariationIsWorkflow ;
+    schema:validFrom "2026-08-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; ifcore:hasAudience ifcore:Public .
+ex:Pr1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:ProvidesEvidenceFor ; ifcore:relationFrom ex:HealthSystem ; ifcore:relationTo ex:VariationIsWorkflow ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:PilotData ; ifcore:hasAudience ifcore:Public .
+ex:Rs1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Researches ; ifcore:relationFrom ex:HealthSystem ; ifcore:relationTo ex:CareAgenda ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotData ; ifcore:hasAudience ifcore:Public .
+ex:Id1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:InformsDesignOf ; ifcore:relationFrom ex:VariationIsWorkflow ; ifcore:relationTo ex:CareProgram ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:PilotData ; ifcore:hasAudience ifcore:Public .
+
+# Commercial implications: what is only guessed is labelled so, and a guess is never demand.
+ex:Buyer1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:PotentialBuyerAspect ;
+    dcterms:description "Payers that carry the cost of the variation."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:Wedge1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:ProductWedgeAspect ;
+    dcterms:description "A pathway-standardization service for one high-volume procedure."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+ex:Comp1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:CompetingApproachAspect ;
+    dcterms:description "Pay reform, which changes the incentive and not the workflow."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:StudyData ; ifcore:hasAudience ifcore:Public .
+ex:Obstacle1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:AdoptionObstacleAspect ;
+    dcterms:description "Clinicians resist a standard pathway that they did not help write."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:Guess1 a ifcore:Assertion ; schema:about ex:VariationIsWorkflow ; ifcore:aspect ifcore:CommercialHypothesisAspect ;
+    dcterms:description "A payer would share savings with a vendor that standardizes a pathway."@en ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .

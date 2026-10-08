@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, design_systems, ontology, reflections, register, specs, terms
+from agora.lib import controls, design_systems, noemas, ontology, reflections, register, specs, terms
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -450,6 +450,149 @@ def ontology_show(ctx: Ctx, term: str) -> Resource:
     for key, cols in (("statements", ["predicate", "object", "kind"]), ("referenced_by", ["curie", "label", "kind", "predicate"]),
                       ("specs", ["requirement", "how", "text"])):
         res.columns[key] = cols
+    return res
+
+
+# reflection --------------------------------------------------------------------------------------------------------
+REFLECTION_KIND = Choice("REFLECTION_KIND", tuple(reflections.KIND_CLASS), "a kind of digital reflection (0047-digital-reflections FR-001)")
+EPISTEMIC_STATE = Choice("EPISTEMIC_STATE", noemas.STATES, "an epistemic state of a Noema (0048-noemas FR-011)")
+REVIEW_STATE = Choice("REVIEW_STATE", reflections.REVIEW_STATES, "a review state (0047-digital-reflections FR-038)")
+
+
+def _reflection_graph(ctx: Ctx) -> tuple[reflections.Graph, set[str]]:
+    g, _ = reflections.load(ctx.root, ctx.public)
+    own = {str(f.relative_to(ctx.root)) for f in (ctx.root / "ontology").rglob("*.ttl")} if (ctx.root / "ontology").is_dir() else set()
+    if ctx.public == ctx.root:
+        own |= {str(f.relative_to(ctx.root)) for f in reflections.examples(ctx.root)}
+    return g, own
+
+
+def _local(node: Any) -> str:
+    v = getattr(node, "value", str(node))
+    return v.rsplit("#", 1)[-1].rsplit("/", 1)[-1]
+
+
+def _label(g: reflections.Graph, subject: Any) -> str:
+    for p in ("http://www.w3.org/2000/01/rdf-schema#label", "http://www.w3.org/2004/02/skos/core#prefLabel"):
+        for o in g.objects(subject, p):
+            if hasattr(o, "lang") or hasattr(o, "datatype"):
+                return o.value
+    return _local(subject)
+
+
+class _Subject(ArgType):
+    name = "SUBJECT"
+    doc = "a subject a reflection is a record of, by its full IRI or by its local name when only one subject has it"
+
+    def validate(self, ctx: Ctx, value: str) -> str:
+        g, _ = _reflection_graph(ctx)
+        reflected = {o.value for rec in g.members(reflections.REFLECTION) for o in g.objects(rec, reflections.REFLECTS)}
+        if value in reflected:
+            return value
+        hits = sorted(v for v in reflected if _local(type("N", (), {"value": v})()) == value)
+        if len(hits) == 1:
+            return hits[0]
+        if hits:
+            raise ValueError(f"{value!r} is the local name of {len(hits)} subjects; give the full IRI: {', '.join(hits[:5])}")
+        raise ValueError(f"{value!r} is not the subject of any reflection; `reflection list` lists them")
+
+    def examples(self, ctx: Ctx) -> list[str]:
+        return ["https://example.org/noema/falsified#KeywordRouting"]
+
+
+SUBJECT = _Subject()
+
+
+def _kind_of_record(g: reflections.Graph, rec: Any) -> str:
+    k = reflections.record_kind(g, rec)
+    return next(iter(k)) if len(k) == 1 else "invalid"
+
+
+@command("reflection list", category="read", help="List digital reflections: Eidolons, Ergons and Noemas, with the Noemas' epistemic state and every review state; or the audit of how a repository's subjects classify",
+         relocatable=True,
+         options=[Opt("--kind", "REFLECTION_KIND", "only reflections of this kind"),
+                  Opt("--state", "EPISTEMIC_STATE", "only Noemas whose current epistemic state is this"),
+                  Opt("--review", "REVIEW_STATE", "only records in this review state; candidate lists what awaits a person"),
+                  Opt("--on", "DATE", "judge each Noema's state on this date (ISO), not today"),
+                  Opt("--duplicates", None, "list Noema subjects that share a label, for a person to merge or tell apart"),
+                  Opt("--audit", None, "classify every subject of the repository and list the reflections that need review; changes nothing")])
+def reflection_list(ctx: Ctx, kind: str | None, state: str | None, review: str | None, on: str | None, duplicates: bool, audit: bool) -> Resource:
+    g, own = _reflection_graph(ctx)
+    if audit:
+        data = reflections.audit(g, own)
+        res = Resource("reflection-audit", "audit", data, text=lambda r: "\n".join(f"{k}: {v}" for k, v in r.data["subjects"].items()) or "no subjects")
+        res.actions.append(Action("Check the ontology", Call("check", {"sections": ["ontology"]})))
+        return res
+    if duplicates:
+        rows = [{"one": a.value, "other": b.value, "label": lab} for a, b, lab in noemas.possible_duplicates(g)]
+        return Resource("reflection-duplicates", "duplicates", {"count": len(rows), "duplicates": rows},
+                        text=lambda r: "\n".join(f"{x['label']}: {_local_iri(x['one'])} / {_local_iri(x['other'])}" for x in r.data["duplicates"]) or "no possible duplicates")
+    rows = []
+    for rec in sorted(g.members(reflections.REFLECTION), key=lambda n: n.value):
+        if g.file(rec) not in own:
+            continue
+        k = _kind_of_record(g, rec)
+        subj = next((o for o in g.objects(rec, reflections.REFLECTS) if hasattr(o, "value")), None)
+        rv = reflections.review_state(g, rec)
+        st = noemas.current_state(g, subj, on)[0] if (k == reflections.NOEMA_K and subj is not None) else None
+        if (kind and k != kind) or (review and rv != review) or (state and st != state):
+            continue
+        rows.append({"record": rec.value, "kind": k, "subject": subj.value if subj is not None else None,
+                     "label": _label(g, subj) if subj is not None else _local(rec), "state": st, "review": rv})
+    res = Resource("reflection-list", kind or "all", {"count": len(rows), "kind": kind, "state": state, "review": review, "reflections": rows},
+                   links=[Link("reflection", Call("reflection show", {"subject": r["subject"]})) for r in rows[:100] if r["subject"]],
+                   text=lambda r: "\n".join(f"{x['kind']:<7} {x['review']:<9} {(x['state'] or ''):<19} {x['label']}" for x in r.data["reflections"]) or "no reflection matches")
+    res.columns["reflections"] = ["kind", "label", "state", "review", "subject"]
+    return res
+
+
+def _local_iri(v: str) -> str:
+    return v.rsplit("#", 1)[-1].rsplit("/", 1)[-1]
+
+
+def _names(g: reflections.Graph, nodes: Any) -> list[dict[str, Any]]:
+    out = []
+    for x in nodes:
+        out.append({"id": x.value, "name": _local(x), "review": reflections.review_state(g, x), "label": reflections.label_of(g, x),
+                    "source": [_local(o) for o in g.objects(x, reflections.SOURCE)],
+                    "attributed_to": [_local(o) for o in g.objects(x, reflections.ATTRIBUTED)]})
+    return out
+
+
+@command("reflection show", category="read", help="Show one digital reflection by its subject: for a Noema its current state, claims, evidence for and against, assumptions, falsifiers, open questions, research stage and reasons to look again, each with its source and review state",
+         relocatable=True, args=[Arg("subject", "SUBJECT", "the subject the reflection is a record of")],
+         options=[Opt("--on", "DATE", "judge the state and the evidence on this date (ISO), not today")])
+def reflection_show(ctx: Ctx, subject: str, on: str | None) -> Resource:
+    g, _ = _reflection_graph(ctx)
+    from agora.lib.turtle import Iri
+    subj = Iri(subject)
+    recs = [r for r in g.members(reflections.REFLECTION) if subj in g.objects(r, reflections.REFLECTS)]
+    kind, why = reflections.subject_kind(g, subj)
+    data: dict[str, Any] = {"subject": subject, "label": _label(g, subj), "kind": kind, "why": why,
+                            "records": [{"record": r.value, "is": _kind_of_record(g, r), "review": reflections.review_state(g, r)} for r in recs],
+                            "types": sorted(reflections.short(t) for t in g.declared_types(subj))}
+    rels = lambda t, a=None, b=None: _names(g, reflections.relationships_of(g, t, a, b, on))      # noqa: E731
+    if kind == reflections.NOEMA_K:
+        st, by = noemas.current_state(g, subj, on)
+        aspect = lambda a: _names(g, noemas.aspects_of(g, subj, a))                               # noqa: E731
+        ev = noemas.evidence(g, subj, on)
+        data.update({
+            "subtypes": sorted(noemas.subtypes(g, subj)), "state": st, "state_given_by": _local(by) if by else None,
+            "assessments": _names(g, noemas.assessments(g, subj)),
+            "claims": [{"id": c.value, "text": next((o.value for o in g.objects(c, "https://schema.org/text")), None)} for c in noemas.claims_of(g, subj, on)],
+            "evidence": {t: _names(g, v) for t, v in ev.items() if v},
+            "assumptions": aspect("assumption"), "falsification_criteria": aspect("falsification-criterion"), "predictions": aspect("prediction"),
+            "limitations": aspect("limitation"), "open_questions": aspect("open-question"), "counterarguments": aspect("counterargument"),
+            "commercial": {a: v for a in ("problem-addressed", "potential-buyer", "product-wedge", "commercial-hypothesis", "demand-evidence",
+                                          "competing-approach", "adoption-obstacle", "native-alpha-source") if (v := aspect(a))},
+            "research_stage": {k: {"reached": [_local(x) for x in v["reached"]], "pending": [_local(x) for x in v["pending"]]} for k, v in noemas.trace(g, subj).items()},
+            "reexamine": noemas.reexamine(g, subj)})
+    else:
+        data["relationships"] = {"from": _names(g, reflections.relationships_of(g, None, subj, None, on)), "to": _names(g, reflections.relationships_of(g, None, None, subj, on))}
+        data["assertions"] = _names(g, noemas.assertions_about(g, subj))
+    res = Resource("reflection", _local(subj), data)
+    res.links.append(Link("kind", Call("ontology show", {"term": "ifcore:" + (_local_iri(reflections.KIND_CLASS[kind]) if kind in reflections.KIND_CLASS else "DigitalReflection")})))
+    res.actions.append(Action("List reflections", Call("reflection list", {})))
     return res
 
 

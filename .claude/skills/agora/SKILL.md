@@ -53,6 +53,7 @@ A `decision` command is for a person: `ink record`, `proposal advance`, `spec se
 | `ontology` | A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037) |
 | `openedx` | A brand's Open edX brand package (frontiers-brand FR-020) |
 | `proposal` | A tracked, replayable change drafted for a person to decide (0041-command-line FR-039; 0042-agora FR-029) |
+| `reflection` | A digital reflection, of one of its three kinds, and the subject it is a record of (0047-digital-reflections, 0048-noemas) |
 | `requirement` | One FR of a spec, and how it is enforced (0020-spec-format FR-011) |
 | `sign` | A printed sign, a job rendered by frontiers-signage-print (0014-design-systems FR-040) |
 | `skill` | The skill file that tells an AI agent how to use this command line, generated from its registry (0042-agora FR-028) |
@@ -108,6 +109,8 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `proposal list` | `read` | terminal, editor, mcp | List proposals: open or accepted, the resource each concerns and what it proposes | `agora proposal list [--status PROPOSAL_STATUS]` |
 | `proposal new` | `record` | terminal, editor, mcp | Draft a change for a person to decide: a tracked proposal that names a command and its fields | `agora proposal new RESOURCE --reason TEXT --run COMMAND [--field TEXT]` |
 | `proposal show` | `read` | terminal, editor, mcp | Show one proposal: its reason and the action it proposes, as a command line | `agora proposal show PROPOSAL` |
+| `reflection list` | `read` | terminal, editor, mcp | List digital reflections: Eidolons, Ergons and Noemas, with the Noemas' epistemic state and every review state; or the audit of how a repository's subjects classify | `agora reflection list [--kind REFLECTION_KIND] [--state EPISTEMIC_STATE] [--review REVIEW_STATE] [--on DATE] [--duplicates] [--audit]` |
+| `reflection show` | `read` | terminal, editor, mcp | Show one digital reflection by its subject: for a Noema its current state, claims, evidence for and against, assumptions, falsifiers, open questions, research stage and reasons to look again, each with its source and review state | `agora reflection show SUBJECT [--on DATE]` |
 | `requirement add` | `record` | terminal, editor, mcp | Add the control a requirement addresses to the control map | `agora requirement add REQUIREMENT --control CONTROL [--note TEXT]` |
 | `requirement list` | `read` | terminal, editor, mcp | List requirements with how each is enforced | `agora requirement list [--spec SPEC] [--mechanism MECHANISM]` |
 | `requirement set` | `record` | terminal, editor, mcp | Set how a requirement is enforced, in the enforcement register | `agora requirement set REQUIREMENT --mechanism MECHANISM [--by TEXT] [--note TEXT]` |
@@ -284,6 +287,16 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--dry-run` (flag): validate, write nothing, show the change
 - `proposal show`
   - `proposal` (PROPOSAL): the proposal
+- `reflection list`
+  - `--kind` (REFLECTION_KIND): only reflections of this kind
+  - `--state` (EPISTEMIC_STATE): only Noemas whose current epistemic state is this
+  - `--review` (REVIEW_STATE): only records in this review state; candidate lists what awaits a person
+  - `--on` (DATE): judge each Noema's state on this date (ISO), not today
+  - `--duplicates` (flag): list Noema subjects that share a label, for a person to merge or tell apart
+  - `--audit` (flag): classify every subject of the repository and list the reflections that need review; changes nothing
+- `reflection show`
+  - `subject` (SUBJECT): the subject the reflection is a record of
+  - `--on` (DATE): judge the state and the evidence on this date (ISO), not today
 - `requirement add`
   - `requirement` (REQUIREMENT): the requirement
   - `--control` (CONTROL, required): <catalog>:<control>
@@ -335,6 +348,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `COURSE_TARGET` | what a course is built to: a static site, an Open edX export or a cmi5 package | web, olx, cmi5 |
 | `DATE` | a date as YYYY-MM-DD | 2026-10-04 |
 | `DESIGN_SYSTEM` | a design system's slug, a directory of design-systems/ | a value `<noun> list` or `--complete` offers |
+| `EPISTEMIC_STATE` | an epistemic state of a Noema (0048-noemas FR-011) | proposed, under-investigation, supported, contested, falsified, superseded |
 | `GENERATOR` | a generator, as `fresh` proves it: brand-theme, brand-specimen, ... | a value `<noun> list` or `--complete` offers |
 | `GROUP` | a command group | a value `<noun> list` or `--complete` offers |
 | `INK` | an ink of a brand's decoration kit as <brand>/<role>, such as frontiers-brand/primary | a value `<noun> list` or `--complete` offers |
@@ -347,14 +361,17 @@ A value that fails its type is an error resource that names the type and gives e
 | `PIECE` | an imagery piece as <brand>/<piece>, such as frontiers-brand/fog-coast-lighthouse-footbridge | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL` | a proposal as NNNN-slug, as `proposal list` shows them | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL_STATUS` | whether a proposal is open or accepted | open, accepted |
+| `REFLECTION_KIND` | a kind of digital reflection (0047-digital-reflections FR-001) | eidolon, ergon, noema |
 | `REQUIREMENT` | a requirement as <spec>/FR-NNN, such as 0020/FR-013 | 0020/FR-013, 0041-command-line/FR-008 |
 | `RESOURCE` | a resource as kind:id, such as spec:0020 or requirement:0020/FR-013 | spec:0020, requirement:0020/FR-013 |
+| `REVIEW_STATE` | a review state (0047-digital-reflections FR-038) | candidate, reviewed, accepted, rejected |
 | `RUNNER` | which harness: browser or python for design-systems | browser, python |
 | `SCHEME` | a concept scheme of the ontology as a CURIE, such as ifcore:CommandCategoryScheme, or by its local name | ifcore:CommandCategoryScheme |
 | `SECTION` | a check section, as `command show check` lists them | a value `<noun> list` or `--complete` offers |
 | `SLUG` | lowercase words joined by hyphens | agora, command-line |
 | `SPEC` | a spec as NNNN-slug or NNNN, or a design system's slug | 0020, 0020-spec-format, frontiers-brand |
 | `SPEC_STATUS` | a spec's status (0020 FR-009) | Draft, Adopted, Superseded |
+| `SUBJECT` | a subject a reflection is a record of, by its full IRI or by its local name when only one subject has it | https://example.org/noema/falsified#KeywordRouting |
 | `SUITE` | a named set of check sections | a value `<noun> list` or `--complete` offers |
 | `TERM` | a term of the ontology as a CURIE, such as ifcore:Agora, or its full IRI | ifcore:Agora, ifcore:ReadCommandCategory |
 | `TOPIC` | a help topic, as `help` lists them: start, check, specs, ... | a value `<noun> list` or `--complete` offers |
@@ -404,7 +421,7 @@ A generated file carries a header naming its generator and must not be edited by
 
 ## MCP
 
-`agora mcp serve` speaks MCP over standard input and output. It lists these 50 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://ontology/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
+`agora mcp serve` speaks MCP over standard input and output. It lists these 52 commands as tools, named with spaces made underscores (`spec_show`, `check`), each taking the arguments above by name; a tool that writes takes `dry_run`, which is true unless you pass false. A `decision` command is never a tool and a call to one is refused with the error resource `decision-refused`, whose next action is `proposal new`. Resources are readable by URI: `agora://spec/ID`, `agora://requirement/SPEC/FR-NNN`, `agora://design-system/SLUG`, `agora://brand/SLUG`, `agora://ontology/ID`, `agora://command/WORDS`, `agora://proposal/ID`, `agora://context/KIND:ID`.
 
 | Tool | Writes |
 | --- | --- |
@@ -448,6 +465,8 @@ A generated file carries a header naming its generator and must not be edited by
 | `proposal_list` | no |
 | `proposal_new` | yes, dry run by default |
 | `proposal_show` | no |
+| `reflection_list` | no |
+| `reflection_show` | no |
 | `requirement_add` | yes, dry run by default |
 | `requirement_list` | no |
 | `requirement_set` | yes, dry run by default |
