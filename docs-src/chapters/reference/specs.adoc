@@ -189,4 +189,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |The distribution platform
 
+|`0047-digital-reflections`
+|Draft
+|Digital reflections: Eidolons and Ergons
+
 |===

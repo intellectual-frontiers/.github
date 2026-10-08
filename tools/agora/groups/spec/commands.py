@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, design_systems, ontology, register, specs, terms
+from agora.lib import controls, design_systems, ontology, reflections, register, specs, terms
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -545,7 +545,8 @@ def check_controls(ctx: Ctx, scope: str | None) -> SectionResult:
 
 @section("ontology")
 def check_ontology(ctx: Ctx, scope: str | None) -> SectionResult:
-    findings = ontology.check_prefixes(ctx.root) + ontology.check_design_systems(ctx.root, ctx.public)
+    findings = ontology.check_prefixes(ctx.root) + ontology.check_design_systems(ctx.root, ctx.public) \
+        + reflections.check(ctx.root, ctx.public)
     return SectionResult.from_findings("ontology", findings)
 
 
