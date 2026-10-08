@@ -363,6 +363,9 @@ is not stated here.
   0017-spoken-and-research-works establishes.
 - The register of books and their status, and any specific book's decisions,
   which are ontology data and package records.
+- How a rendition is stored, delivered, shared by email, given as a review
+  copy, or sold, and which vendors the company considers for reach or sales,
+  which 0046-distribution-platform establishes.
 
 ## Edge cases
 
