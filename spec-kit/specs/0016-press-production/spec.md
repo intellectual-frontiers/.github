@@ -342,7 +342,7 @@ is not stated here.
   and it MUST NOT be padded to reach one; its chapter-count range still
   applies. A chapter that bears on none of the five answers SHOULD be cut or moved
   to the companion. A format's series kicker MUST NOT be applied to a book of
-  the other format.
+  another format.
 - **FR-050**: A term that more than one Press work uses MUST be defined once, in
   the ontology, and every work MUST use it as defined and MUST NOT redefine it
   locally. A term that only one work coins is defined in that work's book bible
@@ -351,6 +351,60 @@ is not stated here.
   the vault at `ai-training/voice/shahid-shah/glossary.md`. A work that appears to define a shared term
   differently MUST be flagged for a person's decision, never silently
   reconciled.
+- **FR-051**: A Pocket Guide is a book format of the Press imprint, not an
+  imprint, a work kind, or a publishing system: it is a `book` work whose format
+  is Pocket Guide, in the series IF Press Pocket Guides. It develops one
+  important idea, or one closely related framework, far enough for a named
+  reader to understand, evaluate, and apply it in a single sitting. It MUST be
+  opinionated and practical, explain something unobvious, and give the reader
+  something to do with the idea; it is not a long article, a compressed book, a
+  white paper, a brochure, or an executive summary, and it MUST stand alone as a
+  publishable work. The formats differ in purpose: an article introduces,
+  explains, or challenges an idea; a Pocket Guide develops one idea enough to
+  understand and apply it; a Fieldbook (FR-049) teaches a complete practical
+  discipline; a Rolebook (FR-049) helps a person perform or move into a
+  professional role; a full-length book develops a comprehensive subject,
+  argument, or body of knowledge. A research article, a Pocket Guide, and a
+  longer book MAY lead to one another, and none MUST: no work is owed a
+  successor, and a Pocket Guide MUST NOT be required to relate to a research
+  program.
+- **FR-052**: A Pocket Guide's editorial targets are 5,000 to 10,000 words,
+  about 32 to 64 finished pages, and a reading time of 45 to 75 minutes, for a
+  clearly identified audience of professionals, practitioners, researchers,
+  founders, or decision-makers. They are targets and MUST NOT be reached by
+  padding; clarity and completeness decide the length. The book-shape ranges for
+  a full-length book (the audit checklist's Book shape step) do not apply to a
+  Pocket Guide, and no chapter-count range applies: its chapters follow the
+  subject. Its argument SHOULD cover seven things, as conceptual elements and
+  not chapter names: the problem (what is misunderstood or inadequately
+  addressed), the insight (the unobvious central idea), the model (how to
+  understand it), the evidence (why to believe or question it), the application
+  (how it changes decisions or behavior), the limitations (where it can fail,
+  with counterarguments and unresolved questions), and the next step (what the
+  reader can do immediately). The house voice (FR-001), the audit (FR-002),
+  and the distinction between evidence, hypothesis, and opinion apply as to
+  every Press work; no Pocket Guide style guide exists. A figure MUST explain
+  something its prose would explain less well, and is drawn with the house
+  figure design system.
+- **FR-053**: A Pocket Guide MUST be produced exactly as any book is: the house
+  design (FR-018), trim, typography, front and back matter, paperback and
+  digital renditions, ISBN (FR-022) and identifiers, distribution, cuts, and
+  preflight checks are those of every book, and no miniature or other physical
+  format, binding, paper, or cover system is introduced for it. Its cover is
+  the house cover with a cover artwork piece chosen by a person as for any book
+  (FR-027); no type-specific artwork or motif is made. Its series kicker is
+  `IF PRESS POCKET GUIDES` and MUST be used only on a Pocket Guide (FR-020).
+  The online companion (FR-031) is optional.
+- **FR-054**: A Pocket Guide's work record MUST carry the class
+  `ifcore:PocketGuide`, its position in the series as `ifcore:seriesNumber`, its
+  central thesis as `ifcore:centralThesis`, the outcome it promises the reader
+  as `ifcore:readerOutcome`, and its intended readers as `schema:audience`; a
+  Pocket Guide that is past Intake MUST carry all four, and every Pocket Guide
+  MUST be `schema:isPartOf` `ifcore:IFPressPocketGuides`. Related research is
+  `schema:isBasedOn` and related publications are `dcterms:relation`. Its title,
+  subtitle, authors, edition, status, ISBNs, and companion are those of every
+  book, kept where the book keeps them (FR-022, FR-024), and its word count is
+  measured from the manuscript, never stored. No other record states them.
 
 ## Out of scope
 
@@ -430,6 +484,9 @@ is not stated here.
 - **A Fieldbook and a Rolebook** — the two book formats FR-049 distinguishes:
   teaching a person to do a kind of work better, and telling a person whose job
   has changed structurally what to do about it.
+- **A Pocket Guide** — the book format FR-051 defines: one important idea
+  developed for a named reader to understand and apply in a single sitting,
+  produced as every book is.
 - **A shared term** — a term more than one Press work uses, defined once in the
   ontology and used as defined everywhere.
 - **A promotion brief** — the supporting record that keeps promotion tied to
@@ -458,6 +515,10 @@ is not stated here.
 - **SC-010**: No Rolebook lacks an answer to any of its five questions or is
   padded to a length range; no shared term is defined by hand anywhere but the
   ontology, and none is redefined by a work.
+- **SC-011**: Every Pocket Guide past Intake carries the four fields FR-054
+  names, no two share a series number, none uses another format's kicker, no
+  other format uses the Pocket Guide kicker, and none has a physical format,
+  cover system, or style guide of its own.
 
 ## Review & acceptance checklist
 

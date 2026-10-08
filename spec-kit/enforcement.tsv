@@ -404,6 +404,10 @@ requirement	mechanism	by	note
 0016-press-production FR-048	check	eidolon: eid check editorial	issues.py check fails a category or gate group outside the closed sets
 0016-press-production FR-049	none	-	Rolebook five answers and kicker use are not checked
 0016-press-production FR-050	none	-	shared-term definition in the ontology is not checked
+0016-press-production FR-051	review	0016-press-production FR-002	whether an idea fits a Pocket Guide is an editorial judgment, made at the audit
+0016-press-production FR-052	none	-	targets, the seven elements and the figures' purpose are judgment; the audit checklist's Book shape step reports the word count against the targets
+0016-press-production FR-053	check	eidolon: eid check works	fails the Pocket Guide kicker on any other book and another format's kicker on a Pocket Guide; the rest is the pipeline every book goes through
+0016-press-production FR-054	check	eidolon: eid check works	fails a Pocket Guide past Intake without a series number, thesis, outcome or audience, a repeated series number, and a Pocket Guide that is not a book
 0017-spoken-and-research-works FR-001	none	-	spoken-first classification is judgment
 0017-spoken-and-research-works FR-002	check	eidolon: eid check works	works.py fails a spoken package without show-bible.md or editorial-constitution.md
 0017-spoken-and-research-works FR-003	none	-	episode brief contents are not checked
