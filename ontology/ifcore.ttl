@@ -1618,7 +1618,22 @@ ifcore:Fieldbook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Fieldbo
     rdfs:comment "A book that teaches a person to do a kind of work better (0016 FR-049)."@en .
 ifcore:Rolebook a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Rolebook"@en ;
     rdfs:comment "A short book for a profession or job function whose job has changed structurally; it answers five questions and is not padded to a length range (0016 FR-049)."@en .
-[] a owl:AllDisjointClasses ; owl:members ( ifcore:Fieldbook ifcore:Rolebook ) .
+ifcore:PocketGuide a owl:Class ; rdfs:subClassOf schema:Book ; rdfs:label "Pocket Guide"@en ;
+    rdfs:comment "A short, opinionated, practical book that develops one important idea far enough for a named reader to understand and apply it in a single sitting; produced exactly as any book is (0016 FR-051 – FR-054)."@en .
+[] a owl:AllDisjointClasses ; owl:members ( ifcore:Fieldbook ifcore:Rolebook ifcore:PocketGuide ) .
+
+ifcore:IFPressPocketGuides a schema:BookSeries ; rdfs:label "IF Press Pocket Guides"@en ;
+    schema:name "IF Press Pocket Guides"@en ;
+    schema:publisher ifcore:IFPress ;
+    schema:slogan "Big ideas. Small books. Useful immediately."@en ;
+    rdfs:comment "The series of Pocket Guides. Its volumes are independent works, not meant to be read in order, so it is not a serial series and has no package (0016 FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:seriesNumber a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PocketGuide ; rdfs:range xsd:positiveInteger ;
+    rdfs:comment "A Pocket Guide's position in IF Press Pocket Guides, a whole number from 1, shown as three digits (0016 FR-054)."@en .
+ifcore:centralThesis a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PocketGuide ; rdfs:range rdf:langString ;
+    rdfs:comment "The one claim a Pocket Guide develops, as the book states it (0016 FR-054)."@en .
+ifcore:readerOutcome a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PocketGuide ; rdfs:range rdf:langString ;
+    rdfs:comment "What the reader can do or decide differently after reading a Pocket Guide (0016 FR-054)."@en .
 
 ifcore:SerialSeries a owl:Class ; rdfs:subClassOf schema:BookSeries, ifcore:SubstantialWork ; rdfs:label "Serial series"@en ;
     rdfs:comment "A set of books meant to be read together in order, kept coherent by one series bible; each volume is its own book work related to it by schema:isPartOf (0016 FR-008 – FR-011)."@en .
