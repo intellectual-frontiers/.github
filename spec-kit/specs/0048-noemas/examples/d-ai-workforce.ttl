@@ -1,0 +1,85 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/noema/ai-workforce#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example D: AI Workforce, the idea and a deployment of it (0048-noemas).
+# Illustrative only. The concept and its operating principles are Noemas. One deployed solution is an Ergon. The people and
+# organizations that develop, operate, buy and use it are Eidolons. Their relationships to the idea (adopts) and to the Ergon
+# (develops, operates, purchases, uses) are different relationships, and none is ownership of the idea. The questions it answers:
+#   - What is the idea, and what is the deployment of it?    a Noema and an Ergon, joined by operationalizes
+#   - Who adopted the idea, and who bought the deployment?   adopts and purchases: not the same fact
+#   - Which principle does the deployment depend on?         implements, from the Ergon to the principle
+
+ex:AIWorkforceIdea a ifcore:IntellectualConstruct ; rdfs:label "AI Workforce"@en ; dcterms:identifier "ai-workforce-idea" ;
+    dcterms:type ifcore:ConceptType, ifcore:FrameworkType, ifcore:DesignPatternType ; dcterms:hasPart ex:HumanDecides, ex:EvidenceBeforeAcceptance ; ifcore:hasAudience ifcore:Public .
+ex:HumanDecides a ifcore:IntellectualConstruct ; rdfs:label "A person decides; the workforce drafts and executes"@en ; dcterms:identifier "human-decides" ;
+    dcterms:type ifcore:PrincipleType ; ifcore:hasAudience ifcore:Public .
+ex:EvidenceBeforeAcceptance a ifcore:IntellectualConstruct ; rdfs:label "Work is accepted on evidence, not on confidence"@en ; dcterms:identifier "evidence-before-acceptance" ;
+    dcterms:type ifcore:PrincipleType ; ifcore:hasAudience ifcore:Public .
+
+ex:ClaimHuman a schema:Claim ; schema:text "A workforce that never makes the final decision stays accountable to the person who does."@en ; ifcore:hasAudience ifcore:Public .
+
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+ex:DeveloperCo a ifcore:Company ; dcterms:identifier "developer-co" ; ifcore:hasAudience ifcore:Public .
+ex:OperatorCo a ifcore:Company ; dcterms:identifier "operator-co" ; ifcore:hasAudience ifcore:Public .
+ex:ClientHospital a schema:MedicalOrganization ; dcterms:identifier "client-hospital" ; ifcore:hasAudience ifcore:Public .
+ex:ClinicalStaff a ifcore:Person ; dcterms:identifier "clinical-staff-member" ; ifcore:hasAudience ifcore:Public .
+ex:ClaimsWorkforce a ifcore:AIWorkforce ; dcterms:identifier "claims-workforce-deployment" ; ifcore:hasAudience ifcore:Public .
+ex:AcceptanceSuite a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/workforce/acceptance"^^xsd:anyURI ;
+    ifcore:verificationCadence "P3M"^^xsd:duration ; ifcore:verificationMethod "automated" ; ifcore:hasAudience ifcore:Public .
+
+ex:IdeaNoema a ifcore:Noema ; ifcore:reflects ex:AIWorkforceIdea ;
+    skos:definition "A specification of intent, a harness that carries it out, agents that hold a role, skills that do one job, and tools that connect them to a reader's own data, kept accountable to a person."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:HumanDecidesNoema a ifcore:Noema ; ifcore:reflects ex:HumanDecides ;
+    skos:definition "The final decision in a workforce's work is a person's, and the workforce never quietly becomes the decision-maker."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:EvidenceNoema a ifcore:Noema ; ifcore:reflects ex:EvidenceBeforeAcceptance ;
+    skos:definition "A workforce's output is accepted when it passes a test written beforehand, not when the agent reports that it is done."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:ClaimsWorkforceErgon a ifcore:Ergon ; ifcore:reflects ex:ClaimsWorkforce ;
+    ifcore:purpose "Read incoming claims, route them and flag the ones a person must see first, with every decision left to a person."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ex:S1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:HumanDecides ; ifcore:relationTo ex:ClaimHuman ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:Op1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operationalizes ; ifcore:relationFrom ex:ClaimsWorkforce ; ifcore:relationTo ex:AIWorkforceIdea ;
+    schema:validFrom "2026-04-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Im1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:ClaimsWorkforce ; ifcore:relationTo ex:HumanDecides ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Im2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:ClaimsWorkforce ; ifcore:relationTo ex:EvidenceBeforeAcceptance ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Ge1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:GeneratesEvidenceFor ; ifcore:relationFrom ex:ClaimsWorkforce ; ifcore:relationTo ex:EvidenceBeforeAcceptance ;
+    schema:validFrom "2026-06-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Id1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:InformsDesignOf ; ifcore:relationFrom ex:AIWorkforceIdea ; ifcore:relationTo ex:ClaimsWorkforce ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+
+# The organizations and people around the idea and around the deployment: different relationships to each.
+ex:Eng1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Proposes ; ifcore:relationFrom ex:DeveloperCo ; ifcore:relationTo ex:AIWorkforceIdea ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Eng2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Adopts ; ifcore:relationFrom ex:ClientHospital ; ifcore:relationTo ex:AIWorkforceIdea ;
+    schema:validFrom "2026-02-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Dev1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Develops ; ifcore:relationFrom ex:DeveloperCo ; ifcore:relationTo ex:ClaimsWorkforce ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Opr1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operates ; ifcore:relationFrom ex:OperatorCo ; ifcore:relationTo ex:ClaimsWorkforce ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Pur1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Purchases ; ifcore:relationFrom ex:ClientHospital ; ifcore:relationTo ex:ClaimsWorkforce ;
+    schema:validFrom "2026-03-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:AcceptanceSuite ; ifcore:hasAudience ifcore:Public .
+ex:Use1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Uses ; ifcore:relationFrom ex:ClinicalStaff ; ifcore:relationTo ex:ClaimsWorkforce ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ex:Chal1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Challenges ; ifcore:relationFrom ex:ClinicalStaff ; ifcore:relationTo ex:HumanDecides ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Low ; ifcore:hasAudience ifcore:Public .
+
+ex:Assess1 a ifcore:EpistemicAssessment ; schema:about ex:EvidenceBeforeAcceptance ; ifcore:assessedState ifcore:UnderInvestigationState ;
+    dcterms:description "One deployment's acceptance results fit the principle; nothing yet tests it against a rival."@en ; schema:validFrom "2026-06-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Low ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-06-15"^^xsd:date ; ifcore:hasAudience ifcore:Public .
