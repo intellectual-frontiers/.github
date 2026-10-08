@@ -1,0 +1,104 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/noema/falsified#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example E: a hypothesis that is falsified (0048-noemas).
+# Illustrative only. A hypothesis is proposed, a small test seems to support it, a larger test contradicts it, it becomes
+# contested and then falsified. Nothing is deleted: its identity, its record, the evidence for and against it, the early claim that
+# was later retracted, the product that was built on it and the successor that builds on it all remain, and the state at any date
+# can still be read. An AI agent's earlier "supported" assessment stayed a candidate and never changed the state. The idea was
+# published while it was supported and stays published: publication is a work's lifecycle, falsification is the idea's state.
+#   - What did we believe on 1 May, and why?                 the current state on a date, from accepted assessments
+#   - What refuted it, and what did we build on it?          contradicts, and the operationalizes that the retirement closed
+#   - Is it worth anything now?                              the successor builds on it, and it keeps its historical importance
+
+ex:KeywordRouting a ifcore:IntellectualConstruct , ifcore:SubstantialWork ; rdfs:label "Keyword routing is enough for triage"@en ; dcterms:identifier "keyword-routing" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:workLifecycleStage ifcore:Distribute ; ifcore:hasAudience ifcore:Public .
+ex:ContextualRouting a ifcore:IntellectualConstruct ; rdfs:label "Routing needs the context of the claim"@en ; dcterms:identifier "contextual-routing" ;
+    dcterms:type ifcore:HypothesisType ; ifcore:hasAudience ifcore:Public .
+
+ex:ClaimKeyword a schema:Claim ; schema:text "Routing a claim by keywords alone reaches the right queue at least nine times in ten."@en ; ifcore:hasAudience ifcore:Public .
+ex:ClaimContext a schema:Claim ; schema:text "Routing a claim by keywords and the context of its history reaches the right queue at least nine times in ten."@en ; ifcore:hasAudience ifcore:Public .
+
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+ex:ResearchAgent a prov:SoftwareAgent ; ifcore:hasAudience ifcore:Public .
+ex:KeywordRouter a schema:SoftwareApplication ; dcterms:identifier "keyword-router" ; ifcore:hasAudience ifcore:Public .
+ex:SmallTest a prov:Activity ; rdfs:label "A test on forty claims"@en ; ifcore:hasAudience ifcore:Public .
+ex:LargeTest a prov:Activity ; rdfs:label "A test on four thousand claims"@en ; ifcore:hasAudience ifcore:Public .
+ex:SmallReport a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/routing/small-test"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+ex:LargeReport a ifcore:ExternalRecordReference ; ifcore:primarySource "https://example.org/routing/large-test"^^xsd:anyURI ;
+    ifcore:verificationCadence "P1Y"^^xsd:duration ; ifcore:verificationMethod "manual" ; ifcore:hasAudience ifcore:Public .
+
+ex:KeywordNoema a ifcore:Noema ; ifcore:reflects ex:KeywordRouting ;
+    skos:definition "Choosing a claim's queue from the words in the claim alone is accurate enough to use."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-01-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:ContextNoema a ifcore:Noema ; ifcore:reflects ex:ContextualRouting ;
+    skos:definition "A claim's queue is chosen accurately only when the claim's history is read with its words."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-07-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:S1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:KeywordRouting ; ifcore:relationTo ex:ClaimKeyword ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-01-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:S2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:ContextualRouting ; ifcore:relationTo ex:ClaimContext ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:LargeReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-07-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:Falsifier1 a ifcore:Assertion ; schema:about ex:KeywordRouting ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "Accuracy below nine in ten on a held-out set of at least a thousand claims."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-01-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Falsifier2 a ifcore:Assertion ; schema:about ex:ContextualRouting ; ifcore:aspect ifcore:FalsificationCriterionAspect ;
+    dcterms:description "Accuracy below nine in ten on a held-out set of at least a thousand claims."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:LargeReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-07-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# The evidence arrives over time. The early support is kept after the later test contradicts it.
+ex:T1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Tests ; ifcore:relationFrom ex:SmallTest ; ifcore:relationTo ex:KeywordRouting ;
+    schema:validFrom "2026-02-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-03"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Sup1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Supports ; ifcore:relationFrom ex:SmallTest ; ifcore:relationTo ex:KeywordRouting ;
+    schema:validFrom "2026-02-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-03"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:T2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Tests ; ifcore:relationFrom ex:LargeTest ; ifcore:relationTo ex:KeywordRouting ;
+    schema:validFrom "2026-04-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:LargeReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-17"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Con1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Contradicts ; ifcore:relationFrom ex:LargeTest ; ifcore:relationTo ex:KeywordRouting ;
+    schema:validFrom "2026-04-15"^^xsd:date ;
+    ifcore:claimLabel ifcore:EvidenceLabel ; ifcore:confidenceLevel ifcore:High ; dcterms:source ex:LargeReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-17"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:EarlyClaim a ifcore:Assertion ; schema:about ex:KeywordRouting ;
+    dcterms:description "Forty of forty claims were routed correctly."@en ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-02-03"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Retraction1 a ifcore:Assertion ; schema:about ex:KeywordRouting ; ifcore:aspect ifcore:RetractionAspect ; prov:wasDerivedFrom ex:EarlyClaim ;
+    dcterms:description "The forty-claim result is withdrawn as evidence of general accuracy: the sample was too small and too easy."@en ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:High ; dcterms:source ex:LargeReport ; schema:validFrom "2026-04-20"^^xsd:date ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-04-20"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# What was built on it, closed (not deleted) when it was retired.
+ex:Op1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operationalizes ; ifcore:relationFrom ex:KeywordRouter ; ifcore:relationTo ex:KeywordRouting ;
+    schema:validFrom "2026-03-01"^^xsd:date ; schema:validThrough "2026-06-30"^^xsd:date ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:SmallReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-02"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# The assessments: proposed, contested, falsified. The agent's early "supported" is a candidate and never counted.
+ex:Assess1 a ifcore:EpistemicAssessment ; schema:about ex:KeywordRouting ; ifcore:assessedState ifcore:ProposedState ;
+    dcterms:description "Put forward with a falsifier; nothing has tested it."@en ; schema:validFrom "2026-01-10"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-01-10"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:AssessAgent a ifcore:EpistemicAssessment ; schema:about ex:KeywordRouting ; ifcore:assessedState ifcore:SupportedState ;
+    dcterms:description "The agent reads the forty-claim result as support."@en ; schema:validFrom "2026-02-05"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Low ; dcterms:source ex:SmallReport ; prov:wasAttributedTo ex:ResearchAgent ; ifcore:hasAudience ifcore:Public .
+ex:Assess2 a ifcore:EpistemicAssessment ; schema:about ex:KeywordRouting ; ifcore:assessedState ifcore:ContestedState ;
+    dcterms:description "The small test supports it and the large test contradicts it."@en ; schema:validFrom "2026-05-01"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:Medium ; dcterms:source ex:SmallReport , ex:LargeReport ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-05-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Assess3 a ifcore:EpistemicAssessment ; schema:about ex:KeywordRouting ; ifcore:assessedState ifcore:FalsifiedState ;
+    dcterms:description "Accuracy of 71 per cent on four thousand held-out claims is below the stated falsifier."@en ; schema:validFrom "2026-06-20"^^xsd:date ;
+    ifcore:claimLabel ifcore:InferenceLabel ; ifcore:confidenceLevel ifcore:High ; dcterms:source ex:LargeReport ; prov:wasAttributedTo ex:Reviewer ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-06-20"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+# Its successor builds on it, and keeps it as history.
+ex:B1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:BuildsOn ; ifcore:relationFrom ex:ContextualRouting ; ifcore:relationTo ex:KeywordRouting ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:LargeReport ; ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-07-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+ex:Rf1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Refines ; ifcore:relationFrom ex:ContextualRouting ; ifcore:relationTo ex:KeywordRouting ;
+    ifcore:claimLabel ifcore:ObservationLabel ; dcterms:source ex:LargeReport ; ifcore:hasAudience ifcore:Public .

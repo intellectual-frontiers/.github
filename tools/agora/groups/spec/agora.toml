@@ -78,6 +78,27 @@ icon = "icon"
 search = "match"
 tooltip = ["kind", "summary", "scheme", "notation"]
 
+[nouns.reflection]
+help = "A digital reflection, of one of its three kinds, and the subject it is a record of (0047-digital-reflections, 0048-noemas)"
+icon = "lightbulb"
+view = "ontology"
+title = "Reflection"
+
+[nouns.reflection.list]
+command = "reflection list"
+rows = "reflections"
+id = "subject"
+label = "label"
+description = "kind"
+status = "review"
+tooltip = ["state", "record"]
+
+[nouns.reflection.list.status_map]
+candidate = "pending"
+reviewed = "info"
+accepted = "ok"
+rejected = "muted"
+
 [sections.specs]
 help = "Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034)"
 watch = ["spec-kit/specs/**", "design-systems/*/spec.md", "ontology/ifcore.ttl"]
@@ -128,6 +149,10 @@ title = "Show Spec…"
 title = "List Ontology Terms"
 [commands."ontology show"]
 title = "Show Ontology Term…"
+[commands."reflection list"]
+title = "List Reflections"
+[commands."reflection show"]
+title = "Show Reflection…"
 
 # A requirement named in a spec or a register (`0020 FR-013`) is a resource an editor can show on hover and open (0041-command-line FR-064).
 [references.requirement]
