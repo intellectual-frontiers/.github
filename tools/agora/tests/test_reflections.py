@@ -83,9 +83,12 @@ class Rules(unittest.TestCase):
         self.assertEqual(kind(self.g, P("SoftwareAgent")), "undetermined", "no rule decides a running instance (OQ-2)")
         self.assertEqual(kind(self.g, P("Activity")), "other", "its activity is an event")
 
-    def test_abstract_subjects_are_neither(self):
-        for cls in (I("Right"), I("PatentFamily"), I("Invention"), I("Capability"), I("Note"), I("ResearchPillar"), S("Claim"),
-                    "http://www.w3.org/2004/02/skos/core#Concept", I("Outcome")):
+    def test_abstract_constructs_are_noemas_and_instruments_are_neither(self):
+        for cls in (I("Invention"), I("Capability"), I("Note"), I("ResearchPillar"), I("NamedTool"), I("IntellectualConstruct"),
+                    "http://www.w3.org/2004/02/skos/core#Concept"):
+            with self.subTest(cls=cls):
+                self.assertEqual(kind(self.g, cls), "noema")
+        for cls in (I("Right"), I("PatentFamily"), I("Trademark"), S("Claim"), I("Outcome"), P("Activity")):
             with self.subTest(cls=cls):
                 self.assertEqual(kind(self.g, cls), "other")
 
@@ -197,8 +200,10 @@ class WorkedExamples(unittest.TestCase):
 
     def test_patent_ownership_is_not_inferred_from_inventorship(self):
         ex = lambda n: Iri("https://example.org/reflections/rights#" + n)   # noqa: E731
-        for abstract in ("MethodInvention", "MethodPatentFamily", "SecondInvention", "SecondPatentFamily"):
-            self.assertEqual(r.subject_kind(self.g, ex(abstract))[0], "other")
+        for idea in ("MethodInvention", "SecondInvention"):
+            self.assertEqual(r.subject_kind(self.g, ex(idea))[0], "noema", "the invention is the idea")
+        for instrument in ("MethodPatentFamily", "SecondPatentFamily"):
+            self.assertEqual(r.subject_kind(self.g, ex(instrument))[0], "other", "the right in it is not the idea")
         self.assertEqual(len(r.relationships_of(self.g, "inventorOf", ex("Inventor"))), 2)
         self.assertEqual(len(r.relationships_of(self.g, "owns", ex("Inventor"))), 0, "an inventor does not own by inventing")
         self.assertEqual(len(r.relationships_of(self.g, "owns", None, ex("SecondPatentFamily"))), 0, "no owner is recorded, so none is inferred")

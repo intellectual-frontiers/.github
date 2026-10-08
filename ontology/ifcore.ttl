@@ -684,12 +684,12 @@ ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:NativeAlpha .
 
 # ───────────────────────── Eidolon, the concept (0007-work-and-assets FR-015) ─────────────────────────
 
-ifcore:Eidolon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Ergon ;
+ifcore:Eidolon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Ergon, ifcore:Noema ;
     rdfs:label "Eidolon"@en ;
     skos:definition "A digital reflection of what exists: a living, AI-readable record of a real-world entity that exists independently of its digital representation, such as a person, an organization, a company, an institution, a facility or an identifiable physical asset, capturing its identity, relationships, state, history and evolving context. Not a replica, but enough grounded evidence for an AI to reason about the real thing accurately and flexibly (0047-digital-reflections FR-006)."@en ;
-    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it. What is deliberately created (a product, a service, a system, a workflow) is reflected by an ifcore:Ergon, not an Eidolon (0047-digital-reflections FR-007)."@en ;
+    skos:scopeNote "Represented subject: an independently identifiable real-world entity. Not the record, a page or row that describes it, a claim made about it, or the idea of what an Eidolon is (0047-digital-reflections FR-037)."@en ;
+    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it. What is deliberately created (a product, a service, a system, a workflow) is reflected by an ifcore:Ergon, and what is conceived (a concept, a hypothesis, a theory) by an ifcore:Noema, not by an Eidolon (0047-digital-reflections FR-007, FR-027). This IRI names both the kind of record and the founder's idea of it; the idea is a Noema subject (0047 OQ-6)."@en ;
     ifcore:hasAudience ifcore:Public .
-
 ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:Eidolon .
 
 # ───────────────────────── Digital reflections: Eidolons and Ergons (0047-digital-reflections) ─────────────────────────
@@ -698,12 +698,12 @@ ifcore:DigitalReflection a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity 
     skos:definition "A maintained, AI-readable record of exactly one subject, with identity, context, relationships, evidence, provenance, history and lifecycle. Not necessarily a digital twin: no simulation, synchronization or completeness is required (0047-digital-reflections FR-001, FR-003)."@en ;
     rdfs:comment "The record, never the subject: the subject has its own identifier, named by ifcore:reflects, and its own types, which decide the record's kind through the ifcore:ClassificationRule individuals below. Its audience is the record's (ifcore:hasAudience); who stewards the record is ifcore:ownerRole, which says nothing of who owns the subject (FR-004)."@en .
 
-ifcore:Ergon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Eidolon ;
+ifcore:Ergon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Eidolon, ifcore:Noema ;
     rdfs:label "Ergon"@en ;
     skos:definition "A digital reflection of what is created: a living, AI-readable record of a deliberately built, designed or assembled product, service, system, workflow or solution, capturing its purpose, design, capabilities, dependencies, operational state, evolution and intended outcomes (0047-digital-reflections FR-007)."@en ;
+    skos:scopeNote "Represented subject: a deliberately created operational solution. Not its instances or executions, the document that specifies it, or the idea it implements, which is a Noema (0047-digital-reflections FR-009, FR-037)."@en ;
     rdfs:comment "Greek ἔργον, a work, a thing made to do a job. The company's own concept, the counterpart of ifcore:Eidolon. An instance, deployment or execution of an Ergon is not itself an Ergon (FR-009)."@en ;
     ifcore:hasAudience ifcore:Public .
-
 ifcore:reflects a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:DigitalReflection ;
     rdfs:comment "The one subject a reflection is a record of, by its stable identifier, never by name (0047-digital-reflections FR-002)."@en .
 ifcore:purpose a owl:DatatypeProperty ; rdfs:domain ifcore:Ergon ; rdfs:range xsd:string ;
@@ -712,16 +712,21 @@ ifcore:purpose a owl:DatatypeProperty ; rdfs:domain ifcore:Ergon ; rdfs:range xs
 # Classification: what a subject is, decided by its type, never by its record or its name (FR-010 – FR-013).
 
 ifcore:ReflectionKindScheme a skos:ConceptScheme ; rdfs:label "Reflection kind"@en ;
-    rdfs:comment "The kind a subject reflects as, resolved from its ifcore:ClassificationRule individuals (0047-digital-reflections FR-011, FR-012). Four, a closed set: an undetermined subject is never defaulted to either kind."@en ;
+    rdfs:comment "The kind a subject reflects as, resolved from its ifcore:ClassificationRule individuals (0047-digital-reflections FR-011, FR-012). Five, a closed set: the three kinds of reflection, a subject of none of them, and one no rule decides. An undetermined subject is never defaulted to a kind. A further kind of reflection is a new concept here, a new class under ifcore:DigitalReflection and its rules (0048-noemas FR-037)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:EidolonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Eidolon"@en ; skos:notation "eidolon" ;
-    skos:definition "The subject exists independently of its representation and is an individual in the world: a person, an organization, a place, an identifiable unit."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The subject exists independently of its representation and is an individual in the world: a person, an organization, a place, an identifiable unit."@en ; ifcore:reflectionClass ifcore:Eidolon ; ifcore:hasAudience ifcore:Public .
 ifcore:ErgonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Ergon"@en ; skos:notation "ergon" ;
-    skos:definition "The subject was deliberately built, designed or assembled to accomplish a purpose: a product model, a service, a system, a workflow, a solution."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The subject was deliberately built, designed or assembled to accomplish a purpose: a product model, a service, a system, a workflow, a solution."@en ; ifcore:reflectionClass ifcore:Ergon ; ifcore:hasAudience ifcore:Public .
 ifcore:OtherKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Other"@en ; skos:notation "other" ;
-    skos:definition "The subject is neither: an abstraction, a right, a claim, an event or an outcome. It keeps the types the ontology already gives it, and no Eidolon or Ergon is made of it (0047-digital-reflections FR-027). Not the name of a third kind of reflection, which is undecided (OQ-1)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "The subject is none of the three kinds of reflection: an event, a legal right or other instrument, a claim, a document, an outcome. It keeps the types the ontology gives it and no reflection is made of it (0047-digital-reflections FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NoemaKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Noema"@en ; skos:notation "noema" ;
+    skos:definition "The subject is an abstract intellectual construct, conceived or understood: a concept, a hypothesis, a theory, a principle, a framework, a methodology, a research question or finding or agenda (0048-noemas FR-001)."@en ; ifcore:reflectionClass ifcore:Noema ; ifcore:hasAudience ifcore:Public .
 ifcore:UndeterminedKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Undetermined"@en ; skos:notation "undetermined" ;
     skos:definition "No rule decides the subject, or the rules for its types disagree. A person decides; no reflection is made until then (0047-digital-reflections FR-012)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:reflectionClass a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain skos:Concept ; rdfs:range owl:Class ;
+    rdfs:comment "The class of reflection records a kind of ifcore:ReflectionKindScheme names. A kind that is not a kind of reflection (other, undetermined) names none. A further kind of reflection is a subclass of ifcore:DigitalReflection, a concept here that names it, and its rules (0048-noemas FR-037)."@en .
 
 ifcore:ClassificationRule a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Classification rule"@en ;
     rdfs:comment "One subject class and the one kind it reflects as. At most one rule names a class (0047-digital-reflections FR-011). The criteria are identity, purpose, abstraction level and lifecycle, never whether a thing is physical, digital, human-made or natural (FR-010); its rdfs:comment states which criterion decides."@en .
@@ -738,7 +743,7 @@ ifcore:Outcome a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "Outcome"@
 ifcore:Capability a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Capability"@en ;
     rdfs:comment "An abstract ability an Ergon implements. The ability is not the Ergon that has it (0047-digital-reflections FR-027)."@en .
 ifcore:Invention a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Invention"@en ;
-    rdfs:comment "The idea a patent describes. Distinct from the patent document, the right in it, and any product that practices it (0047-digital-reflections FR-028)."@en .
+    rdfs:comment "The idea a patent describes, a Noema. Distinct from the patent document and the right in it, which are of kind other, and from any product that practices it, which is an Ergon (0047-digital-reflections FR-028)."@en .
 
 # The initial rules (FR-013). A class with no rule is undetermined; the ones marked so below are decided to be, with the reason.
 ifcore:RulePerson a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Person ; ifcore:reflectedAs ifcore:EidolonKind ;
@@ -784,22 +789,23 @@ ifcore:RuleAIWorkforce a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:
     rdfs:comment "Purpose: an AI Workforce solution, or an AI agent designed for a business purpose, as a design and operating contract. Its runtime instances, identities and activity are separate subjects (0047 FR-015, OQ-2)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:RuleRight a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Right ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a legal right is neither a person nor a thing made; it is a claim recognized by law (0047 FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+    rdfs:comment "Abstraction: a legal right is neither a person, a thing made nor an idea; it is a claim recognized by law (0047 FR-027)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleIntellectualProperty a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:IntellectualProperty ; ifcore:reflectedAs ifcore:OtherKind ;
     rdfs:comment "Abstraction: intellectual property as a right. A product that embodies it is a separate Ergon (0047 FR-028)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:RuleNote a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Note ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a research finding or a hypothesis is knowledge, not an entity or a made thing."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:RuleResearchPillar a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:ResearchPillar ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a standing line of inquiry."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleNote a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Note ; ifcore:reflectedAs ifcore:NoemaKind ;
+    rdfs:comment "Abstraction: a research note or paper sets out a finding, a design pattern or an operating theory, which is an idea, not an entity or a made thing. The note is its document; its record reflects the idea (0048-noemas FR-003)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleResearchPillar a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:ResearchPillar ; ifcore:reflectedAs ifcore:NoemaKind ;
+    rdfs:comment "Abstraction: a standing line of inquiry, a research agenda."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleClaim a ifcore:ClassificationRule ; ifcore:subjectClass schema:Claim ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a claim, such as a patent claim or a thesis."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:RuleConcept a ifcore:ClassificationRule ; ifcore:subjectClass skos:Concept ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a general concept, a theory, a model, a capability or an invention."@en ; ifcore:hasAudience ifcore:Public .
+    rdfs:comment "Abstraction: a claim is a statement that something is the case, such as a proposition a Noema states or a claim of a patent. It is not the idea that states it, and it has no reflection (0048-noemas FR-008)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleConcept a ifcore:ClassificationRule ; ifcore:subjectClass skos:Concept ; ifcore:reflectedAs ifcore:NoemaKind ;
+    rdfs:comment "Abstraction: a defined idea, a named framework, a capability or an invention. A concept of a controlled vocabulary is a defined term and is reflected the same way if it is ever reflected."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RuleIntellectualConstruct a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:IntellectualConstruct ; ifcore:reflectedAs ifcore:NoemaKind ;
+    rdfs:comment "Abstraction: any abstract intellectual construct, by its subtype (dcterms:type of ifcore:NoemaTypeScheme)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleActivity a ifcore:ClassificationRule ; ifcore:subjectClass prov:Activity ; ifcore:reflectedAs ifcore:OtherKind ;
     rdfs:comment "Lifecycle: an event or an execution happens once and is over; it is not a thing that is maintained (0047 FR-009)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleOutcome a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Outcome ; ifcore:reflectedAs ifcore:OtherKind ;
-    rdfs:comment "Abstraction: a result, intended or realized (OQ-4)."@en ; ifcore:hasAudience ifcore:Public .
-
+    rdfs:comment "Abstraction: a result, intended or realized, is measured and not conceived (0047 OQ-4)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleDigitalAsset a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:DigitalAsset ; ifcore:reflectedAs ifcore:UndeterminedKind ;
     rdfs:comment "Abstraction: an asset category that holds a software product (an Ergon), a web property, or a dataset. The category decides nothing; type the subject as what it is."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RuleUnit a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Unit ; ifcore:reflectedAs ifcore:UndeterminedKind ;
@@ -823,7 +829,7 @@ ifcore:concerning a owl:ObjectProperty ; rdfs:domain ifcore:ReflectionRelationsh
     rdfs:comment "What an assignment or a license is of, when the relationship is between two parties about a third thing."@en .
 
 ifcore:RelationFamilyScheme a skos:ConceptScheme ; rdfs:label "Relationship family"@en ;
-    rdfs:comment "The six kinds of connection a reflection relationship can be. A relationship of one family is never inferred from another's (0047-digital-reflections FR-018)."@en ;
+    rdfs:comment "The ten kinds of connection a reflection relationship can be. A relationship of one family is never inferred from another's (0047-digital-reflections FR-018)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:OrganizationalFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Organizational"@en ; skos:notation "organizational" ;
     skos:definition "Who is part of, or works for, an organization."@en ; ifcore:hasAudience ifcore:Public .
@@ -859,7 +865,7 @@ ifcore:Owns a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; sko
     ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind, ifcore:ErgonKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
 ifcore:InventorOf a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "inventorOf"@en ; skos:notation "inventorOf" ;
     skos:definition "A person conceived an invention. It says nothing of who owns it, to whom it was assigned, or who may license it."@en ;
-    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+    ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
 ifcore:AssignsTo a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "assignsTo"@en ; skos:notation "assignsTo" ;
     skos:definition "A party transferred a right (named by ifcore:concerning) to another. A transfer, not an invention and not a license."@en ;
     ifcore:relationFamily ifcore:LegalRightFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
@@ -891,14 +897,14 @@ ifcore:Serves a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; s
     skos:definition "A made thing is meant to benefit, or delivers to, a party."@en ;
     ifcore:relationFamily ifcore:CommercialFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:EidolonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:DependsOn a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "dependsOn"@en ; skos:notation "dependsOn" ;
-    skos:definition "A made thing cannot work without another."@en ; skos:closeMatch dcterms:requires ;
-    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A made thing cannot work, or an idea cannot hold, without another."@en ; skos:closeMatch dcterms:requires ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind, ifcore:NoemaKind ; ifcore:toKind ifcore:ErgonKind, ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
 ifcore:IntegratesWith a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "integratesWith"@en ; skos:notation "integratesWith" ;
     skos:definition "Two made things exchange data or calls. Neither need depend on the other."@en ;
     ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:Implements a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "implements"@en ; skos:notation "implements" ;
-    skos:definition "A made thing realizes an abstract capability."@en ;
-    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A made thing realizes an idea or an abstract capability in its design."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
 ifcore:Intends a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "intends"@en ; skos:notation "intends" ;
     skos:definition "A made thing is meant to produce an outcome. A promise, not a result."@en ;
     ifcore:relationFamily ifcore:OutcomeFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
@@ -909,8 +915,8 @@ ifcore:Instantiates a skos:Concept ; skos:inScheme ifcore:ReflectionRelationSche
     skos:definition "An identifiable unit is made to a model, design or contract."@en ;
     ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:EvolvesFrom a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "evolvesFrom"@en ; skos:notation "evolvesFrom" ;
-    skos:definition "A made thing is a later version of, or was derived from, another."@en ; skos:closeMatch prov:wasDerivedFrom ;
-    ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A made thing, or an idea, is a later version of, or was derived from, another."@en ; skos:closeMatch prov:wasDerivedFrom ;
+    ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:ErgonKind, ifcore:NoemaKind ; ifcore:toKind ifcore:ErgonKind, ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
 
 # Assertions (FR-022 – FR-026): the label, source and verification of what a reflection holds about its subject.
 
@@ -920,6 +926,219 @@ ifcore:verifiedBy a owl:ObjectProperty ; rdfs:domain ifcore:Assertion ; rdfs:ran
     rdfs:comment "The person who checked the assertion against its source. Never an AI agent (0047 FR-024)."@en .
 ifcore:verifiedOn a owl:DatatypeProperty ; rdfs:domain ifcore:Assertion ; rdfs:range xsd:date ;
     rdfs:comment "When the person checked it. Required with ifcore:verifiedBy."@en .
+
+# ───────────────────────── Noemas: reflections of what is conceived (0048-noemas) ─────────────────────────
+
+ifcore:Noema a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disjointWith ifcore:Eidolon, ifcore:Ergon ;
+    rdfs:label "Noema"@en ;
+    skos:definition "A digital reflection of what is conceived: a living, AI-readable representation of an abstract concept, hypothesis, theory, research question, methodology, principle or other intellectual construct, capturing its meaning, assumptions, evidence, relationships, evolution and practical implications (0048-noemas FR-001)."@en ;
+    skos:scopeNote "Represented subject: an abstract intellectual construct. Not an independently existing entity, not a deliberately built operational solution, not the document or database row that holds the record, and not a claim, which a Noema states (0047-digital-reflections FR-037; 0048-noemas FR-003, FR-008)."@en ;
+    rdfs:comment "Greek νόημα, what is thought, a conception. The company's own concept, the third counterpart of ifcore:Eidolon and ifcore:Ergon. It shares every mechanism of ifcore:DigitalReflection (identity, assertions, relationships, review, audience) and adds only what an idea needs: a subtype, an epistemic state assessed over time, and evidence for and against it (0048-noemas FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntellectualConstruct a owl:Class ; rdfs:label "Intellectual construct"@en ;
+    skos:definition "An abstract idea that is conceived or understood rather than found in the world or built: the class of subjects a Noema reflects when no more specific class names them (0048-noemas FR-005)."@en ;
+    rdfs:comment "Its kind is the subtype carried by dcterms:type, a concept of ifcore:NoemaTypeScheme, so a new subtype is a new concept and not a new class. Several subtypes may apply at once."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NoemaTypeScheme a skos:ConceptScheme ; rdfs:label "Noema subtype"@en ;
+    rdfs:comment "What sort of idea a Noema's subject is (0048-noemas FR-005). Open: a subtype is added as a concept, and a subject may carry several (a framework that contains hypotheses and a methodology). The subject carries it as dcterms:type."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ConceptType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Concept"@en ; skos:notation "concept" ;
+    skos:definition "A defined idea or abstraction."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:HypothesisType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Hypothesis"@en ; skos:notation "hypothesis" ;
+    skos:definition "A proposition that can be evaluated or tested."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TheoryType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Theory"@en ; skos:notation "theory" ;
+    skos:definition "An explanatory structure connecting propositions."@en ; skos:relatedMatch ifcore:OperatingTheory ; ifcore:hasAudience ifcore:Public .
+ifcore:PrincipleType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Principle"@en ; skos:notation "principle" ;
+    skos:definition "A general rule or guiding assertion."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FrameworkType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Framework"@en ; skos:notation "framework" ;
+    skos:definition "An organized conceptual model. It may contain hypotheses, principles and methodologies, each its own Noema, related by dcterms:hasPart."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:MethodologyType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Methodology"@en ; skos:notation "methodology" ;
+    skos:definition "A systematic approach to inquiry or work. The abstract approach is the Noema; a deployed workflow that carries it out is an Ergon, related by operationalizes (0048-noemas FR-007)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ResearchQuestionType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Research question"@en ; skos:notation "research-question" ;
+    skos:definition "A question requiring investigation."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ResearchFindingType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Research finding"@en ; skos:notation "research-finding" ;
+    skos:definition "A conclusion supported by identifiable evidence."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ResearchAgendaType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Research agenda"@en ; skos:notation "research-agenda" ;
+    skos:definition "An organized program of investigation."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:TaxonomyType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Taxonomy"@en ; skos:notation "taxonomy" ;
+    skos:definition "A classification structure."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OntologyType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Ontology"@en ; skos:notation "ontology" ;
+    skos:definition "A formal description of concepts and relationships."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DesignPatternType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Design pattern"@en ; skos:notation "design-pattern" ;
+    skos:definition "A reusable abstract solution to a recurring problem."@en ; skos:closeMatch ifcore:DesignPattern ; ifcore:hasAudience ifcore:Public .
+ifcore:BusinessModelType a skos:Concept ; skos:inScheme ifcore:NoemaTypeScheme ; skos:prefLabel "Business model"@en ; skos:notation "business-model" ;
+    skos:definition "An abstract explanation of how value is created, delivered and captured."@en ; ifcore:hasAudience ifcore:Public .
+
+# Epistemic state: how well an idea stands, kept apart from its publication, editorial, approval or operational lifecycle (0048 FR-011 – FR-015).
+
+ifcore:EpistemicStateScheme a skos:ConceptScheme ; rdfs:label "Epistemic state"@en ;
+    rdfs:comment "How well a Noema's idea stands in the evidence (0048-noemas FR-011). Not a publication, editorial, approval or operational state (ifcore:WorkLifecycleStage and the like): a published theory may be contested, and a falsified hypothesis stays in the record. There is no state for proven; supported is not proven (FR-014)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProposedState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Proposed"@en ; skos:notation "proposed" ;
+    skos:definition "Put forward and not yet investigated. A Noema with no accepted assessment is proposed."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UnderInvestigationState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Under investigation"@en ; skos:notation "under-investigation" ;
+    skos:definition "Evidence is being gathered and assumptions challenged."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SupportedState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Supported"@en ; skos:notation "supported" ;
+    skos:definition "The weight of the identified evidence favors it. Not proven, and it may still be challenged."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ContestedState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Contested"@en ; skos:notation "contested" ;
+    skos:definition "Credible evidence or argument for and against it stand together."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FalsifiedState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Falsified"@en ; skos:notation "falsified" ;
+    skos:definition "Evidence refutes it. The Noema stays, with its evidence and history, as a research asset."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SupersededState a skos:Concept ; skos:inScheme ifcore:EpistemicStateScheme ; skos:prefLabel "Superseded"@en ; skos:notation "superseded" ;
+    skos:definition "Replaced by a Noema that supersedes it. It stays, and may remain historically important."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:EpistemicAssessment a owl:Class ; rdfs:subClassOf ifcore:Assertion ; rdfs:label "Epistemic assessment"@en ;
+    rdfs:comment "An assertion about a Noema's subject (schema:about) giving its epistemic state as of schema:validFrom, on a stated basis (dcterms:source). It is a judgment: an AI's is a candidate, and only a reviewed or accepted one changes the Noema's current state (0048-noemas FR-012, FR-015)."@en .
+ifcore:assessedState a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:EpistemicAssessment ; rdfs:range skos:Concept ;
+    rdfs:comment "A concept of ifcore:EpistemicStateScheme."@en .
+
+# Review: candidate, reviewed, accepted, kept apart from verification (0047-digital-reflections FR-038).
+
+ifcore:ReviewStateScheme a skos:ConceptScheme ; rdfs:label "Review state"@en ;
+    rdfs:comment "Whether a person has accepted a statement or a record into what the Eidolon holds (0047-digital-reflections FR-038). None stated is a candidate. Distinct from verification, which checks a statement against its source."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CandidateState a skos:Concept ; skos:inScheme ifcore:ReviewStateScheme ; skos:prefLabel "Candidate"@en ; skos:notation "candidate" ;
+    skos:definition "Proposed by a person or an AI agent and not yet reviewed. Its content is not relied on as knowledge."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReviewedState a skos:Concept ; skos:inScheme ifcore:ReviewStateScheme ; skos:prefLabel "Reviewed"@en ; skos:notation "reviewed" ;
+    skos:definition "A person has read it and kept it for use, without yet accepting it."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AcceptedState a skos:Concept ; skos:inScheme ifcore:ReviewStateScheme ; skos:prefLabel "Accepted"@en ; skos:notation "accepted" ;
+    skos:definition "A person accepted it into what the Eidolon holds."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RejectedState a skos:Concept ; skos:inScheme ifcore:ReviewStateScheme ; skos:prefLabel "Rejected"@en ; skos:notation "rejected" ;
+    skos:definition "A person declined it. It stays, so it is not proposed again."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:reviewState a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifcore:Assertion ifcore:DigitalReflection ) ] ; rdfs:range skos:Concept ;
+    rdfs:comment "A concept of ifcore:ReviewStateScheme; absent means candidate (0047-digital-reflections FR-038)."@en .
+ifcore:reviewedBy a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifcore:Assertion ifcore:DigitalReflection ) ] ; rdfs:range ifcore:Person ;
+    rdfs:comment "The person who reviewed it. Never an AI agent."@en .
+ifcore:reviewedOn a owl:DatatypeProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifcore:Assertion ifcore:DigitalReflection ) ] ; rdfs:range xsd:date ;
+    rdfs:comment "When the person reviewed it. Required with ifcore:reviewedBy."@en .
+
+# Aspects: what an assertion about an idea is (0048 FR-017, FR-018, FR-026, FR-027).
+
+ifcore:AspectScheme a skos:ConceptScheme ; rdfs:label "Assertion aspect"@en ;
+    rdfs:comment "What an assertion about a Noema's subject is, beyond its label: the epistemic parts of an idea and the optional commercial parts (0048-noemas FR-017, FR-026). Each is an ifcore:Assertion with ifcore:aspect, so it has a label, a source, a review state and a verifier like any other."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EpistemicAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:topConceptOf ifcore:AspectScheme ; skos:prefLabel "Epistemic aspect"@en ; skos:notation "epistemic" ;
+    skos:definition "The group of aspects that say what an idea assumes, predicts, can be refuted by, and where it is limited."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CommercialAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:topConceptOf ifcore:AspectScheme ; skos:prefLabel "Commercial aspect"@en ; skos:notation "commercial" ;
+    skos:definition "The group of aspects that say where an idea might become useful to a buyer. Optional: an idea needs none to exist."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AssumptionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Assumption"@en ; skos:notation "assumption" ;
+    skos:definition "Something the idea depends on being true."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PredictionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Testable prediction"@en ; skos:notation "prediction" ;
+    skos:definition "What would be observed if the idea is right."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FalsificationCriterionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Falsification criterion"@en ; skos:notation "falsification-criterion" ;
+    skos:definition "What observation would refute or weaken the idea."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExperimentalDesignAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Experimental design"@en ; skos:notation "experimental-design" ;
+    skos:definition "How the idea could be tested."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:LimitationAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Known limitation"@en ; skos:notation "limitation" ;
+    skos:definition "Where the idea is known not to hold or not to reach."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OpenQuestionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Open question"@en ; skos:notation "open-question" ;
+    skos:definition "Something about the idea that is not yet known."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CounterargumentAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Counterargument"@en ; skos:notation "counterargument" ;
+    skos:definition "An argument against the idea, with or without new evidence."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ConsequenceAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Practical consequence"@en ; skos:notation "consequence" ;
+    skos:definition "What follows in practice if the idea is correct."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RevisionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Revision"@en ; skos:notation "revision" ;
+    skos:definition "A change to an earlier assertion, derived from it. The earlier one stays."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RetractionAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:EpistemicAspect ; skos:prefLabel "Retraction"@en ; skos:notation "retraction" ;
+    skos:definition "A withdrawal of an earlier assertion, derived from it. The earlier one stays."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ProblemAddressedAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Problem addressed"@en ; skos:notation "problem-addressed" ;
+    skos:definition "The real-world problem the idea bears on."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:IntendedBeneficiaryAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Intended beneficiary"@en ; skos:notation "intended-beneficiary" ;
+    skos:definition "Whom the idea is meant to help."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PotentialBuyerAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Potential buyer"@en ; skos:notation "potential-buyer" ;
+    skos:definition "Who might pay for something built from the idea."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExistingWorkflowAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Relevant existing workflow"@en ; skos:notation "existing-workflow" ;
+    skos:definition "The current way of working the idea would change."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ProductWedgeAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Candidate product wedge"@en ; skos:notation "product-wedge" ;
+    skos:definition "A narrow first product or service the idea could enter through."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CommercialHypothesisAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Commercial hypothesis"@en ; skos:notation "commercial-hypothesis" ;
+    skos:definition "A guess about demand or value that has not been shown. It is never demand evidence."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DemandEvidenceAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Demand evidence"@en ; skos:notation "demand-evidence" ;
+    skos:definition "Evidence from identifiable Eidolons (ifcore:demonstratedBy) that someone wants what the idea could yield. Novelty, citations, patentability and technical elegance are not demand evidence (0048-noemas FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:CompetingApproachAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Competing approach"@en ; skos:notation "competing-approach" ;
+    skos:definition "Another way of getting the same result."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AdoptionObstacleAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Adoption obstacle"@en ; skos:notation "adoption-obstacle" ;
+    skos:definition "What stands between the idea and its use."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RightsConsiderationAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Rights and licensing consideration"@en ; skos:notation "rights-consideration" ;
+    skos:definition "A question about rights in or around the idea. A statement here is an assertion with its own source, not a right (0048-noemas FR-030)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:NativeAlphaSourceAspect a skos:Concept ; skos:inScheme ifcore:AspectScheme ; skos:broader ifcore:CommercialAspect ; skos:prefLabel "Potential source of Native Alpha"@en ; skos:notation "native-alpha-source" ;
+    skos:definition "Why the idea might yield a durable technical, economic, workflow, distribution or strategic advantage."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:aspect a owl:ObjectProperty ; rdfs:domain ifcore:Assertion ; rdfs:range skos:Concept ;
+    rdfs:comment "A concept of ifcore:AspectScheme: what this assertion is about the idea (0048-noemas FR-017)."@en .
+ifcore:demonstratedBy a owl:ObjectProperty ; rdfs:domain ifcore:Assertion ;
+    rdfs:comment "The identifiable Eidolons a demand-evidence assertion comes from, by subject identifier (0048-noemas FR-027)."@en .
+
+# Relationship families and types that connect Noemas (0048 FR-021 – FR-024).
+
+ifcore:ConceptualFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Conceptual"@en ; skos:notation "conceptual" ;
+    skos:definition "How one idea builds on, refines, generalizes, specializes or replaces another."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EpistemicFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Epistemic"@en ; skos:notation "epistemic" ;
+    skos:definition "What bears on whether an idea is right: evidence, tests, explanations, challenges, the claims it states and the documents that describe it."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:EngagementFamily a skos:Concept ; skos:inScheme ifcore:RelationFamilyScheme ; skos:prefLabel "Engagement"@en ; skos:notation "engagement" ;
+    skos:definition "Who proposes, researches or adopts an idea. Engagement is not ownership of it or of any right in it."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:BuildsOn a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "buildsOn"@en ; skos:notation "buildsOn" ;
+    skos:definition "An idea takes another as its foundation."@en ;
+    ifcore:relationFamily ifcore:ConceptualFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Refines a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "refines"@en ; skos:notation "refines" ;
+    skos:definition "An idea sharpens another without replacing it."@en ;
+    ifcore:relationFamily ifcore:ConceptualFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Generalizes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "generalizes"@en ; skos:notation "generalizes" ;
+    skos:definition "An idea covers more cases than another it includes."@en ;
+    ifcore:relationFamily ifcore:ConceptualFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Specializes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "specializes"@en ; skos:notation "specializes" ;
+    skos:definition "An idea covers a narrower set of cases than another that includes it."@en ;
+    ifcore:relationFamily ifcore:ConceptualFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Supersedes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "supersedes"@en ; skos:notation "supersedes" ;
+    skos:definition "An idea replaces another. The replaced idea is assessed Superseded and stays (0048-noemas FR-015)."@en ;
+    ifcore:relationFamily ifcore:ConceptualFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Supports a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "supports"@en ; skos:notation "supports" ;
+    skos:definition "An idea, or an observation or experiment, is evidence for an idea. Not a proof, and it coexists with evidence against (0048-noemas FR-016)."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Contradicts a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "contradicts"@en ; skos:notation "contradicts" ;
+    skos:definition "An idea, or an observation or experiment, is evidence against an idea. It does not by itself falsify it."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Challenges a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "challenges"@en ; skos:notation "challenges" ;
+    skos:definition "An idea or a person puts an idea to question, by argument or by test."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind, ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Tests a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "tests"@en ; skos:notation "tests" ;
+    skos:definition "An idea (an experimental design), a made thing or an experiment puts an idea to a test."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind, ifcore:ErgonKind, ifcore:OtherKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Explains a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "explains"@en ; skos:notation "explains" ;
+    skos:definition "An idea accounts for another idea or for an observation."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:MotivatedBy a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "motivatedBy"@en ; skos:notation "motivatedBy" ;
+    skos:definition "An idea was prompted by an observation, a problem or another idea."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:States a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "states"@en ; skos:notation "states" ;
+    skos:definition "An idea puts forward a claim. Stating a claim does not assert that it is true (0048-noemas FR-008)."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Describes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "describes"@en ; skos:notation "describes" ;
+    skos:definition "A document or an instrument (a paper, a patent application, a patent) sets out an idea. It is not the idea, and it says nothing of who owns it (0048-noemas FR-029)."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:OtherKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:InformsDesignOf a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "informsDesignOf"@en ; skos:notation "informsDesignOf" ;
+    skos:definition "An idea shaped how a made thing was designed. The made thing need not carry it out."@en ;
+    ifcore:relationFamily ifcore:LineageFamily ; ifcore:fromKind ifcore:NoemaKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Operationalizes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "operationalizes"@en ; skos:notation "operationalizes" ;
+    skos:definition "A made thing puts an idea to work in operation, as a deployed workflow does a methodology. Distinct from implements, which is the design realizing the idea."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:GeneratesEvidenceFor a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "generatesEvidenceFor"@en ; skos:notation "generatesEvidenceFor" ;
+    skos:definition "A made thing in operation produces results that bear on an idea, for or against."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:ProvidesEvidenceFor a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "providesEvidenceFor"@en ; skos:notation "providesEvidenceFor" ;
+    skos:definition "An organization, a person or a physical asset is where evidence bearing on an idea comes from."@en ;
+    ifcore:relationFamily ifcore:EpistemicFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Proposes a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "proposes"@en ; skos:notation "proposes" ;
+    skos:definition "A person or an organization put an idea forward. It says nothing of who conceived it, owns it or may license it."@en ;
+    ifcore:relationFamily ifcore:EngagementFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Researches a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "researches"@en ; skos:notation "researches" ;
+    skos:definition "A person or an organization investigates an idea."@en ;
+    ifcore:relationFamily ifcore:EngagementFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
+ifcore:Adopts a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "adopts"@en ; skos:notation "adopts" ;
+    skos:definition "A person or an organization takes an idea up as its own working view. It is not ownership and not a license."@en ;
+    ifcore:relationFamily ifcore:EngagementFamily ; ifcore:fromKind ifcore:EidolonKind ; ifcore:toKind ifcore:NoemaKind ; ifcore:hasAudience ifcore:Public .
 
 # The Decisions that justify the new terms (0019-controlled-vocabulary FR-004).
 
@@ -950,6 +1169,56 @@ ifcore:ReflectionRelationsAltProperties a ifcore:Alternative ; rdfs:label "One o
     ifcore:rejectionReason "A property carries no provenance or validity without reification, a sub-property hierarchy lets a reasoner infer one right from another, and each type is a new property for 0019 FR-004 to justify."@en ;
     ifcore:hasAudience ifcore:Public .
 
+
+ifcore:NoemaThirdKind a ifcore:Decision ;
+    rdfs:label "Abstract intellectual constructs are a third kind of reflection, the Noema"@en ;
+    dcterms:subject ifcore:Noema, ifcore:IntellectualConstruct, ifcore:NoemaKind ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "A hypothesis, a theory or a methodology is neither something that exists in the world nor something built to operate, yet research is where unusual insight starts and Native Alpha is traced. Left as kind other they had no record, no epistemic state and no place in the graph that connects customers to products, so the thing the company most needs to track was the thing the model could not hold. A third kind keeps the shared mechanisms of identity, evidence, review and audience in one place and adds only what an idea needs. Greek νόημα (what is thought) completes the set with εἴδωλον (an image of what is) and ἔργον (what is made). No established vocabulary names a maintained record of an idea: SKOS has the concept as a term and PROV has the entity as a thing with provenance, neither carrying a state of belief, evidence for and against, or a history of revision."@en ;
+    ifcore:consideredAlternative ifcore:NoemaAltOther, ifcore:NoemaAltErgon, ifcore:NoemaAltIdea ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoemaAltOther a ifcore:Alternative ; rdfs:label "Leave abstract subjects as kind other with no reflection"@en ;
+    ifcore:rejectionReason "About fifteen hundred typed subjects of the vault and the public root are named concepts, notes and agendas. Leaving them without a record leaves research the one part of the company that cannot be queried, assessed or connected to a product or a buyer."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoemaAltErgon a ifcore:Alternative ; rdfs:label "Treat an idea as an Ergon because it is made by thinking"@en ;
+    ifcore:rejectionReason "An Ergon answers what it does, whom it serves and whether it works. An idea is not operated, is not bought, and can be false; a product that is false is broken, and a hypothesis that is false is a result."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NoemaAltIdea a ifcore:Alternative ; rdfs:label "Name the third kind Idea, Concept or Knowledge"@en ;
+    ifcore:rejectionReason "Concept is one subtype of the kind, Idea is too loose to be a type, and Knowledge claims what the kind deliberately does not: a Noema may be false. A name in the same Greek family as the other two reads as a set."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ClaimsAreNotNoemas a ifcore:Decision ;
+    rdfs:label "A claim is a statement a Noema states, and a claim has no reflection of its own"@en ;
+    dcterms:subject ifcore:States, ifcore:RuleClaim ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "A Noema is the construct under study, with its meaning, assumptions, evidence and history. A claim is one sentence that says something is the case, and the same claim can be stated by several constructs and be a part of a legal instrument as a patent claim. Treating each claim as a Noema would give every sentence its own state and history and would put a patent claim, a legal text, in the same kind as the idea the patent describes. A Noema states claims, evidence bears on the Noema (and on a claim by naming it), and the record's own statements about the Noema are assertions, a third thing. The claim stays a schema:Claim of kind other."@en ;
+    ifcore:consideredAlternative ifcore:ClaimsAltEachANoema ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ClaimsAltEachANoema a ifcore:Alternative ; rdfs:label "Make each proposition a Noema of its own"@en ;
+    ifcore:rejectionReason "It multiplies records, separates a hypothesis from its wording, and cannot tell a patent claim from a research claim."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:EpistemicStateIsAssessed a ifcore:Decision ;
+    rdfs:label "Epistemic state is a dated, reviewed assessment and not a field or a score"@en ;
+    dcterms:subject ifcore:EpistemicAssessment, ifcore:EpistemicStateScheme, ifcore:assessedState, ifcore:ReviewStateScheme, ifcore:reviewState, ifcore:reviewedBy, ifcore:reviewedOn ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "Whether an idea is supported, contested or falsified changes with the evidence and is a judgment someone makes. Held as a field on the record it would overwrite what was believed before and could not say who judged or why; held as one confidence number it would hide the evidence. So it is an assertion about the idea, dated, with its basis, and the current state is the latest accepted one. Review is kept apart from verification: verifying checks a statement against its source, and a hypothesis can never be verified, but a person can accept it as a hypothesis worth keeping. That is the line between what an AI proposes and what the company holds, and it is the same line for every assertion and record, so it lives at the shared layer. Epistemic state is also kept apart from publication, editorial and operational lifecycle, which describe the work and not the idea."@en ;
+    ifcore:consideredAlternative ifcore:EpistemicAltField ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:EpistemicAltField a ifcore:Alternative ; rdfs:label "A status field on the Noema record, or one confidence score"@en ;
+    ifcore:rejectionReason "A field overwrites history, names no judge and no basis, and invites reuse of a publication stage. A score hides which evidence it summarizes."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NoemaSubtypesAreConcepts a ifcore:Decision ;
+    rdfs:label "Noema subtypes and the parts of an idea are concepts of open schemes"@en ;
+    dcterms:subject ifcore:NoemaTypeScheme, ifcore:AspectScheme, ifcore:aspect, ifcore:demonstratedBy ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-08"^^xsd:date ;
+    dcterms:description "A framework contains hypotheses and a methodology, and one idea can be a theory and a framework at once, so a subtype that is a class would force a single answer and a new subtype would be a schema change. A concept of a scheme, carried by dcterms:type, follows the pattern the ontology already uses for kinds of design system and criticality of vendor, allows overlap, and is added without touching the model. The assumptions, predictions, falsification criteria, limits and commercial parts of an idea are likewise assertions with an aspect, so each inherits a label, a source and a review state. Demand evidence names the Eidolons it comes from, because novelty and citations are not demand."@en ;
+    ifcore:hasAudience ifcore:Public .
 # ───────────────────────── The method (0003-intellectual-frontiers FR-007, FR-008) ─────────────────────────
 
 ifcore:MethodStage a owl:Class ; rdfs:label "Method stage"@en ;
@@ -2687,6 +2956,9 @@ ifcore:RequirementResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKin
 ifcore:OntologyResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "ontology"@en ;
     skos:notation "ontology" ;
     skos:definition "A term of the ontology: a class, property, individual, concept scheme or concept (0042-agora FR-037)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ReflectionResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "reflection"@en ;
+    skos:notation "reflection" ;
+    skos:definition "A digital reflection: an Eidolon, an Ergon or a Noema, and the subject it is a record of (0047-digital-reflections, 0048-noemas FR-032)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:DesignSystemResourceKind a skos:Concept ; skos:inScheme ifcore:ResourceKindScheme ; skos:prefLabel "design-system"@en ;
     skos:notation "design-system" ;
     skos:definition "A design system registered in the ontology."@en ; ifcore:hasAudience ifcore:Public .
@@ -2829,6 +3101,14 @@ ifcore:AgoraOntologyShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora
     dcterms:identifier "ontology show" ;
     ifcore:commandNoun ifcore:OntologyResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
     skos:definition "Shows one ontology term: its meaning, relations, statements, the terms that reference it and the requirements that cite it."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraReflectionListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "reflection list"@en ;
+    dcterms:identifier "reflection list" ;
+    ifcore:commandNoun ifcore:ReflectionResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Lists digital reflections by kind, epistemic state or review state, the candidates awaiting review and the possible duplicates, or audits how a repository's subjects classify (0048-noemas FR-032, FR-035)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgoraReflectionShowCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "reflection show"@en ;
+    dcterms:identifier "reflection show" ;
+    ifcore:commandNoun ifcore:ReflectionResourceKind ; ifcore:commandVerb ifcore:ShowCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;
+    skos:definition "Shows one digital reflection by its subject: for a Noema its state, claims, evidence, assumptions, falsifiers, research stage and reasons to look again (0048-noemas FR-032)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:AgoraDesignSystemListCommand a ifcore:Command ; ifcore:commandOf ifcore:Agora ; rdfs:label "design-system list"@en ;
     dcterms:identifier "design-system list" ;
     ifcore:commandNoun ifcore:DesignSystemResourceKind ; ifcore:commandVerb ifcore:ListCommandVerb ; ifcore:commandCategory ifcore:ReadCommandCategory ;

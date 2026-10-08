@@ -437,6 +437,26 @@ A tracked, replayable change drafted for a person to decide (0041-command-line F
 
 |===
 
+=== reflection
+
+A digital reflection, of one of its three kinds, and the subject it is a record of (0047-digital-reflections, 0048-noemas)
+
+[cols="4,2,2,4"]
+|===
+|Usage |Category |Where it runs |What it does
+
+|`agora reflection list [--kind REFLECTION_KIND] [--state EPISTEMIC_STATE] [--review REVIEW_STATE] [--on DATE] [--duplicates] [--audit]`
+|read
+|terminal, editor, mcp
+|List digital reflections: Eidolons, Ergons and Noemas, with the Noemas' epistemic state and every review state; or the audit of how a repository's subjects classify
+
+|`agora reflection show SUBJECT [--on DATE]`
+|read
+|terminal, editor, mcp
+|Show one digital reflection by its subject: for a Noema its current state, claims, evidence for and against, assumptions, falsifiers, open questions, research stage and reasons to look again, each with its source and review state
+
+|===
+
 === requirement
 
 One FR of a spec, and how it is enforced (0020-spec-format FR-011)
@@ -567,6 +587,10 @@ A value that fails its type is an error that names the type and gives examples.
 |a design system's slug, a directory of design-systems/
 |a value `the noun's list command` offers
 
+|`EPISTEMIC_STATE`
+|an epistemic state of a Noema (0048-noemas FR-011)
+|proposed, under-investigation, supported, contested, falsified, superseded
+
 |`GENERATOR`
 |a generator, as `fresh` proves it: brand-theme, brand-specimen, ...
 |a value `the noun's list command` offers
@@ -615,6 +639,10 @@ A value that fails its type is an error that names the type and gives examples.
 |whether a proposal is open or accepted
 |open, accepted
 
+|`REFLECTION_KIND`
+|a kind of digital reflection (0047-digital-reflections FR-001)
+|eidolon, ergon, noema
+
 |`REQUIREMENT`
 |a requirement as <spec>/FR-NNN, such as 0020/FR-013
 |a value `the noun's list command` offers
@@ -622,6 +650,10 @@ A value that fails its type is an error that names the type and gives examples.
 |`RESOURCE`
 |a resource as kind:id, such as spec:0020 or requirement:0020/FR-013
 |a value `the noun's list command` offers
+
+|`REVIEW_STATE`
+|a review state (0047-digital-reflections FR-038)
+|candidate, reviewed, accepted, rejected
 
 |`RUNNER`
 |which harness: browser or python for design-systems
@@ -646,6 +678,10 @@ A value that fails its type is an error that names the type and gives examples.
 |`SPEC_STATUS`
 |a spec's status (0020 FR-009)
 |Draft, Adopted, Superseded
+
+|`SUBJECT`
+|a subject a reflection is a record of, by its full IRI or by its local name when only one subject has it
+|a value `the noun's list command` offers
 
 |`SUITE`
 |a named set of check sections

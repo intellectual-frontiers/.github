@@ -228,8 +228,9 @@ reference model, and governance representation.
   private Eidolon where works are made (`eidolon`), and one presentation channel for
   them (`www.intellectualfrontiers.com`).
 - **A digital reflection** — a maintained record of one subject, either an
-  Eidolon (what exists) or an Ergon (what is created), per
-  0047-digital-reflections. The Eidolon above is the system that holds them.
+  Eidolon (what exists), an Ergon (what is built) or a Noema (what is
+  conceived), per 0047-digital-reflections and 0048-noemas. The Eidolon above
+  is the system that holds them.
 - **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
 - **An audience** — a named permission to see a fact: public, company

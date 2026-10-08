@@ -193,4 +193,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Digital reflections: Eidolons and Ergons
 
+|`0048-noemas`
+|Draft
+|Noemas: reflections of what is conceived
+
 |===

@@ -6,23 +6,26 @@
 **Input:** How the Eidolon represents what a record is about. A digital
 reflection is a maintained, AI-readable record of one subject. It is an
 Eidolon when the subject exists independently of its record (a person, an
-organization, a facility, an identifiable physical asset) and an Ergon when
+organization, a facility, an identifiable physical asset), an Ergon when
 the subject was deliberately created to accomplish a purpose (a product, a
-service, a system, a workflow, a solution). This spec states the shared
-model, the two kinds, the rules that classify a subject, the typed
-relationships that connect them, the assertions that make a record
-evidence-backed, the boundary with subjects that are neither, and how
-records typed Eidolon whose subject is something made are reviewed and
-moved without loss. The terms live in the ontology
-(`ifcore:DigitalReflection`, `ifcore:Eidolon`, `ifcore:Ergon`), reusing
-W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
+service, a system, a workflow, a solution), and a Noema when the subject is
+an abstract intellectual construct (a concept, a hypothesis, a theory, a
+methodology; 0048-noemas). This spec states the shared model, the three
+kinds, the rules that classify a subject, the typed relationships that
+connect them, the assertions that make a record evidence-backed and the
+review that accepts them, the subjects that are none of the three, and how
+records typed with the wrong kind are reviewed and moved without loss. The
+terms live in the ontology (`ifcore:DigitalReflection`, `ifcore:Eidolon`,
+`ifcore:Ergon`, `ifcore:Noema`), reusing W3C PROV, schema.org, Dublin Core
+and SKOS under 0019-controlled-vocabulary.
 
 ## The shared model
 
 - **FR-001**: A digital reflection MUST be a record of exactly one
-  subject, typed as an `ifcore:Eidolon` or an `ifcore:Ergon`, both kinds of
-  `ifcore:DigitalReflection`. The two kinds MUST be disjoint: no record is
-  both, and neither is a label for the other.
+  subject, typed as an `ifcore:Eidolon`, an `ifcore:Ergon` or an
+  `ifcore:Noema`, all kinds of `ifcore:DigitalReflection`. The three kinds
+  MUST be pairwise disjoint: no record is two of them, and none is a label
+  for another.
 - **FR-002**: A reflection MUST name its subject by a stable identifier
   (`ifcore:reflects`, one IRI). The subject is a different individual from
   the record about it. Reflections, relationships and assertions MUST
@@ -92,7 +95,7 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 - **FR-011**: The ontology MUST hold the classification as
   `ifcore:ClassificationRule` individuals, each naming one subject class
   (`ifcore:subjectClass`) and the one kind it reflects as
-  (`ifcore:reflectedAs`): `eidolon`, `ergon`, `other` (FR-027) or
+  (`ifcore:reflectedAs`): `eidolon`, `ergon`, `noema`, `other` (FR-027) or
   `undetermined`. At most one rule MUST name a class. A new subject class
   MUST receive its rule before reflections of it are created.
 - **FR-012**: A subject's kind MUST be resolved from the rules of its
@@ -105,10 +108,11 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 - **FR-013**: The initial rules MUST classify a person, a company or other
   legal entity, a government agency, a hospital organization, a place or
   physical facility, and an identifiable unit of a product as Eidolons;
-  and a product model, a software application, a software-as-a-service
+  a product model, a software application, a software-as-a-service
   product, a commercial service offering, a designed workflow, an AI
   workforce solution or agent design, and an engineered care delivery
-  program as Ergons.
+  program as Ergons; and a concept, a research finding, a research
+  pillar, a named framework and an invention as Noemas.
 - **FR-014**: A legal entity MUST be an Eidolon whatever brought it into
   existence. The defining distinction is its independently identifiable
   identity in the world, not whether people formed it.
@@ -186,19 +190,21 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 
 ## The boundary with other subjects
 
-- **FR-027**: A subject that is abstract (a scientific theory, a research
-  hypothesis, a general concept, an abstract capability, a legal right, a
-  patent claim, a mathematical model, an invention) MUST NOT be given an
-  Eidolon or an Ergon. It keeps the types the ontology already gives it
-  and has the kind `other`.
+- **FR-027**: A subject that is an abstract intellectual construct (a
+  scientific theory, a research hypothesis, a general concept, an abstract
+  capability, a mathematical model, an invention) MUST NOT be given an
+  Eidolon or an Ergon; its reflection is a Noema (0048-noemas). A subject
+  that is none of the three kinds, such as an event, a legal right, a
+  patent claim or other claim, a document or an outcome, has the kind
+  `other` and no reflection.
 - **FR-028**: A patent document, a legal right in it, the invention it
   describes and a commercial product that practices it MUST be distinct
-  subjects, related by typed relationships (FR-016, FR-018). Who owns a
-  right MUST NOT be inferred from who invented it, nor the reverse.
-- **FR-029**: No class or top-level type for a third kind of reflection
-  MUST be created until its name and its tradeoffs are decided
-  (OQ-1).
-
+  subjects, related by typed relationships (FR-016, FR-018): the invention
+  is a Noema, the document and the right are of kind `other`, and the
+  product is an Ergon. Who owns a right MUST NOT be inferred from who
+  invented it, nor the reverse.
+- **FR-029**: Retired. A third kind of reflection exists: FR-001 and
+  0048-noemas govern it.
 ## Compatibility and migration
 
 - **FR-030**: The IRI `ifcore:Eidolon` MUST stay valid, and a record
@@ -229,23 +235,42 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 
 ## Naming and checking
 
-- **FR-035**: The canonical names MUST be `Eidolon` and `Ergon`, with the
-  plurals `Eidolons` and `Ergons`. The Eidolon of 0001-eidolon-architecture
-  (the three-repository system, and a company's own, per 0011-studios
-  FR-017) is the system that holds reflections; prose MUST NOT call a
-  product, a service, a system or a workflow an Eidolon, and MUST call a
-  deliberately created subject an Ergon.
+- **FR-035**: The canonical names MUST be `Eidolon`, `Ergon` and `Noema`,
+  with the plurals `Eidolons`, `Ergons` and `Noemas`. The Eidolon of
+  0001-eidolon-architecture (the three-repository system, and a company's
+  own, per 0011-studios FR-017) is the system that holds reflections; prose
+  MUST NOT call a product, a service, a system or a workflow an Eidolon,
+  MUST call a deliberately created subject an Ergon, and MUST call an
+  abstract intellectual construct a Noema.
 - **FR-036**: `agora check ontology` MUST fail on a classification rule that
   is malformed or duplicated, a reflection without exactly one subject,
-  without an audience or typed as both kinds, an Ergon without a purpose,
+  without an audience or typed as more than one kind, an Ergon without a purpose,
   a relationship or assertion that breaks FR-016 to FR-025, a replaced
   record that breaks FR-032, a required relationship type that is missing, and a relationship type that is
   arranged in a hierarchy (FR-018). It MUST also check the worked examples
   beside this spec.
 
+- **FR-037**: Each kind has a represented subject, and the record MUST NOT
+  be taken for it. The represented subject of an Eidolon is an
+  independently identifiable real-world entity; of an Ergon, a deliberately
+  created operational solution; of a Noema, an abstract intellectual
+  construct. It is never the record itself, a document, page or database
+  row that describes it, a claim or an assertion made about it, or another
+  kind's idea of it. A subject does not change kind because its record
+  exists as a document, a row or a software object: a Noema kept in a file
+  is not an Ergon, and an Eidolon of a person is not the person's profile
+  page.
+- **FR-038**: An assertion MUST carry a review state
+  (`ifcore:reviewState`): `candidate`, `reviewed`, `accepted` or
+  `rejected`; none stated is `candidate`. An assertion attributed only to an
+  AI agent MUST be `candidate` unless a person has reviewed it
+  (`ifcore:reviewedBy`, a `Person`, with `ifcore:reviewedOn`), and a
+  `reviewed`, `accepted` or `rejected` one MUST name its reviewer. Review
+  accepts a statement into what the Eidolon holds; verification (FR-024)
+  checks it against its source. A hypothesis may be accepted as a
+  hypothesis and is never verified. A rejected assertion stays.
 ## Out of scope
 
-- Whether a third kind of reflection is named and introduced (OQ-1).
 - How a reflection is stored, indexed, searched or retrieved by a
   product; this spec fixes the identifiers and types a retrieval
   convention keys on, not an index.
@@ -278,8 +303,11 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
   records it, per FR-024.
 - A product moves from Eidolon to Ergon in the register: a new Ergon
   derives from the old record, which is kept and points to it, per FR-032.
-- An invention, a theory or a mathematical model: kind `other`, no
-  reflection, per FR-027.
+- An invention, a theory or a mathematical model: a Noema, per FR-027; a
+  patent claim, an event or a legal right: kind `other`, no reflection, per
+  FR-027.
+- An idea described in a document, a database row or a software object: it
+  stays a Noema, and the document is not its Ergon, per FR-037.
 
 ## Assumptions
 
@@ -292,11 +320,6 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 
 ## Open questions
 
-- **OQ-1**: Whether a third kind of reflection exists, and what it is
-  named. Abstract subjects (FR-027) stay with their existing types
-  today. A named third kind would give them one queryable home and a
-  uniform record; it would also add a type that needs its own spec and its
-  own rules, and the name would be fixed by the first records that use it.
 - **OQ-2**: The kind of a running instance of an AI agent. It is an
   independently identifiable individual with a lifecycle, which points to an
   Eidolon by FR-010, yet it exists only as software and is created by
@@ -309,6 +332,10 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 - **OQ-4**: Whether the outcome of an Ergon (what it intends and
   produces) is a subject with a record of its own or only a measured
   assertion; the relationships treat it as kind `other`.
+- **OQ-6**: Whether the class IRIs `ifcore:Eidolon` and `ifcore:NativeAlpha`,
+  which also stand for the founder's research ideas, are split into a class
+  of records and a separate Noema subject for the idea. Today one IRI plays
+  both parts, and FR-037 keeps the two senses apart in prose.
 - **OQ-5**: How the subject classes the rules leave `undetermined` are
   decided: a unit of the company (`ifcore:Unit`), an entry in the system
   inventory (`ifcore:InformationSystem`), and a digital asset
@@ -325,6 +352,13 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
   a subject that exists independently of the record.
 - **An Ergon** (`ifcore:Ergon`) - a digital reflection of what is created:
   a subject deliberately made to accomplish a purpose.
+- **A Noema** (`ifcore:Noema`) - a digital reflection of what is
+  conceived: an abstract intellectual construct (0048-noemas).
+- **A represented subject** - the thing a reflection is a record of,
+  named by `ifcore:reflects`; never the record.
+- **A claim** (`schema:Claim`) - a statement that something is the case.
+  It is not a reflection kind: a Noema states claims, and a record
+  asserts things about its subject (0048-noemas).
 - **A classification rule** (`ifcore:ClassificationRule`) - one subject class
   and the kind it reflects as.
 - **A reflection relationship** (`ifcore:ReflectionRelationship`) - a typed,
@@ -335,8 +369,8 @@ W3C PROV, schema.org, Dublin Core and SKOS under 0019-controlled-vocabulary.
 ## Success criteria
 
 - **SC-001**: A company classifies as an Eidolon, a software-as-a-service
-  product as an Ergon, and a subject with no rule, conflicting rules or an
-  abstract nature is never given either.
+  product as an Ergon, a hypothesis as a Noema, and a subject with no rule
+  or conflicting rules is never given a kind.
 - **SC-002**: A device unit and its product model, and a workflow and its
   executions, are separate records and events, related by typed
   relationships.
