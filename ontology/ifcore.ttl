@@ -2965,13 +2965,13 @@ ifcore:OpsfolioControlCatalogErgon a ifcore:Ergon ; ifcore:reflects ifcore:Opsfo
     ifcore:purpose "Holds the controls and requirements of published frameworks, each cited to its source with its effective dates and verification state."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
 
 ifcore:OpsfolioExtensionRegistry a ifcore:PlatformModule ; rdfs:label "Opsfolio Extension Registry"@en ;
-    ifcore:moduleCode "OER" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-extension-registry" ;
+    ifcore:moduleCode "OER" ; ifcore:codeStatus "confirmed" ; ifcore:artifactName "opsfolio-extension-registry" ;
     ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
 ifcore:OpsfolioExtensionRegistryErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioExtensionRegistry ;
     ifcore:purpose "Keeps the signed, versioned packages that extend the platform, such as control catalogs, evidence collectors and runbooks."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
 
 ifcore:OpsfolioPackageRuntime a ifcore:PlatformModule ; rdfs:label "Opsfolio Package Runtime"@en ;
-    ifcore:moduleCode "OPR" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-package-runtime" ;
+    ifcore:moduleCode "OPR" ; ifcore:codeStatus "confirmed" ; ifcore:artifactName "opsfolio-package-runtime" ;
     ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
 ifcore:OpsfolioPackageRuntimeErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioPackageRuntime ;
     ifcore:purpose "Installs a package and runs it in a sandbox that denies by default, within the permissions its manifest states and a tenant administrator approves."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
@@ -2992,7 +2992,7 @@ ifcore:OpsfolioApiGatewayErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioA
     ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
 
 ifcore:OpsfolioAssetInventory a ifcore:PlatformModule ; rdfs:label "Opsfolio Asset Inventory"@en ;
-    ifcore:moduleCode "OAI" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-asset-inventory" ;
+    ifcore:moduleCode "OAI" ; ifcore:codeStatus "confirmed" ; ifcore:artifactName "opsfolio-asset-inventory" ;
     ifcore:platformLayer ifcore:ExtensionsLayer ; ifcore:hasAudience ifcore:Public .
 ifcore:OpsfolioAssetInventoryErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioAssetInventory ;
     ifcore:purpose "Reconciles the assets that a boundary expects with the assets that sources observe, and reports the difference. It holds no boundary."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
