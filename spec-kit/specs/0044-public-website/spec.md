@@ -125,9 +125,21 @@ content document is, 0002-content-format; how addresses map to content,
   Public work (and for every preview, FR-056) and `confidential`
   otherwise. The public tree MUST be part of the website. The
   confidential tree MUST NOT be part of a built website, an archive or a
-  container image: it is served only by the program on the person's own
-  computer, and on a published website only to a reader the application
-  identifies as allowed (FR-027).
+  container image unless that image serves it behind sign-in (FR-058): it
+  is served by the program on the person's own computer, and on a
+  published website only to a reader FR-058 allows (FR-027).
+- **FR-058**: The program MUST offer an authenticated mode: a reader signs
+  in with GitHub at `/__eid/login` (FR-036), and the program MUST serve a
+  confidential rendition (FR-057) only to a reader GitHub says can read
+  the vault's repository, checked at sign-in, for a session of at most
+  twelve hours held in a cookie the program signs. It MUST keep no GitHub
+  token. To a reader not signed in it MUST answer every confidential
+  address alike, by sending the reader to sign in, whether or not a file is
+  there (FR-003). Every credential MUST come from the destination's
+  secrets (FR-022). A program holding confidential renditions with no
+  sign-in configured MUST refuse to start, and without sign-in the
+  confidential tree MUST answer not found. The pages themselves stay
+  public.
 
 ## Addresses
 

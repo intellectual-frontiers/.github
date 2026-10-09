@@ -1341,6 +1341,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-055	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the profile pages, their works and the links from a book, a paper and a patent; no biography on a book page
 0044-public-website FR-056	check	eidolon: eid check site	the check fails any PDF under /books/ and a preview of a book not on the website; eid preview build chooses the pages; the Rust tests check the reader, the shuffled tiles and the watermark
 0044-public-website FR-057	check	eidolon: eid check site	the check fails a confidential rendition in the website and a public one of a work that is not Public; the archive and the image leave the confidential tree out (tests/gaps.rs)
+0044-public-website FR-058	check	eidolon: eid test	the Rust tests (tests/auth.rs) sign in against a fake GitHub: a reader of the repository opens a confidential rendition, another does not, a forged session is refused, every confidential address asks to sign in alike, and a site holding confidential files does not start without sign-in
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
