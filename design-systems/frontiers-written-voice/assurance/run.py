@@ -21,7 +21,7 @@ import sweep  # noqa: E402
 
 ONTOLOGY = SYSTEM.parent.parent / "ontology" / "ifcore.ttl"
 KEYS = {"fail_words", "warn_words", "plain_words", "hedges", "throat_clearing", "fail_announcements",
-        "warn_announcements", "fail_contains", "fail_labels", "max_seesaws", "warn_not_fragments", "procedure"}
+        "warn_announcements", "fail_contains", "fail_labels", "idioms", "max_seesaws", "warn_not_fragments", "procedure"}
 
 
 def main() -> int:
@@ -69,6 +69,12 @@ def main() -> int:
         fails, _ = sweep.sweep(sweep.prose(path.read_text(encoding="utf-8"), path.suffix), patterns, mode=mode, terms=terms)
         want = expected.get(path.name, "")
         check(bool(want) and any(want in f for f in fails), f"fail/{path.name} should be refused for {want!r}; it reported: {'; '.join(fails) or 'nothing'}")
+
+    _, warns = sweep.sweep("The new rule will earn its keep, so put a pin in it and move on.", patterns, terms=terms)
+    check(any("idiom 'earns its keep'" in w or "idiom 'earn their keep'" in w for w in warns) or any("idiom" in w for w in warns),
+          "an idiom should be reported as a warning (FR-021); the sweep reported none")
+    check(not any("idiom" in w for w in sweep.sweep("The rule helps only when someone reads it.", patterns, terms=terms)[1]),
+          "a plain sentence should report no idiom (FR-021)")
 
     if ttl:
         check(bool(re.search(r'dcterms:identifier "frontiers-written-voice"[\s\S]*?ifcore:WrittenVoiceDesignSystemKind', ttl)),

@@ -5,7 +5,7 @@
 **Governed by:** 0014-design-systems
 
 **Input:** How the house voice changes when a work is heard rather than read (an episode, a talk, a
-course video, a voice-over): writing for the ear, humor, punctuation for performance, transitions and
+course video, a voice-over): writing for the ear, punctuation for performance, transitions and
 repetition, derived from `frontiers-written-voice`.
 
 ## Identity and scope
@@ -37,19 +37,18 @@ repetition, derived from `frontiers-written-voice`.
   question"), never only that it is next ("Now let's move on to buyers"). A central claim MAY be
   repeated only where the repetition does a new job: reorienting after a break, joining new evidence, or
   making the consequence clearer.
-- **FR-007**: A story told as from practice MUST be told as a hypothetical ("picture a deal that dies
+- **FR-007**: A story told as from practice MUST be told as a hypothetical ("picture a deal that ends
   late", "say a hospital buys a platform") and MUST NOT be labelled as made up ("this is an illustrative
   case"), and MUST NOT name a real organization or person.
 
-## Humor, punctuation and delivery
+## Plain wording, punctuation and delivery
 
-- **FR-008**: This overrides `frontiers-written-voice` FR-010 for spoken work: a script MAY use more humor
-  than the written voice, dry and specific (a deadpan detail, a wry observation, an absurd setup that
-  resolves into a hard fact), provided each joke carries a point, is never at a named person's or a
-  patient's expense, and never hides uncertainty, softens a claim or stands in for evidence. Puns,
-  slogans, laugh lines and ornate imagery stay refused. Punctuation in a script MAY help the speaker
-  breathe and find the cadence, but MUST NOT carry logic a listener cannot hear (a semicolon,
-  parentheses, an em dash); short paragraph blocks are performance aids, not one sentence per paragraph.
+- **FR-008**: Spoken work follows `frontiers-written-voice` FR-010 and FR-021 without change: a script MUST
+  NOT use humor, jokes, wit, wordplay, slogans, metaphors, idioms or cultural references, because a
+  listener may not be a native speaker and cannot pause to look a phrase up. A script states each point
+  literally. Punctuation in a script MAY help the speaker breathe and find the cadence, but MUST NOT
+  carry logic a listener cannot hear (a semicolon, parentheses, an em dash); short paragraph blocks are
+  performance aids, not one sentence per paragraph.
 - **FR-009**: `sweep.py` MUST sweep a script's spoken text with the written voice's patterns and shared
   terms (its copy) and its own, leaving out the passages a show's format dictates (its identification,
   its tagline). A script is not finished until it sweeps clean and has been read aloud at delivery pace,
