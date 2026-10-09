@@ -41,11 +41,16 @@ the platform's own specs. The terms live in the ontology (`ifcore:EntryDoorSchem
 - **FR-010**: A recipient who keeps the result MUST be able to sign up by a link sent to an address they control, with no password at first. Further factors MAY be required
   as the data they can reach requires (0049-platforms FR-032, FR-033).
 - **FR-011**: An invitation MUST NOT be used to advertise a third party, and a platform MUST NOT sell an invitation list.
+- **FR-024**: A result that a party gave earlier MUST belong to that party. The platform MUST NOT show it to another party, or offer it as the preview of finished work for another
+  party's invitation, unless the owner has consented to that reuse, and the owner MUST confirm each reuse. One party's request MUST NOT expose another party's result to a third
+  party (0049-platforms FR-032, FR-033).
 
 ## Verifying a standing
 
 - **FR-012**: A platform MAY verify the standing of a party in **levels**, held as data: *unverified*, *registered* and *verified*. An unverified party MAY finish a guest task and
   nothing more. A party that owns data, or the platform's own specs, MAY require a level before another party sees that data.
+- **FR-025**: A result that an unverified party gives, for example in a guest task, MUST be recorded as self-asserted, and MUST stay self-asserted until a level above unverified
+  backs it. The platform MUST show that status wherever the result is shown, and MUST NOT close a loop whose type needs verified evidence on a self-asserted result (0049-platforms FR-024).
 - **FR-013**: A platform that verifies MUST name, in its own specs, each source a level rests on, and MUST say what each level proves and what it does not. A level MUST NOT be
   presented as proving more than its sources prove.
 - **FR-014**: What a source returned MUST be kept as an external record reference with its source, the time it was checked and a cadence for checking again
@@ -99,8 +104,9 @@ the platform's own specs. The terms live in the ontology (`ifcore:EntryDoorSchem
 - A level's source fails a later check: the level drops and the party is told, per FR-014.
 - A page's source is overdue: the page is marked and not shown as current, per FR-016.
 - An advertisement script is added to a signed-in page: refused, per FR-020.
-- A vendor is asked by a customer for evidence it has already given to another customer: the platform offers the stored answer as the preview of the finished work, and the
-  vendor confirms it, per FR-005 and FR-008.
+- A vendor is asked by a customer for evidence it has already given to another customer: the platform offers the stored answer as the preview of the finished work only if the
+  vendor owns it and has consented to this reuse, and the vendor confirms each reuse; without that consent the customer sees no answer, per FR-005, FR-008 and FR-024.
+- A guest answers a task and has not signed up: the answer is recorded as self-asserted and cannot close a loop that needs verified evidence, per FR-025.
 - A platform has no field law about rewards: it still has the rule reviewed before it offers one, per FR-023.
 
 ## Assumptions
@@ -128,9 +134,9 @@ the platform's own specs. The terms live in the ontology (`ifcore:EntryDoorSchem
 
 - **SC-001**: A journey of each kind of a platform runs from a door to a closed loop in a test.
 - **SC-002**: A guest finishes a task from an invitation with no account in a test.
-- **SC-003**: An invitation grants no data beyond its task in a test.
+- **SC-003**: An invitation grants no data beyond its task in a test, and a party's earlier result is not shown to another party without the owner's consent in a test.
 - **SC-004**: A refused invitation cannot be sent again for that task in a test.
-- **SC-005**: A party's level follows its sources and drops when a check fails in a test.
+- **SC-005**: A party's level follows its sources and drops when a check fails in a test, and a result from an unverified party stays self-asserted in a test.
 - **SC-006**: A signed-in page loads no advertising script in a test.
 - **SC-007**: A report carries no identity and suppresses a small count in a test.
 - **SC-008**: A page with an overdue source is marked in a test.
