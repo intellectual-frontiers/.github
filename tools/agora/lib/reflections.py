@@ -311,6 +311,8 @@ def check_graph(g: Graph, own: set[str] | None = None) -> list[Finding]:
     _check_review(g, add)
     from . import noemas
     noemas.check(g, add)
+    from . import platforms
+    platforms.check(g, add)
     return out
 
 

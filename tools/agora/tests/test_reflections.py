@@ -413,7 +413,7 @@ class Compatibility(unittest.TestCase):
         self.assertEqual(len(r.relationships_of(after, "develops")), 1, "the relationship is between subjects, so it did not move")
         self.assertEqual(after.objects(Iri("https://example.org/t#OldRecord"), r.REFLECTS), after.objects(Iri("https://example.org/t#NewRecord"), r.REFLECTS))
         self.assertIn(Iri("https://example.org/t#OldRecord"), after.members(r.REFLECTION), "the old record stays")
-        self.assertEqual(len(before.members(r.RELATIONSHIP)), 0)
+        self.assertEqual(len(before.members(r.RELATIONSHIP)), len(graph().members(r.RELATIONSHIP)), "the legacy record adds no relationship of its own")
 
     def test_a_replaced_record_points_at_a_derived_record_of_the_same_subject(self):
         base = self.LEGACY + f"ex:Other a schema:WebApplication ; {PUB} .\n"
