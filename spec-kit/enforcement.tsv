@@ -680,7 +680,7 @@ frontiers-written-voice FR-006	check	.github: agora check design-systems --runne
 frontiers-written-voice FR-007	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	hedge phrases; whether uncertainty is real is a human read
 frontiers-written-voice FR-008	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	banned words, hedges, stock openings and closings refused by the sweep
 frontiers-written-voice FR-009	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	announcement openings and wrap-up asides; headings as claims are a human read
-frontiers-written-voice FR-010	none	-	literary prose and humor; a human read
+frontiers-written-voice FR-010	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	common idioms warn (FR-021 list); wit, humor and metaphor are a human read
 frontiers-written-voice FR-011	none	-	contrarian claims and useful conclusions; a human read
 frontiers-written-voice FR-012	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
 frontiers-written-voice FR-013	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	Not-X fragments warn; rhythm and paragraph jobs are a human read
@@ -691,6 +691,7 @@ frontiers-written-voice FR-017	check	.github: agora check design-systems --runne
 frontiers-written-voice FR-018	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	a derived voice keeps every inherited pattern
 frontiers-written-voice FR-019	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	agora check design-systems runs run.py, which exits non-zero on any failure
 frontiers-written-voice FR-020	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	URLs and mailto: addresses left out of the sweep, link text after a URL still swept, against fixtures
+frontiers-written-voice FR-021	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	the idioms list warns; literal wording, headings and non-native readability are a human read
 frontiers-spoken-voice FR-001	check	.github: agora check ontology	registration, kind and derivation from a written-voice design system
 frontiers-spoken-voice FR-002	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	the inherited copy is identical to its source; no inherited pattern dropped or loosened
 frontiers-spoken-voice FR-003	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	announcement openings; repeating the intro is the consumer's format check
@@ -698,7 +699,7 @@ frontiers-spoken-voice FR-004	none	-	writing for one hearing; a read-aloud judgm
 frontiers-spoken-voice FR-005	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	announcement openings and filler refused by the sweep; fake banter is a human read
 frontiers-spoken-voice FR-006	none	-	transitions and repetition; a human read
 frontiers-spoken-voice FR-007	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	story labels refused; naming a real party is the consumer's check
-frontiers-spoken-voice FR-008	none	-	humor and performance punctuation; a human read
+frontiers-spoken-voice FR-008	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	the inherited idioms warn; humor and wit are a human read; performance punctuation is a human read
 frontiers-spoken-voice FR-009	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	the sweep with both pattern sets against fixtures; reading aloud is the consumer's
 frontiers-spoken-voice FR-010	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	agora check design-systems runs run.py, which exits non-zero on any failure
 frontiers-slides FR-001	check	.github: agora check ontology	registration, deck types and figure design system

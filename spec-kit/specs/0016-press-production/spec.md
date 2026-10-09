@@ -383,7 +383,9 @@ is not stated here.
   with counterarguments and unresolved questions), and the next step (what the
   reader can do immediately). The house voice (FR-001), the audit (FR-002),
   and the distinction between evidence, hypothesis, and opinion apply as to
-  every Press work; no Pocket Guide style guide exists. A figure MUST explain
+  every Press work, including the plain, literal wording that a non-native reader
+  can follow (`frontiers-written-voice` FR-021: no idiom, figure of speech, or
+  wit, in headings or in text); no Pocket Guide style guide exists. A figure MUST explain
   something its prose would explain less well, and is drawn with the house
   figure design system.
 - **FR-053**: A Pocket Guide MUST be produced exactly as any book is: the house

@@ -121,6 +121,9 @@ def sweep(text: str, patterns: dict, fixed: tuple[str, ...] = (), mode: str = "p
     for w, plain in patterns.get("plain_words", {}).items():
         if m := find(w):
             warns.append(f"{w!r} where a person would say {plain!r}: ...{context(m)}...")
+    for w in patterns.get("idioms", []):
+        if m := find(w):
+            warns.append(f"idiom {w!r}: say the literal meaning in plain words (FR-021): ...{context(m)}...")
     for kind in ("hedges", "throat_clearing"):
         for ph in patterns.get(kind, []):
             if m := find(ph):

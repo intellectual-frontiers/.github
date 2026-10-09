@@ -1,5 +1,5 @@
 {
-  "$description": "The machine form of frontiers-written-voice's rules (spec FR-008 to FR-013): what sweep.py looks for. Matching ignores case and treats curly quotes as straight. A phrase of one word in hedges or throat_clearing warns; a longer one fails. spec.md is the source; this file must agree with it.",
+  "$description": "The machine form of frontiers-written-voice's rules (spec FR-008 to FR-013 and FR-021): what sweep.py looks for. Matching ignores case and treats curly quotes as straight. A phrase of one word in hedges or throat_clearing warns; a longer one fails. spec.md is the source; this file must agree with it.",
   "fail_words": [
     "delve", "unlock", "unlocking", "transformative", "multifaceted", "holistic", "paradigm", "synergy", "synergies",
     "game-changer", "game changer", "game-changing", "load-bearing", "materially", "value proposition",
@@ -14,6 +14,22 @@
     "utilize": "use", "utilise": "use", "demonstrate": "show", "demonstrates": "shows",
     "sufficient": "enough", "commence": "start", "facilitate": "help", "in order to": "to"
   },
+  "idioms": [
+    "earn their keep", "earns its keep", "on the table", "at the end of the day", "low-hanging fruit",
+    "move the needle", "deep dive", "boil the ocean", "silver bullet", "rule of thumb", "hit the ground running",
+    "bite the bullet", "game plan", "ballpark", "back to square one", "think outside the box", "tip of the iceberg",
+    "moving target", "best of both worlds", "elephant in the room", "needle in a haystack", "rubber stamp",
+    "rubber-stamp", "hand-wave", "hand wave", "sweep under the rug", "smoke and mirrors", "red herring",
+    "cherry-pick", "cherry pick", "bells and whistles", "nuts and bolts", "under the hood", "in a nutshell",
+    "grain of salt", "drop in the bucket", "paper over", "lip service", "level playing field", "tip the scales",
+    "raise the bar", "pain point", "table stakes", "skin in the game", "all bets are off", "stack the deck",
+    "north star", "cut corners", "double-edged sword", "lose sight of", "hits the ground", "wake-up call",
+    "tip the balance", "come to terms", "in the weeds", "on the same page", "back of the envelope", "kick the can",
+    "punt on", "low bar", "gold standard", "ahead of the curve", "behind the curve", "by the book",
+    "cut to the chase", "fall through the cracks", "falls through the cracks", "fly under the radar", "put a pin in",
+    "read the room", "run out of steam", "shoot yourself in the foot", "spell out", "the whole nine yards",
+    "walk through"
+  ],
   "hedges": [
     "it is important to note", "it is worth mentioning", "one could argue", "it may be helpful to consider",
     "in many ways", "to some extent", "generally speaking", "there are several factors", "the answer is nuanced",

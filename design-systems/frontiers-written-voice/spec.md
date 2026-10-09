@@ -31,12 +31,11 @@ patterns a mechanical sweep looks for.
   making it, and no repeat of the conclusion after making it.
 - **FR-005**: It MUST use the first person in the active voice: "I" for the author's beliefs,
   experience, judgment and decisions; "we" only where the work needs other people to carry it out.
-- **FR-006**: It MUST use plain, spoken, specific language: active verbs, concrete examples, named
+- **FR-006**: It MUST use plain, specific language: active verbs, concrete examples, named
   situations, evidence and consequences, and a clear assertion followed by its evidence, example or
-  practical implication. It MUST prefer the word a person says out loud over the word they write in a
-  report ("use", not "utilize"; "show", not "demonstrate"; "enough", not "sufficient"), with
-  contractions and everyday phrases where they make the idea clearer, and MUST NOT talk down to the
-  reader or make a hard question look easy.
+  practical implication. It MUST prefer the plain word over the word written in a report ("use", not
+  "utilize"; "show", not "demonstrate"; "enough", not "sufficient"), MUST say each thing literally
+  (FR-021), and MUST NOT talk down to the reader or make a hard question look easy.
 - **FR-007**: It MUST NOT hedge unless the uncertainty is real and important, and then MUST say exactly
   what is unknown, why, and what evidence would settle it. It MUST NOT sound more certain than the facts,
   or more timid than the evidence.
@@ -49,9 +48,10 @@ patterns a mechanical sweep looks for.
   the claim, plainly, as a sentence a reader could repeat ("We stop when the evidence says stop", never
   "Reasons we may consider stopping"), with no wordplay, simile, paradox, slogan or echo of the work's
   title.
-- **FR-010**: It MUST NOT use witty, literary, lyrical or ornate prose, metaphors or wordplay to make a
-  line memorable. Humor MAY be used where it makes a practical point easier to grasp: brief, attached to
-  the argument, never at a person's expense, and never in place of evidence or over real uncertainty.
+- **FR-010**: It MUST NOT use witty, literary, lyrical or ornate prose, metaphors, similes, wordplay
+  or humor, and MUST NOT make a line memorable by its phrasing. A reader may be a non-native speaker or
+  read a machine translation, and wit and humor depend on a culture and a language the reader may not
+  share. Interest comes from the evidence, the example and the consequence, said plainly.
 - **FR-011**: A contrarian claim MUST be earned by evidence and MUST lead somewhere practical: what the
   usual view gets wrong, what the evidence says instead, and what to do differently. A piece MUST prefer
   a useful conclusion (a decision, an experiment, the smallest useful test, a next action) over a
@@ -107,6 +107,15 @@ patterns a mechanical sweep looks for.
   punctuation) and each `mailto:` address, in any text it is given, so that a variant, a banned word or
   an em dash inside an address is never reported. It MUST still sweep the link text written after a URL
   in an AsciiDoc macro (`https://example.org/a-b[Native Alpha]`) and the text around it.
+
+- **FR-021**: It MUST be understood by a reader who is not a native speaker of English, without cultural
+  knowledge. It MUST NOT use an idiom, a figure of speech, a proverb, a sports, war, theater, cooking or
+  travel image, a cultural reference or slang. It SHOULD prefer one precise verb to a phrasal verb with a
+  non-literal sense ("start", not "kick off"; "examine", not "dig into"; "find", not "turn up"). A
+  sentence SHOULD carry one idea. A heading, caption or sidebar title states what the section contains,
+  in plain words, and a name given to a failure or a method describes it ("a prompt that only looks
+  thorough", never "prompt theater"). The `idioms` list in `patterns.json` holds the common idioms the
+  sweep reports as warnings; it is not complete, and a human read against this rule is still required.
 
 ## Assurance
 
