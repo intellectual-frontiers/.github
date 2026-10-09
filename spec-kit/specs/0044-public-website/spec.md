@@ -176,19 +176,24 @@ content document is, 0002-content-format; how addresses map to content,
 - **FR-036**: The addresses under `/__eid/` are reserved to the program's
   server (FR-026). The generator MUST NOT generate a page there.
 - **FR-037**: An image the website serves MUST be served in its fast web
-  form: a PNG or JPEG as a WebP, and an SVG as an optimized SVG. When the
-  source is in the vault, the form is a companion kept beside the source
-  (`name.auto.webp`; for a raster at least 1000 pixels wide also
-  `name.auto-960.webp` and `name.auto-480.webp`; `name.auto.svg`), described
-  by the manifest `images.auto.json` of its directory, and `eid image build`
-  makes it. A companion is fresh when it exists and the manifest holds, for
-  the source, the hash of the source's content and the version of the
-  conversion. A companion that is missing or stale MUST be made again, and
-  a fresh one MUST NOT be. When the source is not in the vault (the public
-  root, the vendored brand), the website MUST make the form when it builds
-  and MUST NOT write beside the source. An original MUST NOT be changed, and
-  it MUST be served as it is when its fast form is not smaller or an
-  optimized SVG fails its checks.
+  form: a PNG or JPEG as a WebP, and an SVG as an optimized SVG. Where a
+  print, e-book, guide or retail pipeline also reads the source, the form is
+  a companion kept beside the source (`name.auto.webp`; for a raster at least
+  1000 pixels wide also `name.auto-960.webp` and `name.auto-480.webp`;
+  `name.auto.svg`), described by the manifest `images.auto.json` of its
+  directory, and `eid picture build` makes it. A companion is fresh when it
+  exists and the manifest holds, for the source, the hash of the source's
+  content and the version of the conversion; a companion that is missing or
+  stale MUST be made again, and a fresh one MUST NOT be. Where only the
+  website uses the picture (the previous website's public images), the fast
+  form MUST replace the original: a WebP of at most 200 KB, made by `eid
+  picture convert`, which rewrites each reference to the old address and
+  deletes the original only when nothing in the vault names it any more.
+  When the source is not in the vault (the public root, the vendored brand),
+  the website MUST make the form when it builds and MUST NOT write beside
+  the source. A pipeline's original MUST NOT be changed, and it MUST be
+  served as it is when its fast form is not smaller or an optimized SVG
+  fails its checks.
 
 - **FR-038**: The content delivery network in front of the website's host
   MUST be configured by `eid cdn` from a file in the vault, as code: the zone
