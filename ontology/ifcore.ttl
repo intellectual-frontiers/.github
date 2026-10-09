@@ -815,6 +815,81 @@ ifcore:RuleInformationSystem a ifcore:ClassificationRule ; ifcore:subjectClass i
 ifcore:RuleSoftwareAgent a ifcore:ClassificationRule ; ifcore:subjectClass prov:SoftwareAgent ; ifcore:reflectedAs ifcore:UndeterminedKind ;
     rdfs:comment "Identity and lifecycle: a running instance of an AI agent (0047 OQ-2)."@en ; ifcore:hasAudience ifcore:Public .
 
+# ───────────────────────── Platforms (0049-platforms) ─────────────────────────
+
+ifcore:Platform a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Platform"@en ;
+    skos:definition "A made system that provides the eight capabilities of the platform kernel, each realized by a named module, so that other parties can build and sell on it through published interfaces without reaching into it, and so that any module can be replaced by another that passes the same contract tests (0049-platforms FR-001 to FR-003)."@en ;
+    skos:scopeNote "Represented subject: a platform as a built system. Not a product that lacks a capability of the kernel, a group of products sold together (a suite), a brand, or a deployment of it (0047-digital-reflections FR-009). The word is earned by the kernel, never claimed."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PlatformModule a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Platform module"@en ;
+    skos:definition "A named, coded component of one platform that realizes one or more kernel capabilities or is a platform service, sits in exactly one layer or is orthogonal to the layers, and is reached only through its published interface (0049-platforms FR-007 to FR-013)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RulePlatform a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Platform ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: a platform is a deliberately built system; it is never an Eidolon."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RulePlatformModule a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:PlatformModule ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: a module is a deliberately built component of a platform."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:platformLayer a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range skos:Concept ;
+    rdfs:comment "The one concept of ifcore:PlatformLayerScheme a module sits in, or the orthogonal concept (0049-platforms FR-007)."@en .
+ifcore:moduleCode a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range xsd:string ;
+    rdfs:comment "The three-letter code of a module: the first letter of the platform's name and the first letters of the two words that follow it in the module's name, in capitals. Unique within its platform. A short human name for conversation and tables, never part of an artifact name (0049-platforms FR-012, FR-013)."@en .
+ifcore:layerOrder a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain skos:Concept ; rdfs:range xsd:integer ;
+    rdfs:comment "The position of a layer: 0 is the lowest. A module may depend only on its own layer or the one directly below (0049-platforms FR-008)."@en .
+
+ifcore:PlatformCapabilityScheme a skos:ConceptScheme ; rdfs:label "Platform capability"@en ;
+    rdfs:comment "The platform kernel: the eight capabilities every platform provides (0049-platforms FR-002). A closed set. A module states the capability it realizes by an implements relationship to one of these concepts. A ninth capability, or the removal of one, is an amendment to 0049-platforms and a change here, never a local choice."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GovernedStoreCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed store"@en ; skos:notation "governed-store" ;
+    skos:definition "One store holds all the governed data the platform keeps, in three zones: what was received exactly as it arrived (append-only, with its source, time of arrival and content digest), what was modelled into the ontology (each datum linked to the received artifact it came from), and what was derived from both (always rebuildable, never the only place a fact lives). Every read and write goes through governed interfaces. No other module keeps a store of its own for that data; one that needs a derived store makes it a derived zone of this one. Because there is one store, consent or audience, audit, deletion and export are enforced once."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OntologyModelCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Ontology model"@en ; skos:notation "ontology-model" ;
+    skos:definition "The data model of the platform is its ontology, and the storage structures, validation rules and interfaces are generated from it. An extension, a domain package or a customer adds concepts, properties, value sets and constraints as an ontology package without changing the core. A change that alters the stored meaning of a concept creates a new version of the concept, and existing data stays readable under the version it was written under. Each concept declares its sensitivity class and its validation rules."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:IntegrationSeamCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Integration seam"@en ; skos:notation "integration-seam" ;
+    skos:definition "Every connection to a system outside the platform passes through one module of connectors. A connector extracts data and, where the source allows and the customer enables it, pushes approved data back. Everything extracted lands in the received zone of the governed store first and becomes modelled data only through a declared, reviewable mapping. The module records the authority for each extraction (an agreement, a person's written direction, or a contract), protects the source system from load, holds credentials least-privilege in the customer's secret store, reaches systems behind a firewall without opening inbound ports, keeps a delivery status and a visible failure queue, and has fixtures and a conformance suite for each connector in the assurance environment."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AssuranceEnvironmentCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Assurance environment"@en ; skos:notation "assurance-environment" ;
+    skos:definition "A sophisticated sandbox, separate from production in its accounts, keys, secrets and addresses, where the platform is tested, verified and shown to be fit. It holds only realistic synthetic data, generated and repeatable from a seed, or a customer's data that has been anonymized or de-identified under a recorded agreement, and it is technically unable to receive the regulated production data the platform declares. It provides sandbox tenants and service doubles for every external system, derives tests from the specs, the ontology and the scenario library, evaluates every AI function, lets external reviewers and a customer's users perform acceptance tests with invited, audited access, records sign-offs, can be deployed inside a customer's or partner's own environment, and issues the assurance report that must exist before a release. It is orthogonal to the layers: no module depends on it at runtime. Test management is a tool used inside it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CommitmentLedgerCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Commitment ledger"@en ; skos:notation "commitment-ledger" ;
+    skos:definition "Institutions keep the record of what they did. Nobody keeps the record of what was promised. The ledger keeps it. A commitment is a promise by a party (an organization, a person, a role, an agent) to another party, to do a thing by a time. A loop is a chain of commitments around one purpose that is not finished until it closes. Every open loop has one named owner at every moment, and ownership passes only by an explicit handoff. A loop closes only on evidence of the kind its loop type defines, never on an assertion. A party that does not use the platform is asked to close by the channels it already uses (a message, a form, a file), and the loop is closed by what comes back. A loop that has not moved for the time its type sets escalates, first to the owner, then to the person it serves, then to a named authority. The ledger also measures, for each party and loop type, loops opened, closed, failed and lapsed, and the time to close. A loop type is data (its parties, its evidence of closure, its stall times, its escalation and its measures), so a new type needs no software change. The ledger holds the promise and the evidence of its closure, not the content the evidence points to."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AuthoritativeCatalogCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Authoritative catalog"@en ; skos:notation "authoritative-catalog" ;
+    skos:definition "A user of the platform never has to define a rule, a requirement or a measure that a public or standards body has already published. The catalog turns each published source into ontology records, each with its citation (source, section, version, date retrieved), its effective and end dates and its verification state (verified against the primary text, partly verified, not verified). A record that drives a decision, a payment or a finding is verified by two people. The catalog detects a change in a source and brings it in as a proposed new version, never as an edit. A thing is evaluated against the version in effect on its date. A user selects what applies to it, and the platform configures the work from the selection. Non-public content enters only as a package from its publisher through the extension contract."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ExtensionContractCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Extension contract"@en ; skos:notation "extension-contract" ;
+    skos:definition "The platform is a small, complete core plus extensions that anyone may write, publish and install. The core holds only what every extension needs and cannot be safely provided by one. A fixed, versioned set of contribution points is the only way an extension adds to the platform. An extension carries a manifest (identity, publisher, version, interface versions, contribution points, permissions, data it reads and writes, services it calls, safety class). It runs in a sandbox with a credential scoped to it, receives only the permissions the manifest requests and the customer approves, and every read and write it makes is audited. First-party extensions use only the interfaces a third party can use. A registry keeps signed, immutable, versioned releases, and a solution is a manifest that bundles extensions, ontology packages, catalog content and configuration."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:GovernedAccessCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed access"@en ; skos:notation "governed-access" ;
+    skos:definition "Identity and tenancy, the audience or consent that decides who may see each fact, the audit of every access, and the rule that a person, an extension or an agent acts only within the intersection of its own permissions and the authority of the party it acts for. An agent never has more authority than the person it acts for, and every agent action is attributed to both. Customer data is separated between tenants, including from the operator's."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PlatformLayerScheme a skos:ConceptScheme ; rdfs:label "Platform layer"@en ;
+    rdfs:comment "The five layers of a platform and the orthogonal position (0049-platforms FR-007). A module sits in exactly one."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:FoundationLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Foundation"@en ; skos:notation "foundation" ; ifcore:layerOrder 0 ;
+    skos:definition "The hosts, runtimes and channels the platform runs on, reached through adapters, so that no other layer names one."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:DataLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Data"@en ; skos:notation "data" ; ifcore:layerOrder 1 ;
+    skos:definition "The governed store, the only place the platform's governed data lives."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PlatformServicesLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Platform services"@en ; skos:notation "platform-services" ; ifcore:layerOrder 2 ;
+    skos:definition "The capabilities every solution can call on the same terms: the commitment ledger, the catalog, governed access, the extension runtime and registry."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ExtensionsLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Extensions and products"@en ; skos:notation "extensions-and-products" ; ifcore:layerOrder 3 ;
+    skos:definition "The units that others install and sell, built on the platform services."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SolutionsLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Solutions and services"@en ; skos:notation "solutions-and-services" ; ifcore:layerOrder 4 ;
+    skos:definition "The named offers built from extensions, ontology packages, catalog content and configuration."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:OrthogonalLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Orthogonal"@en ; skos:notation "orthogonal" ;
+    skos:definition "A module that cuts across the layers through their published interfaces only: the integration seam and the assurance environment. It has no layer order."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OfferKindScheme a skos:ConceptScheme ; rdfs:label "Offer kind"@en ;
+    rdfs:comment "What can be built on or offered through a platform (0049-platforms FR-004). Exactly one applies to each offer."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PlatformServiceOffer a skos:Concept ; skos:inScheme ifcore:OfferKindScheme ; skos:prefLabel "Platform service"@en ; skos:notation "platform-service" ;
+    skos:definition "A capability that two or more solutions need, offered to all of them on the same terms through interfaces a third party can also use."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SolutionOffer a skos:Concept ; skos:inScheme ifcore:OfferKindScheme ; skos:prefLabel "Solution"@en ; skos:notation "solution" ;
+    skos:definition "A complete offer for one kind of user, made of a manifest that bundles extensions, ontology packages, catalog content, configuration and branding."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ProductOffer a skos:Concept ; skos:inScheme ifcore:OfferKindScheme ; skos:prefLabel "Product"@en ; skos:notation "product" ;
+    skos:definition "A unit that a party installs, licenses or buys, built on the platform, such as an extension or a connector."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ServiceOffer a skos:Concept ; skos:inScheme ifcore:OfferKindScheme ; skos:prefLabel "Service"@en ; skos:notation "service" ;
+    skos:definition "Work done by people or agents with the platform for a customer, such as implementation, review or managed operation."@en ; ifcore:hasAudience ifcore:Public .
+
 # Relationships (FR-016 – FR-021).
 
 ifcore:ReflectionRelationship a owl:Class ; rdfs:subClassOf ifcore:Assertion ; rdfs:label "Reflection relationship"@en ;
@@ -905,6 +980,12 @@ ifcore:IntegratesWith a skos:Concept ; skos:inScheme ifcore:ReflectionRelationSc
 ifcore:Implements a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "implements"@en ; skos:notation "implements" ;
     skos:definition "A made thing realizes an idea or an abstract capability in its design."@en ;
     ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:NoemaKind, ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .
+ifcore:PartOf a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "partOf"@en ; skos:notation "partOf" ;
+    skos:definition "A made thing is a component of a larger made thing and has no existence as a unit of its own outside it: a module of a platform. The whole is named by the relationship's target. Distinct from dependsOn: a part may depend on nothing else, and a dependency is not a part (0049-platforms FR-007)."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:BuiltOn a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "builtOn"@en ; skos:notation "builtOn" ;
+    skos:definition "A solution, product, service, extension or platform service is made on a platform and reaches it only through the platform's published interfaces. A made thing that merely calls another one's interface without being offered through it is integratesWith, not builtOn (0049-platforms FR-006)."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:Intends a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "intends"@en ; skos:notation "intends" ;
     skos:definition "A made thing is meant to produce an outcome. A promise, not a result."@en ;
     ifcore:relationFamily ifcore:OutcomeFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:OtherKind ; ifcore:hasAudience ifcore:Public .

@@ -197,4 +197,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Noemas: reflections of what is conceived
 
+|`0049-platforms`
+|Draft
+|Platforms: what the word means
+
 |===

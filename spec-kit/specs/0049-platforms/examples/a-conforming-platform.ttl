@@ -1,0 +1,123 @@
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix ex:      <https://example.org/platform/example#> .
+@prefix schema:  <https://schema.org/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: a platform with the whole kernel, and a solution built on it (0049-platforms).
+# Illustrative only. Every name is invented. The platform is an Ergon; each module is an Ergon that is partOf the platform, sits in
+# one layer or is orthogonal, carries its code, and implements the kernel capability it realizes. The questions it answers:
+#   - Does the platform have the whole kernel?     every capability of the scheme is implemented by a module of it
+#   - What may a module depend on?                  its own layer or the one directly below; nothing depends on the assurance environment
+#   - What is a solution?                           an Ergon builtOn the platform with the offer kind solution
+
+ex:Reviewer a ifcore:Person ; dcterms:identifier "reviewer" ; ifcore:hasAudience ifcore:Public .
+
+ex:ExamplePlatform a ifcore:Platform ; rdfs:label "Example"@en ; dcterms:identifier "example-platform" ; ifcore:hasAudience ifcore:Public .
+ex:ExamplePlatformErgon a ifcore:Ergon ; ifcore:reflects ex:ExamplePlatform ;
+    ifcore:purpose "Let other parties build and sell tracking solutions on one governed store, with every module replaceable behind a published interface."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ex:Reviewer ; ifcore:reviewedOn "2026-03-01"^^xsd:date ; ifcore:hasAudience ifcore:Public .
+
+ex:HostAdapters a ifcore:PlatformModule ; rdfs:label "Example Host Adapters"@en ; dcterms:identifier "example-host-adapters" ;
+    ifcore:moduleCode "EHA" ; ifcore:platformLayer ifcore:FoundationLayer ; ifcore:hasAudience ifcore:Public .
+ex:HostAdaptersErgon a ifcore:Ergon ; ifcore:reflects ex:HostAdapters ;
+    ifcore:purpose "Example Host Adapters: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:DataStore a ifcore:PlatformModule ; rdfs:label "Example Data Store"@en ; dcterms:identifier "example-data-store" ;
+    ifcore:moduleCode "EDS" ; ifcore:platformLayer ifcore:DataLayer ; ifcore:hasAudience ifcore:Public .
+ex:DataStoreErgon a ifcore:Ergon ; ifcore:reflects ex:DataStore ;
+    ifcore:purpose "Example Data Store: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:OntologyModel a ifcore:PlatformModule ; rdfs:label "Example Ontology Model"@en ; dcterms:identifier "example-ontology-model" ;
+    ifcore:moduleCode "EOM" ; ifcore:platformLayer ifcore:DataLayer ; ifcore:hasAudience ifcore:Public .
+ex:OntologyModelErgon a ifcore:Ergon ; ifcore:reflects ex:OntologyModel ;
+    ifcore:purpose "Example Ontology Model: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:CommitmentLedger a ifcore:PlatformModule ; rdfs:label "Example Commitment Ledger"@en ; dcterms:identifier "example-commitment-ledger" ;
+    ifcore:moduleCode "ECL" ; ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ex:CommitmentLedgerErgon a ifcore:Ergon ; ifcore:reflects ex:CommitmentLedger ;
+    ifcore:purpose "Example Commitment Ledger: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:AuthoritativeCatalog a ifcore:PlatformModule ; rdfs:label "Example Authoritative Catalog"@en ; dcterms:identifier "example-authoritative-catalog" ;
+    ifcore:moduleCode "EAC" ; ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ex:AuthoritativeCatalogErgon a ifcore:Ergon ; ifcore:reflects ex:AuthoritativeCatalog ;
+    ifcore:purpose "Example Authoritative Catalog: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:ExtensionRegistry a ifcore:PlatformModule ; rdfs:label "Example Extension Registry"@en ; dcterms:identifier "example-extension-registry" ;
+    ifcore:moduleCode "EER" ; ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ex:ExtensionRegistryErgon a ifcore:Ergon ; ifcore:reflects ex:ExtensionRegistry ;
+    ifcore:purpose "Example Extension Registry: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:AccessService a ifcore:PlatformModule ; rdfs:label "Example Access Service"@en ; dcterms:identifier "example-access-service" ;
+    ifcore:moduleCode "EAS" ; ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ex:AccessServiceErgon a ifcore:Ergon ; ifcore:reflects ex:AccessService ;
+    ifcore:purpose "Example Access Service: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:IntegrationEngine a ifcore:PlatformModule ; rdfs:label "Example Integration Engine"@en ; dcterms:identifier "example-integration-engine" ;
+    ifcore:moduleCode "EIE" ; ifcore:platformLayer ifcore:OrthogonalLayer ; ifcore:hasAudience ifcore:Public .
+ex:IntegrationEngineErgon a ifcore:Ergon ; ifcore:reflects ex:IntegrationEngine ;
+    ifcore:purpose "Example Integration Engine: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:AssuranceEnvironment a ifcore:PlatformModule ; rdfs:label "Example Assurance Environment"@en ; dcterms:identifier "example-assurance-environment" ;
+    ifcore:moduleCode "EAE" ; ifcore:platformLayer ifcore:OrthogonalLayer ; ifcore:hasAudience ifcore:Public .
+ex:AssuranceEnvironmentErgon a ifcore:Ergon ; ifcore:reflects ex:AssuranceEnvironment ;
+    ifcore:purpose "Example Assurance Environment: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ex:R1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:HostAdapters ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:DataStore ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R3 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:DataStore ; ifcore:relationTo ifcore:GovernedStoreCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R4 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:DataStore ; ifcore:relationTo ex:HostAdapters ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R5 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:OntologyModel ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R6 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:OntologyModel ; ifcore:relationTo ifcore:OntologyModelCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R7 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:OntologyModel ; ifcore:relationTo ex:DataStore ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R8 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:CommitmentLedger ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R9 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:CommitmentLedger ; ifcore:relationTo ifcore:CommitmentLedgerCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R10 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:CommitmentLedger ; ifcore:relationTo ex:DataStore ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R11 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:AuthoritativeCatalog ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R12 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:AuthoritativeCatalog ; ifcore:relationTo ifcore:AuthoritativeCatalogCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R13 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:AuthoritativeCatalog ; ifcore:relationTo ex:DataStore ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R14 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:ExtensionRegistry ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R15 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:ExtensionRegistry ; ifcore:relationTo ifcore:ExtensionContractCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R16 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:ExtensionRegistry ; ifcore:relationTo ex:DataStore ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R17 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:AccessService ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R18 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:AccessService ; ifcore:relationTo ifcore:GovernedAccessCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R19 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ex:AccessService ; ifcore:relationTo ex:DataStore ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R20 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:IntegrationEngine ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R21 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:IntegrationEngine ; ifcore:relationTo ifcore:IntegrationSeamCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R22 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:AssuranceEnvironment ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:R23 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:AssuranceEnvironment ; ifcore:relationTo ifcore:AssuranceEnvironmentCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+
+ex:IntakeSolution a schema:Service ; rdfs:label "Example Intake"@en ; dcterms:identifier "example-intake" ; dcterms:type ifcore:SolutionOffer ; ifcore:hasAudience ifcore:Public .
+ex:IntakeSolutionErgon a ifcore:Ergon ; ifcore:reflects ex:IntakeSolution ;
+    ifcore:purpose "Collect and route requests for a customer, using only the interfaces a third party can also use."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:R24 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:BuiltOn ; ifcore:relationFrom ex:IntakeSolution ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
