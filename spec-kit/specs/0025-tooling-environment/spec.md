@@ -215,12 +215,30 @@ and what continuous integration needs.
 
 - **FR-030**: Rust MUST be the language of every program the company writes
   that is a server, a generator or a command-line program. Another language
-  MUST have a reason stated in the spec that governs the program. The command
-  groups of `eid` and `agora` are Python scripts that run such programs, since
-  their command line is Python (0006-eid-command-line, 0041-command-line); the
-  program they run is Rust. A Rust program MUST be delivered in one of two
+  MUST have a reason stated in the spec that governs the program (FR-031 states
+  one). The command groups of `eid` and `agora` are Python scripts that run
+  such programs, since their command line is Python (0006-eid-command-line,
+  0041-command-line); the program they run is Rust. A Rust program MUST be delivered in one of two
   ways: built from source with the `rust` kit of `ws-host`, locked by its
   `Cargo.lock`, or as a container image that holds the built program.
+- **FR-031**: A program whose work is reading, writing, validating, querying or
+  reasoning over RDF, an ontology, SHACL shapes or SPARQL MAY be written in
+  Python, whether it is a server, a generator or a command-line program. The
+  reason is that the most complete and longest-tested implementations of those
+  standards are Python libraries. This is the reason FR-030 requires for such
+  a program.
+- **FR-032**: A Rust program that does that work MUST use the most complete
+  maintained Rust library for it, and MUST NOT write its own parser, validator
+  or query engine for a standard that a library implements. Where such a
+  library has a defect that changes a result the program depends on, a
+  server-side Rust program MAY take that result from a Python program, by a
+  remote call or by running the program, as a workaround. The workaround MUST
+  sit behind one interface the Rust program owns, so that replacing it changes
+  that interface alone (0046-distribution-platform FR-005); MUST run from
+  packages locked as FR-013 states, with no installer of its own; MUST be recorded with the defect and the condition that
+  removes the workaround; and MUST be covered by a test that compares the
+  library's results with Python's on the company's own shapes and names each
+  known difference, so that the test says when the workaround can go.
 
 ## Repositories that build on one another
 
@@ -286,6 +304,14 @@ and what continuous integration needs.
   spec, per FR-030.
 - An `eid` command that serves or builds a website: it is a Python script that
   runs the Rust program, per FR-030.
+- A server whose work is validating ontology data against SHACL shapes: it may
+  be Python, per FR-031.
+- A Rust program needs a SHACL result and the Rust library drops a shape's own
+  message: it takes the result from Python behind its interface, records the
+  defect and the condition that removes the workaround, and a comparison test
+  names the difference, per FR-032.
+- A Rust program would parse Turtle with code it writes itself: refused, since a
+  maintained library does it, per FR-032.
 
 ## Assumptions
 
@@ -336,6 +362,9 @@ and what continuous integration needs.
 - **SC-005**: A generated file is the same on every host of one platform.
 - **SC-006**: Every server, generator and command-line program the company
   writes is Rust, or its governing spec states why not.
+- **SC-007**: Every Python workaround in a Rust program sits behind one
+  interface, names the defect and the condition that removes it, and is covered
+  by a comparison test.
 
 ## Review & acceptance checklist
 

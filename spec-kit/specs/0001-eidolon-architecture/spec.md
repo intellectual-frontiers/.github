@@ -30,7 +30,11 @@ reference model, and governance representation.
   Intellectual Frontiers' public root the way a venture inherits a unit's spec.
 - **FR-005**: Persistence for both the public and private Eidolon MUST be plain Git,
   hosted on GitHub. Live, network-mounted content sources are out of scope for the
-  current architecture.
+  current architecture. This governs the Eidolon's facts and content. State an
+  application keeps about its readers and its operations is not a fact of the
+  Eidolon: it MAY live in a database at a rung that 0044-public-website FR-049
+  allows, and such a database MUST NOT be the only place a fact of the Eidolon
+  lives (FR-019).
 
 ## Namespaces
 
@@ -194,6 +198,8 @@ reference model, and governance representation.
 - A decision reviewed after its domain has been delegated to a new role:
   it is judged against the authority in effect when it was made, per
   FR-030.
+- An application keeps a reader's session in a database: it is application
+  state and not a fact of the Eidolon, so it is not Git's to keep, per FR-005.
 
 ## Assumptions
 
