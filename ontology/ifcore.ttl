@@ -10,6 +10,9 @@
 @prefix org:     <http://www.w3.org/ns/org#> .
 @prefix dpv:     <https://w3id.org/dpv#> .
 @prefix odrl:    <http://www.w3.org/ns/odrl/2/> .
+@prefix qb:      <http://purl.org/linked-data/cube#> .
+@prefix ifweb:   <https://www.intellectualfrontiers.com/ontology/web#> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
 
 # Intellectual Frontiers — core ontology (PUBLIC).
 #
@@ -37,9 +40,9 @@ ifcore:Organization a owl:Class ; rdfs:subClassOf org:Organization, schema:Organ
 ifcore:Company a owl:Class ; skos:closeMatch schema:Corporation ; rdfs:subClassOf ifcore:Organization ; rdfs:label "Company"@en .
 ifcore:Person a owl:Class ; rdfs:subClassOf schema:Person ; rdfs:label "Person"@en .
 
-ifcore:legalName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+ifcore:legalName a owl:DatatypeProperty ; rdfs:subPropertyOf schema:legalName ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
     rdfs:comment "A person's full legal name, as it would appear on a signed document."@en .
-ifcore:displayName a owl:DatatypeProperty ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
+ifcore:displayName a owl:DatatypeProperty ; rdfs:subPropertyOf schema:name ; rdfs:domain ifcore:Person ; rdfs:range xsd:string ;
     rdfs:comment "The name a person is known by in ordinary prose and branding."@en .
 
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
@@ -516,29 +519,29 @@ ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
 ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;
     rdfs:comment "Anything asserted in the Eidolon that carries factual content. Every fact MUST declare its audience explicitly (FR-011); a class or property declaration is vocabulary, not a fact, and does not need one."@en .
 
-ifcore:Audience a owl:Class ; rdfs:label "Audience"@en ;
-    rdfs:comment "A named permission to see a fact."@en .
-ifcore:Public a ifcore:Audience ; rdfs:label "Public"@en ;
+ifcore:AccessAudience a owl:Class ; rdfs:label "Access audience"@en ;
+    rdfs:comment "A named permission to see a fact: who may see it. Not the group a work is written for, which is schema:Audience (see ifcore:Readership)."@en .
+ifcore:Public a ifcore:AccessAudience ; rdfs:label "Public"@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en ;
+ifcore:CompanyAffiliated a ifcore:AccessAudience ; rdfs:label "Anyone affiliated with the company"@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:Agreement a owl:Class ; skos:closeMatch odrl:Agreement ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named agreement"@en .
-ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named role or group"@en .
+ifcore:Agreement a owl:Class ; skos:closeMatch odrl:Agreement ; rdfs:subClassOf ifcore:AccessAudience ; rdfs:label "A specific named agreement"@en .
+ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:AccessAudience ; rdfs:label "A specific named role or group"@en .
 
-ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:Audience ;
+ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:AccessAudience ;
     rdfs:comment "Disjunctive: a viewer satisfying any one listed audience may see the fact."@en .
 
 # ───────────────────────── References (FR-015, FR-022 – FR-027) ─────────────────────────
 
 ifcore:Reference a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Reference"@en ;
     rdfs:comment "A fact that points at a value held elsewhere rather than storing it."@en .
-ifcore:describes a owl:ObjectProperty ; rdfs:domain ifcore:Reference ;
+ifcore:describes a owl:ObjectProperty ; rdfs:subPropertyOf schema:about ; rdfs:domain ifcore:Reference ;
     rdfs:comment "The fact or subject this reference is about."@en .
 
 ifcore:ExternalRecordReference a owl:Class ; rdfs:subClassOf ifcore:Reference ;
     rdfs:label "External record reference"@en ;
     rdfs:comment "Points at a fact Intellectual Frontiers does not author or control."@en .
-ifcore:primarySource a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:anyURI .
+ifcore:primarySource a owl:DatatypeProperty ; rdfs:subPropertyOf prov:hadPrimarySource ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:anyURI .
 ifcore:cachedValue a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ;
     rdfs:comment "Optional. If present, resolvedAt MUST also be present."@en .
 ifcore:resolvedAt a owl:DatatypeProperty ; rdfs:domain ifcore:ExternalRecordReference ; rdfs:range xsd:date ;
@@ -570,9 +573,9 @@ ifcore:Decision a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:la
     rdfs:comment "One coherent recorded choice (0008-decision-records FR-003). Routine operational activity is not a Decision. MUST carry its own ifcore:hasAudience when recorded — not necessarily Public — and MUST carry decidedBy (0008 FR-002)."@en .
 ifcore:hasOutcome a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:DecisionOutcome ;
     rdfs:comment "Required only for a decision resolving a Native Alpha thesis question (0001 FR-031, 0008 FR-004). Not a measure of whether the record is still current — see dcterms:isReplacedBy."@en .
-ifcore:decidedAt a owl:DatatypeProperty ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
+ifcore:decidedAt a owl:DatatypeProperty ; rdfs:subPropertyOf prov:generatedAtTime ; rdfs:domain ifcore:Decision ; rdfs:range xsd:date ;
     rdfs:comment "A decision is checked against the authority in effect on this date, not the date of later review."@en .
-ifcore:decidedBy a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person ;
+ifcore:decidedBy a owl:ObjectProperty ; rdfs:subPropertyOf prov:wasAttributedTo ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Person ;
     rdfs:comment "Required on every Decision (0008-decision-records FR-002)."@en .
 ifcore:consideredEvidence a owl:ObjectProperty ; rdfs:domain ifcore:Decision ; rdfs:range ifcore:Fact ;
     rdfs:comment "A tracked fact that informed the decision (0008 FR-005). Not prov:used: PROV-O declares Entity and Activity disjoint, Decision is a prov:Entity, and used's domain is Activity — reusing it directly on a Decision would conflict. Where no tracked fact exists, use dcterms:description for a plain-text rationale instead."@en .
@@ -601,8 +604,8 @@ ifcore:job a owl:DatatypeProperty ; rdfs:domain ifcore:Unit ; rdfs:range xsd:str
 ifcore:question a owl:DatatypeProperty ; rdfs:range xsd:string ;
     rdfs:comment "The one question a unit, or a method stage, exists to answer."@en .
 
-ifcore:hasUnit a owl:ObjectProperty ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Unit .
-ifcore:unitOf a owl:ObjectProperty ; owl:inverseOf ifcore:hasUnit .
+ifcore:hasUnit a owl:ObjectProperty ; rdfs:subPropertyOf org:hasUnit ; rdfs:domain ifcore:Company ; rdfs:range ifcore:Unit .
+ifcore:unitOf a owl:ObjectProperty ; rdfs:subPropertyOf org:unitOf ; owl:inverseOf ifcore:hasUnit .
 
 ifcore:ResearchAndIp a ifcore:Unit ;
     rdfs:label "Intellectual Frontiers Research & IP"@en ;
@@ -850,31 +853,31 @@ ifcore:layerOrder a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain s
 ifcore:PlatformCapabilityScheme a skos:ConceptScheme ; rdfs:label "Platform capability"@en ;
     rdfs:comment "The platform kernel: the nine capabilities every platform provides (0049-platforms FR-002). A closed set. A module states the capability it realizes by an implements relationship to one of these concepts. A ninth capability, or the removal of one, is an amendment to 0049-platforms and a change here, never a local choice."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:GovernedStoreCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed store"@en ; skos:notation "governed-store" ;
+ifcore:GovernedStoreCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed store"@en ; skos:altLabel "Governed data store"@en ; skos:notation "governed-store" ;
     skos:definition "One store holds all the governed data the platform keeps, in three zones: what was received exactly as it arrived (append-only, with its source, time of arrival and content digest), what was modelled into the ontology (each datum linked to the received artifact it came from), and what was derived from both (always rebuildable, never the only place a fact lives). Every read and write goes through governed interfaces. No other module keeps a store of its own for that data; one that needs a derived store makes it a derived zone of this one. Because there is one store, consent or audience, audit, deletion and export are enforced once."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:OntologyModelCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Ontology model"@en ; skos:notation "ontology-model" ;
+ifcore:OntologyModelCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Ontology model"@en ; skos:altLabel "Semantic data model"@en ; skos:notation "ontology-model" ;
     skos:definition "The data model of the platform is its ontology, and the storage structures, validation rules and interfaces are generated from it. An extension, a domain package or a customer adds concepts, properties, value sets and constraints as an ontology package without changing the core. A change that alters the stored meaning of a concept creates a new version of the concept, and existing data stays readable under the version it was written under. Each concept declares its sensitivity class and its validation rules."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:IntegrationSeamCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Integration seam"@en ; skos:notation "integration-seam" ;
+ifcore:IntegrationSeamCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Integration seam"@en ; skos:altLabel "Integration layer"@en ; skos:notation "integration-seam" ;
     skos:definition "Every connection to a system outside the platform passes through one module of connectors. A connector extracts data and, where the source allows and the customer enables it, pushes approved data back. Everything extracted lands in the received zone of the governed store first and becomes modelled data only through a declared, reviewable mapping. The module records the authority for each extraction (an agreement, a person's written direction, or a contract), protects the source system from load, holds credentials least-privilege in the customer's secret store, reaches systems behind a firewall without opening inbound ports, keeps a delivery status and a visible failure queue, and has fixtures and a conformance suite for each connector in the assurance environment."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:ProgrammaticInterfaceCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Programmatic interface"@en ; skos:notation "programmatic-interface" ;
+ifcore:ProgrammaticInterfaceCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Programmatic interface"@en ; skos:altLabel "Application programming interface (API)"@en ; skos:notation "programmatic-interface" ;
     skos:definition "Every function of the platform is available through a published API, and the platform's own clients use the same one. The interface is one contract, made of the catalog of operations and the ontology, from which four flavors are generated and never hand-written: a resource API (REST, described by OpenAPI), a graph API (GraphQL, from the ontology), a virtual SQL layer (a read-only SQL schema, with a view for each concept and relationship, over the same operations or the governed store's read path), and a Model Context Protocol server (each operation a tool, each concept a resource, each workflow a prompt). All four apply the same access decisions, and a conformance suite proves that they return the same result and the same refusal. A domain standard (a data exchange, message or transaction standard) is an interface profile, one more flavor of the same contract, listed by the platform that needs it; the kernel requires none."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:AssuranceEnvironmentCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Assurance environment"@en ; skos:notation "assurance-environment" ;
+ifcore:AssuranceEnvironmentCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Assurance environment"@en ; skos:altLabel "Automated test environment"@en ; skos:notation "assurance-environment" ;
     skos:definition "A sophisticated sandbox, separate from production in its accounts, keys, secrets and addresses, where the platform is tested, verified and shown to be fit. It holds only realistic synthetic data, generated and repeatable from a seed, or a customer's data that has been anonymized or de-identified under a recorded agreement, and it is technically unable to receive the regulated production data the platform declares. It provides sandbox tenants and service doubles for every external system, derives tests from the specs, the ontology and the scenario library, evaluates every AI function, lets external reviewers and a customer's users perform acceptance tests with invited, audited access, records sign-offs, can be deployed inside a customer's or partner's own environment, and issues the assurance report that must exist before a release. It is orthogonal to the layers: no module depends on it at runtime. Test management is a tool used inside it."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:CommitmentLedgerCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Commitment ledger"@en ; skos:notation "commitment-ledger" ;
+ifcore:CommitmentLedgerCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Commitment ledger"@en ; skos:altLabel "Append-only ledger"@en ; skos:notation "commitment-ledger" ;
     skos:definition "Institutions keep the record of what they did. Nobody keeps the record of what was promised. The ledger keeps it. A commitment is a promise by a party (an organization, a person, a role, an agent) to another party, to do a thing by a time. A loop is a chain of commitments around one purpose that is not finished until it closes. Every open loop has one named owner at every moment, and ownership passes only by an explicit handoff. A loop closes only on evidence of the kind its loop type defines, never on an assertion. A party that does not use the platform is asked to close by the channels it already uses (a message, a form, a file), and the loop is closed by what comes back. A loop that has not moved for the time its type sets escalates, first to the owner, then to the person it serves, then to a named authority. The ledger also measures, for each party and loop type, loops opened, closed, failed and lapsed, and the time to close. A loop type is data (its parties, its evidence of closure, its stall times, its escalation and its measures), so a new type needs no software change. The ledger holds the promise and the evidence of its closure, not the content the evidence points to."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:AuthoritativeCatalogCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Authoritative catalog"@en ; skos:notation "authoritative-catalog" ;
+ifcore:AuthoritativeCatalogCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Authoritative catalog"@en ; skos:altLabel "Data catalog; system of record"@en ; skos:notation "authoritative-catalog" ;
     skos:definition "A user of the platform never has to define a rule, a requirement or a measure that a public or standards body has already published. The catalog turns each published source into ontology records, each with its citation (source, section, version, date retrieved), its effective and end dates and its verification state (verified against the primary text, partly verified, not verified). A record that drives a decision, a payment or a finding is verified by two people. The catalog detects a change in a source and brings it in as a proposed new version, never as an edit. A thing is evaluated against the version in effect on its date. A user selects what applies to it, and the platform configures the work from the selection. Non-public content enters only as a package from its publisher through the extension contract."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:ExtensionContractCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Extension contract"@en ; skos:notation "extension-contract" ;
+ifcore:ExtensionContractCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Extension contract"@en ; skos:altLabel "Plug-in interface"@en ; skos:notation "extension-contract" ;
     skos:definition "The platform is a small, complete core plus extensions that anyone may write, publish and install. The core holds only what every extension needs and cannot be safely provided by one. A fixed, versioned set of contribution points is the only way an extension adds to the platform. An extension carries a manifest (identity, publisher, version, interface versions, contribution points, permissions, data it reads and writes, services it calls, safety class). It runs in a sandbox with a credential scoped to it, receives only the permissions the manifest requests and the customer approves, and every read and write it makes is audited. First-party extensions use only the interfaces a third party can use. A registry keeps signed, immutable, versioned releases, and a solution is a manifest that bundles extensions, ontology packages, catalog content and configuration."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:GovernedAccessCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed access"@en ; skos:notation "governed-access" ;
+ifcore:GovernedAccessCapability a skos:Concept ; skos:inScheme ifcore:PlatformCapabilityScheme ; skos:prefLabel "Governed access"@en ; skos:altLabel "Access control"@en ; skos:notation "governed-access" ;
     skos:definition "Identity and tenancy, the audience or consent that decides who may see each fact, the audit of every access, and the rule that a person, an extension or an agent acts only within the intersection of its own permissions and the authority of the party it acts for. An agent never has more authority than the person it acts for, and every agent action is attributed to both. Customer data is separated between tenants, including from the operator's."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -923,9 +926,9 @@ ifcore:ReflectionRelationship a owl:Class ; rdfs:subClassOf ifcore:Assertion ; r
     rdfs:comment "A typed, directional statement between two subjects, by identifier, with its source, its validity in time and how settled it is (0047-digital-reflections FR-016, FR-019). Stated between subjects, not between records, so that a record's change of kind leaves it untouched (FR-021)."@en .
 ifcore:relationType a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ; rdfs:range skos:Concept ;
     rdfs:comment "One concept of ifcore:ReflectionRelationScheme."@en .
-ifcore:relationFrom a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ;
+ifcore:relationFrom a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:subPropertyOf rdf:subject ; rdfs:domain ifcore:ReflectionRelationship ;
     rdfs:comment "The subject the relationship starts from."@en .
-ifcore:relationTo a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain ifcore:ReflectionRelationship ;
+ifcore:relationTo a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:subPropertyOf rdf:object ; rdfs:domain ifcore:ReflectionRelationship ;
     rdfs:comment "The subject the relationship points to."@en .
 ifcore:concerning a owl:ObjectProperty ; rdfs:domain ifcore:ReflectionRelationship ;
     rdfs:comment "What an assignment or a license is of, when the relationship is between two parties about a third thing."@en .
@@ -1255,7 +1258,7 @@ ifcore:Adopts a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; s
 
 ifcore:EidolonErgonSeparation a ifcore:Decision ;
     rdfs:label "Eidolons reflect what exists and Ergons reflect what is created"@en ;
-    dcterms:subject ifcore:DigitalReflection, ifcore:Ergon, ifcore:reflects, ifcore:purpose, ifcore:ClassificationRule ;
+    dcterms:subject ifcore:DigitalReflection, ifcore:Eidolon, ifcore:Ergon, ifcore:reflects, ifcore:purpose, ifcore:ClassificationRule ;
     ifcore:decidedBy ifcore:ShahidNehalShah ;
     ifcore:decidedAt "2026-10-08"^^xsd:date ;
     dcterms:description "A reflection of a company and a reflection of the software it sells answer different questions: the company's is about identity, relationships, state and what changed; the software's is about purpose, design, dependencies, outcomes and the evidence it works. Under one type the two collide, so a product's record would carry a legal identity and a person's would carry a roadmap, and a reader could not tell which questions a record can answer. Two kinds under one shared parent keep what both need (identity, sources, history, audience) in one place and let the kinds differ where they should. No established vocabulary names the pair: schema.org has Thing, Product, Service and Organization but no parent that is a maintained record of a subject, and a digital twin (ISO 23247) requires fidelity and synchronization that neither kind requires. The kind is decided by the subject's type through classification rules, not by the record, so that a wrong kind is found by a check and moved by a person, with no change to identifiers or relationships."@en ;
@@ -1305,6 +1308,185 @@ ifcore:NoemaAltBorrowedWord a ifcore:Alternative ; rdfs:label "Treat 'Noema' and
     ifcore:rejectionReason "'Noema' is an established word in philosophy (Husserl's term for what a thought is directed at) and 'ergon' is classical Greek for 'work'; neither is invented. They are borrowed and given one exact meaning here. 0019 FR-011 says a borrowed word is not original for that reason, so the exception rests on the kinds being the company's own classification (0047-digital-reflections, 0048-noemas) and not on the words. This origin was stated from general knowledge and was not searched in this audit."@en ;
     ifcore:hasAudience ifcore:Public .
 
+# ───────────────────────── Access audience (0019 FR-004, FR-010) ─────────────────────────
+ifcore:AccessAudienceName a ifcore:Decision ;
+    rdfs:label "The class of permissions to see a fact is named Access audience, not Audience"@en ;
+    dcterms:subject ifcore:AccessAudience, ifcore:RoleOrGroup ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "schema.org Audience is the intended audience of an item, the group it was created for; it is descriptive and grants nothing. The class that holds public, company affiliation, a named agreement and a named role or group answers a different question: who may see a fact. Two classes both called Audience made the ontology explain the difference in its own comments (see ifcore:Readership). The class is renamed to the access meaning; the property ifcore:hasAudience keeps its name, because it is a different term from schema:audience and the vault declares it on every fact, and prose may still say 'audience' for the access meaning. No standard term replaces the class: ODRL expresses who may do what with a Permission whose assignee is a Party, and does not define a class of named audiences. OAuth and JSON Web Token use 'audience' for the intended recipient of a token, which is close to this meaning but is not defined as a class of permissions (stated from general knowledge; not searched in this audit)."@en ;
+    ifcore:consideredAlternative ifcore:AccessAudienceAltKeep, ifcore:AccessAudienceAltOdrl, ifcore:AccessAudienceAltRenameAll ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AccessAudienceAltKeep a ifcore:Alternative ; rdfs:label "Keep the name Audience and explain the difference in comments"@en ;
+    ifcore:rejectionReason "The same word means two different things in one ontology, and a reader or a tool that loads schema.org meets both. The class is declared in the company's namespace, so it can be renamed at the cost of nine references."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AccessAudienceAltOdrl a ifcore:Alternative ; rdfs:label "Replace the class with ODRL (Permission, Party, Constraint)"@en ;
+    ifcore:rejectionReason "ODRL states rules about what a party may do with an asset. Here each fact names the set of viewers who may see it, and a viewer who satisfies any one listed audience may see the fact. ODRL has no named class of such sets. It stays a possible later mapping: skos:broadMatch odrl:Permission is already stated for ifcore:Grant."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AccessAudienceAltRenameAll a ifcore:Alternative ; rdfs:label "Rename the property ifcore:hasAudience as well"@en ;
+    ifcore:rejectionReason "The property is a different term from schema:audience, so it does not clash. It appears in about 5,100 places in 459 files of the two repositories, in every fact, in the vault's rules and in its checks, so a rename costs far more than it removes."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Vocabulary audit of 2026-10-09: accepted ties and kept terms (spec 0019) ─────────────────────────
+ifcore:ClarifiedAndMappedTermsAccepted a ifcore:Decision ;
+    rdfs:label "Every change that clarifies a term or ties it to an existing standard is accepted"@en ;
+    dcterms:subject ifcore:Person, ifcore:Organization, ifcore:Company, ifcore:Right, ifcore:License, ifcore:Agreement,
+        ifcore:Grant, ifcore:Hunt, ifcore:NetworkMeasure, ifcore:EvidencePacket, ifcore:RelationshipMemory,
+        ifcore:PlatformCapabilityScheme, ifcore:legalName, ifcore:displayName, ifcore:doi, ifcore:decidedBy,
+        ifcore:decidedAt, ifcore:validFrom, ifcore:validUntil, ifcore:primarySource, ifcore:describes,
+        ifcore:grantedTo, ifcore:unitOf, ifcore:hasUnit, ifcore:sourceFile, ifcore:relationFrom,
+        ifcore:relationTo, ifcore:seriesNumber, ifcore:builtBy, ifweb:Page, ifweb:UnitPage,
+        ifweb:ResearchPillarPage, ifweb:ResearchNotePage, ifweb:PatentFamilyPage, ifweb:TrademarkPage,
+        ifweb:DefensiveDisclosurePage, ifweb:FundPage, ifweb:BookPage, ifweb:WorkPage, ifweb:WorkEditionPage,
+        ifweb:JournalArticlePage, ifweb:PortfolioIndexPage, ifweb:PromotionPost, ifweb:Application ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "The founder accepted all changes proposed by the first vocabulary audit where a term is further clarified and tied to an existing standard: the ties of classes and properties to schema.org, PROV-O, the W3C Organization Ontology, Dublin Core, ODRL and the Data Cube vocabulary, the rename of ifcore:Audience (its own Decision), the elaboration of product-led growth by IPLG (its own Decision), and the established names added as alternative labels to the platform capabilities and to relationship memory. The repository is new and has no outside users, so the cost of a rename or a clarification is nil and the history of the old names is not kept. The ties are checked by the vocabulary scan and are not restated here."@en ;
+    ifcore:consideredAlternative ifcore:ClarifiedAltEachTerm, ifcore:ClarifiedAltKeepAndComment ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ClarifiedAltEachTerm a ifcore:Alternative ; rdfs:label "Decide each term in a separate Decision"@en ;
+    ifcore:rejectionReason "Each term would need its own record that adds no information beyond the tie itself. The tie is the evidence, and the scan lists it."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ClarifiedAltKeepAndComment a ifcore:Alternative ; rdfs:label "Leave each term unchanged and explain the difference in a comment"@en ;
+    ifcore:rejectionReason "A comment is not a tie and the scan cannot read it, so the next audit would flag the same term again. The rule of spec 0019 asks for a tie or a Decision."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ResearchFrameworkTermsKept a ifcore:Decision ;
+    rdfs:label "The evidence ladder, the claim labels, Elenchus, AI Workforce, Labor as Code and Consequential Software are the company's own framework terms"@en ;
+    dcterms:subject ifcore:EvidenceLadderStage, ifcore:ClaimLabel, ifcore:Elenchus, ifcore:AIWorkforce, ifcore:LaborAsCode,
+        ifcore:ConsequentialSoftware ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "Each term names a framework of the company's own research, and an established term was considered for each and found to name a different thing. The evidence ladder ranks a publication's reception (silence, argument, adoption of terminology, willingness to pay), and the claim labels name a claim's role (observation, hypothesis, evidence, inference, recommendation, unknown); the Oxford CEBM levels rank study designs and GRADE rates certainty in an effect estimate. Elenchus is the pattern in which a claim stands only if the evidence survives an attempt to refute it; continuous controls monitoring is one way to carry it out, by automated repeated tests of controls. AI Workforce names a set of five parts (a SpecKit, a harness, agents, skills and MCPs) and a bar a service must meet; Labor as Code names a skill that keeps a person's knowledge, judgment and taste in durable form; the plain words (agentic workflow, skill) name a part and not the framework. Consequential Software names software whose cost of a wrong decision falls on people other than the one who decides; FIPS 199 rates the harm of a security failure to an organization. Elenchus is also a borrowed Greek word; that is not a reason for the exception (spec 0019 FR-011), the reason is the difference in meaning. The labels of the AI Workforce, Labor as Code and Consequential Software judgments come from reading their definitions; no source was found that defines them. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007)."@en ;
+    ifcore:consideredAlternative ifcore:ResearchAltOxfordGrade, ifcore:ResearchAltCcm, ifcore:ResearchAltAgentic, ifcore:ResearchAltFips199 ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ResearchAltOxfordGrade a ifcore:Alternative ; rdfs:label "Use the Oxford CEBM levels or GRADE for the evidence ladder and the claim labels"@en ;
+    ifcore:rejectionReason "They rank study designs and the certainty of an effect estimate. Neither ranks how a publication was received, and neither names the role a claim plays in a text."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchAltCcm a ifcore:Alternative ; rdfs:label "Call Elenchus continuous controls monitoring"@en ;
+    ifcore:rejectionReason "Continuous controls monitoring is automated, repeated testing of whether controls operate. Elenchus is the wider pattern of trying to refute a claim, and compliance testing is one use of it. The established name is kept as a related term in the definition."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchAltAgentic a ifcore:Alternative ; rdfs:label "Use agentic workflow or skill for AI Workforce and Labor as Code"@en ;
+    ifcore:rejectionReason "The plain words name one part. AI Workforce names five parts and a bar to meet, and Labor as Code names a skill that carries a person's judgment and taste in durable form."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchAltFips199 a ifcore:Alternative ; rdfs:label "Use FIPS 199 potential impact for Consequential Software"@en ;
+    ifcore:rejectionReason "FIPS 199 rates the harm of losing confidentiality, integrity or availability to an organization or a person. Consequential Software concerns a decision to build, buy or adopt software whose cost falls on other people."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AIOperatingLevelTermsKept a ifcore:Decision ;
+    rdfs:label "AI First and AI Augmented stay as practitioner terms for how much of a service an AI does"@en ;
+    dcterms:subject ifcore:AIFirst, ifcore:AIAugmented ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "AI-first, AI-augmented, AI-assisted and AI-native are words practitioners use, but no standard defines them and the sources place the lines between them in different places (vendor sources only were found). The ontology needs three levels with a test for each, so it keeps AI First and AI Augmented as practitioner terms, each defined here by its own test, and types a shared service by those tests and not by branding (spec 0011 FR-011). If a standard appears, the terms are tied to it. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007)."@en ;
+    ifcore:consideredAlternative ifcore:AILevelsAltNumbered, ifcore:AILevelsAltAssistedNative ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AILevelsAltNumbered a ifcore:Alternative ; rdfs:label "Adopt a vendor's numbered maturity model"@en ;
+    ifcore:rejectionReason "The vendor models disagree on the number of levels and where each begins, and each is the vendor's own."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AILevelsAltAssistedNative a ifcore:Alternative ; rdfs:label "Use only AI-assisted and AI-native"@en ;
+    ifcore:rejectionReason "Two levels cannot state the case where an AI leads production but developers stay in the daily loop (AI First) and the case where humans do most of the work with AI helping (AI Augmented)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PublishedStandardSchemesKept a ifcore:Decision ;
+    rdfs:label "The Trust Services Criteria, the CMMC Level 1 practices and the risk treatment options reproduce published standards"@en ;
+    dcterms:subject ifcore:TrustServicesCriteria, ifcore:CMMCLevel1, ifcore:RiskTreatmentScheme ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "These schemes list the identifiers or option names of published standards: the AICPA Trust Services Criteria (TSP Section 100, 2017, with the 2022 points of focus), the CMMC Level 1 practices (named by their FAR 52.204-21 paragraph in the DoD CIO Level 1 assessment guide) and risk responses (NIST SP 800-39 names accept, avoid, mitigate, share and transfer; the scheme lists accept, avoid, mitigate and transfer, so the difference is to be checked when the scheme is next changed). The terms are the standards' own, so no new term is invented. No stable address for the criteria or the practices in a published vocabulary was found, so no tie is stated. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007)."@en ;
+    ifcore:consideredAlternative ifcore:StandardSchemesAltMint, ifcore:PlainWordAltNearestStandard ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:StandardSchemesAltMint a ifcore:Alternative ; rdfs:label "Mint an address for each criterion and tie it to the standard's text"@en ;
+    ifcore:rejectionReason "A tie needs an address the standard's owner publishes. None was found, and an address minted here would be one more invented term."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PlainWordClassesKept a ifcore:Decision ;
+    rdfs:label "Classes named in ordinary words of their field, with no established class to tie them to are kept"@en ;
+    dcterms:subject ifcore:Alternative, ifcore:Asset, ifcore:Capability, ifcore:CapitalSource, ifcore:ClaimKind,
+        ifcore:CommercializationSubstage, ifcore:ConfidenceLevel, ifcore:ControlTest, ifcore:CutKind,
+        ifcore:Decision, ifcore:DecisionOutcome, ifcore:DeliveryRecord, ifcore:DesignPartnerRequirement,
+        ifcore:DesignSystem, ifcore:DesignSystemStatus, ifcore:DigitalAsset, ifcore:Disposition,
+        ifcore:EidolonComponent, ifcore:Equipment, ifcore:ExternalRecordReference, ifcore:Fact,
+        ifcore:FinancialAsset, ifcore:FounderWritingType, ifcore:FundMode, ifcore:Goodwill,
+        ifcore:IndependenceTest, ifcore:IntangibleAsset, ifcore:IntellectualProperty, ifcore:Invention,
+        ifcore:LandscapeReview, ifcore:MethodStage, ifcore:NamedTool, ifcore:Note, ifcore:NoteType,
+        ifcore:Outcome, ifcore:OwnershipMode, ifcore:PortfolioCategory, ifcore:PressLevel, ifcore:PromotionBrief,
+        ifcore:RealProperty, ifcore:Reference, ifcore:ResearchArea, ifcore:ResearchPillar,
+        ifcore:RestrictedDataReference, ifcore:SearchStage, ifcore:SharedService, ifcore:SubstantialWork,
+        ifcore:TangibleAsset, ifcore:VentureEvidenceKind, ifcore:VentureLifecycleStage, ifcore:VoicePrinciple,
+        ifcore:WorkDomain, ifcore:WorkKind, ifcore:WorkLifecycleStage, ifweb:ApplicationHost,
+        ifweb:PublishingDestination ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "These classes are ordinary words of the field they model, or names specific to the structure of the company, its works or its tools. No established term in a published vocabulary that works in their place was found, and where one was found it is tied instead (see ClarifiedAndMappedTermsAccepted). Each term was read against PROV-O, schema.org, DCMI Terms, the W3C Organization Ontology, ODRL, SKOS and the Data Cube vocabulary from knowledge of those vocabularies, and every equivalent found is tied in the ontology; the terms were not searched on the web one by one. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007). Their names are kept because the plain word is the established word; for example Disposition, Right, Fund, Trade secret, Patent family, Equipment and Goodwill are terms of law and accounting, and the asset classes cite ISO 55000, whose 2014 edition is withdrawn and replaced by the 2024 edition (https://www.iso.org/standard/83053.html); the citation is to be moved to the current edition."@en ;
+    ifcore:consideredAlternative ifcore:PlainWordAltNearestStandard, ifcore:PlainWordAltRename ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PlainWordPropertiesKept a ifcore:Decision ;
+    rdfs:label "Properties named in ordinary words of their field, with no established property to tie them to are kept"@en ;
+    dcterms:subject ifcore:accessInstructions, ifcore:artifactName, ifcore:briefOf, ifcore:cachedValue, ifcore:cadence,
+        ifcore:centralThesis, ifcore:checksum, ifcore:claimKind, ifcore:claimLabel, ifcore:codeStatus,
+        ifcore:commandCategory, ifcore:commandNoun, ifcore:commandVerb, ifcore:concerning, ifcore:confidenceLevel,
+        ifcore:consequenceDomain, ifcore:consideredAlternative, ifcore:consideredEvidence,
+        ifcore:continuationInPartOf, ifcore:continuationOf, ifcore:covers, ifcore:cutKind,
+        ifcore:defaultDecisionAuthority, ifcore:definedIn, ifcore:deliveredOn, ifcore:deliveredTo,
+        ifcore:designSystemStatus, ifcore:divisionalOf, ifcore:domainStanding, ifcore:drawsFiguresWith,
+        ifcore:drives, ifcore:fixture, ifcore:fromKind, ifcore:grantsAudience, ifcore:hasAudience,
+        ifcore:hasDisposition, ifcore:hasMode, ifcore:hasOutcome, ifcore:heldIn, ifcore:imprintOf,
+        ifcore:imprintThesis, ifcore:inWorkDomain, ifcore:job, ifcore:layerOrder, ifcore:licenses,
+        ifcore:lifecycleOwner, ifcore:measuredBy, ifcore:moduleCode, ifcore:namedUnknown, ifcore:notProofOf,
+        ifcore:noteType, ifcore:noticeWithin, ifcore:offersInterface, ifcore:operates,
+        ifcore:operatesSharedService, ifcore:operationalStatus, ifcore:platformLayer, ifcore:portfolioCategory,
+        ifcore:portfolioCompany, ifcore:probe, ifcore:probeKind, ifcore:providesSurface,
+        ifcore:qualifyingCondition, ifcore:question, ifcore:readerOutcome, ifcore:readerSide,
+        ifcore:recoveryPointObjective, ifcore:recoveryTimeObjective, ifcore:reflectedAs, ifcore:reflectionClass,
+        ifcore:rejectionReason, ifcore:relationFamily, ifcore:relationType, ifcore:resolvedAt,
+        ifcore:retentionPeriod, ifcore:searchesFor, ifcore:sequenceOrder, ifcore:shows, ifcore:sourceCommit,
+        ifcore:sourceLocation, ifcore:subjectClass, ifcore:suppliesDataFor, ifcore:testsControl, ifcore:thesis,
+        ifcore:toKind, ifcore:verificationCadence, ifcore:verificationMethod, ifcore:verifiedBy,
+        ifcore:verifiedOn, ifcore:workLifecycleStage, ifcore:workspaceFlavor, ifweb:applicationOf,
+        ifweb:configurationFile, ifweb:contentKind, ifweb:deploymentRecordFile, ifweb:destinationOf,
+        ifweb:featuresWork, ifweb:hostOf, ifweb:hostedBy, ifweb:inventoryEntry, ifweb:publishingCommand,
+        ifweb:publishingStrategy ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "These properties are ordinary words of the field they model, or names specific to the structure of the company, its works or its tools. No established term in a published vocabulary that works in their place was found, and where one was found it is tied instead (see ClarifiedAndMappedTermsAccepted). Each term was read against PROV-O, schema.org, DCMI Terms, the W3C Organization Ontology, ODRL, SKOS and the Data Cube vocabulary from knowledge of those vocabularies, and every equivalent found is tied in the ontology; the terms were not searched on the web one by one. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007). Terms such as recovery time objective, recovery point objective, retention period, continuation and divisional (of a patent application), checksum and cadence are the established words of continuity planning, records management, patent law and software delivery."@en ;
+    ifcore:consideredAlternative ifcore:PlainWordAltNearestStandard, ifcore:PlainWordAltRename ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PlainWordSchemesKept a ifcore:Decision ;
+    rdfs:label "Concept schemes whose values are ordinary words of their field are kept"@en ;
+    dcterms:subject ifcore:AssessmentItemTypeScheme, ifcore:CommandCategoryScheme, ifcore:CommandSurfaceScheme,
+        ifcore:CommandVerbScheme, ifcore:ConsequenceDomainScheme, ifcore:ControlBaselineRuleScheme,
+        ifcore:ControlDispositionScheme, ifcore:ControlTestProbeKindScheme, ifcore:CourseDeliveryTargetScheme,
+        ifcore:CourseFormatScheme, ifcore:DataClassScheme, ifcore:DeckTypeScheme, ifcore:DecorationMethodScheme,
+        ifcore:DesignDensityScheme, ifcore:DesignExpressionScheme, ifcore:DesignSystemKindScheme,
+        ifcore:DomainCriticalityScheme, ifcore:DomainRoleScheme, ifcore:DomainSecurityControlScheme,
+        ifcore:DomainStandingScheme, ifcore:EmailTypeScheme, ifcore:EnforcementMechanismScheme,
+        ifcore:FigureTypeScheme, ifcore:IncidentSeverityScheme, ifcore:InterfaceFlavorScheme,
+        ifcore:MediaAssetTypeScheme, ifcore:OfferKindScheme, ifcore:PlatformLayerScheme,
+        ifcore:PresentationFormScheme, ifcore:PrintDocumentTypeScheme, ifcore:ProductCategoryScheme,
+        ifcore:ReaderSideScheme, ifcore:ReflectionKindScheme, ifcore:RegistrationKindScheme,
+        ifcore:RelationFamilyScheme, ifcore:ResourceKindScheme, ifcore:RiskRatingScheme, ifcore:SpecStatusScheme,
+        ifcore:VendorCriticalityScheme, ifcore:VerdictOutcomeScheme, ifcore:WebInteractionModelScheme,
+        ifcore:WorkspaceFlavorScheme, ifweb:PublishingStrategyScheme ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-09"^^xsd:date ;
+    dcterms:description "These concept schemes and their concepts are ordinary words of the field they model, or names specific to the structure of the company, its works or its tools. No established term in a published vocabulary that works in their place was found, and where one was found it is tied instead (see ClarifiedAndMappedTermsAccepted). Each term was read against PROV-O, schema.org, DCMI Terms, the W3C Organization Ontology, ODRL, SKOS and the Data Cube vocabulary from knowledge of those vocabularies, and every equivalent found is tied in the ontology; the terms were not searched on the web one by one. Judged by an AI audit pass on the founder's instruction to make best judgements, and accepted by the founder's instruction of the same date; the weekly vocabulary audit re-checks a sample of the terms named here (spec 0019 FR-007). The concepts of these schemes inherit this Decision. Some schemes name tools of the repository itself (the command verbs, categories, surfaces and resource kinds, the check mechanisms) and have no published vocabulary; the platform capabilities carry the established terms as alternative labels."@en ;
+    ifcore:consideredAlternative ifcore:PlainWordAltNearestStandard, ifcore:PlainWordAltRename ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PlainWordAltNearestStandard a ifcore:Alternative ; rdfs:label "Tie each term to the nearest standard class or property"@en ;
+    ifcore:rejectionReason "A tie says the two terms mean the same. For these terms the nearest standard term means something else, and a false tie would hide the difference from the next audit."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PlainWordAltRename a ifcore:Alternative ; rdfs:label "Rename each term to a different phrase"@en ;
+    ifcore:rejectionReason "The plain word is the established word of the field. A different phrase would be the invented term that spec 0019 forbids."@en ;
+    ifcore:hasAudience ifcore:Public .
+
 # ───────────────────────── 1. Native Alpha and Acquired Alpha (0019 FR-004, FR-005, FR-011) ─────────────────────────
 ifcore:NativeAlphaIsTheCompanysOwnTerm a ifcore:Decision ;
     rdfs:label "Native Alpha and Acquired Alpha are the company's own terms, not restated standard terms"@en ;
@@ -1326,15 +1508,15 @@ ifcore:NativeAlphaAltFinanceAlpha a ifcore:Alternative ; rdfs:label "Use 'alpha'
 
 # ───────────────────────── 2. IPLG (0019 FR-004, FR-010) ─────────────────────────
 ifcore:IPLGBuildsOnProductLedGrowth a ifcore:Decision ;
-    rdfs:label "IPLG keeps its name and is stated as a specialization of product-led growth"@en ;
-    dcterms:subject ifcore:IPLG ;
+    rdfs:label "IPLG is a subset and an elaboration of product-led growth, not a replacement"@en ;
+    dcterms:subject ifcore:IPLG, ifcore:ProductLedGrowth ;
     ifcore:decidedBy ifcore:ShahidNehalShah ;
     ifcore:decidedAt "2026-10-09"^^xsd:date ;
-    dcterms:description "'Product-led growth' is an established go-to-market term: the product itself drives acquisition, activation and retention. IPLG is not a new idea beside it. It applies the same idea to a unit's intellectual output (a paper, a tool, a book's executable content) and adds one test: one useful action completed before any commercial ask. The outcome is to keep the name 'Intellectual Product-Led Growth', to write the full name first and the acronym second in every definition, and to state in the definition that it specializes product-led growth. Source for the established term: vendor and analyst pages only; no standard defines it, and its originator was not verified (see the audit report). "@en ;
+    dcterms:description "Product-led growth is an established go-to-market term: the product itself drives acquisition, activation and retention. IPLG is not the same thing and does not replace it. An intellectual product (made by a person or by an AI) is atypical for product-led growth, so IPLG elaborates the established idea for that case. The word 'intellectual' is what the term adds, and it is the part that is the company's own. The ontology therefore declares ifcore:ProductLedGrowth for the established term and states ifcore:IPLG as its subclass, with the full name first and the acronym as an alternative label. Source for the established term: vendor and analyst pages only; no standard defines it, and its originator was not verified (see the audit report)."@en ;
     ifcore:consideredAlternative ifcore:IPLGAltPlainPLG, ifcore:IPLGAltFreeTrial ;
     ifcore:hasAudience ifcore:Public .
 ifcore:IPLGAltPlainPLG a ifcore:Alternative ; rdfs:label "Use 'product-led growth' with no new term"@en ;
-    ifcore:rejectionReason "The established term describes a company's software product. It does not cover research, a book or a tool offered as an intellectual product, and it has no rule that the visitor completes one useful action before any commercial ask. Kept as a specialization, not a replacement."@en ;
+    ifcore:rejectionReason "The established term is understood for software products. An intellectual product, made by a person or by an AI, is atypical for it. It is kept as the parent, and IPLG is its subset and elaboration, not a replacement."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:IPLGAltFreeTrial a ifcore:Alternative ; rdfs:label "Use 'freemium' or 'free trial'"@en ;
     ifcore:rejectionReason "Those name a pricing offer. IPLG names the visitor's first useful action, which can occur with no account and no price."@en ;
@@ -1380,11 +1562,11 @@ ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; r
 
 ifcore:Grant a owl:Class ; skos:broadMatch odrl:Permission ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Grant"@en ;
     rdfs:comment "An explicit, time-bounded link between an identified agent and a specific audience (0005-authentication FR-003). Actual Grant individuals are rarely Public; they are expected to live in the private vault, declaring whatever audience is appropriate to their own sensitivity."@en .
-ifcore:grantedTo a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Person .
-ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Audience .
-ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+ifcore:grantedTo a owl:ObjectProperty ; rdfs:subPropertyOf odrl:assignee ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Person .
+ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:AccessAudience .
+ifcore:validFrom a owl:DatatypeProperty ; rdfs:subPropertyOf schema:validFrom ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
     rdfs:comment "Required. A grant with no start date is not valid (0005 FR-003)."@en .
-ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+ifcore:validUntil a owl:DatatypeProperty ; rdfs:subPropertyOf schema:validThrough ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
     rdfs:comment "Optional. Absent means open-ended; present means the grant stops counting after this date (0005 FR-004)."@en .
 
 # ───────────────────────── Work and assets (0007-work-and-assets) ─────────────────────────
@@ -1519,7 +1701,7 @@ ifcore:LandscapeReview a owl:Class ; rdfs:subClassOf ifcore:Note ; rdfs:label "L
     rdfs:comment "A research record that shows how an organization is likely to fare against others on a complex task, by letting the reader place their own numbers against a peer spread (0017-spoken-and-research-works FR-017). A kind of note, so a check can find it by type."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:noteType a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:range ifcore:NoteType .
-ifcore:doi a owl:DatatypeProperty ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
+ifcore:doi a owl:DatatypeProperty ; rdfs:subPropertyOf schema:identifier ; skos:closeMatch bibo:doi ; rdfs:domain ifcore:Note ; rdfs:range xsd:string .
 
 ifcore:Disposition a owl:Class ; rdfs:label "Disposition"@en ;
     rdfs:comment "The explicit outcome a protectable finding receives (0006 FR-005)."@en .
@@ -1733,7 +1915,7 @@ ifcore:imprintOf a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range 
 ifcore:imprintThesis a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range schema:Claim ;
     rdfs:comment "The argument the imprint's list is built on, a claim labeled by kind (0009-press FR-039)."@en .
 ifcore:Readership a owl:Class ; rdfs:subClassOf schema:Audience ; rdfs:label "Readership"@en ;
-    rdfs:comment "The readers an imprint publishes for, related to it by schema:audience. Distinct from ifcore:Audience, which says who may see a fact, not whom a work is written for."@en .
+    rdfs:comment "The readers an imprint publishes for, related to it by schema:audience. Distinct from ifcore:AccessAudience, which says who may see a fact, not whom a work is written for."@en .
 
 ifcore:IFPress a ifcore:Imprint ;
     rdfs:label "Intellectual Frontiers Press"@en ;
@@ -2309,7 +2491,7 @@ ifcore:IFPressPocketGuides a schema:BookSeries ; rdfs:label "IF Press Pocket Gui
     schema:slogan "Big ideas. Small books. Useful immediately."@en ;
     rdfs:comment "The series of Pocket Guides. Its volumes are independent works, not meant to be read in order, so it is not a serial series and has no package (0016 FR-051)."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:seriesNumber a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PocketGuide ; rdfs:range xsd:positiveInteger ;
+ifcore:seriesNumber a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:subPropertyOf schema:position ; rdfs:domain ifcore:PocketGuide ; rdfs:range xsd:positiveInteger ;
     rdfs:comment "A Pocket Guide's position in IF Press Pocket Guides, a whole number from 1, shown as three digits (0016 FR-054)."@en .
 ifcore:centralThesis a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PocketGuide ; rdfs:range rdf:langString ;
     rdfs:comment "The one claim a Pocket Guide develops, as the book states it (0016 FR-054)."@en .
@@ -2327,7 +2509,7 @@ ifcore:NamedTool a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Named 
     rdfs:comment "A named tool, test, or framework a work teaches and expects a reader to reuse (0016 FR-041). Every individual carries explicit provenance (ifcore:sourceFile, ifcore:sourceLocation) and an audience."@en .
 ifcore:definedIn a owl:ObjectProperty ; rdfs:domain skos:Concept ; rdfs:range schema:CreativeWork ;
     rdfs:comment "The work, chapter, or section that gives a concept its definition."@en .
-ifcore:sourceFile a owl:DatatypeProperty ; rdfs:range xsd:string ;
+ifcore:sourceFile a owl:DatatypeProperty ; rdfs:subPropertyOf dcterms:source ; rdfs:range xsd:string ;
     rdfs:comment "Provenance: the repository-relative path an extracted individual was taken from (0016 FR-041)."@en .
 ifcore:sourceLocation a owl:DatatypeProperty ; rdfs:range xsd:string ;
     rdfs:comment "Provenance: the exact heading, identifier, or line within ifcore:sourceFile an extracted individual was taken from, specific enough for a person to find the passage."@en .
@@ -2499,8 +2681,12 @@ ifcore:Studios ifcore:operatesSharedService ifcore:DemandEngineering, ifcore:Rev
     ifcore:CompanionExecutableSourceCodeRepositories .
 ifcore:operatesSharedService a owl:ObjectProperty ; rdfs:domain ifcore:Unit ; rdfs:range ifcore:SharedService .
 
-ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
-    skos:definition "Intellectual Product-Led Growth: the framework for turning a unit's output into something a visitor can use directly — one useful action completed before any commercial ask — rather than only read about."@en ;
+ifcore:ProductLedGrowth a owl:Class ; rdfs:label "Product-led growth"@en ;
+    skos:definition "The established go-to-market approach in which the product itself drives acquisition, activation, retention and expansion. This class stands for that established term; it has no stable address in a published vocabulary yet, and a tie to one replaces this class when it is found."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IPLG a owl:Class ; rdfs:subClassOf ifcore:ProductLedGrowth ; rdfs:label "Intellectual product-led growth"@en ; skos:altLabel "IPLG"@en ;
+    skos:definition "Product-led growth applied to an intellectual product: a product whose value is knowledge, judgment or method made by a person or by an AI, such as a paper, a tool, a skill or a book's executable content. It is a subset and an elaboration of product-led growth, not a replacement for it. What sets it apart is the word 'intellectual', that is, the kind of product and who or what made it. The company's practice is to let a visitor complete one useful action with such a product before any commercial ask."@en ;
     rdfs:comment "Shared between 0006-research-and-ip (FR-012, FR-013), 0009-press (FR-016, FR-017 — a Fieldbook's executable content is IPLG applied to a book; promotion and diffusion of an intellectual product is Press's own territory), and 0011-studios (FR-020); no unit redefines it, per 0003-intellectual-frontiers FR-002."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -2508,7 +2694,7 @@ ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
 
 ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:range ifcore:PortfolioCategory ;
     rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization, or this product of the portfolio, is classified as."@en .
-ifcore:builtBy a owl:ObjectProperty ; rdfs:range ifcore:Unit ;
+ifcore:builtBy a owl:ObjectProperty ; rdfs:subPropertyOf dcterms:creator ; rdfs:range ifcore:Unit ;
     rdfs:comment "The unit that built this organization, or this product, as a venture, a shared service or a product of the portfolio, per 0011-studios FR-022: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
 ifcore:portfolioCompany a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:Organization ;
     rdfs:comment "A company or shared service this fund holds. A fund's portfolio roster is point-in-time business data, not operating doctrine (0010-capital, Out of scope) — the same reasoning already applied to patent counts."@en .
@@ -2953,12 +3139,12 @@ ifcore:Outcome a ifcore:SearchStage ; rdfs:label "Outcome"@en ; ifcore:sequenceO
 ifcore:Learning a ifcore:SearchStage ; rdfs:label "Learning"@en ; ifcore:sequenceOrder 12 ;
     rdfs:comment "The thesis is corrected with what actually happened; the next search starts from what this one got wrong (0012 FR-005)."@en ; ifcore:hasAudience ifcore:Public .
 
-ifcore:Hunt a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Activity ; rdfs:label "Hunt"@en ;
+ifcore:Hunt a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Activity, schema:SearchAction ; rdfs:label "Hunt"@en ;
     rdfs:comment "A search with a written thesis (0012-network FR-001), bounded work that generates evidence packets via prov:wasGeneratedBy, the same reuse already established for research activities and ifcore:Note (0007-work-and-assets FR-002)."@en .
 ifcore:searchesFor a owl:ObjectProperty ; rdfs:domain ifcore:Hunt ; rdfs:range ifcore:Unit ;
     rdfs:comment "The unit or opportunity a hunt searches for (0012 FR-002)."@en .
 
-ifcore:EvidencePacket a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Evidence packet"@en ;
+ifcore:EvidencePacket a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; skos:closeMatch prov:Bundle ; rdfs:label "Evidence packet"@en ;
     rdfs:comment "What a candidate becomes through cited signals, not a profile (0012-network FR-007, FR-008). Generated by a Hunt via prov:wasGeneratedBy; its subject candidate is named via schema:about (reused, range ifcore:Person); a claim's own source is carried by the existing Reference model (ifcore:ExternalRecordReference or ifcore:RestrictedDataReference per the signal's sensitivity), not a new citation property."@en .
 ifcore:namedUnknown a owl:DatatypeProperty ; rdfs:domain ifcore:EvidencePacket ; rdfs:range xsd:string ;
     rdfs:comment "What is explicitly not yet known about a candidate, stated rather than dropped once the candidate looks promising (0012 FR-008)."@en .
@@ -2969,12 +3155,12 @@ ifcore:High a ifcore:ConfidenceLevel ; rdfs:label "High"@en ; ifcore:hasAudience
 ifcore:confidenceLevel a owl:ObjectProperty ; rdfs:domain [ a owl:Class ; owl:unionOf ( ifcore:EvidencePacket ifcore:Assertion ) ] ; rdfs:range ifcore:ConfidenceLevel ;
     rdfs:comment "How sure an evidence packet's reading, or an assertion, is (0012-network FR-007; 0047-digital-reflections FR-019)."@en .
 
-ifcore:RelationshipMemory a owl:Class ; rdfs:label "Relationship memory"@en ;
+ifcore:RelationshipMemory a owl:Class ; skos:altLabel "Interaction history"@en ; rdfs:label "Relationship memory"@en ;
     skos:definition "The compounding record of who did what and how it turned out, so the next search starts further along than the last one."@en ;
     rdfs:comment "Sensitive by default, the same posture as ifcore:TradeSecret (0007-work-and-assets FR-010): nothing learned in a private conversation appears on a public page without consent, and no individual relationship-memory record is public merely by existing (0012-network FR-015, FR-016, FR-017). An actual record's own ifcore:hasAudience states who it is visible to; none is asserted here."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:NetworkMeasure a owl:Class ; rdfs:label "Network measure"@en ;
+ifcore:NetworkMeasure a owl:Class ; skos:closeMatch qb:MeasureProperty ; rdfs:label "Network measure"@en ;
     rdfs:comment "What Network is evaluated by, in place of activity counts like profiles created or page views (0012-network FR-018, FR-019)."@en .
 ifcore:HuntWithThesis a ifcore:NetworkMeasure ; rdfs:label "A hunt with a recorded thesis"@en ; ifcore:hasAudience ifcore:Public .
 ifcore:CandidateJudgedWorthContacting a ifcore:NetworkMeasure ; rdfs:label "A candidate a person judged worth contacting"@en ; ifcore:hasAudience ifcore:Public .

@@ -3,7 +3,7 @@ that the ontologies of one or more repositories declare in the company's own nam
 established vocabulary or to a Decision that justifies it.
 
 A term is `reused` when it specializes, or is declared to match, a term of an established vocabulary, directly or through its
-own parents or scheme. It is `excepted` when a `Decision` names it by `dcterms:subject` (0019 FR-004). Any other term is
+own parents. It is `excepted` when a `Decision` names it by `dcterms:subject` (0019 FR-004); a concept takes its scheme's status. Any other term is
 `unmapped`: a candidate for the audit's judgment, never a finding of invention by itself, and never renamed by the scan
 (0019 FR-008). Standard library only.
 """
@@ -109,7 +109,7 @@ def scan(roots: dict[str, Path]) -> list[VTerm]:
         if not iri.startswith(OWN):
             continue
         types = {o.value for p, o, *_ in stmts if p == turtle.RDF_TYPE and isinstance(o, Iri)}
-        kind = "class" if types & CLASS else "property" if types & PROPERTY else "scheme" if SCHEME in types \
+        kind = "class" if types & CLASS else "property" if types & PROPERTY else "scheme" if SCHEME in types or CORE + "ControlCatalog" in types \
             else "concept" if CONCEPT in types else ""
         if not kind:
             continue
@@ -123,31 +123,33 @@ def scan(roots: dict[str, Path]) -> list[VTerm]:
         scheme = next((o.value for p, o, *_ in stmts if p == SKOS + "inScheme" and isinstance(o, Iri)), "")
         terms[iri] = VTerm(stmts[0][3], curie(iri), iri, kind, lit(LABELS) or re.split(r"[#/]", iri)[-1], " ".join(lit(COMMENTS).split()),
                            stmts[0][4], min(ln for _, _, ln, _, _ in stmts), curie(scheme) if scheme else "")
-        ties[iri] = [o.value for p, o, *_ in stmts if p in TIES and isinstance(o, Iri)]
+        ties[iri] = [(p, o.value) for p, o, *_ in stmts if p in TIES and isinstance(o, Iri)]
 
     state: dict[str, tuple[str, str]] = {}
 
     def resolve(iri: str, seen: frozenset = frozenset()) -> tuple[str, str]:
+        """An external tie makes a term `reused`. A term inherits from its own parent only a `reused` status: a new term under a parent that
+        a Decision excepted is a new term. A concept inherits its scheme's status, whichever it is, because the scheme is the term the
+        Decision judged."""
         if iri in state:
             return state[iri]
-        if iri in decisions:
-            res = ("excepted", curie(decisions[iri]))
+        res = ("unmapped", "")
+        generic = [t for _, t in ties.get(iri, []) if t in GENERIC]
+        for _, t in ties.get(iri, []):
+            if not t.startswith(OWN) and t not in GENERIC:
+                res = ("reused", curie(t))
+                break
         else:
-            res = ("unmapped", "")
-            generic = [t for t in ties.get(iri, []) if t in GENERIC]
-            for t in ties.get(iri, []):
-                if not t.startswith(OWN) and t not in GENERIC:
-                    res = ("reused", curie(t))
-                    break
-            else:
-                for t in ties.get(iri, []):
-                    if t in terms and t not in seen:
-                        sub = resolve(t, seen | {iri})
-                        if sub[0] != "unmapped":
-                            res = (sub[0], curie(t))
-                            break
-            if res[0] == "unmapped" and generic:
-                res = ("unmapped", "only a generic parent: " + ", ".join(curie(t) for t in generic))
+            for p, t in ties.get(iri, []):
+                if t in terms and t not in seen:
+                    sub = resolve(t, seen | {iri})
+                    if sub[0] == "reused" or (p == SKOS + "inScheme" and sub[0] != "unmapped"):
+                        res = (sub[0], curie(t))
+                        break
+        if res[0] == "unmapped" and iri in decisions:
+            res = ("excepted", curie(decisions[iri]))
+        if res[0] == "unmapped" and generic:
+            res = ("unmapped", "only a generic parent: " + ", ".join(curie(t) for t in generic))
         state[iri] = res
         return res
 

@@ -31,7 +31,7 @@
 ifweb:contentKind a owl:DatatypeProperty ;
     rdfs:comment "Marks a document-level shape: the value a content document's own JSON-LD @type may declare (0002 FR-005, FR-007)."@en .
 
-ifweb:Page a owl:Class, sh:NodeShape ;
+ifweb:Page a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifcore:Fact ;
     rdfs:label "Page"@en ;
     rdfs:comment "The minimal content kind: a content document with no properties beyond the ones every document already carries (0002 FR-004, FR-008) and, where it is generated from a work package's source, its provenance (0002 FR-017)."@en ;
@@ -56,7 +56,7 @@ ifweb:PublicSubjectShape a sh:NodeShape ;
 
 # ───────────────────────── Content kinds backed by one existing individual (0013-web-content-kinds) ─────────────────────────
 
-ifweb:UnitPage a owl:Class, sh:NodeShape ;
+ifweb:UnitPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Unit page"@en ;
     rdfs:comment "Renders one ifcore:Unit individual; asserts no new fact about it (0013 FR-001). Never Public: ifweb:PublicSubjectShape fails a public page whose subject is a unit (0021-works-and-presentations FR-014)."@en ;
@@ -64,7 +64,7 @@ ifweb:UnitPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:UnitPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Unit ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:ResearchPillarPage a owl:Class, sh:NodeShape ;
+ifweb:ResearchPillarPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Research pillar page"@en ;
     rdfs:comment "Renders one ifcore:ResearchPillar individual (0013 FR-002)."@en ;
@@ -72,7 +72,7 @@ ifweb:ResearchPillarPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:ResearchPillarPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:ResearchPillar ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:ResearchNotePage a owl:Class, sh:NodeShape ;
+ifweb:ResearchNotePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Research note page"@en ;
     rdfs:comment "Renders one ifcore:Note individual (0013 FR-003)."@en ;
@@ -80,7 +80,7 @@ ifweb:ResearchNotePage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:ResearchNotePage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Note ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:PatentFamilyPage a owl:Class, sh:NodeShape ;
+ifweb:PatentFamilyPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Patent family page"@en ;
     rdfs:comment "Renders one ifcore:PatentFamily individual. Any status or filing-data value it displays must be a resolved ExternalRecordReference, never a hand-typed literal (0013 FR-004, 0006-research-and-ip FR-008)."@en ;
@@ -88,7 +88,7 @@ ifweb:PatentFamilyPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:PatentFamilyPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:PatentFamily ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:TrademarkPage a owl:Class, sh:NodeShape ;
+ifweb:TrademarkPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Trademark page"@en ;
     rdfs:comment "Renders one ifcore:Trademark individual, under the same ExternalRecordReference discipline as ifweb:PatentFamilyPage (0013 FR-005)."@en ;
@@ -96,7 +96,7 @@ ifweb:TrademarkPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:TrademarkPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Trademark ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:DefensiveDisclosurePage a owl:Class, sh:NodeShape ;
+ifweb:DefensiveDisclosurePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Defensive disclosure page"@en ;
     rdfs:comment "Renders one ifcore:DefensiveDisclosure individual (0013 FR-006)."@en ;
@@ -104,7 +104,7 @@ ifweb:DefensiveDisclosurePage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:DefensiveDisclosurePage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:DefensiveDisclosure ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:FundPage a owl:Class, sh:NodeShape ;
+ifweb:FundPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Fund page"@en ;
     rdfs:comment "Renders one ifcore:Fund individual (0013 FR-007)."@en ;
@@ -112,7 +112,7 @@ ifweb:FundPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:FundPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Fund ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:BookPage a owl:Class, sh:NodeShape ;
+ifweb:BookPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Book page"@en ;
     rdfs:comment "Renders one individual that is both a schema:Book and an ifcore:Copyright, per 0007-work-and-assets FR-013 (0013 FR-008)."@en ;
@@ -121,7 +121,7 @@ ifweb:BookPage a owl:Class, sh:NodeShape ;
     sh:property [ sh:path schema:about ; sh:class schema:Book ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path schema:about ; sh:class ifcore:Copyright ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:WorkPage a owl:Class, sh:NodeShape ;
+ifweb:WorkPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Work page"@en ;
     rdfs:comment "Renders facts that already exist about one ifcore:SubstantialWork and asserts none; a book's own page remains ifweb:BookPage (0013 FR-012)."@en ;
@@ -129,7 +129,7 @@ ifweb:WorkPage a owl:Class, sh:NodeShape ;
     sh:targetClass ifweb:WorkPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:WorkEditionPage a owl:Class, sh:NodeShape ;
+ifweb:WorkEditionPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Work edition page"@en ;
     rdfs:comment "A generated content document rendering a part of a Substantial Work's source — a chapter, appendix, companion page, or show-notes page — naming that same work by both schema:isPartOf and prov:wasDerivedFrom (0013 FR-013; 0002-content-format FR-017)."@en ;
@@ -138,7 +138,7 @@ ifweb:WorkEditionPage a owl:Class, sh:NodeShape ;
     sh:property [ sh:path schema:isPartOf ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path prov:wasDerivedFrom ; sh:class ifcore:SubstantialWork ; sh:minCount 1 ; sh:maxCount 1 ] .
 
-ifweb:JournalArticlePage a owl:Class, sh:NodeShape ;
+ifweb:JournalArticlePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Journal article page"@en ;
     rdfs:comment "The one content kind that may carry text Intellectual Frontiers itself originates rather than only render an existing fact, per 0007-work-and-assets FR-016 (0013 FR-009)."@en ;
@@ -153,7 +153,7 @@ ifweb:featuresWork a owl:ObjectProperty ;
     rdfs:domain ifweb:PortfolioIndexPage ;
     rdfs:comment "Lists an individual already declared elsewhere in the ontology; asserts no new fact about it (0013 FR-009)."@en .
 
-ifweb:PortfolioIndexPage a owl:Class, sh:NodeShape ;
+ifweb:PortfolioIndexPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:CollectionPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Portfolio index page"@en ;
     rdfs:comment "A view over existing individuals, never a new fact type (0013 FR-009). A work kind with no existing ontology class MUST NOT be listed here until its own governing spec establishes it (FR-010)."@en ;
@@ -175,7 +175,7 @@ ifweb:PortfolioIndexPage a owl:Class, sh:NodeShape ;
         )
     ] .
 
-ifweb:PromotionPost a owl:Class, sh:NodeShape ;
+ifweb:PromotionPost a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:Article ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Promotion post"@en ;
     rdfs:comment "Company or unit news, a launch note, or an article written for search or answer engines (0021-works-and-presentations FR-023, FR-024; 0009-press FR-037). Its subject may be the firm or a unit; it names, by dcterms:references, at least one work, presentation, or Journal issue it promotes, which remains the authoritative record (0016-press-production FR-045, FR-047)."@en ;
@@ -226,7 +226,7 @@ ifweb:PreviewThenPromote a skos:Concept ; skos:inScheme ifweb:PublishingStrategy
 
 # ───────────────────────── The application and its hosts (0044-public-website FR-024 – FR-030; 0046-distribution-platform) ─────────────────────────
 
-ifweb:Application a owl:Class, sh:NodeShape ;
+ifweb:Application a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebApplication ;
     rdfs:subClassOf schema:SoftwareApplication, ifcore:Fact ;
     rdfs:label "Application"@en ;
     skos:definition "The program that serves a web property beyond its generated pages: what only identified readers may reach, and the delivery of renditions (0044-public-website FR-024)."@en ;

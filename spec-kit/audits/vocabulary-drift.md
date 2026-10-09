@@ -31,6 +31,11 @@ A work's generated concepts (`*.concepts.ttl`) are not part of this audit; `eid 
      distinctiveness is never a reason. A word borrowed from another language is not original for that reason.
    - **not verified**: say what was tried.
 6. Check each existing exception: its Decision still lists the alternatives, and a standard term has not appeared since.
+   A Decision that names many terms as kept (`PlainWordClassesKept`, `PlainWordPropertiesKept`, `PlainWordSchemesKept`, `VaultPlainWordPropertiesKept`,
+   `PublishedStandardSchemesKept`) stands for a judgement of the whole group. Re-judge at least ten terms of each such Decision per run, chosen
+   at random, by searching for an established term, and list them under "Exceptions to re-check". A term that now has an established
+   equivalent moves to "Candidates to replace" or "Candidates to map".
+   The scan counts a term as excepted only when a Decision names it. A new term under an excepted parent is a new, unmapped term.
 7. Write the report to `spec-kit/audits/vocabulary-drift/<YYYY-MM-DD>.md` in `intellectual-frontiers/.github`
    (sections: Summary, New since the last report, Candidates to replace, Candidates to map, Exceptions needing a Decision,
    Exceptions to re-check, Not verified). Commit it to the session's branch.
