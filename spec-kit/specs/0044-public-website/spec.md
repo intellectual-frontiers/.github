@@ -175,6 +175,43 @@ content document is, 0002-content-format; how addresses map to content,
   static host alone (FR-028).
 - **FR-036**: The addresses under `/__eid/` are reserved to the program's
   server (FR-026). The generator MUST NOT generate a page there.
+- **FR-037**: An image the website serves MUST be served in its fast web
+  form: a PNG or JPEG as a WebP, and an SVG as an optimized SVG. When the
+  source is in the vault, the form is a companion kept beside the source
+  (`name.auto.webp`; for a raster at least 1000 pixels wide also
+  `name.auto-960.webp` and `name.auto-480.webp`; `name.auto.svg`), described
+  by the manifest `images.auto.json` of its directory, and `eid image build`
+  makes it. A companion is fresh when it exists and the manifest holds, for
+  the source, the hash of the source's content and the version of the
+  conversion. A companion that is missing or stale MUST be made again, and
+  a fresh one MUST NOT be. When the source is not in the vault (the public
+  root, the vendored brand), the website MUST make the form when it builds
+  and MUST NOT write beside the source. An original MUST NOT be changed, and
+  it MUST be served as it is when its fast form is not smaller or an
+  optimized SVG fails its checks.
+
+- **FR-038**: The content delivery network in front of the website's host
+  MUST be configured by `eid cdn` from a file in the vault, as code: the zone
+  settings, the tiered cache and the cache rules, each cache rule limited to
+  the website's hostname. The command MUST send only what differs from the
+  zone, MUST list in its plan the settings that change the whole zone, and MUST
+  refuse while the hostname is undecided. It MUST change no DNS record and MUST
+  NOT point any domain (FR-019). The file MUST hold no credential, only the
+  name of the environment variable that holds the token. A purge of the
+  website's cache MUST follow a production publish (FR-019).
+
+- **FR-039**: The generator's check MUST fail a page that loads a stylesheet
+  from another host, an image without its width and height or without alt
+  text, a page of more than 150 000 bytes of HTML before compression, a page
+  (other than the not-found page) without exactly one `h1`, and a home page
+  whose picture is not fetched ahead of the page's own load.
+- **FR-040**: Every file under `/static/` MUST carry in its address a hash of
+  its content and MUST be served with a cache lifetime of one year and the
+  `immutable` directive; every page MUST be served so that a cache asks again
+  before it reuses it. The fonts the pages use MUST be served by the website
+  itself and MUST be declared in the page's own head, and the analytics
+  container (FR-015) MUST load after the page is usable. The header rules MUST
+  be written to the built directory's `_headers` file.
 
 ## The application
 
