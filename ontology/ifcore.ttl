@@ -56,17 +56,17 @@ ifcore:ShahidNehalShah a ifcore:Person ;
     ifcore:displayName "Shahid N. Shah"@en ;
     ifcore:hasAudience ifcore:Public .
 
-# ───────────────────────── The Eidolon's own repositories (FR-001) ─────────────────────────
+# ───────────────────────── The Eidolon's own parts (FR-001) ─────────────────────────
 
 ifcore:EidolonComponent a owl:Class ; rdfs:label "Eidolon component"@en ;
-    rdfs:comment "One of the Eidolon's three repositories: the public Eidolon, the private Eidolon where works are made, and one presentation channel for them (FR-001)."@en .
+    rdfs:comment "A part of the Eidolon: one of its two repositories, the public Eidolon and the private Eidolon where works are made, or its web property, a presentation layer generated from the private Eidolon and not a repository (FR-001)."@en .
 
 ifcore:PublicRoot a ifcore:EidolonComponent ; rdfs:label "Public root"@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:PrivateVault a ifcore:EidolonComponent ; rdfs:label "Private vault"@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:WebProperty a ifcore:EidolonComponent ; rdfs:label "Web property"@en ;
-    rdfs:comment "A channel through which presentations of works reach an audience. It holds no work of its own (FR-001; 0021-works-and-presentations FR-011)."@en ;
+    rdfs:comment "A channel through which presentations of works reach an audience: a presentation layer generated from the private Eidolon, not a repository. It holds no work of its own (FR-001; 0021-works-and-presentations FR-011; 0044-public-website FR-001)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Design systems (0014-design-systems) ─────────────────────────
@@ -692,7 +692,7 @@ ifcore:Eidolon a owl:Class ; rdfs:subClassOf ifcore:DigitalReflection ; owl:disj
     rdfs:label "Eidolon"@en ;
     skos:definition "A digital reflection of what exists: a living, AI-readable record of a real-world entity that exists independently of its digital representation, such as a person, an organization, a company, an institution, a facility or an identifiable physical asset, capturing its identity, relationships, state, history and evolving context. Not a replica, but enough grounded evidence for an AI to reason about the real thing accurately and flexibly (0047-digital-reflections FR-006)."@en ;
     skos:scopeNote "Represented subject: an independently identifiable real-world entity. Not the record, a page or row that describes it, a claim made about it, or the idea of what an Eidolon is (0047-digital-reflections FR-037)."@en ;
-    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the three-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it. What is deliberately created (a product, a service, a system, a workflow) is reflected by an ifcore:Ergon, and what is conceived (a concept, a hypothesis, a theory) by an ifcore:Noema, not by an Eidolon (0047-digital-reflections FR-007, FR-027). This IRI names both the kind of record and the founder's idea of it; the idea is a Noema subject (0047 OQ-6)."@en ;
+    rdfs:comment "Shahid Nehal Shah's own authored research and thesis, independent of Intellectual Frontiers LLC. Not the same individual as the two-repository system this company operates — that system is a distinct, identifiable artifact based on this concept, related to it by schema:isBasedOn below, exactly the structure FR-015 requires rather than conflating a general concept with a specific application of it. What is deliberately created (a product, a service, a system, a workflow) is reflected by an ifcore:Ergon, and what is conceived (a concept, a hypothesis, a theory) by an ifcore:Noema, not by an Eidolon (0047-digital-reflections FR-007, FR-027). This IRI names both the kind of record and the founder's idea of it; the idea is a Noema subject (0047 OQ-6)."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:IntellectualFrontiersLLC schema:isBasedOn ifcore:Eidolon .
 
