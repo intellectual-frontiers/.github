@@ -15,8 +15,8 @@ report, so the new spec states only what they do not, and cites the rest.
 already means something here. Use the field's own term where one exists (0019 FR-001). Elenchus uses audit words (control test,
 exception, finding, plan of action) and keeps a house word only for the pattern itself. Put the reason for the name in the spec.
 . *Split the idea from what carries it out.* An abstract methodology is a Noema. A deployed workflow or product that carries
-it out is an Ergon, related to it by `operationalizes` (0048-noemas FR-007). Elenchus is the Noema. Whether Operational Truth® is
-the Ergon is still a question for a person to answer, so the chapter asserts no relation yet.
+it out is an Ergon, related to it by `operationalizes` (0048-noemas FR-007). Elenchus is the Noema. Operational Truth® is the
+Ergon: a solution built on the Opsfolio platform that operationalizes it.
 . *Decide the kind.* A work kind names a work's primary presentation form (0015 FR-005). A new kind needs its spec, then its
 `ifcore:WorkKind` individual, then a command group in the vault. Do not build ahead of that order (<<working-order>>).
 . *Take the next free spec number from the current `main`.* Fetch first. Another branch may have taken the number you meant to
