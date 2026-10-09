@@ -89,6 +89,17 @@ later, is stated here before it is built.
   from its host (0039-business-continuity-policy FR-003), and a restore onto a
   scratch host MUST be tested at least once a month and recorded as evidence
   (0028-compliance-controls FR-018).
+- **FR-037**: A database engine, and the service that hosts it, is
+  infrastructure the platform runs on and not a distribution capability, so
+  FR-003 does not apply to it. It MUST have a dependency-ledger entry (FR-006),
+  sit behind a boundary the company owns (FR-005) and have an answered
+  disappearance test (FR-007). When a third party hosts it, it MUST also be in
+  the vendor register (0037-vendor-management-policy FR-001) and be adopted by
+  the `Decision` of 0044-public-website FR-050.
+- **FR-038**: The platform's state MUST be held at the lowest rung of the data
+  ladder of 0044-public-website FR-049 that holds it. Its first store MUST be
+  an embedded database file on the volume of FR-009, and the backup of FR-013
+  MUST be a consistent copy of that file that restores onto a scratch host.
 
 ## Anonymous and authenticated requests
 
@@ -238,6 +249,11 @@ later, is stated here before it is built.
   unchanged and the mark is in the access log, per FR-023.
 - A vendor is adopted and later disappears: its adapter alone is replaced, and
   the data is read from the export, per FR-005, FR-007 and FR-008.
+- A hosted database is proposed for a platform that runs in one container:
+  refused, since the embedded file holds its state, per FR-038 and
+  0044-public-website FR-050.
+- A hosted database provider disappears: its adapter alone is replaced and the
+  data is read from the export, per FR-005, FR-007, FR-008 and FR-037.
 
 ## Assumptions
 
@@ -276,8 +292,9 @@ later, is stated here before it is built.
   organization are not decided.
 - **OQ-10**: Who is the seller of record, how tax is handled, and how long
   buyer and access data are kept are not decided.
-- **OQ-11**: The platform's storage engine is not decided; FR-002 constrains
-  the choice and does not make it.
+- **OQ-11**: Which embedded database library the platform uses, and when it
+  first holds state, are not decided; FR-038 and 0044-public-website FR-049
+  fix the order of the choices.
 - **OQ-12**: Which audience-growth features the platform carries beyond
   FR-033 to FR-035, such as bundles or referral codes, is not decided.
 
@@ -312,6 +329,8 @@ later, is stated here before it is built.
 - **SC-006**: Every access beyond `Public` is in the access log.
 - **SC-007**: Every vendor has an answered disappearance test from within the
   last year.
+- **SC-008**: The platform's state restores onto a scratch host from the backup
+  of one database file, with no change to its code.
 
 ## Review & acceptance checklist
 

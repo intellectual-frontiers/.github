@@ -131,6 +131,14 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   under the version it was written under. Each concept MUST declare its
   sensitivity class and its validation rules, and a write that fails validation
   MUST be recorded as a finding, not discarded.
+- **FR-053**: A platform's governed store MUST be held at the lowest rung of the
+  data ladder of 0044-public-website FR-049 that holds its data. A platform
+  whose governed data is transactional, high in volume or too large for one
+  host's memory MUST start at the fourth rung, and the `Decision` of
+  0044-public-website FR-050 MUST name that volume. Because storage structures
+  are generated from the ontology (FR-017), each rung a platform uses MUST be a
+  target of that generation, and moving between rungs MUST NOT change a
+  concept's meaning or the interfaces of FR-045 to FR-048.
 
 ## The integration seam
 
@@ -494,6 +502,11 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   then in effect, per FR-028.
 - An AI proposes that a product is a platform: it is a candidate until a person
   accepts the record, per FR-003 and FR-033.
+- A platform moves from an embedded database file to a database server: concept
+  versions stay readable, the virtual SQL layer is unchanged, and no interface
+  changes, per FR-017, FR-047 and FR-053.
+- A platform that ingests transactional data in volume: it starts at the fourth
+  rung with a `Decision` that names the volume, per FR-053.
 
 ## Assumptions
 
@@ -554,6 +567,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   and a suite with modules each fail the check in a test.
 - **SC-007**: A programmatic interface module that omits a flavor fails the check
   in a test.
+- **SC-008**: A platform's storage structures are generated for every rung it
+  uses, and a concept reads the same through every interface on each.
 
 ## Review & acceptance checklist
 

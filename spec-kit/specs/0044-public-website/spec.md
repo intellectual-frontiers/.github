@@ -287,6 +287,48 @@ content document is, 0002-content-format; how addresses map to content,
   same image (0046-distribution-platform FR-011), so that FR-017's local test
   covers it.
 
+## Data
+
+- **FR-048**: The website's source of truth MUST be the Eidolon in Git: the
+  ontology, the specs and the content (0001-eidolon-architecture FR-005). Every
+  lookup a page or the server makes over that data, such as a search, a list, a
+  filter or a relation between records, MUST be answered from an in-memory
+  index built from those sources when the generator or the server starts and
+  built again when a source changes (FR-033), not from a database.
+- **FR-049**: The data a website holds MUST be held at the lowest rung of this
+  ladder that holds it:
+  1. the Eidolon in Git and the in-memory index of FR-048, for everything that
+     is a fact of the Eidolon (0001-eidolon-architecture FR-019);
+  2. an embedded SQLite database file on the volume that survives replacing the
+     container (0046-distribution-platform FR-009), for application state that
+     is not a fact of the Eidolon, such as a session, a grant, an entitlement,
+     a purchase or an access log;
+  3. a hosted libSQL database, a SQLite-compatible service, when more than one
+     container or host must write the same data;
+  4. a PostgreSQL server.
+- **FR-050**: Starting above the second rung, or moving to a higher rung, MUST
+  be a `Decision` (0008-decision-records) that names the trigger and the
+  measurement that shows it. A trigger is one of: more than one container or
+  host must write the same data (third rung); the data no longer fits the
+  memory or disk of one host, the database must decide access row by row, a
+  restore to a point in time is required that the backup of
+  0046-distribution-platform FR-013 cannot give, or sustained concurrent writes
+  exceed what one writer can serve (fourth rung). Convenience or familiarity
+  MUST NOT be a trigger.
+- **FR-051**: A database MUST NOT be the only place a fact of the Eidolon
+  lives. What a database holds that derives from the Eidolon, such as a search
+  index, MUST be rebuildable from the sources at any time. A generated page
+  MUST NOT read a database (FR-025).
+- **FR-052**: Moving between rungs MUST change an adapter and nothing else: the
+  application MUST reach its database through one interface it owns
+  (0046-distribution-platform FR-005), and all its data MUST be exportable in
+  an open format (0046-distribution-platform FR-008). A hosted libSQL database
+  and a PostgreSQL server are infrastructure under 0046-distribution-platform
+  FR-037, not a vendor capability.
+- **FR-053**: The application's database MUST be reachable only by the
+  application and never by the path that serves the generated files
+  (0033-systems-and-data-policy FR-008).
+
 ## Out of scope
 
 - Which destination hosts the website, which container host runs first,
@@ -338,6 +380,20 @@ content document is, 0002-content-format; how addresses map to content,
 - A generated page needs to show that a reader is signed in: it cannot, since
   the application does not alter a generated page at request time, per
   FR-025.
+- A page lists works by series or searches them: it is answered from the
+  in-memory index, per FR-048.
+- A reader's purchase is recorded: it is application state in the embedded
+  database on the volume, not an ontology individual, per FR-049.
+- A hosted libSQL database is proposed for a single container: refused, since
+  the second rung holds the data, per FR-050.
+- The application's search index is deleted: it is built again from the
+  sources, per FR-051.
+- A generated page needs a count from the application's database: it cannot,
+  since a generated page does not read a database, per FR-051 and FR-025.
+- The ontology no longer fits in the memory of one host: the fourth rung needs
+  a `Decision` that names the measurement, per FR-050.
+- The application moves from the embedded file to a hosted libSQL database:
+  only its adapter changes and its data is exported and read back, per FR-052.
 
 ## Assumptions
 
@@ -349,6 +405,10 @@ content document is, 0002-content-format; how addresses map to content,
 - Every host the application may run on offers a container runtime.
 - A container host can run an image that serves files from memory and answers
   a health address, so FR-035 needs no other service of the host.
+- The Eidolon's ontology, specs and content fit in the memory of one host. If
+  they stop fitting, the fourth-rung trigger of FR-050 applies.
+- The application writes from one container at first, so one database file with
+  one writer is enough until a trigger of FR-050 is met.
 
 ## Open questions
 
@@ -372,6 +432,11 @@ content document is, 0002-content-format; how addresses map to content,
 - **OQ-7**: Which container host runs first, Cloudflare Containers or an AWS
   container service, and the vendor onboarding Decision of each, are not
   decided; both are the decision authority's.
+- **OQ-8**: How a consistent copy of the embedded database file is taken and
+  restored for the backup test of 0046-distribution-platform FR-013 is not
+  decided.
+- **OQ-9**: Whether the in-memory index of FR-048 is queried with in-process
+  SPARQL or with lookups written for each page is not decided.
 
 ## Key entities
 
@@ -400,6 +465,11 @@ content document is, 0002-content-format; how addresses map to content,
   strategy, configuration file and deployment record.
 - **A deployment record** — the destination's file of every publish made
   to it.
+- **The data ladder** — the four rungs a website's data is held at, lowest
+  first: Git and the in-memory index, an embedded SQLite file, a hosted libSQL
+  database, a PostgreSQL server (FR-049).
+- **A trigger** — the measured condition that justifies a higher rung, named in
+  the `Decision` that moves to it (FR-050).
 
 ## Success criteria
 
@@ -426,13 +496,17 @@ content document is, 0002-content-format; how addresses map to content,
   rendering did not change is rendered again.
 - **SC-011**: The image run on the person's own computer answers every
   address as the image at a container host does.
+- **SC-012**: No generated page reads a database, and no database holds the
+  only copy of an Eidolon fact.
+- **SC-013**: Every database above the second rung has a `Decision` that names
+  its trigger and the measurement.
 
 ## Review & acceptance checklist
 
 - [x] Every requirement is testable (MUST / MUST NOT), not aspirational
 - [x] Only the mechanics the decision authority chose are named (the
-      program's language, the container hosts); the rest belongs to an
-      implementation plan
+      program's language, the container hosts, the data ladder's engines); the
+      rest belongs to an implementation plan
 - [x] Every open item is marked, not silently decided
 - [x] Public-safe: no confidential information, no unverified number stated
       as settled fact

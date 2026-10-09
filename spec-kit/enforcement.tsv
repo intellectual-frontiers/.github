@@ -1042,6 +1042,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0025-tooling-environment FR-028	check	.github: agora test	tests check that toolchain list returns the pinned packages and the node version
 0025-tooling-environment FR-029	none	-	the comparison runs in the repository that builds on this one; this repository has no such consumer to check
 0025-tooling-environment FR-030	review	0025-tooling-environment FR-030	the language of a program is judged in review; a reason for another language is read in the governing spec
+0025-tooling-environment FR-031	review	0025-tooling-environment FR-031	a program's language and its reason are judged in review; the eid command groups are Python by FR-030
+0025-tooling-environment FR-032	review	0025-tooling-environment FR-032	a Rust program's use of a library or a Python workaround is judged in review; tools/eid-shacl-parity compares the shacl crate with pyshacl and fails when a listed difference is gone or a new one appears
 0041-command-line FR-066	check	.github: agora check toolchain	fails an entry declared outside tools/agora/toolchain, a command, section, generator, runner or harness that names an entry that does not exist; doctor and the plan are computed from the registry
 0041-command-line FR-067	check	.github: agora test	tests drive toolchain list, show and add (fetch, check, dry-run, offline refusal, failing check); agora check commands compares them with the ontology
 0041-command-line FR-068	check	.github: agora check toolchain	fails an entry whose fields are incomplete, whose address is not https, whose version is a range or floating tag, or that lacks linux-x86_64; that a change of an entry is a commit of its own is a review judgment
@@ -1186,6 +1188,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0046-distribution-platform FR-034	none	-	the platform is not built yet
 0046-distribution-platform FR-035	none	-	the platform is not built yet
 0046-distribution-platform FR-036	none	-	the application is not built yet
+0046-distribution-platform FR-037	review	0046-distribution-platform FR-006	the dependency ledger is reviewed at least once a year
+0046-distribution-platform FR-038	none	-	the application is not built yet
 0047-digital-reflections FR-001	check	.github: agora check ontology	fails a reflection typed as more than one kind or none, and any two kinds not declared disjoint
 0047-digital-reflections FR-002	check	.github: agora check ontology	fails a reflection that does not name exactly one subject by IRI and a relationship end that is a literal; matching by name elsewhere is not tested
 0047-digital-reflections FR-003	none	-	a permission and a prohibition on requiring fidelity; nothing to test
@@ -1314,6 +1318,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0049-platforms FR-050	check	.github: agora check ontology	fails a module that realizes the programmatic interface without stating all four flavors with offersInterface; that it truly serves them is FR-049
 0049-platforms FR-051	none	-	a platform's interface profiles are its own specs; checked in the platform's repository
 0049-platforms FR-052	none	-	authentication, quotas, audit and generated documentation are in the platform's code; checked in its repository
+0049-platforms FR-053	none	-	a platform's storage generation is checked in its own repository
 0044-public-website FR-039	check	eidolon: eid check site	the check fails each of the five conditions; the Rust tests (check.rs) cover them
 0044-public-website FR-040	check	eidolon: eid test	the Rust tests (tests/served.rs) check the hashed addresses, the immutable header on /static/ and the header file; no check of a deployed host's headers
 0044-public-website FR-041	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the labels on the hunts pages
@@ -1323,3 +1328,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-045	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the patent and trademark pages
 0044-public-website FR-046	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the grouping and the filters
 0044-public-website FR-047	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the structured data, the sitemap and the companion list; the tools' events are not tested in a browser
+0044-public-website FR-048	none	-	the application is not built yet; eid-site answers its lookups from an in-memory index, with no check that it is the only way
+0044-public-website FR-049	review	0044-public-website FR-049	which rung a store sits at is judged in review
+0044-public-website FR-050	review	0044-public-website FR-050	a Decision that moves to a higher rung is read in review for its trigger and measurement
+0044-public-website FR-051	none	-	the application is not built yet; eid-site reads no database, with no check
+0044-public-website FR-052	none	-	the application is not built yet
+0044-public-website FR-053	none	-	the application is not built yet
