@@ -22,8 +22,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 - **FR-001**: A platform MUST be an Ergon whose subject is typed
   `ifcore:Platform` and that provides every capability of the kernel (FR-002),
   each realized by a module of it. A made system that lacks one capability MUST
-  NOT be called a platform. It is a product, a suite (products sold together), a
-  service or a solution (FR-004), and its record is typed accordingly.
+  NOT be called a platform. It is a product, a suite (FR-038), a service or a
+  solution (FR-004), and its record is typed accordingly.
 - **FR-002**: The kernel MUST be these eight capabilities, held as the concepts
   of `ifcore:PlatformCapabilityScheme`: the governed store; the ontology model;
   the integration seam; the assurance environment; the commitment ledger; the
@@ -90,17 +90,20 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 - **FR-012**: A module MUST carry a three-letter code (`ifcore:moduleCode`): the
   first letter of the platform's name, then the first letter of each of the two
   words, in capitals. A code MUST be unique within its platform. A code is
-  confirmed only when a person confirms it; a proposed code is marked as
-  proposed in the platform's own record of its modules.
+  confirmed only when a person confirms it. A module MUST state which it is by
+  `ifcore:codeStatus`, `confirmed` or `proposed`.
 - **FR-013**: An artifact that belongs to a module (a container image, a
   package, an interface path, a database namespace, an ontology prefix, a
   command) MUST be named with the platform's name and the module's full
   descriptive name in lowercase words joined by hyphens, never with its code.
-  The code is a short human name for conversation and tables.
+  A module MUST state that name as `ifcore:artifactName`. The code is a short
+  human name for conversation and tables.
 - **FR-014**: A solution, a product or a service MAY carry its own brand name,
   and the name of a product that already exists keeps its name. It MUST say,
   where its users could be misled about who runs it, that it is built on the
-  platform.
+  platform. A product that is the working implementation of a module MUST be
+  related to the module by `carriesOut`; the module keeps its plain name (FR-011)
+  and the product keeps its brand.
 
 ## The governed store and the ontology model
 
@@ -282,13 +285,56 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   locally with the evidence staying where the customer keeps it). The kernel
   MUST NOT be read to require any one host or deployment.
 
+## Suites
+
+- **FR-038**: A **suite** is a set of two or more products that are offered
+  together under one name, where each product can be used on its own and the
+  products need not share a store, a ledger, a catalog or an extension contract.
+  A suite shares at most a name, a purchase, a sign-in and agreed exchanges of
+  data between its products (`integratesWith`). A suite is an Ergon whose
+  subject is typed `ifcore:Suite`, and each member is related to it by
+  `partOf`. A suite is a fair and useful thing to build and sell. It is not a
+  lesser platform and it claims nothing about the kernel.
+- **FR-039**: `ifcore:Suite` and `ifcore:Platform` are disjoint: one subject MUST
+  NOT carry both types. A suite MUST have at least two members. A member of a
+  suite MAY also be a platform, a product or a solution. A suite MUST NOT have
+  modules (FR-007) and MUST NOT be named as the target of `builtOn`: nothing is
+  built on a suite as a whole, only on a product in it that is itself a
+  platform.
+- **FR-040**: The word `suite` MUST be used only for a subject typed
+  `ifcore:Suite`, and the word `platform` MUST be used only for one typed
+  `ifcore:Platform` (FR-003). Neither word is a synonym of the other or of
+  `product`, `portfolio` or `family`. A suite that gains the whole kernel and a
+  person's acceptance becomes a platform: a person creates the platform's
+  record as the replacement of the suite's record (0047-digital-reflections
+  FR-032), and the products that were its members become its modules or
+  products built on it. A platform that loses a capability and cannot restore
+  it is retyped as a suite or a product by a person in the same way. A text that
+  calls a suite a platform, or the reverse, is a defect that review corrects.
+
+## Generalizing
+
+- **FR-041**: A requirement stated in the specs of one platform that would read
+  the same in the specs of another platform, once the domain words are replaced
+  by the words of this spec, MUST be lifted into this spec (or into a spec of
+  its own, when it is large) and cited by the platform's spec. The platform's
+  spec MUST then keep only what is particular to its domain. A requirement that
+  holds only because of a domain rule (a clinical rule, a regulatory rule, a
+  standard) MUST stay in the platform's spec. When it is unclear which, the
+  requirement stays where it is and is listed as an open question of this spec.
+  A platform's checks that duplicate a check of the public root MUST be replaced
+  by the public check as soon as the platform's repository can run it.
+
 ## Checking
 
 - **FR-037**: `agora check ontology` MUST fail a record typed `ifcore:Platform`
   that no module of it realizes the whole kernel for (FR-001, FR-002), a module
   with no layer or more than one, a module whose name, code or uniqueness breaks
-  FR-011 and FR-012, a dependency that breaks FR-008 or FR-010, and a `builtOn`
-  or `partOf` whose target is not typed `ifcore:Platform` (FR-006, FR-007).
+  FR-011 and FR-012, a dependency that breaks FR-008 or FR-010, a `builtOn`
+  or `partOf` whose target is not typed `ifcore:Platform` (FR-006, FR-007), a
+  module with no artifact name or a wrong one, or with no code status (FR-012,
+  FR-013), a subject typed both platform and suite, a suite with fewer than two
+  members, a suite with modules, and a `builtOn` of a suite (FR-039).
   What the check cannot test (the three tests of FR-003, the content of a
   module) is a person's review of the platform's record.
 
@@ -305,7 +351,19 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 
 - A suite of four products, sold together, none of which is a store, a ledger or
   a catalog: it lacks the kernel, so it is not a platform, per FR-001 and
-  FR-002.
+  FR-002; it is a suite, per FR-038.
+- A suite whose products later share one store, one ledger and the rest of the
+  kernel: a person accepts a platform record as its replacement, and the products
+  become modules or built-on products, per FR-040.
+- A platform whose one module has lost a capability and cannot restore it: it
+  stops being a platform and a person retypes it, per FR-040.
+- A product that is part of a suite and is also a platform: both are true, per
+  FR-039.
+- A requirement in one platform's spec that another platform would repeat: it is
+  lifted here, per FR-041.
+- A product with a long-established brand that implements a module: the module
+  keeps its plain name and the product is related to it by `carriesOut`, per
+  FR-014.
 - A system that has all eight capabilities but only its builder can extend it:
   it fails the third-party test and is not accepted as a platform, per FR-003.
 - A new service wants its own database for governed data: refused; it makes a
@@ -356,9 +414,9 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   requires the capability; it does not decide whether the code is shared.
 - **OQ-2**: Whether the offer kinds (FR-004) need a fifth kind for a dataset or
   a catalog that is sold on its own.
-- **OQ-3**: How the records of existing products that are typed as
-  organizations are reclassified. A reclassification is a person's decision,
-  separate from this spec (0047-digital-reflections FR-032, FR-033).
+- **OQ-3**: Whether a platform that has the kernel only in specification, with
+  no module built yet, is shown differently from one that runs. The kernel
+  asks for a named, designed module; it does not yet ask for a built one.
 
 ## Key entities
 
@@ -376,6 +434,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   closed on evidence.
 - **The three zones** - received, modelled, derived.
 - **A published interface** - the only way one module reaches another.
+- **A suite** (`ifcore:Suite`) - two or more products offered together under one
+  name, each usable alone, with no kernel claimed.
 
 ## Success criteria
 
@@ -388,6 +448,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 - **SC-004**: The worked example conforms with no finding.
 - **SC-005**: A `builtOn` or `partOf` that names a thing not typed
   `ifcore:Platform` fails the check in a test.
+- **SC-006**: A subject typed both platform and suite, a suite with one member,
+  and a suite with modules each fail the check in a test.
 
 ## Review & acceptance checklist
 

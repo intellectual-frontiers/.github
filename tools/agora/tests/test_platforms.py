@@ -21,7 +21,7 @@ def rel(n: str, typ: str, frm: str, to: str) -> str:
 
 
 def mod(key: str, label: str, code: str, layer: str = "PlatformServicesLayer", platform: str = "ExamplePlatform") -> str:
-    return (f'ex:{key} a ifcore:PlatformModule ; rdfs:label "{label}"@en ; ifcore:moduleCode "{code}" ; ifcore:platformLayer ifcore:{layer} ; {PUB} .\n'
+    return (f'ex:{key} a ifcore:PlatformModule ; rdfs:label "{label}"@en ; ifcore:moduleCode "{code}" ; ifcore:artifactName "{'-'.join(w.lower() for w in label.split())}" ; ifcore:codeStatus "confirmed" ; ifcore:platformLayer ifcore:{layer} ; {PUB} .\n'
             + rel("P" + key, "PartOf", key, "ex:" + platform))
 
 
@@ -70,7 +70,7 @@ class Kernel(unittest.TestCase):
 
 class Layers(unittest.TestCase):
     def test_a_module_needs_exactly_one_layer(self):
-        out = messages(BODY + f'ex:Loose a ifcore:PlatformModule ; rdfs:label "Example Loose Module"@en ; ifcore:moduleCode "ELM" ; {PUB} .\n')
+        out = messages(BODY + f'ex:Loose a ifcore:PlatformModule ; rdfs:label "Example Loose Module"@en ; ifcore:moduleCode "ELM" ; ifcore:artifactName "example-loose-module" ; ifcore:codeStatus "confirmed" ; {PUB} .\n')
         self.assertTrue(any("exactly one layer" in m for m in out), out)
 
     def test_a_dependency_may_not_skip_a_layer(self):
@@ -110,6 +110,46 @@ class Naming(unittest.TestCase):
     def test_a_code_is_unique_within_a_platform(self):
         out = messages(BODY + mod("Other", "Example Distributed Storage", "EDS", "DataLayer"))
         self.assertTrue(any("also the code of" in m for m in out), out)
+
+
+class Artifacts(unittest.TestCase):
+    def test_an_artifact_name_built_on_the_code_is_reported(self):
+        out = messages(BODY.replace('ifcore:artifactName "example-data-store"', 'ifcore:artifactName "example-eds"'))
+        self.assertTrue(any("artifactName" in m for m in out), out)
+
+    def test_a_missing_artifact_name_is_reported(self):
+        out = messages(BODY.replace('ifcore:artifactName "example-data-store" ; ', ''))
+        self.assertTrue(any("artifactName" in m for m in out), out)
+
+    def test_a_code_status_is_confirmed_or_proposed(self):
+        self.assertEqual(messages(BODY.replace('ifcore:codeStatus "confirmed"', 'ifcore:codeStatus "proposed"', 1)), [])
+        out = messages(BODY.replace('ifcore:codeStatus "confirmed"', 'ifcore:codeStatus "maybe"', 1))
+        self.assertTrue(any("codeStatus" in m for m in out), out)
+
+
+class Suites(unittest.TestCase):
+    def test_a_suite_is_an_ergon_subject(self):
+        self.assertEqual(r.resolve_types(graph(), [pl.SUITE])[0], "ergon")
+
+    def test_a_subject_is_not_both(self):
+        out = messages(BODY + "ex:Both a ifcore:Platform, ifcore:Suite ; rdfs:label \"Both\"@en ; " + PUB + " .\n")
+        self.assertTrue(any("both ifcore:Platform and ifcore:Suite" in m for m in out), out)
+
+    def test_a_suite_needs_two_members(self):
+        out = messages(BODY.replace("ex:RS2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ;", "ex:RS2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:IntegratesWith ;"))
+        self.assertTrue(any("at least two products" in m for m in out), out)
+
+    def test_a_suite_has_no_modules(self):
+        out = messages(BODY + rel("M1", "PartOf", "DataStore", "ex:ExampleSuite"))
+        self.assertTrue(any("a suite has no modules" in m for m in out), out)
+
+    def test_nothing_is_built_on_a_suite(self):
+        out = messages(BODY + rel("B1", "BuiltOn", "IntakeSolution", "ex:ExampleSuite"))
+        self.assertTrue(any("nothing is built on a suite" in m for m in out), out)
+
+    def test_a_product_may_be_in_a_suite_and_be_a_platform(self):
+        extra = rel("M2", "PartOf", "ExamplePlatform", "ex:ExampleSuite")
+        self.assertEqual(messages(BODY + extra), [])
 
 
 class Offers(unittest.TestCase):
