@@ -559,9 +559,11 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0019-controlled-vocabulary FR-004	review	0019-controlled-vocabulary FR-007	review identifies a term lacking both a mapping and a Decision
 0019-controlled-vocabulary FR-005	review	0019-controlled-vocabulary FR-007	judged at review time, per the spec out of scope
 0019-controlled-vocabulary FR-006	none	-	constraint on the review itself; nothing checks it
-0019-controlled-vocabulary FR-007	none	-	defines the review; nothing ensures it happens
-0019-controlled-vocabulary FR-008	none	-	no check
-0019-controlled-vocabulary FR-009	none	-	no point-of-change gate exists; FR-007 review finds such terms only afterward
+0019-controlled-vocabulary FR-007	check	.github: agora check vocabulary	the scan lists every term with no established mapping and no Decision; the weekly AI Audit starts from it and judges each
+0019-controlled-vocabulary FR-008	review	0019-controlled-vocabulary FR-007	the audit flags candidates; a person decides each
+0019-controlled-vocabulary FR-009	check	.github: agora check vocabulary	unmapped terms are warnings in every run; the audit report is the control, never a gate
+0019-controlled-vocabulary FR-010	check	.github: agora check vocabulary	the scan reads every ontology of the public root and each vault, the platforms included; the audit judges equivalence
+0019-controlled-vocabulary FR-011	review	0019-controlled-vocabulary FR-007	the audit rejects an exception that lacks a Decision, a distinct meaning or the company's own research
 0020-spec-format FR-001	none	-	broad; its concrete parts are checked under FR-005
 0020-spec-format FR-002	none	-	no check looks for plan or tasks files
 0020-spec-format FR-003	none	-	inline clarification markers are not scanned for

@@ -13,7 +13,7 @@ from agora.core import (Action, AgoraError, Arg, ArgType, Call, Choice, Ctx, Dyn
 from agora.core import files, invocation
 from agora.core.registry import context_for
 from agora.core.resource import FAILED, OK, USAGE
-from agora.lib import controls, design_systems, noemas, ontology, reflections, register, specs, terms
+from agora.lib import controls, design_systems, noemas, ontology, reflections, register, specs, terms, vocabulary
 from agora.lib.names import ID_IN, MECHANISMS, names
 
 TEXT_LEN = 160
@@ -691,6 +691,15 @@ def check_ontology(ctx: Ctx, scope: str | None) -> SectionResult:
     findings = ontology.check_prefixes(ctx.root) + ontology.check_design_systems(ctx.root, ctx.public) \
         + reflections.check(ctx.root, ctx.public)
     return SectionResult.from_findings("ontology", findings)
+
+
+@section("vocabulary")
+def check_vocabulary(ctx: Ctx, scope: str | None) -> SectionResult:
+    terms_ = vocabulary.scan({"repository": ctx.root})
+    s = vocabulary.summary(terms_)
+    notes = [f"vocabulary: {s['terms']} terms: {s['reused']} reused, {s['excepted']} excepted by a Decision, {s['unmapped']} unmapped "
+             "(0019 FR-009; the weekly AI Audit judges the unmapped, `spec-kit/audits/vocabulary-drift.md`)"]
+    return SectionResult.from_findings("vocabulary", vocabulary.findings(terms_), notes, {"summary": s, "unmapped": vocabulary.rows(terms_, "unmapped")})
 
 
 # design-system -----------------------------------------------------------------------------------------------------

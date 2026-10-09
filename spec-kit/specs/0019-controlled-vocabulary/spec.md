@@ -45,18 +45,48 @@ sooner.
 
 ## Reconsidering vocabulary over time
 
-- **FR-007**: The ontology MUST be reviewed, on a recurring, bounded
-  cadence, for a term that could now be replaced by an established one —
-  including a term that had no obvious established equivalent when it was
-  declared but does now.
-- **FR-008**: A review under FR-007 MUST only flag a candidate; it MUST NOT
+- **FR-007**: The ontologies MUST be audited every week for a term that an
+  established one could replace, including a term that had no established
+  equivalent when it was declared but has one now. The audit is an AI Audit:
+  it follows the procedure in `spec-kit/audits/vocabulary-drift.md`, starts from the
+  deterministic scan (`agora check vocabulary`), checks each candidate against
+  its source, and reports to the decision authority by email and by a written
+  report kept in `spec-kit/audits/vocabulary-drift/`.
+- **FR-008**: An audit under FR-007 MUST only flag a candidate; it MUST NOT
   rename or remove a term by itself. Acting on a flagged candidate follows
   the same spec-before-ontology-before-implementation order as any other
-  ontology change, per 0001-eidolon-architecture FR-037.
-- **FR-009**: A change introducing a term with neither an established
-  equivalent (FR-001–FR-003) nor a Decision justifying it (FR-004) MUST be
-  prevented from reaching the ontology, caught before the change is
-  accepted — not left for FR-007's review to find afterward.
+  ontology change, per 0001-eidolon-architecture FR-037. A person decides
+  each candidate: replace the term, map it to the established term, or record
+  an exception Decision.
+- **FR-009**: A term with neither an established equivalent (FR-001 to FR-003,
+  FR-010) nor a Decision justifying it (FR-004, FR-011) is a finding of the
+  next audit. The scan lists it as unmapped. A term is mapped when it
+  specializes or declares itself a match of an established term (a
+  parent such as `prov:Entity` or `skos:Concept` is too general to count), and
+  it is excepted when a Decision names it with `dcterms:subject`. The scan is
+  a report and never stops a change; the audit and its report are the control.
+
+## The rule
+
+- **FR-010**: A term MUST NOT be invented when an existing term will work. An
+  existing term works when it names the same concept, or a concept the new one
+  is a kind of, in an established vocabulary, in a recognized standard, or in
+  the ordinary professional usage of the field the term serves (for example a
+  standard of ISO, NIST, W3C, the AICPA or a regulator; PROV-O, schema.org,
+  SKOS, Dublin Core, ODRL, the W3C Organization Ontology). The rule covers
+  every class, property, concept scheme and concept of every ontology the
+  company keeps, in the public root and in every vault, including the
+  ontologies of the platforms and products it sponsors or builds (Physia and
+  the Opsfolio platform among them), and every name those ontologies give a
+  module, a scheme or a stage.
+- **FR-011**: The exception for the company's own named concepts is narrow.
+  A term is the company's own concept only when it comes from the company's
+  own research, differs in meaning from any standard business or technical
+  term, and a Decision under FR-004 says so. `Native Alpha`, `Acquired Alpha`
+  and the three kinds of reflection (`Eidolon`, `Ergon`, `Noema`) are the
+  standing examples. A name chosen for distinctiveness, brand or brevity is
+  not a reason (FR-003). A name borrowed from another language or field
+  (for example from Greek) is not original for that reason.
 
 ## Out of scope
 
@@ -64,10 +94,9 @@ sooner.
   list is illustrative, not closed), and how a review tells a genuine
   exception from an unjustified invention, are matters of judgment applied
   at review time, not fixed by this spec.
-- FR-007's recurring review and FR-009's point-of-change gate are
-  requirements on what MUST happen; their schedule, the mechanism that
-  carries either out, and any tooling involved are implementation detail,
-  per 0001-eidolon-architecture's standard for what a spec does not fix.
+- The audit's day and hour, the mail service it uses, and the scan's
+  implementation are implementation detail, per 0001-eidolon-architecture's
+  standard for what a spec does not fix.
 - Renaming a term that FR-007 surfaces as a current candidate is a decision
   to make when it happens, not restated here.
 
@@ -98,15 +127,7 @@ sooner.
 
 ## Open questions
 
-- **OQ-1**: No rule yet states how a candidate FR-007 flags is surfaced to
-  whoever holds decision authority over it, as distinct from that judgment
-  happening informally today.
-- **OQ-2**: Whether FR-009's gate applies to every Eidolon repository, or
-  only the ones that commit ontology files directly — a venture's own
-  ontology extension, for instance — is not yet decided.
-- **OQ-3**: Whether these rules apply to a term FR-001 does not list — an
-  `owl:AnnotationProperty`, a SHACL shape, or a SKOS concept scheme — is
-  not stated.
+- None open.
 
 ## Key entities
 
@@ -125,11 +146,11 @@ sooner.
   `rdfs:subClassOf`, or carries a `Decision` justifying it.
 - **SC-002**: No term already justified by a standing Decision is
   re-justified by a new one (FR-006).
-- **SC-003**: A recurring review identifies, for any term lacking both an
+- **SC-003**: The weekly audit lists, for any term lacking both an
   established mapping and a Decision, exactly that gap — no more, no
   fewer.
-- **SC-004**: No change introducing an unjustified novel term reaches the
-  ontology without being caught first (FR-009).
+- **SC-004**: Every week a report exists in `spec-kit/audits/vocabulary-drift/`
+  and has been mailed to the decision authority (FR-007).
 
 ## Review & acceptance checklist
 
