@@ -34,7 +34,7 @@
 
   suite("Page frame", {
     group: "Integration", needs: "http",
-    description: "Header, breadcrumb band and footer behave as chrome.md describes: the header is sticky, the footer is one column on phones and four from 48rem, the content is capped at the page measure, and the section menu is a native popover.",
+    description: "Header, breadcrumb band and footer behave as chrome.md describes: the header is sticky, the footer is one column on phones and four from 48rem, the content is capped at the page measure, and a long breadcrumb trail folds into a native popover menu.",
   }, (s) => {
     s.test("the header is sticky and stays above content while scrolling", (t) => withFrame({ width: 1280, height: 500 }, async (f) => {
       t.equal(f.style(f.$(".site-header"), "position"), "sticky");
@@ -49,10 +49,12 @@
     s.test("page content is capped at --measure-page (72rem) on wide screens", (t) => withFrame({ width: 1600 }, (f) => {
       t.near(f.$(".page").getBoundingClientRect().width, 1152, 1);
     }));
-    s.test("section menu: native popover opens and closes", (t) => withFrame({ width: 1280 }, async (f) => {
-      const panel = f.$("#menu-section");
+    s.test("breadcrumb menu: a long trail folds into a native popover that opens and closes", (t) => withFrame({ width: 1280 }, async (f) => {
+      const panel = f.$("#menu-crumbs");
       if (!panel.showPopover) t.skip("this browser has no Popover API");
-      f.$(".menu__button").click(); await sleep(40);
+      t.equal(f.style(f.$(".crumbs__fold"), "display"), "flex", "the fold is shown");
+      t.equal(f.style(f.$$(".crumbs ol > li")[2], "display"), "none", "a folded crumb is hidden");
+      f.$(".menu--crumbs .menu__button").click(); await sleep(40);
       t.equal(panel.matches(":popover-open"), true, "opened"); t.ok(panel.getBoundingClientRect().height > 0, "panel has size");
       panel.hidePopover(); await sleep(20); t.equal(panel.matches(":popover-open"), false, "closed");
     }));

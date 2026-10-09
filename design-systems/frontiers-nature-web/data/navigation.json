@@ -1,5 +1,5 @@
 {
-  "$comment": "The site navigation the chrome renders: primary nav, section menus and their path prefixes, breadcrumb parents, and the footer (chrome.md). Trails for individual records are a consumer's own.",
+  "$comment": "The site navigation the chrome renders: primary nav, each section's path prefixes (which primary link is active), breadcrumb parents, and the footer (chrome.md). Trails for individual records are a consumer's own.",
   "primary": [
     { "to": "/portfolio", "label": "Portfolio" },
     { "to": "/ip", "label": "Research" },
@@ -11,30 +11,15 @@
   "sections": [
     {
       "label": "Portfolio",
-      "prefixes": ["/portfolio"],
-      "items": [
-        { "to": "/patents", "label": "Patent register" },
-        { "to": "/capital", "label": "Funds" },
-        { "to": "/studios", "label": "Ventures" },
-        { "to": "/press", "label": "Publishing" }
-      ]
+      "prefixes": ["/portfolio"]
     },
     {
       "label": "The firm",
-      "prefixes": ["/about", "/faq", "/contact"],
-      "items": [
-        { "to": "/faq", "label": "Questions" },
-        { "to": "/contact", "label": "Contact" }
-      ]
+      "prefixes": ["/about", "/faq", "/contact"]
     },
     {
       "label": "Native Alpha™",
-      "prefixes": ["/native-alpha"],
-      "items": [
-        { "to": "/topics", "label": "Topics" },
-        { "to": "/use-cases", "label": "Use cases" },
-        { "to": "/market-potential", "label": "Market potential" }
-      ]
+      "prefixes": ["/native-alpha"]
     },
     {
       "label": "Research",
@@ -42,17 +27,6 @@
         "/ip", "/patents", "/patent-summaries", "/defensive-disclosures",
         "/submit-a-disclosure", "/research", "/research-notes", "/research-papers",
         "/topics", "/trademarks"
-      ],
-      "items": [
-        { "to": "/research", "label": "Research" },
-        { "to": "/topics", "label": "Research areas" },
-        { "to": "/research-papers", "label": "Research papers" },
-        { "to": "/research-notes", "label": "Research notes" },
-        { "to": "/patents", "label": "Patent register" },
-        { "to": "/patent-summaries", "label": "Patent summaries" },
-        { "to": "/trademarks", "label": "Trademarks" },
-        { "to": "/defensive-disclosures", "label": "Defensive disclosures" },
-        { "to": "/submit-a-disclosure", "label": "Submit a disclosure" }
       ]
     },
     {
@@ -60,50 +34,19 @@
       "prefixes": [
         "/capital", "/capital/seed-readiness", "/capital/care-delivery-fund-i",
         "/capital/care-delivery-fund-ii", "/market-potential"
-      ],
-      "items": [
-        { "to": "/capital/seed-readiness", "label": "Seed readiness" },
-        { "to": "/capital/care-delivery-fund-i", "label": "Care Delivery Fund I" },
-        { "to": "/capital/care-delivery-fund-ii", "label": "Care Delivery Fund II" },
-        { "to": "/market-potential", "label": "Market potential" },
-        { "to": "/use-cases", "label": "Use cases" },
-        { "to": "/contact", "label": "Contact" }
       ]
     },
     {
       "label": "Press",
-      "prefixes": ["/press", "/blogs"],
-      "items": [
-        { "to": "/press", "label": "Books & works" },
-        { "to": "/press/about", "label": "About Intellectual Frontiers Press" },
-        { "to": "/blogs", "label": "Writing" },
-        { "to": "/patent-summaries", "label": "Patent summaries" },
-        { "to": "/press/ai-slop-check", "label": "AI Slop Check" },
-        { "to": "/contact", "label": "Contact" }
-      ]
+      "prefixes": ["/press", "/blogs"]
     },
     {
       "label": "Network",
-      "prefixes": ["/network"],
-      "items": [
-        { "to": "/network/how-it-works", "label": "How it works" },
-        { "to": "/network/hunts", "label": "Current hunts" },
-        { "to": "/network/ask", "label": "Ask Network" },
-        { "to": "/contact", "label": "Contact" }
-      ]
+      "prefixes": ["/network"]
     },
     {
       "label": "Studios",
-      "prefixes": ["/studios", "/use-cases"],
-      "items": [
-        { "to": "/studios", "label": "Ventures & companies" },
-        { "to": "/studios/about", "label": "About IF Studios" },
-        { "to": "/studios/ventures", "label": "Ventures" },
-        { "to": "/studios/software", "label": "Software" },
-        { "to": "/use-cases", "label": "Use cases" },
-        { "to": "/submit-a-disclosure", "label": "Submit a disclosure" },
-        { "to": "/contact", "label": "Contact" }
-      ]
+      "prefixes": ["/studios", "/use-cases"]
     }
   ],
   "staticPages": {

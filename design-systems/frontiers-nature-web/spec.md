@@ -74,18 +74,18 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
   "Breadcrumb", an ordered list whose first item links home and whose last item is the current
   page, marked `aria-current="page"`, the only such item, with matching BreadcrumbList JSON-LD. A
   long trail MUST fold its middle crumbs into a menu as `chrome.md` describes, by the
-  `data-fold-sm`, `data-fold-lg` and `data-tail-lg` attributes, in CSS alone.
-- **FR-014**: A section with more than three items MUST present them in a section menu built on
-  the native Popover API (`button[popovertarget]` and a `[popover]` panel), which opens on
-  activation and closes on outside click or Escape; a section with three or fewer MUST use
-  `nav.section-nav`.
+  `data-fold-sm`, `data-fold-lg` and `data-tail-lg` attributes, in CSS alone. The menu MUST be
+  built on the native Popover API (`button[popovertarget]` and a `[popover]` panel), which opens
+  on activation and closes on outside click or Escape.
+- **FR-014**: Retired. A page carries no section menu: a section's pages are reached from the
+  primary navigation and the breadcrumb trail (FR-012, FR-013).
 - **FR-015**: The footer MUST be one column below 48rem and four from 48rem (the logo and tagline,
   then three labelled columns), followed by the legal line.
 - **FR-016**: A page MUST use only the class names this design system's CSS defines, every `nav`
   MUST be labelled, every `id` unique, every in-page anchor MUST resolve, every `img` MUST carry
   `alt`, and no script, stylesheet or image MAY load from another origin.
 - **FR-017**: No page MAY overflow the viewport horizontally at any width from 320px.
-- **FR-018**: `data/navigation.json` MUST hold the primary navigation, each section's menu and
+- **FR-018**: `data/navigation.json` MUST hold the primary navigation, each section's
   path prefix, breadcrumb parents and the footer, and the chrome MUST be rendered from it.
 
 ## Layouts and the template vocabulary
@@ -117,10 +117,9 @@ content uses, and the tokens behind them, themed by any brand that supplies the 
 
 ## Edge cases
 
-- A section with exactly three items: it uses `nav.section-nav`, not a menu, per FR-014.
 - The home page: it has no breadcrumb band, per FR-013.
-- A browser without the Popover API: the menu's panel does not open as a popover; the harness
-  reports that test as skipped, per FR-014 and 0014-design-systems FR-015.
+- A browser without the Popover API: the breadcrumb menu's panel does not open as a popover; the
+  harness reports that test as skipped, per FR-013 and 0014-design-systems FR-015.
 - A page opened without script: the shelf is a scrollable row, per FR-010.
 - A consumer that renders the markup without the template vocabulary: it writes the same classes
   and attributes directly, per FR-019 and FR-020.

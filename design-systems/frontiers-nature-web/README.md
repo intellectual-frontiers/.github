@@ -16,7 +16,7 @@ a little vanilla JavaScript with one web component: no framework, no build step.
 | `css/bundle.txt` | Cascade order for concatenation. |
 | `templating.md` | The optional server-side template vocabulary the markup contract is written against (spec FR-020). |
 | `data/registry.json` | The `app-*`, `data-app-*` and `if-*` names of that vocabulary. |
-| `data/navigation.json` | Primary nav, section menus and prefixes, breadcrumb parents, footer. |
+| `data/navigation.json` | Primary nav, section prefixes, breadcrumb parents, footer. |
 | `js/chrome.js` | Defines the `if-shelf` web component. The only first-party script. |
 | `js/datastar.js` | Datastar bundle, loaded only by pages that need server-driven interactivity — the one interactivity dependency this design system names (0014-design-systems FR-008), opt-in per page, never loaded globally. |
 | `tokens.json` | Machine-readable tokens. |

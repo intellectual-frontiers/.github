@@ -509,8 +509,8 @@ frontiers-nature-web FR-009	check	.github: agora check design-systems --runner b
 frontiers-nature-web FR-010	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Stylesheet discipline: chrome.js defines if-shelf, no modules or network; Datastar opt-in not checked
 frontiers-nature-web FR-011	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract and Page frame: one main, one h1, page capped at 72rem
 frontiers-nature-web FR-012	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: header, labelled primary nav, current section; Page frame: sticky header
-frontiers-nature-web FR-013	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: breadcrumbs ordered, first home, one current; fold attributes not checked
-frontiers-nature-web FR-014	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: section menu popover opens and closes
+frontiers-nature-web FR-013	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: breadcrumbs ordered, first home, one current; Page frame: a long trail folds into a popover menu that opens and closes
+frontiers-nature-web FR-014	none	-	retired: a page carries no section menu (FR-012, FR-013)
 frontiers-nature-web FR-015	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: footer columns at 390, 767, 768 and 1280px
 frontiers-nature-web FR-016	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Markup contract: labelled navs, unique ids, anchors, alt, nothing external; class names not checked
 frontiers-nature-web FR-017	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Page frame: no horizontal overflow at 320 to 1280px
