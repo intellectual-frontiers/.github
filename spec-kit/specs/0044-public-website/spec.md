@@ -106,6 +106,18 @@ content document is, 0002-content-format; how addresses map to content,
   A page that names such an author (a book, a paper, a Journal article, a
   patent) MUST link the name to the profile and MUST NOT repeat the
   biography. An author with no biography is shown by name only.
+- **FR-056**: A book's page MAY offer a preview: pages of the book that a
+  person's Decision makes Public, stated as a part of the book (a
+  `schema:CreativeWork` that `schema:isPartOf` the book, its pages as
+  `schema:pagination`, at the Public audience). No other page of an
+  announced book's manuscript MAY appear (FR-003). The preview MUST be
+  read in the page's own reader and MUST NOT be offered as a download: the
+  website MUST NOT serve the book's PDF or any other rendition for it, and
+  MUST serve each previewed page only as an image whose tiles are shuffled,
+  which the reader puts back together on a canvas with a watermark that
+  names the website and the page. The reader MUST show no text layer, MUST
+  hide the pages when printed, and MUST show the preview's pages, the
+  book's page count and a way to ask for the book.
 
 ## Addresses
 
@@ -358,6 +370,11 @@ content document is, 0002-content-format; how addresses map to content,
   rules unchanged.
 
 ## Edge cases
+- A book with no preview Decision: its page offers no preview and the
+  website serves no image of its pages, per FR-056 and FR-003.
+- A preview image saved from the browser: it is a shuffle of tiles, not a
+  readable page, per FR-056. A screen capture of the reader is not
+  prevented; the watermark names its source.
 
 - A book at Review that is announced: its page shows its public record
   and "forthcoming", never its manuscript or a download, per FR-003,
@@ -456,6 +473,11 @@ content document is, 0002-content-format; how addresses map to content,
   decided.
 - **OQ-9**: Whether the in-memory index of FR-048 is queried with in-process
   SPARQL or with lookups written for each page is not decided.
+- **OQ-10**: Which books offer a preview, and which of their pages, is
+  not decided; until a person records it, no book offers one (FR-056).
+- **OQ-11**: Whether a preview is shown only to a reader who signs in,
+  and whether encrypted media (a DRM licence server) protects it against
+  screen capture, is not decided; both need the application (FR-024).
 
 ## Key entities
 

@@ -1339,6 +1339,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-053	none	-	the application is not built yet
 0044-public-website FR-054	check	eidolon: eid test	the Rust tests (src/render/layout.rs) check the trail, the one current crumb and the fold; the sticky band and the menu are not tested in a browser
 0044-public-website FR-055	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the profile pages, their works and the links from a book, a paper and a patent; no biography on a book page
+0044-public-website FR-056	check	eidolon: eid check site	the check fails a preview image of a book with no Public preview part, and any PDF under /books/; the Rust tests check the reader, the shuffled tiles and the watermark
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
