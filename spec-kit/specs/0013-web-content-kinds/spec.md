@@ -51,7 +51,7 @@ FR-007.
 - **FR-010**: `ifweb:PortfolioIndexPage` MUST NOT assert any fact about a
   specific work. It MAY list any number of individuals already declared
   elsewhere in the ontology, of any combination of: `ifcore:PatentFamily`,
-  `ifcore:Trademark`, `ifcore:DefensiveDisclosure`, `ifcore:Fund`,
+  `ifcore:Patent`, `ifcore:Trademark`, `ifcore:DefensiveDisclosure`, `ifcore:Fund`,
   `schema:Book`, `ifcore:ResearchPillar`, `ifcore:SubstantialWork`,
   `ifcore:VentureCategory`,
   `ifcore:SoftwareCategory`, or `ifcore:SharedServiceCategory`.
@@ -76,14 +76,29 @@ FR-007.
   page, a show-notes page — and asserts no fact the work's source does not
   already carry.
 
+## Supporting assets of a patent
+
+- **FR-014**: `ifweb:PatentSummaryPage` MUST declare `schema:about` naming
+  exactly one `ifcore:Patent` individual: the patent it explains in plain
+  language (0051-patent-portfolio FR-007).
+- **FR-015**: `ifweb:UseCasePage`, `ifweb:MarketPotentialPage`,
+  `ifweb:PatentLandscapePage` and `ifweb:PodcastEpisodePage` MUST each
+  declare `schema:about` naming exactly one `ifcore:Patent` or exactly one
+  `ifcore:PatentFamily` individual (0051-patent-portfolio FR-004).
+- **FR-016**: A supporting asset page MUST NOT carry a patent's registry
+  facts as its own: a status, a date or a claim it shows comes from the
+  patent's `ExternalRecordReference`, per FR-004 and 0051-patent-portfolio
+  FR-008. A `PodcastEpisodePage` MAY name the address of its audio in
+  rendition storage as `schema:associatedMedia`.
+
 ## Out of scope
 
-- A content kind for any legacy, thin, or pre-rebrand content collection
-  (a blog post, a market-potential record, a use case, a patent-landscape
-  record, a plain-language patent summary, a cross-cutting topic page) is
-  deliberately not established here. Whether, and which, of that content
-  is worth curating forward is an editorial decision for the owning unit,
-  not a migration this spec performs.
+- A content kind for any other legacy, thin, or pre-rebrand content
+  collection (a blog post, a cross-cutting topic page) is deliberately
+  not established here. Whether, and which, of that content is worth
+  curating forward is an editorial decision for the owning unit, not a
+  migration this spec performs. The supporting assets of a patent are
+  curated forward under FR-014 to FR-016.
 - Brand and visual identity (a unit's color, logotype, typography, voice
   rules) is a web property design-system concern, not ontology data, and
   is out of scope entirely — not merely deferred.
@@ -131,9 +146,10 @@ FR-007.
 
 ## Open questions
 
-- **OQ-1**: Which legacy Record-shaped content is curated forward into
-  content documents, and under which content kind, is not stated; until then
-  the public website carries all of it as an archive read from its snapshot
+- **OQ-1**: Which legacy Record-shaped content other than the supporting
+  assets of a patent (FR-014 to FR-016) is curated forward into content
+  documents, and under which content kind, is not stated; until then the
+  public website carries it as an archive read from its snapshot
   (0044-public-website FR-013).
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own

@@ -205,4 +205,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Participation: work that invites the other side in
 
+|`0051-patent-portfolio`
+|Draft
+|Patent portfolio: patents, their supporting assets, and the pages that offer them
+
 |===

@@ -114,7 +114,7 @@ content document is, 0002-content-format; how addresses map to content,
   FR-007).
 - **FR-013**: Until a register's records are held in the public root, the
   generator MAY read that register from a snapshot of the previous
-  website's data held in the vault: patents, trademarks, defensive
+  website's data held in the vault: trademarks, defensive
   disclosures, research areas, pillars, notes and papers, funds, ventures,
   companies, the Network's hunts, owned channels, the company's own
   descriptive text, the home page's picture, and the previous website's

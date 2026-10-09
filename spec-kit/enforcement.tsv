@@ -271,6 +271,9 @@ requirement	mechanism	by	note
 0013-web-content-kinds FR-011	check	eidolon: eid check content	featuresWork sh:or rejects any class not in the list
 0013-web-content-kinds FR-012	check	eidolon: eid check content	WorkPage shape: one schema:about of class ifcore:SubstantialWork
 0013-web-content-kinds FR-013	check	eidolon: eid check content	shape checks both point to a SubstantialWork, not that they name the same one
+0013-web-content-kinds FR-014	check	eidolon: eid check content	shape checks one schema:about Patent
+0013-web-content-kinds FR-015	check	eidolon: eid check content	shape checks one schema:about Patent or PatentFamily
+0013-web-content-kinds FR-016	check	eidolon: eid check site	a supporting asset page shows registry facts only from registers/patents; associatedMedia is shape-checked
 0014-design-systems FR-001	none	-	definition; nothing to test
 0014-design-systems FR-002	none	-	permission; nothing to test
 0014-design-systems FR-003	check	.github: agora check ontology	slug must end with a kind code read from ifcore.ttl; directory contents not checked
@@ -1360,3 +1363,24 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0050-participation FR-023	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-024	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-025	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0051-patent-portfolio FR-001	check	eidolon: eid check site	every ontology Patent has a record under registers/patents and is part of one family
+0051-patent-portfolio FR-002	check	eidolon: eid check site	every family has a page and its patents name it
+0051-patent-portfolio FR-003	check	eidolon: eid check site	the relations in the ontology equal the registry relations in registers/patents
+0051-patent-portfolio FR-004	check	eidolon: eid check content	shape checks schema:about on each supporting asset kind
+0051-patent-portfolio FR-005	check	eidolon: eid check site	the /patents list holds patents only
+0051-patent-portfolio FR-006	review	0051-patent-portfolio FR-006	evidence for a new asset's patent is read in review; the converted assets name their patent in their own record
+0051-patent-portfolio FR-007	check	eidolon: eid check content	PatentSummaryPage requires a Patent, never a family
+0051-patent-portfolio FR-008	check	eidolon: eid check site	records under registers/patents name a source and a read date; the ontology holds no registry literal on a Patent
+0051-patent-portfolio FR-009	check	eidolon: eid test	the Rust tests check the as-of date and the estimate wording on a patent page
+0051-patent-portfolio FR-010	check	eidolon: eid check site	granted and pending families have one Offer; abandoned and expired have none
+0051-patent-portfolio FR-011	check	eidolon: eid check site	every page of an offered family carries the inquiry
+0051-patent-portfolio FR-012	check	eidolon: eid check site	patent pages, number redirects and legacy addresses are checked
+0051-patent-portfolio FR-013	check	eidolon: eid test	the Rust tests check the parts of a patent page
+0051-patent-portfolio FR-014	check	eidolon: eid test	the Rust tests check the parts of a family page
+0051-patent-portfolio FR-015	check	eidolon: eid check site	the /patents list holds patents only
+0051-patent-portfolio FR-016	check	eidolon: eid check site	every supporting asset answers at its address and names its patent; no asset address redirects
+0051-patent-portfolio FR-017	check	eidolon: eid test	the Rust tests check topic and classification pages
+0051-patent-portfolio FR-018	check	eidolon: eid test	the Rust tests check the structured data of patent, family and asset pages
+0051-patent-portfolio FR-019	check	eidolon: eid test	the Rust tests check patents.json, patents.csv, the Markdown copies, llms.txt and the sitemap
+0051-patent-portfolio FR-020	check	eidolon: eid test	the Rust tests check an episode page with and without audio
+0051-patent-portfolio FR-021	check	eidolon: eid check site	eid check site
