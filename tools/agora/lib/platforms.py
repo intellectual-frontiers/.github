@@ -1,6 +1,6 @@
 """Platforms (0049-platforms): what must be true of a made system before it is called a platform.
 
-A platform is an Ergon that provides the eight capabilities of the kernel, each realized by a named module. This module reads the
+A platform is an Ergon that provides the nine capabilities of the kernel, each realized by a named module. This module reads the
 records and reports a platform that lacks a capability, a module with no or several layers, a module code that breaks the naming
 rule or repeats, a dependency that skips a layer, a runtime dependency on the assurance environment, and a made thing built on
 something that is not a platform. Nothing here changes a file or decides for a person; whether a platform is accepted is the review
@@ -18,9 +18,11 @@ ARTIFACT, STATUS = IFCORE + "artifactName", IFCORE + "codeStatus"
 CAPABILITY_SCHEME, LAYER_SCHEME = IFCORE + "PlatformCapabilityScheme", IFCORE + "PlatformLayerScheme"
 LAYER, CODE, ORDER = IFCORE + "platformLayer", IFCORE + "moduleCode", IFCORE + "layerOrder"
 LABEL = RDFS + "label"
-KERNEL = ("governed-store", "ontology-model", "integration-seam", "assurance-environment",
+KERNEL = ("governed-store", "ontology-model", "integration-seam", "programmatic-interface", "assurance-environment",
           "commitment-ledger", "authoritative-catalog", "extension-contract", "governed-access")
 ASSURANCE, ORTHOGONAL = "assurance-environment", "orthogonal"
+INTERFACE, FLAVOR_SCHEME, OFFERS = "programmatic-interface", IFCORE + "InterfaceFlavorScheme", IFCORE + "offersInterface"
+FLAVORS = ("resource-api", "graph-api", "virtual-sql", "mcp")
 
 
 def _label(g: Graph, node: Node) -> str:
@@ -80,7 +82,7 @@ def conformance(g: Graph, platform: Node) -> dict[str, list[str]]:
 
 
 def check(g: Graph, add) -> None:
-    """0049-platforms FR-001, FR-002, FR-006 to FR-008, FR-010 to FR-013, FR-039."""
+    """0049-platforms FR-001, FR-002, FR-006 to FR-008, FR-010 to FR-013, FR-039, FR-050."""
     platforms = set(g.members(PLATFORM))
     module_of: dict[Node, Node] = {}
     for p in platforms:
@@ -114,6 +116,12 @@ def check(g: Graph, add) -> None:
                 add("error", r, f"builtOn names the suite {short(to)}; nothing is built on a suite as a whole (0049-platforms FR-039)")
             elif to not in platforms:
                 add("error", r, f"builtOn names {short(to)}, which is not typed ifcore:Platform; a made thing is built on a platform that has the whole kernel, or it integrates with a system (0049-platforms FR-006)")
+    for m in g.members(MODULE):
+        if INTERFACE in capabilities_realized(g, m):
+            offered = {g.concept_notation(o) for o in g.objects(m, OFFERS) if isinstance(o, Iri) and Iri(FLAVOR_SCHEME) in g.objects(o, IN_SCHEME)}
+            missing = [f for f in FLAVORS if f not in offered]
+            if missing:
+                add("error", m, f"{short(m)} realizes the programmatic interface but does not offer {', '.join(missing)}; a platform offers all four flavors (0049-platforms FR-050)")
     codes: dict[tuple[Node, str], Node] = {}
     for m in g.members(MODULE):
         layer, order = layer_of(g, m)

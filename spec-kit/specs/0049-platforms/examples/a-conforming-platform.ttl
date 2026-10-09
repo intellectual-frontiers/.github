@@ -115,6 +115,17 @@ ex:R22 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifc
 ex:R23 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:AssuranceEnvironment ; ifcore:relationTo ifcore:AssuranceEnvironmentCapability ;
     ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
 
+ex:ApiGateway a ifcore:PlatformModule ; rdfs:label "Example Api Gateway"@en ; dcterms:identifier "example-api-gateway" ;
+    ifcore:moduleCode "EAG" ; ifcore:artifactName "example-api-gateway" ; ifcore:codeStatus "confirmed" ; ifcore:platformLayer ifcore:OrthogonalLayer ;
+    ifcore:offersInterface ifcore:ResourceApiFlavor, ifcore:GraphApiFlavor, ifcore:VirtualSqlFlavor, ifcore:McpServerFlavor ; ifcore:hasAudience ifcore:Public .
+ex:ApiGatewayErgon a ifcore:Ergon ; ifcore:reflects ex:ApiGateway ;
+    ifcore:purpose "Api Gateway: the module that realizes this part of the kernel for the example platform."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+ex:RApi1 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ex:ApiGateway ; ifcore:relationTo ex:ExamplePlatform ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ex:RApi2 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:ApiGateway ; ifcore:relationTo ifcore:ProgrammaticInterfaceCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+
 ex:IntakeSolution a schema:Service ; rdfs:label "Example Intake"@en ; dcterms:identifier "example-intake" ; dcterms:type ifcore:SolutionOffer ; ifcore:hasAudience ifcore:Public .
 ex:IntakeSolutionErgon a ifcore:Ergon ; ifcore:reflects ex:IntakeSolution ;
     ifcore:purpose "Collect and route requests for a customer, using only the interfaces a third party can also use."@en ;
