@@ -1258,3 +1258,45 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0048-noemas FR-036	check	.github: agora check ontology	warns, never fails, on a reflection whose kind disagrees with its subject's; agora test proves a check changes no file
 0048-noemas FR-037	check	.github: agora test	tests a fourth kind added in the ontology alone
 0048-noemas FR-038	check	.github: agora test	tests each failure this requirement lists; agora check ontology runs the checks
+0049-platforms FR-001	check	.github: agora check ontology	fails a record typed ifcore:Platform that no module of it realizes the whole kernel for; that a lacking system is not called a platform in prose is review
+0049-platforms FR-002	check	.github: agora test	tests that the eight capabilities in the checker are exactly the concepts of the capability scheme; agora check ontology reports a platform lacking one
+0049-platforms FR-003	review	0049-platforms FR-037	the three tests and a person's acceptance of the record are a review; the check cannot test them
+0049-platforms FR-004	none	-	a check that an offer carries exactly one offer kind is not written
+0049-platforms FR-005	none	-	whether a capability is needed by two solutions is judgment; no check
+0049-platforms FR-006	check	.github: agora check ontology	fails a builtOn whose target is not typed ifcore:Platform; that an offer reaches only published interfaces is not tested
+0049-platforms FR-007	check	.github: agora check ontology	fails a module with no layer or several, and a module part of a thing that is not a platform or of two platforms
+0049-platforms FR-008	check	.github: agora check ontology	fails a dependsOn that skips a layer or points upward; reading another module's storage is not tested
+0049-platforms FR-009	none	-	contract tests live in each platform's assurance environment; the public root cannot run them
+0049-platforms FR-010	check	.github: agora check ontology	fails a dependsOn on a module that realizes the assurance environment
+0049-platforms FR-011	check	.github: agora check ontology	fails a module name that is not the platform's name and two words; that a name is not a metaphor is judgment
+0049-platforms FR-012	check	.github: agora check ontology	fails a code that is not three capital letters, that does not match the name, that repeats within a platform, or with no code status of confirmed or proposed; confirmation is a person's
+0049-platforms FR-013	check	.github: agora check ontology	fails a module with no ifcore:artifactName or one that is not the platform's name and the module's full name in lowercase hyphenated words; artifact names in a platform's code are checked in its repository
+0049-platforms FR-014	none	-	a brand name and the statement that an offer is built on a platform are judgment; no check
+0049-platforms FR-015	none	-	the governed store is in the platform's code; checked in the platform's repository
+0049-platforms FR-016	none	-	zones are in the platform's code; checked in the platform's repository
+0049-platforms FR-017	none	-	the ontology model is in the platform's code; checked in the platform's repository
+0049-platforms FR-018	none	-	connectors are in the platform's code; checked in the platform's repository
+0049-platforms FR-019	none	-	the assurance environment is in the platform's code and hosting; checked in the platform's repository
+0049-platforms FR-020	none	-	the assurance environment's functions are checked in the platform's repository
+0049-platforms FR-021	none	-	the use of the test management product or a Decision for another tool is not checked
+0049-platforms FR-022	none	-	the commitment ledger is in the platform's code; checked in the platform's repository
+0049-platforms FR-023	none	-	ownership of loops is in the platform's code; checked in the platform's repository
+0049-platforms FR-024	none	-	closure on evidence is in the platform's code; checked in the platform's repository
+0049-platforms FR-025	none	-	escalation and measures are in the platform's code; checked in the platform's repository
+0049-platforms FR-026	none	-	loop types as data are in the platform's code; checked in the platform's repository
+0049-platforms FR-027	none	-	the catalog is in the platform's code and content; checked in the platform's repository
+0049-platforms FR-028	none	-	catalog versioning is in the platform's code; checked in the platform's repository
+0049-platforms FR-029	none	-	the core and contribution points are in the platform's code and specs; checked in the platform's repository
+0049-platforms FR-030	none	-	manifests and sandboxes are in the platform's code; checked in the platform's repository
+0049-platforms FR-031	none	-	the registry is in the platform's code; checked in the platform's repository
+0049-platforms FR-032	none	-	separation of customers is in the platform's code and hosting; checked in the platform's repository
+0049-platforms FR-033	none	-	agent authority is in the platform's code; checked in the platform's repository
+0049-platforms FR-034	none	-	a platform's claims as Noemas are checked as Noemas by 0048-noemas; that every bet is one is not tested
+0049-platforms FR-035	none	-	the charter and the readiness test are a platform's own specs; checked in the platform's repository
+0049-platforms FR-036	none	-	a platform's declared deployments are its own record; no check
+0049-platforms FR-037	check	.github: agora test	tests every failure FR-037 lists, and that the worked example conforms
+0049-platforms FR-038	none	-	what a suite is, is judgment; FR-039 checks its shape
+0049-platforms FR-039	check	.github: agora check ontology	fails a subject typed both platform and suite, a suite with fewer than two members, a suite with modules, and a builtOn of a suite
+0049-platforms FR-040	none	-	that the words are used only for the matching type is review of text; no check reads prose for them
+0049-platforms FR-041	none	-	lifting a requirement is a maintainer's judgment on each platform's change; no check
+0049-platforms FR-042	none	-	the install check is in the platform's code; checked in the platform's repository
