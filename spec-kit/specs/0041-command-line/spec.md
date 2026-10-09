@@ -625,7 +625,12 @@ orchestrator names, not part of any rule; the public root's command set is
   (0008-decision-records) naming the program, what it does that Python cannot,
   and the commands that run it. Where the work can be done by a program
   already approved, that program MUST be used rather than a new one, so the
-  set of programs stays as small as the work allows.
+  set of programs stays as small as the work allows. A server, a generator or
+  a command-line program that the company writes is a Rust program
+  (0025-tooling-environment FR-030), not a program outside Python in the sense
+  of this requirement; a command that runs it is a Python script of the
+  command group, and the Rust program is built from source with the `rust`
+  kit of `ws-host` or delivered as a container image.
 - **FR-071**: A maintainer tool is a command a person runs to bring material
   in from outside the repositories, such as reading another repository's
   source. Its output is committed, and no build, check, test, generator or
