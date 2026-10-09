@@ -5,7 +5,7 @@
 
 **Input:** What must be true of a made system before it is called a platform. In
 this Eidolon, `platform` is not a marketing word. A platform is an Ergon
-(0047-digital-reflections) that provides eight named capabilities, the platform
+(0047-digital-reflections) that provides nine named capabilities, the platform
 kernel, each realized by a named module, so that other parties can build and
 sell on it through published interfaces without reaching into it, and so that
 any module can be replaced by another that passes the same contract tests. This
@@ -24,12 +24,13 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   each realized by a module of it. A made system that lacks one capability MUST
   NOT be called a platform. It is a product, a suite (FR-038), a service or a
   solution (FR-004), and its record is typed accordingly.
-- **FR-002**: The kernel MUST be these eight capabilities, held as the concepts
+- **FR-002**: The kernel MUST be these nine capabilities, held as the concepts
   of `ifcore:PlatformCapabilityScheme`: the governed store; the ontology model;
-  the integration seam; the assurance environment; the commitment ledger; the
-  authoritative catalog; the extension contract; governed access. The set is
-  closed. Adding or removing a capability is an amendment to this spec and a
-  change to the scheme, never a choice made for one platform.
+  the integration seam; the programmatic interface; the assurance environment;
+  the commitment ledger; the authoritative catalog; the extension contract;
+  governed access. The set is closed. Adding or removing a capability is an
+  amendment to this spec and a change to the scheme, never a choice made for one
+  platform.
 - **FR-003**: A platform's record MUST state how it meets three tests, and a
   person MUST accept the record (0047-digital-reflections FR-038) before any
   published text calls the system a platform. The tests are:
@@ -76,9 +77,10 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 - **FR-009**: Every interface a module offers MUST be published, versioned and
   covered by a contract test in the assurance environment, so that a module can
   be replaced by another that passes the same contract.
-- **FR-010**: The integration seam and the assurance environment are
-  orthogonal: they MAY touch every layer, only through the layers' published
-  interfaces. No module MAY depend at runtime on the assurance environment.
+- **FR-010**: The integration seam, the programmatic interface and the
+  assurance environment are orthogonal: they MAY touch every layer, only through
+  the layers' published interfaces. No module MAY depend at runtime on the
+  assurance environment.
 
 ## Naming
 
@@ -259,6 +261,86 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   the platform modules it uses and its layer, and the platform MUST refuse to
   install one that uses a module its layer may not reach (FR-008).
 
+## Programmatic interfaces
+
+- **FR-043**: Every function that the platform offers to a person, an extension,
+  another system or an agent MUST be available through a published API. No
+  function MAY exist only in a screen. The platform's own clients (web, desktop,
+  mobile, command line) MUST use the same API that a third party uses, so that
+  the interface is proved by the platform's own use of it.
+- **FR-044**: The interface of a platform MUST be one contract with several
+  flavors, not several interfaces. The contract is the catalog of the platform's
+  operations (name, inputs, outputs, errors, side effects, the authority it
+  needs) and the ontology (FR-017). Every flavor MUST be generated from the
+  contract and MUST NOT be maintained by hand. A change to an operation or a
+  concept MUST appear in every flavor at once, with a version, and a removed
+  operation MUST stay served for the deprecation period that the contract
+  states. Each flavor MUST describe itself in a machine-readable form that
+  generated clients, tools and agents read.
+- **FR-045**: A platform MUST offer a **resource API** over HTTP in the style
+  usually called REST, described by an OpenAPI document. It MUST give each
+  ontology concept a resource, each operation an endpoint, one error model, one
+  way of paging and filtering, and an idempotency key on every call that changes
+  something. A client library MAY be generated from the description.
+- **FR-046**: A platform MUST offer a **graph API**: a GraphQL schema generated
+  from the ontology, in which a client names the concepts and relationships it
+  wants and gets them in one request. It MUST limit the depth and cost of a
+  query, MUST apply the access rules of FR-032 to every field, and MUST NOT offer
+  a way to read what the resource API would refuse.
+- **FR-047**: A platform MUST offer a **virtual SQL layer**: a read-only SQL
+  schema generated from the ontology, with a view for each concept, a view for
+  each relationship, and the lineage columns of the governed store (the zone,
+  the source and the version of the concept). It MUST be served over a SQL
+  connection that standard tools can use. A query MUST run through the same
+  operations as the other flavors or directly on the governed store's read path,
+  and either way MUST apply the same row and column access decisions as the
+  other flavors. A write MUST NOT be possible through a SQL statement; a change
+  is made by calling a named operation, which a SQL function MAY expose and
+  which MUST pass the validation and the audit of every other change. Where the
+  governed store is itself a SQL database on the customer's own machine, the
+  layer MAY be that database's own views, but the access decisions still apply.
+- **FR-048**: A platform MUST offer a **Model Context Protocol server**
+  generated from the same contract: each operation is a tool with a name, a
+  plain-English description and an input schema, each concept is a resource, and
+  each documented workflow is a prompt. A read tool is available by default. A
+  tool that changes something MUST be off until a tenant enables it, and a change
+  that the platform's review rules reserve for a person MUST be made as a
+  proposal, not an action. An agent MUST act within the intersection of its
+  permissions and the authority of the person it acts for (FR-033), and every
+  call MUST be attributed to the agent and to that person. The server MUST work
+  both over the network and on a local connection, so that a platform that runs
+  on a customer's own machine is reachable by the customer's own agents. The
+  platform MUST treat text that a tool or a resource returns as data, never as
+  an instruction to itself. The platform SHOULD also serve its own specs, its
+  ontology and the results of its checks as resources, so that an agent that
+  builds on the platform reads the contract it must follow.
+- **FR-049**: The assurance environment MUST hold a conformance suite that calls
+  each operation through every flavor that the platform offers and compares what
+  comes back, including a refusal. A flavor that returns a different result, or
+  a different refusal, from another flavor for the same caller and the same
+  operation MUST fail the release (FR-020).
+- **FR-050**: A platform MUST offer all four flavors (FR-045 to FR-048). The
+  flavors are generated from the contract, so the cost of each is small; a
+  platform that cannot offer one is not yet a platform. The module that realizes
+  the programmatic interface MUST state the flavors it offers
+  (`ifcore:offersInterface`).
+- **FR-051**: The kernel requires no domain standard. A platform whose domain has
+  mandatory interface standards (a data exchange standard, a message standard, a
+  transaction standard) MUST list them in its own specs as **interface
+  profiles**. A profile is one more flavor of the same contract: it MUST be
+  mapped to the ontology by a declared mapping (FR-018), MUST pass the
+  conformance suite of FR-049 for the operations it covers, and MUST be tested
+  in the assurance environment with the standard's own validator where one
+  exists. A platform for which no domain standard applies MUST NOT adopt one for
+  show.
+- **FR-052**: Every call to the platform MUST be authenticated and attributed
+  (FR-032), limited by a quota for each tenant, and audited. Every flavor MUST
+  accept a credential scoped to one extension, one agent or one person, and the
+  assurance environment MUST issue sandbox credentials that work nowhere else
+  (FR-019). The reference documentation of each flavor MUST be generated, MUST
+  carry examples that the conformance suite runs, and MUST be served by the
+  platform itself.
+
 ## Governed access
 
 - **FR-032**: A platform MUST separate its customers' data from one another,
@@ -337,7 +419,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   FR-011 and FR-012, a dependency that breaks FR-008 or FR-010, a `builtOn`
   or `partOf` whose target is not typed `ifcore:Platform` (FR-006, FR-007), a
   module with no artifact name or a wrong one, or with no code status (FR-012,
-  FR-013), a subject typed both platform and suite, a suite with fewer than two
+  FR-013), a module that realizes the programmatic interface without stating all four
+  flavors (FR-050), a subject typed both platform and suite, a suite with fewer than two
   members, a suite with modules, and a `builtOn` of a suite (FR-039).
   What the check cannot test (the three tests of FR-003, the content of a
   module) is a person's review of the platform's record.
@@ -365,10 +448,22 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   FR-039.
 - A requirement in one platform's spec that another platform would repeat: it is
   lifted here, per FR-041.
+- A function is built into a screen and has no API: refused; the screen calls the
+  API, per FR-043.
+- A client wants a field in the graph API that the resource API refuses: the
+  graph API refuses it too, per FR-046 and FR-049.
+- A tool asks the SQL layer to update a row: refused; a change is a named
+  operation, per FR-047.
+- An agent holds a tool that changes data and its tenant has not enabled it: the
+  tool is off, per FR-048.
+- A platform in a field with no exchange standard: it carries no profile, per
+  FR-051.
+- A platform that serves a standard in a profile and the standard's validator
+  rejects an output: the release fails, per FR-051 and FR-049.
 - A product with a long-established brand that implements a module: the module
   keeps its plain name and the product is related to it by `carriesOut`, per
   FR-014.
-- A system that has all eight capabilities but only its builder can extend it:
+- A system that has all nine capabilities but only its builder can extend it:
   it fails the third-party test and is not accepted as a platform, per FR-003.
 - A new service wants its own database for governed data: refused; it makes a
   derived zone of the governed store, per FR-015.
@@ -408,7 +503,7 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   enforceable once.
 - A platform's builder can describe each module in two plain words; a module
   that cannot be described that way probably does two jobs.
-- The eight capabilities are what the platforms built so far have in common. A
+- The nine capabilities are what the platforms built so far have in common. A
   platform that needs a ninth for every platform is a reason to amend this spec.
 
 ## Open questions
@@ -421,13 +516,16 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
 - **OQ-3**: Whether a platform that has the kernel only in specification, with
   no module built yet, is shown differently from one that runs. The kernel
   asks for a named, designed module; it does not yet ask for a built one.
+- **OQ-4**: Whether a fifth flavor for streaming and events (webhooks and change
+  feeds) is required by the kernel or is a profile of the resource API.
 
 ## Key entities
 
 - **A platform** (`ifcore:Platform`) - an Ergon with the whole kernel.
 - **A platform module** (`ifcore:PlatformModule`) - a named, coded component of
   one platform, in one layer or orthogonal.
-- **The kernel** (`ifcore:PlatformCapabilityScheme`) - the eight capabilities.
+- **The kernel** (`ifcore:PlatformCapabilityScheme`) - the nine capabilities.
+- **An interface flavor** (`ifcore:InterfaceFlavorScheme`) - one way to call the platform: the resource API, the graph API, the virtual SQL layer, or the Model Context Protocol server.
 - **A layer** (`ifcore:PlatformLayerScheme`) - foundation, data, platform
   services, extensions and products, solutions and services; and orthogonal.
 - **An offer kind** (`ifcore:OfferKindScheme`) - platform service, solution,
@@ -454,6 +552,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   `ifcore:Platform` fails the check in a test.
 - **SC-006**: A subject typed both platform and suite, a suite with one member,
   and a suite with modules each fail the check in a test.
+- **SC-007**: A programmatic interface module that omits a flavor fails the check
+  in a test.
 
 ## Review & acceptance checklist
 
