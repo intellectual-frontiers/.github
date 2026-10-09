@@ -2855,12 +2855,13 @@ ifcore:UnblockHealth schema:founder ifcore:GraceCordovano, ifcore:ShahidNehalSha
 # Frontiers Studios product and each name is a trademark the company holds. Intellectual Frontiers LLC is the rights-holder
 # of every one (0005-holding-and-family-office FR-001); the company that builds and operates them is a vault fact.
 
-ifcore:OperationalTruth a ifcore:Organization ;
+ifcore:OperationalTruth a schema:SoftwareApplication ;
+    dcterms:type ifcore:SolutionOffer ;
     rdfs:label "Operational Truth"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
-    rdfs:comment "The company's productized implementation of the Elenchus methodology (a Noema), not yet related to it because the Ergon question is open (eidolon OQ-436): intent held as code is compared continuously with evidence collected from the operation itself, and the difference is reported as a truth gap or as unmanaged risk. Written Operational Truth® where it names this implementation and operational truth, in lowercase, where it names the general idea (0045-elenchus-works FR-040). Carried out by the Opsfolio family. Its license and current status are not yet recorded (0011-studios FR-015)."@en ;
+    rdfs:comment "The company's productized implementation of the Elenchus methodology: a solution (0049-platforms FR-004) built on the Opsfolio platform, which holds intent as code, compares it continuously with evidence collected from the operation itself, and reports the difference as a truth gap or as unmanaged risk. It operationalizes the Elenchus methodology (0048-noemas FR-007) and is carried out by the Opsfolio family. Written Operational Truth® where it names this solution and operational truth, in lowercase, where it names the general idea (0045-elenchus-works FR-040). Its license and current status are not yet recorded (0011-studios FR-015)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:Opsfolio a ifcore:Platform ;
@@ -3065,6 +3066,10 @@ ifcore:OpsfolioRelation33 a ifcore:ReflectionRelationship ; ifcore:relationType 
 ifcore:OpsfolioRelation34 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ifcore:OpsfolioAssetInventory ; ifcore:relationTo ifcore:OpsfolioCommitmentLedger ;
     ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
 ifcore:OpsfolioRelation35 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:DependsOn ; ifcore:relationFrom ifcore:OpsfolioAssetInventory ; ifcore:relationTo ifcore:OpsfolioControlCatalog ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation36 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:BuiltOn ; ifcore:relationFrom ifcore:OperationalTruth ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation37 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Operationalizes ; ifcore:relationFrom ifcore:OperationalTruth ; ifcore:relationTo ifcore:Elenchus ;
     ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
 
 ifcore:OperationalTruthTrademark a ifcore:Trademark ;
@@ -3973,7 +3978,7 @@ ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:pre
 ifcore:Elenchus a ifcore:IntellectualConstruct ; rdfs:label "Elenchus"@en ;
     dcterms:type ifcore:MethodologyType ;
     skos:definition "A pattern in which a claim is tried by trying to refute it, so that a claim of compliance stands only if the evidence survives the attempt (0045-elenchus-works FR-002)."@en ;
-    rdfs:comment "An abstract methodology, so a Noema (0048-noemas FR-007). Greek ἔλεγχος, cross-examination that aims at refutation. A deployed workflow that carries it out is an Ergon related to it by ifcore:Operationalizes; whether the company's Operational Truth is such an Ergon is open (eidolon OQ-436), so no relation is asserted yet. The work kind that holds one month's trial is ifcore:ElenchusKind."@en ;
+    rdfs:comment "An abstract methodology, so a Noema (0048-noemas FR-007). Greek ἔλεγχος, cross-examination that aims at refutation. A deployed workflow that carries it out is an Ergon related to it by ifcore:Operationalizes; the company's Operational Truth is that Ergon. The work kind that holds one month's trial is ifcore:ElenchusKind."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:ElenchusNoema a ifcore:Noema ; ifcore:reflects ifcore:Elenchus ;
