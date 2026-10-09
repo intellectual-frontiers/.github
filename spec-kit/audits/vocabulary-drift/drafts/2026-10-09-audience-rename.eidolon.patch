@@ -1,0 +1,13 @@
+diff --git a/ontology/ifpriv.ttl b/ontology/ifpriv.ttl
+index d9e93c7..04f8ca4 100644
+--- a/ontology/ifpriv.ttl
++++ b/ontology/ifpriv.ttl
+@@ -30,7 +30,7 @@
+ 
+ # ───────────────────────── Named audiences (0001-vault-governance FR-004 – FR-006) ─────────────────────────
+ 
+-ifpriv:retiredAt a owl:DatatypeProperty ; rdfs:domain ifcore:Audience ; rdfs:range xsd:date ;
++ifpriv:retiredAt a owl:DatatypeProperty ; rdfs:domain ifcore:AccessAudience ; rdfs:range xsd:date ;
+     rdfs:comment "The date a RoleOrGroup or Agreement audience individual was retired (0001-vault-governance FR-006). Its absence means the audience is still active. The individual itself is never deleted, so a fact that still declares it as its audience stays traceable."@en .
+ 
+ ifpriv:VaultCircle a ifcore:RoleOrGroup ;
