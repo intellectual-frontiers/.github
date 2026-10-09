@@ -13,7 +13,8 @@ import re
 from .reflections import IFCORE, IN_SCHEME, RDFS, Graph, relationships_of, short
 from .turtle import Iri, Lit, Node
 
-PLATFORM, MODULE = IFCORE + "Platform", IFCORE + "PlatformModule"
+PLATFORM, MODULE, SUITE = IFCORE + "Platform", IFCORE + "PlatformModule", IFCORE + "Suite"
+ARTIFACT, STATUS = IFCORE + "artifactName", IFCORE + "codeStatus"
 CAPABILITY_SCHEME, LAYER_SCHEME = IFCORE + "PlatformCapabilityScheme", IFCORE + "PlatformLayerScheme"
 LAYER, CODE, ORDER = IFCORE + "platformLayer", IFCORE + "moduleCode", IFCORE + "layerOrder"
 LABEL = RDFS + "label"
@@ -62,6 +63,12 @@ def expected_code(platform_label: str, module_label: str) -> str | None:
     return (platform_label[0] + words[0][0] + words[1][0]).upper()
 
 
+def _artifact(platform_label: str, module_label: str) -> str | None:
+    if not module_label.startswith(platform_label + " "):
+        return None
+    return "-".join(w.lower() for w in module_label.split())
+
+
 def conformance(g: Graph, platform: Node) -> dict[str, list[str]]:
     """Per kernel capability, the labels of the modules that realize it (empty when none does)."""
     out: dict[str, list[str]] = {k: [] for k in KERNEL}
@@ -73,7 +80,7 @@ def conformance(g: Graph, platform: Node) -> dict[str, list[str]]:
 
 
 def check(g: Graph, add) -> None:
-    """0049-platforms FR-001, FR-002, FR-006 to FR-008, FR-010 to FR-012."""
+    """0049-platforms FR-001, FR-002, FR-006 to FR-008, FR-010 to FR-013, FR-039."""
     platforms = set(g.members(PLATFORM))
     module_of: dict[Node, Node] = {}
     for p in platforms:
@@ -84,14 +91,28 @@ def check(g: Graph, add) -> None:
         lack = [k for k, ms in conformance(g, p).items() if not ms]
         if lack:
             add("error", p, f"{short(p)} is typed ifcore:Platform but no module of it realizes {', '.join(lack)}: a thing without the whole kernel is a product or a suite, not a platform (0049-platforms FR-001, FR-002)")
+    suites = set(g.members(SUITE))
+    for s in platforms & suites:
+        add("error", s, f"{short(s)} is typed both ifcore:Platform and ifcore:Suite; a subject is one or the other (0049-platforms FR-039)")
+    for s in suites:
+        members = [r for r in relationships_of(g, "partOf", end=s)]
+        if len(members) < 2:
+            add("error", s, f"{short(s)} is a suite with {len(members)} member(s); a suite has at least two products, each related by partOf (0049-platforms FR-039)")
+        for m in g.members(MODULE):
+            if any(s in g.objects(r, IFCORE + "relationTo") for r in relationships_of(g, "partOf", start=m)):
+                add("error", m, f"{short(m)} is a module of the suite {short(s)}; a suite has no modules (0049-platforms FR-039)")
     for r in relationships_of(g, "partOf"):
         for frm in g.objects(r, IFCORE + "relationFrom"):
             for to in g.objects(r, IFCORE + "relationTo"):
+                if to in suites and MODULE not in g.all_types(frm):
+                    continue
                 if MODULE in g.all_types(frm) and to not in platforms:
                     add("error", r, f"{short(frm)} is a platform module but is part of {short(to)}, which is not typed ifcore:Platform (0049-platforms FR-007)")
     for r in relationships_of(g, "builtOn"):
         for to in g.objects(r, IFCORE + "relationTo"):
-            if to not in platforms:
+            if to in suites:
+                add("error", r, f"builtOn names the suite {short(to)}; nothing is built on a suite as a whole (0049-platforms FR-039)")
+            elif to not in platforms:
                 add("error", r, f"builtOn names {short(to)}, which is not typed ifcore:Platform; a made thing is built on a platform that has the whole kernel, or it integrates with a system (0049-platforms FR-006)")
     codes: dict[tuple[Node, str], Node] = {}
     for m in g.members(MODULE):
@@ -114,6 +135,13 @@ def check(g: Graph, add) -> None:
             add("error", m, f"the name {_label(g, m)!r} must be the platform's name {_label(g, p)!r} followed by two plain words (0049-platforms FR-011)")
         elif want != code[0]:
             add("error", m, f"the code {code[0]} of {_label(g, m)!r} must be {want}: the platform's first letter and the first letters of the two words (0049-platforms FR-012)")
+        art = [o.value for o in g.objects(m, ARTIFACT) if isinstance(o, Lit)]
+        wantart = _artifact(_label(g, p), _label(g, m))
+        if len(art) != 1 or (wantart and art[0] != wantart):
+            add("error", m, f"{short(m)} must carry one ifcore:artifactName, {wantart!r}: the platform's name and the module's full name in lowercase words joined by hyphens, never the code (0049-platforms FR-013)")
+        st = [o.value for o in g.objects(m, STATUS) if isinstance(o, Lit)]
+        if st not in (["confirmed"], ["proposed"]):
+            add("error", m, f"{short(m)} must state ifcore:codeStatus as confirmed or proposed (0049-platforms FR-012)")
         if (p, code[0]) in codes and codes[(p, code[0])] != m:
             add("error", m, f"the code {code[0]} is also the code of {short(codes[(p, code[0])])}; a code is unique within its platform (0049-platforms FR-012)")
         codes[(p, code[0])] = m

@@ -817,10 +817,16 @@ ifcore:RuleSoftwareAgent a ifcore:ClassificationRule ; ifcore:subjectClass prov:
 
 # ───────────────────────── Platforms (0049-platforms) ─────────────────────────
 
-ifcore:Platform a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Platform"@en ;
+ifcore:Platform a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; owl:disjointWith ifcore:Suite ; rdfs:label "Platform"@en ;
     skos:definition "A made system that provides the eight capabilities of the platform kernel, each realized by a named module, so that other parties can build and sell on it through published interfaces without reaching into it, and so that any module can be replaced by another that passes the same contract tests (0049-platforms FR-001 to FR-003)."@en ;
     skos:scopeNote "Represented subject: a platform as a built system. Not a product that lacks a capability of the kernel, a group of products sold together (a suite), a brand, or a deployment of it (0047-digital-reflections FR-009). The word is earned by the kernel, never claimed."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:Suite a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; owl:disjointWith ifcore:Platform ; rdfs:label "Suite"@en ;
+    skos:definition "Two or more products offered together under one name, each usable on its own, that need not share a store, a ledger, a catalog or an extension contract. A suite shares at most a name, a purchase, a sign-in and agreed exchanges of data. It claims nothing about the platform kernel (0049-platforms FR-038)."@en ;
+    skos:scopeNote "Represented subject: a group of products offered together. Not a platform, which has the whole kernel, and not a brand or a portfolio that names no offer. The word is used only for a subject typed ifcore:Suite (0049-platforms FR-040)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:RuleSuite a ifcore:ClassificationRule ; ifcore:subjectClass ifcore:Suite ; ifcore:reflectedAs ifcore:ErgonKind ;
+    rdfs:comment "Purpose: a suite is a deliberately assembled offer of products."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:PlatformModule a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Platform module"@en ;
     skos:definition "A named, coded component of one platform that realizes one or more kernel capabilities or is a platform service, sits in exactly one layer or is orthogonal to the layers, and is reached only through its published interface (0049-platforms FR-007 to FR-013)."@en ;
     ifcore:hasAudience ifcore:Public .
@@ -833,6 +839,10 @@ ifcore:platformLayer a owl:ObjectProperty, owl:FunctionalProperty ; rdfs:domain 
     rdfs:comment "The one concept of ifcore:PlatformLayerScheme a module sits in, or the orthogonal concept (0049-platforms FR-007)."@en .
 ifcore:moduleCode a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range xsd:string ;
     rdfs:comment "The three-letter code of a module: the first letter of the platform's name and the first letters of the two words that follow it in the module's name, in capitals. Unique within its platform. A short human name for conversation and tables, never part of an artifact name (0049-platforms FR-012, FR-013)."@en .
+ifcore:artifactName a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range xsd:string ;
+    rdfs:comment "The name every artifact of a module carries: the platform's name and the module's full descriptive name in lowercase words joined by hyphens, never the code (0049-platforms FR-013)."@en .
+ifcore:codeStatus a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range xsd:string ;
+    rdfs:comment "confirmed when a person has confirmed the module's code, proposed until then (0049-platforms FR-012)."@en .
 ifcore:layerOrder a owl:DatatypeProperty, owl:FunctionalProperty ; rdfs:domain skos:Concept ; rdfs:range xsd:integer ;
     rdfs:comment "The position of a layer: 0 is the lowest. A module may depend only on its own layer or the one directly below (0049-platforms FR-008)."@en .
 
@@ -985,6 +995,9 @@ ifcore:PartOf a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; s
     ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:BuiltOn a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "builtOn"@en ; skos:notation "builtOn" ;
     skos:definition "A solution, product, service, extension or platform service is made on a platform and reaches it only through the platform's published interfaces. A made thing that merely calls another one's interface without being offered through it is integratesWith, not builtOn (0049-platforms FR-006)."@en ;
+    ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
+ifcore:CarriesOut a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "carriesOut"@en ; skos:notation "carriesOut" ;
+    skos:definition "A product is the working implementation of the design of a platform module: the module states what is needed and keeps its plain name, and the product is what exists and keeps its brand (0049-platforms FR-014). Distinct from implements, which joins a made thing to an idea or a capability."@en ;
     ifcore:relationFamily ifcore:TechnicalFamily ; ifcore:fromKind ifcore:ErgonKind ; ifcore:toKind ifcore:ErgonKind ; ifcore:hasAudience ifcore:Public .
 ifcore:Intends a skos:Concept ; skos:inScheme ifcore:ReflectionRelationScheme ; skos:prefLabel "intends"@en ; skos:notation "intends" ;
     skos:definition "A made thing is meant to produce an outcome. A promise, not a result."@en ;
@@ -2434,10 +2447,10 @@ ifcore:IPLG a owl:Class ; rdfs:label "IPLG"@en ;
 
 # ───────────────────────── Studios portfolio (0011-studios FR-014 – FR-016; 0010-capital) ─────────────────────────
 
-ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:PortfolioCategory ;
-    rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization is classified as."@en .
-ifcore:builtBy a owl:ObjectProperty ; rdfs:domain ifcore:Organization ; rdfs:range ifcore:Unit ;
-    rdfs:comment "The unit that built this organization as a venture or shared service, per 0011-studios FR-022: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
+ifcore:portfolioCategory a owl:ObjectProperty ; rdfs:range ifcore:PortfolioCategory ;
+    rdfs:comment "Which of 0011-studios' portfolio categories (venture, software, shared service, operating company) this organization, or this product of the portfolio, is classified as."@en .
+ifcore:builtBy a owl:ObjectProperty ; rdfs:range ifcore:Unit ;
+    rdfs:comment "The unit that built this organization, or this product, as a venture, a shared service or a product of the portfolio, per 0011-studios FR-022: entity formation follows at least one experiment's evidence, it does not substitute for it."@en .
 ifcore:portfolioCompany a owl:ObjectProperty ; rdfs:domain ifcore:Fund ; rdfs:range ifcore:Organization ;
     rdfs:comment "A company or shared service this fund holds. A fund's portfolio roster is point-in-time business data, not operating doctrine (0010-capital, Out of scope) — the same reasoning already applied to patent counts."@en .
 
