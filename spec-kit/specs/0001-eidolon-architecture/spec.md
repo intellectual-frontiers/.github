@@ -236,7 +236,7 @@ reference model, and governance representation.
   lacks one is a product or a suite, never a platform.
 - **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
-- **An audience** — a named permission to see a fact: public, company
+- **An audience** (`ifcore:AccessAudience`) — a named permission to see a fact: public, company
   affiliation, a specific agreement, or a specific role or group.
 - **A `Reference`** — a fact that points at a value held elsewhere rather than
   storing the value itself; carries its own audience declaration.

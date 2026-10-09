@@ -226,7 +226,9 @@ restated here.
   portfolio rather than rebuilt per company.
 - **A portfolio category** — venture, software, shared service, or
   operating company, each with its own obligations.
-- **IPLG** — the framework for turning Studios' work into something a
+- **IPLG** (intellectual product-led growth) — a subset and an elaboration of
+  product-led growth, not a replacement for it: the framework for turning Studios'
+  work, an intellectual product made by a person or by an AI, into something a
   visitor can use directly, shared with 0006-research-and-ip.
 - **A company's own Eidolon** — the public root (and private vault, where
   needed) a Studios-incubated company gets once it exists, so an AI can
