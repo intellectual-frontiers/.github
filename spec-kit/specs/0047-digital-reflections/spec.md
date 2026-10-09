@@ -237,7 +237,7 @@ and SKOS under 0019-controlled-vocabulary.
 
 - **FR-035**: The canonical names MUST be `Eidolon`, `Ergon` and `Noema`,
   with the plurals `Eidolons`, `Ergons` and `Noemas`. The Eidolon of
-  0001-eidolon-architecture (the three-repository system, and a company's
+  0001-eidolon-architecture (the two-repository system, and a company's
   own, per 0011-studios FR-017) is the system that holds reflections; prose
   MUST NOT call a product, a service, a system or a workflow an Eidolon,
   MUST call a deliberately created subject an Ergon, and MUST call an

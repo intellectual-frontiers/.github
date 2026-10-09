@@ -25,9 +25,10 @@ content document is, 0002-content-format; how addresses map to content,
   the public root's ontology, content and design systems, and, for the
   registers FR-013 names, the snapshot it describes. Building again at the same
   commits MUST yield the same files.
-- **FR-002**: No page MAY be authored in the web property's own repository;
-  that repository, if one is kept, holds no works
-  (0001-eidolon-architecture).
+- **FR-002**: No page MAY be authored outside the Eidolon's two
+  repositories: the web property is a presentation layer generated from the
+  vault, has no repository of its own, and holds no works
+  (0001-eidolon-architecture FR-001).
 - **FR-003**: The generator MUST include a work only when the work is
   Public or announced (0015-work-packages FR-027), and for an announced
   work that is not Public, only its public record (0015 FR-029). It MUST

@@ -9,14 +9,16 @@ reference model, and governance representation.
 
 ## Repository topology
 
-- **FR-001**: The Eidolon MUST consist of exactly three repositories with distinct
-  roles: a public root (`.github`), which is the public Eidolon; a private extension
-  (`eidolon`), which is the private Eidolon and the monorepo where the company's works
-  are made and maintained; and a web property (`www.intellectualfrontiers.com`), which
-  is one channel presenting those works and holds no work of its own. Works and their
-  presentations are kept apart, per 0021-works-and-presentations; the web property is
-  one channel among several (print, audio, video, events, courses). A work MAY live in
-  a repository of its own outside these three, in which case the vault holds its facts
+- **FR-001**: The Eidolon MUST consist of exactly two repositories with distinct
+  roles: a public root (`.github`), which is the public Eidolon; and a private
+  extension (`eidolon`), which is the private Eidolon and the monorepo where the
+  company's works are made and maintained. Its web property
+  (`www.intellectualfrontiers.com`) MUST be a presentation layer generated from the
+  private Eidolon (0044-public-website), not a repository: it is one channel
+  presenting those works and holds no work of its own. Works and their presentations
+  are kept apart, per 0021-works-and-presentations; the web property is one channel
+  among several (print, audio, video, events, courses). A work MAY live in a
+  repository of its own outside these two, in which case the vault holds its facts
   and a reference to that repository, never a copy of it.
 - **FR-002**: The public root MUST contain only Public-tier facts, specs, and
   ontology. Nothing of any other confidentiality classification may be asserted
@@ -229,10 +231,11 @@ reference model, and governance representation.
   fact, and does not require an audience declaration under FR-011 — only an
   individual asserting factual content does, explicitly, every time, never
   left implicit from the repository it happens to live in.
-- **The Eidolon** — the three-repository system that models and serves everything
-  Intellectual Frontiers knows about itself: the public Eidolon (`.github`), the
-  private Eidolon where works are made (`eidolon`), and one presentation channel for
-  them (`www.intellectualfrontiers.com`).
+- **The Eidolon** — the two-repository system that models and serves everything
+  Intellectual Frontiers knows about itself: the public Eidolon (`.github`) and the
+  private Eidolon where works are made (`eidolon`), with its web property
+  (`www.intellectualfrontiers.com`), a presentation layer generated from the private
+  Eidolon.
 - **A digital reflection** — a maintained record of one subject, either an
   Eidolon (what exists), an Ergon (what is built) or a Noema (what is
   conceived), per 0047-digital-reflections and 0048-noemas. The Eidolon above

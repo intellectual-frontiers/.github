@@ -1,5 +1,5 @@
 [#repositories]
-== Three repositories, one Eidolon
+== Two repositories, one Eidolon
 
 [cols="2,3,4"]
 |===
@@ -12,11 +12,10 @@
 |`eidolon`
 |The private Eidolon, and the monorepo where works are made
 |Every non-public spec and ontology individual, and every work's package; it imports this ontology and never redefines it
-
-|`www.intellectualfrontiers.com`
-|One presentation channel
-|Presents works through an authenticated proxy; holds no work of its own
 |===
+
+The web property, `www.intellectualfrontiers.com`, is not a repository. It is a presentation layer that `eidolon` generates
+(spec 0044): one channel presenting the works, holding no work of its own.
 
 A *work* is the deliverable itself. A book, a web page, an episode, a keynote, a course or a skill is a *presentation* of it (spec 0021).
 Public presentations lead with what works found, made, or proved, never with how the company is organized.
