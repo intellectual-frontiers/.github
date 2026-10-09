@@ -2587,7 +2587,7 @@ ifcore:OperationalTruth a ifcore:Organization ;
     rdfs:comment "The company's productized implementation of the Elenchus pattern: intent held as code is compared continuously with evidence collected from the operation itself, and the difference is reported as a truth gap or as unmanaged risk. Written Operational Truth® where it names this implementation and operational truth, in lowercase, where it names the general idea (0045-elenchus-works FR-040). Carried out by the Opsfolio family. Its license and current status are not yet recorded (0011-studios FR-015)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:Opsfolio a ifcore:Organization ;
+ifcore:Opsfolio a ifcore:Platform ;
     rdfs:label "Opsfolio"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
@@ -2597,7 +2597,7 @@ ifcore:Opsfolio a ifcore:Organization ;
     rdfs:comment "The portfolio name of the Operational Truth family, and the compliance system of record in it. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:Surveilr a ifcore:Organization ;
+ifcore:Surveilr a schema:SoftwareApplication ;
     rdfs:label "surveilr"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
@@ -2607,7 +2607,7 @@ ifcore:Surveilr a ifcore:Organization ;
     rdfs:comment "The Resource Surveillance & Integration Engine for Operational Truth: it ingests files, command output, mail and issue trackers into a local-first SQLite database, the RSSD, that SQL can query. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015); whether its records are tamper-evident is 0045-elenchus-works OQ-7."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:Fleetfolio a ifcore:Organization ;
+ifcore:Fleetfolio a schema:SoftwareApplication ;
     rdfs:label "Fleetfolio"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
@@ -2617,7 +2617,7 @@ ifcore:Fleetfolio a ifcore:Organization ;
     rdfs:comment "Evidence-based asset and boundary management, endpoint detection and penetration-test orchestration, built on surveilr: it reconciles the assets that are expected with the assets observed. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:Qualityfolio a ifcore:Organization ;
+ifcore:Qualityfolio a schema:SoftwareApplication ;
     rdfs:label "Qualityfolio"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
@@ -2627,7 +2627,7 @@ ifcore:Qualityfolio a ifcore:Organization ;
     rdfs:comment "The test management layer of surveilr: tests are written as Markdown with YAML front matter in Git, run from the command line or a pipeline, and their results are kept as evidence that expected tests are compared with. In operation, per its public site on 2026-10-04. Its license is not yet recorded (0011-studios FR-015)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:Spry a ifcore:Organization ;
+ifcore:Spry a schema:SoftwareApplication ;
     rdfs:label "Spry"@en ;
     ifcore:portfolioCategory ifcore:SoftwareCategory ;
     ifcore:builtBy ifcore:Studios ;
@@ -2637,6 +2637,117 @@ ifcore:Spry a ifcore:Organization ;
     schema:url "https://sprymd.org"^^xsd:anyURI ;
     rdfs:comment "Markdown as a programmable medium: every fenced code block of a Markdown document runs, so that a runbook, a data pipeline or a piece of compliance evidence is one document. In operation, per its public site on 2026-10-04. The license is the one its site states; it grants use of the code and does not grant the mark, which the company holds (ifcore:SpryTrademark). Which entity holds the copyright in its code is not yet confirmed."@en ;
     ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── The Opsfolio platform (0049-platforms) ─────────────────────────
+# Opsfolio is a platform: a person classified it so. Its modules below are designed, not all built; each realization is a recommendation
+# a person reviews, and every module code is proposed until a person confirms it (0049-platforms FR-012). The family products keep their
+# brand names and are related to the module they carry out by carriesOut (FR-014). Qualityfolio is the test management tool used inside
+# the assurance environment (FR-021).
+
+ifcore:OpsfolioPlatformErgon a ifcore:Ergon ; ifcore:reflects ifcore:Opsfolio ;
+    ifcore:purpose "Lets a company hold its intent as code, collect evidence from its own operation, and see the difference between the two, with the evidence staying where the customer keeps it."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ;
+    rdfs:comment "Classified as a platform by a person. The nine modules are designed and each realization is stated for a person to review. The third-party test (0049-platforms FR-003) depends on an extension contract that is not yet specified; the replacement and single-store tests are met by design only."@en ;
+    ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ifcore:ShahidNehalShah ; ifcore:reviewedOn "2026-10-09"^^xsd:date ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioEvidenceStore a ifcore:PlatformModule ; rdfs:label "Opsfolio Evidence Store"@en ;
+    ifcore:moduleCode "OES" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-evidence-store" ;
+    ifcore:platformLayer ifcore:DataLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioEvidenceStoreErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioEvidenceStore ;
+    ifcore:purpose "Is the one store of the evidence and the records that the platform keeps, with what was received, what was modelled and what was derived."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioOntologyModel a ifcore:PlatformModule ; rdfs:label "Opsfolio Ontology Model"@en ;
+    ifcore:moduleCode "OOM" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-ontology-model" ;
+    ifcore:platformLayer ifcore:DataLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioOntologyModelErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioOntologyModel ;
+    ifcore:purpose "Holds the controls, evidence, assets and findings as ontology concepts, from which storage and validation are generated."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioIntegrationEngine a ifcore:PlatformModule ; rdfs:label "Opsfolio Integration Engine"@en ;
+    ifcore:moduleCode "OIE" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-integration-engine" ;
+    ifcore:platformLayer ifcore:OrthogonalLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioIntegrationEngineErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioIntegrationEngine ;
+    ifcore:purpose "Collects evidence from files, command output, mail, issue trackers and other systems of the customer, into the Evidence Store only."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioAssuranceEnvironment a ifcore:PlatformModule ; rdfs:label "Opsfolio Assurance Environment"@en ;
+    ifcore:moduleCode "OAE" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-assurance-environment" ;
+    ifcore:platformLayer ifcore:OrthogonalLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioAssuranceEnvironmentErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioAssuranceEnvironment ;
+    ifcore:purpose "Tests and shows the platform fit in a sandbox with realistic synthetic data or de-identified customer data, separate from production."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioCommitmentLedger a ifcore:PlatformModule ; rdfs:label "Opsfolio Commitment Ledger"@en ;
+    ifcore:moduleCode "OCL" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-commitment-ledger" ;
+    ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioCommitmentLedgerErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioCommitmentLedger ;
+    ifcore:purpose "Records each promise a control owner, an engineer or a vendor makes, such as the remedy of an exception, who owns it now and what evidence closes it."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioControlCatalog a ifcore:PlatformModule ; rdfs:label "Opsfolio Control Catalog"@en ;
+    ifcore:moduleCode "OCC" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-control-catalog" ;
+    ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioControlCatalogErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioControlCatalog ;
+    ifcore:purpose "Holds the controls and requirements of published frameworks, each cited to its source with its effective dates and verification state."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioExtensionRegistry a ifcore:PlatformModule ; rdfs:label "Opsfolio Extension Registry"@en ;
+    ifcore:moduleCode "OER" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-extension-registry" ;
+    ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioExtensionRegistryErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioExtensionRegistry ;
+    ifcore:purpose "Keeps the signed, versioned packages that extend the platform, such as control catalogs, evidence collectors and runbooks."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioAccessService a ifcore:PlatformModule ; rdfs:label "Opsfolio Access Service"@en ;
+    ifcore:moduleCode "OAS" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-access-service" ;
+    ifcore:platformLayer ifcore:PlatformServicesLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioAccessServiceErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioAccessService ;
+    ifcore:purpose "Decides who may see each fact and acts for a person only within that person's authority, with every access audited."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioAssetInventory a ifcore:PlatformModule ; rdfs:label "Opsfolio Asset Inventory"@en ;
+    ifcore:moduleCode "OAI" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-asset-inventory" ;
+    ifcore:platformLayer ifcore:ExtensionsLayer ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioAssetInventoryErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioAssetInventory ;
+    ifcore:purpose "Holds the assets and boundaries that are expected and reconciles them with the assets observed."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
+ifcore:OpsfolioRelation01 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioEvidenceStore ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation02 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioEvidenceStore ; ifcore:relationTo ifcore:GovernedStoreCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation03 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:CarriesOut ; ifcore:relationFrom ifcore:Surveilr ; ifcore:relationTo ifcore:OpsfolioEvidenceStore ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation04 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioOntologyModel ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation05 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioOntologyModel ; ifcore:relationTo ifcore:OntologyModelCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation06 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioIntegrationEngine ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation07 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioIntegrationEngine ; ifcore:relationTo ifcore:IntegrationSeamCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation08 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:CarriesOut ; ifcore:relationFrom ifcore:Surveilr ; ifcore:relationTo ifcore:OpsfolioIntegrationEngine ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation09 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioAssuranceEnvironment ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation10 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioAssuranceEnvironment ; ifcore:relationTo ifcore:AssuranceEnvironmentCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation11 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioCommitmentLedger ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation12 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioCommitmentLedger ; ifcore:relationTo ifcore:CommitmentLedgerCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation13 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioControlCatalog ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation14 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioControlCatalog ; ifcore:relationTo ifcore:AuthoritativeCatalogCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation15 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioExtensionRegistry ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation16 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioExtensionRegistry ; ifcore:relationTo ifcore:ExtensionContractCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation17 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioAccessService ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation18 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioAccessService ; ifcore:relationTo ifcore:GovernedAccessCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation19 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioAssetInventory ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation20 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:CarriesOut ; ifcore:relationFrom ifcore:Fleetfolio ; ifcore:relationTo ifcore:OpsfolioAssetInventory ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation21 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Uses ; ifcore:relationFrom ifcore:OpsfolioAssuranceEnvironment ; ifcore:relationTo ifcore:Qualityfolio ;
+    ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
+
 
 ifcore:OperationalTruthTrademark a ifcore:Trademark ;
     rdfs:label "Operational Truth (trademark)"@en ;
