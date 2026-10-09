@@ -150,54 +150,98 @@
    "text": "A computer-implemented method for optimizing an operation of computer-controlled metric appliances in a network, the method comprising: receiving, by an electronic evaluation device, a computer-executable metric recorded by a computer-controlled metric appliance from among the computer-controlled metric appliances, wherein the computer-executable metric is generated based on predefined programmable instructions for the computer-controlled metric appliance; detecting, by the electronic evaluation device, a set of data inputs requiring a refinement in the predefined programmable instructions provided to the computer-controlled metric appliance, wherein the predefined programmable instructions are used to determine whether the computer-executable metric is achieved or not based on assigned computer-executable tasks; and automatically updating, by the electronic evaluation device, the predefined programmable instructions provided to the computer-controlled metric appliance such that the pre-defined programmable instructions after updating changes an expected outcome of the computer-executable metric resulting in an optimized performance of the computer-controlled metric appliance; and generating an output signal by the electronic evaluation device, wherein the output signal triggers a change in operation of the computer-controlled metric appliance when the fault is identified to be valid, and wherein the change in operation of the computer-controlled metric appliance signifies executing one or more tasks by the computer-controlled metric appliance based on an updated set of the predefined programmable instructions."
   }
  ],
+ "background": [],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a computer-implemented method for optimizing an operation of computer-controlled metric appliances in a network. The method includes receiving a computer-executable metric recorded by a computer-controlled metric appliance from the computer-controlled metric appliances, and detecting a fault associated with the computer-controlled metric appliance based on predefined programmable instructions provided to the computer-controlled metric appliance. The predefined programmable instructions are used to determine whether the computer-executable metric is achieved or not. The method includes receiving, by the electronic evaluation device, a feedback about the fault in real time from a validation entity in response to detecting the fault, determining, by the electronic evaluation device, whether the fault associated with the computer-controlled metric appliance is valid based on the feedback received in real time from the validation entity, and automatically updating the predefined programmable instructions provided to the computer-controlled metric appliance based on the feedback in response to determining that the fault is invalid. The predefined programmable instructions, after updating, changes an expected outcome of the computer-executable metric resulting in an optimized performance of the computer-controlled metric appliance.",
+  "In an embodiment, detecting, by the electronic evaluation device, the fault associated with the computer-controlled metric appliance may include determining whether the computer-executable metric is achieved or not by comparing the computer-executable metric recorded by the computer-controlled metric appliance with the predefined programmable instructions provided to the computer-controlled metric appliance, detecting, by the electronic evaluation device, that the computer-executable metric is not achieved in response to determining that the computer-executable metric recorded by the computer-controlled metric appliance does not match with the pre-defined programmable instructions provided to the computer-controlled metric appliance, and detecting the fault associated with the computer-controlled metric appliance in response to determining that the computer-executable metric is not achieved.",
+  "In an embodiment, receiving, by the electronic evaluation device, the feedback about the fault may include determining whether the fault associated with the computer-controlled metric appliance meets a fault threshold in response to detecting the fault, reporting the fault associated with the computer-controlled metric appliance to the validation entity in response to determining that the fault associated with the computer-controlled metric appliance meets the fault threshold, and receiving the feedback about the fault in real time from the validation entity.",
+  "The method may further include detecting a plurality of parameters associated with the candidate computer-controlled metric appliance, determining a computer-executable goal to be achieved by the computer-controlled metric appliance, applying a machine learning model on the plurality of parameters and the computer-executable goal to determine a computer-executable task to be assigned to the computer-controlled metric appliance to achieve the computer-executable goal, and assigning the computer-executable task to the computer-controlled metric appliance.",
+  "In an embodiment, determining the computer-executable goal to be achieved may include receiving an input from an external entity, and determining the computer-executable goal to be achieved by the computer-controlled metric appliance based on the input.",
+  "The method may include receiving the computer-executable metric recorded by the computer-controlled metric appliance and determining whether the computer-executable metric is achieved or not by comparing the computer-executable metric recorded by the computer-controlled metric appliance with the pre-defined programmable instructions provided to the computer-controlled metric appliance. In response to determining that the computer-executable metric recorded by the computer-controlled metric appliance does not match with the predefined programmable instructions provided to the computer-controlled metric appliance, detecting that the computer-executable metric is not achieved, detecting the fault associated with the computer-controlled metric appliance in response to determining that the computer-executable metric is not achieved, and correcting the machine learning model to optimize determination of the computer-executable task assigned to the computer-controlled metric appliance. In response to determining that the computer-executable metric recorded by the computer-controlled metric appliance matches with the pre-defined programmable instructions provided to the computer-controlled metric appliance, detecting that the computer-executable metric is achieved, and updating the machine learning model in response to detecting that the computer-executable metric is achieved.",
+  "The method may include generating an output signal by the electronic evaluation device, wherein the output signal triggers a change in operation of the computer-controlled metric appliance if the fault is identified to be valid. The change in operation of the computer-controlled metric appliance may signify executing one or more tasks by the computer-controlled metric appliance based on an updated set of the predefined programmable instructions.",
+  "The plurality of parameters may include a location of the computer-controlled metric appliance, a type of the computer-controlled metric appliance, a capability of the computer-controlled metric appliance, a user associated with the computer-controlled metric appliance, and historic values of the computer-executable metric generated by the computer-controlled metric appliance.",
+  "Another embodiment herein provides a computer-implemented method for optimizing an operation of computer-controlled metric appliances in a network. The method includes detecting a plurality of parameters associated with a candidate computer-controlled metric appliance from the computer-controlled metric appliances, determining a computer-executable goal to be achieved by the candidate computer-controlled metric appliance, determining a computer-executable task list to be assigned to the candidate computer-controlled metric appliance to achieve the computer-executable goal based on the plurality of parameters and the computer-executable goal by applying a machine learning model, and assigning the computer-executable task list to the candidate computer-controlled metric appliance. The assigning of the computer-executable task list to the candidate computer-controlled metric appliance facilitates achieving the computer-executable goal by the candidate computer-controlled metric appliance.",
+  "In an embodiment, determining the computer-executable goal to be achieved may include receiving an input from an external entity, and determining the computer-executable goal to be achieved by the candidate computer-controlled metric appliance based on the input.",
+  "The method may include receiving a feedback about the fault in real time from a validation entity in response to detecting the fault, determining whether the fault associated with the candidate computer-controlled metric appliance is valid based on the feedback received in real time from the validation entity, and automatically updating a predefined programmable instructions based on the feedback in response to determining that the fault is invalid.",
+  "In an embodiment, receiving the feedback about the fault in real time may include determining whether the fault associated with the candidate computer-controlled metric appliance meets a fault threshold in response to detecting the fault, reporting the fault associated with the candidate computer-controlled metric appliance to the validation entity in response to determining that the fault associated with the candidate computer-controlled metric appliance meets the fault threshold, and receiving the feedback about the fault in real time from the validation entity.",
+  "Another embodiment herein provides an electronic evaluation device for optimizing an operation of computer-controlled metric appliances in a network. The electronic evaluation device includes a memory, a processor, and a computer-executable metric validation controller communicatively coupled to the memory and the processor. The executable metric validation controller is configured to receive a computer-executable metric recorded by a candidate computer-controlled metric appliance from the computer-controlled metric appliances, and detect a fault associated with the candidate computer-controlled metric appliance based on predefined programmable instructions provided to the candidate computer-controlled metric appliance. The pre-defined programmable instructions are used to determine whether the computer-executable metric is achieved or not. The metric validation controller is configured to receive a feedback about the fault in real time from a validation entity in response to detecting the fault, determine whether the fault associated with the candidate computer-controlled metric appliance is valid based on the feedback received in real time from the validation entity, and automatically update the predefined programmable instructions based on the feedback in response to determining that the fault is invalid. An updating of the predefined programmable instructions allows the candidate computer-controlled metric appliance to achieve the computer-executable metric.",
+  "The electronic evaluation device may be further configured to determine whether the computer-executable metric is achieved or not by comparing the computer-executable metric recorded by the candidate computer-controlled metric appliance with the predefined programmable instructions provided to the candidate computer-controlled metric appliance. In response to determining that the computer-executable metric recorded by the candidate computer-controlled metric appliance does not match the predefined programmable instructions assigned to the candidate computer-controlled metric appliance, detect that the computer-executable metric is not achieved. In response to determining that the computer-executable metric is not achieve, detect the fault associated with the candidate computer-controlled metric appliance in response to determining that the computer-executable metric is not achieved.",
+  "The electronic evaluation device may be further configured to determine whether the fault associated with the candidate computer-controlled metric appliance meets a fault threshold in response to detecting the fault, report the fault associated with the candidate computer-controlled metric appliance to the validation entity in response to determining that the fault associated with the candidate computer-controlled metric appliance meets the fault threshold, and receive the feedback about the fault in real time from the validation entity.",
+  "In an embodiment, the electronic evaluation device may include a machine learning based task controller configured to detect a plurality of parameters associated with the candidate computer-controlled metric appliance, determine a computer-executable goal to be achieved by the candidate computer-controlled metric appliance, apply a machine learning model on the plurality of parameters and the computer-executable goal to determine a computer-executable task to be assigned to the candidate computer-controlled metric appliance to achieve the computer-executable goal, and assign the computer-executable task to the candidate computer-controlled metric appliance.",
+  "The electronic evaluation device may be further configured to receive an input from an external entity, and determine the computer-executable goal to be achieved by the candidate computer-controlled metric appliance based on the input.",
+  "The machine learning based task controller may be further configured to receive a computer-executable metric recorded by a candidate computer-controlled metric appliance, and determine whether the computer-executable metric is achieved or not by comparing the computer-executable metric recorded by the candidate computer-controlled metric appliance with the predefined programmable instructions provided to the candidate computer-controlled metric appliance. In response to determining that the computer-executable metric recorded by the candidate computer-controlled metric appliance does not match with the predefined programmable instructions assigned to the candidate computer-controlled metric appliance, the machine learning based task controller may be further configured to detect that the computer-executable metric is not achieved, detect the fault associated with the candidate computer-controlled metric appliance in response to determining that the computer-executable metric is not achieved, and correct the machine learning model to optimize determination of the computer-executable task to be assigned to the candidate computer-controlled metric appliance. Further, in response to determining that the computer-executable metric recorded by the candidate computer-controlled metric appliance matches with the pre-defined programmable instructions assigned to the candidate computer-controlled metric appliance, the machine learning based task controller may be further configured to detect that the computer-executable metric is achieved, and update the machine learning model in response detecting that the computer-executable metric is achieved.",
+  "Another embodiment herein provides an electronic evaluation device for optimizing an operation of computer-controlled metric appliances in a network. The electronic evaluation device includes a memory, a processor and a computer-executable metric validation controller communicatively coupled to the memory and the processor. The executable metric validation controller is configured to detect a plurality of parameters associated with a candidate computer-controlled metric appliance from the computer-controlled metric appliances, determine a computer-executable goal to be achieved by the candidate computer-controlled metric appliance, determine a computer-executable task list to be assigned to the candidate computer-controlled metric appliance to achieve the computer-executable goal based on the plurality of parameters and the computer-executable goal by applying a machine learning model, and assign the computer-executable task list to the candidate computer-controlled metric appliance. An assigning of the computer-executable task list to the candidate computer-controlled metric appliance facilitates achieving the computer-executable goal by the candidate computer-controlled metric appliance.",
+  "The electronic evaluation device may be further configured to receive an input from an external entity and determine the computer-executable goal to be achieved by the candidate computer-controlled metric appliance based on the input.",
+  "The machine learning based task controller may be configured to receive a feedback about the fault in real time from a validation entity in response to detecting the fault, determine whether the fault associated with the candidate computer-controlled metric appliance is valid based on the feedback received in real time from the validation entity, and automatically update predefined programmable instructions based on the feedback in response to determining that the fault is invalid.",
+  "In an embodiment, receiving the feedback about the fault in real time includes determining whether the fault associated with the candidate computer-controlled metric appliance meets a fault threshold in response to detecting the fault, reporting the fault associated with the candidate computer-controlled metric appliance to the validation entity in response to determining that the fault associated with the candidate computer-controlled metric appliance meets the fault threshold, and receiving the feedback about the fault in real time from the validation entity.",
+  "Another embodiment herein provides a computer-implemented method for optimizing an operation of computer-controlled metric appliances in a network. The method includes receiving, by an electronic evaluation device, a computer-executable metric recorded by a computer-controlled metric appliance from among the computer-controlled metric appliances, wherein the computer-executable metric is generated based on a predefined programmable instructions for the computer-controlled metric appliance. The method includes detecting, by the electronic evaluation device, a set of data inputs requiring a refinement in the predefined programmable instructions provided to the computer-controlled metric appliance, wherein the predefined programmable instructions are used to determine whether the computer-executable metric is achieved or not based on assigned computer-executable tasks. The method includes automatically updating, by the electronic evaluation device, the predefined programmable instructions provided to the computer-controlled metric appliance such that the predefined programmable instructions after updating changes an expected outcome of the computer-executable metric resulting in an optimized performance of the computer-controlled metric appliance.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates a high-level overview of a system, according to embodiments as disclosed herein;",
+  "FIG. 2 illustrates a block diagram of an electronic evaluation device, according to embodiments as disclosed herein;",
+  "FIG. 3 illustrates a block diagram of a worklist management system, according to embodiments as disclosed herein;",
+  "FIG. 4 illustrates working of a machine learning system, according to embodiments as disclosed herein;",
+  "FIGS. 5 A- 5 C illustrate a method for optimizing an operation of computer-controlled metric appliances; and",
+  "FIG. 6 is a block diagram illustrating a computer system according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11561884B2/sheet-00000.webp",
-   "label": "Sheet 1 of 8",
-   "width": 215,
-   "height": 120
+   "file": "drawings/US11561884B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1045,
+   "turned": false
   },
   {
-   "file": "drawings/US11561884B2/sheet-00001.webp",
-   "label": "Sheet 2 of 8",
-   "width": 72,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-01.webp",
+   "label": "Sheet 1 of 7",
+   "width": 2571,
+   "height": 1545,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00002.webp",
-   "label": "Sheet 3 of 8",
-   "width": 119,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-02.webp",
+   "label": "Sheet 2 of 7",
+   "width": 1825,
+   "height": 1810,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00003.webp",
-   "label": "Sheet 4 of 8",
-   "width": 63,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-03.webp",
+   "label": "Sheet 3 of 7",
+   "width": 2657,
+   "height": 1396,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00004.webp",
-   "label": "Sheet 5 of 8",
-   "width": 115,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-04.webp",
+   "label": "Sheet 4 of 7",
+   "width": 1988,
+   "height": 1908,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00005.webp",
-   "label": "Sheet 6 of 8",
-   "width": 118,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-05.webp",
+   "label": "Sheet 5 of 7",
+   "width": 2055,
+   "height": 2023,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00006.webp",
-   "label": "Sheet 7 of 8",
-   "width": 38,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-06.webp",
+   "label": "Sheet 6 of 7",
+   "width": 1928,
+   "height": 605,
+   "turned": true
   },
   {
-   "file": "drawings/US11561884B2/sheet-00007.webp",
-   "label": "Sheet 8 of 8",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11561884B2/sheet-07.webp",
+   "label": "Sheet 7 of 7",
+   "width": 2378,
+   "height": 1625,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/e3/9b/2e/8cd22b461a2b78/US11561884.pdf",
@@ -206,13 +250,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16952063",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11561884B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

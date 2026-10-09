@@ -122,21 +122,126 @@
    "text": "The system of claim 14 , wherein the processor is configured to deliver the electronic document comprising the item to the user participant by the service provider system based on the ownership trail."
   }
  ],
- "drawings": [],
+ "background": [],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a networked system containing a computer-controlled marketplace network for facilitating seamless transactions among a plurality of marketplace network participant systems. The networked system includes a plurality of service provider systems associated with respective service provider participants and located remotely from one another physically in respective service settings that each includes one or more central servers, data stores, and cloud-based computing components for managing and processing delivery of one or more services in the service settings by the plurality of service provider systems. Each of the plurality of service provider systems are communicatively coupled to a respective merchant server. The marketplace network further includes a plurality of user systems associated with respective user participants located remotely from one another and remotely from the plurality of service provider systems and configured to generate a service request to one of the plurality of service provider systems in the marketplace network.",
+  "The marketplace server facilitates marketplace transactions digitally by executing a set of computer-executable tasks for securely processing transactional exchanges among the marketplace network participant systems, wherein the transactional exchanges include at least exchanges of ownership rights for digitally stored data at least in part owned originally by the user participants. The marketplace server includes a marketplace interaction component where the service provider participants can establish their one or more offerings digitally for the transactional exchanges. The one or more offerings are associated with respective transactional values that are predefined across the marketplace network by the respective service provider participants. The marketplace server includes a memory circuit configured to store transactional information associated with each transactional exchange of the transactional exchanges among the participants in the marketplace network. The marketplace server includes a processing circuit in communication with the memory circuit and configured to process a transactional exchange digitally and generate an ownership trail of a transacted offering when a user participant consents for data ownership transfer, exclusively or inclusively for the data at least in part, from the user participant, toward a digital purchase and delivery of the offering, wherein the data at least in part has a value of at least equal to a transactional value of the offering exchanged between the service provider participant and the user participant over the marketplace network.",
+  "The marketplace interaction component may allow the service provider systems to define a set of digitally recognizable data valuation parameters for one or more entities and attributes associated with the one or more entities, publish the set of digitally recognizable data valuation parameters defined by the service provider systems, transact for the offerings digitally published in the marketplace network with the data ownership transfer for the data at least in part valued at the transactional value, associated with the offering, calculated in accordance with the set of digitally recognizable data valuation parameters identified by the service provider systems.",
+  "The set digitally recognizable data valuation parameters include one or more of type of the data, length of the data, source of the data, number of entities contained in the data, and number of attributes associated with each of the entities. The transaction exchange may include delivery of the offering to the user participant by the service provider system and transferring of the data to the service provider system by the user participant system at the time of the transaction exchange, wherein the transferring of the data to the service provider system includes one or more of changing access privileges for the service provider system for the data and sharing access credentials of a secured repository containing the data to the service provider system for allowing access. The transaction exchange may include delivery of the offering to the user participant by the service provider system at the time of transaction exchange and delaying the transferring of the data to the service provider system by the user participant system for a later specified time depending on availability of the data with the user participant system.",
+  "The system may include a plurality of buyer systems associated with respective buyer participants located remotely from one another and remotely from the service provider systems and the user systems, wherein each of the plurality of buyer systems comprises a respective buyer server. The service provider system may be communicatively coupled to the buyer system such that the transactional value for the offering is defined based on an input received from the buyer system by the service provider system, further wherein the trail of ownership transfer comprises at least a transfer of ownership from the user participant to the service provider participant, and from the service provider participant to the buyer participant either in real-time or deferred for a later time than when the transactional exchange is performed.",
+  "The plurality of participant systems may be in communication with one another over a peer-to-peer communication network that maintains a decentralized blockchain ledger for tracking and recording the transactional exchanges and ownership trails, wherein each of the participant systems includes at least one processing circuit and at least one physical storage medium that stores at least a portion of the decentralized blockchain ledger comprising a distributed database to record transactional information associated with a transactional exchange that occur on the peer-to-peer communication network between at least two participants systems.",
+  "An embodiment herein provides a merchant acquisition system for facilitating acquisition of an item in a digital marketplace network. The merchant acquisition system includes a merchant server communicatively coupled and associated with a service provider system. The merchant server includes a processor and a physical storage medium that stores merchandise information and transactional information associated with the service provider system. The processor is configured to define a set of digitally recognizable data valuation parameters for one or more entities and attributes associated with tradable data originally stored at a user system remotely located from the merchant server. The processor is further configured to publish the set of digitally recognizable data valuation parameters defined by the service provider system in the marketplace network along with digitally listed one or more offerings and transact for the item with a user participant associated with the user system with data ownership transfer for the tradable data at least in part owned originally by the user participant and valued at a transactional value no less than value of the item calculated in accordance with the set of digitally recognizable data valuation parameters defined by the service provider system.",
+  "The merchant server may be communicatively coupled to a buyer server located remotely from the merchant server, wherein the buyer server is associated with a respective buyer participant, such that the transactional value for the offering may be defined by the merchant server based on an input received from the buyer server. An ownership trail of the data ownership transfer for the data at least in part may include at least a transfer of the ownership from the user participant to the service provider participant, and from the service provider participant to the buyer participant either in real-time or deferred for a later time than when the acquisition of the item is performed.",
+  "The merchant server, the buyer server, and the user system are in communication with one another over a peer-to-peer communication network that maintains a decentralized blockchain ledger for tracking and recording the acquisition of the item and the ownership trail. Each of the merchant server, the buyer server, and the user system may include at least one processing circuit and at least one physical storage medium that stores at least a portion of the decentralized blockchain ledger including a distributed database to record acquisition information associated with the acquisition of the item that occur on the peer-to-peer communication network between at least two of the merchant server, the buyer server, and the user system.",
+  "The merchant server may be a first merchant server and the service provider system may be a first service provider system, such that the system may further include an arbitrarily large number of merchant servers associated with respective service provider systems, each publishing one or more digital offerings in the marketplace network tradable in return of ownership transfer of one or more data files from an arbitrarily large number of computer-executable data files. Each of the computer-executable data files may be owned originally by a user participant from an arbitrarily large number of user participants associated with respective user systems and communicating with the first merchant server and the arbitrarily large number of merchant servers over the marketplace network.",
+  "The merchant server may enable a cryptographic wallet to reflect equivalent transactional value of one or more computer-executable data files owned originally by the user participant and marked by the user participant for trading in the marketplace network, wherein the one or more computer-executable data files includes the tradable data in return of the one or more offerings. The cryptographic wallet may provide one or more acquisition-driven smart contracts that may enable security of transactional information among transacting participants. The cryptographic wallet may be configured to append blocks to the decentralized blockchain ledger with every acquisition which may enable recording of the transactional information across many systems associated with the network participants so that any involved information cannot be altered.",
+  "The acquisition of the item may include either of: 1) delivery of the offering to the user participant by the merchant server and transferring of the data to the merchant server by the user participant system at the time of the acquisition. The transferring of the data to the merchant server may include one or more of modifying access privileges for the merchant server so as to allow the data to be accessed by the merchant server, and sharing access credentials of a secured repository containing the data to the merchant server for allowing access. 2) delivery of the offering to the user participant by the merchant server at the time of acquisition of the item and delaying the transferring of the data to the merchant server by the user participant system for a later specified time depending on availability of the data with the user participant system. The set digitally recognizable data valuation parameters may include one or more of type of the data, length of the data, source of the data, number of entities contained in the data, and number of attributes associated with each of the entities.",
+  "An embodiment herein provides a computer-controlled system for automated evidence-based transactional exchange between a service provider system associated with a service provider and a mobile communication device associated with a user. The system includes a merchant server configured to collect predefined information about a mobile communication device and an associated user. The predefined information includes at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting. The merchant server is further configured to generate a first short message service component (SMS) that is sent to the mobile communication device. The merchant server is further configured to generate a second short message service component (SMS) that is sent to a service provider system. The first SMS and the second SMS contain a first secured hashlink and a second secured hashlink respectively that are executable by the user and the service provider respectively, such that the first SMS and the second SMS are indicative of delivery of the service. The merchant server is further configured to allow a transaction involving delivery of the service to the user and transfer of ownership of digitally executable data originally owned by the user to the service provider when the data is available at a later time in return of the service availed by the user.",
+  "The data may be valued at no less than a value of the service calculated in accordance with a set of digitally recognizable data valuation parameters defined by the service provider system. The merchant server may generate and send a confirmation electronic message along with a digitally executable unique service proof token (SPT) to the mobile communication device and the service provider system upon completion of the service delivery after execution of the first secured hashlink and the second secured hashlink respectively by the mobile communication device and the service provider system. The unique SPT may be associated with each of the mobile communication device and the service provider system and may be indicative of completion and delivery of the service by the service provider system to the user associated with the mobile communication device.",
+  "The service provider system may be able to access the data automatically from a database when the data is available upon submitting the service proof token (SPT). The SPT may serve as an evidence of the delivery of the service by the service provider to the user at a different prior time when the data was not yet available.",
+  "The system may further include a blockchain device configured to automatically store computer-executable instructions including the SPT associated with the mobile communication device and the service provider system for delivery of the service. The system may further include a central verification device to verify the evidence of the service delivery. The central verification device may be configured to compare the SPT submitted by the service system with the SPT stored in the blockchain device to allow the service provider system access to the database storing the data.",
+  "An embodiment herein provides a computer-controlled system for automated evidence-based transactional exchange between a service provider system associated with a service provider and a mobile communication device associated with a user. The system includes a server configured to collect predefined information about a mobile communication device and an associated user. The predefined information includes at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting. The server is further configured to generate and send a confirmation electronic message along with a digitally executable unique service proof token (SPT) to the mobile communication device and the service provider system upon completion of the service delivery. The unique SPT is associated with each of the mobile communication device and the service provider system and records an evidence of the completion and delivery of the service by the service provider system to the user associated with the mobile communication device. The server is further configured to allow a transaction involving transfer of ownership of digitally executable data, originally owned by the user, to the service provider system when the data is available at a later time in return of the service availed by the user.",
+  "The server may be further configured to generate a first short message service component (SMS) that may be sent to the mobile communication device. The server may be further configured to generate a second short message service component (SMS) that may be sent to the service provider system. The first SMS and the second SMS contain a first secured hashlink and a second secured hashlink respectively that are executable by the user and the service provider respectively, such that the first SMS and the second SMS are indicative of delivery of the service. The SPT may be generated after execution of the first secured hashlink and the second secured hashlink respectively by the mobile communication device and the service provider system. The first secured hashlink and the second secured hashlink may each be executable with clicks such that the execution of the first secured hashlink and the second secured hashlink may record a proof of respective locations of the mobile communication device and the service provider system.",
+  "The respective clicks may record GPS locations of the mobile communication device and the service provider system. The system may include a blockchain device such that the GPS locations of the mobile communication device and the service provider system along with service details may be stored in the blockchain device within the STP. The service provider system may be configured to automatically secure the ownership of the digitally executable data at a later time using the STP from the blockchain device."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates, among other things, an example of a computerized architecture for a marketplace in which various embodiments herein may operate;",
+  "FIG. 2 illustrates a block diagram of a cloud-based central controlling system interacting with various network participants in accordance with an embodiment herein;",
+  "FIG. 3 illustrates a block diagram of a cloud-based central controlling system interacting with a pre-consenting device, a service provider system, among other devices in accordance with an embodiment herein;",
+  "FIG. 4 illustrates a block diagram of a pre-consenting device in accordance with an embodiment herein;",
+  "FIG. 5 illustrates blockchain computer architecture of the system of FIG. 1 along with other systems in accordance with an embodiment herein;",
+  "FIG. 6 illustrates an exemplary blockchain device in accordance with an embodiment herein;",
+  "FIG. 7 illustrates an exemplary merchant acquisition system connected with other devices and servers in accordance with an embodiment herein;",
+  "FIG. 8 illustrates a scenario for facilitating recording of an evidence of a service delivery by an evidence system according to an embodiment herein; and",
+  "FIG. 9 is a block diagram illustrating a computer system according to an embodiment herein."
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US12437338B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1372,
+   "turned": false
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-01.webp",
+   "label": "Sheet 1 of 9",
+   "width": 2840,
+   "height": 2113,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-02.webp",
+   "label": "Sheet 2 of 9",
+   "width": 2296,
+   "height": 1882,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-03.webp",
+   "label": "Sheet 3 of 9",
+   "width": 2650,
+   "height": 1559,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-04.webp",
+   "label": "Sheet 4 of 9",
+   "width": 2800,
+   "height": 1952,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-05.webp",
+   "label": "Sheet 5 of 9",
+   "width": 2704,
+   "height": 2010,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-06.webp",
+   "label": "Sheet 6 of 9",
+   "width": 2151,
+   "height": 1712,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-07.webp",
+   "label": "Sheet 7 of 9",
+   "width": 2338,
+   "height": 1476,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-08.webp",
+   "label": "Sheet 8 of 9",
+   "width": 2563,
+   "height": 2105,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12437338B2/sheet-09.webp",
+   "label": "Sheet 9 of 9",
+   "width": 2649,
+   "height": 1910,
+   "turned": true
+  }
+ ],
  "pdfUrl": "",
  "sources": [
   {
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/18372652",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US12437338B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
-   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis. The drawings are those of the earlier publication US20240062291A1: the grant's own sheet images were not yet public when read."
   }
  ]
 }

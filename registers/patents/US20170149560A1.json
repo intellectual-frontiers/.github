@@ -145,60 +145,72 @@
    "text": "The system of claim 1 , wherein said scanner comprises a mobile communication device."
   }
  ],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [
   {
-   "file": "drawings/US20170149560A1/sheet-00000.webp",
-   "label": "Sheet 1 of 9",
-   "width": 151,
-   "height": 120
+   "file": "drawings/US20170149560A1/front.webp",
+   "label": "Front page figure",
+   "width": 2483,
+   "height": 1973,
+   "turned": false
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00002.webp",
-   "label": "Sheet 3 of 9",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-02.webp",
+   "label": "Sheet 2 of 8",
+   "width": 2704,
+   "height": 1939,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00003.webp",
-   "label": "Sheet 4 of 9",
-   "width": 123,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-03.webp",
+   "label": "Sheet 3 of 8",
+   "width": 1152,
+   "height": 1181,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00004.webp",
-   "label": "Sheet 5 of 9",
-   "width": 74,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-04.webp",
+   "label": "Sheet 4 of 8",
+   "width": 2339,
+   "height": 1447,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00005.webp",
-   "label": "Sheet 6 of 9",
-   "width": 101,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-05.webp",
+   "label": "Sheet 5 of 8",
+   "width": 2518,
+   "height": 2125,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00006.webp",
-   "label": "Sheet 7 of 9",
-   "width": 100,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-06.webp",
+   "label": "Sheet 6 of 8",
+   "width": 2432,
+   "height": 2026,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00007.webp",
-   "label": "Sheet 8 of 9",
-   "width": 102,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-07.webp",
+   "label": "Sheet 7 of 8",
+   "width": 2437,
+   "height": 2078,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00008.webp",
-   "label": "Sheet 9 of 9",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-08.webp",
+   "label": "Sheet 8 of 8",
+   "width": 2762,
+   "height": 2055,
+   "turned": true
   },
   {
-   "file": "drawings/US20170149560A1/sheet-00009.webp",
-   "label": "Sheet 10 of 9",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US20170149560A1/sheet-09.webp",
+   "label": "Sheet 9 of 8",
+   "width": 2657,
+   "height": 1951,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/c0/20/f4/447dc17eed91a4/US20170149560A1.pdf",
@@ -207,13 +219,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15427806",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US20170149560A1/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

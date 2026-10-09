@@ -134,72 +134,86 @@
    "text": "The program storage device of claim 19 , wherein said method further comprises monitoring said defined period of time during which said first medical device pauses performing said action, and said second medical device performs said second action, wherein a signal is generated upon completion of said defined period of time by a time detection circuit, said signal being indicative of resuming said first action performed by said first medical device and stopping of said second action performed by said second medical device."
   }
  ],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [
   {
-   "file": "drawings/US20130204145A1/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 152,
-   "height": 120
+   "file": "drawings/US20130204145A1/front.webp",
+   "label": "Front page figure",
+   "width": 2588,
+   "height": 2046,
+   "turned": false
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 96,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2667,
+   "height": 2123,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 2763,
+   "height": 2097,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 74,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 2475,
+   "height": 1529,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2604,
+   "height": 1968,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2573,
+   "height": 2036,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 2568,
+   "height": 1860,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 2490,
+   "height": 1839,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 53,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 2679,
+   "height": 1188,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 2566,
+   "height": 1771,
+   "turned": true
   },
   {
-   "file": "drawings/US20130204145A1/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US20130204145A1/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2369,
+   "height": 1786,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/23/16/b8/521778a0b74ffb/US20130204145A1.pdf",
@@ -208,13 +222,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/13756445",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US20130204145A1/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

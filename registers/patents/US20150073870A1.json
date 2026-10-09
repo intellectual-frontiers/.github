@@ -131,60 +131,72 @@
    "text": "The program storage device of claim 19 , wherein said method further comprising one or more of: removing seemingly essential elements or attributes from said parent innovation such that said sub-innovations have at least one element reduced from said innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; adding seemingly dissimilar and unrelated attributes or elements with said parent innovation such that said sub-innovations have at least one element or attribute added to said parent innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; copying attributes or elements of a parent innovation and making alterations into it to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; and rearranging attributes or elements of a parent innovation in a substantially different manner to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type, wherein said rearrangement can be of a physical or a chemical type such that said physical rearrangement results in a different physical product and a chemical rearrangement results in a different molecule or compound."
   }
  ],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [
   {
-   "file": "drawings/US20150073870A1/sheet-00000.webp",
-   "label": "Sheet 1 of 9",
-   "width": 179,
-   "height": 120
+   "file": "drawings/US20150073870A1/front.webp",
+   "label": "Front page figure",
+   "width": 2802,
+   "height": 1877,
+   "turned": false
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00001.webp",
-   "label": "Sheet 2 of 9",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-01.webp",
+   "label": "Sheet 1 of 8",
+   "width": 2834,
+   "height": 2069,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00002.webp",
-   "label": "Sheet 3 of 9",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-02.webp",
+   "label": "Sheet 2 of 8",
+   "width": 2892,
+   "height": 2207,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00003.webp",
-   "label": "Sheet 4 of 9",
-   "width": 104,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-03.webp",
+   "label": "Sheet 3 of 8",
+   "width": 2595,
+   "height": 2254,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00004.webp",
-   "label": "Sheet 5 of 9",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-04.webp",
+   "label": "Sheet 4 of 8",
+   "width": 2775,
+   "height": 2191,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00005.webp",
-   "label": "Sheet 6 of 9",
-   "width": 101,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-05.webp",
+   "label": "Sheet 5 of 8",
+   "width": 2802,
+   "height": 2348,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00006.webp",
-   "label": "Sheet 7 of 9",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-06.webp",
+   "label": "Sheet 6 of 8",
+   "width": 2767,
+   "height": 1979,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00007.webp",
-   "label": "Sheet 8 of 9",
-   "width": 79,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-07.webp",
+   "label": "Sheet 7 of 8",
+   "width": 2195,
+   "height": 1446,
+   "turned": true
   },
   {
-   "file": "drawings/US20150073870A1/sheet-00008.webp",
-   "label": "Sheet 9 of 9",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US20150073870A1/sheet-08.webp",
+   "label": "Sheet 8 of 8",
+   "width": 2277,
+   "height": 1775,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/60/89/f3/21ce53736eef9a/US20150073870A1.pdf",
@@ -193,13 +205,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/14025493",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US20150073870A1/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

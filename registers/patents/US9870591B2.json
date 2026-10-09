@@ -126,90 +126,123 @@
    "text": "The system of claim 1 , wherein said visual scoring engine further comprising an image processor configured to perform image processing and pre-processing tasks."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a blockchain configured distributed architecture-based system in a communication network. The system includes a memory circuit, communicatively connected to the communication network, to store a plurality of digital profiles associated with a plurality of crowdsourced experts, and further to store a plurality of segmented digital profiles associated with each of the digital profiles, wherein the segmented digital profiles and digital profiles are created based on a plurality of sources distributed and electronically linked across the communication network. The system includes a credentialing engine to allow a plurality of crowdsourced respondents to respond to the segmented digital profiles associated with each of the plurality of experts and credential the plurality of experts and determine crowdsourced credentialed expertise, wherein the credentialing of each of the segmented digital profiles associated with an expert of the plurality of experts contribute to credentialing of a digital profile of the expert upon collation of the credentialed segmented digital profiles. The segmented digital profiles associated with the experts are credentialed from a plurality of respondents using a computerized crowdsourcing index. The crowdsourcing index is indicative of number of respondents credentialing an expert and dynamically increases with an increase in the number of respondents. The system includes an expert scoring module to determine a set of attributes for the experts. The set of attributes includes one or more of the crowdsourced credentialed expertise determined based on the credentialing of the segmented digital profiles of the experts by the respondents, reputation of the experts indicative of a trust of a relevant community on the experts, and officiality indicative of a position or a designation of the experts in a relevant job. Each of the attributes may be assigned varying computer-calculated weights. The expert scoring module further determines an aggregate score of an expert based on the one or more attributes in association with the assigned weights. The system further includes an electronic document scoring engine to receive and process review comments and document ratings for an electronic document by the crowdsourced experts. The crowdsourced experts may have an aggregate score greater than a defined threshold. The document scoring engine includes a natural language processing-based (NLP-based) analysis engine to process textual information-based reviews and comments generated as part of textual review of the electronic document by the crowdsourced experts. The document scoring engine includes a visual scoring engine for processing visual and non-textual feedback and reviews by the crowdsourced experts. The visual scoring engine includes an eye tracks processor controlled by a special purpose microprocessor to receive eye track inputs from respective eye tracking systems associated with computing devices of the crowdsourced experts and process the eye track inputs to associate a review score based on predefined eye track patterns. The visual scoring engine includes a micro expressions processor to receive data indicative of micro facial expressions extracted by respective micro expressions sensors associated with the computing devices of the crowdsourced experts. The micro expressions processor includes an image processing circuitry and an associated memory to interpret the micro facial expressions and compare them with predefined facial patterns to associate a review score based on the extracted micro facial expressions. The document scoring engine is further configured to associate an aggregate score to the electronic document based on aggregation of individual textual and visual review scores obtained by processing of the textual and the visual reviews by the crowdsourced experts who review the document. The document scoring engine is further configured to display, on a graphical user interface, an output indicative of an aggregate score of the document reviewed by the crowdsourced experts along with information about who reviewed and how many times reviewed the document. The system further includes an expert identity validation device to verify identities of the crowdsourced experts during or prior to review. The expert identity validation device includes a device patterns assessment device to receive and process device information extracted by respective agent devices associated with the computing devices of the crowdsourced experts and verify the extracted device information with predefined device information for the respective crowdsourced experts. The expert identity validation device includes a network patterns assessment device to receive and process network information extracted by the respective agent devices associated with the computing devices of the crowdsourced experts and verify the extracted network information with predefined network information of the respective crowdsourced experts. The expert identity validation device includes a geo-spatial mapping device to perform geo-tagging of the crowdsourced experts and the documents reviewed by the crowdsourced experts and compare the geo-tags with pre-stored geo-spatial information about the experts for processing validation. The geo-tagging is performed based on geo-spatial information received from a global positioning system (GPS)-based device. The expert identity validation device includes a facial expression validation device to receive and process facial expressions received from respective facial expression sensors associated with the computing devices of the crowdsourced experts and verify identity in accordance with respective predefined facial patterns of the crowdsourced experts. The facial expression validation device comprises a digital acquisition unit and multichannel amplifiers for pre-processing and amplification of signals transmitted by the facial expression sensors."
+ ],
+ "drawingDescriptions": [
+  "The features of the disclosed embodiments may become apparent from the following detailed description taken in conjunction with the accompanying drawings showing illustrative embodiments herein, in which:",
+  "FIG. 1 illustrates generally, but not by way of limitation, an exemplary ecosystem in which various embodiments may operate;",
+  "FIG. 2 illustrates an exemplary operating environment including a system for crowdsourced credentialing of experts;",
+  "FIG. 3 illustrates a credentialing system, in accordance with an embodiment;",
+  "FIG. 4 illustrates another embodiment of the credentialing system of FIG. 3 ;",
+  "FIG. 5 illustrates a method flowchart for facilitating crowdsourced and multi-level credentialing over the network;",
+  "FIG. 6 illustrates an exemplary expert scoring module, in accordance with an embodiment;",
+  "FIG. 7 illustrates a document scoring module in accordance with an embodiment;",
+  "FIG. 8 illustrates a visual scoring engine, in accordance with an embodiment;",
+  "FIG. 9 illustrates an expert identity validation device, in accordance with an embodiment;",
+  "FIGS. 10 and 11 illustrate a blockchain configured architecture of an electronic document review and scoring system, in accordance with an embodiment;",
+  "FIG. 12 illustrates a method flow diagram for performing an expertise driven review and scoring of electronic documents in a crowdsourced environment; and",
+  "FIG. 13 illustrates generally, but not by the way of limitation, a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US9870591B2/sheet-00000.webp",
-   "label": "Sheet 1 of 14",
-   "width": 144,
-   "height": 120
+   "file": "drawings/US9870591B2/front.webp",
+   "label": "Front page figure",
+   "width": 2226,
+   "height": 1850,
+   "turned": false
   },
   {
-   "file": "drawings/US9870591B2/sheet-00001.webp",
-   "label": "Sheet 2 of 14",
-   "width": 100,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-01.webp",
+   "label": "Sheet 1 of 13",
+   "width": 2479,
+   "height": 2071,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00002.webp",
-   "label": "Sheet 3 of 14",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-02.webp",
+   "label": "Sheet 2 of 13",
+   "width": 2754,
+   "height": 2153,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00003.webp",
-   "label": "Sheet 4 of 14",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-03.webp",
+   "label": "Sheet 3 of 13",
+   "width": 2879,
+   "height": 2205,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00004.webp",
-   "label": "Sheet 5 of 14",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-04.webp",
+   "label": "Sheet 4 of 13",
+   "width": 2910,
+   "height": 2260,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00005.webp",
-   "label": "Sheet 6 of 14",
-   "width": 103,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-05.webp",
+   "label": "Sheet 5 of 13",
+   "width": 2587,
+   "height": 2216,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00006.webp",
-   "label": "Sheet 7 of 14",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-06.webp",
+   "label": "Sheet 6 of 13",
+   "width": 2286,
+   "height": 1856,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00007.webp",
-   "label": "Sheet 8 of 14",
-   "width": 106,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-07.webp",
+   "label": "Sheet 7 of 13",
+   "width": 2394,
+   "height": 2123,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00008.webp",
-   "label": "Sheet 9 of 14",
-   "width": 85,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-08.webp",
+   "label": "Sheet 8 of 13",
+   "width": 2680,
+   "height": 1897,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00009.webp",
-   "label": "Sheet 10 of 14",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-09.webp",
+   "label": "Sheet 9 of 13",
+   "width": 2951,
+   "height": 2183,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00010.webp",
-   "label": "Sheet 11 of 14",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-10.webp",
+   "label": "Sheet 10 of 13",
+   "width": 2932,
+   "height": 2153,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00011.webp",
-   "label": "Sheet 12 of 14",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-11.webp",
+   "label": "Sheet 11 of 13",
+   "width": 2651,
+   "height": 2190,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00012.webp",
-   "label": "Sheet 13 of 14",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-12.webp",
+   "label": "Sheet 12 of 13",
+   "width": 2580,
+   "height": 1711,
+   "turned": true
   },
   {
-   "file": "drawings/US9870591B2/sheet-00013.webp",
-   "label": "Sheet 14 of 14",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US9870591B2/sheet-13.webp",
+   "label": "Sheet 13 of 13",
+   "width": 2836,
+   "height": 2067,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/96/71/16/d3520ba76ca720/US9870591.pdf",
@@ -218,13 +251,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15386846",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US9870591B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

@@ -113,48 +113,88 @@
    "text": "The system of claim 1 , wherein the blockchain device is coupled to a private data store such that an entity accesses the time series database through the private data store."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a computer-controlled system for digitally evaluating one or more computer-executable and traceable metrics associated with a machine at a node. The system includes a computerized data collection wireless device for collecting digital data stored in the form of a plurality of computer-executable files from the machine associated with the node in a physical setting. The node is communicatively connected with one or more other nodes such that the one or more other nodes and the node together form a computer network of nodes. The computerized data collection wireless device includes a metric logistics device configured to generate a metric queue containing a plurality of computer-executable metric components storing information indicative of at least one of a date, time, geo-coordinates, machine identification details, and computer readable and executable performance data associated with the machine. The system further includes a data aggregator configured to receive and store the metric queue from the node locally for a retention period. The system further includes a computer-controlled metric appliance communicatively coupled to the data aggregator and receiving the metric queue from the data aggregator, wherein the computer-controlled metric appliance includes a processing circuit that is configured to analyze and process the metric queue associated with the machine at the node to generate a computer readable and executable output that is indicative of whether the metric is achieved or not by the machine. The computer-controlled metric appliance includes a time series database built to handle the computer-executable metric queue and associated measurements that are time-stamped and location-stamped in the form of a plurality of computer-executable metric clusters of time-location series. The computer-controlled metric appliance further includes a blockchain device communicatively coupled with the time series database for providing blockchain capabilities to the computer-controlled metric appliance, wherein the blockchain device includes a distributed digital ledger system for storing trust notes and creating smart contracts associated with the metric queue.",
+  "The machine may be a first machine such that the first machine may be communicatively coupled to a second machine and a third machine, wherein each of the first machine, the second machine, and the third machine may be located physically at the node such that the node may be communicatively coupled to the other nodes in the network wirelessly.",
+  "The metric and the computer-executable task may be dependent on performance of the first machine and the second machine.",
+  "The metric and the computer-executable task may be dependent on performance of the first machine only.",
+  "The plurality of computer-executable metric components of the metric queue may include a first computer-executable metric component defined as a computer-executable file storing information indicative of time of execution of the computer-executable task performed by the machine at the node.",
+  "The plurality of computer-executable metric components of the metric queue may include a second computer-executable metric component defined as a computer-executable file storing information indicative of date of execution of the computer-executable task performed by the machine at the node.",
+  "The plurality of computer-executable metric components of the metric queue may include a third computer-executable metric component defined as a computer-executable file storing information indicative of geographical coordinates (GPS location) associated with the execution of the computer-executable task performed by the machine at the node.",
+  "The plurality of computer-executable metric components of the metric queue may include a fourth computer-executable metric component defined as a computer-executable file storing information indicative of digital identification details of the machine and an associated entity pertinent to the execution of the computer-executable task performed by the machine at the node.",
+  "The plurality of computer-executable metric components of the metric queue may include a fifth computer-executable metric component defined as a computer-executable file storing information indicative of the computer readable and executable performance data associated with the computer-executable task performed by the machine.",
+  "The system may further include a GPS device to collect location details by real-time tracking of the event occurrences or performance of the computer-executable tasks as executed by the machine at the node.",
+  "The time series database may include a memory for storing time-stamped or time series data digitally, such that the stored data may include measurements and event occurrences that may be tracked, monitored, down-sampled, and aggregated with time and maintained in the form of the metric queue.",
+  "The time series database may store a set of key figure values such that each key figure value may be indicative of a computer-executable task associated with the metric queue that may be organized and stored in the form of the configurable clusters based on an association of the key figure values and respective individual time periods in the time series associated with the computer-executable task.",
+  "The metric appliance may further include a metrics dashboard to display information pertinent to the metric queue in the form of user-friendly statistical patterns and graphical images on a display device.",
+  "The computerized data collection wireless device may further include a metric identifier device configured to define and provide a set of computer-executable identifiers for the one or more computer-executable and traceable metrics.",
+  "The set of computer-executable identifiers may be determined based on a plurality of inputs either provided manually through a computerized system or generated through an automated process based on data acquired from one or more information sources.",
+  "The blockchain device may be coupled to a private data store such that an entity accesses the time series database through the private data store.",
+  "An embodiment herein provides a computer-controlled system for digitally evaluating one or more computer-executable and traceable metrics associated with a machine at a node. The system includes a computerized data collection wireless device for collecting digital data stored in the form of a plurality of computer-executable files from the machine associated with the node in a physical setting. The node is communicatively connected with one or more other nodes such that the one or more other nodes and the node together form a computer network of nodes. The computerized data collection wireless device includes a metric logistics device configured to generate a metric queue containing a plurality of computer-executable metric components storing information indicative of at least one of a date, time, geo-coordinates, machine identification details, and computer readable and executable performance data associated with the machine. The system further includes a data aggregator configured to receive and store the metric queue from the node locally for a retention period. The system further includes a computer-controlled metric appliance communicatively coupled to the data aggregator and receiving the metric queue from the data aggregator, wherein the computer-controlled metric appliance includes a processing circuit that is configured to analyze and process the metric queue associated with the machine at the node to generate a computer readable and executable output that is indicative of whether the metric is achieved or not by the machine. The computer-controlled metric appliance includes a time series database built to handle the computer-executable metric queue and associated measurements that are time-stamped and location-stamped in the form of a plurality of computer-executable metric clusters of time-location series.",
+  "The plurality of computer-executable metric components of the metric queue may include a computer-executable metric component defined as a computer-executable file storing information indicative of time of execution of the computer-executable task performed by the machine at the node.",
+  "The plurality of computer-executable metric components of the metric queue may include a computer-executable metric component defined as a computer-executable file storing information indicative of geographical coordinates (GPS location) associated with the execution of the computer-executable task performed by the machine at the node.",
+  "The computerized data collection wireless device may further include a metric identifier device configured to define and provide a set of computer-executable identifiers for the one or more computer-executable and traceable metrics.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates an example of a computer environment or architecture in which various embodiments herein may operate;",
+  "FIG. 2 illustrates a schematic diagram of a computer system for facilitating evaluation and digital management of one or more computer-executable and traceable metrics in accordance with an embodiment herein;",
+  "FIG. 3 illustrates a schematic diagram of a computer-controlled metric appliance connected with an artificial intelligence/machine learning system in accordance with an embodiment herein;",
+  "FIG. 4 illustrates another example of the computer system of FIG. 2 in accordance with an embodiment herein;",
+  "FIG. 5 illustrates a blockchain computer architecture of the system of FIG. 2 along with other systems in accordance with an embodiment herein; and",
+  "FIG. 6 is a block diagram illustrating a computer system according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11388077B2/sheet-00000.webp",
-   "label": "Sheet 1 of 7",
-   "width": 162,
-   "height": 120
+   "file": "drawings/US11388077B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1393,
+   "turned": false
   },
   {
-   "file": "drawings/US11388077B2/sheet-00001.webp",
-   "label": "Sheet 2 of 7",
-   "width": 98,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-01.webp",
+   "label": "Sheet 1 of 6",
+   "width": 2326,
+   "height": 1909,
+   "turned": true
   },
   {
-   "file": "drawings/US11388077B2/sheet-00002.webp",
-   "label": "Sheet 3 of 7",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-02.webp",
+   "label": "Sheet 2 of 6",
+   "width": 2614,
+   "height": 1949,
+   "turned": true
   },
   {
-   "file": "drawings/US11388077B2/sheet-00003.webp",
-   "label": "Sheet 4 of 7",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-03.webp",
+   "label": "Sheet 3 of 6",
+   "width": 2745,
+   "height": 1964,
+   "turned": true
   },
   {
-   "file": "drawings/US11388077B2/sheet-00004.webp",
-   "label": "Sheet 5 of 7",
-   "width": 81,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-04.webp",
+   "label": "Sheet 4 of 6",
+   "width": 2707,
+   "height": 1832,
+   "turned": true
   },
   {
-   "file": "drawings/US11388077B2/sheet-00005.webp",
-   "label": "Sheet 6 of 7",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-05.webp",
+   "label": "Sheet 5 of 6",
+   "width": 2558,
+   "height": 1763,
+   "turned": true
   },
   {
-   "file": "drawings/US11388077B2/sheet-00006.webp",
-   "label": "Sheet 7 of 7",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US11388077B2/sheet-06.webp",
+   "label": "Sheet 6 of 6",
+   "width": 2572,
+   "height": 1718,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/d7/cd/ee/6f61489027a2ab/US11388077.pdf",
@@ -163,13 +203,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16669496",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11388077B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

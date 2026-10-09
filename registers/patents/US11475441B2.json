@@ -99,54 +99,106 @@
    "text": "The system of claim 12 , wherein said blockchain address identifier comprises a public key corresponding to a private key that registers a transaction on said blockchain device."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a computer-controlled system for automated recording of evidence of a delivery of a service in a service setting. The system includes a mobile communication device associated with a user and proximately located to the user upon the delivery of the service. The computer-controlled system includes a web-based interaction component located remotely from the mobile communication device to collect predefined information about the mobile communication device and the associated user. The predefined information includes at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for the delivery in the service setting. A trigger is initiated upon electronic receipt of the first computer-executable input and the second computer-executable input by the web-based interaction component.",
+  "The computer-controlled system includes a service control system that includes one or more central servers, data stores, and cloud-based computing components for managing and processing the delivery of services in the service setting by a service provider to the user associated with the mobile communication device. The computer-controlled system includes a service interface device coupled to the web-based interaction component, wherein the service interface device generates an electronic signal transmitted to the mobile communication device using a transmission circuit, and wherein the electronic signal allows communication between the mobile communication device and the service control system.",
+  "The electronic signal includes a first short message service component (SMS), wherein the service interface device transmits the first SMS to the mobile communication device upon activation of the trigger in the service setting. The first SMS is indicative of start of a service. The electronic signal includes a second short message service component (SMS). The service interface device transmits the second SMS to the service control system upon activation of the trigger in the service setting. The second SMS is indicative of start of the service. The electronic signal includes a first secured hash link contained within the first SMS and executable by the mobile communication device, wherein executing the link records a first electronic evidence of service delivery associated with the mobile communication device. The first electronic evidence of service delivery is one of an event, a digitally executable location input, a digitally executable voice input, and a digital image. The electronic signal includes a second secured hash link contained within the second SMS and executable by the service control system, wherein executing the second link records a second electronic evidence of service delivery associated with the service control system. The second electronic evidence of service delivery is one of an event, a digitally executable location, a digitally executable location voice input, and a digital image.",
+  "The web-based interaction component further sends a confirmation electronic message along with a unique service proof token (SPT) to the mobile communication device and the service control system upon completion of the service delivery after selection of the first secured hash link and the second secured hash link respectively by the mobile communication device and the service control system. The unique SPT associated with each of the mobile communication device and the service control system is indicative of completion and delivery of the service by the service control system to the user associated with the mobile communication device.",
+  "The computer-controlled system includes a blockchain device configured to automatically store computer-executable instructions including digitally executable SPT associated with the mobile communication device and the service control system. The computer-controlled system includes a central verification device to verify the first evidence of service delivery and the second evidence of service delivery by retrieving the unique SPT from the blockchain device upon a request for a verified evidence, such that a verification by the central verification device determines whether one or more services were performed in the service setting. In an embodiment, the mobile communication device, the service control system, and the central verification device may be allowed to access discrete portions of data elements including the computer executable instructions stored within the blockchain device based on access rights through respective blockchain access points such that an access to the data elements allows one or more of viewing, locally replicating, and digitally sharing the data elements at least in part.",
+  "The at least one of the first electronic evidence of service delivery and the second electronic evidence of service delivery may be an event.",
+  "The at least one of the first electronic evidence of service delivery and the second electronic evidence of service delivery may be a location-based evidence.",
+  "The at least one of the first evidence of service delivery and the second evidence of service delivery may be a voice-based evidence.",
+  "The at least one of the first electronic evidence of service delivery and the second electronic evidence of service delivery may be an image-based evidence.",
+  "The computer-controlled system may include a first Global Positioning System (GPS) communicatively connected with the central verification device, wherein the first GPS records location coordinates of the service control system.",
+  "The first GPS may be contained within the service control system and may be configured to communicate with the central verification device.",
+  "The blockchain device may store the location coordinates of the service control system along with time stamped computer-executable information associated with receipt of the location coordinates of the service control system.",
+  "The computer-controlled system may include a second Global Positioning System (GPS) communicatively connected with the central verification device, wherein the second GPS records location coordinates of the mobile communication device.",
+  "The second GPS may be contained within the mobile communication device and may be configured to communicate with the central verification device.",
+  "The blockchain device may store the location coordinates of the mobile communication device along with time stamped computer-executable information associated with receipt of the location coordinates of the mobile communication device.",
+  "The blockchain device may include a blockchain database to store the SPT associated with the mobile communication device and the control system in a computer executable format.",
+  "The SPT may include a first SPT associated with the mobile communication device and representing a start of service proof token for receipt of the service by the user associated with the mobile communication device. The SPT may also include a second SPT associated with the mobile communication device and representing an end of service proof token for receipt of the service by the user associated with the mobile communication device. The SPT may also include a third SPT associated with the service control system and representing a start of service proof token for delivery of the service by the service control system. The SPT may also include a fourth SPT associated with the service control system and representing an end of service proof token for delivery of the service by the service control system.",
+  "The central verification device may retrieve the first SPT, the second SPT, the third SPT, and the fourth SPT for verification of the electronic evidence of service delivery.",
+  "The central verification device may be communicatively coupled with a rules engine, wherein the rules engine defines a set of computer-executable rules to verify proof of evidences based on the occurrence of the event, receipt of the digitally executable location information, receipt of the digitally executable voice input, or receipt of the digital image input.",
+  "The central verification device may process an electronic transaction if the evidence is verified in accordance with the set of computer-executable rules.",
+  "The rules engine may include at least one rule that identifies an entity that pays for a service and verification information requested by the entity as proof that a particular service was performed through the digitally stored SPT associated with the user of the mobile communication device.",
+  "The blockchain device may include a processing circuit to generate a network identifier associated with a blockchain network, a transaction ID (identifier), a blockchain address identifier using at least a unique key included in a transaction request and one or more hashing codes including the SPT associated with the respective mobile communication device and the service control system, an electronic transaction message, wherein the electronic transaction message may include a plurality of data elements, including at least a first data element configured to store a proof of transaction as the evidence reserved for private use upon request for verification by the central verification device, and a transmitting device configured to transmit the electronic transaction message to the mobile communication device and the service control system for private use.",
+  "The blockchain address identifier may be based on a public key corresponding to a private key that may be used to register the transaction on the blockchain device. The public key and the private key are a public/private key pair associated with the transaction indicative of the delivery of the service in the service setting.",
+  "A computer-controlled system is provided for digitally recording an evidence of a service delivery in a service setting. The system includes a web-based interaction component to collect predefined information about: a mobile communication device and an associated user who are at a service receiving end, wherein the predefined information includes at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting, wherein a trigger is initiated upon receipt of the first computer-executable input and the second computer-executable input by the web-based interaction component; and a service control system at a service delivery end, wherein the service control system includes one or more central servers, data stores, and cloud-based computing components for managing and processing delivery of services in the service setting by a service provider to the user associated with the mobile communication device.",
+  "The system further includes a service interface device coupled to the web-based interaction component. The service interface device generates an electronic signal transmitted to the mobile communication device using a transmission circuit. The electronic signal allows communication with the mobile communication device and the service control system. The electronic signal includes a first short message service component (SMS), wherein the service interface device sends the first SMS to the mobile communication device upon activation of the trigger in the service setting. The first SMS is indicative of start of a service. The electronic signal also includes a second short message service component (SMS), wherein the service interface device sends the second SMS to the service control system upon activation of the trigger in the service setting. The second SMS is indicative of start of the service.",
+  "The electronic signal includes a first secured hash link contained within the first SMS and executable by the mobile communication device or the associated user, wherein executing the link automatically records a first electronic evidence of service delivery associated with the mobile communication device. The electronic signal includes a second secured hash link contained within the second SMS and executable by the service control system, wherein executing the second link automatically records a second electronic evidence of service delivery associated with the service control system.",
+  "The web-based interaction component further sends a confirmation electronic message along with a unique service proof token (SPT) to the mobile communication device and the service control system upon completion of the service delivery after executing the first secured hash link and the second secured hash link respectively by the mobile communication device and the service control system. The unique SPT associated with each of the mobile communication device and the service control system is indicative of completion and delivery of the service by the service control system to the user associated with the mobile communication device.",
+  "The system further includes a blockchain device configured to automatically store computer-executable instructions comprising digitally executable SPT associated with the mobile communication device and the service control system.",
+  "The system includes a central verification device to verify the first electronic evidence of service delivery and the second electronic evidence of service delivery by retrieving the unique SPT from the blockchain device, such that verification by the central verification device determines whether one or more services were performed in the service setting. The system includes a global positioning system (GPS) communicatively connected with the central verification device, wherein the GPS records a first set of location coordinates corresponding to the mobile communication device and a second set of location coordinates corresponding to the service control system. The first set of location coordinates and the second set of location coordinates are stored in the blockchain along with the SPT such that the first set of location coordinates and the second set of location coordinates serve as the first electronic evidence of service delivery and the second electronic evidence of service delivery.",
+  "The mobile communication device, the service control system, and the central verification device may be allowed to access discrete portions of data elements including the computer executable instructions stored within the blockchain device based on access rights through respective blockchain access points such that an access to the data elements allows one or more of viewing, locally replicating, and digitally sharing the data elements at least in part.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates, among other things, an example of an environment or architecture in which various embodiments herein may operate;",
+  "FIG. 2 illustrates a computer-controlled evidence system among other components according to an embodiment herein;",
+  "FIG. 3 illustrates a computer-controlled evidence system among other components according to an embodiment herein;",
+  "FIG. 4 illustrates a flowchart depicting a method for recording of evidence digitally in a computer-executable format with the use of a computer-controlled system according to an embodiment herein;",
+  "FIG. 5 illustrates a use case of service delivery according to an embodiment herein;",
+  "FIG. 6 illustrates blockchain computer architecture of the system of FIG. 1 along with other systems in accordance with an embodiment herein; and",
+  "FIG. 7 is a block diagram illustrating a computer system according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11475441B2/sheet-00000.webp",
-   "label": "Sheet 1 of 8",
-   "width": 174,
-   "height": 120
+   "file": "drawings/US11475441B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1295,
+   "turned": false
   },
   {
-   "file": "drawings/US11475441B2/sheet-00001.webp",
-   "label": "Sheet 2 of 8",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-01.webp",
+   "label": "Sheet 1 of 7",
+   "width": 2521,
+   "height": 1949,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00002.webp",
-   "label": "Sheet 3 of 8",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-02.webp",
+   "label": "Sheet 2 of 7",
+   "width": 2504,
+   "height": 1913,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00003.webp",
-   "label": "Sheet 4 of 8",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-03.webp",
+   "label": "Sheet 3 of 7",
+   "width": 2680,
+   "height": 1931,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00004.webp",
-   "label": "Sheet 5 of 8",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-04.webp",
+   "label": "Sheet 4 of 7",
+   "width": 2701,
+   "height": 1958,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00005.webp",
-   "label": "Sheet 6 of 8",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-05.webp",
+   "label": "Sheet 5 of 7",
+   "width": 2740,
+   "height": 2016,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00006.webp",
-   "label": "Sheet 7 of 8",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-06.webp",
+   "label": "Sheet 6 of 7",
+   "width": 2650,
+   "height": 1866,
+   "turned": true
   },
   {
-   "file": "drawings/US11475441B2/sheet-00007.webp",
-   "label": "Sheet 8 of 8",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11475441B2/sheet-07.webp",
+   "label": "Sheet 7 of 7",
+   "width": 2571,
+   "height": 1750,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/d8/f9/aa/75b84e961d5636/US11475441.pdf",
@@ -155,13 +207,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16045530",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11475441B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

@@ -96,78 +96,122 @@
    "text": "The system of claim 11 , wherein the AI system further comprises: an interface layer to receive inputs form a computing system that serves as an initial input to the AI system; and an AI application processing layer to collect the initial inputs and related information from the blockchain database and external Internet sources, and process the initial inputs, make automated analysis and judgment for automated reading of the data extracted from the first diagnostic device and the second diagnostic devices using computational intelligent tools, wherein the AI system allows to process execution of a workflow task automatically using inputs generated based on the initial inputs at a second state when the initial inputs are evolved using a set of computational intelligence tools."
   }
  ],
+ "background": [],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a computer-controlled diagnostic network system to facilitate integrated remote-based diagnostics. The system includes a first diagnostic device located at a first location in a distributed secured network, a second diagnostic device located at a second location in the distributed secured network and remotely located from the first diagnostic device, a first diagnostician device associated with a first diagnostician located at a third location in the distributed secured network and remotely located from the first diagnostic device and the second diagnostic device, a second diagnostician device associated with a second diagnostician located at a fourth location in the distributed secured network and remotely located from the first diagnostic device, the second diagnostic device, and the third diagnostician device, and a computer-controlled central blockchain server for storing and processing details obtained from the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device. The computer-controlled central blockchain server is communicatively coupled to a data extraction device for retrieving a plurality of computer-executable files stored at discrete distributed locations associated with one or more users of the distributed secured network. At least one of the one or more users is associated with a computer system operatively coupled to an installable extraction agent. The computer-controlled central blockchain server is communicatively coupled to a blockchain device to process blockchain tasks through blockchain-enabled and computer-controlled software and hardware tools. The computer-controlled central blockchain server is located at a location remote from the locations of the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device. The system includes a secured cloud server to allow the one or more users to access one or more of the computer-executable files through a secured access from a remote location without being able to create a local copy of the one or more of the computer-executable files stored within the computer-controlled central blockchain server.",
+  "The plurality of computer-executable files may contain digitally stored data generated and retrieved from the first diagnostic device and the second diagnostic device.",
+  "The system may further include a standardizing device to perform computer-executable digital instructions for standardizing the digitally stored data retrieved from the first diagnostic device and the second diagnostic device in accordance with a predefined format, wherein the digitally stored data before standardizing may reside in a plurality of formats within the first diagnostic device and the second diagnostic device.",
+  "The system may include a blockchain database communicatively coupled to the computer-controlled central blockchain server and located at a location remotely from the locations of the first diagnostic device, the second diagnostic device, the first diagnostician device and the second diagnostician device.",
+  "The data extraction device may be communicatively coupled to a workflow system. The workflow system may be configured to perform a set of special purpose-based computer-executable operations for performing a plurality of computer-controlled tasks within the distributed secured network.",
+  "The plurality of computer-executable tasks within the distributed network may include creating one or more work flow steps for a set of workflow tasks, defining a set of routing rules for one or more of the users associated with the first diagnostician device and the second diagnostician device that trigger or accept to execute a certain workflow task, retrieving the work flow tasks for allocation from the blockchain database where the data extracted from the first diagnostic device and the second diagnostic device is stored, and presenting digitally one or more of the workflow tasks to the users based on their credentials and their preferences as indicative in their registered profiles.",
+  "The workflow system may further include a task segmentation engine to create the one or more work flow steps for the set of workflow tasks defining a set of routing rules for the one or more of the users that trigger or accept to execute the workflow task digitally. The workflow system may further include a task scheduling engine to allocate and present the one or more workflow tasks to the users based on their credentials and their preferences as indicative in their registered profiles. The distributed secured network may be a blockchain configured diagnostic network.",
+  "The data extraction device may further include an image recognition device and a non-image-based data extraction device. The image recognition device may be configured to read, recognize and extract image-based data from the data extraction device, and the non-image-based data extraction device may be configured to read, recognize, and extract the non-image-based data from the first diagnostic device and the second diagnostic device. The image recognition device may further include a communication interface for establishing communication with a plurality of components of the computer-controlled central blockchain server; an image acquisition device to receive digital signals containing image patterns and expressions and to read image-based data obtained from one or more of the first diagnostic device, second diagnostic device, first diagnostician device, and the second diagnostician device; a camera for taking still or streaming images of the data being extracted by the data extraction device; and a plurality of multichannel amplifiers (MCA) such that each amplifier of the multichannel amplifiers may be defined to receive a specific type of sensed information from the camera allowing sourcing of signals for the image recognition device.",
+  "The blockchain device may further include a processing device to process blockchain tasks through computer-controlled software and hardware tools.",
+  "The blockchain device may further include a transmitting device to allow transmission of the computer-executable files from the computer-controlled central blockchain server to the secured cloud server and to one or more of the users and associated one or more of the first diagnostician device and the second diagnostician device as allowed within the diagnostic network based on permissions and access rights.",
+  "The blockchain device may further include a central verification device configured to verify identity information of one or more of the first diagnostician device and the second diagnostician device in the secured network through which a user requests to access a workflow task for execution. The system may further include a credentialing system to compute credentialing of a registered profile associated with the user such that the access is granted based on credentialing of the registered profile.",
+  "The system may further include an artificial intelligence (AI) system integrated within the computer-controlled central blockchain server, wherein the AI system enables an artificially intelligent diagnostic network within the distributed secured network. The AI system may further include an interface layer to receive inputs form a computing system that serves as an initial input to the AI system. The AI system may further include an AI application processing layer to collect the initial inputs and related information from the blockchain database and external Internet sources, and process the initial inputs, make automated analysis and judgment for automated reading of the data extracted from the first diagnostic device and the second diagnostic devices using computational intelligent tools. The AI system may allow to process execution of a workflow task automatically using inputs generated based on the initial inputs at a second state when the initial inputs are evolved using a set of computational intelligence tools.",
+  "An embodiment herein provides a system for managing a diagnostic network including a plurality of digitally configured users to facilitate integrated remote-based diagnostics. The system includes a data extraction device retrieving computer-executable files from one or more of the plurality of users, wherein the plurality of users include one or more of a first networked system associated with a first diagnostician device, a second networked system associated with a second diagnostic device, a third networked system associated with a first diagnostician device, a fourth networked system associated with a second diagnostician device. Each of the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device are located remote from one another at physically distributed locations. The system includes a workflow system for generating a computer-executable workflow file indicative of tasks allocation among the one or more of the plurality of users connected through the diagnostic network, wherein the computer-executable workflow file identify nature of tasks for execution digitally by the one or more of the plurality of users, automated access rights depending on credentialing of digital profiles of the one or more of the plurality of users, and monetary benefits after the execution of the workflow tasks allocated to the one or more of the plurality of users. The workflow tasks allocation is updated dynamically in the computer-executable workflow file when a user of the plurality of users accepts an allocation out of the workflow tasks presented to the user.",
+  "The system further includes a computer-controlled central blockchain server for storing and processing details obtained from the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device. The computer-controlled central blockchain server is communicatively coupled to the data extraction device for retrieving the computer-executable files stored at discrete distributed locations associated with the one or more users of the distributed secured network. The computer-controlled central blockchain server is further communicatively coupled to a blockchain device. The system further includes a secured cloud server to allow the one or more users to access one or more of the computer-executable files through a secured access from a remote location without being able to create a local copy of the one or more of the computer-executable files.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates, among other things, an example of an environment or architecture in which various embodiments herein may operate;",
+  "FIG. 2 illustrates, among other things, another example of an environment or architecture in which various embodiments herein may operate;",
+  "FIG. 3 illustrates, among other components, a processing device that may be coupled communicatively with a blockchain server and a secured cloud server, according to an embodiment herein;",
+  "FIG. 4 illustrates distributed nature of a plurality of users within a diagnostic network according to an embodiment herein;",
+  "FIG. 5 illustrates an example of a workflow system according to an embodiment herein;",
+  "FIG. 6 illustrates various components of a data extraction device in accordance with an embodiment herein;",
+  "FIG. 7 illustrates various blockchain-enabled network devices and components in accordance with an embodiment herein;",
+  "FIG. 8 illustrates an example of an AI system that may be integrated within a blockchain server to enable the artificially intelligent diagnostic network in accordance with an embodiment herein;",
+  "FIG. 9 illustrates an example of a credentialing system in accordance with an embodiment herein;",
+  "FIG. 10 illustrates an exemplary blockchain configured ecosystem architecture in accordance with an embodiment herein; and",
+  "FIG. 11 is a block diagram illustrating a computer system according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11769573B2/sheet-00000.webp",
-   "label": "Sheet 1 of 12",
-   "width": 153,
-   "height": 120
+   "file": "drawings/US11769573B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1463,
+   "turned": false
   },
   {
-   "file": "drawings/US11769573B2/sheet-00001.webp",
-   "label": "Sheet 2 of 12",
-   "width": 98,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-01.webp",
+   "label": "Sheet 1 of 11",
+   "width": 2418,
+   "height": 1980,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00002.webp",
-   "label": "Sheet 3 of 12",
-   "width": 101,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-02.webp",
+   "label": "Sheet 2 of 11",
+   "width": 2419,
+   "height": 2045,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00003.webp",
-   "label": "Sheet 4 of 12",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-03.webp",
+   "label": "Sheet 3 of 11",
+   "width": 2584,
+   "height": 1968,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00004.webp",
-   "label": "Sheet 5 of 12",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-04.webp",
+   "label": "Sheet 4 of 11",
+   "width": 2448,
+   "height": 1772,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00005.webp",
-   "label": "Sheet 6 of 12",
-   "width": 155,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-05.webp",
+   "label": "Sheet 5 of 11",
+   "width": 1091,
+   "height": 1414,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00006.webp",
-   "label": "Sheet 7 of 12",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-06.webp",
+   "label": "Sheet 6 of 11",
+   "width": 2025,
+   "height": 1396,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00007.webp",
-   "label": "Sheet 8 of 12",
-   "width": 119,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-07.webp",
+   "label": "Sheet 7 of 11",
+   "width": 1918,
+   "height": 1908,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00008.webp",
-   "label": "Sheet 9 of 12",
-   "width": 153,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-08.webp",
+   "label": "Sheet 8 of 11",
+   "width": 850,
+   "height": 1087,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00009.webp",
-   "label": "Sheet 10 of 12",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-09.webp",
+   "label": "Sheet 9 of 11",
+   "width": 2600,
+   "height": 1920,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00010.webp",
-   "label": "Sheet 11 of 12",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-10.webp",
+   "label": "Sheet 10 of 11",
+   "width": 2554,
+   "height": 1834,
+   "turned": true
   },
   {
-   "file": "drawings/US11769573B2/sheet-00011.webp",
-   "label": "Sheet 12 of 12",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US11769573B2/sheet-11.webp",
+   "label": "Sheet 11 of 11",
+   "width": 2571,
+   "height": 1692,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/e7/f9/4e/339e3b81f67fea/US11769573.pdf",
@@ -176,13 +220,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16161846",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11769573B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

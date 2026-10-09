@@ -48,7 +48,8 @@ The pages are generated as 0044-public-website states; the terms live in the ont
 ## The registry's facts
 
 - **FR-008**: Each patent's registry facts MUST be held as an `ifcore:ExternalRecordReference` that `ifcore:describes` the patent
-  (0007-work-and-assets FR-008): filing, publication and grant dates, status, abstract, claims, drawings, classifications, inventors,
+  (0007-work-and-assets FR-008): filing, publication and grant dates, status, abstract, the background, summary and description of the
+  drawings of the specification, claims, drawings, classifications, inventors,
   assignee, its parent applications with their relation, and the registry's expiration date. The reference MUST name the registry
   record as its primary source and state its status and dates as its cached value with the date it was read. The structured copy of
   those records MUST be the files under `registers/patents/` in the public root, written by a program from the registry records, never
@@ -78,11 +79,14 @@ The pages are generated as 0044-public-website states; the terms live in the ont
   redirect permanently to that patent's page. An address the
   previous websites published for one patent MUST redirect to that patent's page, not to its family's (0024-persistent-addresses FR-002).
 - **FR-013**: A patent's page MUST show its title, number, family, status and dates with the date they were read, the estimated
-  expiration (FR-009), its abstract, every claim its record holds, its drawings, its classifications linked to their classification pages
-  (FR-017), the patents it is related to by FR-003 with each relation named, its supporting assets grouped by kind, and the offer and
-  inquiry of its family (FR-010, FR-011).
+  expiration (FR-009), its abstract, the background and summary of its specification, every claim its record holds, its drawings with
+  the specification's description of them, its classifications linked to their classification pages (FR-017), the patents it is related
+  to by FR-003 with each relation named, its supporting assets grouped by kind, and the offer and inquiry of its family (FR-010, FR-011).
+  Every drawing sheet MUST be shown at the resolution the registry publishes it, and a figure drawn across its sheet (37 CFR 1.84(i))
+  MUST be turned so that it reads upright.
 - **FR-014**: A family's page MUST show its patents and the relations between them, its work domain, the supporting assets about the
-  family, and the supporting assets about each of its patents, each naming the patent it is about, and the offer and inquiry.
+  family, and the supporting assets about each of its patents, each naming the patent it is about, and the offer and inquiry. Its
+  patents and its filings MUST be shown so that nothing is wider than the screen at any width from 320px.
 - **FR-015**: The list at `/patents` MUST list patents only, grouped by family, and every count it shows MUST count patents or families
   only. Supporting assets MUST be listed only on their own index pages and on the pages of the patents they are about.
 - **FR-016**: A supporting asset MUST answer at the address the previous websites published for it, and its page MUST name the patent or
@@ -132,6 +136,9 @@ The pages are generated as 0044-public-website states; the terms live in the ont
   prior art, per FR-010.
 - A supporting asset that covers several patents of one family: it is about the family, per FR-004.
 - A podcast episode whose audio is not yet in rendition storage: its page shows its text only, per FR-020.
+- A drawing sheet whose figure is drawn across the sheet: it is shown turned a quarter clockwise, per FR-013.
+- A family's patents and filings on a narrow screen: each is shown as a block of facts that wraps, never a table wider than the
+  page, per FR-014.
 
 ## Assumptions
 

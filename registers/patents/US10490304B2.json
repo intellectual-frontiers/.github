@@ -113,78 +113,114 @@
    "text": "The blockchain validation system of claim 13 , wherein respective cross-references are maintained by said plurality of blockchain configured social federation proxies and said BCDB so that an access to said cross-references by said plurality of entities is redirected to said external storage location for viewing, accessing, and managing of said second portion of said data records."
   }
  ],
+ "background": [
+  "Technical Field",
+  "The embodiments herein generally relate to blockchain configured systems and more particularly to blockchain configured management systems.",
+  "Description of the Related Art",
+  "Hospitals, caretakers, nursing centers or homes, medical offices, medical centers, or other sources of medical care and entities generally keep medical and demographic or other such records of their patients. These records may include a variety of information such as demographic information of their patients, medical history, diagnostic and pathology reports of their patients, medical reports or prescriptions, device generated information, or other such information. This information can be used for a variety of purposes by these sources of medical care. A few examples of them are, without limitations, tracking of the patients and their records, billing, historical assessments, integrating with medical devices, remote care, future care taking, telemedicine, proper ongoing medical or health assessment or treatment, or any other similar purpose.",
+  "One way to collate and store the medical data is with the use of an electronic health record data bank (EHRDB). These records from various entities can be electronically maintained such as by the electronic health record data bank (EHRDB) in a central system accessible by the entities. The EHRDB may store medical data of the entities and retrieve the data of the respective entities as and when requested by them.",
+  "There is a need for an improved system and a method that provides a multi-faceted facility in the EHRDB to interact with several entities simultaneously over a blockchain configured framework for advanced security and smooth interaction without requiring human intermediation."
+ ],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a blockchain validation system. The blockchain validation system includes a plurality of computing systems connected with a social integrity network and a plurality of sub-systems of data records. The plurality of sub-systems include a plurality of social aware networks, a plurality of sensors, a plurality of wearable devices, and a plurality of scanners. Each of the plurality of social aware networks, plurality of sensors, plurality of wearable devices, and plurality of scanners serve as a provider of the data records. The blockchain validation system further includes a blockchain configured data bank (BCDB) hosted on a server accessible by each of the plurality of computing systems based on rules and preferences of a plurality of entities upon authorization by the BCDB. The plurality of entities subscribe with the BCDB to create, store, edit, manage or control the data records. The BCDB includes a computer processing component executing stored computer-implemented instructions to process the data records of the plurality of entities over the social integrity network. The data records are obtained from the plurality of social aware networks, plurality of sensors, plurality of wearable devices, and the plurality of scanners associated with the entities. The BCDB further includes a hardware repository coupled to the BCDB to store the data records of the plurality of entities collected from the plurality of social aware networks, plurality of sensors, plurality of wearable devices, and the plurality of scanners. The blockchain validation system includes a blockchain configured component communicatively coupled to the BCDB and adapted to be accessible by each of the plurality of computing systems such that the blockchain configured component enables social interaction among the entities by bypassing the BCDB, and communication with the BCDB over the social integrity network for data records transfer. The blockchain validation system includes a plurality of blockchain configured social federation proxies communicatively coupled to the BCDB and the social integrity network and configured to retrieve the data records from the BCDB collected from the plurality of social aware networks, plurality of sensors, plurality of wearable devices, and the plurality of scanners, and distribute them to the plurality of social aware networks and the plurality of computing systems for display to the respective plurality of entities upon request and validation. The plurality of blockchain configured social federation proxies may include a virtualization layer to provide a distributed virtual access of storage of the data records retrieved from the BCDB and allow an indirect access of the plurality of entities to the BCDB. The plurality of blockchain configured social federation proxies include a processing device configured to manage and communicate the data records in a blockchain configured distributed framework. The blockchain validation system includes a blockchain validation device configured to receive digital inputs from the BCDB to identify access rules and execute blockchain validation mechanisms to authorize the plurality of entities to access the data records accessible from the blockchain configured component through the distributed plurality of blockchain configured social federation proxies linked to the BCDB simultaneously. The blockchain validation device includes a face recognition device to process information received from respective facial expression sensors associated with the plurality of entities to verify identity of the plurality of entities based on respective facial expressions. The blockchain validation device includes a geo-tagging device to obtain geographical coordinates from respective global position system (GPS)-based devices associated with the plurality of entities, tag the data records using geo-tags to establish a geographical identity with the data records, and validate identity of the plurality of entities and the respective data records based on geographical patterns. The BCDB and the plurality of blockchain configured social federation proxies are further configured to identify a source and a target, wherein the source identifies data records for sharing and the target identifies a computing system out of the plurality of computing systems as a recipient of the data records defined by the source. The identification of at least one of the source and the target is dependent on (a) a permission from an owner of the source, (b) an indication of an extent of sharing, (c) a nature and characteristic of the target, (d) a purpose of the sharing of the data records to the target, (e) a timeframe for allowance of sharing of the data records. The source and the target are determined based on (a) to (e) upon receipt of a request from the owner entity. The sharing of the data records with the target is limited to the timeframe. The BCDB and the plurality of blockchain configured social federation proxies are further configured to allow partial viewing of the data records corresponding to the source by the target based on (a) to (e), stop any viewing based on (a) to (e), select which parts to view based on (a) to (e), determine or facilitate the owner entity of the data records to determine who has viewed the data records and accordingly redefine said (a) to (e) and also accordingly make a decision about the partial viewing of the data records corresponding to the source by the target based on (a) to (e) and stopping of any viewing or selecting which parts to view based on the redefined (a) to (e). The blockchain configured component is configured to identify who has viewed the data records in real time and share information about who has viewed the data records with the owner in real time, such that the owner allows fully or partially or stops viewing of the data records by the target in real time."
+ ],
+ "drawingDescriptions": [
+  "In the drawings, like numerals describe similar components substantially throughout the several views. The drawings illustrate generally, by way of an example, but not by a way of limitation, various embodiments.",
+  "FIG. 1 illustrates generally, but not by the way of limitation, among other things, a schematic diagram depicting a communications environment, in which some embodiments herein may operate;",
+  "FIG. 2 illustrates generally, but not by the way of limitation, among other things, an example of an interactive social users interface display of a multi-faceted social health care component, in accordance with embodiments herein;",
+  "FIGS. 3A and 3B illustrate generally, but not by the way of limitation, a sequence diagram depicting a method for restricting access to the multi-faceted social health care component based on the determined policy-based restrictions, in accordance with embodiments herein;",
+  "FIG. 4 illustrates generally, but not by the way of limitation, among other things, a schematic diagram depicting a communications environment, in which some embodiments herein may operate;",
+  "FIG. 5 illustrates a method flowchart for accessing a social health care component by an entity, in accordance with embodiments herein;",
+  "FIG. 6 illustrates a device-driven non-intermediated blockchain configured digital ecosystem in a social integration network, in accordance with embodiments herein;",
+  "FIG. 7 illustrates an architecture for enabling health care transactions and accessing of social records by the entities in accordance with the blockchain configured digital ecosystem of FIG. 6 , in accordance with embodiments herein;",
+  "FIG. 8 illustrates exemplary on chain data sources and off chain data sources generating data for storage in and/or accessible through a blockchain configured social health record data bank (SHRDB), in accordance with embodiments herein;",
+  "FIG. 9 illustrates another view of a portion of a blockchain configured digital ecosystem illustrating multiple entities and associated networks, devices, and systems, in accordance with embodiments herein; and",
+  "FIG. 10 illustrates a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10490304B2/sheet-00000.webp",
-   "label": "Sheet 1 of 12",
-   "width": 177,
-   "height": 120
+   "file": "drawings/US10490304B2/front.webp",
+   "label": "Front page figure",
+   "width": 2980,
+   "height": 2018,
+   "turned": false
   },
   {
-   "file": "drawings/US10490304B2/sheet-00001.webp",
-   "label": "Sheet 2 of 12",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-01.webp",
+   "label": "Sheet 1 of 11",
+   "width": 2831,
+   "height": 2057,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00002.webp",
-   "label": "Sheet 3 of 12",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-02.webp",
+   "label": "Sheet 2 of 11",
+   "width": 2487,
+   "height": 1859,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00003.webp",
-   "label": "Sheet 4 of 12",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-03.webp",
+   "label": "Sheet 3 of 11",
+   "width": 2582,
+   "height": 2131,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00004.webp",
-   "label": "Sheet 5 of 12",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-04.webp",
+   "label": "Sheet 4 of 11",
+   "width": 2650,
+   "height": 2148,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00005.webp",
-   "label": "Sheet 6 of 12",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-05.webp",
+   "label": "Sheet 5 of 11",
+   "width": 2868,
+   "height": 2071,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00006.webp",
-   "label": "Sheet 7 of 12",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-06.webp",
+   "label": "Sheet 6 of 11",
+   "width": 2323,
+   "height": 1730,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00007.webp",
-   "label": "Sheet 8 of 12",
-   "width": 85,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-07.webp",
+   "label": "Sheet 7 of 11",
+   "width": 2969,
+   "height": 2097,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00008.webp",
-   "label": "Sheet 9 of 12",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-08.webp",
+   "label": "Sheet 8 of 11",
+   "width": 2759,
+   "height": 2077,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00009.webp",
-   "label": "Sheet 10 of 12",
-   "width": 96,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-09.webp",
+   "label": "Sheet 9 of 11",
+   "width": 2409,
+   "height": 1936,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00010.webp",
-   "label": "Sheet 11 of 12",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-10.webp",
+   "label": "Sheet 10 of 11",
+   "width": 2544,
+   "height": 1968,
+   "turned": true
   },
   {
-   "file": "drawings/US10490304B2/sheet-00011.webp",
-   "label": "Sheet 12 of 12",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US10490304B2/sheet-11.webp",
+   "label": "Sheet 11 of 11",
+   "width": 2774,
+   "height": 1804,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/a8/35/54/39306527de8408/US10490304.pdf",
@@ -193,13 +229,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15372699",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10490304B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

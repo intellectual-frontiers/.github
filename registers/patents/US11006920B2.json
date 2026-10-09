@@ -161,90 +161,132 @@
    "text": "The system of claim 14 , wherein the remote-controlled device controls an operation of the plurality of electronic devices for performing an action on the subject."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a system for controlling multiple devices, the system comprising a physiological sensor associated with a body of a subject and configured to sense one or more physiological characteristics of the subject and generate a digital physiological signal indicative of an instantaneous physiological state of the subject; a first device configured for bi-directional wireless communication positioned proximate to the subject and comprising a first memory circuit and a first processor, wherein the first device is configured to generate a first signal indicative of an operating state of the first device, and wherein the operating state comprising one of a performing state and a non-performing state of the first device; a second device configured for bi-directional wireless communication positioned proximate to the subject and comprising a second memory circuit and a second processor, wherein the second device is configured to generate a second signal indicative of an operating state of the second device, wherein the operating state comprising one of a performing state and a non-performing state of the second device, and wherein the first device and the second device are configured to perform one of a therapeutic, diagnostic, and a medication delivery task on the subject in accordance with computer-enabled instructions; a computer with telemetry circuitry for communicating with the physiological sensor, the first device, and the second device; and a remote-control device positioned apart from the physiological sensor, the first device, and the second device.",
+  "The remote-control device comprises a digital records repository comprising a memory circuit and a processing unit for storing dynamically updating computer executable files aggregated from a plurality of changing private networks wherein the computer executable files contain dynamically updating digitally recorded information indicative of a set of changing subject attributes and respective changing reference values associated with the subject; an electronic record (ER) client configured to make a wireless connection with each of the private networks and configured to query an ER database associated with each of the private networks for electronic records residing within the private networks; a server machine configured for communicating with the physiological sensor, the first device, and the second device either directly or through the computer, wherein the server machine is configured for receiving the digital physiological signal indicative of the instantaneous physiological state of the subject and sending programmable operational parameters to the first device and the second device in response to a request for service from the computer and based on the instantaneous physiological state such that the operating parameters decides operating characteristics of the first device and operating characteristics of the second device and the operating characteristics of the first device and the operating characteristics of the second device are interdependent through a priority and interdependence relationship, wherein at least one of the physiological sensor, the first device, the second device, and the computer transforms the received operating parameters into a digital data structure readable by a scanner; and an identity validation device to verify an identity of the first device and the second device and associate a subject identifier uniquely representing the subject with the first device and the second device based on information contained within the physiological signal such that the operating parameters are calculated based on one or more of the reference values associated with the subject having the unique subject identifier as identified based on the physiological signal.",
+  "The physiological sensor may be implanted within the body of the subject subcutaneously. The physiological sensor may be associated with the subject as an external device. The physiological sensor may be configured for the subject such that the digital physiological signal contains the subject identifier along with an information indicative of the instantaneous physiological state of the subject. The remote-control device may be configured to associate the subject identifier with the computer executable files stored in the digital records repository to retrieve the reference values associated with the subject and generate an output indicative of the operational parameters of the first device and the second device based on the physiological signal and the retrieved reference values associated with the subject. The operational parameters may comprise any of changing an operating state of the first device only for a first period of time; changing an operating state of the second device only for a second period of time; changing an operating state of both the first device and the second device for a third period of time; and connecting a third device different from the first device and the second device by associating an operating state with the third device in association with the subject for a fourth period of time, wherein each of the first device, the second device, and the third device are uniquely identified by device identifiers such that the digital records repository stores the digital identifiers in a device manager in association with the subject identifier.",
+  "Any of the server machine and the computer may further comprise a switch matrix configured to cause switching of the operating state of the one or more of the first device, second device, and the third device upon receipt of the operational parameters from the remote-control device in accordance with the priority and interdependence relationships. The remote-control device may further comprise a time detection circuit configured to monitor the first period of time, second period of time, third period of time, and the fourth period of time. The system may further comprise a device state detection circuit coupled to the time detection circuit and configured to identify an operating state of the first device, second device, and the third device after completion of the first period of time, the second period of time, the third period of time, and the fourth period of time. The system may further comprise a fault detection circuit configured to generate a signal indicative of a fault when the device state detection circuit does not detect a change in operating states of either of the first device, second device, or the third device in accordance with the operational parameters transmitted by the remote-control device. The first device may comprise a ventilator and the second device may comprise an X-ray machine such that the remote-control device causes the ventilator to perform a first action upon receipt and the X-ray machine to perform a second action upon receipt of the operational parameters.",
+  "The remote-control device may comprise an electronic medical record (EMR) system configured to house a plurality of digital records associated with a plurality of subjects including the subject in the form of a plurality of digital files including the computer executable files associated with the subject, wherein the EMR system comprising the digital records repository; the electronic record (ER) client; a mobile point of care system to capture subject-associated digital data at a point of care wherein the point of care system is communicatively connected with the electronic record (ER) client so as to transmit the electronic records captured by the mobile point of care system from the private networks to the server machine; a data interface, in communication with the mobile point of care system, to facilitate transmission of the electronic records to the server machine; and a web-based interactive graphical user interface for allowing the subject to enter the digital records manually from a distant location. The digital data structure may comprise a QR (quick response) code.",
+  "Another embodiment provides a multi-device system comprising a first medical device configured for bi-directional wireless communication positioned proximate to a subject and comprising a first memory circuit and a first processor, wherein the first medical device is configured to generate a first signal indicative of an operating state of the first medical device, and wherein the operating state comprising one of a performing state and a non-performing state of the first medical device; and a second medical device configured for bi-directional wireless communication positioned proximate to the subject and comprising a second memory circuit and a second processor, wherein the second medical device is configured to generate a second signal indicative of an operating state of the second medical device, and wherein the operating state comprising one of a performing state and a non-performing state of the second medical device.",
+  "Each of the first medical device and the second medical device comprise an integrated gateway device configured to have a multiple interface unit comprising data interface units configured to send medical operation measurements in conformity with one or more operational parameters received via any of a wired and wireless communication network; a medical device housing to contain device accessories and circuitry; one or more of a therapeutic delivery device, a medication delivery device, and a diagnosis device physically contained within the medical device housing and configured to perform one of a therapeutic, diagnostic, and a medication delivery task; an identification module to contain digitally stored information indicative of device identifier and configured to be transmitted to other devices upon request for device identification; and a computer with telemetry circuitry for communicating with a physiological sensor, the first device, and the second device, wherein the computer is configured to receive a physiological signal from the associated physiological sensor configured for a subject; transmit a subject identifier, a first medical device identifier associated with the first medical device, and a second medical device identifier associated with the second medical device along with a service request to a remote-control device positioned apart from the physiological sensor, and wherein the remote-control device is configured to fulfill the service request based on information contained in a plurality of dynamically updating computer executable files from a plurality of digital data sources and stored in an EMR system configured within the remote-control device; and receive the one or more operational parameters from the remote-control device in response to a service request from the computer and based on an instantaneous physiological state as identified from the physiological signal such that the one or more operating parameters decides operating characteristics of the first medical device and operating characteristics of the second medical device, wherein the operating characteristics of the first medical device and the operating characteristics of the second medical device are interdependent through a priority and interdependence relationship.",
+  "The first medical device may comprise a medical imaging machine for imaging of a target including a tissue or a bone structure within a body of a subject, the medical imaging machine comprising a rotatable drive shaft; an imaging device supported on the rotatable drive shaft, the imaging device adapted to transmit energy toward the target; a position adjustment mechanism coupling with the rotatable shaft to allow adjustment of the rotatable drive shaft in order to focus transmission of the energy at the target; the integrated gateway device; and the identification module. The energy may comprise X-rays and the imaging machine may comprise an X-Ray machine.",
+  "The second medical device may comprise a life support system comprising an oxygen source that includes a tank of pressurized gas; one or more control valves disposed over a channel connecting the oxygen source and the subject to allow the oxygen to flow from the tank to a laryngeal mask in a first state and to allow gas expelled from the subject to flow from the laryngeal mask to the atmosphere in a second state while preventing the oxygen from flowing from the oxygen source in a second state; the laryngeal mask disposed downstream from the inspiration control valve, the laryngeal mask configured to form an air seal with the subject's respiratory tract such that the oxygen flows from the oxygen source to the lungs of the subject; a timer for synchronizing actuation of the one or more control valves based on the operational parameters received from the remote-control device containing the EMR system; the integrated gateway device; and the identification module. The life support system may comprise a ventilator. Each of the first medical device and the second medical device may comprise a respective (Global Positioning System) GPS-based device such that the GPS-based device is configured to detect geo-locations of the respective first medical device and the second medical device, wherein the remote-control device receives the detected geo-locations of the first medical device and the second medical device, and the remote-control device automatically correlates the subject identifier for the subject associated with the first medical device and the second medical device and initiates functioning in context of the subject as and when the EMR system is proximate to the subject associated with the first medical device and the second medical device. The computer may be configured to transform the operating parameters received from the remote-control device into a digital data structure, the system further comprising a scanner communicatively coupled to the computer such that the digital data structure is readable by the scanner."
+ ],
+ "drawingDescriptions": [
+  "The features of the disclosed embodiments may become apparent from the following detailed description taken in conjunction with the accompanying drawings showing illustrative embodiments herein, in which:",
+  "FIG. 1 illustrates generally, but not by the way of limitation, among other things, an example of an operating environment in which an embodiment may operate;",
+  "FIG. 2 illustrates generally, but not by the way of limitation, among other things, an ER client such as described in FIG. 1 , in accordance with an embodiment;",
+  "FIG. 3 is a schematic diagram that illustrates generally, but not by the way of limitation, an exemplary cloud computing architecture, in accordance with an exemplary embodiment;",
+  "FIG. 4 illustrates generally, but not by the way of limitation, a plurality of medical devices connected with an EMR system, in accordance with an embodiment;",
+  "FIG. 5 illustrates, generally but not by the way of limitation, a system for facilitating coordination and control among a plurality of medical devices, in accordance with an embodiment;",
+  "FIG. 6 illustrates, generally but not by the way of limitation, an example of a first medical device and a second medical device coordinating in a network before switching their operating states, in an embodiment;",
+  "FIG. 7 illustrates, generally but not by the way of limitation, an example of the first medical device and the second medical device coordinating in the network after switching their operating states, in accordance with an embodiment;",
+  "FIG. 8 illustrates an exemplary lookup table depicting interdependence among a plurality of medical devices, in accordance with an embodiment;",
+  "FIG. 9 illustrates a method for facilitating coordinated functioning of a plurality of medical devices, in accordance with an embodiment;",
+  "FIG. 10 illustrates an exemplary remote-control device in association with a multi-device module, in accordance with an embodiment;",
+  "FIG. 11 illustrates an exemplary multi-device module, in accordance with an embodiment;",
+  "FIG. 12 illustrates an exemplary centralized system linked with medical devices, in accordance with an embodiment; and",
+  "FIG. 13 illustrates generally, but not by the way of limitation, a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11006920B2/sheet-00000.webp",
-   "label": "Sheet 1 of 14",
-   "width": 180,
-   "height": 120
+   "file": "drawings/US11006920B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1253,
+   "turned": false
   },
   {
-   "file": "drawings/US11006920B2/sheet-00001.webp",
-   "label": "Sheet 2 of 14",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-01.webp",
+   "label": "Sheet 1 of 13",
+   "width": 2537,
+   "height": 1997,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00002.webp",
-   "label": "Sheet 3 of 14",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-02.webp",
+   "label": "Sheet 2 of 13",
+   "width": 2438,
+   "height": 1778,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00003.webp",
-   "label": "Sheet 4 of 14",
-   "width": 69,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-03.webp",
+   "label": "Sheet 3 of 13",
+   "width": 2288,
+   "height": 1318,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00004.webp",
-   "label": "Sheet 5 of 14",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-04.webp",
+   "label": "Sheet 4 of 13",
+   "width": 2388,
+   "height": 1661,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00005.webp",
-   "label": "Sheet 6 of 14",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-05.webp",
+   "label": "Sheet 5 of 13",
+   "width": 2448,
+   "height": 1872,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00006.webp",
-   "label": "Sheet 7 of 14",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-06.webp",
+   "label": "Sheet 6 of 13",
+   "width": 2273,
+   "height": 1653,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00007.webp",
-   "label": "Sheet 8 of 14",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-07.webp",
+   "label": "Sheet 7 of 13",
+   "width": 2323,
+   "height": 1680,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00008.webp",
-   "label": "Sheet 9 of 14",
-   "width": 53,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-08.webp",
+   "label": "Sheet 8 of 13",
+   "width": 2470,
+   "height": 1097,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00009.webp",
-   "label": "Sheet 10 of 14",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-09.webp",
+   "label": "Sheet 9 of 13",
+   "width": 2431,
+   "height": 1664,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00010.webp",
-   "label": "Sheet 11 of 14",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-10.webp",
+   "label": "Sheet 10 of 13",
+   "width": 2671,
+   "height": 1972,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00011.webp",
-   "label": "Sheet 12 of 14",
-   "width": 81,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-11.webp",
+   "label": "Sheet 11 of 13",
+   "width": 2583,
+   "height": 1745,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00012.webp",
-   "label": "Sheet 13 of 14",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-12.webp",
+   "label": "Sheet 12 of 13",
+   "width": 2473,
+   "height": 1692,
+   "turned": true
   },
   {
-   "file": "drawings/US11006920B2/sheet-00013.webp",
-   "label": "Sheet 14 of 14",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US11006920B2/sheet-13.webp",
+   "label": "Sheet 13 of 13",
+   "width": 2572,
+   "height": 1769,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/77/73/ff/b2a17908c15b18/US11006920.pdf",
@@ -253,13 +295,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16835258",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11006920B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

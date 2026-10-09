@@ -106,72 +106,106 @@
    "text": "The method of claim 14 , further comprising: analyzing said information blocks delivered to said EMR application in association with said plurality of navigation interfaces associated with said EMR application during a workflow event; mapping said analyzed information blocks with said actual information pre-stored in a separate database connected with said EMR system; and determining an inconsistency in a navigation workflow during said workflow event based on said mapping of said information blocks with said actual information pre-stored in said separate database about said event occurrences; and generating an electric signal comprising a computer executable file signifying said inconsistency in said navigation workflow during said workflow event based on situational awareness through said delivery of said information blocks."
   }
  ],
+ "background": [
+  "Technical Field",
+  "The embodiments herein generally relate to data management, and more particularly to integration and tracking of medical data across electronic medical record systems for specific purposes.",
+  "Description of the Related Art",
+  "Electronic Medical Records (EMR) systems create and maintain all patient data electronically. The system captures patient data, such as patient complaints, lab orders, medications, diagnoses, and procedures, at its source at the time of entry using a graphical user interface. Authorized healthcare providers can access, analyze, update and electronically annotate patient data even while other providers are using the same patient record. The system also permits instant analysis of patient data to identify relationships among data elements. The system also includes a capability to access reference databases for medical consultation.",
+  "However, patient medical records are highly sensitive documents, and it is crucial to maintain confidentiality of the records and allow only qualified people to have access to them. Physicians and hospitals are subject to sanctions for any violations of patient-physician confidentiality. For example, if the database is to be used for data mining, the identity of the patients must be protected from researchers seeking information. Even the system administrator of the database should be prevented from accessing the medical records stored in the database. If individual patients are allowed access to the database, they must have access to only their own medical record.",
+  "In view of the above, there is a need of a system and method to perform surveillance of access to the medical records by patients and health care providers and thus provide enhanced security and confidentiality based on access tracking."
+ ],
+ "summary": [
+  "An embodiment herein provides a computer-implemented surveillance system for monitoring and surveillance of Electronic Medical Record (EMR) application navigation through a plurality of navigation interfaces of an EMR application. The system comprises an EMR system that includes the EMR application. The EMR system is configured to execute computer executable instructions to manage medical records electronically. The system further includes a context-sensitive engine operatively deployed at a front-end of the EMR system. The context-sensitive engine includes an agent device to record EMR application navigation data in real time and contextual data comprising application sensitive, user sensitive and context sensitive data. The agent device is operatively and communicatively connected with the EMR system. The context-sensitive engine further includes an installable computer-executable agent file to allow configuration and setup of the agent device. The system further includes an information management server communicatively connected with the EMR system to facilitate serving of information blocks to the EMR system from a plurality of distributed databases in real-time, wherein each of the plurality of distributed databases are communicatively connected with the EMR system through the information management server. The delivery of the information blocks is based on the contextual information. The system further includes a transceiver to transmit the navigation data and the contextual data from the agent device to the information management server. The system further includes a processing circuit included within or communicatively coupled with the information management server. The processing circuit analyzes the plurality of navigation interfaces associated with the EMR application during a workflow event to generate a signal indicative of analyzed navigation data, maps the analyzed navigation data and the contextual information with actual information pre-stored in a separate database connected with the EMR system, and determine an inconsistency in a navigation workflow during the workflow event based on the mapping. The actual information may signify events occurrences within an environment. The system further includes a notification device to report the inconsistency to the EMR system. The notification device generates an electric signal comprising a computer executable file signifying the inconsistency in the navigation workflow during the workflow event, transmits the electric signal, in a network comprising a plurality of communicatively linked data communication devices, converts the electric signal into a plurality of pixels, and displays the plurality of pixels on a display unit to indicate the navigation data and the inconsistency therein.",
+  "An embodiment herein provides a computer-implemented surveillance method for monitoring and surveillance of EMR application navigation through a plurality of navigation interfaces of an EMR application. The method includes recording EMR application navigation data in real time by an agent device installed at a front-end of the EMR application and recording contextual data comprising application sensitive data, user sensitive data, and context sensitive data by the agent device. The agent device is operatively and communicatively connected with the EMR system. The method further includes transmitting the navigation data and the contextual data from the agent device to the information management server, analyzing the plurality of navigation interfaces associated with the EMR application during a workflow event by a processing circuit to generate a signal indicative of analyzed navigation data, and mapping the analyzed navigation data and the contextual data with actual information pre-stored in a separate database connected with the EMR system. The actual information signifies events occurrences within an environment. The method may further include determining an inconsistency in a navigation workflow during the workflow event based on the mapping, reporting the inconsistency to the EMR system through a notification device. The reporting includes generating an electric signal comprising a computer executable file signifying the inconsistency in the navigation workflow during the workflow event, transmitting the electric signal, in a network comprising a plurality of communicatively linked data communication devices, converting the electric signal into a plurality of pixels, and displaying the plurality of pixels on a display unit to indicate the navigation data and the inconsistency therein."
+ ],
+ "drawingDescriptions": [
+  "In the drawings, like numerals describe similar components substantially throughout the several views. The drawings illustrate generally, by way of an example, but not by a way of limitation, various embodiments.",
+  "FIG. 1 illustrates architecture for managing and delivering context-based information blocks in accordance with an embodiment herein;",
+  "FIG. 2 illustrates an EMR system including or communicatively and/or operatively coupled with a context engine in accordance with an embodiment herein;",
+  "FIG. 3 illustrates an information management server in accordance with an embodiment herein;",
+  "FIGS. 4-6 illustrate exemplary information blocks presented to a user screen associated with an EMR application by an information management server in accordance with an embodiment herein;",
+  "FIG. 7 illustrates an exemplary ecosystem for activity and behavior tracking in accordance with an embodiment herein;",
+  "FIG. 8 illustrates a flow chart for a computer-implemented surveillance method for monitoring and surveillance of EMR application navigation;",
+  "FIG. 9 illustrates an information management server and other connected devices configured as a hardware-based appliance or a kiosk in accordance with an embodiment herein; and",
+  "FIG. 10 illustrates a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10089492B2/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 148,
-   "height": 120
+   "file": "drawings/US10089492B2/front.webp",
+   "label": "Front page figure",
+   "width": 2628,
+   "height": 2129,
+   "turned": false
   },
   {
-   "file": "drawings/US10089492B2/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2955,
+   "height": 2145,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 2390,
+   "height": 1598,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 104,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 2628,
+   "height": 2283,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2676,
+   "height": 1960,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2483,
+   "height": 1930,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 2468,
+   "height": 1852,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 3066,
+   "height": 2205,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 2758,
+   "height": 2238,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 2676,
+   "height": 2112,
+   "turned": true
   },
   {
-   "file": "drawings/US10089492B2/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US10089492B2/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2888,
+   "height": 2119,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/ff/04/53/696fcba5f8b748/US10089492.pdf",
@@ -180,13 +214,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15163662",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10089492B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]
