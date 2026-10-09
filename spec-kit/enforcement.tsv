@@ -1323,26 +1323,26 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-045	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the patent and trademark pages
 0044-public-website FR-046	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the grouping and the filters
 0044-public-website FR-047	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the structured data, the sitemap and the companion list; the tools' events are not tested in a browser
-0050-participation FR-001	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-002	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-003	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-004	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-005	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-006	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-007	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-008	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-009	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-010	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-011	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-012	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-013	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-014	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-015	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-016	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-017	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-018	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-019	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-020	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-021	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-022	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
-0050-participation FR-023	none	-	not yet enforced; the ontology terms and the check follow the acceptance of this spec (0001-eidolon-architecture FR-037)
+0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-004	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-005	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-006	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-007	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-008	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-009	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-010	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-011	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-012	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-013	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-014	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-015	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-016	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-017	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-018	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-019	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-020	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-021	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-022	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
+0050-participation FR-023	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

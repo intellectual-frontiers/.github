@@ -9,7 +9,7 @@ work, whoever starts it is only the first participant, and the other side is inv
 to the party in one loop, not to its account. An invitation carries a task and a preview of the finished work, so that the recipient can finish it as a guest and keeps the
 result by signing up. A platform that does this gets a network effect from its own use, and it needs no sales team to start. This spec states what every platform that offers
 participation does, in plain domain-free words. What a platform verifies a party against, which journeys it offers first, the legal rules of its field and its targets stay in
-the platform's own specs. The terms live in the ontology, which follows this spec once a person has accepted it.
+the platform's own specs. The terms live in the ontology (`ifcore:EntryDoorScheme`, `ifcore:VerificationLevelScheme`, `ifcore:offersDoor` and `ifcore:verifiesAgainst`); an invitation is a schema.org invite action.
 
 ## What participation is
 
@@ -112,19 +112,17 @@ the platform's own specs. The terms live in the ontology, which follows this spe
 
 - **OQ-1**: Whether participation becomes a tenth capability of the kernel, so that the platform check requires a participation module. The working rule: when a second platform
   realizes this spec and a person accepts it, the kernel is amended.
-- **OQ-2**: The terms the ontology needs (the doors, the verification levels, a way for a module to state its doors and sources), and which have an established equivalent. The
-  invitation has one in a published vocabulary. The ontology follows once a person accepts this spec (0001-eidolon-architecture FR-037; 0019-controlled-vocabulary FR-004).
-- **OQ-3**: Whether the verification levels are exactly three for every platform, or a platform may add a level between them.
+- **OQ-2**: Whether the verification levels are exactly three for every platform, or a platform may add a level between them.
 
 ## Key entities
 
 - **A participation module** - the module of one platform that keeps journeys, invitations, verification and the doors.
 - **A journey** - a loop that any party starts and the other side is invited to finish.
 - **A journey kind** - a loop type, held as data.
-- **A door** - a place where a journey starts.
-- **An invitation** - a task sent to a party, carrying a preview of the finished work.
+- **An invitation** (a `schema:InviteAction`) - a task sent to a party, carrying a preview of the finished work.
 - **A guest** - a recipient that finishes a task with no account.
-- **A level** - unverified, registered or verified: how far a party's standing has been checked, and against which sources.
+- **A door** (`ifcore:EntryDoorScheme`) - a place where a journey starts.
+- **A level** (`ifcore:VerificationLevelScheme`) - unverified, registered or verified: how far a party's standing has been checked, and against which sources.
 
 ## Success criteria
 
