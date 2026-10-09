@@ -25,17 +25,21 @@
     <div class="crumbband">
       <div class="wrap crumbband__inner">
         <div class="crumbband__trail">
-          <nav class="crumbs" aria-label="Breadcrumb"><ol>
+          <nav class="crumbs" aria-label="Breadcrumb" data-fold-sm data-fold-lg data-tail-lg="2"><ol>
             <li><a href="page.html">Home</a></li>
-            <li><a href="page.html#a">Portfolio</a></li>
+            <li class="crumbs__fold">
+              <div class="menu menu--crumbs">
+                <button class="menu__button" type="button" popovertarget="menu-crumbs" aria-label="Show the pages above this one">…</button>
+                <div class="menu__panel" id="menu-crumbs" popover>
+                  <a href="page.html#a" data-d="3">Research</a><a href="page.html#b" data-d="2">Research areas</a>
+                </div>
+              </div>
+            </li>
+            <li><a href="page.html#a">Research</a></li>
+            <li><a href="page.html#b">Research areas</a></li>
+            <li><a href="page.html#c">Clinical trials</a></li>
             <li><span aria-current="page">Chrome fixture</span></li>
           </ol></nav>
-        </div>
-        <div class="menu menu--section">
-          <button class="menu__button" type="button" popovertarget="menu-section">Portfolio <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
-          <div class="menu__panel" id="menu-section" popover>
-            <a href="page.html#a">Patent register</a><a href="page.html#b" aria-current="page">Funds</a><a href="page.html#c">Ventures</a><a href="page.html#d">Publishing</a>
-          </div>
         </div>
       </div>
     </div>
