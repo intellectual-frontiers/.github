@@ -56,7 +56,7 @@ class Kernel(unittest.TestCase):
         for cap in pl.KERNEL:
             with self.subTest(cap=cap):
                 name = "".join(w.capitalize() for w in cap.split("-")) + "Capability"
-                body = re.sub(rf"ex:R\d+ a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:\w+ ; ifcore:relationTo ifcore:{name} ;\n.*\n", "", BODY)
+                body = re.sub(rf"ex:R\w+ a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ex:\w+ ; ifcore:relationTo ifcore:{name} ;\n.*\n", "", BODY)
                 out = messages(body)
                 self.assertTrue(any(cap in m and "kernel" in m for m in out), out)
 
@@ -150,6 +150,30 @@ class Suites(unittest.TestCase):
     def test_a_product_may_be_in_a_suite_and_be_a_platform(self):
         extra = rel("M2", "PartOf", "ExamplePlatform", "ex:ExampleSuite")
         self.assertEqual(messages(BODY + extra), [])
+
+
+class Interfaces(unittest.TestCase):
+    def test_the_example_offers_all_four_flavors(self):
+        self.assertEqual(messages(BODY), [])
+
+    def test_each_missing_flavor_is_reported(self):
+        for flavor in ("ResourceApiFlavor", "GraphApiFlavor", "VirtualSqlFlavor", "McpServerFlavor"):
+            with self.subTest(flavor=flavor):
+                body = BODY.replace(f"ifcore:{flavor}, ", "").replace(f", ifcore:{flavor}", "")
+                out = messages(body)
+                self.assertTrue(any("does not offer" in m and "all four flavors" in m for m in out), out)
+
+    def test_a_module_that_states_none_is_reported(self):
+        out = messages(BODY.replace("ifcore:offersInterface ifcore:ResourceApiFlavor, ifcore:GraphApiFlavor, ifcore:VirtualSqlFlavor, ifcore:McpServerFlavor ; ", ""))
+        self.assertTrue(any("resource-api, graph-api, virtual-sql, mcp" in m for m in out), out)
+
+    def test_the_gateway_is_orthogonal_and_may_reach_the_data_layer(self):
+        self.assertEqual(messages(BODY + rel("D1", "DependsOn", "ApiGateway", "ex:DataStore")), [])
+
+    def test_the_flavors_in_the_code_are_the_flavors_in_the_ontology(self):
+        g = graph()
+        scheme = {g.concept_notation(s) for s in g.by if isinstance(s, Iri) and Iri(pl.FLAVOR_SCHEME) in g.objects(s, r.IN_SCHEME)}
+        self.assertEqual(scheme, set(pl.FLAVORS))
 
 
 class Offers(unittest.TestCase):
