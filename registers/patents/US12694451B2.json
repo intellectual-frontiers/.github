@@ -41,6 +41,9 @@
  ],
  "abstract": "",
  "claims": [],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [],
  "pdfUrl": "",
  "sources": [
@@ -48,7 +51,7 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/19303350",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   }
  ]
 }

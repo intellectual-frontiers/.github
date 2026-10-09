@@ -134,114 +134,135 @@
    "text": "The method of claim 13 , wherein synthesizing the computer executable data further comprises: preprocessing heterogeneous data formats using a data harmonization pipeline that includes one or more of natural language processing for unstructured text, Fourier transformations for signal data, and ontology-based mapping for categorical data; and implementing a multi-task deep learning model to concurrently perform of or more of identifying risk factors, predicting disease progression, and generating health insights."
   }
  ],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [
   {
-   "file": "drawings/US20250157609A1/sheet-00000.webp",
-   "label": "Sheet 1 of 18",
-   "width": 159,
-   "height": 120
+   "file": "drawings/US20250157609A1/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1415,
+   "turned": false
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00001.webp",
-   "label": "Sheet 2 of 18",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-01.webp",
+   "label": "Sheet 1 of 17",
+   "width": 2865,
+   "height": 1994,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00002.webp",
-   "label": "Sheet 3 of 18",
-   "width": 102,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-02.webp",
+   "label": "Sheet 2 of 17",
+   "width": 2264,
+   "height": 1925,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00003.webp",
-   "label": "Sheet 4 of 18",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-03.webp",
+   "label": "Sheet 3 of 17",
+   "width": 2831,
+   "height": 1844,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00004.webp",
-   "label": "Sheet 5 of 18",
-   "width": 105,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-04.webp",
+   "label": "Sheet 4 of 17",
+   "width": 2135,
+   "height": 1873,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00005.webp",
-   "label": "Sheet 6 of 18",
-   "width": 104,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-05.webp",
+   "label": "Sheet 5 of 17",
+   "width": 2067,
+   "height": 1808,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00006.webp",
-   "label": "Sheet 7 of 18",
-   "width": 48,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-06.webp",
+   "label": "Sheet 6 of 17",
+   "width": 2791,
+   "height": 1130,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00007.webp",
-   "label": "Sheet 8 of 18",
-   "width": 221,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-07.webp",
+   "label": "Sheet 7 of 17",
+   "width": 907,
+   "height": 1676,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00008.webp",
-   "label": "Sheet 9 of 18",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-08.webp",
+   "label": "Sheet 8 of 17",
+   "width": 2809,
+   "height": 1954,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00009.webp",
-   "label": "Sheet 10 of 18",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-09.webp",
+   "label": "Sheet 9 of 17",
+   "width": 2934,
+   "height": 2319,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00010.webp",
-   "label": "Sheet 11 of 18",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-10.webp",
+   "label": "Sheet 10 of 17",
+   "width": 2849,
+   "height": 2309,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00011.webp",
-   "label": "Sheet 12 of 18",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-11.webp",
+   "label": "Sheet 11 of 17",
+   "width": 2907,
+   "height": 2109,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00012.webp",
-   "label": "Sheet 13 of 18",
-   "width": 75,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-12.webp",
+   "label": "Sheet 12 of 17",
+   "width": 2751,
+   "height": 1727,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00013.webp",
-   "label": "Sheet 14 of 18",
-   "width": 102,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-13.webp",
+   "label": "Sheet 13 of 17",
+   "width": 2649,
+   "height": 2258,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00014.webp",
-   "label": "Sheet 15 of 18",
-   "width": 111,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-14.webp",
+   "label": "Sheet 14 of 17",
+   "width": 2285,
+   "height": 2116,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00015.webp",
-   "label": "Sheet 16 of 18",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-15.webp",
+   "label": "Sheet 15 of 17",
+   "width": 2837,
+   "height": 2216,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00016.webp",
-   "label": "Sheet 17 of 18",
-   "width": 71,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-16.webp",
+   "label": "Sheet 16 of 17",
+   "width": 2856,
+   "height": 1704,
+   "turned": true
   },
   {
-   "file": "drawings/US20250157609A1/sheet-00017.webp",
-   "label": "Sheet 18 of 18",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US20250157609A1/sheet-17.webp",
+   "label": "Sheet 17 of 17",
+   "width": 2821,
+   "height": 1881,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/eb/d9/57/225c87d362a2ef/US20250157609A1.pdf",
@@ -250,13 +271,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/19026240",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US20250157609A1/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

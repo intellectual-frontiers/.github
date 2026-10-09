@@ -124,72 +124,126 @@
    "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises generating database schemata, wherein said database schemata comprises data types, table types, tables, and enumerations, and wherein said method enables an operator to describe database structure components by storing application data."
   }
  ],
+ "background": [
+  "1. Field of the Invention",
+  "The present invention generally relates to reusable software application development systems and methods, and more particularly to a computer system for performing reusable software application development from a set of declarative executable specifications.",
+  "2. Description of the Related Art",
+  "For several years computer software applications have been written to improve the productivity of individuals inside an enterprise, such as a company or firm. Even from the early days of computers, software applications have been developed to provide faster payroll processing, improved record-keeping, management of sales, and increase the speed of research and development. With these so-called internal applications in place for decades, studies indicate that enterprises have been able to significantly improve employee productivity.",
+  "Moreover, since the advent and widespread use of the Internet and the World Wide Web (“the Web”), there has been a desire by the management in these enterprises to extend their internal application functionality and technology infrastructure to external parties, such as their customers, partners, vendors, suppliers, and other constituents. For example, instead of a salesperson taking an order over the telephone and then entering that order into the internal company sales software application, enterprises are now allowing their own constituents to create orders directly into their internal applications by allowing access to the enterprise's systems through the Web. This is called extending the enterprise.",
+  "Over time, enterprises have discovered that the more they extend their internal infrastructures to external parties, the better return on their investment of their infrastructure. Furthermore, extending the enterprise now refers to the rapid creation of simple or complex applications that connect to legacy and existing systems and allow customers, suppliers, vendors, partners, and all constituents to transact business with an enterprise at reduced cost by directly accessing an enterprise's internal computer system(s). This form of application development, which is referred to as an Internet or Web development, has new engineering challenges including security, quality, and maintenance. Developments in Internet software have surfaced in several different areas ranging from on-line shopping and banking to collaborative research and instant messaging. Web-based tools have helped to partially bridge the gap between the Web pages of the early Web and sophisticated Internet-based applications. However, while significant progress has been made in the development of Internet applications, conventional application development tools for the Internet still have many shortcomings, especially for the mission-critical use that most Web applications are now deployed.",
+  "Moreover, existing development environments and languages treat the problem domains of specifications, design, testing, coding, runtime evaluation, and implementation documentation separately. With conventional tools, prototyping, creating functional specifications, design, testing, coding, execution, and documentation are usually performed by different groups from different disciplines within an enterprise. However, by failing to provide a unified system and methodology from which a single set of declarative commands can create specifications, documentation, testable components, and executable code, conventional systems often require more work to be performed, utilizing more experienced and higher number of human resources, and often resulting in multi-component software integration that produces lower quality software. While existing development environments provide for some reuse within an application, they simply fail to allow for reuse across applications and projects. For instance, some components can be shared and reused within an application in these conventional environments. However, across projects, reusing the same components becomes difficult or impossible due to the design of conventional development environments and architectures.",
+  "While the conventional development processes once provided a valuable system of creating multi-components of business systems, there remains a need for a new automated reusable software application development system which provides a uniform framework for describing the various components or facets of business systems using simple declarative constructs that even inexperienced programmers can create and yet achieve quality attributes of systems that senior level architects and engineers often produce."
+ ],
+ "summary": [
+  "In view of the foregoing, and other drawbacks and disadvantages of the conventional systems, the present invention has been devised, and it is an object of the present invention, to provide an automated system and method for performing reusable software application development. It is another object of the present invention to provide a business-oriented computer software system comprising multi-components or facets including forms, dialogs, fields, validation rules, static structured query language statements (SQL), dynamic structured query language statements, security roles and permissions, value sources, data sources, database schemata, reports, navigation, and personalization.",
+  "It is yet another object of the present invention to provide a unified system of processing, testing, and documenting these facets. Still another object of the present invention is to provide a computer system and method for automatically generating and processing software code, object instantiations, testable functionality, and implementation documentation from a single set of declarative executable specifications. Yet another object of the present invention is to provide a computer system that allows a software application developer the ability to declare a single set of executable specifications and receive full unit tests, implementation documentation, and end-user application code from the set of specifications. Another object of the present invention is to provide a computer system for performing software application development that allows the executable specifications to be reused across several projects.",
+  "In order to attain the objects suggested above, there is provided, according to one aspect of the invention, a computer system for performing reusable software application development comprising a multi-component architecture, which comprises data, wherein the multi-component architecture further comprises a relational database server operatively connected to an application server, a presentation component operatively connected to the application server, an application component operatively connected to the application server, a data component operatively connected to the application server, a security and personalization component operatively connected to the presentation component, the application component, and the data component, and wherein the computer system also comprises an administration console operatively connected to the presentation component, the application component, and the data component, wherein the administration console comprises the security and personalization component, and wherein the security and personalization component restricts access to the data.",
+  "The multi-component architecture further comprises declarable executable specifications, wherein the declarable executable specifications further comprise a set of keywords and attributes used to declare the executable specifications. Moreover, the presentation component comprises an extensible application framework comprising at least one application program interface, wherein the application program interface automates form building engines, data state machine engines, queries engines, reporting engines, templating engines, access control engines, project configuration engines, rule processing engines, and metrics engines.",
+  "Additionally, the application component comprises an extensible information framework of libraries, wherein the libraries comprise reusable tables, columns, and indexes. Furthermore, the data component creates a plurality of database object classes, wherein the data component comprises data types, table types, tables, and enumerations. Moreover, the administration console responds to operator commands enabling an operator to access the data and the declarable executable specifications.",
+  "Additionally, there is provided, according to the present invention, a method for performing reusable software application development, wherein the method comprises integrating a data processing system, providing a set of keywords and attributes in the data processing system, and declaring a set of executable specifications using the set of keywords and attributes. The step of declaring a set of executable specifications comprises generating a program code in the data processing system, instantiating an object code in the data processing system, generating a testable functionality result in the data processing system, generating at least one unit test case in the data processing system, generating an implementation documentation output in the data processing system, generating a performance statistics output in the data processing system, and generating a project metrics in the data processing system.",
+  "The step of providing a set of keywords and attributes comprises generating a set of user interface forms, fields, and validation rules, wherein the method enables an operator to describe components of a presentation and interface by receiving input from a user. Furthermore, the step of providing a set of keywords and attributes comprises generating a library of structured query language statements, and generating a library of rules for generating dynamic structured query language statements, wherein the method enables an operator to describe database access components by retrieving data from a data storage device, wherein the data storage device is coupled to the data processing system, and wherein the method enables the operator to describe database access rules and user interface components that connect to the data storage device by retrieving the data from the data storage device and presenting the data to a user.",
+  "Additionally, the step of providing a set of keywords and attributes comprises generating one of a web browser report, a file-based report, and a portable document format report, wherein the method enables an operator to describe database interface components by displaying data to a user. Also, the step of providing a set of keywords and attributes comprises generating a library of security rules and permission statements, wherein the method enables an operator to describe authorization and authentication components of an application. Finally, the step of providing a set of keywords and attributes comprises generating database schemata, wherein the database schemata comprises data types, table types, tables, and enumerations, wherein the method enables an operator to describe database structure components by storing application data.",
+  "Additionally, according to the present invention, a program storage device readable by machine, tangibly embodying a program of instructions executable by the machine to perform the above-described method for performing reusable software application development is disclosed.",
+  "There are several benefits of the present invention. First, the present invention provides an automated system and method for performing reusable software application development. Second, the present invention provides a business-oriented computer software system comprising multi-components or facets including forms, dialogs, fields, validation rules, static structured query language statements, dynamic structured query language statements, security roles and permissions, value sources, data sources, database schemata, reports, navigation, and personalization. Another benefit of the present invention is that it provides a unified system of processing, testing, and documenting these facets.",
+  "Yet another benefit of the present invention is that it provides a computer system and method for automatically generating and processing software code, object instantiations, testable functionality, and implementation documentation from a single set of declarative executable specifications. Still another benefit of the present invention is that it provides a computer system that allows a software application developer the ability to declare a single set of executable specifications and receive full unit tests, implementation documentation, and end-user application code from the set of specifications. Another benefit of the present invention is that it provides a computer system for performing software application development that allows the executable specifications to be reused across several projects.",
+  "Moreover, another benefit of the present invention is that it provides a computer system and methodology which allows application developers to spend time on real features significant to end-users instead of infrastructure issues that are important only to programmers. Furthermore, another benefit of the present invention is that it provides a computer system whereby technical managers can better manage their application development projects by utilizing built-in project management, application documentation, unit-testing, and artifact-generation tools. Additionally, another benefit of the present invention is that most of the user interface and database logic is coded in a declarative style using XML code instead of a programmatic style using Java code, wherein this significantly reduces the amount of code (as much as 50–75% of code can be eliminated), increases reusability of the code, and increases code quality.",
+  "Yet another benefit of the present invention is that it provides a computer system, wherein analysts can use the declarative user interface features to create prototypes that can later be completed by programmers, thereby resulting in no more throw-away prototypes, as is common with conventional systems. Still another benefit of the present invention is that it provides a computer system, wherein applications are built by assembling declared user interface (UI) forms/dialogs and database SQL components combined with application-specific business logic using single or multiple distributed application tiers. Another benefit of the present invention is that it provides a feature-rich framework that significantly reduces the time, resources, and cost of producing reusable high-quality data-intensive thin-client applications.",
+  "Yet another benefit of the present invention is that it implements common design patterns like Model-View-Controller (MVC) and factories, and the present invention's skins infrastructure allows identical business logic to be used across different user interfaces for a variety of browsers and platforms like handheld computers. Still another benefit of the present invention is that it affords developers much flexibility in their software application development process without having to change the existing code-base."
+ ],
+ "drawingDescriptions": [
+  "The foregoing and other objects, aspects and advantages will be better understood from the following detailed description of a preferred embodiment(s) of the invention with reference to the drawings, in which:",
+  "FIG. 1 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 2 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 3 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 4 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 5 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 6 is a system diagram illustrating a preferred embodiment of the present invention;",
+  "FIG. 7 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 8 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 9 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 10 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 11 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 12 is a flow diagram illustrating a preferred method of the present invention;",
+  "FIG. 13 is a flow diagram illustrating a preferred method of the present invention; and",
+  "FIG. 14 is a system diagram according to the present invention."
+ ],
  "drawings": [
   {
-   "file": "drawings/US7039898B2/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 172,
-   "height": 120
+   "file": "drawings/US7039898B2/front.webp",
+   "label": "Front page figure",
+   "width": 2752,
+   "height": 1919,
+   "turned": false
   },
   {
-   "file": "drawings/US7039898B2/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2238,
+   "height": 1571,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 2825,
+   "height": 2032,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 64,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 2789,
+   "height": 1487,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 96,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2358,
+   "height": 1880,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2454,
+   "height": 1812,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 1863,
+   "height": 1211,
+   "turned": true
   },
   {
-   "file": "drawings/US7039898B2/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 96,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 1964,
+   "height": 2454,
+   "turned": false
   },
   {
-   "file": "drawings/US7039898B2/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 1413,
+   "height": 2129,
+   "turned": false
   },
   {
-   "file": "drawings/US7039898B2/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 136,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 1441,
+   "height": 1275,
+   "turned": false
   },
   {
-   "file": "drawings/US7039898B2/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US7039898B2/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2541,
+   "height": 1775,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/2f/e7/27/f40f5ddb15d76e/US7039898.pdf",
@@ -198,13 +252,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/10194646",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US7039898B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

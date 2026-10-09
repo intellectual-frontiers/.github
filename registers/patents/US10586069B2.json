@@ -104,72 +104,101 @@
    "text": "The networking device of claim 9 , further comprising a sixth signal port linking a sixth communication signal to a crowdsourced credentialing index identification device that uses said aggregated credentialing information to generate said crowdsourced credentialing index indicative of credentialing of said structured initial computer executable profile information from said plurality of credentialing sources."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a computer-implemented method for tracking change in a computer executable profile associated with a registered clinician. The method may include retrieving, by a processing circuit, computer executable profile information for the registered clinician, wherein the computer executable profile information includes computer executable user personal information, computer executable review information, and computer executable aggregated credentialing information obtained based on individual credentialing information components retrieved from a plurality of credentialing information sources. The method may include staging the computer executable profile information in one or more cloud staging repositories. The method may include splitting the computer executable profile information into constituent data types. The method may include defining, by the processing circuit, a plurality of computer executable profile fields and corresponding profile information components for each of the plurality of computer executable profile fields. The method may include storing the computer executable profile information including the computer executable profile fields and the corresponding profile information components as initial computer executable profile information in a database communicatively connected with the processing circuit. The method may include accessing the plurality of credentialing information sources after a defined interval of time to obtain the individual credentialing information components as indicated at a later time. The method may include retrieving second computer executable profile information based on the obtained individual credentialing information components from the plurality of credentialing information sources as indicated at the later time. The method may include mapping the initial computer executable profile information with the second computer executable profile information to identify changes in the profile information components corresponding to the computer executable profile fields, wherein the changes are indicative of reliability of credentialing of the profile over time. The method may include defining a set of computer executable notification rules to selectively generate notifications corresponding to the changes between the initial computer executable profile information and the second computer executable profile information upon identification of such changes and generate notifications corresponding to the changes between the initial computer executable profile information and the second computer executable profile information over a defined time period as and when requested by a user computer, communicatively connected with the processing circuit, through a search query submitted to the processing circuit. The method may include determining a crowdsourced credentialing index for the profile based on the changes over time obtained from the mapping of the initial computer executable profile information and the second computer executable profile information. The method may include generating an electric signal comprising data signifying the changes in the profile information. The method may include transmitting the electric signal from the processing circuit, in a network comprising a plurality of communicatively linked data communication devices. The method may include converting the electric signal into a plurality of pixels. The method may include displaying the plurality of pixels on a display unit to indicate timeline views of the second profile information and the changes based on the computer executable notification rules.",
+  "An embodiment herein provides a computer-controlled system for tracking change in a computer executable clinician profile. The system may include a plurality of cloud staging repositories to store computer executable profile information as obtained from a plurality of information sources in unstructured form. The system may include a database for storing structured initial computer executable profile information, wherein the structured initial computer executable profile information includes computer executable clinician personal information, computer executable review information, and computer executable aggregated credentialing information. The computer executable profile information is aggregated from the plurality of information sources comprising a plurality of credentialing information sources such that the computer executable aggregated credentialing information is generated based on individual credentialing information components retrieved from the plurality of credentialing information sources. The database further stores a set of computer executable notification rules to selectively (1) generate default notifications corresponding to changes in the structured initial computer executable profile information upon identification of such changes and (2) generate notifications corresponding to the changes in the structured initial computer executable profile information over a defined time period as and when requested by an external computer through a search query. The system may include a processing circuit to split the computer executable profile information into constituent data types, define a plurality of computer executable profile fields and corresponding profile information components for each of the plurality of computer executable profile fields, and access the plurality of credentialing information sources after a defined interval of time to obtain the individual credentialing information components as indicated at a later time. The processing circuit further generates structured second computer executable profile information based on the obtained individual credentialing information components from the plurality of credentialing information sources as indicated at the later time. The processing circuit maps the structured initial computer executable profile information with the structured second computer executable profile information to identify the changes in the profile information components corresponding to the computer executable profile fields, wherein the changes are indicative of a change in reliability of credentialing of the computer executable clinician profile over time. The processing circuit executes the set of computer executable notification rules to generate the notifications. The processing circuit determines a crowdsourced credentialing index for the clinician profile based on the changes over time obtained from the mapping of the structured initial computer executable profile information and the structured second computer executable profile information. The processing circuit generates an electric signal comprising data signifying the structured second computer executable profile information and changes in the structured initial computer executable profile information, transmits the electric signal, in a network comprising a plurality of communicatively linked data communication devices, convert the electric signal into a plurality of pixels, and displays or causes to display the plurality of pixels on a display unit to indicate timeline views of the structured initial computer executable profile information and the changes based on the computer executable notification rules."
+ ],
+ "drawingDescriptions": [
+  "In the drawings, like numerals describe similar components substantially throughout the several views. The drawings illustrate generally, by way of an example, but not by a way of limitation, various embodiments.",
+  "FIG. 1 illustrates a flow diagram of a method for tracking change in a computer executable profile associated with a registered clinician in accordance with an embodiment herein;",
+  "FIG. 2 illustrates a schematic diagram of a computer-controlled system for tracking change in a computer executable profile, in accordance with an embodiment herein;",
+  "FIG. 3 illustrates exemplary structured computer executable profile information generated at different instances of time and stored in a database;",
+  "FIG. 4 illustrates organization of a computer executable profile information within a database linked to various information sources to aggregate information components, in accordance with an embodiment herein;",
+  "FIG. 5 illustrates various components of a processing circuit, in accordance with an embodiment herein;",
+  "FIG. 6 illustrates visualization of an exemplary timeline view and a computer executable profile information, in accordance with an embodiment herein;",
+  "FIG. 7 is a schematic architecture diagram illustrating transmission and signaling of information across various components, in accordance with an embodiment herein;",
+  "FIG. 8 illustrates a computer system that may be used in accordance with the embodiments herein;",
+  "FIG. 9 is a schematic diagram illustrating a hardware-based appliance (appliance) stored behind a firewall and communicatively and operatively connected with an external network and a client device, in accordance with the embodiments herein; and",
+  "FIG. 10 is a schematic diagram of a networking device and linked components according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10586069B2/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 172,
-   "height": 120
+   "file": "drawings/US10586069B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1305,
+   "turned": false
   },
   {
-   "file": "drawings/US10586069B2/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2649,
+   "height": 2037,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 2650,
+   "height": 1839,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 110,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 2054,
+   "height": 1891,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2514,
+   "height": 1806,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 79,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2669,
+   "height": 1761,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 2551,
+   "height": 1846,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 2616,
+   "height": 1794,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 2571,
+   "height": 1752,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 104,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 2182,
+   "height": 1888,
+   "turned": true
   },
   {
-   "file": "drawings/US10586069B2/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10586069B2/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2560,
+   "height": 1913,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/28/56/67/1c0e7c5abe9517/US10586069.pdf",
@@ -178,13 +207,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15163667",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10586069B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

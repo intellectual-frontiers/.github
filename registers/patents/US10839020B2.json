@@ -148,78 +148,120 @@
    "text": "The system of claim 9 , wherein said processing circuit transmits a user-access denial output signal upon not authenticating an identify of a user."
   }
  ],
+ "background": [],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a blockchain-enabled system that includes a plurality of wearable devices and a cloud gateway agent server. The cloud gateway agent server receives and aggregates user generated electronic data associated with a user and acquired without user intervention from one of the plurality of wearable devices located separately, wherein the user generated electronic data comprises a plurality of computer executable data files residing in the plurality of wearable devices. The system further includes an electronic record repository database communicatively coupled with the cloud gateway agent server and stores the plurality of computer executable data files and metadata associated with the plurality of computer executable data files. The system includes a processing circuit that performs natural language processing and metadata analysis of the plurality of computer executable data files to identify user verified computer executable data files and user unverified computer executable data files from among the plurality of computer executable data files. The processing circuit further generates a computer data object including a plurality of query statements and approval options corresponding to each of the unverified computer executable data files. The processing circuit transmits the computer data object to an external computing machine at the user along with the unverified computer executable data files outputted on a remotely located display unit connected operatively with the external computing machine through an automatically generated notification by the processing circuit, wherein the computer data object represents an integrated view of the user generated electronic data residing on the plurality of wearable devices. The processing circuit updates the unverified computer executable data files as new verified computer executable data files in the electronic record repository database based on an input received from the external computing machine signifying verification of the unverified computer executable data files by the user.",
+  "The system further includes a rules engine communicatively coupled with the processing circuit and that executes a set of programmable rules including dictionary references, and user verification references to govern user approval, the metadata analysis and the natural language processing, wherein the rules engine determines the verification of the user verified computer executable data files by applying rules regarding user approval for different types of electronic data.",
+  "The system includes a blockchain-based identity authorization device connected communicatively to the rules engine to verify identity of the user in association with the set of programmable rules before granting access rights to the user for verification of the unverified computer executable data files, wherein the blockchain-based device comprises one or more of an audio recognition device, an image recognition device, and sensor modalities including a global positioning system. The system includes an electronic transactional system communicatively coupled with the electronic record repository database and the processing circuit through the cloud gateway agent server and retrieves and stores the user verified computer executable data files and the new verified computer executable data files from the electronic records repository database, and communicates electronic data messages among a plurality of computer stations located at users, service providers, and third entities, wherein the electronic data messages are obtained from the user verified computer executable data files and the new verified computer executable data files. The electronic transactional system further includes a social networking application that dynamically changes social networking connections by interacting with the electronic transactional system and by accessing the verified computer executable data files.",
+  "The system includes a communications transmitter coupled with the electronic transactional system that transmits the electronic data messages to the plurality of computer stations identified by a user approval. The computer data object includes embedded digital text-based information of the user generated electronic data that is displayed on the display unit by launching a gateway software application. The processing circuit homogenizes the user generated electronic data in a defined standard compliant format by executing computer executable data files containing the user generated electronic data. The processing circuit automatically associates a numerical trust score with each of the new verified computer executable data files by using the user input signifying the verification. The processing circuit determines verification patterns by using a machine learning algorithm, and automatically classifies the computer executable data files into the user unverified computer executable data files and the user verified computer executable data files by using the verification patterns.",
+  "In an embodiment, at least a portion of the user generated electronic data contained in at least one of the plurality of computer executable data files may be obtained by the cloud gateway agent server from a computing machine other than at the user. The at least a portion of the user generated electronic data may be obtained from the computing machine at a service provider of the user. In an embodiment, each of the plurality of wearable devices may be operatively coupled with an extensible agent appliance that launches a gateway application configured to pair the plurality of wearable devices with the cloud agent server to allow access of the plurality of computer executable data files residing on the plurality of wearable devices by the cloud agent server. The cloud agent server may install the gateway application remotely on the plurality of wearable devices through the extensible agent appliance. The gateway application may be launched at the external computing machine associated with the user to allow the user to view sources of the unverified computer executable data files and to verify the unverified computer executable data files through a single-clickable user executable response against one of the approval options.",
+  "The electronic transactional system may include a filter circuit such that the filter circuit rejects the plurality of computer executable data files from being pushed into the electronic transactional system if the trust score associated with the plurality of computer executable data files is below a threshold limit. The processing circuit may perform natural language processing on an embedded user natural language text note contained digitally in the plurality of computer executable data files.",
+  "An embodiment herein provides a blockchain-enabled system that includes a plurality of devices including at least one wearable device associated with a user. The system includes a cloud gateway agent server that receives and aggregates user generated electronic data associated with the user and acquired without user intervention from one of the plurality of devices located separately, wherein the user generated electronic data includes a plurality of computer executable data files residing in the plurality of devices. The system includes a blockchain database communicatively coupled with the cloud gateway agent server and stores the plurality of computer executable data files and metadata associated with the plurality of computer executable data files.",
+  "The system includes a processing circuit that identifies user verified computer executable data files and user unverified computer executable data files from among the plurality of computer executable data files and generates a computer data object including a plurality of query statements and approval options corresponding to each of the unverified computer executable data files. The processing circuit transmits the computer data object to an external computing device at the user along with the unverified computer executable data files outputted on a remotely located display unit connected operatively with the external computing device through an automatically generated notification by the processing circuit, wherein the computer data object represents an integrated view of the user generated electronic data residing on the plurality of devices associated with the user. The processing circuit updates the unverified computer executable data files as new verified computer executable data files in the blockchain database based on an input received from the external computing device signifying verification of the unverified computer executable data files by the user.",
+  "The system further includes a blockchain-based identity authorization device to verify identity of the user before granting access rights to the user for verification of the unverified computer executable data files, wherein the blockchain-based device includes one or more of an audio recognition device that generates identity information in the form of a digital audio signal for voice recognition based on pre-stored voice patterns, an image recognition device that includes an image acquisition device to receive signals containing image patterns and facial expressions for verifying identity based on image patterns, and a global positioning system-based device that receives signals containing location details for verifying identity of the user based on its location.",
+  "The system further includes an electronic transactional system communicatively coupled with the blockchain database and the processing circuit through the cloud gateway agent server. The electronic transactional system retrieves and stores the user verified computer executable data files and the new verified computer executable data files from the blockchain database and communicates electronic data messages to a plurality of computer stations located at different locations. The electronic data messages are obtained from the user verified computer executable data files and the new verified computer executable data files. The system further includes a communications transmitter coupled with the electronic transactional system that transmits the electronic data messages to the plurality of computer stations identified by a user approval.",
+  "The audio recognition device may include a sound card adapted to receive identity information of the user in the form of a digital audio signal. The image acquisition device of the image recognition device may include a camera for taking still or streaming images. The image recognition device may include a plurality of multichannel amplifiers such that each amplifier of the multichannel amplifiers is defined to receive a specific type of sensed information from the camera sourcing signals for the image recognition device. The image recognition device may include a microcontroller, wherein the image acquisition device may be adapted to receive a digital signal and transmit the digital audio signal to the microcontroller for image recognition based on pre-stored image patterns.",
+  "In an embodiment, at least a portion of the user generated electronic data contained in at least one of the plurality of computer executable data files may be obtained by the cloud gateway agent server from a computing machine other than at the user. In an embodiment, each of the plurality of devices may be operatively coupled with an extensible agent appliance that launches a gateway application configured to pair the plurality of devices with the cloud agent server to allow access of the plurality of computer executable data files residing on the plurality of devices by the cloud agent server. The cloud agent server may install the gateway application remotely on the plurality of devices through the extensible agent appliance.",
+  "The system may further include a blockchain device that may include a specific blockchain-enabled server device and a smart device running a custom dedicated software application, wherein the smart device is configured to engage in communication with the blockchain-enabled server device. The blockchain device may generate a smart contract configured to automatically validate a transaction using a special key over a plurality of computer executable distributed blockchain ledgers such that each of the plurality of computer executable distributed blockchain ledgers may contain a copy of the computer executable data files. The blockchain device may further include a distributed trusted ledgers system that may store the distributed blockchain ledgers over a blockchain integrity network for secured and controlled access by the user through a private key.",
+  "The processing circuit may prevent voice inputs from being received by the audio recognition device upon a predetermined number of unsuccessful voice inputs being entered into the audio recognition device and not authorized or identified by the processing circuit. The processing circuit may prevent visual inputs from being received by the image recognition device upon a predetermined number of unsuccessful visual inputs being entered into the image recognition device and not authorized or identified by the processing circuit. The processing circuit may transmit a user-access denial output signal upon not authenticating an identify of a user."
+ ],
+ "drawingDescriptions": [
+  "The features of the disclosed embodiments may become apparent from the following detailed description taken in conjunction with the accompanying drawings showing illustrative embodiments herein, in which:",
+  "FIG. 1 illustrates an ecosystem including an electronic transactional system for integration of user generated electronic data (UGED) in accordance with an embodiment herein;",
+  "FIG. 2 illustrates a method for integration of the UGED in accordance with an embodiment herein;",
+  "FIG. 3 illustrates an exemplary electronic transactional system, in accordance with an embodiment herein;",
+  "FIGS. 4 and 5 illustrate exemplary user interfaces for allowing a user to interact with a cloud gateway agent server for verification of the UGED in accordance with the embodiments herein;",
+  "FIG. 6 illustrates the cloud gateway agent server and the electronic transactional system connected together and with other devices in a blockchain environment in accordance with the embodiments herein;",
+  "FIG. 7 illustrates the cloud gateway agent server and the processing circuit among other components in accordance with the embodiments herein;",
+  "FIG. 8 illustrates an exemplary audio recognition device, in accordance with the embodiments herein;",
+  "FIG. 9 illustrates an exemplary image recognition device, in accordance with the embodiments herein;",
+  "FIG. 10 illustrates an architecture for enabling an authentication, an access, and a verification mechanism to access and verify digital records (UGED), in accordance with the embodiments herein;",
+  "FIG. 11 illustrates generally, but not by the way of limitation, a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10839020B2/sheet-00000.webp",
-   "label": "Sheet 1 of 12",
-   "width": 169,
-   "height": 120
+   "file": "drawings/US10839020B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1331,
+   "turned": false
   },
   {
-   "file": "drawings/US10839020B2/sheet-00001.webp",
-   "label": "Sheet 2 of 12",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-01.webp",
+   "label": "Sheet 1 of 11",
+   "width": 2604,
+   "height": 1935,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00002.webp",
-   "label": "Sheet 3 of 12",
-   "width": 77,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-02.webp",
+   "label": "Sheet 2 of 11",
+   "width": 2631,
+   "height": 1680,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00003.webp",
-   "label": "Sheet 4 of 12",
-   "width": 109,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-03.webp",
+   "label": "Sheet 3 of 11",
+   "width": 1696,
+   "height": 1535,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00004.webp",
-   "label": "Sheet 5 of 12",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-04.webp",
+   "label": "Sheet 4 of 11",
+   "width": 2168,
+   "height": 1623,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00005.webp",
-   "label": "Sheet 6 of 12",
-   "width": 98,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-05.webp",
+   "label": "Sheet 5 of 11",
+   "width": 2131,
+   "height": 1748,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00006.webp",
-   "label": "Sheet 7 of 12",
-   "width": 81,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-06.webp",
+   "label": "Sheet 6 of 11",
+   "width": 2768,
+   "height": 1862,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00007.webp",
-   "label": "Sheet 8 of 12",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-07.webp",
+   "label": "Sheet 7 of 11",
+   "width": 2552,
+   "height": 1874,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00008.webp",
-   "label": "Sheet 9 of 12",
-   "width": 110,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-08.webp",
+   "label": "Sheet 8 of 11",
+   "width": 1549,
+   "height": 1415,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00009.webp",
-   "label": "Sheet 10 of 12",
-   "width": 132,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-09.webp",
+   "label": "Sheet 9 of 11",
+   "width": 1549,
+   "height": 1706,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00010.webp",
-   "label": "Sheet 11 of 12",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-10.webp",
+   "label": "Sheet 10 of 11",
+   "width": 2716,
+   "height": 1984,
+   "turned": true
   },
   {
-   "file": "drawings/US10839020B2/sheet-00011.webp",
-   "label": "Sheet 12 of 12",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US10839020B2/sheet-11.webp",
+   "label": "Sheet 11 of 11",
+   "width": 2571,
+   "height": 1711,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/35/72/7b/62c0d8e9b79665/US10839020.pdf",
@@ -228,13 +270,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/16048338",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10839020B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

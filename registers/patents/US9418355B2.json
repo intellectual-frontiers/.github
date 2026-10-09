@@ -98,78 +98,115 @@
    "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by said computer to perform a method for management of responses to cases submitted by an entity in a crowdsourced network, said method comprising: receiving, from said entity over said crowdsourced network, a case; evaluating a complexity of various portions of said case based on said level of complexity of said portions; evaluating a complexity of said various portions of said case based on inputs from a plurality of crowdsourced persons; federating said case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of said federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired; defining a crowdsourcing index (CI) that is indicative of a crowd of respondents, wherein said CI is defined based on desired reliability and trust in said integrated response; routing said federated cases to said crowd of respondents in said network such that said routing of said cases is managed based on said session parameters associated with each of said federated cases; receiving responses from said crowd for each of said federated cases; associating information pertaining to said responses as second session parameters that is compared with said first session parameters such that said comparison yields a degree of compliance and appropriateness of said second session parameters toward said first session parameters, wherein, in response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with said one or more such federated cases; routing said one or more such non-compliant federated cases to a second crowd of respondents in said network such that said routing of said cases is managed based on said third session parameters associated with each of said one or more federated cases; integrating responses for each of said federated cases to yield a single integrated response for said case corresponding to said federated cases; reviewing said single integrated response and associating a score to said single integrated response by crowdsourced experts such that said single integrated response when published bears a rating indicative of said experts review and score; and publishing said integrated response anonymously that is viewable publicly."
   }
  ],
+ "background": [
+  "1. Technical Field",
+  "The embodiments herein generally relate to management of responses online, and in particularly to systems and methods for management of responses created by a crowd of respondents in a crowdsourced network to increase authenticity of the responses.",
+  "2. Description of the Related Art",
+  "There exist online platforms through which individuals can submit their questions and a networked agency connected to the online platform provides answers to such questions. However, such answers are not very useful because of a lack of reliability and correctness of the answers.",
+  "Therefore, there is a need for a method and system that ensures reliability and correctness of the answers by using wisdom of crowd and credentialing processes."
+ ],
+ "summary": [
+  "An embodiment herein provides a response management system configured to allow management of responses to a case submitted by an entity in a crowdsourced network. The system includes a memory for storing information pertaining to the case submitted by the entity, respective responses for the case by a crowd of respondents in the crowdsourced network, and programmed instructions. The system further includes a processing circuit. The processing circuit receives, from the entity over the crowdsourced network, the case. The processing circuit federates the case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response. Each of the federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired. The processing circuit routes the federated cases to the crowd of respondents in the network such that the routing of the federated cases is managed based on the session parameters associated with each of the federated cases. The processing circuit receives responses from the crowd for each of the federated cases. The processing circuit associates information pertaining to the responses as second session parameters that are compared with the first session parameters such that the comparison yields a degree of compliance and appropriateness of the second session parameters toward the first session parameters. In response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with the one or more such federated cases. The processing circuit routes the one or more such non-compliant federated cases to a second crowd of respondents in the network such that the routing of the cases is managed based on the third session parameters associated with each of the one or more federated cases. The processing circuit integrates responses for each of the federated cases to yield a single integrated response for the case. The processing circuit publishes the integrated response anonymously that is viewable publicly.",
+  "An embodiment herein provides a method for management of responses to cases submitted by an entity in a crowdsourced network. The method includes receiving, from the entity over the crowdsourced network, a case. The method includes federating the case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of the federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired. The method includes routing the federated cases to the crowd of respondents in the network such that the routing of the cases is managed based on the session parameters associated with each of the federated cases. The method includes receiving responses from the crowd for each of the federated cases. The method includes associating information pertaining to the responses as second session parameters that is compared with the first session parameters such that the comparison yields a degree of compliance and appropriateness of the second session parameters toward the first session parameters. In response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with the one or more such federated cases. The method includes routing the one or more such non-compliant federated cases to a second crowd of respondents in the network such that the routing of the cases is managed based on the third session parameters associated with each of the one or more federated cases. The method includes integrating responses for each of the federated cases to yield a single integrated response for the case corresponding to the federated cases. The method includes publishing the integrated response anonymously that is viewable publicly.",
+  "An embodiment herein provides a program storage device readable by a computer, and comprising a program of instructions executable by said computer to perform a method for management of responses to cases submitted by an entity in a crowdsourced network. The method includes receiving, from the entity over the crowdsourced network, a case. The method includes federating the case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of the federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired. The method includes routing the federated cases to the crowd of respondents in the network such that the routing of the cases is managed based on the session parameters associated with each of the federated cases. The method includes receiving responses from the crowd for each of the federated cases. The method includes associating information pertaining to the responses as second session parameters that is compared with the first session parameters such that the comparison yields a degree of compliance and appropriateness of the second session parameters toward the first session parameters. In response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with the one or more such federated cases. The method includes routing the one or more such non-compliant federated cases to a second crowd of respondents in the network such that the routing of the cases is managed based on the third session parameters associated with each of the one or more federated cases. The method includes integrating responses for each of the federated cases to yield a single integrated response for the case corresponding to the federated cases. The method includes publishing the integrated response anonymously that is viewable publicly."
+ ],
+ "drawingDescriptions": [
+  "The features of the disclosed embodiments may become apparent from the following detailed description taken in conjunction with the accompanying drawings showing illustrative embodiments herein, in which:",
+  "FIG. 1 illustrates an example of an ecosystem to allow management of responses to cases submitted by an entity in a crowdsourced network according to an embodiment herein;",
+  "FIG. 2 illustrates an example of a server in accordance with an embodiment herein;",
+  "FIG. 3 illustrates an example of a processing circuit 204 in accordance with an embodiment herein;",
+  "FIG. 4 illustrates generally, but not by the way of limitation, among other things, an exemplary operating environment for crowdsourced credentialing of respondents;",
+  "FIG. 5 illustrates a credentialing system in accordance with an embodiment herein;",
+  "FIG. 6 illustrates a credentialing system in accordance with another embodiment herein;",
+  "FIG. 7 illustrates a response scoring module in accordance with an exemplary embodiment herein;",
+  "FIG. 8 illustrates a method flowchart for management of responses to cases submitted by a plurality of entities in a crowdsourced network in accordance with an embodiment herein;",
+  "FIGS. 9A and 9B illustrate user searchable interfaces to access various cases and responses in accordance with an embodiment herein; and",
+  "FIG. 10 illustrates generally, but not by the way of limitation, a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US9418355B2/sheet-00000.webp",
-   "label": "Sheet 1 of 12",
-   "width": 146,
-   "height": 120
+   "file": "drawings/US9418355B2/front.webp",
+   "label": "Front page figure",
+   "width": 2665,
+   "height": 2185,
+   "turned": false
   },
   {
-   "file": "drawings/US9418355B2/sheet-00001.webp",
-   "label": "Sheet 2 of 12",
-   "width": 101,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-01.webp",
+   "label": "Sheet 1 of 11",
+   "width": 2672,
+   "height": 2240,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00002.webp",
-   "label": "Sheet 3 of 12",
-   "width": 70,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-02.webp",
+   "label": "Sheet 2 of 11",
+   "width": 2672,
+   "height": 1559,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00003.webp",
-   "label": "Sheet 4 of 12",
-   "width": 106,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-03.webp",
+   "label": "Sheet 3 of 11",
+   "width": 2044,
+   "height": 1801,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00004.webp",
-   "label": "Sheet 5 of 12",
-   "width": 103,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-04.webp",
+   "label": "Sheet 4 of 11",
+   "width": 2558,
+   "height": 2203,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00005.webp",
-   "label": "Sheet 6 of 12",
-   "width": 100,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-05.webp",
+   "label": "Sheet 5 of 11",
+   "width": 2634,
+   "height": 2203,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00006.webp",
-   "label": "Sheet 7 of 12",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-06.webp",
+   "label": "Sheet 6 of 11",
+   "width": 2710,
+   "height": 2187,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00007.webp",
-   "label": "Sheet 8 of 12",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-07.webp",
+   "label": "Sheet 7 of 11",
+   "width": 2316,
+   "height": 1832,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00008.webp",
-   "label": "Sheet 9 of 12",
-   "width": 105,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-08.webp",
+   "label": "Sheet 8 of 11",
+   "width": 2566,
+   "height": 2248,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00009.webp",
-   "label": "Sheet 10 of 12",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-09.webp",
+   "label": "Sheet 9 of 11",
+   "width": 2263,
+   "height": 1862,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00010.webp",
-   "label": "Sheet 11 of 12",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-10.webp",
+   "label": "Sheet 10 of 11",
+   "width": 2596,
+   "height": 1945,
+   "turned": true
   },
   {
-   "file": "drawings/US9418355B2/sheet-00011.webp",
-   "label": "Sheet 12 of 12",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US9418355B2/sheet-11.webp",
+   "label": "Sheet 11 of 11",
+   "width": 2248,
+   "height": 1779,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/91/ad/51/413b959e07c47e/US9418355.pdf",
@@ -178,13 +215,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/14032368",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US9418355B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

@@ -116,48 +116,75 @@
    "text": "The system of claim 14 , wherein the blockchain device comprises a blockchain database to store the plurality of collected context inputs, the micro content blocks, and computer-executable evidence about the consumption of the digital content in association with and based on the respective genuineness score."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment disclosed herein includes a system for monitoring consumption of digital content by a user, the system comprising a display device; a memory circuit maintained on one or more non-transitory computer-readable media; and a processing circuit that monitors the consumption of the digital content by: identifying a progress of the user through the digital content presented on the display device, wherein the digital content comprises a collection of micro content blocks, the progress of the user being at least dependent on one or more of a plurality of predefined parameters; identifying a computer-executable progress score of the user based on the progress identified for the user; defining a computer-executable reward value for the user based on the progress score of the user upon successful achieving at least a defined level of the progress; and instructing the user to redeem the computer-executable reward value as an equivalent transactional amount upon submission of the progress.",
+  "The plurality of predefined parameters comprises a number of words read by the user, a number of characters read by the user, and an amount of time spent by the user in front of the micro content blocks. The system comprising a validation appliance that assesses a computer-executable genuineness score associated with consumption of the digital content by the user. The validation appliance comprises a gaze tracking device for continued tracking of gaze of the user through the digital content. The validation appliance comprises a micro facial expression tracking device for continued monitoring of micro facial expressions of the user through the progress of the digital content.",
+  "The micro facial expression tracking device comprises a micro facial tracking software to help process movement of facial expressions. The computer-executable genuineness score is indicative of an extent of attention paid by the user while going through the digital content such that a higher computer-executable genuineness score is indicative of a higher reward value for the user. The processing circuit monitors the consumption of the digital content by defining at least one of credits, tokens, and redeemable points for each type of the digital content based on one or more of the plurality of predefined parameters.",
+  "The at least one of the credits, tokens, and the redeemable points are redeemable for a digital certification for professionals. The at least one of the credits, tokens, and the redeemable points are redeemable for a monetary transactional value, and wherein the monetary transactional value comprises a cryptocurrency. The at least one of the credits, tokens, and the redeemable points are redeemable for a monetary transactional value. The processing circuit further comprises a computer-installable agent for watching the progress of the user through the digital content. The computer-installable agent comprises a browser-plug in. The system comprises a front-end context monitoring appliance that generates a plurality of context inputs about the user and the user device during the delivery of the digital content to the user device.",
+  "The system comprising an AI/ML (artificial intelligence/machine learning) system remotely connected to the front-end context monitoring appliance and communicatively coupled to the context sensing engine, wherein the AI/ML system: receives a signal containing context inputs from the user device and an output generated based on the context inputs; processes the context inputs to determine a contextual pattern associated with the consumption of the digital content utilizing a plurality of intelligent and machine learning-based tools; and transmits a digital signal containing information pertinent to the contextual pattern to the processing circuit.",
+  "The micro content blocks are time-stamped before transmission by a micro-content communication component to the user device associated with the user. The system comprising a blockchain device that interacts with the user device through a plurality of blockchain configured distributed access points over a blockchain network. The blockchain device comprises a distributed trusted ledgers system containing a plurality of distributed blockchain ledgers associated with a plurality of computing terminals such that each ledger stores a copy of a computer-executable file containing the context inputs, the micro content blocks, and computer-executable evidence about the consumption of the digital content in association with and based on a respective genuineness score. The blockchain device comprises a blockchain database to store the collected context inputs, the micro content blocks, and computer-executable evidence about the consumption of the digital content in association with and based on the respective genuineness score.",
+  "Another embodiment provides a blockchain-enabled information management server for live digital streaming of digital content including one or more content blocks for a user device, the information management server comprising a memory circuit maintained on one or more non-transitory computer-readable media; a processing circuit that creates a reward based on monitoring a user by: identifying a progress of the user through the digital content presented on a display device associated with the user device, wherein the digital content comprises a collection of micro content blocks, the progress of the user being at least dependent on one or more of a plurality of predefined parameters; identifying a computer-executable progress score of the user based on the progress identified for the user; defining a computer-executable reward value for the user based on the computer-executable progress score and the computer-executable genuineness score associated with the user upon successful achieving at least a defined level of the progress; and instructing the user to redeem the computer-executable reward value as an equivalent transactional amount upon submission of the progress based on the computer-executable progress score and the computer-executable genuineness core. A validation appliance assesses a computer-executable genuineness score associated with consumption of the digital content by the user; and a precision blocks creator generates the one or more micro content blocks from a plurality of information blocks extracted from a database or from a plurality of distributed information sources. The information management server comprising a blockchain device that interacts with the validation appliance through a plurality of blockchain configured distributed access points over a blockchain network such that the validation appliance facilitates generating and storing, in a blockchain database, an evidence of the consumption of the micro content blocks in association with the computer-executable genuineness score by the user device.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating exemplary embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates an example of a computer architecture in which various embodiments herein may operate;",
+  "FIG. 2 illustrates a schematic diagram of an information management server in accordance with an embodiment herein;",
+  "FIG. 3 illustrates a front-end context monitoring appliance connected with a context sensing engine in accordance with an embodiment herein;",
+  "FIG. 4 illustrates a validation appliance connected in accordance with an embodiment herein;",
+  "FIG. 5 illustrates a blockchain-configured ecosystem architecture containing one or more components of the system of FIGS. 1 - 4 in accordance with an embodiment herein; and",
+  "FIG. 6 is a block diagram illustrating a computer system used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US12155747B2/sheet-00000.webp",
-   "label": "Sheet 1 of 7",
-   "width": 153,
-   "height": 120
+   "file": "drawings/US12155747B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1469,
+   "turned": false
   },
   {
-   "file": "drawings/US12155747B2/sheet-00001.webp",
-   "label": "Sheet 2 of 7",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-01.webp",
+   "label": "Sheet 1 of 6",
+   "width": 2689,
+   "height": 2113,
+   "turned": true
   },
   {
-   "file": "drawings/US12155747B2/sheet-00002.webp",
-   "label": "Sheet 3 of 7",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-02.webp",
+   "label": "Sheet 2 of 6",
+   "width": 2575,
+   "height": 2026,
+   "turned": true
   },
   {
-   "file": "drawings/US12155747B2/sheet-00003.webp",
-   "label": "Sheet 4 of 7",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-03.webp",
+   "label": "Sheet 3 of 6",
+   "width": 2166,
+   "height": 1486,
+   "turned": true
   },
   {
-   "file": "drawings/US12155747B2/sheet-00004.webp",
-   "label": "Sheet 5 of 7",
-   "width": 77,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-04.webp",
+   "label": "Sheet 4 of 6",
+   "width": 1190,
+   "height": 1834,
+   "turned": false
   },
   {
-   "file": "drawings/US12155747B2/sheet-00005.webp",
-   "label": "Sheet 6 of 7",
-   "width": 81,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-05.webp",
+   "label": "Sheet 5 of 6",
+   "width": 2561,
+   "height": 1743,
+   "turned": true
   },
   {
-   "file": "drawings/US12155747B2/sheet-00006.webp",
-   "label": "Sheet 7 of 7",
-   "width": 77,
-   "height": 120
+   "file": "drawings/US12155747B2/sheet-06.webp",
+   "label": "Sheet 6 of 6",
+   "width": 2572,
+   "height": 1670,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/f1/4d/cf/0c88ac3da529e8/US12155747.pdf",
@@ -166,13 +193,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/17149482",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US12155747B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

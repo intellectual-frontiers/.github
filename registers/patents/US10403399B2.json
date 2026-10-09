@@ -132,120 +132,172 @@
    "text": "A collaborative computer-implemented method for protocol documentation, automation, and compliance designed for a distributed safety critical plurality of devices, said method comprising: defining a patient treatment protocol, indicative of a shared baseline, for a first patient using an input from an electronic medical transactional system, wherein said electronic medical transactional system comprises an electronic medical records database communicatively connected with or included within said electronic medical transactional system, said electronic medical records database storing computer executable patient data files, wherein each of said computer executable patient data files is associated with a first identification code that is indicative of a patient's identity, a second identification code that is indicative of a practitioner associated with said patient; receiving a list of computer executable tasks contained within a computer executable worklist for automated execution in a defined protocol sequence by a plurality of execution servers within an interaction zone, wherein said computer executable worklist is created by a worklist management system using protocol-compliant user customizable options, said worklist management system operatively connected with a control server located remote from said interaction zone; determining credentials of a user based on a user identification card read by an authorization interface connected to the control server; defining, by a special purpose processor in a repository, a time series; associating, by said special purpose processor in said repository, a current time occurrence on said time series; associating a future time occurrence, by said special purpose processor in a repository, on said time series, wherein said future time occurrence is defined as a succeeding time occurrence on said time series in relation to said current time occurrence; defining an interaction zone rule in association with said time series, wherein said step of defining said interaction zone rule includes defining a plurality of triggering events, by said special purpose processor, to initiate said set of tasks in accordance with said shared baseline protocol across said plurality of devices; receiving an output from an event monitor at said control server, said output indicative of said triggering event at said future time occurrence in association with a device from said plurality of devices, wherein the event monitor comprises light emitting diodes to detect said triggering event; notifying said device for performance of a scheduled task at said future time occurrence upon detection of said triggering event; allowing modifications by an authorized practitioner to said shared baseline protocol to adopt said shared baseline protocol for a second patient with customized patient-centric variations; and generating a report based on execution of said shared baseline protocol in association with plurality of devices to identify tasks execution variations."
   }
  ],
+ "background": [
+  "Technical Field",
+  "The embodiments herein generally relate to tasks management, and more particularly to methods and systems for scheduling and execution of predefined tasks.",
+  "Description of the Related Art",
+  "Healthcare providers visit for example elderly patients for routine checkup, glucose monitoring, blood analysis, blood pressure check and other similar tasks. In some cases, healthcare providers need something from patients regularly but do not necessarily want a special trip by the healthcare providers to visit the patients every time. However, the current methods and systems do not allow healthcare providers to take care of these issues without having them to visit the patients every time.",
+  "In view of the above, there is a need for an improved method and system for allowing healthcare providers to establish rules based on defined parameters to drive certain actions associated with patients."
+ ],
+ "summary": [
+  "An embodiment herein provides a computer-implemented method for scheduling, tracking, and executing performance of a set of tasks. The method includes defining, by a special purpose processor in a repository, a time series, associating, by the special purpose processor in the repository, a current time occurrence on the time series, and associating a future time occurrence, by the special purpose processor in a repository, on the time series, wherein the future time occurrence is defined as a succeeding time occurrence on the time series in relation to the current time occurrence. The method further includes creating a tasks list including the set of tasks by a processing circuit, wherein the tasks list includes an actionable questionnaire, a test plan, a process verifier, a runbook, a careplan, a regulatory mandate that each are editable and executable at the future time occurrence. The method may further include defining an interaction zone rule in association with the time series, wherein the step of defining the interaction zone rule includes defining a plurality of triggering events, by the special purpose processor, to initiate the set of tasks. The method may include associating the interaction zone rule with one or more participants in the repository and scheduling a task from the set of tasks at the future time occurrence relative to the current time occurrence based on occurrence of a triggering event in view of the interaction zone rule. The method may include receiving an output from an event monitor at a control server. The output is indicative of the triggering event at the future time occurrence. The method may include notifying the remote device for performance of the scheduled task at the future time occurrence upon detection of the triggering event. The step of notifying may include generating an electric signal comprising data signifying the schedule task and instructions for performance of the scheduled task, transmitting the electric signal from the control server, communicatively connected with the special purpose processor, in a network comprising a plurality of communicatively linked data communication devices, converting the electric signal into a plurality of pixels, and displaying the plurality of pixels on a display unit of the remote device to launch an activation message that includes an instruction to perform the scheduled task at the future time occurrence upon occurrence of the triggering event in accordance with the interaction zone rule. The method further includes receiving a message by the control server from the remote device to update the set of tasks list and the time series dynamically based on a performance status of the scheduled task and replacing the future time occurrence with a new current time occurrence in the repository and defining a new future time occurrence on the time series based on the performance status of the scheduled task and an input from the remote device that is indicative of health of a patient.",
+  "An embodiment herein provides a computer-controlled system for scheduling, tracking, and executing performance of a set of tasks. The system includes a control server configured to communicatively connect with a remote device through a network for allowing exchange of computer executable patient data between the control server and the remote device. The system further includes a special purpose processor included within or communicatively connected with the control server to define a time series in a repository, associate a current time occurrence on the time series in a repository, associate a future time occurrence on the time series in a repository, wherein the future time occurrence is defined as a succeeding time occurrence on the time series in relation to the current time occurrence, create a tasks list including the set of tasks in a repository, wherein the tasks list includes an actionable questionnaire, a test plan, a process verifier, a runbook, a careplan, a regulatory mandate that each are editable and executable at the future time occurrence, define an interaction zone rule in association with the time series. The step of defining the interaction zone rule includes defining a plurality of triggering events, by the special purpose processor, to initiate the set of tasks, associate the interaction zone rule with one or more participants in a repository, schedule a task from the set of tasks at the future time occurrence relative to the current time occurrence based on occurrence of a triggering event in view of the interaction zone rule, receive an input indicative of the triggering event at the future time occurrence, and notify the remote device for performance of the scheduled task at the future time occurrence upon detection of the triggering event. The step of notifying includes generating an electric signal comprising data signifying the schedule task and instructions for performance of the scheduled task, transmitting the electric signal in a network comprising a plurality of communicatively linked data communication devices, converting the electric signal into a plurality of pixels, displaying the plurality of pixels on a display unit of the remote device to launch an activation message that includes an instruction to perform the scheduled task at the future time occurrence upon occurrence of the triggering event in accordance with the interaction zone rule, receive a message from the remote device to update the set of tasks list and the time series dynamically based on performance status of the task, replace the future time occurrence with a new current time occurrence and define a new future time occurrence on the time series in a repository based on the performance status of the scheduled task and an input from the remote device that is indicative of health of a patient. The system further includes an event monitor comprising a location sensor and a weather sensor communicatively connected with the control server for detecting spatial presence and a weather controlled event respectively upon occurrence of the triggering event.",
+  "An embodiment herein provides a computer-controlled worklists management system for creating, scheduling and facilitating execution of a computer executable worklist across a plurality of distributed execution servers. The system includes a processing circuit to generate the computer executable worklist. The computer executable worklist includes a plurality of tasks scheduled to be executed at a future time occurrence on a time series based on occurrence of a triggering event in view of an interaction zone rule indicative of a spatial presence and a weather controlled event within an interaction zone, wherein the plurality of tasks include at least a first task executable by a first device controlled by a first execution server, a second task executable by a second device controlled by a second execution server, a third task executable by a third device controlled by a third execution server. The first execution server, the second execution server, and the third execution server are located remotely in a distributed environment. The system further includes a worklists storage repository. The worklists storage repository includes a worklists library containing predefined and user editable worklist templates. The worklists library includes a survey template, a check list template, a care plan template, a questionnaire template, and a protocol template. The worklists storage repository includes a task library containing user generated and user editable tasks such that the tasks are editable using predefined control options, wherein the tasks are configured to be imported in a select worklist template from among the worklist templates to generate the computer executable worklist. The system further includes a memory circuit coupled to the processing circuit and storing a plurality of application programming interfaces (APIs) providing a stack of API layers including a system API layer to allow communication with 1) customer applications with API capability directly 2) customer applications without API capability indirectly, wherein the customer applications reside at the first device, the second device, and the third device, a supplementary modular, reusable and variably configurable independent API layer for secure authentication, data transfer, and data handling applications configured for interaction zone parameters signifying the triggering event comprising the spatial presence and weather-controlled event, a business process modeling layer that unifies the worklists storage repository with the processing circuit, and a data abstraction layer for enabling communication between the processing circuit and various data stores. The system further includes a file-based interaction device including a first component communicatively and operatively connected with the processing circuit and a second component communicatively and operatively coupled with the first device, the second device, and the third device, wherein the second component comprises an installable agent to: cause the customer applications without API capability to interact with the system APIs indirectly through the first component and the second component, to collect information from the first device, the second device and the third device, and to interact with the workflow storage engine."
+ ],
+ "drawingDescriptions": [
+  "In the drawings, like numerals describe similar components substantially throughout the several views. The drawings illustrate generally, by way of an example, but not by a way of limitation, various embodiments.",
+  "FIG. 1A illustrates an exemplary architecture for managing healthcare functions in accordance with an embodiment herein;",
+  "FIG. 1B illustrates an exemplary architecture for managing healthcare functions in accordance with an embodiment herein;",
+  "FIG. 2 illustrates a detailed block diagram of a processing circuit among other things, in accordance with an embodiment herein;",
+  "FIG. 3 illustrates a method flowchart for facilitating scheduling and performance of a healthcare task, in accordance with an embodiment herein;",
+  "FIG. 4 illustrates a block diagram of a work lists management system communicatively coupled with a processing circuit or a processor, in accordance with an embodiment herein;",
+  "FIG. 5 illustrates a dashboard configured to provide an interface for interacting with the work lists management system to allow a user to navigate through different options for work lists creation and management, in accordance with an embodiment herein;",
+  "FIG. 6 illustrates another interface that provides detailed information about check lists or work lists associated with a user who attended in defined time duration, in accordance with an embodiment herein;",
+  "FIG. 7 illustrates another section of a user interface that provides libraries and tabs for accessing various libraries contained within the work lists management system, in accordance with an embodiment herein;",
+  "FIG. 8 illustrates another section of a user interface that provides libraries and tabs for accessing various libraries contained within the work lists management system, in accordance with an embodiment herein;",
+  "FIG. 9 depicts exemplary activities that may be managed with the use of the work lists management system, in accordance with an embodiment herein;",
+  "FIG. 10 illustrates different components of architecture of a work lists management system that may provide a distributed arrangement and functionality of work lists management across a plurality of organizations or across a plurality of departments in a single organization, in accordance with an embodiment herein;",
+  "FIG. 11 illustrates components of a system architecture according to an embodiment herein;",
+  "FIG. 12 illustrates components of a system architecture according to an embodiment herein;",
+  "FIG. 13 illustrates an ecosystem and components thereof of a work lists management system interacting with a variety of systems or devices within an interaction zone, in accordance with an embodiment herein;",
+  "FIG. 14 illustrates components of a system architecture according to an embodiment herein;",
+  "FIG. 15 illustrates components of a system architecture according to an embodiment herein;",
+  "FIG. 16 illustrates components of a system architecture according to an embodiment herein; and",
+  "FIG. 17 illustrates a computer system used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10403399B2/sheet-00000.webp",
-   "label": "Sheet 1 of 19",
-   "width": 333,
-   "height": 120
+   "file": "drawings/US10403399B2/front.webp",
+   "label": "Front page figure",
+   "width": 5471,
+   "height": 1972,
+   "turned": false
   },
   {
-   "file": "drawings/US10403399B2/sheet-00001.webp",
-   "label": "Sheet 2 of 19",
-   "width": 96,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-01.webp",
+   "label": "Sheet 1 of 18",
+   "width": 2630,
+   "height": 2095,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00002.webp",
-   "label": "Sheet 3 of 19",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-02.webp",
+   "label": "Sheet 2 of 18",
+   "width": 2817,
+   "height": 2117,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00003.webp",
-   "label": "Sheet 4 of 19",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-03.webp",
+   "label": "Sheet 3 of 18",
+   "width": 2773,
+   "height": 2154,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00004.webp",
-   "label": "Sheet 5 of 19",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-04.webp",
+   "label": "Sheet 4 of 18",
+   "width": 2556,
+   "height": 1751,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00005.webp",
-   "label": "Sheet 6 of 19",
-   "width": 107,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-05.webp",
+   "label": "Sheet 5 of 18",
+   "width": 2315,
+   "height": 2066,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00006.webp",
-   "label": "Sheet 7 of 19",
-   "width": 74,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-06.webp",
+   "label": "Sheet 6 of 18",
+   "width": 2780,
+   "height": 1703,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00007.webp",
-   "label": "Sheet 8 of 19",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-07.webp",
+   "label": "Sheet 7 of 18",
+   "width": 2659,
+   "height": 1769,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00008.webp",
-   "label": "Sheet 9 of 19",
-   "width": 128,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-08.webp",
+   "label": "Sheet 8 of 18",
+   "width": 1912,
+   "height": 2040,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00009.webp",
-   "label": "Sheet 10 of 19",
-   "width": 100,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-09.webp",
+   "label": "Sheet 9 of 18",
+   "width": 2439,
+   "height": 2036,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00010.webp",
-   "label": "Sheet 11 of 19",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-10.webp",
+   "label": "Sheet 10 of 18",
+   "width": 2699,
+   "height": 2069,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00011.webp",
-   "label": "Sheet 12 of 19",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-11.webp",
+   "label": "Sheet 11 of 18",
+   "width": 2561,
+   "height": 1752,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00012.webp",
-   "label": "Sheet 13 of 19",
-   "width": 118,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-12.webp",
+   "label": "Sheet 12 of 18",
+   "width": 2073,
+   "height": 2040,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00013.webp",
-   "label": "Sheet 14 of 19",
-   "width": 115,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-13.webp",
+   "label": "Sheet 13 of 18",
+   "width": 2033,
+   "height": 1945,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00014.webp",
-   "label": "Sheet 15 of 19",
-   "width": 85,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-14.webp",
+   "label": "Sheet 14 of 18",
+   "width": 2586,
+   "height": 1835,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00015.webp",
-   "label": "Sheet 16 of 19",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-15.webp",
+   "label": "Sheet 15 of 18",
+   "width": 2531,
+   "height": 2055,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00016.webp",
-   "label": "Sheet 17 of 19",
-   "width": 115,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-16.webp",
+   "label": "Sheet 16 of 18",
+   "width": 2300,
+   "height": 2212,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00017.webp",
-   "label": "Sheet 18 of 19",
-   "width": 95,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-17.webp",
+   "label": "Sheet 17 of 18",
+   "width": 2256,
+   "height": 1795,
+   "turned": true
   },
   {
-   "file": "drawings/US10403399B2/sheet-00018.webp",
-   "label": "Sheet 19 of 19",
-   "width": 88,
-   "height": 120
+   "file": "drawings/US10403399B2/sheet-18.webp",
+   "label": "Sheet 18 of 18",
+   "width": 2791,
+   "height": 2055,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/28/32/0a/6f98f67c215065/US10403399.pdf",
@@ -254,13 +306,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/14946702",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10403399B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

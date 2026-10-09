@@ -108,72 +108,101 @@
    "text": "The system of claim 1 , wherein said semantics learning appliance is further configured to: process rules and instructions stored in said memory circuit for language and text mapping of said inflowing unstructured or semi-structured dataset at digital fields and digital elements level, wherein said digital fields represent a digitally stored data header identifier in a computer-controlled data structure and said digital elements represent a plurality of digital data objects within said respective digital fields including pointers that connect said digital data objects to said respective digital fields; transform said inflowing unstructured or semi-structured dataset to said fully structured computerized dataset based on said mapping of said fields and said elements of said inflowing unstructured or semi-structured dataset with said computerized structured dataset already stored in said blockchain configured records database and said master data and said metadata; and utilize said internal extensible taxonomies and said external taxonomies to classify said inflowing unstructured or semi-structured dataset and store said inflowing unstructured or semi-structured dataset in relevant taxonomy classes in said blockchain configured records database after said transformation to said structured computerized dataset."
   }
  ],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a blockchain configured geographically distributed architecture-based system connected over a communication network for transforming unstructured or semi-structured dataset to structured computerized dataset for a blockchain configured records database communicatively coupled to a plurality of blockchain configured content based routers receiving the unstructured or semi-structured dataset from a plurality of data provider computers in a blockchain-enabled network. The system includes a first proxy database, stored on a first tangible non-transitory computer readable medium and comprising a first special purpose processing device implemented on a first integrated circuit chip. The first proxy device is configured to create a backup of data associated with a first data provider computer, wherein the data associated with the first data provider computer is in a first digital format. The first proxy device is configured to communicate with the first data provider computer for backing up the data associated with the first data provider computer, through a first proxy object, wherein the first proxy object comprises one or more references to the first proxy database to establish a connection between the first data provider computer and the first proxy database through one or more database drivers. The system includes a blockchain configured first content based router of the plurality of blockchain configured content based routers, comprising a second special purpose processing device implemented on a second integrated circuit chip, configured to collect the data associated with the first data provider computer from the first proxy database and convert the data associated with the first data provider computer to the structured computerized dataset in accordance with a standardized digital format of dataset associated with the blockchain configured records database. The blockchain configured first content based router is physically located at a gateway associated with the first data provider computer providing a first digital data access point of the distributed blockchain configured records database to the first data provider computer. The system includes the blockchain configured records database stored on a third tangible non-transitory computer readable medium and including a fifth special purpose processing device implemented on a fifth integrated circuit chip to store and index the structured computerized dataset in the standardized digital format, and providing a plurality of distributed digital data access points including the first digital data access point communicatively connecting with the first data provider computer through the distributed first digital data access point of the plurality of distributed digital data access points. The system includes a master data validation system communicatively and operatively coupled to the blockchain configured first content based router and the blockchain configured records database and including a master data repository to store master data instances in the standardized digital format on a tangible non-transitory memory device. The system includes a metadata validation system different and separately located from the master data validation system and communicatively and operatively coupled to the blockchain configured first content based router, the blockchain configured records database and the master data validation system, and configured to store linkable metadata layer objects in a metadata layer repository and digitally link the metadata layer objects by storing an identifier to a source content residing in the blockchain configured records database. The blockchain configured first content based router is connected to a machine learning system communicatively coupled with the blockchain configured records database. The machine learning system includes internal extensible taxonomies built in a computerized format based on the structured computerized dataset in the blockchain configured records database. The internal extensible taxonomies are defined through a computerized category profile wherein the computerized category profile includes digitally stored parent terms and digitally stored child terms and associated digital identifiers indicative of the respective digitally stored parent terms, digitally stored child terms and pointers indicating mutual connections in a hierarchical pattern. The machine learning system includes external taxonomies pulled from external systems not connected with the blockchain configured records database directly and crawled by accessing the external systems with the use of a search engine-enabled crawler to merge with the internal extensible taxonomies digitally by mapping comparable terms in the external taxonomies with the category profile of the internal extensible taxonomies. The machine learning system includes a memory circuit to store the internal extensible taxonomies and the external taxonomies that are digitally merged with the internal extensible taxonomies. The machine leaning system includes a semantics learning appliance comprising a seventh special purpose processing device implemented on a seventh integrated circuit chip configured to perform mapping of the inflowing unstructured or semi-structured dataset with the structured computerized dataset already stored in the blockchain configured records database and the master data and the metadata. A dedicated first local machine housed in a material frame is operatively and communicatively coupled to the first data provider computer and installed physically behind a firewall and communicatively connected with the remotely located blockchain configured records database to transmit said structured computerized dataset at least in part from said blockchain configured records database to said first data provider computer through a digital transmission channel based on access rights and upon identity verification of the first local machine by the blockchain configured records database.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 is a schematic diagram illustrating a high level system architecture according to an embodiment herein;",
+  "FIG. 2 is a schematic diagram illustrating a functional overview of the system architecture of FIG. 1 according to an embodiment herein;",
+  "FIG. 3 is a flow chart illustrating a method of creating natural language based data processing capabilities from metadata facilitated by proxy database drivers according to an embodiment herein;",
+  "FIG. 4 is schematic diagram illustrating a high level system architecture with a record bank communicatively coupled to a master data validation system and a metadata validation system according to an embodiment herein;",
+  "FIG. 5 illustrates a detailed architecture diagram of the master data validation system according to an embodiment herein;",
+  "FIG. 6 illustrates a detailed architecture diagram of the metadata validation system according to an embodiment herein;",
+  "FIG. 7 illustrates a diagram of a machine learning system according to an embodiment herein;",
+  "FIG. 8 illustrates a local hardware-based device associated with a clinical data provider computer to allow access, retrieval, and syndication of a portion of structured dataset locally according to an embodiment herein;",
+  "FIG. 9 illustrates a blockchain configured ecosystem according to an embodiment herein; and",
+  "FIG. 10 is a schematic diagram illustrating a computer system according to an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10984913B2/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 199,
-   "height": 120
+   "file": "drawings/US10984913B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1131,
+   "turned": false
   },
   {
-   "file": "drawings/US10984913B2/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 101,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2332,
+   "height": 1957,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 137,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 1762,
+   "height": 2006,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 241,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 903,
+   "height": 1812,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 104,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2271,
+   "height": 1963,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 74,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2561,
+   "height": 1579,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 133,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 1806,
+   "height": 1998,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 92,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 2214,
+   "height": 1703,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 2564,
+   "height": 1704,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 2610,
+   "height": 1863,
+   "turned": true
   },
   {
-   "file": "drawings/US10984913B2/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 83,
-   "height": 120
+   "file": "drawings/US10984913B2/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2571,
+   "height": 1770,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/0e/e3/2a/a4ec99d2900250/US10984913.pdf",
@@ -182,13 +211,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15389243",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10984913B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

@@ -136,96 +136,137 @@
    "text": "A computer-implemented method for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity, the method comprising: searching a plurality of repositories containing the plurality of discrete rating indicators associated with the rated entity; retrieving a plurality of rating indicators published on a combination of a web-based repository and a personalized social networking platform section, wherein at least one of the plurality of rating indicators comprises a fraudulent rating indicator; filtering the fraudulent rating indicator based on computer executable input components including a geo-location coordinate similarity between a rating entity and the rated entity, a demographic identification, a frequency of the rating indicator of the rated entity by the rating entity, a sentiment writing style, a duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, a duplication of rating indicators provided by the rating entity for the rated entity, and a use of multiple different rating sources for rating the rated entity by the rating entity; aggregating a filtered combination of the plurality of rating indicators to provide an aggregate rating indicator comprising an equivalent of the plurality of discrete rating indicators other than the fraudulent rating indicator; generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity; converting the electric signal into a plurality of pixels; and displaying the plurality of pixels on a display unit of a communication device."
   }
  ],
+ "background": [
+  "Technical Field",
+  "The embodiments herein generally relate to data compilation, and more particularly to methods and systems for aggregating ratings data.",
+  "Description of the Related Art",
+  "Different review platforms often provide different ratings and reviews which may be substantially different based on who is providing the review and based on reliability and authenticity associated with reviewers and reviews. Such platforms leverage the wisdom of a crowd for assessing different entities such as physicians etc. Rating aggregation algorithms exist which typically collate different ratings from such as websites and generate a summation or an average rating for an entity which is indicative of credibility of the entity such as a physician.",
+  "Existing methods and systems however do not generally provide an optimal aggregate score since the ratings may be influenced due to variances in reviewers' approach of rating an entity and because all reviews or reviewers may not be reliable in the same way.",
+  "In view of the above, there is a need to provide an improved way and system for generating an aggregate rating indicator about an entity to establish an optimal rating and to facilitate searching of entities in an optimal way based on rating indicators to meet user requirements in a precise manner."
+ ],
+ "summary": [
+  "An embodiment herein provides a computer-implemented method for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity. The method includes searching a plurality of repositories containing the plurality of discrete rating indicators associated with the rated entity, wherein each of the plurality of rating indicators comprises a numerical score component and a sentiment score component. The method may include retrieving a first rating indicator published on a web-based repository. The first rating indicator may include a first numerical score component and a first semantic score component. The method may include retrieving a second rating indicator published on a personalized social networking platform section. The second rating indicator may include a second numeric score component and a second semantic score component. The method may include retrieving a third rating indicator stored with a local storage component associated with the rated entity or a rating entity. The third rating indicator may include a third numeric score component and a third semantic score component. At least one of the first rating indicator, the second rating indicator, and the third rating indicator may be a fraudulent rating indicator. The method may include storing the first rating indicator, the second rating indicator, and the third rating indicator in a memory circuit equipped with a special purpose processor. The method may include filtering out the fraudulent rating indicator from among the first rating indicator, the second rating indicator, and the third rating indicator, by the special purpose processor, wherein the fraudulent rating indicator is determined by the special purpose processor based on a combination of parameters including a geo-location coordinate similarity between a rating entity and the rated entity, gender identification, age specifics, frequency of the rating indicator of the rated entity by the rating entity, sentiment writing style, duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, duplicate rating indicators provided by the rating entity for the rated entity, use of multiple different rating sources for rating the rated entity by the rating entity, and the like. The method may include aggregating the first rating indicator, the second rating indicator, and the third rating indicator by the special purpose computer after filtering out the fraudulent rating indicator such that the aggregation results in an aggregate rating indicator indicative of an equivalent of the plurality of discrete rating indicators other than the fraudulent rating indicator. The method may include generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity. The method may include transmitting the electric signal from a data communication device, communicatively connected with the special purpose processor, in a network comprising a plurality of communicatively linked data communication devices. The method may include converting the electric signal into a plurality of pixels. The method may include displaying the plurality of pixels on a display unit of a second communication device to publish the aggregate rating indicator associated with the rated entity and the data signifying the rated entity.",
+  "An embodiment herein provides a system for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity. The system may include a search engine for searching a plurality of repositories containing the plurality of discrete rating indicators associated with the entity, wherein each of the plurality of rating indicators comprises a numerical score component and a sentiment score component. The system may include a special purpose processor for retrieving a first rating indicator published on a web-based repository. The first rating indicator includes a first numerical score component and a first sentiment score component. The special purpose processor is configured to retrieve a second rating indicator published on a personalized social networking platform section. The second rating indicator includes a second numeric score component and a second sentiment score component. The special purpose processor is configured to retrieve a third rating indicator published with a local storage component associated with the rated entity or a ratting entity. The third rating indicator includes a third numeric score component and a third sentiment score component, wherein at least one of the first rating indicator, the second rating indicator, and the third rating indicator is a fraudulent rating indicator. The system includes a memory circuit communicatively and operatively connected with the special purpose processor for storing the first rating indicator, the second rating indicator, and the third rating indicator. The system includes a rating filter or a filtering engine communicatively coupled with the special purpose processor and the memory circuit for filtering out a fraudulent rating indicator. The fraudulent rating indicator is determined based on a combination of parameters including a geo-location coordinate similarity between a rating entity and the rated entity, gender identification, age specifics, frequency of the rating indicator of the rated entity by the rating entity, sentiment writing style, duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, duplicate rating indicators provided by the rating entity for the rated entity, use of multiple rating sources for rating the rated entity by the rating entity. The system may include a rating aggregator communicatively and operatively connected with the special purpose processor for aggregating the first rating indicator, the second rating indicator, and the third rating indicator after filtering out the fraudulent rating indicator such that the aggregation results in an aggregate rating indicator indicative of an equivalent of the plurality of discrete rating indicators other than the fraudulent rating indicator. The system includes an electric signal generator embedded in an electronic circuit and communicatively and operatively connected with the special purpose processor and the memory circuit for generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity. The system includes a transceiver for transmitting the electric signal from a data communication device, communicatively connected with the special purpose processor and the electric signal generator, in a network comprising a plurality of communicatively linked data communication devices. The system includes a signal converter for converting the electric signal into a plurality of pixels to publish the aggregate rating indicator associated with the rated entity and the data signifying the rated entity."
+ ],
+ "drawingDescriptions": [
+  "In the drawings, like numerals describe similar components substantially throughout the several views. The drawings illustrate generally, by way of an example, but not by a way of limitation, various embodiments.",
+  "FIG. 1 illustrates an exemplary architecture for establishing ratings in accordance with an embodiment herein;",
+  "FIG. 2 illustrates an exemplary environment depicting a process of aggregation of ratings acquired from a plurality of publishers in accordance with an embodiment herein;",
+  "FIG. 3 illustrates a system block diagram of the rating aggregator in accordance with an embodiment herein;",
+  "FIG. 4 illustrates an example of a rating aggregator in accordance with another embodiment herein;",
+  "FIGS. 5-7 illustrate examples of user interfaces for facilitating interactions with a rating aggregator in accordance with an embodiment herein;",
+  "FIGS. 8A and 8B illustrate examples of financial information and profile information retrieved by a rating aggregator for use in comparative determination of associated aggregated ratings of physicians in accordance with an embodiment herein;",
+  "FIG. 9 illustrates a sentiment analysis engine, a filtering engine, and a rating evaluation unit communicatively connected with a plurality of rating sources, in accordance with an embodiment herein;",
+  "FIG. 10 illustrates a method diagram for aggregation of rating indicators and publishing of an aggregate rating indicator, in accordance with an embodiment herein;",
+  "FIG. 11 illustrates an exemplary architecture involving a plurality of computing devices connected over the network, in accordance with an embodiment herein;",
+  "FIG. 12 illustrates an example of filtering of the rating indicators that are obtained from various types of sources through use of a multi-layer filtering approach, in accordance with an embodiment herein; and",
+  "FIG. 13 illustrates a computer system that may be used in accordance with the embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10489830B2/sheet-00000.webp",
-   "label": "Sheet 1 of 15",
-   "width": 178,
-   "height": 120
+   "file": "drawings/US10489830B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1261,
+   "turned": false
   },
   {
-   "file": "drawings/US10489830B2/sheet-00001.webp",
-   "label": "Sheet 2 of 15",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-01.webp",
+   "label": "Sheet 1 of 14",
+   "width": 2637,
+   "height": 1991,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00002.webp",
-   "label": "Sheet 3 of 15",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-02.webp",
+   "label": "Sheet 2 of 14",
+   "width": 2624,
+   "height": 1841,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00003.webp",
-   "label": "Sheet 4 of 15",
-   "width": 210,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-03.webp",
+   "label": "Sheet 3 of 14",
+   "width": 1173,
+   "height": 2050,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00004.webp",
-   "label": "Sheet 5 of 15",
-   "width": 176,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-04.webp",
+   "label": "Sheet 4 of 14",
+   "width": 1365,
+   "height": 2003,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00005.webp",
-   "label": "Sheet 6 of 15",
-   "width": 75,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-05.webp",
+   "label": "Sheet 5 of 14",
+   "width": 2512,
+   "height": 1567,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00006.webp",
-   "label": "Sheet 7 of 15",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-06.webp",
+   "label": "Sheet 6 of 14",
+   "width": 2192,
+   "height": 1668,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00007.webp",
-   "label": "Sheet 8 of 15",
-   "width": 119,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-07.webp",
+   "label": "Sheet 7 of 14",
+   "width": 1775,
+   "height": 1760,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00008.webp",
-   "label": "Sheet 9 of 15",
-   "width": 70,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-08.webp",
+   "label": "Sheet 8 of 14",
+   "width": 2616,
+   "height": 1528,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00009.webp",
-   "label": "Sheet 10 of 15",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-09.webp",
+   "label": "Sheet 9 of 14",
+   "width": 2608,
+   "height": 1832,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00010.webp",
-   "label": "Sheet 11 of 15",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-10.webp",
+   "label": "Sheet 10 of 14",
+   "width": 2586,
+   "height": 1970,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00011.webp",
-   "label": "Sheet 12 of 15",
-   "width": 85,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-11.webp",
+   "label": "Sheet 11 of 14",
+   "width": 2517,
+   "height": 1773,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00012.webp",
-   "label": "Sheet 13 of 15",
-   "width": 80,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-12.webp",
+   "label": "Sheet 12 of 14",
+   "width": 2356,
+   "height": 1575,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00013.webp",
-   "label": "Sheet 14 of 15",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-13.webp",
+   "label": "Sheet 13 of 14",
+   "width": 2656,
+   "height": 1933,
+   "turned": true
   },
   {
-   "file": "drawings/US10489830B2/sheet-00014.webp",
-   "label": "Sheet 15 of 15",
-   "width": 69,
-   "height": 120
+   "file": "drawings/US10489830B2/sheet-14.webp",
+   "label": "Sheet 14 of 14",
+   "width": 2654,
+   "height": 1533,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/68/df/0e/2ca94ab83c9534/US10489830.pdf",
@@ -234,13 +275,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15813109",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10489830B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

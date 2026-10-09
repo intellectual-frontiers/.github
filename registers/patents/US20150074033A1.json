@@ -127,66 +127,79 @@
    "text": "The program storage device of claim 18 , wherein said method further comprises associating a crowdsourcing index with said credentialing, wherein said crowdsourcing index is indicative of a degree of crowdsourcing such that said degree of crowdsourcing non-linearly affects said degree of credentialing or said credentialed expertise."
   }
  ],
+ "background": [],
+ "summary": [],
+ "drawingDescriptions": [],
  "drawings": [
   {
-   "file": "drawings/US20150074033A1/sheet-00000.webp",
-   "label": "Sheet 1 of 10",
-   "width": 153,
-   "height": 120
+   "file": "drawings/US20150074033A1/front.webp",
+   "label": "Front page figure",
+   "width": 2555,
+   "height": 2007,
+   "turned": false
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00001.webp",
-   "label": "Sheet 2 of 10",
-   "width": 107,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-01.webp",
+   "label": "Sheet 1 of 9",
+   "width": 2278,
+   "height": 2028,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00002.webp",
-   "label": "Sheet 3 of 10",
-   "width": 98,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-02.webp",
+   "label": "Sheet 2 of 9",
+   "width": 2573,
+   "height": 2112,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00003.webp",
-   "label": "Sheet 4 of 10",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-03.webp",
+   "label": "Sheet 3 of 9",
+   "width": 2596,
+   "height": 2150,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00004.webp",
-   "label": "Sheet 5 of 10",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-04.webp",
+   "label": "Sheet 4 of 9",
+   "width": 2679,
+   "height": 2104,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00005.webp",
-   "label": "Sheet 6 of 10",
-   "width": 98,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-05.webp",
+   "label": "Sheet 5 of 9",
+   "width": 2483,
+   "height": 2021,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00006.webp",
-   "label": "Sheet 7 of 10",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-06.webp",
+   "label": "Sheet 6 of 9",
+   "width": 2052,
+   "height": 1611,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00007.webp",
-   "label": "Sheet 8 of 10",
-   "width": 97,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-07.webp",
+   "label": "Sheet 7 of 9",
+   "width": 2240,
+   "height": 1817,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00008.webp",
-   "label": "Sheet 9 of 10",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-08.webp",
+   "label": "Sheet 8 of 9",
+   "width": 2452,
+   "height": 1589,
+   "turned": true
   },
   {
-   "file": "drawings/US20150074033A1/sheet-00009.webp",
-   "label": "Sheet 10 of 10",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US20150074033A1/sheet-09.webp",
+   "label": "Sheet 9 of 9",
+   "width": 2271,
+   "height": 1771,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/56/0e/b9/91e7558758c0d3/US20150074033A1.pdf",
@@ -195,13 +208,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/14025472",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US20150074033A1/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

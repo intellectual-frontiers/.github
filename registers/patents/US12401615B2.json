@@ -149,21 +149,221 @@
    "text": "The method of claim 14 , wherein each of the first device, the second device, and the third device is communicatively connected to an external controller through a near field communication (NFC) channel so that a communication point of the NFC channel receives executable instructions among the devices to transfer the executable instructions to the external controller associated with a respective device, wherein the executable instructions facilitate coordinated operation according to the relationship parameters defining event occurrence timelines for synchronous task execution."
   }
  ],
- "drawings": [],
+ "background": [],
+ "summary": [
+  "An embodiment herein provides a system for providing a social networking service to a plurality of participants and allowing the participants to perform a series of social tasks in a socially aware network. The system includes a social networking server that facilitates social information exchange among the participants through the socially aware network. The plurality of participants includes device participants and non-device participants. The system further includes a social profiles manager included in or coupled to the social networking server. The social profiles manager creates and manages individual centric profiles of devices that are a social representation of individual devices within the socially aware network. The devices are identifiable by other participants and the social networking server through social profiles associated with the devices. The social profiles includes social device profiles and social human profiles associated with device participants and non-device participants respectively such that the social human profiles are associated with one or more device profiles, and wherein the social human profiles are represented as a subset of corresponding device profiles. The system further includes a social device manager included in or coupled to the social networking server. The social device manager manages device relationships and social activity in the socially aware network. The system further includes a social networking application comprising a cluster of social applications each for providing a specific social facility to facilitate social activity among the plurality of participants through the socially aware network.",
+  "An embodiment herein provides a method for integration of a plurality of participants comprising a plurality of devices and non-devices through a social networking platform. The method includes creating a device centric social profile for each of the plurality of devices. The social profile is a social representation of a respective device within a socially aware network and each device is identifiable by other devices and a social networking server through a social profile of the each device. The method further includes allowing exchange of social content among the devices by the social networking server for the devices to perform a series of social tasks. The social content is exchanged through a first communication channel and a second communication channel. The first communication channel links a device with an external controller and the second communication channel links the external controller with a socially aware network. The series of social tasks includes one or more of voluntarily joining the socially aware network, disassociating or leaving from the socially aware network, extending interconnection with other like-minded devices, sending invitations for connections to other devices, accepting or rejecting invitations from other devices, viewing profiles of other devices, exchanging social activity information, establishing social signatures for social authorization of profiles, creating devices social groups, joining devices groups, and leaving devices groups voluntarily or upon initiation of an activity by a participant. The method further includes maintaining profiles relationships among the devices within the socially aware network.",
+  "An embodiment herein provides a method for integration of a plurality of participants comprising a plurality of devices and non-devices through a social networking platform. The method includes creating a device centric social profile for each of the plurality of devices. The social profile is a social representation of a respective device within a socially aware network and the device is identifiable by other devices and a social networking server through the social profile. The method further includes sending a connection invitation by a first device to a second device through a multi-communication channel including a first near field communication (NFC) channel and the socially aware network. The sending of the connection invitation includes sending the connection invitation from the first device to the external controller associated with the first device through the first NFC channel. The sending of the connection invitation further includes transferring the connection invitation from the external controller to a network point of the socially aware network. The sending of the connection invitation further includes transferring the connection invitation from the network point through the socially aware network to the device. The method further includes accepting or rejecting the connection invitation by the second device upon receipt. The method further includes maintaining a profiles relationship of the first device and the second device based on acceptance or rejection of the connection invitation by the second device. The method further includes allowing an exchange of social content through a social activity between the first device and the second device based on the maintained profile relationships. The social activity comprises a series of social tasks including one or more of devices to voluntarily join the socially aware network, disassociate or leave from the socially aware network, extend interconnection with other like-minded devices, send invitations for connections to other devices, accept or reject invitations from other devices, view profiles of other devices, exchange social activity information, establish social signatures for social authorization of profiles, create devices social groups, join devices groups, and leave devices groups voluntarily or upon initiation of an activity by a participant.",
+  "An embodiment herein provides a non-transitory program storage device readable by a computer, and comprising a program of instructions executable by the computer to perform a method for integration of a plurality of participants including a plurality of devices and non-devices through a social networking platform. The method includes creating a device centric social profile for each of the plurality of devices. The social profile is a social representation of a respective device within a socially aware network and each device is identifiable by other devices and a social networking server through a social profile of the each device. The method further includes allowing exchange of social content among the devices by the social networking server for the devices to perform a series of social tasks. The social content is exchanged through a first communication channel and a second communication channel. The first communication channel links a device with an external controller and the second communication channel links the external controller with a socially aware network. The series of social tasks includes one or more of voluntarily joining the socially aware network, disassociating or leaving from the socially aware network, extending interconnection with other like-minded devices, sending invitations for connections to other devices, accepting or rejecting invitations from other devices, viewing profiles of other devices, exchanging social activity information, establishing social signatures for social authorization of profiles, creating devices social groups, joining devices groups, and leaving devices groups voluntarily or upon initiation of an activity by a participant. The method further includes maintaining profiles relationships among the devices within the socially aware network.",
+  "An embodiment herein provides a system for facilitating sequential, synchronous, and automatically coordinated operation of a plurality of devices through interactive elements involving a chain of tasks and devices. The system includes a social networking server that provides a social networking service to the plurality of devices so that each of the plurality of devices are communicatively connected to the social networking service by associating respective social profiles with the social networking server. The respective social profiles are social representation of the plurality of devices, wherein the social networking server is programmed to allow the plurality of devices to coordinate for a synchronous social times-based functioning by a process. The process includes associating connection type social device relationships between a first device and a second device of the plurality of devices. The connection type social device relationships allow the first device and the second device to view a social profile of one another through a device user interface enabled by the social networking server. The process further includes receiving social content from the first device, wherein the social content is indicative of a social action performed by the first device and an instruction to the second device to perform an action in association with action timelines, and wherein the action timelines are indicative of time points associated with the action and define time when actual action occurs at the plurality of devices. The process further includes notifying the second device of the social content received from the first device. The social content includes the instruction to the second device to perform the action in association with the action timelines.",
+  "An embodiment herein provides a method for facilitating sequential, synchronous, and automatically coordinated operation of a plurality of devices through interactive elements involving a chain of tasks and devices. The method includes providing a social networking service by a social networking server to the plurality of devices so that each of the plurality of devices are communicatively connected to the social networking service by associating respective social profiles with the social networking server, wherein the respective social profiles are a social representation of the plurality of devices, and wherein the social networking server is programmed to allow the plurality of devices to coordinate for a synchronous social times-based functioning. The method further includes associating connection type social device relationships between a first device and a second device of the plurality of devices. The connection type social device relationships allow the first device and the second device to view a social profile of one another through a device user interface enabled by the social networking server. The method includes receiving social content from the first device. The social content is indicative of a social action performed by the first device and an instruction to the second device to perform an action in association with action timelines. The action timelines are indicative of time points associated with the action and define time when actual action should occur at the plurality of devices. The method further includes notifying the second device of the social content received from the first device, wherein the social content includes the instruction to the second device to perform the action in association with the action timelines.",
+  "An embodiment herein provides a system for health management of a plurality of devices interconnected through a social networking platform. The system includes a social networking server that provides a social networking-based health service to the plurality of devices and allows the plurality of devices to perform a series of social health tasks by exchange of social content in a socially aware network. The social networking server is programmed to create and manage individual centric profiles of the plurality of devices that are a social representation of individual devices within the socially aware network. The individual devices are identifiable by other devices and the social networking server through social profiles of the individual devices. The social profiles of each of the individual devices include a health profile indicative of health disciplines corresponding to each device and a specification profile including details corresponding to predefined working parameters of the each device. The social networking server is further programmed to associate device social relationships in the socially aware network. The social networking server is programmed to receive updates pertaining to a health profile and a specification profile of a device through a social activity involving social content exchange between a first device and the social networking server. The social networking server is further programmed to associate a relationship between the specification profile of the device and its health profile, wherein a mismatch between one or more parameters of the health profile and the specification profile represents a fault in the device. The social networking server is further programmed to identify a connection device to alternatively perform a function of a faulty device such that the connection device is in an idle state for a time period during which the connection device is required to alternatively perform the function.",
+  "An embodiment herein provides a method for health management of a device interconnected with a plurality of devices through a social networking platform. The method includes creating and managing individual centric profiles of the plurality of devices that comprise a social representation of individual devices within a socially aware network. The individual devices are identifiable by other devices and a social networking server through a social profile of each individual device. The social profile of each individual device includes a health profile indicative of health disciplines corresponding to a device and a specification profile including details corresponding to predefined working parameters of the device. The method further includes associating device social relationships in the socially aware network. The method further includes receiving updates pertaining to a health profile and a specification profile of a device through a social activity involving social content exchange between the first device and the server. The method further includes associating a relationship between the specification profile of the device and its health profile. A mismatch between one or more parameters of the health profile and the specification profile represents a fault in the device. The method includes identifying a connection device to alternatively perform a function of a faulty device such that the connection device is in an idle state for a time period during which the connection device is required to alternatively perform the function.",
+  "An embodiment herein provides a system for monitoring and conveying health related information from a first device to a second device interconnected through a socially aware network. The system includes a processing circuit coupled to the first device. The system includes a social event timeline recorder that stores information pertinent to when an event should occur at the first device, wherein the event should occur at a defined social time. The system includes a social event timeline monitoring unit that monitors an event occurrence time for the event. The system includes a fault detector that compares the social event timeline with the event occurrence time for the event, wherein a gap between the social event timeline and the event occurrence time beyond a threshold limit is indicative of a fault. The event at the first device and the event at the second device are interdependent. The system includes a communication circuit that allows sharing of a social content, indicative of the fault and a predicted modified event occurrence time at the first device, to a social networking server through a two-way communication channel including a near field communication channel and a socially aware network channel. The social networking server sends the social content to the second device. The first device and the second device include connections and parts of a same chain of integrated tasks.",
+  "An embodiment herein provides a method for monitoring and conveying health related information from a first device to a second device interconnected through a socially aware network. The method includes storing information related to defined social event timelines for tasks associated with the first device, wherein the defined social event timelines define times when an event should occur at the first device. The method includes monitoring a social event occurrence time by a social event timeline monitoring unit. The method includes detecting a fault in functioning of the first device by comparing the social event timeline with an event occurrence time for the event. A gap between the social event timeline and the event occurrence time beyond a threshold limit is indicative of the fault. The event at the first device and the event at the second device are interdependent. The method further includes sharing a social content, indicative of the fault and a predicted modified event occurrence time at the first device, to a social networking platform through a two-way communication channel including a near field communication channel and a socially aware network channel. The social networking platform sends the social content to the second device. The first device and the second device comprise connections and parts of a same chain of integrated tasks."
+ ],
+ "drawingDescriptions": [
+  "The features of the disclosed embodiments may become apparent from the following detailed description taken in conjunction with the accompanying drawings showing illustrative embodiments herein, in which:",
+  "FIG. 1 illustrates an exemplary ecosystem of participants interconnected over a socially aware network through a social networking platform, in an embodiment of an embodiment herein.",
+  "FIG. 2 illustrates a social networking server for implementing a social networking platform in accordance with an embodiment herein;",
+  "FIG. 3 illustrates an exemplary embodiment of social profiles of devices and non-device participants in an embodiment herein;",
+  "FIG. 4 illustrates a social networking server among other things in an embodiment herein;",
+  "FIG. 5 illustrates a multi-profile architecture for creating device specific multiple social profiles in accordance with an embodiment herein;",
+  "FIG. 6 illustrates a communication network for exchange of social content between devices in accordance with an embodiment herein;",
+  "FIG. 7 illustrates an implantable medical device (IMD) fitted inside a body of a patient and communicatively coupled to a server for social networking service in accordance with an embodiment herein;",
+  "FIG. 8 illustrates a method flowchart for integration of a plurality of participants in an embodiment herein;",
+  "FIG. 9 illustrates a method flowchart for integration of a plurality of participants in an embodiment of an embodiment herein.",
+  "FIG. 10 illustrates an ecosystem for facilitating sequential, synchronous and automatically coordinated operation of the plurality of devices through interactive elements involving a chain of tasks and devices, in an embodiment herein;",
+  "FIG. 11 illustrates an example of a device interconnected with a social networking platform in an embodiment herein;",
+  "FIG. 12 illustrates a list of exemplary social activities that a server may be programmed to allow a plurality of devices to perform in accordance with an embodiment herein;",
+  "FIG. 13 illustrates an example of a social map showing interconnection of exemplary devices through the social map in accordance with an embodiment herein;",
+  "FIG. 14 illustrates a method flowchart for facilitating sequential, synchronous and automatically coordinated operation of a plurality of devices through interactive elements involving a chain of tasks and the devices in accordance with an embodiment herein;",
+  "FIG. 15 illustrates interconnection of tasks and devices and their interaction with a social networking server, in an embodiment herein;",
+  "FIG. 16 illustrates an exemplary social profile depicting social health profile and social specification profile of an exemplary infusion pump in accordance with an embodiment herein;",
+  "FIG. 17 illustrates another embodiment of an ecosystem of devices and respective tasks and social profiles interconnected through a social platform implemented by a social networking server for the purpose of health management of the devices, in an embodiment herein;",
+  "FIG. 18 illustrates the ecosystem of FIG. 17 with alternative devices interconnected and bypassing faulty devices, in an embodiment herein;",
+  "FIG. 19 illustrates a method flowchart for health management of a device interconnected with a plurality of devices through a social networking server in accordance with an embodiment herein;",
+  "FIG. 20 illustrates an interconnection of the devices through a chain of tasks and devices in an embodiment herein;",
+  "FIG. 21 illustrates a system coupled communicatively to or included in a device for allowing the device to communicate with a social networking server in accordance with an embodiment herein;",
+  "FIG. 22 is a block diagram illustrating an exemplary hardware environment for practicing the embodiments depicted in FIGS. 1 - 21 ."
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US12401615B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1415,
+   "turned": false
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-01.webp",
+   "label": "Sheet 1 of 22",
+   "width": 2838,
+   "height": 2018,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-02.webp",
+   "label": "Sheet 2 of 22",
+   "width": 2701,
+   "height": 1994,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-03.webp",
+   "label": "Sheet 3 of 22",
+   "width": 2929,
+   "height": 2011,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-04.webp",
+   "label": "Sheet 4 of 22",
+   "width": 2797,
+   "height": 2147,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-05.webp",
+   "label": "Sheet 5 of 22",
+   "width": 2751,
+   "height": 2087,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-06.webp",
+   "label": "Sheet 6 of 22",
+   "width": 2727,
+   "height": 1858,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-07.webp",
+   "label": "Sheet 7 of 22",
+   "width": 2774,
+   "height": 2076,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-08.webp",
+   "label": "Sheet 8 of 22",
+   "width": 1916,
+   "height": 1166,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-09.webp",
+   "label": "Sheet 9 of 22",
+   "width": 1920,
+   "height": 1883,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-10.webp",
+   "label": "Sheet 10 of 22",
+   "width": 2797,
+   "height": 2016,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-11.webp",
+   "label": "Sheet 11 of 22",
+   "width": 2577,
+   "height": 2082,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-12.webp",
+   "label": "Sheet 12 of 22",
+   "width": 2286,
+   "height": 2002,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-13.webp",
+   "label": "Sheet 13 of 22",
+   "width": 2420,
+   "height": 1989,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-14.webp",
+   "label": "Sheet 14 of 22",
+   "width": 1919,
+   "height": 1911,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-15.webp",
+   "label": "Sheet 15 of 22",
+   "width": 2797,
+   "height": 1975,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-16.webp",
+   "label": "Sheet 16 of 22",
+   "width": 2904,
+   "height": 2055,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-17.webp",
+   "label": "Sheet 17 of 22",
+   "width": 2683,
+   "height": 2059,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-18.webp",
+   "label": "Sheet 18 of 22",
+   "width": 2663,
+   "height": 2031,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-19.webp",
+   "label": "Sheet 19 of 22",
+   "width": 1920,
+   "height": 2048,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-20.webp",
+   "label": "Sheet 20 of 22",
+   "width": 2788,
+   "height": 1985,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-21.webp",
+   "label": "Sheet 21 of 22",
+   "width": 2581,
+   "height": 2006,
+   "turned": true
+  },
+  {
+   "file": "drawings/US12401615B2/sheet-22.webp",
+   "label": "Sheet 22 of 22",
+   "width": 2328,
+   "height": 1765,
+   "turned": true
+  }
+ ],
  "pdfUrl": "",
  "sources": [
   {
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/18235327",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US12401615B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
-   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis. The drawings are those of the earlier publication US20240015129A1: the grant's own sheet images were not yet public when read."
   }
  ]
 }

@@ -112,72 +112,108 @@
    "text": "The ecosystem of claim 12 , wherein each innovation and its respective sub-innovations are defined through a computer executable data structure stored in the form of a computer executable file such that said computer executable data structure associates a digital relationship between an innovation and its respective sub-innovations through relational structures maintained in said distributed trusted ledgers."
   }
  ],
+ "background": [],
+ "summary": [
+  "In view of the foregoing, an embodiment herein provides a blockchain configured distributed architecture-based crowdsourced initiatives exchange ecosystem. The crowdsourced initiatives exchange ecosystem includes a plurality of computing terminals associated with respective plurality of innovators which serve as sources of initiatives identified as innovations and respective sub-innovations stored in the form of computer executable files at the computing terminals of the innovators. The plurality of computing terminals are communicatively connected over a crowdsourced initiatives exchange network.",
+  "The crowdsourced initiatives exchange ecosystem includes a distributed trusted ledgers system containing a plurality of distributed blockchain ledgers associated with the plurality of computing terminals such that each ledger stores a copy of the computer executable files containing the innovations and trust notes for defining security and trust among the computing terminals so that each computing terminal trusts the other computing terminal through blockchain. The distributed ledgers system enable coding of rules-based contracts that execute when specified conditions are met. The crowdsourced initiatives exchange ecosystem includes a computing device communicatively connected to the plurality of computing terminals through the crowdsourced initiatives exchange network and configured to access privately the computer executable files stored at the plurality of computing terminals as the blockchain ledgers to source and monitor the innovations from an external system.",
+  "The crowdsourced initiatives exchange ecosystem includes a processing circuit communicatively coupled to the computing device and the plurality of computing terminals. The processing circuit includes an initiatives tracking device that tracks the innovations in the crowdsourced initiatives exchange network by accessing the distributed ledgers associated with the plurality of computing terminals such that the ledgers allow the computing device to review the computer executable files privately. The processing circuit further includes a central initiatives management device that includes an evaluation device for evaluating the innovations based on one or more inputs. The one or more inputs are determined using a credentialed score of an innovator, a crowdsourcing index, a referencing index, an inventor reputation criterion, degree of overlap with a sub-innovation. The crowdsourcing index comprises a non-linear relationship with a number of crowdsource respondents, and the referencing index signifies connections of the innovation with other references. The central initiatives management device includes a scoring device for associating an innovation score to each of the innovations based on an evaluation output. The crowdsourced initiatives exchange ecosystem includes a memory device containing an enterprise asset library to store the computer executable files tracked and extracted from the computing terminals and indicative of the innovations including computer executable initiatives documents, computer executable invention disclosures, computer executable innovator profiles, computer executable innovator credentialing details, the computer executable evaluation output, and the computer executable associated scores.",
+  "The crowdsourced initiatives exchange ecosystem includes a hardware-based identity validation appliance to verify integrity of the plurality of computing terminals and the associated innovators to authorize a secured and private access of the plurality of computing terminals to the crowdsourced initiatives exchange network and to associate metadata with the innovations defining a digital ownership identity, a digital time identity, a digital geographical identity. The hardware-based identity validation appliance includes a geo-spatial mapping device to perform geo-tagging of the computing terminals and the computer executable files and compare the geo-tags with pre-stored geo-spatial information about the innovators for processing validation. The geo-tagging is performed based on geo-spatial information received from a global positioning system (GPS)-based device from the respective computing terminals in the form of electric signals. The crowdsourced initiatives exchange ecosystem includes a digital acquisition unit and multichannel amplifiers operatively coupled to the geo-spatial mapping device and communicatively connected to the GPS-based device and configured for pre-processing and amplification of the electric signals received from the GPS)-based device.",
+  "The ecosystem may include a web platform including a graphical user interactive interface accessible through the computing device. The initiatives tracking device may track sub-innovations for an innovation by removing one or more elements or attributes from the innovation such that the sub-innovations have at least one element reduced from the innovation and results in a tangible product that is different from the innovation in at least one of a physical property, a chemical property, and a biological property. The initiatives tracking device may track sub-innovations for an innovation by adding dissimilar and unrelated attributes or elements with the innovation such that the sub-innovations have at least one element or attribute added to the innovation and results in a tangible product that is different from the innovation in at least one of a physical property, a chemical property, and a biological property.",
+  "The initiatives tracking device may track sub-innovations for an innovation by copying attributes or elements of the innovation and making alterations into it to result in a sub-innovation that is different from the innovation in at least one of a physical property, a chemical property, and a biological property. The initiatives tracking device may track sub-innovations for an innovation by eliminating attributes or elements of the innovation and rearranging them to result in a sub-innovation that is different from the innovation in at least one of a physical property, a chemical property, and a biological property, and wherein the rearrangement is of a physical or a chemical type such that a physical rearrangement results in a different physical product from the innovation and a chemical rearrangement results in a different molecule or compound from the innovation. The memory device may be configured to store programmed instructions that perform defined tasks of elimination, unification, and rearrangement within one or more attributes or elements of an innovation to derive a plurality of sub-innovations.",
+  "The derived sub-innovations may include a first sub-innovation derived from the innovation based on a first similarity relationship and a second sub-innovation derived from the first sub-innovation based on a second similarity relationship. The first similarity relationship and the second similarity relationship may be different. The derived sub-innovations may further include a third sub-innovation derived from the second sub-innovation based on a third similarity relationship between the second sub-innovation and the third sub-innovation such that the third similarity relationship may be different from the first and the second similarity relationships. The innovation, first sub-innovation, second sub-innovation, and the third sub-innovation are non-obvious and novel among themselves.",
+  "The ecosystem may include a mapping system that may develop an initiatives digital map including the innovation and the sub-innovations along with their similarity relationships to define relationship trends. The processing circuit may be configured to track the innovations from the external system not belonging to or integrated with the computing device by reading the distributed ledgers privately accessible by the computing device. The processing circuit may be further configured to develop one or more sub-innovations of the innovations using a set of computer-controlled operations. The processing circuit may be configured to track the one or more sub-innovations by reading the distributed ledgers associated with the plurality of computing terminals. The set of computer-controlled operations may be configured to change configurations of the innovations in at least one of attributes or elements such that resulting sub-innovations may be different from the innovations in at least a category comprising any of a physical property, a chemical property, and a biological property, and wherein respective sub-innovations may be derived by any of eliminating, unifying, or rearranging attributes or elements in the respective innovations.",
+  "In an example, each innovation and its respective sub-innovations may be defined through a computer executable data structure stored in the form of a computer executable file such that the computer executable data structure may associate a digital relationship between an innovation and its respective sub-innovations through relational structures maintained in the distributed trusted ledgers. The identity validation appliance may further include a facial expression based validation device to receive data indicative of micro facial expressions extracted by respective facial expressions sensors associated with the computing terminals of the innovators. The micro expressions based validation device may include an image processing circuitry and an associated memory to interpret the micro facial expressions and compare them with predefined facial patterns to validate an identity of the innovators.",
+  "The ecosystem may further include a credentialing system configured to determine the credentialed score of the innovators and the crowdsourcing index. The credentialing system may include a profile segmenting engine configured to segment digital profiles of the innovators into federated digital profiles associated with each of the innovators. The credentialing system may include a segment certification engine configured to facilitate certification of the federated digital profiles associated with the innovators through a plurality of digital nodes representing crowdsourced respondents networked together in a digital architecture. The credentialing system may include a segment rating engine configured to associate ratings to credentialed federated profiles. The credentialing system may include a profile rating engine configured to determine the credentialed score and associate with the respective profiles of the innovators based on the ratings. The score may be used by the evaluation device for evaluating identity of the innovators and respective innovations.",
+  "These and other aspects of the embodiments herein will be better appreciated and understood when considered in conjunction with the following description and the accompanying drawings. It should be understood, however, that the following descriptions, while indicating preferred embodiments and numerous specific details thereof, are given by way of illustration and not of limitation. Many changes and modifications may be made within the scope of the embodiments herein without departing from the spirit thereof, and the embodiments herein include all such modifications."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates generally, but not by way of limitation, an exemplary computerized ecosystem in which various embodiments may operate;",
+  "FIG. 2 illustrates an example of a computerized central initiatives management system in accordance with an embodiment herein;",
+  "FIGS. 3 through 5 depict exemplary embodiments of a computerized credentialing system in accordance with various embodiments;",
+  "FIG. 6 illustrates an exemplary computerized initiatives tracking device in accordance with an embodiment herein;",
+  "FIG. 7 is a flowchart illustrating a method in accordance with an embodiment herein;",
+  "FIG. 8 illustrates a blockchain computer architecture of the ecosystem of FIG. 1 in accordance with an embodiment herein;",
+  "FIG. 9 illustrates a computerized identity validation appliance in accordance with an embodiment herein; and",
+  "FIG. 10 illustrates a computer system used in accordance with an embodiment herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US11270263B2/sheet-00000.webp",
-   "label": "Sheet 1 of 11",
-   "width": 174,
-   "height": 120
+   "file": "drawings/US11270263B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1295,
+   "turned": false
   },
   {
-   "file": "drawings/US11270263B2/sheet-00001.webp",
-   "label": "Sheet 2 of 11",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-01.webp",
+   "label": "Sheet 1 of 10",
+   "width": 2400,
+   "height": 1647,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00002.webp",
-   "label": "Sheet 3 of 11",
-   "width": 85,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-02.webp",
+   "label": "Sheet 2 of 10",
+   "width": 2324,
+   "height": 1642,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00003.webp",
-   "label": "Sheet 4 of 11",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-03.webp",
+   "label": "Sheet 3 of 10",
+   "width": 2070,
+   "height": 1704,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00004.webp",
-   "label": "Sheet 5 of 11",
-   "width": 89,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-04.webp",
+   "label": "Sheet 4 of 10",
+   "width": 2294,
+   "height": 1706,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00005.webp",
-   "label": "Sheet 6 of 11",
-   "width": 91,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-05.webp",
+   "label": "Sheet 5 of 10",
+   "width": 2292,
+   "height": 1743,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00006.webp",
-   "label": "Sheet 7 of 11",
-   "width": 84,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-06.webp",
+   "label": "Sheet 6 of 10",
+   "width": 2361,
+   "height": 1650,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00007.webp",
-   "label": "Sheet 8 of 11",
-   "width": 60,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-07.webp",
+   "label": "Sheet 7 of 10",
+   "width": 2254,
+   "height": 1119,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00008.webp",
-   "label": "Sheet 9 of 11",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-08.webp",
+   "label": "Sheet 8 of 10",
+   "width": 2257,
+   "height": 1634,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00009.webp",
-   "label": "Sheet 10 of 11",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-09.webp",
+   "label": "Sheet 9 of 10",
+   "width": 2451,
+   "height": 1760,
+   "turned": true
   },
   {
-   "file": "drawings/US11270263B2/sheet-00010.webp",
-   "label": "Sheet 11 of 11",
-   "width": 79,
-   "height": 120
+   "file": "drawings/US11270263B2/sheet-10.webp",
+   "label": "Sheet 10 of 10",
+   "width": 2532,
+   "height": 1658,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/b3/7f/f3/d9ea6606ab53ad/US11270263.pdf",
@@ -186,13 +222,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15587202",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US11270263B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]

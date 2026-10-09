@@ -67,84 +67,125 @@
    "text": "The system of claim 1 , wherein the integrated circuit chip comprises the plurality of memory segments, wherein the external device comprises a scanner, and wherein the scanner comprises a swipe machine reader that electronically reads the integrated circuit chip and executes computer-executable instructions that extract computerized records according to authorization by the access module."
   }
  ],
+ "background": [],
+ "summary": [
+  "The embodiments herein provide a distributed architecture-based system for digitally authorizing access to computerized records. The system includes at least one server. The server includes at least one computerized records data-store storing multiple computer executable files associated with a subject and containing subject data in a digital format and associated with a subject identifier that identifies association of the subject with its respective computer executable file. The system includes an external device communicatively linked to the at least one server. The system includes a scanner operatively linked to the external device. The system includes a communication network communicatively linking at least two of the subject, the server, the external device, and the scanner.",
+  "The system includes a contextual authorization device for authorizing access to the external device. The contextual authorization device includes a database storing a set of custom rules digitally dictating access rights and levels for the external device based on static information associated with the external device and based on dynamically changing contextual information. The contextual authorization device further includes a Global Positioning System (GPS)-based tracking device for tracking a geo-location of the external device such that the custom rules define different rights for different location types as identified from the geo-location of the external device. The different rights define either one of an outright denial or approval of the access or limiting the access to one or more types of digital records based on the location types. The contextual authorization device further includes a credentialing engine to determine a crowdsourced credentialing score associated with an entity associated with the external device. The crowdsourced credentialing score is determined based on credentialing of a digital profile of the entity by a plurality of respondents such that the crowdsourced credentialing score is indicative of a trust of the external device. The custom rules are defined to allow authorization of the external device only when the entity associated with the external device possesses at least a minimum threshold score. The contextual authorization device further includes a user behavior analytics engine to compare dynamically changing contextual details associated with the entity with a set of past requests indicative of historical behavior and determine an index of normality such that the custom rules are defined to allow the access only when a minimum predefined threshold of normality is noted about the external device and the associated entity.",
+  "The contextual authorization device further includes an access module that processes authorization of the external device for access of the computerized records based on an input received from the GPS-based tracking device, credentialing engine, and the user behavior analytics engine. The contextual authorization device further includes a processing component that creates the computerized records based on the authorization by the access module. The processing component transforms the authorized computerized records into a digital data structure readable by the scanner.",
+  "The system may include an interface unit for providing a graphical user interface to the subject and the external entity associated with the external device to respectively update the computerized records of the subject and view or extract the computerized records as authorized by the contextual authorization device. The system may include a communication channel allowing transfer of the computerized records through at least one of a wired and wireless transmission technique to a destination identified by the external device, upon successful authorization of the access by the contextual authorization device. The system may include an input module configured to receive binary values relating authorization access such that the custom rules may be used in association with the input for providing access to the external device by the contextual authorization device. The contextual authorization device may be configured to select a real time automated manner of access authorization for the computerized records based on the custom rules stored in the database.",
+  "The system may include a document usage system which may include one or more document computer systems in communication with a network of devices including the external device and having a machine-accessible medium storing a plurality of program modules configured to determine document utilization information providing an indication of usage of computerized records as authorized to be accessed by the external device associated with the entity. The usage comprises an amount of time that the associated entity or the external devices has accessed particular sections of the authorized computerized records. The computerized records may be classified into discrete types. The system may include a monetization engine configured to associate a price value with the authorized computerized records based on the usage by the external device and based on the classification of authorized computerized records as accessed by the external device are classified into. The digital data structure may include a QR (quick response) code readable by the scanner.",
+  "The embodiments herein provide a portable device for encapsulating computerized records of multiple types. The portable device includes a plurality of memory segments, wherein each of the plurality of memory segments stores a specified type of computerized records and is accessible by an external device upon successful authorization. The portable device includes an access module that processes authorization to access the computerized records by the external device based on certain inputs received from external components to the portable device. The portable device includes a processing component that creates the computerized records based on the authorization by the access module, wherein the processing component transforms the authorized computerized records into a digital data structure readable by a scanner communicatively connected with the external device.",
+  "The portable device is communicatively connected with a remote server. The remote server includes a contextual authorization device for generating the certain inputs for use by the access module in authorizing access to the external device for the computerized records. The contextual authorization device includes a database storing a set of custom rules digitally dictating access rights and levels for the external device based on static information associated with the external device and based on dynamically changing contextual information. The contextual authorization device includes a Global Positioning System (GPS)-based tracking device for tracking geo-location of the external device such that the custom rules define different rights for different location types as identified from the geo-location of the external device. The different rights define either one of an outright denial or approval of the access or limiting the access to one or more types of computerized records based on the location types. The portable device includes a user interface with a plurality of single-click configurable menu options defined to provide authorization request in a single click such that a single-click configurable menu option of the plurality of single-click configurable menu options is defined to authenticate only a particular type of computerized record with a particular level of access. The level of access includes one of a full access, limited access, and no access, wherein the level of access is defined based on geo-location of the external system and the portable device.",
+  "The portable device includes a communication terminal configured to establish a communication link between the portable device and the external device as soon as any of the plurality of single-click configurable menu options is pressed by a user. The access module is allowed to authorize the access of the computerized records either based on the certain inputs received from the remote server without any manual intervention or alternatively based on single click manual authorization using one of the plurality of single-click configurable menu options to allow access of the computerized records of a particular type defined for a particular context.",
+  "The contextual authorization device may include a credentialing engine to determine a crowdsourced credentialing score associated with an entity associated with the external device. The crowdsourced credentialing score may be determined based on credentialing of a digital profile of the entity by a plurality of respondents such that the crowdsourced credentialing score is indicative of a trust of the external device. The custom rules may be defined to allow authorization of the external device only when the entity associated with the external device possesses at least a minimum threshold score. The contextual authorization device may include a user behavior analytics engine to compare dynamically changing contextual details associated with the entity with a set of past requests indicative of historical behavior and determine an index of normality such that the custom rules may be defined to allow the access only when a minimum predefined threshold of normality is noted about the external device and the associated entity.",
+  "The communication terminal may be a near-field communication (NFC) terminal with one or more NFC taps configured to establish a communication link between the portable device and the external device as soon as any of the plurality of single-click configurable menu options is pressed by a user and the one or more NFC taps is activated. The communication terminal may be a WiFi hotspot with one or more WiFi taps configured to establish a communication link between the portable device and the external device as soon as any of the plurality of single-click configurable menu options is pressed by a user and the one or more WiFi taps is activated. The plurality of single-click configurable menu options may include a single-click configurable option for a hospital terminal computer, a single-click configurable option for a pharmacy terminal computer, a single-click configurable option for a lab terminal computer such that each of the plurality of single-click configurable options may be defined by respective location types associated with particular levels of access to particular types of computerized records as defined through associated geo-locations. The external device may include a mobile computing device associated with the entity and may be configured to process a request to access the computerized records. The external device may include a swipe machine configured to receive a portion of the integrated chip such that the scanner may include a swipe machine reader configured to read the integrated chip for extracting the computerized records according to authorization by the authorization module. The digital data structure may include a QR (quick response) code readable by the scanner. The portable device may further include a printed circuit board mounting the plurality of memory segments, the processing component, and electrical circuitry. The portable device may include a housing component for encapsulating the printed circuit board, and a battery for providing a power source for the portable device."
+ ],
+ "drawingDescriptions": [
+  "The embodiments herein will be better understood from the following detailed description with reference to the drawings, in which:",
+  "FIG. 1 illustrates generally, but not by way of limitation, among other things, an example of an environment or architecture in which various embodiments herein may operate;",
+  "FIG. 2 illustrates generally, but not by way of limitation, among other things, a specific example of an environment or architecture in which at least some embodiments herein may operate;",
+  "FIG. 3 illustrates a system for storing and creating computerized records, and authorizing access to an external device, at least in part, for the computerized records according to the embodiments herein;",
+  "FIG. 4 illustrates a network of several devices representing as similar to the external device that are connected with a subject according to the embodiments herein;",
+  "FIG. 5 illustrates generally, but not by way of limitation, an example of an interface providing a capability to the external device such as to access the server for requesting the authorization to access or create the computerized records, at least in part, stored at the server according to the embodiments herein;",
+  "FIG. 6 is a flowchart illustrating a method for sharing the computerized records by the subjects with the server for the purpose of such as authorizing the external device to access the computerized records according to the embodiments herein;",
+  "FIG. 7 is a flowchart illustrating a method of granting access or authorizing the external device for the computerized records, at least in part, by the server or the subject according to the embodiments herein;",
+  "FIG. 8 illustrates a contextual authorization device, according to some embodiments herein;",
+  "FIG. 9 illustrates an example of credentialing engine, according to the embodiments herein;",
+  "FIG. 10 illustrates an integrated chip, according to some embodiments herein;",
+  "FIG. 11 illustrates an exemplary portable device encapsulating the integrated chip connected with the external device, according to some embodiments herein; and",
+  "FIG. 12 illustrates a representative hardware environment for practicing various embodiments herein."
+ ],
  "drawings": [
   {
-   "file": "drawings/US10963585B2/sheet-00000.webp",
-   "label": "Sheet 1 of 13",
-   "width": 156,
-   "height": 120
+   "file": "drawings/US10963585B2/front.webp",
+   "label": "Front page figure",
+   "width": 1875,
+   "height": 1444,
+   "turned": false
   },
   {
-   "file": "drawings/US10963585B2/sheet-00001.webp",
-   "label": "Sheet 2 of 13",
-   "width": 90,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-01.webp",
+   "label": "Sheet 1 of 12",
+   "width": 2471,
+   "height": 1854,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00002.webp",
-   "label": "Sheet 3 of 13",
-   "width": 86,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-02.webp",
+   "label": "Sheet 2 of 12",
+   "width": 2593,
+   "height": 1864,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00003.webp",
-   "label": "Sheet 4 of 13",
-   "width": 99,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-03.webp",
+   "label": "Sheet 3 of 12",
+   "width": 2609,
+   "height": 2143,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00004.webp",
-   "label": "Sheet 5 of 13",
-   "width": 82,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-04.webp",
+   "label": "Sheet 4 of 12",
+   "width": 2599,
+   "height": 1775,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00005.webp",
-   "label": "Sheet 6 of 13",
-   "width": 109,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-05.webp",
+   "label": "Sheet 5 of 12",
+   "width": 1824,
+   "height": 1664,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00006.webp",
-   "label": "Sheet 7 of 13",
-   "width": 87,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-06.webp",
+   "label": "Sheet 6 of 12",
+   "width": 2252,
+   "height": 1638,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00007.webp",
-   "label": "Sheet 8 of 13",
-   "width": 107,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-07.webp",
+   "label": "Sheet 7 of 12",
+   "width": 2005,
+   "height": 1789,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00008.webp",
-   "label": "Sheet 9 of 13",
-   "width": 169,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-08.webp",
+   "label": "Sheet 8 of 12",
+   "width": 1234,
+   "height": 1733,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00009.webp",
-   "label": "Sheet 10 of 13",
-   "width": 78,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-09.webp",
+   "label": "Sheet 9 of 12",
+   "width": 2505,
+   "height": 1628,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00010.webp",
-   "label": "Sheet 11 of 13",
-   "width": 94,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-10.webp",
+   "label": "Sheet 10 of 12",
+   "width": 2494,
+   "height": 1954,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00011.webp",
-   "label": "Sheet 12 of 13",
-   "width": 93,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-11.webp",
+   "label": "Sheet 11 of 12",
+   "width": 1994,
+   "height": 1545,
+   "turned": true
   },
   {
-   "file": "drawings/US10963585B2/sheet-00012.webp",
-   "label": "Sheet 13 of 13",
-   "width": 81,
-   "height": 120
+   "file": "drawings/US10963585B2/sheet-12.webp",
+   "label": "Sheet 12 of 12",
+   "width": 2572,
+   "height": 1742,
+   "turned": true
   }
  ],
  "pdfUrl": "https://patentimages.storage.googleapis.com/fa/68/4e/06f50719226ff1/US10963585.pdf",
@@ -153,13 +194,13 @@
    "name": "USPTO Patent Center",
    "url": "https://patentcenter.uspto.gov/applications/15434942",
    "readAt": "2026-09-27",
-   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract"
   },
   {
    "name": "Google Patents",
    "url": "https://patents.google.com/patent/US10963585B2/en",
    "readAt": "2026-10-09",
-   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "holds": "claims, background, summary, drawing descriptions, drawings, parent applications and their relation, estimated expiration, current assignee",
    "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
   }
  ]
