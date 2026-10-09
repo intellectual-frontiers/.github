@@ -1,0 +1,85 @@
+diff --git a/ontology/ifcore.ttl b/ontology/ifcore.ttl
+index b38fbee..fdf0da8 100644
+--- a/ontology/ifcore.ttl
++++ b/ontology/ifcore.ttl
+@@ -516,16 +516,16 @@ ifcore:FrontiersConsoleWeb a ifcore:DesignSystem ;
+ ifcore:Fact a owl:Class ; rdfs:label "Fact"@en ;
+     rdfs:comment "Anything asserted in the Eidolon that carries factual content. Every fact MUST declare its audience explicitly (FR-011); a class or property declaration is vocabulary, not a fact, and does not need one."@en .
+ 
+-ifcore:Audience a owl:Class ; rdfs:label "Audience"@en ;
+-    rdfs:comment "A named permission to see a fact."@en .
+-ifcore:Public a ifcore:Audience ; rdfs:label "Public"@en ;
++ifcore:AccessAudience a owl:Class ; rdfs:label "Access audience"@en ;
++    rdfs:comment "A named permission to see a fact: who may see it. Not the group a work is written for, which is schema:Audience (see ifcore:Readership)."@en .
++ifcore:Public a ifcore:AccessAudience ; rdfs:label "Public"@en ;
+     ifcore:hasAudience ifcore:Public .
+-ifcore:CompanyAffiliated a ifcore:Audience ; rdfs:label "Anyone affiliated with the company"@en ;
++ifcore:CompanyAffiliated a ifcore:AccessAudience ; rdfs:label "Anyone affiliated with the company"@en ;
+     ifcore:hasAudience ifcore:Public .
+-ifcore:Agreement a owl:Class ; skos:closeMatch odrl:Agreement ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named agreement"@en .
+-ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:Audience ; rdfs:label "A specific named role or group"@en .
++ifcore:Agreement a owl:Class ; skos:closeMatch odrl:Agreement ; rdfs:subClassOf ifcore:AccessAudience ; rdfs:label "A specific named agreement"@en .
++ifcore:RoleOrGroup a owl:Class ; rdfs:subClassOf ifcore:AccessAudience ; rdfs:label "A specific named role or group"@en .
+ 
+-ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:Audience ;
++ifcore:hasAudience a owl:ObjectProperty ; rdfs:domain ifcore:Fact ; rdfs:range ifcore:AccessAudience ;
+     rdfs:comment "Disjunctive: a viewer satisfying any one listed audience may see the fact."@en .
+ 
+ # ───────────────────────── References (FR-015, FR-022 – FR-027) ─────────────────────────
+@@ -1305,6 +1305,25 @@ ifcore:NoemaAltBorrowedWord a ifcore:Alternative ; rdfs:label "Treat 'Noema' and
+     ifcore:rejectionReason "'Noema' is an established word in philosophy (Husserl's term for what a thought is directed at) and 'ergon' is classical Greek for 'work'; neither is invented. They are borrowed and given one exact meaning here. 0019 FR-011 says a borrowed word is not original for that reason, so the exception rests on the kinds being the company's own classification (0047-digital-reflections, 0048-noemas) and not on the words. This origin was stated from general knowledge and was not searched in this audit."@en ;
+     ifcore:hasAudience ifcore:Public .
+ 
++# ───────────────────────── Access audience (0019 FR-004, FR-010) ─────────────────────────
++ifcore:AccessAudienceName a ifcore:Decision ;
++    rdfs:label "The class of permissions to see a fact is named Access audience, not Audience"@en ;
++    dcterms:subject ifcore:AccessAudience ;
++    ifcore:decidedBy ifcore:ShahidNehalShah ;
++    ifcore:decidedAt "DATE"^^xsd:date ;
++    dcterms:description "schema.org Audience is the intended audience of an item, the group it was created for; it is descriptive and grants nothing. The class that holds public, company affiliation, a named agreement and a named role or group answers a different question: who may see a fact. Two classes both called Audience made the ontology explain the difference in its own comments (see ifcore:Readership). The class is renamed to the access meaning; the property ifcore:hasAudience keeps its name, because it is a different term from schema:audience and the vault declares it on every fact, and prose may still say 'audience' for the access meaning. No standard term replaces the class: ODRL expresses who may do what with a Permission whose assignee is a Party, and does not define a class of named audiences. OAuth and JSON Web Token use 'audience' for the intended recipient of a token, which is close to this meaning but is not defined as a class of permissions (stated from general knowledge; not searched in this audit)."@en ;
++    ifcore:consideredAlternative ifcore:AccessAudienceAltKeep, ifcore:AccessAudienceAltOdrl, ifcore:AccessAudienceAltRenameAll ;
++    ifcore:hasAudience ifcore:Public .
++ifcore:AccessAudienceAltKeep a ifcore:Alternative ; rdfs:label "Keep the name Audience and explain the difference in comments"@en ;
++    ifcore:rejectionReason "The same word means two different things in one ontology, and a reader or a tool that loads schema.org meets both. The class is declared in the company's namespace, so it can be renamed at the cost of nine references."@en ;
++    ifcore:hasAudience ifcore:Public .
++ifcore:AccessAudienceAltOdrl a ifcore:Alternative ; rdfs:label "Replace the class with ODRL (Permission, Party, Constraint)"@en ;
++    ifcore:rejectionReason "ODRL states rules about what a party may do with an asset. Here each fact names the set of viewers who may see it, and a viewer who satisfies any one listed audience may see the fact. ODRL has no named class of such sets. It stays a possible later mapping: skos:broadMatch odrl:Permission is already stated for ifcore:Grant."@en ;
++    ifcore:hasAudience ifcore:Public .
++ifcore:AccessAudienceAltRenameAll a ifcore:Alternative ; rdfs:label "Rename the property ifcore:hasAudience as well"@en ;
++    ifcore:rejectionReason "The property is a different term from schema:audience, so it does not clash. It appears in about 5,100 places in 459 files of the two repositories, in every fact, in the vault's rules and in its checks, so a rename costs far more than it removes."@en ;
++    ifcore:hasAudience ifcore:Public .
++
+ # ───────────────────────── 1. Native Alpha and Acquired Alpha (0019 FR-004, FR-005, FR-011) ─────────────────────────
+ ifcore:NativeAlphaIsTheCompanysOwnTerm a ifcore:Decision ;
+     rdfs:label "Native Alpha and Acquired Alpha are the company's own terms, not restated standard terms"@en ;
+@@ -1381,7 +1400,7 @@ ifcore:sequenceOrder a owl:DatatypeProperty ; rdfs:domain ifcore:MethodStage ; r
+ ifcore:Grant a owl:Class ; skos:broadMatch odrl:Permission ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Grant"@en ;
+     rdfs:comment "An explicit, time-bounded link between an identified agent and a specific audience (0005-authentication FR-003). Actual Grant individuals are rarely Public; they are expected to live in the private vault, declaring whatever audience is appropriate to their own sensitivity."@en .
+ ifcore:grantedTo a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Person .
+-ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:Audience .
++ifcore:grantsAudience a owl:ObjectProperty ; rdfs:domain ifcore:Grant ; rdfs:range ifcore:AccessAudience .
+ ifcore:validFrom a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+     rdfs:comment "Required. A grant with no start date is not valid (0005 FR-003)."@en .
+ ifcore:validUntil a owl:DatatypeProperty ; rdfs:domain ifcore:Grant ; rdfs:range xsd:date ;
+@@ -1733,7 +1752,7 @@ ifcore:imprintOf a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range
+ ifcore:imprintThesis a owl:ObjectProperty ; rdfs:domain ifcore:Imprint ; rdfs:range schema:Claim ;
+     rdfs:comment "The argument the imprint's list is built on, a claim labeled by kind (0009-press FR-039)."@en .
+ ifcore:Readership a owl:Class ; rdfs:subClassOf schema:Audience ; rdfs:label "Readership"@en ;
+-    rdfs:comment "The readers an imprint publishes for, related to it by schema:audience. Distinct from ifcore:Audience, which says who may see a fact, not whom a work is written for."@en .
++    rdfs:comment "The readers an imprint publishes for, related to it by schema:audience. Distinct from ifcore:AccessAudience, which says who may see a fact, not whom a work is written for."@en .
+ 
+ ifcore:IFPress a ifcore:Imprint ;
+     rdfs:label "Intellectual Frontiers Press"@en ;
+diff --git a/spec-kit/specs/0001-eidolon-architecture/spec.md b/spec-kit/specs/0001-eidolon-architecture/spec.md
+index 533c724..cf0bb52 100644
+--- a/spec-kit/specs/0001-eidolon-architecture/spec.md
++++ b/spec-kit/specs/0001-eidolon-architecture/spec.md
+@@ -236,7 +236,7 @@ reference model, and governance representation.
+   lacks one is a product or a suite, never a platform.
+ - **The vault** — the `eidolon` repository and the small, named, legally-bound
+   circle with direct clone access to it.
+-- **An audience** — a named permission to see a fact: public, company
++- **An audience** (`ifcore:AccessAudience`) — a named permission to see a fact: public, company
+   affiliation, a specific agreement, or a specific role or group.
+ - **A `Reference`** — a fact that points at a value held elsewhere rather than
+   storing the value itself; carries its own audience declaration.
