@@ -96,6 +96,11 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |none
 |`spec`
 
+|`vocabulary`
+|Vocabulary reuse: every ontology class, property, scheme and concept, and whether it names an established term or a Decision (0019 FR-007, FR-009, FR-010); a report, never a failure
+|none
+|`spec`
+
 |`voice`
 |Prose against frontiers-written-voice's sweep, or with --spoken a script against frontiers-spoken-voice's too (sweep.py)
 |PATH
@@ -119,7 +124,7 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |`design-systems` (with --runner python)
 
 |`spec`
-|`specs`, `register`, `controls`, `ontology`, `toolchain`, `commands`, `help`
+|`specs`, `register`, `controls`, `ontology`, `vocabulary`, `toolchain`, `commands`, `help`
 
 |===
 

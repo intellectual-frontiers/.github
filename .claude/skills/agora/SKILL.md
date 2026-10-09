@@ -401,6 +401,7 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | `slides` | Decks against frontiers-slides' rules: layouts, headlines, points, notes, figures, voice (deck.py check) | PATH | none |
 | `specs` | Spec format: sections, status, identity, numbering, dated provenance, cross-references (0020 FR-005 to FR-009, FR-018; 0001 FR-034) | SPEC | `spec` |
 | `toolchain` | agora's toolchain declarations are valid, complete and current with their generated mise files, no workflow installs a program, and no command takes a program from the host (0041-command-line FR-068; 0025-tooling-environment FR-016, FR-020, FR-022); --functional also runs each installed entry's own check | none | `spec` |
+| `vocabulary` | Vocabulary reuse: every ontology class, property, scheme and concept, and whether it names an established term or a Decision (0019 FR-007, FR-009, FR-010); a report, never a failure | none | `spec` |
 | `voice` | Prose against frontiers-written-voice's sweep, or with --spoken a script against frontiers-spoken-voice's too (sweep.py) | PATH | none |
 
 ## Generators

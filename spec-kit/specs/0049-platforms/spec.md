@@ -531,6 +531,8 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   asks for a named, designed module; it does not yet ask for a built one.
 - **OQ-4**: Whether a fifth flavor for streaming and events (webhooks and change
   feeds) is required by the kernel or is a profile of the resource API.
+- **OQ-5**: Whether participation (0050-participation) becomes a tenth capability of the kernel.
+  The working rule is that it does when a second platform realizes it and a person accepts it.
 
 ## Key entities
 
