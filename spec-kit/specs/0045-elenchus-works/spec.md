@@ -65,8 +65,9 @@ monthly accounts are bound as one.
 *Elenchus* is the broad idea and *Operational Truth®* is one specific way of
 carrying it out. Elenchus is a methodology, so a Noema; a deployed workflow
 that carries it out is an Ergon related to it by `operationalizes`
-(0048-noemas FR-007). Whether Operational Truth® is that Ergon is an open
-question (OQ-11), so no relation is asserted until a person decides. The expected side of
+(0048-noemas FR-007). Operational Truth® is that Ergon: a solution
+(0049-platforms FR-004) built on the Opsfolio platform that operationalizes
+the Elenchus methodology. The expected side of
 the comparison is the test plan, intent held as code. The observed side is
 evidence gathered from the operation by machine, and the difference between
 them is the truth gap. A system that is observed but expected by no one is
@@ -406,9 +407,6 @@ evidence, hold the inventory and run the tests are ontology facts.
   ownership operates counts as independent of the people who run the controls
   it shows. An Elenchus is not an independent assessment (FR-035), but the
   question decides how far a Verdict can be relied on.
-- **OQ-11**: Whether Operational Truth® is an Ergon that `operationalizes`
-  the Elenchus Noema (recorded as an open question in the private vault). Until a person decides, the ontology
-  asserts no relation between them.
 
 ## Key entities
 
