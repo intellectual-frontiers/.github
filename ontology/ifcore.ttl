@@ -894,6 +894,38 @@ ifcore:McpServerFlavor a skos:Concept ; skos:inScheme ifcore:InterfaceFlavorSche
 ifcore:offersInterface a owl:ObjectProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range skos:Concept ;
     rdfs:comment "A flavor of ifcore:InterfaceFlavorScheme that the module realizing the programmatic interface offers (0049-platforms FR-050)."@en .
 
+# ───────────────────────── Participation (0050-participation) ─────────────────────────
+# An invitation is a schema:InviteAction (the sender is its agent and the recipient its participant), so no class is declared for it.
+
+ifcore:EntryDoorScheme a skos:ConceptScheme ; rdfs:label "Entry door"@en ;
+    rdfs:comment "The places where a journey starts (0050-participation FR-004). A platform adds a concept for a door of its own."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PublicPageDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Public page"@en ; skos:notation "public-page" ;
+    skos:definition "A page generated from the platform's catalog that answers one question and ends in an action that starts a journey."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AdvertisementDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Advertisement"@en ; skos:notation "advertisement" ;
+    skos:definition "A paid message that promises one task and leads to a neutral page."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ContentDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Content"@en ; skos:notation "content" ;
+    skos:definition "A piece of content by a member of the field that links to a task a reader can finish."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:InvitationDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Invitation"@en ; skos:notation "invitation" ;
+    skos:definition "A task that a known participant sends to a party, carrying a preview of the finished work."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:ListingDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Listing"@en ; skos:notation "listing" ;
+    skos:definition "An entry in the platform's marketplace or directory that starts a journey."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:AgentMessageDoor a skos:Concept ; skos:inScheme ifcore:EntryDoorScheme ; skos:prefLabel "Agent message"@en ; skos:notation "agent-message" ;
+    skos:definition "A message from a party's agent that starts or continues a journey for that party."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:VerificationLevelScheme a skos:ConceptScheme ; rdfs:label "Verification level"@en ;
+    rdfs:comment "How far a party's standing has been checked (0050-participation FR-012). The sources of each level are the platform's own."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UnverifiedLevel a skos:Concept ; skos:inScheme ifcore:VerificationLevelScheme ; skos:prefLabel "Unverified"@en ; skos:notation "unverified" ;
+    skos:definition "Nothing about the party's standing has been checked. The party may finish a guest task and nothing more."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:RegisteredLevel a skos:Concept ; skos:inScheme ifcore:VerificationLevelScheme ; skos:prefLabel "Registered"@en ; skos:notation "registered" ;
+    skos:definition "The party matches an entry in a public register and controls the addresses it gave. This shows that it is registered, not that it is in good standing."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:VerifiedLevel a skos:Concept ; skos:inScheme ifcore:VerificationLevelScheme ; skos:prefLabel "Verified"@en ; skos:notation "verified" ;
+    skos:definition "Registered, and confirmed by at least one more independent source that the platform names, with no match on a list of parties that are barred."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:offersDoor a owl:ObjectProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range skos:Concept ;
+    rdfs:comment "A door of ifcore:EntryDoorScheme that the participation module of a platform offers (0050-participation FR-001)."@en .
+ifcore:verifiesAgainst a owl:ObjectProperty ; rdfs:domain ifcore:PlatformModule ; rdfs:range ifcore:ExternalRecordReference ;
+    rdfs:comment "A source that the participation module of a platform checks a party against, held as an external record reference (0050-participation FR-001, FR-013, FR-014)."@en .
+
 ifcore:PlatformLayerScheme a skos:ConceptScheme ; rdfs:label "Platform layer"@en ;
     rdfs:comment "The five layers of a platform and the orthogonal position (0049-platforms FR-007). A module sits in exactly one."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:FoundationLayer a skos:Concept ; skos:inScheme ifcore:PlatformLayerScheme ; skos:prefLabel "Foundation"@en ; skos:notation "foundation" ; ifcore:layerOrder 0 ;
@@ -1439,7 +1471,7 @@ ifcore:PlainWordPropertiesKept a ifcore:Decision ;
         ifcore:hasDisposition, ifcore:hasMode, ifcore:hasOutcome, ifcore:heldIn, ifcore:imprintOf,
         ifcore:imprintThesis, ifcore:inWorkDomain, ifcore:job, ifcore:layerOrder, ifcore:licenses,
         ifcore:lifecycleOwner, ifcore:measuredBy, ifcore:moduleCode, ifcore:namedUnknown, ifcore:notProofOf,
-        ifcore:noteType, ifcore:noticeWithin, ifcore:offersInterface, ifcore:operates,
+        ifcore:noteType, ifcore:noticeWithin, ifcore:offersDoor, ifcore:offersInterface, ifcore:operates,
         ifcore:operatesSharedService, ifcore:operationalStatus, ifcore:platformLayer, ifcore:portfolioCategory,
         ifcore:portfolioCompany, ifcore:probe, ifcore:probeKind, ifcore:providesSurface,
         ifcore:qualifyingCondition, ifcore:question, ifcore:readerOutcome, ifcore:readerSide,
@@ -1448,7 +1480,7 @@ ifcore:PlainWordPropertiesKept a ifcore:Decision ;
         ifcore:retentionPeriod, ifcore:searchesFor, ifcore:sequenceOrder, ifcore:shows, ifcore:sourceCommit,
         ifcore:sourceLocation, ifcore:subjectClass, ifcore:suppliesDataFor, ifcore:testsControl, ifcore:thesis,
         ifcore:toKind, ifcore:verificationCadence, ifcore:verificationMethod, ifcore:verifiedBy,
-        ifcore:verifiedOn, ifcore:workLifecycleStage, ifcore:workspaceFlavor, ifweb:applicationOf,
+        ifcore:verifiedOn, ifcore:verifiesAgainst, ifcore:workLifecycleStage, ifcore:workspaceFlavor, ifweb:applicationOf,
         ifweb:configurationFile, ifweb:contentKind, ifweb:deploymentRecordFile, ifweb:destinationOf,
         ifweb:featuresWork, ifweb:hostOf, ifweb:hostedBy, ifweb:inventoryEntry, ifweb:publishingCommand,
         ifweb:publishingStrategy ;
@@ -1467,12 +1499,12 @@ ifcore:PlainWordSchemesKept a ifcore:Decision ;
         ifcore:DesignDensityScheme, ifcore:DesignExpressionScheme, ifcore:DesignSystemKindScheme,
         ifcore:DomainCriticalityScheme, ifcore:DomainRoleScheme, ifcore:DomainSecurityControlScheme,
         ifcore:DomainStandingScheme, ifcore:EmailTypeScheme, ifcore:EnforcementMechanismScheme,
-        ifcore:FigureTypeScheme, ifcore:IncidentSeverityScheme, ifcore:InterfaceFlavorScheme,
+        ifcore:EntryDoorScheme, ifcore:FigureTypeScheme, ifcore:IncidentSeverityScheme, ifcore:InterfaceFlavorScheme,
         ifcore:MediaAssetTypeScheme, ifcore:OfferKindScheme, ifcore:PlatformLayerScheme,
         ifcore:PresentationFormScheme, ifcore:PrintDocumentTypeScheme, ifcore:ProductCategoryScheme,
         ifcore:ReaderSideScheme, ifcore:ReflectionKindScheme, ifcore:RegistrationKindScheme,
         ifcore:RelationFamilyScheme, ifcore:ResourceKindScheme, ifcore:RiskRatingScheme, ifcore:SpecStatusScheme,
-        ifcore:VendorCriticalityScheme, ifcore:VerdictOutcomeScheme, ifcore:WebInteractionModelScheme,
+        ifcore:VendorCriticalityScheme, ifcore:VerdictOutcomeScheme, ifcore:VerificationLevelScheme, ifcore:WebInteractionModelScheme,
         ifcore:WorkspaceFlavorScheme, ifweb:PublishingStrategyScheme ;
     ifcore:decidedBy ifcore:ShahidNehalShah ;
     ifcore:decidedAt "2026-10-09"^^xsd:date ;

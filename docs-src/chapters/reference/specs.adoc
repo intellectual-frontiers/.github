@@ -201,4 +201,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Platforms: what the word means
 
+|`0050-participation`
+|Draft
+|Participation: work that invites the other side in
+
 |===
