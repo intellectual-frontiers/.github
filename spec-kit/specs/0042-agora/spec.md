@@ -174,7 +174,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   rule that a command a row names exists in the registry), `controls`
   (0028-compliance-controls FR-005, FR-006), `ontology` (the ontology's
   prefixes and the design systems' registration, classification and
-  derivation), `toolchain [--functional]` (0041-command-line FR-068 and
+  derivation), `vocabulary` (0019-controlled-vocabulary FR-007, FR-009 and
+  FR-010: every term of the ontologies, whether it names an established term or
+  a Decision; warnings only, never a failure), `toolchain [--functional]` (0041-command-line FR-068 and
   0025-tooling-environment FR-016, FR-020, FR-022: every toolchain entry
   `ws-host` accepts and its generated `mise` files current, that `uv.lock`
   carries hashes, that no workflow installs a program with a package manager or
@@ -200,8 +202,8 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   and `--spoken`, and the other item checks take `--brand`, themed by
   `frontiers-brand` when none is named, as their scripts are.
 - **FR-014**: `agora` MUST declare these suites (0041-command-line FR-031):
-  `spec` (`specs`, `register`, `controls`, `ontology`, `toolchain`, `commands`
-  and `help`, which need no package and no toolchain entry beyond Python),
+  `spec` (`specs`, `register`, `controls`, `ontology`, `vocabulary`, `toolchain`,
+  `commands` and `help`, which need no package and no toolchain entry beyond Python),
   `browser` (`design-systems --runner browser` and `openedx`), `python`
   (`design-systems --runner python`) and `images` (`imagery`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on

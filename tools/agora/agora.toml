@@ -42,7 +42,7 @@ description = "Changes drafted for a person to decide"
 
 # Suites (0041 FR-031; 0042 FR-014): the sections each runs. A section appears in no suite it does not belong to.
 [suites.spec]
-sections = ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"]
+sections = ["specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"]
 [suites.browser]
 sections = ["design-systems", "openedx"]
 options = { runner = "browser" }  # the suite runs the browser harnesses of design-systems; openedx takes no runner

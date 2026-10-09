@@ -121,6 +121,11 @@ help = "Ontology prefixes, and the design systems' registration, classification 
 watch = ["ontology/**", "design-systems/**"]
 relocatable = true
 
+[sections.vocabulary]
+help = "Vocabulary reuse: every ontology class, property, scheme and concept, and whether it names an established term or a Decision (0019 FR-007, FR-009, FR-010); a report, never a failure"
+watch = ["ontology/**"]
+relocatable = true
+
 # How each command is titled in the editor's command palette, and its icon where it has one (0041-command-line FR-064, FR-072).
 [commands."design-system list"]
 title = "List Design Systems"
