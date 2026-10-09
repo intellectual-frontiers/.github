@@ -1,0 +1,39 @@
+# DRAFT for review. Not loaded by anything: this file is outside ontology/.
+# Source: spec-kit/audits/vocabulary-drift/2026-10-09.md, "Candidates to map".
+# To accept: move each statement you approve into ontology/ifcore.ttl, on the subject it names, and add the prefix below.
+# Each line ties a term to an established term (0019-controlled-vocabulary FR-001, FR-002, FR-009). No term is renamed.
+@prefix ifcore:  <https://www.intellectualfrontiers.com/ontology/core#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <https://schema.org/> .
+@prefix org:     <http://www.w3.org/ns/org#> .
+@prefix odrl:    <http://www.w3.org/ns/odrl/2/> .   # NEW prefix: add it to ifcore.ttl
+
+# A person and an organization: a kind of the standard class (FR-002). Company and Fund already specialize Organization,
+# so they are tied by it and need no line of their own.
+ifcore:Person        rdfs:subClassOf schema:Person .
+ifcore:Organization  rdfs:subClassOf org:Organization, schema:Organization .
+
+# A company in the ontology is a legally formed organization; schema.org's Corporation is close but not the same (an LLC is not a
+# corporation in every law), so the tie is a close match, not a subclass.
+ifcore:Company       skos:closeMatch schema:Corporation .
+
+# Rights. dcterms:RightsStatement is "a statement about intellectual property rights held in or over a resource"
+# (https://www.dublincore.org/specifications/dublin-core/dcmi-terms/). An ifcore:Right is the protection itself, not a statement
+# about it, so the tie is a close match. Copyright, Trademark, PatentFamily, TradeSecret and DefensiveDisclosure specialize
+# ifcore:Right and are tied by it.
+ifcore:Right         skos:closeMatch dcterms:RightsStatement .
+# dcterms:LicenseDocument is "a legal document giving official permission to do something with a resource" and is a kind of
+# RightsStatement (same source).
+ifcore:License       skos:closeMatch dcterms:LicenseDocument .
+
+# Access. ODRL (https://www.w3.org/TR/odrl-model/) has Agreement, a policy both parties have agreed to, and Permission.
+# A Grant is a time-bounded link between an agent and an audience, so Permission is broader than it.
+ifcore:Agreement     skos:closeMatch odrl:Agreement .
+ifcore:Grant         skos:broadMatch odrl:Permission .
+
+# NOT drafted, because no verified IRI exists to point at (a person chooses; see the review note):
+#   ifcore:Asset and its children (TangibleAsset, IntangibleAsset, FinancialAsset, RealProperty, Equipment, Goodwill, IntellectualProperty).
+#   ifcore:PatentFamily's own class (WIPO or INPADOC), ifcore:Disposition, ifcore:ControlTest, ifcore:SharedService, ifcore:Note,
+#   ifcore:Fact, ifcore:Audience (a rename candidate, not a mapping candidate).
