@@ -1259,7 +1259,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0048-noemas FR-037	check	.github: agora test	tests a fourth kind added in the ontology alone
 0048-noemas FR-038	check	.github: agora test	tests each failure this requirement lists; agora check ontology runs the checks
 0049-platforms FR-001	check	.github: agora check ontology	fails a record typed ifcore:Platform that no module of it realizes the whole kernel for; that a lacking system is not called a platform in prose is review
-0049-platforms FR-002	check	.github: agora test	tests that the eight capabilities in the checker are exactly the concepts of the capability scheme; agora check ontology reports a platform lacking one
+0049-platforms FR-002	check	.github: agora test	tests that the nine capabilities in the checker are exactly the concepts of the capability scheme; agora check ontology reports a platform lacking one
 0049-platforms FR-003	review	0049-platforms FR-037	the three tests and a person's acceptance of the record are a review; the check cannot test them
 0049-platforms FR-004	none	-	a check that an offer carries exactly one offer kind is not written
 0049-platforms FR-005	none	-	whether a capability is needed by two solutions is judgment; no check
@@ -1300,3 +1300,13 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0049-platforms FR-040	none	-	that the words are used only for the matching type is review of text; no check reads prose for them
 0049-platforms FR-041	none	-	lifting a requirement is a maintainer's judgment on each platform's change; no check
 0049-platforms FR-042	none	-	the install check is in the platform's code; checked in the platform's repository
+0049-platforms FR-043	none	-	a function that exists only in a screen is found by review of the platform's code; checked in the platform's repository
+0049-platforms FR-044	none	-	generation of every flavor from one contract is in the platform's code; checked in its repository, and FR-049 tests the result
+0049-platforms FR-045	none	-	the resource API is in the platform's code; checked in the platform's repository
+0049-platforms FR-046	none	-	the graph API is in the platform's code; checked in the platform's repository
+0049-platforms FR-047	none	-	the virtual SQL layer is in the platform's code; checked in the platform's repository
+0049-platforms FR-048	none	-	the Model Context Protocol server is in the platform's code; checked in the platform's repository
+0049-platforms FR-049	none	-	the conformance suite runs in each platform's assurance environment; the public root cannot run it
+0049-platforms FR-050	check	.github: agora check ontology	fails a module that realizes the programmatic interface without stating all four flavors with offersInterface; that it truly serves them is FR-049
+0049-platforms FR-051	none	-	a platform's interface profiles are its own specs; checked in the platform's repository
+0049-platforms FR-052	none	-	authentication, quotas, audit and generated documentation are in the platform's code; checked in its repository
