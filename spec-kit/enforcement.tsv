@@ -1292,3 +1292,4 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0049-platforms FR-039	check	.github: agora check ontology	fails a subject typed both platform and suite, a suite with fewer than two members, a suite with modules, and a builtOn of a suite
 0049-platforms FR-040	none	-	that the words are used only for the matching type is review of text; no check reads prose for them
 0049-platforms FR-041	none	-	lifting a requirement is a maintainer's judgment on each platform's change; no check
+0049-platforms FR-042	none	-	the install check is in the platform's code; checked in the platform's repository

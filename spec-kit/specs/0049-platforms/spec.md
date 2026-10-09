@@ -255,6 +255,10 @@ The terms live in the ontology (`ifcore:Platform`, `ifcore:PlatformModule`,
   bundles extensions, ontology packages, catalog content, loop types and
   configuration, so that it can be installed, versioned and removed as one unit.
 
+- **FR-042**: A solution, a product or an extension MUST declare in its manifest
+  the platform modules it uses and its layer, and the platform MUST refuse to
+  install one that uses a module its layer may not reach (FR-008).
+
 ## Governed access
 
 - **FR-032**: A platform MUST separate its customers' data from one another,
