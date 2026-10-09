@@ -87,6 +87,17 @@ content document is, 0002-content-format; how addresses map to content,
 - **FR-010**: Every page's colours, type and imagery MUST come from the
   frontiers-brand design system's tokens; the generator MUST NOT state a
   colour literal of its own (0014-design-systems FR-044).
+- **FR-054**: A page with a breadcrumb trail MUST show it in a band of the
+  header, which stays at the top of the viewport while the page scrolls, as
+  frontiers-nature-web FR-012 and FR-013 state for their own chrome: the
+  first crumb links home, the last is the current page, marked
+  `aria-current="page"`, and BreadcrumbList structured data matches it. A
+  trail of five or more crumbs MUST fold the crumbs between the first and
+  the current page's nearest parents (two on a narrow screen, three on a
+  wide one when that still folds two) into a menu that opens on activation
+  and closes on an outside click or Escape. A long label MUST be shortened
+  with an ellipsis and keep its full text as the link's title. A browser
+  that cannot open the menu MUST show the whole trail.
 
 ## Addresses
 
