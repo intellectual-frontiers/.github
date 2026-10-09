@@ -11,7 +11,7 @@ before the remedies exist, so a control nobody has yet made operate shows red
 until someone does. The month's
 outcomes are kept as a work package (0015-work-packages), and the same
 outcomes are rendered as reports, a yearly bound volume and a dashboard.
-Elenchus is the pattern: a claim is tried by trying to refute it. Operational
+Elenchus is the pattern, a methodology held as a Noema: a claim is tried by trying to refute it. Operational
 Truth® is the company's productized implementation of that pattern, which
 compares intent that is code with evidence collected from the operation itself,
 and which a family of the company's products carries out. This spec states the
@@ -63,9 +63,10 @@ ledger of what is owed, turned at every month's start. The year's twelve
 monthly accounts are bound as one.
 
 *Elenchus* is the broad idea and *Operational Truth®* is one specific way of
-carrying it out, in the way an Eidolon is a pattern and the company's own
-three repositories are an implementation of it
-(`ifcore:OperationalTruth` is based on `ifcore:Elenchus`). The expected side of
+carrying it out. Elenchus is a methodology, so a Noema; a deployed workflow
+that carries it out is an Ergon related to it by `operationalizes`
+(0048-noemas FR-007). Whether Operational Truth® is that Ergon is an open
+question (OQ-11), so no relation is asserted until a person decides. The expected side of
 the comparison is the test plan, intent held as code. The observed side is
 evidence gathered from the operation by machine, and the difference between
 them is the truth gap. A system that is observed but expected by no one is
@@ -405,6 +406,9 @@ evidence, hold the inventory and run the tests are ontology facts.
   ownership operates counts as independent of the people who run the controls
   it shows. An Elenchus is not an independent assessment (FR-035), but the
   question decides how far a Verdict can be relied on.
+- **OQ-11**: Whether Operational Truth® is an Ergon that `operationalizes`
+  the Elenchus Noema (recorded as an open question in the private vault). Until a person decides, the ontology
+  asserts no relation between them.
 
 ## Key entities
 
