@@ -88,6 +88,52 @@ ifweb:PatentFamilyPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPag
     sh:targetClass ifweb:PatentFamilyPage ;
     sh:property [ sh:path schema:about ; sh:class ifcore:PatentFamily ; sh:minCount 1 ; sh:maxCount 1 ] .
 
+ifweb:PatentSummaryPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Patent summary page"@en ;
+    rdfs:comment "A supporting asset that explains the core idea of exactly one ifcore:Patent in plain language, for a reader who decides whether the patent belongs on a shortlist. It explains the patent and never replaces the patent's own page (0013 FR-014, 0051-patent-portfolio FR-007)."@en ;
+    ifweb:contentKind "PatentSummaryPage" ;
+    sh:targetClass ifweb:PatentSummaryPage ;
+    sh:property [ sh:path schema:about ; sh:class ifcore:Patent ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] .
+
+ifweb:UseCasePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Use case page"@en ;
+    rdfs:comment "A supporting asset that shows a practical or commercial application of one ifcore:Patent or one ifcore:PatentFamily (0013 FR-015, 0051-patent-portfolio FR-004)."@en ;
+    ifweb:contentKind "UseCasePage" ;
+    sh:targetClass ifweb:UseCasePage ;
+    sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ; sh:or ( [ sh:class ifcore:Patent ] [ sh:class ifcore:PatentFamily ] ) ] ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] .
+
+ifweb:MarketPotentialPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Market potential page"@en ;
+    rdfs:comment "A supporting asset that sets out the market a patent or a patent family serves and the value it can create there (0013 FR-015, 0051-patent-portfolio FR-004)."@en ;
+    ifweb:contentKind "MarketPotentialPage" ;
+    sh:targetClass ifweb:MarketPotentialPage ;
+    sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ; sh:or ( [ sh:class ifcore:Patent ] [ sh:class ifcore:PatentFamily ] ) ] ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] .
+
+ifweb:PatentLandscapePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Patent landscape page"@en ;
+    rdfs:comment "A supporting asset that gives the technology and patent landscape around one ifcore:Patent or one ifcore:PatentFamily (0013 FR-015, 0051-patent-portfolio FR-004)."@en ;
+    ifweb:contentKind "PatentLandscapePage" ;
+    sh:targetClass ifweb:PatentLandscapePage ;
+    sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ; sh:or ( [ sh:class ifcore:Patent ] [ sh:class ifcore:PatentFamily ] ) ] ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] .
+
+ifweb:PodcastEpisodePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Podcast episode page"@en ;
+    rdfs:comment "A supporting asset that explains one ifcore:Patent or one ifcore:PatentFamily in a spoken episode. Its audio, when it is in rendition storage, is named by schema:associatedMedia (0013 FR-015, FR-016, 0051-patent-portfolio FR-020)."@en ;
+    ifweb:contentKind "PodcastEpisodePage" ;
+    sh:targetClass ifweb:PodcastEpisodePage ;
+    sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ; sh:or ( [ sh:class ifcore:Patent ] [ sh:class ifcore:PatentFamily ] ) ] ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:associatedMedia ; sh:nodeKind sh:IRI ; sh:maxCount 1 ] .
+
 ifweb:TrademarkPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Trademark page"@en ;

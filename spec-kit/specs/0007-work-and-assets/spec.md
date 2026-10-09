@@ -65,10 +65,12 @@ assets.
 
 ## Patent family relationships
 
-- **FR-011**: A patent family that shares a priority claim with another
-  MUST be related to it by the specific relationship that holds —
-  continuation, divisional, or continuation-in-part — not left as an
-  unrelated filing or collapsed into a generic derivation.
+- **FR-011**: A patent that claims the benefit of another patent's
+  application MUST be related to it by the specific relationship that
+  holds — continuation, divisional, or continuation-in-part — not left as
+  an unrelated filing or collapsed into a generic derivation. Each patent
+  of a family MUST be its own `ifcore:Patent` individual, part of its
+  `ifcore:PatentFamily` (0051-patent-portfolio FR-001, FR-003).
 
 ## Canonical authority
 
