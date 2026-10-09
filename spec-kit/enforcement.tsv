@@ -1039,6 +1039,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0025-tooling-environment FR-027	check	.github: agora test	tests check that toolchain show and add return path, env, provides, version and state; that another repository uses them is checked in that repository
 0025-tooling-environment FR-028	check	.github: agora test	tests check that toolchain list returns the pinned packages and the node version
 0025-tooling-environment FR-029	none	-	the comparison runs in the repository that builds on this one; this repository has no such consumer to check
+0025-tooling-environment FR-030	review	0025-tooling-environment FR-030	the language of a program is judged in review; a reason for another language is read in the governing spec
 0041-command-line FR-066	check	.github: agora check toolchain	fails an entry declared outside tools/agora/toolchain, a command, section, generator, runner or harness that names an entry that does not exist; doctor and the plan are computed from the registry
 0041-command-line FR-067	check	.github: agora test	tests drive toolchain list, show and add (fetch, check, dry-run, offline refusal, failing check); agora check commands compares them with the ontology
 0041-command-line FR-068	check	.github: agora check toolchain	fails an entry whose fields are incomplete, whose address is not https, whose version is a range or floating tag, or that lacks linux-x86_64; that a change of an entry is a commit of its own is a review judgment
@@ -1058,7 +1059,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-035	check	.github: agora check commands	agora check commands checks docs/index.html uses only the brand's own assets and pages.yml calls ./agora docs build; the Pages deployment itself is the owner's setting and cannot be checked here
 0042-agora FR-036	check	.github: agora check commands	agora check commands fails a README without the link to the guide, the one-time system ensure and help, or over 120 lines
 0042-agora FR-037	check	.github: agora test	tests read the Turtle reader against every statement of the ontology files, then ontology list (kinds, scheme, ranked match, the row shape and icons) and ontology show (a class, a property, an individual, a scheme and a concept; statements, references, citing requirements, refusal with the nearest CURIEs), context ontology:TERM and the MCP resource; agora check commands compares the Ontology view and its icon and search declarations with the data
-0044-public-website FR-001	check	eidolon: eid site build	the build is a pure function of the repositories; two builds compare equal in its tests
+0044-public-website FR-001	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that the build is a pure function of the repositories: two builds of the same commits compare equal
 0044-public-website FR-002	none	-	repository topology; no check
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
 0044-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
@@ -1070,24 +1071,30 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
 0044-public-website FR-011	check	eidolon: eid check site	every patent address and patent redirect from the snapshot answers
 0044-public-website FR-012	check	eidolon: eid check site	the check fails when any ontology file or namespace page is generated; the not-found page exists
-0044-public-website FR-013	none	-	eid site generate writes the snapshot; no check of a hand edit
+0044-public-website FR-013	none	-	the snapshot is fixed data and no command writes it; no check of a hand edit
 0044-public-website FR-014	check	eidolon: eid site status	lists every previous sitemap address neither served nor redirected
 0044-public-website FR-015	check	eidolon: eid check site	every page carries the one analytics container
-0044-public-website FR-016	check	eidolon: eid test	test_site checks the build's redirect and header lists and the not-found page
-0044-public-website FR-017	check	eidolon: eid test	test_site drives eid site serve: trailing slash, index and .html redirect with 307, unknown address 404
+0044-public-website FR-016	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check the build's redirect and header lists and the not-found page
+0044-public-website FR-017	check	eidolon: eid test	the Rust tests (eid-site: cargo test) drive the server: trailing slash, index and .html redirect with 307, unknown address 404; running the image on a computer is not tested
 0044-public-website FR-018	check	eidolon: eid check ontology	the destination's PublishingDestination record names its vendor service, strategy, configuration and deployment record files
-0044-public-website FR-019	none	-	a command that publishes the site is not built yet: preview unless --production, which needs --by and --because; no command changes DNS or routes
-0044-public-website FR-020	none	-	a command that publishes the site is not built yet: the publish builds and checks in the same run and uploads that build
-0044-public-website FR-021	check	eidolon: eid test	test_site: a publish against the fake API appends one deployment record with every field and no token
-0044-public-website FR-022	check	eidolon: eid test	test_site: the token never reaches the record, the output or a file
-0044-public-website FR-023	review	0044-public-website FR-023	the destination's script is reviewed to hand each request to the files
+0044-public-website FR-019	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that a publish is a preview unless --production, which needs --by and --because; no command changes DNS or routes
+0044-public-website FR-020	none	-	publish checks the build before it makes the image, in the order of its code; no test drives a failed check through publish
+0044-public-website FR-021	check	eidolon: eid check site	the check fails a deployment record that holds a key other than the listed ones; the Rust tests (eid test) read the vendor's version and preview address from its answer; no test publishes to a host
+0044-public-website FR-022	check	eidolon: eid check site	the check fails a publish.yml value that is not an environment variable name and any key a record may not hold; the credential is read by the vendor's program, never by eid-site
+0044-public-website FR-023	review	0044-public-website FR-023	the image's server is reviewed to read its routing from the files and to decide nothing else
 0044-public-website FR-024	none	-	the application is not built yet; no check that the site is the generated pages plus the platform
 0044-public-website FR-025	none	-	the application is not built yet; no check that it serves a generated page byte for byte
 0044-public-website FR-026	none	-	the reserved-address list and the generator's collision refusal are not built yet
 0044-public-website FR-027	none	-	the application is not built yet; no check of its evaluation or its not-found answer
-0044-public-website FR-028	none	-	no image is built yet; no check that a static host alone serves the files
+0044-public-website FR-028	none	-	no check that a static host alone serves the build's files
 0044-public-website FR-029	none	-	no command deploys the application's image yet; eid check ontology checks an ApplicationHost record's fields, and nothing yet checks a deploy goes to a described host
 0044-public-website FR-030	none	-	the application is not built yet; no command runs it locally
+0044-public-website FR-031	review	0044-public-website FR-031	whether functionality is dynamic and server-side is judged in review
+0044-public-website FR-032	check	eidolon: eid test	a test checks that the site group holds no Python that renders, serves or publishes the website and that cargo is the rust kit's
+0044-public-website FR-033	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that a changed source renders again only the pages whose source graph holds it, and that an unchanged rendering renders no dependent again
+0044-public-website FR-034	check	eidolon: eid test	the Rust tests (eid-site: cargo test) compare the server's answer for every file of a build with the written file, with the header list on every answer; the keeping of the last good state is not tested
+0044-public-website FR-035	none	-	no check that the image holds only the checked build, answers /__eid/health and holds no credential
+0044-public-website FR-036	check	eidolon: eid check site	the check fails a page or file at an address under /__eid/; the Rust tests check that the server answers only health and status there
 0045-elenchus-works FR-001	none	-	whether a work is of this kind is judgment
 0045-elenchus-works FR-002	none	-	vocabulary; no check of the words a record uses
 0045-elenchus-works FR-003	check	eidolon: eid check elenchus	every field but severity, which has no scale yet (0044 OQ-2)

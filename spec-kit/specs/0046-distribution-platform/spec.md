@@ -27,7 +27,8 @@ later, is stated here before it is built.
   protocol or the platform's own capability; use a library only where it
   removes more complexity, risk and obligation than it adds; and keep state in
   the simplest reliable form. A vendor MUST NOT supply a distribution
-  capability except under FR-003.
+  capability except under FR-003. The platform is a Rust program
+  (0025-tooling-environment FR-030).
 - **FR-003**: A vendor MAY be considered for a capability only when it helps
   generate audience, sales or revenue by doing something the company cannot do
   itself: reach to readers the company has no channel to, a marketplace or
@@ -275,8 +276,8 @@ later, is stated here before it is built.
   organization are not decided.
 - **OQ-10**: Who is the seller of record, how tax is handled, and how long
   buyer and access data are kept are not decided.
-- **OQ-11**: The platform's programming language and storage engine are not
-  decided; FR-002 constrains the choice and does not make it.
+- **OQ-11**: The platform's storage engine is not decided; FR-002 constrains
+  the choice and does not make it.
 - **OQ-12**: Which audience-growth features the platform carries beyond
   FR-033 to FR-035, such as bundles or referral codes, is not decided.
 
@@ -316,7 +317,7 @@ later, is stated here before it is built.
 
 - [x] Every requirement is testable (MUST / MUST NOT), not aspirational
 - [x] No company fact (which vendors, which host, which price) is asserted here
-- [x] No production mechanics (a specific vendor, host, language or database) —
+- [x] No production mechanics (a specific vendor, host or database) —
       those belong to an implementation plan
 - [x] Every open item is marked, not silently decided
 - [x] Public-safe: no confidential information, no unverified number stated as
