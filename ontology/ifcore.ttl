@@ -2662,7 +2662,7 @@ ifcore:Spry a schema:SoftwareApplication ;
 ifcore:OpsfolioPlatformErgon a ifcore:Ergon ; ifcore:reflects ifcore:Opsfolio ;
     ifcore:purpose "Lets a company hold its intent as code, collect evidence from its own operation, and see the difference between the two, with the evidence staying where the customer keeps it."@en ;
     ifcore:ownerRole ifcore:DecisionAuthorityRole ;
-    rdfs:comment "Classified as a platform by a person. The nine modules are designed and each realization is stated for a person to review. The third-party test (0049-platforms FR-003) depends on an extension contract that is not yet specified; the replacement and single-store tests are met by design only."@en ;
+    rdfs:comment "Classified as a platform by a person. The ten modules are designed and each realization is stated for a person to review. The third-party test (0049-platforms FR-003) depends on an extension contract that is not yet specified; the replacement and single-store tests are met by design only."@en ;
     ifcore:reviewState ifcore:AcceptedState ; ifcore:reviewedBy ifcore:ShahidNehalShah ; ifcore:reviewedOn "2026-10-09"^^xsd:date ;
     ifcore:hasAudience ifcore:Public .
 
@@ -2714,6 +2714,15 @@ ifcore:OpsfolioAccessService a ifcore:PlatformModule ; rdfs:label "Opsfolio Acce
 ifcore:OpsfolioAccessServiceErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioAccessService ;
     ifcore:purpose "Decides who may see each fact and acts for a person only within that person's authority, with every access audited."@en ; ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
 
+ifcore:OpsfolioApiGateway a ifcore:PlatformModule ; rdfs:label "Opsfolio API Gateway"@en ;
+    ifcore:moduleCode "OAG" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-api-gateway" ;
+    ifcore:platformLayer ifcore:OrthogonalLayer ;
+    ifcore:offersInterface ifcore:ResourceApiFlavor, ifcore:GraphApiFlavor, ifcore:VirtualSqlFlavor, ifcore:McpServerFlavor ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioApiGatewayErgon a ifcore:Ergon ; ifcore:reflects ifcore:OpsfolioApiGateway ;
+    ifcore:purpose "Offers every function of the platform as a resource API, a graph API, a read-only SQL layer and a Model Context Protocol server, on the customer's own machine or in a hosted instance, with the same access decisions in all four."@en ;
+    ifcore:ownerRole ifcore:DecisionAuthorityRole ; ifcore:hasAudience ifcore:Public .
+
 ifcore:OpsfolioAssetInventory a ifcore:PlatformModule ; rdfs:label "Opsfolio Asset Inventory"@en ;
     ifcore:moduleCode "OAI" ; ifcore:codeStatus "proposed" ; ifcore:artifactName "opsfolio-asset-inventory" ;
     ifcore:platformLayer ifcore:ExtensionsLayer ; ifcore:hasAudience ifcore:Public .
@@ -2763,6 +2772,11 @@ ifcore:OpsfolioRelation20 a ifcore:ReflectionRelationship ; ifcore:relationType 
 ifcore:OpsfolioRelation21 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Uses ; ifcore:relationFrom ifcore:OpsfolioAssuranceEnvironment ; ifcore:relationTo ifcore:Qualityfolio ;
     ifcore:claimLabel ifcore:HypothesisLabel ; ifcore:confidenceLevel ifcore:Medium ; ifcore:hasAudience ifcore:Public .
 
+
+ifcore:OpsfolioRelation22 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:PartOf ; ifcore:relationFrom ifcore:OpsfolioApiGateway ; ifcore:relationTo ifcore:Opsfolio ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
+ifcore:OpsfolioRelation23 a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:Implements ; ifcore:relationFrom ifcore:OpsfolioApiGateway ; ifcore:relationTo ifcore:ProgrammaticInterfaceCapability ;
+    ifcore:claimLabel ifcore:UnknownLabel ; ifcore:hasAudience ifcore:Public .
 
 ifcore:OperationalTruthTrademark a ifcore:Trademark ;
     rdfs:label "Operational Truth (trademark)"@en ;
