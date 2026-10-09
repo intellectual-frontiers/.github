@@ -2,7 +2,7 @@
 
 How the house voice changes when a work is heard rather than read. It derives from
 [`frontiers-written-voice`](../frontiers-written-voice/): every written rule holds unless [`spec.md`](spec.md) cites
-it and states the change (more dry humor, punctuation for performance). Governed by
+it and states the change (punctuation for performance; no humor, idiom or figure of speech). Governed by
 [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spec.md).
 
 | Path | What it is |
