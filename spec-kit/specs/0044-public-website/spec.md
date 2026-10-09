@@ -218,6 +218,41 @@ content document is, 0002-content-format; how addresses map to content,
   container (FR-015) MUST load after the page is usable. The header rules MUST
   be written to the built directory's `_headers` file.
 
+- **FR-041**: A page that shows counts, candidates or figures that are
+  examples MUST say so where they appear. The Network's hunts MUST label
+  their counts and evidence packets "illustrative", and an illustrative
+  scoreboard MUST keep its caption.
+- **FR-042**: A research pillar, note or area page MUST show, for each
+  section, its claim label, points, sources, table with caption and
+  falsifiability list when the register holds them. A figure or screen the
+  website does not draw MUST be shown as its title and description. An area
+  page MUST show its introduction, its parent area and the records filed
+  under it, found by the area's name in a record's title, summary, text or
+  classifications.
+- **FR-043**: The Zero Security Theatre area MUST show its test, its
+  attack-and-recovery scoreboard, open questions and planned outputs. Its
+  registers MUST be filterable by tag, MUST show a method as an ordered list
+  and MUST link each entry to its pillars.
+- **FR-044**: A fund's page MUST show its size only as the register states
+  it, with the register's status beside it, and MUST show every list the
+  register names for that fund.
+- **FR-045**: A patent family's page MUST show, for each filing, its status
+  date, publication and grant dates, examiner, art unit and parent
+  applications, and for the family its priority application, last event
+  date, related records and the official PDF when the register has one. A
+  trademark's page MUST show its registration date, first use, classes,
+  USPTO status and where it is used, with the registered and trademark signs
+  raised.
+- **FR-046**: The What's new page MUST group its items by month and offer
+  area and kind filters. A book's page MAY show a pull quote, premise,
+  audience, parts, frameworks and specifications from the snapshot, but its
+  status comes from the vault.
+- **FR-047**: The Organization structured data MUST carry the company's
+  email, address, founder and its LinkedIn page. The sitemap MUST give a
+  lastmod only for a page whose record has a date. A companion page MUST list
+  its section headings, and an interactive tool MUST push its prompt-copied,
+  artifact-downloaded, email and LinkedIn events to the analytics data layer.
+
 ## The application
 
 - **FR-024**: The website MUST be one site at one domain made of two parts: the
