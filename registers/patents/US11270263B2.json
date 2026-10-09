@@ -1,0 +1,199 @@
+{
+ "number": "US11270263B2",
+ "kind": "granted patent",
+ "title": "Blockchain-Based Crowdsourced Initiatives Tracking System",
+ "applicationNumber": "15587202",
+ "earlierPublication": "US20170236094A1",
+ "filedOn": "2017-05-04",
+ "publishedOn": "2017-08-17",
+ "grantedOn": "2022-03-08",
+ "priorityDate": "2013-09-12",
+ "status": "Patented Case",
+ "statusDate": "2022-02-16",
+ "estimatedExpiration": "2036-01-24",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3624",
+ "examiner": "TURNER, SHELBY AUBURN",
+ "classifications": [
+  "G06Q 10/101",
+  "H04L 9/50",
+  "G06Q 10/46",
+  "G06Q 10/40",
+  "G06Q 10/063",
+  "G06Q 20/36",
+  "G06Q 30/0203",
+  "G06Q 30/0206",
+  "G06Q 50/184",
+  "G06Q2220/00",
+  "H04L 9/0637",
+  "H04L 9/3236",
+  "H04L2209/56"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US14/025,493",
+   "relation": "Continuation-In-Part",
+   "publication": "US20150073870A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "14025493"
+ ],
+ "abstract": "An embodiment herein provides a blockchain configured crowdsourced initiatives exchange ecosystem that includes a plurality of computing terminals associated with respective plurality of innovators which serve as sources of initiatives identified as innovations and respective sub-innovations. The ecosystem includes a distributed trusted ledgers system, a computing device communicatively connected to the plurality of computing terminals and configured to access the plurality of computing terminals and monitor the innovations, and a processing circuit that includes an initiatives tracking device that tracks the innovations associated with the plurality of computing terminals. The processing circuit includes a central initiatives management device. The ecosystem includes a hardware-based identity validation appliance to verify integrity of the plurality of computing terminals and the associated innovators to authorize a secured access of the plurality of computing terminals and to associate metadata with the innovations defining a digital ownership identity, a digital time identity, a digital geographical identity.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A blockchain configured distributed architecture-based crowdsourced initiatives exchange ecosystem comprising: a plurality of computing terminals associated with respective plurality of innovators which serve as sources of initiatives identified as innovations and respective sub-innovations stored in the form of computer executable files at said computing terminals of said innovators, wherein said plurality of computing terminals are communicatively connected over a crowdsourced initiatives exchange network; a distributed trusted ledgers system containing a plurality of distributed blockchain ledgers associated with said plurality of computing terminals such that each ledger stores a copy of said computer executable files containing said innovations and trust notes for defining security and trust among said computing terminals so that each computing terminal trusts the other computing terminal through blockchain, wherein said distributed ledgers system enable coding of rules-based contracts that execute when specified conditions are met; a computing device communicatively connected to said plurality of computing terminals through said crowdsourced initiatives exchange network and configured to access privately said computer executable files stored at said plurality of computing terminals as said blockchain ledgers to source and monitor said innovations from an external system; a processing circuit communicatively coupled to said computing device and said plurality of computing terminals, said processing circuit comprising: an initiatives tracking device that tracks said innovations in said crowdsourced initiatives exchange network by accessing said distributed ledgers associated with said plurality of computing terminals such that said ledgers allow said computing device to review said computer executable files privately; a central initiatives management device comprising: an evaluation device for evaluating said innovations based on one or more inputs, wherein said one or more inputs are determined using a credentialed score of an innovator, a crowdsourcing index, a referencing index, an inventor reputation criterion, degree of overlap with a sub-innovation, wherein said crowdsourcing index comprises a non-linear relationship with a number of crowdsource respondents, and said referencing index signifies connections of said innovation with other references; and a scoring device for associating an innovation score to each of said innovations based on an evaluation output; a memory device containing an enterprise asset library to store said computer executable files tracked and extracted from said computing terminals and indicative of said innovations including computer executable initiatives documents, computer executable invention disclosures, computer executable innovator profiles, computer executable innovator credentialing details, computer executable said evaluation output, and computer executable said associated scores; a credentialing system that determines said credentialed score of said innovators and said crowdsourcing index, wherein said credentialing system comprises an auto-validation engine that certifies federated digital profiles associated with each of said innovators, wherein said federated digital profiles are retrieved from a social networking platform, wherein said auto-validation engine comprises application programming interfaces that allow said auto-validation engine to determine an extent of mapping between information contained in two distinct federated digital profiles associated with each of said innovators, wherein a first of the two distinct federated digital profiles is maintained by said social networking platform, wherein a second of the two distinct federated digital profiles is not maintained by said social networking platform, and wherein said credentialing system determines an aggregate score of a plurality of said innovators contributing towards said initiatives, wherein said credentialing system further comprising: a profile segmenting engine configured to segment digital profiles of said innovators into said federated digital profiles associated with each of said innovators; a segment certification engine configured to facilitate certification of said federated digital profiles associated with said innovators through a plurality of digital nodes representing crowdsourced respondents networked together in a digital architecture; a segment rating engine configured to associate ratings to credentialed federated profiles; and a profile rating engine configured to determine said credentialed score and associate with said respective profiles of said innovators based on said ratings, wherein said score is used by said evaluation device for evaluating identity of said innovators and respective innovations; and a hardware-based identity validation appliance to verify integrity of said plurality of computing terminals and said associated innovators to authorize a secured and private access of said plurality of computing terminals to said crowdsourced initiatives exchange network and to associate metadata with said innovations defining a digital ownership identity, a digital time identity, a digital geographical identity, wherein said hardware-based identity validation appliance comprises: a geo-spatial mapping device to perform geo-tagging of said computing terminals and said computer executable files and compare said geo-tags with pre-stored geo-spatial information about said innovators for processing validation, wherein said geo-tagging is performed based on geo-spatial information received from a global positioning system (GPS)-based device from said respective computing terminals in the form of electric signals, wherein the GPS-based device is blockchain configured and an identity of the GPS-based device is maintained in the distributed blockchain ledgers; and a digital acquisition unit and multichannel amplifiers operatively coupled to said geo-spatial mapping device and communicatively connected to said GPS-based device and configured for pre-processing and amplification of said electric signals received from said GPS)-based device, wherein said hardware-based identity validation appliance further comprises a facial expression based validation device to receive data indicative of micro facial expressions extracted by respective facial expressions sensors associated with said computing terminals of said innovators, and wherein said micro expressions based validation device comprises an image processing circuitry and an associated memory to interpret said micro facial expressions and compare them with predefined facial patterns to validate an identity of said innovators."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , further comprising a web platform including a graphical user interactive interface accessible through said computing device."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking device tracks sub-innovations for an innovation by removing one or more elements or attributes from said innovation such that said sub-innovations have at least one element reduced from said innovation and results in a tangible product that is different from said innovation in at least one of a physical property, a chemical property, and a biological property."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking device tracks sub-innovations for an innovation by adding dissimilar and unrelated attributes or elements with said innovation such that said sub-innovations have at least one element or attribute added to said innovation and results in a tangible product that is different from said innovation in at least one of a physical property, a chemical property, and a biological property."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking device tracks sub-innovations for an innovation by copying attributes or elements of said innovation and making alterations into it to result in a sub-innovation that is different from said innovation in at least one of a physical property, a chemical property, and a biological property."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking device tracks sub-innovations for an innovation by eliminating attributes or elements of said innovation and rearranging them to result in a sub-innovation that is different from said innovation in at least one of a physical property, a chemical property, and a biological property, and wherein the rearrangement is of a physical or a chemical type such that a physical rearrangement results in a different physical product from said innovation and a chemical rearrangement results in a different molecule or compound from said innovation."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said memory device is configured to store programmed instructions that perform defined tasks of elimination, unification, and rearrangement within one or more attributes or elements of an innovation to derive a plurality of sub-innovations."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The ecosystem of claim 7 , wherein the derived sub-innovations include a first sub-innovation derived from said innovation based on a first similarity relationship and a second sub-innovation derived from said first sub-innovation based on a second similarity relationship, wherein said first similarity relationship and said second similarity relationship are different, wherein said derived sub-innovations further including a third sub-innovation derived from said second sub-innovation based on a third similarity relationship between said second sub-innovation and said third sub-innovation such that said third similarity relationship is different from the first and second similarity relationships, and wherein said innovation, said first sub-innovation, said second sub-innovation, and said third sub-innovation are non-obvious and novel among themselves."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The ecosystem of claim 8 , further comprising a mapping system that develops an initiatives digital map including said innovation and said sub-innovations along with their similarity relationships to define relationship trends."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said processing circuit is configured to track said innovations from said external system not belonging to or integrated with said computing device by reading said distributed ledgers privately accessible by said computing device."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The ecosystem of claim 10 , wherein said processing circuit is further configured to develop one or more sub-innovations of said innovations using a set of computer-controlled operations, and wherein said processing circuit is configured to track said one or more sub-innovations by reading said distributed ledgers associated with said plurality of computing terminals."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The ecosystem of claim 11 , wherein said set of computer-controlled operations is configured to change configurations of said innovations in at least one of attributes or elements such that resulting sub-innovations are different from said innovations in at least a category comprising any of a physical property, a chemical property, and a biological property, and wherein respective sub-innovations are derived by any of eliminating, unifying, or rearranging attributes or elements in said respective innovations."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The ecosystem of claim 12 , wherein each innovation and its respective sub-innovations are defined through a computer executable data structure stored in the form of a computer executable file such that said computer executable data structure associates a digital relationship between an innovation and its respective sub-innovations through relational structures maintained in said distributed trusted ledgers."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11270263B2/sheet-00000.webp",
+   "label": "Sheet 1 of 11",
+   "width": 174,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00001.webp",
+   "label": "Sheet 2 of 11",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00002.webp",
+   "label": "Sheet 3 of 11",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00003.webp",
+   "label": "Sheet 4 of 11",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00004.webp",
+   "label": "Sheet 5 of 11",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00005.webp",
+   "label": "Sheet 6 of 11",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00006.webp",
+   "label": "Sheet 7 of 11",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00007.webp",
+   "label": "Sheet 8 of 11",
+   "width": 60,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00008.webp",
+   "label": "Sheet 9 of 11",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00009.webp",
+   "label": "Sheet 10 of 11",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11270263B2/sheet-00010.webp",
+   "label": "Sheet 11 of 11",
+   "width": 79,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/b3/7f/f3/d9ea6606ab53ad/US11270263.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15587202",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11270263B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

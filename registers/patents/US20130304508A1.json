@@ -1,0 +1,195 @@
+{
+ "number": "US20130304508A1",
+ "kind": "published application",
+ "title": "System And Method For Collaborative Patient Engagement",
+ "applicationNumber": "13871107",
+ "earlierPublication": "",
+ "filedOn": "2013-04-26",
+ "publishedOn": "2013-11-14",
+ "grantedOn": "",
+ "priorityDate": "2012-05-14",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-05-15",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3626",
+ "examiner": "PAULSON, SHEETAL R.",
+ "classifications": [
+  "G16H 10/60",
+  "G16H 40/67",
+  "G16H 70/20",
+  "G16H 80/00"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "61646744"
+ ],
+ "abstract": "A system for facilitating collaborative engagement among a plurality of entities. The system includes a common interactive platform for allowing the various entities to interact collaboratively and with the system. The entities include one or more of a patient, healthcare provider, and the healthcare provider related entities, and a patient related entity, the patient related entity bearing a relationship with the patient as defined by an associated relationship identity number associated with the patient related entity in association with the respective patient. The system further includes or is coupled to a patient information database and a clinical data repository. The system further includes a processing unit to process stored programmed instructions for enabling collaborative engagement among the entities.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for facilitating collaborative engagement among a plurality of entities, said system comprising: a common interactive platform to allow said various entities to interact collaboratively and with said system, wherein said entities include one or more of a patient, a healthcare provider, healthcare provider related entities, and a patient related entity, said patient related entity comprising a relationship with said patient as defined by an associated relationship identity number associated with said patient related entity in association with said respective patient; a patient information database to contain information relevant to said patient including demographic information, and health related information for said patient, and information pertinent to a healthcare provider or a healthcare provider related entity associated with said patient in order to develop or manage health plans for said patient; a clinical data repository to store information collated by a plurality of healthcare providers and the healthcare provider related entities as obtained from said patients and said patient related entities, wherein said clinical data repository is coupled to said patient information database and retrieves information partially from said patient related database, wherein said plurality of healthcare providers and said healthcare provider related entities collaboratively engage with one another through said interactive platform to access and maintain said clinical data repository, wherein said clinical data repository further includes guidelines and manual reports prescribed by said healthcare providers and said healthcare provider related entities to said associated patients for health planning and management; a processing unit to process stored programmed instructions for enabling collaborative engagement among said entities, wherein said processing unit includes or is coupled to: a health assessment module configured to assess a health of said patients that are subscribed to a service provided by said system, wherein said health assessment is performed based on records obtained from said associated healthcare providers and said healthcare provider related entities for said patients from one or more of said patient information database and said clinical data repository; a health planning module to recommend medical procedures and guidelines for said patients, said health planning module further defines a baseline for appropriateness of performance to evaluate performance below said recommended guidelines; a tracking module to monitor said patients for performance toward said recommended guidelines in view of an health assessment output as obtained from said health assessment module; an alarm module to raise an alarm in case said tracking module identifies said performance below said baseline; a relationship management module to associate patient related entities with said respective patients and define a nature of association between said patients and said respective patient related entities; and a scoring module coupled to said relationship management module to define a relational score for said patient related entities that considers a cumulative effect of said nature of association with said patient and familiarity of said patient related entity with a problem associated with said patient for which said health planning is sought, wherein said relational score is defined based on input received from said patients, patient related entities, and said health care providers, wherein said system communicates with said patient related entities associated with said respective patients about non-performance of said patients when said performance goes beyond an acceptance range of said baseline, and wherein said related entities are selected based on an association of said related entities with said patients and a relational score associated with said patient related entities."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a relationship updating module to evaluate said relationship between said patient related entities and said respective patients and said relational score associated with said patient related entities and update said nature of association and said relational score associated with said entities periodically."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said health assessment module further comprises: a health review module to allow reviewing of said health assessment details from said individual relevant healthcare providers and said healthcare provider related entities and health experts, wherein said health assessment details are further communicated to said patient related entity based on said relational score and said nature of association."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said health planning module receives an input from said health assessment module to recommend said medical procedures and guidelines for said patients, said health planning module coupled to a baseline generator, wherein said input along with medical knowledge data house stored in said clinical data repository being used to define said baseline for appropriateness by said baseline generator."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said baseline for appropriateness further identifies a range with an upper limit of appropriateness and a lower limit of appropriateness."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said baseline generator is coupled to a dynamic updating module configured to receive input from said clinical data repository and said patient information database continually to update said range of appropriateness and said baseline dynamically, and wherein said patient related entities are informed about said dynamic updates based on said relational score and said nature of association."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a report generator coupled to said tracking module, alarm module and said health assessment module, said report generator adapted to receive inputs from said tracking module and said health assessment module to generate reports regarding health planning and compliance by said patients, said reports being used by said alarm module to generate said alarm, said reports being further communicated to said patient related entities based on said nature of association and said relational score."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said patient related entities include one or more of parents, guardians, kids, siblings, colleagues, teachers, caretakers, and doctors."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said relational score is defined based on parameters including one or more of natural relationship, familiarity of said patient related entity with said medical problem of said patient, historical association of said patient related entity, age of said patient related entity, acceptance of said patient related entity by said patient as caretaker, affinity or proximity toward said patient and ethical intent, and wherein a weightage being associated to each of said parameters by said patient such that said cumulative relational scores are defined based on relational scores for each of said parameters weighted with said respective weightage scores."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , wherein said cumulative relational score for a patient being used by said system to define or update criteria for scoring of subsequent patient related entities, and wherein a historical record of said relational scores of said patients scored in said past being used to dynamically update said subsequent scoring of said patients in real time."
+  },
+  {
+   "number": 11,
+   "independent": true,
+   "text": "A method for facilitating collaborative engagement among a plurality of entities including health providers, patients and patient related entities, said method comprising: assessing a health of said patients, wherein said health assessment is performed based on records obtained from said associated healthcare providers and said healthcare provider related entities for said patients from one or more of a patient information database and a clinical data repository, wherein said clinical data repository and said patient information database stores information pertinent to said patients including demographic information, and health related information of said patients, and information pertinent to said healthcare providers and said healthcare provider related entities associated with said patients in order to develop or manage health plans for said patients, and information collated by said healthcare providers and said healthcare provider related entities as obtained from said patients and said patient related entities, wherein said clinical data repository is coupled to said patient information database and retrieves information partially from said patient information database, wherein said healthcare providers and said healthcare provider related entities collaboratively engage with one another through an interactive platform to access and maintain said clinical data repository, and wherein said clinical data repository further includes guideline and manual reports prescribed by said healthcare providers and said healthcare provider related entities to said associated patients for health planning and management, said patient related entities and said patients further collaboratively engaging with said healthcare providers and said healthcare provider related entities through said interactive platform; developing a health planning recommendation including medical procedures and guidelines for said patients, said health planning recommendation defines a baseline for appropriateness of performance to evaluate performance beyond said recommended guidelines; monitoring said patients for performance toward said recommended guidelines in view of an health assessment output as obtained from said health assessment module; generating an alarm when said monitored performance is beyond an acceptance range of said baseline; and communicating information about said performance of said patients to said respective patient related entities, wherein said patient related entities are dynamically selected based on an associated relational score and nature of association of said patient related entities with said respective patients, wherein said patient related entities bear a relationship with said respective patients as defined by an associated relationship identity number associated with each of said patient related entities in association with said respective patients."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 11 , further comprising assigning said relational score to said patient related entities in association with said respective patients based on parameters including one or more of natural relationship, familiarity of said patient related entity with said medical problem of said patient, historical association of said patient related entity, age of said patient related entity, acceptance of said patient related entity by said patient as caretaker, affinity or proximity toward said patient, and ethical intent, wherein a weightage is associated with each of said parameters such that a cumulative relational score is defined based on relational scores for each of said parameters weighted with said respective weightage scores."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , further comprising using said cumulative relational score to define or update criteria for scoring of subsequent patient related entities, wherein a historical record of said relational scores of said patient related entities scored in said past being used to dynamically update said subsequent scoring of said patient related entities in real time."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 11 , wherein said patient related entities include one or more of parents, guardians, kids, siblings, colleagues, teachers, caretakers, and doctors, each of them being scored differently for assigning said relational score."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 11 , wherein said baseline for appropriateness further identifies a range with an upper limit of appropriateness and a lower limit of appropriateness, said method further comprising updating said range of appropriateness and said baseline dynamically based on an input from said clinical data repository and said patient information database, and wherein said patient related entities are informed about said dynamic updates based on their relational score and said nature of association."
+  },
+  {
+   "number": 16,
+   "independent": true,
+   "text": "A program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for facilitating collaborative engagement among a plurality of entities including health care providers, patients and patient related entities, said method comprising: assessing a health of said patients, wherein said health assessment is performed based on records obtained from said associated healthcare providers and said healthcare provider related entities for said patients from one or more of a patient information database and a clinical data repository, wherein said clinical data repository and said patient information database stores information pertinent to said patients including demographic information, and health related information of said patients, and information pertinent to said healthcare providers and said healthcare provider related entities associated with said patients in order to develop or manage health plans for said patients, and information collated by said healthcare providers and said healthcare provider related entities as obtained from said patients and said patient related entities, wherein said clinical data repository is coupled to said patient information database and retrieves information partially from said patient information database, wherein said healthcare providers and said healthcare provider related entities collaboratively engage with one another through an interactive platform to access and maintain said clinical data repository, and wherein said clinical data repository further includes guideline and manual reports prescribed by said healthcare providers and said healthcare provider related entities to said associated patients for health planning and management, said patient related entities and said patients further collaboratively engaging with said healthcare providers and said healthcare provider related entities through said interactive platform; developing a health planning recommendation including medical procedures and guidelines for said patients, said health planning recommendation defines a baseline for appropriateness of performance to evaluate performance beyond said recommended guidelines; monitoring said patients for performance toward said recommended guidelines in view of an health assessment output as obtained from said health assessment module; generating an alarm when said monitored performance is beyond an acceptance range of said baseline; and communicating information about said performance of said patients to said respective patient related entities, wherein said patient related entities are dynamically selected based on an associated relational score and nature of association of said patient related entities with said respective patients, wherein said patient related entities bear a relationship with said respective patients as defined by an associated relationship identity number associated with each of said patient related entities in association with said respective patients."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said method further comprises assigning said relational score to said patient related entities in association with said respective patients based on parameters including one or more of natural relationship, familiarity of said patient related entity with said medical problem of said patient, historical association of said patient related entity, age of said patient related entity, acceptance of said patient related entity by said patient as caretaker, affinity or proximity toward said patient, and ethical intent, and wherein a weightage is associated with each of said parameters such that a cumulative relational score is defined based on relational scores for each of said parameters weighted with said respective weightage scores."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The program storage device of claim 17 , wherein said method further comprises using said cumulative relational score to define or update criteria for scoring of subsequent patient related entities, and wherein a historical record of said relational scores of said patient related entities scored in said past being used to dynamically update said subsequent scoring of said patient related entities in real time."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said patient related entities include one or more of parents, guardians, kids, siblings, colleagues, teachers, caretakers, and doctors, each of them being scored differently for assigning said relational score."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said baseline for appropriateness further identifies a range with an upper limit of appropriateness and a lower limit of appropriateness, said method further comprising updating said range of appropriateness and said baseline dynamically based on an input from said clinical data repository and said patient information database, wherein said patient related entities are informed about said dynamic updates based on their relational score and said nature of association."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20130304508A1/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 128,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 114,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130304508A1/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 94,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/41/3b/24/0fd54fc012a083/US20130304508A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/13871107",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20130304508A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

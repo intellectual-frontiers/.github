@@ -1,0 +1,206 @@
+{
+ "number": "US10490304B2",
+ "kind": "granted patent",
+ "title": "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network",
+ "applicationNumber": "15372699",
+ "earlierPublication": "US20170091397A1",
+ "filedOn": "2016-12-08",
+ "publishedOn": "2017-03-30",
+ "grantedOn": "2019-11-26",
+ "priorityDate": "2012-01-26",
+ "status": "Patented Case",
+ "statusDate": "2019-11-06",
+ "estimatedExpiration": "2034-06-10",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3686",
+ "examiner": "HEIN, DEVIN C",
+ "classifications": [
+  "G16H 10/60",
+  "H04L 9/50",
+  "G06Q 10/40",
+  "H04L 9/3236",
+  "H04L 63/102",
+  "H04L 63/107",
+  "H04L 63/20",
+  "H04L2209/56"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/740,381",
+   "relation": "Continuation-In-Part",
+   "publication": "US20130197939A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13740381",
+  "61590914"
+ ],
+ "abstract": "A blockchain configured device-driven disintermediated distributed system for facilitating multi-faceted communication over a network. The system includes entities connected with a communications network. Each of the entities and associated devices and sensors and networks serve as a source of data records. The system includes a blockchain configured data bank accessible by each of the plurality of entities based on rules and preferences of the entities upon authorization by the blockchain configured data bank. The blockchain configured data bank includes a processing component for executing stored instructions to process the data records of the entities over the communications network. The system includes a blockchain configured component communicatively coupled to the blockchain configured data bank and adapted to be accessible by each of the plurality of entities. The system includes a validation device including a facial expression-based validation device and a geo-tagging-based validation device.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A blockchain validation system comprising: a plurality of computing systems connected with a social integrity network; a plurality of sub-systems of data records, said plurality of sub-systems comprising: a plurality of social aware networks; a plurality of sensors; a plurality of wearable devices, a plurality of scanners, wherein each of said plurality of social aware networks, plurality of sensors, plurality of wearable devices, and plurality of scanners serve as a provider of said data records; a blockchain configured data bank (BCDB) hosted on a server accessible by each of said plurality of computing systems based on rules and preferences of a plurality of entities upon authorization by said BCDB, wherein said plurality of entities subscribe with said BCDB to create, store, edit, manage or control said data records, said BCDB comprising: a computer processing component executing stored computer-implemented instructions to process said data records of said plurality of entities over said social integrity network, said data records obtained from said plurality of social aware networks, said plurality of sensors, said plurality of wearable devices, and said plurality of scanners associated with said entities; and a hardware repository coupled to said BCDB to store said data records of said plurality of entities collected from said plurality of social aware networks, said plurality of sensors, said plurality of wearable devices, and said plurality of scanners; a blockchain configured component communicatively coupled to said BCDB and adapted to be accessible by each of said plurality of computing systems such that said blockchain configured component enables social interaction among said entities by bypassing said BCDB, and communication with said BCDB over said social integrity network for data records transfer; and a plurality of blockchain configured social federation proxies communicatively coupled to said BCDB and said social integrity network and configured to retrieve said data records from said BCDB collected from said plurality of social aware networks, said plurality of sensors, said plurality of wearable devices, and said plurality of scanners, and distribute them to said plurality of social aware networks and said plurality of computing systems for display to said respective plurality of entities upon request and validation, wherein said plurality of blockchain configured social federation proxies comprise a virtualization layer to provide a distributed virtual access of storage of said data records retrieved from said BCDB and allow an indirect access of said plurality of entities to said BCDB, and wherein said plurality of blockchain configured social federation proxies comprise a processing device configured to manage and communicate said data records in a blockchain configured distributed framework; a blockchain validation device configured to receive digital inputs from said BCDB to identify access rules and execute blockchain validation mechanisms to authorize said plurality of entities to access said data records accessible from said blockchain configured component through said distributed plurality of blockchain configured social federation proxies linked to said BCDB simultaneously, wherein said blockchain validation device comprises: a face recognition device to process information received from respective facial expression sensors associated with said plurality of entities to verify identity of said plurality of entities based on respective facial expressions; and a geo-tagging device to obtain geographical coordinates from respective global position system (GPS)-based devices associated with said plurality of entities, tag said data records using geo-tags to establish a geographical identity with said data records, and validate identity of said plurality of entities and said respective data records based on geographical patterns; wherein said BCDB and said plurality of blockchain configured social federation proxies are further configured to: identify a source and a target, wherein said source identifies data records for sharing and said target identifies a computing system out of said plurality of computing systems as a recipient of said data records defined by said source, wherein said identification of at least one of said source and said target is dependent on: (a) a permission from an owner of said source; (b) an indication of an extent of sharing; (c) a nature and characteristic of said target; (d) a purpose of said sharing of said data records to said target; and (e) a timeframe for allowance of sharing of said data records, wherein said source and said target are determined based on (a) to (e) upon receipt of a request from said owner entity, and wherein said sharing of said data records with said target is limited to said timeframe; allow partial viewing of said data records corresponding to said source by said target based on (a) to (e); stop any viewing based on (a) to (e); select which parts to view based on (a) to (e); and determine or facilitate said owner entity of said data records to determine who has viewed said data records and accordingly redefine said (a) to (e) and also accordingly make a decision about said partial viewing of said data records corresponding to said source by said target based on (a) to (e) and stopping of any viewing or selecting which parts to view based on said redefined (a) to (e); wherein said blockchain configured component is configured to identify who has viewed said data records in real time and share information about who has viewed said data records with said owner in real time, such that said owner allows fully or partially or stops viewing of said data records by said target in real time."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , further comprising a digitized policy controller that is configured to generate an output based on said rules and preferences of said plurality of entities, upon receipt of a request to access said BCDB, said output used by said blockchain configured component to authorize and control access of said plurality of entities."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The blockchain validation system of claim 2 , further comprising a computerized report generator to generate said data records and computerized reports based on said generated data records from said hardware repository based on said request from said plurality of entities, wherein said computerized reports are approved by said digitized policy controller before sharing with said plurality of entities."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said blockchain configured component is configured to provide an interactive social user interface comprising a communication module to facilitate said plurality of entities to socially communicate with each other and with said BCDB through an active social communication network such that any of a social cloud and network platform is configured to communicate among said different entities and said BCDB and said plurality of blockchain configured social federation proxies."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said blockchain configured component further comprises a natural language and speech recognition module to facilitate said plurality of entities to actively interact with each other and with said BCDB through said plurality of blockchain configured social federation proxies using any of natural language and speech recognition."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said multi-faceted blockchain configured component further comprises a single computerized sign on module for a plurality of social network electronic applications, wherein said blockchain configured component is configured to integrate said plurality of entities with a plurality of social network electronic applications through said single computerized sign on module, and wherein said single computerized sign in module allows any of said plurality of entities to access said data records by signing in any of said plurality of social network electronic applications."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said target is allowed to view a ‘no objection’ segment of said data records without restriction within a defined time after initiation of viewing, and wherein said data records corresponding to said ‘no objection’ segment is further defined by said owner based on (a) to (e)."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said GPS-based devices are associated with said plurality of entities such that said GPS-based devices send signals to said blockchain configured validation device, and wherein said signals are indicative of geographical coordinates of a location where said data records originate."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said plurality of facial expression sensors are associated with said plurality of entities such that said plurality of facial expression sensors identify and sense a variety of facial expressions to generate electronic signals indicative of sensed facial expressions, and wherein said sensed facial expressions are communicated to said BCDB to be used by said face recognition device of said blockchain configured validation device to perform digital processing of said sensed facial expressions and verify an identity of said plurality of entities in accordance with predefined facial patterns."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said plurality of sensors comprise any of an environment sensor, a weather sensor, and a pollution sensor, and wherein said plurality of sensors extract contextual information indicative of a plurality of social determinants associated with said plurality of entities."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The blockchain validation system of claim 10 , wherein said plurality of scanners are communicatively and operatively connected with said plurality of computing systems to scan at least a portion of said data records and transfer said scanned data records into said plurality of blockchain configured social federation proxies and said BCDB."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The blockchain validation system of claim 1 , wherein said data records comprise a first portion that is standardized and defined in accordance with a template by said BCDB such that said first portion of said data records is on said plurality of said blockchain configured social federation proxies and said BCDB."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The blockchain validation system of claim 12 , wherein said data records comprise a second portion that is non-standardized and input in said BCDB in a non-standardized format such that said second portion of said data records are stored at an external storage location."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The blockchain validation system of claim 13 , wherein respective cross-references are maintained by said plurality of blockchain configured social federation proxies and said BCDB so that an access to said cross-references by said plurality of entities is redirected to said external storage location for viewing, accessing, and managing of said second portion of said data records."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10490304B2/sheet-00000.webp",
+   "label": "Sheet 1 of 12",
+   "width": 177,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00001.webp",
+   "label": "Sheet 2 of 12",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00002.webp",
+   "label": "Sheet 3 of 12",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00003.webp",
+   "label": "Sheet 4 of 12",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00004.webp",
+   "label": "Sheet 5 of 12",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00005.webp",
+   "label": "Sheet 6 of 12",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00006.webp",
+   "label": "Sheet 7 of 12",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00007.webp",
+   "label": "Sheet 8 of 12",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00008.webp",
+   "label": "Sheet 9 of 12",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00009.webp",
+   "label": "Sheet 10 of 12",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00010.webp",
+   "label": "Sheet 11 of 12",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10490304B2/sheet-00011.webp",
+   "label": "Sheet 12 of 12",
+   "width": 78,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/a8/35/54/39306527de8408/US10490304.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15372699",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10490304B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,171 @@
+{
+ "number": "US20130204641A1",
+ "kind": "published application",
+ "title": "Social Authentication For Accessing Health Records",
+ "applicationNumber": "13756433",
+ "earlierPublication": "",
+ "filedOn": "2013-01-31",
+ "publishedOn": "2013-08-08",
+ "grantedOn": "",
+ "priorityDate": "2012-02-02",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-05-16",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Netspactive Communications LLC",
+ "artUnit": "3686",
+ "examiner": "PATEL, NEHA",
+ "classifications": [
+  "G16H 10/60"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "61594216"
+ ],
+ "abstract": "A system for facilitating access to a Social Heath Record Database (SHRDB) through a social networking platform over a communications network. The system includes an information management platform including one or more database server and one or more social network server configured to implement information storage and retrieval functions within the SHRDB. The system further includes the SHRDB communicatively coupled to the information management platform. The system further includes a social networking engine communicatively coupled to the SHRDB through the social network server to allow interfacing of the SHRDB with the social networking service/platform. The system further includes a programmatic web interface configured as a single sign-on scheme to allow access of one or more repositories of the SHRDB.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for facilitating access to a Social Heath Record Database (SHRDB) through a social networking service or platform over a communications network, said system comprising: an information management platform including one or more database server and one or more social network server configured to implement information storage and retrieval functions within said SHRDB; said SHRDB communicatively coupled to said information management platform, wherein said SHRDB is coupled to: a processing component for executing instructions to process medical records over said communications network; one or more of a Social Health Record (SHR) repository, Health Information Exchange (HIE) repository, and a Virtual Medical Records (VMR) repository to store said medical records; a social networking engine communicatively coupled to said SHRDB through said social network server to allow interfacing of said SHRDB with said social networking service; a programmatic web interface configured as a single sign-on scheme to allow access of said one or more of said SHR repository, HIE repository, and said VMR repository of said SHRDB from one or more distinct social networking platforms using a credential associated with any of said one or more of said distinct social networking platforms, wherein said one or more of said SHR repository, HIE repository, and said VMR repository are each provided with a distinct application configured to be initiated upon access of said respective of said SHR repository, HIE repository, and a VMR repository allowing retrieval of medical records associated with said SHR repository, HIE repository, and said VMR repository."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said single sign-on scheme corresponding to a user includes a first credential associated with a first social networking platform, a second credential associated with a second social networking platform, and a third credential associated with a third social networking platform, wherein said user is allowed to access said one or more of said SHR repository, HIE repository, VMR repository using one of said first credential, second credential, and third credential from any of said first social networking platform, second networking platform, and said third networking platform."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said single sign-on scheme corresponding to a user is defined to associate a plurality of repositories of said SHRDB with a plurality of social networking platforms associated with said user such that said single sign-on scheme includes a first credential associated with a first social networking platform of said user, a second credential associated with a second social networking platform of said user, and a third credential associated with a third social networking platform of said user, wherein said user is allowed to access said SHR repository using said first credential from said first social networking platform, HIE repository using said second credential from said second social networking platform, and said VMR repository using said third credential from said third social networking platform."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said single sign-on scheme corresponding to a user is defined to associate a plurality of repositories of said SHRDB with a plurality of social networking platforms associated with said user such that said single sign-on scheme includes a first credential associated with a first social networking platform of said user, a second credential associated with a second social networking platform of said user, and a third credential associated with a third social networking platform of said user, wherein said user is allowed to access said SHR repository using said first credential from any of said first, second and third social networking platform, HIE repository using said second credential from any of said first, second, and third social networking platform, and said VMR repository using said third credential from any of said first, second, and third social networking platform."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said single sign-on scheme corresponding to a user is defined to associate a plurality of repositories of said SHRDB with a plurality of social networking platforms associated with said user such that said single sign-on scheme includes a first credential associated with a first social networking platform of said user, a second credential associated with a second social networking platform of said user, and a third credential associated with a third social networking platform of said user, wherein said user is allowed to access said SHR repository using said first, or second, or third credential from said first social networking platform, HIE repository using any of said first, second and third credential from said second social networking platform, and said VMR repository using any of said first, second, and third credential from said third social networking platform."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said single sign-on scheme corresponding to a user is defined to associate a plurality of repositories of said SHRDB with a plurality of social networking platforms associated with said user, said plurality of repositories including said SHR repository, HIE repository, and said VMR repository configured as virtual partitions within said SHRDB such that a single sign-on credential associated with said user is mapped by said social network server or said information management platform to allow access to said respective virtual partitions of said SHRDB."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein said single sign-on scheme corresponding to said user includes a first credential associated with a first social networking platform, a second credential associated with a second social networking platform, and a third credential associated with a third social networking platform, wherein said user is allowed to access said one or more of said virtual partitions-based repositories using one of said first credential, second credential, and third credential from any of said first social networking platform, second networking platform, and said third networking platform or directly from a dedicated interface corresponding to said one or more virtual partitions."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 6 , further comprising a virtual layer deployed to allocate storage resources across said virtual partitions of said plurality of repositories for storage of said medical records corresponding to said user."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a qualification unit operatively coupled to said SHRDB, database server and said social network server to allow said social network server and database server to provide access to said SHRDB by said one or more users based on stored details and defined policies."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said sign-on scheme is configured as a multi-domain single sign-on scheme such that a user credential associated with any of a plurality of distinct-web domain based social networking platform enables access to said SHRDB."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social networking platform includes a web interface including a tab such that said single sign-on scheme is triggered by activating an application through said tab manually by a user or automatically upon accessing said social networking platform."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A method for accessing a Social Health Record Data Bank (SHRDB) using a social networking platform, said method comprising: receiving a request from a user for accessing said SHRDB through a social networking platform; authenticating a single sign-on credential of said user associated with said social networking platform; retrieving medical records from said SHRDB as requested by said user, wherein retrieving of said medical records include at least one of sharing of said medical records either partially or fully to said user and allowing viewing of said medical records at least partially by said user."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , wherein said social networking platform is a first social networking platform, and said credential is a first credential associated with said first social networking platform, said method further comprises: receiving a second request from said user for accessing said SHRDB using a second credential such that at least one combination of: said first credential and said second credential, and said first social networking platform and said second social networking platform are different."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 13 , wherein said single sign-on credential allows access of said SHRDB by said user automatically upon accessing either of said first social networking platform using said first credential or said second social networking platform using said second credential."
+  },
+  {
+   "number": 15,
+   "independent": true,
+   "text": "A program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for accessing a social health record data bank (SHRDB) by a user, said method comprising: receiving a request from a user for accessing said SHRDB through a social networking platform; authenticating a single sign-on credential of said user associated with said social networking platform; retrieving medical records from said SHRDB as requested by said user, wherein retrieving of said medical records include at least one of sharing of said medical records either partially or fully to said user and allowing viewing of said medical records at least partially by said user."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The program storage device of claim 15 , wherein said social networking platform is a first social networking platform, and said credential is a first credential associated with said first social networking platform, said method further comprising: receiving a second request from said user for accessing said SHRDB using a second credential such that at least one combination of: said first credential and said second credential, and said first social networking platform and said second social networking platform are different."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said single sign-on scheme allows access of said SHRDB by said user automatically upon accessing either of said first social networking platform using said first credential or said second social networking platform using said second credential."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20130204641A1/sheet-00000.webp",
+   "label": "Sheet 1 of 6",
+   "width": 148,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130204641A1/sheet-00001.webp",
+   "label": "Sheet 2 of 6",
+   "width": 102,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130204641A1/sheet-00002.webp",
+   "label": "Sheet 3 of 6",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130204641A1/sheet-00003.webp",
+   "label": "Sheet 4 of 6",
+   "width": 107,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130204641A1/sheet-00004.webp",
+   "label": "Sheet 5 of 6",
+   "width": 67,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130204641A1/sheet-00005.webp",
+   "label": "Sheet 6 of 6",
+   "width": 84,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/6d/cb/b2/f1f4ee3ab61bfc/US20130204641A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/13756433",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20130204641A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

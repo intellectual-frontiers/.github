@@ -1,0 +1,195 @@
+{
+ "number": "US10984913B2",
+ "kind": "granted patent",
+ "title": "Blockchain System For Natural Language Processing",
+ "applicationNumber": "15389243",
+ "earlierPublication": "US20170103167A1",
+ "filedOn": "2016-12-22",
+ "publishedOn": "2017-04-13",
+ "grantedOn": "2021-04-20",
+ "priorityDate": "2012-04-27",
+ "status": "Patented Case",
+ "statusDate": "2021-03-31",
+ "estimatedExpiration": "2034-09-05",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3626",
+ "examiner": "BALAJ, ANTHONY MICHAEL",
+ "classifications": [
+  "G16H 50/20",
+  "G16H 10/60",
+  "G06F 16/951",
+  "G06F 40/40",
+  "G06Q 10/40",
+  "G06F 11/1464",
+  "G06F2201/80",
+  "G06F2201/84",
+  "G06Q 10/101"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/457,782",
+   "relation": "Continuation-In-Part",
+   "publication": "US20130290022A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13457782"
+ ],
+ "abstract": "A blockchain configured system includes a router and a blockchain configured record bank. The router collects data and converts it in a format in accordance with a defined standard. The blockchain configured record bank can include or be coupled to a data repository. The blockchain configured record bank can be configured to be coupled to the data provider through the router over a communication network. The blockchain configured record bank stores the data received from the data provider and can be accessible or searchable from within or outside the blockchain configured record bank. The blockchain configured record bank can be coupled to or include a data logging unit that maintains metadata associated with the data and configured to facilitate natural language processing capabilities. The router and the blockchain configured record bank may be coupled to machine learning system, metadata validation system, and master data validation system.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A blockchain configured geographically distributed architecture-based system connected over a communication network for transforming an unstructured or semi-structured dataset to a structured computerized dataset fora blockchain configured records database communicatively coupled to a plurality of blockchain configured content based routers receiving said unstructured or semi-structured dataset from a plurality of data provider computers in a blockchain-enabled network, said system comprising: a first proxy database, stored on a first tangible non-transitory computer readable medium and comprising a first special purpose processing device implemented on a first integrated circuit chip, configured to: create a backup of data associated with a first data provider computer, wherein said data associated with said first data provider computer is in a first digital format; and communicate with said first data provider computer for backing up said data associated with said first data provider computer, through a first proxy object, wherein said first proxy object comprises one or more references to said first proxy database to establish a connection between said first data provider computer and said first proxy database through one or more database drivers; a blockchain configured first content based router of said plurality of blockchain configured content based routers, comprising a second special purpose processing device implemented on a second integrated circuit chip, configured to: collect said data associated with said first data provider computer from said first proxy database; and convert said data associated with said first data provider computer to said structured computerized dataset in accordance with a standardized digital format of datasets associated with said blockchain configured records database, wherein said blockchain configured first content based router is physically located at a gateway associated with said first data provider computer providing a first digital data access point of said distributed blockchain configured records database to said first data provider computer; said blockchain configured records database stored on a third tangible non-transitory computer readable medium and comprising a third special purpose processing device implemented on a third integrated circuit chip to store and index said structured computerized dataset in said standardized digital format of datasets associated with said blockchain configured records database, and providing a plurality of distributed digital data access points including said first digital data access point communicatively connecting with said first data provider computer through said first digital data access point of said plurality of distributed digital data access points; a master data validation system communicatively and operatively coupled to said blockchain configured first content based router and said blockchain configured records database and including a master data repository to store master data instances in said standardized digital format of datasets associated with said blockchain configured records database on a tangible non-transitory memory device; and a metadata validation system that is different and separately located from said master data validation system and communicatively and operatively coupled to said blockchain configured first content based router, and said master data validation system, and configured to store linkable metadata layer objects in a metadata layer repository and digitally link said metadata layer objects by storing an identifier to a source content residing in said blockchain configured records database, wherein said blockchain configured first content based router is connected to a machine learning system contained within said blockchain configured records database, said machine learning system comprising: internal extensible taxonomies built in a computerized format based on said structured computerized dataset in said blockchain configured records database, said internal extensible taxonomies are defined through a computerized category profile wherein said computerized category profile includes digitally stored parent terms and digitally stored child terms and associated digital identifiers indicative of said respective digitally stored parent terms, digitally stored child terms and pointers indicating mutual connections in a hierarchical pattern, wherein said internal extensible taxonomies are automatically generated through machine learning over a period of time, and vs/herein said machine learning system receives inputs from said master data validation system and said metadata validation system to build said internal extensible taxonomies; external taxonomies pulled from external systems not connected with said blockchain configured records database directly and crawled by accessing said external systems with the use of a search engine-enabled crawler to merge with said internal extensible taxonomies digitally by mapping comparable terms in said external taxonomies with said category profile of said internal extensible taxonomies; a memory circuit to store said internal extensible taxonomies and said external taxonomies that are digitally merged with said internal extensible taxonomies; and a semantics learning appliance comprising a fourth special purpose processing device implemented on a fourth integrated circuit chip configured to perform mapping of said inflowing unstructured or semi-structured dataset with said structured computerized dataset already stored in said blockchain configured records database and said master data and said metadata; wherein a dedicated first local machine housed in a material frame is operatively and communicatively coupled to said first data provider computer and installed physically behind a firewall and communicatively connected with said remotely located blockchain configured records database to transmit said structured computerized dataset at least in part from said blockchain configured records database to said first data provider computer through a digital transmission channel based on access rights and upon identity verification of said first local machine by said blockchain configured records database, and wherein said first local machine comprises: a first agent device configured to gather browser, device, and network information associated with said data provider computer and transmit said gathered browser, device, and network information to said blockchain configured records database for identity verification to authorize accessing of at least a portion of said structured computerized dataset stored in said blockchain configured records database, and a first contextual sensor fitted proximate to said first data provider computer physically for gathering contextual information about said first data provider computer and transmitting said contextual information to said blockchain configured records database for further identity verification to authorize accessing of said at least a portion of said structured dataset stored in said blockchain configured records database, wherein said first contextual sensor comprises a Global Positioning System-based (GPS-based) device configured to sense geo-spatial information indicative of location coordinates and transmit said sensed geo-spatial information to said blockchain configured records database for verification of identity, of said first data provider computer."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said one or more database drivers comprising a Java Database Connectivity and Open Database Connectivity (JDBC-ODBC) Driver."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first blockchain configured content based router comprises an HL7 content based router that collects said data from said first proxy database."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said master data validation system further comprising: a master data validation interface configured as a role-based graphical user interface (GUI) to allow user access to said master data; a parameter store module to provide an adaptive extensible framework for unified master data across entire multiple data repositories associated with said blockchain configured records database and control information that specifies behavior of master data validation processes and data representation using a set of predefined rules and guidelines; an abstraction layer configured as an application programming interface (API) that enables other systems to access and manipulate said master data in a defined way; and a data integration appliance including specialized hardware and software components for computerized data extraction, transformation and ingestion into said master data repository."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said metadata validation system further comprising: a metadata layer repository configured to store linkable metadata layer objects; a metadata authentication and validation device to store rights policies that specify different access levels and restrictions for different users who attempt to access said metadata layer object; and a server to host components and support systems for enabling technological infrastructure of said metadata validation system."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said machine learning system further comprises machine learning models stored within said memory circuit for enabling interpretation of said unstructured and semi-structured dataset and its components by said mapping by said semantics learning appliance."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said machine learning models comprise one or more of a probabilistic model, semantic model, language cue models, statistical models, extrapolation models, mathematical models, and analytical models."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said search engine-enabled crawler is configured to fetch said external taxonomies or portions thereof into said machine learning system automatically, said search engine-enabled crawler including or be coupled to a search engine to run periodic searches to find relevant taxonomies externally for computerized contextual mapping, computerized categorizing, and computerized transformation of said unstructured or semi-structured dataset into said structured computerized dataset."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said master data validation system is configured to create a computerized unified view of enterprise data specifying each instance of a business element through digital identifiers."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said semantics learning appliance is further configured to: interpret machine learning models stored in said memory circuit; map, element-by-element and field-by-field, said inflowing unstructured or semi-structured dataset from said plurality of data provider computers with said structured computerized dataset already generated and structured by said machine learning system and stored in said blockchain configured records database to identify closest possible ‘fields’ and ‘elements’ from said structured computerized dataset stored in said blockchain configured records database that resemble said ‘fields’ and said ‘elements’ of said inflowing unstructured and semi-structured dataset; reference to metadata and master data stored in said metadata validation system and said master data validation system; and map said referenced data within said master data validation system and said metadata validation system with said inflowing unstructured or semi-structured dataset to identify closest possible ‘fields’ and ‘elements’ of said referenced data in-context that resemble said ‘fields’ and said ‘elements’ of said inflowing data."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said blockchain configured records database comprising a validation appliance configured to compare said browser, device, network, and contextual information transmitted by said first sensor and said first agent device with pre-stored identity information of said first data provider computer to verify said identity of said first data provider computer and allow access to said at least a portion of said structured computerized dataset upon verification through said first blockchain configured access point connected with said blockchain configured records database in a distributed facility."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising: a second proxy database, stored on a second tangible non-transitory computer readable medium and comprising a fifth special purpose processing device implemented on a fifth integrated circuit chip, configured to: create a backup of data associated with a second data provider computer, wherein said data associated with said second data provider computer is in a second digital format which is different from said first digital format; and communicate with said second data provider computer for backing up said data associated with said second data provider computer, through a second proxy object, wherein said second proxy object comprises a second reference to said second proxy database to establish a second connection between said second data provider computer and said second proxy database through a second database driver; and a blockchain configured second content based router comprising a fourth sixth special purpose processing device implemented on a sixth integrated circuit chip, configured to: collect said data associated with said second data provider computer from said second proxy database; and convert said data associated with said second data provider computer to said structured computerized dataset in accordance with said standardized digital format of datasets associated with said blockchain configured records database, wherein said blockchain configured second content based router is physically located at a gateway associated with said second data provider computer providing a second digital access point of said distributed blockchain configured records database to said second data provider computer."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said semantics learning appliance is further configured to: process rules and instructions stored in said memory circuit for language and text mapping of said inflowing unstructured or semi-structured dataset at digital fields and digital elements level, wherein said digital fields represent a digitally stored data header identifier in a computer-controlled data structure and said digital elements represent a plurality of digital data objects within said respective digital fields including pointers that connect said digital data objects to said respective digital fields; transform said inflowing unstructured or semi-structured dataset to said fully structured computerized dataset based on said mapping of said fields and said elements of said inflowing unstructured or semi-structured dataset with said computerized structured dataset already stored in said blockchain configured records database and said master data and said metadata; and utilize said internal extensible taxonomies and said external taxonomies to classify said inflowing unstructured or semi-structured dataset and store said inflowing unstructured or semi-structured dataset in relevant taxonomy classes in said blockchain configured records database after said transformation to said structured computerized dataset."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10984913B2/sheet-00000.webp",
+   "label": "Sheet 1 of 11",
+   "width": 199,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00001.webp",
+   "label": "Sheet 2 of 11",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00002.webp",
+   "label": "Sheet 3 of 11",
+   "width": 137,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00003.webp",
+   "label": "Sheet 4 of 11",
+   "width": 241,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00004.webp",
+   "label": "Sheet 5 of 11",
+   "width": 104,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00005.webp",
+   "label": "Sheet 6 of 11",
+   "width": 74,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00006.webp",
+   "label": "Sheet 7 of 11",
+   "width": 133,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00007.webp",
+   "label": "Sheet 8 of 11",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00008.webp",
+   "label": "Sheet 9 of 11",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00009.webp",
+   "label": "Sheet 10 of 11",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10984913B2/sheet-00010.webp",
+   "label": "Sheet 11 of 11",
+   "width": 83,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/0e/e3/2a/a4ec99d2900250/US10984913.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15389243",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10984913B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,166 @@
+{
+ "number": "US10963585B2",
+ "kind": "granted patent",
+ "title": "Self-Controlled Digital Authorization Over Communication Networks",
+ "applicationNumber": "15434942",
+ "earlierPublication": "US20170161517A1",
+ "filedOn": "2017-02-16",
+ "publishedOn": "2017-06-08",
+ "grantedOn": "2021-03-30",
+ "priorityDate": "2012-09-10",
+ "status": "Patented Case",
+ "statusDate": "2021-03-10",
+ "estimatedExpiration": "2035-02-17",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "FENSTERMACHER, JASON B",
+ "classifications": [
+  "G06F 21/6245",
+  "G16H 10/60",
+  "G06Q 40/08"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/607,997",
+   "relation": "Continuation-In-Part",
+   "publication": "US20140074638A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13607997"
+ ],
+ "abstract": "A system for authorizing an external device to access computerized records. The system includes a server. The server includes a computerized records data-store. The computerized records data-store stores multiple computer executable files associated with subjects. The system includes a communication network which facilitates communication between at least two of the subjects, the server, and the external device. The system includes a contextual authorization device for authorizing access to the external device for the computerized records. The contextual authorization device includes a database storing a set of custom rules. The contextual authorization device further includes a Global Positioning System-based tracking device, a credentialing engine, and a user behavior analytics engine. The contextual authorization device further includes an access module to process authorization of the external device for access of the computerized records.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for providing access authorization to an external device for access to computerized records of multiple types in a computerized records data store, the system comprising: a portable device; a communication terminal communicatively linking the portable device to the external device; a plurality of memory segments in the portable device and comprising a specified type of computerized records that have been authorized for access by the external device; a user interface on the portable device and comprising a plurality of single-click computer-executable menu options defined by a location type comprising particular levels of access to particular types of computerized records that allow authorizing access to the external device by selecting the location type for the external device; an access module in the portable device and comprising electronic circuits that execute computer logic instructions that authorizes that access to computerized records by the external device, wherein the electronic circuits of the access module receive a first signal comprising a geo-location associated with the external device, wherein the electronic circuits of the access module determine levels of access and types of computerized records in the computerized records data store that are allowed to be accessed by the external device, wherein the electronic circuits of the access module extract and place data structures comprising the computerized records that are allowed to be accessed by the external device in one or more of the plurality of memory segments for access by the external device, and wherein the electronic circuits of the access module execute computer logic instructions that authorize the external device to access the computerized records based on the geo-location associated with the external device; and an integrated circuit chip in the portable device and containing a processing component that executes computer logic instructions that create the computerized records in the plurality of memory segments, wherein the electronic circuits of the access module execute computer logic instructions that specifies the level of access and type of computerized records in the computerized records data store that are to be extracted and placed in the plurality of memory segments for access by the external device, wherein the processing component executes computer logic instructions that (i) extract the computerized records from the computerized records data store based upon authorization instructions from the electronic circuits of the access module, and (ii) store extracted computerized records in the plurality of memory segments, wherein the electronic circuits of the access module execute computer logic instructions that process the authorization using the geo-location of the external device in conjunction with custom computer-executable rules digitally dictating access rights and levels for the external device based on static information associated with the external device and based on dynamically changing contextual information stored in a database storing the custom computer-executable rules, wherein the electronic circuits of the access module execute computer logic instructions that process the authorization using the location type of the external device in conjunction with the custom computer-executable rules when the location type of the external device is selected by pressing at least one of the plurality of single-click computer-executable menu options, wherein the custom computer-executable rules define different rights for different location types based on the geo-location of the external device or as identified by selecting at least one of the plurality of single-click computer-executable menu options, wherein the different rights define either one of an outright denial or approval of access or limiting the access to the computerized records based on the location types, wherein the communication terminal provides a communication link through a near-field communication (NFC) or a WiFi communication protocol between the portable device and the external device when at least one of the plurality of single-click computer-executable menu options is selected, and wherein the electronic circuits of the access module execute computer logic instructions that authorize access of the computerized records based on the geo-location of the external device or based on the location type for the external device identified by selecting at least one of the plurality of single-click computer-executable menu options that grants access to authorized types of the computerized records."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of single-click computer-executable menu options comprise a single-click computer-executable menu option for a hospital terminal computer, a single-click computer-executable menu option for a pharmacy terminal computer, a single-click computer-executable menu option for a lab terminal computer such that each of the plurality of single-click computer-executable options are defined by respective location types associated with particular levels of access to particular types of computerized records as defined through associated geo-locations."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a Global Positioning System (GPS)-based tracking device operatively connected to the portable device, wherein the GPS-based tracking device tracks the geo-location of the external device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processing component executes computer logic instructions that transform the authorized computerized records into a digital data structure readable by a scanner communicatively connected with the external device."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the digital data structure comprises a QR (quick response) code readable by the scanner."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the integrated circuit chip comprises the plurality of memory segments, wherein the external device comprises a scanner, and wherein the scanner comprises a swipe machine reader that electronically reads the integrated circuit chip and executes computer-executable instructions that extract computerized records according to authorization by the access module."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10963585B2/sheet-00000.webp",
+   "label": "Sheet 1 of 13",
+   "width": 156,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00001.webp",
+   "label": "Sheet 2 of 13",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00002.webp",
+   "label": "Sheet 3 of 13",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00003.webp",
+   "label": "Sheet 4 of 13",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00004.webp",
+   "label": "Sheet 5 of 13",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00005.webp",
+   "label": "Sheet 6 of 13",
+   "width": 109,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00006.webp",
+   "label": "Sheet 7 of 13",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00007.webp",
+   "label": "Sheet 8 of 13",
+   "width": 107,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00008.webp",
+   "label": "Sheet 9 of 13",
+   "width": 169,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00009.webp",
+   "label": "Sheet 10 of 13",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00010.webp",
+   "label": "Sheet 11 of 13",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00011.webp",
+   "label": "Sheet 12 of 13",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10963585B2/sheet-00012.webp",
+   "label": "Sheet 13 of 13",
+   "width": 81,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/fa/68/4e/06f50719226ff1/US10963585.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15434942",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10963585B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

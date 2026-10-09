@@ -1,0 +1,191 @@
+{
+ "number": "US9418355B2",
+ "kind": "granted patent",
+ "title": "Crowdsourced Responses Management To Cases",
+ "applicationNumber": "14032368",
+ "earlierPublication": "US20150088884A1",
+ "filedOn": "2013-09-20",
+ "publishedOn": "2015-03-26",
+ "grantedOn": "2016-08-16",
+ "priorityDate": "2013-09-20",
+ "status": "Patented Case",
+ "statusDate": "2016-07-27",
+ "estimatedExpiration": "2035-04-14",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2168",
+ "examiner": "HOANG, KEN",
+ "classifications": [
+  "G06Q 10/10",
+  "G06Q 10/40"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A response management system and method configured to allow management of responses to a case submitted by an entity in a crowdsourced network. The system includes a processing circuit that receives, from the entity over the crowdsourced network, the case. The processing circuit federates the case, into a plurality of federated cases, based on one or more parameters. The processing circuit routes the federated cases to the crowd of respondents in the network. The processing circuit receives responses from the crowd for each of the federated cases. The processing circuit integrates responses for each of the federated cases to yield a single integrated response for the case. The processing circuit publishes the integrated response anonymously that is viewable publicly.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A response management system configured to allow management of responses to a case submitted by an entity in a crowdsourced network, said system comprising: a memory for storing information pertaining to said case submitted by said entity, respective responses for said case by a crowd of respondents in said crowdsourced network, and programmed instructions; a processing circuit configured to: receive, from said entity over said crowdsourced network, said case; federate said case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of said federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired, and wherein said level of reliability and trust is controlled by using a crowdsourcing index (CI) that is indicative of a crowd of respondents; route said federated cases to said crowd of respondents in said network such that said routing of said federated cases is managed based on said session parameters associated with each of said federated cases; receive responses from said crowd for each of said federated cases; associate information pertaining to said responses as second session parameters that is compared with said first session parameters such that said comparison yields a degree of compliance and appropriateness of said second session parameters toward said first session parameters, wherein, in response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with said one or more such federated cases; route said one or more such non-compliant federated cases to a second crowd of respondents in said network such that said routing of said cases is managed based on said third session parameters associated with each of said one or more federated cases; integrate responses for each of said federated cases to yield a single integrated response for said case; and publish said integrated response anonymously that is viewable publicly, wherein said processing circuit further comprises a complexity evaluation engine to evaluate a complexity of various portions of said case prior to federating said case into said federated cases based on said level of complexity of said portions, and wherein said complexity evaluation engine evaluates a complexity of said various portions of said case based on inputs from a plurality of crowdsourced persons; and a scoring and reviewing module to review and associate a score to said integrated response by crowdsourced experts such that said integrated response when published bears a rating indicative of said experts review and score."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit comprises a federation engine that federates said case into said plurality of federated cases based on said one or more parameters including said level of complexity, technology involved, and said level of reliability and trust."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit further comprises a session parameters mapping engine that is configured to: compare said first session parameters with said second session parameters; compare said second session parameters with said third session parameters; and generate a correlationship map between each of said first session parameters and said second session parameters, and said second session parameters and said third session parameters, wherein said correlationship map is indicative of said compliance."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit further comprises a session parameter adjustment engine to determine said adjusted third session parameters based on a comparison of said second session parameters with said first session parameters in view of said threshold level."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit further comprises an integration engine to integrate said responses for said federated cases corresponding to said case."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit further comprises a credentialing engine to assess credentialed expertise of said respondents, wherein said credentialed expertise in indicative of credibility of responses submitted by said respondents."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein said credentialed expertise for each of said respondents allows classification of said respondents into distinct groups, with each group tagged with a trust-relationship identifier indicative of a trust and reliability that each group guarantees based on respective credentialed expertise."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , wherein said trust-relationship identifier is further associated with an information pertaining to a relevant domain expertise such that said trust and reliability indicated by said trust-relationship identifier is guaranteed only in association with said relevant domain expertise."
+  },
+  {
+   "number": 9,
+   "independent": true,
+   "text": "A method for management of responses to cases submitted by an entity in a crowdsourced network, said method comprising: receiving, from said entity over said crowdsourced network, a case; evaluating a complexity of various portions of said case based on said level of complexity of said portions; evaluating a complexity of said various portions of said case based on inputs from a plurality of crowdsourced persons; federating said case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of said federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired; defining a crowdsourcing index (CI) that is indicative of a crowd of respondents, wherein said CI is defined based on desired reliability and trust in said integrated response; routing said federated cases to said crowd of respondents in said network such that said routing of said cases is managed based on said session parameters associated with each of said federated cases; receiving responses from said crowd for each of said federated cases; associating information pertaining to said responses as second session parameters that is compared with said first session parameters such that said comparison yields a degree of compliance and appropriateness of said second session parameters toward said first session parameters, wherein, in response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with said one or more such federated cases; routing said one or more such non-compliant federated cases to a second crowd of respondents in said network such that said routing of said cases is managed based on said third session parameters associated with each of said one or more federated cases; integrating responses for each of said federated cases to yield a single integrated response for said case corresponding to said federated cases; reviewing said single integrated response and associating a score to said single integrated response by crowdsourced experts such that said single integrated response when published bears a rating indicative of said experts review and score; and publishing said integrated response anonymously that is viewable publicly."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 9 , further comprising: comparing said first session parameters with said second session parameters; comparing said second session parameters with said third session parameters; and generating a correlationship map between each of said first session parameters and said second session parameters, and said second session parameters and said third session parameters, wherein said correlationship map is indicative of said compliance."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 9 , further comprising determining said adjusted third session parameters based on a comparison of said second session parameters with said first session parameters in view of said threshold level."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 9 , further comprising assessing credentialed expertise of said respondents, wherein said credentialed expertise is indicative of credibility of responses submitted by said respondents."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 9 , wherein said scoring and reviewing utilizes a crowdsourcing index (CI) that is indicative of a crowd of experts involved in review and scoring such that said CI and a response rating based on review and scoring bear a non-linear relationship with one another."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by said computer to perform a method for management of responses to cases submitted by an entity in a crowdsourced network, said method comprising: receiving, from said entity over said crowdsourced network, a case; evaluating a complexity of various portions of said case based on said level of complexity of said portions; evaluating a complexity of said various portions of said case based on inputs from a plurality of crowdsourced persons; federating said case, into a plurality of federated cases, based on one or more parameters including a level of complexity, technology involved, and a level of reliability and trust desired in its respective response, wherein each of said federated cases are associated with one or more corresponding session parameters that are indicative of a respective level of complexity, technology involved, a level of reliability and trust in response desired; defining a crowdsourcing index (CI) that is indicative of a crowd of respondents, wherein said CI is defined based on desired reliability and trust in said integrated response; routing said federated cases to said crowd of respondents in said network such that said routing of said cases is managed based on said session parameters associated with each of said federated cases; receiving responses from said crowd for each of said federated cases; associating information pertaining to said responses as second session parameters that is compared with said first session parameters such that said comparison yields a degree of compliance and appropriateness of said second session parameters toward said first session parameters, wherein, in response to a degree of compliance below a threshold for one or more federated cases, an adjusted set of third session parameters are associated with said one or more such federated cases; routing said one or more such non-compliant federated cases to a second crowd of respondents in said network such that said routing of said cases is managed based on said third session parameters associated with each of said one or more federated cases; integrating responses for each of said federated cases to yield a single integrated response for said case corresponding to said federated cases; reviewing said single integrated response and associating a score to said single integrated response by crowdsourced experts such that said single integrated response when published bears a rating indicative of said experts review and score; and publishing said integrated response anonymously that is viewable publicly."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US9418355B2/sheet-00000.webp",
+   "label": "Sheet 1 of 12",
+   "width": 146,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00001.webp",
+   "label": "Sheet 2 of 12",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00002.webp",
+   "label": "Sheet 3 of 12",
+   "width": 70,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00003.webp",
+   "label": "Sheet 4 of 12",
+   "width": 106,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00004.webp",
+   "label": "Sheet 5 of 12",
+   "width": 103,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00005.webp",
+   "label": "Sheet 6 of 12",
+   "width": 100,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00006.webp",
+   "label": "Sheet 7 of 12",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00007.webp",
+   "label": "Sheet 8 of 12",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00008.webp",
+   "label": "Sheet 9 of 12",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00009.webp",
+   "label": "Sheet 10 of 12",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00010.webp",
+   "label": "Sheet 11 of 12",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9418355B2/sheet-00011.webp",
+   "label": "Sheet 12 of 12",
+   "width": 95,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/91/ad/51/413b959e07c47e/US9418355.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14032368",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US9418355B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

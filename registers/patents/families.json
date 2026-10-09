@@ -1,0 +1,3117 @@
+{
+ "readAt": "2026-09-27",
+ "families": [
+  {
+   "slug": "computer-controlled-smart-referrals-system-and-method",
+   "title": "Computer-Controlled Smart Referrals System And Method",
+   "status": "Pending",
+   "earliestFilingDate": "2024-01-17",
+   "priorityApplicationNumber": "63622038",
+   "lastEventDate": "2026-09-17",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "G16H 20/00",
+    "G16H 30/20",
+    "G16H 50/30",
+    "G16H 30/40",
+    "G06F 21/602",
+    "G06F 21/6245"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20250157609A1"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "63622038",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2024-01-17",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2025-01-19",
+     "title": "Computer-Controlled Smart Referrals System And Marketplace",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/63622038"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "19026240",
+     "artUnit": "3685",
+     "classifications": [
+      "G16H 20/00",
+      "G16H 30/20",
+      "G16H 50/30",
+      "G16H 30/40",
+      "G06F 21/602",
+      "G06F 21/6245"
+     ],
+     "documentUrl": "",
+     "examiner": "PATEL, SHERYL GOPAL",
+     "filedOn": "2025-01-16",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "63622038"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20250157609A1",
+     "publishedOn": "2025-05-15",
+     "status": "Final Rejection Mailed",
+     "statusDate": "2026-09-17",
+     "title": "Computer-Controlled Smart Referrals System And Method",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/19026240"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "digital-native-trials-management-system",
+   "title": "Digital Native Trials Management System",
+   "status": "Pending",
+   "earliestFilingDate": "2024-12-11",
+   "priorityApplicationNumber": "18977822",
+   "lastEventDate": "2026-08-27",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "G16H 10/20",
+    "G16H 40/67",
+    "G06Q 10/06315"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20250111908A1"
+   ],
+   "filings": [
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18977822",
+     "artUnit": "3685",
+     "classifications": [
+      "G16H 10/20",
+      "G16H 40/67",
+      "G06Q 10/06315"
+     ],
+     "documentUrl": "",
+     "examiner": "BURGESS, JOSEPH D",
+     "filedOn": "2024-12-11",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20250111908A1",
+     "publishedOn": "2025-04-03",
+     "status": "Final Rejection Mailed",
+     "statusDate": "2026-08-27",
+     "title": "Digital Native Trials Management System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18977822"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-controlled-marketplace-network-for-digital-transactions",
+   "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+   "status": "Granted",
+   "earliestFilingDate": "2019-04-25",
+   "priorityApplicationNumber": "62838473",
+   "lastEventDate": "2026-07-28",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "G06Q 40/04",
+    "H04L 9/50",
+    "G06Q 30/0605",
+    "G06Q2220/00",
+    "H04L 9/0643",
+    "H04L 9/3213",
+    "H04L 9/3239",
+    "H04L 63/062",
+    "H04L 63/067",
+    "H04L 63/0823",
+    "H04L2209/56",
+    "H04W 4/14"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11880882B2",
+    "US12437338B2",
+    "US12688531B2",
+    "US12694451B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "62838473",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2019-04-25",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2020-04-26",
+     "title": "Computer-Controlled Marketplace Network",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/62838473"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16854872",
+     "artUnit": "3685",
+     "classifications": [
+      "G06Q 40/04",
+      "H04L 9/50",
+      "G06Q 30/0605",
+      "G06Q2220/00",
+      "H04L 9/0643",
+      "H04L 9/3213",
+      "H04L 9/3239",
+      "H04L 63/062",
+      "H04L 63/067",
+      "H04L 63/0823",
+      "H04L2209/56",
+      "H04W 4/14"
+     ],
+     "documentUrl": "",
+     "examiner": "ALI, JAHED",
+     "filedOn": "2020-04-21",
+     "grantedOn": "2024-01-23",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "62838473"
+     ],
+     "patentNumber": "US11880882",
+     "publicationNumber": "US20200250719A1",
+     "publishedOn": "2020-08-06",
+     "status": "Patented Case",
+     "statusDate": "2024-01-03",
+     "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16854872"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18372652",
+     "artUnit": "3699",
+     "classifications": [
+      "G06Q 40/04",
+      "H04L 9/50",
+      "G06Q 30/0605",
+      "G06Q2220/00",
+      "H04L 9/0643",
+      "H04L 9/3213",
+      "H04L 9/3239",
+      "H04L 63/062",
+      "H04L 63/067",
+      "H04L 63/0823",
+      "H04L2209/56",
+      "H04W 4/14"
+     ],
+     "documentUrl": "",
+     "examiner": "ALI, JAHED",
+     "filedOn": "2023-09-25",
+     "grantedOn": "2025-10-07",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16854872",
+      "62838473"
+     ],
+     "patentNumber": "US12437338",
+     "publicationNumber": "US20240062291A1",
+     "publishedOn": "2024-02-22",
+     "status": "Patented Case",
+     "statusDate": "2025-09-24",
+     "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18372652"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18372640",
+     "artUnit": "3699",
+     "classifications": [
+      "G06Q 40/04",
+      "H04L 9/50",
+      "G06Q 30/0605",
+      "G06Q2220/00",
+      "H04L 9/0643",
+      "H04L 9/3213",
+      "H04L 9/3239",
+      "H04L 63/062",
+      "H04L 63/067",
+      "H04L 63/0823",
+      "H04L2209/56",
+      "H04W 4/14"
+     ],
+     "documentUrl": "",
+     "examiner": "ALI, JAHED",
+     "filedOn": "2023-09-25",
+     "grantedOn": "2026-07-21",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16854872",
+      "62838473"
+     ],
+     "patentNumber": "US12688531",
+     "publicationNumber": "US20240062290A1",
+     "publishedOn": "2024-02-22",
+     "status": "Patented Case",
+     "statusDate": "2026-07-08",
+     "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18372640"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "19303350",
+     "artUnit": "3699",
+     "classifications": [
+      "G06Q 40/04",
+      "H04L 9/50",
+      "G06Q 30/0605",
+      "G06Q2220/00",
+      "H04L 9/0643",
+      "H04L 9/3213",
+      "H04L 9/3239",
+      "H04L 63/062",
+      "H04L 63/067",
+      "H04L 63/0823",
+      "H04L2209/56",
+      "H04W 4/14"
+     ],
+     "documentUrl": "",
+     "examiner": "ALI, JAHED",
+     "filedOn": "2025-08-18",
+     "grantedOn": "2026-07-28",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "18372652",
+      "16854872",
+      "62838473"
+     ],
+     "patentNumber": "US12694451",
+     "publicationNumber": "US20260004347A1",
+     "publishedOn": "2026-01-01",
+     "status": "Patented Case",
+     "statusDate": "2026-07-15",
+     "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/19303350"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "collaborative-continuous-and-comprehensive-risk-management-system",
+   "title": "Collaborative, Continuous, And Comprehensive Risk Management System",
+   "status": "Pending",
+   "earliestFilingDate": "2024-11-27",
+   "priorityApplicationNumber": "18963451",
+   "lastEventDate": "2026-07-17",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "G16H 50/30",
+    "G16H 10/60"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20250095861A1"
+   ],
+   "filings": [
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18963451",
+     "artUnit": "3681",
+     "classifications": [
+      "G16H 50/30",
+      "G16H 10/60"
+     ],
+     "documentUrl": "",
+     "examiner": "NEWTON, CHAD A",
+     "filedOn": "2024-11-27",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20250095861A1",
+     "publishedOn": "2025-03-20",
+     "status": "Response to Non-Final Office Action Entered and Forwarded to Examiner",
+     "statusDate": "2026-07-17",
+     "title": "Collaborative, Continuous, And Comprehensive Risk Management System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18963451"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "team-based-tele-diagnostics-blockchain-enabled-system",
+   "title": "Team-Based Tele-Diagnostics Blockchain-Enabled System",
+   "status": "Granted",
+   "earliestFilingDate": "2018-10-16",
+   "priorityApplicationNumber": "16161846",
+   "lastEventDate": "2026-06-16",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 10/60",
+    "G16H 40/67",
+    "G16H 50/20",
+    "G06F 16/27",
+    "G06F 16/1824",
+    "H04L 9/50",
+    "H04L 9/0643",
+    "H04L 9/3236",
+    "H04L 9/3297",
+    "H04L2209/00"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11769573B2",
+    "US12658290B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16161846",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60",
+      "G16H 40/67",
+      "G16H 50/20",
+      "G06F 16/27",
+      "G06F 16/1824",
+      "H04L 9/50",
+      "H04L 9/0643",
+      "H04L 9/3236",
+      "H04L 9/3297",
+      "H04L2209/00"
+     ],
+     "documentUrl": "",
+     "examiner": "COVINGTON, AMANDA R",
+     "filedOn": "2018-10-16",
+     "grantedOn": "2023-09-26",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US11769573",
+     "publicationNumber": "US20190051390A1",
+     "publishedOn": "2019-02-14",
+     "status": "Patented Case",
+     "statusDate": "2023-09-06",
+     "title": "Team-Based Tele-Diagnostics Blockchain-Enabled System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16161846"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "18232314",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60",
+      "G16H 40/67",
+      "G16H 50/20",
+      "G06F 16/27",
+      "G06F 16/1824",
+      "H04L 9/50",
+      "H04L 9/0643",
+      "H04L 9/3236",
+      "H04L 9/3297",
+      "H04L2209/00"
+     ],
+     "documentUrl": "",
+     "examiner": "COVINGTON, AMANDA R",
+     "filedOn": "2023-08-09",
+     "grantedOn": "2026-06-16",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16161846"
+     ],
+     "patentNumber": "US12658290",
+     "publicationNumber": "US20240006038A1",
+     "publishedOn": "2024-01-04",
+     "status": "Patented Case",
+     "statusDate": "2026-06-03",
+     "title": "Team-Based Tele-Diagnostics Blockchain-Enabled System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18232314"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "system-for-management-of-rewardable-computer-controlled-content-blocks-delivery-and-consum",
+   "title": "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption",
+   "status": "Granted",
+   "earliestFilingDate": "2021-01-14",
+   "priorityApplicationNumber": "17149482",
+   "lastEventDate": "2026-06-09",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "H04L 9/0643",
+    "H04L 9/3239",
+    "G06N 20/00",
+    "G06V 40/174",
+    "G06V 40/193",
+    "H04L 9/50",
+    "G06F 3/013",
+    "G06Q 20/123",
+    "G06Q 20/3678",
+    "G06Q 30/0218",
+    "G09B 5/00",
+    "G09B 5/12"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US12155747B2",
+    "US12652158B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "17149482",
+     "artUnit": "3621",
+     "classifications": [
+      "H04L 9/0643",
+      "H04L 9/3239",
+      "G06N 20/00",
+      "G06V 40/174",
+      "G06V 40/193",
+      "H04L 9/50",
+      "G06F 3/013",
+      "G06Q 20/123",
+      "G06Q 20/3678",
+      "G06Q 30/0218",
+      "G09B 5/00",
+      "G09B 5/12",
+      "G09B 7/02",
+      "H04L 9/3263",
+      "H04L2209/56"
+     ],
+     "documentUrl": "",
+     "examiner": "STROUD, CHRISTOPHER",
+     "filedOn": "2021-01-14",
+     "grantedOn": "2024-11-26",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US12155747",
+     "publicationNumber": "US20210143982A1",
+     "publishedOn": "2021-05-13",
+     "status": "Patented Case",
+     "statusDate": "2024-11-06",
+     "title": "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/17149482"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18822384",
+     "artUnit": "3621",
+     "classifications": [
+      "H04L 9/0643",
+      "H04L 9/3239",
+      "G06N 20/00",
+      "G06V 40/174",
+      "G06V 40/193",
+      "H04L 9/50",
+      "G06F 3/013",
+      "G06Q 20/123",
+      "G06Q 20/3678",
+      "G06Q 30/0218",
+      "G09B 5/00",
+      "G09B 5/12",
+      "G09B 7/02",
+      "H04L 9/3263",
+      "H04L2209/56"
+     ],
+     "documentUrl": "",
+     "examiner": "STROUD, CHRISTOPHER",
+     "filedOn": "2024-09-02",
+     "grantedOn": "2026-06-09",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "17149482"
+     ],
+     "patentNumber": "US12652158",
+     "publicationNumber": "US20240421978A1",
+     "publishedOn": "2024-12-19",
+     "status": "Patented Case",
+     "statusDate": "2026-05-27",
+     "title": "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18822384"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-controlled-precision-education-and-training",
+   "title": "Computer-Controlled Precision Education And Training",
+   "status": "Granted",
+   "earliestFilingDate": "2019-12-12",
+   "priorityApplicationNumber": "16712213",
+   "lastEventDate": "2026-03-10",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 10/063114",
+    "G06Q 50/205",
+    "G06F 16/27",
+    "G06N 20/00",
+    "G06Q 10/06334",
+    "G01S 19/13",
+    "G06Q 10/063112",
+    "G06Q 10/0633",
+    "G09B 5/125",
+    "G09B 19/00",
+    "G09B 19/003",
+    "H04L 65/60"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11423500B2",
+    "US11651459B2",
+    "US12572993B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16712213",
+     "artUnit": "2441",
+     "classifications": [
+      "G06Q 10/063114",
+      "G06Q 50/205",
+      "G06F 16/27",
+      "G06N 20/00",
+      "G06Q 10/06334",
+      "G01S 19/13",
+      "G06Q 10/063112",
+      "G06Q 10/0633",
+      "G09B 5/125",
+      "G09B 19/00",
+      "G09B 19/003",
+      "H04L 65/60"
+     ],
+     "documentUrl": "",
+     "examiner": "NG, BILLY H",
+     "filedOn": "2019-12-12",
+     "grantedOn": "2022-08-23",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US11423500",
+     "publicationNumber": "US20200151839A1",
+     "publishedOn": "2020-05-14",
+     "status": "Patented Case",
+     "statusDate": "2022-08-03",
+     "title": "Computer-Controlled Precision Education And Training",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16712213"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "17865173",
+     "artUnit": "2441",
+     "classifications": [
+      "G06Q 10/063114",
+      "G06Q 50/205",
+      "G06F 16/27",
+      "G06N 20/00",
+      "G06Q 10/06334",
+      "G01S 19/13",
+      "G06Q 10/063112",
+      "G06Q 10/0633",
+      "G09B 5/125",
+      "G09B 19/00",
+      "G09B 19/003",
+      "H04L 65/60"
+     ],
+     "documentUrl": "",
+     "examiner": "NG, BILLY H",
+     "filedOn": "2022-07-14",
+     "grantedOn": "2023-05-16",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16712213"
+     ],
+     "patentNumber": "US11651459",
+     "publicationNumber": "US20220351316A1",
+     "publishedOn": "2022-11-03",
+     "status": "Patented Case",
+     "statusDate": "2023-04-26",
+     "title": "Computer-Controlled Precision Education And Training",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/17865173"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "18131648",
+     "artUnit": "3625",
+     "classifications": [
+      "G06Q 10/063114",
+      "G06Q 50/205",
+      "G06F 16/27",
+      "G06N 20/00",
+      "G06Q 10/06334",
+      "G01S 19/13",
+      "G06Q 10/063112",
+      "G06Q 10/0633",
+      "G09B 5/125",
+      "G09B 19/00",
+      "G09B 19/003",
+      "H04L 65/60"
+     ],
+     "documentUrl": "",
+     "examiner": "SINGH, GURKANWALJIT",
+     "filedOn": "2023-04-06",
+     "grantedOn": "2026-03-10",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "17865173",
+      "16712213"
+     ],
+     "patentNumber": "US12572993",
+     "publicationNumber": "US20230245255A1",
+     "publishedOn": "2023-08-03",
+     "status": "Patented Case",
+     "statusDate": "2026-02-25",
+     "title": "Computer-Controlled Precision Education And Training",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18131648"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "integration-of-devices-through-a-social-networking-platform",
+   "title": "Integration Of Devices Through A Social Networking Platform",
+   "status": "Granted",
+   "earliestFilingDate": "2012-12-12",
+   "priorityApplicationNumber": "61736119",
+   "lastEventDate": "2025-08-26",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "H04L 51/52",
+    "H04L 67/306",
+    "G16H 40/67",
+    "H04W 4/80",
+    "H04B 5/20",
+    "H04L 63/102",
+    "H04L 67/303",
+    "H04L 41/0663",
+    "H04B 5/72",
+    "H04L 63/1433",
+    "H04L 67/02"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US9525753B2",
+    "US10320735B2",
+    "US11044221B2",
+    "US11777894B2",
+    "US12401615B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61736119",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2012-12-12",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2013-12-15",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61736119"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "14103098",
+     "artUnit": "2454",
+     "classifications": [
+      "H04L 51/52",
+      "H04L 67/306",
+      "G16H 40/67",
+      "H04W 4/80",
+      "H04B 5/20",
+      "H04L 63/102",
+      "H04L 67/303",
+      "H04L 41/0663",
+      "H04B 5/72",
+      "H04L 63/1433",
+      "H04L 67/02"
+     ],
+     "documentUrl": "",
+     "examiner": "SPRINGER, JAMES E",
+     "filedOn": "2013-12-11",
+     "grantedOn": "2016-12-20",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "61736119"
+     ],
+     "patentNumber": "US9525753",
+     "publicationNumber": "US20140164519A1",
+     "publishedOn": "2014-06-12",
+     "status": "Patented Case",
+     "statusDate": "2016-11-30",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14103098"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15275463",
+     "artUnit": "2454",
+     "classifications": [
+      "H04L 51/52",
+      "H04W 4/80",
+      "H04B 5/20",
+      "H04L 41/0663",
+      "H04L 63/102",
+      "H04L 67/303",
+      "H04L 67/306"
+     ],
+     "documentUrl": "",
+     "examiner": "SPRINGER, JAMES E",
+     "filedOn": "2016-09-25",
+     "grantedOn": "2019-06-11",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "14103098",
+      "61736119"
+     ],
+     "patentNumber": "US10320735",
+     "publicationNumber": "US20170012929A1",
+     "publishedOn": "2017-01-12",
+     "status": "Patented Case",
+     "statusDate": "2019-05-22",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15275463"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16381772",
+     "artUnit": "2454",
+     "classifications": [
+      "H04L 51/52",
+      "H04W 4/80",
+      "H04B 5/20",
+      "H04L 41/0663",
+      "H04L 63/102",
+      "H04L 67/303",
+      "H04L 67/306"
+     ],
+     "documentUrl": "",
+     "examiner": "SPRINGER, JAMES E",
+     "filedOn": "2019-04-11",
+     "grantedOn": "2021-06-22",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "15275463",
+      "14103098",
+      "61736119"
+     ],
+     "patentNumber": "US11044221",
+     "publicationNumber": "US20190245825A1",
+     "publishedOn": "2019-08-08",
+     "status": "Patented Case",
+     "statusDate": "2021-06-02",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16381772"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "17327694",
+     "artUnit": "2454",
+     "classifications": [
+      "H04L 51/52",
+      "H04L 67/306",
+      "G16H 40/67",
+      "H04W 4/80",
+      "H04B 5/20",
+      "H04B 5/72",
+      "H04L 63/102",
+      "H04L 63/1433",
+      "H04L 67/02",
+      "H04L 67/303",
+      "H04L 41/0663"
+     ],
+     "documentUrl": "",
+     "examiner": "SPRINGER, JAMES E",
+     "filedOn": "2021-05-22",
+     "grantedOn": "2023-10-03",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16381772",
+      "15275463",
+      "14103098",
+      "61736119"
+     ],
+     "patentNumber": "US11777894",
+     "publicationNumber": "US20210281535A1",
+     "publishedOn": "2021-09-09",
+     "status": "Patented Case",
+     "statusDate": "2023-09-13",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/17327694"
+    },
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "18235327",
+     "artUnit": "2455",
+     "classifications": [
+      "H04L 51/52",
+      "H04L 67/306",
+      "G16H 40/67",
+      "H04W 4/80",
+      "H04B 5/20",
+      "H04B 5/72",
+      "H04L 63/102",
+      "H04L 63/1433",
+      "H04L 67/02",
+      "H04L 67/303",
+      "H04L 41/0663"
+     ],
+     "documentUrl": "",
+     "examiner": "LAZARO, DAVID R",
+     "filedOn": "2023-08-17",
+     "grantedOn": "2025-08-26",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "17327694",
+      "16381772",
+      "15275463",
+      "14103098",
+      "61736119"
+     ],
+     "patentNumber": "US12401615",
+     "publicationNumber": "US20240015129A1",
+     "publishedOn": "2024-01-11",
+     "status": "Patented Case",
+     "statusDate": "2025-08-13",
+     "title": "Integration Of Devices Through A Social Networking Platform",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/18235327"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "autonomous-orchestration-system-for-decision-lifecycle-management-with-integrated-traceabi",
+   "title": "Autonomous Orchestration System For Decision Lifecycle Management With Integrated Traceability",
+   "status": "Pending",
+   "earliestFilingDate": "2025-03-17",
+   "priorityApplicationNumber": "19081752",
+   "lastEventDate": "2025-07-03",
+   "applicant": "Intellectual Frontiers LLC",
+   "classifications": [
+    "G06N 5/043",
+    "G06N 20/00"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20250217680A1"
+   ],
+   "filings": [
+    {
+     "applicant": "Intellectual Frontiers LLC",
+     "applicationNumber": "19081752",
+     "artUnit": "OPAP",
+     "classifications": [
+      "G06N 5/043",
+      "G06N 20/00"
+     ],
+     "documentUrl": "",
+     "examiner": "CENTRAL, DOCKET",
+     "filedOn": "2025-03-17",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20250217680A1",
+     "publishedOn": "2025-07-03",
+     "status": "Docketed New Case - Ready for Examination",
+     "statusDate": "2025-04-03",
+     "title": "Autonomous Orchestration System For Decision Lifecycle Management With Integrated Traceability",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/19081752"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-executable-and-traceable-metric-queues-system",
+   "title": "Computer-Executable And Traceable Metric Queues System",
+   "status": "Granted",
+   "earliestFilingDate": "2019-10-30",
+   "priorityApplicationNumber": "16669496",
+   "lastEventDate": "2024-01-30",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "H04L 43/12",
+    "G06F 16/285",
+    "G06F 16/212",
+    "G06F 16/2365",
+    "G06F 16/2474",
+    "G06F 16/248",
+    "G01S 19/13",
+    "H04L 41/145",
+    "H04L 41/5009",
+    "H04L 43/08",
+    "H04L 43/106",
+    "H04L 47/82"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11388077B2",
+    "US11888597B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16669496",
+     "artUnit": "2458",
+     "classifications": [
+      "H04L 43/12",
+      "G06F 16/285",
+      "G06F 16/212",
+      "G06F 16/2365",
+      "G06F 16/2474",
+      "G06F 16/248",
+      "G01S 19/13",
+      "H04L 41/145",
+      "H04L 41/5009",
+      "H04L 43/08",
+      "H04L 43/106",
+      "H04L 47/82"
+     ],
+     "documentUrl": "",
+     "examiner": "KIM, DAE Y",
+     "filedOn": "2019-10-30",
+     "grantedOn": "2022-07-12",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US11388077",
+     "publicationNumber": "US20200067811A1",
+     "publishedOn": "2020-02-27",
+     "status": "Patented Case",
+     "statusDate": "2022-06-22",
+     "title": "Computer-Executable And Traceable Metric Queues System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16669496"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "17838198",
+     "artUnit": "2458",
+     "classifications": [
+      "H04L 43/12",
+      "G06F 16/285",
+      "G06F 16/212",
+      "G06F 16/2365",
+      "G06F 16/2474",
+      "G06F 16/248",
+      "G01S 19/13",
+      "H04L 43/08",
+      "H04L 43/106",
+      "H04L 47/82"
+     ],
+     "documentUrl": "",
+     "examiner": "KIM, DAE Y",
+     "filedOn": "2022-06-11",
+     "grantedOn": "2024-01-30",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16669496"
+     ],
+     "patentNumber": "US11888597",
+     "publicationNumber": "US20220329509A1",
+     "publishedOn": "2022-10-13",
+     "status": "Patented Case",
+     "statusDate": "2024-01-10",
+     "title": "Computer-Executable And Traceable Metric Queues System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/17838198"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "self-controlled-digital-authorization-over-communication-networks",
+   "title": "Self-Controlled Digital Authorization Over Communication Networks",
+   "status": "Granted",
+   "earliestFilingDate": "2012-09-10",
+   "priorityApplicationNumber": "13607997",
+   "lastEventDate": "2024-01-16",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06F 21/6245",
+    "G16H 10/60",
+    "G06Q 40/08"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20140074638A1",
+    "US10963585B2",
+    "US11874949B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "13607997",
+     "artUnit": "3685",
+     "classifications": [
+      "G06F 21/6245",
+      "G16H 10/60"
+     ],
+     "documentUrl": "",
+     "examiner": "LEFFALL-ALLEN, NAKIA",
+     "filedOn": "2012-09-10",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20140074638A1",
+     "publishedOn": "2014-03-13",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-05-30",
+     "title": "Consumer Self-Authorization For Electronic Records",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13607997"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15434942",
+     "artUnit": "3685",
+     "classifications": [
+      "G06F 21/6245",
+      "G16H 10/60",
+      "G06Q 40/08"
+     ],
+     "documentUrl": "",
+     "examiner": "FENSTERMACHER, JASON B",
+     "filedOn": "2017-02-16",
+     "grantedOn": "2021-03-30",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "13607997"
+     ],
+     "patentNumber": "US10963585",
+     "publicationNumber": "US20170161517A1",
+     "publishedOn": "2017-06-08",
+     "status": "Patented Case",
+     "statusDate": "2021-03-10",
+     "title": "Self-Controlled Digital Authorization Over Communication Networks",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15434942"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "17184255",
+     "artUnit": "3685",
+     "classifications": [
+      "G06F 21/6245",
+      "G16H 10/60",
+      "G06Q 40/08"
+     ],
+     "documentUrl": "",
+     "examiner": "FENSTERMACHER, JASON B",
+     "filedOn": "2021-02-24",
+     "grantedOn": "2024-01-16",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "15434942",
+      "13607997"
+     ],
+     "patentNumber": "US11874949",
+     "publicationNumber": "US20210182425A1",
+     "publishedOn": "2021-06-17",
+     "status": "Patented Case",
+     "statusDate": "2023-12-27",
+     "title": "Self-Controlled Digital Authorization Over Communication Networks",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/17184255"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "digital-payment-system",
+   "title": "Digital Payment System",
+   "status": "Granted",
+   "earliestFilingDate": "2019-02-24",
+   "priorityApplicationNumber": "16283802",
+   "lastEventDate": "2023-01-31",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 20/40",
+    "G06Q 20/02",
+    "G06Q 20/0855",
+    "G06Q 40/00"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US10643208B2",
+    "US11568401B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16283802",
+     "artUnit": "3697",
+     "classifications": [
+      "G06Q 20/40",
+      "G06Q 20/02",
+      "G06Q 20/0855",
+      "G06Q 40/00"
+     ],
+     "documentUrl": "",
+     "examiner": "LIU, I JUNG",
+     "filedOn": "2019-02-24",
+     "grantedOn": "2020-05-05",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US10643208",
+     "publicationNumber": "US20190188708A1",
+     "publishedOn": "2019-06-20",
+     "status": "Patented Case",
+     "statusDate": "2020-04-15",
+     "title": "Digital Payment System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16283802"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16835289",
+     "artUnit": "3697",
+     "classifications": [
+      "G06Q 20/02",
+      "G06Q 20/40",
+      "G06Q 20/0855",
+      "G06Q 40/00"
+     ],
+     "documentUrl": "",
+     "examiner": "LIU, I JUNG",
+     "filedOn": "2020-03-30",
+     "grantedOn": "2023-01-31",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "16283802"
+     ],
+     "patentNumber": "US11568401",
+     "publicationNumber": "US20200226595A1",
+     "publishedOn": "2020-07-16",
+     "status": "Patented Case",
+     "statusDate": "2023-01-11",
+     "title": "Digital Payment System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16835289"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-controlled-metrics-and-task-lists-management",
+   "title": "Computer-Controlled Metrics And Task Lists Management",
+   "status": "Granted",
+   "earliestFilingDate": "2020-11-18",
+   "priorityApplicationNumber": "16952063",
+   "lastEventDate": "2023-01-24",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06F 11/366",
+    "G06F 11/2263",
+    "G06F 11/079",
+    "G06F 11/0793"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11561884B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16952063",
+     "artUnit": "2113",
+     "classifications": [
+      "G06F 11/366",
+      "G06F 11/2263",
+      "G06F 11/079",
+      "G06F 11/0793"
+     ],
+     "documentUrl": "",
+     "examiner": "GIBSON, JONATHAN D",
+     "filedOn": "2020-11-18",
+     "grantedOn": "2023-01-24",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US11561884",
+     "publicationNumber": "US20210073105A1",
+     "publishedOn": "2021-03-11",
+     "status": "Patented Case",
+     "statusDate": "2023-01-04",
+     "title": "Computer-Controlled Metrics And Task Lists Management",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16952063"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "blockchain-enabled-service-delivery-evidence-system",
+   "title": "Blockchain-Enabled Service Delivery Evidence System",
+   "status": "Granted",
+   "earliestFilingDate": "2018-07-25",
+   "priorityApplicationNumber": "16045530",
+   "lastEventDate": "2022-10-18",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 20/3829",
+    "G06Q 40/08",
+    "G06Q 20/02",
+    "G06Q 20/223",
+    "G06Q 20/389",
+    "G06Q2220/00",
+    "H04W 4/02",
+    "H04W 4/14"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US11475441B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16045530",
+     "artUnit": "3685",
+     "classifications": [
+      "G06Q 20/3829",
+      "G06Q 40/08",
+      "G06Q 20/02",
+      "G06Q 20/223",
+      "G06Q 20/389",
+      "G06Q2220/00",
+      "H04W 4/02",
+      "H04W 4/14"
+     ],
+     "documentUrl": "",
+     "examiner": "IDIAKE, VINCENT I",
+     "filedOn": "2018-07-25",
+     "grantedOn": "2022-10-18",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US11475441",
+     "publicationNumber": "US20200034836A1",
+     "publishedOn": "2020-01-30",
+     "status": "Patented Case",
+     "statusDate": "2022-09-28",
+     "title": "Blockchain-Enabled Service Delivery Evidence System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16045530"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "blockchain-based-crowdsourced-initiatives-tracking-system",
+   "title": "Blockchain-Based Crowdsourced Initiatives Tracking System",
+   "status": "Granted",
+   "earliestFilingDate": "2013-09-12",
+   "priorityApplicationNumber": "14025493",
+   "lastEventDate": "2022-03-08",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 30/0203",
+    "G06Q 10/40",
+    "G06Q 10/063",
+    "G06Q 30/0206",
+    "G06Q 50/184",
+    "G06Q 10/101",
+    "H04L 9/50",
+    "G06Q 10/46",
+    "G06Q 20/36",
+    "G06Q2220/00",
+    "H04L 9/0637",
+    "H04L 9/3236"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20150073870A1",
+    "US11270263B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "14025493",
+     "artUnit": "3623",
+     "classifications": [
+      "G06Q 30/0203",
+      "G06Q 10/40",
+      "G06Q 10/063",
+      "G06Q 30/0206",
+      "G06Q 50/184"
+     ],
+     "documentUrl": "",
+     "examiner": "DICKERSON, TIPHANY B",
+     "filedOn": "2013-09-12",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20150073870A1",
+     "publishedOn": "2015-03-12",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-08-14",
+     "title": "Crowdsourced Initiatives Tracking, Development, Evaluation And Scoring",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14025493"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15587202",
+     "artUnit": "3624",
+     "classifications": [
+      "G06Q 10/101",
+      "H04L 9/50",
+      "G06Q 10/46",
+      "G06Q 10/40",
+      "G06Q 10/063",
+      "G06Q 20/36",
+      "G06Q 30/0203",
+      "G06Q 30/0206",
+      "G06Q 50/184",
+      "G06Q2220/00",
+      "H04L 9/0637",
+      "H04L 9/3236",
+      "H04L2209/56"
+     ],
+     "documentUrl": "",
+     "examiner": "TURNER, SHELBY AUBURN",
+     "filedOn": "2017-05-04",
+     "grantedOn": "2022-03-08",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "14025493"
+     ],
+     "patentNumber": "US11270263",
+     "publicationNumber": "US20170236094A1",
+     "publishedOn": "2017-08-17",
+     "status": "Patented Case",
+     "statusDate": "2022-02-16",
+     "title": "Blockchain-Based Crowdsourced Initiatives Tracking System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15587202"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "digital-blockchain-authentication",
+   "title": "Digital Blockchain Authentication",
+   "status": "Abandoned",
+   "earliestFilingDate": "2012-02-02",
+   "priorityApplicationNumber": "61594216",
+   "lastEventDate": "2021-07-15",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 10/60",
+    "G06T 7/10",
+    "G06V 40/172",
+    "G06V 40/161",
+    "G06K 7/1417",
+    "G10L 17/00",
+    "G10L 17/08",
+    "H04L 9/0637",
+    "H04L 9/3231",
+    "H04L 63/0815"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130204641A1",
+    "US20170149560A1"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61594216",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2012-02-02",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2013-02-03",
+     "title": "Social Authentication For Accessing Health Records",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61594216"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "13756433",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60"
+     ],
+     "documentUrl": "",
+     "examiner": "PATEL, NEHA",
+     "filedOn": "2013-01-31",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "61594216"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20130204641A1",
+     "publishedOn": "2013-08-08",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-05-16",
+     "title": "Social Authentication For Accessing Health Records",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13756433"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15427806",
+     "artUnit": "3685",
+     "classifications": [
+      "G16H 10/60",
+      "G06T 7/10",
+      "G06V 40/172",
+      "G06V 40/161",
+      "G06K 7/1417",
+      "G10L 17/00",
+      "G10L 17/08",
+      "H04L 9/0637",
+      "H04L 9/3231",
+      "H04L 63/0815"
+     ],
+     "documentUrl": "",
+     "examiner": "GETACHEW, WODAJO",
+     "filedOn": "2017-02-08",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "13756433",
+      "61594216"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20170149560A1",
+     "publishedOn": "2017-05-25",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2021-07-15",
+     "title": "Digital Blockchain Authentication",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15427806"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "system-for-controlling-medical-devices",
+   "title": "System For Controlling Medical Devices",
+   "status": "Granted",
+   "earliestFilingDate": "2012-02-02",
+   "priorityApplicationNumber": "61594224",
+   "lastEventDate": "2021-05-18",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "H04L 67/02",
+    "G16H 40/67",
+    "G16H 10/60",
+    "A61B 5/0205",
+    "A61B 6/54",
+    "H04L 67/12",
+    "A61B 6/548",
+    "A61M 16/0069",
+    "A61M 16/0447",
+    "A61M 16/1005",
+    "A61M 16/202",
+    "G16H 40/63"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130204145A1",
+    "US10638999B2",
+    "US11006920B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61594224",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2012-02-02",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2013-02-03",
+     "title": "System And Method For Managing Devices And Data In A Medical Environment",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61594224"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "13756445",
+     "artUnit": "3686",
+     "classifications": [
+      "H04L 67/02",
+      "G16H 40/67",
+      "G16H 10/60",
+      "A61B 5/0205",
+      "A61B 6/54",
+      "H04L 67/12"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2013-01-31",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "61594224"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20130204145A1",
+     "publishedOn": "2013-08-08",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-05-30",
+     "title": "System And Method For Managing Devices And Data In A Medical Environment",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13756445"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15430461",
+     "artUnit": "3686",
+     "classifications": [
+      "A61B 6/548",
+      "A61M 16/0069",
+      "A61M 16/0447",
+      "A61M 16/1005",
+      "A61M 16/202",
+      "G16H 40/67",
+      "G16H 10/60",
+      "G16H 40/63",
+      "A61B 5/076",
+      "A61B 5/6861",
+      "A61B 6/4464",
+      "A61B 6/54",
+      "A61B 6/541",
+      "A61B 6/542",
+      "A61B 6/563",
+      "A61B 6/566",
+      "A61B 6/586",
+      "A61M2202/0208",
+      "A61M2205/3592",
+      "G01S 19/14",
+      "H04L 5/14",
+      "H04L 67/02",
+      "H04L 67/025",
+      "H04L 67/12"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2017-02-11",
+     "grantedOn": "2020-05-05",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "13756445",
+      "61594224"
+     ],
+     "patentNumber": "US10638999",
+     "publicationNumber": "US20170150939A1",
+     "publishedOn": "2017-06-01",
+     "status": "Patented Case",
+     "statusDate": "2020-04-15",
+     "title": "System For Controlling Medical Devices",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15430461"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16835258",
+     "artUnit": "3686",
+     "classifications": [
+      "A61B 6/548",
+      "A61M 16/0069",
+      "A61M 16/0447",
+      "A61M 16/1005",
+      "A61M 16/202",
+      "G16H 40/67",
+      "G16H 10/60",
+      "G16H 40/63",
+      "H04L 67/01",
+      "A61B 5/076",
+      "A61B 5/6861",
+      "A61B 6/4464",
+      "A61B 6/54",
+      "A61B 6/541",
+      "A61B 6/542",
+      "A61B 6/563",
+      "A61B 6/566",
+      "A61B 6/586",
+      "A61M2202/0208",
+      "A61M2205/3592",
+      "G01S 19/14",
+      "H04L 5/14",
+      "H04L 67/02",
+      "H04L 67/025",
+      "H04L 67/12"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2020-03-30",
+     "grantedOn": "2021-05-18",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "15430461",
+      "13756445",
+      "61594224"
+     ],
+     "patentNumber": "US11006920",
+     "publicationNumber": "US20200222021A1",
+     "publishedOn": "2020-07-16",
+     "status": "Patented Case",
+     "statusDate": "2021-04-28",
+     "title": "System For Controlling Medical Devices",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16835258"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "blockchain-system-for-natural-language-processing",
+   "title": "Blockchain System For Natural Language Processing",
+   "status": "Granted",
+   "earliestFilingDate": "2012-04-27",
+   "priorityApplicationNumber": "13457782",
+   "lastEventDate": "2021-04-20",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 10/101",
+    "G16H 40/67",
+    "G16H 10/60",
+    "G16H 30/20",
+    "G16H 50/20",
+    "G06F 16/951",
+    "G06F 40/40",
+    "G06Q 10/40",
+    "G06F 11/1464",
+    "G06F2201/80",
+    "G06F2201/84"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130290022A1",
+    "US10984913B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "13457782",
+     "artUnit": "3626",
+     "classifications": [
+      "G06Q 10/101",
+      "G16H 40/67",
+      "G16H 10/60",
+      "G16H 30/20"
+     ],
+     "documentUrl": "",
+     "examiner": "HUNTER, SEAN KRISTOPHER",
+     "filedOn": "2012-04-27",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20130290022A1",
+     "publishedOn": "2013-10-31",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-04-03",
+     "title": "System And Method For Creating Metadata-Based Natural Language Processing Capabilities",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13457782"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15389243",
+     "artUnit": "3626",
+     "classifications": [
+      "G16H 50/20",
+      "G16H 10/60",
+      "G06F 16/951",
+      "G06F 40/40",
+      "G06Q 10/40",
+      "G06F 11/1464",
+      "G06F2201/80",
+      "G06F2201/84",
+      "G06Q 10/101"
+     ],
+     "documentUrl": "",
+     "examiner": "BALAJ, ANTHONY MICHAEL",
+     "filedOn": "2016-12-22",
+     "grantedOn": "2021-04-20",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "13457782"
+     ],
+     "patentNumber": "US10984913",
+     "publicationNumber": "US20170103167A1",
+     "publishedOn": "2017-04-13",
+     "status": "Patented Case",
+     "statusDate": "2021-03-31",
+     "title": "Blockchain System For Natural Language Processing",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15389243"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "graphical-user-interface-and-smart-card-reader-for-facilitating-crowdsourced-credentialing",
+   "title": "Graphical User Interface And Smart Card Reader For Facilitating Crowdsourced Credentialing And Accreditation",
+   "status": "Abandoned",
+   "earliestFilingDate": "2013-04-18",
+   "priorityApplicationNumber": "13865481",
+   "lastEventDate": "2021-01-19",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 30/018",
+    "G06Q 10/40"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20140317003A1",
+    "US20170076405A1"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "13865481",
+     "artUnit": "3689",
+     "classifications": [
+      "G06Q 30/018"
+     ],
+     "documentUrl": "",
+     "examiner": "ARAQUE JR, GERARDO",
+     "filedOn": "2013-04-18",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20140317003A1",
+     "publishedOn": "2014-10-23",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-01-06",
+     "title": "System And Method For Facilitating Crowdsourced Credentialing And Accreditation",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13865481"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15362768",
+     "artUnit": "3689",
+     "classifications": [
+      "G06Q 10/40",
+      "G06Q 30/018"
+     ],
+     "documentUrl": "",
+     "examiner": "ARAQUE JR, GERARDO",
+     "filedOn": "2016-11-28",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "13865481"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20170076405A1",
+     "publishedOn": "2017-03-16",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2021-01-19",
+     "title": "Graphical User Interface And Smart Card Reader For Facilitating Crowdsourced Credentialing And Accreditation",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15362768"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-controlled-physically-distributed-collaborative-asynchronous-digital-transactions",
+   "title": "Computer-Controlled Physically Distributed Collaborative Asynchronous Digital Transactions",
+   "status": "Abandoned",
+   "earliestFilingDate": "2012-05-14",
+   "priorityApplicationNumber": "61646744",
+   "lastEventDate": "2020-12-22",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 10/60",
+    "G16H 40/67",
+    "G16H 70/20",
+    "G16H 80/00",
+    "G16H 20/60",
+    "G16H 50/70",
+    "G16H 50/20",
+    "G16H 20/10",
+    "G16H 40/63",
+    "G16H 20/70",
+    "G06F 21/44"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130304508A1",
+    "US20170140145A1"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61646744",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2012-05-14",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2013-05-19",
+     "title": "System And Method For Collaborative Patient Engagement",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61646744"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "13871107",
+     "artUnit": "3626",
+     "classifications": [
+      "G16H 10/60",
+      "G16H 40/67",
+      "G16H 70/20",
+      "G16H 80/00"
+     ],
+     "documentUrl": "",
+     "examiner": "PAULSON, SHEETAL R.",
+     "filedOn": "2013-04-26",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "61646744"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20130304508A1",
+     "publishedOn": "2013-11-14",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-05-15",
+     "title": "System And Method For Collaborative Patient Engagement",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13871107"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15418765",
+     "artUnit": "3685",
+     "classifications": [
+      "G16H 20/60",
+      "G16H 40/67",
+      "G16H 50/70",
+      "G16H 50/20",
+      "G16H 20/10",
+      "G16H 40/63",
+      "G16H 20/70",
+      "G16H 80/00",
+      "G06F 21/44"
+     ],
+     "documentUrl": "",
+     "examiner": "SHAHABI, ARI ARASTOO",
+     "filedOn": "2017-01-29",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "13871107",
+      "61646744"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20170140145A1",
+     "publishedOn": "2017-05-18",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2020-12-22",
+     "title": "Computer-Controlled Physically Distributed Collaborative Asynchronous Digital Transactions",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15418765"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "multi-source-user-generated-electronic-data-integration-in-a-blockchain-based-transactiona",
+   "title": "Multi-Source User Generated Electronic Data Integration In A Blockchain-Based Transactional System",
+   "status": "Granted",
+   "earliestFilingDate": "2014-04-14",
+   "priorityApplicationNumber": "61979020",
+   "lastEventDate": "2020-11-17",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 10/60",
+    "G16Z 99/00",
+    "G06Q 30/018",
+    "G06F 16/9038",
+    "G06F 16/907",
+    "G06F 16/182",
+    "G06F 16/90332",
+    "H04L 9/50",
+    "G06F 1/163",
+    "G06Q 10/10",
+    "H04L 9/0637",
+    "H04L 9/0643"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20150294069A1",
+    "US10839020B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61979020",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2014-04-14",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2015-04-19",
+     "title": "Multi-Source Patient Generated Data Collection System And Method",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61979020"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "14686684",
+     "artUnit": "3626",
+     "classifications": [
+      "G16H 10/60",
+      "G16Z 99/00",
+      "G06Q 30/018"
+     ],
+     "documentUrl": "",
+     "examiner": "PAULS, JOHN A",
+     "filedOn": "2015-04-14",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "61979020"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20150294069A1",
+     "publishedOn": "2015-10-15",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2018-10-15",
+     "title": "Multi-Source Patient Generated Healthcare Data Integration In A Transactional System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14686684"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16048338",
+     "artUnit": "3626",
+     "classifications": [
+      "G06F 16/9038",
+      "G16H 10/60",
+      "G06F 16/907",
+      "G06F 16/182",
+      "G06F 16/90332",
+      "H04L 9/50",
+      "G06F 1/163",
+      "G06Q 10/10",
+      "G06Q 30/018",
+      "H04L 9/0637",
+      "H04L 9/0643",
+      "H04L 9/3239",
+      "H04L2209/805"
+     ],
+     "documentUrl": "",
+     "examiner": "PAULS, JOHN A",
+     "filedOn": "2018-07-29",
+     "grantedOn": "2020-11-17",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "14686684",
+      "61979020"
+     ],
+     "patentNumber": "US10839020",
+     "publicationNumber": "US20180336286A1",
+     "publishedOn": "2018-11-22",
+     "status": "Patented Case",
+     "statusDate": "2020-10-28",
+     "title": "Multi-Source User Generated Electronic Data Integration In A Blockchain-Based Transactional System",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16048338"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network",
+   "title": "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network",
+   "status": "Granted",
+   "earliestFilingDate": "2012-01-26",
+   "priorityApplicationNumber": "61590914",
+   "lastEventDate": "2020-10-20",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 10/60",
+    "H04L 9/50",
+    "G06Q 10/40",
+    "H04L 9/3236",
+    "H04L 63/102",
+    "H04L 63/107",
+    "H04L 63/20",
+    "H04L2209/56"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130197939A1",
+    "US10490304B2",
+    "US10811124B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "61590914",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2012-01-26",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2013-01-27",
+     "title": "Social Health Care Record System And Method",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/61590914"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "13740381",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2013-01-14",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "61590914"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20130197939A1",
+     "publishedOn": "2013-08-01",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-02-20",
+     "title": "Social Health Care Record System And Method",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13740381"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15372699",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60",
+      "H04L 9/50",
+      "G06Q 10/40",
+      "H04L 9/3236",
+      "H04L 63/102",
+      "H04L 63/107",
+      "H04L 63/20",
+      "H04L2209/56"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2016-12-08",
+     "grantedOn": "2019-11-26",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "13740381",
+      "61590914"
+     ],
+     "patentNumber": "US10490304",
+     "publicationNumber": "US20170091397A1",
+     "publishedOn": "2017-03-30",
+     "status": "Patented Case",
+     "statusDate": "2019-11-06",
+     "title": "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15372699"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "16517975",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 10/60",
+      "H04L 9/50",
+      "G06Q 10/40",
+      "H04L 9/3236",
+      "H04L 63/102",
+      "H04L 63/107",
+      "H04L 63/20",
+      "H04L2209/56"
+     ],
+     "documentUrl": "",
+     "examiner": "HEIN, DEVIN C",
+     "filedOn": "2019-07-22",
+     "grantedOn": "2020-10-20",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "15372699",
+      "13740381",
+      "61590914"
+     ],
+     "patentNumber": "US10811124",
+     "publicationNumber": "US20190341134A1",
+     "publishedOn": "2019-11-07",
+     "status": "Patented Case",
+     "statusDate": "2020-09-30",
+     "title": "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/16517975"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "global-positioning-system-gps-for-linking-network-access-platforms-with-social-network-pro",
+   "title": "Global Positioning System (GPS) For Linking Network Access Platforms With Social Network Profile Electronic Documents",
+   "status": "Abandoned",
+   "earliestFilingDate": "2012-05-01",
+   "priorityApplicationNumber": "13461312",
+   "lastEventDate": "2020-08-17",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 10/10",
+    "G16H 40/20",
+    "G16H 70/20",
+    "G06Q 30/0185",
+    "G16H 40/67",
+    "G16H 50/30",
+    "G16H 50/20",
+    "G16H 80/00",
+    "G06F 16/951",
+    "G06Q 10/46",
+    "G06Q 10/44",
+    "G06Q 10/40"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20130297323A1",
+    "US20170083924A1"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "13461312",
+     "artUnit": "3626",
+     "classifications": [
+      "G06Q 10/10",
+      "G16H 40/20",
+      "G16H 70/20"
+     ],
+     "documentUrl": "",
+     "examiner": "SOREY, ROBERT A",
+     "filedOn": "2012-05-01",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20130297323A1",
+     "publishedOn": "2013-11-07",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-02-21",
+     "title": "System And Method For Providing Clinical Views Or Recommendations",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/13461312"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15366601",
+     "artUnit": "3626",
+     "classifications": [
+      "G06Q 30/0185",
+      "G16H 40/67",
+      "G16H 40/20",
+      "G16H 50/30",
+      "G16H 50/20",
+      "G16H 80/00",
+      "G06F 16/951",
+      "G06Q 10/46",
+      "G06Q 10/44",
+      "G06Q 10/40",
+      "G06Q 10/10",
+      "H04L 63/0853"
+     ],
+     "documentUrl": "",
+     "examiner": "SOREY, ROBERT A",
+     "filedOn": "2016-12-01",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [
+      "13461312"
+     ],
+     "patentNumber": "",
+     "publicationNumber": "US20170083924A1",
+     "publishedOn": "2017-03-23",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2020-08-17",
+     "title": "Global Positioning System (GPS) For Linking Network Access Platforms With Social Network Profile Electronic Documents",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15366601"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "networking-devices-for-storing-profiles-longitudinally",
+   "title": "Networking Devices For Storing Profiles Longitudinally",
+   "status": "Granted",
+   "earliestFilingDate": "2016-05-24",
+   "priorityApplicationNumber": "15163667",
+   "lastEventDate": "2020-03-10",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06F 21/6245",
+    "G16H 10/60",
+    "G06F 21/6227"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US10586069B2"
+   ],
+   "filings": [
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15163667",
+     "artUnit": "2156",
+     "classifications": [
+      "G06F 21/6245",
+      "G16H 10/60",
+      "G06F 21/6227"
+     ],
+     "documentUrl": "",
+     "examiner": "LU, KUEN S",
+     "filedOn": "2016-05-24",
+     "grantedOn": "2020-03-10",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US10586069",
+     "publicationNumber": "US20170344702A1",
+     "publishedOn": "2017-11-30",
+     "status": "Patented Case",
+     "statusDate": "2020-02-19",
+     "title": "Networking Devices For Storing Profiles Longitudinally",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15163667"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "aggregation-of-rating-indicators",
+   "title": "Aggregation Of Rating Indicators",
+   "status": "Granted",
+   "earliestFilingDate": "2014-06-22",
+   "priorityApplicationNumber": "62015503",
+   "lastEventDate": "2019-11-26",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06Q 30/0282"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US9846896B2",
+    "US10489830B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "62015503",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2014-06-22",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2015-06-28",
+     "title": "Methods And Systems For Rating Aggregation",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/62015503"
+    },
+    {
+     "applicant": "",
+     "applicationNumber": "14744697",
+     "artUnit": "2161",
+     "classifications": [
+      "G06Q 30/0282"
+     ],
+     "documentUrl": "",
+     "examiner": "SAMARA, HUSAM TURKI",
+     "filedOn": "2015-06-19",
+     "grantedOn": "2017-12-19",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "62015503"
+     ],
+     "patentNumber": "US9846896",
+     "publicationNumber": "US20150370801A1",
+     "publishedOn": "2015-12-24",
+     "status": "Patented Case",
+     "statusDate": "2017-11-29",
+     "title": "Aggregation Of Rating Indicators",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14744697"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15813109",
+     "artUnit": "2161",
+     "classifications": [
+      "G06Q 30/0282"
+     ],
+     "documentUrl": "",
+     "examiner": "SAMARA, HUSAM TURKI",
+     "filedOn": "2017-11-14",
+     "grantedOn": "2019-11-26",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "14744697",
+      "62015503"
+     ],
+     "patentNumber": "US10489830",
+     "publicationNumber": "US20180075496A1",
+     "publishedOn": "2018-03-15",
+     "status": "Patented Case",
+     "statusDate": "2019-11-06",
+     "title": "Aggregation Of Rating Indicators",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15813109"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "tasks-scheduling-based-on-triggering-event-and-work-lists-management",
+   "title": "Tasks Scheduling Based On Triggering Event And Work Lists Management",
+   "status": "Granted",
+   "earliestFilingDate": "2014-11-20",
+   "priorityApplicationNumber": "62082263",
+   "lastEventDate": "2019-09-03",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G16H 40/20",
+    "G16H 40/63",
+    "G16H 10/65",
+    "G06Q 10/06311"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US10403399B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "62082263",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2014-11-20",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2015-11-22",
+     "title": "Tasks Scheduling Based On Triggering Event And Work Lists Management",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/62082263"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "14946702",
+     "artUnit": "3686",
+     "classifications": [
+      "G16H 40/20",
+      "G16H 40/63",
+      "G16H 10/65",
+      "G06Q 10/06311"
+     ],
+     "documentUrl": "",
+     "examiner": "TOMASZEWSKI, MICHAEL",
+     "filedOn": "2015-11-19",
+     "grantedOn": "2019-09-03",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "62082263"
+     ],
+     "patentNumber": "US10403399",
+     "publicationNumber": "US20160147955A1",
+     "publishedOn": "2016-05-26",
+     "status": "Patented Case",
+     "statusDate": "2019-08-14",
+     "title": "Tasks Scheduling Based On Triggering Event And Work Lists Management",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14946702"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "patient-navigation-and-situational-awareness-derived-through-context-sensitive-information",
+   "title": "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery",
+   "status": "Granted",
+   "earliestFilingDate": "2015-05-25",
+   "priorityApplicationNumber": "62166103",
+   "lastEventDate": "2018-10-02",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06F 21/6245",
+    "G16H 10/60",
+    "G06Q 10/0633"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US10089492B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "62166103",
+     "artUnit": "",
+     "classifications": [],
+     "documentUrl": "",
+     "examiner": "",
+     "filedOn": "2015-05-25",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "application",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "",
+     "publishedOn": "",
+     "status": "Provisional Application Expired",
+     "statusDate": "2016-05-29",
+     "title": "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/62166103"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15163662",
+     "artUnit": "2494",
+     "classifications": [
+      "G06F 21/6245",
+      "G16H 10/60",
+      "G06Q 10/0633"
+     ],
+     "documentUrl": "",
+     "examiner": "TRAN, TRI MINH",
+     "filedOn": "2016-05-24",
+     "grantedOn": "2018-10-02",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "62166103"
+     ],
+     "patentNumber": "US10089492",
+     "publicationNumber": "US20160350554A1",
+     "publishedOn": "2016-12-01",
+     "status": "Patented Case",
+     "statusDate": "2018-09-12",
+     "title": "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15163662"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "computer-system-for-performing-reusable-software-application-development-from-a-set-of-dec",
+   "title": "Computer System For Performing Reusable Software Application Development From A Set Of Declarative Executable Specifications",
+   "status": "Expired",
+   "earliestFilingDate": "2002-07-12",
+   "priorityApplicationNumber": "10194646",
+   "lastEventDate": "2018-05-28",
+   "applicant": "",
+   "classifications": [
+    "G06F 11/3604",
+    "G06F 11/3676",
+    "G06F 11/3684"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US7039898B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "10194646",
+     "artUnit": "2191",
+     "classifications": [
+      "G06F 11/3604",
+      "G06F 11/3676",
+      "G06F 11/3684"
+     ],
+     "documentUrl": "",
+     "examiner": "STEELMAN, MARY J",
+     "filedOn": "2002-07-12",
+     "grantedOn": "2006-05-02",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US7039898",
+     "publicationNumber": "US20040010776A1",
+     "publishedOn": "2004-01-15",
+     "status": "Patent Expired Due to NonPayment of Maintenance Fees Under 37 CFR 1.362",
+     "statusDate": "2018-05-28",
+     "title": "Computer System For Performing Reusable Software Application Development From A Set Of Declarative Executable Specifications",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/10194646"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "distributed-electronic-document-review-in-a-blockchain-system-and-computerized-scoring-bas",
+   "title": "Distributed Electronic Document Review In A Blockchain System And Computerized Scoring Based On Textual And Visual Feedback",
+   "status": "Granted",
+   "earliestFilingDate": "2013-09-12",
+   "priorityApplicationNumber": "14025472",
+   "lastEventDate": "2018-01-16",
+   "applicant": "Netspective Communications LLC",
+   "classifications": [
+    "G06N 5/02",
+    "G06Q 10/40",
+    "G06F 40/30",
+    "G06V 40/174",
+    "G06V 40/18",
+    "G06Q 10/46",
+    "G06Q 10/42",
+    "G06N 3/02",
+    "G06N 5/043",
+    "G06Q 10/063112",
+    "H04L 9/0637",
+    "H04L 9/32"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US20150074033A1",
+    "US9870591B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "14025472",
+     "artUnit": "3689",
+     "classifications": [
+      "G06N 5/02"
+     ],
+     "documentUrl": "",
+     "examiner": "ARAQUE JR, GERARDO",
+     "filedOn": "2013-09-12",
+     "grantedOn": "",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "publication",
+     "parentApplicationNumbers": [],
+     "patentNumber": "",
+     "publicationNumber": "US20150074033A1",
+     "publishedOn": "2015-03-12",
+     "status": "Abandoned  --  Failure to Respond to an Office Action",
+     "statusDate": "2017-01-23",
+     "title": "Crowdsourced Electronic Documents Review And Scoring",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14025472"
+    },
+    {
+     "applicant": "Netspective Communications LLC",
+     "applicationNumber": "15386846",
+     "artUnit": "3689",
+     "classifications": [
+      "G06Q 10/40",
+      "G06F 40/30",
+      "G06V 40/174",
+      "G06V 40/18",
+      "G06Q 10/46",
+      "G06Q 10/42",
+      "G06N 3/02",
+      "G06N 5/02",
+      "G06N 5/043",
+      "G06Q 10/063112",
+      "H04L 9/0637",
+      "H04L 9/32"
+     ],
+     "documentUrl": "",
+     "examiner": "ARAQUE JR, GERARDO",
+     "filedOn": "2016-12-21",
+     "grantedOn": "2018-01-16",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [
+      "14025472"
+     ],
+     "patentNumber": "US9870591",
+     "publicationNumber": "US20170103472A1",
+     "publishedOn": "2017-04-13",
+     "status": "Patented Case",
+     "statusDate": "2017-12-27",
+     "title": "Distributed Electronic Document Review In A Blockchain System And Computerized Scoring Based On Textual And Visual Feedback",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/15386846"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  },
+  {
+   "slug": "crowdsourced-responses-management-to-cases",
+   "title": "Crowdsourced Responses Management To Cases",
+   "status": "Granted",
+   "earliestFilingDate": "2013-09-20",
+   "priorityApplicationNumber": "14032368",
+   "lastEventDate": "2016-08-16",
+   "applicant": "",
+   "classifications": [
+    "G06Q 10/10",
+    "G06Q 10/40"
+   ],
+   "inventors": [
+    "Shahid N. Shah"
+   ],
+   "patents": [
+    "US9418355B2"
+   ],
+   "filings": [
+    {
+     "applicant": "",
+     "applicationNumber": "14032368",
+     "artUnit": "2168",
+     "classifications": [
+      "G06Q 10/10",
+      "G06Q 10/40"
+     ],
+     "documentUrl": "",
+     "examiner": "HOANG, KEN",
+     "filedOn": "2013-09-20",
+     "grantedOn": "2016-08-16",
+     "inventors": [
+      "Shahid N. Shah"
+     ],
+     "kind": "grant",
+     "parentApplicationNumbers": [],
+     "patentNumber": "US9418355",
+     "publicationNumber": "US20150088884A1",
+     "publishedOn": "2015-03-26",
+     "status": "Patented Case",
+     "statusDate": "2016-07-27",
+     "title": "Crowdsourced Responses Management To Cases",
+     "usptoUrl": "https://patentcenter.uspto.gov/applications/14032368"
+    }
+   ],
+   "sources": [
+    {
+     "name": "USPTO Patent Center",
+     "readAt": "2026-09-27"
+    }
+   ]
+  }
+ ]
+}

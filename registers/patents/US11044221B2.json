@@ -1,0 +1,302 @@
+{
+ "number": "US11044221B2",
+ "kind": "granted patent",
+ "title": "Integration Of Devices Through A Social Networking Platform",
+ "applicationNumber": "16381772",
+ "earlierPublication": "US20190245825A1",
+ "filedOn": "2019-04-11",
+ "publishedOn": "2019-08-08",
+ "grantedOn": "2021-06-22",
+ "priorityDate": "2012-12-12",
+ "status": "Patented Case",
+ "statusDate": "2021-06-02",
+ "estimatedExpiration": "2034-08-26",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2454",
+ "examiner": "SPRINGER, JAMES E",
+ "classifications": [
+  "H04L 51/52",
+  "H04W 4/80",
+  "H04B 5/20",
+  "H04L 41/0663",
+  "H04L 63/102",
+  "H04L 67/303",
+  "H04L 67/306"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US15/275,463",
+   "relation": "Division",
+   "publication": "US10320735B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "15275463",
+  "14103098",
+  "61736119"
+ ],
+ "abstract": "A system and method for providing a social networking service to a plurality of devices. A social networking server for facilitating social information exchange among the plurality of devices through a socially aware network. A social profiles manager is coupled to the social networking server that creates and manages individual centric profiles of the plurality of devices. The individual centric profiles of the plurality of devices are social representation of individual devices within the socially aware network. The plurality of devices are identifiable by other participants and the social networking server through their social profiles.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for monitoring and conveying health related information from a first device to a second device interconnected through a socially aware network, said system comprising: a processing circuit coupled to said first device; a social event timeline recorder that stores information pertinent to when an event should occur at said first device, wherein said event should occur at a defined social time; a social event timeline monitoring unit that monitors an event occurrence time for said event; a fault detector that compares said social event timeline with said event occurrence time for said event, wherein a gap between said social event timeline and said event occurrence time beyond a threshold limit is indicative of a fault, and wherein said event at said first device and said event at said second device are interdependent; and a communication circuit that allows sharing of a social content comprising defined social profiles, indicative of said fault and a predicted modified event occurrence time at said first device, to a social networking server through a two-way communication channel including a near field communication channel and a socially aware network channel, wherein said social networking server sends said social content to said second device, and wherein said first device and said second device comprise connections and parts of a same chain of integrated tasks, wherein said social networking server is coupled to a search interface implementing a search algorithm that identifies and shortlists said defined social profiles, the shortlisted profiles being submitted to said first device so that said first device sends out connection requests to devices associated with said shortlisted profiles for extending a social space, and wherein said first device uses said second device from among said shortlisted social profiles as an intelligent health monitoring device based on proximity and similarity in operation of said second device with respect to said first device so that in case of a fault with or failure of said first device, said second device performs functions of said first device voluntarily or upon a social activity initiated by said first device and directed to said second device."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social content is exchanged through a social activity which is initiated after said first device and said second device are mutual connections."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first device sends a connection request to said second device such that said connection request causes a display of a social profile of said first device to said second device, wherein upon acceptance of said connection request after viewing said social profile, said second device and said first device are mutual connections."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social content indicative of the predicted modified social event timeline is shared with said second device through said social networking server with the use of a chat-room type window conversation setting configuring activation of social information exchange through a chat-room type window."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said chat-room type window conversation setting is activated based on a trigger generated upon detection of the fault, said trigger causing activation of said near field communication channel and said chat-room type window setting."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first device is communicatively coupled to an intelligent health monitoring device for monitoring updates in said defined social profiles, wherein said first device is communicatively coupled to a database for storing said defined social profiles and various updates corresponding to said defined social profiles, and wherein said defined social profiles and said various updates are shared by said intelligent health monitoring device through said social activity involving social content sharing between said health monitoring device and said social networking server."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein said intelligent health monitoring device is integrally included within said first device so that said first device is capable of detecting said fault by comparing said defined social profiles itself, wherein said event from said first device involves a request to a set of connection devices to alternatively contribute in performing a function healthily when the set of connection devices are in an idle state and when said first device is faulty."
+  },
+  {
+   "number": 8,
+   "independent": true,
+   "text": "A method for monitoring and conveying health related information from a first device to a second device interconnected through a socially aware network, said method comprising: storing information related to defined social event timelines for tasks associated with said first device, wherein said defined social event timelines defining times when an event should occur at said first device; monitoring a social event occurrence time by a social event timeline monitoring unit; detecting a fault in functioning of said first device by comparing said social event timeline with an event occurrence time for said event, wherein a gap between said social event timeline and said event occurrence time beyond a threshold limit is indicative of the fault, wherein said event at said first device and said event at said second device are interdependent; and sharing a social content, indicative of said fault and a predicted modified event occurrence time at said first device, to a social networking platform through a two-way communication channel including a near field communication channel and a socially aware network channel, wherein said social networking platform sends said social content to said second device, and wherein said first device and said second device comprise connections and parts of a same chain of integrated tasks, wherein said social networking server is coupled to a search interface implementing a search algorithm that identifies and shortlists said defined social profiles, the shortlisted profiles being submitted to said first device so that said first device sends out connection requests to devices associated with said shortlisted profiles for extending a social space, and wherein said first device uses said second device from among said shortlisted social profiles as an intelligent health monitoring device based on proximity and similarity in operation of said second device with respect to said first device so that in case of a fault with or failure of said first device, said second device performs functions of said first device voluntarily or upon a social activity initiated by said first device and directed to said second device."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 8 , wherein said social content is exchanged through a social activity which is initiated after said first device and said second device are mutual connections."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 8 , further comprising sending to said second device by said first device a connection request such that said connection request causes a display of a social profile of said first device to said second device, wherein upon acceptance of said connection request after viewing said social profile, said second device and said first device are mutual connections."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 8 , wherein said social content indicative of the predicted modified social event timeline is shared with said second device through said social networking server with the use of a chat-room type window conversation setting configuring activation of social information exchange through a chat-room type window."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 11 , wherein said chat-room type window conversation setting is activated based on a trigger generated upon detection of the fault, said trigger causing activation of said near field communication channel and said chat-room type window setting."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 8 , wherein said first device is communicatively coupled to an intelligent health monitoring device for monitoring updates in said defined social profiles, wherein said first device is communicatively coupled to a database for storing said defined social profiles and various updates corresponding to said defined social profiles, and wherein said defined social profiles and said various updates are shared by said intelligent health monitoring device through said social activity involving social content sharing between said health monitoring device and said social networking server."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 13 , wherein said intelligent health monitoring device is integrally included within said first device so that said first device is capable of detecting said fault by comparing said defined social profiles itself, wherein said event from said first device involves a request to a set of connection devices to alternatively contribute in performing a function healthily when the set of connection devices are in an idle state and when said first device is faulty."
+  },
+  {
+   "number": 15,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by the computer to perform a method for monitoring and conveying health related information from a first device to a second device interconnected through a socially aware network, said method comprising: storing information related to defined social event timelines for tasks associated with said first device, wherein said defined social event timelines defining times when an event should occur at said first device; monitoring a social event occurrence time by a social event timeline monitoring unit; detecting a fault in functioning of said first device by comparing said social event timeline with an event occurrence time for said event, wherein a gap between said social event timeline and said event occurrence time beyond a threshold limit is indicative of the fault, wherein said event at said first device and said event at said second device are interdependent; and sharing a social content, indicative of said fault and a predicted modified event occurrence time at said first device, to a social networking platform through a two-way communication channel including a near field communication channel and a socially aware network channel, wherein said social networking platform sends said social content to said second device, and wherein said first device and said second device comprise connections and parts of a same chain of integrated tasks, wherein said social networking server is coupled to a search interface implementing a search algorithm that identifies and shortlists said defined social profiles, the shortlisted profiles being submitted to said first device so that said first device sends out connection requests to devices associated with said shortlisted profiles for extending a social space, and wherein said first device uses said second device from among said shortlisted social profiles as an intelligent health monitoring device based on proximity and similarity in operation of said second device with respect to said first device so that in case of a fault with or failure of said first device, said second device performs functions of said first device voluntarily or upon a social activity initiated by said first device and directed to said second device."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 15 , wherein said social content is exchanged through a social activity which is initiated after said first device and said second device are mutual connections."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 15 , wherein said method further comprises sending to said second device by said first device a connection request such that said connection request causes a display of a social profile of said first device to said second device, wherein upon acceptance of said connection request after viewing said social profile, said second device and said first device are mutual connections."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 15 , wherein said social content indicative of the predicted modified social event timeline is shared with said second device through said social networking server with the use of a chat-room type window conversation setting configuring activation of social information exchange through a chat-room type window."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 18 , wherein said chat-room type window conversation setting is activated based on a trigger generated upon detection of the fault, said trigger causing activation of said near field communication channel and said chat-room type window setting."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 15 , wherein said first device is communicatively coupled to an intelligent health monitoring device for monitoring updates in said defined social profiles, wherein said first device is communicatively coupled to a database for storing said defined social profiles and various updates corresponding to said defined social profiles, and wherein said defined social profiles and said various updates are shared by said intelligent health monitoring device through said social activity involving social content sharing between said health monitoring device and said social networking server, and wherein said intelligent health monitoring device is integrally included within said first device so that said first device is capable of detecting said fault by comparing said defined social profiles itself, wherein said event from said first device involves a request to a set of connection devices to alternatively contribute in performing a function healthily when the set of connection devices are in an idle state and when said first device is faulty."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11044221B2/sheet-00000.webp",
+   "label": "Sheet 1 of 23",
+   "width": 166,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00001.webp",
+   "label": "Sheet 2 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00002.webp",
+   "label": "Sheet 3 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00003.webp",
+   "label": "Sheet 4 of 23",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00004.webp",
+   "label": "Sheet 5 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00005.webp",
+   "label": "Sheet 6 of 23",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00006.webp",
+   "label": "Sheet 7 of 23",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00007.webp",
+   "label": "Sheet 8 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00008.webp",
+   "label": "Sheet 9 of 23",
+   "width": 73,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00009.webp",
+   "label": "Sheet 10 of 23",
+   "width": 118,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00010.webp",
+   "label": "Sheet 11 of 23",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00011.webp",
+   "label": "Sheet 12 of 23",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00012.webp",
+   "label": "Sheet 13 of 23",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00013.webp",
+   "label": "Sheet 14 of 23",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00014.webp",
+   "label": "Sheet 15 of 23",
+   "width": 120,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00015.webp",
+   "label": "Sheet 16 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00016.webp",
+   "label": "Sheet 17 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00017.webp",
+   "label": "Sheet 18 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00018.webp",
+   "label": "Sheet 19 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00019.webp",
+   "label": "Sheet 20 of 23",
+   "width": 128,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00020.webp",
+   "label": "Sheet 21 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00021.webp",
+   "label": "Sheet 22 of 23",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11044221B2/sheet-00022.webp",
+   "label": "Sheet 23 of 23",
+   "width": 91,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/b5/f8/89/3dd9e3b489839e/US11044221.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16381772",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11044221B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

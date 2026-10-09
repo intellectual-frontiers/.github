@@ -1,0 +1,197 @@
+{
+ "number": "US20250217680A1",
+ "kind": "published application",
+ "title": "Autonomous Orchestration System For Decision Lifecycle Management With Integrated Traceability",
+ "applicationNumber": "19081752",
+ "earlierPublication": "",
+ "filedOn": "2025-03-17",
+ "publishedOn": "2025-07-03",
+ "grantedOn": "",
+ "priorityDate": "2025-03-17",
+ "status": "Docketed New Case - Ready for Examination",
+ "statusDate": "2025-04-03",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Pending",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Intellectual Frontiers LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "OPAP",
+ "examiner": "CENTRAL, DOCKET",
+ "classifications": [
+  "G06N 5/043",
+  "G06N 20/00"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A computer-controlled decision lifecycle management system and method are provided for orchestrating a decision lifecycle. The system is to classify a decision type as one of a decision made by a manual intervention, autonomously by an artificial intelligence (AI) system, or collaboratively by both the AI system and the manual intervention. The system is to trigger an initiation of the decision based on a triggering event and generate a decision token representing the decision. The system collects evidence in the form of computer-executable data from a plurality of data sources and associates the evidence with a decision token to enable traceability. An AI-based analysis module of the system processes the evidence by executing one or more AI algorithms and generate a computer executable decision recommendation based on processed evidence.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled decision lifecycle management system for orchestrating a decision lifecycle, the system comprising: a decision categorization module that classifies a decision type as one of a decision made by a manual intervention, a decision made autonomously by an artificial intelligence (AI) system, or a decision made collaboratively by both an AI system and the manual intervention, based on a set of predefined criteria; a decision initiation module that triggers an initiation of the decision based on a triggering event, wherein the triggering event comprises one or more of a hardware input, a user request, a predefined schedule, wherein the decision initiation module is to generate a decision token representing the decision; an evidence aggregation module communicatively coupled to a plurality of data sources distributed across discrete and remote locations, wherein the evidence aggregation module is to collect evidence in the form of computer-executable data from the plurality of data sources and associate the evidence with a decision token to enable traceability; and an AI-based analysis module that processes the evidence by executing one or more AI algorithms and generate a computer executable decision recommendation based on processed evidence."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , comprising: a decision approval module that receives the decision recommendation and facilitate either automated or manual approval based on one or more predefined approval rules, wherein the decision token is updated upon approval to reflect an approval status; and a decision execution module that executes the decision upon approval by triggering one or more actions, wherein the execution includes activating a hardware component, and updating the decision token to reflect an execution status."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the decision execution module is to execute the decision upon the approval by triggering the one or more actions, and wherein the execution includes requesting a user for manual performance to conduct the execution and updating the decision token to reflect the execution status accordingly."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 2 , comprising an audit and compliance module that records an immutable and verifiable record of the decision lifecycle, including the evidence, the decision recommendation, the approval status, and the execution status, stored on a blockchain ledger for auditability and compliance with one or more predefined requirements."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the decision execution module comprises: a hardware actuator interface that receives one or more execution instructions and trigger a physical operation in the hardware component; and a monitoring subsystem that collects telemetry data during the execution and update the decision token with one or more operational metrics and detected anomalies."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein the hardware component comprises one or more of a wearable device, a medical device, a continuous monitoring device, a drug delivery device, a surgical equipment, a therapeutic equipment, and a diagnostic device, and edge node associated with a user."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the evidence aggregation module is to: tokenize the evidence using a blockchain function to create a unique, immutable identifier for each piece of the evidence; and transmit a tokenized evidence to a distributed ledger for secure storage and retrieval, such that the tokenized evidence is tamper-proof and accessible for audit and traceability."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the AI-based analysis module is to: perform a real-time analysis of the evidence by leveraging edge computing resources deployed at the remote locations of the data sources; and adapt the decision recommendation dynamically based on changing inputs, using a reinforcement learning algorithm to optimize decision-making over time, wherein the changing inputs comprises one or more of the predefined criteria and the evidence collected from the data sources."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the decision categorization module is to: dynamically update the predefined criteria for decision classification based on historical decision outcomes and performance metrics stored in a decision analytics repository; and notify the decision initiation module when a reclassification of the decision type is required."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the decision initiation module comprises: a sensor integration interface that receives data streams from one or more of an IoT-enabled device, a wearable device, data stream serving as the triggering events for initiating the decision; and a priority assignment mechanism that ranks multiple simultaneous triggering events based on a predefined priority hierarchy."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the evidence aggregation module is to: validate an integrity of the collected evidence using a digital signature verification process; and filter irrelevant or redundant data prior to associating it with the decision token to improve processing efficiency."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the audit and compliance module is to: track an access permission to data corresponding to the decision lifecycle using a role-based access control mechanism; and log user interactions with the data, including one or more of modifications and approvals."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the evidence aggregation module comprises a SQL-centric resource surveillance mechanism that monitors and analyzes system resources, data inputs, and workflow execution associated with the plurality of data sources in real-time, and wherein the resource surveillance mechanism uses SQL-based queries to gather the evidence in the form of computer-executable data."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A computer-implemented method for managing a decision lifecycle, the method comprising: classifying, by a decision categorization module, a decision type as one of a decision made by a manual intervention, a decision made autonomously by an artificial intelligence (AI) system, or a decision made collaboratively by both the AI system and the manual intervention, based on predefined classification criteria; triggering, by a decision initiation module, an initiation of the decision in response to a triggering event, wherein the triggering event includes one or more of a hardware input, a user request, or a predefined schedule, and generating a decision token representing the decision; collecting, by an evidence aggregation module communicatively coupled to a plurality of data sources distributed across discrete and remote locations, evidence in the form of computer-executable data from the plurality of data sources and associating the evidence with the decision token for traceability; processing, by an AI-based analysis module, the evidence by executing one or more AI algorithms to generate a computer-executable decision recommendation; and updating the decision token to reflect the status of the decision lifecycle stages."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , comprising: receiving, by a decision approval module, the decision recommendation; approving the decision through one or more predefined approval rules, wherein the approval process is either automated or involves manual intervention; and updating the decision token to reflect the approval status."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 14 , comprising: executing, by a decision execution module, the approved decision by triggering one or more actions, wherein the execution includes activating a hardware component or requesting manual performance of the execution; and updating the decision token to reflect an execution status based on the performed actions."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 14 , wherein the collecting of the evidence by the evidence aggregation module comprises: tokenizing the evidence using a cryptographic hash function to create a unique and immutable identifier; and storing the tokenized evidence on a distributed ledger for tamper-proof auditability and traceability."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 14 , wherein the processing of the evidence by the AI-based analysis module comprises: performing a real-time analysis of the evidence by leveraging edge computing resources deployed at the remote locations of the data sources; and dynamically adapting the decision recommendation based on changing inputs including at least the evidence using a reinforcement learning algorithm."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The method of claim 14 , wherein the AI-based analysis module utilizes hardware acceleration components including at least one of specialized graphics processing units (GPUs) and field-programmable gate arrays (FPGAs) to execute computationally intensive AI algorithms, and wherein processing of the evidence comprises: distributing computational tasks between the edge computing resources and central processing resources based on latency requirements and computational complexity; routing security-sensitive decision tasks to trusted execution environments with hardware-level isolation; and executing less sensitive but computationally intensive analysis on specialized AI accelerators, wherein the distribution of computational tasks creates measurable improvements in both decision throughput and response times compared to centralized decision processing."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The method of claim 14 , comprising: implementing a federated learning framework that enables the AI-based analysis module to learn from distributed data sources across the edge nodes without compromising data privacy; utilizing a multi-layered adaptive security framework that dynamically adjusts security measures based on a criticality level of the decision being processed and real-time threat assessments; collecting telemetry data from hardware components through a monitoring subsystem that enables continuous evaluation of decision effectiveness and automatic refinement of future decision processes; and providing a graphical user interface that allows authorized users to visualize decision paths, associated evidence, and real-time adjustments to the decision workflow."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20250217680A1/sheet-00000.webp",
+   "label": "Sheet 1 of 8",
+   "width": 218,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00001.webp",
+   "label": "Sheet 2 of 8",
+   "width": 73,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00002.webp",
+   "label": "Sheet 3 of 8",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00003.webp",
+   "label": "Sheet 4 of 8",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00004.webp",
+   "label": "Sheet 5 of 8",
+   "width": 61,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00005.webp",
+   "label": "Sheet 6 of 8",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00006.webp",
+   "label": "Sheet 7 of 8",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250217680A1/sheet-00007.webp",
+   "label": "Sheet 8 of 8",
+   "width": 86,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/d7/20/f9/2b26836a9d0333/US20250217680A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/19081752",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20250217680A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,211 @@
+{
+ "number": "US7039898B2",
+ "kind": "granted patent",
+ "title": "Computer System For Performing Reusable Software Application Development From A Set Of Declarative Executable Specifications",
+ "applicationNumber": "10194646",
+ "earlierPublication": "US20040010776A1",
+ "filedOn": "2002-07-12",
+ "publishedOn": "2004-01-15",
+ "grantedOn": "2006-05-02",
+ "priorityDate": "2002-07-12",
+ "status": "Patent Expired Due to NonPayment of Maintenance Fees Under 37 CFR 1.362",
+ "statusDate": "2018-05-28",
+ "estimatedExpiration": "2024-02-11",
+ "expirationSourceStatus": "Expired - Fee Related",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "RPX Corp",
+ "artUnit": "2191",
+ "examiner": "STEELMAN, MARY J",
+ "classifications": [
+  "G06F 11/3604",
+  "G06F 11/3676",
+  "G06F 11/3684"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A computer system executing a method for performing reusable software application development comprises integrating a data processing system, providing a set of keywords and attributes, and declaring a set of executable specifications using the keywords and attributes, further comprising generating a program code, instantiating an object code, generating a testable functionality result, generating at least one unit test, generating an implementation documentation output, generating a performance statistics output, and generating a project metrics in the data processing system. The step of providing a set of keywords and attributes comprises generating a set of user interface forms, fields, and validation rules, generating a library of structured query language statements, generating a library of rules for generating dynamic structured query language statements, generating one of a web browser report, a file-based report, and a portable document format report, generating a library of security rules and permission statements, and generating database schemata.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer system for performing reusable software application development, said computer system comprising a multi-component architecture comprising data, wherein said multi-component architecture further comprises: a relational database server operatively connected to an application server; a presentation component operatively connected to said application server; an application component operatively connected to said application server; a data component operatively connected to said application server; a security and personalization component operatively connected to said presentation component, said application component, and said data component; an administration console operatively connected to said presentation component, said application component, and said data component, wherein said administration console comprises said security and personalization component, and wherein said security and personalization component restricts access to said data; and declarable executable specifications operatively connected to said security and personalization component, wherein said declarable executable specifications comprise a set of keywords and attributes used to declare a single set of said executable specifications and receive full unit tests, implementation documentation, and end-user application code from said single set of said executable specifications."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The computer system of claim 1 , wherein said presentation component comprises an extensible application framework comprising at least one application program interface, wherein said application program interface automates form building engines, data state machine engines, queries engines, reporting engines, access control engines, templating engines, project configuration engines, rule processing engines, and metrics engines."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The computer system of claim 1 , wherein said application component comprises an extensible information framework of database structure libraries, wherein said libraries comprise reusable tables, columns, and indexes."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The computer system of claim 1 , wherein said data component creates a plurality of database object classes, and wherein said data component comprises data types, table types, tables, and enumerations."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The computer system of claim 1 , wherein said administration console responds to operator commands enabling an operator to access said data and said declarable executable specifications."
+  },
+  {
+   "number": 6,
+   "independent": true,
+   "text": "A computer-implemented method for performing reusable software application development, said method comprising: integrating a data processing system; providing a set of keywords and attributes in said data processing system; declaring a single set of executable specifications using said set of keywords and attributes; and receiving full unit tests, implementation documentation, and end-user application code from said single set of said executable specifications."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of declaring a set of executable specifications comprises: generating a program code in said data processing system; instantiating an object code in said data processing system; generating a testable functionality result in said data processing system; generating at least one unit test case in said data processing system; generating implementation documentation output in said data processing system; generating a performance statistics output in said data processing system; and generating a project metrics in said data processing system."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of providing a set of keywords and attributes comprises generating a set of user interface forms, fields, and validation rules, and wherein said method enables an operator to describe components of a presentation and interface by receiving input from a user."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of providing a set of keywords and attributes comprises: generating a library of structured query language statements; and generating a library of rules for generating dynamic structured query language statements, wherein said method enables an operator to describe database access components by retrieving data from a data storage device, wherein said data storage device is coupled to said data processing system, and wherein said method enables said operator to describe database access rules and user interface components that connect to said data storage device by retrieving said data from said storage device and presenting data to a user."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of providing a set of keywords and attributes comprises generating one of a web browser report, a file-based report, and a portable document format report, and wherein said method enables an operator to describe database interface components by displaying data to a user."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of providing a set of keywords and attributes comprises generating a library of security rules and permission statements, and wherein said method enables an operator to describe authorization and authentication components of an application."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said step of providing a set of keywords and attributes comprises generating database schemata, wherein said database schemata comprises data types, table types, tables, and enumerations, and wherein said method enables an operator to describe database structure components by storing application data."
+  },
+  {
+   "number": 13,
+   "independent": true,
+   "text": "A program storage device readable by machine, tangibly embodying a program of instructions executable by said machine to perform a method for performing reusable software application development, said method comprising: integrating a data processing system; providing a set of keywords and attributes in said data processing system; declaring a single set of executable specifications using said set of keywords and attributes; and receiving full unit tests, implementation documentation, and end-user application code from said single set of said executable specifications."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of declaring a set of executable specifications comprises: generating a program code in said data processing system; instantiating an object code in said data processing system; generating a testable functionality result in said data processing system; generating at least one unit test case in said data processing system; generating implementation documentation output in said data processing system; generating a performance statistics output in said data processing system; and generating a project metrics in said data processing system."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises generating a set of user interface forms, fields, and validation rules, and wherein said method enables an operator to describe components of a presentation and interface by receiving input from a user."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises: generating a library of structured query language statements; and generating a library of rules for generating dynamic structured query language statements, wherein said method enables an operator to describe database access components by retrieving data from a data storage device, wherein said data storage device is coupled to said data processing system, and wherein said method enables said operator to describe database access rules and user interface components that connect to said data storage device by retrieving said data from said storage device and presenting data to a user."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises generating one of a web browser report, a file-based report, and a portable document format report, and wherein said method enables an operator to describe database interface components by displaying data to a user."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises generating a library of security rules and permission statements, and wherein said method enables an operator to describe authorization and authentication components of an application."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The program storage device of claim 13 , wherein said step of providing a set of keywords and attributes comprises generating database schemata, wherein said database schemata comprises data types, table types, tables, and enumerations, and wherein said method enables an operator to describe database structure components by storing application data."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US7039898B2/sheet-00000.webp",
+   "label": "Sheet 1 of 11",
+   "width": 172,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00001.webp",
+   "label": "Sheet 2 of 11",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00002.webp",
+   "label": "Sheet 3 of 11",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00003.webp",
+   "label": "Sheet 4 of 11",
+   "width": 64,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00004.webp",
+   "label": "Sheet 5 of 11",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00005.webp",
+   "label": "Sheet 6 of 11",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00006.webp",
+   "label": "Sheet 7 of 11",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00007.webp",
+   "label": "Sheet 8 of 11",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00008.webp",
+   "label": "Sheet 9 of 11",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00009.webp",
+   "label": "Sheet 10 of 11",
+   "width": 136,
+   "height": 120
+  },
+  {
+   "file": "drawings/US7039898B2/sheet-00010.webp",
+   "label": "Sheet 11 of 11",
+   "width": 84,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/2f/e7/27/f40f5ddb15d76e/US7039898.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/10194646",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US7039898B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

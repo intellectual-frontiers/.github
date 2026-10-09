@@ -1,0 +1,176 @@
+{
+ "number": "US11388077B2",
+ "kind": "granted patent",
+ "title": "Computer-Executable And Traceable Metric Queues System",
+ "applicationNumber": "16669496",
+ "earlierPublication": "US20200067811A1",
+ "filedOn": "2019-10-30",
+ "publishedOn": "2020-02-27",
+ "grantedOn": "2022-07-12",
+ "priorityDate": "2019-10-30",
+ "status": "Patented Case",
+ "statusDate": "2022-06-22",
+ "estimatedExpiration": "2040-01-13",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2458",
+ "examiner": "KIM, DAE Y",
+ "classifications": [
+  "H04L 43/12",
+  "G06F 16/285",
+  "G06F 16/212",
+  "G06F 16/2365",
+  "G06F 16/2474",
+  "G06F 16/248",
+  "G01S 19/13",
+  "H04L 41/145",
+  "H04L 41/5009",
+  "H04L 43/08",
+  "H04L 43/106",
+  "H04L 47/82"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A computer-controlled system for digitally evaluating one or more computer-executable and traceable metrics associated with a machine at a node. The system includes a computerized data collection wireless device for collecting digital data stored in the form of a plurality of computer-executable files from the machine. The computerized data collection wireless device includes a metric logistics device that generates a metric queue containing a plurality of computer-executable metric components storing information indicative of at least one of a date, time, geo-coordinates, machine identification details, and computer readable and executable performance data associated with the machine. The system includes a data aggregator and a computer-controlled metric appliance communicatively coupled to the data aggregator and receives the metric queue from the data aggregator. The computer-controlled metric appliance analyzes and processes the metric queue to generate an output that is indicative of whether the metric is achieved or not by the machine.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled system for digitally evaluating one or more computer-executable and traceable metrics associated with a machine at a node, the system comprising: a computerized data collection wireless device for collecting digital data stored in the form of a plurality of computer-executable files from the machine associated with the node in a physical setting, wherein the computer data collection wireless device comprises a local data reservoir, a time tracking device, a date tracking device, and a metric identifier device, wherein the node is communicatively connected with one or more other nodes such that the one or more other nodes and the node together form a computer network of nodes, and wherein the computerized data collection wireless device comprises a metric logistics device that generates a metric queue containing a plurality of computer-executable metric components storing information indicative of at least one of a date, time, geo-coordinates, machine identification details, and computer readable and executable performance data associated with the machine; a data aggregator that receives and stores the metric queue from the node locally for a retention period; a computer-controlled metric appliance directly connected to the data aggregator and that receives the metric queue from the data aggregator, wherein the computer-controlled metric appliance is not a part of the data aggregator, and wherein the computer-controlled metric appliance comprises a processing circuit that analyzes and processes the metric queue associated with the machine at the node to generate a computer readable and executable output that is indicative of whether the metric is achieved or not by the machine, the computer-controlled metric appliance comprising: a time series database that handles the computer-executable metric queue and associated measurements that are time-stamped and location-stamped in the form of a plurality of computer-executable metric clusters of time-location series, wherein the time series database stores a set of key figure values such that each key figure value is indicative of a computer-executable task associated with the metric queue that is organized and stored in the form of the configurable clusters based on an association of the key figure values and respective individual time periods in the time series associated with the computer-executable task; and a blockchain device communicatively coupled with the time series database that provides blockchain capabilities to the computer-controlled metric appliance, wherein the blockchain device includes a distributed digital ledger system for storing trust notes and creating smart contracts associated with the metric queue, wherein the metric identifier device converts raw data into metric queues and stores the metric queues in the local data reservoir in a structured form, wherein the time tracking device comprises a computerized digital clock that tracks the time of any entry or exit of data related to one or more computer-executable tasks associated with one or more devices at the node, wherein the date tracking device executes a computerized software process that tracks a date associated with an event at the node in the computer network, and wherein an output generated by the time tracking device and the date tracking device is used to determine if a metric is pending or if the metric is about to be complete in the future or if there is a progress in a performance for the metric with respect to a passage of time and if the progress is as expected."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the machine is a first machine such that the first machine is communicatively coupled to a second machine and a third machine, and wherein each of the first machine, the second machine, and the third machine are located physically at the node such that the node is communicatively coupled to the other nodes in the network wirelessly."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the metric and the computer-executable task is dependent on performance of the first machine and the second machine."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the metric and the computer-executable task is dependent on performance of the first machine only."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable metric components of the metric queue comprises a first computer-executable metric component defined as a computer-executable file storing information indicative of time of execution of the computer-executable task performed by the machine at the node."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable metric components of the metric queue comprises a second computer-executable metric component defined as a computer-executable file storing information indicative of date of execution of the computer-executable task performed by the machine at the node."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable metric components of the metric queue comprises a third computer-executable metric component defined as a computer-executable file storing information indicative of geographical coordinates (GPS location) associated with the execution of the computer-executable task performed by the machine at the node."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable metric components of the metric queue comprises a fourth computer-executable metric component defined as a computer-executable file storing information indicative of digital identification details of the machine and an associated entity pertinent to the execution of the computer-executable task performed by the machine at the node."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable metric components of the metric queue comprises a fifth computer-executable metric component defined as a computer-executable file storing information indicative of the computer readable and executable performance data associated with the computer-executable task performed by the machine."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a GPS device that collects location details by real-time tracking of the event occurrences or performance of the computer-executable tasks as executed by the machine at the node."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the time series database comprises a memory that stores time-stamped or time series data digitally, such that the stored data includes measurements and event occurrences that are tracked, monitored, down-sampled, and aggregated with time and maintained in the form of the metric queue."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the metric appliance further comprising a metrics dashboard that displays information pertinent to the metric queue in the form of user-friendly statistical patterns and graphical images on the display device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the metric identifier device defines and provides a set of computer-executable identifiers for the one or more computer-executable and traceable metrics."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the set of computer-executable identifiers are determined based on a plurality of inputs either provided manually through a computerized system or generated through an automated process based on data acquired from one or more information sources."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the blockchain device is coupled to a private data store such that an entity accesses the time series database through the private data store."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11388077B2/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 162,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11388077B2/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 80,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/d7/cd/ee/6f61489027a2ab/US11388077.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16669496",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11388077B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

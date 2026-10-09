@@ -1,0 +1,263 @@
+{
+ "number": "US20250157609A1",
+ "kind": "published application",
+ "title": "Computer-Controlled Smart Referrals System And Method",
+ "applicationNumber": "19026240",
+ "earlierPublication": "",
+ "filedOn": "2025-01-16",
+ "publishedOn": "2025-05-15",
+ "grantedOn": "",
+ "priorityDate": "2024-01-17",
+ "status": "Final Rejection Mailed",
+ "statusDate": "2026-09-17",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Pending",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Intellectual Frontiers LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "PATEL, SHERYL GOPAL",
+ "classifications": [
+  "G16H 20/00",
+  "G16H 30/20",
+  "G16H 50/30",
+  "G16H 30/40",
+  "G06F 21/602",
+  "G06F 21/6245"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "63622038"
+ ],
+ "abstract": "An embodiment herein provides a system and method for generating hyper-personalized care pathways. The system includes a data ingestion module configured to receive and process computer executable data from one or more data sources. The system includes a profile generation module operatively coupled to the data ingestion module. The profile generation module is configured to synthesize the computer executable data into a hyper-personalized computer executable profile by applying a machine learning algorithm and predictive analytics. The profile generation module is configured to generate a multi-dimensional computer executable representation of current health status and predicted future healthcare needs of the subject. The system includes a pathway generator module that is configured to determine a set of next best actions for the subject based on the hyper-personalized computer executable profile.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for generating hyper-personalized care pathways for a subject, the system comprising: a data ingestion module configured to: receive and process computer executable data from one or more data sources through encrypted communication channels, wherein the computer executable data includes at least one of electronic health records (EHRs), real-time health monitoring data, laboratory results, imaging data, patient preferences, and socio-economic parameters; implement blockchain-based verification protocols to ensure data integrity during transmission; a profile generation module operatively coupled to the data ingestion module, wherein the profile generation module is configured to: generate encrypted data containers for storing the computer executable data; synthesize the computer executable data into a hyper-personalized computer executable profile by applying a machine learning algorithm and predictive analytics while maintaining HIPAA-compliant access controls; generate a multi-dimensional computer executable representation of current health status and predicted future healthcare needs of the subject within the encrypted data containers; and a pathway generator module operatively coupled to the profile generation module, wherein the pathway generator module is configured to: determine a set of next best actions for the subject based on the hyper-personalized computer executable profile while maintaining data privacy through role-based access controls; transmit the next best actions through secure communication protocols, the next best actions comprising dynamically generated computer traceable interventions tailored to one or more clinical and non-clinical parameters associated with the subject; and update the set of next best actions in real-time as new data becomes available with the data ingestion module while maintaining an encrypted audit trail of all updates."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the profile generation module further comprises: a multi-layered neural network configured to analyze synthesized computer executable data, wherein the neural network employs a feature extraction technique to identify one or more latent variables indicative of the clinical and non-clinical parameters of the subject; and a predictive modeling engine incorporating temporal sequence analytics to anticipate a change in the current health status of the subject, the predictive modeling engine being trained on a plurality of historical datasets associated with the subject to refine the hyper-personalized computer executable profile iteratively."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the hyper-personalized computer executable profile comprises: a multidimensional data structure stored in a non-transitory computer-readable medium, wherein the data structure integrates one or more of: demographic parameters mapped to healthcare utilization models; clinical data encoded in accordance with HL7 FHIR schema for standardization and interoperability; and genetic and biomolecular markers processed through feature extraction algorithms."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein the hyper-personalized computer executable profile further comprises a set of predictive analytics data, wherein the set of predictive analytics data includes a probabilistic risk assessment, quantified using gradient-boosted decision trees trained on a multi-modal dataset to assess probabilities of one or more future medical events."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 3 , wherein the hyper-personalized computer executable profile further comprises a dynamic feedback data set, wherein the data set reflects adjustments to care pathways based on real-time subject monitoring data and previous intervention outcome."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 3 , wherein the hyper-personalized computer executable profile further comprises a structured data interface, wherein the structured data interface is configured to facilitate extraction of actionable healthcare insights from the data structure and allows integration with an external healthcare delivery system using machine-interpretable APIs."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising: a security module configured to: implement HIPAA-compliant encryption protocols for all stored and transmitted data; maintain blockchain-based verification of data integrity; generate secure audit logs of all data access and modifications; and enforce role-based access controls for all system interactions."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a feedback component that is configured to incorporate outcomes of the next best actions into the hyper-personalized computer executable profile to refine subsequent recommendations by the pathway generator module, wherein the feedback component includes a generative AI feedback engine, the generative AI feedback engine comprises a scenario simulation engine configured to construct multiple potential next best actions by leveraging a generative AI model trained on domain-specific computer executable datasets including subject data, wherein the model generates probabilistic outcomes and evaluates effectiveness of the potential next best actions based on subject-specific data."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein the AI feedback component is coupled to a real-time feedback acquisition interface, wherein the feedback acquisition interface is configured to collect the subject data from one or more of a patient monitoring device, healthcare provider input, and next best action response metrics to refine simulated next best actions, and wherein the AI feedback component further comprising: an iterative optimization module operatively coupled to the scenario simulation engine, wherein the scenario simulation engine employs a reinforcement learning algorithm to prioritize the potential next best actions based on predefined metrics, including clinical efficacy, patient satisfaction, and resource utilization; and a pathway refinement system configured to dynamically update the potential next best actions by incorporating real-time changes in the subject data and contextual feedback into the generative AI model."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the profile generation module implements: encrypted data containers for storing patient profiles; secure multi-party computation protocols for distributed data processing; privacy-preserving machine learning algorithms that maintain data confidentiality during analysis; and secure key management protocols for controlling access to encrypted data."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the pathway generator module further comprises a next-best-actions generator configured to dynamically analyze the hyper-personalized profile of the subject synthesized by the profile generation module in conjunction with a plurality of computer executable clinical guidelines, historical treatment efficacy datasets, and real-world evidence databases, wherein the next-best-actions generator utilizes a machine learning algorithm, including supervised learning models and reinforcement learning frameworks, to generate the set of next best actions, and wherein the next-best-actions generator is operatively coupled to a predictive modeling engine that applies predictive modeling techniques to account for temporal factors and treatment timelines by generating intervention schedules optimized based on specified parameters."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the pathway generator module further comprises a multi-tiered prioritization engine configured to stratify the set of next-best-actions into categories comprising immediate, short-term, and long-term interventions, wherein the multi-tiered prioritization engine incorporates a prioritization algorithm to evaluate one or more specified computer executable parameters, and wherein a prioritization outcome is communicated to provider system or a subject system through a user interface block in real time."
+  },
+  {
+   "number": 13,
+   "independent": true,
+   "text": "A method for generating hyper-personalized care pathways for a subject, comprising: receiving, by a data ingestion module, computer executable data from one or more data sources, wherein the computer executable data includes at least one of electronic health records (EHRs), real-time health monitoring data, laboratory results, imaging data, patient preferences, and socio-economic parameters; synthesizing, by a profile generation module operatively coupled to the data ingestion module, the computer executable data into a hyper-personalized computer executable profile, wherein the synthesis includes: applying a machine learning algorithm to identify patterns within the computer executable data; and generating a multi-dimensional representation of current health status and predicted future healthcare needs of the subject; determining, by a pathway generator module operatively coupled to the profile generation module, a set of next best actions for the subject based on the hyper-personalized computer executable profile, wherein the next best actions comprise dynamically generated computer traceable interventions tailored to one or more clinical and non-clinical parameters associated with the subject; and updating the set of next best actions in real-time as new data becomes available with the data ingestion module."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 13 , wherein synthesizing the computer executable data further comprises: employing a multi-layered neural network to extract one or more latent variables from the data, wherein the latent variables are indicative of clinical and non-clinical parameters of the subject; and applying temporal sequence analytics to predict a change in the subject's health status based on historical datasets."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 13 , wherein determining the set of next best actions further comprises: analyzing the hyper-personalized computer executable profile using a predictive analytics engine to quantify the probabilities of one or more future medical events; and generating a prioritized list of interventions based on predefined metrics, including clinical efficacy, subject preferences, and socio-economic feasibility."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 13 , further comprising: storing the hyper-personalized computer executable profile as a multi-dimensional data structure in a non-transitory computer-readable medium, wherein the data structure integrates one or more of: demographic parameters mapped to healthcare utilization models; clinical data encoded in accordance with HL7 FHIR schema; and genetic and biomolecular markers processed through feature extraction algorithms."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 13 , wherein updating the set of next best actions further comprises incorporating real-time feedback received from patient monitoring devices, healthcare provider inputs, and outcome metrics of previously implemented actions into the pathway generator module to dynamically refine subsequent next based actions."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 17 , further comprising: utilizing a generative AI feedback mechanism to simulate one or more potential next best actions by constructing the potential next best actions using a generative AI model trained on domain-specific datasets; and evaluating effectiveness of the one or more potential next best actions based on subject-specific data and predefined success metrics."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The method of claim 13 , further comprising monitoring subject adherence to the next best actions through an integration of wearable device telemetry, wherein adherence metrics are dynamically fed back into the pathway generator module to recalibrate the next best actions."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The method of claim 13 , wherein synthesizing the computer executable data further comprises: preprocessing heterogeneous data formats using a data harmonization pipeline that includes one or more of natural language processing for unstructured text, Fourier transformations for signal data, and ontology-based mapping for categorical data; and implementing a multi-task deep learning model to concurrently perform of or more of identifying risk factors, predicting disease progression, and generating health insights."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20250157609A1/sheet-00000.webp",
+   "label": "Sheet 1 of 18",
+   "width": 159,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00001.webp",
+   "label": "Sheet 2 of 18",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00002.webp",
+   "label": "Sheet 3 of 18",
+   "width": 102,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00003.webp",
+   "label": "Sheet 4 of 18",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00004.webp",
+   "label": "Sheet 5 of 18",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00005.webp",
+   "label": "Sheet 6 of 18",
+   "width": 104,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00006.webp",
+   "label": "Sheet 7 of 18",
+   "width": 48,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00007.webp",
+   "label": "Sheet 8 of 18",
+   "width": 221,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00008.webp",
+   "label": "Sheet 9 of 18",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00009.webp",
+   "label": "Sheet 10 of 18",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00010.webp",
+   "label": "Sheet 11 of 18",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00011.webp",
+   "label": "Sheet 12 of 18",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00012.webp",
+   "label": "Sheet 13 of 18",
+   "width": 75,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00013.webp",
+   "label": "Sheet 14 of 18",
+   "width": 102,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00014.webp",
+   "label": "Sheet 15 of 18",
+   "width": 111,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00015.webp",
+   "label": "Sheet 16 of 18",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00016.webp",
+   "label": "Sheet 17 of 18",
+   "width": 71,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250157609A1/sheet-00017.webp",
+   "label": "Sheet 18 of 18",
+   "width": 80,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/eb/d9/57/225c87d362a2ef/US20250157609A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/19026240",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20250157609A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

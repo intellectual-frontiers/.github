@@ -1,0 +1,179 @@
+{
+ "number": "US12155747B2",
+ "kind": "granted patent",
+ "title": "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption",
+ "applicationNumber": "17149482",
+ "earlierPublication": "US20210143982A1",
+ "filedOn": "2021-01-14",
+ "publishedOn": "2021-05-13",
+ "grantedOn": "2024-11-26",
+ "priorityDate": "2021-01-14",
+ "status": "Patented Case",
+ "statusDate": "2024-11-06",
+ "estimatedExpiration": "2043-01-07",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3621",
+ "examiner": "STROUD, CHRISTOPHER",
+ "classifications": [
+  "H04L 9/0643",
+  "H04L 9/3239",
+  "G06N 20/00",
+  "G06V 40/174",
+  "G06V 40/193",
+  "H04L 9/50",
+  "G06F 3/013",
+  "G06Q 20/123",
+  "G06Q 20/3678",
+  "G06Q 30/0218",
+  "G09B 5/00",
+  "G09B 5/12",
+  "G09B 7/02",
+  "H04L 9/3263",
+  "H04L2209/56"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system for monitoring consumption of digital content by a user includes a display device, a memory circuit maintained on one or more non-transitory computer-readable media, and a processing circuit. The processing circuit identifies the progress of the user through the digital content presented on the display device. The digital content includes a collection of micro content blocks, the progress of the user being at least dependent on one or more of a plurality of predefined parameters. The processing circuit identifies a computer-executable progress score of the user based on the progress identified for the user and defines a computer-executable reward value for the user based on the progress score of the user upon successful achieving at least a defined level of the progress. The processing circuit allows the user to redeem the computer-executable reward value as an equivalent transactional amount upon submission of the progress.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for monitoring consumption of digital content by a user, the system comprising: an information management server communicatively connected to a plurality of information sources each of which comprises a storage device that stores a plurality of digital files, the information management server comprising a memory circuit maintained on one or more non-transitory computer-readable media and a processing circuit, wherein the processing circuit: receives a digital request from a user device for the digital content; determines a collection of micro-content blocks from at least one information source from the plurality of information sources, wherein the collection of micro-content blocks corresponds to the digital content to be delivered to the user device based on the request; and transmits at least one micro content block from the collection of micro-content blocks corresponding to the digital content to the user device based on a work flow plan, wherein the work flow plan comprises a series of computerized micro-tasks to be performed on the user device by the user of the user device in a particular sequence at particular locations and at a particular time slot, wherein the user device is remotely located from the information management server; a front-end context monitoring appliance remotely connected with the information management server and the user device, wherein the front-end context monitoring appliance comprises: a Global Positioning Service (GPS) device that tracks location coordinates associated with the user device at which at least one computerized micro-task from the series of computerized micro-tasks is performed by a user of the user device; and a context sensor that generates at least one of a plurality of context inputs provided by the user on the user device to perform the at least one computerized micro-task at the tracked location coordinates and the time slot, and digital messages transferred from the user device to perform the at least one micro-task at the tracked location coordinates and the time slot; an AI/ML (artificial intelligence/machine learning) system remotely connected to the front -end context monitoring appliance and the processing circuit, wherein the AI/ML system: trains a machine learning model using context inputs of different users in different contexts: receives at least one of the plurality of context inputs provided by the user on the user device to perform the at least one computerized micro-task at the tracked location coordinates and the time slot, and the digital messages transferred from the user device to perform the at least one micro-task at the tracked location coordinates and the time slot; determines, using the trained machine learning model, a contextual pattern associated with the consumption of the at least one micro content block corresponding to the digital content about the user and the user device based on at least one of the plurality of context inputs provided by the user on the user device to perform the at least one computerized micro-task at the tracked location coordinates and the time slot, and the digital messages transferred from the user device to perform the at least one computerized micro-task at the tracked location coordinates and the time slot; and transmits a digital signal comprising the contextual pattern to the processing circuit; wherein the processing circuit: receives the digital signal comprising the contextual pattern from the AI/ML system; transmits other micro-content blocks from the collection of micro content blocks to the user device based on the contextual pattern and the work flow plan; identifies a progress of the user based on a number of micro-content blocks from the collection of micro content blocks transmitted to the user device and a plurality of predefined parameters, wherein the plurality of predefined parameters comprises a number of words read by the user, a number of characters read by the user, and an amount of time spent by the user in front of the micro content blocks; identifies a computer-executable progress score of the user based on the progress identified for the user; determines gaze information by tracking the pattern of gaze of the user using an eye movement sensor to determine whether a particular portion of content was consumed; receives a number of predefined evaluation factors comprising the gaze information of the user through the digital content, and micro facial expression information of the user through the progress of the digital content; determines a computer-executable genuineness score based on the number of predefined evaluation factors, wherein the computer-executable genuineness score is indicative of an extent of attention paid by the user while going through the digital content; determines whether the progress score of the user meets a defined level of progress; and defines a computer-executable reward value for the user based on the progress score of the user and the computer-executable genuineness score when the progress score of the user meets the defined level of progress."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a validation appliance that assesses the computer-executable genuineness score based on a consumption of the digital content by the user."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the validation appliance comprises a gaze tracking device for continued tracking of the gaze information of the user corresponding to the at least one transmitted micro content block corresponding to the digital content."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the validation appliance comprises a micro facial expression tracking device for continued monitoring of the micro facial expressions information of the user through the progress of the digital content."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the micro facial expression tracking device comprises a micro facial tracking software to help process movement of the micro facial expressions information."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the computer-executable genuineness score is indicative of an extent of attention paid by the user while going through the digital content such that a higher computer-executable genuineness score is indicative of a higher reward value for the user."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processing circuit instructs the user to redeem the computer-executable reward value as an equivalent transactional amount upon submission of the progress based on the computer-executable progress score and the computer- executable genuineness score, and wherein the processing circuit monitors the consumption of the digital content by defining at least one of credits, tokens, and redeemable points for each type of the digital content based on one or more of the plurality of predefined parameters."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , wherein at least one of the credits, the tokens, and the redeemable points are redeemable for a digital certification for professionals."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 7 , wherein at least one of the credits, the tokens, and the redeemable points are redeemable for a monetary transactional value, and wherein the monetary transactional value comprises a cryptocurrency."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 7 , wherein at least one of the credits, the tokens, and the redeemable points are redeemable for a monetary transactional value."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processing circuit further comprises a computer-installable agent for watching the progress of the user based on the digital content, wherein the computer-installable agent comprises a browser-plug in."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the micro content blocks are time-stamped before transmission by a micro-content communication component to the user device associated with the user."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a blockchain device that interacts with the user device through a plurality of blockchain configured distributed access points over a blockchain network."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the blockchain device comprises a distributed trusted ledgers system containing a plurality of distributed blockchain ledgers associated with a plurality of computing terminals such that each ledger stores a copy of a computer-executable file containing the context inputs, the micro content blocks, and computer-executable evidence about the consumption of the digital content in association with and based on a respective genuineness score."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the blockchain device comprises a blockchain database to store the plurality of collected context inputs, the micro content blocks, and computer-executable evidence about the consumption of the digital content in association with and based on the respective genuineness score."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US12155747B2/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 153,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 77,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US12155747B2/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 77,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/f1/4d/cf/0c88ac3da529e8/US12155747.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/17149482",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US12155747B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

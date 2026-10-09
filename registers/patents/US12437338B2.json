@@ -1,0 +1,142 @@
+{
+ "number": "US12437338B2",
+ "kind": "granted patent",
+ "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+ "applicationNumber": "18372652",
+ "earlierPublication": "US20240062291A1",
+ "filedOn": "2023-09-25",
+ "publishedOn": "2024-02-22",
+ "grantedOn": "2025-10-07",
+ "priorityDate": "2019-04-25",
+ "status": "Patented Case",
+ "statusDate": "2025-09-24",
+ "estimatedExpiration": "2040-07-14",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Intellectual Frontiers LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3699",
+ "examiner": "ALI, JAHED",
+ "classifications": [
+  "G06Q 40/04",
+  "H04L 9/50",
+  "G06Q 30/0605",
+  "G06Q2220/00",
+  "H04L 9/0643",
+  "H04L 9/3213",
+  "H04L 9/3239",
+  "H04L 63/062",
+  "H04L 63/067",
+  "H04L 63/0823",
+  "H04L2209/56",
+  "H04W 4/14"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US16/854,872",
+   "relation": "Division",
+   "publication": "US11880882B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "16854872",
+  "62838473"
+ ],
+ "abstract": "A marketplace network for facilitating transactions among a plurality of marketplace participants. The marketplace network includes a plurality of service provider systems associated with respective service provider participants. Each of the plurality of service provider systems are communicatively coupled to a respective merchant server. The marketplace network includes a plurality of user systems associated with respective user participants configured to generate a service request to one of the plurality of service provider systems. The marketplace server facilitates transactions digitally by executing a set of computer-executable tasks for securely processing transactional exchanges among the marketplace participants. The transactional exchanges include at least exchanges of ownership rights for digitally stored data at least in part owned originally by the user participants.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled system for automated evidence-based transactional exchange between a service provider system associated with a service provider and a mobile communication device associated with a user, the system comprising a merchant server comprising a memory storing instructions, and a processor to execute the instructions, wherein the instructions are configured to: collect predefined information about a mobile communication device and an associated user, the predefined information comprising at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting, generate a first short message service (SMS) that is sent to the mobile communication device; generate a second SMS that is sent to a service provider system, wherein the first SMS and the second SMS contain a first secured hashlink and a second secured hashlink respectively that are executable by the user and the service provider respectively, such that the first SMS and the second SMS are indicative of delivery of the service; and allow a transaction involving: delivery of the service to the user, and transfer of ownership of digitally executable data originally owned by the user to the service provider when the data is available at a later time in return of the service availed by the user, wherein the merchant server generates and sends a confirmation electronic message along with a digitally executable unique service proof token (SPT) to the mobile communication device and the service provider system upon completion of the service delivery after execution of the first secured hashlink and the second secured hashlink respectively by the mobile communication device and the service provider system, and wherein the first secured hashlink and the second secured hashlink are each executable with clicks such that the execution of the first secured hashlink and the second secured hashlink record a proof of respective locations of the mobile communication device and the service provider system."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the data is valued at no less than a value of the service calculated in accordance with a set of digitally recognizable data valuation parameters defined by the service provider system."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the unique SPT is associated with each of the mobile communication device and the service provider system and is indicative of completion and delivery of the service by the service provider system to the user associated with the mobile communication device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein the service provider system accesses the data automatically from a database when the data is available upon submitting the service proof token (SPT)."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the SPT serves as an evidence of the delivery of the service by the service provider to the user at a different prior time when the data was not yet available."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , further comprising a blockchain device that automatically stores computer-executable instructions comprising the SPT associated with the mobile communication device and the service provider system for delivery of the service."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , further comprising a central verification device that verifies the evidence of the service delivery, wherein the central verification device compares the SPT submitted by the service system with the SPT stored in the blockchain device to allow the service provider system access to the database storing the data."
+  },
+  {
+   "number": 8,
+   "independent": true,
+   "text": "A computer-controlled system for automated evidence-based transactional exchange between a service provider system associated with a service provider and a mobile communication device associated with a user, the system comprising a server comprising a memory storing instructions, and a processor to execute the instructions, wherein the instructions are configured to: collect predefined information about a mobile communication device and an associated user, the predefined information comprising at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting, generate and send a confirmation electronic message along with a digitally executable unique service proof token (SPT) to the mobile communication device and the service provider system upon completion of the service delivery, wherein the unique SPT is associated with each of the mobile communication device and the service provider system and records an evidence of the completion and delivery of the service by the service provider system to the user associated with the mobile communication device; and allow a transaction involving transfer of ownership of digitally executable data, originally owned by the user, to the service provider system when the data is available at a later time in return of the service availed by the user, wherein the server generates a first short message service (SMS) that is sent to the mobile communication device, wherein the server generates a second SMS that is sent to the service provider system, wherein the first SMS and the second SMS contain a first secured hashlink and a second secured hashlink respectively that are executable by the user and the service provider respectively, such that the first SMS and the second SMS are indicative of delivery of the service, wherein the SPT is generated after execution of the first secured hashlink and the second secured hashlink respectively by the mobile communication device and the service provider system, and wherein the first secured hashlink and the second secured hashlink are each executable with clicks such that the execution of the first secured hashlink and the second secured hashlink record a proof of respective locations of the mobile communication device and the service provider system."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein respective clicks record GPS locations of the mobile communication device and the service provider system."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , further comprising a blockchain device, wherein the GPS locations of the mobile communication device and the service provider system along with service details are stored in the blockchain device within the STP."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the service provider system is configured to automatically secure the ownership of the digitally executable data at a later time using the STP from the blockchain device."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A computer-controlled system for automated evidence-based transactional exchange between a service provider system associated with a service provider and a mobile communication device associated with a user, the system comprising a server comprising a memory storing instructions, and a processor to execute the instructions, wherein the instructions are configured to: collect predefined information about a mobile communication device and an associated user, the predefined information comprising at least a first computer-executable input indicative of an identifier of the mobile communication device and the associated user, and a second computer-executable input indicative of a service sought for delivery in the service setting, generate and send a confirmation electronic message along with a digitally executable unique service proof token (SPT) to the mobile communication device and the service provider system upon completion of the service delivery, wherein the unique SPT is associated with each of the mobile communication device and the service provider system and records an evidence of the completion and delivery of the service by the service provider system to the user associated with the mobile communication device; and allow a transaction involving transfer of ownership of digitally executable data, originally owned by the user, to the service provider system when the data is available at a later time in return of the service availed by the user, wherein the server generates a first short message service (SMS) that is sent to the mobile communication device, wherein the server generates a second SMS that is sent to the service provider system, and wherein the first SMS and the second SMS contain a first secured hashlink and a second secured hashlink respectively that are executable by the user and the service provider respectively, such that the first SMS and the second SMS are indicative of delivery of the service, and wherein the first secured hashlink and the second secured hashlink are each executable with clicks such that the execution of the first secured hashlink and the second secured hashlink record a proof of respective locations of the mobile communication device and the service provider system."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 12 , comprising a processor configured to digitally record an ownership trail of the digitally executable data as computer-executable files in a decentralized blockchain ledger, wherein the decentralized blockchain ledger is accessed through a graphical user interface (GUI)."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the processor is configured to transform the computer-executable files into an application programming interface to create an electronic document comprising the item."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the processor is configured to deliver the electronic document comprising the item to the user participant by the service provider system based on the ownership trail."
+  }
+ ],
+ "drawings": [],
+ "pdfUrl": "",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/18372652",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US12437338B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

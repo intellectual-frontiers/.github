@@ -1,0 +1,210 @@
+{
+ "number": "US20250111908A1",
+ "kind": "published application",
+ "title": "Digital Native Trials Management System",
+ "applicationNumber": "18977822",
+ "earlierPublication": "",
+ "filedOn": "2024-12-11",
+ "publishedOn": "2025-04-03",
+ "grantedOn": "",
+ "priorityDate": "2024-12-11",
+ "status": "Final Rejection Mailed",
+ "statusDate": "2026-08-27",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Pending",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Intellectual Frontiers LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "BURGESS, JOSEPH D",
+ "classifications": [
+  "G16H 10/20",
+  "G16H 40/67",
+  "G06Q 10/06315"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system for autonomously managing an experimental study using real-world data. The system includes a processor that is configured to generate or receive an adaptive trial protocol defining participant criteria, one or more interventions, one or more outcomes, and respective durations. The processor is configured to facilitate recruitment of one or more participants via one or more digital channels based on assessment of eligibility against the participant criteria. The processor is configured to continuously analyze the real-world data associated with the one or more participants for one or more of adaptive trial adjustments, anomaly detection, and outcome generation.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "An adaptive software-as-a-service (SaaS)-based system for autonomously managing an experimental study using real-world data, the system comprising: a processor to: generate or receive a trial protocol defining participant criteria, one or more interventions, one or more outcomes, and respective durations; facilitate recruitment of one or more participants via one or more digital channels based on assessment of eligibility against the participant criteria; and continuously analyze the real-world data associated with the one or more participants for one or more of adaptive trial adjustments, anomaly detection, and outcome generation."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processor is to refine the protocol using machine learning algorithms based on an interim result of the experimental study."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the recruitment is performed dynamically by assessing the eligibility using real-time physiological data and probabilistic models."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the one or more digital channels comprises one of a mobile application, a wearable device, and a social networking server."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processor is to enroll the one or more participants based on the participant criteria."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the experimental study is a digitally conducted A/B test, the one or more interventions comprising at least a first intervention and a second intervention, wherein both the first intervention and the second intervention are delivered to at least one of the one or more participants such that at least one same participant receive both the first intervention and the second intervention."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein the one or more outcomes comprises a first outcome corresponding to the first intervention and a second outcome corresponding to the second intervention, wherein the processor is to analyze the first outcome and the second outcome to generate a computer executable comparative report."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processor is to: implement a controlled comparative testing mechanism by allocating the one or more participants into at least two groups, wherein each group receives distinct interventions from the one or more interventions defined in the trial protocols; and collect and analyze the real-world data from participants in each group, including the outcomes and the real-world time comprising physiological parameters, to evaluate comparative effectiveness of the distinct interventions."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein the processor is to generate an adaptive trial protocol based on an analysis from the at least two groups to optimize an intervention efficacy."
+  },
+  {
+   "number": 10,
+   "independent": true,
+   "text": "An adaptive software-as-a-service (SaaS)-based digital system for conducting an autonomous experimental study using real-world data, the system comprising: a processor to execute machine-readable instructions stored on a non-transitory computer-readable medium, wherein the processor is to: one of either receive, from a user interface, a trial protocol specifying one or more of participant recruitment criteria, intervention types, outcome measures, and trial duration, or autonomously generate the trial protocol by applying one or more machine learning algorithms to analyze historical study data and multi-dimensional input criteria; facilitate recruitment of one or more participants by integrating with one or more digital channels, including one or more of a mobile application, a wearable device, and a social networking server; dynamically assess participant eligibility by processing at least one of real-time physiological measurements and participant-reported inputs; automatically enroll the one or more participants into the experimental study when their data satisfies the participant recruitment criteria specified in the trial protocol; and execute computational models for analyzing the real-world data during the experimental study to generate one or more trial outcomes."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the processor is to apply predictive models to monitor safety and efficacy of one or more interventions, detect one or more anomalies, and predict one or more adverse events."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A method for autonomously managing an experimental study using real-world data through an adaptive software-as-a-service (SaaS)-based system, the method comprising: generating or receiving a trial protocol, wherein the trial protocol specifies participant criteria, one or more interventions, an outcome, and a duration of the experimental study; assessing eligibility of the one or more participants against the participant criteria specified in the trial protocol; facilitating recruitment of the one or more participants through one or more digital channels; and continuously analyzing the real-world data associated with the one or more participants during the experimental study to perform one or more of adaptive trial adjustments, detecting one or more anomalies, and recording one or more outcomes."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , wherein the analysis is conducted using one or more computational models configured for real-time data processing and decision-making."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 12 , comprising adjusting the trial protocol based on at least one of the one or more anomalies and the one or more adverse events."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 12 , comprising presenting real-time insights and the one or more trial outcomes through an interactive dashboard."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 12 , wherein the recruitment of the one or more participants is performed dynamically by assessing the eligibility using at least one of real-time physiological data and probabilistic models."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 12 , wherein the one or more digital channels comprises one of a mobile application, a wearable device, and a social networking server."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 17 , comprising: implementing a controlled comparative testing mechanism by allocating the one or more participants into at least two groups, wherein each group receives distinct interventions from the one or more interventions defined in the trial protocols; and collecting and analyzing the real-world data from participants in each group, including the outcomes and the real-world data comprising physiological parameters, to evaluate comparative effectiveness of the distinct interventions."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 18 , comprising generating an adaptive trial protocol based on an analysis from the at least two groups to optimize an intervention efficacy."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The method of claim 19 , comprising automatically allocating the one or more participants to the experimental study matching their eligibility, wherein the allocation includes multi-group intervention comparisons."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20250111908A1/sheet-00000.webp",
+   "label": "Sheet 1 of 10",
+   "width": 189,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00001.webp",
+   "label": "Sheet 2 of 10",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00002.webp",
+   "label": "Sheet 3 of 10",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00003.webp",
+   "label": "Sheet 4 of 10",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00004.webp",
+   "label": "Sheet 5 of 10",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00005.webp",
+   "label": "Sheet 6 of 10",
+   "width": 123,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00006.webp",
+   "label": "Sheet 7 of 10",
+   "width": 132,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00007.webp",
+   "label": "Sheet 8 of 10",
+   "width": 67,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00008.webp",
+   "label": "Sheet 9 of 10",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20250111908A1/sheet-00009.webp",
+   "label": "Sheet 10 of 10",
+   "width": 86,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/1a/5f/ab/5019bd93255f32/US20250111908A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/18977822",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20250111908A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

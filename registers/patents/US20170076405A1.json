@@ -1,0 +1,147 @@
+{
+ "number": "US20170076405A1",
+ "kind": "published application",
+ "title": "Graphical User Interface And Smart Card Reader For Facilitating Crowdsourced Credentialing And Accreditation",
+ "applicationNumber": "15362768",
+ "earlierPublication": "",
+ "filedOn": "2016-11-28",
+ "publishedOn": "2017-03-16",
+ "grantedOn": "",
+ "priorityDate": "2013-04-18",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2021-01-19",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3689",
+ "examiner": "ARAQUE JR, GERARDO",
+ "classifications": [
+  "G06Q 10/40",
+  "G06Q 30/018"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/865,481",
+   "relation": "Continuation-In-Part",
+   "publication": "US20140317003A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13865481"
+ ],
+ "abstract": "A graphical user interface and smart card reader system for facilitating crowdsourced credentialing over a network includes a federated profile manager to maintain profile related information for a plurality of professionals obtained from a plurality of federated sources distributed across the crowdsourced network. The system further includes a profile segmenting engine to segment and classify the profile-related information for each of the professionals into a plurality of federated profiles. The system further includes a certification engine to allow a plurality of crowdsourced respondents to respond to the federated profiles associated with each of the plurality of professionals and credential them. The system is configured as a crowdsourced credentialing-based smart controlled-access system in an embodiment.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A graphical user interface (GUI) accessed locally on a computer screen and configured to provide access to a distributed architecture-based system for facilitating crowdsourced credentialing over a crowdsourced communication network, said system comprising: a GUI icon stored on a computerized display device; a profile management server, communicatively connected to said crowdsourced communication network and accessible through said GUI icon, comprising: a profile information collection module of said distributed architecture based system, comprising a collection processor and a collection memory, configured to collect profile creation information about each of a plurality of professionals distributed over said crowdsourced communication network, wherein said profile creation information is collected from: said plurality of professionals distributed over said crowdsourced communication network; and a plurality of online websites of said plurality of professionals, wherein an online website comprises a social networking profile associated with a social networking platform, and an institutional website, wherein said social networking profile is distinct from said institutional website; a federated profile manager of said distributed architecture based system, communicatively coupled to said profile information collection module and comprising a profile manager processor and a profile manager memory, said federated profile manager is configured to: create a plurality of common profiles corresponding to each of said plurality of professionals, using said collected profile creation information by said profile information collection module; a profile segmenting engine of said distributed architecture based system, communicatively coupled to said federated profile manager and accessible through said GUI icon and comprising a profile segmenting processor and a profile segmenting memory, said profile segmenting engine configured to: segment each of said plurality of common profiles into a plurality of portions; communicate each of said plurality of portions to said federated profile manager, wherein said federated profile manager is further configured to store said plurality of portions; a profiles database of said distributed architecture based system accessible through said GUI icon, and configured to centrally store said plurality of common profiles of said plurality of professionals on a first non-transitory storage media, wherein said profiles database is communicatively coupled to said profile management server, such that said federated profile manager maintains said plurality of common profiles stored in said profiles database; a profile certification server accessible through said GUI icon and communicatively connected to said crowdsourced communication network, comprising: a certification engine of said distributed architecture-based system configured to facilitate credentialing of said plurality of common profiles, said certification engine comprises: a segment certification engine, comprising a segment certification processor and a segment certification memory, said segment certification engine configured to: make available said plurality of portions of each of said plurality of common profiles for verification by a plurality of respondents; receive a plurality of crowdsource responses from said plurality of respondents, using said crowdsourced communication network, wherein each of said plurality of crowdsource responses: corresponds to one portion of said plurality of portions of each of said plurality of common profiles; indicates said one portion as correct or as wrong; and includes an attribute indicating a corresponding respondent for said one portion, and a date of said response; credential said one portion, using said crowdsource response, wherein the credentialing said one portion is separate from credentialing any other portion in said plurality of portions; determine a level of accuracy of said credentialing of said one portion using a number of crowdsource responses corresponding to said one portion; and a profile certification engine comprising a profile certification processor and a profile certification memory, wherein said profile certification engine is configured to: credential the entirety of a common profile that includes said one portion, using a first set of crowdsource responses, wherein all responses in said first set of crowdsource responses correspond to said common profile; determine an index of inconsistencies of said common profile, using a distribution of differences across a plurality of responses corresponding to each portion in said common profile; determine a distribution map indicating extent and coverage of said inconsistencies among said plurality of responses corresponding to each portion in said common profile; determine an overall trust factor of said common profile using said index of inconsistencies and said distribution map; and an auto-validation engine of said distributed architecture-based system accessible through said GUI icon, and comprising an auto-validation processor and an auto-validation memory, communicatively coupled to said profile management server and said profile certification server, and platforms hosting said online websites containing information related to said plurality of professionals, wherein said auto-validation engine is configured to certify said credentialing of said common profiles, already certified by said certification engine, by using said information about said professionals from said online websites, wherein, through a plurality of distributed local machines, one or more of said common profiles and respective credentialing information are accessible by distributed medical entities for learning said overall trust factor about said plurality of common profiles of said plurality of professionals based on a cumulative effect of credentialing and said auto validation of said profile related information, wherein said plurality of local machines comprising at least a first local machine, the first local machine comprising: a firewall located in a private network zone; a configurable appliance installed behind said firewall to allow access to a set of computing devices within said network zone of said configurable appliance; a local database communicatively and operatively connected with said configurable appliance for storing, at least in part, said common profiles and respective credentialing information and overall trust factor parsed by said credentialing system; and the display device for presenting an output to a user in response to a user request, said output indicative of said common profiles and respective credentialing information and overall trust factor stored on said local database after processing."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said auto-validation engine comprises a plurality of application programming interfaces (APIs) allowing verification of information associated with each of said plurality of common profiles of said plurality of professionals from respective said social profile of each of said professionals maintained by said social networking platform, wherein said social profile maintained by said social networking platform is distinct from said profiles of each of said professionals maintained by said federated profile manager, wherein said APIs further allow to determine an extent of mapping between said information contained in said two distinct profiles maintained by said federated profile manager and said social networking platform, and wherein said APIs are adapted to link each of said plurality of portions to one or more distinct sources of said social networking platform such that a unique identifier is maintained that associate a distinct source of said social networking platform to each of said plurality of portions."
+  },
+  {
+   "number": 3,
+   "independent": true,
+   "text": "A smart card reader system for accessing a crowdsourced-credentialing-based smart controlled-access system facilitated through crowdsourced credentialing over a crowdsourced communication network, said smart card reader system comprising: a profile management server, communicatively connected to said crowdsourced communication network, comprising: a profile information collection module comprising a collection processor and a collection memory, configured to collect profile creation information about each of a plurality of professionals distributed over said crowdsourced communication network, wherein said profile creation information is collected from: said plurality of professionals distributed over said crowdsourced communication network; and a plurality of online websites of said plurality of professionals, wherein an online website comprises a social networking profile, and an institutional website, wherein said social networking profile is distinct from said institutional website; a federated profile manager communicatively coupled to said profile information collection module, said federated profile manager is configured to: create a plurality of common profiles corresponding to each of said plurality of professionals, using said collected profile creation information by said profile information collection module; a profile segmenting engine communicatively coupled to said federated profile manager and comprising a profile segmenting processor and a profile segmenting memory, said profile segmenting engine configured to: segment each of said plurality of common profiles into a plurality of portions; and communicate each of said plurality of portions to said federated profile manager, wherein said federated profile manager is further configured to store said plurality of portions; a profiles database configured to centrally store said plurality of common profiles of said plurality of professionals on a first non-transitory storage media, wherein said profiles database is communicatively coupled to said profile management server, such that said federated profile manager maintains said plurality of common profiles stored in said profiles database; a profile certification server, communicatively connected to said crowdsourced communication network, comprising: a certification engine of said distributed architecture-based system configured to facilitate credentialing of said plurality of common profiles, said segment certification engine comprises: a segment certification engine, comprising a segment certification processor and a segment certification memory, said segment certification engine configured to: make available said plurality of portions of each of said plurality of common profiles for verification by a plurality of respondents; receive a plurality of crowdsource responses from said plurality of respondents, using said crowdsourced communication network, wherein each of said plurality of crowdsource responses: corresponds to one portion of said plurality of portions of each of said plurality of common profiles; indicates said one portion as correct or as wrong; and includes an attribute indicating a corresponding respondent for said one portion, and a date of said response; credential said one portion, using said crowdsource response, wherein said credentialing of said one portion is separate from credentialing any other portion in said plurality of portions; determine a level of accuracy of said credentialing of said one portion using a number of crowdsource responses corresponding to said one portion; and a profile certification engine comprising a profile certification processor and a profile certification memory, wherein said profile certification engine is configured to: credential said entirety of a common profile that includes said one portion, using a first set of crowdsource responses, wherein all responses in said first set of crowdsource responses correspond to said common profile; determine an index of inconsistencies of said common profile, using a distribution of differences across a plurality of responses corresponding to each portion in said common profile; determine a distribution map indicating extent and coverage of said inconsistencies among said plurality of responses corresponding to each portion in said common profile; determine an overall trust factor of said common profile using said index of inconsistencies and said distribution map; wherein one or more of said common profiles are accessible by medical entities for learning said overall trust factor about said plurality of common profiles of said plurality of professionals based on credentialing of said profile related information; and a smart access card system comprising: a memory circuit to store predefined rules and said common profiles and respective credentialing information and overall trust factor for processing authentication and providing a controlled access to a smart access card; an integrated circuit (IC) card reader to read information stored on said smart access card; a card receptacle such that said smart access card is configured to be inserted into said card receptacle for reading of said information stored on said smart access card by said IC card reader; a card sensor to detect presence of said smart access card in said receptacle such that said detected information is passed to said IC card reader for further processing; a processing circuit to process said information read by said IC card reader and provide controlled access to said smart access card based on said predefined rules stored in said memory circuit; an access panel to display input and output details regarding a processing activity executed by said processing circuit; and a container to house components of said smart access card system structurally."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , further comprising a network interface to facilitate communication between said smart access card system and said credentialing system over said crowdsourced network."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 3 , further comprising an authentication module communicatively and operatively coupled to said processing circuit for executing instructions to authenticate identification details of said smart access card."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said smart access card comprising a magnetic stripe which when comes in contact with said receptacle of said smart access card system is sensed by said sensor to execute said instructions for authentication of said details stored on said smart access card."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20170076405A1/sheet-00000.webp",
+   "label": "Sheet 1 of 10",
+   "width": 160,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00001.webp",
+   "label": "Sheet 2 of 10",
+   "width": 100,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00002.webp",
+   "label": "Sheet 3 of 10",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00003.webp",
+   "label": "Sheet 4 of 10",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00004.webp",
+   "label": "Sheet 5 of 10",
+   "width": 104,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00005.webp",
+   "label": "Sheet 6 of 10",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00006.webp",
+   "label": "Sheet 7 of 10",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00007.webp",
+   "label": "Sheet 8 of 10",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00008.webp",
+   "label": "Sheet 9 of 10",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170076405A1/sheet-00009.webp",
+   "label": "Sheet 10 of 10",
+   "width": 92,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/c9/50/2b/0c4503dcad9957/US20170076405A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15362768",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20170076405A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,193 @@
+{
+ "number": "US10089492B2",
+ "kind": "granted patent",
+ "title": "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery",
+ "applicationNumber": "15163662",
+ "earlierPublication": "US20160350554A1",
+ "filedOn": "2016-05-24",
+ "publishedOn": "2016-12-01",
+ "grantedOn": "2018-10-02",
+ "priorityDate": "2015-05-25",
+ "status": "Patented Case",
+ "statusDate": "2018-09-12",
+ "estimatedExpiration": "2036-10-30",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2494",
+ "examiner": "TRAN, TRI MINH",
+ "classifications": [
+  "G06F 21/6245",
+  "G16H 10/60",
+  "G06Q 10/0633"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "62166103"
+ ],
+ "abstract": "A surveillance system for monitoring of Electronic Medical Record (EMR) application navigation through a plurality of navigation interfaces of an EMR application. The system includes an EMR system that includes the EMR application. The system includes a context-sensitive engine that includes an agent device to record EMR application navigation data in real time and contextual data comprising application sensitive, user sensitive and context sensitive data. The system includes an information management server to facilitate serving of information blocks to the EMR system from a plurality of distributed databases in real-time. The system includes a processing that analyzes the plurality of navigation interfaces associated with the EMR application during a workflow event, maps the analyzed navigation data and the contextual information with actual information pre-stored in a separate database connected with the EMR system, and determine an inconsistency in a navigation workflow during the workflow event based on the mapping.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-implemented surveillance system for monitoring and surveillance of Electronic Medical Record (EMR) application navigation through a plurality of navigation interfaces of an EMR application, said system comprising: an EMR system comprising said EMR application, wherein said EMR system is configured to execute computer executable instructions to manage computerized medical records electronically; a context-sensitive engine operatively deployed at a front-end of said EMR system, said context-sensitive engine comprising: an agent device to: record EMR application navigation data in real time; and record contextual data comprising application sensitive, user sensitive, and context sensitive data, wherein said agent device is operatively and communicatively connected with said EMR system; an installable computer-executable agent file to allow configuration and setup of said agent device; an information management server communicatively connected with said EMR system to facilitate serving of computer executable information blocks to said EMR system from a plurality of distributed databases in real-time, wherein each of said plurality of distributed databases are communicatively connected with said EMR system through said information management server, wherein delivery of said computer executable information blocks is based on said contextual information; a transceiver to transmit said navigation data and said contextual data from said agent device to said information management server; a processing circuit included within or communicatively coupled with said information management server, wherein said processing circuit: analyzes said plurality of navigation interfaces associated with said EMR application during a workflow event to generate a signal indicative of analyzed navigation data; maps said analyzed navigation data and said contextual information with actual information pre-stored in a separate database connected with said EMR system, wherein said actual information signifies events occurrences within an environment; and determines an inconsistency in a navigation workflow during said workflow event based on said mapping; a notification device to report said inconsistency to said EMR system, wherein said notification device: generates an electric signal comprising a computer executable file signifying said inconsistency in said navigation workflow during said workflow event; transmits said electric signal in a network comprising a plurality of communicatively linked data communication devices; converts said electric signal into a plurality of pixels; and displays said plurality of pixels on a display unit to indicate said navigation data and said inconsistency therein, a handheld device-based GPS system comprising: a second display unit such that an output generated and transmitted by the information management server is displayed at the second display unit; a GPS unit to generate and sense location information for providing positioning information of an entity, wherein the positioning information is alternatively used to compare said event occurrences with said navigation data and said contextual information obtained from the information management server to identify said inconsistency by said handheld device-based GPS system to prevent user access of said computer executable information blocks in response to said inconsistency and allow user access of said computer executable information blocks in response to a correlation of said navigation data and said contextual information; and an appliance housing containing said second display unit."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a memory circuit communicatively connected with said EMR system to store said recorded EMR application navigation data."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit further performs: analyzing of said information blocks delivered to said EMR application in association with said plurality of navigation interfaces associated with said EMR application during a workflow event; mapping of said analyzed information blocks with said actual information pre-stored in a separate database connected with said EMR system; determining an inconsistency in a navigation workflow during said workflow event based on said mapping of said information blocks with said actual information pre-stored in said separate database about said event occurrences; and generating an electric signal comprising a computer executable file signifying said inconsistency in said navigation workflow during said workflow event based on situational awareness through said delivery of said information blocks."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said information management server further comprises an information blocks creator, and wherein said information blocks creator generates a set of information blocks based on said contextual information received from said agent device by said information management server."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said information management server further comprises an information button knowledge base, and wherein said information button knowledge base configures a widget presentable on said EMR application along with an information block such that said information block presents a limited information to said EMR application and said widget facilitates redirection to a detailed view of said information at a source web page from where said information contained within said information block is aggregated by said information blocks creator."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said information management server further comprises a plurality of Application Programming Interfaces (APIs) to execute a plurality of custom applications."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said information management server is configured to generate said information blocks such that said information blocks are defined as at least one of: a patient-centric information block presentable for use by a patient section of said EMR application; and a physician-centric information block and presentable for use by a healthcare provider section of said EMR application."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said information management server further comprises an aggregation engine to aggregate a plurality of information pieces from said plurality of distributed databases containing a variety of information types."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said information blocks are configured as real time information widgets presentable on a display of said EMR system, wherein said presentable real time information widgets are configured based on said plurality of information pieces aggregated by said aggregation engine and said contextual data obtained from said agent device."
+  },
+  {
+   "number": 10,
+   "independent": true,
+   "text": "A computer-implemented surveillance method for monitoring and surveillance of Electronic Medical Record (EMR) application navigation through a plurality of navigation interfaces of an EMR application, said method comprising: recording EMR application navigation data in real time by an agent device installed at a front-end of said EMR application; recording contextual data comprising application sensitive data, user sensitive data, and context sensitive data by said agent device, wherein said agent device is operatively and communicatively connected with said EMR system; transmitting said navigation data and said contextual data from said agent device to said information management server; analyzing said plurality of navigation interfaces associated with said EMR application during a workflow event by a processing circuit to generate a signal indicative of analyzed navigation data; mapping said analyzed navigation data and said contextual data with actual information pre-stored in a separate database connected with said EMR system, wherein said actual information signifies events occurrences within an environment; determining an inconsistency in a navigation workflow during said workflow event based on said mapping; and reporting said inconsistency to said EMR system through a notification device, wherein said reporting comprises: generating an electric signal comprising a computer executable file signifying said inconsistency in said navigation workflow during said workflow event; transmitting said electric signal, in a network comprising a plurality of communicatively linked data communication devices; converting said electric signal into a plurality of pixels; and displaying said plurality of pixels on a display unit to indicate said navigation data and said inconsistency therein, wherein the EMR application is communicatively connected to a handheld device-based GPS system, wherein the handheld device-based GPS system comprises: a second display unit such that an output generated and transmitted by the information management server is displayed at the second display unit; a GPS unit to generate and sense location information for providing positioning information of an entity, wherein the positioning information is alternatively used to compare said event occurrences with said navigation data and said contextual information to identify said inconsistency by said handheld device-based GPS system to prevent user access of computer executable information blocks in response to said inconsistency and allow user access of said computer executable information blocks in response to a correlation of said navigation data and said contextual information; and an appliance housing containing said second display unit."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 10 , further comprising generating a set of the information blocks based on said contextual information received from said agent device by said information management server such that said information blocks are defined as at least one of: a patient-centric information block presentable for use by a patient section of said EMR application; and a physician-centric information block and presentable for use by a healthcare provider section of said EMR application."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 10 , further comprising aggregating a plurality of information pieces from a plurality of distributed databases containing a variety of information types such that said plurality of information pieces are utilized by said information management server to create a plurality of the information blocks based on said contextual data and said navigation data."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , wherein said information blocks are configured as real time information widgets presentable on a display device of said EMR system, and wherein said presentable real time information widgets are configured based on said plurality of information pieces aggregated by said aggregation engine and said contextual data obtained from said agent device."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 13 , further comprising delivering one or more information blocks of said plurality of information blocks on said display device of said EMR system based on said contextual data and said navigation data in real time, wherein said delivered information blocks are configured as real time information widgets presentable on said display device of said EMR system."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising: analyzing said information blocks delivered to said EMR application in association with said plurality of navigation interfaces associated with said EMR application during a workflow event; mapping said analyzed information blocks with said actual information pre-stored in a separate database connected with said EMR system; and determining an inconsistency in a navigation workflow during said workflow event based on said mapping of said information blocks with said actual information pre-stored in said separate database about said event occurrences; and generating an electric signal comprising a computer executable file signifying said inconsistency in said navigation workflow during said workflow event based on situational awareness through said delivery of said information blocks."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10089492B2/sheet-00000.webp",
+   "label": "Sheet 1 of 11",
+   "width": 148,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00001.webp",
+   "label": "Sheet 2 of 11",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00002.webp",
+   "label": "Sheet 3 of 11",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00003.webp",
+   "label": "Sheet 4 of 11",
+   "width": 104,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00004.webp",
+   "label": "Sheet 5 of 11",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00005.webp",
+   "label": "Sheet 6 of 11",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00006.webp",
+   "label": "Sheet 7 of 11",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00007.webp",
+   "label": "Sheet 8 of 11",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00008.webp",
+   "label": "Sheet 9 of 11",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00009.webp",
+   "label": "Sheet 10 of 11",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10089492B2/sheet-00010.webp",
+   "label": "Sheet 11 of 11",
+   "width": 88,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/ff/04/53/696fcba5f8b748/US10089492.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15163662",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10089492B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

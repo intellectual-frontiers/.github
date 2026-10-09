@@ -1745,7 +1745,13 @@ ifcore:hasDisposition a owl:ObjectProperty ; rdfs:domain ifcore:Note ; rdfs:rang
 
 ifcore:Right a owl:Class ; skos:closeMatch dcterms:RightsStatement ; rdfs:subClassOf ifcore:IntellectualProperty, prov:Entity ; rdfs:label "Right"@en ;
     rdfs:comment "A kind of protection a finding's disposition can produce; a kind of intellectual property (0007-work-and-assets FR-007) and a thing with provenance (0007 FR-002)."@en .
-ifcore:PatentFamily a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent family"@en .
+ifcore:PatentFamily a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent family"@en ;
+    skos:definition "The patents that share a priority claim, shown as one portfolio (0051-patent-portfolio FR-002)."@en ;
+    rdfs:comment "Its patents are ifcore:Patent individuals that name it by dcterms:isPartOf. Its title, work domain and offer are the company's facts; its patents' registry facts are their ExternalRecordReferences' (0007-work-and-assets FR-008)."@en .
+ifcore:Patent a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Patent"@en ;
+    skos:closeMatch bibo:Patent , <http://www.wikidata.org/entity/Q253623> ;
+    skos:definition "One patent document that a patent office granted or published: a granted patent or a published application, identified by its publication number with its kind code (0051-patent-portfolio FR-001)."@en ;
+    rdfs:comment "The primary asset of the portfolio. It is part of exactly one ifcore:PatentFamily (dcterms:isPartOf) and has its number as dcterms:identifier. A provisional or unpublished application is not a Patent. Its registry facts sit on the ExternalRecordReference that ifcore:describes it, never as its own literals (0007-work-and-assets FR-008). A supporting asset names it by schema:about and is never a Patent (0051 FR-004, FR-005)."@en .
 ifcore:DefensiveDisclosure a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Defensive disclosure"@en .
 ifcore:Trademark a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trademark"@en .
 ifcore:TradeSecret a owl:Class ; rdfs:subClassOf ifcore:Right, ifcore:Fact ; rdfs:label "Trade secret"@en ;
@@ -1760,12 +1766,12 @@ ifcore:licenses a owl:ObjectProperty ; rdfs:domain ifcore:License ; rdfs:range i
 # attribution: creator MAY be a specific named person; rightsHolder defaults to
 # Intellectual Frontiers LLC absent a stated agreement otherwise (0007 FR-014).
 
-ifcore:continuationOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
-    rdfs:comment "Shares the parent's specification and priority date; new claims (0007-work-and-assets FR-011)."@en .
-ifcore:divisionalOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
-    rdfs:comment "Claims split out from a parent application that covered more than one invention (0007 FR-011)."@en .
-ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:PatentFamily ;
-    rdfs:comment "Adds new matter to a parent application; partial priority (0007 FR-011)."@en .
+ifcore:continuationOf a owl:ObjectProperty ; rdfs:domain ifcore:Patent ; rdfs:range ifcore:Patent ;
+    rdfs:comment "Shares the parent's specification and priority date; new claims. Asserted only where the registry states the relation (0007-work-and-assets FR-011, 0051-patent-portfolio FR-003)."@en .
+ifcore:divisionalOf a owl:ObjectProperty ; rdfs:domain ifcore:Patent ; rdfs:range ifcore:Patent ;
+    rdfs:comment "Claims split out from a parent application that covered more than one invention. Asserted only where the registry states the relation (0007 FR-011, 0051 FR-003)."@en .
+ifcore:continuationInPartOf a owl:ObjectProperty ; rdfs:domain ifcore:Patent ; rdfs:range ifcore:Patent ;
+    rdfs:comment "Adds new matter to a parent application; partial priority. Asserted only where the registry states the relation (0007 FR-011, 0051 FR-003)."@en .
 
 ifcore:WorkDomain a owl:Class ; rdfs:label "Work domain"@en ;
     rdfs:comment "A grouping of the patent portfolio by subject matter."@en .
@@ -1786,41 +1792,1413 @@ ifcore:LearningAndContent a ifcore:WorkDomain ; rdfs:label "Learning and content
     ifcore:hasAudience ifcore:Public .
 ifcore:inWorkDomain a owl:ObjectProperty ; rdfs:domain ifcore:PatentFamily ; rdfs:range ifcore:WorkDomain .
 
-ifcore:USPatent10643208 a ifcore:PatentFamily ;
-    rdfs:label "Digital payment system (US10643208B2)"@en ;
+# ───────────────────────── The patent portfolio (0051-patent-portfolio) ─────────────────────────
+# Written from the registry records under registers/patents/ (USPTO Patent Center read 2026-09-27, Google Patents read 2026-10-09).
+# The company's facts are here: each family's title, work domain and offer, each patent's number, family and published
+# addresses, and the relations the registry states between patents. Every registry fact sits on the patent's
+# ExternalRecordReference (0007-work-and-assets FR-008).
+
+ifcore:ComputerControlledSmartReferralsSystemAndMethodFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Controlled Smart Referrals System And Method"@en ;
+    dcterms:identifier "computer-controlled-smart-referrals-system-and-method" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComputerControlledSmartReferralsSystemAndMethodFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:ComputerControlledSmartReferralsSystemAndMethodFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20250157609A1 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Smart Referrals System And Method (US20250157609A1)"@en ;
+    dcterms:identifier "US20250157609A1" ;
+    dcterms:isPartOf ifcore:ComputerControlledSmartReferralsSystemAndMethodFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-smart-referrals-system-and-method/us20250157609a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20250157609A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20250157609A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/19026240"^^xsd:anyURI ;
+    ifcore:cachedValue "Final Rejection Mailed (as of 2026-09-17); application 19026240; filed 2025-01-16; published 2025-05-15."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20250157609A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DigitalNativeTrialsManagementSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Digital Native Trials Management System"@en ;
+    dcterms:identifier "digital-native-trials-management-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DigitalNativeTrialsManagementSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:DigitalNativeTrialsManagementSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20250111908A1 a ifcore:Patent ;
+    rdfs:label "Digital Native Trials Management System (US20250111908A1)"@en ;
+    dcterms:identifier "US20250111908A1" ;
+    dcterms:isPartOf ifcore:DigitalNativeTrialsManagementSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/digital-native-trials-management-system/us20250111908a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20250111908A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20250111908A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18977822"^^xsd:anyURI ;
+    ifcore:cachedValue "Final Rejection Mailed (as of 2026-08-27); application 18977822; filed 2024-12-11; published 2025-04-03."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20250111908A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Controlled Marketplace Network For Digital Transactions"@en ;
+    dcterms:identifier "computer-controlled-marketplace-network-for-digital-transactions" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions-2025"^^xsd:anyURI ;
+    ifcore:inWorkDomain ifcore:MarketplacesAndPayments ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11880882 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Marketplace Network For Digital Transactions (US11880882B2)"@en ;
+    dcterms:identifier "US11880882B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions/us11880882b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions-us11880882b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11880882StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11880882 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16854872"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2024-01-03); application 16854872; filed 2020-04-21; published 2020-08-06; granted 2024-01-23."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11880882B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12437338 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Marketplace Network For Digital Transactions (US12437338B2)"@en ;
+    dcterms:identifier "US12437338B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily ;
+    ifcore:divisionalOf ifcore:USPatent11880882 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions/us12437338b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12437338StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12437338 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18372652"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2025-09-24); application 18372652; filed 2023-09-25; published 2024-02-22; granted 2025-10-07."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12437338B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12688531 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Marketplace Network For Digital Transactions (US12688531B2)"@en ;
+    dcterms:identifier "US12688531B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions/us12688531b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12688531StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12688531 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18372640"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2026-07-08); application 18372640; filed 2023-09-25; published 2024-02-22; granted 2026-07-21."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12688531B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12694451 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Marketplace Network For Digital Transactions (US12694451B2)"@en ;
+    dcterms:identifier "US12694451B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledMarketplaceNetworkForDigitalTransactionsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions/us12694451b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-marketplace-network-for-digital-transactions-us20260004347a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12694451StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12694451 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/19303350"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2026-07-15); application 19303350; filed 2025-08-18; published 2026-01-01; granted 2026-07-28."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12694451B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CollaborativeContinuousAndComprehensiveRiskManagementSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Collaborative, Continuous, And Comprehensive Risk Management System"@en ;
+    dcterms:identifier "collaborative-continuous-and-comprehensive-risk-management-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CollaborativeContinuousAndComprehensiveRiskManagementSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:CollaborativeContinuousAndComprehensiveRiskManagementSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20250095861A1 a ifcore:Patent ;
+    rdfs:label "Collaborative, Continuous, And Comprehensive Risk Management System (US20250095861A1)"@en ;
+    dcterms:identifier "US20250095861A1" ;
+    dcterms:isPartOf ifcore:CollaborativeContinuousAndComprehensiveRiskManagementSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/collaborative-continuous-and-comprehensive-risk-management-system/us20250095861a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20250095861A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20250095861A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18963451"^^xsd:anyURI ;
+    ifcore:cachedValue "Response to Non-Final Office Action Entered and Forwarded to Examiner (as of 2026-07-17); application 18963451; filed 2024-11-27; published 2025-03-20."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20250095861A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TeamBasedTeleDiagnosticsBlockchainEnabledSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Team-Based Tele-Diagnostics Blockchain-Enabled System"@en ;
+    dcterms:identifier "team-based-tele-diagnostics-blockchain-enabled-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TeamBasedTeleDiagnosticsBlockchainEnabledSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:TeamBasedTeleDiagnosticsBlockchainEnabledSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11769573 a ifcore:Patent ;
+    rdfs:label "Team-Based Tele-Diagnostics Blockchain-Enabled System (US11769573B2)"@en ;
+    dcterms:identifier "US11769573B2" ;
+    dcterms:isPartOf ifcore:TeamBasedTeleDiagnosticsBlockchainEnabledSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/team-based-tele-diagnostics-blockchain-enabled-system/us11769573b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11769573StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11769573 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16161846"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-09-06); application 16161846; filed 2018-10-16; published 2019-02-14; granted 2023-09-26."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11769573B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12658290 a ifcore:Patent ;
+    rdfs:label "Team-Based Tele-Diagnostics Blockchain-Enabled System (US12658290B2)"@en ;
+    dcterms:identifier "US12658290B2" ;
+    dcterms:isPartOf ifcore:TeamBasedTeleDiagnosticsBlockchainEnabledSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/team-based-tele-diagnostics-blockchain-enabled-system/us12658290b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/team-based-tele-diagnostics-blockchain-enabled-system-us20240006038a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12658290StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12658290 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18232314"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2026-06-03); application 18232314; filed 2023-08-09; published 2024-01-04; granted 2026-06-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12658290B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:SystemForManagementOfRewardableComputerControlledContentBlocksDeliveryAndConsumptionFamily a ifcore:PatentFamily ;
+    rdfs:label "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption"@en ;
+    dcterms:identifier "system-for-management-of-rewardable-computer-controlled-content-blocks-delivery-and-consum" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:LearningAndContent ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SystemForManagementOfRewardableComputerControlledContentBlocksDeliveryAndConsumptionFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:SystemForManagementOfRewardableComputerControlledContentBlocksDeliveryAndConsumptionFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12155747 a ifcore:Patent ;
+    rdfs:label "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption (US12155747B2)"@en ;
+    dcterms:identifier "US12155747B2" ;
+    dcterms:isPartOf ifcore:SystemForManagementOfRewardableComputerControlledContentBlocksDeliveryAndConsumptionFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/system-for-management-of-rewardable-computer-controlled-content-blocks-delivery-and-consum/us12155747b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12155747StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12155747 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/17149482"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2024-11-06); application 17149482; filed 2021-01-14; published 2021-05-13; granted 2024-11-26."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12155747B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12652158 a ifcore:Patent ;
+    rdfs:label "System For Management Of Rewardable Computer-Controlled Content Blocks Delivery And Consumption (US12652158B2)"@en ;
+    dcterms:identifier "US12652158B2" ;
+    dcterms:isPartOf ifcore:SystemForManagementOfRewardableComputerControlledContentBlocksDeliveryAndConsumptionFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/system-for-management-of-rewardable-computer-controlled-content-blocks-delivery-and-consum/us12652158b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/system-for-management-of-rewardable-computer-controlled-content-blocks-delivery-and-consumption-us20240421978a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12652158StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12652158 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18822384"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2026-05-27); application 18822384; filed 2024-09-02; published 2024-12-19; granted 2026-06-09."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12652158B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerControlledPrecisionEducationAndTrainingFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Controlled Precision Education And Training"@en ;
+    dcterms:identifier "computer-controlled-precision-education-and-training" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:LearningAndContent ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComputerControlledPrecisionEducationAndTrainingFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:ComputerControlledPrecisionEducationAndTrainingFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11423500 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Precision Education And Training (US11423500B2)"@en ;
+    dcterms:identifier "US11423500B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledPrecisionEducationAndTrainingFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-precision-education-and-training/us11423500b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11423500StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11423500 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16712213"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2022-08-03); application 16712213; filed 2019-12-12; published 2020-05-14; granted 2022-08-23."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11423500B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11651459 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Precision Education And Training (US11651459B2)"@en ;
+    dcterms:identifier "US11651459B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledPrecisionEducationAndTrainingFamily ;
+    ifcore:continuationOf ifcore:USPatent11423500 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-precision-education-and-training/us11651459b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-precision-education-and-training-us11651459b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11651459StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11651459 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/17865173"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-04-26); application 17865173; filed 2022-07-14; published 2022-11-03; granted 2023-05-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11651459B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12572993 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Precision Education And Training (US12572993B2)"@en ;
+    dcterms:identifier "US12572993B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledPrecisionEducationAndTrainingFamily ;
+    ifcore:continuationOf ifcore:USPatent11651459 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-precision-education-and-training/us12572993b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-precision-education-and-training-us2023245255a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12572993StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12572993 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18131648"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2026-02-25); application 18131648; filed 2023-04-06; published 2023-08-03; granted 2026-03-10."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12572993B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily a ifcore:PatentFamily ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform"@en ;
+    dcterms:identifier "integration-of-devices-through-a-social-networking-platform" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent9525753 a ifcore:Patent ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform (US9525753B2)"@en ;
+    dcterms:identifier "US9525753B2" ;
+    dcterms:isPartOf ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform/us9525753b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform-us9525753b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent9525753StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent9525753 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14103098"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2016-11-30); application 14103098; filed 2013-12-11; published 2014-06-12; granted 2016-12-20."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US9525753B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10320735 a ifcore:Patent ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform (US10320735B2)"@en ;
+    dcterms:identifier "US10320735B2" ;
+    dcterms:isPartOf ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    ifcore:divisionalOf ifcore:USPatent9525753 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform/us10320735b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10320735StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10320735 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15275463"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2019-05-22); application 15275463; filed 2016-09-25; published 2017-01-12; granted 2019-06-11."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10320735B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11044221 a ifcore:Patent ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform (US11044221B2)"@en ;
+    dcterms:identifier "US11044221B2" ;
+    dcterms:isPartOf ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    ifcore:divisionalOf ifcore:USPatent10320735 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform/us11044221b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform-us11044221b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11044221StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11044221 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16381772"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2021-06-02); application 16381772; filed 2019-04-11; published 2019-08-08; granted 2021-06-22."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11044221B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11777894 a ifcore:Patent ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform (US11777894B2)"@en ;
+    dcterms:identifier "US11777894B2" ;
+    dcterms:isPartOf ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    ifcore:continuationOf ifcore:USPatent11044221 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform/us11777894b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform-us11777894b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11777894StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11777894 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/17327694"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-09-13); application 17327694; filed 2021-05-22; published 2021-09-09; granted 2023-10-03."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11777894B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent12401615 a ifcore:Patent ;
+    rdfs:label "Integration Of Devices Through A Social Networking Platform (US12401615B2)"@en ;
+    dcterms:identifier "US12401615B2" ;
+    dcterms:isPartOf ifcore:IntegrationOfDevicesThroughASocialNetworkingPlatformFamily ;
+    ifcore:continuationOf ifcore:USPatent11777894 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform/us12401615b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform-us12401615b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/integration-of-devices-through-a-social-networking-platform-us20240015129a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent12401615StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent12401615 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/18235327"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2025-08-13); application 18235327; filed 2023-08-17; published 2024-01-11; granted 2025-08-26."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US12401615B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AutonomousOrchestrationSystemForDecisionLifecycleManagementWithIntegratedTraceabilityFamily a ifcore:PatentFamily ;
+    rdfs:label "Autonomous Orchestration System For Decision Lifecycle Management With Integrated Traceability"@en ;
+    dcterms:identifier "autonomous-orchestration-system-for-decision-lifecycle-management-with-integrated-traceabi" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    schema:url "https://www.intellectualfrontiers.com/patents/autonomous-orchestration-system-for-decision-lifecycle-management-with-integrated-traceabi"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/autonomous-orchestration-system-for-decision-lifecycle-management-with-integrated-traceability"^^xsd:anyURI ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AutonomousOrchestrationSystemForDecisionLifecycleManagementWithIntegratedTraceabilityFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:AutonomousOrchestrationSystemForDecisionLifecycleManagementWithIntegratedTraceabilityFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20250217680A1 a ifcore:Patent ;
+    rdfs:label "Autonomous Orchestration System For Decision Lifecycle Management With Integrated Traceability (US20250217680A1)"@en ;
+    dcterms:identifier "US20250217680A1" ;
+    dcterms:isPartOf ifcore:AutonomousOrchestrationSystemForDecisionLifecycleManagementWithIntegratedTraceabilityFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/autonomous-orchestration-system-for-decision-lifecycle-management-with-integrated-traceabi/us20250217680a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20250217680A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20250217680A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/19081752"^^xsd:anyURI ;
+    ifcore:cachedValue "Docketed New Case - Ready for Examination (as of 2025-04-03); application 19081752; filed 2025-03-17; published 2025-07-03."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20250217680A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerExecutableAndTraceableMetricQueuesSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Executable And Traceable Metric Queues System"@en ;
+    dcterms:identifier "computer-executable-and-traceable-metric-queues-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComputerExecutableAndTraceableMetricQueuesSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:ComputerExecutableAndTraceableMetricQueuesSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11388077 a ifcore:Patent ;
+    rdfs:label "Computer-Executable And Traceable Metric Queues System (US11388077B2)"@en ;
+    dcterms:identifier "US11388077B2" ;
+    dcterms:isPartOf ifcore:ComputerExecutableAndTraceableMetricQueuesSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-executable-and-traceable-metric-queues-system/us11388077b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11388077StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11388077 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16669496"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2022-06-22); application 16669496; filed 2019-10-30; published 2020-02-27; granted 2022-07-12."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11388077B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11888597 a ifcore:Patent ;
+    rdfs:label "Computer-Executable And Traceable Metric Queues System (US11888597B2)"@en ;
+    dcterms:identifier "US11888597B2" ;
+    dcterms:isPartOf ifcore:ComputerExecutableAndTraceableMetricQueuesSystemFamily ;
+    ifcore:continuationOf ifcore:USPatent11388077 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-executable-and-traceable-metric-queues-system/us11888597b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-executable-and-traceable-metric-queues-system-us11888597b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/example-protected-page-computer-executable-and-traceable-metric-queues-system-us11888597b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11888597StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11888597 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/17838198"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2024-01-10); application 17838198; filed 2022-06-11; published 2022-10-13; granted 2024-01-30."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11888597B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamily a ifcore:PatentFamily ;
+    rdfs:label "Self-Controlled Digital Authorization Over Communication Networks"@en ;
+    dcterms:identifier "self-controlled-digital-authorization-over-communication-networks" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20140074638A1 a ifcore:Patent ;
+    rdfs:label "Consumer Self-Authorization For Electronic Records (US20140074638A1)"@en ;
+    dcterms:identifier "US20140074638A1" ;
+    dcterms:isPartOf ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/self-controlled-digital-authorization-over-communication-networks/us20140074638a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20140074638A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20140074638A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13607997"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-05-30); application 13607997; filed 2012-09-10; published 2014-03-13."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20140074638A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10963585 a ifcore:Patent ;
+    rdfs:label "Self-Controlled Digital Authorization Over Communication Networks (US10963585B2)"@en ;
+    dcterms:identifier "US10963585B2" ;
+    dcterms:isPartOf ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20140074638A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/self-controlled-digital-authorization-over-communication-networks/us10963585b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10963585StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10963585 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15434942"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2021-03-10); application 15434942; filed 2017-02-16; published 2017-06-08; granted 2021-03-30."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10963585B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11874949 a ifcore:Patent ;
+    rdfs:label "Self-Controlled Digital Authorization Over Communication Networks (US11874949B2)"@en ;
+    dcterms:identifier "US11874949B2" ;
+    dcterms:isPartOf ifcore:SelfControlledDigitalAuthorizationOverCommunicationNetworksFamily ;
+    ifcore:divisionalOf ifcore:USPatent10963585 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/self-controlled-digital-authorization-over-communication-networks/us11874949b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/self-controlled-digital-authorization-over-communication-networks-us11874949b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11874949StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11874949 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/17184255"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-12-27); application 17184255; filed 2021-02-24; published 2021-06-17; granted 2024-01-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11874949B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DigitalPaymentSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Digital Payment System"@en ;
+    dcterms:identifier "digital-payment-system" ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     ifcore:inWorkDomain ifcore:MarketplacesAndPayments ;
-    rdfs:comment "Covers pre-consent capture, data-valuation logic, and a payment engine offsetting a service charge against computed data value, over banking or blockchain rails. Originally assigned to Netspective Communications LLC, reassigned to Intellectual Frontiers LLC in 2023 — consistent with the company-wide 2023 Netspective patent acquisition already in context/company.md."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DigitalPaymentSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:DigitalPaymentSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
     ifcore:hasAudience ifcore:Public .
 
+ifcore:USPatent10643208 a ifcore:Patent ;
+    rdfs:label "Digital Payment System (US10643208B2)"@en ;
+    dcterms:identifier "US10643208B2" ;
+    dcterms:isPartOf ifcore:DigitalPaymentSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/digital-payment-system/us10643208b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Covers pre-consent capture, data-valuation logic, and a payment engine offsetting a service charge against computed data value, over banking or blockchain rails. Originally assigned to Netspective Communications LLC, reassigned to Intellectual Frontiers LLC in 2023."@en ;
+    ifcore:hasAudience ifcore:Public .
 ifcore:USPatent10643208StatusReference a ifcore:ExternalRecordReference ;
     ifcore:describes ifcore:USPatent10643208 ;
-    ifcore:primarySource "https://patents.google.com/patent/US10643208B2"^^xsd:anyURI ;
-    ifcore:cachedValue "Granted May 5, 2020; filed February 24, 2019."@en ;
-    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
-    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16283802"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2020-04-15); application 16283802; filed 2019-02-24; published 2019-06-20; granted 2020-05-05."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
     ifcore:verificationMethod "manual"@en ;
-    rdfs:comment "Expiration date deliberately not cached: sources disagree on the related continuation's expiration (see USPatent11568401StatusReference) and neither figure for either patent has been checked directly against USPTO Patent Center."@en ;
+    rdfs:comment "The structured record is registers/patents/US10643208B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:USPatent11568401 a ifcore:PatentFamily ;
-    rdfs:label "Digital payment system (US11568401B2)"@en ;
+ifcore:USPatent11568401 a ifcore:Patent ;
+    rdfs:label "Digital Payment System (US11568401B2)"@en ;
+    dcterms:identifier "US11568401B2" ;
+    dcterms:isPartOf ifcore:DigitalPaymentSystemFamily ;
     ifcore:continuationOf ifcore:USPatent10643208 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/digital-payment-system/us11568401b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/digital-payment-system-us11568401b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    rdfs:comment "Continuation of US10643208B2: adds a cloud-based central controller, a dedicated buyer subsystem, third-party payer integration, and ETL processing for standardizing health data from diverse sources."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11568401StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11568401 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16835289"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-01-11); application 16835289; filed 2020-03-30; published 2020-07-16; granted 2023-01-31."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11568401B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerControlledMetricsAndTaskListsManagementFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Controlled Metrics And Task Lists Management"@en ;
+    dcterms:identifier "computer-controlled-metrics-and-task-lists-management" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ComputerControlledMetricsAndTaskListsManagementFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:ComputerControlledMetricsAndTaskListsManagementFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11561884 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Metrics And Task Lists Management (US11561884B2)"@en ;
+    dcterms:identifier "US11561884B2" ;
+    dcterms:isPartOf ifcore:ComputerControlledMetricsAndTaskListsManagementFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-metrics-and-task-lists-management/us11561884b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-controlled-metrics-and-task-lists-management-us11561884b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11561884StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11561884 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16952063"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2023-01-04); application 16952063; filed 2020-11-18; published 2021-03-11; granted 2023-01-24."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11561884B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:BlockchainEnabledServiceDeliveryEvidenceSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Blockchain-Enabled Service Delivery Evidence System"@en ;
+    dcterms:identifier "blockchain-enabled-service-delivery-evidence-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BlockchainEnabledServiceDeliveryEvidenceSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:BlockchainEnabledServiceDeliveryEvidenceSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11475441 a ifcore:Patent ;
+    rdfs:label "Blockchain-Enabled Service Delivery Evidence System (US11475441B2)"@en ;
+    dcterms:identifier "US11475441B2" ;
+    dcterms:isPartOf ifcore:BlockchainEnabledServiceDeliveryEvidenceSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/blockchain-enabled-service-delivery-evidence-system/us11475441b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11475441StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11475441 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16045530"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2022-09-28); application 16045530; filed 2018-07-25; published 2020-01-30; granted 2022-10-18."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11475441B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:BlockchainBasedCrowdsourcedInitiativesTrackingSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Blockchain-Based Crowdsourced Initiatives Tracking System"@en ;
+    dcterms:identifier "blockchain-based-crowdsourced-initiatives-tracking-system" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BlockchainBasedCrowdsourcedInitiativesTrackingSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:BlockchainBasedCrowdsourcedInitiativesTrackingSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20150073870A1 a ifcore:Patent ;
+    rdfs:label "Crowdsourced Initiatives Tracking, Development, Evaluation And Scoring (US20150073870A1)"@en ;
+    dcterms:identifier "US20150073870A1" ;
+    dcterms:isPartOf ifcore:BlockchainBasedCrowdsourcedInitiativesTrackingSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/blockchain-based-crowdsourced-initiatives-tracking-system/us20150073870a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20150073870A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20150073870A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14025493"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-08-14); application 14025493; filed 2013-09-12; published 2015-03-12."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20150073870A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11270263 a ifcore:Patent ;
+    rdfs:label "Blockchain-Based Crowdsourced Initiatives Tracking System (US11270263B2)"@en ;
+    dcterms:identifier "US11270263B2" ;
+    dcterms:isPartOf ifcore:BlockchainBasedCrowdsourcedInitiativesTrackingSystemFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20150073870A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/blockchain-based-crowdsourced-initiatives-tracking-system/us11270263b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11270263StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11270263 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15587202"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2022-02-16); application 15587202; filed 2017-05-04; published 2017-08-17; granted 2022-03-08."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11270263B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DigitalBlockchainAuthenticationFamily a ifcore:PatentFamily ;
+    rdfs:label "Digital Blockchain Authentication"@en ;
+    dcterms:identifier "digital-blockchain-authentication" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20130204641A1 a ifcore:Patent ;
+    rdfs:label "Social Authentication For Accessing Health Records (US20130204641A1)"@en ;
+    dcterms:identifier "US20130204641A1" ;
+    dcterms:isPartOf ifcore:DigitalBlockchainAuthenticationFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/digital-blockchain-authentication/us20130204641a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130204641A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130204641A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13756433"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-05-16); application 13756433; filed 2013-01-31; published 2013-08-08."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20130204641A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20170149560A1 a ifcore:Patent ;
+    rdfs:label "Digital Blockchain Authentication (US20170149560A1)"@en ;
+    dcterms:identifier "US20170149560A1" ;
+    dcterms:isPartOf ifcore:DigitalBlockchainAuthenticationFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130204641A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/digital-blockchain-authentication/us20170149560a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20170149560A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20170149560A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15427806"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2021-07-15); application 15427806; filed 2017-02-08; published 2017-05-25."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20170149560A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:SystemForControllingMedicalDevicesFamily a ifcore:PatentFamily ;
+    rdfs:label "System For Controlling Medical Devices"@en ;
+    dcterms:identifier "system-for-controlling-medical-devices" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:SystemForControllingMedicalDevicesFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:SystemForControllingMedicalDevicesFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20130204145A1 a ifcore:Patent ;
+    rdfs:label "System And Method For Managing Devices And Data In A Medical Environment (US20130204145A1)"@en ;
+    dcterms:identifier "US20130204145A1" ;
+    dcterms:isPartOf ifcore:SystemForControllingMedicalDevicesFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/system-for-controlling-medical-devices/us20130204145a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130204145A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130204145A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13756445"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-05-30); application 13756445; filed 2013-01-31; published 2013-08-08."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20130204145A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10638999 a ifcore:Patent ;
+    rdfs:label "System For Controlling Medical Devices (US10638999B2)"@en ;
+    dcterms:identifier "US10638999B2" ;
+    dcterms:isPartOf ifcore:SystemForControllingMedicalDevicesFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130204145A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/system-for-controlling-medical-devices/us10638999b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/system-for-controlling-medical-devices-us10638999b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10638999StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10638999 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15430461"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2020-04-15); application 15430461; filed 2017-02-11; published 2017-06-01; granted 2020-05-05."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10638999B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent11006920 a ifcore:Patent ;
+    rdfs:label "System For Controlling Medical Devices (US11006920B2)"@en ;
+    dcterms:identifier "US11006920B2" ;
+    dcterms:isPartOf ifcore:SystemForControllingMedicalDevicesFamily ;
+    ifcore:continuationOf ifcore:USPatent10638999 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/system-for-controlling-medical-devices/us11006920b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent11006920StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent11006920 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16835258"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2021-04-28); application 16835258; filed 2020-03-30; published 2020-07-16; granted 2021-05-18."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US11006920B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:BlockchainSystemForNaturalLanguageProcessingFamily a ifcore:PatentFamily ;
+    rdfs:label "Blockchain System For Natural Language Processing"@en ;
+    dcterms:identifier "blockchain-system-for-natural-language-processing" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:BlockchainSystemForNaturalLanguageProcessingFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:BlockchainSystemForNaturalLanguageProcessingFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20130290022A1 a ifcore:Patent ;
+    rdfs:label "System And Method For Creating Metadata-Based Natural Language Processing Capabilities (US20130290022A1)"@en ;
+    dcterms:identifier "US20130290022A1" ;
+    dcterms:isPartOf ifcore:BlockchainSystemForNaturalLanguageProcessingFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/blockchain-system-for-natural-language-processing/us20130290022a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130290022A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130290022A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13457782"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-04-03); application 13457782; filed 2012-04-27; published 2013-10-31."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20130290022A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10984913 a ifcore:Patent ;
+    rdfs:label "Blockchain System For Natural Language Processing (US10984913B2)"@en ;
+    dcterms:identifier "US10984913B2" ;
+    dcterms:isPartOf ifcore:BlockchainSystemForNaturalLanguageProcessingFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130290022A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/blockchain-system-for-natural-language-processing/us10984913b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10984913StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10984913 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15389243"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2021-03-31); application 15389243; filed 2016-12-22; published 2017-04-13; granted 2021-04-20."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10984913B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:GraphicalUserInterfaceAndSmartCardReaderForFacilitatingCrowdsourcedCredentialingAndAccreditationFamily a ifcore:PatentFamily ;
+    rdfs:label "Graphical User Interface And Smart Card Reader For Facilitating Crowdsourced Credentialing And Accreditation"@en ;
+    dcterms:identifier "graphical-user-interface-and-smart-card-reader-for-facilitating-crowdsourced-credentialing" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20140317003A1 a ifcore:Patent ;
+    rdfs:label "System And Method For Facilitating Crowdsourced Credentialing And Accreditation (US20140317003A1)"@en ;
+    dcterms:identifier "US20140317003A1" ;
+    dcterms:isPartOf ifcore:GraphicalUserInterfaceAndSmartCardReaderForFacilitatingCrowdsourcedCredentialingAndAccreditationFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/graphical-user-interface-and-smart-card-reader-for-facilitating-crowdsourced-credentialing/us20140317003a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20140317003A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20140317003A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13865481"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-01-06); application 13865481; filed 2013-04-18; published 2014-10-23."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20140317003A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20170076405A1 a ifcore:Patent ;
+    rdfs:label "Graphical User Interface And Smart Card Reader For Facilitating Crowdsourced Credentialing And Accreditation (US20170076405A1)"@en ;
+    dcterms:identifier "US20170076405A1" ;
+    dcterms:isPartOf ifcore:GraphicalUserInterfaceAndSmartCardReaderForFacilitatingCrowdsourcedCredentialingAndAccreditationFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20140317003A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/graphical-user-interface-and-smart-card-reader-for-facilitating-crowdsourced-credentialing/us20170076405a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20170076405A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20170076405A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15362768"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2021-01-19); application 15362768; filed 2016-11-28; published 2017-03-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20170076405A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerControlledPhysicallyDistributedCollaborativeAsynchronousDigitalTransactionsFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer-Controlled Physically Distributed Collaborative Asynchronous Digital Transactions"@en ;
+    dcterms:identifier "computer-controlled-physically-distributed-collaborative-asynchronous-digital-transactions" ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     ifcore:inWorkDomain ifcore:MarketplacesAndPayments ;
-    rdfs:comment "Continuation of US10643208B2: adds a cloud-based central controller, a dedicated buyer subsystem, third-party payer integration, and ETL processing for standardizing health data from diverse sources."@en ;
     ifcore:hasAudience ifcore:Public .
 
-ifcore:USPatent11568401StatusReference a ifcore:ExternalRecordReference ;
-    ifcore:describes ifcore:USPatent11568401 ;
-    ifcore:primarySource "https://patents.google.com/patent/US11568401B2"^^xsd:anyURI ;
-    ifcore:cachedValue "Granted January 31, 2023; filed March 30, 2020; priority date February 24, 2019."@en ;
-    ifcore:resolvedAt "2026-10-02"^^xsd:date ;
-    ifcore:verificationCadence "P1Y"^^xsd:duration ;
+ifcore:USPublication20130304508A1 a ifcore:Patent ;
+    rdfs:label "System And Method For Collaborative Patient Engagement (US20130304508A1)"@en ;
+    dcterms:identifier "US20130304508A1" ;
+    dcterms:isPartOf ifcore:ComputerControlledPhysicallyDistributedCollaborativeAsynchronousDigitalTransactionsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-physically-distributed-collaborative-asynchronous-digital-transactions/us20130304508a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130304508A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130304508A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13871107"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-05-15); application 13871107; filed 2013-04-26; published 2013-11-14."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
     ifcore:verificationMethod "manual"@en ;
-    rdfs:comment "Expiration date deliberately not cached: the source site states November 2040, an independent search states March 16, 2040 — these disagree and neither has been checked directly against USPTO Patent Center. Resolve via an authoritative lookup before asserting either, per 0007-work-and-assets FR-012."@en ;
+    rdfs:comment "The structured record is registers/patents/US20130304508A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20170140145A1 a ifcore:Patent ;
+    rdfs:label "Computer-Controlled Physically Distributed Collaborative Asynchronous Digital Transactions (US20170140145A1)"@en ;
+    dcterms:identifier "US20170140145A1" ;
+    dcterms:isPartOf ifcore:ComputerControlledPhysicallyDistributedCollaborativeAsynchronousDigitalTransactionsFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130304508A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-controlled-physically-distributed-collaborative-asynchronous-digital-transactions/us20170140145a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20170140145A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20170140145A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15418765"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2020-12-22); application 15418765; filed 2017-01-29; published 2017-05-18."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20170140145A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:MultiSourceUserGeneratedElectronicDataIntegrationInABlockchainBasedTransactionalSystemFamily a ifcore:PatentFamily ;
+    rdfs:label "Multi-Source User Generated Electronic Data Integration In A Blockchain-Based Transactional System"@en ;
+    dcterms:identifier "multi-source-user-generated-electronic-data-integration-in-a-blockchain-based-transactiona" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MultiSourceUserGeneratedElectronicDataIntegrationInABlockchainBasedTransactionalSystemFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:MultiSourceUserGeneratedElectronicDataIntegrationInABlockchainBasedTransactionalSystemFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20150294069A1 a ifcore:Patent ;
+    rdfs:label "Multi-Source Patient Generated Healthcare Data Integration In A Transactional System (US20150294069A1)"@en ;
+    dcterms:identifier "US20150294069A1" ;
+    dcterms:isPartOf ifcore:MultiSourceUserGeneratedElectronicDataIntegrationInABlockchainBasedTransactionalSystemFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/multi-source-user-generated-electronic-data-integration-in-a-blockchain-based-transactiona/us20150294069a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20150294069A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20150294069A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14686684"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2018-10-15); application 14686684; filed 2015-04-14; published 2015-10-15."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20150294069A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10839020 a ifcore:Patent ;
+    rdfs:label "Multi-Source User Generated Electronic Data Integration In A Blockchain-Based Transactional System (US10839020B2)"@en ;
+    dcterms:identifier "US10839020B2" ;
+    dcterms:isPartOf ifcore:MultiSourceUserGeneratedElectronicDataIntegrationInABlockchainBasedTransactionalSystemFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20150294069A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/multi-source-user-generated-electronic-data-integration-in-a-blockchain-based-transactiona/us10839020b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/multi-source-user-generated-electronic-data-integration-in-a-blockchain-based-transactional-system"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10839020StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10839020 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16048338"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2020-10-28); application 16048338; filed 2018-07-29; published 2018-11-22; granted 2020-11-17."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10839020B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamily a ifcore:PatentFamily ;
+    rdfs:label "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network"@en ;
+    dcterms:identifier "device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20130197939A1 a ifcore:Patent ;
+    rdfs:label "Social Health Care Record System And Method (US20130197939A1)"@en ;
+    dcterms:identifier "US20130197939A1" ;
+    dcterms:isPartOf ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network/us20130197939a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130197939A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130197939A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13740381"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-02-20); application 13740381; filed 2013-01-14; published 2013-08-01."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20130197939A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10490304 a ifcore:Patent ;
+    rdfs:label "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network (US10490304B2)"@en ;
+    dcterms:identifier "US10490304B2" ;
+    dcterms:isPartOf ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130197939A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network/us10490304b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10490304StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10490304 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15372699"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2019-11-06); application 15372699; filed 2016-12-08; published 2017-03-30; granted 2019-11-26."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10490304B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10811124 a ifcore:Patent ;
+    rdfs:label "Device-Driven Non-Intermediated Blockchain System Over A Social Integrity Network (US10811124B2)"@en ;
+    dcterms:identifier "US10811124B2" ;
+    dcterms:isPartOf ifcore:DeviceDrivenNonIntermediatedBlockchainSystemOverASocialIntegrityNetworkFamily ;
+    ifcore:continuationOf ifcore:USPatent10490304 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network/us10811124b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/device-driven-non-intermediated-blockchain-system-over-a-social-integrity-network-us10811124b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10811124StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10811124 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/16517975"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2020-09-30); application 16517975; filed 2019-07-22; published 2019-11-07; granted 2020-10-20."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10811124B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:GlobalPositioningSystemGpsForLinkingNetworkAccessPlatformsWithSocialNetworkProfileElectronicDocumentsFamily a ifcore:PatentFamily ;
+    rdfs:label "Global Positioning System (GPS) For Linking Network Access Platforms With Social Network Profile Electronic Documents"@en ;
+    dcterms:identifier "global-positioning-system-gps-for-linking-network-access-platforms-with-social-network-pro" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:TrustedDataAndAuthorization ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20130297323A1 a ifcore:Patent ;
+    rdfs:label "System And Method For Providing Clinical Views Or Recommendations (US20130297323A1)"@en ;
+    dcterms:identifier "US20130297323A1" ;
+    dcterms:isPartOf ifcore:GlobalPositioningSystemGpsForLinkingNetworkAccessPlatformsWithSocialNetworkProfileElectronicDocumentsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/global-positioning-system-gps-for-linking-network-access-platforms-with-social-network-pro/us20130297323a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20130297323A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20130297323A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/13461312"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-02-21); application 13461312; filed 2012-05-01; published 2013-11-07."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20130297323A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20170083924A1 a ifcore:Patent ;
+    rdfs:label "Global Positioning System (GPS) For Linking Network Access Platforms With Social Network Profile Electronic Documents (US20170083924A1)"@en ;
+    dcterms:identifier "US20170083924A1" ;
+    dcterms:isPartOf ifcore:GlobalPositioningSystemGpsForLinkingNetworkAccessPlatformsWithSocialNetworkProfileElectronicDocumentsFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20130297323A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/global-positioning-system-gps-for-linking-network-access-platforms-with-social-network-pro/us20170083924a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20170083924A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20170083924A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15366601"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2020-08-17); application 15366601; filed 2016-12-01; published 2017-03-23."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20170083924A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:NetworkingDevicesForStoringProfilesLongitudinallyFamily a ifcore:PatentFamily ;
+    rdfs:label "Networking Devices For Storing Profiles Longitudinally"@en ;
+    dcterms:identifier "networking-devices-for-storing-profiles-longitudinally" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NetworkingDevicesForStoringProfilesLongitudinallyFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:NetworkingDevicesForStoringProfilesLongitudinallyFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10586069 a ifcore:Patent ;
+    rdfs:label "Networking Devices For Storing Profiles Longitudinally (US10586069B2)"@en ;
+    dcterms:identifier "US10586069B2" ;
+    dcterms:isPartOf ifcore:NetworkingDevicesForStoringProfilesLongitudinallyFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/networking-devices-for-storing-profiles-longitudinally/us10586069b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10586069StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10586069 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15163667"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2020-02-19); application 15163667; filed 2016-05-24; published 2017-11-30; granted 2020-03-10."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10586069B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:AggregationOfRatingIndicatorsFamily a ifcore:PatentFamily ;
+    rdfs:label "Aggregation Of Rating Indicators"@en ;
+    dcterms:identifier "aggregation-of-rating-indicators" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:LearningAndContent ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AggregationOfRatingIndicatorsFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:AggregationOfRatingIndicatorsFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent9846896 a ifcore:Patent ;
+    rdfs:label "Aggregation Of Rating Indicators (US9846896B2)"@en ;
+    dcterms:identifier "US9846896B2" ;
+    dcterms:isPartOf ifcore:AggregationOfRatingIndicatorsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/aggregation-of-rating-indicators/us9846896b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/aggregation-of-rating-indicators-us9846896b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent9846896StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent9846896 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14744697"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2017-11-29); application 14744697; filed 2015-06-19; published 2015-12-24; granted 2017-12-19."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US9846896B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10489830 a ifcore:Patent ;
+    rdfs:label "Aggregation Of Rating Indicators (US10489830B2)"@en ;
+    dcterms:identifier "US10489830B2" ;
+    dcterms:isPartOf ifcore:AggregationOfRatingIndicatorsFamily ;
+    ifcore:continuationOf ifcore:USPatent9846896 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/aggregation-of-rating-indicators/us10489830b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10489830StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10489830 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15813109"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2019-11-06); application 15813109; filed 2017-11-14; published 2018-03-15; granted 2019-11-26."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10489830B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:TasksSchedulingBasedOnTriggeringEventAndWorkListsManagementFamily a ifcore:PatentFamily ;
+    rdfs:label "Tasks Scheduling Based On Triggering Event And Work Lists Management"@en ;
+    dcterms:identifier "tasks-scheduling-based-on-triggering-event-and-work-lists-management" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:TasksSchedulingBasedOnTriggeringEventAndWorkListsManagementFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:TasksSchedulingBasedOnTriggeringEventAndWorkListsManagementFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10403399 a ifcore:Patent ;
+    rdfs:label "Tasks Scheduling Based On Triggering Event And Work Lists Management (US10403399B2)"@en ;
+    dcterms:identifier "US10403399B2" ;
+    dcterms:isPartOf ifcore:TasksSchedulingBasedOnTriggeringEventAndWorkListsManagementFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/tasks-scheduling-based-on-triggering-event-and-work-lists-management/us10403399b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10403399StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10403399 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14946702"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2019-08-14); application 14946702; filed 2015-11-19; published 2016-05-26; granted 2019-09-03."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10403399B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:PatientNavigationAndSituationalAwarenessDerivedThroughContextSensitiveInformationBlocksDeliveryFamily a ifcore:PatentFamily ;
+    rdfs:label "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery"@en ;
+    dcterms:identifier "patient-navigation-and-situational-awareness-derived-through-context-sensitive-information" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:HealthcareDelivery ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PatientNavigationAndSituationalAwarenessDerivedThroughContextSensitiveInformationBlocksDeliveryFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:PatientNavigationAndSituationalAwarenessDerivedThroughContextSensitiveInformationBlocksDeliveryFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent10089492 a ifcore:Patent ;
+    rdfs:label "Patient Navigation And Situational Awareness Derived Through Context-Sensitive Information Blocks Delivery (US10089492B2)"@en ;
+    dcterms:identifier "US10089492B2" ;
+    dcterms:isPartOf ifcore:PatientNavigationAndSituationalAwarenessDerivedThroughContextSensitiveInformationBlocksDeliveryFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/patient-navigation-and-situational-awareness-derived-through-context-sensitive-information/us10089492b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/patient-navigation-and-situational-awareness-derived-through-context-sensitive-information-blocks-delivery"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent10089492StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent10089492 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15163662"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2018-09-12); application 15163662; filed 2016-05-24; published 2016-12-01; granted 2018-10-02."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US10089492B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ComputerSystemForPerformingReusableSoftwareApplicationDevelopmentFromASetOfDeclarativeExecutableSpecificationsFamily a ifcore:PatentFamily ;
+    rdfs:label "Computer System For Performing Reusable Software Application Development From A Set Of Declarative Executable Specifications"@en ;
+    dcterms:identifier "computer-system-for-performing-reusable-software-application-development-from-a-set-of-dec" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent7039898 a ifcore:Patent ;
+    rdfs:label "Computer System For Performing Reusable Software Application Development From A Set Of Declarative Executable Specifications (US7039898B2)"@en ;
+    dcterms:identifier "US7039898B2" ;
+    dcterms:isPartOf ifcore:ComputerSystemForPerformingReusableSoftwareApplicationDevelopmentFromASetOfDeclarativeExecutableSpecificationsFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/computer-system-for-performing-reusable-software-application-development-from-a-set-of-dec/us7039898b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/computer-system-for-performing-reusable-software-application-development-from-a-set-of-declarative-executable-specifications"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent7039898StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent7039898 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/10194646"^^xsd:anyURI ;
+    ifcore:cachedValue "Patent Expired Due to NonPayment of Maintenance Fees Under 37 CFR 1.362 (as of 2018-05-28); application 10194646; filed 2002-07-12; published 2004-01-15; granted 2006-05-02."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US7039898B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DistributedElectronicDocumentReviewInABlockchainSystemAndComputerizedScoringBasedOnTextualAndVisualFeedbackFamily a ifcore:PatentFamily ;
+    rdfs:label "Distributed Electronic Document Review In A Blockchain System And Computerized Scoring Based On Textual And Visual Feedback"@en ;
+    dcterms:identifier "distributed-electronic-document-review-in-a-blockchain-system-and-computerized-scoring-bas" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DistributedElectronicDocumentReviewInABlockchainSystemAndComputerizedScoringBasedOnTextualAndVisualFeedbackFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:DistributedElectronicDocumentReviewInABlockchainSystemAndComputerizedScoringBasedOnTextualAndVisualFeedbackFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPublication20150074033A1 a ifcore:Patent ;
+    rdfs:label "Crowdsourced Electronic Documents Review And Scoring (US20150074033A1)"@en ;
+    dcterms:identifier "US20150074033A1" ;
+    dcterms:isPartOf ifcore:DistributedElectronicDocumentReviewInABlockchainSystemAndComputerizedScoringBasedOnTextualAndVisualFeedbackFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/distributed-electronic-document-review-in-a-blockchain-system-and-computerized-scoring-bas/us20150074033a1"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPublication20150074033A1StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPublication20150074033A1 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14025472"^^xsd:anyURI ;
+    ifcore:cachedValue "Abandoned  --  Failure to Respond to an Office Action (as of 2017-01-23); application 14025472; filed 2013-09-12; published 2015-03-12."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US20150074033A1.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent9870591 a ifcore:Patent ;
+    rdfs:label "Distributed Electronic Document Review In A Blockchain System And Computerized Scoring Based On Textual And Visual Feedback (US9870591B2)"@en ;
+    dcterms:identifier "US9870591B2" ;
+    dcterms:isPartOf ifcore:DistributedElectronicDocumentReviewInABlockchainSystemAndComputerizedScoringBasedOnTextualAndVisualFeedbackFamily ;
+    ifcore:continuationInPartOf ifcore:USPublication20150074033A1 ;
+    schema:url "https://www.intellectualfrontiers.com/patents/distributed-electronic-document-review-in-a-blockchain-system-and-computerized-scoring-bas/us9870591b2"^^xsd:anyURI , "https://www.intellectualfrontiers.com/patents/distributed-electronic-document-review-in-a-blockchain-system-and-computerized-scoring-based-on-textual-and-visual-feedback"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent9870591StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent9870591 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/15386846"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2017-12-27); application 15386846; filed 2016-12-21; published 2017-04-13; granted 2018-01-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US9870591B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:CrowdsourcedResponsesManagementToCasesFamily a ifcore:PatentFamily ;
+    rdfs:label "Crowdsourced Responses Management To Cases"@en ;
+    dcterms:identifier "crowdsourced-responses-management-to-cases" ;
+    dcterms:creator ifcore:ShahidNehalShah ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:inWorkDomain ifcore:EvidenceAndDecisions ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CrowdsourcedResponsesManagementToCasesFamilyOffer a schema:Offer ;
+    schema:itemOffered ifcore:CrowdsourcedResponsesManagementToCasesFamily ;
+    schema:businessFunction <http://purl.org/goodrelations/v1#LeaseOut> , <http://purl.org/goodrelations/v1#Sell> ;
+    schema:seller ifcore:IntellectualFrontiersLLC ;
+    schema:description "Available for an exclusive or non-exclusive licence, field-of-use licences included, or for acquisition. Terms on inquiry (0051-patent-portfolio FR-010)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:USPatent9418355 a ifcore:Patent ;
+    rdfs:label "Crowdsourced Responses Management To Cases (US9418355B2)"@en ;
+    dcterms:identifier "US9418355B2" ;
+    dcterms:isPartOf ifcore:CrowdsourcedResponsesManagementToCasesFamily ;
+    schema:url "https://www.intellectualfrontiers.com/patents/crowdsourced-responses-management-to-cases/us9418355b2"^^xsd:anyURI ;
+    dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:USPatent9418355StatusReference a ifcore:ExternalRecordReference ;
+    ifcore:describes ifcore:USPatent9418355 ;
+    ifcore:primarySource "https://patentcenter.uspto.gov/applications/14032368"^^xsd:anyURI ;
+    ifcore:cachedValue "Patented Case (as of 2016-07-27); application 14032368; filed 2013-09-20; published 2015-03-26; granted 2016-08-16."@en ;
+    ifcore:resolvedAt "2026-09-27"^^xsd:date ;
+    ifcore:verificationCadence "P90D"^^xsd:duration ;
+    ifcore:verificationMethod "manual"@en ;
+    rdfs:comment "The structured record is registers/patents/US9418355B2.json, which also holds the claims, the parent applications with their relation, and the estimated expiration as Google Patents states it, read 2026-10-09. That expiration is an estimate, not the registry's final disposition (0007-work-and-assets FR-012, 0051-patent-portfolio FR-009)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 # ───────────────────────── Capital (0010-capital) ─────────────────────────

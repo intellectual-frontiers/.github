@@ -1,0 +1,179 @@
+{
+ "number": "US20150294069A1",
+ "kind": "published application",
+ "title": "Multi-Source Patient Generated Healthcare Data Integration In A Transactional System",
+ "applicationNumber": "14686684",
+ "earlierPublication": "",
+ "filedOn": "2015-04-14",
+ "publishedOn": "2015-10-15",
+ "grantedOn": "",
+ "priorityDate": "2014-04-14",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2018-10-15",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3626",
+ "examiner": "PAULS, JOHN A",
+ "classifications": [
+  "G16H 10/60",
+  "G16Z 99/00",
+  "G06Q 30/018"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "61979020"
+ ],
+ "abstract": "A system and method for aggregating patient generated healthcare data associated with a patient from a plurality of computing machines located separately without patient intervention. Metadata is stored associated with the patient generated healthcare data in a medical record repository database to perform natural language processing and metadata analysis of the patient generated healthcare data to identify patient verified data and patient unverified data. A data object including query statements and approval options is generated and presented on a remotely located display unit accessible by the patient. An input against each of the plurality of query statements is received and the system provides updating of the unverified data based on the received input. The patient generated healthcare data is then pushed into the electronic medical transactional system which may communicate medical data messages among a plurality of computer stations.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system comprising: a cloud gateway agent server that receives and aggregates patient generated healthcare data associated with a patient and acquired without patient intervention from a plurality of computing machines located separately, wherein said patient generated healthcare data comprises a plurality of computer executable patient data files residing in said plurality of computing machines; a medical record repository database communicatively coupled with said cloud gateway agent server and stores said plurality of computer executable patient data files and metadata associated with said plurality of computer executable patient data files; a processing circuit that: performs natural language processing and metadata analysis of said plurality of computer executable patient data files to identify patient verified computer executable patient data files and patient unverified computer executable patient data files from among said plurality of computer executable patient data files; generates a data object including a plurality of query statements and approval options corresponding to each of said unverified computer executable patient data files; transmits said data object to an external computing machine at said patient along with said unverified computer executable patient data files outputted on a remotely located display unit connected operatively with said external computing machine through an automatically generated notification by said processing circuit, wherein said data object represents an integrated view of said patient generated healthcare data residing on said plurality of computing machines; and updates said unverified computer executable patient data files as new verified computer executable patient data files in said medical record repository database based on an input received from said external computing machine signifying verification of said unverified computer executable patient data files by said patient; a rules engine communicatively coupled with said processing circuit and that executes a set of programmable rules including dictionary references, and patient verification references to govern patient approval, said metadata analysis and said natural language processing; an electronic medical transactional system communicatively coupled with said medical record repository database and said processing circuit through said cloud gateway agent server and retrieves and stores said patient verified computer executable patient data files and said new verified computer executable patient data files from said medical records repository database; and communicates medical data messages among a plurality of computer stations located at patients, healthcare providers, and financial entities, wherein said medical data messages are obtained from said patient verified computer executable patient data files and said new verified computer executable patient data files; and a communications transmitter coupled with said electronic medical transactional system that transmits said medical data messages to said plurality of computer stations identified by a patient approval."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein at least one machine from among said plurality of computing machines comprises a smart wearable medical device."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein at least a portion of said patient generated healthcare data contained in at least one of said plurality of computer executable patient data files is obtained by said cloud gateway agent server from a computing machine other than at said patient."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein said at least a portion of said patient generated healthcare data is obtained from said computing machine at a healthcare service provider of said patient."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein each of said plurality of computing machines are operatively coupled with an extensible agent appliance that launches a gateway application configured to pair said plurality of computing machines with said cloud agent server to allow access of said plurality of computer executable patient data files residing on said plurality of computing machines by said cloud agent server."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said cloud agent server installs said gateway application remotely on said plurality of computing machines through said extensible agent appliance."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said gateway application is launched at said external computing machine associated with said patient to allow said patient to view sources of said unverified computer executable patient data files and to verify said unverified computer executable patient data files through a single-clickable user executable response against one of said approval options."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit homogenizes said patient generated healthcare data contained in said computer executable patient data files in a defined Health Insurance Portability and Accountability Act (HIPAA) compliant format."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein, based on said patient input signifying said verification, said processing circuit associates a numerical trust score with each of said new verified computer executable patient data files."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , wherein said electronic medical transactional system comprises a filter circuit such that said filter circuit rejects said plurality of computer executable patient data files from being pushed into said electronic medical transactional system if said trust score associated with said plurality of computer executable patient data files is below a threshold limit."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said electronic medical transactional system further comprises a social networking application that dynamically changes social networking connections to interact with said electronic medical transactional system for accessing said verified computer executable patient data files."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit performs natural language processing on an embedded patient natural language text note contained digitally in said plurality of computer executable patient data files."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit determines verification patterns by said patient and automatically verify said unverified computer executable patient data files based on said verification patterns."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A computer-implemented method for use in an electronic medical transactional system, said computer-implemented method comprising: aggregating patient generated healthcare data associated with a patient from a plurality of computing machines located separately by a cloud gateway agent server over a network through a communication circuit without patient intervention, wherein said patient generated healthcare data comprises a plurality of computer executable patient data files residing on said plurality of computing machines; storing said plurality of computer executable patient data files in a medical record repository database communicatively coupled with said cloud gateway agent server; storing metadata associated with said plurality of computer executable patient data files in said medical record repository database; performing natural language processing and metadata analysis of said plurality of computer executable patient data files by a processing circuit communicatively coupled with said cloud gateway agent server to identify patient verified computer executable patient data files and patient unverified computer executable patient data files from among said plurality of computer executable patent data files; generating, by said processing circuit, a data object including a plurality of query statements and approval options corresponding to each of said unverified computer executable patient data files; presenting said data object along with said unverified computer executable patient data files on a remotely located display unit accessible by said patient through an automatically generated notification by said processing circuit, wherein said data object represents an integrated view of said patient generated healthcare data residing on said plurality of computing machines; receiving an input against each of said plurality of query statements corresponding to said unverified computer executable patient data files by said patient; updating said unverified computer executable patient data files as new verified computer executable patient data files in said medical records repository database based on said received input; pushing said verified computer executable patient data files and said new verified computer executable patient data files into said electronic medical transactional system; and communicating, by said electronic medical transactional system, medical data messages among a plurality of computer stations located at patients, healthcare providers, and financial entities, wherein said medical data messages are obtained from said patient verified computer executable patient data files and said new verified computer executable patient data files based on a predefined patient approval associated with said medical data messages."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising associating a trust score and a reliability index determined based on said trust score with each of said plurality of computer executable patient data files based on a status of verification and status of completeness of said plurality of computer executable patient data files."
+  },
+  {
+   "number": 16,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by said computer for use in an electronic medical transactional system to perform a method, said method comprising: aggregating patient generated healthcare data associated with a patient from a plurality of computing machines located separately by a cloud gateway agent server over a network through a communication circuit without patient intervention, wherein said patient generated healthcare data comprises a plurality of computer executable patient data files residing on said plurality of computing machines; storing the plurality of computer executable patient data files in a medical record repository database communicatively coupled with said cloud gateway agent server; storing metadata associated with said plurality of computer executable patient data files in said medical record repository database; performing natural language processing and metadata analysis of said plurality of computer executable patient data files by a processing circuit communicatively coupled with said cloud gateway agent server to identify patient verified computer executable patient data files and patient unverified computer executable patient data files from among said plurality of computer executable patent data files; generating, by said processing circuit, a data object including a plurality of query statements and approval options corresponding to each of said unverified computer executable patient data files; presenting said data object along with said unverified computer executable patient data files on a remotely located display unit accessible by said patient through an automatically generated notification by said processing circuit, wherein said data object represents an integrated view of said patient generated healthcare data residing on said plurality of computing machines; receiving an input against each of said plurality of query statements corresponding to said unverified computer executable patient data files by said patient; and updating said unverified computer executable patient data files as new verified computer executable patient data files in said medical records repository database based on said received input; pushing said verified computer executable patient data files and said new verified computer executable patient data files into said electronic medical transactional system; and communicating, by said electronic medical transactional system, medical data messages among a plurality of computer stations located at patients, healthcare providers, and financial entities, wherein said medical data messages are obtained from said patient verified computer executable patient data files and said new verified computer executable patient data files based on a predefined patient approval associated with said medical data messages."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 16 , wherein said method further comprises associating a trust score and a reliability index determined based on said trust score with each of said plurality of computer executable patient data files based on a status of verification and status of completeness of said plurality of computer executable patient data files."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20150294069A1/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 165,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 115,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150294069A1/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 96,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/6e/88/e1/6a20292c17aa27/US20150294069A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14686684",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20150294069A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

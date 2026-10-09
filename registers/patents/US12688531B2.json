@@ -1,0 +1,53 @@
+{
+ "number": "US12688531B2",
+ "kind": "granted patent",
+ "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+ "applicationNumber": "18372640",
+ "earlierPublication": "US20240062290A1",
+ "filedOn": "2023-09-25",
+ "publishedOn": "2024-02-22",
+ "grantedOn": "2026-07-21",
+ "priorityDate": "",
+ "status": "Patented Case",
+ "statusDate": "2026-07-08",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Intellectual Frontiers LLC",
+ "currentAssignee": "",
+ "artUnit": "3699",
+ "examiner": "ALI, JAHED",
+ "classifications": [
+  "G06Q 40/04",
+  "H04L 9/50",
+  "G06Q 30/0605",
+  "G06Q2220/00",
+  "H04L 9/0643",
+  "H04L 9/3213",
+  "H04L 9/3239",
+  "H04L 63/062",
+  "H04L 63/067",
+  "H04L 63/0823",
+  "H04L2209/56",
+  "H04W 4/14"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "16854872",
+  "62838473"
+ ],
+ "abstract": "",
+ "claims": [],
+ "drawings": [],
+ "pdfUrl": "",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/18372640",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  }
+ ]
+}

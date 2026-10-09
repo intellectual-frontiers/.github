@@ -1,0 +1,167 @@
+{
+ "number": "US20170140145A1",
+ "kind": "published application",
+ "title": "Computer-Controlled Physically Distributed Collaborative Asynchronous Digital Transactions",
+ "applicationNumber": "15418765",
+ "earlierPublication": "",
+ "filedOn": "2017-01-29",
+ "publishedOn": "2017-05-18",
+ "grantedOn": "",
+ "priorityDate": "2012-05-14",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2020-12-22",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "SHAHABI, ARI ARASTOO",
+ "classifications": [
+  "G16H 20/60",
+  "G16H 40/67",
+  "G16H 50/70",
+  "G16H 50/20",
+  "G16H 20/10",
+  "G16H 40/63",
+  "G16H 20/70",
+  "G16H 80/00",
+  "G06F 21/44"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/871,107",
+   "relation": "Continuation-In-Part",
+   "publication": "US20130304508A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13871107",
+  "61646744"
+ ],
+ "abstract": "A system for facilitating asynchronous digital transactions among a plurality of computer-controlled devices associated with a plurality of respective nodes. The system includes a first digital information database to store computerized identity information pertaining to the plurality of respective nodes and the associated plurality of computer-controlled devices. The system further includes a cognitive interactive human-machine interface configured to allow the plurality of computer-controlled devices and the associated nodes to interact digitally among them and with the system and with an external authorized node. The cognitive interactive human-machine interface is configured to receive at least one sensed stimulus from at least one of the computer-controlled devices and transmit digital information contained in the at least one sensed stimulus at least in part to the external authorized node to annotate the digital information by generating a digital input.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A distributed-architecture based-system for facilitating collaborative asynchronous digital transactions enabled through a blockchain configured digital integrity network among a plurality of computer-controlled devices associated with a plurality of respective nodes, said system comprising: a first digital information database to store computerized identity files pertaining to said plurality of respective nodes and said associated plurality of computer-controlled devices; a cognitive interactive human-machine interface configured to allow said plurality of computer-controlled devices and said associated nodes to interact digitally among them and with said system and with an external authorized node, wherein said cognitive interactive human-machine interface is configured to receive at least one sensed stimulus from at least one of said computer-controlled devices and transmit digital information contained in said at least one sensed stimulus at least in part to said external authorized node to annotate said digital information by generating a digital input, wherein said digital input is indicative of a change or no change in a digital planned scheme of delivery for a node associated with said at least one of said computer-controlled devices that generates said at least one sensed stimulus; a controller communicatively connected with said authorized external node and with said cognitive interactive human-machine interface to process said at least one sensed stimulus for comprehension and conversion into said digital information for transmission to said external authorized node and to process said digital input received from said external authorized node, wherein said controller comprises: a blockchain configured identity validation device to verify identity of said at least one of said plurality of computer-controlled devices generating said sensed stimulus based on said pre-stored identity information in said first digital information database and an electronic signature received from said at least one of said computer-controlled devices along with said at least one sensed stimulus; a computerized trust system including a memory circuit and a special purpose processor that evaluates trustworthiness and device integrity of said at least one of said computer-controlled devices that generates said at least one sensed stimulus associated with said respective node participating in said asynchronous digital transactions and generate a digital signal indicative of a trust score associated with said at least one of said computer-controlled devices and said associated node; wherein said controller is configured to: attest veracity and trustworthiness of said at least one sensed stimulus based on inputs received from said blockchain configured identity validation device and said computerized trust system such that an attestation is indicative of a change in said digital planned scheme of delivery based on said sensed stimulus; and attest identity of said external authorized node based on a node token received by said controller from said external authorized node, wherein said node token represents a unique digital identity of said authorized external node; cause said blockchain configured network to update said digital planned scheme of delivery in view of said determined change in said digital planned scheme of delivery as identified from said digital input received from said external authorized node; and notify said at least one of said computer-controlled devices of said determined change; the notifying comprising: generating an electric signal comprising data signifying said determined change and instructions for compliance toward an updated digital planned scheme of delivery; transmitting said electric signal in said network comprising said plurality of communicatively linked computer-controlled devices; converting said electric signal into a plurality of pixels; and displaying said plurality of pixels on a display unit of said at least one of said computer-controlled devices to launch an activation message that includes an instruction in accordance with said determined change and said updated planned scheme of delivery."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a second computerized information database to store computer-executable files indicative of digital parameters and respective reference values for use in updating and creating said planned scheme of delivery for said node associated with said at least one of said computer-controlled devices."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein said at least one of said computer-controlled devices is operatively coupled to a physiological sensor configured to generate a physiological signal component of said at least one sensed stimulus associated with said node such that said controller further comprising a tracking device configured to process said physiological signal component of said at least one sensed stimulus to assess information pertaining to one or more of said digital parameters associated with said node."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein said tracking device generates an output indicative of: said compliance by said node within a baseline value range; or said compliance by said node beyond said baseline value range, wherein a baseline value represents a digitally maintained dynamically updating minimum threshold level for said node to qualify for compliance in accordance with said planned scheme of delivery stored as said computer-executable files and transmitted to said at least one of said computer-controlled devices by said controller."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein said controller further comprises an alarm device to generate an alarm signal and a transmitter to transmit said alarm signal to said node if said performance is detected to go beyond said baseline value range."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 3 , wherein said physiological sensor is implanted within said node subcutaneously or positioned over an external surface so as to detect intrinsic physiological parameters at regular intervals and transmit them as said at least one sensed stimulus in real-time to said controller."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said at least one of said computer-controlled devices is operatively connected to an environment sensor to detect environmental parameters and transmit detected information as said at least one sensed stimulus in real-time to said controller."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said at least one of said computer-controlled devices is connected to an unstructured or semi-structured data-generating device associated with said node and configured to sense at least one of a set of digital parameters indicative of compliance by said node."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said at least one of computer-controlled devices is connected to a structured data-generating device associated with said node and configured to sense at least one of a set of digital parameters indicative of compliance by said node."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said at least one sensed stimulus is indicative of collected sensed information corresponding to instantaneous environmental determinants, instantaneous social determinants, and instantaneous physiological determinants associated with a set of digital parameters such that said controller further comprising a cognitive rules-based validation device to determine patterns within said digital parameters based on said at least one sensed stimulus and associate said determined patterns with historical reference values corresponding to routine environmental determinants, routine social determinants, and routine physiological determinants to identity a deviation so that said deviation is identified as one of an anomaly or a criticality in usage from said reference values."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said cognitive interactive human-machine interface further comprising a hardware-based multi-device gateway to communicatively connect with said plurality of computer-controlled devices, wherein said hardware-based multi-device gateway is configured to transmit instructions to said controller based on said sensed stimulus to execute a set of computer-executable custom rules for allowing said digital transactions over said blockchain configured network."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said controller further comprising a baseline generator to generate a baseline value, an upper acceptable range, and a below acceptable range for a respective digital parameter in association with a node associated with said at least one of said computer-controlled devices based on said sensed stimulus, and wherein said controller is configured to use an input from said baseline generator to display deviations of an instantaneous value corresponding to said digital parameter from said baseline value as peaks and troughs on a digital baseline chart."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20170140145A1/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 165,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170140145A1/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 85,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/79/5c/3a/83aaaa6cd114cc/US20170140145A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15418765",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20170140145A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

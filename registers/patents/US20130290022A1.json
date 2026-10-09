@@ -1,0 +1,176 @@
+{
+ "number": "US20130290022A1",
+ "kind": "published application",
+ "title": "System And Method For Creating Metadata-Based Natural Language Processing Capabilities",
+ "applicationNumber": "13457782",
+ "earlierPublication": "",
+ "filedOn": "2012-04-27",
+ "publishedOn": "2013-10-31",
+ "grantedOn": "",
+ "priorityDate": "2012-04-27",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-04-03",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3626",
+ "examiner": "HUNTER, SEAN KRISTOPHER",
+ "classifications": [
+  "G06Q 10/101",
+  "G16H 40/67",
+  "G16H 10/60",
+  "G16H 30/20"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system and method for managing data in a healthcare environment can include a content based router, and a healthcare record bank. The content based router can be configured to collect the data from a clinical data provider and convert the data in a format in accordance with a defined standard. The healthcare record bank can include or be coupled to a data repository. The healthcare record bank can be configured to be coupled to the clinical data provider through the content based router over a communication network. The healthcare record bank can be configured to store the data received from the clinical data provider and can be accessible or searchable from within or outside the healthcare record bank. The healthcare record bank can be coupled to or include a data logging unit configured to maintain metadata associated with the clinical data and configured to facilitate natural language processing capabilities.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for managing data in a healthcare environment, said system comprising: a proxy database that creates a backup of data associated with a clinical data provider; a content based router that: collects said data from said proxy database; and converts said data in a format in accordance with a defined standard; a data repository operatively connected to said content based router; a healthcare record bank coupled to said data repository, wherein said healthcare record bank is coupled to said clinical data provider through said content based router over a communication network, wherein said healthcare record bank stores said data received from the clinical data provider and is accessible and searchable from within or outside said healthcare record bank; and a data logging unit operatively connected to said healthcare record bank, wherein said data logging unit maintains metadata associated with said data and facilitates natural language processing (NLP) capabilities of said metadata."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said proxy database interacts with said clinical data provider through one or more proxy objects, wherein said one or more proxy objects comprising one or more references to said proxy database to establish a connection between said clinical data provider and said proxy database through one or more database drivers, and wherein said one or more database drivers comprising a Java Database Connectivity and Open Database Connectivity (JDBC-ODBC) Driver."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said content based router forms a communicative link between any of: said clinical data provider, wherein said clinical data provider comprises a first clinical data provider, and a second clinical data provider; and said clinical data provider and said healthcare record bank."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a social network platform operatively connected to said content based router, wherein said social network platform is external to said healthcare record bank and accesses said metadata stored within said data logging unit."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein said content based router is operatively connected to said healthcare record bank, and wherein said social network platform is operatively connected to said healthcare record bank."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a processing component that: accesses said metadata stored within said data logging unit; and searches for said metadata using said NLP capabilities, wherein said healthcare record bank interacts with a metadata management service that facilitates said NLP capabilities."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said content based router comprises an HL7 content based router that: collects said data from said proxy database; and converts said data into a format in accordance with an HL7 standard."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said proxy database is maintained at any of: a clinical data provider end that remotely communicates with said healthcare data bank; and a healthcare record bank end that remotely communicates and retrieves data from said clinical data provider."
+  },
+  {
+   "number": 9,
+   "independent": true,
+   "text": "A system for managing data in a healthcare environment, said system comprising: a content based router that: collects data from a clinical data provider; and converts said data into a format in accordance with a defined standard; a data repository operatively connected to said content based router; a healthcare record bank operatively connected to said data repository, wherein said healthcare record bank is operatively connected to said clinical data provider through said content based router over a communication network, and wherein said healthcare record bank stores said data received from said clinical data provider and is accessible and searchable from within or outside said healthcare record bank; and a data logging unit operatively connected to said healthcare record bank, wherein said data logging unit maintains metadata associated with said data and facilitates natural language processing (NLP) capabilities of said metadata."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , further comprising a proxy database that creates a backup of data associated with said clinical data provider."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein said proxy database interacts with said clinical data provider through one or more proxy objects, wherein said one or more proxy objects comprising one or more references to said proxy database to establish a connection between said clinical data provider and said proxy database through one or more database drivers, and wherein said one or more database drivers comprising a Java Database Connectivity and Open Database Connectivity (JDBC-ODBC) Driver."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A method for managing data in a healthcare environment, said method comprising: creating a backup of data associated with a clinical data provider in a proxy database; using a content based router to: collect said data from the proxy database; and convert said data into a format in accordance with a defined standard; maintaining metadata associated with said data in a data logging unit; and providing natural language processing (NLP) capabilities for searching said metadata."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , further comprising storing said data received from said clinical data provider in a healthcare record bank, wherein said data is accessible and searchable from within or outside said healthcare record bank."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 12 , further comprising: receiving said data from said clinical data provider by said proxy database; and establishing a connection between said clinical data provider and said proxy database through one or more proxy objects."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , wherein said proxy database is maintained at any of: a clinical data provider end that remotely communicates with a healthcare data bank; and a healthcare record bank end that remotely communicates and retrieves data from said clinical data provider."
+  },
+  {
+   "number": 16,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for managing data in a healthcare environment, said method comprising: creating a backup of data associated with a clinical data provider in a proxy database; collecting said data from the proxy database; converting said data into a format in accordance with a defined standard; maintaining metadata associated with said data in a data logging unit; and providing natural language processing (NLP) capabilities for searching said metadata."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said method further comprises storing said data received from said clinical data provider in a healthcare record bank, wherein said data is accessible and searchable from within or outside said healthcare record bank."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said method further comprises: receiving said data from said clinical data provider by said proxy database; and establishing a connection between said clinical data provider and said proxy database through one or more proxy objects."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The program storage device of claim 18 , wherein said proxy database is maintained at any of: a clinical data provider end that remotely communicates with a healthcare data bank; and a healthcare record bank end that remotely communicates and retrieves data from said clinical data provider."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20130290022A1/sheet-00000.webp",
+   "label": "Sheet 1 of 5",
+   "width": 148,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130290022A1/sheet-00001.webp",
+   "label": "Sheet 2 of 5",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130290022A1/sheet-00002.webp",
+   "label": "Sheet 3 of 5",
+   "width": 121,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130290022A1/sheet-00003.webp",
+   "label": "Sheet 4 of 5",
+   "width": 127,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130290022A1/sheet-00004.webp",
+   "label": "Sheet 5 of 5",
+   "width": 108,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/2d/54/37/6ac0006733cb1a/US20130290022A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/13457782",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20130290022A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

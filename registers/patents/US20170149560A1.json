@@ -1,0 +1,220 @@
+{
+ "number": "US20170149560A1",
+ "kind": "published application",
+ "title": "Digital Blockchain Authentication",
+ "applicationNumber": "15427806",
+ "earlierPublication": "",
+ "filedOn": "2017-02-08",
+ "publishedOn": "2017-05-25",
+ "grantedOn": "",
+ "priorityDate": "2012-02-02",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2021-07-15",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "GETACHEW, WODAJO",
+ "classifications": [
+  "G16H 10/60",
+  "G06T 7/10",
+  "G06V 40/172",
+  "G06V 40/161",
+  "G06K 7/1417",
+  "G10L 17/00",
+  "G10L 17/08",
+  "H04L 9/0637",
+  "H04L 9/3231",
+  "H04L 63/0815"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US13/756,433",
+   "relation": "Continuation-In-Part",
+   "publication": "US20130204641A1"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "13756433",
+  "61594216"
+ ],
+ "abstract": "A system for authenticating an access to a computerized records data-store by a plurality computer networking systems. The system includes a pre-stored identity information database to store identity information of the plurality of computer networking systems. The plurality of computer networking systems may include at least a first computer networking system and a second computer networking system such that the first computer networking system is uniquely defined by a first identity information and the second computer networking system is uniquely defined by a second identity information such that only the first computer networking system owns a registered digital account with the system and is authorized to access the computerized records data-store.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A blockchain configured distributed architecture-based system for authenticating access to a computerized records data-store by a plurality of blockchain configured trusted computer networking systems located at remote locations within a blockchain configured computer network, the blockchain configured distributed architecture-based system comprising: a pre-stored identity information database to store identity information of the plurality of blockchain configured computer networking systems, wherein the plurality of blockchain configured computer networking systems comprise at least a first computer networking system and a second computer networking system such that the first computer networking system is associated with a first entity and is uniquely defined by a first identity information and the second computer networking system is associated with a second entity and is uniquely defined by a second identity information, wherein only the first computer networking system owns a registered digital account with the system and is authorized to access the computerized records data-store; a pre-stored digital community information database to store federated digital community information of the plurality of blockchain configured computer networking systems identifying whether the plurality of computer networking systems belong to the same federated digital community or different federated digital communities; an identity authorization device for verifying an identity of the plurality of computer networking systems including verifying the first identity information and the second identity information, the identity authorization device comprising: a voice recognition device to detect voice inputs from the first entity associated with the first computer networking system and the second entity associated with the second computer networking system during access of the computerized records data-store respectively by the first networking system and the second computer networking system and compare the detected voice inputs with pre-stored voice patterns of the respective first identity information and the second identity information; and an image recognition device to detect face patterns of the first entity associated with the first computer networking system and the second entity associated with the second computer networking system during access of the computerized records data-store respectively by the first networking system and the second networking system and compare the detected face patterns with pre-stored face patterns of the first identity information and the second identity information; a processing circuit to authenticate the second computer networking system to access the computerized records data-store upon verification of the second identity information and whether the second computer networking system and the first computer networking system belong to the same federated digital community of the computerized records data-store, even if the second computer networking system does not own a registered digital account with the system; and a programmatic web interface comprising a single digital sign-on scheme to allow access to the computerized records data-store by the first computer networking system and the second computer networking system after verification of the first identity information and the second identity information respectively and upon verification that the second computer networking system and the first computer networking system belong to the same federated digital community of the computerized records data-store, wherein said processing circuit transforms the accessed computerized records into a digital data structure readable by a scanner."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the federated digital community is defined by a trusted computerized group of digitally stored computer executable profiles associated with a social networking server such that each such digitally stored computer executable profile is associated with at least one of the plurality of blockchain configured trusted computer networking systems associated with an entity and uniquely identifiable by its identity information."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the processing circuit is configured to: allow access to the first computer networking system upon verification of the first identity information indicative of an authorized access to the computerized records data-store, wherein the first identity information is linked to the registered account authorizing access to the computerized records data store and owned by the first computer networking system associated with the first entity; and allow access to the second computer networking system upon verification of the second identity information simply because the first computer networking system is already allowed to access the computerized records data-store and the first computer networking system and the second computer networking system are part of the same federated digital community, wherein the second computer networking system does not own a registered account with the system which is to authorize access to the computerized records data store."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein the registered account with the system owned by the first computer networking system is defined by a secured encrypted login credential information containing a unique digital identifier indicative of a registered access to the computerized records data-store."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the login credential information associated with the first computer networking system of the first entity is integrated within the first identity information so as the first identity information to also verify the login credential information of the registered account with the system."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 2 , wherein the blockchain configured computer network comprises a first arbitrarily large number of blockchain configured computer networking systems of the plurality of blockchain configured computer networking systems and the federated digital community comprises a second arbitrarily large number of blockchain configured computer networking systems such that each such blockchain configured computer networking system of the second arbitrarily large number of blockchain configured computer networking systems is associated with a digitally stored computer executable profile indicative of a unique identity."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein the digitally stored computer executable profile is accessible through a unique social digital login credential of a computer networking system."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , wherein the unique social digital login credential of a computer networking system together with an identity information of an associated entity allows access to the computer records data-store upon verification by the identity authorization device, wherein the identity authorization device further comprising a social digital identity verification device such that the social digital identity verification device is configured to verify the social digital login credential of the computer networking system via the social networking server communicatively coupled to a third party network."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a set of computer executable rules configured to be executed by the processing circuit to associate one or more of the plurality of computer networking systems within a federated digital community."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the voice recognition device comprising: a communication interface that communicates with an external device; a hardware-based sound card including or coupled to an external microphone that collects sound to produce audio data; a voice recognition software to execute speech recognition instructions; and a microcontroller to analyze the audio data based on the speech recognition instructions and generate a signal indicative of the voice inputs."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the image recognition device comprising: a communication interface that communicates with an external device; a hardware-based image acquisition device including a camera that collects an image from a live stream in the external device; an image segmentation device that breaks the image into a plurality of segmented portions; and a processor to analyze each of the segmented portions and generate a signal indicative of the face patterns."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first computer networking system comprises a mobile communication device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said second computer networking system comprises a mobile communication device."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said identity authorization device comprises a mobile communication device."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said digital data structure comprises a QR (quick response) code."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first computer networking system comprises a cloud-based architecture."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said second computer networking system comprises a cloud-based architecture."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit transforms the accessed computerized records into a multi-media format presented on a display device."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said processing circuit transforms the accessed computerized records into an audio format output by a speaker."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said scanner comprises a mobile communication device."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20170149560A1/sheet-00000.webp",
+   "label": "Sheet 1 of 9",
+   "width": 151,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00002.webp",
+   "label": "Sheet 3 of 9",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00003.webp",
+   "label": "Sheet 4 of 9",
+   "width": 123,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00004.webp",
+   "label": "Sheet 5 of 9",
+   "width": 74,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00005.webp",
+   "label": "Sheet 6 of 9",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00006.webp",
+   "label": "Sheet 7 of 9",
+   "width": 100,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00007.webp",
+   "label": "Sheet 8 of 9",
+   "width": 102,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00008.webp",
+   "label": "Sheet 9 of 9",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20170149560A1/sheet-00009.webp",
+   "label": "Sheet 10 of 9",
+   "width": 88,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/c0/20/f4/447dc17eed91a4/US20170149560A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15427806",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20170149560A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}
