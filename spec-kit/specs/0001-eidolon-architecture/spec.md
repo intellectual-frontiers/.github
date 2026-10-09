@@ -231,6 +231,9 @@ reference model, and governance representation.
   Eidolon (what exists), an Ergon (what is built) or a Noema (what is
   conceived), per 0047-digital-reflections and 0048-noemas. The Eidolon above
   is the system that holds them.
+- **A platform** — an Ergon that provides the eight capabilities of the platform
+  kernel, each realized by a named module, per 0049-platforms. A made system that
+  lacks one is a product or a suite, never a platform.
 - **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
 - **An audience** — a named permission to see a fact: public, company
