@@ -1314,3 +1314,10 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0049-platforms FR-052	none	-	authentication, quotas, audit and generated documentation are in the platform's code; checked in its repository
 0044-public-website FR-039	check	eidolon: eid check site	the check fails each of the five conditions; the Rust tests (check.rs) cover them
 0044-public-website FR-040	check	eidolon: eid test	the Rust tests (tests/served.rs) check the hashed addresses, the immutable header on /static/ and the header file; no check of a deployed host's headers
+0044-public-website FR-041	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the labels on the hunts pages
+0044-public-website FR-042	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the sections, the area page and the filed-under list
+0044-public-website FR-043	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the area page and the register pages
+0044-public-website FR-044	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the fund pages; whether the sizes may be published is OQ-445 of the vault
+0044-public-website FR-045	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the patent and trademark pages
+0044-public-website FR-046	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the grouping and the filters
+0044-public-website FR-047	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the structured data, the sitemap and the companion list; the tools' events are not tested in a browser
