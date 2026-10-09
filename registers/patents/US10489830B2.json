@@ -1,0 +1,247 @@
+{
+ "number": "US10489830B2",
+ "kind": "granted patent",
+ "title": "Aggregation Of Rating Indicators",
+ "applicationNumber": "15813109",
+ "earlierPublication": "US20180075496A1",
+ "filedOn": "2017-11-14",
+ "publishedOn": "2018-03-15",
+ "grantedOn": "2019-11-26",
+ "priorityDate": "2014-06-22",
+ "status": "Patented Case",
+ "statusDate": "2019-11-06",
+ "estimatedExpiration": "2036-03-13",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2161",
+ "examiner": "SAMARA, HUSAM TURKI",
+ "classifications": [
+  "G06Q 30/0282"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US14/744,697",
+   "relation": "Continuation",
+   "publication": "US9846896B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "14744697",
+  "62015503"
+ ],
+ "abstract": "A computer-implemented method and system for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity. The method includes searching a plurality of repositories containing the plurality of discrete rating indicators associated with the rated entity. The method may include retrieving a first rating indicator, a second rating indicator, and a third rating indicator. At least one of the first rating indicator, the second rating indicator, and the third rating indicator may be a fraudulent rating indicator. The method may include filtering out the fraudulent rating indicator from among the first, second, and third rating indicators, wherein the fraudulent rating indicator is determined based on a combination of parameters. The method may include aggregating the first, second, and third rating indicators after filtering out the fraudulent rating indicator such that the aggregation results in an aggregate rating indicator.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-implemented method for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity, the method comprising: searching a plurality of repositories containing the plurality of discrete rating indicators associated with the rated entity; retrieving a first rating indicator published on a web-based repository; retrieving a second rating indicator published on a personalized social networking platform section; retrieving a third rating indicator stored with a local storage component associated with the rated entity or a rating entity, wherein at least one of the first rating indicator, the second rating indicator, and the third rating indicator comprises a first fraudulent rating indicator; filtering the first fraudulent rating indicator from among the first rating indicator, the second rating indicator, and the third rating indicator, wherein the first fraudulent rating indicator is determined based on computer executable input components including a geo-location coordinate similarity between a rating entity and the rated entity, a demographic identification, a frequency of the rating indicator of the rated entity by the rating entity, a sentiment writing style, a duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, a duplication of rating indicators provided by the rating entity for the rated entity, and a use of multiple different rating sources for rating the rated entity by the rating entity; aggregating a filtered combination of the first rating indicator, the second rating indicator, and the third rating indicator to provide an aggregate rating indicator comprising an equivalent of the plurality of discrete rating indicators other than the first fraudulent rating indicator; generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity; converting the electric signal into a plurality of pixels; and displaying the plurality of pixels on a display unit of a communication device."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The method of claim 1 , wherein the plurality of repositories is associated with a rating indicator website, a social networking engine, and a healthcare rating indicator agency information source."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The method of claim 1 , further comprising: searching the local storage component for a rating indicator submitted by an individual for the rated entity, wherein the rating indicator comprises sentiments, reviews, comments, and views; and indexing the rating indicator, identified by the sentiments, reviews, comments, and the views."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The method of claim 1 , further comprising associating a rating indicator category with the rated entity, wherein the aggregate score is determined for the plurality of discrete rating indicators such that each of the plurality of discrete rating indicators are linked to the same category."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The method of claim 4 , further comprising determining a trust score, and a reliability index for the first rating indicator, the second rating indicator, and the third rating indicator, wherein the first rating indicator, the second rating indicator, and the third rating indicator qualifies for the aggregation when the trust score and the reliability index exceeds a threshold trust score and a threshold reliability score for a specific rating indicator category identified by a rating indicator category identifier."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The method of claim 5 , wherein the rated entity comprises a first entity and the aggregate rating indicator comprises a first aggregate rating indicator, the method further comprising: retrieving a fourth rating indicator, a fifth rating indicator, and a sixth rating indicator associated with a second entity for the same rating indicator category identified by the rating indicator category identifier; filtering a second fraudulent rating indicator from among the fourth rating indicator, the fifth rating indicator and the sixth rating indicator; aggregating the fourth rating indicator, the fifth rating indicator, and the sixth rating indicator after filtering the second fraudulent rating indicator such that the aggregation results in a second aggregate rating indicator; comparing the first aggregate rating indicator and the second aggregate rating indicator; and identifying a relevant entity from among the first entity and the second entity, wherein the relevant entity is identified based on any of an availability at a particular time, an availability at a particular location, a geographical proximity from a specific location, and a comparison of trust scores and reliability indices associated with the first entity and the second entity."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The method of claim 6 , further comprising: generating an electric signal comprising data signifying the relevant entity and a relevant entity profile; converting the electric signal into a plurality of pixels; and displaying the plurality of pixels on the display unit of the communication device to publish the data signifying the relevant entity and the relevant entity profile."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The method of claim 6 , wherein parameters for aggregating the plurality of discrete ratings comprises a comparison output obtained from a profile component and a billing component of the rated entity, wherein the profile component comprises a computer executable profile of the rated entity generated by the rating entity and accessible through a social engine associated with a social networking platform with dynamically changing user connections, and the billing component comprises a billing profile including financial and billing information generated and verified by a third party computing system such that the profile component and the billing component include a combination of sentiments, natural texts, numerical scores, and other numerical data."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 1 , wherein the first rating indicator is defined in the form of an audio review, the second rating indicator is defined in the form of a video review, and the third rating indicator is defined in the form of a visual review, the method further comprising normalizing and standardizing the first rating indicator, the second rating indicator, and the third rating indicator to a predefined format by the processor."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 1 , wherein the filtering comprises: creating a historical rating profile of the rating entity that is indicative of rating behavior of the rated entity for rating of a plurality of other entities; creating historical rating profiles of a plurality of other rating entities other than the rating entity; comparing the historical rating profile of the rating entity with the historical rating profiles of the plurality of other rating entities to generate a comparison output; and considering a rating indicator from among the first rating indicator, the second rating indicator, and the third rating indicator as the first fraudulent rating indicator based on the comparison output."
+  },
+  {
+   "number": 11,
+   "independent": true,
+   "text": "A system for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity, the system comprising: a search engine for searching a plurality of repositories containing the plurality of discrete rating indicators associated with the entity; a processor for: retrieving a first rating indicator published on a web-based repository; retrieving a second rating indicator published on a personalized social networking platform section; and retrieving a third rating indicator published with a local storage component associated with the rated entity or a rating entity, wherein at least one of the first rating indicator, the second rating indicator, and the third rating indicator comprises a first fraudulent rating indicator; a memory operatively connected to the processor for storing the first rating indicator, the second rating indicator, and the third rating indicator; a filter communicatively coupled to the processor and the memory for filtering the first fraudulent rating indicator, wherein the first fraudulent rating indicator is determined based on computer executable input components including a geo-location coordinate similarity between a rating entity and the rated entity, a demographic identification, a frequency of the rating indicator of the rated entity by the rating entity, a sentiment writing style, a duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, a duplication of rating indicators provided by the rating entity for the rated entity, and a use of multiple different rating sources for rating the rated entity by the rating entity; a rating aggregator operatively connected to the processor for aggregating the first rating indicator, the second rating indicator, and the third rating indicator after filtering the first fraudulent rating indicator such that the aggregation results in an aggregate rating indicator indicative of an equivalent of the plurality of discrete rating indicators other than the fraudulent rating indicator; an electric signal generator operatively connected to the processor and the memory for generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity; a transceiver for transmitting the electric signal; and a signal converter for converting the electric signal into a plurality of pixels to publish the aggregate rating indicator associated with the rated entity and the data signifying the rated entity."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the web-hosted repositories are associated with a rating indicator website, a social networking engine, and a healthcare rating indicator agency information source."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 11 , further comprising a server operatively connected to the processor to access the repositories, wherein the server is communicatively coupled with individual local storage components residing on a local computing machine remotely located from the server and the processor, the server configured to access the individual local storage components, the server and the processor together configured to: search digital information stored on the individual local storage components for a rating indicator provided by an individual to the rated entity, wherein the rating indicator residing in the local storage components comprises sentiments, reviews, comments, and views; and index the rating indicator, identified by the sentiments, reviews, comments, and the views, in the memory by the processor."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the processor is further configured to associate a rating indicator category with the rated entity, wherein the aggregate score is determined for the plurality of discrete rating indicators such that each of the plurality of discrete rating indicators are linked to the same category."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the processor is further configured to determine a trust score, and a reliability index for the first rating indicator, the second rating indicator, and the third rating indicator, wherein the first rating indicator, the second rating indicator, and the third rating indicator qualifies for the aggregation when the trust score and the reliability index exceeds a threshold trust score and a threshold reliability score for a specific rating indicator category identified by a rating indicator category identifier maintained by the memory."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the rated entity is a first entity and the aggregate rating indicator is a first aggregate rating indicator, and wherein the processor is further configured to: retrieve a fourth rating indicator, a fifth rating indicator, and a sixth rating indicator associated with a second entity for the same rating indicator category identified by the rating indicator category identifier; filter a second fraudulent rating indicator from among the fourth rating indicator, the fifth rating indicator and the sixth rating indicator by the processor; aggregate the fourth rating indicator, the fifth rating indicator, and the sixth rating indicator after filtering the second fraudulent rating indicator such that the aggregation results in a second aggregate rating indicator; compare the first aggregate rating indicator and the second aggregate rating indicator; and identify a relevant entity from among the first entity and the second entity, wherein the relevant entity is identified based on any of an availability at a particular time, an availability at a particular location, a geographical proximity from a specific location, and a comparison of trust scores and reliability indices associated with the first entity and the second entity."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The system of claim 15 , wherein: the signal generator is further configured to generate an electric signal comprising data signifying the relevant entity and a relevant entity profile; the transceiver is further configured to transmit the electric signal; and the signal converter is further configured to convert the electric signal into a plurality of pixels to publish the data signifying the relevant entity and the relevant entity profile."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the transceiver transmits the electric signal to a communication device, and wherein the plurality of pixels is displayed on a display unit of the communication device."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the processor comprises a special purpose processor."
+  },
+  {
+   "number": 20,
+   "independent": true,
+   "text": "A computer-implemented method for publishing an aggregate rating indicator based on a plurality of discrete rating indicators associated with a rated entity, the method comprising: searching a plurality of repositories containing the plurality of discrete rating indicators associated with the rated entity; retrieving a plurality of rating indicators published on a combination of a web-based repository and a personalized social networking platform section, wherein at least one of the plurality of rating indicators comprises a fraudulent rating indicator; filtering the fraudulent rating indicator based on computer executable input components including a geo-location coordinate similarity between a rating entity and the rated entity, a demographic identification, a frequency of the rating indicator of the rated entity by the rating entity, a sentiment writing style, a duration between the rating indicator and a subsequent rating indicator by the same rating entity for the same rated entity, a duplication of rating indicators provided by the rating entity for the rated entity, and a use of multiple different rating sources for rating the rated entity by the rating entity; aggregating a filtered combination of the plurality of rating indicators to provide an aggregate rating indicator comprising an equivalent of the plurality of discrete rating indicators other than the fraudulent rating indicator; generating an electric signal comprising data signifying the aggregate rating indicator and the rated entity; converting the electric signal into a plurality of pixels; and displaying the plurality of pixels on a display unit of a communication device."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10489830B2/sheet-00000.webp",
+   "label": "Sheet 1 of 15",
+   "width": 178,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00001.webp",
+   "label": "Sheet 2 of 15",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00002.webp",
+   "label": "Sheet 3 of 15",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00003.webp",
+   "label": "Sheet 4 of 15",
+   "width": 210,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00004.webp",
+   "label": "Sheet 5 of 15",
+   "width": 176,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00005.webp",
+   "label": "Sheet 6 of 15",
+   "width": 75,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00006.webp",
+   "label": "Sheet 7 of 15",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00007.webp",
+   "label": "Sheet 8 of 15",
+   "width": 119,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00008.webp",
+   "label": "Sheet 9 of 15",
+   "width": 70,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00009.webp",
+   "label": "Sheet 10 of 15",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00010.webp",
+   "label": "Sheet 11 of 15",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00011.webp",
+   "label": "Sheet 12 of 15",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00012.webp",
+   "label": "Sheet 13 of 15",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00013.webp",
+   "label": "Sheet 14 of 15",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10489830B2/sheet-00014.webp",
+   "label": "Sheet 15 of 15",
+   "width": 69,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/68/df/0e/2ca94ab83c9534/US10489830.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15813109",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10489830B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

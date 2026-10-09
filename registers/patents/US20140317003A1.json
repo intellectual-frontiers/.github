@@ -1,0 +1,180 @@
+{
+ "number": "US20140317003A1",
+ "kind": "published application",
+ "title": "System And Method For Facilitating Crowdsourced Credentialing And Accreditation",
+ "applicationNumber": "13865481",
+ "earlierPublication": "",
+ "filedOn": "2013-04-18",
+ "publishedOn": "2014-10-23",
+ "grantedOn": "",
+ "priorityDate": "2013-04-18",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-01-06",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3689",
+ "examiner": "ARAQUE JR, GERARDO",
+ "classifications": [
+  "G06Q 30/018"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system and method for facilitating crowdsourced credentialing over a network includes a federated profile manager to maintain profile related information for a plurality of professionals obtained from a plurality of federated sources distributed across the crowdsourced network. The system further includes a profile segmenting engine to segment and classify the profile-related information for each of the professionals into a plurality of federated profiles. The system further includes a certification engine to allow a plurality of crowdsourced respondents to respond to the federated profiles associated with each of the plurality of professionals and credential them.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for facilitating crowdsourced credentialing over a network, said system comprising: a federated profile manager to maintain profile related information for a plurality of professionals obtained from a plurality of federated sources distributed across said crowdsourced network, wherein said profile related information for each of said plurality of professionals is located at one or more of said federated sources; a profile segmenting engine to segment and classify said profile related information for each of said professionals into a plurality of federated profiles; a certification engine to allow a plurality of crowdsourced respondents to respond to said federated profiles associated with each of said plurality of professionals and credential said plurality of professionals, wherein said credentialing of each of said federated profiles associated with a professional of said plurality of professionals contribute to credentialing of an entire common profile of said professional upon collation of said credentialed federated profiles, and wherein said federated profiles associated with said professional are credentialed from a plurality of respondents; and an auto-validation engine coupled to said certification engine and communicatively linked to a social networking platform hosting information related to said professionals, said auto-validation engine to certify said credentialing of said federated profiles, already certified by said certification engine, by using said information about said professionals from said social networking platform, wherein one or more of said federated profiles are accessible by medical entities for determining a level of trust about said plurality of professionals based on a cumulative effect of credentialing and said auto validation of said profile related information."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a profile management server such that said profile management server comprises: a profile information collation module to collect said profile related information about each of said plurality of professionals from said plurality of sources; said federated profile manager; and said profile segmenting engine."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , further comprising a profile certification server communicatively coupled to or included in said profile management server such that said profile certification server includes said certification engine comprising: a segment certification engine to facilitate credentialing of said federated profiles associated with said common profile or said profile related information associated with each of said professionals; a profile certification engine to facilitate credentialing of said common profile in entirety based on a collated effect of credentialing of said federated profiles associated with said common profile of a professional."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein said profile certification server further comprises a segment rating engine to associate a rating to each of said federated profiles of said common profile based on credentialing from said crowdsourced plurality of respondents."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein said profile certification server further comprises a profile rating engine to associate a rating to said entire common profile based on credentialing of each of said federated profiles and ratings associated with each of said federated profiles as determined by said segment rating engine cumulatively."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a profiles database to store information pertinent to said profiles of said plurality of professionals, said profiles database coupled to said federated profile manager such that said federated profile manager maintains said information stored in said profiles database."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , further comprising a profiles certification database to store information pertinent to certification status of said profiles associated with said plurality of professionals, wherein said certification status includes one or more of a verified segment, a verified profile, a pending verification, a verification in progress, a segment rejected as incorrect, and a profile rejected as incorrect, and wherein said certification credentialing database is coupled to said profiles database."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , further comprising a certified credential database coupled to said profiles certification database and storing profiles verified by said certification engine, wherein a medical entity is allowed a direct access to said certified credential database based on preferences and rules defined for said medical entity, wherein said medical entity is one of a hospital, a nursing center, a doctor, a physician, a healthcare unit, and a government healthcare department."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said certified credential database further stores information pertinent to one or more of work history, education, and personal demographics of one or more professionals corresponding one or more of verified profiles."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 8 , further comprising a profile sources database coupled to said profiles database and said profiles certification database, wherein said profile sources database comprises information about a plurality of sources in said crowdsourced network that are linked to each of said federated profiles associated with said plurality of said professionals, and information about a plurality of sources who responds to said federated profiles for credentialing."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said auto-validation engine comprises a plurality of application programming interfaces (APIs) allowing verification of information associated with each of said federated profiles of said plurality of professionals from a social profile of each of said professionals maintained by said social networking platform, wherein said social profile maintained by said social networking platform is distinct from said profiles of each of said professionals maintained by said federated profile manager, wherein said APIs further allow to determine an extent of mapping between said information contained in said two distinct profiles maintained by said federated profile manager and said social networking platform, and wherein said APIs are adapted to link each of said federated profiles to one or more distinct sources of said social networking platform such that a unique identifier is maintained that associate a distinct source of said social networking platform to a federated profile."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A method for facilitating crowdsourced and multi-level credentialing over a network for use of multi-level credentialed information by a plurality of medical entities through said crowdsourced network, said method comprising: receiving profile information from a plurality of crowdsourced professionals; segmenting said profile information associated with each of said plurality of professionals into a plurality of federated profiles; and receiving responses from a plurality of crowdsourced respondents for each of said federated profiles, said response defining certification of information contained in each of said federated profiles, wherein said certification associated with each of said federated profiles concludes in either verified as correct or verified as wrong, wherein said crowdsourced credentialing facilitates said certification of each of said federated profiles from one or more respondents so as to cumulate an effect of said certification at multiple levels defined by each respondent, and wherein said cumulated effect of said certification allows to associate a cumulative segment rating to each of said federated profiles associated with each of said professionals, wherein said response from each of said professionals associated with each of said federated profiles is associated with an attribute defining said source and said respondent for each of said federated profile during credentialing, and a date of certification; auto-validating said responses to further certify said information provided by said respondents for each of said federated profiles through one or more sources of a social networking platform that associates said professionals through a social networking profile; either refining said segment rating for each of said federated profiles or associating a separate rating based on a mapping of each of said federated profiles with said social networking profiles; and facilitating access by said plurality of medical entities to retrieve said responses identifying credentialing and certification and said refined or associated rating through a web-based portal operating in said crowdsourced network."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 12 , wherein said auto-validating comprises automatically searching from a social networking database to verify for each of said federated profiles, wherein in response to detection of a mismatch between said searched information and said federated profile information, wherein said method further comprises suggesting a federated profile update, and wherein said method further comprises suggesting said social networking profile update to said social networking platform."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 12 , wherein said respondents comprise one or more of profile owners and other professionals."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 12 further comprising using a plurality of application programming interfaces (APIs) to allow verification of information associated with each of said federated profiles of said plurality of professionals from a profile of each of said professionals maintained by said social networking platform, wherein said APIs are adapted to link each of said federated profiles to one or more distinct sources of said social networking platform such that a unique identifier is maintained that associate a distinct source of said social networking platform to a federated profile."
+  },
+  {
+   "number": 16,
+   "independent": true,
+   "text": "A program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for facilitating crowdsourced and multi-level credentialing over a network for use of multi-level credentialed information by a plurality of medical entities through said crowdsourced network, said method comprising: receiving profile information from a plurality of crowdsourced professionals; segmenting said profile information associated with each of said plurality of professionals into a plurality of federated profiles; and receiving responses from a plurality of crowdsourced respondents for each of said federated profiles, said response defining certification of information contained in each of said federated profiles, wherein said certification associated with each of said federated profiles concludes in either verified as correct or verified as wrong, wherein said crowdsourced credentialing facilitates said certification of each of said federated profiles from one or more respondents so as to cumulate an effect of said certification at multiple levels defined by each respondent, wherein said cumulated effect of said certification allows to associate a cumulative segment rating to each of said federated profiles associated with each of said professionals, and wherein said response from each of said professionals associated with each of said federated profiles is associated with an attribute defining said source and said respondent for each of said federated profile during credentialing, and a date of certification; auto-validating said responses to further certify said information provided by said respondents for each of said federated profiles through one or more sources of a social networking platform that associates said professionals through a social networking profile; either refining said segment rating for each of said federated profiles or associating a separate rating based on a mapping of each of said federated profiles with said social networking profiles; and facilitating access by said plurality of medical entities to retrieve said responses identifying credentialing and certification and said refined or associated rating through a web-based portal operating in said crowdsourced network."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said respondents comprises one or more of profile owners and other professionals."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The program storage device of claim 16 , wherein said method further comprises using a plurality of application programming interfaces (APIs) to allow verification of information associated with each of said federated profiles of said plurality of professionals from a profile of each of said professionals maintained by said social networking platform, wherein said APIs are adapted to link each of said federated profiles to one or more distinct sources of said social networking platform such that a unique identifier is maintained that associate a distinct source of said social networking platform to a federated profile."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20140317003A1/sheet-00000.webp",
+   "label": "Sheet 1 of 7",
+   "width": 162,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00001.webp",
+   "label": "Sheet 2 of 7",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00002.webp",
+   "label": "Sheet 3 of 7",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00003.webp",
+   "label": "Sheet 4 of 7",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00004.webp",
+   "label": "Sheet 5 of 7",
+   "width": 114,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00005.webp",
+   "label": "Sheet 6 of 7",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20140317003A1/sheet-00006.webp",
+   "label": "Sheet 7 of 7",
+   "width": 101,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/3d/47/c1/0aae8a9f9cc704/US20140317003A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/13865481",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20140317003A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,189 @@
+{
+ "number": "US11769573B2",
+ "kind": "granted patent",
+ "title": "Team-Based Tele-Diagnostics Blockchain-Enabled System",
+ "applicationNumber": "16161846",
+ "earlierPublication": "US20190051390A1",
+ "filedOn": "2018-10-16",
+ "publishedOn": "2019-02-14",
+ "grantedOn": "2023-09-26",
+ "priorityDate": "2018-10-16",
+ "status": "Patented Case",
+ "statusDate": "2023-09-06",
+ "estimatedExpiration": "2040-07-06",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3686",
+ "examiner": "COVINGTON, AMANDA R",
+ "classifications": [
+  "G16H 10/60",
+  "G16H 40/67",
+  "G16H 50/20",
+  "G06F 16/27",
+  "G06F 16/1824",
+  "H04L 9/50",
+  "H04L 9/0643",
+  "H04L 9/3236",
+  "H04L 9/3297",
+  "H04L2209/00"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A computer-controlled diagnostic network system. The system includes diagnostic devices and diagnostician devices located at different locations in a distributed secured network. The system includes a computer-controlled central blockchain server for storing and processing details obtained from the diagnostic devices and the diagnostician devices. The computer-controlled central blockchain server is communicatively coupled to a data extraction device for retrieving a plurality of computer-executable files stored at discrete distributed locations associated with one or more users of the distributed secured network. The computer-controlled central blockchain server is communicatively coupled to a blockchain device to process blockchain tasks through blockchain-enabled and computer-controlled software and hardware tools. The computer-controlled central blockchain server is located at a location remote from the locations of the diagnostic devices and the diagnostician devices.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled diagnostic network system for facilitating integrated remote-based diagnostics, said system comprising: a first diagnostic device located at a first location in a distributed secured network and is associated with a first diagnostic center, wherein the first diagnostic device generate at least one computer-executable file comprising diagnostic data in a first format, and wherein the first diagnostic device is at least one of electronic stethoscopes, sphygmomanometers, ophthalmoscopes, otoscopes, electrocardiographs, thermometers, magnetic resonance imaging (MRI) devices, ultrasound devices, CT scan machines, laboratory equipment, devices for self-testing, in vitro diagnostic medical devices, X-ray equipment, and screening devices; a second diagnostic device located at a second location in the distributed secured network and remotely located from the first diagnostic device and is associated with a second diagnostic center, wherein the second diagnostic device generate at least one computer-executable file comprising diagnostic data in a second format, and wherein the second diagnostic device is at least one of electronic stethoscopes, sphygmomanometers, ophthalmoscopes, otoscopes, electrocardiographs, thermometers, magnetic resonance imaging (MRI) devices, ultrasound devices, CT scan machines, laboratory equipment, devices for self-testing, in vitro diagnostic medical devices, X-ray equipment, and screening devices; a first diagnostician device associated with a first diagnostician located at a third location in the distributed secured network and remotely located from the first diagnostic device and the second diagnostic device, wherein the first diagnostician device reads the diagnostic data digitally stored in the at least one computer-executable file from the first diagnostic device; a second diagnostician device associated with a second diagnostician located at a fourth location in the distributed secured network and remotely located from the first diagnostic device, the second diagnostic device, and the first diagnostician device, wherein the second diagnostician device reads the diagnostic data digitally stored in the at least one computer-executable file from the second diagnostic device; a computer-controlled central blockchain server for storing and processing details obtained from the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device, wherein the computer-controlled central blockchain server is communicatively coupled to: a data extraction device that: retrieves the at least one computer-executable file comprising the diagnostic data in the first format—from the first diagnostic device, receives the at least one computer-executable file comprising the diagnostic data in the second format from the second diagnostic device, standardizes the diagnostic data in the first format retrieved from the first diagnostic device and the diagnostic data in the second format retrieved from the second diagnostic device in accordance with a predefined format, and stores the diagnostic data from the first diagnostic device and the second diagnostic device in the predefined format; and a workflow system, associated to the data extraction device, to perform a set of special purpose-based computer-executable operations for performing a plurality of computer-controlled tasks within the distributed secured network, wherein the workflow system generates a computer-executable workflow file indicative of tasks allocated among one or more of the plurality of users connected through a diagnostic network, wherein the computer-executable workflow file identifies nature of tasks for execution digitally by the one or more of the plurality of users, automated access rights depending on credentialing of digital profiles of the one or more of the plurality of users, and monetary benefits after the execution of the workflow tasks allocated to the one or more of the plurality of users, wherein the workflow tasks that are allocated are updated dynamically in the computer-executable workflow file when a user of the plurality of users accepts an allocated workflow task presented to the user, wherein the plurality of computer-executable tasks within the distributed secured network comprises: creating one or more workflow steps for a set of workflow tasks, defining a set of routing rules for one or more of the users associated with the first diagnostician device and the second diagnostician device that trigger or accept to execute a certain workflow task, retrieving the workflow tasks that are allocated from a blockchain database where the data extracted from the first diagnostic device and the second diagnostic device is stored, and presenting digitally one or more of the workflow tasks to the users based on their credentials and their preferences as indicative in their registered profiles; a blockchain device to process blockchain tasks through blockchain-enabled and computer-controlled software and hardware tools, wherein the computer-controlled central blockchain server is located at a location remote from the locations of the first diagnostic device, the second diagnostic device, the first diagnostician device, and the second diagnostician device, wherein the blockchain device comprises a transmitting device to allow transmission of the computer-executable files from the computer-controlled central blockchain server to a secured cloud server and to the second diagnostician device as allowed within the diagnostic network based on permissions and access rights; and wherein the secured cloud server allows the one or more users to access one or more of the computer-executable files through a secured access from a remote location without being able to create a local copy of the one or more of the computer-executable files stored within the computer-controlled central blockchain server; and a distributed ledger to enable coding of smart contracts and execute the smart contracts when specified conditions are met, wherein the smart contracts protect information associated with the workflow tasks and the diagnosis data retrieved from the first diagnostic device and the second diagnostic device and eliminate risk of the computer-executable files copying and redistribution without protecting privacy rights, wherein the data extraction device further comprises an image recognition device and a non-image-based data extraction device, wherein the image recognition device reads, recognizes and extracts image-based data from the data extraction device, and the non-image-based data extraction device reads, recognizes, and extracts the non-image-based data from the first diagnostic device and the second diagnostic device, and wherein the image recognition device further comprises: a communication interface for establishing communication with a plurality of components of the computer-controlled central blockchain server; an image acquisition device to receive digital signals containing image patterns and expressions and to read image-based data obtained from one or more of the first diagnostic device, second diagnostic device, first diagnostician device, and the second diagnostician device; a camera for taking still or streaming images of the data being extracted by the data extraction device; and a plurality of multichannel amplifiers such that each amplifier of the multichannel amplifiers may be defined to receive a specific type of sensed information from the camera allowing sourcing of signals for the image recognition device; wherein the image recognition device receives amplified signals from the plurality of multichannel amplifiers for fragmenting received image patterns."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the plurality of computer-executable files comprise the digitally stored diagnostic data generated and retrieved from the first diagnostic device and the second diagnostic device."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a standardizing device to perform computer-executable digital instructions for standardizing the diagnostic data in the first format retrieved from the first diagnostic device and the diagnostic data in the second format retrieved from the second diagnostic device in accordance with the predefined format, wherein the digitally stored data before standardizing resides in a plurality of formats within the first diagnostic device and the second diagnostic device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a blockchain database communicatively coupled to the computer-controlled central blockchain server and located at a location remotely from the locations of the first diagnostic device, the second diagnostic device, the first diagnostician device and the second diagnostician device."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the workflow system further comprises a task segmentation engine to create the one or more workflow steps for the set of workflow tasks defining a set of routing rules for the one or more of the users that trigger or accept to execute the workflow task digitally."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the workflow system further comprises a task scheduling engine to allocate and present the one or more workflow tasks to the users based on their credentials and their preferences as indicative in their registered profiles."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the distributed secured network comprises a blockchain configured diagnostic network."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the blockchain device further comprises a processing device to process blockchain tasks through computer-controlled software and hardware tools."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the blockchain device further comprises a central verification device configured to verify identity information of one or more of the first diagnostician device and the second diagnostician device in the secured network through which a user requests to access a workflow task for execution."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , further comprising a credentialing system to compute credentialing of a registered profile associated with the user such that the access is granted based on credentialing of the registered profile."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising an artificial intelligence (AI) system integrated within the computer-controlled central blockchain server, wherein the AI system enables an artificially intelligent diagnostic network within the distributed secured network."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the AI system further comprises: an interface layer to receive inputs form a computing system that serves as an initial input to the AI system; and an AI application processing layer to collect the initial inputs and related information from the blockchain database and external Internet sources, and process the initial inputs, make automated analysis and judgment for automated reading of the data extracted from the first diagnostic device and the second diagnostic devices using computational intelligent tools, wherein the AI system allows to process execution of a workflow task automatically using inputs generated based on the initial inputs at a second state when the initial inputs are evolved using a set of computational intelligence tools."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11769573B2/sheet-00000.webp",
+   "label": "Sheet 1 of 12",
+   "width": 153,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00001.webp",
+   "label": "Sheet 2 of 12",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00002.webp",
+   "label": "Sheet 3 of 12",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00003.webp",
+   "label": "Sheet 4 of 12",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00004.webp",
+   "label": "Sheet 5 of 12",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00005.webp",
+   "label": "Sheet 6 of 12",
+   "width": 155,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00006.webp",
+   "label": "Sheet 7 of 12",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00007.webp",
+   "label": "Sheet 8 of 12",
+   "width": 119,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00008.webp",
+   "label": "Sheet 9 of 12",
+   "width": 153,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00009.webp",
+   "label": "Sheet 10 of 12",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00010.webp",
+   "label": "Sheet 11 of 12",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11769573B2/sheet-00011.webp",
+   "label": "Sheet 12 of 12",
+   "width": 78,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/e7/f9/4e/339e3b81f67fea/US11769573.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16161846",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11769573B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

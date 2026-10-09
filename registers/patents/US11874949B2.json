@@ -1,0 +1,237 @@
+{
+ "number": "US11874949B2",
+ "kind": "granted patent",
+ "title": "Self-Controlled Digital Authorization Over Communication Networks",
+ "applicationNumber": "17184255",
+ "earlierPublication": "US20210182425A1",
+ "filedOn": "2021-02-24",
+ "publishedOn": "2021-06-17",
+ "grantedOn": "2024-01-16",
+ "priorityDate": "2012-09-10",
+ "status": "Patented Case",
+ "statusDate": "2023-12-27",
+ "estimatedExpiration": "2033-04-09",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "FENSTERMACHER, JASON B",
+ "classifications": [
+  "G06F 21/6245",
+  "G16H 10/60",
+  "G06Q 40/08"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US15/434,942",
+   "relation": "Division",
+   "publication": "US10963585B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "15434942",
+  "13607997"
+ ],
+ "abstract": "A system for authorizing an external device to access computerized records. The system includes a server. The server includes a computerized records data-store. The computerized records data-store stores multiple computer executable files associated with subjects. The system includes a communication network which facilitates communication between at least two of the subjects, the server, and the external device. The system includes a contextual authorization device for authorizing access to the external device for the computerized records. The contextual authorization device includes a database storing a set of custom rules. The contextual authorization device further includes a Global Positioning System-based tracking device, a credentialing engine, and a user behavior analytics engine. The contextual authorization device further includes an access module to process authorization of the external device for access of the computerized records.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A distributed architecture-based system for digitally authorizing access to computerized records, the system comprising: at least one server comprising at least one computerized records data-store storing multiple computer executable files associated with a subject and containing subject data in a digital format and associated with a subject identifier that identifies association of the subject with its respective computer executable file; an external device communicatively linked to the at least one server; a scanner operatively linked to the external device; a communication network communicatively linking at least two of the subject, the server, the external device, and the scanner; and a contextual authorization device communicatively coupled to the at least one server, wherein the contextual authorization device comprises electronic circuits and computer logic instructions, which when executed by the electronic circuits of the contextual authorization device, cause the contextual authorization device to perform the steps of: tracking a geo-location of the external device using a Global Positioning System (GPS); determining a crowdsourced credentialing score associated with an entity associated with the external device, wherein the crowdsourced credentialing score is determined based on credentialing of a digital profile of the entity by a plurality of respondents such that the crowdsourced credentialing score is indicative of a trust of the external device; comparing dynamically changing contextual information associated with the entity with a set of past requests indicative of historical behavior and determine an index of normality; creating a set of custom rules based on the geo-location of the external device and the dynamically changing contextual information associated with the entity, and wherein the set of custom rules defines different rights for different location types as identified from the geo-location of the external device, and wherein the different rights define either one of an outright denial or approval of the access or limiting the access to one or more types of computerized records based on the location types; storing the set of custom rules in a database, wherein the set of custom rules digitally dictates access rights and levels for the external device; processing authorization of the external device for access of the computerized records based on the geo-location of the external device, the dynamically changing contextual information associated with the entity, the crowdsourced credentialing score associated with the entity, the index of normality, and the set of custom rules, wherein the set of custom rules processes authorization of the external device only when at least one the entity associated with the external device possesses at least a minimum threshold score, and a minimum predefined threshold of normality is noted about the external device and the associated entity; and creating the computerized records based on the authorization and transforms the authorized computerized records into a digital data structure readable by the scanner."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a graphical user interface displayed to the subject and the external entity associated with the external device to respectively update the computerized records of the subject and view or extract the computerized records as authorized by the contextual authorization device."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one server allows transfer of the computerized records through at least one of a wired and wireless transmission technique to a destination identified by the external device, upon successful authorization of the access by the contextual authorization device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one server receives binary values relating to authorization access, wherein the custom rules are used in association with the input module for providing access to the external device by the contextual authorization device."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the contextual authorization device selects a real-time automated manner of access authorization for the computerized records based on the custom rules stored in the database."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a document usage system which includes one or more document computer systems in communication with a network of devices including the external device and having a machine-accessible medium storing a plurality of program modules configured to determine document utilization information providing an indication of usage of computerized records as authorized to be accessed by the external device associated with the entity, wherein the usage comprises an amount of time that the associated entity or the external device has accessed particular sections of the authorized computerized records."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 6 , wherein the computerized records are classified into discrete types, and wherein the system comprises a monetization engine that comprises electronic circuits that associates a price value with the authorized computerized records based on the usage by the external device and based on the classification of authorized computerized records as accessed by the external device."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the digital data structure comprises a QR (quick response) code readable by the scanner."
+  },
+  {
+   "number": 9,
+   "independent": true,
+   "text": "A system for digitally authorizing access to computerized records, the system comprising: a server comprising multiple computer executable files associated with a subject and containing digital subject data related to a subject identifier that identifies association of the subject with its respective computer executable file, wherein the server comprises a port that provides a communicative link to an external device; a contextual authorization device communicatively coupled to the at least one server, wherein the contextual authorization device comprises electronic circuits and computer logic instructions, which when executed by the electronic circuits of the contextual authorization device, cause the contextual authorization device to perform the steps of: identifying geo-location data of the external device using a Global Positioning System (GPS); determining a crowdsourced credentialing score associated with an entity associated with the external device, wherein the crowdsourced credentialing score is indicative of a trust factor of the external device; comparing dynamically changing contextual details associated with the entity with a set of past requests indicative of historical behavior; determining an index of normality to create custom rules; creating the set of custom rules based on the geo-location of the external device and the dynamically changing contextual information associated with the entity, and wherein the set of custom rules defines different rights for different location types as identified from the geo-location of the external device, and wherein the different rights define either one of an outright denial or approval of the access or limiting the access to one or more types of computerized records based on the location types; storing the set of custom rules in a database, wherein the set of custom rules digitally dictates access rights and levels for the external device; and transforming the computerized records into a digital data structure for access through the external device based on the geolocation of the external device, the dynamically changing contextual information associated with the entity, the crowdsourced credentialing score associated with the entity, the index of normality, and the set of custom rules, wherein the set of custom rules allow the access through the external device only when at least one of the entity associated with the external device possesses at least a minimum threshold score, and a minimum predefined threshold of normality is noted about the external device and the associated entity."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , further comprising a graphical user interface that displays the computerized records that are authorized for access."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 9 , wherein the port provides any of a wired and wireless link to the external device and to another device identified by the external device upon authorization of the access of the computerized records."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 9 , wherein the at least one server receives binary values for authorization access of the computerized records, wherein the custom rules are used in association with the input module to provide access to the external device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 12 , wherein the contextual authorization device provides for a real-time automated access for the computerized records based on the custom rules stored in the database."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 9 , further comprising a document usage system comprising a machine-accessible medium storing a plurality of program modules that determine document utilization information providing an indication of usage of the computerized records as authorized to be accessed by the external device associated with the entity, wherein the usage comprises an amount of time that the external device has accessed particular sections of the authorized computerized records."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , further comprising a monetization engine comprises electronic circuits that associate a price value with the authorized computerized records based on the usage by the external device and based on a classification of the authorized computerized records as accessed by the external device."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 9 , comprising a scanner operatively connected to the external device, wherein the digital data structure comprises a QR (quick response) code readable by the scanner."
+  },
+  {
+   "number": 17,
+   "independent": true,
+   "text": "A system for digitally authorizing access to computerized records, the system comprising: a server comprising multiple computer executable files associated with a subject and containing digital subject data related to a subject identifier that identifies association of the subject with its respective computer executable file, wherein the server comprises a port that provides a communicative link to an external device; a contextual authorization device communicatively coupled to the at least one server, wherein the contextual authorization device comprises electronic circuits and computer logic instructions, which when executed by the electronic circuits of the contextual authorization device, cause the contextual authorization device to perform the steps of: identifying geo-location data of the external device using a Global Positioning System (GPS); comparing dynamically changing contextual details of an entity associated with the external device with a set of past requests indicative of historical behavior; determining an index of normality such that the custom rules are defined to allow the access when a minimum predefined threshold of normality is identified; creating a set of custom rules based on the geo-location of the external device and the dynamically changing contextual information associated with the entity, and wherein the set of custom rules defines different rights for different location types as identified from the geo-location of the external device, and wherein the different rights define either one of an outright denial or approval of the access or limiting the access to one or more types of computerized records based on the location types; storing the set of custom rules in a database, wherein the set of custom rules digitally dictates access rights and levels for the external device; and transforming the computerized records into a digital data structure for access through the external device based on the geolocation of the external device, the dynamically changing contextual information associated with the entity, the index of normality, and the set of custom rules, wherein the set of custom rules allows the access through the external device only when at least one of the entity associated with the external device possesses at least a minimum threshold score, and a minimum predefined threshold of normality is noted about the external device and the associated entity."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 17 , wherein the contextual authorization device determines a crowdsourced credentialing score associated with the entity associated with the external device, wherein the crowdsourced credentialing score is indicative of a trust factor of the external device, and wherein the custom rules set an authorization to access the computerized records upon the crowdsourced credentialing score comprising a minimum threshold score."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 17 , wherein the at least one server receives binary values for authorization access of the computerized records, wherein the custom rules are used in association with the input module to provide access to the external device, and wherein the contextual authorization device provides for a real-time automated access for the computerized records based on the custom rules stored in the database."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The system of claim 17 , further comprising: a graphical user interface that displays the computerized records that are authorized for access; a document usage system comprising a machine-accessible medium storing a plurality of program modules that determine document utilization information providing an indication of usage of the computerized records as authorized to be accessed by the external device associated with the entity, wherein the usage comprises an amount of time that the external device has accessed particular sections of the authorized computerized records; a monetization engine comprises electronic circuits that associate a price value with the authorized computerized records based on the usage by the external device and based on a classification of the authorized computerized records as accessed by the external device; and a scanner operatively connected to the external device, wherein the digital data structure comprises a QR (quick response) code readable by the scanner."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11874949B2/sheet-00000.webp",
+   "label": "Sheet 1 of 13",
+   "width": 156,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00001.webp",
+   "label": "Sheet 2 of 13",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00002.webp",
+   "label": "Sheet 3 of 13",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00003.webp",
+   "label": "Sheet 4 of 13",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00004.webp",
+   "label": "Sheet 5 of 13",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00005.webp",
+   "label": "Sheet 6 of 13",
+   "width": 109,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00006.webp",
+   "label": "Sheet 7 of 13",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00007.webp",
+   "label": "Sheet 8 of 13",
+   "width": 107,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00008.webp",
+   "label": "Sheet 9 of 13",
+   "width": 169,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00009.webp",
+   "label": "Sheet 10 of 13",
+   "width": 77,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00010.webp",
+   "label": "Sheet 11 of 13",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00011.webp",
+   "label": "Sheet 12 of 13",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11874949B2/sheet-00012.webp",
+   "label": "Sheet 13 of 13",
+   "width": 81,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/ac/09/76/a71f49fb827309/US11874949.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/17184255",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11874949B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

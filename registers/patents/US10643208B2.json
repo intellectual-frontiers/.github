@@ -1,0 +1,174 @@
+{
+ "number": "US10643208B2",
+ "kind": "granted patent",
+ "title": "Digital Payment System",
+ "applicationNumber": "16283802",
+ "earlierPublication": "US20190188708A1",
+ "filedOn": "2019-02-24",
+ "publishedOn": "2019-06-20",
+ "grantedOn": "2020-05-05",
+ "priorityDate": "2019-02-24",
+ "status": "Patented Case",
+ "statusDate": "2020-04-15",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3697",
+ "examiner": "LIU, I JUNG",
+ "classifications": [
+  "G06Q 20/40",
+  "G06Q 20/02",
+  "G06Q 20/0855",
+  "G06Q 40/00"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A digital payment system for facilitating seamless transactions from a user system to a buyer system. The system includes a service provider system which further includes a service interaction component. The service interaction component is configured to collect predefined information about the user system and the associated user. The service provider system also includes a payment engine for processing payments digitally based on data worth associated with the data owned by the user and authorized for sharing by the service provider to the buyer system. The payment engine calculates a payable amount payable digitally by the user to the service provider based on a digital transactional value indicative of the data worth associated with the data owned by the user and authorized for sharing, among other things. The system further includes a pre-consenting system configured to facilitate user authorization.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled payment system for facilitating seamless transactions from a user system to a buyer system via an intermediary system, the system comprising: an electronic service provider system associated with a service provider and located physically in a service setting that includes one or more central servers, data stores, and cloud-based computing components for managing and processing delivery of a service in the service setting by the service provider to the user associated with the user system, wherein the service provider system comprising: a service interaction component to generate an electronic signal transmitted to the user system using a transmission circuit, and wherein the electronic signal allows communication between the user system and the service provider system, the service interaction component further configured to collect predefined information about the user system and the associated user, the predefined information comprising at least a first computer-executable input indicative of an identifier of the user system and the associated user and a second computer-executable input indicative of a service sought for delivery in the service setting by the service provider; and a payment engine for processing payments digitally based on data worth associated with the data owned by the user and authorized for sharing by the service provider to the buyer system, wherein the payment engine calculates a payable amount payable digitally by the user to the service provider based on: a first digital transactional value indicative of a service charge for the service delivered digitally by the service provider; a second digital transactional value indicative of a predefined co-pay between the user and a co-pay entity; and a third digital transactional value indicative of the data worth associated with the data owned by the user and authorized for sharing, wherein the data worth is calculated based on a set of predefined criteria specified by the buyer entity for a set of data types, data entities and data attributes; and a pre-consenting system located remotely from the user system and communicatively coupled to the service provider system in the service setting, wherein the pre-consenting system is configured to receive a digital signal containing a third computer-executable input for authorizing sharing of the data owned by the user at least in part toward a digital purchase and delivery of the service from the service provider by the user such that the data owned by the user serves as a transactional value for the digital purchase and delivery of the service as and when the data is made available, wherein the pre-consenting system is further configured to generate a trigger that is initiated upon electronic receipt of the third computer-executable input by the pre-consenting system, the trigger containing a unique code referencing the user, the user system and authorized data of the user for storage, processing, and sharing of the authorized data."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the pre-consenting system is configured to generate an electronic trigger that is initiated upon electronic receipt of the third computer-executable input by the pre-consenting system that is indicative of the user authorization for sharing at least one or more computer executable files containing the authorized data of the user."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the trigger includes a unique code referencing the user, the user system, and the authorized data of the user for storage, processing, and sharing of the authorized data."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the pre-consenting system further comprising a processing circuit to process the data associated with the user system as a response to a request made by the service provider system for authorization of use of the data against a service provided by the service provider system digitally."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the processing circuit further comprising at least one of: a data recognition device, an audio signal recognition device, a video signal recognition device, and a fingerprint identifier input device, wherein the at least one of the data recognition device, the audio signal recognition device, the video signal recognition device, and the fingerprint identifier input device is configured to process the data digitally coming from the user system as a response to a request made by the service provider system for the authorization of data usage against the service charge for the service provided by the service provider system."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein the data recognition device includes a programmable electronic device configured to automatically recognize and capture user associated information including one or more of an associated phone number, and an associated email address of the user and associated with the user system to serve as an input for initializing payment by the payment engine."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 5 , wherein the fingerprint identifier input device includes a programmable radio frequency (RF) device reader to capture the response from the user system and record it for later use as the authorization for sharing the user data by the service provider system in exchange of the digital service delivery to the user."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 5 , wherein the pre-consenting device is programmed to generate at least one of a random number, a checksum, and a cryptographic code using at least one of a randomization function, and a checksum function, and a cryptographic hash serving as an authorization token transmitted by the pre-consenting device to the service provider system processing the payment by the payment engine and sharing the user data."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a data valuation device configured to evaluate worth of approved data owned by the user and received by the service provider system and authorized for sharing by the user, wherein the worth of the approved data is calculated based on a set of predefined criteria specified for a set of data types, data entities and data attributes so that the delivery of the service is defined in terms of transactional values payable through the user data by the user upon authorization through the pre-consenting system."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 further comprising a data extraction device to pull the data from the service provider system, contained in a central data center, corresponding to the user that has been authorized for transaction by the user system."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the payment engine is enabled through a digital banking procedure for processing digital transactions."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the payment engine is enabled through a blockchain-enabled component for processing digital transactions."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a blockchain device to process blockchain tasks through blockchain-enabled tools and a computer, wherein the blockchain device is located at a location remote from locations of the user system and the buyer system."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the blockchain device is coupled to a blockchain database that is located at a location remotely from the locations of the user system and the buyer system."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 13 , wherein the blockchain device further comprising a processing device to process blockchain tasks through the computer."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10643208B2/sheet-00000.webp",
+   "label": "Sheet 1 of 8",
+   "width": 173,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00001.webp",
+   "label": "Sheet 2 of 8",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00002.webp",
+   "label": "Sheet 3 of 8",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00003.webp",
+   "label": "Sheet 4 of 8",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00004.webp",
+   "label": "Sheet 5 of 8",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00005.webp",
+   "label": "Sheet 6 of 8",
+   "width": 111,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00006.webp",
+   "label": "Sheet 7 of 8",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10643208B2/sheet-00007.webp",
+   "label": "Sheet 8 of 8",
+   "width": 85,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/e5/4b/a8/22010101a565bb/US10643208.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16283802",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10643208B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "number": "US12658290B2",
+ "kind": "granted patent",
+ "title": "Team-Based Tele-Diagnostics Blockchain-Enabled System",
+ "applicationNumber": "18232314",
+ "earlierPublication": "US20240006038A1",
+ "filedOn": "2023-08-09",
+ "publishedOn": "2024-01-04",
+ "grantedOn": "2026-06-16",
+ "priorityDate": "",
+ "status": "Patented Case",
+ "statusDate": "2026-06-03",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "",
+ "artUnit": "3686",
+ "examiner": "COVINGTON, AMANDA R",
+ "classifications": [
+  "G16H 10/60",
+  "G16H 40/67",
+  "G16H 50/20",
+  "G06F 16/27",
+  "G06F 16/1824",
+  "H04L 9/50",
+  "H04L 9/0643",
+  "H04L 9/3236",
+  "H04L 9/3297",
+  "H04L2209/00"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "16161846"
+ ],
+ "abstract": "",
+ "claims": [],
+ "drawings": [],
+ "pdfUrl": "",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/18232314",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  }
+ ]
+}

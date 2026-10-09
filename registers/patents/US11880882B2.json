@@ -1,0 +1,146 @@
+{
+ "number": "US11880882B2",
+ "kind": "granted patent",
+ "title": "Computer-Controlled Marketplace Network For Digital Transactions",
+ "applicationNumber": "16854872",
+ "earlierPublication": "US20200250719A1",
+ "filedOn": "2020-04-21",
+ "publishedOn": "2020-08-06",
+ "grantedOn": "2024-01-23",
+ "priorityDate": "2019-04-25",
+ "status": "Patented Case",
+ "statusDate": "2024-01-03",
+ "estimatedExpiration": "2042-07-08",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "ALI, JAHED",
+ "classifications": [
+  "G06Q 40/04",
+  "H04L 9/50",
+  "G06Q 30/0605",
+  "G06Q2220/00",
+  "H04L 9/0643",
+  "H04L 9/3213",
+  "H04L 9/3239",
+  "H04L 63/062",
+  "H04L 63/067",
+  "H04L 63/0823",
+  "H04L2209/56",
+  "H04W 4/14"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "62838473"
+ ],
+ "abstract": "A marketplace network for facilitating transactions among a plurality of marketplace participants. The marketplace network includes a plurality of service provider systems associated with respective service provider participants. Each of the plurality of service provider systems are communicatively coupled to a respective merchant server. The marketplace network includes a plurality of user systems associated with respective user participants configured to generate a service request to one of the plurality of service provider systems. The marketplace server facilitates transactions digitally by executing a set of computer-executable tasks for securely processing transactional exchanges among the marketplace participants. The transactional exchanges include at least exchanges of ownership rights for digitally stored data at least in part owned originally by the user participants.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system containing a computer-controlled online marketplace network for facilitating seamless transactions among a plurality of marketplace network participant systems, the system comprising: a plurality of service provider systems associated with respective service provider participants and located remotely from one another physically, wherein each of the plurality of service provider systems are communicatively coupled to a respective merchant server; a plurality of user systems associated with respective user participants located remotely from one another and remotely from the plurality of service provider systems and configured to generate a service request to one of the plurality of service provider systems in the online marketplace network, wherein the plurality of service provider systems comprises a processor and a storage medium, wherein the processor is configured to: receive, via a communication device, the service request from one of the plurality of user systems, define a set of digitally recognizable data valuation parameters for one or more entities and attributes associated with the one or more entities, publish the set of digitally recognizable data valuation parameters defined by the plurality of service provider systems, and transact for one or more digital offerings digitally published in the online marketplace network with respective ownership transfer for data at least in part valued at a predefined transactional value, associated with the one or more digital offerings, calculated in accordance with the set of digitally recognizable data valuation parameters identified by the plurality of service provider systems; a graphical user interface (GUI) to permit a user of the plurality of user systems to interact with the plurality of service provider systems, wherein the GUI controls data access authorization of the plurality of service provider systems; and a computerized marketplace server communicatively coupled in the online marketplace network, wherein the computerized marketplace server facilitates marketplace transactions digitally by executing a set of computer-executable tasks for securely processing transactional exchanges among the marketplace network participant systems, wherein the computerized marketplace server comprising: a memory circuit configured to store transactional information associated with each transactional exchange of the transactional exchanges among the participants in the online marketplace network; and a processing circuit in communication with the memory circuit and configured to: receive the set of digitally recognizable data valuation parameters defined by the plurality of service provider systems; receive the one or more digital offerings from the plurality of service provider systems; generate an ownership trail of the one or more digital offerings based on the set of digitally recognizable data valuation parameters, when a user participant consents for data ownership transfer, exclusively or inclusively for the data at least in part, from the user participant, toward a digital purchase and delivery of the one or more digital offerings, wherein the data at least in part has a value of at least equal to a transactional value of the one or more digital offerings exchanged between the service provider participant and the user participant over the online marketplace network; digitally record the ownership trail as computer-executable files in the computerized marketplace server and in a decentralized blockchain ledger, wherein the decentralized blockchain ledger is accessed through the GUI; transform the computer-executable files into an application programming interface to create an electronic document comprising the one of more digital offerings; and deliver the electronic document comprising the one or more digital offerings to the user participant by the service provider system based on the ownership trail, wherein the plurality of participant systems are in communication with one another over a peer-to-peer communication network that maintains the decentralized blockchain ledger for tracking and recording the transactional exchanges and the ownership trail, and wherein each of the participant systems includes at least one processing circuit and at least one physical storage medium that stores at least a portion of the decentralized blockchain ledger comprising a distributed database to record transactional information associated with a transactional exchange that occurs on the peer-to-peer communication network between at least two participants systems."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the set digitally recognizable data valuation parameters comprise one or more of type of the data, length of the data, source of the data, number of entities contained in the data, and number of attributes associated with each of the entities."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein delivery of the one or more digital offerings to the user participant by the service provider system includes either of: delivery of the one or more digital offerings to the user participant by the service provider system and transferring of the data to the service provider system by the user participant system at the time of the transaction exchange, wherein the transferring of the data to the service provider system comprises one or more of changing access privileges for the service provider system for the data and sharing access credentials of a secured repository containing the data to the service provider system for allowing access; and delivery of the one or more digital offerings to the user participant by the service provider system at the time of transaction exchange and delaying the transferring of the data to the service provider system by the user participant system for a later specified time depending on availability of the data with the user participant system."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , further comprising a plurality of buyer systems associated with respective buyer participants located remotely from one another and remotely from the plurality of service provider systems and the user systems, wherein each of the plurality of buyer systems comprises a respective buyer server."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 4 , wherein the plurality of service provider systems are communicatively coupled to the plurality of buyer systems such that the transactional value for the one or more digital offerings is defined based on an input received from the plurality of buyer systems by the plurality of service provider systems, and wherein the trail of ownership transfer comprises at least a transfer of ownership from the user participant to the service provider participant, and from the service provider participant to the buyer participant either in real-time or deferred for a later time than when the transactional exchange is performed."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11880882B2/sheet-00000.webp",
+   "label": "Sheet 1 of 10",
+   "width": 164,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00001.webp",
+   "label": "Sheet 2 of 10",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00002.webp",
+   "label": "Sheet 3 of 10",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00003.webp",
+   "label": "Sheet 4 of 10",
+   "width": 70,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00004.webp",
+   "label": "Sheet 5 of 10",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00005.webp",
+   "label": "Sheet 6 of 10",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00006.webp",
+   "label": "Sheet 7 of 10",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00007.webp",
+   "label": "Sheet 8 of 10",
+   "width": 75,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00008.webp",
+   "label": "Sheet 9 of 10",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11880882B2/sheet-00009.webp",
+   "label": "Sheet 10 of 10",
+   "width": 86,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/bc/56/3b/c505cf90405052/US11880882.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16854872",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11880882B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

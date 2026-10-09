@@ -1,0 +1,312 @@
+{
+ "number": "US11777894B2",
+ "kind": "granted patent",
+ "title": "Integration Of Devices Through A Social Networking Platform",
+ "applicationNumber": "17327694",
+ "earlierPublication": "US20210281535A1",
+ "filedOn": "2021-05-22",
+ "publishedOn": "2021-09-09",
+ "grantedOn": "2023-10-03",
+ "priorityDate": "2012-12-12",
+ "status": "Patented Case",
+ "statusDate": "2023-09-13",
+ "estimatedExpiration": "2034-09-14",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2454",
+ "examiner": "SPRINGER, JAMES E",
+ "classifications": [
+  "H04L 51/52",
+  "H04L 67/306",
+  "G16H 40/67",
+  "H04W 4/80",
+  "H04B 5/20",
+  "H04B 5/72",
+  "H04L 63/102",
+  "H04L 63/1433",
+  "H04L 67/02",
+  "H04L 67/303",
+  "H04L 41/0663"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US16321772",
+   "relation": "Continuation",
+   "publication": ""
+  },
+  {
+   "applicationNumber": "US16/381,772",
+   "relation": "Continuation",
+   "publication": "US11044221B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "16381772",
+  "15275463",
+  "14103098",
+  "61736119"
+ ],
+ "abstract": "A system and method for providing a social networking service to a plurality of devices. A social networking server for facilitating social information exchange among the plurality of devices through a socially aware network. A social profiles manager is coupled to the social networking server that creates and manages individual centric profiles of the plurality of devices. The individual centric profiles of the plurality of devices are social representation of individual devices within the socially aware network. The plurality of devices are identifiable by other participants and the social networking server through their social profiles.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system comprising: a plurality of devices interconnected through a socially aware network; a social networking server that provides a social networking service to the plurality of devices so that each of the plurality of devices are communicatively connected to the social networking service by associating respective social profiles with the social networking server, wherein the respective social profiles being social representation of the plurality of devices, and wherein the social networking server is programmed to execute computer-readable instructions for performing a method comprising: receiving a search request for functionally similar devices from a first device from the plurality of devices based on information contained in a social profile of the first device and current operating characteristics of the first device, searching for the functionally similar devices from the plurality of devices, and providing a list of the searched functionally similar devices including social profiles of the searched functionally similar devices and network links for the functionally similar devices to allow the first device to send a connection request to one or more of the searched functionally similar devices, wherein the plurality of devices are associated with respective external controllers that allow interconnection of the plurality of devices with the social networking server to allow a social activity through the social networking server, and wherein each of the plurality of devices is associated with a switch matrix to cause the plurality of devices to change operating states based on a social content requesting a change in the operating states."
+  },
+  {
+   "number": 2,
+   "independent": true,
+   "text": "A method for linking a plurality of devices interconnected through a socially aware network, the method comprising: establishing, by an external controller communicatively linked to a social networking server, an interconnection of the plurality of devices with the social networking server to allow an electronic social activity through the social networking server; providing, by the social networking server, a social networking service to the plurality of devices so that each of the plurality of devices are communicatively connected to the social networking service by associating respective social profiles with the social networking server, wherein the respective social profiles being social representation of the plurality of devices; receiving, by the social networking server, a search request for functionally similar devices from a first device from the plurality of devices based on information contained in a social profile of the first device and current operating characteristics of the first device; searching, by the social networking server, for the functionally similar devices from the plurality of devices; and providing, by the social networking server, a list of the searched functionally similar devices including social profiles of the searched functionally similar devices and network links for the functionally similar devices so as to allow the first device to send a connection request to one or more of the searched functionally similar devices, wherein each of the plurality of devices is associated with a switch matrix to cause the plurality of devices to change operating states based on a social content requesting a change in the operating states."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The method of claim 2 , comprising: connecting each of the plurality of devices to a sensing and monitoring unit; and monitoring and recording activities of the plurality of devices for social exchange through the social activity."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The method of claim 2 , wherein each of the plurality of devices is communicatively connected to the external controller through a near field communication (NFC) channel so that a communication point of the NFC channel receives social content from the first device and transfers the social content to a first external controller associated with the first device."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The method of claim 4 , wherein the first external controller is communicatively coupled to a network point of the socially aware network, and wherein either the network point of the socially aware network or the communication point of the NFC channel receives the social content."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The method of claim 5 , wherein the socially aware network comprises a private and dedicated network for a medical environment, wherein the social networking server allows the first device to send a connection notification to a second device of the plurality of devices through the network point of the socially aware network and the communication point of the NFC channel, wherein once the second device accepts the connection notification, the first device sends the social content to the second device through the network point of the socially aware network and the communication point NFC channel, and wherein the social content is indicative of an action to be performed by the second device at a social event timeline specified by the social content."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The method of claim 6 , wherein the socially aware network comprises a distributed network, wherein the social networking server allows the first device to send a connection notification to the second device through the network point of the socially aware network and the communication point of the NFC channel, wherein once the second device accepts the connection notification, the first device sends the social content to the second device through the network point of the socially aware network and the communication point NFC channel, and wherein the social content is indicative of an action to be performed by the second device at a social event timeline specified by the social content."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The method of claim 2 , wherein the social activity comprises at least one of: posting a connection request for a second device of the plurality of devices to associate a relationship with the second device and causing a synchronous and non-conflicting performance between the first device and the second device; accepting or rejecting a connection invitation by a second device in response to a request sent by the first device for associating a relationship with the first device toward a synchronous and non-conflicting performance between the first device and the second device; posting a search request for identification and receiving profile information of an adjacent device in the sequential, synchronous, and automatically coordinated operation in response to a search request by the first device, wherein upon receipt of the profile information, the first device sends a connection request to the adjacent device; and posting a search request for identification and receiving profile information of related devices in response to the search request by the first device, wherein upon receipt of the profile information, the first device sends a connection request to one or more of the functionally similar devices."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 2 , comprising: detecting a change in a performance state of a functionally similar device using a sensing unit associated with each of the plurality of devices; generating, by the sensing unit, an input signal based on the detected change in the performance state; storing, in a database, operation and performance parameters of the functionally similar device in association with coordination and conflicting data with connected devices of the functionally similar device; processing the generated input signal by the external controller of the first device; correlating the generated signal with information stored in the database to generate a second signal that communicates social content to the social networking server."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 2 , wherein a requested change in the operating states occurs at specific social timelines."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 2 , comprising: monitoring, by a monitoring unit, health parameters of each of the functionally similar devices; comparing the health parameters with threshold health parameters of each of the functionally similar devices to ascertain an operational status of the functionally similar devices; determining whether the operational status is below a threshold limit; when ascertained operational status is indicative of below the threshold limit, generating a signal indicative of the operational status below the threshold limit; and initiating, by the first device, using the social networking server, social activities that include communicating the operational status to a set of connected devices so as to allow one of the connected devices to switch to a task performed by the functionally similar device in case of a health failure of the functionally similar device."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The method of claim 11 , wherein the health parameters of the functionally similar device are identified by monitoring a set of physiological parameters of a patient that are controlled by at least one of the functionally similar devices, and wherein a drop in the physiological parameters of the patient is indicative of a health failure of the functionally similar device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The method of claim 2 , comprising generating, by a social map generator connected to the social networking server, a social map among the chain of tasks and devices based on connection relationships among the plurality of devices, and wherein the social map comprising a set of nodes that are representative of the plurality of devices and a set of edges connecting the nodes that are representative of connection relationships between connected devices."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The method of claim 13 , wherein a length of the edge in the social map represents proximity between the connected devices."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 13 , wherein the social networking server comprises a processing unit that processes the social map for a device to identify proximity of interconnected devices."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 13 , wherein each action performed by a device connected through the social networking server is associated with a social action timeline indicative of when a particular action occurs at the device, and wherein the social action timeline is communicated to set of connected devices for integrating the device with one or more of the set of connected devices."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 16 , wherein a social profile associated with the device comprises information pertinent to the social action timeline."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 17 , comprising determining the social event timeline of the first device."
+  },
+  {
+   "number": 19,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by the computer to perform a method for determining relationships between a plurality of devices interconnected through a socially aware network, the method comprising: connecting a plurality of devices with a social networking server to allow an electronic social activity through the social networking server; sending, by a first device from the plurality of devices, a search request for functionally similar devices to a social networking server based on information contained in a social profile of the first device and current operating characteristics of the first device; receiving, by the first device from the social networking server, a list of the functionally similar devices including social profiles of the functionally similar devices and network links for the functionally similar devices; sending, by the first device, a connection request to one or more of the searched functionally similar devices; monitoring health parameters of each of the functionally similar devices; comparing the health parameters with threshold health parameters to ascertain operational status of each of the functionally similar devices; determining whether the operational status is below a threshold limit; when ascertained operational status is indicative of below the threshold limit, generating a signal indicative of the operational status below the threshold limit; and initiating, by the first device using the social networking server, social activities that include communicating the operational status to a set of connected devices of the plurality of devices so as to allow at least one of the connected devices to switch to a task performed by functionally similar devices in case of a health failure of any of the functionally similar devices."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The non-transitory program storage device of claim 19 , wherein the method comprises associating each of the plurality of devices with: a sensing unit to detect a change in a performance state of a functionally similar device and generate an input signal; a database to store operation and performance parameters of the functionally similar device in association with coordination and conflicting data with connected devices of the functionally similar device; and the external controller associated with the first device to process the generated input signal, correlate the generated signal with information stored in the database and generate a second signal that communicates social content to the social networking server."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11777894B2/sheet-00000.webp",
+   "label": "Sheet 1 of 23",
+   "width": 165,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00001.webp",
+   "label": "Sheet 2 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00002.webp",
+   "label": "Sheet 3 of 23",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00003.webp",
+   "label": "Sheet 4 of 23",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00004.webp",
+   "label": "Sheet 5 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00005.webp",
+   "label": "Sheet 6 of 23",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00006.webp",
+   "label": "Sheet 7 of 23",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00007.webp",
+   "label": "Sheet 8 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00008.webp",
+   "label": "Sheet 9 of 23",
+   "width": 73,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00009.webp",
+   "label": "Sheet 10 of 23",
+   "width": 117,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00010.webp",
+   "label": "Sheet 11 of 23",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00011.webp",
+   "label": "Sheet 12 of 23",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00012.webp",
+   "label": "Sheet 13 of 23",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00013.webp",
+   "label": "Sheet 14 of 23",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00014.webp",
+   "label": "Sheet 15 of 23",
+   "width": 119,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00015.webp",
+   "label": "Sheet 16 of 23",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00016.webp",
+   "label": "Sheet 17 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00017.webp",
+   "label": "Sheet 18 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00018.webp",
+   "label": "Sheet 19 of 23",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00019.webp",
+   "label": "Sheet 20 of 23",
+   "width": 128,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00020.webp",
+   "label": "Sheet 21 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00021.webp",
+   "label": "Sheet 22 of 23",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11777894B2/sheet-00022.webp",
+   "label": "Sheet 23 of 23",
+   "width": 91,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/81/5c/74/c1e7d22f253e58/US11777894.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/17327694",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11777894B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

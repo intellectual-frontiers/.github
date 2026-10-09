@@ -1,0 +1,208 @@
+{
+ "number": "US20150074033A1",
+ "kind": "published application",
+ "title": "Crowdsourced Electronic Documents Review And Scoring",
+ "applicationNumber": "14025472",
+ "earlierPublication": "",
+ "filedOn": "2013-09-12",
+ "publishedOn": "2015-03-12",
+ "grantedOn": "",
+ "priorityDate": "2013-09-12",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-01-23",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3689",
+ "examiner": "ARAQUE JR, GERARDO",
+ "classifications": [
+  "G06N 5/02"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system and a method for facilitating an expertise driven review and scoring of electronic documents in a crowdsourced environment. The system includes a server computer, a memory circuit and a processing circuit. The processing circuit is coupled to the memory circuit and includes or is coupled to a credentialing engine. The system further includes an expert scoring module. The system further includes a document reviewing and scoring engine coupled to the processing circuit. The document review and scoring module associates an aggregate score to the electronic document based on aggregation of the review ratings by crowdsourced experts and aggregate scores of each of the crowdsourced experts based on the set of attributes including one or more of the credentialed expertise, reputation of the expert, and the officiality.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "An ecosystem for an expertise driven review and scoring of electronic documents in a crowdsourced environment, said system comprising: a server computer; a memory circuit to store a plurality of common profiles associated with a plurality of crowdsourced experts, and further to store a plurality of federated profiles associated with each of said common profiles, wherein the federated and common profiles are created based on a plurality of federated sources distributed across a crowdsourced network; a processing circuit coupled to said memory circuit and including or coupled to: a credentialing engine to: allow a plurality of crowdsourced respondents to respond to said federated profiles associated with each of said plurality of experts and credential said plurality of experts, wherein said credentialing of each of said federated profiles associated with an expert of said plurality of experts contribute to credentialing of an entire common profile of said expert upon collation of said credentialed federated profiles, and wherein said federated profiles associated with said experts are credentialed from a plurality of respondents, wherein a crowdsourcing index is associated with said credentialing indicative of a degree of crowdsourcing such that said degree of crowdsourcing non-linearly affects said degree of credentialing that is indicative through said crowdsourcing index; an expert scoring module to: determine a set of attributes for said experts, said set of attributes including one or more of said crowdsourced credentialed expertise determined based on said credentialing of said federated and common profiles of said experts by said respondents, reputation of said expert indicative of a trust of a relevant community on said expert, and officiality indicative of a position or a designation of said expert in a relevant job, wherein each of said attributes are assigned varying weights; and determine an aggregate score of an expert based on said one or more attributes in association with said assigned weights; a document reviewing and scoring engine coupled to said processing circuit to: receive review comments along with a document rating by each of said crowdsourced experts for an electronic document, wherein a facility to review and score said electronic document is provided to said experts with a defined threshold of said aggregate score as a minimum criteria; and associate an aggregate score to said electronic document based on aggregation of said review ratings by said crowdsourced experts and said aggregate scores of each of said crowdsourced experts based on said set of attributes including one or more of said credentialed expertise, reputation of said expert, and said officiality."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , further comprising an expert scoring module, wherein said expert scoring module further comprises a weight module to identify a degree of relevance and significance of an expert attribute with said electronic document to be reviewed and accordingly assign a weight to each of said attributes of said experts based on said identified degree of significance."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The ecosystem of claim 2 , wherein said attribute of credentialed expertise is weighed as the highest by said weight module followed by said officiality, and said attribute of reputation is weighed as the lowest by said weight module."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 2 , wherein said weight module is adapted to dynamically change weight assignment based on type of said document."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said processing circuit further comprises a reputation assessment engine adapted to determine a degree of reputation of an expert."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said processing circuit further comprises an officiality assessment engine to determine a degree of officiality of an expert."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The ecosystem of claim 1 further comprising a federation engine to fragment a common profile of an expert into a plurality of federated profiles based on commonalities in content of said federated profiles, wherein said federated profiles are treated as distinct profiles for said purpose of credentialing separately by said crowdsourced respondents."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said document reviewing and scoring module further comprising a document aggregate score assessment engine, comment analysis module, comment aggregator, semantics and analytics engine, and document classification/tagging module."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said aggregate score of an expert (AES) for one or more attributes is determined based on an empirical relation, said empirical relation being: AES=EW1+RW2+OW3, wherein ‘E’ represents credentialed expertise, ‘R’ represents reputation, and ‘O’ represents officiality, and W1, W2, W3 represent weightage of said credentialed expertise, reputation, and officiality respectively."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The ecosystem of claim 9 , wherein said credentialing engine evaluates said credentialed expertise (E) for said expert based on an empirical relation, said empirical relation being: E =( P F11 +P F12 + . . . P F1N ) X ( P F21 +P F22 + . . . P F2N ) X . . . X ( P FZ1 +P FZ2 + . . . P FZN ), wherein: P F11 represents credentialed federated profile score for a first federated profile of a first expert by a first respondent, P F12 represents credentialed federated profile score for said first federated profile of said first expert by a second respondent, P F1N represents credentialed federated profile score for said first federated profile of said first expert by an Nth respondent, P F21 represents credentialed federated profile score for a second federated profile of said first expert by said first respondent, P F22 represents credentialed federated profile score for said second federated profile of said first expert by said second respondent, P F2N represents credentialed federated profile score for said second federated profile of said first expert by said Nth respondent, P FZ1 represents credentialed federated profile score for a Zth federated profile of said first expert by said first respondent, P FZ2 represents credentialed federated profile score for said Zth federated profile of said first expert by said second respondent, P FZN represents credentialed federated profile score for said Zth federated profile of said first expert by said Nth respondent, and wherein said empirical relation above considers profiles scores for entire federated profiles from 1 to Z, wherein said empirical relation above considers all respondents from 1 to N."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The ecosystem of claim 10 , wherein said document reviewing and scoring engine evaluates aggregate crowdsourced document score (ACDS) based on credentialed expertise and other attributes of said crowdsourced experts, based on an empirical relation, said empirical relation being: ACDS={( E 1 +E 2 +E 3 + . . . +E X ) W 1 +( R 1 +R 2 +R 3+ . . . +R X ) W 2 +( O 1 +O 2 +O 3 + . . . +O X ) W 3 }( D 1 +D 2 +D 3 + . . . +D X ) CI wherein: E 1 , E 2 , E 3 , . . . E X represent respective credentialed expertise of X number of crowdsourced experts, R 1 , R 2 , R 3 , . . . R X represent respective reputation of said X number of crowdsourced experts, O 1 , O 2 , O 3 , . . . O X represent respective officiality of said X number of crowdsourced experts, D 1 , D 2 , D 3 . . . D X represent respective document scores earned by said X number of crowdsourced experts, and CI represents Non-Linear Crowdsourcing Index."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The ecosystem of claim 11 , wherein said CI is defined non-linearly with integral ranges (R) of experts who credential said document, first five of said ranges and corresponding CI being: CI=1, when R=0-2 experts, CI=1.2, when R=3-4 experts, CI=1.5, when R=5-6 experts CI=1.9, when R=7-8 experts, and CI=2.5, when R=9-10 experts."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The ecosystem of claim 11 , wherein said CI is calculated based on an empirical relationship that dynamically determines value of said CI with every integral change in number of expert credentialing said document."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A method for performing an expertise driven review and scoring of electronic documents in a crowdsourced environment, said method comprising: receiving a document for reviewing and scoring by a plurality of crowdsourced experts; determining a set of expert attributes including one or more of crowdsourced credentialing, officiality, and reputation, wherein said reputation is indicative of a trust of a relevant community on said expert, and said officiality is indicative of a position or a designation of said expert in a relevant job and said credentialed expertise is indicative of degree of credentialing of an expert federated and common profiles by crowdsourced respondents; determining an aggregate score of an expert based on said one or more attributes; receiving review comments along with a document rating by each of said crowdsourced experts; and associating an aggregate score to said electronic document based on an aggregation of said review ratings by said crowdsourced experts and said aggregate scores of each of said crowdsourced experts based on said set of attributes including one or more of said credentialed expertise, reputation of said expert, and said officiality."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising federating a common profile of an expert into a plurality of federated profiles based on commonalities in content of said federated profiles, wherein said federated profiles are treated as distinct profiles for said purpose of credentialing separately by said crowdsourced respondents."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising identifying a degree of relevance and significance of an expert attribute with said electronic document to be reviewed and accordingly assign a weight to each of said attributes of said experts based on said identified degree of significance."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising associating a crowdsourcing index with said credentialing, wherein said crowdsourcing index is indicative of a degree of crowdsourcing such that said degree of crowdsourcing non-linearly affects said degree of credentialing or said credentialed expertise."
+  },
+  {
+   "number": 18,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for performing an expertise driven review and scoring of electronic documents in a crowdsourced environment, said method comprising: receiving a document for reviewing and scoring by a plurality of crowdsourced experts; determining a set of expert attributes including one or more of crowdsourced credentialing, officiality, and reputation, wherein said reputation is indicative of a trust of a relevant community on said expert, and said officiality is indicative of a position or a designation of said expert in a relevant job and said credentialed expertise is indicative of degree of credentialing of an expert federated and common profiles by crowdsourced respondents; determining an aggregate score of an expert based on said one or more attributes; receiving review comments along with a document rating by each of said crowdsourced experts, and associating an aggregate score to said electronic document based on an aggregation of said review ratings by said crowdsourced experts and said aggregate scores of each of said crowdsourced experts based on said set of attributes including one or more of said credentialed expertise, reputation of said expert, and said officiality."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The program storage device of claim 18 , wherein said method further comprises identifying a degree of relevance and significance of an expert attribute with said electronic document to be reviewed and accordingly assign a weight to each of said attributes of said experts based on said identified degree of significance."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The program storage device of claim 18 , wherein said method further comprises associating a crowdsourcing index with said credentialing, wherein said crowdsourcing index is indicative of a degree of crowdsourcing such that said degree of crowdsourcing non-linearly affects said degree of credentialing or said credentialed expertise."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20150074033A1/sheet-00000.webp",
+   "label": "Sheet 1 of 10",
+   "width": 153,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00001.webp",
+   "label": "Sheet 2 of 10",
+   "width": 107,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00002.webp",
+   "label": "Sheet 3 of 10",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00003.webp",
+   "label": "Sheet 4 of 10",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00004.webp",
+   "label": "Sheet 5 of 10",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00005.webp",
+   "label": "Sheet 6 of 10",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00006.webp",
+   "label": "Sheet 7 of 10",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00007.webp",
+   "label": "Sheet 8 of 10",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00008.webp",
+   "label": "Sheet 9 of 10",
+   "width": 78,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150074033A1/sheet-00009.webp",
+   "label": "Sheet 10 of 10",
+   "width": 94,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/56/0e/b9/91e7558758c0d3/US20150074033A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14025472",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20150074033A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,266 @@
+{
+ "number": "US11006920B2",
+ "kind": "granted patent",
+ "title": "System For Controlling Medical Devices",
+ "applicationNumber": "16835258",
+ "earlierPublication": "US20200222021A1",
+ "filedOn": "2020-03-30",
+ "publishedOn": "2020-07-16",
+ "grantedOn": "2021-05-18",
+ "priorityDate": "2012-02-02",
+ "status": "Patented Case",
+ "statusDate": "2021-04-28",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3686",
+ "examiner": "HEIN, DEVIN C",
+ "classifications": [
+  "A61B 6/548",
+  "A61M 16/0069",
+  "A61M 16/0447",
+  "A61M 16/1005",
+  "A61M 16/202",
+  "G16H 40/67",
+  "G16H 10/60",
+  "G16H 40/63",
+  "H04L 67/01",
+  "A61B 5/076",
+  "A61B 5/6861",
+  "A61B 6/4464",
+  "A61B 6/54",
+  "A61B 6/541",
+  "A61B 6/542",
+  "A61B 6/563",
+  "A61B 6/566",
+  "A61B 6/586",
+  "A61M2202/0208",
+  "A61M2205/3592",
+  "G01S 19/14",
+  "H04L 5/14",
+  "H04L 67/02",
+  "H04L 67/025",
+  "H04L 67/12"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US15/430,461",
+   "relation": "Continuation",
+   "publication": "US10638999B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "15430461",
+  "13756445",
+  "61594224"
+ ],
+ "abstract": "Controlling a multi-device module includes a physiological sensor configured to sense physiological characteristics of a subject and generate a signal indicative of an instantaneous physiological state. A first device is configured to generate a first signal indicative of an operating state of the first device. A second device is configured to generate a second signal indicative of an operating state of the second device. A remote-control device includes a repository for storing computer executable files aggregated from a plurality of changing private networks. The remote-control device includes an electronic record (ER) client to make a wireless connection with each of the private networks and to query ER database associated with the private networks for electronic records residing within the private networks.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system comprising: a sensor that senses one or more physiological characteristics of a physiological subject and generates a digital signal indicative of an instantaneous physiological state of the subject; at least one electronic device that generates signals corresponding to an operating state of the at least one electronic device, wherein the at least one electronic device performs one of a therapeutic, diagnostic, and a medication delivery task on the subject based on a pre-programmed set of instructions; a database that stores changing computer-executable files aggregated from a plurality of changing private networks, wherein the computer-executable files contain dynamically updating digitally recorded information indicative of a set of changing subject attributes and respective changing reference values associated with the subject; a server communicatively linked to the sensor and the at least one electronic device, wherein the server receives the digital signal indicative of the instantaneous physiological state of the subject and transmits programmable operational parameters to the at least one electronic device based on the instantaneous physiological state; and an identity validation device that verifies an identity of the at least one electronic device and associates a subject identifier uniquely representing the subject with the at least one electronic device based on information contained within the digital signal such that the operational parameters are dependent on the reference values associated with the subject."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , comprising an interface communicatively linked to a social network platform to facilitate real-time communication associated with the operating state of the at least one electronic device."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , comprising an interface communicatively linked to a social network platform to facilitate real-time communication associated with the subject interacting with at least one electronic device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein communication to/from the least one electronic device occurs in a blockchain configuration."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one electronic device comprises: a first electronic device that generates a first signal corresponding to an operating state of the first electronic device, wherein the first electronic device performs one of a therapeutic, diagnostic, and a medication delivery task on the subject based on a first selected set of instructions; and a second electronic device that generates a second signal corresponding to an operating state of the second electronic device, wherein the second electronic device performs one of a therapeutic, diagnostic, and a medication delivery task on the subject based on a second selected set of instructions."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein the operating state of the first electronic device and the operating state of the second electronic device are interdependent such that the operating state of the first electronic device is non-performing when the operating state of the second electronic device is performing, and wherein the server is configured to retrieve information about interdependence of the first electronic device and the second electronic device from a lookup table stored in the database."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one electronic device comprises a plurality of electronic devices that are communicatively integrated with each other."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , comprising a device manager that detects newly connected electronic devices communicatively linked with the at least one electronic device or with the server."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a device manager that detects updates affecting an operation of the at least one electronic device."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one electronic device is configured to detect geo-locations of the at least one electronic device."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the server comprises a communication interface to communicate with the at least one electronic device."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the at least one electronic device comprises a medical device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a remote-controlled device that controls an operation of the at least one electronic device for performing an action on the subject."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A system comprising: a sensor that detects physiological data associated with a subject; a plurality of electronic devices communicatively linked to the sensor, wherein the plurality of electronic devices generate a plurality of signals indicative of an operating state of the plurality of electronic devices, and wherein said operating state comprises one of a performing state and a non-performing state of the plurality of electronic devices; an integrated gateway device communicatively linked to each of the plurality of electronic devices, wherein the integrated gateway device transmits medical operation measurements of the subject in conformity with one or more operational parameters associated with the plurality of electronic devices; at least one of a therapeutic delivery device, a medication delivery device, and a diagnosis device that perform one of a therapeutic, diagnostic, and a medication delivery task on the subject based on the one or more operational parameters associated with the plurality of electronic devices; an identification module that contains digitally stored information for transmission to other electronic devices communicatively linked to the plurality of electronic devices; and a processor communicatively linked with the sensor and the plurality of electronic devices, wherein the processor: receives a signal from the sensor, wherein the signal contains the physiological data; verifies an identity of the plurality of electronic devices based at least on the digitally stored information and associates a subject identifier uniquely representing the subject with at least one of the plurality of electronic devices based on information contained in the physiological data associated with a subject; transmits the subject identifier and a plurality of electronic devices identifier associated along with a service request to a remote-control device positioned apart from the sensor, wherein the remote-control device fulfills the service request based on information contained in a plurality of dynamically updating computer-executable files from a plurality of digital data sources communicatively linked to the remote-control device; and receives the one or more operational parameters from the remote-control device in response to the service request from the processor and based on an instantaneous physiological state as identified from the signal such that said one or more operating parameters decides operating characteristics of the plurality of electronic devices."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the plurality of electronic devices and the integrated gateway device are communicatively linked through the Internet."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the plurality of electronic devices comprise medical devices."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The system of claim 14 , comprising a sub-system that detects potential operational threats to the plurality of electronic devices or operational vulnerabilities of the plurality of electronic devices."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 17 , wherein the sub-system establishes a trust factor associated with each of the plurality of electronic devices based on the detected potential operational threats and operational vulnerabilities associated with the plurality of electronic devices."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 18 , wherein the trust factor determines whether a particular electronic device of the plurality of electronic devices is to be used."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the remote-controlled device controls an operation of the plurality of electronic devices for performing an action on the subject."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11006920B2/sheet-00000.webp",
+   "label": "Sheet 1 of 14",
+   "width": 180,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00001.webp",
+   "label": "Sheet 2 of 14",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00002.webp",
+   "label": "Sheet 3 of 14",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00003.webp",
+   "label": "Sheet 4 of 14",
+   "width": 69,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00004.webp",
+   "label": "Sheet 5 of 14",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00005.webp",
+   "label": "Sheet 6 of 14",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00006.webp",
+   "label": "Sheet 7 of 14",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00007.webp",
+   "label": "Sheet 8 of 14",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00008.webp",
+   "label": "Sheet 9 of 14",
+   "width": 53,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00009.webp",
+   "label": "Sheet 10 of 14",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00010.webp",
+   "label": "Sheet 11 of 14",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00011.webp",
+   "label": "Sheet 12 of 14",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00012.webp",
+   "label": "Sheet 13 of 14",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11006920B2/sheet-00013.webp",
+   "label": "Sheet 14 of 14",
+   "width": 83,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/77/73/ff/b2a17908c15b18/US11006920.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16835258",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11006920B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

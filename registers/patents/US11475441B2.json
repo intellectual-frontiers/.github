@@ -1,0 +1,168 @@
+{
+ "number": "US11475441B2",
+ "kind": "granted patent",
+ "title": "Blockchain-Enabled Service Delivery Evidence System",
+ "applicationNumber": "16045530",
+ "earlierPublication": "US20200034836A1",
+ "filedOn": "2018-07-25",
+ "publishedOn": "2020-01-30",
+ "grantedOn": "2022-10-18",
+ "priorityDate": "2018-07-25",
+ "status": "Patented Case",
+ "statusDate": "2022-09-28",
+ "estimatedExpiration": "2039-02-16",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3685",
+ "examiner": "IDIAKE, VINCENT I",
+ "classifications": [
+  "G06Q 20/3829",
+  "G06Q 40/08",
+  "G06Q 20/02",
+  "G06Q 20/223",
+  "G06Q 20/389",
+  "G06Q2220/00",
+  "H04W 4/02",
+  "H04W 4/14"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "A system is provided for automated recording of evidence of delivery of a service in a service setting. The system includes a mobile communication device, a web-based interaction component, and a service control system. The system includes a service interface device to generate an electronic signal. The electronic signal includes a first SMS transmitted to the mobile communication device and a second SMS transmitted to the service control system. The electronic signal also includes a first secured hash link executable by the mobile communication device, wherein executing the link records a first electronic evidence of service delivery. The electronic signal includes a second secured hash link executable by the service control system, wherein executing the second link records a second electronic evidence of service delivery.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-controlled system for automated recording of evidence of a delivery of a service in a service setting, said system comprising: a mobile communication device associated with a user in a service network, wherein said mobile communication device comprises predefined information about said mobile communication device and said user; a service provider-associated computer system that manages and processes delivery of services in said service setting by a service provider; an electronic device that transmits: a first short message service (SMS) signal to the mobile communication device and comprising a first secured hash link that is clicked to record a first evidence of service delivery associated with the mobile communication device; and a second short message service (SMS) signal to the service provider-associated computer system and comprising a second secured hash link that is clicked to record a second evidence of service delivery associated with the service provider-associated computer system; a processor that records an electronic evidence of service delivery in the service network by transmitting a confirmation electronic message along with a unique service proof token (SPT) to said mobile communication device and to the service provider-associated computer system, wherein said electronic evidence of service delivery is one of an event, a digitally executable location, a digitally executable location voice input, and a digital image; a blockchain device directly connected to the electronic device, wherein the block chain device comprises computer-executable instructions comprising a digitally executable SPT associated with said mobile communication device, wherein the digitally executable SPT is an electronic token identifying a start of receipt of service and an end of receipt of service; and a client electronic device directly connected to the blockchain device, wherein the client electronic device verifies said electronic evidence of service delivery by retrieving said unique SPT from said blockchain device."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a first Global Positioning System (GPS) communicatively connected with said client electronic device, wherein said first GPS records location coordinates of the service provider-associated computer system."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein said first GPS is contained within the service provider-associated computer system and communicates with said client electronic device."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 2 , wherein said blockchain device comprises said location coordinates of the service provider-associated computer system."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , comprising a second Global Positioning System (GPS) communicatively connected with said client electronic device, wherein said second GPS records location coordinates of said mobile communication device."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said second GPS is contained within said mobile communication device and communicates with said client electronic device."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 5 , wherein said blockchain device comprises said location coordinates of said mobile communication device."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said blockchain device comprises said SPT associated with said mobile communication device and the service provider-associated computer system."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said SPT comprising: a first SPT associated with said mobile communication device and comprising a start of service proof token for receipt of said service detected by said mobile communication device; a second SPT associated with said mobile communication device and comprising an end of service proof token for receipt of said service detected by said mobile communication device; a third SPT associated with the service provider-associated computer system and comprising a start of service proof token for delivery of said service by the service provider-associated computer system; and a fourth SPT associated with the service provider-associated computer system and comprising an end of service proof token for delivery of said service by the service provider-associated computer system."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , wherein said first SPT, said second SPT, said third SPT, and said fourth SPT comprise digitally executable verification of said electronic evidence of service delivery."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein client electronic device is communicatively coupled with a rules engine comprising a set of computer-executable rules that verify proof of evidences based on occurrence of said event, receipt of said digitally executable location information, receipt of said digitally executable voice input, or receipt of said digital image input."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said blockchain device comprises: a network identifier associated with a blockchain network; a transaction ID (identifier); a blockchain address identifier using at least a unique key included in a transaction request and one or more hashing codes including said SPT associated with said respective mobile communication device; and a plurality of data elements comprising a proof of transaction as said evidence reserved for private use upon request for verification by said client electronic device."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 12 , wherein said blockchain address identifier comprises a public key corresponding to a private key that registers a transaction on said blockchain device."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US11475441B2/sheet-00000.webp",
+   "label": "Sheet 1 of 8",
+   "width": 174,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00001.webp",
+   "label": "Sheet 2 of 8",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00002.webp",
+   "label": "Sheet 3 of 8",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00003.webp",
+   "label": "Sheet 4 of 8",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00004.webp",
+   "label": "Sheet 5 of 8",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00005.webp",
+   "label": "Sheet 6 of 8",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00006.webp",
+   "label": "Sheet 7 of 8",
+   "width": 84,
+   "height": 120
+  },
+  {
+   "file": "drawings/US11475441B2/sheet-00007.webp",
+   "label": "Sheet 8 of 8",
+   "width": 82,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/d8/f9/aa/75b84e961d5636/US11475441.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/16045530",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US11475441B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

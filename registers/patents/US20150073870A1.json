@@ -1,0 +1,206 @@
+{
+ "number": "US20150073870A1",
+ "kind": "published application",
+ "title": "Crowdsourced Initiatives Tracking, Development, Evaluation And Scoring",
+ "applicationNumber": "14025493",
+ "earlierPublication": "",
+ "filedOn": "2013-09-12",
+ "publishedOn": "2015-03-12",
+ "grantedOn": "",
+ "priorityDate": "2013-09-12",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-08-14",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3623",
+ "examiner": "DICKERSON, TIPHANY B",
+ "classifications": [
+  "G06Q 30/0203",
+  "G06Q 10/40",
+  "G06Q 10/063",
+  "G06Q 30/0206",
+  "G06Q 50/184"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [],
+ "abstract": "An initiatives exchange ecosystem includes a computing device operatively connected to a crowdsourced initiatives exchange network. The initiatives include an innovation and corresponding sub-innovations such that each innovation tracks sub-innovations. The ecosystem further includes a web platform accessible through a user interactive interface through the computing device and a processing circuit. The processing circuit includes an initiatives tracking engine that develops or tracks sub-innovations corresponding to an innovation in the crowdsourced initiatives exchange network. The initiatives are developed or tracked by performing a set of automated tasks aiming to change configurations of a parent innovation in at least one of the attributes or elements such that the resulting sub-innovation is different from the parent innovation in at least one of the categories.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "An initiatives exchange ecosystem comprising: a computing device operatively connected to a crowdsourced initiatives exchange network, wherein said initiatives include an innovation and corresponding sub-innovations such that each innovation tracks sub-innovations; a web platform accessible through a user interactive interface through said computing device; a processing circuit including or coupled to: an initiatives tracking engine that develops or tracks sub-innovations corresponding to an innovation in said crowdsourced initiatives exchange network, wherein said initiatives are developed or tracked by performing a set of automated tasks aiming to change configurations of a parent innovation in at least one of said attributes or elements such that said resulting sub-innovation is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type and bear a similarity relationship thread with said parent invention; and a central initiatives management engine including: an evaluation module for evaluating said initiatives based on one or more inputs; and a scoring module for associating a score to each of said initiatives based on an evaluation output; an enterprise asset library to serve as a knowledge repository for storing information pertinent to said initiatives including initiatives documents, invention disclosures, innovator profiles, innovator credentialing details, said evaluation output, and said associated scores; a financial transaction engine coupled to said processing circuit for: exploring a plurality of target agency requirements within and outside said initiatives exchange network; determining a degree of relevance of an initiative with said target agency requirements; and determining a financial value of said initiative for said target agency; an initiatives transfer engine for facilitating transfer of rights associated with said initiatives once said financial transaction is settled."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein one or more inputs including officiality of an innovator, reputation of an innovator, and credentialed expertise of an innovator are used as inputs to said evaluation module for assessing said innovation asset."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein one or more inputs including novelty search output, non-obviousness decision, significance of said innovation assets for a target agency, revenue potential, and market coverage are further used as inputs by said evaluation module to evaluate said innovation asset by said innovator."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking engine tracks sub-innovations for an innovation by removing seemingly essential elements or attributes from said parent innovation such that said sub-innovations have at least one element reduced from said innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking engine tracks sub-innovations for an innovation by adding seemingly dissimilar and unrelated attributes or elements with said parent innovation such that said sub-innovations have at least one element or attribute added to said parent innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking engine tracks sub-innovations for an innovation by copying attributes or elements of a parent innovation and making alterations into it to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said initiatives tracking engine tracks sub-innovations for an innovation by eliminating attributes or elements of a parent innovation and rearranging them in a substantially different manner to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type, wherein said rearrangement can be of a physical or a chemical type such that said physical rearrangement results in a different physical product and a chemical rearrangement results in a different molecule or compound."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein an innovation comprises a transition sunglass that changes color with sunlight effects, wherein a resulting sub-innovation comprises an air conditioning unit that changes temperature settings based on an external environment temperature and moisture content, wherein said similarity relationship thread between said innovation and said sub-innovation comprises an external environment transition, said similarity relationship of said external environment transition further allowing developing or tracking a plurality of sub-innovations in a hierarchical series such that each corresponding sub-innovation derived from a respective parent innovation bears said same similarity relationship, and wherein said respective sub-innovations are derived by either eliminating, unifying, or rearranging attributes or elements in said respective parent inventions within said hierarchical series."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein an innovation comprises a transition sunglass that changes color with sunlight effects, wherein a resulting sub-innovation comprises an air conditioning unit that changes temperature settings based on an external environment temperature and moisture content, wherein said similarity relationship thread between said innovation and said sub-innovation comprises an external environment transition, said similarity relationship of said external environment transition further allowing developing or tracking a plurality of sub-innovations in a hierarchical series such that each corresponding sub-innovation derived from a respective parent innovation bears unique and different similarity relationships, and wherein said respective sub-innovations are derived by either eliminating, unifying, or rearranging attributes or elements in said respective parent inventions within said hierarchical series."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The ecosystem of claim 9 , wherein said unique and different similarity relationship in said series between an innovation and a sub-innovation includes said external environment transition such that said innovation and its respective sub-innovation exhibits an innovative change by sensing an impact due to said external environmental transition."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The ecosystem of claim 1 , wherein said processing circuit is further coupled to a memory circuit for storing programmed instructions that perform defined tasks of elimination, unification, and rearrangement within one or more attributes or elements of said parent innovation to derive a plurality of sub-innovations different in one or both of obviousness and novelty and bearing at least one similarity relationship."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The ecosystem of claim 11 , wherein said derived sub-innovations include a first sub-innovation derived from said parent innovation with a similarity relationship between said first sub-innovation and said second sub-innovation, said derived sub-innovations further including a second sub-innovation derived from said first sub-innovation based on a similarity relationship between said second sub-innovation and said first sub-innovation, wherein said first similarity relationship and said second similarity relationship are different, said derived sub-innovations further including a third sub-innovation derived from said second sub-innovation based on a third similarity relationship between said second sub-innovation and said third sub-innovation such that said third similarity relationship is different from said first and second similarity relationships, wherein said parent innovation, first sub-innovation, second sub-innovation, and said third sub-innovation are non-obvious and novel among themselves."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The ecosystem of claim 12 , further comprising a mapping system that develops an initiatives map including said parent innovation and said sub-innovations along with their similarity relationships to define relationship trends."
+  },
+  {
+   "number": 14,
+   "independent": true,
+   "text": "A method for tracking or developing and scoring sub-innovations from an innovation in an initiatives exchange ecosystem, said method comprising: developing or tracking sub-innovations corresponding to an innovation in the crowdsourced initiatives exchange network, wherein said initiatives are developed or tracked by performing a set of automated tasks aiming to change configurations of a parent innovation in at least one of said attributes or elements such that said resulting sub-innovation is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type and bear a similarity relationship thread with said parent invention; evaluating said initiatives based on one or more inputs, wherein said one or more inputs include credentialed score, officiality, and reputation of said innovator, novelty search output, non-obviousness decision, significance of said initiatives for a target agency, revenue potential, and market coverage; associating a score to each of said initiatives based on an evaluation output; and outputting said score to a computing device."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising removing seemingly essential elements or attributes from said parent innovation such that said sub-innovations have at least one element reduced from said innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising adding seemingly dissimilar and unrelated attributes or elements with said parent innovation such that said sub-innovations have at least one element or attribute added to said parent innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising copying attributes or elements of a parent innovation and making alterations into it to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 14 , further comprising rearranging attributes or elements of a parent innovation in a substantially different manner to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type, wherein said rearrangement can be of a physical or a chemical type such that said physical rearrangement results in a different physical product and a chemical rearrangement results in a different molecule or compound."
+  },
+  {
+   "number": 19,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for tracking or developing and scoring sub-innovations from an innovation in an initiatives exchange ecosystem, said method comprising: developing or tracking sub-innovations corresponding to an innovation in said crowdsourced initiatives exchange network, wherein said initiatives are developed or tracked by performing a set of automated tasks aiming to change configurations of a parent innovation in at least one of said attributes or elements such that said resulting sub-innovation is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type and bear a similarity relationship thread with said parent invention; evaluating said initiatives based on one or more inputs, wherein said one or more inputs include credentialed score, officiality, and reputation of said innovator, novelty search output, non-obviousness decision, significance of said initiatives for a target agency, revenue potential, and market coverage; and associating a score to each of said initiatives based on an evaluation output."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The program storage device of claim 19 , wherein said method further comprising one or more of: removing seemingly essential elements or attributes from said parent innovation such that said sub-innovations have at least one element reduced from said innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; adding seemingly dissimilar and unrelated attributes or elements with said parent innovation such that said sub-innovations have at least one element or attribute added to said parent innovation and results in a tangible product that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; copying attributes or elements of a parent innovation and making alterations into it to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type; and rearranging attributes or elements of a parent innovation in a substantially different manner to result in a sub-innovation that is different from said parent innovation in at least one of said categories including physical property, chemical property, biologic property, end usage, functionality, portability, cost effectiveness, and product type, wherein said rearrangement can be of a physical or a chemical type such that said physical rearrangement results in a different physical product and a chemical rearrangement results in a different molecule or compound."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20150073870A1/sheet-00000.webp",
+   "label": "Sheet 1 of 9",
+   "width": 179,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00001.webp",
+   "label": "Sheet 2 of 9",
+   "width": 88,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00002.webp",
+   "label": "Sheet 3 of 9",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00003.webp",
+   "label": "Sheet 4 of 9",
+   "width": 104,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00004.webp",
+   "label": "Sheet 5 of 9",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00005.webp",
+   "label": "Sheet 6 of 9",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00006.webp",
+   "label": "Sheet 7 of 9",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00007.webp",
+   "label": "Sheet 8 of 9",
+   "width": 79,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20150073870A1/sheet-00008.webp",
+   "label": "Sheet 9 of 9",
+   "width": 94,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/60/89/f3/21ce53736eef9a/US20150073870A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14025493",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20150073870A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

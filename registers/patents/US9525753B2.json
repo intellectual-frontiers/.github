@@ -1,0 +1,323 @@
+{
+ "number": "US9525753B2",
+ "kind": "granted patent",
+ "title": "Integration Of Devices Through A Social Networking Platform",
+ "applicationNumber": "14103098",
+ "earlierPublication": "US20140164519A1",
+ "filedOn": "2013-12-11",
+ "publishedOn": "2014-06-12",
+ "grantedOn": "2016-12-20",
+ "priorityDate": "2012-12-12",
+ "status": "Patented Case",
+ "statusDate": "2016-11-30",
+ "estimatedExpiration": "2034-12-27",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2454",
+ "examiner": "SPRINGER, JAMES E",
+ "classifications": [
+  "H04L 51/52",
+  "H04L 67/306",
+  "G16H 40/67",
+  "H04W 4/80",
+  "H04B 5/20",
+  "H04L 63/102",
+  "H04L 67/303",
+  "H04L 41/0663",
+  "H04B 5/72",
+  "H04L 63/1433",
+  "H04L 67/02"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "61736119"
+ ],
+ "abstract": "A system and method for providing a social networking service to a plurality of devices. A social networking server for facilitating social information exchange among the plurality of devices through a socially aware network. A social profiles manager is coupled to the social networking server that creates and manages individual centric profiles of the plurality of devices. The individual centric profiles of the plurality of devices are social representation of individual devices within the socially aware network. The plurality of devices are identifiable by other participants and the social networking server through their social profiles.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "An integrated healthcare system for providing a social networking service to a plurality of participants and allowing said participants to perform a series of social tasks in a socially aware network, said system comprising: a social networking server that facilitates social information exchange among said participants through said socially aware network, said plurality of participants comprising medical devices and non-device participants; a social profiles manager included in or coupled to said social networking server, wherein said social profiles manager creates and manages individual centric profiles of said medical devices that are a social representation of individual said medical devices within said socially aware network, wherein said medical devices are identifiable by other participants and said social networking server through social profiles associated with said medical devices, the social profiles comprising social device profiles and social human profiles associated with said medical devices and non-device participants respectively such that said social human profiles are associated with one or more device profiles, and wherein said social human profiles are represented as a subset of corresponding device profiles; a social device manager included in or coupled to said social networking server, wherein said social device manager manages device relationships and social activity in said socially aware network; a social networking application comprising a cluster of social applications each for providing a specific social facility to facilitate social activity among said plurality of participants through said socially aware network, said social networking application comprising: a web-sharing facility that allows information exchange among said participants; a social profiles facility that allows said participants to create respective social profiles; a social groups facility that creates a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; a prediction analytics engine that: determines a predicted future behavior of a non-device participant based on historical social data about said non-device participant; and generates information about what a medical device corresponding to said non-device participant can do in future, based on said predicted future behavior; an information security facility that encrypts and decrypts said social content during exchange among said participants; and a risk manager that: retrieves social profile information corresponding to said medical devices; predicts an individual risk pattern for each of said plurality of medical devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculates an aggregate risk based on said individual risk pattern of each of said medical devices; provides risk documentations based on said individual and aggregate risks in said social profiles of said medical devices; and updates said risk documentations based on networking and interconnection of said medical devices with another group of medical devices having different risks; wherein a connection with the new device is accepted or rejected based on said risk documentations."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein each of said medical devices are operatively connected with an external controller through a near field communication (NFC) channel so that a communication point of said NFC channel receives social content from said medical device and transfers said social content to said external controller, and wherein said external controller is communicatively coupled to said socially aware network."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein a first device participant is independently incapable of performing computation tasks."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 3 , wherein said first device participant is operatively connected with a second device participant that is incapable of performing computation tasks, a third device participant that is partially capable of performing computation tasks, a fourth smart device that is independently capable of performing computation tasks, and a non-device participant associated with one of the device participants, wherein said first device participant transfers said social content to said second device, said third device, the fourth device, and the non-device participant through said NFC channel and said socially aware network, wherein said socially aware network is automatically triggered upon receipt of said social content by the NFC point."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said medical devices are incapable of computation capabilities completely or partially."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social tasks comprise one or more of devices that voluntarily join said socially aware network, disassociate or leave from said socially aware network, extend interconnection with other like-minded devices, send invitations for connections to other devices, accept or reject invitations from other devices, view profiles of other devices, exchange social activity information, establish social signatures for social authorization of profiles, create devices social groups, join devices groups, and leave devices groups voluntarily or non-voluntarily through an action of a participant."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social device manager comprises: a relationship manager that associates a relationship of a device with other devices, wherein said relationship comprises at least one of an installation relationship, time relationship, operation relationship, location relationship, reliability-based relationship, network type-relationship, security-based relationship and human relationship; and a relationship information storage module that stores information pertaining to associated relationship among the devices."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social networking application further comprises one or more of: a notification facility that facilitates receipt and sending of invitation notifications for extending a social space of a participant; a recommendation facility that shares recommendations for a device based on noticed past behavior of a device by a connection device; and a messaging facility that shares social content from a participant to another connection participant."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social profiles manager comprises: a participants profiles storage module that stores profiles of said plurality of participants, wherein said profiles comprise a device profile and a human profile associated with said device profile, and wherein said device profile comprises a manufacturing social profile, an installation social profile, an operation social profile, a schedules social profile, a location social profile, a reliability social profile, a network social profile, a security social profile, a time profile, a location profile, and a human profile; a profiles updating module that updates said profiles based on a change in one or more of manufacturing parameters of said devices, installation parameters of said devices, operation parameters of said devices, schedules or constraints of said devices, network parameters of said devices, reliability of said devices, security of said devices, time parameters of said devices, location of said devices, and associated non-device parameters of said devices; a profiles aggregator that aggregates information pertinent to a manufacturing social profile of said devices, an installation social profile, an operation social profile, security profile, network profile, security profile, location profile, associated non-device profile, time profile, and a schedules social profile information into a common social profile of said devices; and a profiles federation engine that federates said common social profile into a respective manufacturing social profile, installation social profile, operation social profile, security profile, network profile, security profile, location profile, associated non-device profile, time profile, and schedules social profile."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said socially aware network comprises a Wi-Fi or internet such that the network allows interconnection and automation among a plurality of remotely located participants, and between said plurality of remotely located participants and said social networking server."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 1 , wherein each device is communicatively coupled to a sensing and monitoring apparatus, the sensing and monitoring apparatus being communicatively coupled to an external controller that communicates with a near field communication (NFC) point through a NFC channel."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 11 , wherein an activity of social content exchange from said external controller to said NFC point triggers said socially aware network to socially share said social content to remotely located participants through said socially aware network."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 11 , wherein an activity of social content exchange from a socially aware network point of said socially aware network to said external controller triggers a near field point of a near field network that socially shares said social content to a remotely located device associated with said external controller through said social networking server."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 11 , wherein said NFC channel comprises a short range NFC communication network, and wherein a range of said short range communication network is substantially 100 meters to allow a device that is located within proximity of 100 meters from said external controller to communicate social content with said external controller."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , wherein the NFC network comprises a Bluetooth™ network."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 11 , wherein said NFC channel comprises a short range NFC communication network, and wherein a range of said short range communication network is substantially 30 feet to allow a device that is located within proximity of 30 feet from said external controller to communicate social content with said external controller."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The system of claim 16 , wherein said NFC network is based on a radio frequency identification (RFID) system such that said device comprises a RFID tag that is readable by a reader communicatively coupled to or included within said external controller."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 11 , wherein said NFC network comprises a Body Area Network."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 11 , wherein said devices comprise NFC tags programmable by NFC applications."
+  },
+  {
+   "number": 20,
+   "independent": true,
+   "text": "A method for integration of a plurality of participants comprising a plurality of devices and non-devices through a social networking platform, said method comprising: creating a device centric social profile for each of said plurality of devices, wherein said social profile comprises a social representation of a respective device within a socially aware network and each device is identifiable by other devices and a social networking server through a social profile of said each device; allowing exchange of social content among the devices by said social networking server for said devices to perform a series of social tasks, wherein social content is exchanged through a first communication channel and a second communication channel, the first communication channel linking a device with an external controller and the second communication channel linking said external controller with a socially aware network, wherein said series of social tasks comprise one or more of voluntarily joining said socially aware network, disassociating or leaving from said socially aware network, extending interconnection with other like-minded devices, sending invitations for connections to other devices, accepting or rejecting invitations from other devices, viewing profiles of other devices, exchanging social activity information, establishing social signatures for social authorization of profiles, creating devices social groups, joining devices groups, and leaving devices groups voluntarily or upon initiation of an activity by a participant; maintaining profiles relationships among said devices within said socially aware network allowing information exchange among said participants; allowing said participants to create respective social profiles; creating a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; determining a predicted future behavior of a non-device participant based on historical social data about said non-device participant; generating information about what a device corresponding to said non-device participant can do in future, based on said predicted future behavior; encrypting and decrypting said social content during exchange among said participants; retrieving social profile information corresponding to said devices; predicting an individual risk pattern for each of said plurality of devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculating an aggregate risk based on said individual risk pattern of each of said devices; providing risk documentations based on said individual and aggregate risks in said social profiles of said devices; updating said risk documentations based on networking and interconnection of said devices with another group of devices having different risks; and accepting or rejecting a connection with one or more of the plurality of devices based on said risk documentations."
+  },
+  {
+   "number": 21,
+   "independent": false,
+   "text": "The method of claim 20 , further comprising facilitating a recommendation of a connection device by another device based on noticed past behavior of said connection device by said another device."
+  },
+  {
+   "number": 22,
+   "independent": true,
+   "text": "A method for integration of a plurality of participants comprising a plurality of devices and non-devices through a social networking platform, said method comprising: creating a device centric social profile for each of said plurality of devices, wherein said social profile comprises a social representation of a respective device within a socially aware network and the device is identifiable by other devices and a social networking server through said social profile; allowing information exchange among said participants; allowing said participants to create respective social profiles; creating a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; determining a predicted future behavior of a non-device participant based on historical social data about said non-device participant; generating information about what a device corresponding to said non-device participant can do in future, based on said predicted future behavior; encrypting and decrypting said social content during exchange among said participants; retrieving social profile information corresponding to said devices; predicting an individual risk pattern for each of said plurality of devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculating an aggregate risk based on said individual risk pattern of each of said devices; providing risk documentations based on said individual and aggregate risks in said social profiles of said devices; updating said risk documentations based on networking and interconnection of said devices with another group of devices having different risks; sending a connection invitation by a first device to a second device through a multi-communication channel including a first near field communication (NFC) channel and said socially aware network, wherein the sending of the connection invitation comprises: sending said connection invitation from said first device to said external controller associated with said first device through said first NFC channel; transferring said connection invitation from said external controller to a network point of said socially aware network; and transferring said connection invitation from said network point through said socially aware network to said device; accepting or rejecting said connection invitation by said second device upon receipt based on the risk documentations; maintaining a profiles relationship of said first device and said second device based on acceptance or rejection of said connection invitation by said second device; and allowing an exchange of social content through a social activity between said first device and said second device based on the maintained profile relationships, wherein said social activity comprises a series of social tasks comprising one or more of devices to voluntarily join said socially aware network, disassociate or leave from said socially aware network, extend interconnection with other like-minded devices, send invitations for connections to other devices, accept or reject invitations from other devices, view profiles of other devices, exchange social activity information, establish social signatures for social authorization of profiles, create devices social groups, join devices groups, and leave devices groups voluntarily or upon initiation of an activity by a participant."
+  },
+  {
+   "number": 23,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by a computer, and comprising a program of instructions executable by said computer to perform a method for integration of a plurality of participants including a plurality of devices and non-devices through a social networking platform, said method comprising: creating a device centric social profile for each of said plurality of devices, wherein the profile comprises a social representation of a respective device within a socially aware network and the device is identifiable by other devices and a social networking server through said social profile of said device; allowing exchange of social content among said plurality of devices by said social networking server for said plurality of devices to perform a series of social tasks, wherein said social content is exchanged through a first communication channel and a second communication channel, the first communication channel linking a device with an external controller and the second communication channel linking said external controller with a socially aware network, wherein said series of social tasks comprise one or more of voluntarily joining said socially aware network, disassociating or leaving from said socially aware network, extending interconnection with other like-minded devices, sending invitations for connections to other devices, accepting or rejecting invitations from other devices, viewing profiles of other devices, exchanging social activity information, establishing social signatures for social authorization of profiles, creating devices social groups, joining devices groups, and leaving devices groups voluntarily or upon initiation of an activity by a participant; maintaining profiles relationships among said plurality of devices within said socially aware network; allowing information exchange among said participants; allowing said participants to create respective social profiles; creating a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; determining a predicted future behavior of a non-device participant based on historical social data about said non-device participant; generating information about what a device corresponding to said non-device participant can do in future, based on said predicted future behavior; encrypting and decrypting said social content during exchange among said participants; retrieving social profile information corresponding to said devices; predicting an individual risk pattern for each of said plurality of devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculating an aggregate risk based on said individual risk pattern of each of said devices; providing risk documentations based on said individual and aggregate risks in said social profiles of said devices; updating said risk documentations based on networking and interconnection of said devices with another group of devices having different risks; and accepting or rejecting a connection with one or more of the plurality of devices based on said risk documentations."
+  },
+  {
+   "number": 24,
+   "independent": true,
+   "text": "An integrated computer network system for facilitating sequential, synchronous, and automatically coordinated operation of a plurality of devices through interactive elements involving a chain of tasks and devices, said system comprising: a social networking server that provides a social networking service to said plurality of devices so that each of said plurality of devices are operatively connected to said social networking service by associating respective social profiles with said social networking server, the respective social profiles being social representation of said plurality of devices, wherein said social networking server is programmed to allow said plurality of devices to coordinate for a synchronous social times-based functioning by a process comprising: associating connection type social device relationships between a first device and a second device of said plurality of devices, wherein said connection type social device relationships allow said first device and said second device to view a social profile of one another through a device user interface enabled by said social networking server, receiving social content from said first device, wherein said social content being indicative of a social action performed by said first device and an instruction to said second device to perform an action in association with action timelines, and wherein said action timelines are indicative of time points associated with said action and define time when actual action occurs at said plurality of devices; and notifying said second device of said social content received from said first device, wherein said social content comprising said instruction to said second device to perform said action in association with said action timelines; allowing information exchange among said participants; allowing said participants to create respective social profiles; creating a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; determining a predicted future behavior of a non-device participant based on historical social data about said non-device participant; generating information about what a device corresponding to said non-device participant can do in future, based on said predicted future behavior; encrypting and decrypting said social content during exchange among said participants; retrieving social profile information corresponding to said devices; predicting an individual risk pattern for each of said plurality of devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculating an aggregate risk based on said individual risk pattern of each of said devices; providing risk documentations based on said individual and aggregate risks in said social profiles of said devices; updating said risk documentations based on networking and interconnection of said devices with another group of devices having different risks; and accepting or rejecting a connection with one or more of the plurality of devices based on said risk documentations."
+  },
+  {
+   "number": 25,
+   "independent": true,
+   "text": "A method for facilitating sequential, synchronous, and automatically coordinated operation of a plurality of devices through interactive elements involving a chain of tasks and devices, said method comprising: providing a social networking service by a social networking server to said plurality of devices so that each of said plurality of devices are operatively connected to said social networking service by associating respective social profiles with said social networking server, wherein said respective social profiles comprise a social representation of said plurality of devices, and wherein said social networking server is programmed to allow said plurality of devices to coordinate for a synchronous social times-based functioning; associating connection type social device relationships between a first device and a second device of said plurality of devices, wherein said connection type social device relationships allow said first device and said second device to view a social profile of one another through a device user interface enabled by said social networking server; receiving social content from said first device, wherein said social content is indicative of a social action performed by said first device and an instruction to said second device to perform an action in association with action timelines, and wherein said action timelines are indicative of time points associated with said action and define time when actual action should occur at said plurality of devices; notifying said second device of said social content received from said first device, wherein said social content comprising said instruction to said second device to perform said action in association with said action timelines; allowing information exchange among said participants; allowing said participants to create respective social profiles; creating a social group dedicated for said participants and exhibiting a defined behavior or belonging to a defined class; determining a predicted future behavior of a non-device participant based on historical social data about said non-device participant; generating information about what a device corresponding to said non-device participant can do in future, based on said predicted future behavior; encrypting and decrypting said social content during exchange among said participants; retrieving social profile information corresponding to said devices; predicting an individual risk pattern for each of said plurality of devices indicative of how safe and reliable it is for a new device to join said social group for social information exchange; calculating an aggregate risk based on said individual risk pattern of each of said devices; providing risk documentations based on said individual and aggregate risks in said social profiles of said devices; updating said risk documentations based on networking and interconnection of said devices with another group of devices having different risks; and accepting or rejecting a connection with one or more of the plurality of devices based on said risk documentations."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US9525753B2/sheet-00000.webp",
+   "label": "Sheet 1 of 23",
+   "width": 160,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00001.webp",
+   "label": "Sheet 2 of 23",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00002.webp",
+   "label": "Sheet 3 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00003.webp",
+   "label": "Sheet 4 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00004.webp",
+   "label": "Sheet 5 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00005.webp",
+   "label": "Sheet 6 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00006.webp",
+   "label": "Sheet 7 of 23",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00007.webp",
+   "label": "Sheet 8 of 23",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00008.webp",
+   "label": "Sheet 9 of 23",
+   "width": 72,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00009.webp",
+   "label": "Sheet 10 of 23",
+   "width": 115,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00010.webp",
+   "label": "Sheet 11 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00011.webp",
+   "label": "Sheet 12 of 23",
+   "width": 103,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00012.webp",
+   "label": "Sheet 13 of 23",
+   "width": 103,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00013.webp",
+   "label": "Sheet 14 of 23",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00014.webp",
+   "label": "Sheet 15 of 23",
+   "width": 116,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00015.webp",
+   "label": "Sheet 16 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00016.webp",
+   "label": "Sheet 17 of 23",
+   "width": 83,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00017.webp",
+   "label": "Sheet 18 of 23",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00018.webp",
+   "label": "Sheet 19 of 23",
+   "width": 99,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00019.webp",
+   "label": "Sheet 20 of 23",
+   "width": 119,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00020.webp",
+   "label": "Sheet 21 of 23",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00021.webp",
+   "label": "Sheet 22 of 23",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US9525753B2/sheet-00022.webp",
+   "label": "Sheet 23 of 23",
+   "width": 96,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/76/ee/aa/2ab3ea701b8ea9/US9525753.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14103098",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US9525753B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

@@ -1,0 +1,198 @@
+{
+ "number": "US20130197939A1",
+ "kind": "published application",
+ "title": "Social Health Care Record System And Method",
+ "applicationNumber": "13740381",
+ "earlierPublication": "",
+ "filedOn": "2013-01-14",
+ "publishedOn": "2013-08-01",
+ "grantedOn": "",
+ "priorityDate": "2012-01-26",
+ "status": "Abandoned  --  Failure to Respond to an Office Action",
+ "statusDate": "2017-02-20",
+ "estimatedExpiration": "",
+ "expirationSourceStatus": "Abandoned",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3686",
+ "examiner": "HEIN, DEVIN C",
+ "classifications": [
+  "G16H 10/60"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "61590914"
+ ],
+ "abstract": "A system for facilitating multi-faceted communication over a network. The system includes a plurality of healthcare related entities connected with a communications network. Each of the plurality of healthcare related entities serve as a source of medical records. The system includes a social health care record data bank (SHRDB) accessible by each of the plurality of entities based on rules and preferences of the entities upon authorization by the SHRDB. The SHRDB includes a processing component capable of executing stored instructions to process the medical records of the entities over the communications network. The SHRDB further includes a repository to store the medical records of the plurality of entities. The system includes a multi-faceted social health care component communicatively coupled to the SHRDB and adapted to be accessible by each of the plurality of entities.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for facilitating multi-faceted communication over a network, said system comprising: a plurality of healthcare related entities each with a computing system connected with a communications network and associated with a plurality of social aware networks, wherein each of said plurality of healthcare related entities serve as a source of medical records; a social health care record data bank (SHRDB) accessible by each of said plurality of entities based on rules and preferences of said entities upon authorization by said SHRDB, wherein said plurality of entities subscribe with said SHRDB to create, store, edit, manage or control said medical records, said SHRDB including: a processing component capable of executing stored instructions to process said medical records of said entities over said communications network; a repository included in or coupled to said SHRDB to store said medical records of said plurality of entities collected from the plurality of social aware networks; a multi-faceted social health care component communicatively coupled to said SHRDB and adapted to be accessible by each of said plurality of entities such that said multi-faceted social health care component enables social interaction among said entities and said SHRDB over said communications network for medical records transfer or sharing; and a social federation proxy communicatively coupled to said SHRDB and said communications network and configured to retrieve said medical records from said SHRDB collected from the social aware networks and distribute them to said plurality of social aware networks for display to said respective plurality of entities upon request."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said system further comprising a policy controller that is configured to generate an output based on said rules and preferences of said plurality of entities, upon receipt of a request to access said SHRDB, said output used by said multi-faceted social health care component to authorize and control access of said plurality of entities."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 2 , wherein said system further comprising a report generator to generate said medical records and reports based on said generated medical records from said repository based on said request from said plurality of entities, wherein said reports can further be approved by said policy controller before sharing with said plurality of entities."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said multi-faceted social health care component is configured to provide an interactive social user interface comprising a communication module to facilitate said plurality of entities to socially communicate with each other and with said SHRDB through an active social communication such that a social cloud or platform is implemented to communicate among said different entities and said SHRDB."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said multi-faceted social health care component further comprises a natural language and speech recognition module to facilitate said plurality of entities to actively interact with each other and with said SHRDB through natural language and/or speech recognition techniques."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said multi-faceted social health care component further comprises a social entity relationship management module that employs social entity relationship management techniques to build long-term relationships through said multi-faceted social health care component."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said multi-faceted social health care component further comprises a single sign on scheme or module for a plurality of social electronic applications, wherein said social health care component is configured to integrate said plurality of entities with said plurality of social electronic applications through said single sign on scheme or module."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said plurality of entities comprises a first entity, a second entity, a third entity, a fourth entity, and a fifth entity, wherein: said first entity receives a purely intermediated care from said SHRDB or in combination with a third party; said second entity receives a purely non-intermediated care from said SHRDB or in combination with a third party; said third entity receives a purely directed care from said SHRDB or in combination with a third party; said fourth entity receives a purely undirected care from said SHRDB or in combination with a third party; and said fifth entity receives a customized service with a combination of two or more of said intermediated, non-intermediated, directed, and undirected care from said SHRDB or in combination with a third party."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 1 , wherein the SHRDB is configured to identify at least one source location and a target location, wherein said source location identifies medical records for sharing and said target location identifies an entity out of said plurality of entities as a recipient of said medical records defined by said source location, wherein at least one of said source location and said target is dependent on at least one of: (a) an explicit or implicit permission from an owner of said source location; (b) an indication of an extent of sharing; (c) a nature and characteristic of said target location; (d) a purpose of said sharing of said medical records to said target location; and (e) a timeframe for allowance of sharing of said medical records, wherein said at least one of said source location and said target location is automatically determined based on one or more of (a) to (e) upon receipt of a request from said owner entity or is predefined within said SHRDB by said owner entity."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 9 , wherein said sharing of said medical records with said target location includes providing viewing rights to said target location such that said SHRDB is configured to: allow partial viewing of said medical records corresponding to said source location by said target location based on one or more of (a) to (e); stop any viewing or select which parts to view based on one or more of (a) to (e); and determine or facilitate said owner entity of said medical records to determine who has viewed said medical records and accordingly redefine said one or more of said (a) to (e) and also accordingly make a decision about said partial viewing of said medical records corresponding to said source location by said target location based on one or more of (a) to (e) and stopping of any viewing or selecting which parts to view based on said redefined one or more of (a) to (e)."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein said social health care component is configured to identify who has viewed said medical records in real time and share information about who has viewed said medical records with the owner in real time, such that said owner allows fully or partially or stops viewing of said medical records by said target location in real time without predefining rules and guidelines for allowance and denial, wherein said allowance or denial by said owner is performed manually, further wherein said target location is allowed to view a ‘no objection’ segment of said medical records within a defined time after initiation of viewing if: more than a time within which allowance or denial is made by said owner converts said ‘no objection’ viewing to viewing as decided or authorized by said owner, or less than a time within which allowance or denial is made by said owner either extends the ‘no objection’ time by allowing more of medical records under ‘no objection’ viewing or repeats a previously viewed ‘no-objection’ segment of said medical records."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 11 , wherein said time and said medical records corresponding to said ‘no objection’ segment is further defined by said owner automatically or manually based on one or more of: an explicit or implicit permission from an owner of said source location; an indication of an extent of sharing; a nature and characteristic of said target location; a purpose of said sharing of said medical records to said target location; and a timeframe for allowance of sharing of said medical records."
+  },
+  {
+   "number": 13,
+   "independent": true,
+   "text": "A system for facilitating multi-faceted communication over a network, said system comprising: a plurality of healthcare related entities each with a computing system connected with a communications network, wherein each of said plurality of healthcare related entities serve as a source of medical records; a social health care record data bank (SHRDB) accessible by each of said plurality of entities based on rules and preferences of said entities upon authorization by said SHRDB, wherein said plurality of entities subscribe with said SHRDB to create, store, edit, manage or control said medical records, said SHRDB including: a processing component capable of executing stored instructions to process said medical records of said entities over said communications network; a repository included in or coupled to said SHRDB to store said medical records of said plurality of entities; a policy controller to authorize and control access of said plurality of entities based on said rules and respective preferences; and a report generator to generate said medical records and reports based on said generated medical records from said repository based on said request from said plurality of entities; and a multi-faceted social health care component communicatively coupled to said SHRDB and adapted to be accessible by each of said plurality of entities such that said multi-faceted social health care component enables social interaction among said entities and said SHRDB over said communications network for said medical records transfer or sharing, wherein said multi-faceted social heath care component behaves as a centralized application and is adapted to automatically control display of said medical data based on said rules and said preferences, and wherein said multi-faceted social health care component is adapted to interact with: a first of said plurality of entities such that said first entity receives a purely intermediated care from said SHRDB or in combination with a third party; a second of said plurality of entities such that said second entity receives a purely non-intermediated care from said SHRDB or in combination with a third party; a third of said plurality of entities such that said third entity receives a purely directed care from said SHRDB or in combination with a third party; a fourth of said plurality of entities such that said fourth entity receives a purely undirected care from said SHRDB or in combination with a third party; and a fifth of said plurality of entities such that said fifth entity receives a combination of two or more of the intermediated, non-intermediated, directed, and undirected care from said SHRDB or in combination with a third party."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 13 , wherein said SHRDB is configured to identify at least one source location and a target location, wherein said source location identifies medical records for sharing and said target location identifies an entity out of said plurality of entities as a recipient of said medical records defined by said source location, wherein at least one of said source location and said target location is dependent on at least one of: (a) an explicit or implicit permission from an owner of said source location; (b) an indication of an extent of sharing; (c) a nature and characteristic of said target location; (d) a purpose of said sharing of said medical records to said target location; and (e) a timeframe for allowance of sharing of said medical records, wherein said at least one of said source location and said target location is automatically determined based on one or more of (a) to (e) upon receipt of a request from said owner entity or is predefined within said SHRDB by said owner entity."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 14 , wherein said sharing of said medical records with said target location includes providing viewing rights to said target location such that said SHRDB is configured to allow: partial viewing of said medical records corresponding to said source location by said target location based on one or more of (a) to (e); stop any viewing or select which parts to view based on one or more of (a) to (e); and determine or facilitate said owner entity of said medical records to determine who has viewed said medical records and accordingly redefine said one or more of the (a) to (e) and also accordingly make a decision about said partial viewing of said medical records corresponding to said source location by said target location based on said redefined one or more of (a) to (e) and said stopping of any viewing or selecting which parts to view based on said redefined one or more of (a) to (e)."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 15 , wherein said social health care component is configured to identify who has viewed said medical records in real time and share information about who has viewed said medical records with said owner in real time, such that said owner allows fully or partially or stops viewing of said medical records by said target location in real time without predefining rules and guidelines for allowance and denial, wherein said allowance or denial by said owner is performed manually, further wherein said target location is allowed to view a ‘no objection’ segment of said medical records within a defined time after initiation of viewing if: more than a time within which allowance or denial is made by said owner converts said ‘no objection’ viewing to viewing as decided or authorized by said owner, or less than a time within which allowance or denial is made by said owner either extends said ‘no objection’ time by allowing more of medical records under ‘no objection’ viewing or repeats a previously viewed ‘no-objection’ segment of the medical records."
+  },
+  {
+   "number": 17,
+   "independent": true,
+   "text": "A method for accessing a social health record data bank (SHRDB) by an entity, said method comprising: receiving a request from said entity for accessing said SHRDB; authenticating said entity; determining access rights of said entity based on rules and preferences; retrieving medical records from a repository of said SHRDB as requested by said entity in said request, wherein retrieving of said medical records include at least one of sharing of said medical records either partially or fully to said entity and allowing viewing of said medical records at least partially by said entity; determining a type of service to be provided to said entity in association with said sharing of said medical records or allowing viewing of said medical records by said entity, wherein said service includes at least one of a pure intermediated care, pure non-intermediated care, pure directed care, and pure undirected care, said service being provided by said SHRDB or in combination with a third party, wherein said request from said entity further includes an instruction to share at least a portion of said medical records to a target location entity, said method including: sharing said at least a portion of said medical records to said target location based on at least one of: (a) an explicit or implicit permission from said entity; (b) an indication of an extent of sharing; (c) a nature and characteristic of said target location entity; (d) a purpose of said sharing of said medical records to said target location entity; and (e) a timeframe for allowance of sharing of said medical records, said sharing of said medical records with said target location including providing viewing rights to said target location such that said method allows: partial viewing of said at least a portion of said medical records by said target location based on one or more of (a) to (e); stop any viewing or select which parts to view based on one or more of (a) to (e); and determine or facilitate said entity to determine who has viewed said medical records."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The method of claim 17 further comprising: redefining said one or more of said (a) to (e); making a decision about said partial viewing of said at least a portion of said medical records by said target location entity based on said redefined one or more of (a) to (e) and said stopping of any viewing and selecting which parts to view based on said redefined one or more of (a) to (e)."
+  },
+  {
+   "number": 19,
+   "independent": true,
+   "text": "A non-transitory program storage device readable by computer, and comprising a program of instructions executable by said computer to perform a method for accessing a social health record data bank (SHRDB) by an entity, said method comprising: receiving a request from said entity for accessing said SHRDB; authenticating said entity; determining access rights of said entity based on rules and preferences; retrieving medical records from a repository of said SHRDB as requested by said entity in said request, wherein retrieving of said medical records include at least one of sharing of said medical records either partially or fully to said entity and allowing viewing of said medical records at least partially by said entity; determining a type of service to be provided to said entity in association with said sharing of said medical records or allowing viewing of said medical records by said entity, wherein said service includes at least one of a pure intermediated care, pure non-intermediated care, pure directed care, and pure undirected care, said service being provided by said SHRDB or in combination with a third party, wherein said request from said entity further includes an instruction to share at least a portion of said medical records to a target location entity, said method including: sharing said at least a portion of said medical records to said target location based on at least one of: (a) an explicit or implicit permission from said entity; (b) an indication of an extent of sharing; (c) a nature and characteristic of said target location entity; (d) a purpose of said sharing of said medical records to said target location entity; and (e) a timeframe for allowance of sharing of said medical records, said sharing of said medical records with said target location including providing viewing rights to said target location such that said method allows: partial viewing of said at least a portion of said medical records by said target location based on one or more of (a) to (e); stop any viewing or select which parts to view based on one or more of (a) to (e); and determine or facilitate said entity to determine who has viewed said medical records."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The program storage of claim 19 , wherein said method further comprising: redefining said one or more of said (a) to (e); making a decision about said partial viewing of said at least a portion of said medical records by said target location entity based on said redefined one or more of (a) to (e) and said stopping of any viewing and selecting which parts to view based on said redefined one or more of (a) to (e)."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US20130197939A1/sheet-00000.webp",
+   "label": "Sheet 1 of 8",
+   "width": 145,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00001.webp",
+   "label": "Sheet 2 of 8",
+   "width": 98,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00002.webp",
+   "label": "Sheet 3 of 8",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00003.webp",
+   "label": "Sheet 4 of 8",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00004.webp",
+   "label": "Sheet 5 of 8",
+   "width": 101,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00005.webp",
+   "label": "Sheet 6 of 8",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00006.webp",
+   "label": "Sheet 7 of 8",
+   "width": 100,
+   "height": 120
+  },
+  {
+   "file": "drawings/US20130197939A1/sheet-00007.webp",
+   "label": "Sheet 8 of 8",
+   "width": 89,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/f3/81/90/5adaa9651fd9aa/US20130197939A1.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/13740381",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US20130197939A1/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

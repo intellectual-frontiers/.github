@@ -1,0 +1,167 @@
+{
+ "number": "US12572993B2",
+ "kind": "granted patent",
+ "title": "Computer-Controlled Precision Education And Training",
+ "applicationNumber": "18131648",
+ "earlierPublication": "US20230245255A1",
+ "filedOn": "2023-04-06",
+ "publishedOn": "2023-08-03",
+ "grantedOn": "2026-03-10",
+ "priorityDate": "2019-12-12",
+ "status": "Patented Case",
+ "statusDate": "2026-02-25",
+ "estimatedExpiration": "2041-01-14",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3625",
+ "examiner": "SINGH, GURKANWALJIT",
+ "classifications": [
+  "G06Q 10/063114",
+  "G06Q 50/205",
+  "G06F 16/27",
+  "G06N 20/00",
+  "G06Q 10/06334",
+  "G01S 19/13",
+  "G06Q 10/063112",
+  "G06Q 10/0633",
+  "G09B 5/125",
+  "G09B 19/00",
+  "G09B 19/003",
+  "H04L 65/60"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US17/865,173",
+   "relation": "Continuation",
+   "publication": "US11651459B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "17865173",
+  "16712213"
+ ],
+ "abstract": "A system for streaming of contextual micro-content blocks for a workflow task to facilitate task performance by a user. The system includes a context sensing engine that processes one or more context inputs and generates an output based on the context inputs received from a front-end context monitoring appliance. The system includes a processing circuit having a navigation engine to navigate through digital information sources and search for information that matches one or more parameters of relevance for the workflow task. The processing circuit extracts computer-executable information files from the digital information sources that matches the one or more parameters of relevance for the workflow task and digitally processes the collected computer-executable information files into processed information blocks. The processing circuit includes a micro-content blocks creator for generating the contextual micro-content blocks from the processed information blocks. The micro-content blocks are delivered to the user when the micro-tasks are beginning.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A method for live digital streaming of one or more contextual micro-content blocks in real-time for a workflow task to facilitate task performance by a user, the method comprising: receiving one or more digital inputs from a front-end context monitoring appliance deployed at a user device, wherein each digital input is indicative of one or more parameters of relevance associated with the workflow task, wherein the front-end context monitoring appliance comprises a context sensor that detects a context of the task performance and an installable agent configured as a browser plugin at the device associated with the user; navigating through one or more digital information sources accessible over a network to search for information that matches the one or more parameters of relevance associated with the workflow task using at least one of a push gateway system that monitors data elements at the information sources and a pull gateway system that queries the information sources; filtering, by a filtering circuit, a plurality of processed information blocks based on a contextual pattern associated with the user and the workflow task to remove redundant information and manage information overload by comparing the processed information blocks with reference characteristics to determine what is noise versus what is important for the workflow task; generating one or more contextual micro-content blocks based on an overall contextual pattern associated with the workflow task, wherein the one or more contextual micro-content blocks are generated from the filtered plurality of processed information blocks and are configured to auto-hash review interactions at required intervals; and transmitting the one or more contextual micro-content blocks relating to the workflow task to the device associated with the user according to a delivery schedule managed by a task manager that examines status of micro-tasks on a time series and identifies timelines associated with delivery of the micro-content blocks for different tasks."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The method of claim 1 , comprising generating the overall contextual pattern defined by a score that represents a context of the workflow task."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The method of claim 1 , comprising: detecting a context of the task performance; and detecting geographical coordinates of the device associated with the user."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The method of claim 1 , wherein the one or more contextual micro-content blocks are time-stamped before transmission to the device associated with the user for real-time delivery according to an occurrence of a plurality of micro-tasks associated with the workflow task."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The method of claim 4 , comprising receiving a signal indicative of the plurality of micro-tasks specific to the user for real-time delivery of the one or more contextual micro-content blocks to the user device."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The method of claim 4 , wherein a duration of a first micro task of the plurality of micro tasks is determined based on a level of guidance that the first micro task needs as a standalone step independent of a second micro task, where the second micro task is one of the plurality of micro tasks other than the first micro task."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The method of claim 1 , wherein generating the one or more contextual micro-content blocks based on the contextual pattern associated with the workflow task comprises: extracting one or more computer-executable information files from the one or more digital information sources based on the contextual pattern associated with the workflow task; digitally processing the one or more extracted computer-executable information files into a plurality of processed information blocks; and generating the one or more contextual micro-content blocks from the plurality of processed information blocks."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The method of claim 1 , comprising notifying to the user when the one or more contextual micro-content blocks is at least one of delivered, completed, and remains pending after a specified due time."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 1 , comprising generating AI/ML-based predictions of future expected behavior and learning requirements by the user using an artificial intelligence machine and a machine learning tool to timely guide when predefined information is required by the user."
+  },
+  {
+   "number": 10,
+   "independent": true,
+   "text": "A system for live digital streaming of one or more contextual micro-content blocks in real-time for a workflow task to facilitate task performance by a user, wherein the system comprises: an information management server connected to a plurality of user devices associated with a plurality of users, wherein each of the user devices performs the workflow task at a particular time and location such that performance of the workflow task occurs at a location remote from a location of the information management server, and wherein the workflow task comprises a plurality of micro-tasks performed in a particular sequence at particular locations and particular time slots; a front-end context monitoring appliance communicatively coupled to the information management server at a remote location, the front-end context monitoring appliance comprising: a context sensor that detects a context of the task performance; a GPS device that detects geographical coordinates of the device associated with the user and retrieves real-time tracking location coordinates associated with event occurrences for the plurality of micro-tasks; and an agent device operated by deploying an installable agent configured as a browser plugin at the device associated with the user; wherein the information management server comprises: a network layer that uses at least one of a push gateway system that monitors data elements at information sources and pushes relevant data and a pull gateway system that sends queries to the information sources and pulls in computer-executable files containing information; and a processor configured to: navigate through one or more digital information sources accessible over a network to search for information that matches one or more parameters of relevance associated with the workflow task; generate a unified score for determining a contextual pattern associated with the workflow task based on the one or more parameters of relevance associated with the workflow task; filter, through a filtering circuit, a plurality of processed information blocks based on the contextual pattern to manage semantic signal-to-noise ratio by comparing the processed information blocks with the contextual pattern to determine what is noise versus what is important; and generate one or more contextual micro-content blocks based on the contextual pattern associated with the workflow task, wherein the micro-content blocks are configured to auto-hash review interactions at required intervals; and a task manager that schedules delivery of the micro-content blocks according to schedule of the tasks and associated micro-tasks, ties different tasks on a time series, identifies timelines associated with delivery of the micro-content blocks for the different tasks, and examines status of the micro-tasks on the time series to transmit the one or more contextual micro-content blocks relating to the workflow task to the device associated with the user when the micro-tasks are scheduled to begin execution."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the one or more contextual micro-content blocks is time-stamped before transmission to the device associated with the user for real-time delivery according to an occurrence of a plurality of micro-tasks."
+  },
+  {
+   "number": 12,
+   "independent": false,
+   "text": "The system of claim 11 , wherein the processor tracks activities of the user, determines the plurality of micro-tasks specific to the activities of the user for real-time delivery, determines recommendations for the user related to the activities of the user, and generates the one or more micro-content blocks that pertains to accomplish the plurality of micro-tasks specific to the user activities for real-time delivery of the one or more micro content blocks."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 11 , wherein a duration of a first micro task of the plurality of micro tasks is determined based on a level of guidance that the first micro task needs as a standalone step independent of a second micro task, where the second micro task is one of the plurality of micro tasks other than the first micro task."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the processor generates the one or more contextual micro-content blocks based on the contextual pattern associated with the workflow task, the processor further configured to: extract computer-executable information files from the one or more digital information sources based on the contextual pattern associated with the workflow task; digitally process the extracted computer-executable information files into a plurality of processed information blocks; and generate the one or more contextual micro-content blocks from the plurality of processed information blocks."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the processor notifies to the user when the one or more contextual micro-content blocks is at least one of delivered, completed, and remains pending after a specified due time."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 10 , wherein the processor is configured to generate one or more AI/ML-based predictions of future expected behavior and learning requirements by the user using one or more of an artificial intelligence machine and a machine learning tool to timely guide when certain information is required by the user."
+  },
+  {
+   "number": 17,
+   "independent": true,
+   "text": "A system for digital streaming of one or more contextual micro-content blocks in real-time for a workflow task to facilitate task performance by a user, wherein the system comprises: an information management server connected to a plurality of user devices associated with a plurality of users; a blockchain device that interacts with the information management server through a plurality of blockchain configured distributed access points over a blockchain network, wherein the blockchain device comprises: a distributed trusted ledgers system containing a plurality of distributed blockchain ledgers associated with a plurality of computing terminals such that each ledger stores a copy of a computer-executable file containing context inputs and the one or more contextual micro-content blocks associated with the workflow task; and a private data store configured to auto-hash review interactions at required intervals and provide compartmentalized access to computer-executable files based on access rights authorized to nodes; wherein the information management server comprises: a network layer that uses at least one of a push gateway system and a pull gateway system to collect data from one or more digital information sources; and a processor configured to: extract computer-executable information files from the one or more digital information sources that matches one or more parameters of relevance for the workflow task; create a plurality of information blocks based on the extracted computer-executable information files; filter the plurality of information blocks through a filtering circuit that removes redundant information using automated methods to manage information overload and increment semantic signal-to-noise ratio; and generate one or more contextual micro-content blocks from the plurality of filtered information blocks, wherein the contextual micro-content blocks are configured to enable auto-hash review interactions at required intervals for integrity verification; and a task manager configured to schedule and transmit the one or more contextual micro-content blocks relating to the workflow task to a device associated with the user based on examining status of micro-tasks on a time series."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 17 , wherein the one or more micro-content blocks comprises at least one of a context-based micro-content block, a location-based micro-content block, a role-based micro-content block, and a skills-based micro-content block."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 18 , wherein the one or more contextual micro-content blocks are time-stamped before transmission to the device associated with the user for real-time delivery of the one or more micro content blocks according to an occurrence of the plurality of micro-tasks associated with the workflow task."
+  },
+  {
+   "number": 20,
+   "independent": false,
+   "text": "The system of claim 17 , wherein the processor notifies the user when the one or more contextual micro-content blocks is at least one of delivered, completed, and remains pending after a specified due time."
+  }
+ ],
+ "drawings": [],
+ "pdfUrl": "",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/18131648",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US12572993B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

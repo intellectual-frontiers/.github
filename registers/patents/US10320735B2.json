@@ -1,0 +1,256 @@
+{
+ "number": "US10320735B2",
+ "kind": "granted patent",
+ "title": "Integration Of Devices Through A Social Networking Platform",
+ "applicationNumber": "15275463",
+ "earlierPublication": "US20170012929A1",
+ "filedOn": "2016-09-25",
+ "publishedOn": "2017-01-12",
+ "grantedOn": "2019-06-11",
+ "priorityDate": "2012-12-12",
+ "status": "Patented Case",
+ "statusDate": "2019-05-22",
+ "estimatedExpiration": "2035-04-14",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "2454",
+ "examiner": "SPRINGER, JAMES E",
+ "classifications": [
+  "H04L 51/52",
+  "H04W 4/80",
+  "H04B 5/20",
+  "H04L 41/0663",
+  "H04L 63/102",
+  "H04L 67/303",
+  "H04L 67/306"
+ ],
+ "parentApplications": [
+  {
+   "applicationNumber": "US14/103,098",
+   "relation": "Division",
+   "publication": "US9525753B2"
+  }
+ ],
+ "parentApplicationNumbers": [
+  "14103098",
+  "61736119"
+ ],
+ "abstract": "A system and method for providing a social networking service to a plurality of devices. A social networking server for facilitating social information exchange among the plurality of devices through a socially aware network. A social profiles manager is coupled to the social networking server that creates and manages individual centric profiles of the plurality of devices. The individual centric profiles of the plurality of devices are social representation of individual devices within the socially aware network. The plurality of devices are identifiable by other participants and the social networking server through their social profiles.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A system for health management of a plurality of devices interconnected through a social networking platform, said system comprising: a social networking server that provides a social networking-based health service to said plurality of devices and allows said plurality of devices to perform a series of social health tasks by exchange of social content in a socially aware network, wherein said social networking server is programmed to: create and manage individual centric profiles of said plurality of devices that comprise a social representation of individual devices within said socially aware network, wherein said individual devices are identifiable by other devices and said social networking server through social profiles of said individual devices, wherein said social profiles of each of said individual devices comprise a health profile indicative of health disciplines corresponding to each device and a specification profile comprising details corresponding to predefined working parameters of said each device; associate device social relationships in said socially aware network; receive updates pertaining to a health profile and specification profile of a device through a social activity involving social content exchange between a first device and said social networking server; associate a relationship between said specification profile of said device and its health profile, wherein a mismatch between one or more parameters of said health profile and said specification profile represents a fault in said device; and identify a connection device to alternatively perform a function of a faulty device such that said connection device is in an idle state for a time period during which said connection device is required to alternatively perform said function, wherein said first device is communicatively coupled to an intelligent health monitoring device for monitoring updates in said health profile or said specification profile, wherein said first device is communicatively coupled to a database for storing said health profile and said specification profile and various updates corresponding to said specification profile and said health profile, wherein said health profile and said specification profile and said various updates are shared by said intelligent health monitoring device through said social activity involving social content exchange between said health monitoring device and said social networking server, and wherein said intelligent health monitoring device is integrally included within said first device so that said first device is capable of detecting said fault by comparing said health profile and said specification profile itself, wherein said social activity from said first device involves a request to a set of connection devices to alternatively contribute in performing a function healthily when the set of connection devices are in an idle state and when said first device is faulty."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social networking server further comprising a social networking application that comprises a cluster of social applications each for providing a specific health facility to contribute in health-related social activity among said plurality of devices through said socially aware network."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first device is incapable of computation capabilities, said first device being communicatively connected with an external controller through a near field communication (NFC) channel so that a communication point of said NFC channel receives social content from said first device and transfers said social content to said external controller, and wherein said socially aware network allows information sharing between said external controller and said social networking server in real-time."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said social activity involves sending out a connection invitation to said social networking server for identification and searching of defined social profiles, wherein said social networking server is coupled to a search interface implementing a search algorithm that identifies and shortlists said defined social profiles, the shortlisted profiles being submitted to said first device so that said first device further performs a second social activity to send out connection requests to devices associated with said shortlisted profiles for extending a social space."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The system of claim 1 , wherein said first device uses a second device from among said shortlisted social profiles as an intelligent health monitoring device based on proximity and similarity in operation of said second device with respect to said first device so that in case of a fault with or failure of said first device, said second device performs functions of said first device voluntarily or upon a social activity initiated by said first device and directed to said second device."
+  },
+  {
+   "number": 6,
+   "independent": true,
+   "text": "A method for health management of a device interconnected with a plurality of devices through a social networking platform, said method comprising: creating and managing individual centric profiles of said plurality of devices that comprise a social representation of individual devices within a socially aware network, wherein said individual devices are identifiable by other devices and a social networking server through a social profile of each individual device, wherein said social profile of each individual device comprises a health profile indicative of health disciplines corresponding to a device and a specification profile comprising details corresponding to predefined working parameters of said device; associating device social relationships in the socially aware network; receiving updates pertaining to a health profile and a specification profile of a device through a social activity involving social content exchange between a first device and the server; associating a relationship between said specification profile of said device and its health profile, wherein a mismatch between one or more parameters of said health profile and said specification profile represents a fault in said device, and identifying a connection device to alternatively perform a function of a faulty device such that said connection device is in an idle state for a time period during which said connection device is required to alternatively perform said function, wherein said first device is communicatively coupled to an intelligent health monitoring device for monitoring updates in said health profile or said specification profile, wherein said first device is communicatively coupled to a database for storing said health profile and said specification profile and various updates corresponding to said specification profile and said health profile, wherein said health profile and said specification profile and said various updates are shared by said intelligent health monitoring device through said social activity involving social content exchange between said health monitoring device and said social networking server, and wherein said intelligent health monitoring device is integrally included within said first device so that said first device is capable of detecting said fault by comparing said health profile and said specification profile itself, wherein said social activity from said first device involves a request to a set of connection devices to alternatively contribute in performing a function healthily when the set of connection devices are in an idle state and when said first device is faulty."
+  },
+  {
+   "number": 7,
+   "independent": false,
+   "text": "The method of claim 6 , further comprising informing said first device about said connection device that can perform the function in case of faults with said first device, wherein information comprises a social profile of said connection device."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The method of claim 6 , further comprising sending out a request by said first device to said connection device for alternatively performing a faulty function of said first device."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The method of claim 6 , further comprising sending out a remote message by said first device to said connection device through a social activity initiated by said first device, wherein said remote message automatically triggers said connection device to perform the function at a specified social event timeline occurrence."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The method of claim 6 , further comprising sending out an auto-correction message to said first device by a health monitoring device or a second device to trigger a fault management operation for rectifying the fault of said first device."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The method of claim 6 , wherein said first device comprises a medical device or a component thereof that is either partially or completely incapable of computations."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10320735B2/sheet-00000.webp",
+   "label": "Sheet 1 of 23",
+   "width": 120,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00001.webp",
+   "label": "Sheet 2 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00002.webp",
+   "label": "Sheet 3 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00003.webp",
+   "label": "Sheet 4 of 23",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00004.webp",
+   "label": "Sheet 5 of 23",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00005.webp",
+   "label": "Sheet 6 of 23",
+   "width": 91,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00006.webp",
+   "label": "Sheet 7 of 23",
+   "width": 81,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00007.webp",
+   "label": "Sheet 8 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00008.webp",
+   "label": "Sheet 9 of 23",
+   "width": 74,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00009.webp",
+   "label": "Sheet 10 of 23",
+   "width": 116,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00010.webp",
+   "label": "Sheet 11 of 23",
+   "width": 86,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00011.webp",
+   "label": "Sheet 12 of 23",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00012.webp",
+   "label": "Sheet 13 of 23",
+   "width": 105,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00013.webp",
+   "label": "Sheet 14 of 23",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00014.webp",
+   "label": "Sheet 15 of 23",
+   "width": 116,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00015.webp",
+   "label": "Sheet 16 of 23",
+   "width": 87,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00016.webp",
+   "label": "Sheet 17 of 23",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00017.webp",
+   "label": "Sheet 18 of 23",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00018.webp",
+   "label": "Sheet 19 of 23",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00019.webp",
+   "label": "Sheet 20 of 23",
+   "width": 128,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00020.webp",
+   "label": "Sheet 21 of 23",
+   "width": 89,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00021.webp",
+   "label": "Sheet 22 of 23",
+   "width": 94,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10320735B2/sheet-00022.webp",
+   "label": "Sheet 23 of 23",
+   "width": 93,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/c9/fe/38/05eaaa831697a7/US10320735.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/15275463",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10320735B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}

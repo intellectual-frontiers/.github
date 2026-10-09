@@ -1,0 +1,267 @@
+{
+ "number": "US10403399B2",
+ "kind": "granted patent",
+ "title": "Tasks Scheduling Based On Triggering Event And Work Lists Management",
+ "applicationNumber": "14946702",
+ "earlierPublication": "US20160147955A1",
+ "filedOn": "2015-11-19",
+ "publishedOn": "2016-05-26",
+ "grantedOn": "2019-09-03",
+ "priorityDate": "2014-11-20",
+ "status": "Patented Case",
+ "statusDate": "2019-08-14",
+ "estimatedExpiration": "2038-04-16",
+ "expirationSourceStatus": "Active",
+ "inventors": [
+  "Shahid N. Shah"
+ ],
+ "applicant": "Netspective Communications LLC",
+ "currentAssignee": "Intellectual Frontiers LLC",
+ "artUnit": "3686",
+ "examiner": "TOMASZEWSKI, MICHAEL",
+ "classifications": [
+  "G16H 40/20",
+  "G16H 40/63",
+  "G16H 10/65",
+  "G06Q 10/06311"
+ ],
+ "parentApplications": [],
+ "parentApplicationNumbers": [
+  "62082263"
+ ],
+ "abstract": "A computer-implemented method for scheduling, tracking, and executing performance of a set of tasks includes defining a time series, associating a current time occurrence on the time series, and associating a future time occurrence on the time series. The method includes creating a tasks list including the set of tasks. The method includes defining an interaction zone rule in association with the time series and triggering events to initiate the set of tasks. The method includes scheduling a task from the set of tasks at the future time occurrence relative to the current time occurrence based on occurrence of a triggering event in view of the interaction zone rule. The method includes receiving an output from an event monitor at a control server. The method includes notifying a remote device for performance of the scheduled task at the future time occurrence upon detection of the triggering event.",
+ "claims": [
+  {
+   "number": 1,
+   "independent": true,
+   "text": "A computer-implemented method for scheduling, tracking, and executing performance of a set of tasks, said method comprising: defining, by a special purpose processor in a repository, a time series; associating, by said special purpose processor in said repository, a current time occurrence on said time series; associating a future time occurrence, by said special purpose processor in a repository, on said time series, wherein said future time occurrence is defined as a succeeding time occurrence on said time series in relation to said current time occurrence; creating a tasks list including said set of tasks by a processing circuit, wherein said tasks list includes an actionable questionnaire, a test plan, a process verifier, a runbook, a careplan, a regulatory mandate that each are editable and executable at said future time occurrence; defining an interaction zone rule in association with said time series, wherein said step of defining said interaction zone rule includes defining a plurality of triggering events, by said special purpose processor, to initiate said set of tasks; associating said interaction zone rule with one or more participants in said repository; scheduling a task from said set of tasks at said future time occurrence relative to said current time occurrence based on occurrence of a triggering event in view of said interaction zone rule; receiving an output from an event monitor at a control server, said output indicative of said triggering event at said future time occurrence, wherein the event monitor comprises light emitting diodes to detect said triggering event; determining credentials of a user based on a user identification card read by an authorization interface connected to the control server; notifying a remote device for performance of said scheduled task at said future time occurrence upon detection of said triggering event; said step of notifying comprises: generating an electric signal comprising data signifying said schedule task and instructions for performance of said scheduled task; transmitting said electric signal from said control server, communicatively connected with said special purpose processor, in a network comprising a plurality of communicatively linked data communication devices; converting said electric signal into a plurality of pixels; and displaying said plurality of pixels on a display unit of said remote device to launch an activation message that includes an instruction to perform said scheduled task at said future time occurrence upon occurrence of said triggering event in accordance with said interaction zone rule; receiving a message by said control server from said remote device to update said set of tasks list and said time series dynamically based on a performance status of said scheduled task; and replacing said future time occurrence with a new current time occurrence in said repository and defining a new future time occurrence on said time series based on said performance status of said scheduled task and an input from said remote device that is indicative of health of a patient."
+  },
+  {
+   "number": 2,
+   "independent": false,
+   "text": "The method of claim 1 , wherein said interaction zone rule is applied in association with an interaction zone defined by physical coordinates of a geographical location such that said triggering event is indicative of an entry of said remote device within said geographical location bounded by said physical coordinates at said future time occurrence."
+  },
+  {
+   "number": 3,
+   "independent": false,
+   "text": "The method of claim 2 , further comprising detecting spatial presence of said remote device within said interaction zone with the use of a location sensor physically located within said interaction zone or associated with said remote device and capable of detecting transition of said remote device from outside to within said interaction zone."
+  },
+  {
+   "number": 4,
+   "independent": false,
+   "text": "The method of claim 1 , wherein said interaction zone rule is applied in association with an interaction zone defined by physical coordinates of a geographical location such that said triggering event is indicative of a weather controlled event occurrence within said geographical location bounded by said physical coordinates at said future time occurrence."
+  },
+  {
+   "number": 5,
+   "independent": false,
+   "text": "The method of claim 4 , further comprising monitoring weather parameters or said weather-controlled triggering event with the use of a weather sensor physically located within said interaction zone or associated with said remote device and capable of sending detected signals indicative of said weather-controlled triggering event to said control server."
+  },
+  {
+   "number": 6,
+   "independent": false,
+   "text": "The method of claim 5 , wherein said weather-controlled triggering event comprises rain, humidity, and temperature, such that said weather sensor comprises a rain sensor, a temperature sensor, and a humidity sensor, wherein said weather sensor is capable of sending signals to said control server indicative of occurrence of said weather-controlled triggering event only at said future time occurrence."
+  },
+  {
+   "number": 7,
+   "independent": true,
+   "text": "A computer-controlled system for scheduling, tracking, and executing performance of a set of tasks, said system comprising: a control server configured to communicatively connect with a remote device through a network for allowing exchange of computer executable patient data between said control server and said remote device; an authorization interface connected to the control server to implement an authentication policy to determine credentials of a user based on a user identification card read by the authorization interface; a special purpose processor included within or communicatively connected with said control server to: define a time series in a repository; associate a current time occurrence on said time series in a repository; associate a future time occurrence on said time series in a repository, wherein said future time occurrence is defined as a succeeding time occurrence on said time series in relation to said current time occurrence; create a tasks list including said set of tasks in a repository, wherein said tasks list includes an actionable questionnaire, a test plan, a process verifier, a runbook, a careplan, a regulatory mandate that each are editable and executable at said future time occurrence; define an interaction zone rule in association with said time series, wherein said step of defining said interaction zone rule includes defining a plurality of triggering events, by said special purpose processor, to initiate said set of tasks; associate said interaction zone rule with one or more participants in a repository; schedule a task from said set of tasks at said future time occurrence relative to said current time occurrence based on occurrence of a triggering event in view of said interaction zone rule; receive an input indicative of said triggering event at said future time occurrence; notify said remote device for performance of said scheduled task at said future time occurrence upon detection of said triggering event; said step of notifying comprises: generating an electric signal comprising data signifying said schedule task and instructions for performance of said scheduled task; transmitting said electric signal in a network comprising a plurality of communicatively linked data communication devices; converting said electric signal into a plurality of pixels; and displaying said plurality of pixels on a display unit of said remote device to launch an activation message that includes an instruction to perform said scheduled task at said future time occurrence upon occurrence of said triggering event in accordance with said interaction zone rule; receive a message from said remote device to update said set of tasks list and said time series dynamically based on performance status of said task; and replace said future time occurrence with a new current time occurrence and define a new future time occurrence on said time series in a repository based on said performance status of said scheduled task and an input from said remote device that is indicative of health of a patient; and an event monitor comprising a location sensor and a weather sensor communicatively connected with said control server for detecting spatial presence and a weather controlled event respectively upon occurrence of said triggering event."
+  },
+  {
+   "number": 8,
+   "independent": false,
+   "text": "The system of claim 7 , further comprising an electronic medical records database communicatively connected with said control server, said electronic medical records database storing computer executable patient data files, wherein each of said computer executable patient data files is associated with a first identification code that is indicative of a patient's identity, a second identification code that is indicative of a practitioner associated with said patient, a third identification code that is indicative of a set of tasks recommended for performance, in association with said patient, by said practitioner at said current time occurrence."
+  },
+  {
+   "number": 9,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said current time occurrence is associated with a last visit of said practitioner in said interaction zone for said patient."
+  },
+  {
+   "number": 10,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said future time occurrence is associated with occurrence of said triggering event such that said future time occurrence is set to occur after a predefined number of said triggering event has occurred within said interaction zone, wherein said predefined number is dynamically adjusted by said special purpose processor based on an input received from said remote device including a computer executable file signifying health status of said patient and a recommendation note by said practitioner."
+  },
+  {
+   "number": 11,
+   "independent": false,
+   "text": "The system of claim 8 , wherein said interaction zone is defined to exhibit preset capabilities within a defined spatial coordinate of a geographical location to allow information exchange between said control server and said remote device within said interaction zone, wherein said performance of said set of tasks is limited within said spatial coordinates of said interaction zone in view of said interaction zone rule."
+  },
+  {
+   "number": 12,
+   "independent": true,
+   "text": "A computer-controlled worklists management system for creating, scheduling and facilitating execution of a computer executable worklist across a plurality of distributed execution servers, said system comprising: a processing circuit to: generate said computer executable worklist, said computer executable worklist comprising a plurality of tasks scheduled to be executed at a future time occurrence on a time series based on occurrence of a triggering event in view of an interaction zone rule indicative of a spatial presence and a weather controlled event within an interaction zone, wherein said plurality of tasks include at least a first task executable by a first device controlled by a first execution server, a second task executable by a second device controlled by a second execution server, a third task executable by a third device controlled by a third execution server, wherein said first execution server, said second execution server, and said third execution server are located remotely in a distributed environment; an authorization interface integrated with the processing circuit to implement an authentication policy to determine credentials of a user based on a user identification card read by the authorization interface; a worklists storage repository comprising: a worklists library containing predefined and user editable worklist templates, said worklists library including a survey template, a check list template, a care plan template, a questionnaire template, and a protocol template; a task library containing user generated and user editable tasks such that said tasks are editable using predefined control options, wherein said tasks are configured to be imported in a select worklist template from among said worklist templates to generate said computer executable worklist; a memory circuit coupled to said processing circuit and storing a plurality of internet-based application programming interfaces (APIs) providing a stack of API layers comprising: a system API layer to allow communication with 1) customer applications with API capability directly 2) customer applications without API capability indirectly, wherein said customer applications reside at said first device, said second device, and said third device; a supplementary modular, reusable and variably configurable independent API layer for secure authentication, data transfer, and data handling applications configured for interaction zone parameters signifying said triggering event comprising said spatial presence and weather-controlled event; a business process modeling layer that unifies said worklists storage repository with said processing circuit; and a data abstraction layer for enabling communication between said processing circuit and data stores; and a file-based interaction device including a first component communicatively and operatively connected with said processing circuit and a second component communicatively and operatively coupled with said first device, said second device, and said third device, wherein said second component comprises an installable agent to: cause said customer applications without API capability to interact with said system APIs indirectly through said first component and said second component; collect information from said first device, said second device, and said third device; and interact with said workflow storage engine."
+  },
+  {
+   "number": 13,
+   "independent": false,
+   "text": "The system of claim 12 , wherein said interaction zone rule is applied in association with said interaction zone defined by physical coordinates of a geographical location such that said triggering event is indicative of an entry of said first device, said second device, and said third device within said geographical location bounded by said physical coordinates at said future time occurrence."
+  },
+  {
+   "number": 14,
+   "independent": false,
+   "text": "The system of claim 12 , wherein said spatial presence of said first device, said second device, and said third device within said interaction zone is detected with the use of a location sensor physically located within said interaction zone or associated with said first device, said second device, and said third device and capable of detecting transition of said first device, said second device, and said third device from outside to within said interaction zone."
+  },
+  {
+   "number": 15,
+   "independent": false,
+   "text": "The system of claim 12 , further comprising a WIFI-enabled Light Emitting Diode within said interaction zone that contains said location sensor and said weather sensor and is configured to operate within said interaction zone to monitor presence, entry or exit and transmits signals to said processing circuit."
+  },
+  {
+   "number": 16,
+   "independent": false,
+   "text": "The system of claim 12 , wherein said interaction zone rule is applied in association with said interaction zone defined by physical coordinates of a geographical location such that said triggering event is indicative of a weather controlled event occurrence within said geographical location bounded by said physical coordinates at said future time occurrence."
+  },
+  {
+   "number": 17,
+   "independent": false,
+   "text": "The system of claim 16 , wherein a weather parameter or said weather-controlled triggering event is monitored with the use of a weather sensor physically located within said interaction zone or associated with said first device, said second device, and said third device and capable of sending detected signals indicative of said weather-controlled triggering event to said processing circuit, wherein said weather-controlled triggering event comprises rain, humidity, and temperature, such that said weather sensor comprises a rain sensor, a temperature sensor, and a humidity sensor, and wherein said weather sensor is capable of sending signals to said processing circuit indicative of occurrence of said weather-controlled triggering event only at said future time occurrence."
+  },
+  {
+   "number": 18,
+   "independent": false,
+   "text": "The system of claim 12 , further comprising an electronic medical transactional system including an electronic medical records database communicatively connected with or included within said electronic medical transactional system, said electronic medical records database storing computer executable patient data files, wherein each of said computer executable patient data files is associated with a first identification code that is indicative of a patient's identity, a second identification code that is indicative of a practitioner associated with said patient, a third identification code that is indicative of a set of tasks recommended for performance, in association with said patient, by said practitioner at said future time occurrence."
+  },
+  {
+   "number": 19,
+   "independent": false,
+   "text": "The system of claim 12 , further comprising external sources of work lists that supply said user editable worklist templates to said processing circuit to schedule said plurality of tasks for execution by said plurality of execution servers across said distributed devices."
+  },
+  {
+   "number": 20,
+   "independent": true,
+   "text": "A collaborative computer-implemented method for protocol documentation, automation, and compliance designed for a distributed safety critical plurality of devices, said method comprising: defining a patient treatment protocol, indicative of a shared baseline, for a first patient using an input from an electronic medical transactional system, wherein said electronic medical transactional system comprises an electronic medical records database communicatively connected with or included within said electronic medical transactional system, said electronic medical records database storing computer executable patient data files, wherein each of said computer executable patient data files is associated with a first identification code that is indicative of a patient's identity, a second identification code that is indicative of a practitioner associated with said patient; receiving a list of computer executable tasks contained within a computer executable worklist for automated execution in a defined protocol sequence by a plurality of execution servers within an interaction zone, wherein said computer executable worklist is created by a worklist management system using protocol-compliant user customizable options, said worklist management system operatively connected with a control server located remote from said interaction zone; determining credentials of a user based on a user identification card read by an authorization interface connected to the control server; defining, by a special purpose processor in a repository, a time series; associating, by said special purpose processor in said repository, a current time occurrence on said time series; associating a future time occurrence, by said special purpose processor in a repository, on said time series, wherein said future time occurrence is defined as a succeeding time occurrence on said time series in relation to said current time occurrence; defining an interaction zone rule in association with said time series, wherein said step of defining said interaction zone rule includes defining a plurality of triggering events, by said special purpose processor, to initiate said set of tasks in accordance with said shared baseline protocol across said plurality of devices; receiving an output from an event monitor at said control server, said output indicative of said triggering event at said future time occurrence in association with a device from said plurality of devices, wherein the event monitor comprises light emitting diodes to detect said triggering event; notifying said device for performance of a scheduled task at said future time occurrence upon detection of said triggering event; allowing modifications by an authorized practitioner to said shared baseline protocol to adopt said shared baseline protocol for a second patient with customized patient-centric variations; and generating a report based on execution of said shared baseline protocol in association with plurality of devices to identify tasks execution variations."
+  }
+ ],
+ "drawings": [
+  {
+   "file": "drawings/US10403399B2/sheet-00000.webp",
+   "label": "Sheet 1 of 19",
+   "width": 333,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00001.webp",
+   "label": "Sheet 2 of 19",
+   "width": 96,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00002.webp",
+   "label": "Sheet 3 of 19",
+   "width": 90,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00003.webp",
+   "label": "Sheet 4 of 19",
+   "width": 93,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00004.webp",
+   "label": "Sheet 5 of 19",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00005.webp",
+   "label": "Sheet 6 of 19",
+   "width": 107,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00006.webp",
+   "label": "Sheet 7 of 19",
+   "width": 74,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00007.webp",
+   "label": "Sheet 8 of 19",
+   "width": 80,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00008.webp",
+   "label": "Sheet 9 of 19",
+   "width": 128,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00009.webp",
+   "label": "Sheet 10 of 19",
+   "width": 100,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00010.webp",
+   "label": "Sheet 11 of 19",
+   "width": 92,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00011.webp",
+   "label": "Sheet 12 of 19",
+   "width": 82,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00012.webp",
+   "label": "Sheet 13 of 19",
+   "width": 118,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00013.webp",
+   "label": "Sheet 14 of 19",
+   "width": 115,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00014.webp",
+   "label": "Sheet 15 of 19",
+   "width": 85,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00015.webp",
+   "label": "Sheet 16 of 19",
+   "width": 97,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00016.webp",
+   "label": "Sheet 17 of 19",
+   "width": 115,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00017.webp",
+   "label": "Sheet 18 of 19",
+   "width": 95,
+   "height": 120
+  },
+  {
+   "file": "drawings/US10403399B2/sheet-00018.webp",
+   "label": "Sheet 19 of 19",
+   "width": 88,
+   "height": 120
+  }
+ ],
+ "pdfUrl": "https://patentimages.storage.googleapis.com/28/32/0a/6f98f67c215065/US10403399.pdf",
+ "sources": [
+  {
+   "name": "USPTO Patent Center",
+   "url": "https://patentcenter.uspto.gov/applications/14946702",
+   "readAt": "2026-09-27",
+   "holds": "application, dates, status, classifications, inventors, applicant, examiner, abstract, drawings"
+  },
+  {
+   "name": "Google Patents",
+   "url": "https://patents.google.com/patent/US10403399B2/en",
+   "readAt": "2026-10-09",
+   "holds": "claims, parent applications and their relation, estimated expiration, current assignee",
+   "note": "Google Patents states that its status, expiration, assignee and priority date are not a legal analysis."
+  }
+ ]
+}
