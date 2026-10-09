@@ -21,7 +21,8 @@ person runs it. No repository requires a container or any other prepared
 environment. Linux is the platform; macOS and Windows are served by WSL, a
 virtual machine or a container that runs Linux. This spec states the host's
 part, the Python locks, the toolchain, the store, offline use, platform
-coverage, the exception, and what continuous integration needs.
+coverage, the exception, the language of the programs the company writes,
+and what continuous integration needs.
 
 ## Scope
 
@@ -210,6 +211,17 @@ coverage, the exception, and what continuous integration needs.
   persona: no file it holds MAY make one a prerequisite, no check MAY fail for
   lack of one, and no error or hint MAY tell a person to use one.
 
+## The language of the company's programs
+
+- **FR-030**: Rust MUST be the language of every program the company writes
+  that is a server, a generator or a command-line program. Another language
+  MUST have a reason stated in the spec that governs the program. The command
+  groups of `eid` and `agora` are Python scripts that run such programs, since
+  their command line is Python (0006-eid-command-line, 0041-command-line); the
+  program they run is Rust. A Rust program MUST be delivered in one of two
+  ways: built from source with the `rust` kit of `ws-host`, locked by its
+  `Cargo.lock`, or as a container image that holds the built program.
+
 ## Repositories that build on one another
 
 - **FR-027**: Each repository that is a provider declares its own entries. A
@@ -269,6 +281,11 @@ coverage, the exception, and what continuous integration needs.
   FR-027.
 - Two machines of one platform: the same locked versions give the same
   generated files, per FR-026.
+- A new generator, server or command-line program: it is written in Rust, per
+  FR-030. A program that needs another language states the reason in its own
+  spec, per FR-030.
+- An `eid` command that serves or builds a website: it is a Python script that
+  runs the Rust program, per FR-030.
 
 ## Assumptions
 
@@ -300,6 +317,9 @@ coverage, the exception, and what continuous integration needs.
 - **A toolchain entry** — a program a command needs that has no wheel: name,
   version, an address and checksum per platform, and what it provides, declared
   in `.workspaces-host/toolchain.d/` (FR-016).
+- **A Rust program** — a program the company writes as a server, a generator or
+  a command-line program, built from source with the `rust` kit and locked by
+  `Cargo.lock`, or delivered as a container image (FR-030).
 - **The store** — the one directory `ws-host` installs entries into and verifies
   them in (FR-017).
 
@@ -314,6 +334,8 @@ coverage, the exception, and what continuous integration needs.
 - **SC-004**: No repository's tools, checks, workflows or hints require a
   container or a persona.
 - **SC-005**: A generated file is the same on every host of one platform.
+- **SC-006**: Every server, generator and command-line program the company
+  writes is Rust, or its governing spec states why not.
 
 ## Review & acceptance checklist
 
