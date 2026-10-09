@@ -99,6 +99,13 @@ content document is, 0002-content-format; how addresses map to content,
   and closes on an outside click or Escape. A long label MUST be shortened
   with an ellipsis and keep its full text as the link's title. A browser
   that cannot open the menu MUST show the whole trail.
+- **FR-055**: Every author the vault keeps a biography for (its house
+  design's author files) MUST have one profile page at `/authors/<slug>`,
+  listed at `/authors`, that shows the biography and every book, paper,
+  Journal article and patent on the website the author wrote or invented.
+  A page that names such an author (a book, a paper, a Journal article, a
+  patent) MUST link the name to the profile and MUST NOT repeat the
+  biography. An author with no biography is shown by name only.
 
 ## Addresses
 
