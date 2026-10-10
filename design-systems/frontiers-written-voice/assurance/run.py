@@ -22,7 +22,7 @@ import sweep  # noqa: E402
 ONTOLOGY = SYSTEM.parent.parent / "ontology" / "ifcore.ttl"
 KEYS = {"fail_words", "warn_words", "plain_words", "hedges", "throat_clearing", "fail_announcements",
         "warn_announcements", "fail_contains", "fail_labels", "idioms", "max_seesaws", "warn_not_fragments", "procedure",
-        "fail_headline_starts", "warn_headline_starts", "fail_headline_labels"}
+        "fail_headline_starts", "warn_headline_starts", "fail_headline_labels", "fail_self_description"}
 
 
 def main() -> int:

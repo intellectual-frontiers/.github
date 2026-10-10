@@ -16,5 +16,6 @@
   "heading-announces.md": "heading announces a topic or an activity ('exploring')",
   "heading-label.md": "heading is a bare label ('Conclusion')",
   "closer.md": "throat-clearing 'in conclusion'",
-  "page-announces.html": "heading announces a topic or an activity ('a closer look')"
+  "page-announces.html": "heading announces a topic or an activity ('a closer look')",
+  "self-description.md": "describes the page's own apparatus"
 }

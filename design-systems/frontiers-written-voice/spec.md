@@ -46,8 +46,11 @@ patterns a mechanical sweep looks for.
 - **FR-009**: It MUST NOT announce that a point is coming ("here's the part that matters", "this
   section explores"), describe what the writing is doing instead of saying it ("in this article we
   examine", "this report provides a detailed analysis of", "the purpose of this page is"), look back at
-  what it said ("as discussed above", "in conclusion"), or end a paragraph on a cute wrap-up aside; it
-  says the point, and the reader meets the idea, never a description of the writing. The test is
+  what it said ("as discussed above", "in conclusion"), end a paragraph on a cute wrap-up aside, or
+  describe its own apparatus: what its items, cards, entries or sections say, show, name or carry, or
+  how they are arranged ("every item says how settled its claim is", "each says what stage it is at",
+  "the form is a label on the card"); it says the point, and the
+  reader meets the idea, never a description of the writing or of the page. The test is
   editorial: a sentence that describes what the author or the document is doing, rather than giving the
   reader something in plain words, is rewritten or removed. This holds for every part of a piece: its
   title, subtitle, description or summary, headings, lede, transitions and body. A heading MUST state
@@ -55,8 +58,9 @@ patterns a mechanical sweep looks for.
   "Reasons we may consider stopping"), never announce a topic or an activity ("Exploring the evolving
   role of AI", "A closer look at", "Key considerations", "Overview", "Conclusion"), and carry no wordplay,
   simile, paradox, slogan or echo of the work's title. `patterns.json` lists the announcements, the
-  throat-clearing and the headline openings and labels the sweep refuses (FR-017); the sweep finds the
-  mechanical cases, and a person reads the rest.
+  throat-clearing, the self-descriptions of a page's apparatus (as regular expressions) and the headline
+  openings and labels the sweep refuses (FR-017); the sweep finds the mechanical cases, and a person
+  reads the rest.
 - **FR-010**: It MUST NOT use witty, literary, lyrical or ornate prose, metaphors, similes, wordplay
   or humor, and MUST NOT make a line memorable by its phrasing. A reader may be a non-native speaker or
   read a machine translation, and wit and humor depend on a culture and a language the reader may not

@@ -415,7 +415,7 @@ requirement	mechanism	by	note
 0016-press-production FR-043	review	0009-press FR-027	quarterly surface review covers the website text audit
 0016-press-production FR-044	none	-	promotion in a work's source is not detected
 0016-press-production FR-045	none	-	promotion record pairing is not checked
-0016-press-production FR-046	check	eidolon: eid check promotion	fails a published work of any kind with no complete promotion brief (a book keeps it in jacket.yml, the rest in promotion-brief.md); a work at Distribute or later owes one, as a warning
+0016-press-production FR-046	check	eidolon: eid check promotion	fails a published work of any kind with no complete promotion brief (a book keeps it in jacket.yml, the rest in promotion-brief.md; a research area, pillar, note or publication owes none); a work at Distribute or later owes one, as a warning
 0016-press-production FR-047	none	-	promotion outrunning the work is judgment
 0016-press-production FR-048	check	eidolon: eid check editorial	issues.py check fails a category or gate group outside the closed sets
 0016-press-production FR-049	none	-	Rolebook five answers and kicker use are not checked
@@ -1369,13 +1369,14 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-065	none	-	the elsewhere department is not rendered yet
 0044-public-website FR-066	none	-	the navigation still lists eight items
 0044-public-website FR-067	none	-	no Markdown copy, llms.txt line or issue JSON exists for the Journal yet
-0044-public-website FR-068	none	-	the redirects are not declared yet
+0044-public-website FR-068	check	eidolon: eid test	the research, toolbox and writing index redirects, and a renamed research record's legacy slug, are tested (tests/gaps.rs)
 0044-public-website FR-069	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs) find only the placeholder on a page served beside the vault's launcher, from the sources or from a model, and nothing on a build or on a model served with no launcher beside it, render the Console at its address from a desk export with its parts, items, roll-up and guides, and run lines through a stub launcher: a check runs, a record dry-runs first, a decision and a shell line are refused, a model answers not found
 0044-public-website FR-070	check	eidolon: eid test	the Rust tests find the "Console" control only on a page that carries the Console
 0044-public-website FR-071	none	-	the icons and the rule are the Console's markup; no check reads a rendered page's colours
 0044-public-website FR-072	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the favicon, the ICO, the Apple touch icon and the manifest linked from a page's head and served at their unhashed addresses from the vendored brand, the manifest naming the three icons
 0044-public-website FR-073	check	eidolon: eid check site	the website's check reads every page's title, description, headings and paragraphs against the vendored written voice's patterns.json and refuses an announcement, throat-clearing or an announcing heading; unit tests in src/voice.rs
 0044-public-website FR-074	check	eidolon: eid check site	the generator reads registers/portfolio, trademarks, disclosures and hunts from the public root (tools/eid-site/src/registers.rs); the snapshot holds none of them; the Rust tests render the ventures, products, trademarks, disclosures and hunts pages from the records
+0044-public-website FR-075	check	eidolon: eid check site	the generator reads works/research/<slug>/{area,pillar,note,publication}.adoc (tools/eid-site/src/research.rs) and the snapshot holds no research; the Rust tests render every announced record's page
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

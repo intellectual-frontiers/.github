@@ -15,7 +15,7 @@
     "It runs on Nix flakes and home-manager, so the environment is code rather than a page of setup steps that somebody forgot to update. Pull a commit, rebuild, and the result is the same every time. That matters most when the same work has to happen on a Windows laptop under WSL, on a Linux box, on a Mac, inside a container, and inside a cloud agent session, which is now the normal spread for a single project.",
     "The base install stays small. Personas add tool sets on top for backend, data, mobile, agent ops, compliance, and networking work, so a developer gets what the job needs instead of everything anyone ever needed. A health check reports what passed, what needs attention, and what failed, which is how somebody new finds out their setup is wrong before they spend a morning on it.",
     "Development follows a spec driven workflow with GitHub Spec Kit. Every feature has a spec and a plan under the repository's specs directory, the design principles live in a written constitution, and a spec that no longer matches the code is corrected in the same change that broke it rather than in a cleanup pass that never comes. That discipline is the same one we ask of a research note or a patent claim.",
-    "This is the first entry of a kind that does not assume a licence. Workspaces Host v3 is MIT licensed and public. Other software we count here may be source available, proprietary, or held inside a venture, and each entry records what it actually is."
+    "This is the first entry of a kind that does not assume a licence. Workspaces Host v3 is MIT licensed and public. Other software we count here may be source available, proprietary, or held inside a venture, and the entry records what it actually is."
   ],
   "specs": [
     {

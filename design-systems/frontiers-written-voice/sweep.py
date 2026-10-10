@@ -191,6 +191,9 @@ def sweep(text: str, patterns: dict, fixed: tuple[str, ...] = (), mode: str = "p
     for ph in patterns.get("fail_contains", []):
         if m := find(ph):
             fails.append(f"announcement or wrap-up aside {ph!r}: ...{context(m)}...; say the plain point")
+    for rx in patterns.get("fail_self_description", []):
+        if m := re.search(rx, t, re.I):
+            fails.append(f"describes the page's own apparatus ({m.group(0)!r}): ...{context(m)}...; say the thing, not what the page says about it")
     for term in terms:
         for variant in term.get("avoid", []):
             if variant in t:
