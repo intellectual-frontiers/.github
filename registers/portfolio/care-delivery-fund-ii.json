@@ -6,5 +6,419 @@
   "title": "Care Delivery Fund II",
   "summary": "Back the clinicians rebuilding care delivery. An intelligence engine built on CMS and claims data decides whether the firm invests in a founder already in motion, takes selective control of an operator worth re-platforming, or builds the company itself.",
   "status": "In formation",
-  "year": "2026"
+  "year": "2026",
+  "fund": {
+    "to": "/capital/care-delivery-fund-ii",
+    "size": "$25M starting point, perhaps as high as $50M",
+    "status": "In formation",
+    "summary": "Back the clinicians rebuilding care delivery. An intelligence engine built on CMS and claims data decides whether the firm invests in a founder already in motion, takes selective control of an operator worth re-platforming, or builds the company itself.",
+    "archetypes": [
+      {
+        "body": "Continuous, agent-augmented management of the conditions that drive most of the spend, in place of episodic and reactive care.",
+        "edge": "Legacy disease-management vendors still sit inside episodic workflows and pre-AI staffing models.",
+        "head": "AI-native chronic care"
+      },
+      {
+        "body": "Accountable post-acute models built against bundled and at-risk economics, where quality and cost most often collapse.",
+        "edge": "Home health and skilled-nursing rollups often optimize census rather than outcomes inside an episode.",
+        "head": "Post-hospital redesign"
+      },
+      {
+        "body": "Companies that own the seam between sites of care: staff, software, and accountability under one roof.",
+        "edge": "Care-management software often records the seam without owning the outcome.",
+        "head": "Care-transition ownership"
+      },
+      {
+        "body": "Specialty models priced for the next reimbursement curve rather than financial rollups wearing a clinical label.",
+        "edge": "A financial structure can aggregate clinics without redesigning the specialty model for the next contract.",
+        "head": "Reimbursement-aligned specialty care"
+      },
+      {
+        "body": "Companies that hire and equip the clinicians instead of selling another tool that adds clicks.",
+        "edge": "A point solution cannot rewire workflow when it does not own the team.",
+        "head": "Digitally enabled care teams"
+      },
+      {
+        "body": "Services with proprietary software inside, priced correctly on both sides and compounding on each.",
+        "edge": "Pure software underprices the clinical work. Pure services underprice the technology leverage.",
+        "head": "Clinician-led service platforms"
+      },
+      {
+        "body": "Engagement measured in adherence, biomarkers, and admissions, the things a buyer actually pays for.",
+        "edge": "Portals and reminders can report activity without moving adherence, biomarkers, or admissions.",
+        "head": "Engagement that moves outcomes"
+      }
+    ],
+    "briefs": [
+      {
+        "cells": [
+          {
+            "body": "Medicare and commercial beneficiaries with claims for excessive daytime sleepiness, obesity hypoventilation, or habitual snoring, but no obstructive sleep apnea diagnosis in the lookback period.",
+            "label": "Cohort"
+          },
+          {
+            "body": "Counties where sleep-related emergency utilization runs well above benchmark while home sleep test claim density sits near the bottom of the national distribution.",
+            "label": "Geography"
+          },
+          {
+            "body": "Hypertension, atrial fibrillation, and type 2 diabetes cluster in the same cohort. Undiagnosed patients consume materially more inpatient and cardiology spending than diagnosed and treated patients.",
+            "label": "CMS signal"
+          },
+          {
+            "body": "Home sleep testing codes, CPAP device reimbursement, chronic care management, and remote monitoring create a pathway that can pay for diagnosis and downstream management.",
+            "label": "Reimbursement path"
+          },
+          {
+            "body": "The illustrative sizing comes from a small capture rate across the undiagnosed cohort, before device revenue or downstream management revenue.",
+            "label": "Market logic"
+          },
+          {
+            "body": "A convenient testing and treatment pathway that removes the device burden, works under the right laboratory and clinical governance, and targets geographies with weak incumbent coverage.",
+            "label": "Company shape"
+          }
+        ],
+        "lookingFor": [
+          "Home sleep testing platforms",
+          "Direct-to-consumer diagnostics",
+          "Remote CPAP management",
+          "Primary care workflow operators"
+        ],
+        "revenue": "$420M to $940M",
+        "revenueSub": "Illustrative annual addressable revenue",
+        "summary": "A large population shows sleep-related utilization and comorbidity patterns without a formal obstructive sleep apnea diagnosis or a completed home sleep test.",
+        "tag": "Diagnostics and home testing",
+        "title": "Obstructive sleep apnea diagnosis gap"
+      },
+      {
+        "cells": [
+          {
+            "body": "Patients with repeated emergency visits coded as acute bronchitis or unspecified respiratory failure, no pulmonary function test in the prior window, and no COPD diagnosis on record.",
+            "label": "Cohort"
+          },
+          {
+            "body": "Rural counties where COPD-adjacent admissions rank high and the nearest pulmonologist is far enough away that primary care needs a practical screening path before referral.",
+            "label": "Geography"
+          },
+          {
+            "body": "COPD is part of the Hospital Readmissions Reduction Program. Hospitals in the flagged counties carry above-average readmission rates and a direct payment incentive to reduce them.",
+            "label": "CMS signal"
+          },
+          {
+            "body": "Spirometry opens the diagnosis. Chronic care management and remote physiological monitoring can then create recurring reimbursement for the right operating model.",
+            "label": "Reimbursement path"
+          },
+          {
+            "body": "The illustrative model multiplies flagged rural practices, eligible patients per practice, and annual management reimbursement. Device revenue is separate.",
+            "label": "Market logic"
+          },
+          {
+            "body": "A rural primary care operator or platform that combines point-of-care spirometry, diagnosis capture, and billing infrastructure without adding another disconnected screen.",
+            "label": "Company shape"
+          }
+        ],
+        "lookingFor": [
+          "Point-of-care spirometry operators",
+          "COPD management companies",
+          "Rural primary care platforms",
+          "CCM and RPM infrastructure teams"
+        ],
+        "revenue": "$2,400+",
+        "revenueSub": "Illustrative revenue per managed patient each year",
+        "summary": "Patients with repeated respiratory utilization reach rural primary care without spirometry, a confirmed COPD diagnosis, or the recurring management reimbursement that follows diagnosis.",
+        "tag": "Provider operations",
+        "title": "COPD spirometry gap in rural primary care"
+      },
+      {
+        "cells": [
+          {
+            "body": "Medicare beneficiaries with a primary heart-failure diagnosis, repeated hospitalization in the prior year, and no remote monitoring claim from the treating cardiologist or care-management company.",
+            "label": "Cohort"
+          },
+          {
+            "body": "Metropolitan areas where heart-failure readmission rates are elevated while remote monitoring claim density among attributed patients remains low.",
+            "label": "Geography"
+          },
+          {
+            "body": "Readmission penalties, cardiology utilization, and the existing RPM and CCM code stack point to an operating gap rather than an absence of reimbursement.",
+            "label": "CMS signal"
+          },
+          {
+            "body": "The RPM setup and monitoring series can stack with chronic care management, creating recurring annual reimbursement for practices that operate the workflow correctly.",
+            "label": "Reimbursement path"
+          },
+          {
+            "body": "The illustrative value is revenue per managed patient, not a claim that every eligible patient can or should be enrolled.",
+            "label": "Market logic"
+          },
+          {
+            "body": "A clinician-led monitoring service that owns enrollment, escalation, documentation, billing, and cardiology review rather than selling another dashboard.",
+            "label": "Company shape"
+          }
+        ],
+        "lookingFor": [
+          "Cardiology service companies",
+          "Heart-failure monitoring operators",
+          "CCM and RPM companies",
+          "Clinician-led chronic care teams"
+        ],
+        "revenue": "$1,440 to $2,400",
+        "revenueSub": "Illustrative revenue per patient each year",
+        "summary": "Cardiology practices and chronic-care companies already have the patients, penalty exposure, and billing codes. Many still do not use remote monitoring for their highest-risk heart-failure population.",
+        "tag": "Cardiology and chronic care",
+        "title": "Heart-failure remote monitoring"
+      },
+      {
+        "cells": [
+          {
+            "body": "Medicare beneficiaries with two or more chronic conditions who are eligible for Chronic Care Management but have no CPT 99490 or related management claim in the measurement window.",
+            "label": "Cohort"
+          },
+          {
+            "body": "Practices and counties where eligible chronic disease panels are large, CCM billing penetration is low, and staffing constraints make manual enrollment unrealistic.",
+            "label": "Geography"
+          },
+          {
+            "body": "Eligible patients generate avoidable utilization while practices fail to claim the management revenue CMS already makes available.",
+            "label": "CMS signal"
+          },
+          {
+            "body": "CPT 99490 and related codes create recurring monthly reimbursement when consent, care planning, time tracking, and clinician review are handled correctly.",
+            "label": "Reimbursement path"
+          },
+          {
+            "body": "The illustrative range reflects annual reimbursement per enrolled patient. The operating question is how much of the eligible panel can be enrolled and served credibly.",
+            "label": "Market logic"
+          },
+          {
+            "body": "An AI-assisted care-management operation that handles the routine work, keeps clinicians accountable for review, and gives practices a service rather than another task list.",
+            "label": "Company shape"
+          }
+        ],
+        "lookingFor": [
+          "CCM operating companies",
+          "Primary care enablement teams",
+          "AI care-management platforms",
+          "Value-based care operators"
+        ],
+        "revenue": "$744 to $1,584",
+        "revenueSub": "Illustrative annual reimbursement per enrolled patient",
+        "summary": "Eligible patients sit in primary care panels while practices leave Chronic Care Management reimbursement unclaimed because consent, documentation, time tracking, and review are still operationally hard.",
+        "tag": "Value-based care operations",
+        "title": "Chronic Care Management capture"
+      }
+    ],
+    "dataSources": [
+      "CMS claims and reimbursement data",
+      "Medicare Advantage encounter data",
+      "MDS and OASIS assessments",
+      "HEDIS measures and quality programs",
+      "Star ratings",
+      "Public utilization and geographic data",
+      "Labor and licensure data",
+      "Peer-reviewed care delivery research",
+      "Clinician and operator signal"
+    ],
+    "engine": [
+      {
+        "body": "A population defined out of claims: diagnoses, utilization, and risk flags, not a market-research estimate.",
+        "head": "Cohort"
+      },
+      {
+        "body": "County and metro-level targeting, so a deployment lands where the gap is largest rather than where the first meeting happened.",
+        "head": "Geography"
+      },
+      {
+        "body": "The specific CMS metric that shows the gap: readmissions, unmet quality measures, eligible services that are never billed.",
+        "head": "Signal"
+      },
+      {
+        "body": "Every code and bundle that makes the model pay, named before anyone builds anything.",
+        "head": "Reimbursement path"
+      },
+      {
+        "body": "Per-patient rate times addressable cohort times a capture rate the firm is willing to defend in writing.",
+        "head": "Revenue at stake"
+      }
+    ],
+    "focusAreas": [
+      "Healthcare services and care delivery",
+      "Digital health and healthcare technology",
+      "AI-enabled healthcare businesses",
+      "Patient engagement and navigation",
+      "Caregiver support",
+      "Care coordination and continuity",
+      "Healthcare data and workflow infrastructure",
+      "Clinician workflow and burden reduction",
+      "Revenue, administrative, and operational services",
+      "Specialized business services for healthcare organizations",
+      "Overlooked healthcare opportunities with strong fundamentals"
+    ],
+    "goToMarket": [
+      {
+        "body": "Start with a cohort, a place, a payer signal, and a reimbursement path rather than a product looking for a budget.",
+        "head": "Identify reimbursed demand"
+      },
+      {
+        "body": "Put the proposed work in front of the clinicians, operators, patients, and buyers who would have to live with it.",
+        "head": "Pressure-test the workflow"
+      },
+      {
+        "body": "Map the buyer, code, bundle, value-based arrangement, security review, and procurement route before the pilot starts.",
+        "head": "Shape the contract path"
+      },
+      {
+        "body": "Sequence design partners and pilots that can answer the commercial question, not just produce a case study.",
+        "head": "Line up the first proof"
+      },
+      {
+        "body": "Remain involved through procurement, implementation, contracting, renewal, and the operating work that makes early revenue repeatable.",
+        "head": "Stay through the sale"
+      }
+    ],
+    "journey": [
+      {
+        "body": "The clinician or operator names the workflow that has to change and the evidence that the status quo is failing.",
+        "head": "Clinical conviction"
+      },
+      {
+        "body": "The Atlas sizes the cohort, geography, CMS signal, reimbursement path, and revenue at stake before capital moves.",
+        "head": "Data validation"
+      },
+      {
+        "body": "The operating model, target buyer, contract chassis, leadership need, and first unit economics are settled.",
+        "head": "Venture design"
+      },
+      {
+        "body": "The first design partners are chosen for evidence value and procurement realism, not for a friendly logo.",
+        "head": "Pilot strategy"
+      },
+      {
+        "body": "The company goes through workflow validation, security review, contracting, launch, and the first revenue motion.",
+        "head": "Market entry"
+      },
+      {
+        "body": "Follow-on capital, shared services, payer and provider access, and selective control support the company as the evidence compounds.",
+        "head": "Scale"
+      }
+    ],
+    "measures": [
+      "Clinical or functional outcomes",
+      "Patient and caregiver experience",
+      "Access to care",
+      "Time to diagnosis, treatment, or follow-up",
+      "Care coordination and continuity",
+      "Preventable complications and avoidable utilization",
+      "Clinician time returned to patient care",
+      "Administrative steps eliminated",
+      "Staff workload and burnout indicators",
+      "Patient understanding and adherence",
+      "Affordability and financial burden",
+      "Access across different populations"
+    ],
+    "modes": [
+      {
+        "body": "A clinician founder is already in motion with a clear wedge and either early commercial signal or a design partner worth funding. The fund writes the check and brings a commercialization path, not a contact list.",
+        "head": "Invest"
+      },
+      {
+        "body": "A cash-flowing care operator (a service line, regional group, or specialty asset) can be re-platformed around AI-native workflow and moved toward at-risk reimbursement, either by taking control of delivery or by embedding the reimagined model inside a partner operator that already delivers care. Control or deep partnership is warranted when capital, software, and clinical leadership all have to move together.",
+        "head": "Take selective control"
+      },
+      {
+        "body": "The data conviction is loud, the operating thesis is clear, and no suitable company exists or the right delivery partner is already in place. The fund designs, staffs, and capitalizes the reimagined care company, then pairs in the clinician CEO, or partners with an established operator to deliver it.",
+        "head": "Build"
+      }
+    ],
+    "notList": [
+      "A traditional venture capital fund",
+      "A private equity fund",
+      "An accelerator",
+      "An incubator",
+      "A consulting firm",
+      "A short-term financial buyer"
+    ],
+    "ownership": [
+      {
+        "body": "Turn a strong care-delivery thesis into a focused company. The fund defines the problem, sets the strategy, assembles the leadership team, builds the operating foundation, and capitalizes it.",
+        "head": "Create",
+        "outcome": "New capacity against a real care-delivery problem."
+      },
+      {
+        "body": "Buy or partner with existing care companies that have a real foundation and unrealized growth. The fund supplies operating discipline, software, governance, clinical insight, and capital.",
+        "head": "Acquire and grow",
+        "outcome": "Better care delivery at greater scale."
+      },
+      {
+        "body": "Hold good companies without a predetermined exit clock. Care companies need time to earn clinician trust, sit inside the workflow, and produce measurable outcomes. The holding period follows the business.",
+        "head": "Own for the long term",
+        "outcome": "Durable improvements clinicians can rely on."
+      },
+      {
+        "body": "Some companies end up better served by a strategic buyer, new investors, or an independent structure. That decision is made on sustainable value and impact, not on a schedule.",
+        "head": "Sell or spin out when appropriate",
+        "outcome": "The ownership model that best serves patients and the business."
+      }
+    ],
+    "patterns": [
+      "Utilization mispricing",
+      "Quality collapse",
+      "Transition failure",
+      "Capacity loss",
+      "Referral friction",
+      "Chronic-care leakage",
+      "Reimbursement asymmetry",
+      "Patient engagement failure",
+      "Quality and cost asymmetry"
+    ],
+    "pillars": [
+      {
+        "body": "Care that is easier to understand, reach, navigate, receive, and continue over time, including for the family members who carry most of the work between visits.",
+        "head": "Better patient and caregiver experience"
+      },
+      {
+        "body": "Clinical, functional, financial, safety, access, or quality-of-life outcomes. Every company names the outcomes it intends to move and how progress gets measured.",
+        "head": "Better outcomes"
+      },
+      {
+        "body": "Fewer administrative steps, fewer fragmented handoffs, less repeated data entry, less cognitive load: the friction that pulls clinicians away from patients.",
+        "head": "Less burden on clinicians"
+      }
+    ],
+    "questions": [
+      "Does it address a real problem for patients, caregivers, clinicians, or care teams?",
+      "Does it improve the end-to-end care experience rather than optimizing one isolated transaction?",
+      "Can it move clinical, functional, financial, safety, access, or quality-of-life outcomes?",
+      "Does it remove unnecessary work or cognitive burden from clinicians?",
+      "Does it make appropriate care easier to deliver and easier to receive?",
+      "Can the impact be measured with credible, practical indicators?",
+      "Is the business model aligned with better care rather than dependent on avoidable friction?",
+      "Would the fund's capital, operating support, technology, and relationships materially change its odds?"
+    ],
+    "support": [
+      {
+        "body": "Capital formation, investor relationships, entity and cap-table structure, and the work of standing a company up.",
+        "head": "Capital and company formation"
+      },
+      {
+        "body": "Clinical, market, technology, financial, and regulatory diligence, then an operating plan with measurable goals and a governance rhythm.",
+        "head": "Diligence and operating plans"
+      },
+      {
+        "body": "Architecture, data and cybersecurity posture, and the AI strategy that decides which new form of care work the company can actually perform.",
+        "head": "Technology, data, and AI strategy"
+      },
+      {
+        "body": "Business development, payer and provider access, and a commercialization path rather than an introduction list.",
+        "head": "Growth and market access"
+      },
+      {
+        "body": "Executive recruitment, leadership development, and shared finance, administrative, and technical services across the portfolio.",
+        "head": "Executives and shared services"
+      },
+      {
+        "body": "Defining what the company will move, how it gets measured, and what evidence is published when it does not work.",
+        "head": "Outcome definition"
+      }
+    ]
+  }
 }

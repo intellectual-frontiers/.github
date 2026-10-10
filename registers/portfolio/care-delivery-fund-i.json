@@ -6,5 +6,63 @@
   "title": "Care Delivery Fund I",
   "summary": "A small, working fund that incubates the foundational ventures and shared services the rest of the portfolio will run on: demand intelligence, revenue operations, an execution layer for providers, and ambient measurement.",
   "status": "Active now",
-  "year": "2025"
+  "year": "2025",
+  "fund": {
+    "to": "/capital/care-delivery-fund-i",
+    "size": "Under $1M",
+    "status": "Active now",
+    "summary": "A small, working fund that incubates the foundational ventures and shared services the rest of the portfolio will run on: demand intelligence, revenue operations, an execution layer for providers, and ambient measurement.",
+    "ventures": [
+      {
+        "body": "Verified practitioner consults delivered online, with a real operating stack behind the booking screen: intake, a longitudinal care record, agents that carry the routine work, a clinician copilot, and the compliance apparatus a regulated consult requires.",
+        "name": "OurHakeem",
+        "role": "Venture"
+      },
+      {
+        "body": "An HSA card that pays patients a data dividend for consented, de-identified health data. No surveys, no tracking: the value exchange rides on the card transaction itself. The privacy architecture (HIPAA Expert Determination de-identification, transparent revocable consent, IRB oversight for research partnerships) is the work, not the marketing.",
+        "name": "Payshent",
+        "role": "Venture"
+      },
+      {
+        "body": "Finds reimbursed demand in healthcare and states it in the terms a business plan needs: the claims-defined cohort, the counties where the gap is largest, the CMS signal that proves it, the CPT and HCPCS codes and bundles that pay for it, and the revenue at stake. It is a shared service to every other venture and the intelligence spine of Fund II.",
+        "name": "Medigy Opportunity Atlas",
+        "role": "Shared service"
+      },
+      {
+        "body": "A governed evaluation platform for hospitals and health systems. Instead of a procurement queue full of unranked vendor claims, a health system gets structured evaluation: who has been vetted, on what evidence, against which internal need.",
+        "name": "Medigy Demand Intelligence",
+        "role": "Shared service"
+      },
+      {
+        "body": "An execution layer that turns the Microsoft 365 or Google Workspace a provider already pays for into a working digital front door. The argument is that most organizations do not need to buy more healthcare software; they need the software they own to actually run the work. It serves the portfolio as the shared front-door capability.",
+        "name": "PatientTeam.com",
+        "role": "Shared service"
+      },
+      {
+        "body": "A healthcare growth and care-access capability that turns fragmented patient demand into timely, scheduled care. The team designs, launches, and operates AI-driven demand intelligence, orchestration, and routing on behalf of provider organizations, filling real provider capacity instead of reporting clicks and leads. The portfolio's ventures draw on it as the shared demand-and-access engine.",
+        "name": "Neuvist",
+        "role": "Shared service"
+      },
+      {
+        "body": "A continuous clinical research infrastructure platform that reads signals across consented health transaction data for earlier detection and continuous research. Payshent is its funding and consent layer; Symvion is the intelligence layer that turns compensated patient data into detectable signal.",
+        "name": "Symvion",
+        "role": "Shared service"
+      },
+      {
+        "body": "Revenue operations for post-acute care: durable medical equipment, home health, home infusion, home respiratory, and hospice. Segments where the clinical work is done well and the money is routinely left on the floor.",
+        "name": "Revenue Acceleration LLC",
+        "role": "Venture"
+      },
+      {
+        "body": "A reference lab for biomarkers captured passively from ordinary sensors: voice, gait, respiration, facial expression, wearable and metabolic signals, standardized into panels, reported like any other lab result, and governed by an integrated review board and clinician network.",
+        "name": "Ambient Biomarkers Reference Lab",
+        "role": "Venture"
+      },
+      {
+        "body": "An operating system for supervising an accountable digital care operation. A clinical leader reviews decisions, evidence, and billing as a queue of work with owners and dates, instead of hunting through a dashboard for whatever went wrong.",
+        "name": "Continuous Care OS",
+        "role": "Venture"
+      }
+    ]
+  }
 }
