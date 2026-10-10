@@ -212,6 +212,56 @@ ontology data and registers, not restated here.
   engines, and other promotion, alongside the Journal. Each MUST satisfy
   FR-001 through FR-004 and 0021-works-and-presentations FR-023 through
   FR-025.
+- **FR-047**: Every item the Journal carries MUST be labeled with exactly
+  one department, the form it takes: a finding, a made item, a paper, a
+  program, a note, a position, a referenced piece (elsewhere), or a
+  correction, as the ontology's Journal departments define them. A
+  department is a label on the item, never a section of the Journal:
+  FR-034 stands, and the sections are the research areas, each the reader
+  problem it addresses. A paper, a program and a note the Journal carries
+  are the firm's research records themselves (0006-research-and-ip),
+  shown under the Journal's front and keeping their own pages.
+- **FR-048**: A position MUST state, in one sentence on the article, what
+  would make it wrong. Where the position's subject is a Noema, that
+  sentence MUST agree with the Noema's falsification criteria
+  (0048-noemas FR-017). The Journal MUST keep a public register of its
+  positions, each with the date it was stated and whether it stands, is
+  settled or is reversed; a reversed position stays in the register and
+  is reported as a correction under FR-049.
+- **FR-049**: Every correction the Journal makes under FR-010 and FR-035,
+  and every reversal of a position, MUST be recorded as a correction
+  naming the article, the date, what changed and why, and MUST be listed
+  on one public corrections page, in place and never deleted. The page
+  MUST say so when there is none.
+- **FR-050**: A product (a skill, a companion, an interactive tool, a
+  piece of software, a shared service, a dataset or a method) MUST NOT be
+  introduced in the Journal except by an article that names the reader
+  problem it addresses and, where it derives from the firm's own research,
+  the Note or pillar it derives from, per FR-022. An article that only
+  explains a product, with nothing a reader can run, MUST NOT be published
+  as its introduction.
+- **FR-051**: A release of a product MUST be reported in the issue of its
+  quarter as a made item: what changed and what was measured, each claim
+  labeled under FR-001, in the Journal's words and with no launch
+  language. The release's announcement MUST be a promotional post
+  (0021-works-and-presentations FR-023) that links to the made item, and
+  the product's own page and the website's news MUST carry the release
+  note; the made item MUST draw on that note, as FR-036 draws on a book's.
+- **FR-052**: A failed claim inside a shared service, recorded as a
+  completed result under 0011-studios FR-012, MUST be reported in the
+  Journal as a finding when the service is public, with the same
+  prominence as a claim that held.
+- **FR-053**: The Journal MUST publish an item when the work it presents
+  lands, and MUST gather every item published in a quarter into that
+  quarter's issue, frozen at the quarter's end with its volume and number.
+  The front page MUST show the current issue first and the running record
+  of programs, notes and positions after it. The periodicity the ontology
+  records for the Journal is the issue's.
+- **FR-054**: Writing that originated outside the Journal, which FR-023
+  requires to be referenced rather than republished, MUST be carried only
+  in the elsewhere department, each piece keeping its own kind and linking
+  to where it lives, and MUST NOT enter an issue unless it changed a
+  decision the issue reports.
 
 ## Events and partnerships
 
@@ -300,6 +350,22 @@ ontology data and registers, not restated here.
 - A Fieldbook method whose last step is a judgment the reader must make:
   the companion skill or MCP tool runs the method up to that judgment and
   leaves the judgment to the reader, per FR-017.
+- A working paper carried by the Journal: it is a paper by department, per
+  FR-047, keeps its own page, and its claims carry their kinds and its
+  status says it is not peer reviewed, per FR-001 and FR-021.
+- An essay of the founder's that lives on the founder's own site: it is
+  referenced in the elsewhere department and enters no issue unless it
+  changed a decision the issue reports, per FR-023 and FR-054.
+- A new skill released with no article behind it: it is listed as a
+  product but not introduced in the Journal until its article names the
+  problem it addresses, per FR-050; its release is still a made item of
+  the quarter, per FR-051.
+- A position whose subject is later falsified: the register marks it
+  reversed and a correction is listed, per FR-048 and FR-049; the article
+  stays, corrected in place, per FR-010.
+- A note dated in a quarter that no article draws on: it is in the
+  running record and in that quarter's issue as a note, per FR-047 and
+  FR-053, and is not a finding.
 
 ## Assumptions
 
@@ -328,6 +394,13 @@ ontology data and registers, not restated here.
   to a company that is both a Studios company and an IF Capital company.
 - **OQ-4**: Whether "Acquired Alpha" needs trademark clearance, as "Native
   Alpha" has, is not decided; until it is, the term carries no mark.
+- **OQ-5**: The two positions the Journal has published do not yet state
+  what would make them wrong, as FR-048 requires; their sentences are the
+  author's to write.
+- **OQ-6**: How a card's settledness is worded beyond the four claim kinds
+  of FR-001 (built, measured once, hypotheses untested, other people's
+  evidence) is not a controlled vocabulary yet; each work's status text is
+  shown as written until one is decided (0019-controlled-vocabulary).
 
 ## Key entities
 
@@ -356,6 +429,15 @@ ontology data and registers, not restated here.
 - **The Journal** — a standing periodical, distinct from a one-off book;
   an article it publishes is related to the research it was drawn from
   by `prov:wasDerivedFrom`, never presented as the primary record.
+- **A department** — the form an item of the Journal takes, a label on
+  the item and never a section: finding, made, paper, program, note,
+  position, elsewhere, correction.
+- **A position** — an argued piece that states what would make it wrong
+  and stays in the public register of positions until settled or
+  reversed.
+- **A correction** — a record of a change made in place to a published
+  article, or of a position's reversal: the article, the date, what
+  changed and why.
 
 ## Success criteria
 
@@ -395,6 +477,14 @@ ontology data and registers, not restated here.
   or placed by a vendor in the category it evaluates.
 - **SC-016**: No promotion calls the imprint the leading, definitive, or
   de facto imprint for its readership.
+- **SC-017**: Every item the Journal carries has exactly one department,
+  and no department is a section of the Journal.
+- **SC-018**: No position is published without the sentence that says
+  what would make it wrong, and every position is in the register.
+- **SC-019**: Every correction and every reversal is on the corrections
+  page, and none is deleted.
+- **SC-020**: Every public release of a product in a quarter is a made
+  item of that quarter's issue, and no launch note is the record of it.
 
 ## Review & acceptance checklist
 

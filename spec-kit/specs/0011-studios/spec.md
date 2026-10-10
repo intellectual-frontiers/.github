@@ -82,6 +82,12 @@ restated here.
 - **FR-016**: When internally built software turns out to be worth more
   outside the firm, it MUST be spun out rather than kept as an internal
   tool indefinitely.
+- **FR-028**: A spin-out under FR-016 MUST be recorded once, in the
+  ontology, as the product having become the venture and the venture
+  having grown out of the product, so that a consumer can show the
+  lineage both ways without listing either twice. The product's record
+  MUST keep its licence and status (FR-015) until the venture's own
+  Eidolon holds them (FR-017).
 
 ## Each company's own Eidolon
 
