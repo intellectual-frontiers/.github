@@ -34,7 +34,13 @@ property fetches them are decisions outside this spec.
   or at `ventures/<company>/works/<kind>/<slug>/` for a work belonging to a
   venture held under 0011-studios FR-019 through FR-021. `<slug>` MUST be a
   short, URL-safe, kebab-case name, unique within its kind, and MUST NOT
-  change once any content document or delivered rendition exposes it.
+  change once any content document or delivered rendition exposes it. A
+  work of kind `website` is the exception: its slug MUST be the fully
+  qualified domain name visitors land on, in lowercase ASCII without a
+  trailing dot (`www.intellectualfrontiers.com`), since a website is
+  assigned its domain name; another name that resolves to it (the apex, a
+  retired host) is an alias recorded in the package, never a package of
+  its own.
 - **FR-005**: `<kind>` MUST name an `ifcore:WorkKind` individual declared in
   the ontology before any work package of that kind exists, per
   0001-eidolon-architecture FR-037. A kind names the work's primary
@@ -207,6 +213,18 @@ property fetches them are decisions outside this spec.
   person reviews it. A check MUST report a living work as overdue when more
   than its cadence has passed since that date. A living work's stage
   advances as any work's does; being living never holds it at a stage.
+- **FR-036**: A website package (`works/website/<fqdn>/`, FR-004) MUST
+  hold `website.yml`, the site's identity: its `domain` (equal to the
+  slug), its `aliases`, its `title`, the contact address, the analytics
+  container it loads (0044-public-website FR-015) and the paths its
+  crawler rules disallow; `assets/`, the stylesheet, scripts and tool
+  scripts the site's program writes onto it, and `tools/`, its interactive
+  tools; its publishing records (`publish.yml`, `deployments.yml`,
+  `cdn.yml`, `images.yml`); its home picture and the previous website's
+  sitemap (0044-public-website FR-077); and its bible, issues and audit
+  notes as any work. The ontology MUST mark one website the default
+  (`ifpriv:defaultWebsite true`, set by a Decision), the one a command
+  acts on when none is named.
 
 ## Works published elsewhere
 
