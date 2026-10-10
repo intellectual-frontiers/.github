@@ -273,6 +273,30 @@ def check_voice(ctx: Ctx, scope: list[str] | None) -> SectionResult:
     return _report("voice", ctx, problems, len(paths or []), "file", how)
 
 
+CONTENT = "content"
+
+
+@section("content")
+def check_content(ctx: Ctx, scope: list[str] | None) -> SectionResult:
+    """Every page of the website held under content/ (the Journal's articles and the registers' pages) against the written
+    voice: prose and headings, an announcement or a heading that names a topic instead of stating its claim among them
+    (frontiers-written-voice FR-009, FR-017; 0044-public-website FR-010). A page this website shows is this website's
+    writing, whichever website first published it."""
+    draft = bool(ctx.section_options.get("draft"))
+    given = _scope(scope)
+    if given:
+        paths, bad = items.expand(given, (".html", ".md", ".adoc"))
+        how = f"--scope {', '.join(items.rel(ctx.root, Path(g)) for g in given)}"
+    else:
+        paths, bad = items.expand([ctx.root / CONTENT], (".html",)) if (ctx.root / CONTENT).is_dir() else ([], [])
+        how = f"no --scope: every page under {CONTENT}/"
+    findings = [Finding("error", p.split(":")[0], p) for p in bad]
+    if findings:
+        return _report("content", ctx, [], 0, "page", how, extra_findings=findings)
+    problems = items.sweep_voice(ctx.root, paths, None, draft, False, fixtures_only=False)
+    return _report("content", ctx, problems, len(paths), "page", how + ("; draft" if draft else ""))
+
+
 @section("slides")
 def check_slides(ctx: Ctx, scope: list[str] | None) -> SectionResult:
     brand = ctx.section_options.get("brand") or DEFAULT_BRAND

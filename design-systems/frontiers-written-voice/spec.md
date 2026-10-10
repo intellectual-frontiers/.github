@@ -44,10 +44,19 @@ patterns a mechanical sweep looks for.
   `hedges`, `throat_clearing`). A word in `warn_words` MAY be used only in its literal sense
   ("ecosystem" for a real network of parties that cannot be named more precisely).
 - **FR-009**: It MUST NOT announce that a point is coming ("here's the part that matters", "this
-  section explores"), or end a paragraph on a cute wrap-up aside; it says the point. A heading MUST state
+  section explores"), describe what the writing is doing instead of saying it ("in this article we
+  examine", "this report provides a detailed analysis of", "the purpose of this page is"), look back at
+  what it said ("as discussed above", "in conclusion"), or end a paragraph on a cute wrap-up aside; it
+  says the point, and the reader meets the idea, never a description of the writing. The test is
+  editorial: a sentence that describes what the author or the document is doing, rather than giving the
+  reader something in plain words, is rewritten or removed. This holds for every part of a piece: its
+  title, subtitle, description or summary, headings, lede, transitions and body. A heading MUST state
   the claim, plainly, as a sentence a reader could repeat ("We stop when the evidence says stop", never
-  "Reasons we may consider stopping"), with no wordplay, simile, paradox, slogan or echo of the work's
-  title.
+  "Reasons we may consider stopping"), never announce a topic or an activity ("Exploring the evolving
+  role of AI", "A closer look at", "Key considerations", "Overview", "Conclusion"), and carry no wordplay,
+  simile, paradox, slogan or echo of the work's title. `patterns.json` lists the announcements, the
+  throat-clearing and the headline openings and labels the sweep refuses (FR-017); the sweep finds the
+  mechanical cases, and a person reads the rest.
 - **FR-010**: It MUST NOT use witty, literary, lyrical or ornate prose, metaphors, similes, wordplay
   or humor, and MUST NOT make a line memorable by its phrasing. A reader may be a non-native speaker or
   read a machine translation, and wit and humor depend on a culture and a language the reader may not
@@ -92,11 +101,12 @@ patterns a mechanical sweep looks for.
 
 ## Machine-readable form and audit
 
-- **FR-017**: `sweep.py` MUST find, in a passage of prose or a file of AsciiDoc or Markdown read as its
-  prose: an em dash, every pattern `patterns.json` lists, an avoided variant of a shared term, the "not
-  only X but also Y" formula, more seesaws than allowed, and more "Not X." fragments than reads
-  naturally; and, in procedure mode, an instruction or sentence over its length and a passive
-  instruction. It MUST exit non-zero on a FAIL, and report a WARN without failing. A finished piece MUST
+- **FR-017**: `sweep.py` MUST find, in a passage of prose or a file of AsciiDoc, Markdown or HTML read as
+  its prose: an em dash, every pattern `patterns.json` lists, an avoided variant of a shared term, the
+  "not only X but also Y" formula, more seesaws than allowed, and more "Not X." fragments than reads
+  naturally; in a file's headings, its title included, a heading that announces a topic or an activity
+  or is a bare label (a FAIL) and one that only names a topic (a WARN) (FR-009); and, in procedure mode,
+  an instruction or sentence over its length and a passive instruction. It MUST exit non-zero on a FAIL, and report a WARN without failing. A finished piece MUST
   sweep clean and MUST also pass an adversarial human read against every rule here, since no sweep can
   judge an argument.
 - **FR-018**: A design system that derives from this one (a spoken voice, 0014-design-systems FR-020,

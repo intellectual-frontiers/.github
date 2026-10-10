@@ -291,6 +291,18 @@ how addresses map to content, 0004-addressing; what the application does,
   These addresses MUST stay as they are, unhashed, since devices and
   browsers fetch them by name; the manifest's colours are the brand's, not
   the generator's (FR-010).
+- **FR-073**: Every page MUST read in the house's written voice on one
+  point the check can hold: it MUST NOT announce what it is about to say,
+  describe what the writing is doing, look back at what it said, or head a
+  section with a topic or an activity instead of a claim
+  (frontiers-written-voice FR-009). The check (FR-004) MUST read every
+  page's title, description, headings and paragraphs against the lists the
+  vendored written voice keeps in `patterns.json` (its announcements,
+  throat-clearing, headline openings and bare labels) and MUST refuse the
+  website on a hit, whichever source the text came from: the generator's
+  own words, a work in the vault, a page under the public root's
+  `content/`, or the snapshot (FR-013). The lists have one source, the
+  design system, so the website and the writers' own sweeps agree.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -322,9 +334,13 @@ how addresses map to content, 0004-addressing; what the application does,
   companies, the Network's hunts, owned channels, the company's own
   descriptive text, the home page's picture, and the previous website's
   record pages kept as an archive. A snapshot is fixed
-  data: no command writes it and no one edits it by hand. It MUST hold only
-  what the previous website published to the public, and a register leaves it
-  when the register moves into the public root.
+  data: no command writes it, and no one adds to it by hand. It MUST hold
+  only what the previous website published to the public, and a register
+  leaves it when the register moves into the public root. Its text MAY be
+  edited by hand for one reason: the written voice (FR-073), since a page
+  this website shows is this website's writing, whichever website first
+  published it; such an edit changes wording, never a fact, a date or a
+  name, and git holds the text as it was published.
 - **FR-014**: The generator MUST report every address the previous
   website's sitemap lists that the generated website neither serves nor
   redirects, so nothing it published is dropped unnoticed.

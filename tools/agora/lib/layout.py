@@ -16,7 +16,7 @@ DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
 PREREQUISITES = {"workspaces-host"}  # the one repository agora may name: its program, `ws-host`, is the prerequisite (0042 FR-003; 0025 FR-005)
 # 0042 FR-013: the check sections, and FR-014: the suites, as `sections`.
 SECTIONS = {"specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help", "design-systems", "imagery", "openedx",
-            "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
+            "content", "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
 SUITES = {"spec": {"specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"},
           "browser": {"design-systems --runner browser", "openedx"},
           "python": {"design-systems --runner python"},

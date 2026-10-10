@@ -21,7 +21,8 @@ import sweep  # noqa: E402
 
 ONTOLOGY = SYSTEM.parent.parent / "ontology" / "ifcore.ttl"
 KEYS = {"fail_words", "warn_words", "plain_words", "hedges", "throat_clearing", "fail_announcements",
-        "warn_announcements", "fail_contains", "fail_labels", "idioms", "max_seesaws", "warn_not_fragments", "procedure"}
+        "warn_announcements", "fail_contains", "fail_labels", "idioms", "max_seesaws", "warn_not_fragments", "procedure",
+        "fail_headline_starts", "warn_headline_starts", "fail_headline_labels"}
 
 
 def main() -> int:
@@ -58,7 +59,9 @@ def main() -> int:
 
     for path in sorted((HERE / "fixtures" / "pass").iterdir()):
         mode = "procedure" if path.name.startswith("procedure-") else "prose"
-        fails, _ = sweep.sweep(sweep.prose(path.read_text(encoding="utf-8"), path.suffix), patterns, mode=mode, terms=terms)
+        text = path.read_text(encoding="utf-8")
+        fails, _ = sweep.sweep(sweep.prose(text, path.suffix), patterns, mode=mode, terms=terms)
+        fails += sweep.sweep_headings(sweep.headings(text, path.suffix), patterns)[0]
         check(not fails, f"pass/{path.name} should sweep clean; it reported: {'; '.join(fails)}")
     expected = json.loads((HERE / "fixtures" / "expected.json").read_text(encoding="utf-8"))
     fail_files = sorted((HERE / "fixtures" / "fail").iterdir())
@@ -66,10 +69,17 @@ def main() -> int:
           "fixtures/expected.json and fixtures/fail/ name different fixtures")
     for path in fail_files:
         mode = "procedure" if path.name.startswith("procedure-") else "prose"
-        fails, _ = sweep.sweep(sweep.prose(path.read_text(encoding="utf-8"), path.suffix), patterns, mode=mode, terms=terms)
+        text = path.read_text(encoding="utf-8")
+        fails, _ = sweep.sweep(sweep.prose(text, path.suffix), patterns, mode=mode, terms=terms)
+        fails += sweep.sweep_headings(sweep.headings(text, path.suffix), patterns)[0]
         want = expected.get(path.name, "")
         check(bool(want) and any(want in f for f in fails), f"fail/{path.name} should be refused for {want!r}; it reported: {'; '.join(fails) or 'nothing'}")
 
+    _, topic = sweep.sweep_headings(["The future of patent licensing"], patterns)
+    check(bool(topic), "a heading that only names a topic should be reported as a warning (FR-009)")
+    check(not sweep.sweep_headings(["We stop when the evidence says stop"], patterns)[0], "a heading that states its claim passes (FR-009)")
+    check(sweep.prose("<html><head><title>T</title></head><body><p>One <b>bold</b> line.</p><script>x()</script></body></html>", ".html").strip() == "One bold line.",
+          "an HTML file's prose is its text without its head, scripts and tags")
     _, warns = sweep.sweep("The new rule will earn its keep, so put a pin in it and move on.", patterns, terms=terms)
     check(any("idiom 'earns its keep'" in w or "idiom 'earn their keep'" in w for w in warns) or any("idiom" in w for w in warns),
           "an idiom should be reported as a warning (FR-021); the sweep reported none")

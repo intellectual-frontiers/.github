@@ -60,6 +60,14 @@ scope_many = true
 isolated = true
 options = ["--mode", "--draft", "--spoken"]
 
+[sections.content]
+help = "Every page under content/ against frontiers-written-voice's sweep, prose and headings (sweep.py)"
+watch = ["content/**", "design-systems/frontiers-written-voice/**", "tools/agora/lib/items.py", "tools/agora/groups/items/**"]
+scope = "PATH"
+scope_many = true
+isolated = true
+options = ["--draft"]
+
 [sections.slides]
 help = "Decks against frontiers-slides' rules: layouts, headlines, points, notes, figures, voice (deck.py check)"
 watch = ["design-systems/frontiers-slides/**", "design-systems/frontiers-figures/**", "design-systems/frontiers-written-voice/**", "tools/agora/lib/items.py", "tools/agora/groups/items/**"]
