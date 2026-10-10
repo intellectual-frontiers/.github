@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Desk">
+  <!-- Physical desk and legs -->
+  <path d="M2 16h20M4.5 16v5M19.5 16v5"/>
+  <!-- Open writing laptop, showing the page being worked on -->
+  <rect x="8" y="4.5" width="10" height="8.5" rx="1"/>
+  <path d="M7 14h12M10.5 7.5h5M10.5 10h3.5"/>
+  <!-- Pencil cup on the desk -->
+  <path d="M3.5 12h2.8l-.4 4H3.9zM4.8 9.4V12"/>
+</svg>

@@ -18,7 +18,7 @@ governed by [`0014-design-systems`](../../spec-kit/specs/0014-design-systems/spe
 | `images/icons/`, `images/favicon.ico` | The app icons (Apple touch, 192, 512, maskable 512) and the multi-size favicon, written by `agora imagery build frontiers-brand` from the icon-only mark. |
 | `logos/units/` | Each unit's mark: the wordmark with the unit's name, one-color SVG, set by `agora decoration generate --only set`. |
 | `images/favicon.png` | The icon-only mark at 64×64. |
-| `icons/` | Interface icons: one-color stroke SVG on a 24px grid in `currentColor`, drawn, not traced; `whats-left.svg` marks the website's "What's left" band (FR-021). |
+| `icons/` | Interface icons: one-color stroke SVG on a 24px grid in `currentColor`, drawn, not traced (FR-021): `console.svg` marks the website's Console and its control, `whats-left.svg` its "What's left" part and `desk.svg` its "Starting something new" part. |
 | `images/share-card.png` | The link-preview card, 1200×630: the light lockup on the surface. |
 | `imagery/` | The imagery pool: the approved frontier artwork every design system this brand themes chooses from, with `catalog.json` and WebP files for the web. See [`imagery/README.md`](imagery/README.md). |
 | `openedx/` | The brand's Open edX brand package (Paragon 23 design tokens, logos, favicon, fonts) with its build in `openedx/dist/`, written by `agora openedx build --paragon PATH`. See [`openedx/README.md`](openedx/README.md). |
