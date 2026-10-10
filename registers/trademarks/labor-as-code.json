@@ -1,0 +1,33 @@
+{
+  "slug": "labor-as-code",
+  "order": 0,
+  "coverage": "Registered in classes 9, 35 and 42, held by Netspective Communications LLC.",
+  "detail": [
+    "LABOR AS CODE is held by Netspective Communications LLC under serial number 99647951, filed on 11 February 2026 and registered on 25 August 2026 as registration 8412325.",
+    "First use claimed in the application is 7 February 2026.",
+    "Status, dates, and wording on this page come from the USPTO record and are refreshed when the site is published."
+  ],
+  "filedDate": "2026-02-11",
+  "firstUse": "2026",
+  "goodsAndServices": [
+    "IC 009: Downloadable computer software using artificial intelligence (AI) for use in data analytics; Downloadable computer software using artificial intelligence (AI) for agent-based control of computer systems; Downloadable computer software platforms for artificial intelligence workflows; Downloadable middleware for software application integration; Downloadable computer software for data and document capture, transmission, storage and indexing, namely, database management software; Downloadable computer software for use in collecting, analyzing and reporting data, namely for database management and computer systems integration; Downloadable computer software for ensuring the security of electronic data, namely, data encryption software; Downloadable computer software for monitoring computer security threats; Downloadable computer software for compliance management, namely, for data security and encryption in the field of healthcare management; Downloadable computer software for use in the field of healthcare management, namely, for ensuring data security of healthcare records; Downloadable computer software for computer security, namely antivirus software; Downloadable computer software for database management; Downloadable computer software for use in managing and validating database information; Downloadable computer software for data anonymization and de-identification, namely, software for removal of metadata; Downloadable computer compliance auditing software for use in evidence management; Downloadable computer software for automated compliance reporting; Downloadable computer software for processing healthcare data formats, namely, for parsing healthcare data from diverse data structures; Downloadable computer software for electronic data interchange, namely, for transferring healthcare data between computer systems; Downloadable computer software for use in product lifecycle management, namely, to manage computer system lifecycles and replacement schedules; Downloadable computer software for log file analysis in the nature of computer security software to detect network intrusions; Downloadable computer software for computer security for healthcare data management; Downloadable computer software using artificial intelligence (AI) for task automation and workflow management; Downloadable computer software platforms for data analytics, namely, for analyzing trends of healthcare data.",
+    "IC 035: Business advisory services; Business advisory services in the field of cybersecurity and information technology; Business advisory services, consultancy and information; Business consulting services in the field of regulatory compliance strategy; Business consulting services in the field of governance, risk, and compliance (GRC); Business advisory services in the field of compliance framework implementation.",
+    "IC 042: Consultancy and information services relating to information technology architecture and infrastructure; Planning, design and management of information technology systems; Technology consultation in the field of cybersecurity; Computer security consultancy in the field of cybersecurity and artificial intelligence; Consulting services in the field of cloud computing; Data security consultancy; Computer software consultation; Consulting services in the design and implementation of computer-based information systems for businesses; Development of customized software for others for use in risk assessment, information security, business analysis, audit and audit planning, and sales management; Development of security systems and contingency planning for information systems; Information technology consulting relating to computer network design; Information technology consulting relating to computer software design; Providing temporary use of on-line non-downloadable software for evidence management, namely, for auditing data for compliance assurance; Platform as a service (PAAS) featuring computer software platforms for compliance automation, namely, for creating automated rules for auditing data; Consulting services in the field of software as a service (SAAS); Business technology software consultation services; Computer technology consultancy; Technology consultation in the field of artificial intelligence; Technological consultation in the technology field of compliance framework mapping, namely, mapping data security controls across multiple regulatory frameworks; Technology consultation in the field of software for continuous compliance verification and monitoring; Technology consultation in the field of compliance-as-code, namely, advising on converting compliance policies into executable software specifications; Technology consultation in the field of evidence-based compliance, namely, designing software systems for continuous collection and verification of compliance evidence; Technology consultation in the field of developer security operations (DevSecOps), namely, integrating security compliance verification into software development pipelines; Computer security consultancy in the field of information systems management, computer networking, and database management."
+  ],
+  "group": "registered",
+  "internationalClasses": [
+    "IC 009",
+    "IC 035",
+    "IC 042"
+  ],
+  "mark": "Labor as Code®",
+  "owner": "studios",
+  "ownerOfRecord": "Netspective Communications LLC",
+  "registrationDate": "2026-08-25",
+  "registrationNumber": "8412325",
+  "serialNumber": "99647951",
+  "status": "Registered, registration 8412325",
+  "title": "Labor as Code®",
+  "usptoStatus": "REGISTERED",
+  "wordmark": "LABOR AS CODE"
+}

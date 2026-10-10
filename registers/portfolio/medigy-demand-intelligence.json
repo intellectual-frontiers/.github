@@ -1,0 +1,25 @@
+{
+  "slug": "medigy-demand-intelligence",
+  "order": 58,
+  "kind": "shared-service",
+  "unit": "studios",
+  "title": "Medigy Demand Intelligence",
+  "summary": "A governed evaluation platform for hospitals and health systems. Instead of a procurement queue full of unranked vendor claims, a health system gets structured evaluation: who has been vetted, on what evidence, against which internal need.",
+  "status": "In build",
+  "year": "2026",
+  "detail": [
+    "A governed evaluation platform for hospitals and health systems. Instead of a procurement queue full of unranked vendor claims, a health system gets structured evaluation: who has been vetted, on what evidence, against which internal need.",
+    "It is built to stand alone. Every other venture in the portfolio can draw on it, and if the market signal is strong enough it gets spun out as its own company rather than staying an internal tool.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

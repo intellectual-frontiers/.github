@@ -1,0 +1,25 @@
+{
+  "slug": "ambient-biomarkers-reference-lab",
+  "order": 30,
+  "kind": "venture",
+  "unit": "studios",
+  "title": "Ambient Biomarkers Reference Lab",
+  "summary": "A reference lab for biomarkers captured passively from ordinary sensors: voice, gait, respiration, facial expression, wearable and metabolic signals, standardized into panels, reported like any other lab result, and governed by an integrated review board and clinician network.",
+  "status": "In build",
+  "year": "2026",
+  "detail": [
+    "A reference lab for biomarkers captured passively from ordinary sensors: voice, gait, respiration, facial expression, wearable and metabolic signals, standardized into panels, reported like any other lab result, and governed by an integrated review board and clinician network.",
+    "It is chartered as an operating company, not a project. It carries its own entity, its own operator, and a written closure path if paid demand never shows up.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "slug": "companion-executable-source-code-repositories",
+  "order": 36,
+  "kind": "shared-service",
+  "unit": "studios",
+  "title": "Companion Executable Source Code Repositories",
+  "summary": "An open initiative for scientific research reproducibility. Companion executable source code repositories pair a published paper with the code, data, and documentation needed to reproduce it, turning static publications into living evidence.",
+  "status": "Ideation",
+  "year": "2026",
+  "url": "https://ccr.netspective.foundation",
+  "detail": [
+    "Peer-reviewed papers still anchor scientific discourse, but they are static snapshots. Reproducibility runs into complex dependencies, scattered documentation, and no access to the complete computational environment. Most reviewers never open the supplementary materials, because manual validation costs more time than anyone has, and verification at scale becomes nearly impossible.",
+    "The initiative proposes companion executable source code repositories: standardized, containerized environments that bundle source code, data, and documentation so research can be reproduced exactly as it was originally conducted. The published paper describes what was done and why, the data repository shows what was found, the source code repository demonstrates how it was actually done, and continuous updates keep it current. Published paper plus data repository plus source code repository plus continuous updates equals living evidence.",
+    "Continuous integration of real-world data and real-world evidence is the point. Electronic health records, claims data, patient registries, and digital health tools provide streams of evidence that validate and refine original findings in diverse populations and real clinical settings. Version control and transparent methodology updates preserve the peer-reviewed foundation while allowing evidence-based refinement, moving medicine from eminence-driven to evidence-driven.",
+    "Peer review is complemented, never replaced. It remains the gold standard for validation, published papers keep their role in innovation diffusion, and scientific discourse continues through established channels. What improves is that static conclusions evolve with accumulating evidence, clinical decisions become more evidence-driven, and research impact grows through continuous validation.",
+    "The work is built for every stakeholder in the research ecosystem: government and funders, journals and publishers, researchers and data managers, clinicians and practice leaders, and commercial and non-profit organizations. For funders it complements DMS and FAIR policies with transparent workflows, so reviewers can examine actual analysis pipelines, software versions, and preprocessing decisions rather than inferring methods from prose.",
+    "This is a community-driven ideation microsite rather than a finished product. Templates are published, the discussion runs in the open through Discord and GitHub Discussions, and the design is being worked out with the people who would use it. We back it because our own research and Press publications depend on claims a stranger can check."
+  ],
+  "specs": [
+    {
+      "label": "Published Paper",
+      "value": "Describes what was done and why"
+    },
+    {
+      "label": "Data Repository",
+      "value": "Shows what was found, with metadata and ontologies"
+    },
+    {
+      "label": "Source Code Repository",
+      "value": "Demonstrates how it was actually done"
+    },
+    {
+      "label": "Continuous Updates",
+      "value": "Evolves with new RWD and RWE findings"
+    },
+    {
+      "label": "Data Governance",
+      "value": "Patient-level data stays in secure, governed repositories"
+    },
+    {
+      "label": "Peer Review",
+      "value": "Complemented, never replaced"
+    }
+  ],
+  "links": [
+    {
+      "label": "The publications it backs",
+      "to": "/press"
+    },
+    {
+      "label": "How we charter a shared service",
+      "to": "/studios/about"
+    },
+    {
+      "label": "Back to the register",
+      "to": "/portfolio"
+    }
+  ]
+}

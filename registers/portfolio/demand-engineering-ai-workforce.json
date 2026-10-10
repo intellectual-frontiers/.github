@@ -1,0 +1,70 @@
+{
+  "slug": "demand-engineering-ai-workforce",
+  "order": 40,
+  "kind": "shared-service",
+  "unit": "studios",
+  "title": "Demand Engineering AI Workforce™",
+  "summary": "The companion shared service we run when Revenue Engineering is too early. The outcome it owns is proven demand: a named audience, a claim that survives contact with them, and a first step they will actually take.",
+  "status": "Operating",
+  "year": "2026",
+  "detail": [
+    "Revenue Engineering assumes there is something to sell to someone known: an offer, a rough ICP, and a market that already searches for the problem. Plenty of our work starts before any of that is true. Demand Engineering is what we run in that period, and it stops when demand is evidenced rather than assumed.",
+    "It fits a venture in formation with an invention and no proven buyer, a category with no search volume for outbound and content to attach to, an offer that has never been tested against real objections, and a company whose revenue loop keeps stalling because nobody validated the inputs it runs on.",
+    "The work itself is the same AI Workforce™ form. Problem and audience definition written as executable specs rather than a deck: who has the problem, in what words, with what workaround today. Claim testing, where a small number of falsifiable claims go in front of that audience and each one gets a recorded result. Category and language work, so the problem can be searched for, written about, and asked for by name. Proof assets, meaning the smallest artifact that makes a stranger believe the claim.",
+    "Evidence follows the same search-first rules we use everywhere. Public sites, filings, job posts, procurement notices, news, and public profiles, with source URLs and dates captured. We respect site terms, rate limits, and anti-spam norms, and we do not bypass logins, paywalls, or technical controls.",
+    "There is a handoff gate rather than a gradual blur. When an audience, a claim, and a repeatable first step all hold up, the work transfers to Revenue Engineering, and the specs, signals, scorecards, and evidence carry over instead of being rebuilt. If they do not hold up, that is a result too, and it is cheaper to learn here than in a pipeline that never converts.",
+    "The qualification gate is the same one. If humans still do most of the work, or several developers have to stay in the daily production loop, the model is AI First or AI Augmented and we say so rather than calling it an AI Workforce™. We name it for the outcome it owns, so Demand Engineering AI Workforce™, never with Revenue stuffed into the name.",
+    "Like the other shared services, it is built to stand alone. Every company in the portfolio can draw on it, and if outside demand is strong enough it gets spun out as its own company."
+  ],
+  "specs": [
+    {
+      "label": "Demand Engineering",
+      "value": "The discipline and operating model before revenue"
+    },
+    {
+      "label": "Demand Evidence",
+      "value": "Sourced proof that an audience has the problem"
+    },
+    {
+      "label": "Claim Test",
+      "value": "A falsifiable claim put in front of that audience"
+    },
+    {
+      "label": "Category Language",
+      "value": "The words the problem can be searched for by"
+    },
+    {
+      "label": "Proof Asset",
+      "value": "The smallest artifact that convinces a stranger"
+    },
+    {
+      "label": "Handoff Gate",
+      "value": "Audience, claim, and first step all hold up"
+    }
+  ],
+  "links": [
+    {
+      "label": "Where the work goes once demand is proven",
+      "params": {
+        "slug": "revenue-engineering-ai-workforce"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "The method underneath it",
+      "to": "/native-alpha"
+    },
+    {
+      "label": "How we charter a shared service",
+      "to": "/studios/about"
+    },
+    {
+      "label": "The fund that pays for the first year",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Back to the register",
+      "to": "/portfolio"
+    }
+  ]
+}

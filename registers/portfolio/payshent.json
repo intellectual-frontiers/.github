@@ -1,0 +1,33 @@
+{
+  "slug": "payshent",
+  "order": 65,
+  "kind": "venture",
+  "unit": "studios",
+  "title": "Payshent",
+  "summary": "An HSA card that pays patients a data dividend for consented, de-identified health data. No surveys, no tracking: the value exchange rides on the card transaction itself. The privacy architecture (HIPAA Expert Determination de-identification, transparent revocable consent, IRB oversight for research partnerships) is the work, not the marketing.",
+  "status": "In build",
+  "year": "2026",
+  "url": "https://payshent.netspective.foundation/",
+  "detail": [
+    "An HSA card that pays patients a data dividend for consented, de-identified health data. No surveys, no tracking: the value exchange rides on the card transaction itself. The privacy architecture (HIPAA Expert Determination de-identification, transparent revocable consent, IRB oversight for research partnerships) is the work, not the marketing.",
+    "It is chartered as an operating company, not a project. It carries its own entity, its own operator, and a written closure path if paid demand never shows up.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See the intelligence layer it funds",
+      "params": {
+        "slug": "symvion"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "slug": "native-alpha",
+  "order": 10,
+  "coverage": "The firm's operating method, together with the written materials and engagements delivered under the name.",
+  "detail": [
+    "Native Alpha is what we call the method the firm runs on. It is described in full on its own page and is not restated here.",
+    "The mark is used on the method as taught, on the materials that explain it, and on work sold under the name. It has been in continuous use since 2025 in Press titles and in Studios and Capital engagements."
+  ],
+  "firstUse": "2025",
+  "group": "pending-at-firm",
+  "mark": "Native Alpha™",
+  "owner": "ip",
+  "status": "Common-law mark in use",
+  "title": "Native Alpha™",
+  "usedOn": [
+    {
+      "label": "The Native Alpha method",
+      "to": "/native-alpha"
+    },
+    {
+      "label": "The firm",
+      "to": "/about"
+    }
+  ],
+  "wordmark": "Native Alpha"
+}

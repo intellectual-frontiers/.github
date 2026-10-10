@@ -1,0 +1,64 @@
+{
+  "slug": "healthcare-ai-board-members",
+  "order": 3,
+  "counts": {
+    "experiments": 0,
+    "inConversation": 2,
+    "reviewed": 6,
+    "surfaced": 18
+  },
+  "disqualifying": [
+    "Board seats collected as credentials",
+    "No operating history in a regulated setting"
+  ],
+  "learned": [
+    "The people who write publicly about a program they ended are a very small set, and almost all of them were worth talking to."
+  ],
+  "nativeAlphaSought": "Comfort with a written kill condition, and the standing to enforce it.",
+  "packets": [
+    {
+      "confidence": "Medium",
+      "evidence": [
+        {
+          "claim": "Published the wind down account",
+          "source": "Personal site"
+        },
+        {
+          "claim": "Filed comment on device software guidance",
+          "source": "Federal docket"
+        }
+      ],
+      "nativeAlpha": "Treats a kill condition as a design artifact rather than an admission of failure.",
+      "nextAction": "Ask the Fund I operator for context before any direct contact.",
+      "person": "Illustrative candidate: a former digital health operator",
+      "relationship": "Second degree. A Fund I operator worked with them previously.",
+      "role": "Former chief product officer, regulated digital health company",
+      "signals": [
+        "Public post mortem with numbers",
+        "Written comment on a software as a medical device guidance",
+        "Advisory work limited to two companies"
+      ],
+      "status": "Reviewed",
+      "surfacedFor": "Board members for healthcare AI ventures",
+      "unknowns": [
+        "Availability",
+        "Whether the account matches what other participants remember"
+      ],
+      "whyItMatters": "Every venture we charter carries a written closure condition. A board that will not enforce it makes the condition decorative.",
+      "whySurfaced": "Published a detailed account of ending a monitoring product, including the threshold that triggered the decision and what it cost."
+    }
+  ],
+  "qualifying": [
+    "Held fiduciary responsibility somewhere real",
+    "Can point to a program they ended and explain the decision",
+    "Understands both clinical risk and software delivery"
+  ],
+  "signals": [
+    "Public post mortems",
+    "Testimony or written comment on health technology oversight",
+    "Named in filings tied to a wind down"
+  ],
+  "thesis": "A venture board is useful when at least one member has personally shut something down. We are looking for people with a documented record of ending a program, not only of launching one.",
+  "title": "Board members for healthcare AI ventures",
+  "unit": "Network"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "ourhakeem",
+  "order": 62,
+  "kind": "venture",
+  "unit": "studios",
+  "title": "OurHakeem",
+  "summary": "Verified practitioner consults delivered online, with a real operating stack behind the booking screen: intake, a longitudinal care record, agents that carry the routine work, a clinician copilot, and the compliance apparatus a regulated consult requires.",
+  "status": "In build",
+  "year": "2026",
+  "detail": [
+    "Verified practitioner consults delivered online, with a real operating stack behind the booking screen: intake, a longitudinal care record, agents that carry the routine work, a clinician copilot, and the compliance apparatus a regulated consult requires.",
+    "It is chartered as an operating company, not a project. It carries its own entity, its own operator, and a written closure path if paid demand never shows up.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

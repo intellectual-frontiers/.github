@@ -153,9 +153,10 @@ FR-007.
 ## Open questions
 
 - **OQ-1**: Which legacy Record-shaped content other than the supporting
-  assets of a patent (FR-014 to FR-016) is curated forward into content
-  documents, and under which content kind, is not stated; until then the
-  public website carries it as an archive read from its snapshot
+  assets of a patent (FR-014 to FR-016) and the records registers
+  (0044-public-website FR-074) is curated forward into content documents,
+  and under which content kind, is not stated; until then the public
+  website carries it as an archive read from its snapshot
   (0044-public-website FR-013).
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own

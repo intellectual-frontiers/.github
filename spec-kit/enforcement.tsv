@@ -1375,6 +1375,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-071	none	-	the icons and the rule are the Console's markup; no check reads a rendered page's colours
 0044-public-website FR-072	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the favicon, the ICO, the Apple touch icon and the manifest linked from a page's head and served at their unhashed addresses from the vendored brand, the manifest naming the three icons
 0044-public-website FR-073	check	eidolon: eid check site	the website's check reads every page's title, description, headings and paragraphs against the vendored written voice's patterns.json and refuses an announcement, throat-clearing or an announcing heading; unit tests in src/voice.rs
+0044-public-website FR-074	check	eidolon: eid check site	the generator reads registers/portfolio, trademarks, disclosures and hunts from the public root (tools/eid-site/src/registers.rs); the snapshot holds none of them; the Rust tests render the ventures, products, trademarks, disclosures and hunts pages from the records
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

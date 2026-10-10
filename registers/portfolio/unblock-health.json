@@ -1,0 +1,33 @@
+{
+  "slug": "unblock-health",
+  "order": 133,
+  "kind": "venture",
+  "unit": "studios",
+  "title": "Unblock Health",
+  "summary": "A patient access venture, sponsored by the nonprofit Netspective Foundation, that helps people obtain the health records they are already entitled to and helps provider organizations meet their information-blocking obligations.",
+  "status": "Operating",
+  "year": "2021",
+  "url": "https://www.unblock.health/",
+  "detail": [
+    "Federal law gives patients a right to their records. In practice the request still fails: the form is hard to find, the response is late, the file arrives in a format nobody can use, and there is no record of what went wrong. Unblock Health treats that gap as an operational problem rather than a policy complaint.",
+    "The venture gives patients and their advocates a structured way to ask for records and escalate when the request stalls, and gives provider organizations the evidence trail they need to show they complied with the 21st Century Cures Act information-blocking rules and HIPAA right-of-access requirements.",
+    "It is sponsored by the Netspective Foundation, the nonprofit operating company in this portfolio, so the public-interest side of the work is funded as public capability rather than as an owned position."
+  ],
+  "links": [
+    {
+      "label": "See its nonprofit sponsor",
+      "params": {
+        "slug": "netspective-foundation"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "See the other Studios ventures",
+      "to": "/studios/ventures"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

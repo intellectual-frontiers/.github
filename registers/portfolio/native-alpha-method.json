@@ -1,0 +1,32 @@
+{
+  "slug": "native-alpha-method",
+  "order": 151,
+  "kind": "method",
+  "unit": "press",
+  "title": "Native Alpha™",
+  "summary": "Our method for turning a finding into an owned position: find, prove, decide, compound. It is a work in its own right, because everything else in this register was produced by running it.",
+  "status": "In use",
+  "year": "2016",
+  "detail": [
+    "Native Alpha™ is the method the whole firm runs on. Find something that behaves differently in the field than the literature says it should. Prove it against data somebody already paid for. Decide whether to own it, publish it, fund it, or drop it. Compound what survives.",
+    "We treat the method as a portfolio work because it is the reusable part. A patent covers one invention. The method produced thirty families, a disclosure register, a fund thesis, and a venture charter process, and it will produce the next thirty.",
+    "It is published rather than protected. The advantage is in running it consistently, not in keeping it secret."
+  ],
+  "links": [
+    {
+      "label": "Read how the method works",
+      "to": "/native-alpha"
+    },
+    {
+      "label": "Chasing Native Alpha, the book",
+      "params": {
+        "slug": "chasing-native-alpha"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "See what the method produced",
+      "to": "/patents"
+    }
+  ]
+}

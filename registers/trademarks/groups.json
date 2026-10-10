@@ -1,0 +1,20 @@
+{
+  "readAt": "2026-09-27",
+  "groups": [
+    {
+      "group": "registered",
+      "heading": "Registered",
+      "note": "Marks on the federal register, with the registration number the USPTO issued."
+    },
+    {
+      "group": "pending",
+      "heading": "Pending at the USPTO",
+      "note": "Applications filed and still moving through examination or opposition."
+    },
+    {
+      "group": "pending-at-firm",
+      "heading": "Pending at Intellectual Frontiers",
+      "note": "Marks in use or under renewal review at the firm, with or without a federal application on file."
+    }
+  ]
+}

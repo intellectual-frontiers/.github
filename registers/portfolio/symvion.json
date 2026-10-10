@@ -1,0 +1,33 @@
+{
+  "slug": "symvion",
+  "order": 71,
+  "kind": "shared-service",
+  "unit": "studios",
+  "title": "Symvion",
+  "summary": "A continuous clinical research infrastructure platform that reads signals across consented health transaction data for earlier detection and continuous research. Payshent is its funding and consent layer; Symvion is the intelligence layer that turns compensated patient data into detectable signal.",
+  "status": "In build",
+  "year": "2026",
+  "url": "https://symvion.netspective.foundation/",
+  "detail": [
+    "A continuous clinical research infrastructure platform that reads signals across consented health transaction data for earlier detection and continuous research. Payshent is its funding and consent layer; Symvion is the intelligence layer that turns compensated patient data into detectable signal.",
+    "It is built to stand alone. Every other venture in the portfolio can draw on it, and if the market signal is strong enough it gets spun out as its own company rather than staying an internal tool.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See the funding and consent layer",
+      "params": {
+        "slug": "payshent"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

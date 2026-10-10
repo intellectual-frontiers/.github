@@ -1,0 +1,16 @@
+{
+  "slug": "operationaltruth",
+  "order": 145,
+  "kind": "publication",
+  "unit": "press",
+  "title": "OperationalTruth.org",
+  "summary": "The record of what systems actually do in the field versus what they are documented to do, which is where our findings start.",
+  "status": "Operating",
+  "year": "2018",
+  "url": "https://operationaltruth.org",
+  "detail": [
+    "Most organizations have two versions of a system: the one in the architecture diagram and the one the operators keep running with workarounds. OperationalTruth.org publishes the second version, because that is where the real constraints, costs, and opportunities live.",
+    "The site is the publishing arm of our find step. An invention usually starts with a mismatch between the documented process and the observed behavior. Writing that mismatch down, with enough detail to be useful and enough restraint to be fair, is how we turn an observation into a position.",
+    "We count it as a work because it disciplines the rest of the portfolio. A patent claim, a fund brief, and a venture charter all get stronger when they start from what is true on the ground rather than what is supposed to be true."
+  ]
+}

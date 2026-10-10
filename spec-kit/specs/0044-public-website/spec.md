@@ -303,6 +303,25 @@ how addresses map to content, 0004-addressing; what the application does,
   own words, a work in the vault, a page under the public root's
   `content/`, or the snapshot (FR-013). The lists have one source, the
   design system, so the website and the writers' own sweeps agree.
+- **FR-074**: The company's records that the website shows MUST be held
+  in the public root under `registers/`, one JSON file per record named by
+  its slug, as the patents are (0051-patent-portfolio FR-008), and the
+  generator MUST read them there, never from the snapshot (FR-013):
+  `registers/portfolio/` for the works of the portfolio register that are
+  not held elsewhere (ventures, companies and funds, FR-064; software,
+  shared services, datasets, methods, landscape studies and the
+  company-run publications, FR-063), each with its kind, unit, title,
+  summary, status, year and the detail, links and specifications its page
+  shows, and `moved.json` naming each `/portfolio/` address of the previous
+  website whose work is held elsewhere now and where it lives
+  (0024-persistent-addresses); `registers/trademarks/` for the marks, with `groups.json` naming
+  the groups and the date the USPTO record was read; `registers/disclosures/`
+  for the defensive disclosures; and `registers/hunts/` for the Network's
+  hunts with their packets. A record carries `order`, its place in the
+  register, so a front lists records as the register orders them. A record
+  states facts; the ontology holds the individual it describes where one is
+  asserted (0007-work-and-assets FR-008), and a page MUST show what a
+  record states and say what it does not (FR-063, FR-064).
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -329,11 +348,10 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-007).
 - **FR-013**: Until a register's records are held in the public root, the
   generator MAY read that register from a snapshot of the previous
-  website's data held in the vault: trademarks, defensive
-  disclosures, research areas, pillars, notes and papers, funds, ventures,
-  companies, the Network's hunts, owned channels, the company's own
-  descriptive text, the home page's picture, and the previous website's
-  record pages kept as an archive. A snapshot is fixed
+  website's data held in the vault: research areas, pillars, notes and
+  papers, owned channels, the company's own descriptive text, the home
+  page's picture, and the previous website's record pages kept as an
+  archive. The records registers have left it (FR-074). A snapshot is fixed
   data: no command writes it, and no one adds to it by hand. It MUST hold
   only what the previous website published to the public, and a register
   leaves it when the register moves into the public root. Its text MAY be

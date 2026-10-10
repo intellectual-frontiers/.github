@@ -1,0 +1,73 @@
+{
+  "slug": "rural-hospital-venture-architect",
+  "order": 0,
+  "counts": {
+    "experiments": 1,
+    "inConversation": 4,
+    "reviewed": 11,
+    "surfaced": 34
+  },
+  "disqualifying": [
+    "Only consulting engagements, never accountable for the result",
+    "Track record built entirely inside large integrated systems",
+    "Cannot name a measurement that would have proven them wrong"
+  ],
+  "learned": [
+    "Operators who can describe a failure in numbers convert to a real conversation far more often than the ones with the cleanest record.",
+    "The thesis originally asked for a CEO. The people who fit were mostly COOs and service line directors, so the thesis was corrected."
+  ],
+  "nativeAlphaSought": "The rare combination of hospital line responsibility and comfort designing a new operating model rather than defending the existing one.",
+  "packets": [
+    {
+      "confidence": "Medium",
+      "evidence": [
+        {
+          "claim": "Presented the swing bed redesign with before and after figures",
+          "source": "State hospital association annual meeting program"
+        },
+        {
+          "claim": "Filed public comment on a telehealth reimbursement rule",
+          "source": "Federal rulemaking docket"
+        },
+        {
+          "claim": "Named as co-author on the transfer avoidance brief",
+          "source": "Association publication"
+        }
+      ],
+      "nativeAlpha": "Can hold a clinical argument and a payer argument in the same sentence, which is what a rural venture needs from its first operator.",
+      "nextAction": "Ask one question by email: what did the swing bed program look like two years later, and what would they change.",
+      "person": "Illustrative candidate: a rural COO",
+      "relationship": "No direct relationship. One of our Press contributors interviewed a colleague at the same facility in 2024.",
+      "role": "Chief operating officer, 25 bed critical access hospital",
+      "signals": [
+        "Two conference sessions in eighteen months on the same operating problem",
+        "Co-authored a state association practice brief on transfer avoidance",
+        "Public comment filed on a rural telehealth reimbursement rule"
+      ],
+      "status": "Reviewed, contact drafted",
+      "surfacedFor": "Venture Architect for rural hospital operations",
+      "unknowns": [
+        "Whether the swing bed result held after the presentation",
+        "Whether they are willing to leave an operating role for a chartered venture",
+        "What they would need to be true about equity and governance"
+      ],
+      "whyItMatters": "The venture thesis fails without someone who can defend the model to clinicians and to the plan on the same day. That person is rare and usually not looking.",
+      "whySurfaced": "Presented a swing bed program redesign at a state hospital association meeting and published the census and margin figures before and after, including the two quarters when the program lost money."
+    }
+  ],
+  "qualifying": [
+    "Ran a department or a facility with a real budget, not an advisory role",
+    "Changed a service line and can describe what the change did to volume and margin",
+    "Has publicly explained a decision that went badly",
+    "Works in a market where the nearest tertiary center is more than an hour away"
+  ],
+  "signals": [
+    "Conference talks about rural service line economics",
+    "Named in state hospital association program materials",
+    "Writing that argues with a widely held position in the field",
+    "Board or committee service in rural health policy"
+  ],
+  "thesis": "A rural hospital company can only be chartered by someone who has run the operation, not by someone who has studied it. We are looking for an operator who has carried a critical access hospital through a service line change and came out with the numbers to show for it.",
+  "title": "Venture Architect for rural hospital operations",
+  "unit": "Studios"
+}

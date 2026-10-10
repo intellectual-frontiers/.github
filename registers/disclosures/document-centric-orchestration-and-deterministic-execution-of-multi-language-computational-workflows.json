@@ -1,0 +1,10 @@
+{
+  "slug": "document-centric-orchestration-and-deterministic-execution-of-multi-language-computational-workflows",
+  "order": 0,
+  "date": "Apr 16, 2026",
+  "number": "IFJ-2026W05VT33XP",
+  "status": "Published",
+  "summary": "Systems and methods for executing, orchestrating, and materializing computational workflows from document-based representations. Human-readable documents such as Markdown files carry the documentation, the executable logic, and the structured outputs as one artifact.",
+  "title": "Document-Centric Orchestration and Deterministic Execution of Multi-Language Computational Workflows",
+  "url": "https://www.intellectualfrontiers.com/defensive-disclosures/document-centric-orchestration-and-deterministic-execution-of-multi-language-computational-workflows"
+}

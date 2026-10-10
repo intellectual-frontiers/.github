@@ -48,7 +48,7 @@ ifcore:displayName a owl:DatatypeProperty ; rdfs:subPropertyOf schema:name ; rdf
 ifcore:IntellectualFrontiersLLC a ifcore:Company ;
     rdfs:label "Intellectual Frontiers LLC"@en ;
     skos:altLabel "Intellectual Frontiers"@en ;
-    schema:slogan "A think tank that builds useful things."@en ;
+    schema:slogan "A think tank that builds consequential things."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:ShahidNehalShah a ifcore:Person ;
