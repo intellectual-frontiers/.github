@@ -501,7 +501,7 @@ frontiers-brand FR-003	check	.github: agora check design-systems --runner browse
 frontiers-brand FR-004	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: Inter, Source Serif 4, wordmark weight 700
 frontiers-brand FR-005	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: palette inks and unit colors on white and Warm Paper
 frontiers-brand FR-006	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files and Frontiers palette: sizes load as stated; light and dark, PNG and WebP; names state sizes
-frontiers-brand FR-007	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files: icon files load at their stated size; crop provenance not checked
+frontiers-brand FR-007	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Logo files: icon and squared icon files load at their stated size; the unit suite finds the squared set square, PNG at each size and WebP below the master; crop provenance not checked
 frontiers-brand FR-008	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Frontiers palette: minimum sizes stated
 frontiers-brand FR-009	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Specimen: light lockups on light, dark on dark; redrawing or recoloring not checked
 frontiers-brand FR-010	none	-	clear space is a placement judgment; no check
@@ -1373,6 +1373,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-069	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs) find only the placeholder on a page served beside the vault's launcher, from the sources or from a model, and nothing on a build or on a model served with no launcher beside it, render the Console at its address from a desk export with its parts, items, roll-up and guides, and run lines through a stub launcher: a check runs, a record dry-runs first, a decision and a shell line are refused, a model answers not found
 0044-public-website FR-070	check	eidolon: eid test	the Rust tests find the "Console" control only on a page that carries the Console
 0044-public-website FR-071	none	-	the icons and the rule are the Console's markup; no check reads a rendered page's colours
+0044-public-website FR-072	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the favicon, the ICO, the Apple touch icon and the manifest linked from a page's head and served at their unhashed addresses from the vendored brand, the manifest naming the three icons
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
