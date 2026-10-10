@@ -123,22 +123,26 @@ content document is, 0002-content-format; how addresses map to content,
   `<origin>` is `auto` for a rendition generated from the work's source
   and `original` for one that was not, and `<audience>` is `public` for a
   Public work (and for every preview, FR-056) and `confidential`
-  otherwise. The public tree MUST be part of the website. The
-  confidential tree MUST NOT be part of a built website, an archive or a
-  container image unless that image serves it behind sign-in (FR-058): it
-  is served by the program on the person's own computer, and on a
-  published website only to a reader FR-058 allows (FR-027).
-- **FR-058**: The program MUST offer an authenticated mode: a reader signs
-  in with GitHub at `/__eid/login` (FR-036), and the program MUST serve a
-  confidential rendition (FR-057) only to a reader GitHub says can read
-  the vault's repository, checked at sign-in, for a session of at most
-  twelve hours held in a cookie the program signs. It MUST keep no GitHub
-  token. To a reader not signed in it MUST answer every confidential
-  address alike, by sending the reader to sign in, whether or not a file is
-  there (FR-003). Every credential MUST come from the destination's
-  secrets (FR-022). A program holding confidential renditions with no
-  sign-in configured MUST refuse to start, and without sign-in the
-  confidential tree MUST answer not found. The pages themselves stay
+  otherwise. A preview's images MUST be open to every visitor. Every
+  other rendition, whatever its audience, MUST be served only to a person
+  who has logged in (FR-058), and MUST NOT be part of a built website, an
+  archive, or an image made without its renditions. On the person's own
+  computer the program MUST serve the whole tree without a log-in, with a
+  listing of each of its directories.
+- **FR-058**: The program MUST offer a log-in: at `/__eid/login` (FR-036),
+  linked as "Login" at the bottom right of every page's footer, a person
+  enters an email address, and when it is one of the addresses the
+  program itself holds (not its configuration) the program MUST email a
+  code that holds for three minutes; the code entered logs the person in
+  for a session of at most twelve hours, held in a cookie the program
+  signs. Any other address MUST see the same steps and MUST NOT be logged
+  in. A page MUST NOT name a rendition's address: once logged in, the page
+  MUST list its work's renditions for download, asked of the program; not
+  logged in, a rendition's address MUST answer that a log-in is needed and
+  send the person to log in, whether or not a file is there (FR-003).
+  Tries and emails MUST be limited. Every credential MUST come from the
+  destination's secrets (FR-022). A program holding renditions with no
+  log-in configured MUST refuse to start. The pages themselves stay
   public.
 
 ## Addresses
