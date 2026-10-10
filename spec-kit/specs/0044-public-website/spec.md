@@ -361,15 +361,21 @@ how addresses map to content, 0004-addressing; what the application does,
   each at `/topics/<slug>` with its introduction, parent and the records
   filed under it (FR-042), and the subject tags of `registers/topics/`
   (FR-074).
-- **FR-077**: The website's own copy MUST be held in the public root under
-  `site/`: `site/about.json`, the About page's proposition, opening
-  statement and body, claims standard, unit boundaries, provenance and
-  corporate facts. The website's own package in the vault
-  (`works/website/intellectualfrontiers-com/`) MUST hold the home page's
-  picture and the previous website's sitemap (FR-014); the Zero Security
-  Theatre registers (FR-043) are a data file beside that area's research
-  record (0017-spoken-and-research-works FR-018). The generator writes
-  the crawler rules itself.
+- **FR-077**: The website is a work of kind `website` whose slug is its
+  domain name (0015-work-packages FR-004, FR-036):
+  `works/website/www.intellectualfrontiers.com/`, the default website.
+  The generator MUST build the site named to it, or the default, and read
+  from that package its identity (`website.yml`), its stylesheet, scripts
+  and interactive tools, the home page's picture and the previous
+  website's sitemap (FR-014); its check MUST refuse the website when a
+  page's address, contact address or analytics container (FR-015) differs
+  from what `website.yml` states, and MUST write the crawler rules from
+  it. The website's own copy MUST be held in the public root under
+  `websites/<fqdn>/`: `websites/www.intellectualfrontiers.com/about.json`,
+  the About page's proposition, opening statement and body, claims
+  standard, unit boundaries, provenance and corporate facts. The Zero
+  Security Theatre registers (FR-043) are a data file beside that area's
+  research record (0017-spoken-and-research-works FR-018).
 - **FR-078**: Every date the website shows MUST be a fact its source
   states, never chosen for effect. A work's date is the date its record
   carries. A pillar's start is its `:started:`, and where that year is
@@ -425,7 +431,8 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-026) keeps its old address as a permanent redirect, from the record's
   `:legacy-slugs:`.
 - **FR-015**: Every page MUST load the analytics container the previous
-  website used, and no other tracking.
+  website used, the one the website's package states (FR-077), and no
+  other tracking.
 
 ## Publishing and testing
 
