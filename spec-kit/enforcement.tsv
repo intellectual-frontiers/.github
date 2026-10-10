@@ -515,6 +515,7 @@ frontiers-brand FR-017	check	.github: agora check design-systems --runner browse
 frontiers-brand FR-018	check	.github: agora check imagery	agora check imagery: every app icon and favicon.ico present at its size; Logo files: each loads at its size
 frontiers-brand FR-019	check	.github: agora check design-systems --runner browser --scope frontiers-brand	Unit marks: one per unit color, one-color SVG in currentColor; placement and size are a review judgment
 frontiers-brand FR-020	check	.github: agora check openedx --scope frontiers-brand	agora check openedx: the package and dist/ are what the tool and Paragon write; built pairs meet 4.5:1 (CI browser job)
+frontiers-brand FR-021	none	-	the icon file is read by the website; no check draws it
 frontiers-nature-web FR-001	none	-	registration and scope; no check
 frontiers-nature-web FR-002	none	-	directory contents; no check
 frontiers-nature-web FR-003	check	.github: agora check design-systems --runner browser --scope frontiers-nature-web	Design tokens: required tokens defined; Theme: tokens.json mirrors tokens.css
@@ -1369,6 +1370,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-066	none	-	the navigation still lists eight items
 0044-public-website FR-067	none	-	no Markdown copy, llms.txt line or issue JSON exists for the Journal yet
 0044-public-website FR-068	none	-	the redirects are not declared yet
+0044-public-website FR-069	check	eidolon: eid test	the Rust tests (tests/gaps.rs) render a work page from the vault with a desk export and find the band with its items, and render a model and find none
+0044-public-website FR-070	check	eidolon: eid test	the Rust tests find the "Show what's left" control only on a page that carries the band
+0044-public-website FR-071	none	-	the icon and the rule are the band's markup; no check reads a rendered page's colours
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
