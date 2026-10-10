@@ -388,12 +388,15 @@ how addresses map to content, 0004-addressing; what the application does,
   hold (the earliest patent filing, mark in use, paper in a journal, essay
   and post), computed, never written as a literal.
 - **FR-079**: A kicker (the small label above a heading, on a page head, a
-  section head or a card) MUST say something the words beside it do not:
-  a work's kind where the heading does not state it, a series, a journal,
-  a subject, a status. It MUST NOT repeat the heading, the lede, the
-  breadcrumb trail, the section's own heading, a badge or the page's
-  place in the site. A section of one kind of card carries no kind kicker,
-  and a page whose trail names what it belongs to carries none either.
+  section head or a card), a badge and a meta line MUST each say something
+  the words beside them do not: a work's kind where the heading does not
+  state it, a series, a journal, a subject, a status, a year. None of them
+  MUST repeat the heading, the lede, the breadcrumb trail, the section's
+  own heading, one another, a fact the row beside them states, or the
+  page's place in the site. A section of one kind of card carries no kind
+  kicker, a page whose trail names what it belongs to carries none either,
+  a status shown as a badge is not the meta line too, and a shelf headed
+  as an experiment does not badge each book again.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
