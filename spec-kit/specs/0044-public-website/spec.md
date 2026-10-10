@@ -216,8 +216,10 @@ how addresses map to content, 0004-addressing; what the application does,
   Markdown copy beside its page, as ScholarlyArticle structured data, and
   as one line of `llms.txt`; each issue as a JSON document; and a stable
   identifier and citation form on every article and issue.
-- **FR-069**: When the program serves the website from the vault on the
-  person's own computer (FR-017), the page of every book, research paper,
+- **FR-069**: When the program senses the vault's command line beside the
+  website it serves, its launcher `eid` at the root of the clone it renders
+  from, which is so on the person's own computer (FR-017) and never in the
+  container image (FR-035), the page of every book, research paper,
   pillar and note, Journal article, product and venture MUST show, under
   its page head and before the work, a band headed "Console", read from the
   desk export the vault's command line writes (`eid insight build desk`,
@@ -260,9 +262,14 @@ how addresses map to content, 0004-addressing; what the application does,
   page, so that the check of the pages (FR-004) never reads it and a page
   is published without it. The Console MAY name a work that is not yet
   announced, since it is the editor's own desk on the editor's own
-  computer. The Console MUST NOT render from a model (FR-035) or at a
-  container host, MUST NOT be in the model or in any file the model holds,
-  and nothing it shows MAY reach a published page (FR-003, FR-027).
+  computer. The program MUST sense the Console by that launcher and by
+  nothing else, with no mode to choose: the same build and the same serve
+  show it where the launcher is and not where it is not, so what the
+  person tests differs from what the destination serves by the placeholder
+  and the control alone. The Console MUST NOT render where no launcher is
+  beside the website, the container host among them (FR-035), MUST NOT be
+  in the model or in any file the model holds, and nothing it shows MAY
+  reach a published page (FR-003, FR-027).
 - **FR-070**: Wherever the Console may render, the masthead MUST carry a
   control labelled "Console" that shows and hides every Console on the
   page without a reload. The person's choice MUST be kept in the browser
@@ -576,8 +583,9 @@ how addresses map to content, 0004-addressing; what the application does,
 - A work's page served from the vault with no item in the desk export:
   the Console's "What's left" says nothing is left on the desk, and its
   guides still show, per FR-069.
-- The website served from an exported model on the person's own computer:
-  no Console and no control, per FR-069 and FR-070.
+- The website served where no `eid` launcher is beside it, as the
+  container image serves it: no Console and no control, per FR-069 and
+  FR-070.
 - The desk export is older than the vault's records: the Console shows
   when it was made and the command that refreshes it, per FR-069.
 - A person hides the Console on one page and opens another: it stays
@@ -591,8 +599,14 @@ how addresses map to content, 0004-addressing; what the application does,
 - A record command run from the Console: it runs as a dry run first and
   shows what it would change; a second request runs it for real, per
   FR-069.
-- A line posted to the run address from a model or a container host: it
-  answers not found, per FR-069.
+- A line posted to the run address where no launcher is beside the
+  website, the container host among them: it answers not found, per
+  FR-069.
+- The program started the container's way, from an exported model, beside
+  a vault clone with its launcher on the person's computer: the pages carry
+  the placeholder and the control, the Console is read from the vault at
+  the request, and the works tree stays as the destination serves it, per
+  FR-069 and FR-058.
 - A work at Intake, not yet announced, on the Console's roll-up of a
   front: the Console names it, since it is rendered at the request on the
   editor's computer and is part of no page; the page itself does not, per
