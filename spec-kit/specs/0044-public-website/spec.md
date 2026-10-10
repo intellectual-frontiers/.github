@@ -406,7 +406,11 @@ how addresses map to content, 0004-addressing; what the application does,
   at when to use it, not that it is a skill. A heading names its subject,
   never the page or the reader's position on it: no "here", "below",
   "this page" or "this patent" where the number is known, and no empty
-  heading.
+  heading. A link or button is named by what it reaches ("Read the
+  original patent", "Visit netspective.com"), never "here" or a bare
+  "Visit", and one page makes one call to the same action: two buttons to
+  the same address, or a sentence that asks what the button beside it
+  asks, are one too many.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
