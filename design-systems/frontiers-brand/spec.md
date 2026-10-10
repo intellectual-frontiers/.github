@@ -148,8 +148,9 @@ restating them.
   in `currentColor` with a 2-pixel stroke and round caps and joins, kept under `icons/` and
   named for what it means, so that a page draws it in its text's colour at any size. Icons
   are drawn, never traced from the logo, and are not part of the decoration kit. The first
-  is `whats-left.svg`, the mark of the website's "What's left" band (0044-public-website
-  FR-071).
+  three mark the website's Console (0044-public-website FR-071): `console.svg` the Console
+  and its control, `whats-left.svg` its "What's left" part and `desk.svg` its "Starting
+  something new" part.
 
 ## Out of scope
 
