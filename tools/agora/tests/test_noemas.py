@@ -20,8 +20,9 @@ PAT = f"ex:Pat a ifcore:Person ; {PUB} .\nex:Bot a prov:SoftwareAgent ; {PUB} .\
 
 def idea(extra: str = "", types: str = "ifcore:HypothesisType", defn: bool = True, claim: bool = True, falsifier: bool = True) -> str:
     """A small Noema of one subject, and the pieces a valid hypothesis carries; a test removes or breaks one."""
+    definition = 'skos:definition "an idea" ;' if defn else ""
     out = (PAT + f"ex:H a ifcore:IntellectualConstruct ; rdfs:label \"H\" ; dcterms:type {types} ; {PUB} .\n"
-           f"ex:Rec a ifcore:Noema ; ifcore:reflects ex:H ; {'skos:definition \"an idea\" ;' if defn else ''} {PUB} .\n")
+           f"ex:Rec a ifcore:Noema ; ifcore:reflects ex:H ; {definition} {PUB} .\n")
     if claim:
         out += (f"ex:C a schema:Claim ; {PUB} .\nex:St a ifcore:ReflectionRelationship ; ifcore:relationType ifcore:States ; ifcore:relationFrom ex:H ; "
                 f"ifcore:relationTo ex:C ; ifcore:claimLabel ifcore:UnknownLabel ; {PUB} .\n")
