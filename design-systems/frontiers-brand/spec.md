@@ -144,6 +144,12 @@ restating them.
   replaced by its text mixed into its surface at each gray's own luminance. Every built pair of
   body, headings, link, muted text and each button's text on its background MUST meet 4.5:1, and
   the committed `openedx/dist/` MUST be what the build writes.
+- **FR-021**: An interface icon MUST be a one-color stroke SVG on a 24-pixel grid, drawn
+  in `currentColor` with a 2-pixel stroke and round caps and joins, kept under `icons/` and
+  named for what it means, so that a page draws it in its text's colour at any size. Icons
+  are drawn, never traced from the logo, and are not part of the decoration kit. The first
+  is `whats-left.svg`, the mark of the website's "What's left" band (0044-public-website
+  FR-071).
 
 ## Out of scope
 

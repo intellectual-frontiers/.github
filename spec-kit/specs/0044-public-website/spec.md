@@ -216,6 +216,34 @@ how addresses map to content, 0004-addressing; what the application does,
   Markdown copy beside its page, as ScholarlyArticle structured data, and
   as one line of `llms.txt`; each issue as a JSON document; and a stable
   identifier and citation form on every article and issue.
+- **FR-069**: When the program serves the website from the vault on the
+  person's own computer (FR-017), the page of every book, research paper,
+  pillar and note, Journal article, product and venture MUST show, under
+  its page head and before the work, a band headed "What's left": what the
+  work still needs, read from the desk export the vault's command line
+  writes (`eid insight build desk`, specified in the vault). The band MUST group
+  the export's items by who acts (the decision authority, the editor, the
+  author, the producer) and show for each its level (a blocker, needs a
+  person, for information), its sentence, the command that shows or fixes
+  it, where it was found, and the requirement it serves as the spec's own
+  text cut at two hundred characters with the spec's path and line; the
+  work's readiness score and the prerequisites of its next stage; when the
+  export was made and the command that refreshes it; and "Nothing is left
+  on the desk" when the export holds no item for the work. When the export
+  is missing the band MUST say so and name the command that makes it. The
+  band MUST NOT render from a model (FR-035) or at a container host, MUST
+  NOT be in the model or in any file the model holds, and nothing it shows
+  MAY reach a published page (FR-003, FR-027).
+- **FR-070**: Wherever the band may render, the masthead MUST carry a
+  control labelled "Show what's left" that shows and hides every band on
+  the page without a reload. The person's choice MUST be kept in the
+  browser and hold across pages, the band MUST be shown until the person
+  hides it, and the control MUST NOT appear where the band may not render.
+- **FR-071**: The band's heading and the control MUST carry the brand's
+  "what's left" icon (frontiers-brand FR-021) before the words, drawn in
+  the text's colour. The band MUST be set apart from the page by a double
+  rule in the brand's tertiary colour and MUST say that it is for this
+  computer only.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -515,6 +543,14 @@ how addresses map to content, 0004-addressing; what the application does,
   permanently to the skill's address on the products front, per FR-068.
 - A research pillar's address after the merge: it answers as before,
   within the Journal's section of the website, per FR-061 and FR-068.
+- A work's page served from the vault with no item in the desk export:
+  the band says nothing is left on the desk, per FR-069.
+- The website served from an exported model on the person's own computer:
+  no band and no control, per FR-069 and FR-070.
+- The desk export is older than the vault's records: the band shows when
+  it was made and the command that refreshes it, per FR-069.
+- A person hides the band on one page and opens another: it stays hidden,
+  per FR-070.
 - A request for a namespace address such as `/ontology/core`: it answers
   with the not-found page, and the ontology is read in the IF Console, per
   FR-012.
@@ -611,6 +647,13 @@ how addresses map to content, 0004-addressing; what the application does,
 - **OQ-14**: Whether the ventures front, once software and services have
   left it, shows funds as its own showcase or under each venture they back
   is not decided.
+- **OQ-15**: Whether the fronts and the home page carry a band that rolls
+  up what is left across a kind, and whether a page of the vault's whole
+  desk is served at a reserved address, is not decided (FR-069 covers a
+  work's own page).
+- **OQ-16**: Whether the desk export is made again while the website is
+  served and the vault changes, or only when the person runs its command,
+  is not decided; the vault's command line decides it.
 
 ## Key entities
 
@@ -644,6 +687,9 @@ how addresses map to content, 0004-addressing; what the application does,
   and the masthead.
 - **A front** — one of the six items of the navigation, each a showcase
   of one kind of work or the Journal.
+- **The desk** — what is left to do for a work, read from the vault's
+  desk export and shown as the "What's left" band on the work's page,
+  only on the person's own computer.
 - **A snapshot** — the previous website's published data, fixed, held in the
   vault until each register moves into the public root.
 - **A publishing destination** — a container host the website's image is
@@ -691,6 +737,8 @@ how addresses map to content, 0004-addressing; what the application does,
   outside the Journal's front, and none changed its address in the merge.
 - **SC-016**: No product is shown without its stage, and no shared service
   is labeled an AI Workforce that its record does not call one.
+- **SC-017**: No model, no file of a model and no published page carries
+  the "What's left" band, its control or the desk export.
 
 ## Review & acceptance checklist
 
