@@ -1066,7 +1066,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0042-agora FR-035	check	.github: agora check commands	agora check commands checks docs/index.html uses only the brand's own assets and pages.yml calls ./agora docs build; the Pages deployment itself is the owner's setting and cannot be checked here
 0042-agora FR-036	check	.github: agora check commands	agora check commands fails a README without the link to the guide, the one-time system ensure and help, or over 120 lines
 0042-agora FR-037	check	.github: agora test	tests read the Turtle reader against every statement of the ontology files, then ontology list (kinds, scheme, ranked match, the row shape and icons) and ontology show (a class, a property, an individual, a scheme and a concept; statements, references, citing requirements, refusal with the nearest CURIEs), context ontology:TERM and the MCP resource; agora check commands compares the Ontology view and its icon and search declarations with the data
-0044-public-website FR-001	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that the build is a pure function of the repositories: two builds of the same commits compare equal
+0044-public-website FR-001	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that rendering is a pure function of the model: two renders of the same commits, and of the exported model, compare equal
 0044-public-website FR-002	none	-	repository topology; no check
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
 0044-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
@@ -1081,7 +1081,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-013	none	-	the snapshot is fixed data and no command writes it; no check of a hand edit
 0044-public-website FR-014	check	eidolon: eid site status	lists every previous sitemap address neither served nor redirected
 0044-public-website FR-015	check	eidolon: eid check site	every page carries the one analytics container
-0044-public-website FR-016	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check the build's redirect and header lists and the not-found page
+0044-public-website FR-016	check	eidolon: eid test	the Rust tests (tests/served.rs) drive the server: trailing slash, index and .html redirect, the kept redirects, unknown address 404
 0044-public-website FR-017	check	eidolon: eid test	the Rust tests (eid-site: cargo test) drive the server: trailing slash, index and .html redirect with 307, unknown address 404; running the image on a computer is not tested
 0044-public-website FR-018	check	eidolon: eid check ontology	the destination's PublishingDestination record names its vendor service, strategy, configuration and deployment record files
 0044-public-website FR-019	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that a publish is a preview unless --production, which needs --by and --because; no command changes DNS or routes
@@ -1093,14 +1093,14 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-025	none	-	the application is not built yet; no check that it serves a generated page byte for byte
 0044-public-website FR-026	none	-	the reserved-address list and the generator's collision refusal are not built yet
 0044-public-website FR-027	none	-	the application is not built yet; no check of its evaluation or its not-found answer
-0044-public-website FR-028	none	-	no check that a static host alone serves the build's files
+0044-public-website FR-028	none	-	the application is not built yet
 0044-public-website FR-029	none	-	no command deploys the application's image yet; eid check ontology checks an ApplicationHost record's fields, and nothing yet checks a deploy goes to a described host
 0044-public-website FR-030	none	-	the application is not built yet; no command runs it locally
-0044-public-website FR-031	review	0044-public-website FR-031	whether functionality is dynamic and server-side is judged in review
+0044-public-website FR-031	check	eidolon: eid test	the Rust tests (tests/datastar.rs) check the server-driven parts; whether a new part is dynamic is judged in review
 0044-public-website FR-032	check	eidolon: eid test	a test checks that the site group holds no Python that renders, serves or publishes the website and that cargo is the rust kit's
 0044-public-website FR-033	check	eidolon: eid test	the Rust tests (eid-site: cargo test) check that a changed source renders again only the pages whose source graph holds it, and that an unchanged rendering renders no dependent again
-0044-public-website FR-034	check	eidolon: eid test	the Rust tests (eid-site: cargo test) compare the server's answer for every file of a build with the written file, with the header list on every answer; the keeping of the last good state is not tested
-0044-public-website FR-035	none	-	no check that the image holds only the checked build, answers /__eid/health and holds no credential
+0044-public-website FR-034	check	eidolon: eid test	the Rust tests (tests/served.rs) compare the answers rendered from the sources with those rendered from the exported model
+0044-public-website FR-035	check	eidolon: eid test	the Rust tests (tests/served.rs) export the model, check it holds no hidden title, no ontology and no path of the computer, render it byte-identical to the vault, and refuse to start a model holding renditions without the log-in
 0044-public-website FR-036	check	eidolon: eid check site	the check fails a page or file at an address under /__eid/; the Rust tests check that the server answers only health and status there
 0044-public-website FR-037	check	eidolon: eid check images	eid check images fails a source with no companion or a stale one, and a website-only picture that is still a PNG or JPEG or a WebP over 200 KB; the Rust tests (tests/images.rs) check the conversion, the hash rule with the modified time as a shortcut, the rewrite of references and the deletion of an original only when nothing names it, that nothing outside the roots is written and that a pipeline's original is never changed
 0044-public-website FR-038	check	eidolon: eid test	the Rust tests (tests/cdn.rs) check request building, the difference between the file and recorded zone answers, the hostname scope of every cache rule and the refusals; not run against Cloudflare; no check yet that a production publish is followed by a purge
@@ -1323,7 +1323,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0049-platforms FR-052	none	-	authentication, quotas, audit and generated documentation are in the platform's code; checked in its repository
 0049-platforms FR-053	none	-	a platform's storage generation is checked in its own repository
 0044-public-website FR-039	check	eidolon: eid check site	the check fails each of the five conditions; the Rust tests (check.rs) cover them
-0044-public-website FR-040	check	eidolon: eid test	the Rust tests (tests/served.rs) check the hashed addresses, the immutable header on /static/ and the header file; no check of a deployed host's headers
+0044-public-website FR-040	check	eidolon: eid test	the Rust tests (tests/served.rs, tests/auth.rs) check the hashed addresses, the immutable header on /static/ and a logged-in page served private
 0044-public-website FR-041	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the labels on the hunts pages
 0044-public-website FR-042	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the sections, the area page and the filed-under list
 0044-public-website FR-043	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the area page and the register pages
@@ -1339,9 +1339,10 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-053	none	-	the application is not built yet
 0044-public-website FR-054	check	eidolon: eid test	the Rust tests (src/render/layout.rs) check the trail, the one current crumb and the fold; the sticky band and the menu are not tested in a browser
 0044-public-website FR-055	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the profile pages, their works and the links from a book, a paper and a patent; no biography on a book page
-0044-public-website FR-056	check	eidolon: eid check site	the check fails any PDF under /books/ and a preview of a book not on the website; eid preview build chooses the pages; the Rust tests check the reader, the shuffled tiles and the watermark
-0044-public-website FR-057	check	eidolon: eid check site	the check fails any rendition but a preview in the built website and a preview of a book not on it; the archive and the image leave renditions out unless asked (tests/gaps.rs, tests/auth.rs)
-0044-public-website FR-058	check	eidolon: eid test	the Rust tests (tests/auth.rs) log in against a fake Microsoft Graph: only an allowed address gets a code, a wrong code and a forged session are refused, every rendition address asks to log in alike, the downloads are listed only when logged in, and a site holding renditions does not start without the log-in
+0044-public-website FR-056	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs, src/preview.rs) choose the pages from a PDF, draw a page on demand from the model as shuffled tiles over Datastar, and refuse a page outside the preview and the PDF itself; the check fails any PDF under /books/
+0044-public-website FR-057	check	eidolon: eid check site	the check fails any rendition among the website's files; the model leaves renditions out unless exported with them (tests/served.rs, tests/gaps.rs, tests/auth.rs)
+0044-public-website FR-058	check	eidolon: eid test	the Rust tests (tests/auth.rs) log in against a fake Microsoft Graph, by pages and by the dialog: only an allowed address gets a code, a wrong code and a forged session are refused, every rendition address asks to log in alike, the downloads are on the page, privately, only when logged in
+0044-public-website FR-059	check	eidolon: eid test	the Rust tests (tests/datastar.rs, tests/auth.rs, src/server.rs) drive the log-in dialog, the patched page parts, a book's preview pages, the server-side filtering and search and the live patches over Datastar
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
