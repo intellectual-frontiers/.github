@@ -196,6 +196,14 @@ requirement	mechanism	by	note
 0009-press FR-044	none	-	vendor payments and disclosures are not recorded anywhere a check can read
 0009-press FR-045	none	-	tie to Native Alpha is editorial judgment
 0009-press FR-046	check	eidolon: eid test	test_imprint: the catalog and the website's /books group by reader side, then domain, a book in several domains once
+0009-press FR-047	none	-	department labels are not checked until the vault renders the Journal front (0044 FR-061)
+0009-press FR-048	none	-	no check that a position states what would make it wrong; the register of positions is not rendered yet
+0009-press FR-049	none	-	no correction record exists yet
+0009-press FR-050	none	-	whether a product has its introducing article is editorial judgment
+0009-press FR-051	none	-	no made item or release note of a product exists yet
+0009-press FR-052	none	-	no shared service has a public failed claim yet
+0009-press FR-053	none	-	no issue record exists yet; the front page is 0044 FR-061
+0009-press FR-054	none	-	the elsewhere department is 0044 FR-065; whether a piece changed a reported decision is editorial judgment
 0010-capital FR-001	none	-	rule of judgment; no check possible
 0010-capital FR-002	none	-	rule of judgment; no check possible
 0010-capital FR-003	none	-	rule of judgment; no check possible
@@ -239,6 +247,7 @@ requirement	mechanism	by	note
 0011-studios FR-025	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-026	none	-	rule of judgment; no check or defined review covers it
 0011-studios FR-027	none	-	rule of judgment; no check or defined review covers it
+0011-studios FR-028	none	-	no spin-out is recorded yet
 0012-network FR-001	none	-	rule of judgment; no check or defined review covers it
 0012-network FR-002	none	-	rule of judgment; no check or defined review covers it
 0012-network FR-003	none	-	rule of judgment; no check or defined review covers it
@@ -274,6 +283,7 @@ requirement	mechanism	by	note
 0013-web-content-kinds FR-014	check	eidolon: eid check content	shape checks one schema:about Patent
 0013-web-content-kinds FR-015	check	eidolon: eid check content	shape checks one schema:about Patent or PatentFamily
 0013-web-content-kinds FR-016	check	eidolon: eid check site	a supporting asset page shows registry facts only from registers/patents; associatedMedia is shape-checked
+0013-web-content-kinds FR-017	none	-	no issue document exists yet; the JournalIssuePage shape is in ifweb.ttl
 0014-design-systems FR-001	none	-	definition; nothing to test
 0014-design-systems FR-002	none	-	permission; nothing to test
 0014-design-systems FR-003	check	.github: agora check ontology	slug must end with a kind code read from ifcore.ttl; directory contents not checked
@@ -1078,8 +1088,8 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-003	gate	eidolon: eid site build	the build includes only Public or announced works and Public content documents
 0044-public-website FR-004	gate	eidolon: eid site build	the build runs the leak check and writes nothing when it fails
 0044-public-website FR-005	review	0044-public-website FR-005	what the home page leads with is editorial judgment
-0044-public-website FR-006	check	eidolon: eid check site	every section index and item page exists
-0044-public-website FR-007	check	eidolon: eid check site	the toolbox lists every Public skill and every interactive tool answers at its address
+0044-public-website FR-006	check	eidolon: eid check site	every section index and item page exists; the research index, toolbox and writing fronts are replaced by the Journal and products fronts (FR-061, FR-063, FR-065)
+0044-public-website FR-007	check	eidolon: eid check site	the toolbox lists every Public skill and every interactive tool answers at its address; it becomes the products front under FR-063
 0044-public-website FR-008	check	eidolon: eid check site	every image is a book cover, from the imagery pool, or the home picture
 0044-public-website FR-009	none	-	no check that a reference is not a copy
 0044-public-website FR-010	none	-	the stylesheet reads brand.css custom properties; no check of literals
@@ -1351,6 +1361,14 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-058	check	eidolon: eid test	the Rust tests (tests/auth.rs) log in against a fake Microsoft Graph, by pages and by the dialog: only an allowed address gets a code, a wrong code and a forged session are refused, every rendition address asks to log in alike, the downloads are on the page, privately, only when logged in
 0044-public-website FR-059	check	eidolon: eid test	the Rust tests (tests/datastar.rs, tests/auth.rs, src/server.rs) drive the log-in dialog, the patched page parts, a book's preview pages, the server-side filtering and search and the live patches over Datastar
 0044-public-website FR-060	check	eidolon: eid test	the Rust tests (tests/browsable.rs) serve a Public browsable edition to anyone, another only after logging in, and none without its presentation
+0044-public-website FR-061	none	-	the Journal front is not rendered yet; eid check site will cover it when the vault implements it
+0044-public-website FR-062	none	-	department kickers and settledness lines are not rendered yet
+0044-public-website FR-063	none	-	the products front is not rendered yet
+0044-public-website FR-064	none	-	the ventures front still lists software and services; the four charter fields are not in the snapshot (OQ-13)
+0044-public-website FR-065	none	-	the elsewhere department is not rendered yet
+0044-public-website FR-066	none	-	the navigation still lists eight items
+0044-public-website FR-067	none	-	no Markdown copy, llms.txt line or issue JSON exists for the Journal yet
+0044-public-website FR-068	none	-	the redirects are not declared yet
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

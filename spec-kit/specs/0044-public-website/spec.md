@@ -66,14 +66,16 @@ how addresses map to content, 0004-addressing; what the application does,
   unit MUST NOT be the principal subject of any page except one page about
   the company (0021-works-and-presentations FR-014, FR-015).
 - **FR-006**: The website MUST have, for each kind of work it shows, an
-  index and a page per item: books, the Journal (0009-press), research
-  papers and notes, patents, trademarks, defensive disclosures, the toolbox,
-  the spoken works, ventures and companies, funds, the Network's hunts, and
-  writing.
-- **FR-007**: The toolbox MUST present every Public skill with its text,
-  every book companion that is Public, and the interactive tools the
-  previous website offered, as tools a reader can use; an interactive tool
-  keeps the address the previous website published.
+  index and a page per item: books, the Journal (0009-press) with the
+  research papers, pillars and notes it carries as departments (FR-061),
+  patents, trademarks, defensive disclosures, the products (FR-063), the
+  spoken works, ventures and companies, funds, and the Network's hunts.
+  Writing is carried by the Journal's elsewhere department (FR-065) and
+  has no index of its own.
+- **FR-007**: The products front MUST present every Public skill with its
+  text, every book companion that is Public, and the interactive tools the
+  previous website offered, as products a reader can use; an interactive
+  tool keeps the address the previous website published.
 - **FR-008**: A book's page MUST show its front cover, its public record,
   its status (0015 FR-031), its companion and its news. Wherever the website
   shows a book's cover, on its page and on every shelf of books, it MUST show
@@ -164,6 +166,56 @@ how addresses map to content, 0004-addressing; what the application does,
   that no presentation describes. A role for a named agreement, such as a
   subscription, is not specified yet. The work's page MUST link its
   browsable edition only for a reader who may open it.
+- **FR-061**: The Journal's front page MUST be the website's one front for
+  the firm's research. It MUST show, in this order: the current issue
+  (0009-press FR-053) with its volume, number, citation form and the
+  items published in the quarter; the sections, one per research area,
+  each holding the area's papers, pillars, notes and positions with the
+  department of each as its label (0009-press FR-047); the newest notes;
+  the elsewhere department (FR-065); the register of positions and the
+  corrections page (0009-press FR-048, FR-049); and the masthead, which
+  states the Journal's policy in a sentence per rule. A paper, pillar and
+  note keep the page and address they have, within the Journal's section
+  of the website. A paper whose research area is not recorded MUST be
+  listed under one holding heading that says so, and the check (FR-004)
+  MUST report it.
+- **FR-062**: Every card and item page of the Journal MUST show its
+  department as its kicker and its settledness as written in its work's
+  status, with its claim kinds where its record labels them
+  (0009-press FR-001, FR-021); a working paper's card MUST say it is a
+  working paper. An item that an episode of the Show presents MUST link
+  the episode (0017-spoken-and-research-works FR-010).
+- **FR-063**: The products front MUST list every intellectual product a
+  reader can use, grouped by how it is taken: open (skills, companions
+  and interactive tools, per FR-007); software; services (the shared
+  services); and data and methods (datasets, methods and landscape
+  studies). Every card MUST show the product's stage as its record states
+  it (0011-studios FR-013), a piece of software MUST show its licence and
+  status (0011-studios FR-015), and a shared service MUST NOT be labeled
+  an AI Workforce unless its record is (0011-studios FR-011). The
+  publications the company runs MUST be listed as products, each a
+  reference to where it lives (FR-009).
+- **FR-064**: The ventures front MUST list only ventures, companies and
+  funds, with the Network's hunts. A venture's card and page MUST show
+  its entity, its operator, its rights position and its closure condition
+  where its record states them (0011-studios FR-014), and MUST say which
+  it does not state. A product spun out into a venture MUST be shown on
+  the product's page as having become the venture and on the venture's
+  page as having grown out of the product (0011-studios FR-028).
+- **FR-065**: Writing whose authoritative text lives elsewhere (FR-009)
+  MUST be shown in the Journal's elsewhere department (0009-press FR-054),
+  each piece with its kind as its kicker, its author and an outward link,
+  and on its author's profile (FR-055), and MUST NOT appear in an issue
+  unless 0009-press FR-054 admits it.
+- **FR-066**: The navigation of every page MUST list exactly six fronts,
+  in this order: Books, Products, Journal, Patents, The Show, Ventures.
+  The home page's showcases (FR-005) MUST follow the same fronts: one
+  showcase for the Journal that leads with the current issue, and none
+  for research or writing apart from it.
+- **FR-067**: The Journal MUST offer a machine edition: each article as a
+  Markdown copy beside its page, as ScholarlyArticle structured data, and
+  as one line of `llms.txt`; each issue as a JSON document; and a stable
+  identifier and citation form on every article and issue.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -201,6 +253,11 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-014**: The generator MUST report every address the previous
   website's sitemap lists that the generated website neither serves nor
   redirects, so nothing it published is dropped unnoticed.
+- **FR-068**: The addresses the fronts of FR-066 replaced MUST redirect
+  permanently (FR-016): the research index to the Journal's sections, the
+  toolbox and each of its items to the products front and its items, and
+  the writing index to the Journal's elsewhere department. A paper's,
+  pillar's and note's address MUST NOT change.
 - **FR-015**: Every page MUST load the analytics container the previous
   website used, and no other tracking.
 
@@ -445,7 +502,19 @@ how addresses map to content, 0004-addressing; what the application does,
   reads it from the public root and the snapshot entry is removed, per
   FR-013.
 - An essay published on the founder's own website: the website shows it
-  as a reference to that address, per FR-009.
+  as a reference to that address, in the Journal's elsewhere department
+  and on the author's profile, per FR-009 and FR-065.
+- A working paper whose record names no research area: it is listed on
+  the Journal's front under the holding heading and the check reports it,
+  per FR-061.
+- A shared service at ideation: its card on the products front says so,
+  per FR-063, and it is never shown as operating.
+- A venture whose register does not state its closure condition: its card
+  says the condition is not stated, per FR-064.
+- A request for the old toolbox address of a skill: it redirects
+  permanently to the skill's address on the products front, per FR-068.
+- A research pillar's address after the merge: it answers as before,
+  within the Journal's section of the website, per FR-061 and FR-068.
 - A request for a namespace address such as `/ontology/core`: it answers
   with the not-found page, and the ontology is read in the IF Console, per
   FR-012.
@@ -532,6 +601,16 @@ how addresses map to content, 0004-addressing; what the application does,
 - **OQ-11**: Whether a preview is shown only to a reader who signs in,
   and whether encrypted media (a DRM licence server) protects it against
   screen capture, is not decided; both need the application (FR-024).
+- **OQ-12**: Whether a skill's address moves to the products front with a
+  redirect from the toolbox address (FR-068), or the toolbox addresses
+  stay as the skills' own, is not decided.
+- **OQ-13**: The ventures register in the snapshot (FR-013) does not hold
+  a venture's entity, operator, rights position or closure condition; until
+  the register moves into the public root with them, a venture's card says
+  they are not stated, per FR-064.
+- **OQ-14**: Whether the ventures front, once software and services have
+  left it, shows funds as its own showcase or under each venture they back
+  is not decided.
 
 ## Key entities
 
@@ -555,8 +634,16 @@ how addresses map to content, 0004-addressing; what the application does,
   generated page may use.
 - **A showcase** — the index of one kind of work, presenting each item
   with its image, record and status.
-- **The toolbox** — the Public skills and book companions, presented as
-  tools a reader can use.
+- **The products front** — every intellectual product a reader can use:
+  the Public skills, book companions and interactive tools, the software,
+  the shared services, and the datasets, methods and landscape studies,
+  each with its stage.
+- **The Journal's front** — the website's one front for the firm's
+  research: the current issue, the sections by research area, the
+  departments as labels, the register of positions, the corrections page
+  and the masthead.
+- **A front** — one of the six items of the navigation, each a showcase
+  of one kind of work or the Journal.
 - **A snapshot** — the previous website's published data, fixed, held in the
   vault until each register moves into the public root.
 - **A publishing destination** — a container host the website's image is
@@ -598,6 +685,12 @@ how addresses map to content, 0004-addressing; what the application does,
   only copy of an Eidolon fact.
 - **SC-013**: Every database above the second rung has a `Decision` that names
   its trigger and the measurement.
+- **SC-014**: Every page's navigation lists the six fronts and no other,
+  and every replaced address redirects permanently to its front.
+- **SC-015**: No research paper, pillar or note is reachable only from
+  outside the Journal's front, and none changed its address in the merge.
+- **SC-016**: No product is shown without its stage, and no shared service
+  is labeled an AI Workforce that its record does not call one.
 
 ## Review & acceptance checklist
 

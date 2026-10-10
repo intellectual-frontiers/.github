@@ -3936,10 +3936,10 @@ ifcore:JournalOfIntellectualFrontiers a schema:Periodical ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     schema:alternateName "JINFRO"@en ;
     dcterms:accrualPeriodicity <http://purl.org/cld/freq/quarterly> ;
-    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020), and the firm's one journal (FR-031). It reports outcomes, what the firm's works found, made, or proved, not company or unit news (FR-032); it is not a presentation of one work but the vehicle for many, each issue a presentation in online and print editions (FR-033). Quarterly, online and in print. Its short form is JINFRO, not 'JIF', which is Clarivate's trademarked abbreviation for Journal Impact Factor; JINFRO's own clearance is a separate decision. In ideation: its lifecycle stage is Intake."@en ;
+    rdfs:comment "A standing, AI-native publication in the long-term mold of a business-and-management journal, distinct from any one-off book (0009-press FR-020), and the firm's one journal (FR-031). It reports outcomes, what the firm's works found, made, or proved, not company or unit news (FR-032); it is not a presentation of one work but the vehicle for many, each issue a presentation in online and print editions (FR-033). Published continuously, as each work lands, and gathered into a quarterly issue, online and in print (FR-053); the periodicity stated here is the issue's. Its front is the website's one front for the firm's research: the research areas are its sections (FR-034), and papers, programs, notes, positions and referenced writing are departments within them (FR-047). Its short form is JINFRO, not 'JIF', which is Clarivate's trademarked abbreviation for Journal Impact Factor; JINFRO's own clearance is a separate decision."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:JournalOfIntellectualFrontiers a ifcore:SubstantialWork ;
-    ifcore:workLifecycleStage ifcore:Intake ;
+    ifcore:workLifecycleStage ifcore:Research ;
     ifcore:lifecycleOwner ifcore:Press .
 
 ifcore:EidolonJournalArticle a schema:Article ;
@@ -3947,6 +3947,7 @@ ifcore:EidolonJournalArticle a schema:Article ;
     schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
     schema:about ifcore:Eidolon ;
     prov:wasDerivedFrom ifcore:EidolonPillar ;
+    ifcore:journalDepartment ifcore:PositionsDepartment ;
     schema:author ifcore:ShahidNehalShah ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
@@ -3959,11 +3960,176 @@ ifcore:IplgJournalArticle a schema:Article ;
     schema:isPartOf ifcore:JournalOfIntellectualFrontiers ;
     schema:about ifcore:IPLG ;
     prov:wasDerivedFrom ifcore:IplgPillar ;
+    ifcore:journalDepartment ifcore:PositionsDepartment ;
     schema:author ifcore:ShahidNehalShah ;
     dcterms:creator ifcore:ShahidNehalShah ;
     dcterms:rightsHolder ifcore:IntellectualFrontiersLLC ;
     ifcore:claimKind ifcore:Framework ;
     rdfs:comment "Native-origin work, per 0007-work-and-assets FR-016: its full text is a content document in this repository's content root. Draws on the firm's own prior IPLG strategy work, already partly implemented across the public site's executable-content pattern."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── The Journal's departments, positions and corrections (0009-press FR-047 – FR-054) ─────────────────────────
+
+ifcore:JournalDepartment a owl:Class ; rdfs:label "Journal department"@en ;
+    rdfs:comment "The form an item of the Journal takes: a label on the item, never a section of the Journal, whose sections are the reader problems its research areas name (0009-press FR-034, FR-047). No established term names it: schema.org types an article by genre (ScholarlyArticle, NewsArticle, Report), not by the editorial form a periodical gives it, and bibo types the document, not its place in an issue. Justified by ifcore:JournalDepartmentsAsLabels."@en .
+ifcore:journalDepartment a owl:ObjectProperty ; rdfs:domain schema:Article ; rdfs:range ifcore:JournalDepartment ;
+    rdfs:comment "The one department an item of the Journal is labeled with (0009-press FR-047)."@en .
+ifcore:FindingsDepartment a ifcore:JournalDepartment ; rdfs:label "Finding"@en ;
+    rdfs:comment "What a work found or proved since the previous issue, the decision it changed and the evidence for each (0009-press FR-032)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:MadeDepartment a ifcore:JournalDepartment ; rdfs:label "Made"@en ;
+    rdfs:comment "What a product made or changed: a release, reporting what changed and what was measured, in the Journal's words and never a launch note (0009-press FR-051)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PapersDepartment a ifcore:JournalDepartment ; rdfs:label "Paper"@en ;
+    rdfs:comment "A working paper or a published paper, shown with how settled its claims are (0009-press FR-047)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProgramsDepartment a ifcore:JournalDepartment ; rdfs:label "Program"@en ;
+    rdfs:comment "A research pillar: its question, its status and the notes that record what it found (0006-research-and-ip FR-002)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NotesDepartment a ifcore:JournalDepartment ; rdfs:label "Note"@en ;
+    rdfs:comment "A dated note from a program: what was done or decided; not a finding until an issue carries it (0009-press FR-047)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PositionsDepartment a ifcore:JournalDepartment ; rdfs:label "Position"@en ;
+    rdfs:comment "An argued view, a framework or an opinion under 0009-press FR-001, that states what would make it wrong and stays in the public register of positions until settled or reversed (FR-048)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ElsewhereDepartment a ifcore:JournalDepartment ; rdfs:label "Elsewhere"@en ;
+    rdfs:comment "Writing that originated outside the Journal, referenced and never copied (0009-press FR-023, FR-054; 0044-public-website FR-009)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:CorrectionsDepartment a ifcore:JournalDepartment ; rdfs:label "Correction"@en ;
+    rdfs:comment "A correction to a published article, or the reversal of a position (0009-press FR-010, FR-035, FR-049)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:wouldBeWrongIf a owl:DatatypeProperty ; rdfs:domain schema:Article ; rdfs:range xsd:string ; rdfs:label "would be wrong if"@en ;
+    rdfs:comment "What would make a Position wrong, in the author's words, one sentence (0009-press FR-048). Where the position's subject is a Noema, the Noema's falsification criteria (0048-noemas FR-017) are the fuller record and this is their short form on the article. Justified by ifcore:JournalDepartmentsAsLabels."@en .
+
+ifcore:Correction a owl:Class ; rdfs:subClassOf ifcore:Fact, prov:Entity ; rdfs:label "Correction"@en ;
+    rdfs:comment "A correction made in place to a published article, or the reversal of a position (0009-press FR-010, FR-035, FR-049): the article it corrects, the date, what changed and why. Listed in public and never deleted. schema:correction is the nearest established term and is a text or an address on a creative work, not a record with a date and a reason; it is named as related, not reused. Justified by ifcore:JournalDepartmentsAsLabels."@en ;
+    rdfs:seeAlso schema:correction .
+ifcore:corrects a owl:ObjectProperty ; rdfs:domain ifcore:Correction ; rdfs:range schema:Article ;
+    rdfs:comment "The article the correction changes or the position it reverses (0009-press FR-049)."@en .
+
+# ───────────────────────── The website's fronts: the Decisions of 2026-10-10 (0008-decision-records; 0019 FR-004) ─────────────────────────
+
+ifcore:ResearchIntoJournal a ifcore:Decision ;
+    rdfs:label "The website's research front is the Journal: research areas are its sections, and papers, programs and notes its departments"@en ;
+    dcterms:subject ifcore:JournalOfIntellectualFrontiers, ifcore:ResearchArea, ifcore:ResearchPillar, ifcore:Note ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "Pillar, note, paper and article are one pipeline: the research pages show the bench and the Journal shows the write-up. Shown as two fronts, the Journal held two articles and read as thin, and the research index read as a filing cabinet. One front gives the Journal a body on the day it opens and gives the research an editorial frame. The press spec already requires the Journal's sections to follow the reader's problem (0009-press FR-034), and the research areas are those problems, so the sections are the areas and the form of each item (a paper, a program, a note) is a label on it. A paper, a pillar and a note keep their own pages and addresses, as the website spec owes an index and a page per kind (0044-public-website FR-006). Approved in the working session of 2026-10-10 after a mock-up of the merged front page built from the vault's own records."@en ;
+    ifcore:consideredAlternative ifcore:ResearchIntoJournalAltTwoFronts, ifcore:ResearchIntoJournalAltJournalUnderResearch ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchIntoJournalAltTwoFronts a ifcore:Alternative ; rdfs:label "Keep Research and Journal as two navigation items"@en ;
+    ifcore:rejectionReason "The Journal's lede promised a quarterly of outcomes organized by reader problem and its page showed two framework articles in a grid; the research index held the papers, programs and notes the promise needed. Two fronts kept each weaker than the one."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ResearchIntoJournalAltJournalUnderResearch a ifcore:Alternative ; rdfs:label "Make the Journal a department of a Research front"@en ;
+    ifcore:rejectionReason "The Journal is Press's standing periodical with issues, a citation form and corrections (0009-press FR-020, FR-033, FR-035); a research index subsuming it would make the periodical a sub-page of a list. The periodical is the frame and the research its matter."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ToolboxBecomesProducts a ifcore:Decision ;
+    rdfs:label "The toolbox front is named Products and holds every intellectual product a reader can use: skills, companions, interactive tools, software, shared services, datasets and methods"@en ;
+    dcterms:subject ifcore:SkillKind, ifcore:SoftwareCategory, ifcore:SharedServiceCategory, ifcore:SharedService, ifcore:IPLG ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "Software and shared services were listed with the ventures, companies and funds, though a piece of software needs no entity or operator the way a venture must (0011-studios FR-015), and the toolbox held only the open skills, companions and interactive tools. The IPLG article defines an intellectual product as something a visitor can use directly, and names skills and worksheets as examples; software and shared services meet the same definition. One front named Products takes them all, grouped by how a reader takes them (open, software, services, data and methods), each with its stage and licence (0011-studios FR-013, FR-015). The plain word is the one readers and search engines look for; the free things remain products at a zero price with a download."@en ;
+    ifcore:consideredAlternative ifcore:ToolboxAltSolutions, ifcore:ToolboxAltInstruments, ifcore:ToolboxAltKeep ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ToolboxAltSolutions a ifcore:Alternative ; rdfs:label "Name the front Solutions"@en ;
+    ifcore:rejectionReason "Six of the eight shared services are in build or in ideation, and a service not yet running must be described as such wherever it is named (0011-studios FR-013); a front called Solutions says they are solved. It is also the consultancy's word, and Studios must not operate as custom consulting (0011-studios FR-005)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ToolboxAltInstruments a ifcore:Alternative ; rdfs:label "Name the front Instruments"@en ;
+    ifcore:rejectionReason "It covers a skill, a program and an AI Workforce equally and reads like a research group rather than a vendor, but it loses the plain word a reader searches for. Kept as the one serious alternative should Products prove too generic."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ToolboxAltKeep a ifcore:Alternative ; rdfs:label "Keep the name Toolbox and widen what it holds"@en ;
+    ifcore:rejectionReason "An operating shared service or an AI Workforce is not a tool in a box; the name undersold what the front would hold."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:VenturesNarrowedToCompanies a ifcore:Decision ;
+    rdfs:label "The Ventures front holds ventures, companies and funds only, and shows each venture's charter and lineage"@en ;
+    dcterms:subject ifcore:VentureCategory, ifcore:OperatingCompanyCategory, ifcore:Fund ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "With software, shared services, datasets, methods and studies moved to Products, the Ventures front is the portfolio of companies: the ventures being incubated, the operating companies and the funds that back them, with the Network's hunts. A venture's card shows the four things the studios spec demands before a first hire, its entity, its operator, its rights position and its closure condition (0011-studios FR-014); publishing the closure condition is the house's practice made visible. A product spun out under 0011-studios FR-016 is shown as having become the venture, and the venture as having grown out of the product, so nothing is listed twice."@en ;
+    ifcore:consideredAlternative ifcore:VenturesAltBuiltAndBacked ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:VenturesAltBuiltAndBacked a ifcore:Alternative ; rdfs:label "Keep everything built and backed on one front"@en ;
+    ifcore:rejectionReason "The studios spec gives a venture and a piece of software different obligations (0011-studios FR-014, FR-015); one front hid the difference and listed an operating AI Workforce beside a fund in formation."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:WritingIntoJournal a ifcore:Decision ;
+    rdfs:label "The Writing front folds into the Journal as a referenced department, Elsewhere, and the company's publications move to Products"@en ;
+    dcterms:subject ifcore:ElsewhereDepartment, ifcore:NativeAlphaArticle ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "The Writing front held the founder's essays, each living on the founder's own site, and the publications the company runs. The essays belong near the Journal and cannot be Journal articles: the website shows writing whose authoritative text lives elsewhere as a reference, never a copy (0044-public-website FR-009), and the Journal must not pose as the primary source of a concept that originated outside it (0009-press FR-023). They enter the Journal as a department of referenced pieces, Elsewhere, each keeping its own kind and its outward link, and an issue carries one only when it changed a decision the issue reports, so the Journal does not become a blog. They also sit on their author's profile and inside the section of the problem they address. The publications are intellectual products and move to Products. The old front's address redirects, and every essay stays reachable."@en ;
+    ifcore:consideredAlternative ifcore:WritingAltKeepFront, ifcore:WritingAltAsArticles ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WritingAltKeepFront a ifcore:Alternative ; rdfs:label "Keep Writing as its own navigation item"@en ;
+    ifcore:rejectionReason "Writing is a plain word and the essays are likely the most visited pages, but the author's profile and the Elsewhere department keep every essay reachable and the old index redirects; a seventh navigation item for referenced pieces was not worth the split."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:WritingAltAsArticles a ifcore:Alternative ; rdfs:label "Publish the essays as Journal articles"@en ;
+    ifcore:rejectionReason "Forbidden twice over: the website may show them only as references (0044-public-website FR-009), and the Journal may not republish an externally originated concept as its own (0009-press FR-023)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ShowStaysItsOwnFront a ifcore:Decision ;
+    rdfs:label "The Show keeps its own front; an episode that presents a work is linked from the work's item in the Journal"@en ;
+    dcterms:subject ifcore:SpokenKind, ifcore:JournalOfIntellectualFrontiers ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "A spoken work must not bind Press and no outlet controls its conclusions (0017-spoken-and-research-works FR-010); the Journal is Press's periodical, so putting the Show under its masthead would attach a Press imprint to work the spec keeps independent. The Show is also a different medium with its own production rules, a show bible, an editorial constitution and an episode record (0017 FR-002 to FR-005), and a listener subscribes on a channel where a reader cites an issue. The integration that costs nothing is the link: an issue item for a finding names the episode that presents it, and the show notes already live under the press path."@en ;
+    ifcore:consideredAlternative ifcore:ShowAltIntoJournal ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ShowAltIntoJournal a ifcore:Alternative ; rdfs:label "Fold the Show into the Journal as a spoken department"@en ;
+    ifcore:rejectionReason "It would place a non-Press work under the Press masthead against 0017 FR-010, and merge a listener's path with a reader's."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:JournalContinuousGatheredQuarterly a ifcore:Decision ;
+    rdfs:label "The Journal publishes an item when its work lands and gathers the quarter's items into an issue"@en ;
+    dcterms:subject ifcore:JournalOfIntellectualFrontiers ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "Notes land daily and papers when they are ready; a front that waited for the quarter would be stale for most of it, and a front that only streamed would have no issue to cite, freeze and print (0009-press FR-033, FR-035). The Journal does both: an item is published when its work lands, and the issue is the quarter's items, frozen at the quarter's end with its volume and number, its online and print editions carrying the same items. The front page shows the current issue above and the running record below. The periodicity recorded on the periodical stays quarterly and names the issue."@en ;
+    ifcore:consideredAlternative ifcore:JournalAltQuarterlyOnly, ifcore:JournalAltStreamOnly ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:JournalAltQuarterlyOnly a ifcore:Alternative ; rdfs:label "Publish only at the quarter, as a printed journal does"@en ;
+    ifcore:rejectionReason "The vault's notes are dated to the day and the website renders again when a record changes; holding a finding for a quarter would make the Journal the one stale page of a live site."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:JournalAltStreamOnly a ifcore:Alternative ; rdfs:label "Publish continuously with no issues"@en ;
+    ifcore:rejectionReason "Without an issue there is nothing to cite by volume and number, nothing to freeze and print, and no next printed issue for a correction to run in (0009-press FR-033, FR-035)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:JournalDepartmentsAsLabels a ifcore:Decision ;
+    rdfs:label "A Journal item's form is a department label, a position states what would make it wrong, and corrections are listed in public"@en ;
+    dcterms:subject ifcore:JournalDepartment, ifcore:journalDepartment, ifcore:FindingsDepartment, ifcore:MadeDepartment, ifcore:PapersDepartment, ifcore:ProgramsDepartment, ifcore:NotesDepartment, ifcore:PositionsDepartment, ifcore:ElsewhereDepartment, ifcore:CorrectionsDepartment, ifcore:wouldBeWrongIf, ifcore:Correction, ifcore:corrects ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "The Journal's sections must follow the reader's problem and never a unit (0009-press FR-034); the form of an item, a finding, a paper, a program, a note, a position, a referenced piece or a correction, is a different axis and is carried as a label on the item, so the two never compete. Two forms get rules of their own. A position, the Journal's contrarian piece, states in one sentence what would make it wrong and stays in a public register until its subject is settled or reversed; that register is what a blog never has and a journal owes. A correction is a record, the article, the date, what changed and why, listed on a public page and never deleted, which 0009-press FR-010 and FR-035 already require in place and in print. No established vocabulary carries either: schema.org types an article by genre and has correction as a text, not a record; bibo types documents, not their place in an issue."@en ;
+    ifcore:consideredAlternative ifcore:DepartmentsAltSections, ifcore:DepartmentsAltClaimKind ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DepartmentsAltSections a ifcore:Alternative ; rdfs:label "Make the departments the Journal's sections"@en ;
+    ifcore:rejectionReason "Sections by form (Papers, Notes, Positions) would displace sections by reader problem, which 0009-press FR-034 requires; a reader arrives with a problem, not a preference for a form."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:DepartmentsAltClaimKind a ifcore:Alternative ; rdfs:label "Reuse the claim kind as the department"@en ;
+    ifcore:rejectionReason "A claim kind (observable fact, opinion, framework, illustration; 0009-press FR-001) labels a claim inside a piece; a department labels the piece's form in the periodical. A finding carries observable facts and a position carries a framework, but a paper carries all four kinds, so the two axes are not the same."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:ProductsEnterTheJournal a ifcore:Decision ;
+    rdfs:label "A product enters the Journal with the article that justifies it, each release is a Made item, and a failed claim of a shared service is a finding"@en ;
+    dcterms:subject ifcore:MadeDepartment, ifcore:FindingsDepartment, ifcore:SharedService, ifcore:SoftwareCategory, ifcore:SkillKind ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "The Journal reports what the firm's works found, made or proved (0009-press FR-032), and company news is a promotional post that points to the Journal (0021-works-and-presentations FR-023). Those two rules give products a pipeline that needs no exception. A product is introduced by an article naming the problem it addresses and the research it derives from; the IPLG article states the test one way, an article with nothing to run fails, and the reverse holds, a product with nothing to read is not introduced. A release is a Made item of the quarter's issue, what changed and what was measured, claim-labeled, with no launch language; the launch note is the promotional post and links to the item. A shared service's failed claim, which must be recorded as a completed result (0011-studios FR-012), is a finding, and publishing the misses from the firm's own services is the most credible thing the Journal carries."@en ;
+    ifcore:consideredAlternative ifcore:ProductsAltNewsOnly ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ProductsAltNewsOnly a ifcore:Alternative ; rdfs:label "Announce releases only on What's new and the product's page"@en ;
+    ifcore:rejectionReason "A release is something the firm made, which 0009-press FR-032 names as the Journal's subject; leaving it to news alone would keep the Journal from reporting half of what the firm does."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:JournalAdvancesToResearch a ifcore:Decision ;
+    rdfs:label "The Journal advances from Intake to Research"@en ;
+    dcterms:subject ifcore:JournalOfIntellectualFrontiers ;
+    ifcore:decidedBy ifcore:ShahidNehalShah ;
+    ifcore:decidedAt "2026-10-10"^^xsd:date ;
+    dcterms:description "The Journal's front, cadence, departments and the pipeline from products into it were designed and mocked up in the working session of 2026-10-10 from the vault's own records, so the work is past intake and in the stage where its shape is worked out. Research is the next stage in order (0015-work-packages FR-023), and this Decision is recorded in the commit that changes the stage. It is not yet at Review: its first issue, its masthead and the falsifiers of its two published positions are not written."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:Find a ifcore:MethodStage ; rdfs:label "Find"@en ; ifcore:sequenceOrder 1 ;

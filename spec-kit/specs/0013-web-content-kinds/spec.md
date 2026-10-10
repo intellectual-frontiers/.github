@@ -45,6 +45,12 @@ FR-007.
   article is derived from the firm's own tracked research, it MUST also
   declare `prov:wasDerivedFrom` naming the `Note` or `ResearchPillar` it
   was drawn from, per 0007-work-and-assets FR-016 and 0009-press FR-022.
+- **FR-017**: `ifweb:JournalIssuePage` MUST declare `schema:about` naming
+  exactly one `schema:PublicationIssue` individual, the issue it renders,
+  and `schema:isPartOf` naming the Journal `schema:Periodical` individual
+  (0009-press FR-033). It MUST NOT assert a fact about an article it
+  gathers; each article is declared by its own `JournalArticlePage` or
+  research record.
 
 ## The portfolio index
 

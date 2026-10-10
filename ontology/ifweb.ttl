@@ -193,6 +193,15 @@ ifweb:JournalArticlePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebP
     sh:property [ sh:path schema:isPartOf ; sh:class schema:Periodical ; sh:minCount 1 ; sh:maxCount 1 ] ;
     sh:property [ sh:path schema:about ; sh:minCount 1 ; sh:maxCount 1 ] .
 
+ifweb:JournalIssuePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Journal issue page"@en ;
+    rdfs:comment "Renders one issue of the Journal: a schema:PublicationIssue that is a presentation gathering articles already declared, each naming the work it presents (0009-press FR-033; 0013 FR-017). It asserts no fact about an article."@en ;
+    ifweb:contentKind "JournalIssuePage" ;
+    sh:targetClass ifweb:JournalIssuePage ;
+    sh:property [ sh:path schema:about ; sh:class schema:PublicationIssue ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:isPartOf ; sh:class schema:Periodical ; sh:minCount 1 ; sh:maxCount 1 ] .
+
 # ───────────────────────── The portfolio index (0013 FR-010 – FR-011) ─────────────────────────
 
 ifweb:featuresWork a owl:ObjectProperty ;
