@@ -307,7 +307,7 @@ def lock(ctx: Ctx, group: str | None) -> Resource:
         with tempfile.TemporaryDirectory() as d:
             inp, out = Path(d, "in.txt"), Path(d, "out.txt")
             inp.write_text("".join(f"{k}=={v}\n" for k, v in sorted(g.packages.items())), encoding="utf-8")
-            p = subprocess.run([uv, "pip", "compile", "--generate-hashes", "--no-header", "--no-annotate", "--quiet", "--python-version", "3.11", "-o", str(out),
+            p = subprocess.run([uv, "pip", "compile", "--generate-hashes", "--no-header", "--no-annotate", "--quiet", "--python-version", "3.14", "-o", str(out),
                                 str(inp)], capture_output=True, text=True)
             if p.returncode != 0:
                 raise AgoraError("lock", f"uv could not lock group {g.name}: {p.stderr.strip()[-400:]}", exit=FAILED)
