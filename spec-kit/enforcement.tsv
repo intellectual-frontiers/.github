@@ -1370,7 +1370,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-066	none	-	the navigation still lists eight items
 0044-public-website FR-067	none	-	no Markdown copy, llms.txt line or issue JSON exists for the Journal yet
 0044-public-website FR-068	none	-	the redirects are not declared yet
-0044-public-website FR-069	check	eidolon: eid test	the Rust tests (tests/gaps.rs) render a work page and a front from the vault with a desk export and find the Console's parts, items, roll-up and guides, and render a model and find none
+0044-public-website FR-069	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs) render a work page and a front with a desk export and find the Console's parts, items, roll-up and guides, render a model and find none, and run lines through a stub launcher: a check runs, a record dry-runs first, a decision and a shell line are refused, a model answers not found
 0044-public-website FR-070	check	eidolon: eid test	the Rust tests find the "Console" control only on a page that carries the Console
 0044-public-website FR-071	none	-	the icons and the rule are the Console's markup; no check reads a rendered page's colours
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
