@@ -58,7 +58,9 @@ ontology data and registers, not restated here.
   changes; who other than the reader bears the consequence of that
   decision; and why the decision is costly to reverse. The reader side
   and the consequence domain are also stated in the work's ontology
-  record.
+  record. A book made for the company's own operations
+  (`ifcore:NotDistributed`, 0015-work-packages FR-034) is not on the
+  imprint's list: FR-040 to FR-042 do not apply to it.
 - **FR-041**: Each consequence domain the imprint publishes in MUST be
   recorded in the ontology as core or exploratory. A book in an
   exploratory domain is an experiment: it MUST still satisfy FR-040, MUST

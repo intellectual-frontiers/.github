@@ -357,6 +357,9 @@ requirement	mechanism	by	note
 0015-work-packages FR-030	check	eidolon: eid fresh	the generator gives an announced work's companion, news and show-notes pages the Public audience
 0015-work-packages FR-031	none	-	status derived by eid site build; no check of other consumers
 0015-work-packages FR-032	check	eidolon: eid check site	the leak check fails a page carrying a non-public work's source text
+0015-work-packages FR-033	check	eidolon: eid check ontology	the book shape (ontology/shapes/works.shapes.ttl) requires exactly one distribution intent from DistributionIntentScheme on every book
+0015-work-packages FR-034	check	eidolon: eid check works	fails a work not distributed that is announced or Public; eid work advance holds it at Review
+0015-work-packages FR-035	check	eidolon: eid check works	reports a living work whose review cadence has passed since its schema:lastReviewed date, and a cadence without that date
 0016-press-production FR-001	none	-	house voice is a judgment; no check
 0016-press-production FR-002	check	eidolon: eid check spoken	audit record required for episodes past draft and anthology chapters; not books
 0016-press-production FR-003	none	-	separate-reader audit of AI text is not checked
@@ -411,6 +414,8 @@ requirement	mechanism	by	note
 0016-press-production FR-052	none	-	targets, the seven elements and the figures' purpose are judgment; the audit checklist's Book shape step reports the word count against the targets
 0016-press-production FR-053	check	eidolon: eid check works	fails the Pocket Guide kicker on any other book and another format's kicker on a Pocket Guide; the rest is the pipeline every book goes through
 0016-press-production FR-054	check	eidolon: eid check works	fails a Pocket Guide past Intake without a series number, thesis, outcome or audience, a repeated series number, and a Pocket Guide that is not a book
+0016-press-production FR-055	check	eidolon: eid check delivery	the delivery, ISBN and retail checks apply only to a book for sale; a book not for sale keeps every other check
+0016-press-production FR-056	check	eidolon: eid check books	the voice and visual-floor checks skip a chapter marked generated, and eid fresh proves it current
 0017-spoken-and-research-works FR-001	none	-	spoken-first classification is judgment
 0017-spoken-and-research-works FR-002	check	eidolon: eid check works	works.py fails a spoken package without show-bible.md or editorial-constitution.md
 0017-spoken-and-research-works FR-003	none	-	episode brief contents are not checked
@@ -611,6 +616,8 @@ example-brand FR-005	check	.github: agora check design-systems --runner browser 
 0021-works-and-presentations FR-023	check	eidolon: eid check content	ifweb:PromotionPost requires dcterms:references to a work, presentation, or issue
 0021-works-and-presentations FR-024	check	eidolon: eid check content	PublicSubjectShape exempts only the PromotionPost kind
 0021-works-and-presentations FR-025	none	-	whether a post outruns its work is judgment
+0021-works-and-presentations FR-026	check	eidolon: eid test	the Rust tests (tests/browsable.rs) serve a browsable edition only for a work with a Web pages presentation, and only to its audience
+0021-works-and-presentations FR-027	check	eidolon: eid test	the Rust tests offer a preview only for a book with a Public preview excerpt (tests/gaps.rs)
 0022-domain-names FR-001	none	-	no shape yet distinguishes a DomainName from a DigitalAsset
 0022-domain-names FR-002	check	eidolon: eid check domains	identifier unique across the catalog; that it is registrable, not a subdomain, is unchecked
 0022-domain-names FR-003	check	eidolon: eid check domains	identifier lowercase A-label pattern
@@ -1339,10 +1346,11 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-053	none	-	the application is not built yet
 0044-public-website FR-054	check	eidolon: eid test	the Rust tests (src/render/layout.rs) check the trail, the one current crumb and the fold; the sticky band and the menu are not tested in a browser
 0044-public-website FR-055	check	eidolon: eid test	the Rust tests (tests/gaps.rs) check the profile pages, their works and the links from a book, a paper and a patent; no biography on a book page
-0044-public-website FR-056	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs, src/preview.rs) choose the pages from a PDF, draw a page on demand from the model as shuffled tiles over Datastar, and refuse a page outside the preview and the PDF itself; the check fails any PDF under /books/
+0044-public-website FR-056	check	eidolon: eid test	the Rust tests (tests/gaps.rs, tests/datastar.rs, src/preview.rs) offer a preview only for a book with a Public preview excerpt, choose the pages from its PDF, draw a page on demand as shuffled tiles over Datastar, and refuse a page outside the preview and the PDF itself
 0044-public-website FR-057	check	eidolon: eid check site	the check fails any rendition among the website's files; the model leaves renditions out unless exported with them (tests/served.rs, tests/gaps.rs, tests/auth.rs)
 0044-public-website FR-058	check	eidolon: eid test	the Rust tests (tests/auth.rs) log in against a fake Microsoft Graph, by pages and by the dialog: only an allowed address gets a code, a wrong code and a forged session are refused, every rendition address asks to log in alike, the downloads are on the page, privately, only when logged in
 0044-public-website FR-059	check	eidolon: eid test	the Rust tests (tests/datastar.rs, tests/auth.rs, src/server.rs) drive the log-in dialog, the patched page parts, a book's preview pages, the server-side filtering and search and the live patches over Datastar
+0044-public-website FR-060	check	eidolon: eid test	the Rust tests (tests/browsable.rs) serve a Public browsable edition to anyone, another only after logging in, and none without its presentation
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

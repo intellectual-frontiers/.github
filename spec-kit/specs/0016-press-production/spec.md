@@ -408,6 +408,25 @@ is not stated here.
   book, kept where the book keeps them (FR-022, FR-024), and its word count is
   measured from the manuscript, never stored. No other record states them.
 
+## Books not for sale, and generated reference
+
+- **FR-055**: The obligations of sale MUST apply only to a book whose
+  distribution intent is `ifcore:ForSale` (0015-work-packages FR-033): its
+  retail categories (FR-021), its ISBN (FR-022), its promotion brief
+  (FR-046) and the commercial-readiness group of its release checks
+  (FR-048), with its price and its submission to any vendor. A book made
+  for free distribution or for the company's own operations MUST meet
+  every other requirement of this spec: voice and audit, its package,
+  house design, cuts and editions, its news record, and production
+  checks.
+- **FR-056**: A book MAY carry generated reference: an appendix generated
+  from another source of truth (a command tree, a register, the
+  enforcement register) by a generator `eid fresh` proves current. Such an
+  appendix MUST be marked generated in the book's source, MUST NOT be
+  edited by hand, and is exempt from the voice audit (FR-001, FR-002) and
+  the visual floor (FR-014); every chapter the book's author writes is
+  not.
+
 ## Out of scope
 
 - Voice principles beyond those in 0009-press, and the audit checklist's own

@@ -108,8 +108,9 @@ how addresses map to content, 0004-addressing; what the application does,
   A page that names such an author (a book, a paper, a Journal article, a
   patent) MUST link the name to the profile and MUST NOT repeat the
   biography. An author with no biography is shown by name only.
-- **FR-056**: Every book at Review or later whose PDF the program holds
-  MUST offer a preview on its page: its front matter and its first
+- **FR-056**: Every book with a preview excerpt whose audience is Public
+  (0021-works-and-presentations FR-027) and whose PDF the program holds
+  MUST offer a preview on its page; no other book MAY: its front matter and its first
   chapter, read from the PDF's outline, or its first 15% of pages when
   those are shorter, by the decision authority's rule; no other page of an
   announced book's manuscript MAY appear (FR-003). The preview MUST be read
@@ -125,13 +126,17 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-057**: A work's renditions (a PDF, an EPUB, a recording) MUST be
   kept in the vault's build directory, untracked by Git, under the address
   the website serves them from:
-  `/works/<origin>/<audience>/<kind>/<format>/<slug>.<ext>`, where
+  `/works/<origin>/<audience>/<kind>/<format>/<slug>.<ext>`, or, for a
+  browsable edition of many pages (FR-060),
+  `/works/<origin>/<audience>/<kind>/html/<slug>/` holding its pages, where
   `<origin>` is `auto` for a rendition generated from the work's source
   and `original` for one that was not, and `<audience>` is `public` for a
   Public work and `confidential` otherwise. A rendition, whatever its
   audience, MUST be served only to a person who has logged in (FR-058),
+  except a browsable edition, which is served as FR-060 states,
   and MUST NOT be in the website's model unless the model is exported
-  with its renditions; a book's PDF the model holds for its preview
+  with its renditions (a browsable edition whose presentation is Public
+  always is); a book's PDF the model holds for its preview
   (FR-056) MUST NOT be served. On the person's own computer the program
   MUST serve the whole tree without a log-in, with a listing of each of
   its directories.
@@ -150,6 +155,15 @@ how addresses map to content, 0004-addressing; what the application does,
   destination's secrets (FR-022). A program holding renditions with no
   log-in configured MUST refuse to start. The pages themselves stay
   public.
+- **FR-060**: A work's browsable edition (0021-works-and-presentations
+  FR-026) MUST be its pages, generated from its source, kept in the works
+  tree (FR-057) and served to whoever its presentation's audience allows:
+  one whose audience is Public to every visitor, and any other only to a
+  person who has logged in (FR-058), and on the person's own computer
+  without a log-in. The program MUST NOT serve a work's browsable edition
+  that no presentation describes. A role for a named agreement, such as a
+  subscription, is not specified yet. The work's page MUST link its
+  browsable edition only for a reader who may open it.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its

@@ -4678,6 +4678,35 @@ ifcore:PeriodicalIssueForm a skos:Concept ; skos:inScheme ifcore:PresentationFor
 ifcore:SkillOrToolForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Skill or tool"@en ;
     skos:definition "A skill or MCP tool that carries a work's method to a reader's own AI (0009-press FR-016)."@en ; ifcore:hasAudience ifcore:Public .
 
+ifcore:PreviewExcerptForm a skos:Concept ; skos:inScheme ifcore:PresentationFormScheme ; skos:prefLabel "Preview excerpt"@en ;
+    skos:definition "Pages of a work shown before a reader buys or asks for it, read in a web property's reader and never offered as a download (0021-works-and-presentations FR-027, 0044-public-website FR-056)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+# ───────────────────────── Distribution intent and living works (0015-work-packages FR-033 – FR-035) ─────────────────────────
+# Three independent facts about a work: who may see it (ifcore:hasAudience), who it is written for (its readership), and why
+# it is made, to be sold, given away, or kept for the company's own operations (ifcore:distributionIntent). Whether a reader
+# pays for one presentation is that presentation's own schema:Offer (0021-works-and-presentations FR-026).
+
+ifcore:distributionIntent a owl:ObjectProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range skos:Concept ;
+    rdfs:label "distribution intent"@en ;
+    rdfs:comment "Why a Substantial Work is made: to be sold, to be given away, or for the company's own operations, a concept in ifcore:DistributionIntentScheme (0015-work-packages FR-033). It is not the work's access audience (who may see it) nor its readership (who it is written for), and says nothing of a presentation's price, which is that presentation's schema:Offer; schema:isAccessibleForFree says whether one reader pays, not why the work exists."@en .
+ifcore:DistributionIntentScheme a skos:ConceptScheme ; rdfs:label "Distribution intent"@en ;
+    rdfs:comment "The values of ifcore:distributionIntent (0015-work-packages FR-033)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:ForSale a skos:Concept ; skos:inScheme ifcore:DistributionIntentScheme ; skos:prefLabel "For sale"@en ; skos:notation "for-sale" ;
+    skos:definition "Made to be sold: every obligation of sale applies, from its retail categories and ISBN to its promotion brief and commercial checks (0016-press-production FR-055)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:FreeDistribution a skos:Concept ; skos:inScheme ifcore:DistributionIntentScheme ; skos:prefLabel "Free distribution"@en ; skos:notation "free" ;
+    skos:definition "Made to be given away, such as a public paper or a free guide: no obligation of sale applies, every other obligation does."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:NotDistributed a skos:Concept ; skos:inScheme ifcore:DistributionIntentScheme ; skos:prefLabel "Not distributed"@en ; skos:notation "internal" ;
+    skos:definition "Made for the company's own operations, such as a guide to its own tools: never sold, never announced, never Public, and read only by its audience; it is otherwise a work like any other (0015-work-packages FR-034)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:reviewCadence a owl:DatatypeProperty ; rdfs:domain ifcore:SubstantialWork ; rdfs:range xsd:duration ;
+    rdfs:label "review cadence"@en ;
+    rdfs:comment "How often a living work must be reviewed against what it describes (0015-work-packages FR-035): it is overdue when more than this has passed since its schema:lastReviewed date. A work with no cadence is not a living work."@en .
+
 # ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
 # Every tool installs itself: a host supplies only python3 and uv (0025 FR-014); Python packages come from hashed uv
 # locks and every other program from a toolchain lock fetched into a per-user cache (0025 FR-013, FR-015). A reference
