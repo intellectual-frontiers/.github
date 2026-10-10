@@ -43,8 +43,16 @@
         t.ok(have.has(`${bg} ${sz} png`), `${bg} ${sz} png`);
         if (sz !== "1229x362") t.ok(have.has(`${bg} ${sz} webp`), `${bg} ${sz} webp`);
       }
-      for (const f of [...l.lockup.files, ...l.icon.files]) t.ok(f.file.includes(`-${f.width}x${f.height}-`), `${f.file} names its size`);
+      for (const f of [...l.lockup.files, ...l.icon.files, ...l["icon-square"].files]) t.ok(f.file.includes(`-${f.width}x${f.height}-`), `${f.file} names its size`);
       t.equal(l.lockup["min-width-px"], 100); t.equal(l.icon["min-width-px"], 50);
+      // the squared mark (FR-007): square, PNG at each size and WebP below its 1254 master, and the favicon is its 64 file
+      const sq = new Set(l["icon-square"].files.map((f) => `${f.width}x${f.height} ${f.file.split(".").pop()}`));
+      for (const f of l["icon-square"].files) t.equal(f.width, f.height, `${f.file} is square`);
+      for (const sz of new Set(l["icon-square"].files.map((f) => `${f.width}x${f.height}`))) {
+        t.ok(sq.has(`${sz} png`), `squared ${sz} png`);
+        if (sz !== "1254x1254") t.ok(sq.has(`${sz} webp`), `squared ${sz} webp`);
+      }
+      t.equal(`${l.favicon.width}x${l.favicon.height}`, "64x64"); t.ok(sq.has("64x64 png"), "the favicon's size is in the squared set");
     });
   });
 })();

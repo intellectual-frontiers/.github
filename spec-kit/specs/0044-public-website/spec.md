@@ -216,34 +216,81 @@ how addresses map to content, 0004-addressing; what the application does,
   Markdown copy beside its page, as ScholarlyArticle structured data, and
   as one line of `llms.txt`; each issue as a JSON document; and a stable
   identifier and citation form on every article and issue.
-- **FR-069**: When the program serves the website from the vault on the
-  person's own computer (FR-017), the page of every book, research paper,
+- **FR-069**: When the program senses the vault's command line beside the
+  website it serves, its launcher `eid` at the root of the clone it renders
+  from, which is so on the person's own computer (FR-017) and never in the
+  container image (FR-035), the page of every book, research paper,
   pillar and note, Journal article, product and venture MUST show, under
-  its page head and before the work, a band headed "What's left": what the
-  work still needs, read from the desk export the vault's command line
-  writes (`eid insight build desk`, specified in the vault). The band MUST group
-  the export's items by who acts (the decision authority, the editor, the
-  author, the producer) and show for each its level (a blocker, needs a
-  person, for information), its sentence, the command that shows or fixes
-  it, where it was found, and the requirement it serves as the spec's own
-  text cut at two hundred characters with the spec's path and line; the
-  work's readiness score and the prerequisites of its next stage; when the
-  export was made and the command that refreshes it; and "Nothing is left
-  on the desk" when the export holds no item for the work. When the export
-  is missing the band MUST say so and name the command that makes it. The
-  band MUST NOT render from a model (FR-035) or at a container host, MUST
-  NOT be in the model or in any file the model holds, and nothing it shows
-  MAY reach a published page (FR-003, FR-027).
-- **FR-070**: Wherever the band may render, the masthead MUST carry a
-  control labelled "Show what's left" that shows and hides every band on
-  the page without a reload. The person's choice MUST be kept in the
-  browser and hold across pages, the band MUST be shown until the person
-  hides it, and the control MUST NOT appear where the band may not render.
-- **FR-071**: The band's heading and the control MUST carry the brand's
-  "what's left" icon (frontiers-brand FR-021) before the words, drawn in
-  the text's colour. The band MUST be set apart from the page by a double
-  rule in the brand's tertiary colour and MUST say that it is for this
-  computer only.
+  its page head and before the work, a band headed "Console", read from the
+  desk export the vault's command line writes (`eid insight build desk`,
+  specified in the vault). The Console has two parts. "What's left" MUST
+  show what the work still needs: the export's items grouped by who acts
+  (the decision authority, the editor, the author, the producer), each
+  with its level (a blocker, needs a person, for information), its
+  sentence, the command that shows or fixes it, where it was found, and
+  the requirement it serves as the spec's own text cut at two hundred
+  characters with the spec's path and line; the work's readiness score and
+  the prerequisites of its next stage; and "Nothing is left on the desk"
+  when the export holds no item for the work. "Starting something new"
+  MUST show the guides the export names for the work's kind: the vault's
+  help topics, each with its summary, its sections and its steps, every
+  step's command shown as the line a person types with a control that
+  copies it. Each of the six fronts and the home page MUST show a Console
+  too: its "What's left" is the roll-up of the pages under that front (the
+  home page's of every page), the counts by level, and the pages with the
+  most to do first, each linked; its "Starting something new" is the
+  guides the export names for the front, among them how to start a work
+  of that kind, run its checks and advance it. The Console MUST say when
+  the export was made and the command that refreshes it; when the export
+  is missing it MUST say so and name that command. On this computer the
+  Console is a facade for the vault's command line: beside every command
+  it shows, a control MUST run that command through the vault's own
+  launcher, never a shell, and stream what it prints into the page as it
+  runs, with its exit; a `read`, `check` or `build` command runs at once; a
+  `record` or `generate` command runs first as a dry run, and for real only
+  on a second request that says so; a `decision` or `setup` command never
+  runs from a page, its line is there to copy; a line that is not a
+  command of the vault, or that carries a shell's own characters, is
+  refused and the refusal shown. One command runs at a time. The Console
+  MUST offer its own refresh, the command that makes the export again, and
+  the page MUST show the result once it is written. Nothing runs from a
+  model or at a container host, and the address that runs a line is one of
+  the reserved ones (FR-036). A rendered page MUST carry only the Console's
+  placeholder, which asks the program's server for the Console when the
+  page opens, at a reserved address (FR-036); the Console MUST be rendered
+  at that request from the export and MUST NOT be part of any rendered
+  page, so that the check of the pages (FR-004) never reads it and a page
+  is published without it. The Console MAY name a work that is not yet
+  announced, since it is the editor's own desk on the editor's own
+  computer. The program MUST sense the Console by that launcher and by
+  nothing else, with no mode to choose: the same build and the same serve
+  show it where the launcher is and not where it is not, so what the
+  person tests differs from what the destination serves by the placeholder
+  and the control alone. The Console MUST NOT render where no launcher is
+  beside the website, the container host among them (FR-035), MUST NOT be
+  in the model or in any file the model holds, and nothing it shows MAY
+  reach a published page (FR-003, FR-027).
+- **FR-070**: Wherever the Console may render, the masthead MUST carry a
+  control labelled "Console" that shows and hides every Console on the
+  page without a reload. The person's choice MUST be kept in the browser
+  and hold across pages, the Console MUST be shown until the person hides
+  it, and the control MUST NOT appear where the Console may not render.
+- **FR-071**: The control and the Console's heading MUST carry the brand's
+  console icon, the "What's left" part its what's-left icon and the
+  "Starting something new" part its desk icon (frontiers-brand FR-021),
+  each before the words and drawn in the text's colour. The Console MUST
+  be set apart from the page by a double rule in the brand's tertiary
+  colour and MUST say that it is for this computer only.
+- **FR-072**: Every page's head MUST link the brand's icons, as the
+  vendored brand ships them (frontiers-brand FR-007, FR-013, FR-018), and
+  never a redrawn one: `images/favicon.png` at `/assets/favicon.png`,
+  `images/favicon.ico` at `/favicon.ico`, the Apple touch icon at
+  `/apple-touch-icon.png`, and a web app manifest at `/site.webmanifest`
+  that names the 192, 512 and maskable 512 icons under `/assets/icons/`
+  with the brand's surface and primary colours read from its stylesheet.
+  These addresses MUST stay as they are, unhashed, since devices and
+  browsers fetch them by name; the manifest's colours are the brand's, not
+  the generator's (FR-010).
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -544,13 +591,36 @@ how addresses map to content, 0004-addressing; what the application does,
 - A research pillar's address after the merge: it answers as before,
   within the Journal's section of the website, per FR-061 and FR-068.
 - A work's page served from the vault with no item in the desk export:
-  the band says nothing is left on the desk, per FR-069.
-- The website served from an exported model on the person's own computer:
-  no band and no control, per FR-069 and FR-070.
-- The desk export is older than the vault's records: the band shows when
-  it was made and the command that refreshes it, per FR-069.
-- A person hides the band on one page and opens another: it stays hidden,
-  per FR-070.
+  the Console's "What's left" says nothing is left on the desk, and its
+  guides still show, per FR-069.
+- The website served where no `eid` launcher is beside it, as the
+  container image serves it: no Console and no control, per FR-069 and
+  FR-070.
+- The desk export is older than the vault's records: the Console shows
+  when it was made and the command that refreshes it, per FR-069.
+- A person hides the Console on one page and opens another: it stays
+  hidden, per FR-070.
+- A front whose pages report nothing: its Console's roll-up says every
+  page is clear and its guides show, per FR-069.
+- A guide's step on a front: its command is the line a person types, with
+  the controls that copy it and run it on this computer, per FR-069.
+- A step that is a decision, such as advancing a work: its line is shown
+  to copy and no control runs it, per FR-069.
+- A record command run from the Console: it runs as a dry run first and
+  shows what it would change; a second request runs it for real, per
+  FR-069.
+- A line posted to the run address where no launcher is beside the
+  website, the container host among them: it answers not found, per
+  FR-069.
+- The program started the container's way, from an exported model, beside
+  a vault clone with its launcher on the person's computer: the pages carry
+  the placeholder and the control, the Console is read from the vault at
+  the request, and the works tree stays as the destination serves it, per
+  FR-069 and FR-058.
+- A work at Intake, not yet announced, on the Console's roll-up of a
+  front: the Console names it, since it is rendered at the request on the
+  editor's computer and is part of no page; the page itself does not, per
+  FR-069 and FR-003.
 - A request for a namespace address such as `/ontology/core`: it answers
   with the not-found page, and the ontology is read in the IF Console, per
   FR-012.
@@ -647,10 +717,9 @@ how addresses map to content, 0004-addressing; what the application does,
 - **OQ-14**: Whether the ventures front, once software and services have
   left it, shows funds as its own showcase or under each venture they back
   is not decided.
-- **OQ-15**: Whether the fronts and the home page carry a band that rolls
-  up what is left across a kind, and whether a page of the vault's whole
-  desk is served at a reserved address, is not decided (FR-069 covers a
-  work's own page).
+- **OQ-15**: Whether a page of the vault's whole desk is served at a
+  reserved address, beyond the home page's roll-up (FR-069), is not
+  decided.
 - **OQ-16**: Whether the desk export is made again while the website is
   served and the vault changes, or only when the person runs its command,
   is not decided; the vault's command line decides it.
@@ -687,9 +756,10 @@ how addresses map to content, 0004-addressing; what the application does,
   and the masthead.
 - **A front** — one of the six items of the navigation, each a showcase
   of one kind of work or the Journal.
-- **The desk** — what is left to do for a work, read from the vault's
-  desk export and shown as the "What's left" band on the work's page,
-  only on the person's own computer.
+- **The Console** — the band shown only on the person's own computer,
+  read from the vault's desk export: "What's left", what is left to do for
+  a work or across a front, and "Starting something new", the guides for
+  the work's or the front's kind.
 - **A snapshot** — the previous website's published data, fixed, held in the
   vault until each register moves into the public root.
 - **A publishing destination** — a container host the website's image is
@@ -738,7 +808,10 @@ how addresses map to content, 0004-addressing; what the application does,
 - **SC-016**: No product is shown without its stage, and no shared service
   is labeled an AI Workforce that its record does not call one.
 - **SC-017**: No model, no file of a model and no published page carries
-  the "What's left" band, its control or the desk export.
+  the Console, its control or the desk export.
+- **SC-018**: No decision or setup command runs from a page, no line runs
+  through a shell, and no line runs anywhere but on the person's own
+  computer.
 
 ## Review & acceptance checklist
 
