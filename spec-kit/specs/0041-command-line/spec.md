@@ -547,6 +547,12 @@ orchestrator names, not part of any rule; the public root's command set is
 - **FR-056**: Whenever a command deliberately leaves something alone, its
   rendering MUST say in plain words that the person's work is safe, name what
   was left alone and why, and give the one next action, if there is one.
+- **FR-077**: A command that cannot do its work without a value that belongs to the person (an identifier of an account or an app, a name) MUST NOT require an environment variable
+  or an edited file. Where a person can be asked (a terminal, in text mode), it MUST say in plain words what the value is and where to find it, ask for it, check it with the
+  argument's type (FR-013), ask again on a wrong answer and stop after a few, keep it for the person where the orchestrator keeps such values, and not ask again. Where no one can be asked (the editor,
+  MCP, a pipeline) it MUST fail with the error code `needs-input` and status `missing`, whose plain text says the same, and whose actions are a `set` command taking the values as typed
+  arguments (so that the editor asks for them in boxes, FR-055) and then the command again. A value MAY also be given in an environment variable or the person's configuration, and MUST then
+  not be asked for. A secret MUST NOT be asked for this way: it MUST be typed only where it is never echoed, and never kept in a file the person can read.
 - **FR-057**: `context` together with `doctor`, with secrets removed, MUST
   form a report a person can paste to a person or to an AI to get help. The
   editor MUST offer it as a "Get help" command (FR-050).
