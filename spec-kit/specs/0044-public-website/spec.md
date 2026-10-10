@@ -238,7 +238,11 @@ how addresses map to content, 0004-addressing; what the application does,
   `/__eid/status`.
 - **FR-035**: The website MUST be published as a container image that
   holds the program (FR-032) and the checked model (FR-001), with the
-  files its pages use, pushed to Cloudflare Containers. The image MUST
+  files its pages use, published to one of the destinations FR-018
+  describes: Cloudflare Containers, an AWS container service, Railway or
+  Azure Container Apps. Where the host builds the image itself (Railway),
+  it MUST build it from the same build context, holding exactly the checked
+  model (FR-020). The image MUST
   render the website from that model into memory when it starts, MUST
   answer `/__eid/health`, and MUST hold no credential. The model MUST hold
   nothing FR-003 keeps from the website: no list of works it must not show,
@@ -500,9 +504,10 @@ how addresses map to content, 0004-addressing; what the application does,
   image is not decided.
 - **OQ-6**: What `/__eid/status` shows at a container host, so that it never
   names a work that is neither Public nor announced (FR-003), is not decided.
-- **OQ-7**: Which container host runs first, Cloudflare Containers or an AWS
-  container service, and the vendor onboarding Decision of each, are not
-  decided; both are the decision authority's.
+- **OQ-7**: Which container host runs first, Cloudflare Containers, an AWS
+  container service, Railway or Azure Container Apps, and the vendor
+  onboarding Decision of each, are not decided; all are the decision
+  authority's.
 - **OQ-8**: How a consistent copy of the embedded database file is taken and
   restored for the backup test of 0046-distribution-platform FR-013 is not
   decided.
@@ -525,8 +530,9 @@ how addresses map to content, 0004-addressing; what the application does,
   pages its rendering read; the page is rendered again only when one of them
   changes (FR-033).
 - **The image** — the container image that holds `eid-site` and the checked
-  model, pushed to Cloudflare Containers and run on the person's own computer
-  for local verification (FR-035).
+  model, published to Cloudflare Containers, AWS, Railway or Azure Container
+  Apps and run on the person's own computer for local verification
+  (FR-035).
 - **The application** — the distribution platform
   (0046-distribution-platform), which serves what the generated pages cannot.
 - **A reserved address** — an address the application serves, which no
