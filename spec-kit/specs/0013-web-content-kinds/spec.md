@@ -153,8 +153,9 @@ FR-007.
 ## Open questions
 
 - **OQ-1**: Which legacy Record-shaped content other than the supporting
-  assets of a patent (FR-014 to FR-016) and the records registers
-  (0044-public-website FR-074) is curated forward into content documents,
+  assets of a patent (FR-014 to FR-016), the records registers
+  (0044-public-website FR-074) and the research records (0044-public-website
+  FR-075) is curated forward into content documents,
   and under which content kind, is not stated; until then the public
   website carries it as an archive read from its snapshot
   (0044-public-website FR-013).

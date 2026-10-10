@@ -310,6 +310,9 @@ is not stated here.
   live. A book's brief MUST also carry the four statements 0009-press
   FR-040 requires. A book keeps this as its distribution metadata; every other work
   keeps it beside its source. The brief is never a second copy of the work.
+  A research area, pillar, note or publication (0017-spoken-and-research-works
+  FR-017), whose release is its record on the website and which is not
+  promoted, needs no brief; a paper does.
   The brief MUST state how the work will be found and by whom. Promotion
   MUST be deliberate and in good taste: no spam, manufactured urgency, or
   inflated social proof. Whether, where, and how hard to promote is a

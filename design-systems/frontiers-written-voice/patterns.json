@@ -1,5 +1,5 @@
 {
-  "$description": "The machine form of frontiers-written-voice's rules (spec FR-008 to FR-013 and FR-021): what sweep.py looks for. Matching ignores case and treats curly quotes as straight. A phrase of one word in hedges or throat_clearing warns; a longer one fails. spec.md is the source; this file must agree with it. The headline lists are for headings and titles: a heading that starts with a word in fail_headline_starts, or is one of fail_headline_labels, announces a topic or an activity instead of stating the claim (FR-009); one that starts with a phrase in warn_headline_starts names a topic and is read again by a person.",
+  "$description": "The machine form of frontiers-written-voice's rules (spec FR-008 to FR-013 and FR-021): what sweep.py looks for. Matching ignores case and treats curly quotes as straight. A phrase of one word in hedges or throat_clearing warns; a longer one fails. spec.md is the source; this file must agree with it. The headline lists are for headings and titles: a heading that starts with a word in fail_headline_starts, or is one of fail_headline_labels, announces a topic or an activity instead of stating the claim (FR-009); one that starts with a phrase in warn_headline_starts names a topic and is read again by a person. The fail_self_description list holds regular expressions, matched ignoring case: prose that describes the page's own apparatus, what its items, cards or sections say, show or carry, and how they are arranged (FR-009).",
   "fail_words": [
     "delve",
     "unlock",
@@ -522,6 +522,13 @@
     "deserves the same courtesy",
     "wearing a different hat",
     "without ceremony"
+  ],
+  "fail_self_description": [
+    "\\b(each|every)( (one|item|card|entry|page|row|line|listing|section|piece|link))? (says|names|states|tells|shows|carries|lists|reports|gives|declares|records|links to) (what|how|which|where|whether|if|its|the)\\b",
+    "\\b(say|says|state|states|name|names|tell|tells|show|shows) (how settled (its|their|the) claims? (is|are)|what stage (it|they) (is|are) at|how far (its|their) claims? (has|have) been tested)\\b",
+    "\\b(form|kind|type|status|stage|date|department) is (a|the|its) (label|line|badge|kicker|tag)\\b",
+    "\\b(label|badge|line|kicker) on (the|each|every|its) card\\b",
+    "\\ba section of its own\\b"
   ],
   "fail_labels": [],
   "max_seesaws": 1,

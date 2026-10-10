@@ -322,6 +322,23 @@ how addresses map to content, 0004-addressing; what the application does,
   states facts; the ontology holds the individual it describes where one is
   asserted (0007-work-and-assets FR-008), and a page MUST show what a
   record states and say what it does not (FR-063, FR-064).
+- **FR-075**: The research areas, pillars, notes and publications the
+  website shows MUST be research records of the vault
+  (0017-spoken-and-research-works FR-017), one per work package under
+  `works/research/<slug>/`, read from the record's AsciiDoc source and
+  shown only when the ontology gives the work a Public audience; the
+  generator MUST read them there, never from the snapshot (FR-013). A
+  pillar's page is its header and its sections; a note's is its summary,
+  header and sections; an area's introduction is its sections and its
+  parent is its `:parent-area:`; a publication's page is its header, its
+  abstract and its summary. A section's claim label, falsifiability list,
+  points, sources, table, figure and screen are the blocks the vault's
+  research standard writes (`house-design/research/README.md`, section
+  attributes), and a figure or screen is shown as its title and
+  description (FR-042). A record's `:related:` names other records by
+  slug; the generator resolves each among the pillars, notes, papers,
+  publications, disclosures, trademarks, patent families and portfolio
+  works it lists, in that order, and leaves out one it does not list.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -348,10 +365,11 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-007).
 - **FR-013**: Until a register's records are held in the public root, the
   generator MAY read that register from a snapshot of the previous
-  website's data held in the vault: research areas, pillars, notes and
-  papers, owned channels, the company's own descriptive text, the home
-  page's picture, and the previous website's record pages kept as an
-  archive. The records registers have left it (FR-074). A snapshot is fixed
+  website's data held in the vault: owned channels, the company's own
+  descriptive text, the home page's picture, and the previous website's
+  record pages kept as an archive. The records registers have left it
+  (FR-074), and so have the research areas, pillars, notes and
+  publications (FR-075). A snapshot is fixed
   data: no command writes it, and no one adds to it by hand. It MUST hold
   only what the previous website published to the public, and a register
   leaves it when the register moves into the public root. Its text MAY be
@@ -366,7 +384,10 @@ how addresses map to content, 0004-addressing; what the application does,
   permanently (FR-016): the research index to the Journal's sections, the
   toolbox and each of its items to the products front and its items, and
   the writing index to the Journal's elsewhere department. A paper's,
-  pillar's and note's address MUST NOT change.
+  pillar's and note's address MUST NOT change; a record the vault renamed
+  because two records shared one slug (0017-spoken-and-research-works
+  FR-026) keeps its old address as a permanent redirect, from the record's
+  `:legacy-slugs:`.
 - **FR-015**: Every page MUST load the analytics container the previous
   website used, and no other tracking.
 
@@ -480,7 +501,7 @@ how addresses map to content, 0004-addressing; what the application does,
   scoreboard MUST keep its caption.
 - **FR-042**: A research pillar, note or area page MUST show, for each
   section, its claim label, points, sources, table with caption and
-  falsifiability list when the register holds them. A figure or screen the
+  falsifiability list when the record holds them (FR-075). A figure or screen the
   website does not draw MUST be shown as its title and description. An area
   page MUST show its introduction, its parent area and the records filed
   under it, found by the area's name in a record's title, summary, text or
