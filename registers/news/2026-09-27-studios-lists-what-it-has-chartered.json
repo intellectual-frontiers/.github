@@ -1,0 +1,14 @@
+{
+  "slug": "2026-09-27-studios-lists-what-it-has-chartered",
+  "order": 8,
+  "title": "Studios now shows every company, service and piece of software it has chartered",
+  "date": "2026-09-27",
+  "link": "/studios",
+  "summary": "The Studios page lists its ventures, shared services, operating companies and maintained software, each with its status, its operator and its record on file.",
+  "area": "studios",
+  "kind": "update",
+  "keywords": [
+    "studios"
+  ],
+  "text": "<p>If you are deciding whether Studios builds what it says it builds, the page is now the evidence. Ventures are chartered as companies with their own entity, operator, licensed rights and a closure condition written before the first hire. Shared services are built once so no venture rebuilds what exists next door. Software entries record their licence and status rather than implying one.</p>"
+}

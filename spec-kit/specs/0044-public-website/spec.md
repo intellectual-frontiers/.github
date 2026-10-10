@@ -83,8 +83,11 @@ how addresses map to content, 0004-addressing; what the application does,
   (0016-press-production FR-028), not the flat cover. Every other image on
   the website MUST come from the frontiers-brand imagery pool
   (0014-design-systems FR-044), except the home page's picture, which is the
-  previous website's, read from its snapshot (FR-013); a work other than a
-  book needs no image.
+  website's own (FR-077); a work other than a book needs no image. A
+  book's page MUST also show what `page.yml` beside its jacket states
+  (0015-work-packages): the premise, a pull quote, the specifications the
+  website shows, its parts and chapters, the frameworks it teaches and who
+  it is for.
 - **FR-009**: Writing published on a channel the company owns, and any
   work whose authoritative text lives elsewhere, MUST be shown as a
   reference that links to where it lives, never as a copy
@@ -322,7 +325,11 @@ how addresses map to content, 0004-addressing; what the application does,
   research areas are topics too, from their records, FR-075); and
   `registers/writing/` for the founder's writing that lives elsewhere
   (FR-009, FR-065), each with its title, summary, date, kind, series, tags
-  and address. A record carries `order`, its place in the
+  and address; and `registers/news/` for the dated What's new items the
+  previous website published, each with its title, date, link, summary,
+  area, kind, keywords and text. A fund's record carries, under `fund`,
+  the size, the earlier address and the lists its page shows. A record
+  carries `order`, its place in the
   register, so a front lists records as the register orders them. A record
   states facts; the ontology holds the individual it describes where one is
   asserted (0007-work-and-assets FR-008), and a page MUST show what a
@@ -354,6 +361,15 @@ how addresses map to content, 0004-addressing; what the application does,
   each at `/topics/<slug>` with its introduction, parent and the records
   filed under it (FR-042), and the subject tags of `registers/topics/`
   (FR-074).
+- **FR-077**: The website's own copy MUST be held in the public root under
+  `site/`: `site/about.json`, the About page's proposition, opening
+  statement and body, claims standard, unit boundaries, provenance and
+  corporate facts. The website's own package in the vault
+  (`works/website/intellectualfrontiers-com/`) MUST hold the home page's
+  picture and the previous website's sitemap (FR-014); the Zero Security
+  Theatre registers (FR-043) are a data file beside that area's research
+  record (0017-spoken-and-research-works FR-018). The generator writes
+  the crawler rules itself.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -378,23 +394,17 @@ how addresses map to content, 0004-addressing; what the application does,
   Console (0043-if-console). An address the website does not serve MUST
   answer with one not-found page and a not-found status (0004-addressing
   FR-007).
-- **FR-013**: Until a register's records are held in the public root, the
-  generator MAY read that register from a snapshot of the previous
-  website's data held in the vault: the company's own descriptive text
-  and the home page's picture. The records registers, the topics and the
-  writing elsewhere have left it (FR-074), and so have the research areas,
-  pillars, notes and publications (FR-075) and the previous website's blog
-  posts (FR-076). A snapshot is fixed
-  data: no command writes it, and no one adds to it by hand. It MUST hold
-  only what the previous website published to the public, and a register
-  leaves it when the register moves into the public root. Its text MAY be
-  edited by hand for one reason: the written voice (FR-073), since a page
-  this website shows is this website's writing, whichever website first
-  published it; such an edit changes wording, never a fact, a date or a
-  name, and git holds the text as it was published.
+- **FR-013**: The generator MUST read nothing from a snapshot of the
+  previous website: every register and text the previous website
+  published has a permanent home that this specification names (the
+  records registers, FR-074; the research records, FR-075; the archived
+  posts and topics, FR-076; the website's own copy, FR-077), and a text
+  carried from the previous website is this website's writing, so it
+  keeps the written voice (FR-073) and git holds it as it was published.
 - **FR-014**: The generator MUST report every address the previous
   website's sitemap lists that the generated website neither serves nor
-  redirects, so nothing it published is dropped unnoticed.
+  redirects, so nothing it published is dropped unnoticed. The sitemap is
+  held with the website's own package (FR-077).
 - **FR-068**: The addresses the fronts of FR-066 replaced MUST redirect
   permanently (FR-016): the research index to the Journal's sections, the
   toolbox and each of its items to the products front and its items, and

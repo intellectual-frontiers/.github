@@ -1,0 +1,72 @@
+{
+  "proposition": "Intellectual Frontiers is a think tank that builds consequential things. We turn unusual ideas into publications, intellectual property, software, companies, and investments.",
+  "openingStatement": "Intellectual Frontiers LLC is a Maryland limited liability company that develops, owns, commercializes, funds, builds, and publishes intellectual assets and ventures organized around Native Alpha.",
+  "openingBody": [
+    "The company is deliberately lightweight. It owns the capabilities where control, judgment, rights, relationships, capital allocation, and accumulated knowledge can compound into advantage, and it uses partners and specialized providers for work that does not need to become permanent overhead.",
+    "That means a small number of people, a large number of records, and a preference for keeping decisions and rights in house while renting execution."
+  ],
+  "claimsStandard": [
+    "Observable facts should be verifiable.",
+    "Opinions should be identifiable as opinions.",
+    "Frameworks should be identifiable as frameworks.",
+    "Illustrations should be identifiable as illustrations.",
+    "A claim does not become a fact because we published it ourselves."
+  ],
+  "unitBoundaries": [
+    "A patent does not prove a venture.",
+    "A publication does not prove demand.",
+    "Studio activity does not justify investment.",
+    "Investment does not prove product-market fit."
+  ],
+  "provenance": [
+    "Intellectual Frontiers acquired all Netspective Communications LLC patents in 2023. Intellectual Frontiers has subsequently continued to develop and prosecute intellectual property directly.",
+    "The age of an underlying invention and the age of Intellectual Frontiers LLC are different things. Some patent families now owned by Intellectual Frontiers trace their priority histories back more than a decade.",
+    "You do not have to take our word for either statement. Assignment records, file histories, and priority dates are public."
+  ],
+  "corporateFacts": [
+    {
+      "label": "Legal name",
+      "value": "Intellectual Frontiers LLC"
+    },
+    {
+      "label": "Entity type",
+      "value": "Limited liability company"
+    },
+    {
+      "label": "Jurisdiction",
+      "value": "Maryland, United States"
+    },
+    {
+      "label": "Location",
+      "value": "Silver Spring, Maryland, United States"
+    },
+    {
+      "href": "https://www.intellectualfrontiers.com/",
+      "label": "Website",
+      "value": "intellectualfrontiers.com"
+    },
+    {
+      "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
+      "label": "Formation date",
+      "source": "Maryland Department of Assessments and Taxation",
+      "value": null
+    },
+    {
+      "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
+      "label": "Maryland Department ID",
+      "source": "Maryland Department of Assessments and Taxation",
+      "value": null
+    },
+    {
+      "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
+      "label": "Maryland standing",
+      "source": "Maryland Department of Assessments and Taxation",
+      "value": null
+    },
+    {
+      "label": "Federal EIN",
+      "note": "There is no public IRS lookup for a private LLC, so we do not publish it.",
+      "value": "Provided to counterparties on request"
+    }
+  ]
+}

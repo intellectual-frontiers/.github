@@ -1,0 +1,15 @@
+{
+  "slug": "2026-09-27-ip-decides-what-a-discovery-becomes",
+  "order": 6,
+  "title": "The IP page now asks what each discovery should become",
+  "date": "2026-09-27",
+  "link": "/ip",
+  "summary": "Research and IP is reframed around five questions that decide whether an advantage deserves a patent, a trade secret, a publication, a licence, or nothing at all.",
+  "area": "patents",
+  "kind": "update",
+  "keywords": [
+    "patents",
+    "research"
+  ],
+  "text": "<p>The page now starts from the advantage, not the filing. Five questions test whether an insight is real, who would pay for it, whether it is hard to reproduce, and whether protection would create more value than publication, secrecy or speed. The outputs run from patents and trade secrets to defensive disclosures, publications, data and contractual rights, trademarks, licensing, new ventures and investments.</p>"
+}

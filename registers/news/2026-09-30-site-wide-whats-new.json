@@ -1,0 +1,14 @@
+{
+  "slug": "2026-09-30-site-wide-whats-new",
+  "order": 10,
+  "title": "One page now lists everything that changed on the site",
+  "date": "2026-09-30",
+  "link": "/whats-new",
+  "summary": "What's new collects new research, patents, portfolio works, book updates, and site changes in one dated feed, with filters by area and kind and an Atom feed.",
+  "area": "site",
+  "kind": "new",
+  "keywords": [
+    "site"
+  ],
+  "text": "<p>The feed merges three sources: items written for it, the news entries for each\nprinted work, and every dated record published in the last six months. Filter\nby area or kind, or subscribe to the Atom feed.</p>"
+}

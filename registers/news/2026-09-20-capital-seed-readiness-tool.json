@@ -1,0 +1,14 @@
+{
+  "slug": "2026-09-20-capital-seed-readiness-tool",
+  "order": 5,
+  "title": "A browser tool tests whether funding would speed up a repeatable customer motion",
+  "date": "2026-09-20",
+  "link": "/capital/seed-readiness",
+  "summary": "The seed and early-capital readiness tool gives a verdict on whether money would accelerate a repeatable customer motion or only extend the search for one.",
+  "area": "capital",
+  "kind": "new",
+  "keywords": [
+    "capital"
+  ],
+  "text": "<p>If you are a founder deciding whether to raise, answer the gate questions and the tool returns a verdict from deterministic rules, not a score. It runs in your browser, with nothing sent unless you choose to share it. You can also switch it to challenge mode, copy an AI prompt that stress-tests your answers, and download a decision record. A companion section lists the common traps that make a raise look ready when it isn't.</p>"
+}
