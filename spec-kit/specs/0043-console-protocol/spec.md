@@ -57,6 +57,8 @@ how the extension draws it is the Console's spec.
 - **FR-009**: A provider's streams MUST be NDJSON, one resource per line
   (0041-command-line FR-019), which the Console shows as progress with the
   stream's own words.
+- **FR-011**: When a provider's command fails with the code `needs-input` (0041-command-line FR-077), the Console MUST show its plain text and its actions, MUST ask for the typed arguments of an
+  action in input boxes, validated by the argument's type, and MUST then offer to run the command again. It MUST NOT ask for a secret.
 - **FR-010**: A provider that serves MCP (`mcp serve`, 0041-command-line FR-027)
   MUST be registered by the Console with VS Code where it supports it, and
   MUST offer no `decision` through it.

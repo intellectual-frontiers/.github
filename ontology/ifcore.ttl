@@ -1439,7 +1439,7 @@ ifcore:StandardSchemesAltMint a ifcore:Alternative ; rdfs:label "Mint an address
 ifcore:PlainWordClassesKept a ifcore:Decision ;
     rdfs:label "Classes named in ordinary words of their field, with no established class to tie them to are kept"@en ;
     dcterms:subject ifcore:Alternative, ifcore:Asset, ifcore:Capability, ifcore:CapitalSource, ifcore:ClaimKind,
-        ifcore:CommercializationSubstage, ifcore:ConfidenceLevel, ifcore:ControlTest, ifcore:CutKind,
+        ifcore:CommandSetting, ifcore:CommercializationSubstage, ifcore:ConfidenceLevel, ifcore:ControlTest, ifcore:CutKind,
         ifcore:Decision, ifcore:DecisionOutcome, ifcore:DeliveryRecord, ifcore:DesignPartnerRequirement,
         ifcore:DesignSystem, ifcore:DesignSystemStatus, ifcore:DigitalAsset, ifcore:Disposition,
         ifcore:EidolonComponent, ifcore:Equipment, ifcore:ExternalRecordReference, ifcore:Fact,
@@ -1470,7 +1470,7 @@ ifcore:PlainWordPropertiesKept a ifcore:Decision ;
         ifcore:drives, ifcore:fixture, ifcore:fromKind, ifcore:grantsAudience, ifcore:hasAudience,
         ifcore:hasDisposition, ifcore:hasMode, ifcore:hasOutcome, ifcore:heldIn, ifcore:imprintOf,
         ifcore:imprintThesis, ifcore:inWorkDomain, ifcore:job, ifcore:layerOrder, ifcore:licenses,
-        ifcore:lifecycleOwner, ifcore:measuredBy, ifcore:moduleCode, ifcore:namedUnknown, ifcore:notProofOf,
+        ifcore:lifecycleOwner, ifcore:measuredBy, ifcore:moduleCode, ifcore:namedUnknown, ifcore:needsSetting, ifcore:notProofOf,
         ifcore:noteType, ifcore:noticeWithin, ifcore:offersDoor, ifcore:offersInterface, ifcore:operates,
         ifcore:operatesSharedService, ifcore:operationalStatus, ifcore:platformLayer, ifcore:portfolioCategory,
         ifcore:portfolioCompany, ifcore:probe, ifcore:probeKind, ifcore:providesSurface,
@@ -4922,6 +4922,12 @@ ifcore:Command a owl:Class ; rdfs:subClassOf schema:Action ; rdfs:label "Command
     skos:definition "One command of an orchestrator: its words, the kind of resource it acts on, its verb, and its category (0041-command-line FR-008, FR-014)."@en ;
     rdfs:comment "Specializes schema:Action (0019 FR-002). Its words are dcterms:identifier, for example spec show. A command with no noun is one of the closed repository-wide set (0041 FR-010) and has no ifcore:commandNoun; a command whose second word is not in the verb scheme (the mcp control word, 0041 FR-011) or that is repository-wide has no ifcore:commandVerb, except check, which carries the verb check. Every command has exactly one category."@en ;
     ifcore:hasAudience ifcore:Public .
+ifcore:CommandSetting a owl:Class ; rdfs:label "Command setting"@en ;
+    skos:definition "A value a command needs from the person who runs it before it can do its work, such as the identifier of an app registration: it is asked for in plain words at a terminal, checked by its argument type, and kept for the person, and no one is required to set an environment variable or edit a file (0041-command-line FR-077)."@en ;
+    rdfs:comment "No established class names it (0019-controlled-vocabulary FR-004). It is not a secret: a secret is never asked for here or kept in a readable file."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:needsSetting a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range ifcore:CommandSetting ;
+    rdfs:comment "A setting a command asks for when it is not yet known (0041-command-line FR-077). No established property names it (0019-controlled-vocabulary FR-004)."@en .
 ifcore:commandOf a owl:ObjectProperty ; rdfs:subPropertyOf schema:isPartOf ; rdfs:domain ifcore:Command ; rdfs:range ifcore:Orchestrator ;
     rdfs:comment "The orchestrator a command belongs to (0042-agora FR-004)."@en .
 ifcore:commandNoun a owl:ObjectProperty ; rdfs:domain ifcore:Command ; rdfs:range skos:Concept ;

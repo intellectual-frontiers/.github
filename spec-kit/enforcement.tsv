@@ -1427,3 +1427,5 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0051-patent-portfolio FR-019	check	eidolon: eid test	the Rust tests check patents.json, patents.csv, the Markdown copies, llms.txt and the sitemap
 0051-patent-portfolio FR-020	check	eidolon: eid test	the Rust tests check an episode page with and without audio
 0051-patent-portfolio FR-021	check	eidolon: eid check site	eid check site
+0041-command-line FR-077	check	workspaces-host: ws-host test	test_onedrive.AskingForTheApp checks that a terminal is asked, checked and not asked again, that where no one can be asked the failure is needs-input with plain words and a set action, and that a person who set the variables is not asked
+0043-console-protocol FR-011	none	-	no check yet that the Console shows needs-input and asks for the action's typed arguments; workspaces-host tests the command's side
