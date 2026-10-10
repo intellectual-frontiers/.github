@@ -281,6 +281,16 @@ how addresses map to content, 0004-addressing; what the application does,
   each before the words and drawn in the text's colour. The Console MUST
   be set apart from the page by a double rule in the brand's tertiary
   colour and MUST say that it is for this computer only.
+- **FR-072**: Every page's head MUST link the brand's icons, as the
+  vendored brand ships them (frontiers-brand FR-007, FR-013, FR-018), and
+  never a redrawn one: `images/favicon.png` at `/assets/favicon.png`,
+  `images/favicon.ico` at `/favicon.ico`, the Apple touch icon at
+  `/apple-touch-icon.png`, and a web app manifest at `/site.webmanifest`
+  that names the 192, 512 and maskable 512 icons under `/assets/icons/`
+  with the brand's surface and primary colours read from its stylesheet.
+  These addresses MUST stay as they are, unhashed, since devices and
+  browsers fetch them by name; the manifest's colours are the brand's, not
+  the generator's (FR-010).
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its

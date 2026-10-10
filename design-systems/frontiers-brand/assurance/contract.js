@@ -92,7 +92,7 @@
     });
     s.test("every listed file loads at its stated size", async (t) => {
       const l = logo(await tokens());
-      for (const f of [...l.lockup.files, ...l.icon.files, l.favicon, l["share-card"], ...(l["app-icons"]?.files || [])]) {
+      for (const f of [...l.lockup.files, ...l.icon.files, ...(l["icon-square"]?.files || []), l.favicon, l["share-card"], ...(l["app-icons"]?.files || [])]) {
         const [w, h] = await size(f.file);
         t.equal(`${w}x${h}`, `${f.width}x${f.height}`, f.file);
       }

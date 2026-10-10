@@ -113,9 +113,12 @@ def luminance(hex_color: str) -> float:
 
 
 def icon_master(brand: Path) -> Path:
+    """The master the app icons and favicon.ico are made from: the squared icon-only mark's largest PNG when the brand ships
+    one (frontiers-brand FR-007), else the icon-only mark's."""
     tokens = json.loads((brand / "tokens.json").read_text(encoding="utf-8"))
-    files = tokens["$extensions"]["com.intellectualfrontiers.logo"]["icon"]["files"]
-    return brand / max(files, key=lambda f: f["width"])["file"]
+    logo = tokens["$extensions"]["com.intellectualfrontiers.logo"]
+    files = logo.get("icon-square", {}).get("files") or logo["icon"]["files"]
+    return brand / max((f for f in files if f["file"].endswith(".png")), key=lambda f: f["width"])["file"]
 
 
 def app_icons(brand: Path) -> list[dict]:

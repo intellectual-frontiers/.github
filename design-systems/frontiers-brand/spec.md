@@ -61,7 +61,11 @@ restating them.
 - **FR-007**: The icon-only mark MUST be the landscape alone, cropped from the master's own
   pixels, shipped as the files `tokens.json` lists under `logo.icon`. It MUST be used only where
   the full lockup does not fit, such as a book spine or a favicon. A different crop MUST NOT be
-  made without amending this spec.
+  made without amending this spec. The mark MUST also ship squared, the same pixels centered on a
+  transparent square canvas, as the files `tokens.json` lists under `logo.icon-square`: a PNG at
+  each size and each size below the 1254×1254 master also as WebP, every file named by its size
+  (FR-006). The favicon (FR-013) and the app icons (FR-018) MUST be made from the squared set, so
+  the mark sits the same in every icon a device or browser shows.
 - **FR-008**: The lockup MUST NOT be placed smaller than 100px wide on screen or 1in wide in
   print, and the icon not smaller than 50px or 0.5in on its long side. A size MUST be taken from
   the nearest larger file, never from a smaller file scaled up.
@@ -77,11 +81,12 @@ restating them.
   placement and the relationship between landscape and wordmark, simplifying landscape detail
   only as legibility at that size requires. A refreshed logo MUST ship as a new dated set of
   files beside the existing set, never replacing a file in place.
-- **FR-013**: The favicon MUST be `images/favicon.png`, a 64×64 rendering of the icon-only mark.
+- **FR-013**: The favicon MUST be `images/favicon.png`, the squared icon-only mark at 64×64: the
+  64×64 file of `logo.icon-square` (FR-007), as it is.
 
 - **FR-018**: Its app icons MUST be those `tokens.json` lists under `logo.app-icons`: an Apple touch
-  icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the icon-only mark
-  centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
+  icon (180×180), icons of 192×192 and 512×512, and a maskable 512×512 icon, each the squared
+  icon-only mark (FR-007) centered on the surface role, never enlarged past its master, the maskable icon's mark inside the
   80% circle a platform may crop it to; and `images/favicon.ico` at 16, 32 and 48px. They are
   written by `agora imagery build` and never edited by hand.
 - **FR-019**: Each unit MAY be signed by its unit mark, where the unit and not the house signs a
