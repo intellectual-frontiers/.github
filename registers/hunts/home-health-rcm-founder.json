@@ -1,0 +1,64 @@
+{
+  "slug": "home-health-rcm-founder",
+  "order": 1,
+  "counts": {
+    "experiments": 1,
+    "inConversation": 3,
+    "reviewed": 9,
+    "surfaced": 21
+  },
+  "disqualifying": [
+    "Only sold into revenue cycle, never operated it",
+    "Treats the answer as more staff"
+  ],
+  "learned": [
+    "The most useful signal was specificity. Anyone who wrote about reason codes by number was worth reading. Everyone who wrote about revenue cycle in general was not."
+  ],
+  "nativeAlphaSought": "Somebody who reads denials as a data source rather than as a queue to be worked down.",
+  "packets": [
+    {
+      "confidence": "High",
+      "evidence": [
+        {
+          "claim": "Published the denial breakdown with reason codes",
+          "source": "Public post"
+        },
+        {
+          "claim": "Template adopted by peer agencies",
+          "source": "Practitioner forum thread"
+        }
+      ],
+      "nativeAlpha": "Turns payer behavior into a documentation specification, which is exactly the product thesis we want to fund.",
+      "nextAction": "Invite to a paid two week diagnostic on one agency's denial file, as an experiment before any founder conversation.",
+      "person": "Illustrative candidate: an agency revenue cycle director",
+      "relationship": "Warm. They commented on a Press article about authorization turnaround in 2025.",
+      "role": "Director of revenue cycle, multi state home health agency",
+      "signals": [
+        "Long form post with reason code level detail",
+        "Answers operational questions in a practitioner forum, consistently and without selling",
+        "Built an internal appeals template later adopted by two other agencies"
+      ],
+      "status": "In conversation",
+      "surfacedFor": "Founder for home health revenue cycle",
+      "unknowns": [
+        "Whether they want to found rather than lead operations",
+        "Whether the template result survives outside their own agency"
+      ],
+      "whyItMatters": "The fund needs a founder who already knows which denials are worth automating and which are noise. That knowledge is not purchasable.",
+      "whySurfaced": "Published a public breakdown of the six denial reasons that accounted for most of their volume, with the documentation change that closed each one."
+    }
+  ],
+  "qualifying": [
+    "Owned a denial rate or a days in accounts receivable number",
+    "Built or specified a tool that changed it",
+    "Can explain a payer's behavior without moralizing about it"
+  ],
+  "signals": [
+    "Detailed public writing about specific denial reason codes",
+    "Open source or public templates for appeals",
+    "Speaking at home health operations meetings rather than general health IT ones"
+  ],
+  "thesis": "Home health revenue cycle is a documentation problem wearing a billing costume. The founder we want has already been personally responsible for a denial rate and has built something to fix it, even if the something was a spreadsheet.",
+  "title": "Founder for home health revenue cycle",
+  "unit": "Capital"
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "healthcareguy",
+  "order": 155,
+  "kind": "publication",
+  "unit": "press",
+  "title": "HealthcareGuy.com",
+  "summary": "The longest continuous record in the publishing program: a personal site where health IT arguments, field observations, and invention sketches have been published in public for two decades.",
+  "status": "Operating",
+  "year": "2005",
+  "url": "https://healthcareguy.com",
+  "detail": [
+    "HealthcareGuy.com is where the public record starts. It is not a corporate blog; it is a running notebook written while building systems, filing patents, and advising buyers. The posts are dated, specific, and usually angry at the gap between what a system promises and what it actually does.",
+    "We treat it as a portfolio work because it is an owned audience and a standing proof of reputation. A publication you rent can change its algorithm tomorrow. One you own can carry the same argument for twenty years.",
+    "Many of the ideas that became patent families, funds, and ventures first appeared there as a paragraph or a diagram. The site is the raw feed; the rest of the register is what survived the decide step."
+  ]
+}

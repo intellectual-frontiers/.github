@@ -1,0 +1,16 @@
+{
+  "slug": "compliantinsecurity",
+  "order": 150,
+  "kind": "publication",
+  "unit": "press",
+  "title": "CompliantInSecurity.com",
+  "summary": "The standing argument that passing an audit is not the same as being secure, written for the people who own both obligations.",
+  "status": "Operating",
+  "year": "2016",
+  "url": "https://compliantinsecurity.com",
+  "detail": [
+    "Every regulated organization lives with two separate jobs: proving compliance to an auditor and actually defending the system. CompliantInSecurity.com exists because those two jobs are often confused, and the confusion is where breaches hide.",
+    "We publish the gap in plain language: what a framework asks for, what an attacker actually does, and what a responsible operator does about the difference. The audience is the CISO, the compliance officer, and the engineer who has to satisfy both.",
+    "It is a portfolio work because it carries a persistent point of view. When our patent families or ventures touch security, authorization, or evidence, this site has already made the argument that the harder problem is worth solving."
+  ]
+}

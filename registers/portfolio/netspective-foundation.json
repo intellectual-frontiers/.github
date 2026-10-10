@@ -1,0 +1,33 @@
+{
+  "slug": "netspective-foundation",
+  "order": 153,
+  "kind": "company",
+  "unit": "studios",
+  "title": "Netspective Foundation, Inc.",
+  "summary": "A nonprofit operating company that equips medical researchers, clinicians, and patient advocates with software engineering, data architecture, AI, and machine learning to advance real-world evidence.",
+  "status": "Operating",
+  "year": "2015",
+  "url": "https://netspective.foundation",
+  "detail": [
+    "Netspective Foundation stands at the intersection of technology and medical research. It builds custom data-collection tools, data-management platforms, and AI-driven models for patient registries and research groups, with a focus on high-prevalence chronic conditions.",
+    "Its Research as a Service model democratizes access to analytics and cloud-based collaboration environments, making biomedical discovery more accessible for professional researchers and citizen scientists alike. The output is public research capability, not an owned position.",
+    "We list it in the portfolio because it is an operating entity we started and continue to support, and because its work on real-world data and evidence feeds the same kinds of questions our Care Delivery funds and IP programs ask."
+  ],
+  "links": [
+    {
+      "label": "See Unblock Health, a venture it sponsors",
+      "params": {
+        "slug": "unblock-health"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "See the fund thesis it connects to",
+      "to": "/capital"
+    },
+    {
+      "label": "Read how we publish research",
+      "to": "/press"
+    }
+  ]
+}

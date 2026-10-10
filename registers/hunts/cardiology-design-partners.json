@@ -1,0 +1,64 @@
+{
+  "slug": "cardiology-design-partners",
+  "order": 2,
+  "counts": {
+    "experiments": 2,
+    "inConversation": 5,
+    "reviewed": 12,
+    "surfaced": 27
+  },
+  "disqualifying": [
+    "Paid advisory relationships with a device manufacturer in the same category",
+    "No hands on time with the monitoring queue"
+  ],
+  "learned": [
+    "Physicians who complain publicly about alert burden are the best possible reviewers of claim language, because they already know the failure mode by heart."
+  ],
+  "nativeAlphaSought": "Clinicians who can describe the failure of a data flow precisely enough that it becomes a claim.",
+  "packets": [
+    {
+      "confidence": "Medium",
+      "evidence": [
+        {
+          "claim": "Published the alert triage argument",
+          "source": "Professional publication"
+        },
+        {
+          "claim": "Committee service listed publicly",
+          "source": "Society roster"
+        }
+      ],
+      "nativeAlpha": "Describes data problems in terms of who has to act on them, which converts directly into claim scope.",
+      "nextAction": "Ask for one hour of paid review on two claim summaries, in plain English.",
+      "person": "Illustrative candidate: an electrophysiologist",
+      "relationship": "None known.",
+      "role": "Electrophysiologist, community cardiology group",
+      "signals": [
+        "Society committee service on remote monitoring",
+        "Public writing on alert triage",
+        "No visible manufacturer advisory relationships"
+      ],
+      "status": "Surfaced",
+      "surfacedFor": "Cardiology design partners for a device data program",
+      "unknowns": [
+        "Institutional rules on outside review work",
+        "Whether the triage rule was ever implemented"
+      ],
+      "whyItMatters": "A claim written without a clinician who works the queue tends to cover the wrong step.",
+      "whySurfaced": "Wrote a short piece describing how remote monitoring alerts consumed a full nursing role without changing an outcome, and proposed a triage rule."
+    }
+  ],
+  "qualifying": [
+    "Practicing, not purely academic",
+    "Has published or spoken about remote monitoring workload",
+    "Willing to review claim language in plain English"
+  ],
+  "signals": [
+    "Writing about alert burden and remote monitoring staffing",
+    "Society committee work on remote monitoring standards",
+    "Case reports involving data reconciliation failures"
+  ],
+  "thesis": "Device telemetry claims are only worth holding if practicing cardiologists will tell us what the data has to do in clinic. We want three practicing physicians who have already fought with device data and lost.",
+  "title": "Cardiology design partners for a device data program",
+  "unit": "IP"
+}

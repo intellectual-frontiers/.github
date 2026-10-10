@@ -1,0 +1,66 @@
+{
+  "slug": "workspaces-host-v3",
+  "order": 4,
+  "kind": "software",
+  "unit": "studios",
+  "title": "Workspaces Host v3",
+  "summary": "One engineering setup that installs the same way on Windows through WSL, Linux, macOS, in a container, or in a cloud agent session, with the shell, git credentials, repository layout, and everyday tools already configured.",
+  "status": "Operating",
+  "year": "2026",
+  "date": "2026-09-13",
+  "url": "https://intellectual-frontiers.github.io/workspaces-host-v3/",
+  "urlLabel": "Read the documentation",
+  "detail": [
+    "Every venture, shared service, and research project here runs on somebody's machine, and the hours lost to a machine that is almost but not quite set up correctly are hours nobody accounts for. Workspaces Host v3 removes that cost by making the environment itself a build artifact. One command gives a developer a configured bash shell, git and GitHub or GitLab credentials handled safely, one predictable place for every repository, and a growing set of everyday tools.",
+    "It runs on Nix flakes and home-manager, so the environment is code rather than a page of setup steps that somebody forgot to update. Pull a commit, rebuild, and the result is the same every time. That matters most when the same work has to happen on a Windows laptop under WSL, on a Linux box, on a Mac, inside a container, and inside a cloud agent session, which is now the normal spread for a single project.",
+    "The base install stays small. Personas add tool sets on top for backend, data, mobile, agent ops, compliance, and networking work, so a developer gets what the job needs instead of everything anyone ever needed. A health check reports what passed, what needs attention, and what failed, which is how somebody new finds out their setup is wrong before they spend a morning on it.",
+    "Development follows a spec driven workflow with GitHub Spec Kit. Every feature has a spec and a plan under the repository's specs directory, the design principles live in a written constitution, and a spec that no longer matches the code is corrected in the same change that broke it rather than in a cleanup pass that never comes. That discipline is the same one we ask of a research note or a patent claim.",
+    "This is the first entry of a kind that does not assume a licence. Workspaces Host v3 is MIT licensed and public. Other software we count here may be source available, proprietary, or held inside a venture, and each entry records what it actually is."
+  ],
+  "specs": [
+    {
+      "label": "Licence",
+      "value": "MIT"
+    },
+    {
+      "label": "Source",
+      "value": "Public repository"
+    },
+    {
+      "label": "Built with",
+      "value": "Nix flakes and home-manager"
+    },
+    {
+      "label": "Runs on",
+      "value": "Windows via WSL, Linux, macOS, containers, cloud agent sessions"
+    },
+    {
+      "label": "Personas",
+      "value": "Backend, data, mobile, agent ops, compliance, networking"
+    },
+    {
+      "label": "Development",
+      "value": "Spec driven, GitHub Spec Kit"
+    }
+  ],
+  "links": [
+    {
+      "label": "Every software work Studios maintains",
+      "to": "/studios/software"
+    },
+    {
+      "label": "How Studios builds shared capability",
+      "to": "/studios/about"
+    },
+    {
+      "label": "Back to the register",
+      "to": "/portfolio"
+    }
+  ],
+  "externalLinks": [
+    {
+      "href": "https://github.com/intellectual-frontiers/workspaces-host-v3",
+      "label": "See the source on GitHub"
+    }
+  ]
+}

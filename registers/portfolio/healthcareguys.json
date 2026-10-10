@@ -1,0 +1,16 @@
+{
+  "slug": "healthcareguys",
+  "order": 154,
+  "kind": "publication",
+  "unit": "press",
+  "title": "HealthcareGuys.com",
+  "summary": "A healthcare media network of news, interviews, and vendor coverage written for the people who buy and run health technology, not the people who sell it.",
+  "status": "Operating",
+  "year": "2008",
+  "url": "https://healthcareguys.com",
+  "detail": [
+    "HealthcareGuys.com runs on the same principle as the rest of Press: explain a technology in terms of the operation it has to fit into. The network carries interviews, product reads, and market signal from contributors who have actually implemented the systems they write about.",
+    "We count it as a work because it is an owned distribution channel. When we publish a patent summary, a fund thesis, or a venture launch, we do not have to hope a trade publication covers it fairly. We have a place that already speaks to the buyer.",
+    "The editorial line is independent of any one company's marketing calendar. That independence is the asset: a buyer trusts the network because it has criticized the same vendors it later recommends."
+  ]
+}

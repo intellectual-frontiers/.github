@@ -1,0 +1,26 @@
+{
+  "slug": "revenue-acceleration",
+  "order": 146,
+  "kind": "company",
+  "unit": "studios",
+  "title": "Revenue Acceleration LLC",
+  "summary": "Revenue operations and denial management built for home-based care. We run the operational layer over the intake-to-cash lifecycle for home health, home infusion, DME, hospice, and respiratory providers.",
+  "status": "Operating",
+  "year": "2018",
+  "url": "https://revenue.health",
+  "detail": [
+    "Revenue Acceleration is not a software license. It is a services company that turns the intake-to-cash lifecycle into something measurable: referral and eligibility, prior authorization, documentation review, coding and billing, A/R and denials, cash posting. Each handoff is instrumented so leakage shows up at the source, not just in a month-end summary.",
+    "The team is specialized by post-acute segment, not pooled across all of healthcare. That matters because home health, home infusion, hospice, DME, and respiratory each have their own payer rules, documentation standards, and denial patterns. We built the workflows around those specifics.",
+    "We own it because it is operating proof that reimbursed demand can be captured cleanly. It sits directly on top of the claims and market-intelligence work Capital runs, and it gives Studios a real P&L to test against before chartering new care-delivery companies."
+  ],
+  "links": [
+    {
+      "label": "See the fund it feeds",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter ventures",
+      "to": "/studios/about"
+    }
+  ]
+}

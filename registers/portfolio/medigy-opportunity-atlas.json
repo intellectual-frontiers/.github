@@ -1,0 +1,25 @@
+{
+  "slug": "medigy-opportunity-atlas",
+  "order": 59,
+  "kind": "shared-service",
+  "unit": "studios",
+  "title": "Medigy Opportunity Atlas",
+  "summary": "Finds reimbursed demand in healthcare and states it in the terms a business plan needs: the claims-defined cohort, the counties where the gap is largest, the CMS signal that proves it, the CPT and HCPCS codes and bundles that pay for it, and the revenue at stake. It is a shared service to every other venture and the intelligence spine of Fund II.",
+  "status": "In build",
+  "year": "2026",
+  "detail": [
+    "Finds reimbursed demand in healthcare and states it in the terms a business plan needs: the claims-defined cohort, the counties where the gap is largest, the CMS signal that proves it, the CPT and HCPCS codes and bundles that pay for it, and the revenue at stake. It is a shared service to every other venture and the intelligence spine of Fund II.",
+    "It is built to stand alone. Every other venture in the portfolio can draw on it, and if the market signal is strong enough it gets spun out as its own company rather than staying an internal tool.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

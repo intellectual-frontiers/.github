@@ -1,0 +1,25 @@
+{
+  "slug": "continuous-care-os",
+  "order": 39,
+  "kind": "venture",
+  "unit": "studios",
+  "title": "Continuous Care OS",
+  "summary": "An operating system for supervising an accountable digital care operation. A clinical leader reviews decisions, evidence, and billing as a queue of work with owners and dates, instead of hunting through a dashboard for whatever went wrong.",
+  "status": "In build",
+  "year": "2026",
+  "detail": [
+    "An operating system for supervising an accountable digital care operation. A clinical leader reviews decisions, evidence, and billing as a queue of work with owners and dates, instead of hunting through a dashboard for whatever went wrong.",
+    "It is chartered as an operating company, not a project. It carries its own entity, its own operator, and a written closure path if paid demand never shows up.",
+    "Care Delivery Fund I pays once for the first year of discovery across the ventures and shared services, so each one starts with the market work already done."
+  ],
+  "links": [
+    {
+      "label": "See how Fund I underwrites it",
+      "to": "/capital/care-delivery-fund-i"
+    },
+    {
+      "label": "Read how we charter a venture",
+      "to": "/studios/about"
+    }
+  ]
+}

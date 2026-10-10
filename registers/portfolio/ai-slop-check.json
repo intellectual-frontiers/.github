@@ -1,0 +1,49 @@
+{
+  "slug": "ai-slop-check",
+  "order": 1,
+  "kind": "software",
+  "unit": "press",
+  "title": "AI Slop Check",
+  "summary": "A free browser tool that turns a few answers about a business document into a review prompt that scores how much of it is specific, evidenced, and useful, and how much of it could have been written for any company.",
+  "status": "Operating",
+  "year": "2026",
+  "date": "2026-09-14",
+  "detail": [
+    "Most bad documents are not badly written. They are well-formatted, polished, and interchangeable: the same paragraphs would serve any company in any market, which means they carry almost no information. The AI Slop Check exists to measure that before a document circulates and costs readers their time.",
+    "You answer a short set of questions about the company, the unit, the market, the customer, the reader, and the evidence already in the document, and the tool assembles a review prompt from fixed templates. Nothing runs on our side: no account, no upload, no AI call. The same answers always produce the same prompt, which you paste into whatever assistant you already use.",
+    "The review scores a document from 0 to 10 on company, customer, and market specificity, evidence versus assertion, actionability, repetition, unnecessary background, vague language, AI-shaped formatting, information density, and whether it separates what is known from what is assumed. It returns the score, an estimate of how much text could be removed without losing anything that matters, the passages that could belong to any company, the unsupported claims, the surgical cuts, and a compact header block the writer can paste at the top of the next revision.",
+    "A document that cannot pass is not ready to become someone else's problem. The writer keeps working until it is specific, supported, and useful."
+  ],
+  "specs": [
+    {
+      "label": "Licence",
+      "value": "Free to use in the browser"
+    },
+    {
+      "label": "Runs on",
+      "value": "Any modern browser; no account or upload"
+    },
+    {
+      "label": "Data handling",
+      "value": "Nothing entered is stored or sent"
+    },
+    {
+      "label": "Output",
+      "value": "A ready-to-paste review prompt and downloadable record"
+    }
+  ],
+  "links": [
+    {
+      "label": "Why Press exists",
+      "to": "/press"
+    },
+    {
+      "label": "Writing and field notes",
+      "to": "/blogs"
+    },
+    {
+      "label": "Back to the register",
+      "to": "/portfolio"
+    }
+  ]
+}

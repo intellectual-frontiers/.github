@@ -1,0 +1,26 @@
+{
+  "slug": "netspective-communications",
+  "order": 159,
+  "kind": "company",
+  "unit": "studios",
+  "title": "Netspective Communications LLC",
+  "summary": "Engineering and delivery for regulated software: the bridge between AI-generated code and a product that survives FDA submission, FedRAMP authorization, HIPAA audit, and SOC 2.",
+  "status": "Operating",
+  "year": "1997",
+  "url": "https://netspective.com",
+  "detail": [
+    "Netspective is the delivery capability the rest of the portfolio draws on. It exists because there is a canyon between writing code and shipping a regulated product, and most advisors only look at it from the sidelines. We cross it daily: FDA submissions, FedRAMP authorizations, HIPAA audits, SOC 2 Type 1 and Type 2.",
+    "The credibility comes from operating our own regulated products, not just consulting on someone else's. Opsfolio, surveilr, Medigy, Spry, and others run in production under the same compliance constraints we build for clients.",
+    "For Studios, Netspective is the engineering partner that turns a venture charter into a shipped system. For IP and Capital, it is the proof that an invention or thesis can survive real-world security, privacy, and regulatory review."
+  ],
+  "links": [
+    {
+      "label": "See the IP it helps deliver",
+      "to": "/ip"
+    },
+    {
+      "label": "Read the venture lifecycle",
+      "to": "/studios/about"
+    }
+  ]
+}

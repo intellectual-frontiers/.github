@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-<h3 align="center">A think tank that builds useful things.</h3>
+<h3 align="center">A think tank that builds consequential things.</h3>
 
 Intellectual Frontiers (IF) finds the advantage a company already has, tests
 whether it changes a real decision, and then builds, funds, or publishes on

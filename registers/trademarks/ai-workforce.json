@@ -1,0 +1,50 @@
+{
+  "slug": "ai-workforce",
+  "order": 8,
+  "coverage": "Filed and under examination in classes 9 and 42, held by Netspective Communications LLC.",
+  "detail": [
+    "AI WORKFORCE is the filing behind the shared services Studios sells as Revenue Engineering AI Workforce and Demand Engineering AI Workforce.",
+    "AI WORKFORCE is held by Netspective Communications LLC under serial number 99021281, filed on 28 January 2025. The USPTO records its status as non-final action - mailed.",
+    "First use claimed in the application is 27 January 2025.",
+    "Status, dates, and wording on this page come from the USPTO record and are refreshed when the site is published."
+  ],
+  "filedDate": "2025-01-28",
+  "firstUse": "2025",
+  "goodsAndServices": [
+    "IC 009: Downloadable artificial intelligence software for task automation and workflow management; Downloadable artificial intelligence software for use in data analytics; Downloadable computer software platforms for artificial intelligence workflows; Downloadable artificial intelligence software for agent-based control of computer systems.",
+    "IC 042: Platform as a service (PaaS) featuring computer software platforms for artificial intelligence-based task automation and workflow management; Software as a service (SaaS) services featuring software for use in managing and automating business processes through artificial intelligence; Software as a service (SaaS) services featuring software for use in managing computer-based information systems with artificial intelligence capabilities; Cloud computing services, namely, cloud computing featuring software for use in developing, configuring, customizing and deploying artificial intelligence applications; Application monitoring and management for others in the nature of a computer monitoring service which tracks artificial intelligence software performance, performs periodic maintenance and provides reports and alerts concerning such performance; Providing temporary use of on-line non-downloadable artificial intelligence software to others for managing, tracking, analyzing, and reporting data across industries including healthcare, finance, and logistics; Consulting services in the fields of artificial intelligence implementation and integration; Providing information in the field of artificial intelligence technology; Computer programming services for others, namely, designing, developing, customizing, testing, implementing and maintaining artificial intelligence software systems for others; Computer programming services for others, namely, designing, developing, customizing, testing, implementing and maintaining agent-based artificial intelligence software systems for others; Information technology consulting services, namely, artificial intelligence integration services for enterprise clients."
+  ],
+  "group": "pending",
+  "internationalClasses": [
+    "IC 009",
+    "IC 042"
+  ],
+  "mark": "AI Workforce™",
+  "owner": "studios",
+  "ownerOfRecord": "Netspective Communications LLC",
+  "serialNumber": "99021281",
+  "status": "Non — Final Action — Mailed",
+  "title": "AI Workforce™",
+  "usedOn": [
+    {
+      "label": "Revenue Engineering AI Workforce",
+      "params": {
+        "slug": "revenue-engineering-ai-workforce"
+      },
+      "to": "/trademarks/$slug"
+    },
+    {
+      "label": "Demand Engineering AI Workforce",
+      "params": {
+        "slug": "demand-engineering-ai-workforce"
+      },
+      "to": "/trademarks/$slug"
+    },
+    {
+      "label": "Studios",
+      "to": "/studios"
+    }
+  ],
+  "usptoStatus": "NON-FINAL ACTION - MAILED",
+  "wordmark": "AI WORKFORCE"
+}

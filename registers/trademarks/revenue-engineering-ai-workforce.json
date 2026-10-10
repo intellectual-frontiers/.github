@@ -1,0 +1,36 @@
+{
+  "slug": "revenue-engineering-ai-workforce",
+  "order": 11,
+  "coverage": "The shared service that runs go-to-market for portfolio companies, and the software harness behind it.",
+  "detail": [
+    "Revenue Engineering AI Workforce is the shared service Studios runs for portfolio firms once a company knows who buys from it. The portfolio record explains what the service does.",
+    "The mark is used on that record, in Studios materials, and on the engagements themselves. It has been in use since 2026. It builds on AI WORKFORCE, which Netspective Communications has on file with the USPTO."
+  ],
+  "firstUse": "2026",
+  "group": "pending-at-firm",
+  "mark": "Revenue Engineering AI Workforce™",
+  "owner": "studios",
+  "status": "Common-law mark in use",
+  "title": "Revenue Engineering AI Workforce™",
+  "usedOn": [
+    {
+      "label": "Revenue Engineering AI Workforce in the portfolio",
+      "params": {
+        "slug": "revenue-engineering-ai-workforce"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "Studios",
+      "to": "/studios"
+    },
+    {
+      "label": "The AI WORKFORCE filing",
+      "params": {
+        "slug": "ai-workforce"
+      },
+      "to": "/trademarks/$slug"
+    }
+  ],
+  "wordmark": "Revenue Engineering AI Workforce"
+}

@@ -1,0 +1,24 @@
+{
+  "slug": "medigy-opportunity-atlas-dataset",
+  "order": 97,
+  "kind": "dataset",
+  "unit": "capital",
+  "title": "CMS and claims opportunity atlas",
+  "summary": "The claims-defined view of where reimbursed demand actually sits: cohort, county, CMS signal, the codes and bundles that pay, and the revenue at stake. It is the intelligence spine under Fund II, and an asset in its own right.",
+  "status": "Operating",
+  "year": "2025",
+  "detail": [
+    "Most healthcare market sizing is a slide. This is a query. A cohort defined out of claims, the counties where the gap is widest, the CMS metric that proves the gap, the CPT and HCPCS codes that pay for closing it, and a capture rate we are willing to defend in writing.",
+    "We count it as a portfolio work because it is the thing that decides where capital goes. Every Fund II brief is an output of it, and every venture in Fund I can query it."
+  ],
+  "links": [
+    {
+      "label": "See the briefs it produced",
+      "to": "/capital/care-delivery-fund-ii"
+    },
+    {
+      "label": "Read a market case",
+      "to": "/market-potential"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "demand-engineering-ai-workforce",
+  "order": 12,
+  "coverage": "The companion shared service used before revenue engineering, when a company still has to establish that anyone wants what it sells.",
+  "detail": [
+    "Demand Engineering AI Workforce is the service we run when revenue engineering would be premature. Its portfolio record sets out the work and the gate a company has to clear to graduate out of it.",
+    "The mark is used on that record and alongside Revenue Engineering AI Workforce in Studios materials. It has been in use since 2026."
+  ],
+  "firstUse": "2026",
+  "group": "pending-at-firm",
+  "mark": "Demand Engineering AI Workforce™",
+  "owner": "studios",
+  "status": "Common-law mark in use",
+  "title": "Demand Engineering AI Workforce™",
+  "usedOn": [
+    {
+      "label": "Demand Engineering AI Workforce in the portfolio",
+      "params": {
+        "slug": "demand-engineering-ai-workforce"
+      },
+      "to": "/portfolio/$slug"
+    },
+    {
+      "label": "Studios",
+      "to": "/studios"
+    },
+    {
+      "label": "The AI WORKFORCE filing",
+      "params": {
+        "slug": "ai-workforce"
+      },
+      "to": "/trademarks/$slug"
+    }
+  ],
+  "wordmark": "Demand Engineering AI Workforce"
+}

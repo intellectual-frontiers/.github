@@ -1,0 +1,16 @@
+{
+  "slug": "govconic",
+  "order": 152,
+  "kind": "publication",
+  "unit": "press",
+  "title": "GovConIC.com",
+  "summary": "GovCon Intelligence Center (GovCon IC): the publication for how public agencies buy, modernize, and evaluate technology.",
+  "status": "Operating",
+  "year": "2015",
+  "url": "https://govconic.com",
+  "detail": [
+    "Government contracting moves on different timelines and rules than commercial health technology, but the same failure modes show up: a procurement written around an incumbent, a modernization project that ships paperwork instead of software, a security review that checks compliance boxes but not the actual attack surface.",
+    "GovCon IC covers how agencies buy, how contractors sell, and where the real modernization work happens. We publish it because our work in health IT, payments, and credentialing often has a government buyer or regulator on the other side, and that buyer deserves the same plain argument we give the commercial market.",
+    "The site is a work because it owns a corner of the public-sector conversation. It makes our positions legible to program managers, contracting officers, and the vendors who want to bid honestly."
+  ]
+}
