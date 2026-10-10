@@ -28,7 +28,10 @@ stated here.
 - **FR-003**: Every episode MUST state its intellectual purpose in a brief:
   the question, claim, or working theory, the intended listener, the relevant
   evidence, the strongest disconfirming evidence, and the change in listener
-  understanding or action it seeks.
+  understanding or action it seeks. When a program addresses more than one
+  audience, such as the builders of products and the buyers of them, the brief
+  MUST state, for each audience, what that listener can do on the next working
+  day.
 - **FR-004**: An episode's one live source is its script in AsciiDoc. Briefs,
   source ledgers, metadata, audits, recordings, and transcripts MUST NOT
   become second live-edited copies of it.
