@@ -185,6 +185,29 @@ property fetches them are decisions outside this spec.
   its renditions, its delivery records, or its Decisions visible beyond the
   work's own audience.
 
+## Distribution intent and living works
+
+- **FR-033**: Every Substantial Work of kind `book` MUST state its
+  distribution intent exactly once, as `ifcore:distributionIntent` on its
+  individual: `ifcore:ForSale` (made to be sold), `ifcore:FreeDistribution`
+  (made to be given away), or `ifcore:NotDistributed` (made for the
+  company's own operations). A work of any other kind MAY state it. The
+  intent is independent of the work's audience (who may see it, FR-024)
+  and of its readership (who it is written for), and it says nothing of
+  what one presentation of the work costs (0021-works-and-presentations
+  FR-026).
+- **FR-034**: A work whose intent is `NotDistributed` MUST NOT be announced
+  (FR-027) and its audience MUST NOT be Public: advancing it to Review MUST
+  hold it from announcement (FR-028), and no consumer MAY show its public
+  record. In every other respect it is a work like any other: its package,
+  stages, Decisions, checks and renditions follow this spec.
+- **FR-035**: A work kept current with what it describes is a living work:
+  it MUST state its review cadence (`ifcore:reviewCadence`, a duration) and
+  the date it was last reviewed (`schema:lastReviewed`), recorded when a
+  person reviews it. A check MUST report a living work as overdue when more
+  than its cadence has passed since that date. A living work's stage
+  advances as any work's does; being living never holds it at a stage.
+
 ## Works published elsewhere
 
 - **FR-026**: Where a Substantial Work's authoritative text is published
@@ -275,6 +298,10 @@ property fetches them are decisions outside this spec.
 - **A generated content document** — a content document produced from a
   work package's source, living in the content root of the repository that
   holds the package.
+- **A distribution intent** — why a work is made: for sale, for free
+  distribution, or for the company's own operations (FR-033).
+- **A living work** — a work kept current with what it describes, reviewed
+  at its stated cadence (FR-035).
 
 ## Success criteria
 
@@ -295,6 +322,9 @@ property fetches them are decisions outside this spec.
 - **SC-008**: No consumer shows a fact of an announced, non-Public work
   outside its public record, and none shows a work that is neither
   announced nor Public.
+- **SC-009**: No book lacks a distribution intent, no work made for the
+  company's own operations is announced or Public, and no living work is
+  past its review cadence without a check saying so.
 
 ## Review & acceptance checklist
 

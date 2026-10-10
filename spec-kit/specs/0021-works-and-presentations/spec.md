@@ -41,7 +41,9 @@ schema.org's `workExample` and `exampleOfWork`.
   FR-005.
 - **FR-007**: A presentation's audience MUST NOT be broader than its
   work's audience, the rule 0015-work-packages FR-017 and FR-021 already
-  apply to renditions and generated content documents.
+  apply to renditions and generated content documents. The one exception
+  is a preview excerpt of an announced work (FR-027), which MAY be Public
+  as the work's public record is (0015-work-packages FR-027).
 - **FR-008**: A presentation MUST record who presented it: a person, a
   partner, or an AI-assisted conversion a person approved. The presenter
   is attribution; the work's lifecycle owner (0007-work-and-assets FR-021)
@@ -137,6 +139,22 @@ schema.org's `workExample` and `exampleOfWork`.
 - **FR-025**: A promotional post MUST meet 0016-press-production FR-047:
   it MUST NOT claim more than the work or article it promotes keeps.
 
+## Browsable editions and previews
+
+- **FR-026**: A work that can be read page by page on a web property MUST
+  have a presentation of the form Web pages (`ifcore:WebPagesForm`): its
+  browsable edition, generated from the work's source (0015-work-packages
+  FR-013). Who may read it is that presentation's own audience (FR-007),
+  and what reading it costs is a `schema:Offer` on that presentation, so a
+  browsable edition MAY be free to the public, open to a named agreement
+  such as a subscription, or open only to the company, whatever the
+  work's other presentations cost. A work that is sold MAY have one.
+- **FR-027**: A work's preview, the pages shown before a reader buys or
+  asks for the work, MUST be a presentation of the form Preview excerpt
+  (`ifcore:PreviewExcerptForm`) with its own audience; a work offers a
+  preview only when it has one. The pages it shows are chosen by the
+  consumer's rule (0044-public-website FR-056), never named by hand.
+
 ## Out of scope
 
 - The ontology terms for a work, a presentation, a presenter, and a
@@ -199,6 +217,10 @@ schema.org's `workExample` and `exampleOfWork`.
 - **A channel** — a medium through which presentations reach an audience:
   the web property, print, audio, video, events, and courses.
 - **A rendition** — a file generated from a presentation (0015).
+- **A browsable edition** — a work's Web pages presentation, read page by
+  page on a web property by whoever its audience allows (FR-026).
+- **A preview excerpt** — the presentation that offers a work's preview
+  (FR-027).
 - **A company a work led to** — an organization, neither the work nor a
   presentation of it.
 - **A promotional post** — company or unit news written for search,
@@ -218,6 +240,9 @@ schema.org's `workExample` and `exampleOfWork`.
   presentation that states the claim.
 - **SC-006**: Every public page with a unit as its subject is a
   promotional post that names what it promotes.
+- **SC-007**: No work offers a preview or a browsable edition without the
+  presentation that says so, and none is read by anyone its presentation's
+  audience does not allow.
 
 ## Review & acceptance checklist
 
