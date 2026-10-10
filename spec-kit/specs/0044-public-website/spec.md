@@ -399,7 +399,11 @@ how addresses map to content, 0004-addressing; what the application does,
   shown as a badge is not the meta line too, a shelf headed as an
   experiment does not badge each book again, a lede does not restate the
   number or name its heading carries, and a tagline drawn from a record's
-  summary is not followed by the same summary as the first paragraph.
+  summary is not followed by the same summary as the first paragraph. A
+  card's text says what its title and its section do not: a card in a
+  section of book companions names its book and no more, a mark's card
+  under a status heading starts at its classes, and a skill's card starts
+  at when to use it, not that it is a skill.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
