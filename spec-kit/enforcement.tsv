@@ -1380,6 +1380,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-075	check	eidolon: eid check site	the generator reads works/research/<slug>/{area,pillar,note,publication}.adoc (tools/eid-site/src/research.rs) and the snapshot holds no research; the Rust tests render every announced record's page
 0044-public-website FR-076	check	eidolon: eid check site	the archive lists content/blogs/<slug>.html at /blogs/<slug> and the topics are the research areas and registers/topics (tools/eid-site/src/render/archive.rs, topics.rs); the snapshot holds no posts, topics or essays
 0044-public-website FR-077	check	eidolon: eid check site	site/about.json, the funds' records, the security theatre file beside the area record, the website package's picture and sitemap are read (tools/eid-site/src/registers.rs, research.rs, render/home.rs, cli.rs)
+0044-public-website FR-078	check	eidolon: eid test	the Rust tests assert a pillar's start with its anchor, no date on an evergreen note, and the computed record span (tests/gaps.rs)
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

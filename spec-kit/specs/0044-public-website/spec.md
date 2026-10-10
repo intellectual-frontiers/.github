@@ -370,6 +370,17 @@ how addresses map to content, 0004-addressing; what the application does,
   Theatre registers (FR-043) are a data file beside that area's research
   record (0017-spoken-and-research-works FR-018). The generator writes
   the crawler rules itself.
+- **FR-078**: Every date the website shows MUST be a fact its source
+  states, never chosen for effect. A work's date is the date its record
+  carries. A pillar's start is its `:started:`, and where that year is
+  earlier than the record, `:started-from:` names the verifiable thing it
+  rests on (a mark in use since that year, a filing), which the page shows
+  beside the year. A note whose record marks it evergreen
+  (`:evergreen: true`) shows no date, since its subject has none; its
+  record keeps the date it was written. The home page and the Journal
+  state how far back the firm's record runs from the dates the registers
+  hold (the earliest patent filing, mark in use, paper in a journal, essay
+  and post), computed, never written as a literal.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
