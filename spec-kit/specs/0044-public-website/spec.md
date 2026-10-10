@@ -253,10 +253,16 @@ how addresses map to content, 0004-addressing; what the application does,
   MUST offer its own refresh, the command that makes the export again, and
   the page MUST show the result once it is written. Nothing runs from a
   model or at a container host, and the address that runs a line is one of
-  the reserved ones (FR-036). The Console MUST NOT render from a model
-  (FR-035) or at a container host, MUST NOT be in the model or in any file
-  the model holds, and nothing it shows MAY reach a published page (FR-003,
-  FR-027).
+  the reserved ones (FR-036). A rendered page MUST carry only the Console's
+  placeholder, which asks the program's server for the Console when the
+  page opens, at a reserved address (FR-036); the Console MUST be rendered
+  at that request from the export and MUST NOT be part of any rendered
+  page, so that the check of the pages (FR-004) never reads it and a page
+  is published without it. The Console MAY name a work that is not yet
+  announced, since it is the editor's own desk on the editor's own
+  computer. The Console MUST NOT render from a model (FR-035) or at a
+  container host, MUST NOT be in the model or in any file the model holds,
+  and nothing it shows MAY reach a published page (FR-003, FR-027).
 - **FR-070**: Wherever the Console may render, the masthead MUST carry a
   control labelled "Console" that shows and hides every Console on the
   page without a reload. The person's choice MUST be kept in the browser
@@ -587,6 +593,10 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-069.
 - A line posted to the run address from a model or a container host: it
   answers not found, per FR-069.
+- A work at Intake, not yet announced, on the Console's roll-up of a
+  front: the Console names it, since it is rendered at the request on the
+  editor's computer and is part of no page; the page itself does not, per
+  FR-069 and FR-003.
 - A request for a namespace address such as `/ontology/core`: it answers
   with the not-found page, and the ontology is read in the IF Console, per
   FR-012.
