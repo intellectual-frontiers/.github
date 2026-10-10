@@ -379,6 +379,8 @@ how addresses map to content, 0004-addressing; what the application does,
   3. a hosted libSQL database, a SQLite-compatible service, when more than one
      container or host must write the same data;
   4. a PostgreSQL server.
+  The `embedded-sql` kit of ws-host installs the tools for the second and third rungs (SQLite, DuckDB, the Turso command line, `litestream` for backing up the
+  SQLite file, and clients, migrations and a formatter), and `ws-host workspace ensure` installs it by default.
 - **FR-050**: Starting above the second rung, or moving to a higher rung, MUST
   be a `Decision` (0008-decision-records) that names the trigger and the
   measurement that shows it. A trigger is one of: more than one container or
