@@ -11,8 +11,8 @@ This is the public root of Intellectual Frontiers' Eidolon: the company's own ac
 testable specs and typed against an ontology, so that a person or an AI can check it instead of guessing. The organization's public
 landing page is [`profile/README.md`](profile/README.md).
 
-One command line, `agora`, runs every check, build and record here. It needs only `python3` (3.11 or later) and
-[`uv`](https://docs.astral.sh/uv/) on your machine; it fetches everything else, pinned and checked by fingerprint, and never uses a
+One command line, `agora`, runs every check, build and record here. It needs only [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) on your machine, which supplies the newest Python (3.14) and
+[`uv`](https://docs.astral.sh/uv/); it fetches everything else, pinned and checked by fingerprint, and never uses a
 program it finds on your machine unless you name it.
 
 ## The flow
