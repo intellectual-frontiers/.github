@@ -1,7 +1,7 @@
 [#first-day]
 == Your first day
 
-You need two things on your machine: Python 3.11 or later, and https://docs.astral.sh/uv/[uv]. There is no `make install` and
+You need one thing on your machine, `ws-host`, which supplies the newest Python (3.14) and https://docs.astral.sh/uv/[uv]. There is no `make install` and
 no environment to prepare. Everything else, from the Python packages to a typesetter and a browser, `agora` fetches into a cache
 that belongs to you the first time a command needs it, checks against a fixed fingerprint before it unpacks anything, and uses
 from there. It never uses a program it finds on your machine unless you name it.

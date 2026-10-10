@@ -29,4 +29,4 @@ export PYTHONPATH PYTHONDONTWRITEBYTECODE=1
 
 # No packages: the plain standard-library interpreter, through uv so that no host site-packages is involved.
 exec ws-host provider run agora --ensure uv --ensure python ${offline:+"$offline"} -- \
-  uv run --no-project --no-python-downloads --python ">=3.11" ${offline:+"$offline"} python -m agora "$@"
+  uv run --no-project --no-python-downloads --python ">=3.14" ${offline:+"$offline"} python -m agora "$@"
