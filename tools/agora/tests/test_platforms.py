@@ -21,7 +21,8 @@ def rel(n: str, typ: str, frm: str, to: str) -> str:
 
 
 def mod(key: str, label: str, code: str, layer: str = "PlatformServicesLayer", platform: str = "ExamplePlatform") -> str:
-    return (f'ex:{key} a ifcore:PlatformModule ; rdfs:label "{label}"@en ; ifcore:moduleCode "{code}" ; ifcore:artifactName "{'-'.join(w.lower() for w in label.split())}" ; ifcore:codeStatus "confirmed" ; ifcore:platformLayer ifcore:{layer} ; {PUB} .\n'
+    artifact = "-".join(w.lower() for w in label.split())
+    return (f'ex:{key} a ifcore:PlatformModule ; rdfs:label "{label}"@en ; ifcore:moduleCode "{code}" ; ifcore:artifactName "{artifact}" ; ifcore:codeStatus "confirmed" ; ifcore:platformLayer ifcore:{layer} ; {PUB} .\n'
             + rel("P" + key, "PartOf", key, "ex:" + platform))
 
 

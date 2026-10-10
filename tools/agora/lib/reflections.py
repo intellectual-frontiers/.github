@@ -372,7 +372,7 @@ def _check_relation_types(g: Graph, add) -> None:
         for prop, label in ((FROM_KIND, "fromKind"), (TO_KIND, "toKind")):
             ks = {g.concept_notation(o) for o in g.objects(t, prop)}
             if not ks or not ks <= kinds_ok:
-                add("error", t, f"{short(t)} must name at least one of {", ".join(sorted(kinds_ok))} as {label} (0047-digital-reflections FR-017)")
+                add("error", t, f"{short(t)} must name at least one of {', '.join(sorted(kinds_ok))} as {label} (0047-digital-reflections FR-017)")
         for prop in HIERARCHY:
             if g.objects(t, prop):
                 add("error", t, f"{short(t)} is arranged under another term by {short(prop)}; relationship types are flat, so none is inferred from another (0047-digital-reflections FR-018)")
