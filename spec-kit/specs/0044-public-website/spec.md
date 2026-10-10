@@ -240,10 +240,23 @@ how addresses map to content, 0004-addressing; what the application does,
   guides the export names for the front, among them how to start a work
   of that kind, run its checks and advance it. The Console MUST say when
   the export was made and the command that refreshes it; when the export
-  is missing it MUST say so and name that command. The Console MUST NOT
-  render from a model (FR-035) or at a container host, MUST NOT be in the
-  model or in any file the model holds, and nothing it shows MAY reach a
-  published page (FR-003, FR-027).
+  is missing it MUST say so and name that command. On this computer the
+  Console is a facade for the vault's command line: beside every command
+  it shows, a control MUST run that command through the vault's own
+  launcher, never a shell, and stream what it prints into the page as it
+  runs, with its exit; a `read`, `check` or `build` command runs at once; a
+  `record` or `generate` command runs first as a dry run, and for real only
+  on a second request that says so; a `decision` or `setup` command never
+  runs from a page, its line is there to copy; a line that is not a
+  command of the vault, or that carries a shell's own characters, is
+  refused and the refusal shown. One command runs at a time. The Console
+  MUST offer its own refresh, the command that makes the export again, and
+  the page MUST show the result once it is written. Nothing runs from a
+  model or at a container host, and the address that runs a line is one of
+  the reserved ones (FR-036). The Console MUST NOT render from a model
+  (FR-035) or at a container host, MUST NOT be in the model or in any file
+  the model holds, and nothing it shows MAY reach a published page (FR-003,
+  FR-027).
 - **FR-070**: Wherever the Console may render, the masthead MUST carry a
   control labelled "Console" that shows and hides every Console on the
   page without a reload. The person's choice MUST be kept in the browser
@@ -566,7 +579,14 @@ how addresses map to content, 0004-addressing; what the application does,
 - A front whose pages report nothing: its Console's roll-up says every
   page is clear and its guides show, per FR-069.
 - A guide's step on a front: its command is the line a person types, with
-  the control that copies it, never run from the page, per FR-069.
+  the controls that copy it and run it on this computer, per FR-069.
+- A step that is a decision, such as advancing a work: its line is shown
+  to copy and no control runs it, per FR-069.
+- A record command run from the Console: it runs as a dry run first and
+  shows what it would change; a second request runs it for real, per
+  FR-069.
+- A line posted to the run address from a model or a container host: it
+  answers not found, per FR-069.
 - A request for a namespace address such as `/ontology/core`: it answers
   with the not-found page, and the ontology is read in the IF Console, per
   FR-012.
@@ -755,6 +775,9 @@ how addresses map to content, 0004-addressing; what the application does,
   is labeled an AI Workforce that its record does not call one.
 - **SC-017**: No model, no file of a model and no published page carries
   the Console, its control or the desk export.
+- **SC-018**: No decision or setup command runs from a page, no line runs
+  through a shell, and no line runs anywhere but on the person's own
+  computer.
 
 ## Review & acceptance checklist
 
