@@ -1,0 +1,6 @@
+{
+  "slug": "device-health-monitoring",
+  "order": 6,
+  "title": "Device Health Monitoring",
+  "summary": "Patents and writing under this tag cover monitoring the operating condition of a device itself, such as a medical device, separate from monitoring the patient or user it serves."
+}

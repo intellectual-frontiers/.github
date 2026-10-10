@@ -316,8 +316,13 @@ how addresses map to content, 0004-addressing; what the application does,
   website whose work is held elsewhere now and where it lives
   (0024-persistent-addresses); `registers/trademarks/` for the marks, with `groups.json` naming
   the groups and the date the USPTO record was read; `registers/disclosures/`
-  for the defensive disclosures; and `registers/hunts/` for the Network's
-  hunts with their packets. A record carries `order`, its place in the
+  for the defensive disclosures; `registers/hunts/` for the Network's
+  hunts with their packets; `registers/topics/` for the subject tags the
+  website files records under, each with its title and summary (the
+  research areas are topics too, from their records, FR-075); and
+  `registers/writing/` for the founder's writing that lives elsewhere
+  (FR-009, FR-065), each with its title, summary, date, kind, series, tags
+  and address. A record carries `order`, its place in the
   register, so a front lists records as the register orders them. A record
   states facts; the ontology holds the individual it describes where one is
   asserted (0007-work-and-assets FR-008), and a page MUST show what a
@@ -339,6 +344,16 @@ how addresses map to content, 0004-addressing; what the application does,
   slug; the generator resolves each among the pillars, notes, papers,
   publications, disclosures, trademarks, patent families and portfolio
   works it lists, in that order, and leaves out one it does not list.
+- **FR-076**: The blog posts of the previous website MUST be content
+  documents of the public root, `content/blogs/<slug>.html`, each of kind
+  `ifweb:ArchivedPostPage` (0013-web-content-kinds FR-018), kept as
+  published with its date and summary; the generator MUST read them there,
+  never from the snapshot (FR-013), list them in the archive at `/blogs`
+  and serve each at `/blogs/<slug>`, the address it had. The topics the
+  website organizes records under MUST be the research areas (FR-075),
+  each at `/topics/<slug>` with its introduction, parent and the records
+  filed under it (FR-042), and the subject tags of `registers/topics/`
+  (FR-074).
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -365,11 +380,11 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-007).
 - **FR-013**: Until a register's records are held in the public root, the
   generator MAY read that register from a snapshot of the previous
-  website's data held in the vault: owned channels, the company's own
-  descriptive text, the home page's picture, and the previous website's
-  record pages kept as an archive. The records registers have left it
-  (FR-074), and so have the research areas, pillars, notes and
-  publications (FR-075). A snapshot is fixed
+  website's data held in the vault: the company's own descriptive text
+  and the home page's picture. The records registers, the topics and the
+  writing elsewhere have left it (FR-074), and so have the research areas,
+  pillars, notes and publications (FR-075) and the previous website's blog
+  posts (FR-076). A snapshot is fixed
   data: no command writes it, and no one adds to it by hand. It MUST hold
   only what the previous website published to the public, and a register
   leaves it when the register moves into the public root. Its text MAY be

@@ -134,6 +134,15 @@ ifweb:PodcastEpisodePage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebP
     sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:maxCount 1 ] ;
     sh:property [ sh:path schema:associatedMedia ; sh:nodeKind sh:IRI ; sh:maxCount 1 ] .
 
+ifweb:ArchivedPostPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
+    rdfs:subClassOf ifweb:Page ;
+    rdfs:label "Archived post page"@en ;
+    rdfs:comment "A blog post of the previous website, kept as it was published, with its date; it states no fact the ontology holds and is not the firm's current position (0013 FR-018, 0044-public-website FR-076)."@en ;
+    ifweb:contentKind "ArchivedPostPage" ;
+    sh:targetClass ifweb:ArchivedPostPage ;
+    sh:property [ sh:path schema:datePublished ; sh:datatype xsd:date ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path schema:about ; sh:maxCount 0 ] .
+
 ifweb:TrademarkPage a owl:Class, sh:NodeShape ; rdfs:subClassOf schema:WebPage ;
     rdfs:subClassOf ifweb:Page ;
     rdfs:label "Trademark page"@en ;

@@ -120,7 +120,8 @@ patterns a mechanical sweep looks for.
   each `http://` or `https://` URL (up to whitespace or a bracket, without the sentence's own closing
   punctuation) and each `mailto:` address, in any text it is given, so that a variant, a banned word or
   an em dash inside an address is never reported. It MUST still sweep the link text written after a URL
-  in an AsciiDoc macro (`https://example.org/a-b[Native Alpha]`) and the text around it.
+  in an AsciiDoc macro (`https://example.org/a-b[Native Alpha]`) and the text around it. A cited title,
+  written in `<cite>` in HTML, is another author's words: it is never swept, and the text around it is.
 
 - **FR-021**: It MUST be understood by a reader who is not a native speaker of English, without cultural
   knowledge. It MUST NOT use an idiom, a figure of speech, a proverb, a sports, war, theater, cooking or

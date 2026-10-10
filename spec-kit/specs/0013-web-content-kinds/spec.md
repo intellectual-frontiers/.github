@@ -91,6 +91,11 @@ FR-007.
   `ifweb:PatentLandscapePage` and `ifweb:PodcastEpisodePage` MUST each
   declare `schema:about` naming exactly one `ifcore:Patent` or exactly one
   `ifcore:PatentFamily` individual (0051-patent-portfolio FR-004).
+- **FR-018**: `ifweb:ArchivedPostPage` is a post of the previous website
+  kept as it was published (0044-public-website FR-076). It MUST declare
+  `schema:datePublished` and MUST NOT declare `schema:about`: an archived
+  post states no fact the ontology holds, and its text is not the firm's
+  current position.
 - **FR-016**: A supporting asset page MUST NOT carry a patent's registry
   facts as its own: a status, a date or a claim it shows comes from the
   patent's `ExternalRecordReference`, per FR-004 and 0051-patent-portfolio
@@ -152,13 +157,13 @@ FR-007.
 
 ## Open questions
 
-- **OQ-1**: Which legacy Record-shaped content other than the supporting
-  assets of a patent (FR-014 to FR-016), the records registers
-  (0044-public-website FR-074) and the research records (0044-public-website
-  FR-075) is curated forward into content documents,
-  and under which content kind, is not stated; until then the public
-  website carries it as an archive read from its snapshot
-  (0044-public-website FR-013).
+- **OQ-1**: Resolved. The previous website's Record-shaped content is
+  curated forward in full: the supporting assets of a patent (FR-014 to
+  FR-016), the records registers, topics and writing elsewhere
+  (0044-public-website FR-074), the research records (0044-public-website
+  FR-075) and its blog posts as archived posts (FR-018, 0044-public-website
+  FR-076). What the snapshot still holds is descriptive text and a
+  picture, not records (0044-public-website FR-013).
 - **OQ-2**: No content kind yet exists for standalone software, a
   dataset, a method, or a study as a portfolio work — each needs its own
   governing spec before FR-011 is satisfied for it.

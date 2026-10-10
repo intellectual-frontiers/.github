@@ -61,7 +61,8 @@ def plain_quotes(text: str) -> str:
     return str(text).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')
 
 
-HTML_DROP = re.compile(r"(?is)<(script|style|template|svg)\b.*?</\1\s*>|<!--.*?-->|<head\b.*?</head\s*>")
+# A cited title (<cite>) is another author's words and is never swept (FR-020).
+HTML_DROP = re.compile(r"(?is)<(script|style|template|svg|cite)\b.*?</\1\s*>|<!--.*?-->|<head\b.*?</head\s*>")
 HTML_BLOCK = re.compile(r"(?i)</?(?:p|div|section|article|main|header|footer|nav|aside|h[1-6]|li|ul|ol|dl|dt|dd|tr|td|th|table|"
                         r"thead|tbody|blockquote|figure|figcaption|pre|br|hr|details|summary)\b[^>]*>")
 HTML_TAG = re.compile(r"<[^>]+>")

@@ -1,0 +1,6 @@
+{
+  "slug": "blockchain",
+  "order": 3,
+  "title": "Blockchain",
+  "summary": "Patents and writing under this tag treat blockchain as a specific technical mechanism, a shared and tamper-evident ledger, and cover the applications that actually need that property rather than a database with extra steps."
+}

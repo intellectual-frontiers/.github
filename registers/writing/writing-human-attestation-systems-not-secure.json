@@ -1,0 +1,14 @@
+{
+  "slug": "writing-human-attestation-systems-not-secure",
+  "order": 26,
+  "title": "Systems that require human attestation to prove compliance are not secure",
+  "summary": "While a system may meet all the necessary regulations and standards, it can still be vulnerable to threats and attacks because of human attestation.",
+  "date": "2023-09-26",
+  "kind": "Contrarian Brief",
+  "series": "",
+  "tags": [
+    "AI",
+    "Cybersecurity"
+  ],
+  "url": "https://www.shahidshah.com/blog/2023/human-attestation-systems-not-secure"
+}

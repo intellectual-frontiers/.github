@@ -1,0 +1,6 @@
+{
+  "slug": "sentiment-analysis",
+  "order": 19,
+  "title": "Sentiment Analysis",
+  "summary": "Patents and writing under this tag cover sentiment analysis: determining whether text expresses a positive, negative, or neutral view, and using that signal at scale across support tickets, reviews, and social content."
+}

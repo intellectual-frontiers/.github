@@ -282,6 +282,7 @@ requirement	mechanism	by	note
 0013-web-content-kinds FR-013	check	eidolon: eid check content	shape checks both point to a SubstantialWork, not that they name the same one
 0013-web-content-kinds FR-014	check	eidolon: eid check content	shape checks one schema:about Patent
 0013-web-content-kinds FR-015	check	eidolon: eid check content	shape checks one schema:about Patent or PatentFamily
+0013-web-content-kinds FR-018	check	eidolon: eid check content	shape checks one schema:datePublished and no schema:about
 0013-web-content-kinds FR-016	check	eidolon: eid check site	a supporting asset page shows registry facts only from registers/patents; associatedMedia is shape-checked
 0013-web-content-kinds FR-017	none	-	no issue document exists yet; the JournalIssuePage shape is in ifweb.ttl
 0014-design-systems FR-001	none	-	definition; nothing to test
@@ -1377,6 +1378,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-073	check	eidolon: eid check site	the website's check reads every page's title, description, headings and paragraphs against the vendored written voice's patterns.json and refuses an announcement, throat-clearing or an announcing heading; unit tests in src/voice.rs
 0044-public-website FR-074	check	eidolon: eid check site	the generator reads registers/portfolio, trademarks, disclosures and hunts from the public root (tools/eid-site/src/registers.rs); the snapshot holds none of them; the Rust tests render the ventures, products, trademarks, disclosures and hunts pages from the records
 0044-public-website FR-075	check	eidolon: eid check site	the generator reads works/research/<slug>/{area,pillar,note,publication}.adoc (tools/eid-site/src/research.rs) and the snapshot holds no research; the Rust tests render every announced record's page
+0044-public-website FR-076	check	eidolon: eid check site	the archive lists content/blogs/<slug>.html at /blogs/<slug> and the topics are the research areas and registers/topics (tools/eid-site/src/render/archive.rs, topics.rs); the snapshot holds no posts, topics or essays
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

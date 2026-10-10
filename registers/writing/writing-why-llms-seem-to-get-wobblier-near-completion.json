@@ -1,0 +1,16 @@
+{
+  "slug": "writing-why-llms-seem-to-get-wobblier-near-completion",
+  "order": 4,
+  "title": "Why LLMs Seem to Get Wobblier Near Completion",
+  "summary": "My working theory: these models are great at continuing and lousy at being done. The last stretch of a project probably needs different rules, not a smarter model — a canonical spec, scheduled audits, and a second model as judge.",
+  "date": "2026-09-11",
+  "kind": "Working Theory",
+  "series": "",
+  "tags": [
+    "AI",
+    "Software Engineering",
+    "CTO",
+    "Product"
+  ],
+  "url": "https://www.shahidshah.com/blog/2026/why-llms-seem-to-get-wobblier-near-completion"
+}

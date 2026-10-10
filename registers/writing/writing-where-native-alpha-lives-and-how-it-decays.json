@@ -1,0 +1,16 @@
+{
+  "slug": "writing-where-native-alpha-lives-and-how-it-decays",
+  "order": 14,
+  "title": "Where Native Alpha Actually Lives, and How It Decays",
+  "summary": "Advantage is contextual, it hides at surprisingly small scales, it needs protection in the place it actually lives, and it expires. How to find it, where to put the fence, and when to admit it is gone.",
+  "date": "2026-08-25",
+  "kind": "Contrarian Brief",
+  "series": "Native Alpha",
+  "tags": [
+    "Venture Building",
+    "Leadership",
+    "CTO",
+    "Architecture"
+  ],
+  "url": "https://www.shahidshah.com/blog/2026/where-native-alpha-lives-and-how-it-decays"
+}

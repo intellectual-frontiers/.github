@@ -1,0 +1,6 @@
+{
+  "slug": "authorization-and-data-privacy",
+  "order": 2,
+  "title": "Authorization & Data Privacy",
+  "summary": "Patents and writing under this tag cover how a system decides who may access data and how that access is proven: authorization, authentication, and privacy controls, largely in healthcare and finance."
+}
