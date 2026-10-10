@@ -11,5 +11,10 @@
   "term-variant.md": "'IF Press' for the shared term",
   "procedure-long-step.md": "an instruction of 25 words, over 20",
   "procedure-passive.md": "a passive instruction",
-  "url-link-text.adoc": "banned word 'delve'"
+  "url-link-text.adoc": "banned word 'delve'",
+  "section-announces.md": "throat-clearing 'this section provides'",
+  "heading-announces.md": "heading announces a topic or an activity ('exploring')",
+  "heading-label.md": "heading is a bare label ('Conclusion')",
+  "closer.md": "throat-clearing 'in conclusion'",
+  "page-announces.html": "heading announces a topic or an activity ('a closer look')"
 }

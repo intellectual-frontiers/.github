@@ -190,7 +190,11 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   `design-systems [--scope SLUG] [--brand B] [--runner browser|python]` (each
   design system's harness under every brand, 0014-design-systems FR-015,
   FR-039), `imagery` (each brand's imagery pool and share card), `openedx`
-  (a brand's Open edX package), and the item checks `figures`, `voice`,
+  (a brand's Open edX package), `content` (every page under `content/`, the
+  Journal's articles and the registers' pages, against the written voice's
+  sweep, prose and headings, frontiers-written-voice FR-009 and FR-017; with
+  no `--scope` it checks every page there, since those pages are the website's
+  own writing), and the item checks `figures`, `voice`,
   `slides`, `email`, `course`, `media`, `signage` and `merchandise`, each of
   which takes `--scope PATH`, more than once if need be, to the work it checks
   (a file, or a directory of such files), and calls the design system's own

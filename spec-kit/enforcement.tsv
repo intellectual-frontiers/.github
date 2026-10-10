@@ -702,7 +702,7 @@ frontiers-written-voice FR-005	none	-	person and voice; a human read
 frontiers-written-voice FR-006	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	plain-word swaps warn; specificity is a human read
 frontiers-written-voice FR-007	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	hedge phrases; whether uncertainty is real is a human read
 frontiers-written-voice FR-008	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	banned words, hedges, stock openings and closings refused by the sweep
-frontiers-written-voice FR-009	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	announcement openings and wrap-up asides; headings as claims are a human read
+frontiers-written-voice FR-009	check	.github: agora check content	announcement openings, throat-clearing, wrap-up asides, and headings that announce a topic or are bare labels, in prose and in headings: the sweep's fixtures (agora check design-systems --runner python), every page under content/ (agora check content) and every page of the website (eidolon: eid check site, 0044 FR-073); whether a heading states its claim is a human read
 frontiers-written-voice FR-010	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	common idioms warn (FR-021 list); wit, humor and metaphor are a human read
 frontiers-written-voice FR-011	none	-	contrarian claims and useful conclusions; a human read
 frontiers-written-voice FR-012	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	em dash, not-only formula, seesaw limit; quotes, serial comma and en dashes not checked
@@ -710,7 +710,7 @@ frontiers-written-voice FR-013	check	.github: agora check design-systems --runne
 frontiers-written-voice FR-014	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	procedure mode: instruction and sentence length, passive instructions
 frontiers-written-voice FR-015	none	-	presentation form; a human read
 frontiers-written-voice FR-016	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	every shared term is in ifcore.ttl under its label; avoided variants refused
-frontiers-written-voice FR-017	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	the sweep against fail and pass fixtures
+frontiers-written-voice FR-017	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	the sweep against fail and pass fixtures, HTML and headings among them
 frontiers-written-voice FR-018	check	.github: agora check design-systems --runner python --scope frontiers-spoken-voice	a derived voice keeps every inherited pattern
 frontiers-written-voice FR-019	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	agora check design-systems runs run.py, which exits non-zero on any failure
 frontiers-written-voice FR-020	check	.github: agora check design-systems --runner python --scope frontiers-written-voice	URLs and mailto: addresses left out of the sweep, link text after a URL still swept, against fixtures
@@ -1374,6 +1374,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-070	check	eidolon: eid test	the Rust tests find the "Console" control only on a page that carries the Console
 0044-public-website FR-071	none	-	the icons and the rule are the Console's markup; no check reads a rendered page's colours
 0044-public-website FR-072	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the favicon, the ICO, the Apple touch icon and the manifest linked from a page's head and served at their unhashed addresses from the vendored brand, the manifest naming the three icons
+0044-public-website FR-073	check	eidolon: eid check site	the website's check reads every page's title, description, headings and paragraphs against the vendored written voice's patterns.json and refuses an announcement, throat-clearing or an announcing heading; unit tests in src/voice.rs
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

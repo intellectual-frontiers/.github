@@ -348,8 +348,12 @@ def sweep_voice(root: Path, paths: list[Path], mode: str | None, draft: bool, sp
         m = mode or ("procedure" if fixtures_only and p.name.startswith("procedure-") else "prose")
 
         def one(p: Path = p, m: str = m, where: str = where) -> Problems:
-            text = written.prose(p.read_text(encoding="utf-8"), p.suffix)
+            raw = p.read_text(encoding="utf-8")
+            text = written.prose(raw, p.suffix)
             fails, warns = written.sweep(text, patterns, mode=m, terms=terms)
+            if hasattr(written, "sweep_headings"):      # the written voice sweeps a file's headings too (FR-009)
+                hf, hw = written.sweep_headings(written.headings(raw, p.suffix), patterns)
+                fails, warns = fails + hf, warns + hw
             if draft:
                 fails, warns = [], fails + warns
             return [("error", where, f) for f in fails] + [("warning", where, w) for w in warns]
