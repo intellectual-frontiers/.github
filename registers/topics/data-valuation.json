@@ -1,0 +1,6 @@
+{
+  "slug": "data-valuation",
+  "order": 5,
+  "title": "Data Valuation",
+  "summary": "Patents and writing under this tag cover methods for estimating what a specific dataset is worth for a specific use, as distinct from data volume or data quality on their own."
+}

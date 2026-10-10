@@ -1,0 +1,16 @@
+{
+  "slug": "writing-test-first-discover-second-build-third",
+  "order": 9,
+  "title": "Test First, Discover Second, Build Third: A Practical Strategy for Brownfield and Legacy Software Engineering",
+  "summary": "For non-trivial changes to legacy systems, define the business outcome first, then how you will prove the change works, before you estimate or build it. Outcome, evaluation, bounded discovery, incremental implementation, in that order.",
+  "date": "2026-08-30",
+  "kind": "Design Pattern",
+  "series": "",
+  "tags": [
+    "Software Engineering",
+    "Architecture",
+    "AI",
+    "Leadership"
+  ],
+  "url": "https://www.shahidshah.com/blog/2026/test-first-discover-second-build-third"
+}

@@ -1,0 +1,6 @@
+{
+  "slug": "near-field-communication-nfc",
+  "order": 14,
+  "title": "Near Field Communication (NFC)",
+  "summary": "Patents and writing under this tag cover near-field communication as a short-range wireless mechanism, and the specific problems it solves in payments and device pairing that other wireless methods do not."
+}

@@ -1,0 +1,6 @@
+{
+  "slug": "data-management",
+  "order": 4,
+  "title": "Data Management",
+  "summary": "Patents and writing under this tag cover the mechanics of organizing, storing, and retrieving data at scale: infrastructure other products are built on, not a product in its own right."
+}
