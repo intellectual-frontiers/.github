@@ -181,6 +181,16 @@ reference model, and governance representation.
   represented in the ontology, and in the ontology before it is implemented anywhere
   else — code, content, or process. Work MUST NOT proceed out of this order.
 
+## Authorship of the record
+
+- **FR-038**: The author and the committer of every commit, in this repository
+  and in every repository that follows these specs, MUST be Shahid Shah
+  <shahid@shah.org>, unless a person expressly authorizes an agent to be the
+  author of a named commit; that authorization is written in the commit's
+  message. An agent that writes a commit on a person's behalf records its part
+  in a `Co-Authored-By` trailer and in nothing else. History that names an
+  agent as an author is rewritten to this rule, once, by the person.
+
 ## Edge cases
 
 - A fact that is both a third party's confidential information and

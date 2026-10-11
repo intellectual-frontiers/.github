@@ -240,7 +240,8 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 ## Replacing every script
 
 - **FR-016**: `agora` MUST replace every script this repository keeps outside
-  a design system's own directory. `tools/spec_check.py`,
+  a design system's own directory, the session hook of
+  0025-tooling-environment FR-033 apart. `tools/spec_check.py`,
   `tools/run_assurance.sh`, `tools/brand_decoration.py`,
   `tools/brand_imagery.py`, `tools/brand_openedx.py`,
   `tools/brand_specimen.py`, `tools/brand_theme.py` and the profile's

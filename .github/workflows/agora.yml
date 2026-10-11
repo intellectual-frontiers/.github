@@ -20,6 +20,11 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
+      - name: Bootstrap ws-host and enable the clone (0025 FR-033)
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/workspaces-host/main/install.sh | WS_HOST_NO_APT=1 WS_HOST_NO_ADVANCE=1 sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/ws-host" provider add "$PWD" --yes
       # doctor exits 3 when python3 or uv is missing or a browser library is; that is a warning naming what is missing, and the
       # job goes on. Exit 1 (a conflict) fails the job (0041-command-line FR-021).
       - name: agora's doctor

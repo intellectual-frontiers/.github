@@ -115,6 +115,7 @@ def check_workflows(home: Path) -> list[Finding]:
 
 SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".js", ".mjs", ".cjs", ".ts")
 SKIP_DIRS = (".git", "node_modules", "__pycache__", ".agora", ".venv")
+SESSION_HOOK = ".claude/hooks/session-start.sh"  # the one script outside agora: the bootstrap of 0025 FR-033
 
 
 def check_scripts(home: Path) -> list[Finding]:
@@ -125,7 +126,7 @@ def check_scripts(home: Path) -> list[Finding]:
         here = Path(dirpath).relative_to(home)
         dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and (here / d).parts not in (("design-systems",), ("tools", NAME), ("tools", "if-console")))
         for n in sorted(names):
-            if n.endswith(SCRIPT_SUFFIXES):
+            if n.endswith(SCRIPT_SUFFIXES) and (here / n).as_posix() != SESSION_HOOK:
                 out.append(Finding("error", str(here / n), f"a script outside design-systems/, tools/{NAME}/ and tools/if-console/: delete it once {NAME} "
                                    "provides its function, and rewrite every reference to it (0042 FR-016)"))
     return out

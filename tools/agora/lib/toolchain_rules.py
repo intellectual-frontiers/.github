@@ -16,7 +16,10 @@ FORBIDDEN_STEP = re.compile(
     r"(?<![\w/.-])(?:apt-get|apt|aptitude|dpkg|brew|yum|dnf|pacman|apk|snap|choco|winget|pip3?|pipx|npm|npx|yarn|pnpm|corepack|"
     r"gem|bundle|cargo|go\s+install|curl|wget|docker|podman|sudo)(?![\w/.-])"
     r"|uses:\s*actions/setup-(?:node|java|ruby|go|dotnet)|uses:\s*docker://|^\s*(?:-\s*)?(?:container|services|image):")
-ALLOWED_STEP = re.compile(r"ws-host\s+system\s+ensure\b")  # the documented one-time setup, the only place `sudo` is allowed
+# The documented one-time setup (the only place `sudo` is allowed), and the bootstrap of 0025 FR-033: the installer of workspaces-host,
+# then enabling the clone as a provider with the `--yes` the person committed.
+ALLOWED_STEP = re.compile(r"ws-host\s+system\s+ensure\b|raw\.githubusercontent\.com/intellectual-frontiers/workspaces-host/main/install\.sh\b"
+                          r"|ws-host\s+provider\s+add\b")
 HOST_PROGRAMS = tuple("""git convert identify magick pdftotext pdfinfo pdffonts pdfimages pdftoppm rsvg-convert potrace latexmk
                          xelatex lualatex pdflatex node npm npx chromium chrome java asciidoctor""".split())
 HOST_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(re.escape(p) for p in HOST_PROGRAMS) + r")[\"']")

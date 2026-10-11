@@ -17,7 +17,8 @@ program it finds on your machine unless you name it.
 
 ## The flow
 
-1. Install `python3` and `uv`, and clone this repository.
+1. Install [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) (its README has the one line), clone this repository
+   and enable it once with `ws-host provider add .`; a machine with no person at it runs the bootstrap in [`AGENTS.md`](AGENTS.md).
 2. Run `./agora help start`. The daily work is documented in one place, the program, and in VS Code every step is a button
    ([IF Console](tools/if-console/), Learn).
 3. Once per machine, run `./agora system ensure --dry-run` to see, then `./agora system ensure`, which installs the few system libraries and

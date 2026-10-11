@@ -19,5 +19,10 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v7
+      - name: Bootstrap ws-host and enable the clone (0025 FR-033)
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/workspaces-host/main/install.sh | WS_HOST_NO_APT=1 WS_HOST_NO_ADVANCE=1 sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/ws-host" provider add "$PWD" --yes
       - name: Specs, enforcement register, controls, ontology and commands
         run: ./agora check --suite spec

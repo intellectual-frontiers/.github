@@ -83,7 +83,8 @@ and what continuous integration needs.
   tool, what it checks, a lock or a toolchain entry. A tool that fails there
   MUST fail CI.
 - **FR-011**: Each repository's CI MUST run on a stock runner that has been
-  given only `ws-host`, plus a restored cache of what it has fetched (FR-023).
+  given only `ws-host`, by the bootstrap of FR-033, plus a restored cache of
+  what it has fetched (FR-023).
   A CI job MUST NOT install a program with a package manager, pull an image,
   or run in a container built for the repository, so that FR-002 and FR-006 are
   tested rather than assumed.
@@ -192,8 +193,9 @@ and what continuous integration needs.
 
 - **FR-022**: A repository's CI MUST NOT contain a step that installs a
   program, a library or a browser with the host's package manager or that
-  fetches one outside `ws-host` (FR-021's setup command apart), and MUST NOT
-  run a job whose purpose is to prove a prepared environment. A job that needs
+  fetches one outside `ws-host` (FR-021's setup command and FR-033's bootstrap
+  apart), and MUST NOT run a job whose purpose is to prove a prepared
+  environment. A job that needs
   a program runs the launcher, which has `ws-host` fetch the entry as FR-017
   states.
 - **FR-023**: CI MAY restore and save the store `ws-host` fills and uv's
@@ -201,6 +203,21 @@ and what continuous integration needs.
   locks and the toolchain entries. A cache MUST be an optimization only: a run
   with an empty cache MUST pass, only slower, and `ws-host` MUST verify what it
   finds in the store as FR-017 does.
+- **FR-033**: A runner, a container or an agent session that starts without
+  `ws-host` MUST obtain it by one bootstrap and nothing else: the installer of
+  `workspaces-host` (`install.sh`, run with `WS_HOST_NO_APT=1` and
+  `WS_HOST_NO_ADVANCE=1`, so it installs no package and asks nothing), then
+  `ws-host provider add CLONE --yes` for each clone the session works in. The
+  bootstrap needs no setting of the environment that runs it. It is the one
+  step a CI workflow MAY run before the launcher (FR-022), and each repository
+  MUST carry it, in the same words, in three places: its CI workflow, its
+  session hook (`.claude/hooks/session-start.sh`, registered in
+  `.claude/settings.json` beside allow rules for the launcher and `ws-host`,
+  so that an agent runs them without a prompt), and the entry file an agent
+  reads first. `--yes` on that line is the typed answer of the person who
+  committed it, as `ws-host`'s own specs state; an agent MUST NOT add `--yes`
+  to a command it runs on its own initiative, and a repository MUST NOT add a
+  bootstrap of its own.
 
 ## What a repository must not require
 
