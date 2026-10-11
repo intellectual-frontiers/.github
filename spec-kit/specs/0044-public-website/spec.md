@@ -413,7 +413,12 @@ how addresses map to content, 0004-addressing; what the application does,
   asks, are one too many. An aside is the page's fact sheet: a fact it
   states is not a tagline, a kicker or a body line as well, and no two of
   its rows state one fact; the footer's line about the firm is left off a
-  page whose head already says it.
+  page whose head already says it. A page's title is its heading, or a
+  shorter name for it, followed by the site's name once; a crumb is the
+  short name the navigation gives its page, the same wherever that page
+  is named in a trail; and the trail and the navigation's current item
+  both stand, since one says how the page was reached and the other where
+  it sits.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
