@@ -433,7 +433,12 @@ how addresses map to content, 0004-addressing; what the application does,
   place it belongs: a fact sheet's row, a list's item, a line's time; a
   row that would repeat the row above it under another name (a priority
   date that is the filing date) is left out, and a sentence of a record
-  that restates the fact sheet beside it is not shown.
+  that restates the fact sheet beside it is not shown. A page's
+  description, for a search result or a share card, says in whole
+  sentences of up to about 300 characters what the page holds, never only
+  its title again, never nothing, and never the same sentence as another
+  page's; its structured data carries the page's facts once, under one
+  type each, with the site's organization and website stated once.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
