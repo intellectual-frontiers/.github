@@ -428,7 +428,12 @@ how addresses map to content, 0004-addressing; what the application does,
   what will appear when there is. A table's caption says what its heading
   does not, a column whose every cell would say one thing the page
   already says is left out, and a list item does not name again what its
-  own text names.
+  own text names. A date the website writes is written one way, "1 January
+  2026", whatever form its record holds it in, and stated once in each
+  place it belongs: a fact sheet's row, a list's item, a line's time; a
+  row that would repeat the row above it under another name (a priority
+  date that is the filing date) is left out, and a sentence of a record
+  that restates the fact sheet beside it is not shown.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
