@@ -425,7 +425,10 @@ how addresses map to content, 0004-addressing; what the application does,
   a placeholder where the label is hidden, never both in sight, and its
   help text says what the name does not. An empty state says once that
   there is nothing, in the heading or in the line under it, and then
-  what will appear when there is.
+  what will appear when there is. A table's caption says what its heading
+  does not, a column whose every cell would say one thing the page
+  already says is left out, and a list item does not name again what its
+  own text names.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
