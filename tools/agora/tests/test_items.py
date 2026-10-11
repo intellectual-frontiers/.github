@@ -88,6 +88,20 @@ class Sections(unittest.TestCase):
         r = items_cmd.check_voice(section_ctx(spoken=True), [str(spoken / "fail" / "story-label.txt")])
         self.assertTrue(any("labels a story" in m for _, _, m in findings(r)))
 
+    def test_a_content_page_whose_alt_text_names_only_the_kind_of_picture_is_warned(self):
+        self.assertEqual(items.generic_alts('<img src="a.webp" alt="Figure 1"><img src="b.webp" alt="Figures. 8">'
+                                            '<img src="c.webp" alt="Chart"><img src="d.webp" alt="Bar chart of closes, 2019 to 2030">'
+                                            '<img src="e.webp" alt="">'), ["Figure 1", "Figures. 8", "Chart"])
+        with tempfile.TemporaryDirectory() as d:
+            page = Path(d) / "page.html"
+            page.write_text('<!doctype html><html><head><title>Costs fell in March</title></head><body><main><h1>Costs fell in March</h1>'
+                            '<p>The budget ran out, so the pilot stopped.</p><p><img src="a.webp" alt="Figure 1"></p></main></body></html>',
+                            encoding="utf-8")
+            r = items_cmd.check_content(section_ctx(), [str(page)])
+        self.assertEqual(r.status, "passed")  # a warning, never a failure
+        self.assertEqual([lv for lv, _, _ in findings(r)], ["warning"])
+        self.assertTrue(findings(r)[0][2].startswith("an image's alt text names the kind of picture and nothing it shows ('Figure 1')"))
+
     def test_a_procedure_named_fixture_is_swept_as_a_procedure_only_among_the_fixtures(self):
         r = items_cmd.check_voice(section_ctx(), None)
         self.assertEqual((r.status, r.data["checked"]), ("passed", 3))
