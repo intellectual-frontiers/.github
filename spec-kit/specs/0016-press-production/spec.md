@@ -245,7 +245,10 @@ is not stated here.
 - **FR-037**: A book's news record MUST be published as a generated content
   document once the book itself is announced (0015-work-packages FR-027),
   and MUST NOT be published for a book that has not been announced, because
-  publishing its news would announce the book.
+  publishing its news would announce the book. The page's opening line,
+  which tells a reader who has read the book what the page is, MUST be
+  written by the generator from the book's title; the record holds its
+  entries and nothing a template would repeat in every book.
 
 ## Books as working AI
 
@@ -267,7 +270,11 @@ is not stated here.
   operationalizes by `schema:isBasedOn` (0007-work-and-assets FR-015) and
   MUST NOT stand in the place of a book. It reaches readers by its own
   publication decision (0015-work-packages FR-025) as soon as it is ready,
-  whatever the stage of the book it realizes.
+  whatever the stage of the book it realizes. A Public skill's text MUST
+  NOT cite a path only the vault can open (`ai-training/`, `ontology/`,
+  another package's folder): it names the book, chapter or public address
+  it rests on, since the same file is read on the website and as a
+  download.
 - **FR-041**: The named tools, tests, and frameworks of a book MUST also be
   queryable in the ontology, each individual carrying provenance to the exact
   source file and section it was extracted from and an explicit audience

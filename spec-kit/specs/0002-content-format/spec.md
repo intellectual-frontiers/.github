@@ -74,7 +74,11 @@ ontology, and carrying its own confidentiality declaration per
   else: FR-001 through FR-015 apply to it unchanged. Its JSON-LD block
   MUST declare `prov:wasDerivedFrom` naming the Substantial Work it
   renders, and it MUST satisfy the reproducibility and audience rules of
-  0015-work-packages for generated content documents.
+  0015-work-packages for generated content documents. It MUST NOT be
+  older than its source: a source whose last commit is newer than the
+  last commit of the document generated from it is a warning until the
+  generator runs again, and a hand edit to a generated document is made
+  to its source in the same commit.
 
 ## Out of scope
 

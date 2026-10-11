@@ -54,7 +54,7 @@ requirement	mechanism	by	note
 0002-content-format FR-014	check	eidolon: eid check content	target=_blank requires rel=noopener; vault docs
 0002-content-format FR-015	check	eidolon: eid check content	href, src, cite schemes checked; JSON-LD URLs not checked; vault docs
 0002-content-format FR-016	none	-	nothing rejects non-HTML files under content/
-0002-content-format FR-017	check	eidolon: eid check content	WorkEditionPage shape requires prov:wasDerivedFrom; vault docs
+0002-content-format FR-017	check	eidolon: eid check companion	`eid check companion` warns when a companion or What's new source's last commit is newer than its generated page's (lib/editorial/companion.py)
 0003-intellectual-frontiers FR-001	none	-	no shape on ifcore:Unit job and question
 0003-intellectual-frontiers FR-002	none	-	rule of judgment; no check possible
 0003-intellectual-frontiers FR-003	none	-	rule of judgment; no check possible
@@ -408,10 +408,10 @@ requirement	mechanism	by	note
 0016-press-production FR-034	none	-	companion-check only warns; committing a generated CSV is not checked
 0016-press-production FR-035	check	eidolon: eid check editorial	news-check fails a book with no NEWS.adoc, undated entries, or wrong order
 0016-press-production FR-036	none	-	news-check only warns on process or object wording
-0016-press-production FR-037	none	-	news page inherits the work's audience by construction; no check
+0016-press-production FR-037	check	eidolon: eid content generate	the generator writes the What's new page's opening line from the book's title (lib/vault/content_gen.py); `eid check news` refuses a record that carries it
 0016-press-production FR-038	none	-	whether a book has a skill is not checked
 0016-press-production FR-039	none	-	faithfulness of a skill is judgment
-0016-press-production FR-040	none	-	console panel shows missing isBasedOn; no check fails
+0016-press-production FR-040	check	eidolon: eid check works	`eid check works` refuses a Public skill whose SKILL.md cites a vault-only path (lib/vault/packages.py check_skill)
 0016-press-production FR-041	check	eidolon: eid check ontology	every concept individual must declare an audience; provenance unchecked
 0016-press-production FR-042	none	-	website package contents are not checked
 0016-press-production FR-043	review	0009-press FR-027	quarterly surface review covers the website text audit
@@ -446,7 +446,7 @@ requirement	mechanism	by	note
 0017-spoken-and-research-works FR-016	none	-	no show-notes generator or check exists
 0017-spoken-and-research-works FR-017	check	eidolon: eid check works	works.py fails a research package without exactly one typed record source
 0017-spoken-and-research-works FR-018	check	eidolon: eid check works	works.py requires the record source as <type>.adoc; research-check checks header
-0017-spoken-and-research-works FR-019	check	eidolon: eid check research-papers	fails a hypothesis heading with no practical test
+0017-spoken-and-research-works FR-019	check	eidolon: eid check research-papers	the header-contract rule (lib/research/rules.py) requires an area's or pillar's :status: to begin with Intake, Active, Paused or Closed and no status to speak of provenance or the previous website
 0017-spoken-and-research-works FR-020	none	-	research-check states DOI-registry matching is not built
 0017-spoken-and-research-works FR-021	check	eidolon: eid check research-papers	fails a claim label outside the closed set or not above a heading
 0017-spoken-and-research-works FR-022	check	eidolon: eid check research-papers	fails a hypothesis/inference/recommendation with no falsifier, or no status section
@@ -1382,7 +1382,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-076	check	eidolon: eid check site	the archive lists content/blogs/<slug>.html at /blogs/<slug> and the topics are the research areas and registers/topics (tools/eid-site/src/render/archive.rs, topics.rs); the snapshot holds no posts, topics or essays
 0044-public-website FR-077	check	eidolon: eid check site	the program builds the website package named or the default (works/website/<fqdn>/), reads website.yml, assets/, tools/, the picture and the sitemap from it, and refuses a page whose address, contact or analytics container differs from website.yml; websites/<fqdn>/about.json is the About copy
 0044-public-website FR-078	check	eidolon: eid test	the Rust tests assert a pillar's start with its anchor, no date on an evergreen note, and the computed record span (tests/gaps.rs)
-0044-public-website FR-079	check	eidolon: eid test	the renderers (src/render/) pass an empty kicker, badge or meta line where the trail, heading, section or a neighbouring fact says it, write ledes without the heading's name or number, skip a paragraph that repeats the tagline, write card text that starts after what the section says (Skill::card_text, trademarks::coverage), head lists by their subject, name links by their target (layout::host_of), keep each fact in the aside or the prose, not both, name a crumb as the navigation names its page, give a captioned drawing an alt that names only what its link opens, state an empty state once, leave out a table column or caption the page already says, write every date through text::human_date, every description through text::blurb, the feed and llms.txt (render/feeds.rs) by the same rule, redirects in one hop to served pages (render/redirects.rs, the check), and the Console (render/desk.rs) and log-in (auth.rs) by the same rule; `agora check content` holds the content pages; the Rust tests assert the kind kickers and status badges that remain (tests/gaps.rs)
+0044-public-website FR-079	check	eidolon: eid site check	the "once" pass of the website check (tools/eid-site/src/once.rs) reads every built page for a kicker, badge, meta line, tagline, alt, heading, link, button, aside row, description, redirect or feed entry that repeats what stands beside it, with FR-079's exceptions; its unit tests seed each duplicate
 0050-participation FR-001	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-002	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written
 0050-participation FR-003	none	-	not yet enforced; the terms are in the ontology, and a check of a participation module is not written

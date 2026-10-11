@@ -387,71 +387,49 @@ how addresses map to content, 0004-addressing; what the application does,
   state how far back the firm's record runs from the dates the registers
   hold (the earliest patent filing, mark in use, paper in a journal, essay
   and post), computed, never written as a literal.
-- **FR-079**: A kicker (the small label above a heading, on a page head, a
-  section head or a card), a badge, a meta line, a lede and a tagline MUST
-  each say something the words beside them do not: a work's kind where
-  the heading does not state it, a series, a journal, a subject, a status,
-  a year, a fact the heading leaves out. None of them MUST repeat the
-  heading, the breadcrumb trail, the section's own heading, one another, a
-  fact the row or the paragraph beside them states, or the page's place
-  in the site. A section of one kind of card carries no kind kicker, a
-  page whose trail names what it belongs to carries none either, a status
-  shown as a badge is not the meta line too, a shelf headed as an
-  experiment does not badge each book again, a lede does not restate the
-  number or name its heading carries, and a tagline drawn from a record's
-  summary is not followed by the same summary as the first paragraph. A
-  card's text says what its title and its section do not: a card in a
-  section of book companions names its book and no more, a mark's card
-  under a status heading starts at its classes, and a skill's card starts
-  at when to use it, not that it is a skill. A heading names its subject,
-  never the page or the reader's position on it: no "here", "below",
-  "this page" or "this patent" where the number is known, and no empty
-  heading. A link or button is named by what it reaches ("Read the
-  original patent", "Visit netspective.com"), never "here" or a bare
-  "Visit", and one page makes one call to the same action: two buttons to
-  the same address, or a sentence that asks what the button beside it
-  asks, are one too many. An aside is the page's fact sheet: a fact it
-  states is not a tagline, a kicker or a body line as well, and no two of
-  its rows state one fact; the footer's line about the firm is left off a
-  page whose head already says it. A page's title is its heading, or a
-  shorter name for it, followed by the site's name once; a crumb is the
-  short name the navigation gives its page, the same wherever that page
-  is named in a trail; and the trail and the navigation's current item
-  both stand, since one says how the page was reached and the other where
-  it sits. An image's alt text says what the image shows, or names what
-  its link opens; it never repeats the caption, the heading or the
-  sentence beside it, and where those say it all the alt is empty, so a
-  reader hears it once. A form control has one visible name: a label, or
-  a placeholder where the label is hidden, never both in sight, and its
-  help text says what the name does not. An empty state says once that
-  there is nothing, in the heading or in the line under it, and then
-  what will appear when there is. A table's caption says what its heading
-  does not, a column whose every cell would say one thing the page
-  already says is left out, and a list item does not name again what its
-  own text names. A date the website writes is written one way, "1 January
-  2026", whatever form its record holds it in, and stated once in each
-  place it belongs: a fact sheet's row, a list's item, a line's time; a
-  row that would repeat the row above it under another name (a priority
-  date that is the filing date) is left out, and a sentence of a record
-  that restates the fact sheet beside it is not shown. A page's
-  description, for a search result or a share card, says in whole
-  sentences of up to about 300 characters what the page holds, never only
-  its title again, never nothing, and never the same sentence as another
-  page's; its structured data carries the page's facts once, under one
-  type each, with the site's organization and website stated once. The
-  machine editions follow the same rule: a feed entry's kind is its
-  category, not a prefix on its title; every line of llms.txt names its
-  page and says what it holds, in a description of the same length as
-  the page's; and the sitemap lists each page once, without a trailing
-  slash, with a last-modified date only where the record has one. The
-  not-found page says once that the page is not there and offers what the
-  menu beside it does not, never the fronts again; a redirect goes to a
-  page the website serves, in one hop, and no address is both served and
-  redirected. The Console's lede says where its items come from and how
-  they are ordered, not the counts its tiles carry nor that it is this
-  computer's, which its label says; a control's tooltip names the action
-  and not where its result lands; and the log-in dialog's step says what
-  the field's label does not.
+- **FR-079**: Every label the website writes beside a work's words MUST say
+  something those words do not, and say it once. The labels are the
+  kicker, badge, meta line, lede, tagline and card text; the heading,
+  title, breadcrumb trail and navigation; alt text and captions; buttons,
+  links and calls to action; asides, fact rows and the footer; forms,
+  empty states, tables and lists; dates and bylines; descriptions,
+  structured data, the feed, llms.txt and the sitemap; the not-found page
+  and redirects; the Console band and the log-in dialog. In each place the
+  rule means:
+  - a kicker, badge or meta line is left out where the heading, the trail,
+    the section, a badge or a neighbouring row already says it;
+  - a lede or tagline does not restate its heading's name or number, and
+    is not followed by the same words as the first paragraph;
+  - a heading, a link and a button name their subject or their target,
+    never the page or the reader's position on it ("here", "below", "this
+    page", a bare "Visit"), and a page makes one call to one action;
+  - an aside is the fact sheet: a fact in it is not a tagline or a body
+    line too, and no two of its rows state one fact;
+  - alt text says what the caption and the heading do not, and is empty
+    where they say it all;
+  - a form control has one visible name, an empty state is stated once, and
+    a table column or caption the page already says is left out;
+  - a date is written one way, "1 January 2026", and once in each place it
+    belongs;
+  - a description is whole sentences of up to about 300 characters, never
+    the title alone, never empty, never shared between pages, and the
+    structured data states each fact once;
+  - the feed's kind is a category, each llms.txt line describes its page,
+    the sitemap lists each page once, and a redirect is one hop to a page
+    the website serves;
+  - the Console's lede and the log-in dialog's step say what their tiles,
+    labels and fields do not.
+
+  The exceptions, which the check leaves alone: the patent FAQ blocks,
+  which restate facts for their FAQPage data; the trail's section crumb
+  beside the navigation's current item, one the path and the other the
+  place; "Cover of X" beside the title X (FR-008); the companions' blank
+  worksheet columns and their "the table below", since a form is filled
+  where it stands; "Print this page"; a skill's "Use this skill when" and
+  "this skill", which are its genre; and numbering such as "Scenario 01"
+  or "Stage 1". The reasoning behind each clause is in the
+  frontiers-written-voice README, "Say it once". The mechanical part is
+  the "once" pass of `eid site check`.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
