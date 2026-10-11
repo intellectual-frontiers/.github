@@ -438,7 +438,12 @@ how addresses map to content, 0004-addressing; what the application does,
   sentences of up to about 300 characters what the page holds, never only
   its title again, never nothing, and never the same sentence as another
   page's; its structured data carries the page's facts once, under one
-  type each, with the site's organization and website stated once.
+  type each, with the site's organization and website stated once. The
+  machine editions follow the same rule: a feed entry's kind is its
+  category, not a prefix on its title; every line of llms.txt names its
+  page and says what it holds, in a description of the same length as
+  the page's; and the sitemap lists each page once, without a trailing
+  slash, with a last-modified date only where the record has one.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
