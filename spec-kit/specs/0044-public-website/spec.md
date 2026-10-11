@@ -410,7 +410,10 @@ how addresses map to content, 0004-addressing; what the application does,
   original patent", "Visit netspective.com"), never "here" or a bare
   "Visit", and one page makes one call to the same action: two buttons to
   the same address, or a sentence that asks what the button beside it
-  asks, are one too many.
+  asks, are one too many. An aside is the page's fact sheet: a fact it
+  states is not a tagline, a kicker or a body line as well, and no two of
+  its rows state one fact; the footer's line about the firm is left off a
+  page whose head already says it.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
