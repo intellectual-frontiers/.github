@@ -421,7 +421,11 @@ how addresses map to content, 0004-addressing; what the application does,
   it sits. An image's alt text says what the image shows, or names what
   its link opens; it never repeats the caption, the heading or the
   sentence beside it, and where those say it all the alt is empty, so a
-  reader hears it once.
+  reader hears it once. A form control has one visible name: a label, or
+  a placeholder where the label is hidden, never both in sight, and its
+  help text says what the name does not. An empty state says once that
+  there is nothing, in the heading or in the line under it, and then
+  what will appear when there is.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
