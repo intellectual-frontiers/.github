@@ -219,7 +219,10 @@ property fetches them are decisions outside this spec.
   container it loads (0044-public-website FR-015) and the paths its
   crawler rules disallow; `assets/`, the stylesheet, scripts and tool
   scripts the site's program writes onto it, and `tools/`, its interactive
-  tools; its publishing records (`publish.yml`, `deployments.yml`,
+  tools, whose hand-written HTML uses the house design's classes for the
+  elements the website's checks read (a kicker is `kicker`, a lede `lede`,
+  a caption `figcaption`), so a tool page is checked as every page is
+  (0044-public-website FR-079); its publishing records (`publish.yml`, `deployments.yml`,
   `cdn.yml`, `images.yml`); its home picture and the previous website's
   sitemap (0044-public-website FR-077); and its bible, issues and audit
   notes as any work. The ontology MUST mark one website the default

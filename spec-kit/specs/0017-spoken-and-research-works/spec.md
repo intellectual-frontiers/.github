@@ -134,7 +134,12 @@ stated here.
   header or in a data file beside the source, and MUST NOT duplicate a fact
   the ontology asserts. A record is written natively; an idea that came from
   other material MUST say where it came from, as provenance only.
-- **FR-019**: A pillar MUST state its question and its status. A note MUST be
+- **FR-019**: A pillar MUST state its question and its status. An area's or
+  a pillar's `:status:` MUST begin with one of Intake, Active, Paused or
+  Closed, and MAY continue, after a full stop, with what is untested; a
+  note's status is plain words on where it stands. No record's status
+  speaks of its provenance or of the previous website, which is
+  `:derived-from:`'s to say. A note MUST be
   typed as a design pattern or an operating theory, carry a date, and have a
   one-paragraph summary, per 0006-research-and-ip FR-003. A paper MUST have an
   abstract, a status statement, hypotheses each with a practical test, and
