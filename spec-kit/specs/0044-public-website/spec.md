@@ -443,7 +443,11 @@ how addresses map to content, 0004-addressing; what the application does,
   category, not a prefix on its title; every line of llms.txt names its
   page and says what it holds, in a description of the same length as
   the page's; and the sitemap lists each page once, without a trailing
-  slash, with a last-modified date only where the record has one.
+  slash, with a last-modified date only where the record has one. The
+  not-found page says once that the page is not there and offers what the
+  menu beside it does not, never the fronts again; a redirect goes to a
+  page the website serves, in one hop, and no address is both served and
+  redirected.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
