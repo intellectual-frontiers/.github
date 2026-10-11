@@ -116,9 +116,12 @@ themed by a brand so that the same design can be set in another brand's colors, 
   themselves, and MUST give sans-set text as the string that was set, without added spaces.
 - **FR-020**: A glyph a font lacks MUST fall back to another font this design system ships and never
   vanish from the PDF. The main, sans and monospace families of an article fall back to STIX Two Math
-  and Inter, and the book interior's families do the same for the technical symbols `≈ ≠ ≤ ≥ ≡ ∞ ∑ √ ∂ ∆ → ← ↔ ✓ ✗`.
+  and Inter, and the book interior's families do the same for the technical symbols `≈ ≠ ≤ ≥ ≡ ∞ ∑ √ ∂ ∆ → ← ↔ ✓ ✗ −`; `✅` is set as `✓`.
   A build that logs a missing character fails the assurance check, and a code block, inline code and
   monospace text MUST extract those symbols as set.
+- **FR-021**: The book interior MUST load `longtable` at v4.13 (`\usepackage{longtable}[=v4.13]`): TeX Live 2025's v4.24 logs
+  "Infinite glue shrinkage found in box being split", an error TeX ignores, at every table it splits across a page, and
+  v4.13 sets the same table without it. A build MUST log no such error.
 
 ## Out of scope
 

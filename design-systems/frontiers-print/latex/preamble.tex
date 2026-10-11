@@ -98,6 +98,9 @@
 \newunicodechar{↔}{\ifsymfallback{2194}}
 \newunicodechar{✓}{\ifsymfallback{2713}}
 \newunicodechar{✗}{\ifsymfallback{2717}}
+\newunicodechar{−}{\ifsymfallback{2212}}
+% ✅ (U+2705) is an emoji no shipped font draws; it is set as the check mark ✓ every one of them has.
+\newunicodechar{✅}{\ifsymfallback{2713}}
 
 \renewcommand{\normalsize}{\fontsize{10.5pt}{14.7pt}\selectfont}
 \normalsize
@@ -124,7 +127,9 @@
 
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{longtable}
+% TeX Live 2025's longtable (v4.24) raises "Infinite glue shrinkage found in box being split" (an error TeX ignores) at every
+% table it splits across a page; v4.13, the release before it, does not and sets the same table.
+\usepackage{longtable}[=v4.13]
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{enumitem}
