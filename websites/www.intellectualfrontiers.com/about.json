@@ -47,19 +47,7 @@
     },
     {
       "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
-      "label": "Formation date",
-      "source": "Maryland Department of Assessments and Taxation",
-      "value": null
-    },
-    {
-      "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
-      "label": "Maryland Department ID",
-      "source": "Maryland Department of Assessments and Taxation",
-      "value": null
-    },
-    {
-      "href": "https://egov.maryland.gov/BusinessExpress/EntitySearch",
-      "label": "Maryland standing",
+      "label": "Formation date, department ID and standing",
       "source": "Maryland Department of Assessments and Taxation",
       "value": null
     },
