@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 import tempfile
 import warnings
@@ -253,6 +254,28 @@ def _guard(where: str, fn: Callable[[], list[str]]) -> Problems:
 
 def brand_problem(root: Path, brand: str) -> str | None:
     return None if (system(root, brand) / "brand.css").is_file() else f"{brand} is not a brand: it has no brand.css"
+
+
+# Alt text that names the kind of picture and nothing it shows (0044-public-website FR-079).
+GENERIC_ALT = re.compile(r"(?i)^(figures?|figs?|image|img|picture|photo|photograph|chart|diagram|graph|screenshot|illustration)\.?\s*\d*\.?$")
+IMG_ALT = re.compile(r"(?is)<img\b[^>]*\balt=\"([^\"]*)\"")
+
+
+def generic_alts(raw: str) -> list[str]:
+    """Every alt text in a page's HTML that names the kind of picture and nothing it shows."""
+    return [m.group(1) for m in IMG_ALT.finditer(raw) if GENERIC_ALT.match(m.group(1).strip())]
+
+
+def sweep_alts(root: Path, paths: list[Path]) -> Problems:
+    """A warning for each image whose alt text says only what kind of picture it is (0044-public-website FR-079)."""
+    out: Problems = []
+    for p in paths:
+        if p.suffix.lower() != ".html":
+            continue
+        for alt in generic_alts(p.read_text(encoding="utf-8", errors="replace")):
+            out.append(("warning", rel(root, p), f"an image's alt text names the kind of picture and nothing it shows ({alt!r}); "
+                                                 "say what the picture shows (0044-public-website FR-079)"))
+    return out
 
 
 def check_figures(root: Path, paths: list[Path], brand: str | None) -> Problems:

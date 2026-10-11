@@ -280,8 +280,9 @@ CONTENT = "content"
 def check_content(ctx: Ctx, scope: list[str] | None) -> SectionResult:
     """Every page of the website held under content/ (the Journal's articles and the registers' pages) against the written
     voice: prose and headings, an announcement or a heading that names a topic instead of stating its claim among them
-    (frontiers-written-voice FR-009, FR-017; 0044-public-website FR-010). A page this website shows is this website's
-    writing, whichever website first published it."""
+    (frontiers-written-voice FR-009, FR-017; 0044-public-website FR-010), and an image whose alt text names only the kind
+    of picture, a warning (0044-public-website FR-079). A page this website shows is this website's writing, whichever
+    website first published it."""
     draft = bool(ctx.section_options.get("draft"))
     given = _scope(scope)
     if given:
@@ -293,7 +294,7 @@ def check_content(ctx: Ctx, scope: list[str] | None) -> SectionResult:
     findings = [Finding("error", p.split(":")[0], p) for p in bad]
     if findings:
         return _report("content", ctx, [], 0, "page", how, extra_findings=findings)
-    problems = items.sweep_voice(ctx.root, paths, None, draft, False, fixtures_only=False)
+    problems = items.sweep_voice(ctx.root, paths, None, draft, False, fixtures_only=False) + items.sweep_alts(ctx.root, paths)
     return _report("content", ctx, problems, len(paths), "page", how + ("; draft" if draft else ""))
 
 
