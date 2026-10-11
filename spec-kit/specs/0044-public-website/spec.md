@@ -447,7 +447,11 @@ how addresses map to content, 0004-addressing; what the application does,
   not-found page says once that the page is not there and offers what the
   menu beside it does not, never the fronts again; a redirect goes to a
   page the website serves, in one hop, and no address is both served and
-  redirected.
+  redirected. The Console's lede says where its items come from and how
+  they are ordered, not the counts its tiles carry nor that it is this
+  computer's, which its label says; a control's tooltip names the action
+  and not where its result lands; and the log-in dialog's step says what
+  the field's label does not.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
