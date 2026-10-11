@@ -385,6 +385,7 @@ Every check runs through `agora check [SECTION...] [--scope ID] [--suite SUITE] 
 | Section | Checks | Scope | Suites |
 | --- | --- | --- | --- |
 | `commands` | The registry and the ontology list the same commands, with the same noun, verb and category (0042-agora FR-004) | none | `spec` |
+| `content` | Every page under content/ against frontiers-written-voice's sweep, prose and headings (sweep.py) | PATH | none |
 | `controls` | The control map: each row names a requirement and a control (0028 FR-005, FR-006) | none | `spec` |
 | `course` | Courses against frontiers-course's rules: outcomes taught and assessed, accessibility, limits, voice (course.py check) | PATH | none |
 | `design-systems` | Each design system's assurance harness: browser harnesses under every brand, Python harnesses once; fails where a design system has none (0014 FR-015, FR-017, FR-039) | DESIGN_SYSTEM | `browser`, `python` |

@@ -16,6 +16,11 @@ Every check runs through `agora check [SECTION...]`. With nothing named it runs 
 |none
 |`spec`
 
+|`content`
+|Every page under content/ against frontiers-written-voice's sweep, prose and headings (sweep.py)
+|PATH
+|none
+
 |`controls`
 |The control map: each row names a requirement and a control (0028 FR-005, FR-006)
 |none

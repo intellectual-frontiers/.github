@@ -429,7 +429,7 @@ how addresses map to content, 0004-addressing; what the application does,
   "this skill", which are its genre; and numbering such as "Scenario 01"
   or "Stage 1". The reasoning behind each clause is in the
   frontiers-written-voice README, "Say it once". The mechanical part is
-  the "once" pass of `eid site check`.
+  the "once" pass of `eid check site`.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
@@ -549,7 +549,7 @@ how addresses map to content, 0004-addressing; what the application does,
   stale MUST be made again, and a fresh one MUST NOT be. Where only the
   website uses the picture (the previous website's public images), the fast
   form MUST replace the original: a WebP of at most 200 KB, made by `eid
-  picture convert`, which rewrites each reference to the old address and
+  picture ensure`, which rewrites each reference to the old address and
   deletes the original only when nothing in the vault names it any more.
   When the source is not in the vault (the public root, the vendored brand),
   the website MUST make the form when it builds and MUST NOT write beside
