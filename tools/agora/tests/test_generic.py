@@ -52,6 +52,10 @@ class EveryCommand(unittest.TestCase):
         self.assertIn("0020-spec-format/FR-013", s["properties"]["requirement"].get("enum", ["0020-spec-format/FR-013"]))
 
     def test_every_type_validates_resolves_and_completes(self):  # 0041 FR-013
+        import os
+        before = os.getcwd()
+        os.chdir(HOME)  # a PATH example is relative to where the command runs: the repository root
+        self.addCleanup(os.chdir, before)
         ctx = Ctx(self.reg, HOME, HOME)
         for name, t in self.reg.types.items():
             with self.subTest(type=name):
@@ -172,7 +176,7 @@ class Boundaries(unittest.TestCase):
 
     def test_sections_and_suites_must_be_the_ones_0042_declares(self):
         m = self.home / "tools" / "agora" / "agora.toml"
-        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"]',
+        m.write_text(m.read_text().replace('sections = ["specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"]',
                                             'sections = ["specs", "register"]'))
         self.assertTrue(any("suite spec is" in x for x in self.findings()[1]))
 

@@ -1,5 +1,5 @@
 """Runs the vocabulary scan (0019-controlled-vocabulary FR-007) on any computer that has Python, without `ws-host`, so the
-weekly AI Audit can start from it in a fresh session: `python3 -I tools/vocabulary_scan.py --root .github=. --root vault=PATH
+weekly AI Audit can start from it in a fresh session: `python3 -I tools/vocabulary_scan.py --root .github=. --root NAME=PATH
 [--json] [--status unmapped]`. The same scan is `agora check vocabulary`. It reads and prints; it writes nothing.
 """
 import argparse

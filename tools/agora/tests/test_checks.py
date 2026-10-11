@@ -156,7 +156,7 @@ class Selection(unittest.TestCase):
         code, doc = run_json(["check", "--suite", "spec"])
         self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
         self.assertEqual([s["name"] for s in doc["data"]["sections"]],
-                         ["specs", "register", "controls", "ontology", "toolchain", "commands", "help"])
+                         ["specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"])
         self.assertEqual(doc["audience"], "public")
 
     def test_a_suite_that_names_no_section_ran_nothing_and_fails(self):
@@ -178,7 +178,7 @@ class Selection(unittest.TestCase):
         with mock.patch("agora.core.worker.needs_worker", return_value=False):
             code, doc = run_json(["check"], registry=reg)
         self.assertEqual(code, 0)
-        self.assertEqual(doc["data"]["summary"]["run"], 18)
+        self.assertEqual(doc["data"]["summary"]["run"], 20)
 
     def test_scope_and_options_must_apply(self):
         self.assertEqual(run(["check", "controls", "--scope", "x"])[0], 2)

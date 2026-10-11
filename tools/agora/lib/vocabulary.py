@@ -73,8 +73,8 @@ def ontology_files(root: Path) -> list[Path]:
 
 
 def scan(roots: dict[str, Path]) -> list[VTerm]:
-    """`roots` maps a repository name to its root. Terms are resolved across all of them, because the vault's ontology builds on the
-    public root's."""
+    """`roots` maps a repository name to its root. Terms are resolved across all of them, because another repository's ontology
+    builds on the public root's."""
     prefixes: dict[str, str] = {}
     triples: list[tuple[Any, str, Any, int, str, str]] = []
     for repo, root in roots.items():
