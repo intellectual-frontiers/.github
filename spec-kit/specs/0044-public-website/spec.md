@@ -418,7 +418,10 @@ how addresses map to content, 0004-addressing; what the application does,
   short name the navigation gives its page, the same wherever that page
   is named in a trail; and the trail and the navigation's current item
   both stand, since one says how the page was reached and the other where
-  it sits.
+  it sits. An image's alt text says what the image shows, or names what
+  its link opens; it never repeats the caption, the heading or the
+  sentence beside it, and where those say it all the alt is empty, so a
+  reader hears it once.
 - **FR-059**: The website's dynamic parts MUST use Datastar over server-
   sent events, its one script library (0014-design-systems FR-008), loaded
   on every page: the log-in MUST open as a dialog on the page and its
