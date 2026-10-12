@@ -1440,3 +1440,5 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-077	check	workspaces-host: ws-host test	test_onedrive.AskingForTheApp checks that a terminal is asked, checked and not asked again, that where no one can be asked the failure is needs-input with plain words and a set action, and that a person who set the variables is not asked
 0043-console-protocol FR-011	none	-	no check yet that the Console shows needs-input and asks for the action's typed arguments; workspaces-host tests the command's side
 0041-command-line FR-083	check	workspaces-host: ws-host test	tests check the spinner, colour, emoji and megabytes at a terminal for a person, the events for the editor and the web, and plain lines only where nobody is attending
+0044-public-website FR-080	check	eidolon: eid test	the Rust tests (tests/served.rs) serve a model with no works directory, then fill it while running and see the downloads appear, empty it and see them go, and serve nothing without a log-in
+0044-public-website FR-081	check	eidolon: eid test	the container test reads the Dockerfile for the volume, EID_WORKS and no copied renditions

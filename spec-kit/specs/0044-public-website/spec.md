@@ -615,6 +615,18 @@ how addresses map to content, 0004-addressing; what the application does,
   lastmod only for a page whose record has a date. A companion page MUST list
   its section headings, and an interactive tool MUST push its prompt-copied,
   artifact-downloaded, email and LinkedIn events to the analytics data layer.
+- **FR-080**: The program MUST read the works tree (FR-057) from the
+  directory `EID_WORKS` names, else from the model's `works/`. That directory
+  MAY be missing, empty, mounted after the program starts, or filled and
+  emptied while it runs: every request MUST read it afresh, so a rendition
+  put there is offered at once and one taken away stops being offered. With
+  no rendition there, every page MUST still be served, with no download
+  link and no error. A program with no log-in configured MUST serve nothing
+  from it, however it is filled.
+- **FR-081**: The container image MUST hold no rendition unless it is
+  built with them (FR-057), MUST name `/renditions` as the works tree
+  (`EID_WORKS`) and MUST declare it a volume, so the renditions arrive by
+  mounting a volume that something other than the image fills.
 
 ## The application
 
