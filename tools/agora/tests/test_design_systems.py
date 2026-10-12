@@ -7,7 +7,7 @@ import json
 from agora.core.registry import Registry
 from agora.lib import design_systems
 
-from .helpers import HOME, TempRepo, run_json, spec_text
+from .helpers import HOME, TempRepo, run_json, spec_text, copy_agora
 
 
 KIND_TTL = """@prefix ifcore: <https://example.test/ifcore#> .
@@ -35,7 +35,7 @@ class ToyRepo(TempRepo):
 
     def setUp(self) -> None:
         super().setUp()
-        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.root)
         self.write("ontology/ifcore.ttl", KIND_TTL)
         self.write("design-systems/toy-web/spec.md", spec_text("toy-web"))
 

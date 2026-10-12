@@ -49,8 +49,8 @@ def check_layout(home: Path, registry) -> list[Finding]:
     for name, g in registry.groups.items():
         if not (g.path / "agora.toml").is_file():
             f.append(Finding("error", f"tools/agora/groups/{name}", "a group has an agora.toml (0042 FR-001)"))
-        if g.lock.is_file() and not g.packages:
-            f.append(Finding("error", str(g.lock.relative_to(home)), "a group holds a lock only where it pins packages (0041 FR-007)"))
+        if (g.path / "agora.lock").exists():
+            f.append(Finding("error", str((g.path / "agora.lock").relative_to(home)), "a group holds no lock of its own: uv.lock, beside pyproject.toml, holds every group's (0041 FR-003)"))
     logs = registry.root_manifest.get("logs")
     gi = home / ".gitignore"
     if not logs or not gi.is_file() or f"{logs.rstrip('/')}/" not in gi.read_text(encoding="utf-8").split():

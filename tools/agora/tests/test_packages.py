@@ -41,7 +41,7 @@ class Locks(unittest.TestCase):
                 if g.name != "selftest":
                     self.assertEqual(selftest.get(name.lower()), ver, f"{name} of group {g.name}")
 
-    def test_every_group_lock_matches_its_pins_and_hashes_every_distribution(self):
+    def test_uv_lock_matches_every_groups_pins_and_hashes_every_distribution(self):
         for g in self.reg.groups.values():
             self.assertEqual(plan.lock_problems(g), [], g.name)
 

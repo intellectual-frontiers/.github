@@ -602,8 +602,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   toolchain entry, not a wheel.
 - **OQ-3**: `agora` still declares its registry in manifests, its UI-less
   views are not yet declared, its register check still reads
-  the repository names from a workspace file instead of the ontology, and its
-  packages are locked per group rather than in one `uv.lock`; moving to code
+  the repository names from a workspace file instead of the ontology; moving to code
   (FR-001), declaring the editor views (FR-019) and removing what FR-011
   retires is pending, and until it is done the requirements that depend on it
   are enforced by nothing.

@@ -8,7 +8,7 @@ from agora.core.cli import main
 from agora.core.registry import Arg, Command, Opt, Registry
 from agora.core.resource import Resource
 
-from .helpers import HOME
+from .helpers import HOME, copy_agora
 
 
 class Logs(unittest.TestCase):
@@ -16,7 +16,7 @@ class Logs(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)
-        shutil.copytree(HOME / "tools" / "agora", self.home / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.home)
         shutil.copytree(HOME / "ontology", self.home / "ontology")
 
     def lines(self):

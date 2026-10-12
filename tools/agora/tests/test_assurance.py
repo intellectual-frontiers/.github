@@ -132,14 +132,15 @@ class Discovery(Repo):
         self.assertEqual(printer.toolchain, ["node", "tinytex"])
 
     def test_the_real_manifest_names_the_print_harness_toolchain_and_the_python_packages(self):
-        m = Registry.load(HOME).groups["assurance"].manifest
+        group = Registry.load(HOME).groups["assurance"]
+        m, packages = group.manifest, group.packages
         self.assertEqual(m["harnesses"]["frontiers-print:python"]["toolchain"], ["tinytex", "tex-packages"])
         self.assertEqual(m["runners"]["browser"]["toolchain"], ["chromium", "playwright"])
         self.assertEqual(m["runners"]["python"]["toolchain"], ["node"])
         self.assertNotIn("programs", m)  # no host program is declared (0042 FR-030)
-        self.assertEqual(set(m["packages"]), {"Pillow", "fonttools", "lxml", "pypdf", "pypdfium2",
-                                              "reportlab", "resvg-py"})
-        self.assertTrue(all(v.replace(".", "").isdigit() for v in m["packages"].values()))  # exact pins
+        self.assertNotIn("packages", m)  # the pins are the dependency groups of pyproject.toml (0041 FR-003)
+        self.assertEqual(set(packages), {"Pillow", "fonttools", "lxml", "pypdf", "pypdfium2", "reportlab", "resvg-py"})
+        self.assertTrue(all(v.replace(".", "").isdigit() for v in packages.values()))  # exact pins
 
 
 class Running(Repo):

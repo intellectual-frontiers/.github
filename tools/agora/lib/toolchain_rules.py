@@ -73,7 +73,7 @@ def generated_findings(home: Path, env: Any = None) -> list[Finding]:
 
 
 def lock_findings(home: Path, registry: Any) -> list[Finding]:
-    """The hashed locks: each group's `agora.lock` carries a hash for every file of every package (0025 FR-013), and Chromium is the build of the Playwright
+    """The hashed locks: `uv.lock` carries a hash for every file of every package a group pins (0025 FR-013), and Chromium is the build of the Playwright
     that is pinned (0025 FR-009)."""
     from agora.core import plan
 

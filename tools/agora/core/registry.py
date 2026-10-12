@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
+from .pins import dependency_pins, pin_problems
 from .types import ArgType
 
 VERBS = ("list", "show", "status", "check", "build", "generate", "add", "set", "record", "new", "advance", "ensure", "sync", "publish", "serve", "test", "remove", "run")
@@ -140,10 +141,11 @@ class Group:
     packages: dict[str, str] = field(default_factory=dict)
     nouns: dict[str, str] = field(default_factory=dict)
     manifest: dict[str, Any] = field(default_factory=dict)
+    home: Path | None = None   # the repository, whose uv.lock holds every group's packages (0025 FR-013)
 
     @property
     def lock(self) -> Path:
-        return self.path / "agora.lock"
+        return (self.home or self.path) / "uv.lock"
 
 
 def command(name: str, *, category: str, help: str = "", args: tuple[Arg, ...] | list[Arg] = (),
@@ -192,6 +194,7 @@ def section(name: str):
 class Registry:
     def __init__(self, home: Path | None = None):
         self.home = home
+        self.pins: dict[str, dict[str, str]] = {}   # each dependency group's exact pins, from pyproject.toml (core/pins.py)
         self.root_manifest: dict[str, Any] = {}
         self.name = "agora"
         self.audience = "public"
@@ -215,6 +218,7 @@ class Registry:
     @classmethod
     def load(cls, home: Path) -> "Registry":
         reg = cls(home)
+        reg.pins = dependency_pins(home)
         manifest = home / "tools" / "agora" / "agora.toml"
         reg.root_manifest = tomllib.loads(manifest.read_text(encoding="utf-8"))
         rm = reg.root_manifest
@@ -232,8 +236,8 @@ class Registry:
 
     def load_group(self, path: Path, module: str | None = None) -> Group:
         m = tomllib.loads((path / "agora.toml").read_text(encoding="utf-8"))
-        g = Group(m["name"], m.get("help", ""), path, dict(m.get("packages", {})),
-                  {k: v.get("help", "") for k, v in m.get("nouns", {}).items()}, m)
+        g = Group(m["name"], m.get("help", ""), path, dict(self.pins.get(m["name"], {})),
+                  {k: v.get("help", "") for k, v in m.get("nouns", {}).items()}, m, self.home)
         if g.name in self.groups:
             self.conflicts.append(f"group {g.name} is declared twice")
         self.groups[g.name] = g
@@ -391,7 +395,7 @@ class Registry:
                     out.append(f"suite {sname} names section {n}, which is not declared (0041 FR-031)")
         from . import presentation
 
-        return out + presentation.problems(self)
+        return out + (pin_problems(self.home, set(self.groups)) if self.home else []) + presentation.problems(self)
 
     def plan_conflicts(self) -> list[str]:
         """0041 FR-029: an invocation whose plan needs two locks without isolation."""

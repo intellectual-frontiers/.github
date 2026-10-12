@@ -1,28 +1,6 @@
 name = "assurance"
 help = "The design systems' assurance harnesses, each brand's imagery pool and share card, its Open edX package, and the profile's figure"
 
-# Python packages the harnesses and the brand tools import (0041-command-line FR-003; 0042-agora FR-018), each to one
-# exact version, locked with hashes in agora.lock. Found by reading every harness and the scripts it imports:
-#   Pillow                 frontiers-figures (svgkit.py), frontiers-media (media.py), frontiers-signage-print (signage.py)
-#                          measure text with ImageFont; the imagery checks and the Open edX favicon read and write images
-#                          (in place of ImageMagick); the profile's figure generator draws with frontiers-figures
-#   fontTools              frontiers-figures (theme.py) and frontiers-course (build.py) cut and embed the brand's sans as WOFF;
-#                          frontiers-signage-print cuts the sans it embeds in a PDF
-#   lxml                   frontiers-course's harness validates cmi5.xml against cmi5's schema
-#   pypdf, pypdfium2       frontiers-print and frontiers-signage-print read the PDFs they build: page size, fonts, images
-#                          (pypdf, BSD-3-Clause) and the text layer (pypdfium2, Apache-2.0 or BSD-3-Clause), in place of
-#                          poppler's pdfinfo, pdffonts, pdfimages and pdftotext
-#   reportlab              frontiers-signage-print writes the sign's vector PDF (BSD-3-Clause), in place of rsvg-convert
-#   resvg-py               frontiers-figures and frontiers-media render SVG with the design systems' own fonts alone, in
-#                          place of rsvg-convert
-[packages]
-Pillow = "12.3.0"
-fonttools = "4.66.1"
-lxml = "6.1.3"
-pypdf = "6.19.0"
-pypdfium2 = "5.14.0"
-reportlab = "5.0.1"
-resvg-py = "0.5.0"
 
 # Programs outside Python are toolchain entries (0041-command-line FR-006, FR-066; 0042-agora FR-030), declared in
 # .workspaces-host/toolchain.d/ and installed by ws-host on first use. What each kind of harness needs of them: an entry

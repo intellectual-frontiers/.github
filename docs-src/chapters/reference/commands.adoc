@@ -65,10 +65,10 @@ These take no noun.
 |terminal, editor, mcp
 |Explain the daily work: the topics, or one topic with its sections and steps, each step a command you can run
 
-|`agora lock [GROUP]`
+|`agora lock`
 |setup
 |terminal
-|Write a group's hashed lock from the packages its manifest pins, through uv
+|Write uv.lock, the hashes of every locked package, from the dependency groups of pyproject.toml, through uv
 
 |`agora test`
 |check

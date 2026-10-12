@@ -45,6 +45,13 @@ CLOSING = """
 """
 
 
+def copy_agora(root: Path) -> None:
+    """tools/agora and the two files that pin its packages (pyproject.toml, uv.lock), into a throwaway repository."""
+    shutil.copytree(HOME / "tools" / "agora", root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+    for name in ("pyproject.toml", "uv.lock"):
+        shutil.copy(HOME / name, root / name)
+
+
 def copy_guide(home: Path) -> None:
     """The guide's own files that `check commands` reads (0042 FR-035): docs/index.html, pages.yml, and an empty stand-in for each brand asset."""
     from agora.lib import guide

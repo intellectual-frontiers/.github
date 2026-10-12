@@ -299,37 +299,35 @@ def doctor(ctx: Ctx) -> Resource:
 
 
 # lock --------------------------------------------------------------------------------------------------------------
-@command("lock", category="setup", help="Write a group's hashed lock from the packages its manifest pins, through uv",
-         args=[Arg("group", "GROUP", "the group; every group that pins packages when none is named", required=False)])
-def lock(ctx: Ctx, group: str | None) -> Resource:
+@command("lock", category="setup", help="Write uv.lock, the hashes of every locked package, from the dependency groups of pyproject.toml, through uv")
+def lock(ctx: Ctx) -> Resource:
     reg = ctx.registry
     if ctx.offline:
         raise AgoraError("offline", "lock resolves packages and must run online; run it without --offline", exit=MISSING,
-                         actions=[next_command("lock online", "lock", group=group)])
-    targets = [reg.groups[group]] if group else list(reg.groups.values())
-    pinned = [g for g in targets if g.packages]
-    if not pinned:
-        return Resource("lock", group or "all", {"locked": [], "message": "no group pins packages; there is nothing to lock",
-                                                 "dry_run": ctx.dry_run})
+                         actions=[next_command("lock online", "lock")])
+    pyproject, target = ctx.home / "pyproject.toml", ctx.home / "uv.lock"
+    if not pyproject.is_file():
+        raise AgoraError("lock", "there is no pyproject.toml to lock (0025-tooling-environment FR-013)", exit=FAILED)
     uv = shutil.which("uv")
     if not uv:
         raise AgoraError("missing-program", "lock needs uv", exit=MISSING,
                          detail={"program": "uv", "hint": reg.root_manifest["prerequisites"]["uv"]["hint"]})
-    changes = []
-    for g in pinned:
-        with tempfile.TemporaryDirectory() as d:
-            inp, out = Path(d, "in.txt"), Path(d, "out.txt")
-            inp.write_text("".join(f"{k}=={v}\n" for k, v in sorted(g.packages.items())), encoding="utf-8")
-            p = subprocess.run([uv, "pip", "compile", "--generate-hashes", "--no-header", "--no-annotate", "--quiet", "--python-version", "3.14", "-o", str(out),
-                                str(inp)], capture_output=True, text=True)
-            if p.returncode != 0:
-                raise AgoraError("lock", f"uv could not lock group {g.name}: {p.stderr.strip()[-400:]}", exit=FAILED)
-            text = f"{plan.STAMP}{plan.pins_stamp(g.packages)}\n" + out.read_text(encoding="utf-8")
-        old = g.lock.read_text(encoding="utf-8") if g.lock.is_file() else None
-        changes.append({"group": g.name, "lock": str(g.lock.relative_to(ctx.home)), "change": "unchanged" if old == text else "create" if old is None else "modify"})
-        if not ctx.dry_run and old != text:
-            g.lock.write_text(text, encoding="utf-8")
-    return Resource("lock", group or "all", {"locked": changes, "dry_run": ctx.dry_run})
+    # The resolution is made beside a copy, so that a dry run, and a lock that finds nothing new, write nothing here.
+    with tempfile.TemporaryDirectory() as d:
+        work = Path(d)
+        shutil.copy(pyproject, work / "pyproject.toml")
+        if target.is_file():
+            shutil.copy(target, work / "uv.lock")
+        p = subprocess.run([uv, "lock", "--quiet", "--project", str(work)], capture_output=True, text=True)
+        if p.returncode != 0:
+            raise AgoraError("lock", f"uv could not lock the dependency groups: {p.stderr.strip()[-400:]}", exit=FAILED)
+        text = (work / "uv.lock").read_text(encoding="utf-8")
+    old = target.read_text(encoding="utf-8") if target.is_file() else None
+    change = "unchanged" if old == text else "create" if old is None else "modify"
+    if not ctx.dry_run and old != text:
+        target.write_text(text, encoding="utf-8")
+    groups = sorted(g.name for g in reg.groups.values() if g.packages)
+    return Resource("lock", "all", {"locked": [{"lock": "uv.lock", "change": change, "groups": groups}], "dry_run": ctx.dry_run})
 
 
 # mcp ---------------------------------------------------------------------------------------------------------------

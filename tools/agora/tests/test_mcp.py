@@ -12,7 +12,7 @@ from pathlib import Path
 from agora.core.mcp import VERSIONS, Server, tool_name
 from agora.core.registry import WRITES, Registry
 
-from .helpers import HOME
+from .helpers import HOME, copy_agora
 
 
 def msg(i, method, **params):
@@ -66,7 +66,7 @@ class OverPipes(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)
-        shutil.copytree(HOME / "tools" / "agora", self.home / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.home)
         shutil.copytree(HOME / "ontology", self.home / "ontology")
         shutil.copytree(HOME / "spec-kit", self.home / "spec-kit")
         shutil.copy(HOME / ".gitignore", self.home / ".gitignore")

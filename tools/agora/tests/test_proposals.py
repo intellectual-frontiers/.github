@@ -3,13 +3,13 @@ import json
 import shutil
 import subprocess
 
-from .helpers import HOME, TempRepo, run_json
+from .helpers import HOME, TempRepo, run_json, copy_agora
 
 
 class Proposals(TempRepo):
     def setUp(self):
         super().setUp()
-        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.root)
         shutil.copytree(HOME / "ontology", self.root / "ontology")
         self.write("README.md", "")
 

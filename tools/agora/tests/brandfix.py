@@ -10,7 +10,7 @@ from pathlib import Path
 
 from agora.core.registry import Registry
 
-from .helpers import HOME, run_json
+from .helpers import HOME, run_json, copy_agora
 
 HAS_PILLOW = importlib.util.find_spec("PIL") is not None
 
@@ -49,7 +49,7 @@ def _files(o, out: list[str]) -> list[str]:
 def make_repo(root: Path, name: str = "mini-brand", openedx: bool = False) -> Path:
     """tools/agora, and design-systems/<name>: frontiers-brand's tokens without its units, wordmark or app icons, every
     file they name present, and the web fonts the Open edX package carries."""
-    shutil.copytree(HOME / "tools" / "agora", root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+    copy_agora(root)
     b = root / "design-systems" / name
     tokens = json.loads((HOME / "design-systems" / "frontiers-brand" / "tokens.json").read_text(encoding="utf-8"))
     logo = tokens["$extensions"]["com.intellectualfrontiers.logo"]

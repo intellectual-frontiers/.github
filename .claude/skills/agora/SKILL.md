@@ -104,7 +104,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `layout build` | `build` | terminal, editor, mcp | uv only | Write a built layout's iflayout.def, the macros the article class reads, from layouts.json and typefaces.json | `agora layout build LAYOUT --out TEXT [--typeface TEXT]` |
 | `layout list` | `read` | terminal, editor, mcp | uv only | List the print design system's article layouts: status, aliases and summary | `agora layout list` |
 | `layout show` | `read` | terminal, editor, mcp | uv only | Show one print layout: what it is for, its numbers and, with --def, the iflayout.def the class reads | `agora layout show LAYOUT [--def] [--typeface TEXT]` |
-| `lock` | `setup` | terminal | uv only | Write a group's hashed lock from the packages its manifest pins, through uv | `agora lock [GROUP]` |
+| `lock` | `setup` | terminal | uv only | Write uv.lock, the hashes of every locked package, from the dependency groups of pyproject.toml, through uv | `agora lock` |
 | `mcp serve` | `setup` | terminal | uv only | Serve MCP over standard input and output until the client closes it: for AI agents | `agora mcp serve` |
 | `media build` | `build` | terminal, editor, mcp | packages: Pillow, fonttools, reportlab, resvg-py | Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009) | `agora media build PATH [--out\|-o TEXT] [--svg TEXT] [--brand BRAND]` |
 | `ontology list` | `read` | terminal, editor, mcp | uv only | List the ontology's classes, properties, individuals, schemes and concepts, or the ones that match a text | `agora ontology list [--kind ONTOLOGY_KIND] [--scheme SCHEME] [--match TEXT]` |
@@ -259,7 +259,6 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
   - `--def` (flag): also give the iflayout.def the document class reads (a layout that is built)
   - `--typeface` (TEXT): with --def: the typeface set to use instead of the layout's own
 - `lock`
-  - `group` (GROUP, optional): the group; every group that pins packages when none is named
   - `--dry-run` (flag): validate, write nothing, show the change
 - `mcp serve`
   - `--dry-run` (flag): validate, write nothing, show the change

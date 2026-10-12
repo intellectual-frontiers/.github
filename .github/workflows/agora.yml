@@ -1,6 +1,6 @@
 # Runs agora's own proofs on a stock runner given only Python and uv (0025-tooling-environment FR-010, FR-011; 0042-agora
 # FR-022): that every generator's tracked output is current (`fresh`), and agora's own tests. Every package they need comes
-# from agora's hashed locks, which agora installs itself; no program is installed here (0042-agora FR-030), and the toolchain
+# from agora's hashed lock (uv.lock), which agora installs itself; no program is installed here (0042-agora FR-030), and the toolchain
 # lock is fetched into the cache only by the jobs that run a check needing it (design-systems.yml).
 name: agora
 

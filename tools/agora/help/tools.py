@@ -110,7 +110,7 @@ def extend():
              "library at module level."),
             ("A group",
              "A folder under tools/agora/groups/ with an agora.toml (its name, its nouns, its check sections) and a commands.py. "
-             "If it needs a Python package, the manifest pins it to one exact version and `agora lock GROUP` writes its hashed lock."),
+             "If it needs a Python package, `pyproject.toml` pins it to one exact version in a dependency group named for the command group, and `agora lock` writes the hashed `uv.lock`."),
             ("A help topic or a toolchain entry",
              "A module in tools/agora/help/ or tools/agora/toolchain/ is found by presence. An entry carries its version, an "
              "address and a SHA-256 for each platform, and a small test that proves it works."),

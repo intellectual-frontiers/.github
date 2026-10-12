@@ -2,7 +2,7 @@ import json
 import unittest
 from pathlib import Path
 
-from .helpers import HOME, TempRepo, run, run_json, spec_text
+from .helpers import HOME, TempRepo, run, run_json, spec_text, copy_agora
 
 
 class SpecCommands(TempRepo):
@@ -10,7 +10,7 @@ class SpecCommands(TempRepo):
         """Writing commands refuse --root, so they run with the temp repository as home."""
         import shutil
         if not (self.root / "tools" / "agora").exists():
-            shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+            copy_agora(self.root)
             shutil.copy(HOME / "ontology" / "ifcore.ttl", self.root / "ontology" / "ifcore.ttl") if (self.root / "ontology").exists() else (
                 (self.root / "ontology").mkdir(), shutil.copy(HOME / "ontology" / "ifcore.ttl", self.root / "ontology" / "ifcore.ttl"))
             self.write(".devcontainer/ws-repos.json", (HOME / ".devcontainer/ws-repos.json").read_text())
@@ -192,11 +192,16 @@ class OtherCommands(unittest.TestCase):
         code, doc = run_json(["doctor"], registry=reg)
         self.assertEqual((code, doc["data"]["status"]), (1, "failed"))
 
-    def test_lock_with_nothing_pinned_reports_nothing_to_lock(self):
-        code, doc = run_json(["lock", "core"])
-        self.assertEqual((code, doc["data"]["locked"]), (0, []))
-        code, doc = run_json(["lock", "spec", "--dry-run"])
-        self.assertEqual(code, 0)
+    def test_lock_of_this_repository_changes_nothing_and_a_dry_run_writes_nothing(self):
+        import shutil
+        if not shutil.which("uv"):
+            self.skipTest("uv is not installed")
+        before = (HOME / "uv.lock").read_bytes()
+        code, doc = run_json(["lock", "--dry-run"])
+        self.assertEqual((code, doc["data"]["dry_run"]), (0, True))
+        self.assertEqual([r["lock"] for r in doc["data"]["locked"]], ["uv.lock"])
+        self.assertEqual((HOME / "uv.lock").read_bytes(), before)
+        self.assertEqual(doc["data"]["locked"][0]["change"], "unchanged", "uv.lock is the resolution of pyproject.toml's groups")
 
     def test_lock_refuses_offline(self):
         code, doc = run_json(["lock", "--offline"])

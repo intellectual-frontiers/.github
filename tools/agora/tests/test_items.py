@@ -22,7 +22,7 @@ from agora.groups.items import commands as items_cmd
 from agora.groups.layout import commands as layout_cmd
 from agora.lib import items, print_layouts
 
-from .helpers import HOME, run, run_json
+from .helpers import HOME, run, run_json, copy_agora
 
 DS = HOME / "design-systems"
 IN_GROUP = {"AGORA_PLAN_GROUP": "items"}  # as a worker's process stands, so a command does not re-run under uv
@@ -142,7 +142,7 @@ class FakeSystems(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
-        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.root)
         for slug in ("frontiers-brand",):
             d = self.root / "design-systems" / slug
             d.mkdir(parents=True)

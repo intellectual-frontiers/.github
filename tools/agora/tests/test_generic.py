@@ -11,7 +11,7 @@ from agora.core.ctx import Ctx
 from agora.core.registry import WRITES, Registry
 from agora.lib import testrun
 
-from .helpers import HOME, TempRepo, copy_guide, run, run_json
+from .helpers import HOME, TempRepo, copy_guide, run, run_json, copy_agora
 
 
 class EveryCommand(unittest.TestCase):
@@ -92,7 +92,7 @@ class WritesLeaveGitAlone(TempRepo):
                               capture_output=True, text=True).stdout
 
     def test_write_commands_never_commit_stage_tag_or_push(self):
-        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.root)
         (self.root / "ontology").mkdir()
         shutil.copy(HOME / "ontology" / "ifcore.ttl", self.root / "ontology" / "ifcore.ttl")
         self.write("spec-kit/controls.tsv", "requirement\tcontrol\tnote\n")
@@ -113,7 +113,7 @@ class WritesLeaveGitAlone(TempRepo):
         self.assertIn("M spec-kit/specs/0001-first/spec.md", self.git("status", "--short"))
 
     def test_dry_runs_change_nothing(self):
-        shutil.copytree(HOME / "tools" / "agora", self.root / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.root)
         (self.root / "ontology").mkdir()
         shutil.copy(HOME / "ontology" / "ifcore.ttl", self.root / "ontology" / "ifcore.ttl")
         self.git("init", "-q")
@@ -132,7 +132,7 @@ class Boundaries(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)
-        shutil.copytree(HOME / "tools" / "agora", self.home / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.home)
         (self.home / "ontology").mkdir()
         shutil.copy(HOME / "ontology" / "ifcore.ttl", self.home / "ontology" / "ifcore.ttl")
         (self.home / ".devcontainer").mkdir()
@@ -180,6 +180,6 @@ class Boundaries(unittest.TestCase):
                                             'sections = ["specs", "register"]'))
         self.assertTrue(any("suite spec is" in x for x in self.findings()[1]))
 
-    def test_a_group_that_holds_a_lock_without_pins_fails(self):
+    def test_a_group_that_holds_a_lock_of_its_own_fails(self):
         (self.home / "tools" / "agora" / "groups" / "spec" / "agora.lock").write_text("x")
-        self.assertTrue(any("holds a lock only where it pins packages" in x for x in self.findings()[1]))
+        self.assertTrue(any("holds no lock of its own" in x for x in self.findings()[1]))

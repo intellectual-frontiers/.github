@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from .helpers import HOME, copy_guide, run_json
+from .helpers import HOME, copy_guide, run_json, copy_agora
 
 
 class CommandsSection(unittest.TestCase):
@@ -15,7 +15,7 @@ class CommandsSection(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)
-        shutil.copytree(HOME / "tools" / "agora", self.home / "tools" / "agora", ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        copy_agora(self.home)
         (self.home / "ontology").mkdir()
         shutil.copy(HOME / "agora", self.home / "agora")
         (self.home / ".workspaces-host").mkdir(exist_ok=True)

@@ -35,7 +35,7 @@ build, a dry run or an MCP call, goes to untracked logs in `.agora/logs/`. Reads
 
 === Packages and the toolchain
 
-The launcher needs only `uv` and Python 3. Python packages come from hashed locks, one per command group, and programs outside Python
+The launcher needs only `uv` and Python 3. Python packages come from one hashed lock, `uv.lock`, of the dependency groups in `pyproject.toml` (one group per command group), and programs outside Python
 come from Python packages in those locks wherever a wheel exists: Node, PDF readers, an SVG renderer, an image library, a tracer and
 Git's reads. So none of them is installed on the host, and a command's output never depends on one.
 

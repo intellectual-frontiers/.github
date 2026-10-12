@@ -242,7 +242,7 @@ In a group's commands.py, a function with the command decorator: its noun and ve
 
 ==== A group
 
-A folder under tools/agora/groups/ with an agora.toml (its name, its nouns, its check sections) and a commands.py. If it needs a Python package, the manifest pins it to one exact version and `agora lock GROUP` writes its hashed lock.
+A folder under tools/agora/groups/ with an agora.toml (its name, its nouns, its check sections) and a commands.py. If it needs a Python package, `pyproject.toml` pins it to one exact version in a dependency group named for the command group, and `agora lock` writes the hashed `uv.lock`.
 
 ==== A help topic or a toolchain entry
 
