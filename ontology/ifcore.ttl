@@ -1493,7 +1493,7 @@ ifcore:PlainWordPropertiesKept a ifcore:Decision ;
 ifcore:PlainWordSchemesKept a ifcore:Decision ;
     rdfs:label "Concept schemes whose values are ordinary words of their field are kept"@en ;
     dcterms:subject ifcore:AssessmentItemTypeScheme, ifcore:AttendanceScheme, ifcore:CommandCategoryScheme, ifcore:CommandSurfaceScheme,
-        ifcore:ProvisioningScheme,
+        ifcore:RequirementSourceScheme,
         ifcore:CommandVerbScheme, ifcore:ConsequenceDomainScheme, ifcore:ControlBaselineRuleScheme,
         ifcore:ControlDispositionScheme, ifcore:ControlTestProbeKindScheme, ifcore:CourseDeliveryTargetScheme,
         ifcore:CourseFormatScheme, ifcore:DataClassScheme, ifcore:DeckTypeScheme, ifcore:DecorationMethodScheme,
@@ -5058,25 +5058,28 @@ ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceSch
     skos:notation "mcp" ;
     skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .
 
-ifcore:ProvisioningScheme a skos:ConceptScheme ; rdfs:label "Provisioning"@en ;
-    rdfs:comment "How a host that runs an orchestrator is provisioned: with ws-host, or with uv alone (0041-command-line FR-078; 0025-tooling-environment FR-005). It says what the host can supply, never who is at the keyboard; attendance is the other scheme."@en ;
-    ifcore:hasAudience ifcore:Public .
-ifcore:HostedProvisioning a skos:Concept ; skos:inScheme ifcore:ProvisioningScheme ; skos:prefLabel "hosted"@en ;
-    skos:notation "hosted" ;
-    skos:definition "A host that has ws-host: the programs outside Python that a command names are installed from the toolchain, verified, and every command runs (0025-tooling-environment FR-005, FR-014)."@en ; ifcore:hasAudience ifcore:Public .
-ifcore:BareProvisioning a skos:Concept ; skos:inScheme ifcore:ProvisioningScheme ; skos:prefLabel "bare"@en ;
-    skos:notation "bare" ;
-    skos:definition "A host that has uv and no ws-host: every command whose plan names no toolchain entry runs, and one that names an entry exits 3 naming ws-host (0025-tooling-environment FR-014; 0041-command-line FR-079)."@en ; ifcore:hasAudience ifcore:Public .
-
 ifcore:AttendanceScheme a skos:ConceptScheme ; rdfs:label "Attendance"@en ;
-    rdfs:comment "Whether a person is at an invocation (0041-command-line FR-078). It decides only what an output carries for a reader, never a command's result; the hosted or bare provisioning is the other scheme, and the two are independent."@en ;
+    rdfs:comment "Whether a person is at an invocation (0041-command-line FR-078). An invocation is unattended unless something says a person is there. It decides only what an output carries for a reader and whether anything asks a question, never a command's result."@en ;
     ifcore:hasAudience ifcore:Public .
 ifcore:AttendedAttendance a skos:Concept ; skos:inScheme ifcore:AttendanceScheme ; skos:prefLabel "attended"@en ;
     skos:notation "attended" ;
-    skos:definition "A person is at the invocation: a terminal, or the editor surface (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "A person is at the invocation: the environment variable ARCHON_ATTENDANCE says so (the editor sets it), or both standard input and standard error are terminals and no CI or agent variable is set (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:UnattendedAttendance a skos:Concept ; skos:inScheme ifcore:AttendanceScheme ; skos:prefLabel "unattended"@en ;
     skos:notation "unattended" ;
-    skos:definition "No person is at the invocation: an AI agent, the MCP surface, a CI job or a pipe (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "No person is known to be at the invocation: an AI agent, the MCP surface, a CI job, a pipe, or a terminal-less run. This is the default (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:RequirementSourceScheme a skos:ConceptScheme ; rdfs:label "Requirement source"@en ;
+    rdfs:comment "Where a program outside Python that a command needs came from, in the order archon tries them (0025-tooling-environment FR-017)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:PathRequirementSource a skos:Concept ; skos:inScheme ifcore:RequirementSourceScheme ; skos:prefLabel "path"@en ;
+    skos:notation "path" ;
+    skos:definition "A program already on the host's PATH whose version meets the entry's minimum (0025-tooling-environment FR-019)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:SystemRequirementSource a skos:Concept ; skos:inScheme ifcore:RequirementSourceScheme ; skos:prefLabel "system"@en ;
+    skos:notation "system" ;
+    skos:definition "A package the host's package manager offers at a version that meets the entry's minimum, installed non-interactively (0025-tooling-environment FR-017)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:PinnedRequirementSource a skos:Concept ; skos:inScheme ifcore:RequirementSourceScheme ; skos:prefLabel "pinned"@en ;
+    skos:notation "pinned" ;
+    skos:definition "The entry's own download, its SHA-256 checked before it is unpacked, kept in archon's store (0025-tooling-environment FR-017)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:ResourceKindScheme a skos:ConceptScheme ; rdfs:label "Resource kind"@en ;
     rdfs:comment "The kinds of resource an orchestrator's commands act on, which are its nouns (0041-command-line FR-008, FR-016). A repository-wide command's own resource has its command's name as its kind, and an error has the kind error; neither is a noun."@en ;

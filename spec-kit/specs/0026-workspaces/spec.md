@@ -70,8 +70,7 @@ and other distributions, come later, each under its own spec.
   to run as often as the person likes, and MUST install no program a
   repository's tools need.
 - **FR-009**: Contributor documentation MUST state the path from a clone first
-  (install `ws-host`, enable the clone with `ws-host provider add`, then run
-  the launcher, 0025-tooling-environment FR-024), and MAY then state `ws-host
+  (install `uv`, then run the launcher, 0025-tooling-environment FR-024), and MAY then state `ws-host
   workspace ensure` as the way to have every repository cloned and updated.
 
 ## Updating without harm

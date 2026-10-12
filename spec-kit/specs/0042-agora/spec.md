@@ -11,10 +11,10 @@ square, it reads, fetches and depends on nothing outside this repository,
 and every CI job calls it and nothing else. It needs only `uv` on the
 host (0025-tooling-environment): `uv` supplies the newest Python, its Python
 packages come from a hashed lock, and every command that needs nothing more
-runs on that alone, for a person, a CI job or an AI agent. Where the host has
-`ws-host`, `ws-host` runs it in its own environment and installs every other
-program from the toolchain it declares in `.workspaces-host/`, so that no tool
-is installed by hand. It is a provider for
+runs on that alone, for a person, a CI job or an AI agent. `archon`
+(workspaces-host's command runner) makes every other program available from the
+toolchain it declares in `.workspaces-host/`, so that no tool is installed by
+hand and nobody wonders whether one is there. It is a provider for
 `ws-host` and for the Workspaces Console (0043-console-protocol), which
 `ws-host` houses. Its surfaces are the command line, which is the core; the
 Workspaces Console; and its MCP server. A person learns it from one place,
@@ -45,7 +45,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 - **FR-003**: `agora` MUST be public only. Its code, its specs, its
   documentation and its messages MUST NOT read, fetch or depend on any other
   repository, and MUST NOT name any other repository or its tools as a
-  literal, except `ws-host` and its repository `workspaces-host`, the prerequisite
+  literal, except `archon`, `ws-host` and their repository `workspaces-host`, the runner
   it runs on (0025-tooling-environment FR-005), which is a program it runs and
   never a source it reads: a repository's name comes to it as data from the ontology or a
   register, never from its own code (0041-command-line FR-045). Every output
@@ -180,7 +180,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   FR-010: every term of the ontologies, whether it names an established term or
   a Decision; warnings only, never a failure), `toolchain [--functional]` (0041-command-line FR-068 and
   0025-tooling-environment FR-016, FR-020, FR-022: every toolchain entry
-  `ws-host` accepts and its generated `mise` files current, that `uv.lock`
+  `archon` accepts and its generated `mise` files current, that `uv.lock`
   carries hashes, that no workflow installs a program with a package manager or
   runs in an image, and that no command takes a program from the host;
   `--functional` runs each installed entry's own check), `commands`
@@ -268,14 +268,14 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   groups the `spec` suite uses MUST pin none. A program outside Python MUST be
   a Python package or a toolchain entry (FR-030), never a host program;
   `agora doctor` MUST report `uv`, the execution profile (0041-command-line
-  FR-078), `ws-host` as present or absent, and, where `ws-host` is present, the
-  state of each toolchain entry as `ws-host` says it, with hints that name only
-  `uv`, `ws-host`, a package or an entry
+  FR-078), the package manager `archon` found, and the source of each
+  toolchain entry as `archon` says it, with hints that name only
+  `uv`, a package or an entry
   (0041-command-line FR-029, 0025-tooling-environment FR-012).
 - **FR-030**: `agora`'s toolchain MUST be declared as data in
   `.workspaces-host/toolchain.d/` (0041-command-line FR-066), one file per
   entry, and MUST be what its commands need beyond the Python standard library
-  and the locked packages, and no more; `ws-host` installs it (workspaces-host), and `agora` asks `ws-host` where it is. The programs its
+  and the locked packages, and no more; `archon` obtains it (workspaces-host), and `agora` asks `archon` where it is. The programs its
   commands needed from the host before this rule MUST be replaced as follows,
   and each choice is confirmed against fidelity and licence by the change that
   makes it, with the generated files that change regenerated and proven by
@@ -292,7 +292,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     Asciidoctor 2.0.26 and the EPUB 3 converter) and `asciidoctor-pdf`
     (asciidoctorj-pdf, as its own entry so that `asciidoctor` stays exactly the
     version and checksum the other providers' toolchains pin, which lets one
-    copy in `ws-host`'s store serve them), for the guide (FR-034); `node` (the
+    copy in `archon`'s store serve them), for the guide (FR-034); `node` (the
     Node that the browser harnesses, the course's script tests and Paragon's
     CLI run on), `playwright` (Playwright for Node) and `paragon`
     (`@openedx/paragon`), each npm package pinned with the dependency lock
@@ -304,8 +304,8 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
     cross-references settle); and `chromium` (Playwright's pinned Chromium
     build, from the address Playwright publishes it at, for the pinned
     Playwright version). The browser's Linux system libraries are listed in
-    the `chromium` entry's `system` key and installed once by `ws-host system
-    ensure` (0025-tooling-environment FR-021), which the README and `help start`
+    the `chromium` entry's `system` key and installed by `archon`
+    (0025-tooling-environment FR-021), which the README and `help start`
     document.
   The list is confirmed by the change that implements it (OQ-2).
 
@@ -318,11 +318,10 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   sections of plain language and steps. Every step MUST be an action
   (0041-command-line FR-017): a command of the registry with its fields, shown
   as one pasteable line in the terminal and as a button in the editor; a thing
-  the person must do themselves, such as installing `ws-host`, MUST be said in
+  the person must do themselves, such as installing `uv`, MUST be said in
   words and not given as a step. `help` with no topic MUST list the topics.
   The topics MUST include `start` (the first day: `uv` from the host and
-  `./agora doctor`, then, for the commands that name a toolchain entry, `ws-host`,
-  `ws-host provider add`, `ws-host system ensure`, `ws-host toolchain ensure`), `check` (what to run before pushing),
+  `./agora doctor`; the commands that name a toolchain entry have `archon` obtain it), `check` (what to run before pushing),
   `specs` (writing a spec and its register rows), `design-systems`, `brands`,
   `toolchain`, `editor` (the Workspaces Console), `ai` (agents, MCP and proposals),
   `extend` (adding a command or a group with an AI) and `recover` (what to do
@@ -359,12 +358,11 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   Actions once; until then the deploy job fails and says so. The guide is
   served at `https://intellectual-frontiers.github.io/.github/`.
 - **FR-036**: The `README.md` MUST be short: what the repository is, the flow in
-  a few numbered steps (run `./agora help start`, which needs only `uv`; for the
-  programs outside Python install `ws-host` and run `ws-host provider add .`,
-  `ws-host system ensure` once; then `./agora check`), the
+  a few numbered steps (install `uv`; run `./agora help start`; then
+  `./agora check`, which obtains the programs it needs), the
   link to the guide, and a paragraph for contributors; and everything else it
   once held MUST be in the guide. The section `commands` MUST fail when the
-  README lacks the link to the guide, the one-time `ws-host system ensure` and the
+  README lacks the link to the guide, the `uv` step and the
   `help` command, or is longer than 120 lines.
 
 ## Surfaces
@@ -453,13 +451,13 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 
 - **FR-022**: Every workflow in `.github/workflows/` MUST call `agora` and no
   other tool of this repository's own, on a stock runner given only
-  `actions/checkout` and `uv`, or `uv` and the install of `ws-host`, and MAY
+  `actions/checkout` and `uv`, and MAY
   restore and save the caches `agora` fills (0025-tooling-environment FR-011,
   FR-023). No workflow MAY install a program with a package manager, set up
   Node or a browser itself, pull an image, or run in a container.
   `spec-check.yml` MUST run `./agora check --suite spec`. `design-systems.yml`
   MUST run `./agora check --suite browser`, `--suite python` and `--suite images`
-  in separate jobs, each that needs a browser's libraries after `ws-host system ensure --yes`.
+  in separate jobs.
   `pages.yml` MUST build the guide with `./agora docs build` and MAY use
   GitHub's own `actions/configure-pages`, `actions/upload-pages-artifact` and
   `actions/deploy-pages`, which publish and install nothing (FR-035). A workflow that runs `agora` in a
@@ -570,7 +568,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 
 ## Assumptions
 
-- The public root's workflows run on runners that can install `ws-host`, per
+- The public root's workflows run on runners that can install `uv`, per
   0025-tooling-environment FR-011.
 - Every program outside Python that the checks need is available as a wheel or
   as a toolchain entry whose upstream publishes a Linux x86_64 build, per
@@ -641,10 +639,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   directory and `tools/agora/`.
 - **SC-004**: No file of `agora` names or reads another repository.
 - **SC-005**: Every workflow's run steps call `agora`, on a runner given only
-  `uv` or `ws-host`.
-- **SC-007**: `./agora check` passes on a stock host that has `ws-host`, with a
-  network and a cold store, and `./agora check --available` passes on a stock host
-  that has only `uv`.
+  `uv`.
+- **SC-007**: `./agora check` passes on a stock host that has only `uv`, with a
+  network and a cold store, and `./agora check --available` passes with no network.
 - **SC-006**: `agora` runs no server: it has no `ui` command, and both views
   render from `read` commands' resources.
 

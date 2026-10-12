@@ -13,16 +13,17 @@ reports errors as resources, and never decides for a person what only a
 person decides. Its behavior is code and its information is a small
 environment-style file. It needs only `uv` on the host (0025-tooling-environment):
 `uv` supplies the newest Python and the orchestrator obtains its Python packages
-from a hashed uv lock, and every command that needs nothing else runs there. Where the
-host also has `ws-host`, `ws-host` runs the orchestrator in its own environment
-and installs every other program from the orchestrator's toolchain, into one
-store, verified. It runs offline on request. It records nothing outside Git. Its surfaces are the command line,
+from a hashed uv lock, and `archon` (workspaces-host's command runner) makes every other
+program the command names available before it runs: one already on the host,
+the host's package manager's, or the toolchain entry's own verified download
+into one store. Nobody is asked to install anything, and nothing is asked of
+a person who is not there. It runs offline on request. It records nothing outside Git. Its surfaces are the command line,
 which is the core; the Workspaces Console, one VS Code extension that is
 the secondary interface for every orchestrator (0043-console-protocol, and
 workspaces-host's Console specification); and an MCP server for agents.
-`ws-host` is the environment orchestrator every other orchestrator assumes: it
-prepares a person's machine, clones their repositories, installs toolchains and
-runs the Workspaces Console (0026-workspaces). This spec states those rules for
+`ws-host` is the environment orchestrator for a person: it prepares their
+machine, clones their repositories and runs the Workspaces Console
+(0026-workspaces), and it is built on `archon`. This spec states those rules for
 any repository. Names such as `agora` and `ws-host` are examples of
 orchestrator names, not part of any rule; the public root's command set is
 0042-agora.
@@ -31,16 +32,16 @@ orchestrator names, not part of any rule; the public root's command set is
 
 - **FR-001**: A repository's orchestrator MUST be one executable launcher at
   the repository root, named for the orchestrator, written in POSIX `sh`,
-  that needs only `uv` from the host (0025-tooling-environment FR-014). Where
-  the host has `ws-host` and the clone is enabled as a provider
-  (0025-tooling-environment FR-006), it MUST hand over to `ws-host provider
-  run`, which runs the command in the repository's own environment with Python
-  and `uv`; where it does not, or `ws-host` cannot start the command, it MUST
-  run the command with `uv` alone, under the newest Python that the
-  repository's `requires-python` allows. It MUST run from a fresh clone, from
-  any working directory inside the clone, MUST find the repository from its own
-  location, and MUST exit 3 naming `uv` and where to get it where `uv` is
-  missing.
+  that needs only `uv` from the host (0025-tooling-environment FR-014). It
+  MUST run `archon run` (workspaces-host's archon specification) at the revision the repository pins
+  in `pyproject.toml`, by `uvx --from git+https://github.com/intellectual-frontiers/workspaces-host@REVISION`,
+  which runs the orchestrator's module under the newest Python that the
+  repository's `requires-python` allows. `ARCHON_FROM` MAY name another source
+  for `archon` (a clone, for development and tests). It MUST run from a fresh
+  clone, from any working directory inside the clone, MUST find the repository
+  from its own location, and MUST exit 3 naming `uv` and where to get it where
+  `uv` is missing. It MUST NOT look for `ws-host`: a host with it and a host
+  without it give the same result.
 - **FR-002**: Every command MUST declare, in code, the packages it needs as
   names of dependency groups in the repository's `pyproject.toml`, and the
   launcher MUST compute the dependency plan for the requested command before
@@ -59,8 +60,8 @@ orchestrator names, not part of any rule; the public root's command set is
 - **FR-004**: The orchestrator MUST run offline on request: when the
   environment variable named for the orchestrator with the suffix `_OFFLINE`
   is `1`, or `--offline` is given, it MUST NOT download anything, and a
-  command whose plan needs something not already in uv's cache or the
-  `ws-host` store MUST fail with an error resource naming the package and its
+  command whose plan needs something not already in uv's cache, on the host or in
+  `archon`'s store MUST fail with an error resource naming the package and its
   group, or the toolchain entry, and the command that prepares it while online
   (FR-020, FR-067).
 - **FR-005**: The orchestrator's core (its registry, parser, typed arguments,
@@ -73,17 +74,17 @@ orchestrator names, not part of any rule; the public root's command set is
   package installed. `doctor` MUST enforce this (FR-029).
 - **FR-006**: A program outside Python that a command needs (a typesetter,
   a browser, a Java runtime, a Node runtime) MUST come from a Python package
-  or from a toolchain entry (FR-066), never from the host, except a
-  maintainer tool's approved program (FR-071). An orchestrator MUST NOT use a
-  program found on the host, and MUST NOT install one with the host's package
-  manager. The registry MUST declare each such program, the commands that need
-  it, and the package or toolchain entry that supplies it, and a hint MUST name
-  only that package or entry, or `ws-host` (0025-tooling-environment FR-012). A
-  command whose entry cannot be obtained (offline with a cold store, or no build
-  for the platform) MUST fail with an error resource that says what is missing;
-  the one thing it may ask a person to install is what
-  0025-tooling-environment FR-021 names, through `ws-host system ensure`
-  (FR-069).
+  or from a toolchain entry (FR-066), never from a host program the entry does
+  not accept, except a maintainer tool's approved program (FR-071). An
+  orchestrator MUST NOT run its own installer or call the host's package
+  manager itself: `archon` obtains each entry, and may use the package manager
+  to do it (0025-tooling-environment FR-017). The registry MUST declare each
+  such program, the commands that need it, and the package or toolchain entry
+  that supplies it, and a hint MUST name only that package or entry
+  (0025-tooling-environment FR-012). A command whose entry cannot be obtained
+  (offline with nothing on the host, no administrator rights where a package is
+  the only source, or no build for the platform) MUST fail with an error
+  resource that says what is missing, and for each source why it did not yield.
 
 ## The registry and the grammar
 
@@ -236,42 +237,46 @@ orchestrator names, not part of any rule; the public root's command set is
 
 ## The execution profile
 
-- **FR-078**: An orchestrator MUST determine two facts once per invocation
-  and report them in `doctor` (FR-029). Its provisioning is `hosted` when
-  `ws-host` is on the host and `bare` when it is not. The launcher states the
-  provisioning it used in the environment variable named for the orchestrator
-  with the suffix `_PROVISIONING`; where that is not set the orchestrator
-  derives it. Its attendance is `attended` when a person is at the invocation
-  and `unattended` when not, taken from the first of these that applies: the
-  environment variable named for the orchestrator with the suffix
-  `_ATTENDANCE`, with the value `attended` or `unattended`; the invocation's
-  surface (MCP is unattended and the editor is attended); the variables `CI`
-  and `CLAUDE_CODE_REMOTE` when set to `true` or `1`; and otherwise it is
-  attended. A pipe does not make an invocation unattended, because the editor
-  reads a command's JSON through one. Neither fact MAY change a command's
-  result or exit status for the same inputs, except as FR-079, FR-080 and
-  FR-081 state.
+- **FR-078**: An orchestrator MUST take its profile from `archon`
+  (workspaces-host's archon specification) once per invocation and report it in `doctor` (FR-029): an
+  invocation is `unattended` unless something says a person is at it. It is
+  `attended` only when the environment variable `ARCHON_ATTENDANCE` says so;
+  or neither `CI` nor `CLAUDE_CODE_REMOTE` is `true` or `1` and both standard
+  input and standard error are terminals. The editor sets
+  `ARCHON_ATTENDANCE=attended`, and the MCP surface is unattended. A pipe alone
+  does not make an invocation attended, and nothing about the host, such as
+  `ws-host` being installed, enters the decision. The profile MAY change only
+  what an output carries for a reader and whether anything asks a question; it
+  MUST NOT change a command's result or exit status for the same inputs.
 - **FR-079**: `command list` MUST say, for each command, the dependency groups
-  and the toolchain entries its plan names (FR-002, FR-006) and whether it is
-  runnable on this host. A command that names a toolchain entry is runnable
-  when the host is hosted and not when it is bare; a command that is not
-  runnable MUST exit 3 and name `ws-host` (FR-004, FR-006), and one that is
-  runnable but whose entry is not installed MUST have `ws-host` install it
-  (FR-006).
+  and the toolchain entries its plan names (FR-002, FR-006) and whether each
+  entry is met now or would be obtained when the command runs. A command is not
+  runnable on this host only when an entry it names can come from no source
+  here; a command that is not runnable MUST exit 3 naming the entry and each
+  source's reason (FR-006, FR-082).
 - **FR-080**: In an unattended invocation, `command list --json` MUST omit the
   editor's presentation (FR-064), and the MCP server MUST list only the
   commands that are runnable on this host. An attended invocation's output is
   unchanged.
 - **FR-081**: `check` and `fresh` MUST accept `--available`: each runs the
   sections or generators that are runnable on this host, reports each other
-  one as skipped naming the missing prerequisite, states in its resource that
-  the run is incomplete, and exits 0 when everything it ran passed. Without
-  `--available` a skipped section or generator makes the exit status 3
-  (FR-033, FR-036).
-- **FR-082**: Whatever a launcher or the orchestrator cannot do because a host
-  is bare MUST be reported as exit status 3 with a message that names the one
-  command that fixes it, never as a failure (exit status 1), a stack trace or
-  a pass.
+  one as skipped naming the entry that cannot be obtained and why, states in
+  its resource that the run is incomplete, and exits 0 when everything it ran
+  passed. Without `--available` a skipped section or generator makes the exit
+  status 3 (FR-033, FR-036).
+- **FR-082**: Whatever a launcher or the orchestrator cannot do because a
+  requirement cannot be obtained on this host MUST be reported as exit status 3
+  with a message that names the requirement and, for each source, why it did
+  not yield (workspaces-host's archon specification), never as a failure (exit status 1), a stack trace
+  or a pass.
+- **FR-083**: For an attended invocation, progress is a main feature: a step
+  that takes a while (an install, a download, the preparation of a group's
+  packages) MUST show at a terminal a spinner with the seconds and what has
+  come, with colour and an emoji for the kind of step, and in the editor and
+  on the web the same steps as events the surface draws as a bar or a
+  notification (0025-tooling-environment FR-017). For an unattended
+  invocation it MAY say what it is doing as plain lines on standard error and
+  MUST draw nothing else.
 
 ## The editor surface
 
@@ -453,12 +458,12 @@ orchestrator names, not part of any rule; the public root's command set is
   several groups MUST run each section's group in its own worker.
 - **FR-029**: `doctor` MUST report what the orchestrator needs and what is
   present: the launcher's prerequisite (`uv`), the execution profile (FR-078),
-  `ws-host` as present or absent (absent is not a fault), whether `uv.lock` matches
+  the package manager `archon` found, whether `uv.lock` matches
   `pyproject.toml`, whether each group's packages are in uv's cache (so offline
-  runs work), and the state of each toolchain entry as `ws-host` says it
-  (installed, or not installed yet), with hints (FR-006) that name `ws-host
-  toolchain ensure` for a missing entry and `ws-host system ensure` for a
-  missing library (0025-tooling-environment FR-021). It MUST also
+  runs work), and the source of each toolchain entry as `archon` says it (on the
+  host, from the package manager, from its download, or not obtained yet), with
+  hints (FR-006) that name the entry and the command that obtains it while
+  online (0025-tooling-environment FR-021). It MUST also
   check the registry and fail on any conflict: two commands with one name; two
   toolchain entries with one name (FR-066); a command in two groups; a type
   declared twice with different meanings; a non-isolated invocation whose plan
@@ -573,9 +578,8 @@ orchestrator names, not part of any rule; the public root's command set is
   NOT lock, queue or reconcile concurrent writers.
 - **FR-045**: A repository's orchestrator MUST NOT read, fetch or depend on
   the code or data of another repository, except a repository the person
-  names with `--root` (FR-040), except that it MAY run `ws-host`, the
-  environment orchestrator it assumes (0025-tooling-environment FR-005), and
-  except that an environment orchestrator
+  names with `--root` (FR-040), except that it runs `archon`
+  (0025-tooling-environment FR-005), and except that an environment orchestrator
   MAY read the `.workspaces-host/` directory of a repository the person
   trusts (FR-061) and MAY clone repositories that a person's configuration or
   a listed repository's environment file names as data (FR-062). It MUST treat
@@ -611,8 +615,9 @@ orchestrator names, not part of any rule; the public root's command set is
 - **FR-058**: Retired. A program a command needs comes from a package or a
   toolchain entry (FR-066), not from a kit a person installs.
 - **FR-059**: Retired. The only fetch an orchestrator makes is of a toolchain
-  entry into the `ws-host` store (0025-tooling-environment FR-017), and it
-  uses no package manager and no `sudo` (the one `sudo` command is `ws-host system ensure`, 0025-tooling-environment FR-021).
+  entry into `archon`'s store (0025-tooling-environment FR-017), and it
+  uses no package manager and no `sudo` of its own: `archon` does, under the
+  rules of 0025-tooling-environment FR-017 and FR-021.
 - **FR-060**: Retired. `doctor` prints the version of each toolchain entry
   and package (FR-029).
 - **FR-061**: A repository's launcher MUST run from the editor only when the
@@ -645,31 +650,30 @@ orchestrator names, not part of any rule; the public root's command set is
 
 - **FR-066**: An orchestrator MUST declare each toolchain entry as data in
   `.workspaces-host/toolchain.d/<name>.toml`, the fields
-  0025-tooling-environment FR-016 names and `ws-host` reads, and each command MUST declare in its registry entry which
+  0025-tooling-environment FR-016 names and `archon` reads, and each command MUST declare in its registry entry which
   toolchain entries and packages its plan names, so that the plan, `doctor` and
   the offline check are computed from the registry alone (FR-002). A module
   under the orchestrator's toolchain package holds only an entry's functional
   check and the way its program is started, and MUST import only the standard
   library at module level (FR-005). The fetching, verifying, unpacking and
-  storing are `ws-host`'s, not the orchestrator's.
+  storing are `archon`'s, not the orchestrator's.
 - **FR-067**: An orchestrator MUST NOT have the nouns `provider`, `toolchain`
-  or `system`: they are `ws-host`'s, which
-  installs an entry on first use when a command's plan names it, refuses to
-  fetch offline (FR-004), and answers `provider show NAME` with each entry's
-  version, state, installed path and environment, so that an orchestrator
+  or `system`: they are `ws-host`'s, built on `archon`. `archon` makes an
+  entry available on first use when a command's plan names it, refuses to
+  fetch offline (FR-004), and answers `archon ensure --json NAME` with each
+  entry's source, version, programs and environment, so that an orchestrator
   finds what it pinned. The command that prepares the store while online is
-  `ws-host toolchain ensure --provider NAME`.
+  `archon ensure`.
 - **FR-068**: A toolchain entry's checksum, its address and its version MUST
   change only in a commit of their own that passes the entry's functional
   check (0025-tooling-environment FR-009, FR-016), and the registry's `check`
-  MUST fail on an entry that `ws-host` rejects, whose
+  MUST fail on an entry that `archon` rejects, whose
   generated `mise` files are not current, or that lacks the platform
   `linux-x64` (0025-tooling-environment FR-020).
-- **FR-069**: Retired. `ws-host system ensure` installs the shared libraries
-  that entries list in their `system` key; it is the
-  only command that may run `sudo`, prints exactly what it will run, takes
-  `--dry-run` (FR-015), asks before running `sudo` and refuses to run under MCP
-  (FR-022).
+- **FR-069**: Retired. `archon` installs the shared libraries that entries
+  list in their `system` key (0025-tooling-environment FR-021), and
+  `ws-host system ensure` does it ahead of time for a person, printing exactly
+  what it will run and taking `--dry-run` (FR-015).
 
 - **FR-070**: Python comes first. Before a change adds a program outside
   Python — a toolchain entry, a Python package that only wraps one, or a host
@@ -685,7 +689,7 @@ orchestrator names, not part of any rule; the public root's command set is
   (0025-tooling-environment FR-030), not a program outside Python in the sense
   of this requirement; a command that runs it is a Python script of the
   command group, and the Rust program is built from source with the `rust`
-  kit of `ws-host` or delivered as a container image.
+  toolchain entry or delivered as a container image.
 - **FR-071**: A maintainer tool is a command a person runs to bring material
   in from outside the repositories, such as reading another repository's
   source. Its output is committed, and no build, check, test, generator or
@@ -736,21 +740,21 @@ orchestrator names, not part of any rule; the public root's command set is
 
 ## Edge cases
 
-- An AI agent in a cloud session that has `uv` and no `ws-host`: the launcher
-  runs with `uv` alone, `doctor` says bare and unattended, `command list` marks
-  the commands that name a toolchain entry as not runnable, and `check
-  --available` runs the rest, per FR-001, FR-078, FR-079 and FR-081.
-- `ws-host` is on the host and the clone is not enabled: the launcher runs
-  with `uv` alone, and a command that names a toolchain entry exits 3 naming
-  `ws-host provider add`, per FR-001 and FR-082.
+- An AI agent in a cloud session that has `uv` and nothing else: the launcher
+  runs `archon`, `doctor` says unattended, a command that names a toolchain
+  entry has `archon` obtain it (the host's program, the package manager, or the
+  download), and `check --available` runs what can be obtained and skips the
+  rest, per FR-001, FR-078, FR-079 and FR-081.
 - A person or the editor reads a command's output through a pipe: the
-  invocation stays attended and its output is unchanged, per FR-078 and FR-080.
+  invocation is attended only where the editor says so with
+  `ARCHON_ATTENDANCE`; the output is the same either way, per FR-078 and FR-080.
 - A command needs a package or a toolchain entry and the machine is offline
   with a cold store: it fails with an error resource naming the package and
   group, or the entry, per FR-004 and FR-020; it does not fall back to
   downloading.
-- A command needs a program the host also has on its `PATH`: it is not used
-  and the entry from the store is, per FR-006.
+- A command needs a program the host also has on its `PATH`: it is used when
+  the entry declares a minimum version and the program meets it, and otherwise
+  the entry is obtained, per FR-006.
 - A tool would be easier to write with a program outside Python that
   Python's standard library or an existing package can also do: Python is
   used and the program is not added, per FR-070.
@@ -758,9 +762,10 @@ orchestrator names, not part of any rule; the public root's command set is
   Python package can evaluate: the decision authority approves a host
   program for it, and only that tool runs it, per FR-070 and FR-071.
 - A command needs a toolchain entry the store lacks and the machine is online:
-  `ws-host` fetches and verifies it once, then it runs, per FR-066 and FR-067.
-- A browser's system libraries are missing on Linux: the command fails with
-  exit status 3 naming the setup command, and installs nothing, per FR-006 and
+  `archon` obtains it once, then it runs, per FR-066 and FR-067.
+- A browser's system libraries are missing on Linux: `archon` installs them
+  where it has administrator rights, and where it does not the command fails
+  with exit status 3 naming the packages, per FR-006 and
   0025-tooling-environment FR-021.
 - An agent asks to accept a proposal over MCP: the call is refused and the
   tool is not listed, per FR-023; the person advances it in the terminal or
@@ -844,14 +849,13 @@ orchestrator names, not part of any rule; the public root's command set is
 
 - **An orchestrator** — a repository's launcher and the registry of commands
   behind it; the only way its behavior is run.
-- **An execution profile** — an invocation's provisioning (hosted or bare) and
-  attendance (attended or unattended), determined once and reported by
-  `doctor` (FR-078).
-- **An environment orchestrator** — the orchestrator every other one assumes:
-  it prepares a person's machine, clones their repositories and installs their
-  toolchains (0026-workspaces).
+- **An execution profile** — an invocation's attendance (attended or
+  unattended), determined once and reported by `doctor` (FR-078).
+- **An environment orchestrator** — the orchestrator for a person: it prepares
+  their machine, clones their repositories and runs the Workspaces Console
+  (0026-workspaces), built on `archon`.
 - **A toolchain entry** — a program with no wheel, declared as data with an
-  address and checksum per platform and installed by `ws-host` into its store
+  address and checksum per platform and obtained by `archon`
   (0025-tooling-environment FR-016).
 - **The registry** — the commands, nouns, verbs, categories, surfaces,
   dependency groups and arguments the orchestrator's code declares.

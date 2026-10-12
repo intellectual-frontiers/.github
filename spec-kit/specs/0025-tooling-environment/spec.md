@@ -6,27 +6,26 @@
 **Input:** Where the company's own tooling runs, and how it gets what it
 needs. Every tool an Eidolon repository holds (a checker, a harness, a
 build or publishing script, a CI job) installs itself. A host has to supply
-`uv` and nothing else: `uv` fetches the newest Python and the Python packages
-a tool locks, and every command that needs nothing more runs there, for a
-person, a CI runner or an AI agent alike. That is the core. `ws-host`, the
-workspaces orchestrator (workspaces-host), adds what `uv` cannot: it brings its
-own `mise`, and from it a pinned Python and `uv` and every program a repository
-pins. A repository declares what it needs in a
-`.workspaces-host/` folder of small TOML files and ships a launcher that uses
-`ws-host` when the host has it and `uv` alone when it does not. The Python packages a tool
-needs come from a hashed `uv` lock. Every other program a tool needs (a
-typesetter, a browser, a Java runtime, a Node runtime and its packages) is an
-entry of the repository's toolchain with a version, a download address and a
-checksum for each platform; `ws-host` fetches it once into one store, verifies
-it, and the tool uses that copy, never one it happens to find on the host. The
-one thing a fetch cannot supply is a Linux browser's system libraries, which
-need root: `ws-host system ensure` installs them, with `sudo`, only when a
-person runs it. No repository requires a container or any other prepared
-environment. Linux is the platform; macOS and Windows are served by WSL, a
-virtual machine or a container that runs Linux. This spec states the host's
-part, the Python locks, the toolchain, the store, offline use, platform
-coverage, the exception, the language of the programs the company writes,
-and what continuous integration needs.
+`uv` and nothing else, and nobody wonders what is installed: the repository's
+launcher fetches `archon` (workspaces-host, 0011-archon), the Python command
+runner, which makes whatever the command needs exist before the command runs. `uv`
+supplies the newest Python and the Python packages a tool locks. A program
+outside Python (a typesetter, a browser, a Java runtime, a Node runtime and
+its packages) is an entry of the repository's toolchain, with a version, and
+for each platform a download address and a checksum. `archon` obtains it from
+the first source that has it at the version the entry accepts: the program
+already on the host, the host's package manager, or the entry's own verified
+download into one store. Every one of these works for a person, a CI runner or an
+AI agent alike, with nobody present to answer a question. `ws-host`, the
+workspaces orchestrator, is the interactive experience for a person (a
+friendly command line, the editor window, setting up a Linux machine) and is
+built on `archon`; no tool needs it. A repository declares what it needs in a
+`.workspaces-host/` folder of small TOML files. No repository requires a
+container or any other prepared environment. Linux is the platform; macOS and
+Windows are served by WSL, a virtual machine or a container that runs Linux.
+This spec states the host's part, the Python locks, the toolchain, the store,
+offline use, platform coverage, the language of the programs the company
+writes, and what continuous integration needs.
 
 ## Scope
 
@@ -38,11 +37,11 @@ and what continuous integration needs.
 
 ## Independence
 
-- **FR-002**: A tool whose plan names no toolchain entry MUST run on any host
-  that supplies the host prerequisite (FR-014) and nothing more. A tool whose
-  plan names a toolchain entry MUST run on any host that also has `ws-host`
-  (FR-005). A tool MUST NOT require a particular operator's machine, a program
-  installed on the host, or a path that exists only on one kind of host.
+- **FR-002**: A tool MUST run on any host that supplies the host prerequisite
+  (FR-014) and nothing more, whatever programs outside Python it names:
+  `archon` makes them available (FR-017). A tool MUST NOT require a particular
+  operator's machine, a program installed on the host beyond what an entry
+  accepts (FR-019), or a path that exists only on one kind of host.
 - **FR-003**: A tool MUST declare what it needs (each Python package, each
   toolchain entry, and any version constraint) at its point of use. An
   orchestrator's registry (0041-command-line FR-007) is the declaration at
@@ -58,28 +57,23 @@ and what continuous integration needs.
 ## The prerequisite
 
 - **FR-005**: `uv` is the one prerequisite of every Eidolon repository's
-  tools (FR-014); it supplies the newest Python. `ws-host` is the one
-  prerequisite of the programs outside Python (FR-015) and of the reference
-  environment a person works in. It is public, installed by one documented
-  command, and independent of any repository that depends on it. A host that
-  has `ws-host` is hosted, and one that has only `uv` is bare. No other
-  prepared environment is required: no container, no devcontainer and no
-  persona.
+  tools (FR-014); it supplies the newest Python and fetches `archon` at the
+  revision the repository pins. `archon` is the one installer of the programs
+  outside Python (FR-015) and of the Python environments (FR-013). It is
+  public, in workspaces-host, and independent of any repository that depends
+  on it. `ws-host` is the reference environment a person works in and is not
+  a prerequisite of any tool. No other prepared environment is required: no
+  container, no devcontainer and no persona.
 - **FR-006**: Every tool MUST run unmodified from a fresh clone of the
   repository that holds it, with no other step: no `make install`, package
-  install, virtual environment or other setup command. On a bare host that is
-  all there is to do. On a hosted host the tool runs in the provider's
-  environment once a person has enabled the clone (`ws-host provider add`,
-  which only a person can do, so that a repository cannot enable itself); a
-  clone that is not enabled runs as on a bare host. The first run of a command
-  MAY fetch what it needs (FR-013, FR-016).
+  install, virtual environment, enabling of the clone or other setup command.
+  The first run of a command MAY fetch what it needs (FR-013, FR-016).
 - **FR-007**: A tool that needs a program MUST obtain it as a Python
   package (FR-013) where a package of acceptable fidelity and licence
   exists, and otherwise as a toolchain entry (FR-015). A repository MUST NOT
   close a gap with its own installer, install target, requirements file,
-  version manager, package-manager call (FR-021's setup command apart) or
-  bootstrap script, and MUST NOT tell a person to install a program by hand,
-  except for the one-time setup of FR-021.
+  version manager, package-manager call or bootstrap script, and MUST NOT
+  tell a person to install a program by hand.
 - **FR-008**: Retired. A repository holds no pin of a prepared
   environment; what is pinned is each package and each toolchain entry
   (FR-013, FR-015).
@@ -94,19 +88,16 @@ and what continuous integration needs.
   tool, what it checks, a lock or a toolchain entry. A tool that fails there
   MUST fail CI.
 - **FR-011**: Each repository's CI MUST run its tools on a stock runner that
-  has been given only `uv`, and on one that has been given `ws-host` by the
-  bootstrap of FR-033, each with a restored cache of what it has fetched
-  (FR-023). A step on the `uv` runner that needs a toolchain entry is skipped
-  and reported as skipped (0041-command-line FR-033), and the `ws-host` runner
-  runs it.
-  A CI job MUST NOT install a program with a package manager, pull an image,
-  or run in a container built for the repository, so that FR-002 and FR-006 are
-  tested rather than assumed.
-- **FR-012**: A hint for a missing prerequisite MUST name only `uv` or
-  `ws-host` and the command that fixes it, the Python package or the toolchain entry that
-  supplies the program (0041-command-line FR-006), or, for a maintainer tool,
-  the approved host program it runs (0041-command-line FR-071). A tool MUST NOT
-  name a container, a devcontainer or a persona as a requirement.
+  has been given only `uv`, with a restored cache of what it has fetched
+  (FR-023). A CI job MUST NOT install a program with a package manager, pull an
+  image, or run in a container built for the repository, so that FR-002 and
+  FR-006 are tested rather than assumed; `archon` may use the runner's package
+  manager itself (FR-017).
+- **FR-012**: A hint for a missing prerequisite MUST name only `uv`, or the
+  requirement `archon` could not obtain and why (workspaces-host's archon specification), or, for
+  a maintainer tool, the approved host program it runs (0041-command-line
+  FR-071). A tool MUST NOT name a container, a devcontainer or a persona as a
+  requirement.
 
 ## Locked Python packages
 
@@ -128,16 +119,15 @@ and what continuous integration needs.
 
 ## Host prerequisites
 
-- **FR-014**: The host MUST be required to supply `uv` and nothing else,
-  except for `ws-host` where a command's plan names a toolchain entry (FR-005)
-  and the one-time setup of FR-021. A repository MUST NOT document or check
-  for another host program as a prerequisite. A launcher MUST need no more
-  than `uv` to print its help, to run `doctor`, and to run any command whose
-  plan names no toolchain entry. It MUST use `ws-host` to run the command
-  when the host has it and the clone is enabled, and `uv` alone otherwise,
-  without a second invocation by the person. The Python it runs under MUST be
-  the newest the repository's `requires-python` allows, and that bound MUST be
-  written once, in the repository's `pyproject.toml` (FR-013).
+- **FR-014**: The host MUST be required to supply `uv` and nothing else. A
+  repository MUST NOT document or check for another host program as a
+  prerequisite. A launcher MUST need no more than `uv`: it runs `archon` at the
+  revision the repository pins (`revision` under `[tool.archon]` in its
+  `pyproject.toml`), by `uvx --from git+https://github.com/intellectual-frontiers/workspaces-host@REVISION archon run`
+  (workspaces-host's archon specification), and `archon` runs the command, making what it
+  needs available first. The Python it runs under MUST be the newest the
+  repository's `requires-python` allows, and that bound MUST be written once,
+  in the repository's `pyproject.toml` (FR-013).
 
 ## The toolchain lock
 
@@ -156,46 +146,55 @@ and what continuous integration needs.
   page loads) rather than that a file exists. An entry MUST NOT declare a
   version range, a floating tag such as `latest`, or an address that changes
   over time.
-- **FR-017**: `ws-host` fetches an entry only when a command whose plan names
-  it runs, or when a person asks, and only once: into its one store under the
-  XDG data directory, never into the clone, the host's program directories or an
-  environment the host owns. It verifies the archive's SHA-256 before
-  unpacking, and a checksum that does not match installs nothing and fails with
-  an error that names the entry. Fetching needs no administrator rights.
-  A fetch, an install and the first preparation of a group's packages MUST show that
-  they are working: at a terminal a spinner with the seconds and what has come, a ✅ or ❌ line when it took a while, and where there
-  is no terminal one plain line when it starts, on standard error, so a long download never looks stuck.
+- **FR-017**: `archon` makes an entry available only when a command whose plan
+  names it runs, or when a person asks, and only once. It takes the entry from
+  the first source that yields a program meeting the entry's `minimum`, in this
+  order: a program already on `PATH`; the host's package manager (`apt`,
+  `dnf`, `apk` or `brew`), used when it offers a version meeting the minimum
+  and runs as root or through `sudo` (without a password when nobody is
+  attending); the entry's own download, into its one store under the XDG data
+  directory, never into the clone, the host's program directories or an
+  environment the host owns (workspaces-host's archon specification). It verifies a download's
+  archive SHA-256 before unpacking, and a checksum that does not match
+  installs nothing and fails with an error that names the entry. A fetch, an
+  install and the first preparation of a group's packages MUST show that they
+  are working (workspaces-host's archon specification): for a person, a spinner with the
+  seconds and what has come, with colour and an emoji, a ✅ or ❌ line when it
+  took a while, and the same steps as events for the editor and the web;
+  where nobody is attending, plain lines on standard error.
 - **FR-018**: A launcher MUST run offline on request (0041-command-line
-  FR-004): `ws-host` then uses only what the store already holds, and a command
-  whose plan names an entry the store lacks MUST fail with exit status 3,
-  naming each missing entry and its version, and the command that fetches it
-  while online (0041-command-line FR-067).
-- **FR-019**: A program found on the host MUST NOT be used in place of a
-  toolchain entry or a package, and there is no override, so that a command's
-  output never depends on the machine it ran on. Programs a person installs for
-  their own use (a package manager's, an environment loader) are theirs and
-  `ws-host` neither installs nor configures them.
+  FR-004): `archon` then uses only what the host and the store already hold,
+  and a command whose plan names an entry no source can yield MUST fail with
+  exit status 3, naming each missing entry and its version, and the command
+  that fetches it while online (0041-command-line FR-067).
+- **FR-019**: A program found on the host, or a package the host's package
+  manager supplies, MAY stand in for a toolchain entry only when the entry
+  declares a `minimum` and a `probe` and the program's version meets the
+  minimum (workspaces-host's archon specification). An entry whose program writes a tracked
+  generated file (FR-026) MUST NOT declare a `minimum`, so that such a file
+  never depends on the machine it was made on. There is no other override.
+  Programs a person installs for their own use (a package manager's, an
+  environment loader) are theirs; `archon` uses the package manager to install
+  only what an entry names.
 - **FR-020**: Every entry MUST list the platform `linux-x64`, and MUST list
   `linux-arm64` where the upstream publishes a build for it. A command whose
   plan names an entry that has no build for the host's platform MUST fail with
   exit status 3, naming the entry and the platform. macOS and Windows are served
   through Linux, in WSL, a virtual machine or a container.
 
-## The one-time setup: a browser's system libraries
+## A browser's system libraries
 
 - **FR-021**: A Chromium build the toolchain supplies runs on Linux only when
-  the host's shared libraries it links against are present, and installing them
-  needs administrator rights. `ws-host system ensure`
-  is therefore the one setup command for them, and the only command that may run
-  `sudo`: the entry lists the packages for the Debian family in its `system`
-  key, the command prints exactly what it will run (`--dry-run` prints it and
-  runs nothing), asks before it runs `sudo`, and is never run implicitly by
-  another command. A command that needs the browser MUST, if the browser cannot
-  start for want of a library, fail with exit status 3 naming that command.
-  `ws-host doctor` MUST report the same without failing a command that does not
-  use the browser, and the repository's README MUST document it. This is the
-  only prerequisite beyond FR-014 that any repository may have, and the only
-  use of `sudo`.
+  the host's shared libraries it links against are present, and installing
+  them needs administrator rights. The entry lists the packages for the Debian
+  family in its `system` key, and `archon` installs the ones that are missing
+  through the host's package manager, as root or through `sudo` (workspaces-host's archon specification), as part of making the entry available. Where it cannot (no
+  rights, offline, no package manager), the command that needs the browser MUST
+  fail with exit status 3 naming the packages. `ws-host system ensure` is the
+  command a person runs to install them ahead of time, and prints exactly what
+  it will run (`--dry-run` prints it and runs nothing). `doctor` MUST report the
+  same without failing a command that does not use the browser, and the
+  repository's README MUST document it.
 
 ## Updating and generated files
 
@@ -211,41 +210,28 @@ and what continuous integration needs.
 
 - **FR-022**: A repository's CI MUST NOT contain a step that installs a
   program, a library or a browser with the host's package manager or that
-  fetches one outside `ws-host` (FR-021's setup command and FR-033's bootstrap
-  apart), and MUST NOT run a job whose purpose is to prove a prepared
-  environment. A job that needs
-  a program runs the launcher, which has `ws-host` fetch the entry as FR-017
-  states.
-- **FR-023**: CI MAY restore and save the store `ws-host` fills and uv's
+  fetches one outside `archon`, and MUST NOT run a job whose purpose is to
+  prove a prepared environment. A job that needs a program runs the launcher,
+  which has `archon` obtain the entry as FR-017 states.
+- **FR-023**: CI MAY restore and save the store `archon` fills and uv's
   cache to avoid fetching on every run, with a key made from the hashes of the
   locks and the toolchain entries. A cache MUST be an optimization only: a run
-  with an empty cache MUST pass, only slower, and `ws-host` MUST verify what it
+  with an empty cache MUST pass, only slower, and `archon` MUST verify what it
   finds in the store as FR-017 does.
-- **FR-033**: A runner, a container or an agent session works with `uv` alone
-  for every command whose plan names no toolchain entry (FR-014). One that
-  needs a toolchain entry and starts without `ws-host` MUST obtain it by one
-  bootstrap and nothing else: the installer of
-  `workspaces-host` (`install.sh`, run with `WS_HOST_NO_APT=1` and
-  `WS_HOST_NO_ADVANCE=1`, so it installs no package and asks nothing), then
-  `ws-host provider add CLONE --yes` for each clone the session works in. The
-  bootstrap needs no setting of the environment that runs it. It is the one
-  step a CI workflow MAY run before the launcher (FR-022), and each repository
-  MUST carry it, in the same words, in three places: its CI workflow, its
-  session hook (`.claude/hooks/session-start.sh`, registered in
-  `.claude/settings.json` beside allow rules for the launcher and `ws-host`,
-  so that an agent runs them without a prompt), and the entry file an agent
-  reads first, which says that the launcher works without it and what the
-  bootstrap adds. `--yes` on that line is the typed answer of the person who
-  committed it, as `ws-host`'s own specs state; an agent MUST NOT add `--yes`
-  to a command it runs on its own initiative, and a repository MUST NOT add a
-  bootstrap of its own.
+- **FR-033**: The launcher is the whole bootstrap. A runner, a container or an
+  agent session that has `uv` runs every command through the launcher, and
+  nothing else is run first: no installer, no enabling of the clone, no
+  confirmation flag. Each repository MUST say so, in the same words, in its CI
+  workflow, its session hook (`.claude/hooks/session-start.sh`, registered in
+  `.claude/settings.json` beside an allow rule for the launcher) and the entry
+  file an agent reads first, and a repository MUST NOT add a bootstrap of its
+  own.
 
 ## What a repository must not require
 
 - **FR-024**: A repository MUST be usable from a clone by following only its
-  README's first steps: run the launcher. The README's next steps, for the
-  commands that need a toolchain entry, are to install `ws-host` and enable the
-  clone as a provider.
+  README's first steps: install `uv` and run the launcher. The README MAY
+  then point a person to `ws-host`, the friendlier environment.
 - **FR-025**: A repository MUST NOT require a container, a devcontainer or a
   persona: no file it holds MAY make one a prerequisite, no check MAY fail for
   lack of one, and no error or hint MAY tell a person to use one.
@@ -258,7 +244,7 @@ and what continuous integration needs.
   one). The command groups of `eid` and `agora` are Python scripts that run
   such programs, since their command line is Python (0006-eid-command-line,
   0041-command-line); the program they run is Rust. A Rust program MUST be delivered in one of two
-  ways: built from source with the `rust` kit of `ws-host`, locked by its
+  ways: built from source with the `rust` toolchain entry, locked by its
   `Cargo.lock`, or as a container image that holds the built program.
 - **FR-031**: A program whose work is reading, writing, validating, querying or
   reasoning over RDF, an ontology, SHACL shapes or SPARQL MAY be written in
@@ -284,10 +270,10 @@ and what continuous integration needs.
 - **FR-027**: Each repository that is a provider declares its own entries. A
   program that two providers pin at the same name and version is installed once
   in the store; two providers MUST NOT declare one name and version with
-  different addresses or checksums, and `ws-host` refuses to enable the second
+  different addresses or checksums, and `archon` and `ws-host` refuse the second
   so that no provider changes what another's pin
   means. A repository that builds on another MUST NOT copy its entries.
-- **FR-028**: Retired. What a provider pins is read with `ws-host provider show`, not from another repository's command line.
+- **FR-028**: Retired. What a provider pins is read with `archon ensure` or `ws-host provider show`, not from another repository's command line.
 - **FR-029**: Retired. Two providers' pins are independent and identical ones
   share one copy in the store (FR-027).
 
@@ -309,16 +295,21 @@ and what continuous integration needs.
 
 - A tool that needs a headless browser: the browser is a toolchain entry,
   fetched into the store and verified, per FR-015 through FR-017; on Linux its
-  system libraries are installed once by `ws-host system ensure`, which a person
-  runs and which asks before `sudo`, per FR-021.
+  system libraries are installed by `archon` through the package manager, per
+  FR-021.
 - A tool that needs a typesetting toolchain: it is a toolchain entry named by
   the commands that need it, not a program found on the host, per FR-007 and
   FR-015.
 - A program with a PyPI wheel, such as an image or PDF library: it is a locked
   package and needs no entry, per FR-007 and FR-013.
-- A host that already has the program on its `PATH`: it is not used, per FR-019.
+- A host that already has the program on its `PATH` at the entry's minimum: it
+  is used as it is, per FR-019; an entry with no minimum always uses its own
+  download.
+- A host whose package manager offers the program at the minimum: the package is
+  installed and used, before any download, per FR-017.
 - A machine with no network and a warm store: `--offline` runs, per FR-018;
-  with a cold store the command fails naming each missing entry, per FR-018.
+  with a cold store and nothing on the host, the command fails naming each
+  missing entry, per FR-018.
 - A fetched archive whose checksum differs from the entry's: nothing is
   installed and the command fails naming the entry, per FR-017.
 - A platform with no build of an entry: the command fails with exit 3 naming
@@ -329,17 +320,14 @@ and what continuous integration needs.
   affected generated files change once in the same change and `fresh` proves
   them, per FR-009 and FR-026.
 - CI with an empty cache: it passes, only slower, per FR-023.
-- A repository that has not been enabled as a provider: its launcher runs it as
-  on a bare host, and a command that needs a toolchain entry exits 3 naming
-  `ws-host provider add`, per FR-006 and FR-014.
-- A bare host: every command whose plan names no toolchain entry runs; one that
-  names an entry exits 3 naming `ws-host`, per FR-002 and FR-014.
+- A repository that has not been enabled as a provider: its launcher runs it
+  all the same, per FR-006.
 - A Python older than the repository's `requires-python`, or none: `uv` fetches
   the newest allowed one, per FR-014; with no network the launcher exits 3
   naming `uv python install`.
-- A host that lacks a library Chromium links against: the browser is not
-  started, exit status 3 names the setup command, and nothing is installed by
-  the failing command, per FR-021.
+- A host that lacks a library Chromium links against: `archon` installs it
+  through the package manager where it has the rights; where it does not, the
+  browser is not started and exit status 3 names the packages, per FR-021.
 - Two providers pinning one program at one version: one copy in the store, per
   FR-027.
 - Two machines of one platform: the same locked versions give the same
@@ -360,12 +348,12 @@ and what continuous integration needs.
 
 ## Assumptions
 
-- `ws-host` can be installed by a person on every host the tools run on, by
-  one documented command.
+- `uv` can be installed on every host the tools run on, by one documented
+  command, and the host can reach `github.com` and the package index once.
 - The addresses that toolchain entries name stay reachable and keep the
   archives they served when the checksum was recorded; where one does not, the
   entry is changed as FR-009 states.
-- A stock CI runner of the provider in use can install `ws-host`.
+- A stock CI runner of the provider in use can install `uv`.
 - Simplicity is chosen over determinism of the whole machine: where every
   system library must be fixed, a later spec generates a container.
 
@@ -380,10 +368,11 @@ and what continuous integration needs.
 
 - **A tool** — a script, checker, harness, build or publishing command, or CI
   job an Eidolon repository runs on its own content.
-- **The host prerequisite** — `uv`, the one thing a host supplies (FR-014); a host
-  that also has `ws-host` is hosted, and one that has only `uv` is bare (FR-005).
+- **The host prerequisite** — `uv`, the one thing a host supplies (FR-014).
+- **archon** — the Python command runner in workspaces-host that makes a
+  command's packages and programs available (0011-archon).
 - **A provider** — a repository with `.workspaces-host/provider.toml` and a
-  launcher, enabled by a person (FR-006).
+  launcher.
 - **A lock** — a repository's committed `uv.lock`, the hashed resolution of the
   Python packages its commands declare (FR-013).
 - **A toolchain entry** — a program a command needs that has no wheel: name,
@@ -392,14 +381,13 @@ and what continuous integration needs.
 - **A Rust program** — a program the company writes as a server, a generator or
   a command-line program, built from source with the `rust` kit and locked by
   `Cargo.lock`, or delivered as a container image (FR-030).
-- **The store** — the one directory `ws-host` installs entries into and verifies
+- **The store** — the one directory `archon` installs entries into and verifies
   them in (FR-017).
 
 ## Success criteria
 
 - **SC-001**: Every tool in every Eidolon repository passes on a stock host
-  that has `ws-host`, with a cold store and a network, and every tool that
-  names no toolchain entry passes on a stock host that has only `uv`.
+  that has only `uv`, with a cold store and a network.
 - **SC-002**: Every tool that needs no toolchain entry beyond Python and `uv`
   passes with no network and a warm `uv` cache.
 - **SC-003**: No tool in any Eidolon repository installs or downloads anything
