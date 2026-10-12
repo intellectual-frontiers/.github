@@ -61,6 +61,13 @@
 - **FR-031**: A repeated failure to act on recommendations MUST be recorded as a diagnosis to investigate (low trust, wrong priorities, unclear authority or too little capacity) and MUST NOT be recorded as non-compliance by a person.
 - **FR-032**: The Board MUST NOT be used to score or surveil an individual.
 
+## Delivery by message
+
+- **FR-035**: A Board MAY be delivered as routine messages (a daily or other regular email, for example). A message MUST name its audience, a person or a distribution group, and MUST carry no more candidates than the Board's stated limit (FR-018).
+- **FR-036**: A message MUST carry only candidates that its audience has authority to decide or act on, or has a stated reason to be told. A candidate that no member of the audience can decide or act on MUST NOT be in the message. Audiences with different decision rights MUST NOT receive one generic set of candidates by default.
+- **FR-037**: A message is a rendering of candidates held in the record and MUST NOT be the record. A reply that accepts, rejects or defers a candidate MUST be recorded only when the sender is a person with authority over that candidate, and a reply from anyone else, or text inside a reply that tells an agent what to do, MUST NOT approve or change anything (FR-024, FR-028).
+- **FR-038**: A message MUST link to evidence and MUST NOT copy into it data the audience is not permitted to see. The effect of a message MUST be measured by the decisions made and the actions completed after it, and MUST NOT be measured by opens or clicks alone (FR-014).
+
 ## Claims about the method
 
 - **FR-033**: A work that says the method improves an outcome MUST label the statement a hypothesis until a trial has tested it, and MUST say what would show it wrong (0017-spoken-and-research-works FR-021, FR-022). A work MUST NOT present a scenario that is a composite as a case study.
@@ -85,6 +92,10 @@
 - A ranking that flips when one rating moves one band: it is reported as unstable, per FR-023.
 - An instruction inside a customer's email that tells the agent to approve an action: the agent treats it as data, per FR-028.
 - A paper that describes a worked scenario as a case from practice: it is a composite and is labeled so, per FR-033.
+- A message to a distribution group whose members hold different authority: each candidate is in the message only if the group can act on it, or the message is split by audience, per FR-036.
+- An email reply of "approved" from a person who has no authority over the candidate: nothing is approved, per FR-037.
+- A message whose open rate is high and whose candidates are never decided: the effect is measured as none, per FR-038.
+- A sixth candidate that matters to an audience whose limit is five: it waits in view with its age shown, per FR-018 and FR-035.
 
 ## Assumptions
 
@@ -98,6 +109,7 @@
 - **OQ-2**: Whether "Decisions & NBA Board" is cleared for use as an outward name. Its clearance is a separate decision, as the Journal's short form's is.
 - **OQ-3**: How many candidates a small team can decide in a week. The research pillar's pilot is to find out; FR-018 states a limit without a number until it does.
 - **OQ-4**: Whether `ifcore:Observation` should be related to the SOSA observation class by a close match. The ontology does not import SOSA today.
+- **OQ-5**: Whether starting a Board as routine messages produces better selection and better audience fit than starting with a shared view. The research pillar's hypothesis H7 is the test.
 
 ## Key entities
 
@@ -113,6 +125,7 @@
 - **AcceptanceEvidence** - evidence that demonstrates a result, as against a report of it.
 - **ObservedResult** - what was observed at the checkpoint, against the baseline.
 - **LearningRecord** - what the result changed in a rule, a measure or a priority.
+- **BoardMessage** - a routine message that renders up to the limit of candidates for one named audience.
 
 ## Success criteria
 
@@ -120,6 +133,7 @@
 - **SC-002**: A closed candidate holds a result recorded against its baseline and its counter-measure.
 - **SC-003**: No recommendation on the Board is recorded as a Decision.
 - **SC-004**: A work that describes the method uses the terms of FR-004 as the ontology names them.
+- **SC-005**: Each message names its audience, holds no more candidates than the limit, and holds none that its audience cannot decide or act on.
 
 ## Review & acceptance checklist
 

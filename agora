@@ -16,6 +16,13 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd -P)
 
 if ! command -v uv >/dev/null 2>&1; then
+  # Not on PATH: look where uv's installer and ws-host put it, so nobody has to wonder (0041-command-line FR-001).
+  data=${XDG_DATA_HOME:-$HOME/.local/share}/workspaces-host/mise/data/installs/uv
+  for dir in "$HOME/.local/bin" "$HOME/.cargo/bin" "$data"/*/.mise-bins "$data"/*; do
+    if [ -x "$dir/uv" ]; then PATH="$dir:$PATH"; export PATH; break; fi
+  done
+fi
+if ! command -v uv >/dev/null 2>&1; then
   echo "agora: uv is needed and is not on PATH; install it (https://docs.astral.sh/uv/getting-started/installation/), then run this again" >&2
   exit 3
 fi

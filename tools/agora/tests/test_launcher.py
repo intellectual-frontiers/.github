@@ -102,6 +102,30 @@ class HandsOver(unittest.TestCase):
         self.assertIn("uv run --no-project --quiet --python >=3.14 -- python -W ignore -m archon run", self.calls()[0])
         self.assertIn(f"PYTHONPATH={clone}", self.calls()[1])
 
+    def stubs_in(self, directory: Path) -> None:
+        directory.mkdir(parents=True, exist_ok=True)
+        for name in ("uv", "uvx"):
+            f = directory / name
+            f.write_text(f'#!/bin/sh\necho "{name} $*" >> {self.log}\n')
+            f.chmod(0o755)
+
+    def test_a_uv_off_path_is_found_where_its_installer_and_ws_host_put_it(self):        # 0041 FR-001
+        bare = _tools(self.tmp / "bare", *self.TOOLS)
+        for place in (self.tmp / ".local" / "bin", self.tmp / ".cargo" / "bin",
+                      self.tmp / ".local" / "share" / "workspaces-host" / "mise" / "data" / "installs" / "uv" / "0.12.0" / ".mise-bins"):
+            self.log.unlink(missing_ok=True)
+            self.stubs_in(place)
+            p = self.run_agora("doctor", path=str(bare))
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertTrue(self.calls()[0].startswith("uvx --quiet --from"), (place, self.calls()))
+            shutil.rmtree(place)
+
+    def test_a_uv_on_path_wins_over_one_in_those_places(self):
+        self.stubs_in(self.tmp / ".local" / "bin")
+        (self.tmp / ".local" / "bin" / "uvx").write_text("#!/bin/sh\necho from-home >> " + str(self.log) + "\n")
+        self.assertEqual(self.run_agora("doctor").returncode, 0)
+        self.assertTrue(self.calls()[0].startswith("uvx --quiet --from"), self.calls())
+
     def test_it_never_looks_for_ws_host(self):
         marker = self.tmp / "ws-host-was-called"
         f = self.bin / "ws-host"

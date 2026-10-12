@@ -5882,3 +5882,11 @@ ifcore:resolvedBy a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; 
     rdfs:comment "The Decision that records a person's choice on a candidate (0052-decisions-nba-board FR-005)."@en .
 ifcore:nextCheckpoint a owl:DatatypeProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range xsd:date ; rdfs:label "next checkpoint"@en ;
     rdfs:comment "The date the result of a candidate is next checked (0052-decisions-nba-board FR-015, FR-029)."@en .
+
+ifcore:BoardMessage a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Board message"@en ;
+    skos:definition "A routine message, an email for example, that renders up to the Board's limit of decision candidates for one named audience (0052-decisions-nba-board FR-035)."@en ;
+    rdfs:comment "A rendering of candidates held in the record, never the record (0052 FR-037). Distinct from ifcore:hasAudience, which says who may see a resource."@en .
+ifcore:addressedTo a owl:ObjectProperty ; rdfs:domain ifcore:BoardMessage ; rdfs:label "addressed to"@en ;
+    rdfs:comment "The person or distribution group a Board message is written for (0052-decisions-nba-board FR-035, FR-036)."@en .
+ifcore:carries a owl:ObjectProperty ; rdfs:domain ifcore:BoardMessage ; rdfs:range ifcore:DecisionCandidate ; rdfs:label "carries"@en ;
+    rdfs:comment "A decision candidate a Board message renders (0052-decisions-nba-board FR-035)."@en .
