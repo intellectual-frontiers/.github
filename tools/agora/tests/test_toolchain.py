@@ -105,6 +105,25 @@ class Declarations(unittest.TestCase):
         declared = {**declared, "jre": {**declared["jre"], "needs": ["ghost"]}}
         self.assertTrue(any("ghost" in f.message for f in toolchain_rules.entry_findings(declared, Registry.load(HOME))))
 
+    def test_python_and_uv_hold_the_versions_archon_pins_and_a_difference_is_named(self):        # 0025 FR-072
+        import os
+        from unittest import mock
+
+        declared = tc.declared(HOME)
+        with tempfile.TemporaryDirectory() as tmp:
+            clone = Path(tmp)
+            (clone / "archon").mkdir()
+            (clone / "archon" / "bootstrap.env").write_text(f"PYTHON_VERSION=9.9.9\nUV_VERSION={declared['uv']['version']}\n")
+            with mock.patch.dict(os.environ, {"ARCHON_FROM": str(clone)}):
+                found = toolchain_rules.pin_findings(HOME)
+            self.assertEqual([f.where for f in found], [".workspaces-host/toolchain.d/python.toml"])
+            self.assertIn("archon pins 9.9.9", found[0].message)
+            (clone / "archon" / "bootstrap.env").write_text(f"PYTHON_VERSION={declared['python']['version']}\nUV_VERSION={declared['uv']['version']}\n")
+            with mock.patch.dict(os.environ, {"ARCHON_FROM": str(clone)}):
+                self.assertEqual(toolchain_rules.pin_findings(HOME), [])
+        with mock.patch.dict(os.environ, {"ARCHON_FROM": ""}), mock.patch.object(toolchain_rules, "archon_pins", return_value=None):
+            self.assertEqual(toolchain_rules.pin_findings(HOME), [])        # no clone to read: nothing is compared
+
     def test_archons_findings_become_findings(self):
         self.assertEqual(toolchain_rules.generated_findings(HOME), [])      # this repository's generated files are current
         with tempfile.TemporaryDirectory() as tmp:

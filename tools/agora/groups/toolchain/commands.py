@@ -19,6 +19,7 @@ def check_toolchain(ctx: Ctx, scope: str | None) -> SectionResult:
     findings += toolchain_rules.code_findings(ctx.home)
     notes = [f"toolchain: {len(declared)} entries declared in .workspaces-host/toolchain.d ({', '.join(declared)})"]
     findings += toolchain_rules.generated_findings(ctx.home)
+    findings += toolchain_rules.pin_findings(ctx.home)
     if ctx.section_options.get("functional"):
         findings += _functional(ctx, notes)
     return SectionResult.from_findings("toolchain", findings, notes, {"entries": sorted(declared)})

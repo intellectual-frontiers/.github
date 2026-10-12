@@ -72,6 +72,36 @@ def generated_findings(home: Path) -> list[Finding]:
     return out
 
 
+def archon_pins(home: Path) -> dict[str, str] | None:
+    """The versions of Python and uv `archon` pins (`archon/bootstrap.env`), from the clone of workspaces-host `ARCHON_FROM` names or the one beside this
+    repository; None when there is none to read."""
+    import os
+
+    given = os.environ.get("ARCHON_FROM", "")
+    candidates = ([Path(given)] if given and Path(given).is_dir() else []) + [home.parent / "workspaces-host"]
+    for c in candidates:
+        f = c / "archon" / "bootstrap.env"
+        if f.is_file():
+            pins = dict(line.split("=", 1) for line in f.read_text().splitlines() if "=" in line and not line.startswith("#"))
+            return {"python": pins.get("PYTHON_VERSION", ""), "uv": pins.get("UV_VERSION", "")}
+    return None
+
+
+def pin_findings(home: Path) -> list[Finding]:
+    """The `python` and `uv` entries hold the versions `archon` pins, so a tool is installed once at one version and a version moves in every repository
+    together (0025 FR-072). Nothing is compared where no clone of workspaces-host is to be read."""
+    pins = archon_pins(home)
+    declared = tcore.declared(home)
+    out = []
+    for name in ("python", "uv"):
+        have = declared.get(name, {}).get("version")
+        if pins and pins.get(name) and have and have != pins[name]:
+            out.append(Finding("error", f".workspaces-host/toolchain.d/{name}.toml",
+                               f"pins {name} {have}; archon pins {pins[name]} (archon/bootstrap.env of workspaces-host). They move together: change both, then run "
+                               "`archon generate` and commit"))
+    return out
+
+
 def lock_findings(home: Path, registry: Any) -> list[Finding]:
     """The hashed locks: `uv.lock` carries a hash for every file of every package a group pins (0025 FR-013), and Chromium is the build of the Playwright
     that is pinned (0025 FR-009)."""
