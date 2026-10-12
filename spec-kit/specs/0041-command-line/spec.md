@@ -11,11 +11,12 @@ that declares its commands in a registry found by presence, takes typed
 arguments, returns every result as a resource rendered as text, JSON or HTML,
 reports errors as resources, and never decides for a person what only a
 person decides. Its behavior is code and its information is a small
-environment-style file. It needs only `ws-host` on the host (0025-tooling-environment):
-`ws-host` runs it in its own environment with Python and `uv`, the orchestrator
-obtains its Python packages from hashed uv locks, and `ws-host` installs every
-other program from the orchestrator's toolchain, into one store, verified, and
-runs offline on request. It records nothing outside Git. Its surfaces are the command line,
+environment-style file. It needs only `uv` on the host (0025-tooling-environment):
+`uv` supplies the newest Python and the orchestrator obtains its Python packages
+from a hashed uv lock, and every command that needs nothing else runs there. Where the
+host also has `ws-host`, `ws-host` runs the orchestrator in its own environment
+and installs every other program from the orchestrator's toolchain, into one
+store, verified. It runs offline on request. It records nothing outside Git. Its surfaces are the command line,
 which is the core; the Workspaces Console, one VS Code extension that is
 the secondary interface for every orchestrator (0043-console-protocol, and
 workspaces-host's Console specification); and an MCP server for agents.
@@ -30,13 +31,16 @@ orchestrator names, not part of any rule; the public root's command set is
 
 - **FR-001**: A repository's orchestrator MUST be one executable launcher at
   the repository root, named for the orchestrator, written in POSIX `sh`,
-  that needs only `ws-host` from the host (0025-tooling-environment FR-014),
-  and hands over to `ws-host provider run`, which runs the command in the
-  repository's own environment with Python and `uv`. It MUST run from a fresh
-  clone that a person has enabled as a provider (0025-tooling-environment
-  FR-006), from any working directory inside the clone, MUST find the
-  repository from its own location, and MUST exit 3 naming the one command
-  that fixes it where `ws-host` is missing or the clone is not enabled.
+  that needs only `uv` from the host (0025-tooling-environment FR-014). Where
+  the host has `ws-host` and the clone is enabled as a provider
+  (0025-tooling-environment FR-006), it MUST hand over to `ws-host provider
+  run`, which runs the command in the repository's own environment with Python
+  and `uv`; where it does not, or `ws-host` cannot start the command, it MUST
+  run the command with `uv` alone, under the newest Python that the
+  repository's `requires-python` allows. It MUST run from a fresh clone, from
+  any working directory inside the clone, MUST find the repository from its own
+  location, and MUST exit 3 naming `uv` and where to get it where `uv` is
+  missing.
 - **FR-002**: Every command MUST declare, in code, the packages it needs as
   names of dependency groups in the repository's `pyproject.toml`, and the
   launcher MUST compute the dependency plan for the requested command before
@@ -230,6 +234,45 @@ orchestrator names, not part of any rule; the public root's command set is
   rules live in the repository's library code, so that the surfaces cannot
   disagree.
 
+## The execution profile
+
+- **FR-078**: An orchestrator MUST determine two facts once per invocation
+  and report them in `doctor` (FR-029). Its provisioning is `hosted` when
+  `ws-host` is on the host and `bare` when it is not. The launcher states the
+  provisioning it used in the environment variable named for the orchestrator
+  with the suffix `_PROVISIONING`; where that is not set the orchestrator
+  derives it. Its attendance is `attended` when a person is at the invocation
+  and `unattended` when not, taken from the first of these that applies: the
+  environment variable named for the orchestrator with the suffix
+  `_ATTENDANCE`, with the value `attended` or `unattended`; the invocation's
+  surface (MCP is unattended and the editor is attended); the variables `CI`
+  and `CLAUDE_CODE_REMOTE` when set to `true` or `1`; and otherwise it is
+  attended. A pipe does not make an invocation unattended, because the editor
+  reads a command's JSON through one. Neither fact MAY change a command's
+  result or exit status for the same inputs, except as FR-079, FR-080 and
+  FR-081 state.
+- **FR-079**: `command list` MUST say, for each command, the dependency groups
+  and the toolchain entries its plan names (FR-002, FR-006) and whether it is
+  runnable on this host. A command that names a toolchain entry is runnable
+  when the host is hosted and not when it is bare; a command that is not
+  runnable MUST exit 3 and name `ws-host` (FR-004, FR-006), and one that is
+  runnable but whose entry is not installed MUST have `ws-host` install it
+  (FR-006).
+- **FR-080**: In an unattended invocation, `command list --json` MUST omit the
+  editor's presentation (FR-064), and the MCP server MUST list only the
+  commands that are runnable on this host. An attended invocation's output is
+  unchanged.
+- **FR-081**: `check` and `fresh` MUST accept `--available`: each runs the
+  sections or generators that are runnable on this host, reports each other
+  one as skipped naming the missing prerequisite, states in its resource that
+  the run is incomplete, and exits 0 when everything it ran passed. Without
+  `--available` a skipped section or generator makes the exit status 3
+  (FR-033, FR-036).
+- **FR-082**: Whatever a launcher or the orchestrator cannot do because a host
+  is bare MUST be reported as exit status 3 with a message that names the one
+  command that fixes it, never as a failure (exit status 1), a stack trace or
+  a pass.
+
 ## The editor surface
 
 - **FR-050**: The editor surface MUST be one VS Code extension, the
@@ -409,7 +452,8 @@ orchestrator names, not part of any rule; the public root's command set is
   process MUST NOT ever hold two dependency groups: `check` with sections from
   several groups MUST run each section's group in its own worker.
 - **FR-029**: `doctor` MUST report what the orchestrator needs and what is
-  present: the launcher's prerequisite (`ws-host`), whether `uv.lock` matches
+  present: the launcher's prerequisite (`uv`), the execution profile (FR-078),
+  `ws-host` as present or absent (absent is not a fault), whether `uv.lock` matches
   `pyproject.toml`, whether each group's packages are in uv's cache (so offline
   runs work), and the state of each toolchain entry as `ws-host` says it
   (installed, or not installed yet), with hints (FR-006) that name `ws-host
@@ -445,14 +489,19 @@ orchestrator names, not part of any rule; the public root's command set is
 - **FR-033**: A check MUST NOT report a section it did not run as passed. With
   no sections or suite named, `check` MUST run every section, and a section
   whose program is missing (FR-006) MUST be reported as skipped and make the
-  exit status non-zero; a suite or a section named explicitly MUST run exactly
-  what it names. A check's resource MUST list each section's result, and
+  exit status 3, unless `--available` is given (FR-081); a section that could
+  not read something it compares for want of a prerequisite MUST be reported
+  as skipped for that reason, never as passed; a suite or a section named
+  explicitly MUST run exactly what it names. A check's resource MUST list each section's result, and
   each finding with its location and the action to take next (FR-017). A
   check MUST NOT change any tracked file.
 - **FR-034**: An orchestrator MUST carry its own tests, run by `test` with the
   standard library's test runner, unless the group declares packages it needs;
   `test` MUST fail on any failing test and report none it did not run as
-  passed.
+  passed. A test that needs a toolchain entry the host lacks MUST be
+  reported as skipped, naming the entry, and MUST NOT stop the tests that do
+  not need it; the exit status is 3 when any test was skipped for that reason
+  and nothing failed.
 
 ## Generated files
 
@@ -687,6 +736,15 @@ orchestrator names, not part of any rule; the public root's command set is
 
 ## Edge cases
 
+- An AI agent in a cloud session that has `uv` and no `ws-host`: the launcher
+  runs with `uv` alone, `doctor` says bare and unattended, `command list` marks
+  the commands that name a toolchain entry as not runnable, and `check
+  --available` runs the rest, per FR-001, FR-078, FR-079 and FR-081.
+- `ws-host` is on the host and the clone is not enabled: the launcher runs
+  with `uv` alone, and a command that names a toolchain entry exits 3 naming
+  `ws-host provider add`, per FR-001 and FR-082.
+- A person or the editor reads a command's output through a pipe: the
+  invocation stays attended and its output is unchanged, per FR-078 and FR-080.
 - A command needs a package or a toolchain entry and the machine is offline
   with a cold store: it fails with an error resource naming the package and
   group, or the entry, per FR-004 and FR-020; it does not fall back to
@@ -786,6 +844,9 @@ orchestrator names, not part of any rule; the public root's command set is
 
 - **An orchestrator** — a repository's launcher and the registry of commands
   behind it; the only way its behavior is run.
+- **An execution profile** — an invocation's provisioning (hosted or bare) and
+  attendance (attended or unattended), determined once and reported by
+  `doctor` (FR-078).
 - **An environment orchestrator** — the orchestrator every other one assumes:
   it prepares a person's machine, clones their repositories and installs their
   toolchains (0026-workspaces).

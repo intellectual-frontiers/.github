@@ -1492,7 +1492,8 @@ ifcore:PlainWordPropertiesKept a ifcore:Decision ;
 
 ifcore:PlainWordSchemesKept a ifcore:Decision ;
     rdfs:label "Concept schemes whose values are ordinary words of their field are kept"@en ;
-    dcterms:subject ifcore:AssessmentItemTypeScheme, ifcore:CommandCategoryScheme, ifcore:CommandSurfaceScheme,
+    dcterms:subject ifcore:AssessmentItemTypeScheme, ifcore:AttendanceScheme, ifcore:CommandCategoryScheme, ifcore:CommandSurfaceScheme,
+        ifcore:ProvisioningScheme,
         ifcore:CommandVerbScheme, ifcore:ConsequenceDomainScheme, ifcore:ControlBaselineRuleScheme,
         ifcore:ControlDispositionScheme, ifcore:ControlTestProbeKindScheme, ifcore:CourseDeliveryTargetScheme,
         ifcore:CourseFormatScheme, ifcore:DataClassScheme, ifcore:DeckTypeScheme, ifcore:DecorationMethodScheme,
@@ -4874,14 +4875,14 @@ ifcore:reviewCadence a owl:DatatypeProperty ; rdfs:domain ifcore:SubstantialWork
     rdfs:comment "How often a living work must be reviewed against what it describes (0015-work-packages FR-035): it is overdue when more than this has passed since its schema:lastReviewed date. A work with no cadence is not a living work."@en .
 
 # ───────────────────────── Tooling environment (0025-tooling-environment) ─────────────────────────
-# Every tool installs itself: a host supplies only python3 and uv (0025 FR-014); Python packages come from hashed uv
+# Every tool installs itself: a host supplies only uv (0025 FR-014); Python packages come from hashed uv
 # locks and every other program from a toolchain lock fetched into a per-user cache (0025 FR-013, FR-015). A reference
 # environment is an optional convenience, never required (0025 FR-005, FR-025). The repository is reused as
 # schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002). Which entries a repository's toolchain lock holds is
 # declared in that repository's orchestrator code, not restated here (0001-eidolon-architecture FR-019).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
-    rdfs:comment "An optional, prepared environment, a release of its repository on a Debian-family host, that a person MAY choose as a convenience. No tool, check, workflow or hint of an Eidolon repository requires it, and a tool runs on a host that has only python3 and uv (0025-tooling-environment FR-005, FR-014, FR-025)."@en .
+    rdfs:comment "An optional, prepared environment, a release of its repository on a Debian-family host, that a person MAY choose as a convenience. No tool, check, workflow or hint of an Eidolon repository requires it for a command that names no toolchain entry, and such a command runs on a host that has only uv (0025-tooling-environment FR-005, FR-014, FR-025)."@en .
 
 ifcore:ToolchainEntry a owl:Class ; rdfs:subClassOf schema:SoftwareApplication ; rdfs:label "Toolchain entry"@en ;
     skos:definition "A program a command needs that has no Python wheel, pinned in a repository's toolchain lock with a version and, for each platform, an address and a SHA-256, fetched once into a per-user cache and verified before use (0025-tooling-environment FR-015, FR-016, FR-017)."@en ;
@@ -5056,6 +5057,26 @@ ifcore:EditorCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurface
 ifcore:McpCommandSurface a skos:Concept ; skos:inScheme ifcore:CommandSurfaceScheme ; skos:prefLabel "MCP"@en ;
     skos:notation "mcp" ;
     skos:definition "The MCP server, which never exposes a decision command (0041-command-line FR-023, FR-027)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:ProvisioningScheme a skos:ConceptScheme ; rdfs:label "Provisioning"@en ;
+    rdfs:comment "How a host that runs an orchestrator is provisioned: with ws-host, or with uv alone (0041-command-line FR-078; 0025-tooling-environment FR-005). It says what the host can supply, never who is at the keyboard; attendance is the other scheme."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:HostedProvisioning a skos:Concept ; skos:inScheme ifcore:ProvisioningScheme ; skos:prefLabel "hosted"@en ;
+    skos:notation "hosted" ;
+    skos:definition "A host that has ws-host: the programs outside Python that a command names are installed from the toolchain, verified, and every command runs (0025-tooling-environment FR-005, FR-014)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:BareProvisioning a skos:Concept ; skos:inScheme ifcore:ProvisioningScheme ; skos:prefLabel "bare"@en ;
+    skos:notation "bare" ;
+    skos:definition "A host that has uv and no ws-host: every command whose plan names no toolchain entry runs, and one that names an entry exits 3 naming ws-host (0025-tooling-environment FR-014; 0041-command-line FR-079)."@en ; ifcore:hasAudience ifcore:Public .
+
+ifcore:AttendanceScheme a skos:ConceptScheme ; rdfs:label "Attendance"@en ;
+    rdfs:comment "Whether a person is at an invocation (0041-command-line FR-078). It decides only what an output carries for a reader, never a command's result; the hosted or bare provisioning is the other scheme, and the two are independent."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifcore:AttendedAttendance a skos:Concept ; skos:inScheme ifcore:AttendanceScheme ; skos:prefLabel "attended"@en ;
+    skos:notation "attended" ;
+    skos:definition "A person is at the invocation: a terminal, or the editor surface (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
+ifcore:UnattendedAttendance a skos:Concept ; skos:inScheme ifcore:AttendanceScheme ; skos:prefLabel "unattended"@en ;
+    skos:notation "unattended" ;
+    skos:definition "No person is at the invocation: an AI agent, the MCP surface, a CI job or a pipe (0041-command-line FR-078)."@en ; ifcore:hasAudience ifcore:Public .
 
 ifcore:ResourceKindScheme a skos:ConceptScheme ; rdfs:label "Resource kind"@en ;
     rdfs:comment "The kinds of resource an orchestrator's commands act on, which are its nouns (0041-command-line FR-008, FR-016). A repository-wide command's own resource has its command's name as its kind, and an error has the kind error; neither is a noun."@en ;

@@ -5,12 +5,16 @@
 
 **Input:** Where the company's own tooling runs, and how it gets what it
 needs. Every tool an Eidolon repository holds (a checker, a harness, a
-build or publishing script, a CI job) installs itself. The one thing a host
-has to supply is `ws-host`, the workspaces orchestrator (workspaces-host): it brings its own `mise`, and from it Python, `uv` and every
-program a repository pins. A repository declares what it needs in a
-`.workspaces-host/` folder of small TOML files and ships a launcher that
-`ws-host` runs in the repository's own environment. The Python packages a tool
-needs come from hashed `uv` locks. Every other program a tool needs (a
+build or publishing script, a CI job) installs itself. A host has to supply
+`uv` and nothing else: `uv` fetches the newest Python and the Python packages
+a tool locks, and every command that needs nothing more runs there, for a
+person, a CI runner or an AI agent alike. That is the core. `ws-host`, the
+workspaces orchestrator (workspaces-host), adds what `uv` cannot: it brings its
+own `mise`, and from it a pinned Python and `uv` and every program a repository
+pins. A repository declares what it needs in a
+`.workspaces-host/` folder of small TOML files and ships a launcher that uses
+`ws-host` when the host has it and `uv` alone when it does not. The Python packages a tool
+needs come from a hashed `uv` lock. Every other program a tool needs (a
 typesetter, a browser, a Java runtime, a Node runtime and its packages) is an
 entry of the repository's toolchain with a version, a download address and a
 checksum for each platform; `ws-host` fetches it once into one store, verifies
@@ -34,10 +38,11 @@ and what continuous integration needs.
 
 ## Independence
 
-- **FR-002**: A tool MUST run on any host that supplies the host
-  prerequisite (FR-014) and nothing more. It MUST NOT require a particular
-  operator's machine, a program installed on the host, or a path that exists
-  only on one kind of host.
+- **FR-002**: A tool whose plan names no toolchain entry MUST run on any host
+  that supplies the host prerequisite (FR-014) and nothing more. A tool whose
+  plan names a toolchain entry MUST run on any host that also has `ws-host`
+  (FR-005). A tool MUST NOT require a particular operator's machine, a program
+  installed on the host, or a path that exists only on one kind of host.
 - **FR-003**: A tool MUST declare what it needs (each Python package, each
   toolchain entry, and any version constraint) at its point of use. An
   orchestrator's registry (0041-command-line FR-007) is the declaration at
@@ -52,16 +57,22 @@ and what continuous integration needs.
 
 ## The prerequisite
 
-- **FR-005**: `ws-host` is the one prerequisite of every Eidolon repository's
-  tools (FR-014). It is public, installed by one documented command, and
-  independent of any repository that depends on it. No other prepared
-  environment is required: no container, no devcontainer and no persona.
+- **FR-005**: `uv` is the one prerequisite of every Eidolon repository's
+  tools (FR-014); it supplies the newest Python. `ws-host` is the one
+  prerequisite of the programs outside Python (FR-015) and of the reference
+  environment a person works in. It is public, installed by one documented
+  command, and independent of any repository that depends on it. A host that
+  has `ws-host` is hosted, and one that has only `uv` is bare. No other
+  prepared environment is required: no container, no devcontainer and no
+  persona.
 - **FR-006**: Every tool MUST run unmodified from a fresh clone of the
-  repository that holds it on a host that supplies only `ws-host` and has
-  enabled the clone as a provider (`ws-host provider add`, which only a person
-  can do, so that a repository cannot enable itself), with no other step: no
-  `make install`, package install, virtual environment or other setup command.
-  The first run of a command MAY fetch what it needs (FR-013, FR-016).
+  repository that holds it, with no other step: no `make install`, package
+  install, virtual environment or other setup command. On a bare host that is
+  all there is to do. On a hosted host the tool runs in the provider's
+  environment once a person has enabled the clone (`ws-host provider add`,
+  which only a person can do, so that a repository cannot enable itself); a
+  clone that is not enabled runs as on a bare host. The first run of a command
+  MAY fetch what it needs (FR-013, FR-016).
 - **FR-007**: A tool that needs a program MUST obtain it as a Python
   package (FR-013) where a package of acceptable fidelity and licence
   exists, and otherwise as a toolchain entry (FR-015). A repository MUST NOT
@@ -82,14 +93,17 @@ and what continuous integration needs.
   repository's launcher, on every push and pull request that changes the
   tool, what it checks, a lock or a toolchain entry. A tool that fails there
   MUST fail CI.
-- **FR-011**: Each repository's CI MUST run on a stock runner that has been
-  given only `ws-host`, by the bootstrap of FR-033, plus a restored cache of
-  what it has fetched (FR-023).
+- **FR-011**: Each repository's CI MUST run its tools on a stock runner that
+  has been given only `uv`, and on one that has been given `ws-host` by the
+  bootstrap of FR-033, each with a restored cache of what it has fetched
+  (FR-023). A step on the `uv` runner that needs a toolchain entry is skipped
+  and reported as skipped (0041-command-line FR-033), and the `ws-host` runner
+  runs it.
   A CI job MUST NOT install a program with a package manager, pull an image,
   or run in a container built for the repository, so that FR-002 and FR-006 are
   tested rather than assumed.
-- **FR-012**: A hint for a missing prerequisite MUST name only `ws-host` and
-  the command that fixes it, the Python package or the toolchain entry that
+- **FR-012**: A hint for a missing prerequisite MUST name only `uv` or
+  `ws-host` and the command that fixes it, the Python package or the toolchain entry that
   supplies the program (0041-command-line FR-006), or, for a maintainer tool,
   the approved host program it runs (0041-command-line FR-071). A tool MUST NOT
   name a container, a devcontainer or a persona as a requirement.
@@ -114,12 +128,16 @@ and what continuous integration needs.
 
 ## Host prerequisites
 
-- **FR-014**: The host MUST be required to supply `ws-host` and nothing else,
-  except for the one-time setup of FR-021. A repository MUST NOT document or
-  check for another host program as a prerequisite. A launcher MUST need no
-  more than `ws-host` to print its help, to run `doctor`, and to run any
-  command whose plan needs no toolchain entry beyond the Python and `uv` that
-  `ws-host` supplies to every launcher it runs.
+- **FR-014**: The host MUST be required to supply `uv` and nothing else,
+  except for `ws-host` where a command's plan names a toolchain entry (FR-005)
+  and the one-time setup of FR-021. A repository MUST NOT document or check
+  for another host program as a prerequisite. A launcher MUST need no more
+  than `uv` to print its help, to run `doctor`, and to run any command whose
+  plan names no toolchain entry. It MUST use `ws-host` to run the command
+  when the host has it and the clone is enabled, and `uv` alone otherwise,
+  without a second invocation by the person. The Python it runs under MUST be
+  the newest the repository's `requires-python` allows, and that bound MUST be
+  written once, in the repository's `pyproject.toml` (FR-013).
 
 ## The toolchain lock
 
@@ -203,8 +221,10 @@ and what continuous integration needs.
   locks and the toolchain entries. A cache MUST be an optimization only: a run
   with an empty cache MUST pass, only slower, and `ws-host` MUST verify what it
   finds in the store as FR-017 does.
-- **FR-033**: A runner, a container or an agent session that starts without
-  `ws-host` MUST obtain it by one bootstrap and nothing else: the installer of
+- **FR-033**: A runner, a container or an agent session works with `uv` alone
+  for every command whose plan names no toolchain entry (FR-014). One that
+  needs a toolchain entry and starts without `ws-host` MUST obtain it by one
+  bootstrap and nothing else: the installer of
   `workspaces-host` (`install.sh`, run with `WS_HOST_NO_APT=1` and
   `WS_HOST_NO_ADVANCE=1`, so it installs no package and asks nothing), then
   `ws-host provider add CLONE --yes` for each clone the session works in. The
@@ -214,7 +234,8 @@ and what continuous integration needs.
   session hook (`.claude/hooks/session-start.sh`, registered in
   `.claude/settings.json` beside allow rules for the launcher and `ws-host`,
   so that an agent runs them without a prompt), and the entry file an agent
-  reads first. `--yes` on that line is the typed answer of the person who
+  reads first, which says that the launcher works without it and what the
+  bootstrap adds. `--yes` on that line is the typed answer of the person who
   committed it, as `ws-host`'s own specs state; an agent MUST NOT add `--yes`
   to a command it runs on its own initiative, and a repository MUST NOT add a
   bootstrap of its own.
@@ -222,8 +243,9 @@ and what continuous integration needs.
 ## What a repository must not require
 
 - **FR-024**: A repository MUST be usable from a clone by following only its
-  README's first steps: install `ws-host`, enable the clone as a provider, then
-  run the launcher.
+  README's first steps: run the launcher. The README's next steps, for the
+  commands that need a toolchain entry, are to install `ws-host` and enable the
+  clone as a provider.
 - **FR-025**: A repository MUST NOT require a container, a devcontainer or a
   persona: no file it holds MAY make one a prerequisite, no check MAY fail for
   lack of one, and no error or hint MAY tell a person to use one.
@@ -307,8 +329,14 @@ and what continuous integration needs.
   affected generated files change once in the same change and `fresh` proves
   them, per FR-009 and FR-026.
 - CI with an empty cache: it passes, only slower, per FR-023.
-- A repository that has not been enabled as a provider: its launcher exits 3
-  naming `ws-host provider add`, per FR-006.
+- A repository that has not been enabled as a provider: its launcher runs it as
+  on a bare host, and a command that needs a toolchain entry exits 3 naming
+  `ws-host provider add`, per FR-006 and FR-014.
+- A bare host: every command whose plan names no toolchain entry runs; one that
+  names an entry exits 3 naming `ws-host`, per FR-002 and FR-014.
+- A Python older than the repository's `requires-python`, or none: `uv` fetches
+  the newest allowed one, per FR-014; with no network the launcher exits 3
+  naming `uv python install`.
 - A host that lacks a library Chromium links against: the browser is not
   started, exit status 3 names the setup command, and nothing is installed by
   the failing command, per FR-021.
@@ -352,7 +380,8 @@ and what continuous integration needs.
 
 - **A tool** — a script, checker, harness, build or publishing command, or CI
   job an Eidolon repository runs on its own content.
-- **The host prerequisite** — `ws-host`, the one thing a host supplies (FR-014).
+- **The host prerequisite** — `uv`, the one thing a host supplies (FR-014); a host
+  that also has `ws-host` is hosted, and one that has only `uv` is bare (FR-005).
 - **A provider** — a repository with `.workspaces-host/provider.toml` and a
   launcher, enabled by a person (FR-006).
 - **A lock** — a repository's committed `uv.lock`, the hashed resolution of the
@@ -369,7 +398,8 @@ and what continuous integration needs.
 ## Success criteria
 
 - **SC-001**: Every tool in every Eidolon repository passes on a stock host
-  that has only `ws-host`, with a cold store and a network.
+  that has `ws-host`, with a cold store and a network, and every tool that
+  names no toolchain entry passes on a stock host that has only `uv`.
 - **SC-002**: Every tool that needs no toolchain entry beyond Python and `uv`
   passes with no network and a warm `uv` cache.
 - **SC-003**: No tool in any Eidolon repository installs or downloads anything

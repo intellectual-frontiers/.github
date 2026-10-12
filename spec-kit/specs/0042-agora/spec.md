@@ -8,11 +8,13 @@
 this repository keeps outside its design systems: the spec and register
 check, the brand tools, the assurance runner. It is named for the public
 square, it reads, fetches and depends on nothing outside this repository,
-and every CI job calls it and nothing else. It needs only `ws-host` on the
-host (0025-tooling-environment): `ws-host` runs it in its own environment with
-Python and `uv`, its Python packages come from hashed locks and every other
-program from the toolchain it declares in `.workspaces-host/`, which `ws-host`
-installs, so that no tool is installed by hand. It is a provider for
+and every CI job calls it and nothing else. It needs only `uv` on the
+host (0025-tooling-environment): `uv` supplies the newest Python, its Python
+packages come from a hashed lock, and every command that needs nothing more
+runs on that alone, for a person, a CI job or an AI agent. Where the host has
+`ws-host`, `ws-host` runs it in its own environment and installs every other
+program from the toolchain it declares in `.workspaces-host/`, so that no tool
+is installed by hand. It is a provider for
 `ws-host` and for the Workspaces Console (0043-console-protocol), which
 `ws-host` houses. Its surfaces are the command line, which is the core; the
 Workspaces Console; and its MCP server. A person learns it from one place,
@@ -211,7 +213,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   `browser` (`design-systems --runner browser` and `openedx`), `python`
   (`design-systems --runner python`) and `images` (`imagery`). A section MUST
   appear in no suite it does not belong to, and the `spec` suite MUST run on
-  a stock host with only `ws-host`. The item checks of FR-013 belong to no
+  a stock host with only `uv`. The item checks of FR-013 belong to no
   suite: they run when named, and in a plain `check`.
 - **FR-015**: `agora` MUST declare these generators (0041-command-line
   FR-035), each proven by `agora fresh`: `brand-theme` (a brand's `brand.css`
@@ -265,8 +267,10 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   hashes in the committed `uv.lock` (0025-tooling-environment FR-013). The
   groups the `spec` suite uses MUST pin none. A program outside Python MUST be
   a Python package or a toolchain entry (FR-030), never a host program;
-  `agora doctor` MUST report `ws-host`, the state of each toolchain entry as
-  `ws-host` says it, with hints that name only `ws-host`, a package or an entry
+  `agora doctor` MUST report `uv`, the execution profile (0041-command-line
+  FR-078), `ws-host` as present or absent, and, where `ws-host` is present, the
+  state of each toolchain entry as `ws-host` says it, with hints that name only
+  `uv`, `ws-host`, a package or an entry
   (0041-command-line FR-029, 0025-tooling-environment FR-012).
 - **FR-030**: `agora`'s toolchain MUST be declared as data in
   `.workspaces-host/toolchain.d/` (0041-command-line FR-066), one file per
@@ -316,8 +320,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   as one pasteable line in the terminal and as a button in the editor; a thing
   the person must do themselves, such as installing `ws-host`, MUST be said in
   words and not given as a step. `help` with no topic MUST list the topics.
-  The topics MUST include `start` (the first day: `ws-host` from the
-  host, `ws-host provider add`, `ws-host system ensure`, `ws-host toolchain ensure`), `check` (what to run before pushing),
+  The topics MUST include `start` (the first day: `uv` from the host and
+  `./agora doctor`, then, for the commands that name a toolchain entry, `ws-host`,
+  `ws-host provider add`, `ws-host system ensure`, `ws-host toolchain ensure`), `check` (what to run before pushing),
   `specs` (writing a spec and its register rows), `design-systems`, `brands`,
   `toolchain`, `editor` (the Workspaces Console), `ai` (agents, MCP and proposals),
   `extend` (adding a command or a group with an AI) and `recover` (what to do
@@ -354,8 +359,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   Actions once; until then the deploy job fails and says so. The guide is
   served at `https://intellectual-frontiers.github.io/.github/`.
 - **FR-036**: The `README.md` MUST be short: what the repository is, the flow in
-  a few numbered steps (install `ws-host`, run `ws-host provider add .`, run `./agora help start`,
-  `ws-host system ensure` once, `./agora check`), the
+  a few numbered steps (run `./agora help start`, which needs only `uv`; for the
+  programs outside Python install `ws-host` and run `ws-host provider add .`,
+  `ws-host system ensure` once; then `./agora check`), the
   link to the guide, and a paragraph for contributors; and everything else it
   once held MUST be in the guide. The section `commands` MUST fail when the
   README lacks the link to the guide, the one-time `ws-host system ensure` and the
@@ -447,7 +453,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 
 - **FR-022**: Every workflow in `.github/workflows/` MUST call `agora` and no
   other tool of this repository's own, on a stock runner given only
-  `actions/checkout` and the install of `ws-host`, and MAY
+  `actions/checkout` and `uv`, or `uv` and the install of `ws-host`, and MAY
   restore and save the caches `agora` fills (0025-tooling-environment FR-011,
   FR-023). No workflow MAY install a program with a package manager, set up
   Node or a browser itself, pull an image, or run in a container.
@@ -629,16 +635,17 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 ## Success criteria
 
 - **SC-001**: `./agora check --suite spec` passes on a stock runner with only
-  `ws-host`.
+  `uv`.
 - **SC-002**: The registry and the ontology list the same commands, with the
   same noun, verb and category.
 - **SC-003**: No script remains in this repository outside a design system's
   directory and `tools/agora/`.
 - **SC-004**: No file of `agora` names or reads another repository.
 - **SC-005**: Every workflow's run steps call `agora`, on a runner given only
-  `ws-host`.
-- **SC-007**: `./agora check` passes on a stock host that has only `ws-host`,
-  with a network and a cold store.
+  `uv` or `ws-host`.
+- **SC-007**: `./agora check` passes on a stock host that has `ws-host`, with a
+  network and a cold store, and `./agora check --available` passes on a stock host
+  that has only `uv`.
 - **SC-006**: `agora` runs no server: it has no `ui` command, and both views
   render from `read` commands' resources.
 

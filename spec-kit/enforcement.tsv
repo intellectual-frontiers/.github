@@ -1432,5 +1432,10 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0051-patent-portfolio FR-019	check	eidolon: eid test	the Rust tests check patents.json, patents.csv, the Markdown copies, llms.txt and the sitemap
 0051-patent-portfolio FR-020	check	eidolon: eid test	the Rust tests check an episode page with and without audio
 0051-patent-portfolio FR-021	check	eidolon: eid check site	eid check site
+0041-command-line FR-078	check	.github: agora test	test_profile checks the provisioning from the launcher's variable and from the PATH, and the attendance from its override, the surface, CI and CLAUDE_CODE_REMOTE, and the terminals, in that order
+0041-command-line FR-079	check	.github: agora test	test_profile checks that command list names each command's groups and toolchain entries and whether it is runnable, and that a bare host exits 3 naming ws-host
+0041-command-line FR-080	check	.github: agora test	test_profile checks that an unattended command list --json omits the editor's presentation and that the MCP tool list drops the commands that are not runnable
+0041-command-line FR-081	check	.github: agora test	test_profile checks that check --available runs what can run, reports the rest as skipped, says the run is incomplete and exits 0
+0041-command-line FR-082	check	.github: agora test	test_launcher checks that a bare host and an unenabled clone run with uv alone; test_profile checks that a missing ws-host is exit 3 naming the fix
 0041-command-line FR-077	check	workspaces-host: ws-host test	test_onedrive.AskingForTheApp checks that a terminal is asked, checked and not asked again, that where no one can be asked the failure is needs-input with plain words and a set action, and that a person who set the variables is not asked
 0043-console-protocol FR-011	none	-	no check yet that the Console shows needs-input and asks for the action's typed arguments; workspaces-host tests the command's side
