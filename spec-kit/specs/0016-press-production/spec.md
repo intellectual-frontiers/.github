@@ -352,7 +352,8 @@ is not stated here.
   and it MUST NOT be padded to reach one; its chapter-count range still
   applies. A chapter that bears on none of the five answers SHOULD be cut or moved
   to the companion. A format's series kicker MUST NOT be applied to a book of
-  another format.
+  another format. A Fieldbook's series kicker is `INTELLECTUAL FRONTIERS PRESS
+  FIELDBOOKS`, and the series is named "Intellectual Frontiers Press Fieldbooks".
 - **FR-050**: A term that more than one Press work uses MUST be defined once, in
   the ontology, and every work MUST use it as defined and MUST NOT redefine it
   locally. A term that only one work coins is defined in that work's book bible
