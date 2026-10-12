@@ -15,7 +15,7 @@ policy under 0030-policies, owned by the decision authority in effect.
   Public data (0033-systems-and-data-policy FR-002). This covers laptops,
   desktops, and phones, whoever owns them. Device management records are
   held outside every Eidolon repository, and are represented only by a
-  `RestrictedDataReference` (0001-private-repo-architecture FR-023).
+  `RestrictedDataReference` (0001-eidolon-architecture FR-023).
 - **FR-002**: An enrolled device MUST meet all of the following:
   - its storage is encrypted;
   - it locks after no more than fifteen minutes idle;
@@ -57,7 +57,7 @@ policy under 0030-policies, owned by the decision authority in effect.
 ## Carried out by
 
 - An exposed secret is rotated, and removed from history:
-  0001-private-repo-architecture FR-036.
+  0001-eidolon-architecture FR-036.
 - A lost or compromised device is an incident:
   0035-incident-response-policy FR-001.
 

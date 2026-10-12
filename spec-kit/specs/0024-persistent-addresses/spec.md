@@ -35,7 +35,7 @@ citation survive an address changing. It extends 0022-domain-names,
 
 ## The ontology's namespaces
 
-- **FR-005**: Each ontology namespace address (0001-private-repo-architecture
+- **FR-005**: Each ontology namespace address (0001-eidolon-architecture
   FR-007: `ifcore:`, `ifweb:` and `ifpriv:`) MUST be an identifier only. The
   web does not serve it: a request for it answers like any address the
   website does not serve (0044-public-website FR-012), and the ontology is
@@ -58,7 +58,7 @@ citation survive an address changing. It extends 0022-domain-names,
 - **FR-010**: A persistent identifier for a person who authors a
   published work (an ORCID iD, for instance) MUST be recorded by
   `schema:sameAs` only with that person's consent and only at an audience
-  that person's other facts already have, per 0001-private-repo-architecture
+  that person's other facts already have, per 0001-eidolon-architecture
   FR-016.
 - **FR-011**: A persistent identifier for the company or one of its
   organizations (a ROR ID, for instance) MUST be recorded by

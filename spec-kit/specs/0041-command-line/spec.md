@@ -626,7 +626,7 @@ orchestrator names, not part of any rule; the public root's command set is
   Python — a toolchain entry, a Python package that only wraps one, or a host
   program for a maintainer tool (FR-071) — it MUST show that the Python
   standard library and the packages already used cannot do the work, and MUST
-  ask the decision authority (0001-private-repo-architecture FR-029) to approve the
+  ask the decision authority (0001-eidolon-architecture FR-029) to approve the
   program before it is used. The approval is recorded as a Decision
   (0008-decision-records) naming the program, what it does that Python cannot,
   and the commands that run it. Where the work can be done by a program

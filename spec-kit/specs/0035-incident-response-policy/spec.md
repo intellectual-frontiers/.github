@@ -33,7 +33,7 @@ incident happened and what it touched, never its specifics.
   involved (0033-systems-and-data-policy FR-002), its severity from the
   ontology's incident severity scheme, and when it was discovered,
   contained, and closed. Anything that names a person or would be
-  sensitive under 0001-private-repo-architecture FR-016 MUST be held only by
+  sensitive under 0001-eidolon-architecture FR-016 MUST be held only by
   `RestrictedDataReference`.
 - **FR-004**: Each incident MUST be triaged within one day of its report:
   given a severity, an owner role, and the notification obligations it
@@ -59,7 +59,7 @@ incident happened and what it touched, never its specifics.
 - **FR-007**: An incident MUST be contained before the systems it affected
   return to normal use. A credential it may have exposed MUST be rotated,
   and a repository it affected is handled under
-  0001-private-repo-architecture FR-036.
+  0001-eidolon-architecture FR-036.
 - **FR-008**: Logs and other evidence about an incident MUST be kept until
   its review is complete (FR-009), and longer wherever an obligation
   requires it.
@@ -78,7 +78,7 @@ incident happened and what it touched, never its specifics.
 ## Carried out by
 
 - An exposed secret is removed from history and rotated:
-  0001-private-repo-architecture FR-036.
+  0001-eidolon-architecture FR-036.
 - Domain security failures are reported to the decision authority:
   0023-domain-security FR-018.
 - Certificates issued for company domains are watched:
@@ -117,7 +117,7 @@ incident happened and what it touched, never its specifics.
 
 - **OQ-1**: Who the incident contact is, and who covers when the decision
   authority is unreachable, is not stated. The second part is
-  0001-private-repo-architecture OQ-1.
+  0001-eidolon-architecture OQ-1.
 - **OQ-2**: The definitions of each incident severity level are not yet
   stated.
 

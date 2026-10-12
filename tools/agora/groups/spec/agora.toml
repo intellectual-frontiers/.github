@@ -41,6 +41,7 @@ check = "ok"
 gate = "ok"
 review = "info"
 none = "warning"
+missing = "error"
 [nouns.design-system]
 help = "A design system: its spec, its entry in the ontology and its harness (0014-design-systems)"
 icon = "symbol-color"

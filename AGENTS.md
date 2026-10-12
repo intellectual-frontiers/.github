@@ -16,4 +16,4 @@ Work spec first: the spec, then the ontology, then everything else (`./agora hel
 `./agora check --suite spec`, `./agora test` and `./agora fresh`.
 
 Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the
-author of that commit in its message; an agent's part is a `Co-Authored-By` trailer (`0001-private-repo-architecture` FR-038).
+author of that commit in its message; an agent's part is a `Co-Authored-By` trailer (`0001-eidolon-architecture` FR-038).

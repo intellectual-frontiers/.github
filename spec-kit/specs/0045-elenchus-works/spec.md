@@ -84,7 +84,7 @@ evidence, hold the inventory and run the tests are ontology facts.
 
 - **FR-003**: A control test MUST be an ontology fact (`ifcore:ControlTest`)
   in the repository that holds the boundary it applies to, and MUST declare
-  its audience (0001-private-repo-architecture FR-012). It MUST state:
+  its audience (0001-eidolon-architecture FR-012). It MUST state:
   - the control it concerns, as `<catalog notation>:<control notation>`
     (0028-compliance-controls FR-001);
   - the boundary or boundaries it applies to, by `schema:about`;
@@ -242,7 +242,7 @@ evidence, hold the inventory and run the tests are ontology facts.
   An Elenchus MUST NOT enter Commercialize.
 - **FR-027**: Closing an Elenchus, its advance to Deploy, MUST be a
   `Decision` by the decision authority in effect
-  (0001-private-repo-architecture FR-029) that names the Elenchus by `schema:about`
+  (0001-eidolon-architecture FR-029) that names the Elenchus by `schema:about`
   and states the pinned test plan commit, the digest of the Verdict, the number
   of exceptions and not-tested outcomes, and each outcome it leaves unremedied
   (FR-018). Neither an AI nor a check MAY close one. A closed Elenchus MUST NOT
@@ -278,7 +278,7 @@ evidence, hold the inventory and run the tests are ontology facts.
   access 0028-compliance-controls FR-022 states. The view MAY be limited to
   the one boundary the engagement names.
 - **FR-034**: No control test, Verdict, finding or rendition MAY carry a sensitive
-  literal (0001-private-repo-architecture FR-016), a credential, or information
+  literal (0001-eidolon-architecture FR-016), a credential, or information
   that 0028-compliance-controls FR-019 covers. A system that holds such
   information MUST be named only by its `RestrictedDataReference`.
 - **FR-035**: An Elenchus is the company's own examination. It MUST NOT be
@@ -402,7 +402,7 @@ evidence, hold the inventory and run the tests are ontology facts.
 - **OQ-9**: Whether a control test's probe may be a Qualityfolio test case or a
   Spry executable document, and which of the two is then the one source of the
   test, given that a control test is an ontology fact
-  (0001-private-repo-architecture FR-019).
+  (0001-eidolon-architecture FR-019).
 - **OQ-10**: Whether evidence from a system that a company under common
   ownership operates counts as independent of the people who run the controls
   it shows. An Elenchus is not an independent assessment (FR-035), but the

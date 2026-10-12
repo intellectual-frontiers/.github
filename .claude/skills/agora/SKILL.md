@@ -361,7 +361,7 @@ A value that fails its type is an error resource that names the type and gives e
 | `PIECE` | an imagery piece as <brand>/<piece>, such as frontiers-brand/fog-coast-lighthouse-footbridge | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL` | a proposal as NNNN-slug, as `proposal list` shows them | a value `<noun> list` or `--complete` offers |
 | `PROPOSAL_STATUS` | whether a proposal is open or accepted | open, accepted |
-| `REFLECTION_KIND` | a kind of digital reflection (0047-digital-reflections FR-001) | private-repo, ergon, noema |
+| `REFLECTION_KIND` | a kind of digital reflection (0047-digital-reflections FR-001) | eidolon, ergon, noema |
 | `REQUIREMENT` | a requirement as <spec>/FR-NNN, such as 0020/FR-013 | 0020/FR-013, 0041-command-line/FR-008 |
 | `RESOURCE` | a resource as kind:id, such as spec:0020 or requirement:0020/FR-013 | spec:0020, requirement:0020/FR-013 |
 | `REVIEW_STATE` | a review state (0047-digital-reflections FR-038) | candidate, reviewed, accepted, rejected |

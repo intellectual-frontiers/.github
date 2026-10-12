@@ -47,11 +47,11 @@ their controls.
   `Adopted` policy with no current review MUST be reported.
 - **FR-007**: A review that changes a policy MUST change it as a spec
   amendment, in spec, ontology, then implementation order
-  (0001-private-repo-architecture FR-037). A review that changes nothing still
+  (0001-eidolon-architecture FR-037). A review that changes nothing still
   records its `Decision`.
 - **FR-008**: Each policy MUST name, in its `Input`, the role that owns it.
   The owner is the decision authority in effect unless a recorded
-  delegation names another role (0001-private-repo-architecture FR-029).
+  delegation names another role (0001-eidolon-architecture FR-029).
 
 ## Who a policy binds
 
@@ -64,7 +64,7 @@ their controls.
 - **FR-011**: An acknowledgment, and anything else that names a person or
   says what they did, MUST be held outside every Eidolon repository. It
   MUST be represented only by a `RestrictedDataReference`
-  (0001-private-repo-architecture FR-016(b), FR-023). The Eidolon MAY state
+  (0001-eidolon-architecture FR-016(b), FR-023). The Eidolon MAY state
   how many people have acknowledged a policy, and how many have not yet,
   as a count with the date the count was taken.
 

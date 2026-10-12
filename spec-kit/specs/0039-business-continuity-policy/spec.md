@@ -29,7 +29,7 @@ objectives, backups, restore tests, and exercises. It is a policy under
 - **FR-004**: The Eidolon's repositories MUST each have a current copy
   held outside their host, refreshed at least weekly. A copy of the vault
   MUST be held somewhere at least as restricted as the vault
-  (0001-private-repo-architecture FR-008).
+  (0001-eidolon-architecture FR-008).
 - **FR-005**: Each system whose recovery time objective is shorter than a
   week MUST have its restore tested at least once a year, against that
   objective. Each test MUST be recorded as evidence
@@ -51,12 +51,12 @@ objectives, backups, restore tests, and exercises. It is a policy under
 - Published addresses outlive the systems behind them:
   0024-persistent-addresses FR-002.
 - Facts live in plain Git, which every clone holds in full:
-  0001-private-repo-architecture FR-005.
+  0001-eidolon-architecture FR-005.
 
 ## Out of scope
 
 - Who decides when the decision authority is unreachable. That is
-  0001-private-repo-architecture OQ-1.
+  0001-eidolon-architecture OQ-1.
 
 ## Edge cases
 

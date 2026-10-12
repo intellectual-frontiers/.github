@@ -354,7 +354,7 @@ def _check_rules(g: Graph, add) -> None:
         if not g.objects(r, RDFS + "comment"):
             add("error", r, f"{short(r)} states no reason (rdfs:comment): which of identity, purpose, abstraction level or lifecycle decides (0047-digital-reflections FR-010)")
         if not g.objects(r, AUDIENCE):
-            add("error", r, f"{short(r)} declares no audience (0001-private-repo-architecture FR-011)")
+            add("error", r, f"{short(r)} declares no audience (0001-eidolon-architecture FR-011)")
 
 
 def _check_relation_types(g: Graph, add) -> None:

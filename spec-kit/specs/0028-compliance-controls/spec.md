@@ -46,7 +46,7 @@ the vault, not stated here.
   revision, re-verified at least once a year. A new revision MUST be
   reported to the decision authority in effect. Adopting a new revision is
   an amendment to the catalog, made in spec, ontology, then implementation
-  order (0001-private-repo-architecture FR-037). It never happens on its own.
+  order (0001-eidolon-architecture FR-037). It never happens on its own.
 - **FR-004**: Some framework levels or categories select only part of a
   catalog, for example a SOC 2 trust services category. Such a level or
   category MUST be a `skos:Collection` of the controls it selects. This
@@ -98,7 +98,7 @@ the vault, not stated here.
   - its evidence.
 
   The plan MUST NOT be kept as a separate document that restates any of
-  these (0001-private-repo-architecture FR-019). An assessor may need a
+  these (0001-eidolon-architecture FR-019). An assessor may need a
   narrative that nothing else states, such as a system description. That
   narrative MAY be written once, in the vault, and the plan cites it.
 - **FR-011**: Creating a boundary, retiring one, and changing its baseline
@@ -150,7 +150,7 @@ the vault, not stated here.
   integration service's artifact or log retention.
 - **FR-017**: Evidence MUST declare the same audiences as what it
   describes. Evidence MUST NOT carry any of the following:
-  - a sensitive literal (0001-private-repo-architecture FR-016);
+  - a sensitive literal (0001-eidolon-architecture FR-016);
   - a credential;
   - controlled government information (FR-019).
 - **FR-018**: A review that a requirement defines (0020-spec-format
@@ -166,7 +166,7 @@ the vault, not stated here.
   company to safeguard MUST NOT be stored in any Eidolon repository in any
   form. The forbidden forms include a fact, a file, a commit message, an
   issue, a check's output, and an evidence entry. Such information is
-  sensitive under 0001-private-repo-architecture FR-016(a) and (c). The system
+  sensitive under 0001-eidolon-architecture FR-016(a) and (c). The system
   that holds it MUST be represented only by a `RestrictedDataReference`,
   and that system MUST be part of the boundary of the entity that the
   contract binds.
@@ -186,7 +186,7 @@ the vault, not stated here.
   boundary by `schema:about`, and a `Grant` to that audience. The `Grant`
   MUST state `validUntil`, no more than one year after its `validFrom`.
   The access MUST be served through the mediated interface, never by
-  repository access (0001-private-repo-architecture FR-009).
+  repository access (0001-eidolon-architecture FR-009).
 - **FR-023**: An assessment that a party outside the company makes or
   holds about a boundary MUST be held as an `ExternalRecordReference` that
   describes the boundary. Examples are an attestation report and a
@@ -205,7 +205,7 @@ the vault, not stated here.
   change to either repository's ontology or control map.
 - **FR-025**: A compliance status report MUST be produced at least weekly
   and reported to the decision authority in effect
-  (0001-private-repo-architecture FR-025). Each run MUST keep one current
+  (0001-eidolon-architecture FR-025). Each run MUST keep one current
   report rather than add another. For each boundary, it lists:
   - its gaps (FR-007);
   - its untested controls (FR-008);
@@ -213,7 +213,7 @@ the vault, not stated here.
   - each assessment no longer current, or ceasing to be current within
     ninety days;
   - each reference it depends on that is overdue for re-verification
-    (0001-private-repo-architecture FR-024).
+    (0001-eidolon-architecture FR-024).
 
   The report MUST only report. It MUST NOT add, change, or remove anything
   it reports on.

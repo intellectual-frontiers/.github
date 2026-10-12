@@ -12,7 +12,7 @@ when it considers a vendor, how the platform is deployed so that no host owns
 it, how it separates anonymous requests from authenticated ones, and what it
 records. What a rendition is and how it is delivered is
 0015-work-packages FR-014 to FR-018; a cut, 0016-press-production FR-025; who
-may see what, 0001-private-repo-architecture and 0005-authentication; the generated
+may see what, 0001-eidolon-architecture and 0005-authentication; the generated
 public pages, 0044-public-website. Every feature of distribution, now and
 later, is stated here before it is built.
 
@@ -20,7 +20,7 @@ later, is stated here before it is built.
 
 - **FR-001**: A distribution feature MUST be stated by a requirement of this
   spec before it is built, and MUST follow this spec once built
-  (0001-private-repo-architecture FR-037). A feature no requirement states MUST NOT
+  (0001-eidolon-architecture FR-037). A feature no requirement states MUST NOT
   be built.
 - **FR-002**: The company MUST build and own each distribution capability
   itself, to the house engineering method, Bare Metal Software: start from the
@@ -191,7 +191,7 @@ later, is stated here before it is built.
 - **FR-032**: Data about a recipient, a buyer or a reader MUST be held only in
   the platform's store and MUST NOT be committed to any repository; where a
   repository must mention it, it MUST use a `RestrictedDataReference`
-  (0001-private-repo-architecture FR-023). The platform's inventory entry MUST
+  (0001-eidolon-architecture FR-023). The platform's inventory entry MUST
   declare the highest data class it holds (0033-systems-and-data-policy
   FR-002).
 

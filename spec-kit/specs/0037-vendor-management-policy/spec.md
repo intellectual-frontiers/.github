@@ -26,7 +26,7 @@ owned by the decision authority in effect.
   - the `Agreement` its terms are in.
 
   An account at a vendor MUST be held only as a
-  `RestrictedDataReference` (0001-private-repo-architecture FR-023).
+  `RestrictedDataReference` (0001-eidolon-architecture FR-023).
 - **FR-002**: A vendor that would be critical, or would hold Restricted
   data, federal contract information, or health information, MUST be
   assessed before it is used. Onboarding it MUST be recorded as a

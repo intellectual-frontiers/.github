@@ -1,4 +1,4 @@
-"""The ontology's checks (0001-private-repo-architecture FR-007; 0014-design-systems FR-003, FR-010, FR-020, FR-022,
+"""The ontology's checks (0001-eidolon-architecture FR-007; 0014-design-systems FR-003, FR-010, FR-020, FR-022,
 FR-032 to FR-052) and a reader for its SKOS concepts and command individuals.
 
 Ported from the public root's former spec checker, with the same findings and messages.

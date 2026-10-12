@@ -29,7 +29,7 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-002**: No page MAY be authored outside the Eidolon's two
   repositories: the web property is a presentation layer generated from the
   vault, has no repository of its own, and holds no works
-  (0001-private-repo-architecture FR-001).
+  (0001-eidolon-architecture FR-001).
 - **FR-003**: The generator MUST include a work only when the work is
   Public or announced (0015-work-packages FR-027), and for an announced
   work that is not Public, only its public record (0015 FR-029). It MUST
@@ -650,7 +650,7 @@ how addresses map to content, 0004-addressing; what the application does,
 ## Data
 
 - **FR-048**: The website's source of truth MUST be the Eidolon in Git: the
-  ontology, the specs and the content (0001-private-repo-architecture FR-005). Every
+  ontology, the specs and the content (0001-eidolon-architecture FR-005). Every
   lookup a page or the server makes over that data, such as a search, a list, a
   filter or a relation between records, MUST be answered from an in-memory
   index built from those sources when the generator or the server starts and
@@ -658,7 +658,7 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-049**: The data a website holds MUST be held at the lowest rung of this
   ladder that holds it:
   1. the Eidolon in Git and the in-memory index of FR-048, for everything that
-     is a fact of the Eidolon (0001-private-repo-architecture FR-019);
+     is a fact of the Eidolon (0001-eidolon-architecture FR-019);
   2. an embedded SQLite database file on the volume that survives replacing the
      container (0046-distribution-platform FR-009), for application state that
      is not a fact of the Eidolon, such as a session, a grant, an entitlement,

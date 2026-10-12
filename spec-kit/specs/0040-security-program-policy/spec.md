@@ -20,7 +20,7 @@ the decision authority in effect.
   policy cites it.
 - **FR-002**: Every security responsibility in the program MUST be held by
   a role. The decision authority in effect holds each one not delegated
-  (0001-private-repo-architecture FR-029).
+  (0001-eidolon-architecture FR-029).
 
 ## Oversight
 
@@ -56,7 +56,7 @@ the decision authority in effect.
 ## Carried out by
 
 - A named decision authority, delegated explicitly:
-  0001-private-repo-architecture FR-029.
+  0001-eidolon-architecture FR-029.
 - Every requirement names what tests it, and the specs are checked on
   every push: 0020-spec-format FR-011 and FR-015.
 - Every framework is a control catalog, and every boundary a baseline:

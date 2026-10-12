@@ -51,9 +51,9 @@ stated here.
   MUST be called an estimate.
 - **FR-009**: A schedule a spoken program receives from an outside producer
   MUST be represented as an `ExternalRecordReference`
-  (0001-private-repo-architecture FR-022) whose cached copy carries the date it
+  (0001-eidolon-architecture FR-022) whose cached copy carries the date it
   was verified, a verification cadence, and a verification method, and MUST
-  be read as stale when overdue, per 0001-private-repo-architecture FR-024. Only the schedule MUST be
+  be read as stale when overdue, per 0001-eidolon-architecture FR-024. Only the schedule MUST be
   copied; nothing else the producer's document holds MAY be read, written, or
   kept, because such a document can hold credentials.
 - **FR-010**: A spoken work MUST NOT bind Press to an event. The rules for

@@ -641,7 +641,7 @@ A value that fails its type is an error that names the type and gives examples.
 
 |`REFLECTION_KIND`
 |a kind of digital reflection (0047-digital-reflections FR-001)
-|private-repo, ergon, noema
+|eidolon, ergon, noema
 
 |`REQUIREMENT`
 |a requirement as <spec>/FR-NNN, such as 0020/FR-013

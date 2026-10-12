@@ -118,7 +118,7 @@ FR-007.
   re-specified per content kind here.
 - Where a Confidential document under one of these kinds should actually
   live, and what being internal-only changes about its content, is
-  governed by 0001-private-repo-architecture's confidentiality model, not this
+  governed by 0001-eidolon-architecture's confidentiality model, not this
   spec — a content kind here works the same whether the document carrying
   it is Public or Confidential.
 

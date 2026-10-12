@@ -3,20 +3,20 @@
 # requirement's rule addresses the control, in full or in part; whether a boundary meets the control is the
 # assessor's judgment (0027 Assumptions). One row per requirement and control; the specs are never restated per framework.
 requirement	control	note
-0001-private-repo-architecture FR-002	cmmc-l1:AC.L1-b.1.iv	only Public-tier facts in the publicly readable repository
-0001-private-repo-architecture FR-002	soc2:C1.1	confidential facts kept out of the public root
-0001-private-repo-architecture FR-008	soc2:CC6.1	repository access limited to a named circle
-0001-private-repo-architecture FR-008	cmmc-l1:AC.L1-b.1.i	repository access limited to authorized users
-0001-private-repo-architecture FR-009	soc2:CC6.1	everyone else reaches the vault only through an authenticated, mediated interface
-0001-private-repo-architecture FR-009	cmmc-l1:AC.L1-b.1.ii	outside parties are limited to what the mediated interface serves them
-0001-private-repo-architecture FR-011	soc2:C1.1	every fact declares who may see it
-0001-private-repo-architecture FR-012	soc2:C1.1	an undeclared audience defaults to the most restrictive
-0001-private-repo-architecture FR-021	soc2:C1.1	a sensitive fact is never a literal
-0001-private-repo-architecture FR-023	soc2:CC6.1	no credential in any repository
-0001-private-repo-architecture FR-029	soc2:CC1.3	a named decision authority, delegated explicitly
-0001-private-repo-architecture FR-035	soc2:CC8.1	every change to a spec or the ontology says what changed and why
-0001-private-repo-architecture FR-036	soc2:CC7.4	exposure of a secret is removed from history and the secret rotated
-0001-private-repo-architecture FR-037	soc2:CC8.1	a change is specified before it is built
+0001-eidolon-architecture FR-002	cmmc-l1:AC.L1-b.1.iv	only Public-tier facts in the publicly readable repository
+0001-eidolon-architecture FR-002	soc2:C1.1	confidential facts kept out of the public root
+0001-eidolon-architecture FR-008	soc2:CC6.1	repository access limited to a named circle
+0001-eidolon-architecture FR-008	cmmc-l1:AC.L1-b.1.i	repository access limited to authorized users
+0001-eidolon-architecture FR-009	soc2:CC6.1	everyone else reaches the vault only through an authenticated, mediated interface
+0001-eidolon-architecture FR-009	cmmc-l1:AC.L1-b.1.ii	outside parties are limited to what the mediated interface serves them
+0001-eidolon-architecture FR-011	soc2:C1.1	every fact declares who may see it
+0001-eidolon-architecture FR-012	soc2:C1.1	an undeclared audience defaults to the most restrictive
+0001-eidolon-architecture FR-021	soc2:C1.1	a sensitive fact is never a literal
+0001-eidolon-architecture FR-023	soc2:CC6.1	no credential in any repository
+0001-eidolon-architecture FR-029	soc2:CC1.3	a named decision authority, delegated explicitly
+0001-eidolon-architecture FR-035	soc2:CC8.1	every change to a spec or the ontology says what changed and why
+0001-eidolon-architecture FR-036	soc2:CC7.4	exposure of a secret is removed from history and the secret rotated
+0001-eidolon-architecture FR-037	soc2:CC8.1	a change is specified before it is built
 0005-authentication FR-001	soc2:CC6.1	every non-public request is bound to an identified agent
 0005-authentication FR-001	cmmc-l1:IA.L1-b.1.v	users identified before evaluation
 0005-authentication FR-003	soc2:CC6.2	access beyond Public only by an explicit, dated grant

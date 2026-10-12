@@ -71,7 +71,7 @@ class Kinds(unittest.TestCase):
             for d in doms:
                 self.assertNotEqual(d, Iri(r.NOEMA))
 
-    def test_the_kind_of_an_idea_is_noema_and_never_ergon_or_private-repo(self):
+    def test_the_kind_of_an_idea_is_noema_and_never_ergon_or_eidolon(self):
         for cls in (I("IntellectualConstruct"), I("Note"), I("ResearchPillar"), I("Invention"), I("Capability"), I("NamedTool")):
             self.assertEqual(kind(self.g, cls), "noema", cls)
 
@@ -427,7 +427,7 @@ class Native(unittest.TestCase):
         self.assertTrue({"potential-buyer", "product-wedge", "competing-approach", "adoption-obstacle", "commercial-hypothesis", "assumption",
                          "experimental-design", "limitation", "counterargument", "falsification-criterion"} <= aspects)
 
-    def test_c_a_program_is_an_ergon_a_system_is_an_private-repo(self):
+    def test_c_a_program_is_an_ergon_a_system_is_an_eidolon(self):
         self.assertEqual((r.subject_kind(self.g, Iri(CD + "CareProgram"))[0], r.subject_kind(self.g, Iri(CD + "HealthSystem"))[0]), ("ergon", EID_K))
 
     # -- D
@@ -499,7 +499,7 @@ class Native(unittest.TestCase):
 
 
 class Aspects(unittest.TestCase):
-    def test_demand_evidence_names_private-repos_and_is_evidence(self):
+    def test_demand_evidence_names_eidolons_and_is_evidence(self):
         co = "ex:Co a ifcore:Company ; " + PUB + " .\n"
         base = "ex:D a ifcore:Assertion ; schema:about ex:H ; ifcore:aspect ifcore:DemandEvidenceAspect ; "
         g = graph(idea(co + base + f"ifcore:claimLabel ifcore:EvidenceLabel ; dcterms:source ex:Co ; ifcore:demonstratedBy ex:Co ; {PUB} .\n"))
@@ -580,7 +580,7 @@ class Commands(unittest.TestCase):
         code, doc = run_json(["reflection", "show", "Decomposable", "--on", "2026-01-01"])
         self.assertEqual(code, 0)
 
-    def test_show_an_private-repo_or_an_ergon_gives_its_relationships(self):
+    def test_show_an_eidolon_or_an_ergon_gives_its_relationships(self):
         code, doc = run_json(["reflection", "show", AW + "ClaimsWorkforce"])
         self.assertEqual((code, doc["data"]["kind"]), (0, "ergon"))
         self.assertGreaterEqual(len(doc["data"]["relationships"]["to"]), 4)
@@ -603,7 +603,7 @@ class Commands(unittest.TestCase):
         self.assertIn("noema", d["types"])
         self.assertIsInstance(d["noema_subjects_without_a_record"], int)
 
-    def test_the_audit_names_a_record_of_an_abstract_subject_made_as_an_ergon_or_an_private-repo(self):
+    def test_the_audit_names_a_record_of_an_abstract_subject_made_as_an_ergon_or_an_eidolon(self):
         g = graph(f"ex:Idea a ifcore:IntellectualConstruct ; dcterms:type ifcore:ConceptType ; {PUB} .\n"
                   f"ex:Old a ifcore:Eid ; ifcore:reflects ex:Idea ; {PUB} .\n"
                   f"ex:Old2 a ifcore:Ergon ; ifcore:reflects ex:Idea ; ifcore:purpose \"x\" ; {PUB} .\n")

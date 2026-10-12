@@ -14,7 +14,7 @@ with governments. This spec covers:
 They are kept the way domain registrations are kept (0022-domain-names):
 the government's record is the authority, the company holds a dated
 reference to it, and expiry is reported before it costs anything.
-0001-private-repo-architecture FR-022 through FR-025 apply to every
+0001-eidolon-architecture FR-022 through FR-025 apply to every
 registration, and this spec adds what is particular to registrations.
 Which entities hold which registrations is ontology data, not stated
 here.
@@ -41,7 +41,7 @@ here.
   the `Organization` or anywhere else. They sit only on the reference: as
   its cached value, and, for the date the registration lapses, as its
   `dcterms:valid`. Either kind of cached value needs the reference's
-  `ifcore:resolvedAt` (0001-private-repo-architecture FR-022).
+  `ifcore:resolvedAt` (0001-eidolon-architecture FR-022).
 - **FR-005**: A recurring filing, such as an annual return or a state
   annual report, MUST be represented as a registration whose
   `dcterms:valid` is the date the next filing is due. Once a filing is
@@ -60,7 +60,7 @@ here.
   offers a read-only interface the company can use without a write
   credential. Otherwise the method is manual.
 - **FR-008**: A cached value MUST NOT carry any of the following:
-  - a personal detail of a point of contact (0001-private-repo-architecture
+  - a personal detail of a point of contact (0001-eidolon-architecture
     FR-016(b));
   - banking or payment details;
   - a taxpayer identification number.
@@ -74,14 +74,14 @@ here.
 
 - **FR-009**: A registration whose `dcterms:valid` falls within ninety days
   MUST be reported to the decision authority in effect
-  (0001-private-repo-architecture FR-025). One whose `dcterms:valid` has
+  (0001-eidolon-architecture FR-025). One whose `dcterms:valid` has
   passed MUST be reported as a failure. Neither report is made when a
   recorded `Decision` already lets that registration lapse.
 - **FR-010**: Each of the following MUST be recorded as a `Decision`
   (0008-decision-records): obtaining a registration, letting one lapse,
   and withdrawing one. Renewing a registration already held, and making a
   recurring filing, are routine and MUST NOT require one
-  (0001-private-repo-architecture FR-031).
+  (0001-eidolon-architecture FR-031).
 - **FR-011**: A representation, certification, or affirmation made to a
   government is the act of the official its regime names. No check, AI,
   or automation MAY make, submit, or renew one. Examples are the
@@ -113,7 +113,7 @@ here.
 
 - What a filing says, and the company's tax and financial affairs.
 - Who holds the accounts the company files through. Each such account is a
-  `RestrictedDataReference` (0001-private-repo-architecture FR-023), held in
+  `RestrictedDataReference` (0001-eidolon-architecture FR-023), held in
   the vault.
 - Which frameworks a boundary follows, and assessments that a party
   outside government holds. These belong to 0028-compliance-controls.
@@ -160,7 +160,7 @@ here.
   - where any key such an interface needs is held;
   - who obtains that key.
 - **OQ-3**: Who the affirming official is for each entity's cybersecurity
-  affirmation is not yet delegated (0001-private-repo-architecture FR-029).
+  affirmation is not yet delegated (0001-eidolon-architecture FR-029).
 - **OQ-4**: Whether some kinds of registration need more notice than
   FR-009's ninety days is not yet stated.
 

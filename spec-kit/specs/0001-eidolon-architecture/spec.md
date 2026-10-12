@@ -1,6 +1,6 @@
 # Feature Specification: The Eidolon
 
-**Spec ID:** 0001-private-repo-architecture
+**Spec ID:** 0001-eidolon-architecture
 **Status:** Draft
 
 **Input:** The architecture for Intellectual Frontiers' Eidolon — repository
@@ -11,7 +11,7 @@ reference model, and governance representation.
 
 - **FR-001**: The Eidolon MUST consist of exactly two repositories with distinct
   roles: a public root (`.github`), which is the public Eidolon; and a private
-  extension (`private-repo`), which is the private Eidolon and the monorepo where the
+  extension (`eidolon`), which is the private Eidolon and the monorepo where the
   company's works are made and maintained. Its web property
   (`www.intellectualfrontiers.com`) MUST be a presentation layer generated from the
   private Eidolon (0044-public-website), not a repository: it is one channel
@@ -48,11 +48,11 @@ reference model, and governance representation.
 
 ## The vault
 
-- **FR-008**: Clone access to the `private-repo` repository MUST be limited to a small,
+- **FR-008**: Clone access to the `eidolon` repository MUST be limited to a small,
   explicitly named circle: the founder and a close team bound by legal
   confidentiality agreements.
 - **FR-009**: Every party outside that circle — employees not in the circle, NDA'd
-  external counterparties, and the public — MUST access anything in `private-repo` only
+  external counterparties, and the public — MUST access anything in `eidolon` only
   through an authenticated, mediated interface (the website, or another proxy such
   as a synced file share), never through direct repository access.
 - **FR-010**: Within the vault circle, trust MUST be flat: no sub-tiering of
@@ -100,7 +100,7 @@ reference model, and governance representation.
   reference to that source, never a duplicate value.
 - **FR-020**: A fact with no external authoritative source and no sensitivity
   classification under FR-016 MAY be stored as a literal directly in its owning
-  repository (`.github` if Public, `private-repo` otherwise).
+  repository (`.github` if Public, `eidolon` otherwise).
 - **FR-021**: A fact classified as sensitive under FR-016 MUST NOT be stored as a
   literal in any Eidolon repository. It MUST be represented as a
   `RestrictedDataReference`.
@@ -243,7 +243,7 @@ reference model, and governance representation.
   left implicit from the repository it happens to live in.
 - **The Eidolon** — the two-repository system that models and serves everything
   Intellectual Frontiers knows about itself: the public Eidolon (`.github`) and the
-  private Eidolon where works are made (`private-repo`), with its web property
+  private Eidolon where works are made (`eidolon`), with its web property
   (`www.intellectualfrontiers.com`), a presentation layer generated from the private
   Eidolon.
 - **A digital reflection** — a maintained record of one subject, either an
@@ -253,7 +253,7 @@ reference model, and governance representation.
 - **A platform** — an Ergon that provides the eight capabilities of the platform
   kernel, each realized by a named module, per 0049-platforms. A made system that
   lacks one is a product or a suite, never a platform.
-- **The vault** — the `private-repo` repository and the small, named, legally-bound
+- **The vault** — the `eidolon` repository and the small, named, legally-bound
   circle with direct clone access to it.
 - **An audience** (`ifcore:AccessAudience`) — a named permission to see a fact: public, company
   affiliation, a specific agreement, or a specific role or group.

@@ -26,7 +26,7 @@ assets.
 ## What crosses into the Eidolon
 
 - **FR-004**: A `prov:Entity` MUST become a tracked `ifcore:Fact` —
-  carrying its own audience declaration per 0001-private-repo-architecture
+  carrying its own audience declaration per 0001-eidolon-architecture
   FR-011 — once it is the subject of a Note or has received a Disposition
   (0006-research-and-ip FR-003, FR-005). Before that point, it is not
   required to be represented in the Eidolon at all.
@@ -52,15 +52,15 @@ assets.
   classifications Intellectual Frontiers itself is the authority on. Any
   property an external registry (a patent office, a trademark office) is
   authoritative over MUST be represented as an `ExternalRecordReference`
-  per 0001-private-repo-architecture FR-022, granular to the individual asset —
+  per 0001-eidolon-architecture FR-022, granular to the individual asset —
   never aggregated into one reference for an entire register, and never
   duplicated as a literal on the asset itself.
 - **FR-009**: An asset with no external registry — a common-law mark, a
   trade secret — MAY hold its own classifying facts as literals, per
-  0001-private-repo-architecture FR-020, since Intellectual Frontiers is the
+  0001-eidolon-architecture FR-020, since Intellectual Frontiers is the
   authority on them.
 - **FR-010**: A trade secret's substantive content MUST be classified as
-  sensitive under 0001-private-repo-architecture FR-016 by default. Its public
+  sensitive under 0001-eidolon-architecture FR-016 by default. Its public
   representation MUST NOT describe what the secret actually is.
 
 ## Patent family relationships
@@ -169,7 +169,7 @@ assets.
   territorial terms are not modeled yet — today's model only states who the
   primary rights-holder is.
 - Asset stewardship distinct from legal ownership is not modeled; the
-  company's single decision authority (0001-private-repo-architecture FR-029)
+  company's single decision authority (0001-eidolon-architecture FR-029)
   covers this until a second role actually exists.
 - Actual revenue, pricing, and licensing figures generated during a
   Substantial Work's Commercialization stage are Capital's financial-

@@ -26,7 +26,7 @@ the strength of it. Most of the companies we have built are in healthcare.
   reflects what is built (a product, a service, a system, a workflow); a Noema
   reflects what is conceived (a concept, a hypothesis, a theory, a method),
   with the evidence for it and against it. This repository is a working one, and the essay
-  [Eidolons: A Working Digital Reflection](https://github.com/intellectual-frontiers/.github/blob/main/content/journal/private-repos.html)
+  [Eidolons: A Working Digital Reflection](https://github.com/intellectual-frontiers/.github/blob/main/content/journal/eidolons.html)
   explains why.
 - **Intellectual Product-Led Growth.** How a knowledge-heavy organization turns
   its research into something a visitor can use directly, before any sales

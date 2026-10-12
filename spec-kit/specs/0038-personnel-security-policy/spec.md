@@ -73,7 +73,7 @@ policy under 0030-policies, owned by the decision authority in effect.
 ## Out of scope
 
 - Employment terms, pay, and benefits, which are personal financial terms
-  under 0001-private-repo-architecture FR-016(d).
+  under 0001-eidolon-architecture FR-016(d).
 - Disclosure of a published work's funding. That belongs to the Press's
   own rules.
 

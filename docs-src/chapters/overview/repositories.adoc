@@ -9,12 +9,12 @@
 |The public Eidolon
 |Public-tier facts, specs and ontology only
 
-|`private-repo`
+|`eidolon`
 |The private Eidolon, and the monorepo where works are made
 |Every non-public spec and ontology individual, and every work's package; it imports this ontology and never redefines it
 |===
 
-The web property, `www.intellectualfrontiers.com`, is not a repository. It is a presentation layer that `private-repo` generates
+The web property, `www.intellectualfrontiers.com`, is not a repository. It is a presentation layer that `eidolon` generates
 (spec 0044): one channel presenting the works, holding no work of its own.
 
 A *work* is the deliverable itself. A book, a web page, an episode, a keynote, a course or a skill is a *presentation* of it (spec 0021).

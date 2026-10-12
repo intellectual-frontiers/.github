@@ -20,7 +20,7 @@ effect.
   - for a risk being mitigated, the requirements or controls that do it.
 
   A detail that would itself be sensitive under
-  0001-private-repo-architecture FR-016, such as how a weakness could be
+  0001-eidolon-architecture FR-016, such as how a weakness could be
   exploited, MUST be held only by reference.
 - **FR-002**: A risk the company accepts MUST be accepted by the decision
   authority in effect, in a `Decision` that names the risk and lapses by

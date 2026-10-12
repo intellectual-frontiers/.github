@@ -1,7 +1,7 @@
 {
   "repos": [
     { "repo": "github.com/intellectual-frontiers/.github" },
-    { "repo": "github.com/intellectual-frontiers/private-repo" },
+    { "repo": "github.com/intellectual-frontiers/eidolon" },
     { "repo": "github.com/intellectual-frontiers/workspaces-host" }
   ]
 }

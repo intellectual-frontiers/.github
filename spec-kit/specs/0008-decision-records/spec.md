@@ -11,16 +11,16 @@ record's confidentiality follows the same rules as any other fact.
 ## Recording a decision
 
 - **FR-001**: A significant decision MUST be recorded as a `Decision`
-  individual, per 0001-private-repo-architecture FR-031. Routine operational
+  individual, per 0001-eidolon-architecture FR-031. Routine operational
   activity still does not require one.
 - **FR-002**: Every `Decision` MUST state who made it
-  (0001-private-repo-architecture `decidedBy`). A decision record with no
+  (0001-eidolon-architecture `decidedBy`). A decision record with no
   accountable person is not a complete record.
 - **FR-003**: A `Decision` MUST record exactly one coherent choice. A
   decision bundling multiple distinct choices MUST be split into multiple
   `Decision` individuals, not represented as one with mixed outcomes.
 - **FR-004**: `hasOutcome` is required only when the decision resolves a
-  Native Alpha thesis question (0001-private-repo-architecture FR-031). A
+  Native Alpha thesis question (0001-eidolon-architecture FR-031). A
   significant decision outside that shape MAY omit it and rely on its
   rationale alone.
 
@@ -53,7 +53,7 @@ record's confidentiality follows the same rules as any other fact.
 ## Confidentiality
 
 - **FR-010**: A `Decision`'s audience classification defaults to the most
-  restrictive available, per 0001-private-repo-architecture FR-012, unless
+  restrictive available, per 0001-eidolon-architecture FR-012, unless
   deliberately classified otherwise.
 - **FR-011**: Where a decision's outcome is shareable but its rationale is
   not, the outcome and the rationale MUST be represented as two separate,
@@ -65,7 +65,7 @@ record's confidentiality follows the same rules as any other fact.
   outward — the public record never discloses that a restricted companion
   exists.
 - **FR-013**: If a `Decision`'s audience is found to need tightening after
-  it was recorded with a broader one, 0001-private-repo-architecture FR-036
+  it was recorded with a broader one, 0001-eidolon-architecture FR-036
   applies in full, including the history rewrite and any credential
   rotation that rule requires. Loosening a decision's audience over time
   carries no such requirement — only tightening does.
@@ -74,14 +74,14 @@ record's confidentiality follows the same rules as any other fact.
 
 - **FR-014**: A decision that changes the Eidolon's own specs or ontology —
   amending a rule, changing a confidentiality default — is governed by the
-  spec-amendment process (0001-private-repo-architecture FR-034, FR-035), not
+  spec-amendment process (0001-eidolon-architecture FR-034, FR-035), not
   represented as a `Decision` individual. The two mechanisms are not
   interchangeable.
 
 ## Out of scope
 
 - A multi-role decision framework (a distinct recommender, approver, or
-  input-giver) is not modeled; 0001-private-repo-architecture FR-029's single
+  input-giver) is not modeled; 0001-eidolon-architecture FR-029's single
   default authority covers this until a second decision-maker actually
   exists.
 - Sequential decision numbering (as flat-file ADRs use) is not adopted — a
@@ -101,7 +101,7 @@ record's confidentiality follows the same rules as any other fact.
   rationale are two linked facts, linked only from the private side, per
   FR-011 and FR-012.
 - A decision recorded with a broad audience is later found to need a
-  narrower one: 0001-private-repo-architecture FR-036 applies in full, per
+  narrower one: 0001-eidolon-architecture FR-036 applies in full, per
   FR-013.
 - The context behind a decision was never recorded as a tracked Fact: the
   reasoning is stated as a plain-text rationale instead, per FR-005.
@@ -112,14 +112,14 @@ record's confidentiality follows the same rules as any other fact.
   as its `decidedBy`.
 - A `Decision` and the facts it cites are held in one graph, so links
   between them resolve.
-- The audience model of 0001-private-repo-architecture applies to a `Decision`
+- The audience model of 0001-eidolon-architecture applies to a `Decision`
   the same as to any other fact.
 
 ## Open questions
 
 - **OQ-1**: No process addresses a conflict of interest between the
   founder's personal interests and the company's, for a decision that
-  isn't simply about a wholly-owned asset — 0001-private-repo-architecture
+  isn't simply about a wholly-owned asset — 0001-eidolon-architecture
   FR-033 only covers the wholly-owned case.
 - **OQ-2**: As recorded decisions accumulate, whether they should live in a
   separate location from the core vocabulary they're typed against is

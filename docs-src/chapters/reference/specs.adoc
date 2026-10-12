@@ -9,7 +9,7 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |===
 |Spec |Status |Subject
 
-|`0001-private-repo-architecture`
+|`0001-eidolon-architecture`
 |Draft
 |The Eidolon
 

@@ -81,7 +81,7 @@ vault and register data, not restated here.
   found or holds relationship memory about.
 - **FR-017**: A relationship path to a candidate, where recorded, MUST
   carry the audience it is visible to explicitly, per
-  0001-private-repo-architecture FR-011 — never left implicit from being
+  0001-eidolon-architecture FR-011 — never left implicit from being
   recorded at all.
 
 ## What Network is measured by
@@ -102,7 +102,7 @@ vault and register data, not restated here.
   spec-level.
 - Where hunt and packet data physically lives — which parts are Public
   versus held only in the private vault — is governed by
-  0001-private-repo-architecture, not re-decided here.
+  0001-eidolon-architecture, not re-decided here.
 
 ## Edge cases
 

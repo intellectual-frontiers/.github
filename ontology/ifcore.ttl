@@ -16,7 +16,7 @@
 
 # Intellectual Frontiers — core ontology (PUBLIC).
 #
-# Implements 0001-private-repo-architecture. Every class, property, and individual
+# Implements 0001-eidolon-architecture. Every class, property, and individual
 # here traces to a requirement in that spec; nothing is asserted ahead of it
 # (FR-037). A private ontology imports this and adds its own individuals; it
 # must not redefine or remove anything declared here (FR-003).
@@ -31,8 +31,8 @@
     a owl:Ontology ;
     owl:versionInfo "0.1.0" ;
     dcterms:title "Intellectual Frontiers core ontology"@en ;
-    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0001-private-repo-architecture/spec.md> ;
-    rdfs:comment "The company, the Eidolon's own repositories, audiences, references, and governance, per 0001-private-repo-architecture."@en .
+    dcterms:source <https://github.com/intellectual-frontiers/.github/blob/main/spec-kit/specs/0001-eidolon-architecture/spec.md> ;
+    rdfs:comment "The company, the Eidolon's own repositories, audiences, references, and governance, per 0001-eidolon-architecture."@en .
 
 # ───────────────────────── Organization ─────────────────────────
 
@@ -718,7 +718,7 @@ ifcore:purpose a owl:DatatypeProperty ; rdfs:domain ifcore:Ergon ; rdfs:range xs
 ifcore:ReflectionKindScheme a skos:ConceptScheme ; rdfs:label "Reflection kind"@en ;
     rdfs:comment "The kind a subject reflects as, resolved from its ifcore:ClassificationRule individuals (0047-digital-reflections FR-011, FR-012). Five, a closed set: the three kinds of reflection, a subject of none of them, and one no rule decides. An undetermined subject is never defaulted to a kind. A further kind of reflection is a new concept here, a new class under ifcore:DigitalReflection and its rules (0048-noemas FR-037)."@en ;
     ifcore:hasAudience ifcore:Public .
-ifcore:EidolonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Eidolon"@en ; skos:notation "private-repo" ;
+ifcore:EidolonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Eidolon"@en ; skos:notation "eidolon" ;
     skos:definition "The subject exists independently of its representation and is an individual in the world: a person, an organization, a place, an identifiable unit."@en ; ifcore:reflectionClass ifcore:Eidolon ; ifcore:hasAudience ifcore:Public .
 ifcore:ErgonKind a skos:Concept ; skos:inScheme ifcore:ReflectionKindScheme ; skos:prefLabel "Ergon"@en ; skos:notation "ergon" ;
     skos:definition "The subject was deliberately built, designed or assembled to accomplish a purpose: a product model, a service, a system, a workflow, a solution."@en ; ifcore:reflectionClass ifcore:Ergon ; ifcore:hasAudience ifcore:Public .
@@ -3563,7 +3563,7 @@ ifcore:CloudflareAccountAccess a ifcore:RestrictedDataReference ;
     rdfs:label "Cloudflare account"@en ;
     ifcore:describes ifcore:IntellectualFrontiersLLC ;
     ifcore:heldIn "Cloudflare, the company's primary registrar and DNS provider."@en ;
-    ifcore:accessInstructions "Access, including any read-only API token, is granted by the decision authority in effect (0001-private-repo-architecture FR-029). No credential is held in any Eidolon repository (0022-domain-names FR-014)."@en ;
+    ifcore:accessInstructions "Access, including any read-only API token, is granted by the decision authority in effect (0001-eidolon-architecture FR-029). No credential is held in any Eidolon repository (0022-domain-names FR-014)."@en ;
     rdfs:comment "Other registrar accounts, and how reconciliation reaches them, are 0022-domain-names OQ-2."@en ;
     ifcore:hasAudience ifcore:Public .
 
@@ -4878,7 +4878,7 @@ ifcore:reviewCadence a owl:DatatypeProperty ; rdfs:domain ifcore:SubstantialWork
 # locks and every other program from a toolchain lock fetched into a per-user cache (0025 FR-013, FR-015). A reference
 # environment is an optional convenience, never required (0025 FR-005, FR-025). The repository is reused as
 # schema:SoftwareSourceCode (0019-controlled-vocabulary FR-002). Which entries a repository's toolchain lock holds is
-# declared in that repository's orchestrator code, not restated here (0001-private-repo-architecture FR-019).
+# declared in that repository's orchestrator code, not restated here (0001-eidolon-architecture FR-019).
 
 ifcore:ReferenceEnvironment a owl:Class ; rdfs:subClassOf schema:SoftwareSourceCode ; rdfs:label "Reference environment"@en ;
     rdfs:comment "An optional, prepared environment, a release of its repository on a Debian-family host, that a person MAY choose as a convenience. No tool, check, workflow or hint of an Eidolon repository requires it, and a tool runs on a host that has only python3 and uv (0025-tooling-environment FR-005, FR-014, FR-025)."@en .
@@ -4897,7 +4897,7 @@ ifcore:WorkspacesHost a ifcore:ReferenceEnvironment ;
 
 # ───────────────────────── Workspaces (0026-workspaces) ─────────────────────────
 # The flavor is the one way the optional workspace is run (0026 FR-001). What each repository lists is held in
-# its own .workspaces-host/ws-host.env, never restated here (0001-private-repo-architecture FR-019).
+# its own .workspaces-host/ws-host.env, never restated here (0001-eidolon-architecture FR-019).
 
 ifcore:workspaceFlavor a owl:ObjectProperty ; rdfs:domain ifcore:ReferenceEnvironment ; rdfs:range skos:Concept ;
     rdfs:comment "A flavor the optional reference environment runs in, a concept in ifcore:WorkspaceFlavorScheme (0026-workspaces FR-001). No established property names the ways one environment is run; dcterms:hasFormat names derived resources, not runtimes (0019-controlled-vocabulary FR-004)."@en .
@@ -5374,7 +5374,7 @@ ifcore:ControlCatalog a owl:Class ; rdfs:subClassOf skos:ConceptScheme ; rdfs:la
 ifcore:ComplianceBoundary a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Compliance boundary"@en ;
     skos:definition "One legal entity's systems and the controls they must meet (0028-compliance-controls FR-009)."@en ;
     skos:closeMatch <https://pages.nist.gov/OSCAL/learn/concepts/layer/implementation/ssp/> ;
-    rdfs:comment "The system an OSCAL system security plan describes. Names exactly one legal entity by schema:provider, its baseline (ControlCatalogs or skos:Collections) by dcterms:conformsTo, and its systems by dcterms:hasPart. Its plan is generated, never kept as a separate document (FR-010); creating, retiring, or rebaselining it is a Decision (FR-011). Held in the vault (0001-private-repo-architecture FR-003)."@en .
+    rdfs:comment "The system an OSCAL system security plan describes. Names exactly one legal entity by schema:provider, its baseline (ControlCatalogs or skos:Collections) by dcterms:conformsTo, and its systems by dcterms:hasPart. Its plan is generated, never kept as a separate document (FR-010); creating, retiring, or rebaselining it is a Decision (FR-011). Held in the vault (0001-eidolon-architecture FR-003)."@en .
 
 ifcore:ControlDispositionScheme a skos:ConceptScheme ; rdfs:label "Control disposition"@en ;
     rdfs:comment "Why a boundary departs from a control in its baseline: the dcterms:type of a Decision that names the boundary and the control by schema:about and lapses on its dcterms:valid, no more than a year after it is decided (0028-compliance-controls FR-012)."@en ;
@@ -5552,7 +5552,7 @@ ifcore:TSCPrivacyCategory a skos:Collection ; skos:notation "privacy" ; skos:pre
 # ───────────────────────── Elenchus (0045-elenchus-works) ─────────────────────────
 # A control test tries to show that one control operates in one boundary and names the probe that carries it out; the test plan
 # is every control test written and not retired; a Verdict states one outcome for each control in each boundary. Control tests and
-# Verdicts are facts of the repository that holds the boundary, never of this ontology (0001-private-repo-architecture FR-003).
+# Verdicts are facts of the repository that holds the boundary, never of this ontology (0001-eidolon-architecture FR-003).
 
 ifcore:Elenchus a ifcore:IntellectualConstruct ; rdfs:label "Elenchus"@en ;
     dcterms:type ifcore:MethodologyType ;
@@ -5683,10 +5683,10 @@ ifcore:SecurityProgramPolicy a dcterms:Policy ; rdfs:label "Security program pol
 # is dcterms:accessRights; a provider is schema:provider; a criticality, treatment or kind is dcterms:type; a risk's
 # ratings and an incident's severity are the W3C Data Privacy Vocabulary's dpv:hasLikelihood, dpv:hasImpact, and
 # dpv:hasSeverity; the boundary a risk or incident concerns is schema:about. Entries are vault data; anything naming a
-# person, or sensitive under 0001-private-repo-architecture FR-016, is held only by RestrictedDataReference.
+# person, or sensitive under 0001-eidolon-architecture FR-016, is held only by RestrictedDataReference.
 
 ifcore:DecisionAuthorityRole a org:Role ; rdfs:label "Decision authority"@en ;
-    skos:definition "The decision authority in effect (0001-private-repo-architecture FR-029): the owner role of anything no delegation assigns elsewhere (0030-policies FR-008)."@en ;
+    skos:definition "The decision authority in effect (0001-eidolon-architecture FR-029): the owner role of anything no delegation assigns elsewhere (0030-policies FR-008)."@en ;
     ifcore:hasAudience ifcore:Public .
 
 ifcore:ownerRole a owl:ObjectProperty ; rdfs:subPropertyOf dcterms:relation ; rdfs:range org:Role ; rdfs:label "owner role"@en ;
@@ -5702,7 +5702,7 @@ ifcore:InternalData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos
 ifcore:ConfidentialData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Confidential"@en ; skos:notation "confidential" ;
     skos:definition "The company's or a customer's, whose disclosure would harm them."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:RestrictedData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Restricted"@en ; skos:notation "restricted" ;
-    skos:definition "Sensitive under 0001-private-repo-architecture FR-016."@en ; ifcore:hasAudience ifcore:Public .
+    skos:definition "Sensitive under 0001-eidolon-architecture FR-016."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:FederalContractInformationData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Federal contract information"@en ; skos:notation "fci" ;
     skos:definition "Information a federal contract provides or generates that is not for public release, as FAR 52.204-21 defines it."@en ; ifcore:hasAudience ifcore:Public .
 ifcore:HealthInformationData a skos:Concept ; skos:inScheme ifcore:DataClassScheme ; skos:prefLabel "Health information"@en ; skos:notation "health" ;

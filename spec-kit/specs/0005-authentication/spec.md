@@ -4,7 +4,7 @@
 **Status:** Draft
 
 **Input:** What must be true before a request is evaluated against a content
-document's declared audience (0001-private-repo-architecture FR-011 – FR-014),
+document's declared audience (0001-eidolon-architecture FR-011 – FR-014),
 and how membership in an audience is granted, checked, and revoked — for
 requesters outside the vault, per 0004-addressing's deferral.
 
@@ -12,7 +12,7 @@ requesters outside the vault, per 0004-addressing's deferral.
 
 - **FR-001**: A request for anything beyond `Public`-audience content MUST
   be bound to exactly one identified agent before it is evaluated against
-  0001-private-repo-architecture FR-011. A request with no identified agent MUST
+  0001-eidolon-architecture FR-011. A request with no identified agent MUST
   be treated as satisfying only the `Public` audience.
 - **FR-002**: How an agent's identity is established — the specific
   authentication mechanism — is not specified here. This spec constrains
@@ -32,7 +32,7 @@ requesters outside the vault, per 0004-addressing's deferral.
   revoked grant keep authorizing requests until the session separately
   expires.
 - **FR-006**: Creating or revoking a grant is a decision and MUST follow
-  0001-private-repo-architecture's decision-authority rules (FR-029, FR-030) —
+  0001-eidolon-architecture's decision-authority rules (FR-029, FR-030) —
   by default, the founder, unless delegated.
 
 ## Sessions
@@ -45,7 +45,7 @@ requesters outside the vault, per 0004-addressing's deferral.
   be issued.
 - **FR-009**: No session token, password, or other authentication
   credential MAY be stored as a literal in any Eidolon repository, public
-  or private — consistent with 0001-private-repo-architecture FR-023's treatment
+  or private — consistent with 0001-eidolon-architecture FR-023's treatment
   of credentials generally.
 
 ## Accountability
@@ -53,7 +53,7 @@ requesters outside the vault, per 0004-addressing's deferral.
 - **FR-010**: Access to any content beyond the `Public` audience MUST be
   logged: which agent, which document, and when.
 - **FR-011**: An access log entry is itself subject to the same
-  confidentiality rules as any other fact (0001-private-repo-architecture
+  confidentiality rules as any other fact (0001-eidolon-architecture
   FR-011) — a record of who viewed what MAY itself need restricting,
   depending on what was viewed. Where and how logs are stored is
   implementation detail; log entries are not committed to any Eidolon
@@ -65,8 +65,8 @@ requesters outside the vault, per 0004-addressing's deferral.
   anything else) a requester uses to establish identity.
 - The specific technology used to store sessions, grant records, or access
   logs.
-- A vault member's direct access to the `private-repo` repository — governed
-  already by 0001-private-repo-architecture FR-008 and FR-009, not by this spec.
+- A vault member's direct access to the `eidolon` repository — governed
+  already by 0001-eidolon-architecture FR-008 and FR-009, not by this spec.
 
 ## Edge cases
 
@@ -83,7 +83,7 @@ requesters outside the vault, per 0004-addressing's deferral.
 - A vault member reaches content through a mediated request rather than
   through the repository: the request is evaluated against grants like
   any other, per FR-003; clone access is governed separately, per
-  0001-private-repo-architecture FR-008 and FR-009.
+  0001-eidolon-architecture FR-008 and FR-009.
 
 ## Assumptions
 

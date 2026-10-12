@@ -43,12 +43,12 @@ is ontology data, not restated here.
 
 - **FR-008**: Each patent family's status and filing data MUST be
   represented as its own `ExternalRecordReference`, per
-  0001-private-repo-architecture FR-022 and 0007-work-and-assets FR-008 — never
+  0001-eidolon-architecture FR-022 and 0007-work-and-assets FR-008 — never
   hand-typed as a literal, and never aggregated into one reference for the
   register as a whole.
 - **FR-009**: A specific count from any register, when it appears outside
   the live register itself, MUST carry the date it was resolved as of, per
-  0001-private-repo-architecture FR-026.
+  0001-eidolon-architecture FR-026.
 
 ## Commercialization gate
 
@@ -112,7 +112,7 @@ is ontology data, not restated here.
   outside counsel) are operational detail.
 - Whatever process keeps an `ExternalRecordReference`'s cached register
   value current is implementation detail, governed already by
-  0001-private-repo-architecture FR-024 and FR-025.
+  0001-eidolon-architecture FR-024 and FR-025.
 - Web page shapes for a research area, pillar, note, or right (`ifweb:`
   content kinds) are deferred to a future spec, per 0002-content-format
   FR-007 — this spec establishes the business concepts; it does not yet

@@ -17,7 +17,7 @@ not restated here.
   not asserted in this or any other spec.
 - **FR-002**: A unit MAY have its own spec for operating detail deeper than
   this one covers. That spec MUST inherit this one and
-  0001-private-repo-architecture without redefining either.
+  0001-eidolon-architecture without redefining either.
 - **FR-003**: A unit's output MUST NOT be treated as sufficient proof for
   another unit's decision. In particular: a patent MUST NOT be treated as
   proof an investment should follow; a publication MUST NOT be treated as
@@ -91,7 +91,7 @@ not restated here.
 ## Decisions
 
 - **FR-012**: Every decision made under this spec MUST resolve to one of the
-  decision-checkpoint outcomes already defined in 0001-private-repo-architecture
+  decision-checkpoint outcomes already defined in 0001-eidolon-architecture
   (`ifcore:DecisionOutcome`). This spec MUST NOT define a second, parallel
   decision model.
 

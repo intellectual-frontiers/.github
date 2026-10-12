@@ -742,12 +742,12 @@ def design_system_new(ctx: Ctx, slug: str, kind: str) -> Resource:
     d = ctx.root / "design-systems" / slug
     if not (d / "spec.md").is_file():
         raise AgoraError("no-spec", f"design-systems/{slug}/spec.md does not exist: the spec comes first, then the ontology, then the work "
-                         "(0001-private-repo-architecture FR-037; 0014-design-systems FR-022)", exit=FAILED,
+                         "(0001-eidolon-architecture FR-037; 0014-design-systems FR-022)", exit=FAILED,
                          actions=[next_command("write the spec first", "spec list")])
     entry = design_systems.entries(ctx.root).get(slug)
     if entry is None:
         raise AgoraError("no-entry", f"{slug} has no ifcore:DesignSystem individual in ontology/ifcore.ttl: the ontology comes before the work "
-                         "(0001-private-repo-architecture FR-037; 0014-design-systems FR-010)", exit=FAILED, actions=again)
+                         "(0001-eidolon-architecture FR-037; 0014-design-systems FR-010)", exit=FAILED, actions=again)
     if entry["kind"] != kind:
         raise AgoraError("kind", f"the ontology registers {slug} as kind {entry['kind']!r}, not {kind!r} (a kind never changes, "
                          "0014-design-systems FR-018)", exit=USAGE, actions=again)

@@ -95,7 +95,7 @@ the DNS-as-code source and the registrar account, never in the ontology
   0022-domain-names FR-012's and whenever the DNS-as-code source
   changes. The check MUST NOT hold a write credential.
 - **FR-018**: Each failure MUST be reported to the decision authority in
-  effect, per 0001-private-repo-architecture FR-025, naming the domain, the
+  effect, per 0001-eidolon-architecture FR-025, naming the domain, the
   control, and what was observed. A report MUST NOT carry a record value
   that 0022-domain-names FR-015 treats as sensitive.
 - **FR-019**: The baseline MUST be the default. A new zone in the
@@ -204,7 +204,7 @@ the DNS-as-code source and the registrar account, never in the ontology
   or must be set by a person, is for DevOps to state, with
   0022-domain-names OQ-1.
 - **OQ-5**: Whether a role other than the founder receives FR-018's
-  reports is not yet delegated, per 0001-private-repo-architecture FR-029.
+  reports is not yet delegated, per 0001-eidolon-architecture FR-029.
 - **OQ-6**: Whether newsletter email carries a verified brand logo
   (BIMI), which needs a registered trademark and a paid mark certificate,
   is not decided.

@@ -63,7 +63,7 @@ class Rules(unittest.TestCase):
             with self.subTest(cls=cls):
                 self.assertEqual(kind(self.g, cls), want)
 
-    def test_a_company_is_an_private-repo_whoever_formed_it(self):
+    def test_a_company_is_an_eidolon_whoever_formed_it(self):
         g = graph(f"ex:Founder a ifcore:Person ; {PUB} .\nex:Co a ifcore:Company ; dcterms:creator ex:Founder ; prov:wasAttributedTo ex:Founder ; {PUB} .\n")
         self.assertEqual(r.subject_kind(g, Iri("https://example.org/t#Co"))[0], EID_K)
 

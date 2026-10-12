@@ -93,14 +93,14 @@ restated here.
 
 - **FR-017**: A company Studios incubates MUST receive its own Eidolon —
   a public root and, where it holds anything Confidential, a private
-  vault — the same separation 0001-private-repo-architecture FR-004 already
+  vault — the same separation 0001-eidolon-architecture FR-004 already
   requires for a fund, so an AI reasoning about that company's own work
   has a grounded representation of it to manage work against, not only
   prose about it.
 - **FR-018**: Until a company's own Eidolon exists, Studios MUST
   represent it as individuals within Intellectual Frontiers' own
   Eidolon. That representation MUST transfer to the company's own
-  Eidolon once it exists, per 0001-private-repo-architecture FR-019's
+  Eidolon once it exists, per 0001-eidolon-architecture FR-019's
   single-source-of-truth rule — not be duplicated and left to drift in
   both places.
 - **FR-019**: A company represented under FR-018 MUST live under a
@@ -239,7 +239,7 @@ restated here.
 - **A company's own Eidolon** — the public root (and private vault, where
   needed) a Studios-incubated company gets once it exists, so an AI can
   reason about and help manage its work directly, the same separation
-  0001-private-repo-architecture FR-004 requires for a fund.
+  0001-eidolon-architecture FR-004 requires for a fund.
 - **A company's `ventures/` directory** — the transitional home, scoped
   to one company and private by default, where it lives inside
   Intellectual Frontiers' own Eidolon before its own Eidolon exists; not

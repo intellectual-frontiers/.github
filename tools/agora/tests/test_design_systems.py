@@ -1,4 +1,4 @@
-"""`design-system list`, `show` and `new` (0042-agora FR-006, FR-009; 0001-private-repo-architecture FR-037)."""
+"""`design-system list`, `show` and `new` (0042-agora FR-006, FR-009; 0001-eidolon-architecture FR-037)."""
 from __future__ import annotations
 
 import shutil

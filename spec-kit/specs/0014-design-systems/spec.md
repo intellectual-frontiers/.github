@@ -169,7 +169,7 @@ any number of each kind.
   a rule depends on (banned words, a palette) MAY be held in the system's
   machine-readable form and cited by the requirement, not restated in it.
 - **FR-023**: A change to a design system's spec is a spec amendment
-  (0001-private-repo-architecture FR-034, FR-035), whether it adds, retires, or
+  (0001-eidolon-architecture FR-034, FR-035), whether it adds, retires, or
   changes the meaning of a house rule. A lesson a work teaches becomes a
   house rule only by being written into that spec as a requirement.
 
@@ -274,7 +274,7 @@ any number of each kind.
   logo files, its share card and its imagery pool. Its consumers are the design systems it themes and the
   channels that pair it with them. A brand that is not yet public MUST live,
   with the same layout and harness, in a repository that may hold
-  confidential material, never in this one (0001-private-repo-architecture
+  confidential material, never in this one (0001-eidolon-architecture
   FR-002).
 
 - **FR-043**: A brand MAY supply an **imagery pool**: the approved pieces

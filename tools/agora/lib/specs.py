@@ -1,7 +1,7 @@
 """Specs: finding them, indexing their requirements, and checking their format.
 
 Ported from the public root's former spec checker, with the same findings and messages (0020-spec-format FR-005,
-FR-006, FR-008, FR-009, FR-018; 0001-private-repo-architecture FR-034).
+FR-006, FR-008, FR-009, FR-018; 0001-eidolon-architecture FR-034).
 """
 from __future__ import annotations
 

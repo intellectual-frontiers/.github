@@ -57,7 +57,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   scheme of command categories, a scheme of command verbs, a scheme of
   resource kinds (the nouns), and one `ifcore:Command` individual for every
   command, naming its noun, its verb and its category
-  (0001-private-repo-architecture FR-037, 0019-controlled-vocabulary FR-001). The
+  (0001-eidolon-architecture FR-037, 0019-controlled-vocabulary FR-001). The
   check section `commands` MUST fail when the registry has a command the
   ontology does not declare, the ontology has one the registry does not, or
   their noun, verb or category differ.
@@ -111,7 +111,7 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
   design system's spec (`design-systems/<slug>/spec.md`) and its entry in the
   ontology already exist, and the entry's kind is KIND, a kind code of the
   ontology's kind scheme that ends the slug, so that the spec comes first,
-  then the ontology, then the work (0001-private-repo-architecture FR-037;
+  then the ontology, then the work (0001-eidolon-architecture FR-037;
   0014-design-systems FR-003, FR-010, FR-022). When it does not refuse it MUST
   create only the files 0014-design-systems FR-006 names that the directory
   lacks, a `README.md` and an `assurance/` harness that reports it has no

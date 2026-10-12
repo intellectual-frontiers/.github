@@ -30,7 +30,7 @@ effect. A system's place in a boundary is the boundary's
   - its recovery objectives (0039-business-continuity-policy FR-001).
 
   An account, an address, or a configuration value that would be
-  sensitive under 0001-private-repo-architecture FR-016 MUST be held only by
+  sensitive under 0001-eidolon-architecture FR-016 MUST be held only by
   reference.
 - **FR-002**: Every system MUST declare its highest data class from the
   ontology's data classification scheme:
@@ -38,7 +38,7 @@ effect. A system's place in a boundary is the boundary's
   - **Internal**: the company's own, not for publication;
   - **Confidential**: the company's or a customer's, whose disclosure would
     harm them;
-  - **Restricted**: sensitive under 0001-private-repo-architecture FR-016;
+  - **Restricted**: sensitive under 0001-eidolon-architecture FR-016;
   - **Federal contract information**;
   - **Health information**: information a business associate agreement or
     health privacy law protects.
@@ -85,7 +85,7 @@ effect. A system's place in a boundary is the boundary's
 ## Carried out by
 
 - The Eidolon itself: facts declare audiences, and sensitive facts are
-  never literals: 0001-private-repo-architecture FR-011, FR-016, and FR-021.
+  never literals: 0001-eidolon-architecture FR-011, FR-016, and FR-021.
 - Access to Eidolon content beyond Public is logged:
   0005-authentication FR-010.
 - Domains, their DNS, and their certificates: 0022-domain-names FR-018

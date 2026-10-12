@@ -52,7 +52,7 @@ cites its practices rather than inventing its own.
 ## Carried out by
 
 - Every change to a spec or the ontology says what changed and why, and a
-  change is specified before it is built: 0001-private-repo-architecture
+  change is specified before it is built: 0001-eidolon-architecture
   FR-035 and FR-037.
 - The specs and register are checked on every push:
   0020-spec-format FR-015.
@@ -60,7 +60,7 @@ cites its practices rather than inventing its own.
   deployed: 0023-domain-security FR-019.
 - A published contact for reporting weaknesses:
   0023-domain-security FR-022.
-- No credential is ever committed: 0001-private-repo-architecture FR-023.
+- No credential is ever committed: 0001-eidolon-architecture FR-023.
 
 ## Out of scope
 

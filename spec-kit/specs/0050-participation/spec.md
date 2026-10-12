@@ -54,7 +54,7 @@ the platform's own specs. The terms live in the ontology (`ifcore:EntryDoorSchem
 - **FR-013**: A platform that verifies MUST name, in its own specs, each source a level rests on, and MUST say what each level proves and what it does not. A level MUST NOT be
   presented as proving more than its sources prove.
 - **FR-014**: What a source returned MUST be kept as an external record reference with its source, the time it was checked and a cadence for checking again
-  (0001-private-repo-architecture FR-024). A level MUST drop when a check fails, and the party MUST be told.
+  (0001-eidolon-architecture FR-024). A level MUST drop when a check fails, and the party MUST be told.
 - **FR-015**: A party MUST be able to verify itself in a self-service flow through a source it already uses, by a standard sign-in protocol, where that source offers one. The
   source MUST NOT receive data of any other party through the sign-in, and the source's terms MUST be followed.
 

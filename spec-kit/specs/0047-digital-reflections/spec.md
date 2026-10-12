@@ -36,7 +36,7 @@ and SKOS under 0019-controlled-vocabulary.
   stated as an assertion labelled `unknown` (FR-022), not omitted and not
   guessed.
 - **FR-004**: A reflection is a `Fact` and MUST declare its audience
-  (0001-private-repo-architecture FR-011), and MAY name the role that stewards
+  (0001-eidolon-architecture FR-011), and MAY name the role that stewards
   the record by `ifcore:ownerRole`. Stewardship of a record MUST NOT be
   read as ownership of the subject, a legal right in it, or authority
   over it.
@@ -95,7 +95,7 @@ and SKOS under 0019-controlled-vocabulary.
 - **FR-011**: The ontology MUST hold the classification as
   `ifcore:ClassificationRule` individuals, each naming one subject class
   (`ifcore:subjectClass`) and the one kind it reflects as
-  (`ifcore:reflectedAs`): `private-repo`, `ergon`, `noema`, `other` (FR-027) or
+  (`ifcore:reflectedAs`): `eidolon`, `ergon`, `noema`, `other` (FR-027) or
   `undetermined`. At most one rule MUST name a class. A new subject class
   MUST receive its rule before reflections of it are created.
 - **FR-012**: A subject's kind MUST be resolved from the rules of its
@@ -183,7 +183,7 @@ and SKOS under 0019-controlled-vocabulary.
   the assertions it rests on. Human judgment stays explicit: an AI
   inference is never established fact by being recorded.
 - **FR-026**: Every assertion is subject to the sensitivity test
-  (0001-private-repo-architecture FR-016). Personally identifying information
+  (0001-eidolon-architecture FR-016). Personally identifying information
   about a person an Eidolon reflects, and a third party's confidential
   information about any subject, MUST be held only by a
   `RestrictedDataReference`.
@@ -237,7 +237,7 @@ and SKOS under 0019-controlled-vocabulary.
 
 - **FR-035**: The canonical names MUST be `Eidolon`, `Ergon` and `Noema`,
   with the plurals `Eidolons`, `Ergons` and `Noemas`. The Eidolon of
-  0001-private-repo-architecture (the two-repository system, and a company's
+  0001-eidolon-architecture (the two-repository system, and a company's
   own, per 0011-studios FR-017) is the system that holds reflections; prose
   MUST NOT call a product, a service, a system or a workflow an Eidolon,
   MUST call a deliberately created subject an Ergon, and MUST call an
@@ -325,7 +325,7 @@ and SKOS under 0019-controlled-vocabulary.
   Eidolon by FR-010, yet it exists only as software and is created by
   instantiating a design, which points away from one. No rule classifies it,
   so it is `undetermined`.
-- **OQ-3**: Whether the Eidolon of 0001-private-repo-architecture, the system, is
+- **OQ-3**: Whether the Eidolon of 0001-eidolon-architecture, the system, is
   renamed now that `Eidolon` also names one kind of record. FR-035 keeps both
   uses distinct in prose; a rename is a decision for the authority in
   effect.

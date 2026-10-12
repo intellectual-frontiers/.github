@@ -6,7 +6,7 @@
 **Input:** What a content document is, independent of any specific business
 content type: a single HTML5 file, strictly parsed, typed against the
 ontology, and carrying its own confidentiality declaration per
-0001-private-repo-architecture's facts and audience model.
+0001-eidolon-architecture's facts and audience model.
 
 ## What a content document is
 
@@ -29,25 +29,25 @@ ontology, and carrying its own confidentiality declaration per
   shape. An unknown property, a missing required property, or a malformed
   value MUST fail the document.
 - **FR-007**: A content kind MUST exist in the ontology — per
-  0001-private-repo-architecture FR-037 — before any document may declare that
+  0001-eidolon-architecture FR-037 — before any document may declare that
   `@type`. A document MUST NOT invent a type the ontology does not define.
 - **FR-008**: A content document's `<title>` and `<meta name="description">`
   (FR-004) MUST be derived from the same fact(s) its JSON-LD block asserts.
   Neither MAY be independently authored text that could drift from it —
-  0001-private-repo-architecture FR-019's single-source-of-truth rule applies to
+  0001-eidolon-architecture FR-019's single-source-of-truth rule applies to
   a document's own metadata, not only to business facts.
 
 ## Confidentiality
 
-- **FR-009**: A content document is a Fact under 0001-private-repo-architecture
+- **FR-009**: A content document is a Fact under 0001-eidolon-architecture
   and MUST declare its audience via `ifcore:hasAudience` in its JSON-LD
   block, per that spec's FR-011 through FR-014.
 - **FR-010**: A content document MUST NOT resolve a `RestrictedDataReference`
-  value into its body, per 0001-private-repo-architecture FR-027. It MAY state
+  value into its body, per 0001-eidolon-architecture FR-027. It MAY state
   that the fact exists and how to request it.
 - **FR-011**: A content document that displays a resolved
   `ExternalRecordReference` value MUST display the date it was resolved as
-  of, visibly, per 0001-private-repo-architecture FR-026.
+  of, visibly, per 0001-eidolon-architecture FR-026.
 
 ## Body
 

@@ -43,7 +43,7 @@ property fetches them are decisions outside this spec.
   its own.
 - **FR-005**: `<kind>` MUST name an `ifcore:WorkKind` individual declared in
   the ontology before any work package of that kind exists, per
-  0001-private-repo-architecture FR-037. A kind names the work's primary
+  0001-eidolon-architecture FR-037. A kind names the work's primary
   presentation form, not the work itself, per
   0021-works-and-presentations FR-019.
 - **FR-006**: A work package is not a content root. No file inside one is a
@@ -55,7 +55,7 @@ property fetches them are decisions outside this spec.
   the source in another format, where one is kept, MUST be marked non-live
   in its own folder and MUST NOT be edited. Anything that must exist in
   several places MUST be one real copy referenced from the others, per
-  0001-private-repo-architecture FR-019.
+  0001-eidolon-architecture FR-019.
 - **FR-008**: A file in or beside a work package MUST NOT assert, as a
   literal, a fact the ontology asserts about the same work: its lifecycle
   stage, its lifecycle owner, its audience, or its decisions. It MUST
@@ -105,7 +105,7 @@ property fetches them are decisions outside this spec.
 - **FR-017**: Every delivered binary rendition MUST be represented by a
   delivery record — a `Reference` — carrying where the rendition lives, the
   source commit, the date delivered, and a checksum, and carrying its own
-  audience declaration per 0001-private-repo-architecture FR-015. A delivery
+  audience declaration per 0001-eidolon-architecture FR-015. A delivery
   record's audience MUST NOT be broader than its work's audience. A
   delivery record MUST NOT hold a credential, a password, an access secret,
   or a signed or expiring address.
@@ -140,10 +140,10 @@ property fetches them are decisions outside this spec.
   an earlier one.
 - **FR-024**: A work's audience MUST default to the most restrictive
   available audience until a publication decision records otherwise, per
-  0001-private-repo-architecture FR-012.
+  0001-eidolon-architecture FR-012.
 - **FR-025**: Broadening a work's audience to Public MUST be its own
   `Decision`, made by the decision authority in effect
-  (0001-private-repo-architecture FR-029) and recorded before any consumer
+  (0001-eidolon-architecture FR-029) and recorded before any consumer
   serves the work, one of its generated content documents, or one of its
   renditions to the public. Broadening an audience requires no history
   rewrite; narrowing one is governed by 0008-decision-records FR-013.
@@ -153,7 +153,7 @@ property fetches them are decisions outside this spec.
 - **FR-027**: A Substantial Work MAY be announced: its public record (FR-029)
   is made visible to the public while the work itself keeps its audience.
   Announcing a work MUST be its own `Decision`, made by the decision
-  authority in effect (0001-private-repo-architecture FR-029) and recorded before
+  authority in effect (0001-eidolon-architecture FR-029) and recorded before
   any consumer shows the work's public record, and the announcement MUST be
   asserted once, on the work's individual, in the same edit. A Public work's
   publication decision (FR-025) also announces it.

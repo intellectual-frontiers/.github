@@ -16,7 +16,7 @@ system in a boundary and cites them rather than restating them.
   account of their own. An account shared by several people MUST NOT
   exist. An account used by software rather than a person (a service
   account) MUST have an owner role, and its credential MUST be held only
-  as a `RestrictedDataReference` (0001-private-repo-architecture FR-023).
+  as a `RestrictedDataReference` (0001-eidolon-architecture FR-023).
 - **FR-002**: Every sign-in to a system in a boundary that holds anything
   beyond Public data (0033-systems-and-data-policy FR-002) MUST require a
   second factor. Every administrative account MUST use a
@@ -47,7 +47,7 @@ system in a boundary and cites them rather than restating them.
   owner role approved it. Outside systems include a third-party service,
   an integration, and a personal device.
 - **FR-008**: Information MUST be posted on a publicly reachable system
-  only once its audience is Public (0001-private-repo-architecture FR-011).
+  only once its audience is Public (0001-eidolon-architecture FR-011).
   Each publicly reachable system MUST have an owner role who checks that
   rule before anything is posted to it.
 
@@ -62,8 +62,8 @@ system in a boundary and cites them rather than restating them.
 
 - The vault's clone access is limited to a named circle, and everyone else
   reaches the vault only through the mediated interface:
-  0001-private-repo-architecture FR-008 and FR-009.
-- No credential is ever committed: 0001-private-repo-architecture FR-023 and
+  0001-eidolon-architecture FR-008 and FR-009.
+- No credential is ever committed: 0001-eidolon-architecture FR-023 and
   0005-authentication FR-009.
 - Access beyond Public needs an identified agent and a current grant,
   checked on every request: 0005-authentication FR-001, FR-003 through
@@ -76,7 +76,7 @@ system in a boundary and cites them rather than restating them.
 - Physical access, and the devices people sign in from. Both belong to
   0032-endpoint-and-media-policy.
 - Who may see a fact in the Eidolon. That is governed by audiences, per
-  0001-private-repo-architecture FR-011 through FR-014.
+  0001-eidolon-architecture FR-011 through FR-014.
 
 ## Edge cases
 

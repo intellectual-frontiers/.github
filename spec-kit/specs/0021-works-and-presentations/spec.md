@@ -19,7 +19,7 @@ schema.org's `workExample` and `exampleOfWork`.
 - **FR-002**: A work's lifecycle stage, lifecycle owner, audience, Native
   Alpha claim (0003-intellectual-frontiers FR-014 through FR-016),
   evidence, and rights MUST be asserted on the work, once, per
-  0001-private-repo-architecture FR-019, and never restated on a presentation
+  0001-eidolon-architecture FR-019, and never restated on a presentation
   of it. A presentation's own production stage, owner, audience, and
   rights, where it has them, are its own facts, per FR-022.
 - **FR-003**: A work MUST NOT be identified by, or exist only as, one of
@@ -158,7 +158,7 @@ schema.org's `workExample` and `exampleOfWork`.
 ## Out of scope
 
 - The ontology terms for a work, a presentation, a presenter, and a
-  channel. They follow this spec, per 0001-private-repo-architecture FR-037,
+  channel. They follow this spec, per 0001-eidolon-architecture FR-037,
   reusing established vocabulary per 0019-controlled-vocabulary.
 - Restructuring the vault's `works/` directory. FR-019 governs until a
   Decision changes it.

@@ -167,4 +167,4 @@ derived from the old record, and the old record stays and points to it, so ident
 can decide stays as it is and goes on the repository's register of open questions. Changing the rules and moving records are separate
 commits. A further kind of reflection is added in the ontology alone, as a class, a kind concept and its rules.
 
-The longer essay is `content/journal/private-repos.html`.
+The longer essay is `content/journal/eidolons.html`.

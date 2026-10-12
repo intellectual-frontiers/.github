@@ -8,14 +8,14 @@ This is an official AI Audit of the company. It runs every week. The rule it enf
 Every class, property, concept scheme and concept in every ontology of:
 
 - `intellectual-frontiers/.github` (`ontology/`, including the platform vocabularies and the Opsfolio platform);
-- `intellectual-frontiers/private-repo` (`ontology/`, including `physia.ttl`, `compliance.ttl`, `domains.ttl`, `elenchus.ttl`, `publishing.ttl`, `imprint.ttl`, `ifpriv.ttl`, `works.ttl`).
+- `intellectual-frontiers/eidolon` (`ontology/`, including `physia.ttl`, `compliance.ttl`, `domains.ttl`, `elenchus.ttl`, `publishing.ttl`, `imprint.ttl`, `ifpriv.ttl`, `works.ttl`).
 
 A work's generated concepts (`*.concepts.ttl`) are not part of this audit; `eid check terms` covers them.
 
 ## Procedure
 
 1. Check out both repositories on their default branches.
-2. Run the scan: `python3 -I tools/agora/vocabulary_scan.py --root .github=<path> --root private-repo=<path> --json`.
+2. Run the scan: `python3 -I tools/agora/vocabulary_scan.py --root .github=<path> --root eidolon=<path> --json`.
    It lists each term as `reused` (tied to an established term), `excepted` (a `Decision` names it) or `unmapped`.
    Unmapped means "not yet shown to be reused". It does not mean "invented".
 3. Compare with the previous report in `spec-kit/audits/vocabulary-drift/`. New unmapped terms come first.

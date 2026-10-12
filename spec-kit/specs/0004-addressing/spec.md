@@ -6,7 +6,7 @@
 **Input:** How a content document's file path becomes a URL, and how a
 request for that URL is resolved across the Eidolon's public root and
 private vault, given persistence stays Git-backed with no live
-network-mounted source (0001-private-repo-architecture FR-005).
+network-mounted source (0001-eidolon-architecture FR-005).
 
 ## Path to URL
 
@@ -33,7 +33,7 @@ network-mounted source (0001-private-repo-architecture FR-005).
   root's content. If no document matches there, it MUST then be resolved
   against the private vault's content.
 - **FR-006**: Resolution MUST apply the same audience check
-  (0001-private-repo-architecture FR-011 – FR-014) to a matched document
+  (0001-eidolon-architecture FR-011 – FR-014) to a matched document
   regardless of which repository it came from. No matched document is
   served to a requester without this check.
 - **FR-007**: A requester who does not satisfy any audience listed on a
@@ -55,7 +55,7 @@ network-mounted source (0001-private-repo-architecture FR-005).
   delivered rendition under FR-010.
 - **FR-010**: A consumer that serves a delivered rendition (0015-work-packages)
   MUST apply the audience declared on that rendition's own delivery
-  record, per 0001-private-repo-architecture FR-011 through FR-015, and MUST
+  record, per 0001-eidolon-architecture FR-011 through FR-015, and MUST
   NOT serve it to a requester who does not satisfy that audience. Where a
   consumer retrieves renditions from storage outside both repositories,
   and when it retrieves them, is the consumer's own decision and is
@@ -70,7 +70,7 @@ network-mounted source (0001-private-repo-architecture FR-005).
 - Composable layouts, includes, and reusable fragments remain templating,
   out of scope per 0002-content-format.
 - A live, network-mounted content source remains out of scope per
-  0001-private-repo-architecture FR-005; addressing here is defined entirely
+  0001-eidolon-architecture FR-005; addressing here is defined entirely
   over Git-backed content.
 
 ## Edge cases

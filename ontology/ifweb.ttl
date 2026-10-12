@@ -15,7 +15,7 @@
 # class and a SHACL NodeShape, marked with ifweb:contentKind when it is a
 # document-level shape a content document's own JSON-LD block may declare
 # as its @type (0002 FR-005). Per the working order in
-# 0001-private-repo-architecture FR-037, a shape is added here only once a spec
+# 0001-eidolon-architecture FR-037, a shape is added here only once a spec
 # establishes the business concept it represents — Page is the one
 # exception, since it names no business concept beyond the content-document
 # contract 0002 already establishes for every document.

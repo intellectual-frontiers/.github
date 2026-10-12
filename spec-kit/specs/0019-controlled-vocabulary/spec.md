@@ -55,7 +55,7 @@ sooner.
 - **FR-008**: An audit under FR-007 MUST only flag a candidate; it MUST NOT
   rename or remove a term by itself. Acting on a flagged candidate follows
   the same spec-before-ontology-before-implementation order as any other
-  ontology change, per 0001-private-repo-architecture FR-037. A person decides
+  ontology change, per 0001-eidolon-architecture FR-037. A person decides
   each candidate: replace the term, map it to the established term, or record
   an exception Decision.
 - **FR-009**: A term with neither an established equivalent (FR-001 to FR-003,
@@ -95,7 +95,7 @@ sooner.
   exception from an unjustified invention, are matters of judgment applied
   at review time, not fixed by this spec.
 - The audit's day and hour, the mail service it uses, and the scan's
-  implementation are implementation detail, per 0001-private-repo-architecture's
+  implementation are implementation detail, per 0001-eidolon-architecture's
   standard for what a spec does not fix.
 - Renaming a term that FR-007 surfaces as a current candidate is a decision
   to make when it happens, not restated here.

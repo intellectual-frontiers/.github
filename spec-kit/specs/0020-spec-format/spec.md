@@ -42,7 +42,7 @@ where it departs from it.
   edge case.
 - **FR-007**: An assumption MUST state a condition the spec takes as given
   and would need revisiting if it stopped holding. An assumption MUST NOT
-  assert a company fact (0001-private-repo-architecture FR-002, FR-019): a fact
+  assert a company fact (0001-eidolon-architecture FR-002, FR-019): a fact
   belongs in the ontology.
 - **FR-008**: Requirement identifiers MUST NOT be renumbered or reused. A
   new requirement takes the next unused number in its spec, whichever
@@ -55,15 +55,15 @@ where it departs from it.
 
 - **FR-009**: A spec's status MUST be one of three, as the ontology's spec
   status scheme defines them: `Draft` (in force, and open to amendment by
-  anyone working under 0001-private-repo-architecture FR-037), `Adopted` (in
+  anyone working under 0001-eidolon-architecture FR-037), `Adopted` (in
   force, and amended only by the authority in effect or with its explicit
   approval), or `Superseded by <spec>` (no longer in force; the named
   spec governs instead), where `<spec>` is a numbered spec's `NNNN-slug`
   or a design system's slug (FR-018).
 - **FR-010**: A spec MUST move from `Draft` to `Adopted`, or to
   `Superseded`, only by the authority in effect, per
-  0001-private-repo-architecture FR-029. The move is a spec amendment, recorded
-  by its commit message per 0001-private-repo-architecture FR-035, not a
+  0001-eidolon-architecture FR-029. The move is a spec amendment, recorded
+  by its commit message per 0001-eidolon-architecture FR-035, not a
   `Decision` individual, per 0008-decision-records FR-014. Neither an AI
   nor a check MAY make that move on its own judgment.
 

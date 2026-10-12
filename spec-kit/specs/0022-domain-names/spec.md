@@ -9,7 +9,7 @@ it serves; which of its facts the company is the authority on and which
 belong to the domain's registry; who may see that the company holds it;
 where its DNS records live; and how the catalog is kept true against the
 registrar and DNS provider accounts the company holds. It applies
-0007-work-and-assets FR-006 through FR-008 and 0001-private-repo-architecture
+0007-work-and-assets FR-006 through FR-008 and 0001-eidolon-architecture
 FR-016 through FR-025 to domain names.
 
 ## What a domain name is
@@ -57,7 +57,7 @@ FR-016 through FR-025 to domain names.
 
 - **FR-008**: Every domain name the company holds MUST be represented, in
   the public root if its audience is Public and in the vault otherwise,
-  per 0001-private-repo-architecture FR-002 and FR-003, so that the two
+  per 0001-eidolon-architecture FR-002 and FR-003, so that the two
   together are the complete catalog.
 - **FR-009**: A `DomainName` MAY declare the Public audience only when its
   role is primary, redirect, or mail and everything it names by
@@ -84,21 +84,21 @@ FR-016 through FR-025 to domain names.
   the domain.
 - **FR-013**: A cached registration value MUST NOT carry the registrant's,
   administrative, or technical contact details, even where a registry
-  publishes them unredacted, per 0001-private-repo-architecture FR-016.
+  publishes them unredacted, per 0001-eidolon-architecture FR-016.
 
 ## Registrars, DNS, and access
 
 - **FR-014**: Each account the company holds at a registrar or DNS
   provider MUST be represented as a `RestrictedDataReference`, per
-  0001-private-repo-architecture FR-023. No credential, API token, or account
+  0001-eidolon-architecture FR-023. No credential, API token, or account
   recovery detail for any such account MAY appear in any Eidolon
   repository.
 - **FR-015**: A domain's DNS records MUST be kept as code, in the
   company's DNS-as-code source, which is their single source per
-  0001-private-repo-architecture FR-019. They MUST NOT be asserted as facts in
+  0001-eidolon-architecture FR-019. They MUST NOT be asserted as facts in
   the ontology or copied into any other Eidolon repository; a record that
   exposes an origin address or a verification token is sensitive under
-  0001-private-repo-architecture FR-016(c).
+  0001-eidolon-architecture FR-016(c).
 
 ## Gaining, keeping, and giving up a domain
 
@@ -106,10 +106,10 @@ FR-016 through FR-025 to domain names.
   another registrar or rights-holder, and letting one lapse or deleting
   it MUST each be recorded as a `Decision`, per 0008-decision-records.
   Renewing a domain already held is routine and MUST NOT require one, per
-  0001-private-repo-architecture FR-031.
+  0001-eidolon-architecture FR-031.
 - **FR-017**: A `DomainName` whose expiry, as last verified under FR-012,
   falls within sixty days MUST be reported to the decision authority in
-  effect, per 0001-private-repo-architecture FR-029, unless a `Decision` to let
+  effect, per 0001-eidolon-architecture FR-029, unless a `Decision` to let
   it lapse is already recorded.
 
 ## Keeping the catalog true
@@ -121,7 +121,7 @@ FR-016 through FR-025 to domain names.
   decision authority in effect.
 - **FR-019**: A reconciliation run under FR-018 MUST only report; it MUST
   NOT add, change, or remove a `DomainName` on its own. Acting on a report
-  follows 0001-private-repo-architecture FR-016 and FR-037.
+  follows 0001-eidolon-architecture FR-016 and FR-037.
 - **FR-020**: A domain name the decision authority has decided to let
   lapse MAY be left out of the catalog, despite FR-008, once that
   `Decision` is recorded under FR-016; the `Decision` itself MUST name
@@ -151,7 +151,7 @@ FR-016 through FR-025 to domain names.
   redirect address, a platform's verification of the domain, a service
   that sends mail as it) MUST be recorded in the vault as a reference
   that `dcterms:requires` the `DomainName`, carrying no credential, per
-  0001-private-repo-architecture FR-023.
+  0001-eidolon-architecture FR-023.
 - **FR-025**: A `Decision` to let a domain lapse or to transfer it away
   MUST NOT be recorded while anything `dcterms:requires` it or while it
   carries a published address (0024-persistent-addresses FR-003).
