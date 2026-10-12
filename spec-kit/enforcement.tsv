@@ -1442,3 +1442,37 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0041-command-line FR-083	check	workspaces-host: ws-host test	tests check the spinner, colour, emoji and megabytes at a terminal for a person, the events for the editor and the web, and plain lines only where nobody is attending
 0044-public-website FR-080	check	eidolon: eid test	the Rust tests (tests/served.rs) serve a model with no works directory, then fill it while running and see the downloads appear, empty it and see them go, and serve nothing without a log-in
 0044-public-website FR-081	check	eidolon: eid test	the container test reads the Dockerfile for the volume, EID_WORKS and no copied renditions
+0052-decisions-nba-board FR-001	none	-	whether a work records the method as a Noema is judgment; eid check works reads the work's kind only
+0052-decisions-nba-board FR-002	none	-	judgment
+0052-decisions-nba-board FR-003	none	-	judgment
+0052-decisions-nba-board FR-004	none	-	no check of the terms a work uses
+0052-decisions-nba-board FR-005	none	-	judgment
+0052-decisions-nba-board FR-006	none	-	no check of the words a record uses for operational truth outside 0045 FR-040's own check
+0052-decisions-nba-board FR-007	none	-	judgment
+0052-decisions-nba-board FR-008	none	-	judgment
+0052-decisions-nba-board FR-009	none	-	judgment
+0052-decisions-nba-board FR-010	none	-	judgment
+0052-decisions-nba-board FR-011	none	-	judgment; the research source check records what was verified
+0052-decisions-nba-board FR-012	none	-	judgment
+0052-decisions-nba-board FR-013	none	-	judgment
+0052-decisions-nba-board FR-014	none	-	judgment
+0052-decisions-nba-board FR-015	none	-	judgment; a Board's own acceptance tests carry it
+0052-decisions-nba-board FR-016	none	-	judgment
+0052-decisions-nba-board FR-017	none	-	judgment
+0052-decisions-nba-board FR-018	none	-	judgment
+0052-decisions-nba-board FR-019	none	-	judgment
+0052-decisions-nba-board FR-020	none	-	judgment
+0052-decisions-nba-board FR-021	none	-	judgment
+0052-decisions-nba-board FR-022	none	-	judgment
+0052-decisions-nba-board FR-023	none	-	judgment
+0052-decisions-nba-board FR-024	none	-	judgment; a runtime permission gate is a product's, not this spec's
+0052-decisions-nba-board FR-025	none	-	judgment
+0052-decisions-nba-board FR-026	none	-	judgment
+0052-decisions-nba-board FR-027	none	-	judgment
+0052-decisions-nba-board FR-028	none	-	judgment; a product's tests carry it
+0052-decisions-nba-board FR-029	none	-	judgment
+0052-decisions-nba-board FR-030	none	-	judgment
+0052-decisions-nba-board FR-031	none	-	judgment
+0052-decisions-nba-board FR-032	none	-	judgment
+0052-decisions-nba-board FR-033	check	eidolon: eid check research-papers	eid check research-papers reads claim labels and falsifiers of a research record; a work outside research is not checked
+0052-decisions-nba-board FR-034	none	-	judgment; no check of rights wording

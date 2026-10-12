@@ -5808,3 +5808,77 @@ ifcore:mayTrigger a owl:ObjectProperty ; rdfs:subPropertyOf dcterms:relation ; r
     rdfs:comment "An obligation this incident may trigger, found at triage (0035 FR-004). It stays open in the status report until a Decision names the incident and the obligation (FR-005, FR-006)."@en .
 ifcore:noticeWithin a owl:DatatypeProperty ; rdfs:domain ifcore:NotificationObligation ; rdfs:range xsd:duration ; rdfs:label "notice within"@en ;
     rdfs:comment "How long after discovery notice is due (0035 FR-005)."@en .
+
+# ───────────────────────── Decisions & NBA Board (0052-decisions-nba-board) ─────────────────────────
+# The method is an abstract methodology, so a Noema (0048-noemas FR-007). A product or workflow that carries it out is an Ergon related to it by
+# ifcore:Operationalizes. A decision candidate, a goal and a result are facts of the organization that runs a Board, never of this ontology
+# (0001-eidolon-architecture FR-003); the classes below name them. ifcore:Decision, ifcore:Alternative and ifcore:consideredAlternative are reused.
+
+ifcore:DecisionsAndNbaBoard a ifcore:IntellectualConstruct ; rdfs:label "Decisions & NBA Board"@en ;
+    dcterms:type ifcore:MethodologyType ;
+    skos:definition "A short, continuously refreshed queue of decisions, each carrying cited operational truth, its alternatives (doing nothing among them), a recommended next best action, a person with authority to decide, and a dated check on the result (0052-decisions-nba-board FR-001, FR-002)."@en ;
+    rdfs:comment "An abstract methodology, so a Noema. It is not a dashboard, a task tracker, a chatbot or an autonomous manager (0052 FR-003). What it achieves is a hypothesis of the research pillar that studies it. Its name's clearance is an open question (0052 OQ-2)."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DecisionsAndNbaBoardNoema a ifcore:Noema ; ifcore:reflects ifcore:DecisionsAndNbaBoard ;
+    skos:definition "A short, continuously refreshed queue of decisions, each carrying cited operational truth, its alternatives (doing nothing among them), a recommended next best action, a person with authority to decide, and a dated check on the result (0052-decisions-nba-board FR-001, FR-002)."@en ;
+    ifcore:ownerRole ifcore:ResearchAndIp ;
+    rdfs:comment "The record of the Decisions & NBA Board methodology (0048-noemas FR-007). Its epistemic state is assessed, not stored here (0048 FR-012); the research pillar holds the claims it makes."@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:DecisionsAndNbaBoardPillar a ifcore:ResearchPillar, prov:Plan ;
+    rdfs:label "Decisions & NBA Board"@en ;
+    dcterms:isPartOf ifcore:AiNativeSystemsArea ;
+    schema:about ifcore:DecisionsAndNbaBoard ;
+    ifcore:question "Does a short, evidence-backed queue of decisions and next best actions, routed to people with authority and checked against results, change business outcomes more than an AI summary of the same information?"@en ;
+    ifcore:hasAudience ifcore:Public .
+
+ifcore:Goal a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Goal"@en ;
+    skos:definition "What an organization wants, with an owner, an outcome measure, a dated baseline, a target, a time horizon, a segment, hard constraints and the tradeoff it accepts (0052-decisions-nba-board FR-012)."@en ;
+    rdfs:comment "Not a task and not a metric. A goal without a baseline is instrumentation work, not a met goal (0052 FR-010)."@en .
+ifcore:OutcomeMetric a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Outcome metric"@en ;
+    skos:definition "How the result of a goal is measured, with its definition and source, paired with at least one counter-measure (0052-decisions-nba-board FR-012, FR-013)."@en ;
+    rdfs:comment "A leading indicator and an activity count are not an outcome metric (0052 FR-014)."@en .
+ifcore:Observation a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "Observation"@en ;
+    skos:definition "A raw record of something seen, with its source and the time it was observed (0052-decisions-nba-board FR-007)."@en ;
+    rdfs:comment "Kept apart from a documented assertion, an inference and a forecast. Distinct from ifcore:ObservationLabel, the claim label. Whether to relate it to the SOSA observation class is open (0052 OQ-4)."@en .
+ifcore:EvidenceRecord a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "Evidence record"@en ;
+    skos:definition "An observation, assertion or inference cited for a decision candidate, with its source, its time and a status of verified, reported, stale or disputed (0052-decisions-nba-board FR-007)."@en ;
+    rdfs:comment "Distinct from ifcore:Evidence, the claim label, and from ifcore:EvidencePacket, which concerns a candidate for a Hunt. Conflicting records are both kept (0052 FR-009)."@en .
+ifcore:DecisionCandidate a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Decision candidate"@en ;
+    skos:definition "A card: a choice the Board puts before a person with authority, with the goal it serves, its cited evidence, at least two alternatives of which one is to wait, a decision owner, why it is on the Board now, what happens if nothing is done and a dated next checkpoint (0052-decisions-nba-board FR-015)."@en ;
+    rdfs:comment "A recommendation is not a Decision. A person's choice on a candidate is an ifcore:Decision related by ifcore:resolvedBy (0052 FR-005)."@en .
+ifcore:NextBestAction a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Next best action"@en ;
+    skos:definition "The action or experiment the evidence currently justifies for a goal, in a context and for a decision maker, which MAY be to stop, defer, investigate or do nothing (0052-decisions-nba-board FR-020)."@en ;
+    rdfs:comment "Conditional on evidence, constraints, uncertainty, cost, capacity, reversibility and timing. It is not a universal optimum the model found."@en .
+ifcore:Commitment a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Commitment"@en ;
+    skos:definition "A promise by a named person to do something by a date."@en ;
+    skos:related ifcore:CommitmentLedgerCapability ;
+    rdfs:comment "Whether the commitment ledger of a product of the Opsfolio family carries this class is open (0052-decisions-nba-board OQ-1)."@en .
+ifcore:ApprovedAction a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Approved action"@en ;
+    skos:definition "An action a person with authority has approved, with its owner, its permissions and its acceptance evidence owed (0052-decisions-nba-board FR-024, FR-026)."@en .
+ifcore:AcceptanceEvidence a owl:Class ; rdfs:subClassOf ifcore:EvidenceRecord ; rdfs:label "Acceptance evidence"@en ;
+    skos:definition "Evidence that demonstrates a result, as against a report that it happened (0052-decisions-nba-board FR-008)."@en .
+ifcore:ObservedResult a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Observed result"@en ;
+    skos:definition "What was observed at a checkpoint, recorded against the baseline and its counter-measure, with its acceptance evidence (0052-decisions-nba-board FR-029)."@en ;
+    rdfs:comment "Where the design does not support a claim of cause, the record says the attribution is weak (0052 FR-030)."@en .
+ifcore:LearningRecord a owl:Class ; rdfs:subClassOf ifcore:Fact ; rdfs:label "Learning record"@en ;
+    skos:definition "What a result changed in a rule, a measure or a priority (0052-decisions-nba-board FR-029)."@en ;
+    rdfs:comment "Distinct from ifcore:Learning, a stage of a search."@en .
+
+ifcore:servesGoal a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range ifcore:Goal ; rdfs:label "serves goal"@en ;
+    rdfs:comment "The goal a candidate serves (0052-decisions-nba-board FR-015)."@en .
+ifcore:measuredBy a owl:ObjectProperty ; rdfs:domain ifcore:Goal ; rdfs:range ifcore:OutcomeMetric ; rdfs:label "measured by"@en ;
+    rdfs:comment "The outcome metric that measures a goal (0052-decisions-nba-board FR-012)."@en .
+ifcore:counterMeasure a owl:ObjectProperty ; rdfs:domain ifcore:OutcomeMetric ; rdfs:range ifcore:OutcomeMetric ; rdfs:label "counter-measure"@en ;
+    rdfs:comment "A metric that would show harm done in pursuit of this one (0052-decisions-nba-board FR-013)."@en .
+ifcore:basedOnEvidence a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range ifcore:EvidenceRecord ; rdfs:label "based on evidence"@en ;
+    rdfs:comment "Evidence a candidate cites (0052-decisions-nba-board FR-015)."@en .
+ifcore:decisionOwner a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range ifcore:Person ; rdfs:label "decision owner"@en ;
+    rdfs:comment "The person with authority to choose on a candidate (0052-decisions-nba-board FR-015, FR-024)."@en .
+ifcore:recommends a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range ifcore:NextBestAction ; rdfs:label "recommends"@en ;
+    rdfs:comment "The next best action a candidate recommends (0052-decisions-nba-board FR-020)."@en .
+ifcore:resolvedBy a owl:ObjectProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range ifcore:Decision ; rdfs:label "resolved by"@en ;
+    rdfs:comment "The Decision that records a person's choice on a candidate (0052-decisions-nba-board FR-005)."@en .
+ifcore:nextCheckpoint a owl:DatatypeProperty ; rdfs:domain ifcore:DecisionCandidate ; rdfs:range xsd:date ; rdfs:label "next checkpoint"@en ;
+    rdfs:comment "The date the result of a candidate is next checked (0052-decisions-nba-board FR-015, FR-029)."@en .
