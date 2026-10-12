@@ -21,6 +21,7 @@ from agora.core.checks import changed_paths, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
 from agora.core.mcp import Server
+from agora.core.profile import needs_of, python_floor, runnable
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
 from agora.core.resource import FAILED, MISSING, OK
 from agora.core.types import COMMIT  # noqa: F401  (declared here, once, for every group)
@@ -77,15 +78,20 @@ RESOURCE = _Resource()
          options=[Opt("--category", "CATEGORY", "only this category")])
 def command_list(ctx: Ctx, category: str | None) -> Resource:
     reg = ctx.registry
+    profile = ctx.profile
     rows = []
     for c in sorted(reg.commands.values(), key=lambda c: c.id):
         if category and c.category != category:
             continue
+        # What the plan names and whether this host can run it (0041 FR-079); the editor's palette titles and icons only for an attended reader (FR-080).
         rows.append({"id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
-                     "help": c.help, **presentation.of_command(reg, c.id)})
-    res = Resource("command-list", "all", {"count": len(rows), "commands": rows, "presentation": presentation.emit(reg)},
-                   links=[Link("command", Call("command show", {"command": r["id"]})) for r in rows])
-    res.columns["commands"] = ["id", "category", "group", "surfaces"]
+                     "help": c.help, "needs": needs_of(reg, c), "runnable": runnable(profile, c.toolchain),
+                     **({} if profile.unattended else presentation.of_command(reg, c.id))})
+    data = {"count": len(rows), "profile": profile.to_dict(), "commands": rows}
+    if not profile.unattended:
+        data["presentation"] = presentation.emit(reg)
+    res = Resource("command-list", "all", data, links=[Link("command", Call("command show", {"command": r["id"]})) for r in rows])
+    res.columns["commands"] = ["id", "category", "group", "surfaces", "runnable"]
     return res
 
 
@@ -120,22 +126,24 @@ def context_command(ctx: Ctx, ident: str) -> dict[str, Any]:
                   Opt("--suite", "SUITE", "run a named set of sections"),
                   Opt("--changed", None, "run only sections whose watched paths changed"),
                   Opt("--since", "TEXT", "with --changed, also what differs from this Git commit"),
+                  Opt("--available", None, "run what can run on this host, say what was skipped, and exit 0 when what ran passed"),
                   Opt("--runner", "RUNNER", "design-systems: browser or python"),
                   Opt("--brand", "BRAND", "design-systems: one brand"),
                   Opt("--paragon", "TEXT", "openedx: Paragon's CLI, to rebuild dist/ (PARAGON in the environment otherwise)"),
                   Opt("--mode", "VOICE_MODE", "voice: sweep as prose or as a procedure (prose by default)"),
                   Opt("--draft", None, "voice: report every failure as a warning"),
                   Opt("--spoken", None, "voice: sweep as a script to be spoken, with the spoken voice's patterns too")])
-def check(ctx: Ctx, sections: list[str], scope: list[str], suite: str | None, changed: bool, since: str | None,
+def check(ctx: Ctx, sections: list[str], scope: list[str], suite: str | None, changed: bool, since: str | None, available: bool,
           runner: str | None, brand: str | None, paragon: str | None, mode: str | None, draft: bool, spoken: bool) -> Resource:
-    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon, mode, draft, spoken)
+    return checkrun.run_check(ctx, sections, suite, scope, changed, since, runner, brand, paragon, mode, draft, spoken, available)
 
 
 # fresh -------------------------------------------------------------------------------------------------------------
 @command("fresh", category="check", help="Prove every generator's tracked output current, writing nothing", relocatable=False,
          args=[Arg("generators", "GENERATOR", "the generators to prove; every one when none is named", many=True)],
-         options=[Opt("--changed", None, "prove only generators whose sources or outputs changed")])
-def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
+         options=[Opt("--changed", None, "prove only generators whose sources or outputs changed"),
+                  Opt("--available", None, "prove the generators whose programs are here, say which were skipped, and exit 0 when what ran is current")])
+def fresh(ctx: Ctx, generators: list[str], changed: bool, available: bool) -> Resource:
     reg = ctx.registry
     names = generators or list(reg.generators)
     skipped_unchanged: list[dict[str, str]] = []
@@ -153,8 +161,9 @@ def fresh(ctx: Ctx, generators: list[str], changed: bool) -> Resource:
     data = {"status": status, "generators": rows, "skipped_unchanged": skipped_unchanged,
             "summary": {"run": len(rows), "fresh": sum(r["status"] == "fresh" for r in rows), "stale": len(stale),
                         "skipped": len(skipped)}}
+    data["complete"] = not skipped
     res = Resource("fresh", " ".join(generators) or "all", data, text=_fresh_text,
-                   exit=FAILED if stale else MISSING if skipped else OK)
+                   exit=FAILED if stale else MISSING if skipped and not available else OK)
     res.columns["generators"] = ["name", "status", "files"]
     seen: set[str] = set()
     for r in stale:
@@ -191,7 +200,8 @@ def _fresh_text(res: Resource) -> str:
 @command("test", category="check", help="Run agora's own tests with the standard library's runner, under the selftest group's locked packages")
 def test(ctx: Ctx) -> Resource:
     tests = ctx.home / "tools" / "agora" / "tests"
-    env = {**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "PYTHONDONTWRITEBYTECODE": "1", "AGORA_TESTING": "1"}
+    env = {**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "PYTHONDONTWRITEBYTECODE": "1", "AGORA_TESTING": "1",
+           "AGORA_ATTENDANCE": ctx.env.get("AGORA_ATTENDANCE", "attended")}  # a CI job or an agent session is not the tests' reader
     py = plan.prepare(ctx.registry, "selftest", offline=ctx.offline, command="test")
     p = subprocess.run([str(py), "-m", "unittest", "discover", "-s", str(tests), "-t", str(ctx.home / "tools")],
                        capture_output=True, text=True, env=env, cwd=ctx.home)
@@ -216,7 +226,7 @@ def doctor(ctx: Ctx) -> Resource:
         if path and name == "uv":
             ver = subprocess.run([path, "--version"], capture_output=True, text=True).stdout.strip()
         if name == "python3":
-            ok = sys.version_info >= (3, 11)
+            ok = sys.version_info[:2] >= python_floor(ctx.home)
             ver = platform.python_version()
             path = path or sys.executable
             if not ok:
@@ -259,21 +269,24 @@ def doctor(ctx: Ctx) -> Resource:
         for n in gen.toolchain:
             needed_by.setdefault(n, []).append(f"fresh {gen.name}")
     toolchain_rows = []
-    try:
-        entries = tc.entries
-    except toolchain.ToolchainError as e:
-        entries = {}
-        missing.append("ws-host's answer about this provider")
-        problems_note = e.message
+    problems_note = ""
+    entries: dict[str, Any] = {}
+    if not ctx.profile.hosted:
+        # A bare host is not a fault: every command that names no toolchain entry runs (0041 FR-029, FR-078).
+        problems_note = ("ws-host is not on this host, so the toolchain entries are not listed; commands that name one are not runnable "
+                         "here (install ws-host from https://github.com/intellectual-frontiers/workspaces-host, then run `ws-host provider add` on this clone)")
     else:
-        problems_note = ""
+        try:
+            entries = tc.entries
+        except toolchain.ToolchainError as e:
+            problems_note = e.message
     for e in entries.values():
         toolchain_rows.append({"entry": e.name, "version": e.version, "platform": toolchain.platform_name(),
                                "cache": "ready" if e.state == "ready" else "not installed",
                                "needed by": sorted(needed_by.get(e.name, [])),
                                "hint": "" if e.state == "ready" else (f"installed on first use, or `ws-host toolchain ensure {e.name} --provider agora`")})
     status = "failed" if problems else "missing" if missing else "ok"
-    data = {"status": status, "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows,
+    data = {"status": status, "profile": ctx.profile.to_dict(), "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows,
             "conflicts": problems, "missing": missing, "offline": ctx.offline, **({"note": problems_note} if problems_note else {}),
             "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)

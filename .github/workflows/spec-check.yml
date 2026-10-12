@@ -1,6 +1,7 @@
 # Checks this repository's specs and enforcement register on every push and
-# pull request (0020-spec-format FR-015). A stock runner with Python and uv
-# set up; the spec suite needs no package and no other program (0042-agora FR-014, FR-022).
+# pull request (0020-spec-format FR-015). Two stock runners (0025-tooling-environment FR-011): one with only uv, where the toolchain section
+# that compares files only ws-host can generate is skipped and `--available` accepts that, and one with ws-host bootstrapped, where nothing is
+# skipped. The spec suite needs no package and no other program (0042-agora FR-014, FR-022).
 name: spec-check
 
 on:
@@ -26,3 +27,11 @@ jobs:
           "$HOME/.local/bin/ws-host" provider add "$PWD" --yes
       - name: Specs, enforcement register, controls, ontology and commands
         run: ./agora check --suite spec
+
+  spec-check-bare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Specs, enforcement register, controls, ontology and commands, with uv alone
+        run: ./agora check --suite spec --available

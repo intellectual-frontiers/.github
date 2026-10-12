@@ -166,7 +166,7 @@ def check_readme(home: Path, registry) -> list[Finding]:
     out = []
     if GUIDE_URL not in text:
         out.append(Finding("error", "README.md", f"does not link to the guide, {GUIDE_URL} (0042 FR-036)"))
-    for needle, why in (("agora system ensure", "the one-time system ensure"), ("agora help", "the help command")):
+    for needle, why in (("ws-host system ensure", "the one-time system ensure"), ("agora help", "the help command")):
         if needle not in text:
             out.append(Finding("error", "README.md", f"does not name {why}, `{needle}` (0042 FR-036)"))
     n = len(text.splitlines())

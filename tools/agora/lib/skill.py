@@ -42,6 +42,17 @@ def _type_row(reg: Registry, t: ArgType) -> tuple[str, str, str]:
     return t.name, t.doc, eg
 
 
+def _needs(reg: Registry, c: Any) -> str:
+    """What a command's plan names: the packages of its group, and its toolchain entries (0041-command-line FR-079)."""
+    group = reg.groups.get(c.group) if c.group else None
+    parts = []
+    if group is not None and group.packages:
+        parts.append(f"packages: {', '.join(sorted(group.packages))}")
+    if c.toolchain:
+        parts.append(f"ws-host: {', '.join(c.toolchain)}")
+    return _cell("; ".join(parts)) if parts else "uv only"
+
+
 def text(reg: Registry) -> str:
     name = reg.name
     commands = sorted(reg.commands.values(), key=lambda c: c.id)
@@ -76,6 +87,16 @@ def text(reg: Registry) -> str:
       "specs and requirements that govern it, its links, its actions and its files, bounded, saying what it left out.")
     w(f"- `{name} command list` and `{name} command show COMMAND` read the registry itself; `{name} --help` shows the shape.")
     w("")
+    w("## Where it runs")
+    w("")
+    w(f"- `{name}` needs only `uv` on the host, which fetches the newest Python and the locked packages. A command whose Needs column names a "
+      "toolchain entry (a typesetter, a browser, a Java runtime) also needs `ws-host` (https://github.com/intellectual-frontiers/workspaces-host) "
+      "with this clone enabled by `ws-host provider add .`; without it that command exits 3 and names `ws-host`, and every other command runs.")
+    w(f"- `{name} doctor` reports the execution profile: provisioning `hosted` (`ws-host` is there) or `bare` (`uv` alone), and attendance "
+      f"`attended` or `unattended`. `{name} command list --json` marks each command `runnable` on this host.")
+    w(f"- `{name} check --available` runs the sections that can run here, reports the others as skipped and the run as incomplete, and exits 0 when "
+      "what ran passed. Without `--available` a skipped section makes the exit status 3: a skipped section was not checked.")
+    w("")
     w("## What you may do, by category")
     w("")
     w("| Category | Means |")
@@ -98,11 +119,11 @@ def text(reg: Registry) -> str:
     w("")
     w("Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. Each row's example is its usage line.")
     w("")
-    w("| Command | Category | Surfaces | Does | Example |")
-    w("| --- | --- | --- | --- | --- |")
+    w("| Command | Category | Surfaces | Needs | Does | Example |")
+    w("| --- | --- | --- | --- | --- | --- |")
     for c in commands:
         d = command_data(reg, c)
-        w(f"| `{c.id}` | `{c.category}` | {', '.join(d['surfaces'])} | {_cell(c.help)} | `{_cell(d['usage'])}` |")
+        w(f"| `{c.id}` | `{c.category}` | {', '.join(d['surfaces'])} | {_needs(reg, c)} | {_cell(c.help)} | `{_cell(d['usage'])}` |")
     w("")
     w("### Arguments and options")
     w("")

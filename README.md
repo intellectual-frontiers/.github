@@ -11,20 +11,21 @@ This is the public root of Intellectual Frontiers' Eidolon: the company's own ac
 testable specs and typed against an ontology, so that a person or an AI can check it instead of guessing. The organization's public
 landing page is [`profile/README.md`](profile/README.md).
 
-One command line, `agora`, runs every check, build and record here. It needs only [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) on your machine, which supplies the newest Python (3.14) and
-[`uv`](https://docs.astral.sh/uv/); it fetches everything else, pinned and checked by fingerprint, and never uses a
-program it finds on your machine unless you name it.
+One command line, `agora`, runs every check, build and record here. It needs only [`uv`](https://docs.astral.sh/uv/) on your machine, which
+supplies the newest Python (3.14) and the locked packages; the programs outside Python (a typesetter, a browser, a Java runtime) come from
+[`ws-host`](https://github.com/intellectual-frontiers/workspaces-host), pinned and checked by fingerprint, when you have it. It never uses a program it
+finds on your machine unless you name it. A person, a CI job and an AI agent run the same commands; `./agora doctor` says which commands this machine can run.
 
 ## The flow
 
-1. Install [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) (its README has the one line), clone this repository
-   and enable it once with `ws-host provider add .`; a machine with no person at it runs the bootstrap in [`AGENTS.md`](AGENTS.md).
-2. Run `./agora help start`. The daily work is documented in one place, the program, and in VS Code every step is a button
-   ([IF Console](tools/if-console/), Learn).
-3. Once per machine, run `./agora system ensure --dry-run` to see, then `./agora system ensure`, which installs the few system libraries and
+1. Clone this repository and run `./agora help start`. That needs only `uv`. For the commands that name a toolchain entry, install
+   [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) (its README has the one line) and enable the clone once with
+   `ws-host provider add .`; a machine with no person at it runs the bootstrap in [`AGENTS.md`](AGENTS.md).
+2. The daily work is documented in one place, the program, and in VS Code every step is a button ([IF Console](tools/if-console/), Learn).
+3. Once per machine that has `ws-host`, run `ws-host system ensure --dry-run` to see, then `ws-host system ensure`, which installs the few system libraries and
    the display server that a browser and VS Code need. It asks before it uses `sudo`, and it is the only command that does.
 4. Work spec first: the spec, then the ontology, then everything else. `./agora help specs` has the steps.
-5. Before you push, run `./agora check --suite spec`, `./agora test` and `./agora fresh`. `./agora help check` says what else.
+5. Before you push, run `./agora check --suite spec` (with `--available` where `ws-host` is not installed), `./agora test` and `./agora fresh`. `./agora help check` says what else.
 
 ## The guide
 

@@ -27,9 +27,12 @@ def check_toolchain(ctx: Ctx, scope: str | None) -> SectionResult:
         if skipped:
             return SectionResult("toolchain", "skipped", reason=skipped)
         findings += _functional(ctx, notes)
-    elif skipped:
-        notes.append(f"the generated files were not compared, because {skipped}")
-    return SectionResult.from_findings("toolchain", findings, notes, {"entries": sorted(declared)})
+    result = SectionResult.from_findings("toolchain", findings, notes, {"entries": sorted(declared)})
+    if skipped and result.status == "passed":
+        # What it compares needs ws-host: a section that could not read it is skipped, never passed (0041-command-line FR-033).
+        result.status = "skipped"
+        result.reason = f"the generated files were not compared, because {skipped}"
+    return result
 
 
 def _functional(ctx: Ctx, notes: list[str]) -> list[Finding]:

@@ -40,7 +40,7 @@ These take no noun.
 |===
 |Usage |Category |Where it runs |What it does
 
-|`agora check [SECTION...] [--scope TEXT] [--suite SUITE] [--changed] [--since TEXT] [--runner RUNNER] [--brand BRAND] [--paragon TEXT] [--mode VOICE_MODE] [--draft] [--spoken]`
+|`agora check [SECTION...] [--scope TEXT] [--suite SUITE] [--changed] [--since TEXT] [--available] [--runner RUNNER] [--brand BRAND] [--paragon TEXT] [--mode VOICE_MODE] [--draft] [--spoken]`
 |check
 |terminal, editor, mcp
 |Run checks: sections, a suite, one scope, or only what changed
@@ -55,7 +55,7 @@ These take no noun.
 |terminal, editor, mcp
 |Report what agora needs and what is present; fail on registry conflicts
 
-|`agora fresh [GENERATOR...] [--changed]`
+|`agora fresh [GENERATOR...] [--changed] [--available]`
 |check
 |terminal, editor, mcp
 |Prove every generator's tracked output current, writing nothing

@@ -40,3 +40,17 @@ jobs:
         run: ./agora fresh
       - name: agora's own tests
         run: ./agora test
+
+  # The same proofs on a stock runner given only uv (0025-tooling-environment FR-011): no ws-host, so a command that names a toolchain
+  # entry is not run and says so; everything else is.
+  proofs-bare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: agora's doctor
+        run: ./agora doctor
+      - name: agora's own tests
+        run: ./agora test
+      - name: Every generator's output is current
+        run: ./agora fresh

@@ -46,7 +46,10 @@ class Repo(unittest.TestCase):
         self.host = FakeHost(self.root)
         self.host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
         self.host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")
-        self.tc = self.host.toolchain(env=self.host.env())
+        # node is the stand-in host's, first on PATH as ws-host's environment puts it, so a test needs no node of the machine's own
+        env = self.host.env()
+        env["PATH"] = f"{self.root / 'store' / 'node' / 'bin'}{os.pathsep}{env.get('PATH', '')}"
+        self.tc = self.host.toolchain(env=env)
 
     def ds(self, slug, *, brand=False, py=None, mjs=None):
         d = self.root / "design-systems" / slug

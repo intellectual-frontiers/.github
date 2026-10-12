@@ -174,7 +174,8 @@ class OtherCommands(unittest.TestCase):
             code, doc = run_json(["doctor"], env=host.env())
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
-        self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["ws-host"])
+        self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv"])
+        self.assertEqual(doc["data"]["profile"]["provisioning"], "hosted")
         self.assertNotIn("programs", doc["data"])  # no host program is declared: packages and toolchain entries supply them
         rows = {r["entry"]: r for r in doc["data"]["toolchain"]}
         self.assertEqual(set(rows), {"tinytex", "chromium", "playwright", "jre", "asciidoctor", "node"})

@@ -33,6 +33,16 @@ class Ctx:
         return cached
 
     @property
+    def profile(self):
+        """How the host is provisioned and whether a person is at this invocation (0041 FR-078)."""
+        from .profile import detect
+
+        cached = self.__dict__.get("_profile")
+        if cached is None:
+            cached = self.__dict__["_profile"] = detect(self.registry.name, self.env, self.surface)
+        return cached
+
+    @property
     def relocated(self) -> bool:
         return self.root.resolve() != self.home.resolve()
 

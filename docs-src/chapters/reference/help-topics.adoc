@@ -105,10 +105,11 @@ Four commands say whether a change is sound. Run the first three before every pu
 
 ==== The quick checks
 
-The spec suite needs nothing but ws-host. It checks the specs, the enforcement register, the controls, the ontology, the toolchain, the commands and the help topics.
+The spec suite needs nothing but uv. It checks the specs, the enforcement register, the controls, the ontology, the toolchain, the commands and the help topics. The toolchain section compares files only ws-host can generate, so on a machine without ws-host it is skipped and the run is incomplete (exit 3); `--available` accepts that and exits 0 when what ran passed.
 
 ----
 ./agora check --suite spec
+./agora check --suite spec --available
 ----
 
 ==== The tests and the generated files
@@ -145,6 +146,7 @@ A finding names a file and a line, and says what to edit. A section that could n
 ==== Steps
 
 * Run the quick checks: `agora check --suite spec`
+* Run the quick checks on a machine without ws-host: `agora check --suite spec --available`
 * Run agora's own tests: `agora test`
 * Prove the generated files are current: `agora fresh`
 * Run only what you changed: `agora check --changed`
@@ -425,26 +427,30 @@ Draft, Adopted and Superseded are a decision only a person makes. The command as
 
 _Your first day: what to install, what to run once, and how to look around._
 
-agora is this repository's one command line. It needs only ws-host on your machine. ws-host brings Python and uv, installs everything else agora needs, checks each program against a fixed fingerprint, and keeps one copy that belongs to you.
+agora is this repository's one command line. It needs only uv on your machine: uv brings the newest Python and the packages agora locks, and every command that needs nothing more runs there, for a person, a CI job or an AI agent. The programs outside Python (TeX, a browser, Java, Node) come from ws-host, which installs each at one exact version, checks it against its fingerprint, and keeps one copy that belongs to you.
 
-==== 1. Install ws-host yourself
+==== 1. See what you have
 
-Install ws-host (https://github.com/intellectual-frontiers/workspaces-host) and follow its first-run steps. Nothing else is needed from your machine, and agora never uses a program it finds there.
-
-==== 2. Nothing to enable
-
-ws-host uses this clone by itself: it comes from the intellectual-frontiers organization that ws-host trusts, and installing ws-host was your yes. A clone from another organization is the one case that asks you, once, from the root of the clone.
-
-----
-ws-host provider add .
-----
-
-==== 3. See that it runs
-
-Ask agora how it finds your machine. It lists what is present and what is not, and fails only on a real problem.
+Ask agora how it finds your machine. It says whether ws-host is there (hosted) or not (bare), whether a person is at the invocation, and what is present; it fails only on a real problem, and a machine without ws-host is not one.
 
 ----
 ./agora doctor
+----
+
+==== 2. See what runs here
+
+Every command is listed, and each says what it needs and whether this machine can run it. A command that names a toolchain entry exits 3 and names ws-host where the machine has none.
+
+----
+./agora command list --json
+----
+
+==== 3. Install ws-host, when a command needs it
+
+Install ws-host (https://github.com/intellectual-frontiers/workspaces-host) and follow its first-run steps. Nothing else is needed from your machine, and agora never uses a program it finds there. A clone from the intellectual-frontiers organization needs no further step; a clone from another organization is enabled once, from the root of the clone.
+
+----
+ws-host provider add .
 ----
 
 ==== 4. Install the system libraries, once

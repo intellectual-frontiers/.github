@@ -153,10 +153,13 @@ class Sections(TempRepo):
 
 class Selection(unittest.TestCase):
     def test_suite_spec_passes_on_this_repository(self):
-        code, doc = run_json(["check", "--suite", "spec"])
-        self.assertEqual((code, doc["data"]["status"]), (0, "passed"))
-        self.assertEqual([s["name"] for s in doc["data"]["sections"]],
-                         ["specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"])
+        code, doc = run_json(["check", "--suite", "spec", "--available"])
+        self.assertEqual(code, 0)
+        status = {s["name"]: s["status"] for s in doc["data"]["sections"]}
+        self.assertEqual(list(status), ["specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help"])
+        # The toolchain section compares files only ws-host can generate: on a bare host it is skipped, never passed (0041 FR-033).
+        self.assertEqual({n for n, st in status.items() if st != "passed"} - {"toolchain"}, set())
+        self.assertIn(status["toolchain"], ("passed", "skipped"))
         self.assertEqual(doc["audience"], "public")
 
     def test_a_suite_that_names_no_section_ran_nothing_and_fails(self):
@@ -172,7 +175,7 @@ class Selection(unittest.TestCase):
         from agora.core.registry import Registry
         reg = Registry.load(HOME)
         for n in ("design-systems", "imagery", "openedx", "figures", "voice", "slides", "email", "course", "media", "signage",
-                  "merchandise"):  # the harnesses and item checks have their own tests; this one proves the selection
+                  "merchandise", "toolchain"):  # the harnesses and item checks have their own tests; this one proves the selection
             reg.sections[n].fn = lambda ctx, scope, n=n: SectionResult(n)
             reg.sections[n].toolchain = ()
         with mock.patch("agora.core.worker.needs_worker", return_value=False):

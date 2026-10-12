@@ -8,9 +8,10 @@ groups = ["core", "toolchain", "spec", "assurance", "brand", "decoration", "layo
 logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists it (0041 FR-042, 0042 FR-021)
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
-# What the launcher needs from the host (0041-command-line FR-001, FR-006): ws-host, which supplies Python, uv and every toolchain entry.
-[prerequisites.ws-host]
-hint = "install ws-host (https://github.com/intellectual-frontiers/workspaces-host), then run `ws-host provider add` on this clone"
+# What the launcher needs from the host (0041-command-line FR-001, 0025-tooling-environment FR-014): uv, which supplies Python and the locked
+# packages. ws-host is not a prerequisite: it adds the toolchain entries, and a host without it is bare (0041 FR-078).
+[prerequisites.uv]
+hint = "install uv (https://docs.astral.sh/uv/getting-started/installation/)"
 
 # The views an editor shows for this command line, each holding the nouns that name it in their `view` (0041-command-line FR-064). The
 # editor's own Home (order 10), Checks and All commands views are not declared here.

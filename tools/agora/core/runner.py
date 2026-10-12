@@ -58,7 +58,7 @@ def validate_selection(ctx: Ctx, sections: list[str], suite: str | None, scope: 
 
 def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | list[str] | None, changed: bool, since: str | None,
               runner: str | None = None, brand: str | None = None, paragon: str | None = None, mode: str | None = None,
-              draft: bool = False, spoken: bool = False) -> Resource:
+              draft: bool = False, spoken: bool = False, available: bool = False) -> Resource:
     reg = ctx.registry
     explicit = bool(sections or suite)
     names = validate_selection(ctx, sections, suite, scope, runner, brand, paragon, mode=mode, draft=draft, spoken=spoken)
@@ -108,10 +108,13 @@ def run_check(ctx: Ctx, sections: list[str], suite: str | None, scope: str | lis
         "suite": suite, "scope": scopes[0] if len(scopes) == 1 else scopes or None, "changed": changed, "status": status,
         "summary": {"run": len(results), "passed": len(results) - len(failed) - len(skipped), "failed": len(failed),
                     "skipped": len(skipped)},
+        "complete": not skipped,  # a run that skipped a section did not check all it was asked to (0041 FR-081)
         "sections": [r.to_dict() for r in results],
         "skipped_unchanged": skipped_unchanged,
     }
-    res = Resource("check", label, data, text=_text, exit=FAILED if failed else MISSING if skipped else OK)
+    # `--available` runs what can run here and accepts that the rest was skipped: exit 0 when what ran passed (0041 FR-081).
+    exit_code = FAILED if failed else MISSING if skipped and not available else OK
+    res = Resource("check", label, data, text=_text, exit=exit_code)
     res.actions = [next_command(f"run {r.name} again", "check", sections=[r.name]) for r in failed + skipped]
     return res
 
@@ -121,6 +124,9 @@ def _toolchain_problem(ctx: Ctx, s: Section) -> str:
     the cache lacks is fetched here, on first use, unless offline (0025-tooling-environment FR-017, FR-018)."""
     if not s.toolchain or (s.toolchain_unless and ctx.section_options.get(s.toolchain_unless)):
         return ""
+    if not ctx.profile.hosted:
+        return (f"it needs {', '.join(s.toolchain)}, which ws-host installs, and this host is bare: install ws-host "
+                f"(https://github.com/intellectual-frontiers/workspaces-host), then run `ws-host provider add` on this clone")
     try:
         ctx.toolchain().use(s.toolchain)
     except AgoraError as e:
@@ -153,5 +159,6 @@ def _text(res: Resource) -> str:
     for s in d["skipped_unchanged"]:
         out.append(f"⏭️  {s['name']}: not run ({s['reason']})")
     m = d["summary"]
-    out.append(f"check {res.id}: {d['status']}: {m['run']} section(s) run, {m['failed']} failed, {m['skipped']} skipped")
+    out.append(f"check {res.id}: {d['status']}: {m['run']} section(s) run, {m['failed']} failed, {m['skipped']} skipped"
+               + ("" if d.get("complete", True) else "; incomplete, the skipped sections were not checked"))
     return "\n".join(out)

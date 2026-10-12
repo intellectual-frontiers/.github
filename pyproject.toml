@@ -1,0 +1,11 @@
+# The Python floor is written here once (0025-tooling-environment FR-014): the launcher, `doctor` and CI read it.
+# The command groups' locked packages join it as dependency groups (0041-command-line FR-002, FR-003).
+[project]
+name = "agora-env"
+version = "0"
+description = "The environment agora's commands run in; not a package"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv]
+package = false
