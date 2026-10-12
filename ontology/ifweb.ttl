@@ -325,3 +325,15 @@ ifweb:hostOf a owl:ObjectProperty ; rdfs:domain ifweb:ApplicationHost ; rdfs:ran
     rdfs:comment "The application this host runs (0044 FR-029)."@en .
 ifweb:inventoryEntry a owl:ObjectProperty ; rdfs:domain ifweb:ApplicationHost ; rdfs:range ifcore:InformationSystem ;
     rdfs:comment "The host's entry in the system inventory, which carries its data class, owner role, provider and recovery objectives (0046 FR-012; 0033-systems-and-data-policy FR-001)."@en .
+
+# ───────────────────────── Private pages (0044-public-website FR-082 – FR-087) ─────────────────────────
+
+ifweb:PrivateGuardScheme a skos:ConceptScheme ; rdfs:label "Private page guard"@en ;
+    skos:definition "What a page under the website's private prefix requires of the request before it is served; a request that does not meet it is answered as an address the website does not serve (0044-public-website FR-084)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifweb:LocalGuard a skos:Concept ; skos:inScheme ifweb:PrivateGuardScheme ; skos:prefLabel "Local"@en ; skos:notation "local" ;
+    skos:definition "Served only where the vault's launcher sits beside the website, on the person's own computer (0044 FR-069, FR-084)."@en ;
+    ifcore:hasAudience ifcore:Public .
+ifweb:ReaderGuard a skos:Concept ; skos:inScheme ifweb:PrivateGuardScheme ; skos:prefLabel "Reader"@en ; skos:notation "reader" ;
+    skos:definition "Served only to a person who has logged in (0044 FR-058, FR-084)."@en ;
+    ifcore:hasAudience ifcore:Public .

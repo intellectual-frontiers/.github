@@ -260,7 +260,7 @@ how addresses map to content, 0004-addressing; what the application does,
   model or at a container host, and the address that runs a line is one of
   the reserved ones (FR-036). A rendered page MUST carry only the Console's
   placeholder, which asks the program's server for the Console when the
-  page opens, at a reserved address (FR-036); the Console MUST be rendered
+  page opens, at the Console's address under the private prefix (FR-087); the Console MUST be rendered
   at that request from the export and MUST NOT be part of any rendered
   page, so that the check of the pages (FR-004) never reads it and a page
   is published without it. The Console MAY name a work that is not yet
@@ -536,7 +536,11 @@ how addresses map to content, 0004-addressing; what the application does,
   and no manuscript but the PDF of a book that offers a preview, which the
   server draws the preview from and never serves (FR-056).
 - **FR-036**: The addresses under `/__eid/` are reserved to the program's
-  server (FR-026). The generator MUST NOT generate a page there.
+  server (FR-026), as are those under the private prefix (FR-082). The
+  generator MUST NOT generate a page at either. The `/__eid/` addresses are
+  the program's machinery (health, status, log-in, filtering, live updates,
+  the preview and the Console's run address); the private prefix holds
+  pages.
 - **FR-037**: An image the website serves MUST be served in its fast web
   form: a PNG or JPEG as a WebP, and an SVG as an optimized SVG. Where a
   print, e-book, guide or retail pipeline also reads the source, the form is
@@ -627,6 +631,46 @@ how addresses map to content, 0004-addressing; what the application does,
   built with them (FR-057), MUST name `/renditions` as the works tree
   (`EID_WORKS`) and MUST declare it a volume, so the renditions arrive by
   mounting a volume that something other than the image fills.
+
+## Private pages
+
+- **FR-082**: The program MUST reserve one path prefix, the private prefix,
+  for pages that are not for every reader. Its default is `/.infro` ("InFor",
+  Intellectual Frontiers), an internal constant of the program. An environment variable
+  `EID_PRIVATE_PREFIX` that is set and not empty MUST be used first, the
+  option `--private-prefix` second, and the default when neither is given.
+  Every command of the program that reads or writes the model or serves it
+  (`build`, `check`, `export`, `serve`, `publish`) MUST resolve the prefix
+  the same way, and the private prefix MUST be reserved as FR-026 states.
+- **FR-083**: A private prefix MUST be a leading `/` and one path segment,
+  with no trailing slash, no dot-segment (`.` or `..`), no query or
+  fragment, no whitespace and no upper case. The program MUST refuse, saying
+  why and naming where the value came from, a prefix that is `/`, is or lies
+  under `/__eid`, or is the address of a page, a file or a redirect of the
+  model.
+- **FR-084**: Every page under the private prefix MUST declare its guard:
+  `local`, served only where the vault's launcher sits beside the website
+  (FR-069), or `reader`, served only to a person who has logged in (FR-058).
+  An address under the private prefix that no page declares, or whose guard is
+  not met, MUST answer as an address the website does not serve: the same
+  status, headers (but for the date) and bytes as the not-found page that
+  FR-016 gives an address no page matches, so that the answer does not show
+  whether a private page exists.
+- **FR-085**: Nothing generated MAY name the private prefix: no page, link,
+  navigation entry, sitemap, `llms.txt`, feed, structured data, redirect or
+  `robots.txt` rule (a rule would announce the address), and the model
+  exported from the check (FR-004) MUST hold none. The Console's placeholder
+  and control, on a page served beside the launcher (FR-069), are the one
+  exception.
+- **FR-086**: A response from an address under the private prefix that is
+  served MUST carry `Cache-Control: private, no-store` and
+  `X-Robots-Tag: noindex, nofollow`.
+- **FR-087**: The Console (FR-069) MUST be a private page with the guard
+  `local` at `<private prefix>/console`, showing the roll-up of the fronts and the way
+  to each page's own band; the summary of the acceptance run of the website's
+  release (0016-website-acceptance, `eidolon`) MUST be a private page with the
+  guard `local` at `<private prefix>/console/uat`. The Console's run address
+  stays `/__eid/console/run` (FR-036).
 
 ## The application
 
@@ -796,6 +840,13 @@ how addresses map to content, 0004-addressing; what the application does,
   address, per FR-025.
 - An anonymous request for an address that holds a private rendition: it
   answers as an address the website does not serve, per FR-027.
+- A request under the private prefix to the container image, or to a program
+  with no launcher beside it: every address answers the not-found page, byte
+  for byte as a missing page does, per FR-084.
+- `EID_PRIVATE_PREFIX` and `--private-prefix` both given: the environment
+  variable is used, per FR-082.
+- A private prefix of `/__eid/x`, `/` or `/books`: the program refuses it
+  and says why, per FR-083.
 - A new surface of the application needs an address a generated page already
   uses: the generator refuses to write the website until the collision is
   resolved, per FR-026.
@@ -965,6 +1016,11 @@ how addresses map to content, 0004-addressing; what the application does,
 - **SC-018**: No decision or setup command runs from a page, no line runs
   through a shell, and no line runs anywhere but on the person's own
   computer.
+- **SC-019**: No address under the private prefix is served to a reader
+  whose guard is not met, and its answer cannot be told from a missing
+  page's.
+- **SC-020**: No generated file, and no page served where no launcher is
+  beside the website, names the private prefix.
 
 ## Review & acceptance checklist
 

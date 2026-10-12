@@ -1476,3 +1476,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0052-decisions-nba-board FR-032	none	-	judgment
 0052-decisions-nba-board FR-033	check	eidolon: eid check research-papers	eid check research-papers reads claim labels and falsifiers of a research record; a work outside research is not checked
 0052-decisions-nba-board FR-034	none	-	judgment; no check of rights wording
+0044-public-website FR-082	check	eidolon: eid test	the Rust tests (tests/private.rs) resolve the prefix from the environment variable first, the option second and the default `/.infro` last, for build, check, export, serve and publish
+0044-public-website FR-083	check	eidolon: eid test	the Rust tests (tests/private.rs) refuse a prefix that is `/`, lies under /__eid, has a dot-segment, a query, upper case or a trailing slash, or is a page, file or redirect, and name the source of the value
+0044-public-website FR-084	check	eidolon: eid test	the Rust tests (tests/private.rs) get the same status, headers and bytes from an undeclared or unmet private address as from a missing page; the website acceptance run (0016-website-acceptance FR-009) checks it on the release
+0044-public-website FR-085	check	eidolon: eid test	eid check site fails a generated page, sitemap, llms.txt, feed, redirect or robots.txt rule that names the prefix; the Rust tests find it only in the placeholder beside the launcher
+0044-public-website FR-086	check	eidolon: eid test	the Rust tests (tests/private.rs) find both headers on a served private page
+0044-public-website FR-087	check	eidolon: eid test	the Rust tests (tests/private.rs) serve the Console at <prefix>/console and the summary at <prefix>/console/uat beside the launcher and not elsewhere, and leave /__eid/console/run where it is
