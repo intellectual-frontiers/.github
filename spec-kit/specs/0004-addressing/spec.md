@@ -21,9 +21,13 @@ network-mounted source (0001-eidolon-architecture FR-005).
   `content/` at that repository's root — `content/` in the public root for
   content whose audience is Public, `content/` in the private vault for
   all other content, including the content of every work whose package the
-  vault holds. No other directory in either repository MAY hold a content
+  vault holds. A content document generated from a work package's source is
+  not tracked: it lives in `build/content/` of the repository that holds the
+  package, which is a second content root of that repository with the same
+  relative paths, and a path MUST NOT exist under both `content/` and
+  `build/content/`. No other directory in either repository MAY hold a content
   document. A work package's source files are not content documents
-  (0015-work-packages). The vault's content root MAY hold a document whose
+  (0015-work-packages). The vault's content roots MAY hold a document whose
   audience is Public; such a document is resolved and served exactly as
   a public-root document is, under FR-005 through FR-008.
 

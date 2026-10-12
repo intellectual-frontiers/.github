@@ -355,8 +355,8 @@ requirement	mechanism	by	note
 0015-work-packages FR-016	none	-	cuts write records but deliver nothing; no delivery command exists
 0015-work-packages FR-017	check	eidolon: eid check ontology	DeliveryRecord shape: location, commit, date, checksum, audience, no signed URL
 0015-work-packages FR-018	gate	eidolon: eid cut new --review	a review cut's PDF is watermarked "Review <date>"; a final cut (eid cut new --final) is refused before the Deploy stage, the publication decision
-0015-work-packages FR-019	none	-	generator writes to content/ by design; no check
-0015-work-packages FR-020	check	eidolon: eid fresh	regenerates content and fails if the tree differs
+0015-work-packages FR-019	check	eidolon: eid test	the generator writes only under build/content/ and a tracked file under content/press fails eid check sensitive; the readers take both roots (test_content_gen.py, tests/served.rs)
+0015-work-packages FR-020	check	eidolon: eid fresh	eid fresh runs the generator, which fails naming the page it cannot render; the tests regenerate twice for identical bytes
 0015-work-packages FR-021	check	eidolon: eid fresh	generator copies the work audience; fresh fails on a hand-edited one
 0015-work-packages FR-022	check	eidolon: eid check ontology	SubstantialWork shape: exactly one stage and one owner
 0015-work-packages FR-023	gate	eidolon: eid work advance	works.py advance refuses to skip a stage; check-works also checks the chain

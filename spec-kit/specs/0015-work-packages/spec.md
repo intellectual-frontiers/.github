@@ -116,12 +116,18 @@ property fetches them are decisions outside this spec.
 ## Generated content documents
 
 - **FR-019**: A content document generated from a work package's source
-  (0002-content-format FR-017) MUST live in the `content/` directory of the
-  repository that holds the package.
+  (0002-content-format FR-017) MUST be written under `build/content/` of
+  the repository that holds the package, at the path it would have under
+  `content/` (0004-addressing FR-004), and MUST NOT be tracked by Git: like
+  a rendition (FR-014) it is built from committed source. `content/` holds
+  only documents authored directly. Every consumer of content documents
+  MUST read `build/content/` as a content root beside `content/`, and a
+  command that serves or exports the website MUST generate what is missing
+  or older than its source first.
 - **FR-020**: A generated content document MUST be reproducible:
-  regenerating it from its source at the current commit MUST yield
-  identical bytes, and a difference MUST fail the check. A generated
-  content document MUST NOT be hand-edited.
+  regenerating it from its source MUST yield identical bytes on every
+  computer, and a generator MUST fail, naming the page, when it cannot
+  render one. A generated content document MUST NOT be hand-edited.
 - **FR-021**: A generated content document's audience MUST NOT be broader
   than the audience of the work it renders, except a companion page, a
   news record or show notes of an announced work, per FR-030.
