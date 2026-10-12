@@ -229,6 +229,17 @@ writes, and what continuous integration needs.
   file an agent reads first, and a repository MUST NOT add a bootstrap of its
   own.
 
+## One version of a tool
+
+- **FR-072**: A tool MUST be installed once on a computer, at one version
+  (workspaces-host's archon specification, FR-024). A requirement that two
+  repositories declare MUST be one declaration, and the public root's is the
+  source: a private repository's entry of the same name is a copy of it, which
+  its fresh command rewrites, and the `python` and `uv` entries of the public
+  root MUST hold the versions `archon` pins in `archon/bootstrap.env`, checked
+  beside a clone of workspaces-host. A repository's check MUST fail when they
+  differ, naming the file to change.
+
 ## What a repository must not require
 
 - **FR-024**: A repository MUST be usable from a clone by following only its
