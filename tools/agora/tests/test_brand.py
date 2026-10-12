@@ -379,12 +379,14 @@ class OpenEdx(Repo):
         host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
         host.add("paragon", ready=False, needs=("node",), provides={"paragon": "node_modules/.bin/paragon"})
         offline = host.env(AGORA_OFFLINE="1")
-        code, doc = self.go("openedx", "build", "mini-brand", env=offline)
+        with host.patched():
+            code, doc = self.go("openedx", "build", "mini-brand", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "toolchain"))
         self.assertIn("paragon", doc["data"]["message"])
-        self.assertIn("ws-host toolchain ensure paragon --provider agora", doc["data"]["message"])
+        self.assertIn("Run the command once while online", doc["data"]["message"])
         # a Paragon of the person's own is named explicitly, and stands in for the pinned one: nothing is installed or asked for
-        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon", env=offline)
+        with host.patched():
+            code, doc = self.go("openedx", "build", "mini-brand", "--paragon", "/no/paragon", env=offline)
         self.assertEqual((code, doc["data"]["code"]), (3, "missing-program"))
         self.assertIn("paragon", doc["data"]["message"].lower())
 
@@ -402,7 +404,8 @@ class OpenEdx(Repo):
         host.add("node", files={"bin/node": b"#!/bin/sh\n"}, bin="bin")
         env = host.env()
         before = tree(self.root)
-        code, doc = self.go("openedx", "build", "mini-brand", "--paragon", str(cli), "--dry-run", env=env)
+        with host.patched():
+            code, doc = self.go("openedx", "build", "mini-brand", "--paragon", str(cli), "--dry-run", env=env)
         self.assertEqual(code, 0, doc)
         self.assertEqual(tree(self.root), before)
         self.assertEqual(self.go("openedx", "build", "mini-brand", "--paragon", str(cli), env=env)[0], 0)

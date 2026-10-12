@@ -75,7 +75,8 @@ class Parser(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             host = FakeHost(Path(tmp))
             host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")
-            code, doc = run_json(["spec", "status"], registry=reg, env=host.env())
+            with host.patched():
+                code, doc = run_json(["spec", "status"], registry=reg, env=host.env())
         self.assertEqual((code, doc["data"]["code"]), (3, "toolchain"))
         self.assertIn("no-such-tool 1.0", doc["data"]["message"])
 

@@ -9,7 +9,7 @@ logs = ".agora/logs"            # untracked NDJSON action logs; .gitignore lists
 proposals = ".agora/proposals"  # tracked proposals (0041 FR-039)
 
 # What the launcher needs from the host (0041-command-line FR-001, 0025-tooling-environment FR-014): uv, which supplies Python and the locked
-# packages. ws-host is not a prerequisite: it adds the toolchain entries, and a host without it is bare (0041 FR-078).
+# packages. archon, which the launcher fetches, makes the toolchain entries available (0025-tooling-environment FR-017).
 [prerequisites.uv]
 hint = "install uv (https://docs.astral.sh/uv/getting-started/installation/)"
 

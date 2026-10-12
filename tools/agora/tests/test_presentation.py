@@ -16,7 +16,7 @@ def loaded():
 
 class Emitted(unittest.TestCase):
     def setUp(self):
-        _, self.doc = run_json(["command", "list"])
+        _, self.doc = run_json(["command", "list"], env={"ARCHON_ATTENDANCE": "attended"})
         self.p = self.doc["data"]["presentation"]
 
     def test_the_schema_version_is_unchanged_because_every_field_is_added(self):
@@ -130,7 +130,7 @@ class Checked(unittest.TestCase):
         self.assertIn("is not a codicon id of the glyph map", " | ".join(presentation.data_problems(ctx)))
 
     def test_the_ontology_noun_declares_its_icon_field_and_its_search_option(self):
-        _, doc = run_json(["command", "list"])
+        _, doc = run_json(["command", "list"], env={"ARCHON_ATTENDANCE": "attended"})
         noun = next(n for n in doc["data"]["presentation"]["nouns"] if n["noun"] == "ontology")
         self.assertEqual((noun["view"], noun["list"]["icon"], noun["list"]["search"]), ("ontology", "icon", "match"))
 

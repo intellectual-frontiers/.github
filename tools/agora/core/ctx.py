@@ -34,12 +34,13 @@ class Ctx:
 
     @property
     def profile(self):
-        """How the host is provisioned and whether a person is at this invocation (0041 FR-078)."""
-        from .profile import detect
+        """Whether a person is at this invocation (0041 FR-078), which `archon` decides; the MCP surface is unattended."""
+        from archon import profile
 
         cached = self.__dict__.get("_profile")
         if cached is None:
-            cached = self.__dict__["_profile"] = detect(self.registry.name, self.env, self.surface)
+            cached = self.__dict__["_profile"] = (profile.Profile(profile.UNATTENDED, "the MCP surface") if self.surface == "mcp"
+                                                  else profile.detect(self.env or None))
         return cached
 
     @property

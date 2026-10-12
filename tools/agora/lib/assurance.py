@@ -133,7 +133,7 @@ def _node_problem(env: dict[str, str]) -> str:
     """Why no node can run, or an empty string."""
     if node.node_path(env):
         return ""
-    return "needs node, an entry of the toolchain that ws-host installs: `ws-host toolchain ensure node --provider agora`"
+    return "needs node, an entry of the toolchain that archon obtains (on PATH, from the package manager, or its verified download); run the command while online"
 
 
 def _argv(h: Harness, env: dict[str, str]) -> list[str]:

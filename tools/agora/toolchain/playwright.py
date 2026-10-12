@@ -1,4 +1,4 @@
-"""Playwright for Node, for the design systems' browser harnesses (0042-agora FR-030): an npm package `ws-host` installs from its lock, by a pinned Node."""
+"""Playwright for Node, for the design systems' browser harnesses (0042-agora FR-030): an npm package `archon` obtains from its lock, by a pinned Node."""
 from __future__ import annotations
 
 from agora.core.toolchain import Resolved, ToolchainError, run_program

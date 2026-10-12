@@ -1,12 +1,12 @@
 """The TeX Live packages the print design system loads that TinyTeX does not hold, pinned (0042-agora FR-030).
 
-Each is one `tex-<package>` entry: one container of TeX Live 2025's final, frozen repository (`tlnet-final`), whose checksum `ws-host` verifies before it
-unpacks anything; each entry sets TEXMFHOME to its own tree and `ws-host` joins them. `microtype` is among them although TinyTeX holds it: the bundle's
+Each is one `tex-<package>` entry: one container of TeX Live 2025's final, frozen repository (`tlnet-final`), whose checksum `archon` verifies before it
+unpacks anything; each entry sets TEXMFHOME to its own tree and `archon` joins them. `microtype` is among them although TinyTeX holds it: the bundle's
 3.2c stops at `\\begin{document}` when titletoc is loaded after it, and the frozen repository's r78231 does not. TEXMFHOME comes before TinyTeX's own tree,
 so this copy is the one TeX reads.
 
 To add a package: find its name (`tlmgr info`, or the file the log says is missing), add `.workspaces-host/toolchain.d/tex-<name>.toml` with the
-SHA-256 of the container, run `ws-host toolchain generate agora`, and commit it alone with `agora check toolchain --functional` passing.
+SHA-256 of the container, run `archon generate`, and commit it alone with `agora check toolchain --functional` passing.
 """
 from __future__ import annotations
 

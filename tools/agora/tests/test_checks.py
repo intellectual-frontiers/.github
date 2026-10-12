@@ -202,7 +202,8 @@ class Selection(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             host = FakeHost(Path(tmp))
             host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")  # no build for any platform
-            code, doc = run_json(["check", "controls"], registry=reg, env=host.env())
+            with host.patched():
+                code, doc = run_json(["check", "controls"], registry=reg, env=host.env())
         s = doc["data"]["sections"][0]
         self.assertEqual((code, s["status"], doc["data"]["status"]), (3, "skipped", "skipped"))
         self.assertIn("no-such-tool", s["reason"])

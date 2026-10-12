@@ -13,7 +13,7 @@ from .register import known_repositories
 
 NAME = "agora"  # 0042 FR-002
 DECISIONS = {"spec set", "ink record", "proposal advance"}  # 0042 FR-007
-PREREQUISITES = {"workspaces-host"}  # the one repository agora may name: its program, `ws-host`, is the prerequisite (0042 FR-003; 0025 FR-005)
+PREREQUISITES = {"workspaces-host"}  # the one repository agora may name: its runner, `archon`, is what the launcher fetches (0042 FR-003; 0025 FR-005)
 # 0042 FR-013: the check sections, and FR-014: the suites, as `sections`.
 SECTIONS = {"specs", "register", "controls", "ontology", "vocabulary", "toolchain", "commands", "help", "design-systems", "imagery", "openedx",
             "content", "figures", "voice", "slides", "email", "course", "media", "signage", "merchandise"}
@@ -158,7 +158,7 @@ README_MAX_LINES = 120  # 0042 FR-036
 
 
 def check_readme(home: Path, registry) -> list[Finding]:
-    """0042 FR-036: the README is the short way in: it links to the guide, names the one-time `system ensure` and `help`, and stays short."""
+    """0042 FR-036: the README is the short way in: it links to the guide, names the `uv` step and `help`, and stays short."""
     readme = home / "README.md"
     if not readme.is_file():
         return [Finding("error", "README.md", "is missing (0042 FR-036)")]
@@ -166,7 +166,7 @@ def check_readme(home: Path, registry) -> list[Finding]:
     out = []
     if GUIDE_URL not in text:
         out.append(Finding("error", "README.md", f"does not link to the guide, {GUIDE_URL} (0042 FR-036)"))
-    for needle, why in (("ws-host system ensure", "the one-time system ensure"), ("agora help", "the help command")):
+    for needle, why in (("install `uv`", "the `uv` step"), ("agora help", "the help command")):
         if needle not in text:
             out.append(Finding("error", "README.md", f"does not name {why}, `{needle}` (0042 FR-036)"))
     n = len(text.splitlines())

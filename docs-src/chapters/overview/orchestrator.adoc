@@ -35,23 +35,38 @@ build, a dry run or an MCP call, goes to untracked logs in `.agora/logs/`. Reads
 
 === Packages and the toolchain
 
-The launcher needs only `uv` and Python 3. Python packages come from one hashed lock, `uv.lock`, of the dependency groups in `pyproject.toml` (one group per command group), and programs outside Python
+The launcher needs only `uv`. It hands `agora` to `archon`, the command runner in workspaces-host, which runs it under the newest Python that `pyproject.toml` allows. Python packages come from one hashed lock, `uv.lock`, of the dependency groups in `pyproject.toml` (one group per command group), and programs outside Python
 come from Python packages in those locks wherever a wheel exists: Node, PDF readers, an SVG renderer, an image library, a tracer and
 Git's reads. So none of them is installed on the host, and a command's output never depends on one.
 
-What has no wheel is the *toolchain lock*, declared in `tools/agora/toolchain/` and listed in <<reference-toolchain>>: TeX, a
+What has no wheel is the *toolchain*, declared in `.workspaces-host/toolchain.d/` and listed in <<reference-toolchain>>: TeX, a
 browser, Java and AsciidoctorJ for this guide, VS Code for the extension's tests, and the npm packages that the browser harnesses
-and Paragon need. Each entry has a version, an address and a SHA-256 for each platform, and a small test. A command that needs one
-fetches it into a per-user cache the first time (`~/.cache/agora/toolchain`, or `AGORA_TOOLCHAIN_CACHE`), verifies the checksum before
-unpacking, and uses that copy, never one found on the host. `--offline` uses only the cache and fails naming the entry. A program of
-your own stands in for an entry only if you name it, with the entry's variable, and `fresh` will not call a generated file current
-while one stands in.
+and Paragon need. Each entry has a version, an address and a SHA-256 for each platform, and may name the least version it accepts, how to ask for it and the
+package manager's name for it. A command that names an entry has `archon` make it available first, from the first of three sources that has it:
 
-The one thing a fetch cannot supply is the shared libraries a browser and VS Code link on Linux, and the display server VS Code's
-tests start under. They need administrator rights, so one command, `agora system ensure`, installs them. It prints exactly what it will
-run, asks before it uses `sudo`, and is the only command that does. It is never run by another command and never offered over MCP; a
-command that needs the libraries fails naming it. On Debian and Ubuntu the packages are pinned in the code; on another distribution it
-names the libraries and stops.
+----
+  1. already on your machine   a program on PATH whose version meets the entry's minimum; used as it is
+  2. your package manager      apt, dnf, apk or brew offers that version; installed without questions
+  3. a verified download       its SHA-256 is checked before it is unpacked; kept once in one store
+  none works                   exit status 3, with the reason each source gave
+----
+
+An entry that gives no minimum, such as the typesetter whose output is written into committed files, always uses its own download, so a generated file never
+depends on the machine it was made on. `--offline` uses only what is already on the machine or in the store and fails naming the entry. A browser's shared
+libraries are installed through the package manager as part of its entry.
+
+=== A person or nobody
+
+`archon` assumes nobody is at the keyboard unless something says otherwise: `ARCHON_ATTENDANCE=attended`, which the editor sets, or a terminal with neither `CI`
+nor `CLAUDE_CODE_REMOTE` set. `agora doctor` reports which and why.
+
+----
+                 attended                              unattended
+  who          a person at a terminal or in VS Code   an AI agent, a CI job, the MCP server
+  progress     spinner, colour, emoji, progress bar   plain lines at most
+  questions    asked before anything needs sudo       never asked; yes is assumed
+  result       the same command gives the same result and exit status
+----
 
 === Extending it
 

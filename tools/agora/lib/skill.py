@@ -49,7 +49,7 @@ def _needs(reg: Registry, c: Any) -> str:
     if group is not None and group.packages:
         parts.append(f"packages: {', '.join(sorted(group.packages))}")
     if c.toolchain:
-        parts.append(f"ws-host: {', '.join(c.toolchain)}")
+        parts.append(f"programs: {', '.join(c.toolchain)}")
     return _cell("; ".join(parts)) if parts else "uv only"
 
 
@@ -89,11 +89,12 @@ def text(reg: Registry) -> str:
     w("")
     w("## Where it runs")
     w("")
-    w(f"- `{name}` needs only `uv` on the host, which fetches the newest Python and the locked packages. A command whose Needs column names a "
-      "toolchain entry (a typesetter, a browser, a Java runtime) also needs `ws-host` (https://github.com/intellectual-frontiers/workspaces-host) "
-      "with this clone enabled by `ws-host provider add .`; without it that command exits 3 and names `ws-host`, and every other command runs.")
-    w(f"- `{name} doctor` reports the execution profile: provisioning `hosted` (`ws-host` is there) or `bare` (`uv` alone), and attendance "
-      f"`attended` or `unattended`. `{name} command list --json` marks each command `runnable` on this host.")
+    w(f"- `{name}` needs only `uv` on the host, which fetches `archon` (https://github.com/intellectual-frontiers/workspaces-host), the newest Python and "
+      "the locked packages. A command whose Needs column names a toolchain entry (a typesetter, a browser, a Java runtime) has `archon` obtain it "
+      "first, from a program already on the host, the host's package manager or the entry's verified download; nothing is asked of you. If no "
+      "source can supply it (offline, no administrator rights, no build for this platform) the command exits 3 and says why.")
+    w(f"- `{name} doctor` reports the profile: attendance `attended` or `unattended`, which is `unattended` unless a person is at the invocation. "
+      f"`{name} command list --json` marks each command `runnable` on this host.")
     w(f"- `{name} check --available` runs the sections that can run here, reports the others as skipped and the run as incomplete, and exits 0 when "
       "what ran passed. Without `--available` a skipped section makes the exit status 3: a skipped section was not checked.")
     w("")

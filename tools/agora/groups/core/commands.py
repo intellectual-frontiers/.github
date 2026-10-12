@@ -17,11 +17,11 @@ from typing import Any
 from agora.core import (Arg, Action, AgoraError, Call, Choice, Ctx, Dynamic, Finding, Link, Opt, Pattern, Resource,
                         SectionResult, command, next_command, section)
 from agora.core import generate, plan, presentation, toolchain
+from agora.core.toolchain import runnable
 from agora.core.checks import changed_paths, section_changed
 from agora.core import runner as checkrun
 from agora.core.describe import command_data
 from agora.core.mcp import Server
-from agora.core.profile import needs_of, python_floor, runnable
 from agora.core.registry import CATEGORIES, VERBS, WRITES, context_for
 from agora.core.resource import FAILED, MISSING, OK
 from agora.core.types import COMMIT  # noqa: F401  (declared here, once, for every group)
@@ -73,6 +73,22 @@ class _Resource(Dynamic):
 RESOURCE = _Resource()
 
 
+def _needs_of(reg: Any, command: Any) -> dict[str, Any]:
+    """The dependency group's packages and the toolchain entries a command's plan names (0041 FR-079)."""
+    group = reg.groups.get(command.group) if command.group else None
+    return {"packages": sorted(group.packages) if group is not None else [], "toolchain": list(command.toolchain)}
+
+
+def _python_floor(home: Any) -> tuple[int, int]:
+    """The oldest Python the repository allows, from the one place it is written: `requires-python` in `pyproject.toml` (0025 FR-014)."""
+    import re
+
+    from archon import pyenv
+
+    m = re.search(r">=\s*(\d+)\.(\d+)", pyenv.requires_python(home))
+    return (int(m.group(1)), int(m.group(2))) if m else (3, 14)
+
+
 # command list | show ---------------------------------------------------------------------------------------------
 @command("command list", category="read", help="List the registry's commands", relocatable=True,
          options=[Opt("--category", "CATEGORY", "only this category")])
@@ -85,7 +101,7 @@ def command_list(ctx: Ctx, category: str | None) -> Resource:
             continue
         # What the plan names and whether this host can run it (0041 FR-079); the editor's palette titles and icons only for an attended reader (FR-080).
         rows.append({"id": c.id, "noun": c.noun, "verb": c.verb, "category": c.category, "group": c.group or None, "surfaces": ["terminal", *reg.surfaces_of(c)],
-                     "help": c.help, "needs": needs_of(reg, c), "runnable": runnable(profile, c.toolchain),
+                     "help": c.help, "needs": _needs_of(reg, c), "runnable": runnable(ctx.home, c.toolchain, ctx.env or None, ctx.offline),
                      **({} if profile.unattended else presentation.of_command(reg, c.id))})
     data = {"count": len(rows), "profile": profile.to_dict(), "commands": rows}
     if not profile.unattended:
@@ -201,7 +217,7 @@ def _fresh_text(res: Resource) -> str:
 def test(ctx: Ctx) -> Resource:
     tests = ctx.home / "tools" / "agora" / "tests"
     env = {**ctx.env, "PYTHONPATH": str(ctx.home / "tools"), "PYTHONDONTWRITEBYTECODE": "1", "AGORA_TESTING": "1",
-           "AGORA_ATTENDANCE": ctx.env.get("AGORA_ATTENDANCE", "attended")}  # a CI job or an agent session is not the tests' reader
+           "ARCHON_ATTENDANCE": ctx.env.get("ARCHON_ATTENDANCE", "attended")}  # a CI job or an agent session is not the tests' reader
     py = plan.prepare(ctx.registry, "selftest", offline=ctx.offline, command="test")
     p = subprocess.run([str(py), "-m", "unittest", "discover", "-s", str(tests), "-t", str(ctx.home / "tools")],
                        capture_output=True, text=True, env=env, cwd=ctx.home)
@@ -226,7 +242,7 @@ def doctor(ctx: Ctx) -> Resource:
         if path and name == "uv":
             ver = subprocess.run([path, "--version"], capture_output=True, text=True).stdout.strip()
         if name == "python3":
-            ok = sys.version_info[:2] >= python_floor(ctx.home)
+            ok = sys.version_info[:2] >= _python_floor(ctx.home)
             ver = platform.python_version()
             path = path or sys.executable
             if not ok:
@@ -242,12 +258,12 @@ def doctor(ctx: Ctx) -> Resource:
         problems += lp
         in_cache = ""
         if g.packages:
-            in_cache = "yes" if cache and (cache / "agora").is_dir() and any((cache / "agora").glob(f"{g.name}-*/.agora-ready")) else "no"
+            in_cache = "yes" if cache and (cache / "archon").is_dir() and any((cache / "archon").glob(f"{g.name}-*/.archon-ready")) else "no"
         groups.append({"group": g.name, "packages": [f"{k}=={v}" for k, v in sorted(g.packages.items())] or "none",
                        "lock": ("ok" if g.packages and not lp else "problem" if lp else "none needed"),
                        "in cache": in_cache or "n/a", "plan": plan.plan_for(reg, g.name).describe()})
-    # The toolchain (0025 FR-015): each entry's state as ws-host says it and the commands that need it. An entry not yet installed is not a
-    # fault: a command that needs it has ws-host install it on first use.
+    # The toolchain (0025 FR-015): each entry's state as archon says it and the commands that need it. An entry not yet obtained is not a
+    # fault: a command that needs it has archon obtain it on first use.
     tc = ctx.toolchain()
     needed_by: dict[str, list[str]] = {}
     for c in reg.commands.values():
@@ -271,27 +287,22 @@ def doctor(ctx: Ctx) -> Resource:
     toolchain_rows = []
     problems_note = ""
     entries: dict[str, Any] = {}
-    if not ctx.profile.hosted:
-        # A bare host is not a fault: every command that names no toolchain entry runs (0041 FR-029, FR-078).
-        problems_note = ("ws-host is not on this host, so the toolchain entries are not listed; commands that name one are not runnable "
-                         "here (install ws-host from https://github.com/intellectual-frontiers/workspaces-host, then run `ws-host provider add` on this clone)")
-    else:
-        try:
-            entries = tc.entries
-        except toolchain.ToolchainError as e:
-            problems_note = e.message
+    try:
+        entries = tc.entries
+    except toolchain.ToolchainError as e:
+        problems_note = e.message
     for e in entries.values():
         toolchain_rows.append({"entry": e.name, "version": e.version, "platform": toolchain.platform_name(),
-                               "cache": "ready" if e.state == "ready" else "not installed",
+                               "cache": "ready" if e.state == "ready" else "not obtained yet", "source": e.source or "-",
                                "needed by": sorted(needed_by.get(e.name, [])),
-                               "hint": "" if e.state == "ready" else (f"installed on first use, or `ws-host toolchain ensure {e.name} --provider agora`")})
+                               "hint": "" if e.state == "ready" else "obtained on first use, from the host, the package manager or its verified download"})
     status = "failed" if problems else "missing" if missing else "ok"
     data = {"status": status, "profile": ctx.profile.to_dict(), "prerequisites": prereq, "groups": groups, "toolchain": toolchain_rows,
             "conflicts": problems, "missing": missing, "offline": ctx.offline, **({"note": problems_note} if problems_note else {}),
             "commands": len(reg.commands)}
     res = Resource("doctor", reg.name, data, exit=FAILED if problems else MISSING if missing else OK)
     res.columns["prerequisites"] = ["name", "present", "version", "hint"]
-    res.columns["toolchain"] = ["entry", "version", "cache", "needed by", "hint"]
+    res.columns["toolchain"] = ["entry", "version", "cache", "source", "needed by", "hint"]
     res.columns["groups"] = ["group", "packages", "lock", "in cache", "plan"]
     if problems or missing:
         res.actions = [next_command("run the doctor again", "doctor")]

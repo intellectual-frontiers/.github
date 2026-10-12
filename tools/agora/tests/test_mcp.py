@@ -148,7 +148,7 @@ class InProcess(unittest.TestCase):
     def setUpClass(cls):
         cls.reg = Registry.load(HOME)
 
-    ENV = {"AGORA_PROVISIONING": "hosted", "AGORA_ATTENDANCE": "unattended"}   # the same profile on both surfaces, so they cannot disagree
+    ENV = {"ARCHON_ATTENDANCE": "unattended"}   # the same profile on both surfaces, so they cannot disagree
 
     def setUp(self):
         self.server = Server(self.reg, HOME, self.ENV)
@@ -190,7 +190,7 @@ class InProcess(unittest.TestCase):
     def test_no_declaration_can_make_a_decision_callable(self):  # 0041 FR-023
         reg = Registry.load(HOME)
         reg.find("spec set").surfaces = ("editor", "mcp")  # a declaration that tries
-        server = Server(reg, HOME, {"AGORA_PROVISIONING": "hosted"})
+        server = Server(reg, HOME, {"ARCHON_ATTENDANCE": "unattended"})
         server.line(json.dumps(msg(0, "initialize", protocolVersion=VERSIONS[0])))
         listed = json.loads(server.line(json.dumps(msg(1, "tools/list"))))["result"]["tools"]
         self.assertNotIn("spec_set", [t["name"] for t in listed])
@@ -256,4 +256,7 @@ class InProcess(unittest.TestCase):
             with self.subTest(tool=tool):
                 got = self.rpc("tools/call", name=tool, arguments=args)["result"]["structuredContent"]
                 code, want = run_json(argv, env=self.ENV)
+                got, want = dict(got), dict(want)
+                for doc in (got, want):                     # the surface that asked is the one thing that differs: the MCP surface is unattended by rule
+                    doc.get("data", {}).get("profile", {}).pop("attendance decided by", None)
                 self.assertEqual(got, want)

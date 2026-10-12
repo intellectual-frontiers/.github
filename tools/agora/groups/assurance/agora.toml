@@ -3,7 +3,7 @@ help = "The design systems' assurance harnesses, each brand's imagery pool and s
 
 
 # Programs outside Python are toolchain entries (0041-command-line FR-006, FR-066; 0042-agora FR-030), declared in
-# .workspaces-host/toolchain.d/ and installed by ws-host on first use. What each kind of harness needs of them: an entry
+# .workspaces-host/toolchain.d/ and obtained by archon on first use. What each kind of harness needs of them: an entry
 # that cannot be had (offline with a cold cache, no build for the platform, a browser's system libraries missing) skips the
 # harness, naming the entry and the command that fixes it, and makes the run exit 3 (0041-command-line FR-033); nothing is
 # reported as passed that did not run.

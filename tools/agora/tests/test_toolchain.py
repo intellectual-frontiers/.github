@@ -1,8 +1,9 @@
-"""agora's view of the toolchain ws-host owns (0025-tooling-environment FR-015 to FR-020; 0041-command-line FR-066 to FR-068; 0042-agora FR-030), driven
-through a stand-in ws-host."""
+"""agora's view of the toolchain archon makes available (0025-tooling-environment FR-015 to FR-020; 0041-command-line FR-066 to FR-068; 0042-agora FR-030),
+driven through a stand-in backend."""
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from agora.core import toolchain as tc
 from agora.lib import toolchain_rules
@@ -22,7 +23,7 @@ class Adapter(unittest.TestCase):
         self.host.add("tex-fvextra", files={"tex/y": b"y"}, env={"TEXMFHOME": "{dir}"})
         self.host.add("tinytex", ready=False)
 
-    def test_entries_come_from_ws_host_with_agoras_own_checks_attached(self):
+    def test_entries_come_from_archon_with_agoras_own_checks_attached(self):
         t = self.host.toolchain()
         self.assertEqual(sorted(t.entries), ["asciidoctor", "jre", "tex-fvextra", "tex-xurl", "tinytex"])
         self.assertEqual(t.entries["jre"].state, "ready")
@@ -35,10 +36,10 @@ class Adapter(unittest.TestCase):
         with self.assertRaises(tc.ToolchainError):
             t.expand(["nope"])
 
-    def test_use_installs_only_what_is_missing_through_ws_host_then_says_where_it_is(self):
+    def test_use_obtains_only_what_is_missing_through_archon_then_says_where_it_is(self):
         t = self.host.toolchain()
         r = t.use(["asciidoctor"])
-        self.assertEqual([l for l in self.host.asked() if l.startswith("toolchain ensure")], ["toolchain ensure asciidoctor --provider agora"])
+        self.assertEqual(self.host.asked(), ["obtain asciidoctor"])
         self.assertEqual(sorted(r.dirs), ["asciidoctor", "jre"])
         self.assertTrue(str(r.path_of("java")).endswith("jre/bin/java"))
 
@@ -58,30 +59,27 @@ class Adapter(unittest.TestCase):
             t.use(["asciidoctor"])
         self.assertEqual(e.exception.exit, 3)
         self.assertIn("asciidoctor 1.0", e.exception.message)
-        self.assertIn("ws-host toolchain ensure asciidoctor --provider agora", e.exception.message)
-        self.assertEqual([l for l in self.host.asked() if l.startswith("toolchain ensure")], [], "nothing is installed offline")
+        self.assertIn("Run the command once while online", e.exception.message)
+        self.assertEqual(self.host.asked(), [], "nothing is obtained offline")
 
-    def test_an_entry_ws_host_cannot_install_is_exit_3_and_names_why(self):
+    def test_an_entry_no_source_can_supply_is_exit_3_and_names_why(self):
         self.host.add("no-build", ready=False, fail="no-build 1.0 has no build for linux-x64")
         with self.assertRaises(tc.ToolchainError) as e:
             self.host.toolchain().use(["no-build"])
         self.assertEqual(e.exception.exit, 3)
         self.assertIn("no build", e.exception.message)
 
-    def test_without_ws_host_it_says_so_with_exit_3(self):
-        t = tc.Toolchain(HOME, env={"PATH": "/nonexistent"}, offline=False)
+    def test_an_entry_the_repository_does_not_declare_is_a_usage_error(self):
         with self.assertRaises(tc.ToolchainError) as e:
-            t.use(["jre"])
-        self.assertEqual(e.exception.exit, 3)
-        self.assertIn("ws-host is needed", e.exception.message)
+            self.host.toolchain().use(["no-such-entry"])
+        self.assertEqual(e.exception.exit, 2)
 
-    def test_a_ws_host_that_does_not_know_the_provider_is_exit_3(self):
-        import json
-        self.host.script.write_text("#!/bin/sh\necho '{\"kind\": \"error\", \"data\": {\"plain\": \"No enabled provider is called agora.\"}}'\nexit 3\n")
-        with self.assertRaises(tc.ToolchainError) as e:
-            self.host.toolchain().entries
-        self.assertEqual(e.exception.exit, 3)
-        self.assertIn("No enabled provider", e.exception.message)
+    def test_the_real_backend_reads_this_repositorys_declarations_and_installs_nothing_to_answer(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict("os.environ", {"XDG_DATA_HOME": f"{tmp}/data", "XDG_CACHE_HOME": f"{tmp}/cache"}):
+            rows = tc.ArchonBackend(HOME, {}, False).rows()
+            self.assertEqual(sorted(e["name"] for e in rows["entries"]), sorted(tc.declared(HOME)))
+            self.assertEqual({e["name"]: e["state"] for e in rows["entries"]}["asciidoctor"], "missing")
+            self.assertFalse((Path(tmp) / "data").exists() and any((Path(tmp) / "data").rglob("*.jar")))
 
 
 class Declarations(unittest.TestCase):
@@ -107,17 +105,10 @@ class Declarations(unittest.TestCase):
         declared = {**declared, "jre": {**declared["jre"], "needs": ["ghost"]}}
         self.assertTrue(any("ghost" in f.message for f in toolchain_rules.entry_findings(declared, Registry.load(HOME))))
 
-    def test_ws_host_findings_become_findings(self):
-        self.assertEqual(toolchain_rules.generated_findings.__name__, "generated_findings")
+    def test_archons_findings_become_findings(self):
+        self.assertEqual(toolchain_rules.generated_findings(HOME), [])      # this repository's generated files are current
         with tempfile.TemporaryDirectory() as tmp:
-            host = FakeHost(Path(tmp))
-            host.extra = {"stale": [".workspaces-host/mise/.config/mise/conf.d/jre.toml"]}
-            host.save()
-            found = toolchain_rules.generated_findings(HOME, host.env())
-            self.assertEqual([f.where for f in found], [".workspaces-host/mise/.config/mise/conf.d/jre.toml"])
-            host.extra = {"stale": [], "generate_exit": 1}
-            host.save()
-            self.assertEqual(len(toolchain_rules.generated_findings(HOME, host.env())), 1)
+            self.assertEqual([f.message for f in toolchain_rules.generated_findings(Path(tmp))], ["declares no provider (provider.toml)"])
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ from typing import Any, Iterable
 from . import cli, execute, render
 from .ctx import Ctx
 from .describe import tool_schema
-from .profile import detect, runnable
+from .toolchain import runnable
 from .registry import WRITES, Command, Registry
 from .resource import AgoraError, Resource, next_command
 
@@ -55,9 +55,8 @@ class Server:
     # tools -------------------------------------------------------------------------------------------------------
     def exposed(self) -> dict[str, Command]:
         """The tools: every command that declares MCP and is not a decision command (0041 FR-022, FR-023)."""
-        profile = detect(self.reg.name, self.env, "mcp")
         return {tool_name(c): c for c in sorted(self.reg.commands.values(), key=lambda c: c.id)
-                if "mcp" in self.reg.surfaces_of(c) and c.category != "decision" and runnable(profile, c.toolchain)}
+                if "mcp" in self.reg.surfaces_of(c) and c.category != "decision" and runnable(self.home, c.toolchain, self.env or None)}
 
     def ctx(self, **kw: Any) -> Ctx:
         return execute.new_ctx(self.reg, self.home, self.env, surface="mcp", **kw)

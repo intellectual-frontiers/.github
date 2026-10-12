@@ -171,16 +171,17 @@ class OtherCommands(unittest.TestCase):
             host = FakeHost(Path(tmp))
             for name in ("tinytex", "chromium", "playwright", "jre", "asciidoctor", "node"):
                 host.add(name, ready=name != "chromium")
-            code, doc = run_json(["doctor"], env=host.env())
+            with host.patched():
+                code, doc = run_json(["doctor"], env=host.env())
         self.assertEqual((code, doc["data"]["status"]), (0, "ok"))
         self.assertEqual(doc["data"]["conflicts"], [])
         self.assertEqual([p["name"] for p in doc["data"]["prerequisites"]], ["uv"])
-        self.assertEqual(doc["data"]["profile"]["provisioning"], "hosted")
+        self.assertIn(doc["data"]["profile"]["attendance"], ("attended", "unattended"))
         self.assertNotIn("programs", doc["data"])  # no host program is declared: packages and toolchain entries supply them
         rows = {r["entry"]: r for r in doc["data"]["toolchain"]}
         self.assertEqual(set(rows), {"tinytex", "chromium", "playwright", "jre", "asciidoctor", "node"})
-        self.assertEqual(rows["chromium"]["cache"], "not installed")
-        self.assertIn("ws-host toolchain ensure chromium --provider agora", rows["chromium"]["hint"])
+        self.assertEqual(rows["chromium"]["cache"], "not obtained yet")
+        self.assertIn("obtained on first use", rows["chromium"]["hint"])
         self.assertTrue(any("browser" in n for n in rows["chromium"]["needed by"]))
         self.assertTrue(any("frontiers-print" in n for n in rows["tinytex"]["needed by"]))
         self.assertNotIn("overrides", doc["data"])  # there is no override of a toolchain entry (0025 FR-019)

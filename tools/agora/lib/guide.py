@@ -167,17 +167,17 @@ def toolchain_chapter(reg: Registry, entries: dict[str, Any]) -> str:
     """The toolchain as `.workspaces-host/toolchain.d/` declares it: `entries` maps each entry's name to its parsed file."""
     lines = [header(), "[#reference-toolchain]", "== The toolchain", "",
              f"What `{reg.name}` runs on and has no Python wheel for. Each entry is one file in `.workspaces-host/toolchain.d/`: one exact version "
-             "with an address and a SHA-256 for every platform it is built for. `ws-host` reads those files, installs from the lock only, checks "
-             "each download before anything is unpacked, and keeps one copy of a program for every repository that pins it. "
-             "`ws-host toolchain list` shows what your machine holds, and "
+             "with an address and a SHA-256 for every platform it is built for. `archon` reads those files, takes each program from one already on your machine when it is new enough, else from your package manager, else from its "
+             "download, which it checks before anything is unpacked, and keeps one copy of a program for every repository that pins it. "
+             "`agora doctor` shows where each came from, and "
              f"`{reg.name} help toolchain` explains the work.", "",
              '[cols="1,1,4,2,1"]', "|===", "|Entry |Version |What it is |Platforms |Needs", ""]
     for name, e in sorted(entries.items()):
         lines += [f"|`{name}`", f"|{_cell(str(e.get('version', '')))}", f"|{_cell(str(e.get('summary', '')))}",
                   f"|{_cell(', '.join(sorted(e.get('platforms', {}))) or e.get('kind', ''))}", f"|{_cell(', '.join(e.get('needs', [])) or '-')}", ""]
     lines += ["|===", "", "=== System libraries", "",
-              "A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `ws-host system ensure` "
-              "installs them once with `sudo`: it says what it will run and asks first, and no other command uses `sudo`. The names are for Debian and "
+              "A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `archon` "
+              "installs the missing ones through the package manager, as root or with `sudo`; attended, it says what it will run and asks first. The names are for Debian and "
               "Ubuntu; on another distribution it names the libraries and stops.", "", '[cols="2,2"]', "|===", "|Entry |Packages", ""]
     for name, e in sorted(entries.items()):
         if e.get("system"):

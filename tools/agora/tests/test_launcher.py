@@ -11,15 +11,7 @@ from .helpers import HOME
 LAUNCHER = HOME / "agora"
 
 
-def _enabled() -> bool:
-    """ws-host is here and has this clone enabled as a provider (0025 FR-006)."""
-    if not shutil.which("ws-host"):
-        return False
-    p = subprocess.run(["ws-host", "provider", "show", "agora", "--json"], capture_output=True, text=True)
-    return p.returncode == 0
-
-
-@unittest.skipUnless(_enabled(), "ws-host is not installed or has not enabled this clone")
+@unittest.skipUnless(shutil.which("uv"), "uv is not installed")
 class Launcher(unittest.TestCase):
     def run_agora(self, *argv, cwd=HOME, env=None):
         return subprocess.run([str(LAUNCHER), *argv], capture_output=True, text=True, cwd=cwd,
@@ -51,43 +43,44 @@ class Launcher(unittest.TestCase):
 
 
 def _tools(dest: Path, *names: str) -> Path:
-    """A PATH holding only these programs, so that a test says exactly what a host has."""
+    """A PATH holding only these programs, so that a test says exactly what a computer has."""
     dest.mkdir(parents=True, exist_ok=True)
     for tool in names:
         (dest / tool).symlink_to(shutil.which(tool))
     return dest
 
 
-@unittest.skipUnless(shutil.which("uv"), "uv is not installed")
-class BareLauncher(unittest.TestCase):
-    """The launcher on a host with uv and no ws-host, and with a ws-host that cannot start the command (0041 FR-001, FR-082)."""
+class HandsOver(unittest.TestCase):
+    """The launcher hands over to archon, and asks nothing of the computer but uv (0041 FR-001, 0025-tooling-environment FR-014, FR-033)."""
 
-    TOOLS = ("sh", "dirname", "sed", "head", "mktemp", "rm", "uv", "env", "cksum", "cut", "mkdir", "printf")
+    TOOLS = ("sh", "dirname", "sed", "head", "env")
 
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.bin = _tools(self.tmp / "bin", *self.TOOLS)
-        self.work = self.tmp / "work"
-        self.work.mkdir()
+        self.log = self.tmp / "calls.log"
+        for name in ("uv", "uvx"):          # stand-ins that record how they were called
+            f = self.bin / name
+            f.write_text(f'#!/bin/sh\necho "{name} $*" >> {self.log}\nprintf "PYTHONPATH=%s\\n" "$PYTHONPATH" >> {self.log}\n')
+            f.chmod(0o755)
 
-    def stub(self, body: str) -> None:
-        f = self.bin / "ws-host"
-        f.write_text("#!/bin/sh\n" + body)
-        f.chmod(0o755)
+    def run_agora(self, *argv, env=None, path=None):
+        return subprocess.run(["/bin/sh", str(LAUNCHER), *argv], capture_output=True, text=True, cwd=self.tmp,
+                              env={"PATH": path or str(self.bin), "HOME": str(self.tmp), **(env or {})})
 
-    def run_agora(self, *argv, path=None, env=None):
-        return subprocess.run(["/bin/sh", str(LAUNCHER), *argv], capture_output=True, text=True, cwd=self.work,
-                              env={"PATH": path or str(self.bin), "HOME": str(self.tmp), "XDG_CACHE_HOME": str(self.tmp / "cache"), "UV_CACHE_DIR": os.environ.get("UV_CACHE_DIR", str(Path.home() / ".cache" / "uv")),
-                                   "UV_PYTHON_INSTALL_DIR": os.environ.get("UV_PYTHON_INSTALL_DIR", str(Path.home() / ".local" / "share" / "uv" / "python")),
-                                   **(env or {})})
+    def calls(self) -> list[str]:
+        return self.log.read_text().splitlines() if self.log.is_file() else []
 
-    def profile(self, p):
-        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        return json.loads(p.stdout)["data"]["profile"]
+    def revision(self) -> str:
+        import tomllib
 
-    def test_it_needs_only_uv(self):
-        self.assertEqual(self.profile(self.run_agora("doctor", "--json"))["provisioning"], "bare")
+        return tomllib.loads((HOME / "pyproject.toml").read_text())["tool"]["archon"]["revision"]
+
+    def test_it_runs_archon_at_the_pinned_revision_and_passes_every_word_after_the_dashes(self):
+        self.assertEqual(self.run_agora("check", "--help", "x").returncode, 0)
+        self.assertEqual(self.calls()[0], f"uvx --quiet --from git+https://github.com/intellectual-frontiers/workspaces-host@{self.revision()} archon run "
+                                          f"--repo {HOME} --path tools -- agora check --help x")
 
     def test_without_uv_it_says_so_and_exits_3(self):
         p = self.run_agora("doctor", path=str(_tools(self.tmp / "nouv", "sh", "dirname")))
@@ -95,34 +88,24 @@ class BareLauncher(unittest.TestCase):
         self.assertIn("uv is needed", p.stderr)
         self.assertIn("https://docs.astral.sh/uv", p.stderr)
 
-    STARTS = 'case "$1 $2" in "provider show") exit 0;; esac\nwhile [ "$1" != "--" ]; do shift; done\nshift\nexec "$@"\n'
+    def test_offline_by_flag_and_by_environment_reaches_uv_and_archon(self):
+        for argv, env in ((("lock", "--offline"), {}), (("lock",), {"AGORA_OFFLINE": "1"})):
+            self.log.unlink(missing_ok=True)
+            self.run_agora(*argv, env=env)
+            self.assertIn("uvx --quiet --offline --from", self.calls()[0])
+            self.assertIn(f"--path tools --offline -- agora lock", self.calls()[0])
 
-    def test_a_ws_host_that_does_not_know_the_clone_leaves_it_to_uv_alone_and_says_nothing(self):
-        self.stub('echo "No enabled provider is called agora." >&2\nexit 3\n')
-        p = self.run_agora("doctor", "--json")
-        self.assertEqual(self.profile(p)["provisioning"], "bare")
-        self.assertNotIn("No enabled provider", p.stdout + p.stderr)  # ws-host's refusal never reaches the output, which may be JSON
-        self.assertEqual(list(Path(tempfile.gettempdir()).glob("agora-started.*")), [])
+    def test_a_clone_named_in_archon_from_is_run_in_place(self):
+        clone = self.tmp / "workspaces-host"
+        clone.mkdir()
+        self.run_agora("doctor", env={"ARCHON_FROM": str(clone)})
+        self.assertIn("uv run --no-project --quiet --python >=3.14 -- python -W ignore -m archon run", self.calls()[0])
+        self.assertIn(f"PYTHONPATH={clone}", self.calls()[1])
 
-    def test_a_ws_host_that_starts_it_is_hosted_and_a_failure_of_the_command_is_not_retried(self):
-        self.stub(self.STARTS)
-        self.assertEqual(self.profile(self.run_agora("doctor", "--json"))["provisioning"], "hosted")
-        p = self.run_agora("nonsense")
-        self.assertEqual(p.returncode, 2)
-        self.assertEqual(len(list((self.tmp / "cache" / "agora").glob("hosted-*"))), 1)  # asked once, remembered
-
-    def test_a_remembered_answer_that_has_gone_stale_is_dropped_and_the_command_still_runs(self):
-        self.stub(self.STARTS)
-        self.run_agora("doctor", "--json")
-        self.stub('exit 3\n')  # the clone is no longer enabled; the stamp says it is
-        self.assertEqual(self.profile(self.run_agora("doctor", "--json"))["provisioning"], "bare")
-        self.assertEqual(list((self.tmp / "cache" / "agora").glob("hosted-*")), [])
-
-    def test_a_command_that_names_a_toolchain_entry_exits_3_naming_ws_host_and_the_rest_run(self):
-        p = self.run_agora("docs", "build", "--json")
-        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("ws-host", p.stdout + p.stderr)
-        self.assertEqual(self.run_agora("spec", "list", "--json").returncode, 0)
-
-    def test_offline_still_applies(self):
-        self.assertEqual(self.run_agora("lock", "--offline", "--json").returncode, 3)
+    def test_it_never_looks_for_ws_host(self):
+        marker = self.tmp / "ws-host-was-called"
+        f = self.bin / "ws-host"
+        f.write_text(f"#!/bin/sh\ntouch {marker}\nexit 9\n")
+        f.chmod(0o755)
+        self.assertEqual(self.run_agora("doctor").returncode, 0)
+        self.assertFalse(marker.exists())

@@ -172,14 +172,14 @@ class Running(Repo):
         self.assertIn("no-such-tool 1.0", o.reason)
         self.assertFalse(any("must not run" in l for l in lines))
 
-    def test_offline_with_a_cold_cache_skips_the_harness_naming_the_entry_and_the_command_that_fetches_it(self):
+    def test_offline_with_a_cold_cache_skips_the_harness_naming_the_entry_and_what_to_do(self):
         self.host.add("cold-tool", ready=False, files={"bin/cold-tool": b"x"})
         self.tc = self.host.toolchain(offline=True)
         h = self.harness("a", "raise SystemExit('must not run')\n", ["cold-tool"])
         o, _ = self.run_one(h)
         self.assertEqual(o.status, "skipped")
         self.assertIn("cold-tool 1.0", o.reason)
-        self.assertIn("ws-host toolchain ensure cold-tool --provider agora", o.reason)
+        self.assertIn("Run the command once while online", o.reason)
 
     def test_an_entry_is_fetched_on_first_use_and_its_environment_reaches_the_harness(self):
         self.host.add("warm-tool", ready=False, files={"bin/warm-tool": b"x"}, env={"WARM_TOOL_HOME": "{dir}"})
@@ -188,7 +188,7 @@ class Running(Repo):
         o, _ = self.run_one(h)
         self.assertEqual(o.status, "passed")
         self.assertTrue(any(l.startswith("HOME=") and "warm-tool" in l for l in o.tail), o.tail)
-        self.assertIn("toolchain ensure warm-tool --provider agora", self.host.asked())
+        self.assertIn("obtain warm-tool", self.host.asked())
 
     def test_the_hosts_own_settings_do_not_reach_the_harness(self):
         self.host.add("warm-tool", files={"bin/warm-tool": b"x"})
@@ -396,7 +396,7 @@ class OpenedxSection(Repo):
         r, _ = self.section()
         self.assertEqual(r.status, "skipped")
         self.assertIn("paragon", r.reason)
-        self.assertIn("ws-host toolchain ensure paragon --provider agora", r.reason)
+        self.assertIn("Run the command once while online", r.reason)
 
     def test_paragon_comes_from_the_option_and_not_from_the_hosts_environment(self):
         self.package("import os\nprint('PARAGON=' + os.environ.get('PARAGON', ''))\n")

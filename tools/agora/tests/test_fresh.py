@@ -148,7 +148,7 @@ class Fresh(Repo):
         host = FakeHost(Path(self.root) / "fake-host")
         host.add("no-such-tool", ready=False, fail="no-such-tool 1.0 has no build for linux-x64")
         env = host.env()
-        with mock.patch("agora.core.generate.needs_worker", return_value=False):
+        with mock.patch("agora.core.generate.needs_worker", return_value=False), host.patched():
             code, doc = run_json(["fresh", "needs-a-tool"], home=self.root, registry=reg, env=env)
             (row,) = doc["data"]["generators"]
             self.assertEqual((code, row["status"], row["stale"]), (3, "skipped", []))

@@ -1,4 +1,4 @@
-"""Node, an entry of agora's toolchain (`node`, installed by `ws-host`; 0042-agora FR-030).
+"""Node, an entry of agora's toolchain (`node`, obtained by `archon`; 0042-agora FR-030).
 
 The browser harnesses, the course's script tests and Paragon's CLI run on the Node the `node` entry pins, never on a Node that happens to be on the host's
 PATH, so that what they print does not depend on the machine: a command that needs it names `node` among its toolchain entries, and the environment it runs

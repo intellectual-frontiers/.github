@@ -3,7 +3,7 @@
 [#reference-toolchain]
 == The toolchain
 
-What `agora` runs on and has no Python wheel for. Each entry is one file in `.workspaces-host/toolchain.d/`: one exact version with an address and a SHA-256 for every platform it is built for. `ws-host` reads those files, installs from the lock only, checks each download before anything is unpacked, and keeps one copy of a program for every repository that pins it. `ws-host toolchain list` shows what your machine holds, and `agora help toolchain` explains the work.
+What `agora` runs on and has no Python wheel for. Each entry is one file in `.workspaces-host/toolchain.d/`: one exact version with an address and a SHA-256 for every platform it is built for. `archon` reads those files, takes each program from one already on your machine when it is new enough, else from your package manager, else from its download, which it checks before anything is unpacked, and keeps one copy of a program for every repository that pins it. `agora doctor` shows where each came from, and `agora help toolchain` explains the work.
 
 [cols="1,1,4,2,1"]
 |===
@@ -121,7 +121,7 @@ What `agora` runs on and has no Python wheel for. Each entry is one file in `.wo
 
 === System libraries
 
-A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `ws-host system ensure` installs them once with `sudo`: it says what it will run and asks first, and no other command uses `sudo`. The names are for Debian and Ubuntu; on another distribution it names the libraries and stops.
+A browser links shared libraries that a download cannot supply. An entry lists them in its `system` key, and `archon` installs the missing ones through the package manager, as root or with `sudo`; attended, it says what it will run and asks first. The names are for Debian and Ubuntu; on another distribution it names the libraries and stops.
 
 [cols="2,2"]
 |===

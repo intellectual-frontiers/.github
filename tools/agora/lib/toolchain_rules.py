@@ -16,17 +16,13 @@ FORBIDDEN_STEP = re.compile(
     r"(?<![\w/.-])(?:apt-get|apt|aptitude|dpkg|brew|yum|dnf|pacman|apk|snap|choco|winget|pip3?|pipx|npm|npx|yarn|pnpm|corepack|"
     r"gem|bundle|cargo|go\s+install|curl|wget|docker|podman|sudo)(?![\w/.-])"
     r"|uses:\s*actions/setup-(?:node|java|ruby|go|dotnet)|uses:\s*docker://|^\s*(?:-\s*)?(?:container|services|image):")
-# The documented one-time setup (the only place `sudo` is allowed), and the bootstrap of 0025 FR-033: the installer of workspaces-host,
-# then enabling the clone as a provider with the `--yes` the person committed.
-ALLOWED_STEP = re.compile(r"ws-host\s+system\s+ensure\b|raw\.githubusercontent\.com/intellectual-frontiers/workspaces-host/main/install\.sh\b"
-                          r"|ws-host\s+provider\s+add\b")
 HOST_PROGRAMS = tuple("""git convert identify magick pdftotext pdfinfo pdffonts pdfimages pdftoppm rsvg-convert potrace latexmk
                          xelatex lualatex pdflatex node npm npx chromium chrome java asciidoctor""".split())
 HOST_CALL = re.compile(r"subprocess\.\w+\(\s*\[\s*[\"'](" + "|".join(re.escape(p) for p in HOST_PROGRAMS) + r")[\"']")
 WHICH_CALL = re.compile(r"shutil\.which\(\s*[\"']([\w.-]+)[\"']")
-# uv and python3 come from the provider's environment, and ws-host is the prerequisite that supplies it (0025 FR-014).
-WHICH_ALLOWED = ("uv", "python3", "ws-host", "node")
-# Where a download may be made: nowhere in agora; `ws-host` fetches and verifies what a provider pins (0025 FR-004, FR-017).
+# uv and python3 are what the launcher runs on; node is the entry the browser harnesses run on (0025 FR-014).
+WHICH_ALLOWED = ("uv", "python3", "node")
+# Where a download may be made: nowhere in agora; `archon` fetches and verifies what a provider pins (0025 FR-004, FR-017).
 NETWORK_IMPORT = re.compile(r"^\s*(?:import|from)\s+(?:urllib\.request|http\.client|requests|httpx|ftplib|socket)\b")
 NETWORK_ALLOWED: tuple[str, ...] = ()
 INSTALLERS = "apt-get apt dpkg brew yum dnf pip pip3 pipx npm npx gem cargo".split()
@@ -36,7 +32,7 @@ SELF = "tools/agora/lib/toolchain_rules.py"
 
 def entry_findings(declared: dict[str, dict[str, Any]], registry: Any) -> list[Finding]:
     """That every toolchain a command, section, generator, runner or harness names is an entry (or a group of entries), and that every entry's
-    `needs` names an entry. The fields of an entry are `ws-host`'s to check (`generated_findings`)."""
+    `needs` names an entry. The fields of an entry are `archon`'s to check (`generated_findings`)."""
     out: list[Finding] = []
     names = set(declared) | set(tcore.GROUPS)
 
@@ -63,13 +59,17 @@ def entry_findings(declared: dict[str, dict[str, Any]], registry: Any) -> list[F
     return out
 
 
-def generated_findings(home: Path, env: Any = None) -> list[Finding]:
-    """What `ws-host` finds wrong with the declarations, and the generated mise files that are not what the entries say now (0008-providers FR-005, FR-006)."""
-    doc = tcore.ask(["toolchain", "generate", "--root", str(home), "--dry-run"], env)
-    data = doc.get("data", {})
-    if doc.get("_exit", 0) != 0:
-        return [Finding("error", ".workspaces-host", data.get("plain") or data.get("message") or "ws-host could not read the declarations")]
-    return [Finding("error", f, "is not what the entries say now; run `ws-host toolchain generate agora` and commit it") for f in data.get("stale", [])]
+def generated_findings(home: Path) -> list[Finding]:
+    """What `archon` finds wrong with the declarations, and the generated mise files that are not what the entries say now."""
+    from archon import provider as prov
+
+    p = prov.load(home)
+    if p is None:
+        return [Finding("error", ".workspaces-host", "declares no provider (provider.toml)")]
+    out = [Finding("error", pr.where, pr.message) for pr in p.problems]
+    if not p.problems:
+        out += [Finding("error", f, "is not what the entries say now; run `archon generate` and commit it") for f in prov.stale(p)]
+    return out
 
 
 def lock_findings(home: Path, registry: Any) -> list[Finding]:
@@ -88,14 +88,14 @@ def lock_findings(home: Path, registry: Any) -> list[Finding]:
 
 def workflow_findings(home: Path) -> list[Finding]:
     """No workflow installs a program with a package manager, fetches one outside the launcher or runs in an image (FR-022);
-    `./agora system ensure` is the one documented step that may use `sudo`, and may only be run through the launcher."""
+    nothing but the launcher runs in a job."""
     out: list[Finding] = []
     d = home / ".github" / "workflows"
     for f in sorted(d.glob("*.y*ml")) if d.is_dir() else []:
         rel = f.relative_to(home).as_posix()
         for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
             text = line.split("#", 1)[0] if not line.lstrip().startswith("uses:") else line
-            if not text.strip() or ALLOWED_STEP.search(text):
+            if not text.strip():
                 continue
             m = FORBIDDEN_STEP.search(text)
             if m:

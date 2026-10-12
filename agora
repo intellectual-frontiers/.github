@@ -1,15 +1,14 @@
 #!/bin/sh
 # agora, the public root's command line (0041-command-line FR-001, 0042-agora FR-001).
-# POSIX sh. Needs only uv (https://docs.astral.sh/uv/), which supplies the newest Python that pyproject.toml's requires-python allows
-# and every locked package. Where the host also has ws-host (https://github.com/intellectual-frontiers/workspaces-host) and this clone is
-# enabled as its provider (`ws-host provider add .`; a repository cannot enable itself), the command runs in ws-host's pinned environment and
-# a command that names a toolchain entry has ws-host install the program from the lock on first use; where it does not, the command runs
-# with uv alone and such a command exits 3 naming ws-host (0025-tooling-environment FR-014, 0041 FR-079, FR-082). Everything else is
-# tools/agora/: this file only finds the clone, picks one of the two, and hands over. A command that needs packages is re-run by agora
-# under its group's locked environment (core/plan.py).
+# POSIX sh. Needs only uv (https://docs.astral.sh/uv/). uv fetches archon, the command runner of workspaces-host
+# (https://github.com/intellectual-frontiers/workspaces-host), at the revision pyproject.toml pins under [tool.archon]; archon runs agora under the
+# newest Python that requires-python allows, with the locked packages of the command's group, and makes any program outside Python that the
+# command names available first: one already on the host, the host's package manager's, or the entry's verified download (0025-tooling-environment
+# FR-014, FR-017). Everything else is tools/agora/: this file only finds the clone and hands over.
 #
 #   AGORA_OFFLINE=1 or --offline   never download anything; a command needing something not cached fails saying what
-#   AGORA_ATTENDANCE=attended|unattended   say whether a person is at the invocation (0041 FR-078); otherwise it is worked out
+#   ARCHON_ATTENDANCE=attended|unattended   say whether a person is at the invocation (0041 FR-078); otherwise it is worked out
+#   ARCHON_FROM=PATH               run archon from a clone of workspaces-host instead of the pinned revision (development and tests)
 #   --complete WORD...             completion candidates for the words typed so far
 #   --completion-script bash|zsh   a shell completion script
 set -eu
@@ -27,39 +26,18 @@ for arg in "$@"; do
 done
 [ "${AGORA_OFFLINE:-}" = 1 ] && offline=--offline
 
-# The Python floor is written once, in pyproject.toml (0025-tooling-environment FR-014).
+# The Python floor and the revision of archon are written once each, in pyproject.toml (0025-tooling-environment FR-014).
 python=$(sed -n 's/^requires-python[[:space:]]*=[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$here/pyproject.toml" 2>/dev/null | head -n 1)
 python=${python:->=3.14}
+revision=$(sed -n '/^\[tool\.archon\]/,/^\[/s/^revision[[:space:]]*=[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$here/pyproject.toml" 2>/dev/null | head -n 1)
+source=${ARCHON_FROM:-git+https://github.com/intellectual-frontiers/workspaces-host@$revision}
 
-PYTHONPATH="$here/tools${PYTHONPATH:+:$PYTHONPATH}"
-export PYTHONPATH PYTHONDONTWRITEBYTECODE=1
-
-# Hosted: ws-host runs agora in its own environment. If ws-host cannot start it (the clone is not enabled, say), agora has not run, and it
-# removes the marker as its first act; a marker still here after a failure means the command never started, so it runs bare instead.
-# Whether ws-host can run this clone is asked quietly, once, and remembered in a stamp that a failed hosted start removes.
-hosted_ok() {
-  stamp="${XDG_CACHE_HOME:-${HOME:-/tmp}/.cache}/agora/hosted-$(printf %s "$here" | cksum | cut -d' ' -f1)"
-  [ -f "$stamp" ] && return 0
-  ws-host provider show agora --json >/dev/null 2>&1 || return 1
-  mkdir -p "$(dirname "$stamp")" 2>/dev/null && : >"$stamp" 2>/dev/null
-  return 0
-}
-
-if command -v ws-host >/dev/null 2>&1 && hosted_ok; then
-  marker=$(mktemp "${TMPDIR:-/tmp}/agora-started.XXXXXX" 2>/dev/null) || marker=
-  if [ -n "$marker" ]; then
-    rc=0
-    AGORA_PROVISIONING=hosted AGORA_STARTED_MARKER=$marker \
-      ws-host provider run agora --ensure uv --ensure python ${offline:+"$offline"} -- \
-      uv run --no-project --no-python-downloads --python "$python" ${offline:+"$offline"} python -m agora "$@" || rc=$?
-    if [ ! -e "$marker" ]; then
-      exit "$rc"
-    fi
-    rm -f "$marker" "$stamp"
-  fi
+PYTHONDONTWRITEBYTECODE=1
+export PYTHONDONTWRITEBYTECODE
+# A clone of workspaces-host named in ARCHON_FROM (development and tests) is run in place; anything else is fetched by uv at the pinned revision.
+if [ -d "$source" ]; then
+  PYTHONPATH="$source${PYTHONPATH:+:$PYTHONPATH}"
+  export PYTHONPATH
+  exec uv run --no-project --quiet --python "$python" ${offline:+"$offline"} -- python -W ignore -m archon run --repo "$here" --path tools ${offline:+"$offline"} -- agora "$@"
 fi
-
-# Bare: uv alone. It fetches the Python if the host has none that satisfies requires-python.
-AGORA_PROVISIONING=bare
-export AGORA_PROVISIONING
-exec uv run --no-project --quiet --python "$python" ${offline:+"$offline"} python -m agora "$@"
+exec uvx --quiet ${offline:+"$offline"} --from "$source" archon run --repo "$here" --path tools ${offline:+"$offline"} -- agora "$@"

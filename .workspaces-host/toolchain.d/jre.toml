@@ -1,6 +1,9 @@
 name = "jre"
 version = "21.0.12.1+1"
 summary = "a Temurin Java runtime"
+minimum = "21"
+probe = { program = "java", args = ["-version"] }
+packages = { apt = ["openjdk-21-jre-headless"], dnf = ["java-21-openjdk-headless"], apk = ["openjdk21-jre-headless"], brew = ["openjdk@21"] }
 kind = "archive"
 strip = 1
 bin = "bin"

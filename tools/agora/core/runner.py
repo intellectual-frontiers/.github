@@ -124,9 +124,6 @@ def _toolchain_problem(ctx: Ctx, s: Section) -> str:
     the cache lacks is fetched here, on first use, unless offline (0025-tooling-environment FR-017, FR-018)."""
     if not s.toolchain or (s.toolchain_unless and ctx.section_options.get(s.toolchain_unless)):
         return ""
-    if not ctx.profile.hosted:
-        return (f"it needs {', '.join(s.toolchain)}, which ws-host installs, and this host is bare: install ws-host "
-                f"(https://github.com/intellectual-frontiers/workspaces-host), then run `ws-host provider add` on this clone")
     try:
         ctx.toolchain().use(s.toolchain)
     except AgoraError as e:

@@ -1,6 +1,9 @@
 name = "node"
 version = "22.20.0"
 summary = "Node.js"
+minimum = "22"
+probe = { program = "node", args = ["--version"] }
+packages = { apt = ["nodejs"], dnf = ["nodejs"], apk = ["nodejs"], brew = ["node@22"] }
 kind = "tool"
 tool = "node"
 bin = "bin"

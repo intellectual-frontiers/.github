@@ -1,6 +1,6 @@
 """The `toolchain` check section (0041-command-line FR-066, FR-068; 0042-agora FR-013, FR-030; 0025-tooling-environment).
 
-The programs themselves are `ws-host`'s: `provider`, `toolchain` and `system` are its nouns (0041 FR-069). This group holds only the check of what agora declares,
+The programs themselves are `archon`'s: `provider`, `toolchain` and `system` are `ws-host`'s nouns (0041 FR-069). This group holds only the check of what agora declares,
 the rules in agora.lib.toolchain_rules, and, with `--functional`, each installed entry's own check. Standard library only.
 """
 from __future__ import annotations
@@ -18,21 +18,10 @@ def check_toolchain(ctx: Ctx, scope: str | None) -> SectionResult:
     findings += toolchain_rules.workflow_findings(ctx.home)
     findings += toolchain_rules.code_findings(ctx.home)
     notes = [f"toolchain: {len(declared)} entries declared in .workspaces-host/toolchain.d ({', '.join(declared)})"]
-    skipped = ""
-    try:
-        findings += toolchain_rules.generated_findings(ctx.home, ctx.toolchain().env)
-    except toolchain.WsHostMissing as e:
-        skipped = e.message
+    findings += toolchain_rules.generated_findings(ctx.home)
     if ctx.section_options.get("functional"):
-        if skipped:
-            return SectionResult("toolchain", "skipped", reason=skipped)
         findings += _functional(ctx, notes)
-    result = SectionResult.from_findings("toolchain", findings, notes, {"entries": sorted(declared)})
-    if skipped and result.status == "passed":
-        # What it compares needs ws-host: a section that could not read it is skipped, never passed (0041-command-line FR-033).
-        result.status = "skipped"
-        result.reason = f"the generated files were not compared, because {skipped}"
-    return result
+    return SectionResult.from_findings("toolchain", findings, notes, {"entries": sorted(declared)})
 
 
 def _functional(ctx: Ctx, notes: list[str]) -> list[Finding]:

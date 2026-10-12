@@ -347,7 +347,7 @@ def openedx_build(ctx: Ctx, brand: str, paragon: str | None) -> Resource:
     resolved = ctx.toolchain().use(["node"] if paragon else ["paragon"])
     env = resolved.env()
     if node.node_path(env) is None:
-        raise AgoraError("missing-program", "openedx build needs node, an entry of the toolchain that ws-host installs", exit=MISSING,
+        raise AgoraError("missing-program", "openedx build needs node, an entry of the toolchain that archon obtains", exit=MISSING,
                          detail={"entry": "node"})
     cli = assurance.paragon_path(paragon) if paragon else resolved.path_of("paragon")
     if not cli.is_file():

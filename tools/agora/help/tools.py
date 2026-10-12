@@ -4,30 +4,31 @@ from __future__ import annotations
 from agora.core.help import Step, topic
 
 
-@topic("toolchain", "The programs ws-host installs for agora, and how to see, fetch and trust them.")
+@topic("toolchain", "The programs archon obtains for agora, and how to see, fetch and trust them.")
 def toolchain():
     return {
-        "plain": ("agora needs more than Python: TeX, a browser, Java, Node. It does not use the ones on your machine. ws-host installs "
-                  "each one at a fixed version, checks its fingerprint before it unpacks anything, and keeps it in a store that "
-                  "belongs to you, with one copy for every repository that pins it."),
+        "plain": ("agora needs more than Python: TeX, a browser, Java, Node. For each, archon uses a program already on your machine when "
+                  "its version is new enough, otherwise installs it with your package manager, otherwise downloads the entry's own copy, "
+                  "checks its fingerprint before it unpacks anything, and keeps it in a store that belongs to you, with one copy for "
+                  "every repository that pins it."),
         "sections": (
             ("See the entries",
-             "    ws-host provider show agora\n    ws-host toolchain show chromium --provider agora\n\nThe entries are the files in "
-             ".workspaces-host/toolchain.d/ of this clone."),
+             "The doctor lists every entry, its version and where it came from (your PATH, the package manager, or the download).\n\n"
+             "    ./agora doctor\n\nThe entries are the files in .workspaces-host/toolchain.d/ of this clone."),
             ("Fetch them",
-             "Each command has ws-host install what it needs the first time, so this is only for fetching ahead of time.\n\n"
-             "    ws-host toolchain ensure --provider agora --all"),
+             "Each command gets what it needs the first time it runs, so there is nothing to fetch by hand. To have them ready before you "
+             "go offline, run the commands once while online."),
             ("Check that they work",
              "Every entry has its own small test, which runs on what is installed.\n\n    ./agora check toolchain --functional"),
             ("Offline",
-             "With --offline nothing is downloaded. A command that needs something not in the store stops and names it; "
-             "install it while you are online."),
+             "With --offline nothing is downloaded. A program already on your machine or in the store still works; a command that needs "
+             "something else stops and names it and why no source could supply it."),
             ("The system libraries",
-             "A few shared libraries cannot be fetched without administrator rights. `agora help start` explains the one command "
-             "that installs them."),
+             "A browser needs a few shared libraries. archon installs the missing ones through your package manager, as root or with "
+             "sudo (it asks first when you are at a terminal, and never waits for a password when nobody is)."),
             ("Change a pin",
-             "Edit the entry's file, run `ws-host toolchain generate agora`, and commit what it writes: the lock beside the entries is "
-             "generated, and `agora check toolchain` fails when it is not current."),
+             "Edit the entry's file, run `archon generate` (from workspaces-host; `ws-host toolchain generate agora` does the same), and "
+             "commit what it writes: the lock beside the entries is generated, and `agora check toolchain` fails when it is not current."),
         ),
         "steps": (
             Step("Check the toolchain's declarations", "check", {"sections": ["toolchain"]}),
@@ -168,9 +169,9 @@ def recover():
              "0 is success. 1 means what you checked failed. 2 means the command was used wrongly. 3 means something is missing: "
              "a package, a toolchain entry or a library, and the message names it."),
             ("A program or library is missing",
-             "Ensure the toolchain is installed and the system libraries are present, once.\n\n    ws-host toolchain ensure --provider agora --all\n    ws-host system ensure --dry-run"),
+             "Run the command again while online: archon obtains what is missing, and the message says which source failed and why. See where each program would come from.\n\n    ./agora doctor"),
             ("A download did not match its fingerprint",
-             "ws-host installed nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, "
+             "archon installed nothing. A flaky network can cut a transfer; run the fetch again. If it fails twice, "
              "something is wrong with the source, and the entry's pin should be looked at, not worked around."),
             ("A generated file is stale",
              "fresh names the command that rewrites it. Run that command, review the change, and commit it.\n\n    ./agora fresh"),

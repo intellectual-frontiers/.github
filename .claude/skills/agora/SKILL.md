@@ -20,8 +20,8 @@ description: Use agora, this repository's command line, to read its specs, requi
 
 ## Where it runs
 
-- `agora` needs only `uv` on the host, which fetches the newest Python and the locked packages. A command whose Needs column names a toolchain entry (a typesetter, a browser, a Java runtime) also needs `ws-host` (https://github.com/intellectual-frontiers/workspaces-host) with this clone enabled by `ws-host provider add .`; without it that command exits 3 and names `ws-host`, and every other command runs.
-- `agora doctor` reports the execution profile: provisioning `hosted` (`ws-host` is there) or `bare` (`uv` alone), and attendance `attended` or `unattended`. `agora command list --json` marks each command `runnable` on this host.
+- `agora` needs only `uv` on the host, which fetches `archon` (https://github.com/intellectual-frontiers/workspaces-host), the newest Python and the locked packages. A command whose Needs column names a toolchain entry (a typesetter, a browser, a Java runtime) has `archon` obtain it first, from a program already on the host, the host's package manager or the entry's verified download; nothing is asked of you. If no source can supply it (offline, no administrator rights, no build for this platform) the command exits 3 and says why.
+- `agora doctor` reports the profile: attendance `attended` or `unattended`, which is `unattended` unless a person is at the invocation. `agora command list --json` marks each command `runnable` on this host.
 - `agora check --available` runs the sections that can run here, reports the others as skipped and the run as incomplete, and exits 0 when what ran passed. Without `--available` a skipped section makes the exit status 3: a skipped section was not checked.
 
 ## What you may do, by category
@@ -86,7 +86,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `design-system list` | `read` | terminal, editor, mcp | uv only | List design systems: kind, status, spec and harness | `agora design-system list [--kind KIND]` |
 | `design-system new` | `generate` | terminal, editor, mcp | uv only | Scaffold a design system whose spec and ontology entry already exist (0001 FR-037) | `agora design-system new SLUG --kind KIND` |
 | `design-system show` | `read` | terminal, editor, mcp | uv only | Show one design system: its registration, spec, harness and derivation | `agora design-system show DESIGN_SYSTEM` |
-| `docs build` | `build` | terminal, editor, mcp | ws-host: jre, asciidoctor | Build the guide into a folder: the multi-page site, the single page, the PDF and the EPUB, with the toolchain's converters | `agora docs build [--out\|-o TEXT]` |
+| `docs build` | `build` | terminal, editor, mcp | programs: jre, asciidoctor | Build the guide into a folder: the multi-page site, the single page, the PDF and the EPUB, with the toolchain's converters | `agora docs build [--out\|-o TEXT]` |
 | `docs generate` | `generate` | terminal, editor, mcp | uv only | Write the guide's reference chapters from the registry, the help topics, the toolchain, the checks and the design systems | `agora docs generate` |
 | `doctor` | `check` | terminal, editor, mcp | uv only | Report what agora needs and what is present; fail on registry conflicts | `agora doctor` |
 | `email build` | `build` | terminal, editor, mcp | packages: Pillow, fonttools, reportlab, resvg-py | Build an email from its Markdown: 600px table-laid HTML with every style inline, and its plain-text alternative (frontiers-email FR-005) | `agora email build PATH [--out\|-o TEXT] --assets TEXT [--brand BRAND]` |
@@ -109,7 +109,7 @@ Surfaces: `terminal` always; `editor` a person's editor; `mcp` the MCP server. E
 | `media build` | `build` | terminal, editor, mcp | packages: Pillow, fonttools, reportlab, resvg-py | Render a media asset's job to a PNG: podcast and episode art, a thumbnail, title card, lower third or social card (frontiers-media FR-009) | `agora media build PATH [--out\|-o TEXT] [--svg TEXT] [--brand BRAND]` |
 | `ontology list` | `read` | terminal, editor, mcp | uv only | List the ontology's classes, properties, individuals, schemes and concepts, or the ones that match a text | `agora ontology list [--kind ONTOLOGY_KIND] [--scheme SCHEME] [--match TEXT]` |
 | `ontology show` | `read` | terminal, editor, mcp | uv only | Show one term: its meaning, relations, statements, what references it and the requirements that cite it | `agora ontology show TERM` |
-| `openedx build` | `build` | terminal, editor, mcp | packages: Pillow; ws-host: paragon | Write a brand's Open edX package sources and build dist/ with Paragon's CLI | `agora openedx build BRAND [--paragon TEXT]` |
+| `openedx build` | `build` | terminal, editor, mcp | packages: Pillow; programs: paragon | Write a brand's Open edX package sources and build dist/ with Paragon's CLI | `agora openedx build BRAND [--paragon TEXT]` |
 | `openedx generate` | `generate` | terminal, editor, mcp | packages: Pillow | Write a brand's Open edX package sources from its tokens.json, logos and fonts (not the built dist/) | `agora openedx generate BRAND` |
 | `proposal advance` | `decision` | terminal, editor | uv only | Accept a proposal: show its dry run, replay its action and mark it accepted | `agora proposal advance PROPOSAL` |
 | `proposal list` | `read` | terminal, editor, mcp | uv only | List proposals: open or accepted, the resource each concerns and what it proposes | `agora proposal list [--status PROPOSAL_STATUS]` |

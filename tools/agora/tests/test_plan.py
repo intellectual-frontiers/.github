@@ -6,6 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import archon
+
 from agora.core import pins, plan
 from agora.core.registry import Group, Registry
 from agora.core.resource import AgoraError
@@ -181,9 +183,9 @@ class Core(unittest.TestCase):
                            [node.module] if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module else []
                     for m in mods:
                         top = m.split(".")[0]
-                        self.assertTrue(top in stdlib or top == "agora" or id(node) in lazy, f"{f}: imports {m}")
+                        self.assertTrue(top in stdlib or top in ("agora", "archon") or id(node) in lazy, f"{f}: imports {m}")
 
     def test_the_core_runs_with_no_package_installed(self):
         p = subprocess.run([sys.executable, "-S", "-m", "agora", "command", "list", "--json"], capture_output=True, text=True,
-                           env={"PYTHONPATH": str(HOME / "tools"), "PATH": os.environ["PATH"]}, cwd=HOME)
+                           env={"PYTHONPATH": str(HOME / "tools"), "PATH": os.environ["PATH"], "ARCHON_PATH": str(Path(archon.__file__).parent.parent)}, cwd=HOME)
         self.assertEqual(p.returncode, 0, p.stderr)

@@ -13,6 +13,10 @@ dependencies = []
 package = false
 required-version = ">=0.11"
 
+# The revision of workspaces-host whose archon runs this repository's command line (0025-tooling-environment FR-014).
+[tool.archon]
+revision = "7939e6e"
+
 [dependency-groups]
 # Pillow       the imagery checks and the Open edX favicon read and write images (in place of ImageMagick); frontiers-figures (svgkit.py),
 #              frontiers-media (media.py) and frontiers-signage-print (signage.py) measure text with ImageFont
