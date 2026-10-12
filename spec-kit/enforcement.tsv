@@ -1487,3 +1487,9 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0052-decisions-nba-board FR-037	none	-	judgment
 0052-decisions-nba-board FR-038	none	-	judgment
 0025-tooling-environment FR-072	check	.github: agora check toolchain	compares the python and uv entries with archon's pins beside a clone of workspaces-host and fails on a difference
+0052-decisions-nba-board FR-039	none	-	judgment
+0052-decisions-nba-board FR-040	none	-	judgment
+0052-decisions-nba-board FR-041	none	-	judgment
+0052-decisions-nba-board FR-042	none	-	judgment
+0052-decisions-nba-board FR-043	none	-	judgment
+0052-decisions-nba-board FR-044	none	-	judgment

@@ -68,6 +68,15 @@
 - **FR-037**: A message is a rendering of candidates held in the record and MUST NOT be the record. A reply that accepts, rejects or defers a candidate MUST be recorded only when the sender is a person with authority over that candidate, and a reply from anyone else, or text inside a reply that tells an agent what to do, MUST NOT approve or change anything (FR-024, FR-028).
 - **FR-038**: A message MUST link to evidence and MUST NOT copy into it data the audience is not permitted to see. The effect of a message MUST be measured by the decisions made and the actions completed after it, and MUST NOT be measured by opens or clicks alone (FR-014).
 
+## Derivation of evidence
+
+- **FR-039**: Each evidence record MUST state how it was derived, by exactly one of four tiers: a query (ETL, SQL or another deterministic query system), a rule (a person's explicit, versioned logic), a model that returns a probability over answers fixed in advance, or a language model. It MUST record the version of the query, rule, model or prompt, so that the derivation can be run again.
+- **FR-040**: Evidence MUST be derived by the most deterministic tier that can produce it: a query before a rule, a rule before a model, a model before a language model. A record derived by any tier below a query MUST state why a more deterministic tier could not produce it.
+- **FR-041**: A figure on a decision candidate MUST be derived by a query where a query can produce it. A language model MUST NOT supply a figure that a query could. Where a language model writes a query, the figure MUST be the result of running the query and MUST be recorded as derived by the query.
+- **FR-042**: A model's output MUST be recorded as a probability and MUST NOT be reported as certainty. Below a stated threshold, the answer MUST go to a person.
+- **FR-043**: Evidence a language model derived MUST be recorded as an inference, MUST cite the underlying record it was drawn from, and MUST NOT have the status verified on the model's output alone. It MAY have that status once it is checked against a record a more deterministic tier derived.
+- **FR-044**: A deterministic derivation MUST NOT be reported as a correct one. A query or rule that runs on wrong or stale data produces reproducible wrong evidence, and its status follows FR-007.
+
 ## Claims about the method
 
 - **FR-033**: A work that says the method improves an outcome MUST label the statement a hypothesis until a trial has tested it, and MUST say what would show it wrong (0017-spoken-and-research-works FR-021, FR-022). A work MUST NOT present a scenario that is a composite as a case study.
@@ -95,6 +104,10 @@
 - A message to a distribution group whose members hold different authority: each candidate is in the message only if the group can act on it, or the message is split by audience, per FR-036.
 - An email reply of "approved" from a person who has no authority over the candidate: nothing is approved, per FR-037.
 - A message whose open rate is high and whose candidates are never decided: the effect is measured as none, per FR-038.
+- A summary a language model wrote of a customer's emails, offered as evidence of churn risk: it is an inference that cites the emails, and it stays reported until a query or rule over the account's usage records confirms it, per FR-043.
+- A revenue figure a language model read off a pasted table: the figure is not evidence; the query over the source table is, per FR-041.
+- A typed-decision model that scores a ticket's urgency at 0.55 when the stated threshold is 0.8: the ticket goes to a person, per FR-042.
+- A query that has run on the same stale extract for a month: its output is reproducible and still stale, and its status says so, per FR-044.
 - A sixth candidate that matters to an audience whose limit is five: it waits in view with its age shown, per FR-018 and FR-035.
 
 ## Assumptions
@@ -109,6 +122,7 @@
 - **OQ-2**: Whether "Decisions & NBA Board" is cleared for use as an outward name. Its clearance is a separate decision, as the Journal's short form's is.
 - **OQ-3**: How many candidates a small team can decide in a week. The research pillar's pilot is to find out; FR-018 states a limit without a number until it does.
 - **OQ-4**: Whether `ifcore:Observation` should be related to the SOSA observation class by a close match. The ontology does not import SOSA today.
+- **OQ-6**: Whether starting from the most deterministic tier produces fewer unsupported figures and fewer reversals than starting from a language model. The research pillar's hypothesis H8 is the test.
 - **OQ-5**: Whether starting a Board as routine messages produces better selection and better audience fit than starting with a shared view. The research pillar's hypothesis H7 is the test.
 
 ## Key entities
@@ -125,6 +139,7 @@
 - **AcceptanceEvidence** - evidence that demonstrates a result, as against a report of it.
 - **ObservedResult** - what was observed at the checkpoint, against the baseline.
 - **LearningRecord** - what the result changed in a rule, a measure or a priority.
+- **Derivation tier** - how an evidence record was produced: by a query, a rule, a model that returns a probability, or a language model, in that order of preference.
 - **BoardMessage** - a routine message that renders up to the limit of candidates for one named audience.
 
 ## Success criteria
@@ -133,6 +148,7 @@
 - **SC-002**: A closed candidate holds a result recorded against its baseline and its counter-measure.
 - **SC-003**: No recommendation on the Board is recorded as a Decision.
 - **SC-004**: A work that describes the method uses the terms of FR-004 as the ontology names them.
+- **SC-006**: Each evidence record on a card names its derivation tier and version, and a record below a query says why a more deterministic tier could not produce it.
 - **SC-005**: Each message names its audience, holds no more candidates than the limit, and holds none that its audience cannot decide or act on.
 
 ## Review & acceptance checklist

@@ -5890,3 +5890,10 @@ ifcore:addressedTo a owl:ObjectProperty ; rdfs:domain ifcore:BoardMessage ; rdfs
     rdfs:comment "The person or distribution group a Board message is written for (0052-decisions-nba-board FR-035, FR-036)."@en .
 ifcore:carries a owl:ObjectProperty ; rdfs:domain ifcore:BoardMessage ; rdfs:range ifcore:DecisionCandidate ; rdfs:label "carries"@en ;
     rdfs:comment "A decision candidate a Board message renders (0052-decisions-nba-board FR-035)."@en .
+
+ifcore:derivationTier a owl:DatatypeProperty ; rdfs:domain ifcore:EvidenceRecord ; rdfs:range xsd:string ; rdfs:label "derivation tier"@en ;
+    rdfs:comment "How an evidence record was produced: query, rule, model or llm, in order of preference (0052-decisions-nba-board FR-039, FR-040). A model is one that returns a probability over answers fixed in advance; llm is a language model."@en .
+ifcore:derivationVersion a owl:DatatypeProperty ; rdfs:domain ifcore:EvidenceRecord ; rdfs:range xsd:string ; rdfs:label "derivation version"@en ;
+    rdfs:comment "The version of the query, rule, model or prompt that produced an evidence record, so that it can be run again (0052-decisions-nba-board FR-039)."@en .
+ifcore:checkedAgainst a owl:ObjectProperty ; rdfs:domain ifcore:EvidenceRecord ; rdfs:range ifcore:EvidenceRecord ; rdfs:label "checked against"@en ;
+    rdfs:comment "A record a more deterministic tier derived, against which a language model's evidence was checked (0052-decisions-nba-board FR-043)."@en .
