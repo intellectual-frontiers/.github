@@ -39,8 +39,10 @@ orchestrator names, not part of any rule; the public root's command set is
   repository's `requires-python` allows. `ARCHON_FROM` MAY name another source
   for `archon` (a clone, for development and tests). It MUST run from a fresh
   clone, from any working directory inside the clone, MUST find the repository
-  from its own location, and MUST exit 3 naming `uv` and where to get it where
-  `uv` is missing. It MUST NOT look for `ws-host`: a host with it and a host
+  from its own location. Where `uv` is not on `PATH` it MUST look where `uv`'s
+  installer and `ws-host` put it (`~/.local/bin`, `~/.cargo/bin` and `ws-host`'s
+  store of installed tools) and use the one it finds; it MUST exit 3 naming
+  `uv` and where to get it only where there is none. It MUST NOT look for `ws-host`: a host with it and a host
   without it give the same result.
 - **FR-002**: Every command MUST declare, in code, the packages it needs as
   names of dependency groups in the repository's `pyproject.toml`, and the

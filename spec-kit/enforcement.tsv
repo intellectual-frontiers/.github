@@ -963,7 +963,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0040-security-program-policy FR-005	none	-	publication to the people bound is not observed (0030 OQ-2)
 0040-security-program-policy FR-006	none	-	where commitments are published is 0040 OQ-2
 0040-security-program-policy FR-007	check	eidolon: eid compliance status	an assessment no longer current is reported; whether one exists is judgment
-0041-command-line FR-001	check	.github: agora test	the launcher is POSIX sh, executable, and runs from any directory in the clone; agora check commands checks its form
+0041-command-line FR-001	check	.github: agora test	the launcher is POSIX sh, executable, runs from any directory in the clone, and finds a uv that is off PATH in ~/.local/bin, ~/.cargo/bin or ws-host's store; agora check commands checks its form
 0041-command-line FR-002	none	-	agora still plans from per-group manifests (0042 OQ-3); the plan from pyproject.toml groups is not checked
 0041-command-line FR-003	none	-	agora still keeps per-group locks (0042 OQ-3); doctor does not yet check uv.lock against pyproject.toml
 0041-command-line FR-004	check	.github: agora test	tests run lock and a cold-cache plan offline, by flag and by environment, the launcher offline, and the toolchain cache offline (cold and warm)

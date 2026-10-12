@@ -119,7 +119,9 @@ writes, and what continuous integration needs.
 
 ## Host prerequisites
 
-- **FR-014**: The host MUST be required to supply `uv` and nothing else. A
+- **FR-014**: The host MUST be required to supply `uv` and nothing else; `uv`
+  is supplied where it is on `PATH` or where its installer or `ws-host` puts it
+  (0041-command-line FR-001). A
   repository MUST NOT document or check for another host program as a
   prerequisite. A launcher MUST need no more than `uv`: it runs `archon` at the
   revision the repository pins (`revision` under `[tool.archon]` in its
