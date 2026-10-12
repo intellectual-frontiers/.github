@@ -209,4 +209,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Patent portfolio: patents, their supporting assets, and the pages that offer them
 
+|`0052-decisions-nba-board`
+|Draft
+|Decisions & NBA Board
+
 |===
