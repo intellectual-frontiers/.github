@@ -68,7 +68,7 @@ person in to GitHub before it clones.
 
 - **FR-014**: The script MUST sign the person in to GitHub with `gh auth login --web` (a one-time code and a browser; no password, token or
   SSH key is typed or kept by the script), make `gh` git's credential helper for `github.com`, and continue. Where nobody can answer
-  (no terminal) and the person is not signed in, it MUST stop before cloning with the one command to run, exit status 0.
+  (no terminal) and the person is not signed in, it MUST stop before cloning with the one command to run, exit status 0. Before it opens the sign-in it MUST say, in plain words with colour and emoji where the terminal shows them, what GitHub and a repository are, that the person needs a GitHub account the owner has given access to `archon`, and the four steps: read the one-time code, press Enter, type the code at github.com/login/device and click Authorize, then come back; where nobody can answer, it MUST print the same instruction for later.
 - **FR-015**: The script MUST set `user.name` and `user.email` in git's global configuration from the signed-in GitHub account (the name, and
   GitHub's private `noreply` address) only where git has none, MUST set a value given in `BOOTSTRAP_GIT_NAME` or `BOOTSTRAP_GIT_EMAIL` over the
   existing one, and MUST NOT change anything else in git's configuration.

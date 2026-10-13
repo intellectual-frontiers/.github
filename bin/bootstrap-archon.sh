@@ -157,9 +157,9 @@ fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
   *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_font='🔤 '
-     e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 ' ;;
+     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 ' ;;
   *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_font=''
-     e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
+     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
 esac
 
 say() { printf '%s\n' "$*"; }
@@ -1096,15 +1096,25 @@ sign_in() {
   fi
   have_cmd gh || { warn "gh, the tool that signs you in to GitHub, is not installed."; problem "gh is not installed"; return 0; }
   if signed_in; then
-    say "You are signed in to GitHub."
+    say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
-    say "You are not signed in to GitHub, and the archon repository is private. I will sign you in now."
-    say "It shows a one-time code, then opens a page in your browser; type the code there. No password, token or SSH key is needed."
-    say "If no page opens, copy the address it shows into your browser on Windows (or any computer)."
+    say ""
+    say "${b}${e_key}Let's sign you in to GitHub${z}"
+    say "${d}GitHub is the website where this organization keeps its work. A \"repository\" is one project's folder there, and the one this setup copies"
+    say "to your computer, archon, is private, so GitHub must know who you are. You need a GitHub account that the organization's owner has given"
+    say "access to archon; if you have none yet, stop now (Ctrl+C), ask the owner, and run this setup again.${z}"
+    say ""
+    say "${c}${e_one}1.${z} In a moment a ${b}one-time code${z} appears, like ${b}ABCD-1234${z}."
+    say "${c}${e_two}2.${z} Press ${b}Enter${z}. Your web browser opens ${b}github.com/login/device${z}."
+    say "   ${d}No page? Copy that address into any browser, on Windows or on your phone.${z}"
+    say "${c}${e_three}3.${z} Type the code there, sign in if asked, and click ${g}${b}Authorize${z}."
+    say "${c}${e_four}4.${z} Come back here: the setup carries on by itself."
+    say "${d}No password, token or SSH key is typed in this window.${z}"
+    say ""
     gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
     signed_in || { signin_needed=1; return 0; }
   else
-    say "You are not signed in to GitHub, and nobody can answer here (there is no terminal), so I stop before copying archon."
+    say "${y}${e_key}You are not signed in to GitHub${z}, and nobody can answer here (there is no terminal), so I stop before copying archon."
     signin_needed=1
     return 0
   fi
@@ -1164,11 +1174,11 @@ workspace_and_clone() {
   if [ "${signin_needed:-0}" = 1 ]; then
     cloned=0
     say ""
-    say "${b}${e_key}Sign in to GitHub first${z}; the archon repository is private. Type:"
+    say "${b}${e_key}Sign in to GitHub first${z}; the archon repository (the project's folder on GitHub) is private. In a terminal, type:"
     say ""
     say "    ${c}gh auth login --hostname github.com --web --git-protocol https${z}"
     say ""
-    say "follow the code it shows, then run this setup again (it picks up where it left off)."
+    say "Press ${b}Enter${z} when it shows a code, type the code at ${b}github.com/login/device${z}, click ${g}${b}Authorize${z}, then run this setup again ${e_next}it picks up where it left off."
     return 0
   fi
   if [ -d "$target/.git" ]; then
