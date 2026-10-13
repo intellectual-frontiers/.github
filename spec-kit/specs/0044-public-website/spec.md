@@ -474,8 +474,9 @@ how addresses map to content, 0004-addressing; what the application does,
   FR-026) keeps its old address as a permanent redirect, from the record's
   `:legacy-slugs:`.
 - **FR-015**: Every page MUST load the analytics container the previous
-  website used, the one the website's package states (FR-077), and no
-  other tracking.
+  website used, the one the website's package states (FR-077), and, where
+  the runtime is configured for it (FR-093), the product analytics of
+  PostHog, and no other tracking.
 
 ## Publishing and testing
 
@@ -695,6 +696,20 @@ how addresses map to content, 0004-addressing; what the application does,
   `Product` structured data, with its name, description, address and the
   firm as brand. A book page MUST open, under its title and deck, with the
   first paragraph of its back copy, before the actions.
+
+## Runtime analytics
+
+- **FR-093**: The program MUST read, when it starts, `WWW_POSTHOG_KEY` (a PostHog project key), `WWW_POSTHOG_HOST` (default `https://us.i.posthog.com`) and
+  `WWW_ENVIRONMENT` (one of `dev`, `test`, `stage` and `production`), and MUST render the PostHog snippet into a page only when the key and a valid environment are both
+  set; with neither, or with one, no page names PostHog and the program says which is missing in its log. The snippet MUST load after the page has loaded and the browser is idle (FR-015),
+  MUST keep no cookie or local storage, MUST NOT capture automatically, record a session or ignore a visitor's Do Not Track, and MUST register `environment`, `site` and `release` (the first
+  twelve characters of the SHA-256 of the package's `PACKAGE.json`, or `dev` beside no package) on every event. A private page (FR-084) and an address reserved to the server (FR-036) MUST carry none.
+- **FR-094**: One PostHog project, `www.intellectualfrontiers.com`, holds every environment, which the `environment` property tells apart. The program MUST refuse to start with
+  `WWW_ENVIRONMENT=production` while it listens on a loopback address, and with `WWW_ENVIRONMENT=dev` while it listens on any other address, and MUST refuse an environment that is not
+  one of the four, with the reason.
+- **FR-095**: `eid` MUST start the program for `dev` (`eid site serve`, `eid orch serve`), `test` (`eid uat run`) and `stage` (`eid orch serve --stage`) with the project's key and that environment, and
+  never for `production`, which only the production host's secrets give it (`eidolon` 0018-observability FR-010).
+- **FR-096**: The website's check MUST find the analytics container exactly once on every page, as FR-015 states, and the PostHog snippet at most once, and never on a private page.
 
 ## The application
 

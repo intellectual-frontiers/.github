@@ -1498,3 +1498,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-090	check	eidolon: eid test	the Rust tests find that a note's document is not served as a page and that its address redirects to the note
 0044-public-website FR-091	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the research, topics, posts and ventures sections of llms.txt
 0044-public-website FR-092	check	eidolon: eid test	the UAT search lens (rich-results) and read lens (opening) find a product without Product data and a book without an opening paragraph
+0044-public-website FR-093	check	eidolon: eid test	the snippet appears only with a key and a valid environment, loads idle, keeps no cookie, registers environment, site and release, and is absent from private and reserved pages
+0044-public-website FR-094	check	eidolon: eid test	production on a loopback address, dev on any other and an unknown environment are refused with the reason
+0044-public-website FR-095	check	eidolon: eid test	each run of the program is given the project's key with its environment, and never production
+0044-public-website FR-096	check	eidolon: eid check site	the check finds one analytics container and at most one PostHog snippet per page, none on a private page
