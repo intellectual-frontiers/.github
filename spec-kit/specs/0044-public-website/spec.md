@@ -708,7 +708,7 @@ how addresses map to content, 0004-addressing; what the application does,
   `WWW_ENVIRONMENT=production` while it listens on a loopback address, and with `WWW_ENVIRONMENT=dev` while it listens on any other address, and MUST refuse an environment that is not
   one of the four, with the reason.
 - **FR-095**: `eid` MUST start the program for `dev` (`eid site serve`, `eid orch serve`), `test` (`eid uat run`) and `stage` (`eid orch serve --stage`) with the project's key and that environment, and
-  never for `production`, which only the production host's secrets give it (`eidolon` 0018-observability FR-010).
+  never for `production`, which only the production host's secrets give it (the archon repository's observability specification, FR-010).
 - **FR-096**: The website's check MUST find the analytics container exactly once on every page, as FR-015 states, and the PostHog snippet at most once, and never on a private page.
 
 ## The application

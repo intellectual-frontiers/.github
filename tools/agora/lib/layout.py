@@ -115,18 +115,19 @@ def check_workflows(home: Path) -> list[Finding]:
 
 SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".js", ".mjs", ".cjs", ".ts")
 SKIP_DIRS = (".git", "node_modules", "__pycache__", ".agora", ".venv")
-SESSION_HOOK = ".claude/hooks/session-start.sh"  # the one script outside agora: the bootstrap of 0025 FR-033
+# the scripts outside agora: the session hook (0025 FR-033) and the machine bootstrap, which runs before uv, and so before agora, exists (0053)
+ALLOWED_SCRIPTS = (".claude/hooks/session-start.sh", "bin/bootstrap-archon.sh", "bin/bootstrap/managed.sh")
 
 
 def check_scripts(home: Path) -> list[Finding]:
     """0042 FR-016: no script of this repository's own outside a design system's directory, tools/agora/ and the IF Console's own
-    directory (0043 FR-002; SC-003)."""
+    directory (0043 FR-002; SC-003), the session hook and the machine bootstrap apart."""
     out: list[Finding] = []
     for dirpath, dirs, names in os.walk(home):
         here = Path(dirpath).relative_to(home)
         dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and (here / d).parts not in (("design-systems",), ("tools", NAME), ("tools", "if-console")))
         for n in sorted(names):
-            if n.endswith(SCRIPT_SUFFIXES) and (here / n).as_posix() != SESSION_HOOK:
+            if n.endswith(SCRIPT_SUFFIXES) and (here / n).as_posix() not in ALLOWED_SCRIPTS:
                 out.append(Finding("error", str(here / n), f"a script outside design-systems/, tools/{NAME}/ and tools/if-console/: delete it once {NAME} "
                                    "provides its function, and rewrite every reference to it (0042 FR-016)"))
     return out

@@ -243,7 +243,9 @@ guide, how it relates to the design systems' own harnesses, and what CI runs.
 
 - **FR-016**: `agora` MUST replace every script this repository keeps outside
   a design system's own directory, the session hook of
-  0025-tooling-environment FR-033 apart. `tools/spec_check.py`,
+  0025-tooling-environment FR-033 and the machine bootstrap of
+  0053-machine-bootstrap (`bin/bootstrap-archon.sh` and `bin/bootstrap/`, which
+  run before `uv`, and so before `agora`, exists on the computer) apart. `tools/spec_check.py`,
   `tools/run_assurance.sh`, `tools/brand_decoration.py`,
   `tools/brand_imagery.py`, `tools/brand_openedx.py`,
   `tools/brand_specimen.py`, `tools/brand_theme.py` and the profile's

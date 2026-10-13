@@ -213,4 +213,8 @@ Every spec of this repository, with its status. A spec says what must be true; t
 |Draft
 |Decisions & NBA Board
 
+|`0053-machine-bootstrap`
+|Draft
+|Machine bootstrap
+
 |===

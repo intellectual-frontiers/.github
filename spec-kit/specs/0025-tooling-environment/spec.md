@@ -227,7 +227,9 @@ writes, and what continuous integration needs.
   workflow, its session hook (`.claude/hooks/session-start.sh`, registered in
   `.claude/settings.json` beside an allow rule for the launcher) and the entry
   file an agent reads first, and a repository MUST NOT add a bootstrap of its
-  own.
+  own. The machine bootstrap of 0053-machine-bootstrap is not one: it prepares
+  a computer that has nothing yet (it installs `uv`), and no command, check or
+  workflow of any repository needs it.
 
 ## One version of a tool
 

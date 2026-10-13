@@ -1502,3 +1502,26 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-094	check	eidolon: eid test	production on a loopback address, dev on any other and an unknown environment are refused with the reason
 0044-public-website FR-095	check	eidolon: eid test	each run of the program is given the project's key with its environment, and never production
 0044-public-website FR-096	check	eidolon: eid check site	the check finds one analytics container and at most one PostHog snippet per page, none on a private page
+0053-machine-bootstrap FR-001	check	.github: agora test	test_bootstrap runs the pipe form, the checkout form and the POSIX syntax; that no program reads the script's input is not checked
+0053-machine-bootstrap FR-002	check	.github: agora test	test_bootstrap runs the script twice with every installation off and compares the folders; the marked-block editor is tested on text
+0053-machine-bootstrap FR-003	check	.github: agora test	test_bootstrap runs --dry-run in an empty home and compares the folder before and after
+0053-machine-bootstrap FR-004	check	.github: agora test	test_bootstrap refuses a non-Debian os-release and an empty HOME
+0053-machine-bootstrap FR-005	check	.github: agora test	test_bootstrap loads a data file from beside the script and from BOOTSTRAP_URL
+0053-machine-bootstrap FR-006	none	-	no test asks for a password; the up-front request and the root case need a Debian machine
+0053-machine-bootstrap FR-007	none	-	no test runs apt; which packages are chosen on each release is not checked
+0053-machine-bootstrap FR-008	check	.github: agora test	test_bootstrap tests the checksum rule, the release-file rule and the shape of the pins; the pinned programs are not fetched
+0053-machine-bootstrap FR-009	check	.github: agora test	test_bootstrap tests the marked-block editor chezmoi runs; chezmoi itself is not run by the tests
+0053-machine-bootstrap FR-010	check	.github: agora test	test_bootstrap tests the theme files and the Nerd Font hint; that the pretty theme equals ws-host's is not checked
+0053-machine-bootstrap FR-011	none	-	needs apt or the fish release download
+0053-machine-bootstrap FR-012	none	-	needs a terminal and chsh; no test
+0053-machine-bootstrap FR-013	none	-	needs the network; the release rules it relies on are tested under FR-008
+0053-machine-bootstrap FR-014	none	-	no test signs in; test_bootstrap proves only the stop before the clone when nobody can answer
+0053-machine-bootstrap FR-015	check	.github: agora test	test_bootstrap runs the identity step against a stand-in gh
+0053-machine-bootstrap FR-016	check	.github: agora test	test_bootstrap clones, fast-forwards and leaves work alone against a local repository
+0053-machine-bootstrap FR-017	check	.github: agora test	test_bootstrap runs the three commands against a stand-in launcher, with one failing
+0053-machine-bootstrap FR-018	check	.github: agora test	test_bootstrap checks the next steps, the wrapper and that no orch dev is named
+0053-machine-bootstrap FR-019	none	-	the spinner needs a terminal; no test
+0053-machine-bootstrap FR-020	check	.github: agora test	test_bootstrap sets the switches and compares what a run writes
+0053-machine-bootstrap FR-021	none	-	archon's own behavior, not this script's
+0053-machine-bootstrap FR-022	check	.github: agora test	test_bootstrap reads the README section for the command and each term
+0053-machine-bootstrap FR-023	check	.github: agora test	test_bootstrap scans the workflows, hooks and agora's code for a reference
