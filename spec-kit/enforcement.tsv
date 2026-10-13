@@ -1497,3 +1497,4 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0044-public-website FR-089	check	eidolon: eid test	the Rust tests find the DefinedTerm and Article data of a rendered pillar and note; the UAT search lens finds a research page without Article data
 0044-public-website FR-090	check	eidolon: eid test	the Rust tests find that a note's document is not served as a page and that its address redirects to the note
 0044-public-website FR-091	check	eidolon: eid test	the Rust tests (tests/gaps.rs) find the research, topics, posts and ventures sections of llms.txt
+0044-public-website FR-092	check	eidolon: eid test	the UAT search lens (rich-results) and read lens (opening) find a product without Product data and a book without an opening paragraph

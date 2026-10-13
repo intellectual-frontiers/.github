@@ -690,6 +690,10 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-091**: `llms.txt` MUST list, one line each with its address and a
   short description, every research pillar and note, every topic, every
   archived post and every venture that the sitemap lists.
+- **FR-092**: A product page under `/products` that is not a skill MUST state
+  `Product` structured data, with its name, description, address and the
+  firm as brand. A book page MUST open, under its title and deck, with the
+  first paragraph of its back copy, before the actions.
 
 ## The application
 
