@@ -482,8 +482,9 @@ how addresses map to content, 0004-addressing; what the application does,
 - **FR-016**: The program's server MUST route every address itself: every
   page MUST answer at its address without a trailing slash; the same
   address with a trailing slash, an `index` or an `.html` ending MUST
-  redirect to it; a redirect the website keeps MUST answer as a permanent
-  redirect; and an address that matches no page, no file and no redirect
+  redirect to it permanently, so that a search engine moves what it knows of
+  the other form to the page; a redirect the website keeps MUST answer as a
+  permanent redirect; and an address that matches no page, no file and no redirect
   MUST answer with the not-found page and a not-found status.
 - **FR-017**: The program MUST serve the website on the person's own
   computer from the sources (FR-033), and the container image (FR-035)
@@ -671,6 +672,21 @@ how addresses map to content, 0004-addressing; what the application does,
   release (0016-website-acceptance, `eidolon`) MUST be a private page with the
   guard `local` at `<private prefix>/console/uat`. The Console's run address
   stays `/__eid/console/run` (FR-036).
+- **FR-088**: Every research page (a pillar, a note, a paper and a topic) MUST
+  end with a next step: a link to its full text when the vault holds one, and
+  a link by which the reader writes to the firm about that research. Every
+  venture page MUST carry a link by which the reader writes to the firm about
+  that venture.
+- **FR-089**: A research page that defines a coined term (Native Alpha, Zero
+  Neo, Labor as Code, Compliant Insecurity) MUST define it in its first
+  sentence and MUST state it as a `DefinedTerm` in its structured data. A
+  research page, a Journal article and a paper MUST state `Article` data with
+  a headline, description, address, image, publisher and author, and the date
+  when the page shows one (FR-067).
+- **FR-090**: A research note MUST have one address: its page under
+  `/research-notes/`. The address of the full-text document the note was
+  once also served at, under `/press/research/`, MUST redirect to it
+  permanently (FR-016).
 
 ## The application
 

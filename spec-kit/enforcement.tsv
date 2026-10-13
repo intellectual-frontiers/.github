@@ -1493,3 +1493,6 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0052-decisions-nba-board FR-042	none	-	judgment
 0052-decisions-nba-board FR-043	none	-	judgment
 0052-decisions-nba-board FR-044	none	-	judgment
+0044-public-website FR-088	check	eidolon: eid test	the UAT journey and funnel cases (0016-website-acceptance) find a research page with no next step and a venture with no email link
+0044-public-website FR-089	check	eidolon: eid test	the Rust tests find the DefinedTerm and Article data of a rendered pillar and note; the UAT search lens finds a research page without Article data
+0044-public-website FR-090	check	eidolon: eid test	the Rust tests find that a note's document is not served as a page and that its address redirects to the note
