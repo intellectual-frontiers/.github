@@ -528,9 +528,10 @@ how addresses map to content, 0004-addressing; what the application does,
   holds the program (FR-032) and the checked model (FR-001), with the
   files its pages use, published to one of the destinations FR-018
   describes: Cloudflare Containers, an AWS container service, Railway or
-  Azure Container Apps. Where the host builds the image itself (Railway),
-  it MUST build it from the same build context, holding exactly the checked
-  model (FR-020). The image MUST
+  Azure Container Apps. The image MUST be built from the website's staging
+  area (`0015-rendition-releases` FR-032, `eidolon`), and where the host builds
+  the image itself (Railway) it MUST build it from that same directory, holding
+  exactly the checked model (FR-020). The image MUST
   render the website from that model into memory when it starts, MUST
   answer `/__eid/health`, and MUST hold no credential. The model MUST hold
   nothing FR-003 keeps from the website: no list of works it must not show,
