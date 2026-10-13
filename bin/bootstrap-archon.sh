@@ -2,6 +2,7 @@
 # Set up a new computer for the Intellectual Frontiers harness: a slim Debian 12 or 13 (amd64 or arm64), under WSL 2 or in a virtual machine, becomes
 # a complete working environment with a clone of the harness repository, `archon` (0053-machine-bootstrap).
 #
+#   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh -s -- --dry-run
 #

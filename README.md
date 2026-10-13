@@ -32,7 +32,10 @@ new enough, else from your package manager, else its own download checked by fin
 One line in a Debian terminal gives a new computer everything this organization's work needs, and copies the harness to it. The harness is the
 Intellectual Frontiers AI Workforce® Harness; `archon` is its command line (the Console is the web interface built into the website).
 
+A bare Debian has neither `curl` nor `wget` (the programs that fetch files from the internet), so first install them, from your home folder, then run the setup:
+
 ```sh
+cd && sudo apt update && sudo apt install -y curl wget
 curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh
 ```
 

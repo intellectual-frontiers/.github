@@ -15,7 +15,7 @@ person in to GitHub before it clones.
 
 - **FR-001**: The script MUST run unchanged from a pipe (`curl -fsSL URL | sh`), from a checkout, and as `sh bin/bootstrap-archon.sh`,
   using only POSIX `sh` until it has installed `bash` and `fish`. It MUST NOT let any program it runs read the script's own standard input:
-  a program gets no input, or the terminal device, and every question is asked of and answered on the terminal device alone.
+  a program gets no input, or the terminal device, and every question is asked of and answered on the terminal device alone. The documented first step MUST install `curl` and `wget` with `apt` (`cd && sudo apt update && sudo apt install -y curl wget`), because a bare Debian has neither.
 - **FR-002**: The script MUST be safe to run again: a step whose result is already in place MUST change nothing, and a file of the person's
   that the script edits MUST be edited only between its own marked lines, with a copy of the file kept first (FR-009).
 - **FR-003**: `--dry-run` MUST list, in order, every step the script would take on this machine, write nothing, fetch nothing, and ask for no
