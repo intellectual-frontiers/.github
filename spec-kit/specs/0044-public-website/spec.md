@@ -687,6 +687,9 @@ how addresses map to content, 0004-addressing; what the application does,
   `/research-notes/`. The address of the full-text document the note was
   once also served at, under `/press/research/`, MUST redirect to it
   permanently (FR-016).
+- **FR-091**: `llms.txt` MUST list, one line each with its address and a
+  short description, every research pillar and note, every topic, every
+  archived post and every venture that the sitemap lists.
 
 ## The application
 
