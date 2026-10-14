@@ -1325,8 +1325,8 @@ sign_in_stop() {  # not signed in: the one stop that is not an error, so it asks
   say "${y}${b}${e_key}The GitHub sign-in did not finish, so setup paused here.${z}"
   say "${d}Nothing is wrong with your computer. The sign-in is needed because archon is private.${z}"
   say ""
-  say "${c}${e_one}1.${z} Type:  ${b}gh auth login --hostname github.com --web --git-protocol https${z}"
-  say "${c}${e_two}2.${z} Follow the code and the web page, click ${g}${b}Authorize${z}."
+  say "${c}${e_one}1.${z} Type:  ${b}gh auth login --hostname github.com --web --skip-browser --git-protocol https${z}"
+  say "${c}${e_two}2.${z} Copy the code, open ${b}https://github.com/login/device${z} in your normal browser, type it, click ${g}${b}Authorize${z}."
   say "${c}${e_three}3.${z} Run this setup again: it picks up where it left off."
   say "${d}Still stuck? The log is $(short_path "$logfile") ; send it to ${support_who:-the support team}.${z}"
   say ""
@@ -1354,14 +1354,14 @@ sign_in() {
     say ""
     say "${c}${e_one}1.${z} GitHub asks ${b}Authenticate Git with your GitHub credentials?${z}"
     say "   Press ${b}Enter${z} (that means yes)."
-    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears, like ${b}ABCD-1234${z}. Press ${b}Enter${z}"
-    say "   and your browser opens ${b}github.com/login/device${z}."
-    say "   ${d}No page? Copy that address into any browser, even on your phone.${z}"
-    say "${c}${e_three}3.${z} Type the code there, sign in if asked, click ${g}${b}Authorize${z}."
+    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it${z}."
+    say "${c}${e_three}3.${z} In your normal web browser (Chrome, Edge, Safari, on this computer or"
+    say "   your phone), open ${b}https://github.com/login/device${z} ${d}(this setup does not open it for you)${z}."
+    say "   Type the code, sign in if asked, click ${g}${b}Authorize${z}."
     say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
-    gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
+    BROWSER=true gh auth login --hostname github.com --web --skip-browser --git-protocol https </dev/tty || true
     signed_in || sign_in_stop
   else
     sign_in_stop
@@ -1424,9 +1424,9 @@ workspace_and_clone() {
     say ""
     say "${b}${e_key}Sign in to GitHub first${z}; the archon repository (the project's folder on GitHub) is private. In a terminal, type:"
     say ""
-    say "    ${c}gh auth login --hostname github.com --web --git-protocol https${z}"
+    say "    ${c}gh auth login --hostname github.com --web --skip-browser --git-protocol https${z}"
     say ""
-    say "Press ${b}Enter${z} when it shows a code, type the code at ${b}github.com/login/device${z}, click ${g}${b}Authorize${z}, then run this setup again ${e_next}it picks up where it left off."
+    say "Copy the code it shows, open ${b}https://github.com/login/device${z} in your normal browser, type the code, click ${g}${b}Authorize${z}, then run this setup again ${e_next}it picks up where it left off."
     return 0
   fi
   if [ -d "$target/.git" ]; then
@@ -1446,7 +1446,7 @@ workspace_and_clone() {
   else
     cloned=0
     if grep -qiE 'could not read Username|could not read Password|Authentication failed|terminal prompts disabled|Invalid username or password' "$work/last.log" 2>/dev/null; then
-      say "GitHub did not accept a login for $archon_url. Sign in with: gh auth login --hostname github.com --web --git-protocol https, then run this again."
+      say "GitHub did not accept a login for $archon_url. Sign in with: gh auth login --hostname github.com --web --skip-browser --git-protocol https, then run this again."
     elif grep -qiE 'not found|Repository not found' "$work/last.log" 2>/dev/null; then
       say "GitHub says $archon_url does not exist for your account. Your GitHub login (signed in as $(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)) may not have access to the repository: ask an administrator of the intellectual-frontiers organization to add you, then run this again."
     else
