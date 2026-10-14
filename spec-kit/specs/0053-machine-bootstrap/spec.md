@@ -118,7 +118,7 @@ person in to GitHub before it clones.
   names who) and say what they were doing. A sign-in that did not finish is the one stop that is not an error (exit status 5) and says how to sign in and run the setup again.
 - **FR-030**: `archon doctor` MUST NOT run before every installation is complete, since a program that is not installed yet would show as missing.
 - **FR-031**: A long step that can count its work (installing the programs) MUST show how many are done of how many, beside the seconds it has taken (`Installing programs: 57 of 130 (176s)`), so a person can tell it is working and not stuck.
-- **FR-032**: Programs that do not touch each other MUST be fetched at the same time, at most `BOOTSTRAP_JOBS` (6 by default) at once: each job has a work folder of its own, writes only to its own
+- **FR-032**: Programs that do not touch each other MUST be fetched at the same time, at most `BOOTSTRAP_JOBS` at once (by default twice the number of processors, at least 2 and at most 6: the work waits on the network, so processors are not the limit, but unpacking needs some): each job has a work folder of its own, writes only to its own
   folder under the tools folder and to its own link, never uses `apt`, and is logged in full; the setup waits for them all behind one progress line (`Installing tools: 7 of 24`), and a failure
   stops it after the others finish, naming the one that failed (FR-029).
 - **FR-033**: The packages the rest of the setup needs to download, unpack and sign in (`git`, `curl`, `wget`, `tar`, `xz-utils`, `unzip`, `jq`, `gh`, `fish`) MUST be installed first, in front of

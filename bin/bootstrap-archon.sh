@@ -349,7 +349,12 @@ step_soft() { soft_ok=1; step "$@"; rc_soft=$?; soft_ok=0; return "$rc_soft"; } 
 # ---- parallel downloads: tools that do not touch each other are fetched at the same time ------------------------------------------------------------
 # Each job runs in the background with a work folder of its own (so no two share a temporary file), writes only to its own folder under $tools and to
 # its own link in ~/.local/bin, and never touches apt. The caller waits for all of them with one progress line, then stops if any failed.
-par=${BOOTSTRAP_JOBS:-6}
+# How many at once: the work waits mostly on the network, so cores are not the limit (bandwidth and the servers' own limits are, which is why 6 is the ceiling), but unpacking is
+# some work for the processor, so a small computer gets fewer: twice its processors, at least 2 and at most 6. BOOTSTRAP_JOBS sets it.
+cpus=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
+case $cpus in '' | *[!0-9]*) cpus=2 ;; esac
+par_default=$((cpus * 2)); [ "$par_default" -lt 2 ] && par_default=2; [ "$par_default" -gt 6 ] && par_default=6
+par=${BOOTSTRAP_JOBS:-$par_default}
 pool_n=0; pool_started=0; pool_title=""
 pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
 pool_done() { n=0; for f in "$pool_dir"/*.rc; do [ -e "$f" ] && n=$((n + 1)); done; printf '%s' "$n"; }
