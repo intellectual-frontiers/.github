@@ -4,7 +4,7 @@ This repository is small on purpose: the organization's public profile (`profile
 (`tests/`). Everything else (the harness, specs, ontology, design systems, content) is in the private `archon` repository; do not add any of it here.
 
 - Work spec first: change `spec/0053-machine-bootstrap.md`, then the script, then the tests. Every requirement has a test or says why it has none.
-- Run `python3 -m unittest discover -s tests` before you push. It needs only the standard library, and a `Slim` test fails if a new top-level entry appears.
+- Run `python3 -m unittest discover -s tests` before you push (`.github/workflows/tests.yml` runs it on every push and pull request). It needs only the standard library, and a `Slim` test fails if a new top-level entry appears.
 - `bin/bootstrap-archon.sh` is POSIX `sh`, runs from a pipe (`curl ... | sh`), and must stay readable by a newcomer. The settings blocks it writes (`secrets_block`, `secrets_fish`) must stay byte for byte what
   `archon secrets` writes in the `archon` repository.
 - Never put a secret, a token or a person's data in this repository: it is public.

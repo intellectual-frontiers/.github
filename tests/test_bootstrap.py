@@ -574,7 +574,7 @@ class Slim(unittest.TestCase):
         """The rest of the harness lives in the private archon repository; this one stays small and public."""
         tracked = subprocess.run(["git", "ls-files"], cwd=HOME, capture_output=True, text=True, check=True).stdout.split()
         top = {t.split("/")[0] for t in tracked}
-        self.assertLessEqual(top, {"bin", "profile", "spec", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
+        self.assertLessEqual(top, {".github", "bin", "profile", "spec", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
 
 
 

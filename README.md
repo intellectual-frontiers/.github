@@ -20,4 +20,4 @@ which the people who may run the script can read.
 
 ## Tests
 
-`python3 -m unittest discover -s tests` runs them with the standard library alone (`shellcheck` is used where it is installed); nothing here needs `uv`, `archon` or the network.
+`python3 -m unittest discover -s tests` runs them with the standard library alone (`shellcheck` is used where it is installed); nothing here needs `uv`, `archon` or the network. A GitHub Actions workflow runs them on every push.
