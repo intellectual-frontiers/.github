@@ -604,6 +604,11 @@ class Telemetry(Fixture):
         self.assertIn("broke at", failed["error_tail"])
         self.assertEqual(next(e for e in ev if e["event"] == "bootstrap_finished")["properties"]["outcome"], "stopped")
         self.assertNotIn(str(self.home), json.dumps(ev))
+        journal = (self.home / ".archon" / "telemetry" / "sent.jsonl").read_text()
+        lines = [json.loads(l) for l in journal.splitlines()]
+        self.assertEqual([l["event"] for l in lines], [e["event"] for e in ev] or [l["event"] for l in lines])
+        self.assertTrue(all(l["source"] == "bootstrap" and l["status"] == 200 for l in lines))
+        self.assertNotIn("phc_test", journal)
         first = ev[0]["distinct_id"]
         srv2, got2 = self.serve()
         self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=f"http://127.0.0.1:{srv2.server_port}")

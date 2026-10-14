@@ -320,7 +320,16 @@ ph_event() {
   pe_who=${ARCHON_PERSON:-$ph_dev}
   pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"archon-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
     "$ph_key" "$pe_name" "$(ph_str "$pe_who")" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
-  ( printf '%s' "$pe_body" | curl -fsS -m 3 -o /dev/null -H 'Content-Type: application/json' --data-binary @- "$ph_host/batch/" >/dev/null 2>&1 || true ) &
+  # the journal `archon observe` reads: the event, PostHog's answer and every property, never the key
+  pe_journal=$(printf '{"at":"%s","source":"bootstrap","event":"%s","host":"%s","status":STATUS,"error":null,"properties":{"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}' \
+    "$(date -u +%Y-%m-%dT%H:%M:%S)" "$pe_name" "$ph_host" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
+  ( code=$(printf '%s' "$pe_body" | curl -sS -m 3 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' --data-binary @- "$ph_host/batch/" 2>/dev/null || true)
+    case $code in '' | *[!0-9]*) code=0 ;; esac
+    jd=${ARCHON_HOME:-$HOME/.archon}/telemetry
+    if mkdir -p "$jd" 2>/dev/null; then
+      [ -f "$jd/README.txt" ] || printf '%s\n' "This folder is archon's own record of what it reports to PostHog: sent.jsonl has one line for each event sent, with PostHog's answer and every property; the project key is never written here. Read it with: archon observe" >"$jd/README.txt" 2>/dev/null
+      printf '%s\n' "$pe_journal" | sed "s/\"status\":STATUS/\"status\":$code/" >>"$jd/sent.jsonl" 2>/dev/null
+    fi ) &
   ph_pids="$ph_pids $!"
   return 0
 }
