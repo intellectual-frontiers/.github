@@ -519,6 +519,73 @@ class Stops(Fixture):
 
 
 @unittest.skipUnless(SH, "sh is not installed")
+class Telemetry(Fixture):
+    """0053-machine-bootstrap FR-038: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
+
+    def serve(self):
+        import http.server
+        import threading
+        got: list[dict] = []
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                got.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                self.send_response(200)
+                self.end_headers()
+
+            def log_message(self, *a):
+                pass
+
+        srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        return srv, got
+
+    def run_failing(self, **extra):
+        script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; step 'Installing one' true; step 'Installing two' sh -c 'echo broke at /home/x/y; exit 7'"
+        return subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", **extra), timeout=60)
+
+    def events(self, got):
+        return [e for b in got for e in b["batch"]]
+
+    def test_steps_a_failure_and_the_end_are_sent_with_the_environment_and_a_stable_device_id(self):
+        srv, got = self.serve()
+        p = self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=f"http://127.0.0.1:{srv.server_port}")
+        self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
+        ev = self.events(got)
+        self.assertEqual([e["event"] for e in ev if e["event"] == "bootstrap_step"], ["bootstrap_step", "bootstrap_step"])
+        names = {e["event"] for e in ev}
+        self.assertTrue({"bootstrap_failed", "bootstrap_finished"} <= names, names)
+        for e in ev:
+            self.assertEqual(e["properties"]["environment"], "bootstrap")
+            self.assertTrue(e["distinct_id"].startswith("dev-"))
+            self.assertEqual(e["distinct_id"], e["properties"]["device_id"])
+            for k in ("host_kind", "os_id", "arch", "cpus", "bootstrap_run"):
+                self.assertIn(k, e["properties"])
+        failed = next(e for e in ev if e["event"] == "bootstrap_failed")["properties"]
+        self.assertIn("~/.archon-bootstrap/log/bootstrap-", failed["log_file"])
+        self.assertIn("broke at", failed["error_tail"])
+        self.assertEqual(next(e for e in ev if e["event"] == "bootstrap_finished")["properties"]["outcome"], "stopped")
+        self.assertNotIn(str(self.home), json.dumps(ev))
+        first = ev[0]["distinct_id"]
+        srv2, got2 = self.serve()
+        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=f"http://127.0.0.1:{srv2.server_port}")
+        self.assertEqual(self.events(got2)[0]["distinct_id"], first)
+
+    def test_nothing_is_sent_without_a_key_or_when_told_not_to(self):
+        srv, got = self.serve()
+        host = f"http://127.0.0.1:{srv.server_port}"
+        self.run_failing(ARCHON_POSTHOG_HOST=host)
+        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=host, DO_NOT_TRACK="1")
+        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=host, ARCHON_OBSERVE="off")
+        self.assertEqual(got, [])
+
+    def test_an_unreachable_host_changes_nothing_but_the_log(self):
+        p = self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST="http://127.0.0.1:9")
+        self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
+
+
+@unittest.skipUnless(SH, "sh is not installed")
 class Pool(Fixture):
     """0053-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
 

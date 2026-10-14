@@ -26,7 +26,7 @@
 #
 # Environment, so it can be tested (a "1" switches it on):
 #   ARCHON_POSTHOG_KEY     optional: your PostHog project API key, set (export ARCHON_POSTHOG_KEY=...) before starting so the archon commands the setup runs are
-#                          recorded in PostHog (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
+#                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the kind of computer; no name, password or file) (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
 #   BOOTSTRAP_URL          where the data files come from when run from a pipe (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
 #   BOOTSTRAP_NO_APT=1     never install a package
@@ -218,6 +218,12 @@ problems=$work/problems     # one line for each thing that did not work, shown a
 : >"$problems"
 ka_pid=""
 cleanup() {
+  ec=$?
+  if [ "$dry" = 0 ] && command -v ph_event >/dev/null 2>&1; then
+    case $ec in 0) oc=finished ;; 4) oc=stopped ;; 5) oc=sign-in-pending ;; 130) oc=interrupted ;; *) oc=failed ;; esac
+    ph_event bootstrap_finished "s:outcome=$oc" "n:exit_code=$ec" "n:duration_ms=$(( ($(date +%s) - ph_started) * 1000 ))" "n:steps=${step_no:-0}" "n:problems=$(wc -l <"$problems" 2>/dev/null | tr -d ' ')" "s:log_file=$(short_path "${logfile:-}")"
+    ph_wait
+  fi
   [ -n "$ka_pid" ] && kill "$ka_pid" 2>/dev/null
   rm -rf "$work"
 }
@@ -238,6 +244,83 @@ logf() {  # logf TEXT: one timestamped line in the log, without colour codes
   printf '%s %s\n' "$(date +%H:%M:%S)" "$(printf '%s' "$*" | sed 's/\x1b\[[0-9;]*m//g')" >>"$logfile" 2>/dev/null || true
 }
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
+
+# ---- telemetry: optional, to PostHog, only with ARCHON_POSTHOG_KEY (0053 FR-038) ----------------------------------------------------------------------
+# With the key set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can see how long
+# things take and where people get stuck: environment `bootstrap`, a device id made from the machine (never its name), and the kind of computer. No name, host name,
+# password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ARCHON_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
+ph_key=${ARCHON_POSTHOG_KEY:-}
+ph_host=${ARCHON_POSTHOG_HOST:-https://us.i.posthog.com}
+ph_host=${ph_host%/}
+ph_pids=""
+ph_on=0
+if [ -n "$ph_key" ] && [ "$dry" = 0 ] && command -v curl >/dev/null 2>&1; then
+  case $(printf '%s' "${ARCHON_OBSERVE:-}" | tr 'A-Z' 'a-z') in off | 0 | false | no) ;; *)
+    case $(printf '%s' "${DO_NOT_TRACK:-}" | tr 'A-Z' 'a-z') in 1 | true | yes) ;; *) ph_on=1 ;; esac ;;
+  esac
+fi
+ph_started=$(date +%s)
+ph_run=$stamp-$$
+
+ph_str() { printf '%s' "$1" | tr -d '\000-\037' | sed 's/\\/\\\\/g; s/"/\\"/g' | cut -c1-400; }   # one JSON string's text
+
+# the device id: the same on every run on this machine or distro, made from its machine id (hashed, so the id itself is never sent), else a random one kept in a file
+ph_device() {
+  f=${ARCHON_DEVICE_ID_FILE:-$HOME/.archon-bootstrap/device-id}
+  if [ -s "$f" ]; then cat "$f"; return 0; fi
+  mid=$(cat /etc/machine-id 2>/dev/null || cat /var/lib/dbus/machine-id 2>/dev/null || true)
+  if [ -n "$mid" ]; then id=dev-$(printf 'archon-device\0%s' "$mid" | sha256sum | cut -c1-16)
+  else id=dev-$(cat /proc/sys/kernel/random/uuid 2>/dev/null | tr -d - | cut -c1-16); fi
+  [ "$id" = dev- ] && id=dev-$(date +%s)$$
+  mkdir -p "$(dirname "$f")" 2>/dev/null && printf '%s\n' "$id" >"$f" 2>/dev/null || true
+  printf '%s' "$id"
+}
+
+# what kind of computer, and no more: WSL or a virtual machine or a container or real hardware, the system, the processors, memory and free disk
+ph_machine() {
+  kind=machine
+  if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then kind=wsl
+  elif [ -f /.dockerenv ] || grep -qaE 'docker|containerd|lxc|kubepods' /proc/1/cgroup 2>/dev/null; then kind=container
+  elif v=$(systemd-detect-virt 2>/dev/null) && [ "$v" != none ]; then kind=vm-$v
+  elif grep -qw hypervisor /proc/cpuinfo 2>/dev/null; then kind=vm; fi
+  wslv=""; case $(cat /proc/version 2>/dev/null) in *WSL2*) wslv=2 ;; *[Mm]icrosoft*) wslv=1 ;; esac
+  os_id=""; os_ver=""
+  if [ -r /etc/os-release ]; then
+    os_id=$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"' | head -n 1); os_ver=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"' | head -n 1)
+  fi
+  mem=$(awk '/^MemTotal:/ {printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null || true)
+  free=$(df -k "$HOME" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1048576}')
+  printf '"host_kind":"%s","wsl_version":"%s","os_id":"%s","os_version":"%s","kernel":"%s","arch":"%s","cpus":%s,"memory_gb":%s,"disk_free_gb":%s' \
+    "$(ph_str "$kind")" "$wslv" "$(ph_str "$os_id")" "$(ph_str "$os_ver")" "$(ph_str "$(uname -r)")" "$(uname -m)" "${cpus:-0}" "${mem:-0}" "${free:-0}"
+}
+
+# ph_event NAME [s:key=text | n:key=number]...  sends one event in the background (curl, three seconds at most); it never fails the setup
+ph_event() {
+  [ "$ph_on" = 1 ] || return 0
+  [ -n "${ph_machine_json:-}" ] || ph_machine_json=$(ph_machine 2>/dev/null || true)
+  [ -n "${ph_dev:-}" ] || ph_dev=$(ph_device 2>/dev/null || echo dev-unknown)
+  pe_name=$1; shift
+  pe_props=""
+  for pe_a in "$@"; do
+    pe_k=${pe_a%%=*}; pe_v=${pe_a#*=}; pe_t=${pe_k%%:*}; pe_k=${pe_k#*:}
+    case $pe_t in
+      n) case $pe_v in '' | *[!0-9.]*) pe_v=0 ;; esac; pe_props="$pe_props,\"$pe_k\":$pe_v" ;;
+      *) pe_props="$pe_props,\"$pe_k\":\"$(ph_str "$pe_v")\"" ;;
+    esac
+  done
+  pe_who=${ARCHON_PERSON:-$ph_dev}
+  pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"archon-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
+    "$ph_key" "$pe_name" "$(ph_str "$pe_who")" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
+  ( printf '%s' "$pe_body" | curl -fsS -m 3 -o /dev/null -H 'Content-Type: application/json' --data-binary @- "$ph_host/batch/" >/dev/null 2>&1 || true ) &
+  ph_pids="$ph_pids $!"
+  return 0
+}
+ph_wait() {  # wait (a few seconds at most) for what is still being sent
+  [ -n "$ph_pids" ] || return 0
+  for pw_p in $ph_pids; do wait "$pw_p" 2>/dev/null || true; done
+  ph_pids=""
+}
+ph_home() { printf '%s' "$1" | sed "s#$HOME#~#g"; }   # a path or an error line without the person's user name in it
 
 # Where this script is, when it is a file; the data files beside it are used then, else they are fetched from raw_url.
 script_dir=""
@@ -329,6 +412,7 @@ step() {
     log_from=$(( $(wc -l <"$logfile") + 1 ))
     { printf '\n==== STEP %s: %s (exit %s)\n' "$step_no" "$label" "$rc"; cat "$log"; } >>"$logfile" 2>/dev/null || true
   fi
+  ph_event bootstrap_step "s:step=$label" "s:phase=$cur_phase" "s:outcome=$([ "$rc" = 0 ] && echo ok || echo failed)" "n:exit_code=$rc" "n:duration_ms=$(( ($(date +%s) - start) * 1000 ))" "n:step_no=$step_no"
   if [ "$rc" != 0 ]; then
     phase_bad=1
     cp "$log" "$work/last.log"
@@ -385,7 +469,8 @@ pstep() {  # pstep LABEL COMMAND...
   printf '%s' "$label" >"$j.label"
   (
     work=$j.work; mkdir -p "$work"
-    rc=0; "$@" >"$j.log" 2>&1 </dev/null || rc=$?
+    t0=$(date +%s); rc=0; "$@" >"$j.log" 2>&1 </dev/null || rc=$?
+    echo $(( $(date +%s) - t0 )) >"$j.secs"
     echo "$rc" >"$j.rc.tmp"; mv "$j.rc.tmp" "$j.rc"
   ) &
 }
@@ -401,6 +486,7 @@ pool_end() {
   while [ "$i" -le "$pool_n" ]; do
     j=$pool_dir/$i; rc=$(cat "$j.rc" 2>/dev/null || echo 1); lab=$(cat "$j.label")
     step_no=$((step_no + 1))
+    ph_event bootstrap_step "s:step=$lab" "s:phase=$cur_phase" "s:outcome=$([ "$rc" = 0 ] && echo ok || echo failed)" "n:exit_code=$rc" "n:duration_ms=$(( $(cat "$j.secs" 2>/dev/null || echo 0) * 1000 ))" "n:step_no=$step_no" "s:parallel=yes"
     if [ "$log_ok" = 1 ]; then
       log_from=$(( $(wc -l <"$logfile") + 1 ))
       { printf '\n==== STEP %s: %s (exit %s)\n' "$step_no" "$lab" "$rc"; cat "$j.log"; } >>"$logfile" 2>/dev/null || true
@@ -423,6 +509,8 @@ stop_here() {  # stop_here LABEL STEPLOG LOGLINE
   trap - INT TERM
   [ -n "$ka_pid" ] && kill "$ka_pid" 2>/dev/null
   phase_close_quiet
+  ph_event bootstrap_failed "s:step=$1" "n:step_no=$step_no" "n:log_line=${3:-0}" "s:log_file=$(short_path "$logfile")" "s:support_file=$(short_path "$support_file")" \
+    "s:error_tail=$(tail -n 3 "$2" 2>/dev/null | tr '\n' ' ' | sed 's/\x1b\[[0-9;]*m//g' | sed -E 's/(gh[pousr]_|github_pat_|ph[cx]_)[A-Za-z0-9_]+/[removed]/g' | sed "s#$HOME#~#g")"
   say ""
   say "${r}${b}${e_stop}Setup stopped: something went wrong${z}"
   say "${d}Nothing is half-installed in a way that matters; it is safe to run the setup again once this is fixed.${z}"
@@ -1369,8 +1457,11 @@ sign_in() {
     say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
+    si0=$(date +%s)
     BROWSER=true gh auth login --hostname github.com --web --skip-browser --git-protocol https </dev/tty || true
-    signed_in || sign_in_stop
+    if signed_in; then si_ok=ok; else si_ok=unfinished; fi
+    ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
+    [ "$si_ok" = ok ] || sign_in_stop
   else
     sign_in_stop
   fi
@@ -1524,7 +1615,7 @@ link_archon() {
 
 # in_archon_quiet COMMAND...: the same, for a step: every question is answered yes, and the progress lines archon draws for a person are off.
 in_archon_quiet() {
-  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_PROGRESS=never "$@" </dev/null )
+  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_ENVIRONMENT=bootstrap ARCHON_PROGRESS=never "$@" </dev/null )
 }
 in_archon() {  # in_archon COMMAND...: run in the clone, showing its output; asking nothing of standard input unless there is a terminal
   if [ "$has_tty" = 1 ]; then ( cd "$target" && "$@" </dev/tty ); else ( cd "$target" && "$@" </dev/null ); fi
@@ -1646,12 +1737,14 @@ main() {
   say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for the Intellectual Frontiers harness."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
   if [ -n "${ARCHON_POSTHOG_KEY:-}" ]; then
-    say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so the archon commands this setup runs are recorded in PostHog."
+    say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
+    say "${d}   It sends a device id made from this computer (not its name), the kind of computer (WSL, virtual machine) and the system. Never your name, a password or a file.${z}"
   else
     say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ARCHON_POSTHOG_KEY=<your project key>${z}${d}, then start again."
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
+  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}"
   signin_needed=0; cloned=0; archon_ran=0
   # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.
   install_packages
