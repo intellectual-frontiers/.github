@@ -173,6 +173,20 @@ person in to GitHub before it clones.
 - **OQ-2**: 0026-workspaces FR-017 keeps a non-public repository out of public specifications and code; this spec and the script name
   the harness repository because the person asked for the clone. Whether that rule should name this script as an exception.
 
+- **OQ-3** (long-term; to be taken up after the other major tasks of October 2026 are done): The script assumes a computer it owns: a fresh Debian 12 or 13 in a
+  virtual machine or WSL, where it installs packages, edits the shell's startup files, offers to change the login shell and refuses any other distribution
+  (FR-004). Whether, and how, `archon` should run on a computer a person already uses, such as a distribution like Omarchy (Arch-based, pacman, Hyprland), without
+  changing that person's environment more than they agree to, is not decided. Ideas to weigh, none adopted: (a) a *guest* mode that writes only under
+  one prefix in the home folder (the tools directory, the cache, `~/.local/bin/archon`), uses no `sudo`, edits no startup file, does not change the login
+  shell and leaves telemetry off, and that lists every path it wrote so that one command can remove it all; (b) *detect before install*: use a `git`,
+  `uv`, `claude` or `codex` the person already has when it is new enough (the toolchain's `minimum` and `probe` already allow this), and for a system package
+  that is missing print the one command for the person's own package manager (`pacman`, `dnf`, `brew` beside `apt`) instead of running it; (c) split the
+  script into *set up a computer* (Debian only, owns the environment) and *add the harness to a computer* (any Linux, user space only); (d) offer to run the
+  existing Debian path inside a container the person's account already has (`distrobox` or `toolbox` with a Debian image, home folder shared), which leaves the
+  host untouched and keeps one tested path; (e) a dry run in guest mode that prints "what will change on your computer" before anything is written, and
+  consent per step; (f) a test matrix that runs the script in Arch, Fedora and Ubuntu containers. The decision, the requirements that follow from it, and the
+  change to FR-004 are for a person to make.
+
 ## Key entities
 
 - **The bootstrap script** - `bin/bootstrap-archon.sh`, with its data in `bin/bootstrap/`.
