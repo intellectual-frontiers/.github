@@ -516,3 +516,40 @@ class Stops(Fixture):
         support = next((self.home / ".archon-bootstrap" / "log").glob("support-*")).read_text()
         self.assertNotIn("abc123", support)
         self.assertNotIn("ghp_ABCDEFGHIJKLMNOP1234", support)
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Pool(Fixture):
+    """0053-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
+
+    def run_pool(self, body, **extra):
+        script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; {body}"
+        return subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", **extra))
+
+    def test_six_one_second_jobs_run_at_the_same_time_and_each_has_its_own_work_folder(self):
+        import time
+
+        started = time.time()
+        p = self.run_pool("f() { sleep 1; echo \"$work\" >>\"$HOME/folders\"; }; pool_begin T; for i in 1 2 3 4 5 6; do pstep \"job $i\" f; done; pool_end; echo DONE", BOOTSTRAP_JOBS="6")
+        self.assertIn("DONE", p.stdout, p.stdout + p.stderr)
+        self.assertLess(time.time() - started, 4.5, "six one-second jobs in parallel take about one second, not six")
+        folders = (self.home / "folders").read_text().split()
+        self.assertEqual(len(set(folders)), 6, "no two jobs share a temporary folder")
+
+    def test_the_number_of_jobs_at_once_is_capped(self):
+        import time
+
+        started = time.time()
+        p = self.run_pool("pool_begin T; for i in 1 2 3 4; do pstep \"job $i\" sleep 1; done; pool_end; echo DONE", BOOTSTRAP_JOBS="2")
+        self.assertIn("DONE", p.stdout)
+        self.assertGreaterEqual(time.time() - started, 1.9, "four one-second jobs two at a time take two seconds")
+
+    def test_a_failed_job_stops_the_setup_after_the_others_finish_and_names_it(self):
+        p = self.run_pool("pool_begin T; pstep 'good one' true; pstep 'bad one' sh -c 'echo nope; exit 9'; pstep 'good two' true; pool_end; echo SHOULD_NOT_GET_HERE")
+        self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
+        self.assertNotIn("SHOULD_NOT_GET_HERE", p.stdout)
+        self.assertIn("bad one", p.stdout)
+        self.assertIn("nope", p.stdout)
+        log = next((self.home / ".archon-bootstrap" / "log").glob("bootstrap-*")).read_text()
+        self.assertIn("(exit 9)", log)
+        self.assertEqual(log.count("==== STEP"), 3, "every job is in the log, whether it worked or not")

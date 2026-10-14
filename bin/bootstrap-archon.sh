@@ -346,6 +346,65 @@ step() {
 soft_ok=0
 step_soft() { soft_ok=1; step "$@"; rc_soft=$?; soft_ok=0; return "$rc_soft"; }   # a step whose failure the caller explains and handles itself
 
+# ---- parallel downloads: tools that do not touch each other are fetched at the same time ------------------------------------------------------------
+# Each job runs in the background with a work folder of its own (so no two share a temporary file), writes only to its own folder under $tools and to
+# its own link in ~/.local/bin, and never touches apt. The caller waits for all of them with one progress line, then stops if any failed.
+par=${BOOTSTRAP_JOBS:-6}
+pool_n=0; pool_started=0; pool_title=""
+pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
+pool_done() { n=0; for f in "$pool_dir"/*.rc; do [ -e "$f" ] && n=$((n + 1)); done; printf '%s' "$n"; }
+pstep() {  # pstep LABEL COMMAND...
+  label=$1; shift
+  if [ "$dry" = 1 ]; then printf '  - %s\n' "$label"; return 0; fi
+  [ "$par" -ge 1 ] 2>/dev/null || par=1
+  while [ $((pool_started - $(pool_done))) -ge "$par" ]; do sleep 0.2; done
+  pool_n=$((pool_n + 1)); pool_started=$((pool_started + 1)); j=$pool_dir/$pool_n
+  printf '%s' "$label" >"$j.label"
+  (
+    work=$j.work; mkdir -p "$work"
+    rc=0; "$@" >"$j.log" 2>&1 </dev/null || rc=$?
+    echo "$rc" >"$j.rc.tmp"; mv "$j.rc.tmp" "$j.rc"
+  ) &
+}
+pool_end() {
+  [ "$dry" = 1 ] && return 0
+  [ "$pool_started" -gt 0 ] || return 0
+  start=$(date +%s); ticks=0
+  # shellcheck disable=SC2086
+  set -- $frames; nframes=$#
+  while [ "$(pool_done)" -lt "$pool_started" ]; do
+    if [ "$tty_ui" = 1 ]; then
+      ticks=$((ticks + 1))
+      if [ "$ticks" -ge 5 ]; then
+        n=$(( ticks % nframes )); f=""; i=0
+        for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
+        printf '\r\033[K%s%s%s %s: %s%s%s of %s %s(%ss)%s' "$c" "$f" "$z" "$pool_title" "$b" "$(pool_done)" "$z" "$pool_started" "$d" "$(( $(date +%s) - start ))" "$z" >&2
+      fi
+    fi
+    sleep 0.1
+  done
+  [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
+  wait 2>/dev/null || true
+  failed_label=""; failed_log=""; failed_from=0
+  i=1
+  while [ "$i" -le "$pool_n" ]; do
+    j=$pool_dir/$i; rc=$(cat "$j.rc" 2>/dev/null || echo 1); lab=$(cat "$j.label")
+    step_no=$((step_no + 1))
+    if [ "$log_ok" = 1 ]; then
+      log_from=$(( $(wc -l <"$logfile") + 1 ))
+      { printf '\n==== STEP %s: %s (exit %s)\n' "$step_no" "$lab" "$rc"; cat "$j.log"; } >>"$logfile" 2>/dev/null || true
+    fi
+    if [ "$rc" != 0 ] && [ -z "$failed_label" ]; then failed_label=$lab; failed_log=$j.log; failed_from=${log_from:-0}; cp "$j.log" "$work/last.log"; fi
+    i=$((i + 1))
+  done
+  pool_started=0
+  if [ -n "$failed_label" ]; then
+    phase_bad=1
+    if [ "$keep_going" = 1 ]; then warn "$failed_label did not install"; else stop_here "$failed_label" "$failed_log" "$failed_from"; fi
+  fi
+  return 0
+}
+
 # The one way setup ends when something went wrong: stop, say what failed in plain words with colour and emoji, say where to look (a path
 # relative to your home folder), and say how to ask for help. A support file with what the team needs (and no secrets) is written beside the log.
 support_who=${BOOTSTRAP_SUPPORT:-the Intellectual Frontiers support team}
@@ -573,12 +632,65 @@ install_packages() {
   done
   if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
   if [ -n "$chosen" ]; then
-    # shellcheck disable=SC2086
-    count_re='^Setting up '
-    count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
-    [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
-    step "${e_pkg}Installing programs" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
-    count_re=""; count_total=""
+    # The few programs the rest of this setup itself needs (to download, unpack, sign in) are installed first, in front of you. The rest are installed in the
+    # background while you sign in to GitHub and while the tools download: apt and those downloads touch different files, so they cannot get in each other's way.
+    first=""; rest=""
+    for pkg in $chosen; do
+      case $pkg in git | ca-certificates | curl | wget | tar | xz-utils | unzip | jq | gh | fish) first="$first $pkg" ;; *) rest="$rest $pkg" ;; esac
+    done
+    if [ -n "$first" ]; then
+      count_re='^Setting up '
+      count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $first 2>/dev/null | grep -c '^Inst ' || true)
+      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
+      step "${e_pkg}Installing programs" apt_install $first || need "the packages could not be installed." "run: sudo apt install$first"
+      count_re=""; count_total=""
+    fi
+    if [ -n "$rest" ]; then bg_apt_start $rest; fi
+  fi
+  return 0
+}
+
+# ---- the rest of the packages, installed in the background -----------------------------------------------------------------------------------------
+bgapt_on=0; bgapt_total=""
+bg_apt_start() {
+  bgapt_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y "$@" 2>/dev/null | grep -c '^Inst ' || true)
+  [ "${bgapt_total:-0}" -gt 0 ] 2>/dev/null || bgapt_total=""
+  rm -f "$work/bgapt.rc" "$work/bgapt.log"
+  ( rc=0; apt_install "$@" >"$work/bgapt.log" 2>&1 </dev/null || rc=$?; echo "$rc" >"$work/bgapt.rc.tmp"; mv "$work/bgapt.rc.tmp" "$work/bgapt.rc" ) &
+  bgapt_on=1; bgapt_list="$*"
+  logf "started installing in the background:$bgapt_list"
+}
+bg_apt_wait() {  # waits for the background install, with the same progress line as any install, and stops if it failed
+  [ "$bgapt_on" = 1 ] || return 0
+  start=$(date +%s); ticks=0
+  # shellcheck disable=SC2086
+  set -- $frames; nframes=$#
+  while [ ! -f "$work/bgapt.rc" ]; do
+    if [ "$tty_ui" = 1 ]; then
+      ticks=$((ticks + 1))
+      if [ "$ticks" -ge 5 ]; then
+        n=$(( ticks % nframes )); f=""; i=0
+        for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
+        done_n=$(grep -c '^Setting up ' "$work/bgapt.log" 2>/dev/null || true)
+        of=""; [ -n "$bgapt_total" ] && of=" of $bgapt_total"
+        printf '\r\033[K%s%s%s %sFinishing the programs: %s%s%s%s %s(%ss)%s' "$c" "$f" "$z" "$e_pkg" "$b" "$done_n" "$z" "$of" "$d" "$(( $(date +%s) - start ))" "$z" >&2
+      fi
+    fi
+    sleep 0.1
+  done
+  [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
+  bgapt_on=0
+  rc=$(cat "$work/bgapt.rc" 2>/dev/null || echo 1)
+  step_no=$((step_no + 1))
+  log_from=0
+  if [ "$log_ok" = 1 ]; then
+    log_from=$(( $(wc -l <"$logfile") + 1 ))
+    { printf '\n==== STEP %s: Installing the rest of the programs (exit %s)\n' "$step_no" "$rc"; cat "$work/bgapt.log"; } >>"$logfile" 2>/dev/null || true
+  fi
+  if [ "$rc" != 0 ]; then
+    phase_bad=1
+    cp "$work/bgapt.log" "$work/last.log"
+    if [ "$keep_going" = 1 ]; then warn "the rest of the programs did not install"; else stop_here "Installing the rest of the programs" "$work/bgapt.log" "$log_from"; fi
   fi
   return 0
 }
@@ -882,14 +994,14 @@ each_tool() {
 release_step() {
   n=$1; repo=$2; shift 2
   if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  step "${e_dl}Installing $n (the newest release)" install_release "$n" "$repo" "" "$@" || problem "$n could not be installed ($(tail -n 1 "$work/last.log" 2>/dev/null))"
+  pstep "${e_dl}Installing $n (the newest release)" install_release "$n" "$repo" "" "$@"
   return 0
 }
 
 pypi_step() {
   n=$1; pkg=$2; shift 2
   if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  step "${e_py}Installing $n (the newest version)" install_pypi "$n" "$pkg" "$@" || problem "$n could not be installed ($(tail -n 1 "$work/last.log" 2>/dev/null))"
+  pstep "${e_py}Installing $n (the newest version)" install_pypi "$n" "$pkg" "$@"
   return 0
 }
 
@@ -961,25 +1073,28 @@ setup_tools() {
   [ "$dry" = 1 ] || mkdir -p "$bin" "$tools"
   if kit_on base; then
     phase "${e_dl}Installing handy command-line tools"
+    pool_begin "Installing tools"
     # glab: Debian 13 and Ubuntu carry it as a package (installed above); where the archive has none, the pinned release
     if ! have_cmd glab && ! tool_present glab glab=bin/glab; then
-      step "${e_dl}Installing glab $GLAB_VERSION" install_pinned glab "$GLAB_VERSION" \
-        "https://gitlab.com/gitlab-org/cli/-/releases/v$GLAB_VERSION/downloads/glab_${GLAB_VERSION}_linux_$goarch.tar.gz" "$(arch_sha GLAB)" tar 0 glab=bin/glab ||
-        problem "glab could not be installed"
+      pstep "${e_dl}Installing glab $GLAB_VERSION" install_pinned glab "$GLAB_VERSION" \
+        "https://gitlab.com/gitlab-org/cli/-/releases/v$GLAB_VERSION/downloads/glab_${GLAB_VERSION}_linux_$goarch.tar.gz" "$(arch_sha GLAB)" tar 0 glab=bin/glab
     fi
     if ! tool_present duckdb duckdb=duckdb || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; then
       case $arch in x86_64) dpat='^duckdb_cli-linux-amd64\.zip$' ;; *) dpat='^duckdb_cli-linux-(arm64|aarch64)\.zip$' ;; esac
-      step "${e_dl}Installing duckdb (the newest release)" install_release duckdb duckdb/duckdb "$dpat" duckdb=duckdb || problem "duckdb could not be installed"
+      pstep "${e_dl}Installing duckdb (the newest release)" install_release duckdb duckdb/duckdb "$dpat" duckdb=duckdb
     fi
     if [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
-      step "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org || problem "the SQLite command line tools from sqlite.org could not be installed (the distribution's sqlite3 is used)"
+      pstep "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org
     fi
     each_tool "$MODERN_TOOLS" release_step
+    pool_end
   fi
   if kit_on embedded-sql; then
     phase "${e_dl}Installing tools for working with data"
+    pool_begin "Installing data tools"
     each_tool "$SQL_TOOLS" release_step
     each_tool "$PY_TOOLS" pypi_step
+    pool_end
   fi
   return 0
 }
@@ -1512,13 +1627,14 @@ main() {
   signin_needed=0; cloned=0; archon_ran=0
   # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.
   install_packages
-  [ "$dry" = 1 ] || link_fd
   sign_in
   identity
   setup_runtime
   setup_tools
   setup_shell_kit
   configure_dotfiles
+  bg_apt_wait
+  [ "$dry" = 1 ] || link_fd
   verify_install
   workspace_and_clone
   offer_fish
