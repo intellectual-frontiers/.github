@@ -355,15 +355,25 @@ cpus=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
 case $cpus in '' | *[!0-9]*) cpus=2 ;; esac
 par_default=$((cpus * 2)); [ "$par_default" -lt 2 ] && par_default=2; [ "$par_default" -gt 6 ] && par_default=6
 par=${BOOTSTRAP_JOBS:-$par_default}
-pool_n=0; pool_started=0; pool_title=""
-pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
+pool_n=0; pool_started=0; pool_title=""; pool_total=""; pool_start=0; ticks=0
+pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_total=0; pool_start=$(date +%s); ticks=0;
+  # shellcheck disable=SC2086
+  set -- $frames; nframes=$#; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
 pool_done() { n=0; for f in "$pool_dir"/*.rc; do [ -e "$f" ] && n=$((n + 1)); done; printf '%s' "$n"; }
+pool_draw() {  # one progress line: how many of the programs started so far are done, and for how long
+  [ "$tty_ui" = 1 ] || return 0
+  ticks=$((ticks + 1))
+  [ "$ticks" -ge 2 ] || return 0
+  n=$(( ticks % nframes )); f=""; i=0
+  for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
+  printf '\r\033[K%s%s%s %s: %s%s%s of %s %s(%ss)%s' "$c" "$f" "$z" "$pool_title" "$b" "$(pool_done)" "$z" "$pool_total" "$d" "$(( $(date +%s) - pool_start ))" "$z" >&2
+}
 pstep() {  # pstep LABEL COMMAND...
   label=$1; shift
   if [ "$dry" = 1 ]; then printf '  - %s\n' "$label"; return 0; fi
   [ "$par" -ge 1 ] 2>/dev/null || par=1
-  while [ $((pool_started - $(pool_done))) -ge "$par" ]; do sleep 0.2; done
-  pool_n=$((pool_n + 1)); pool_started=$((pool_started + 1)); j=$pool_dir/$pool_n
+  while [ $((pool_started - $(pool_done))) -ge "$par" ]; do pool_draw; sleep 0.1; done
+  pool_n=$((pool_n + 1)); pool_started=$((pool_started + 1)); pool_total=$pool_started; j=$pool_dir/$pool_n
   printf '%s' "$label" >"$j.label"
   (
     work=$j.work; mkdir -p "$work"
@@ -374,20 +384,8 @@ pstep() {  # pstep LABEL COMMAND...
 pool_end() {
   [ "$dry" = 1 ] && return 0
   [ "$pool_started" -gt 0 ] || return 0
-  start=$(date +%s); ticks=0
-  # shellcheck disable=SC2086
-  set -- $frames; nframes=$#
-  while [ "$(pool_done)" -lt "$pool_started" ]; do
-    if [ "$tty_ui" = 1 ]; then
-      ticks=$((ticks + 1))
-      if [ "$ticks" -ge 5 ]; then
-        n=$(( ticks % nframes )); f=""; i=0
-        for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
-        printf '\r\033[K%s%s%s %s: %s%s%s of %s %s(%ss)%s' "$c" "$f" "$z" "$pool_title" "$b" "$(pool_done)" "$z" "$pool_started" "$d" "$(( $(date +%s) - start ))" "$z" >&2
-      fi
-    fi
-    sleep 0.1
-  done
+  pool_total=$pool_started
+  while [ "$(pool_done)" -lt "$pool_started" ]; do pool_draw; sleep 0.1; done
   [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
   wait 2>/dev/null || true
   failed_label=""; failed_log=""; failed_from=0
@@ -1338,7 +1336,7 @@ sign_in() {
   heading "${e_key}Signing in to GitHub ${d}(the one thing that needs you)${z}"
   if [ "${BOOTSTRAP_NO_AUTH:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_AUTH=1)."; return 0; fi
   if [ "$dry" = 1 ]; then
-    would "check that you are signed in to GitHub; if not, run: gh auth login --hostname github.com --web --git-protocol https (a code and your browser)"
+    would "check that you are signed in to GitHub; if not, run: gh auth login --hostname github.com --web --skip-browser --git-protocol https (a code to type into your own browser)"
     would "make gh git's credential helper for github.com, and set the name and email on your commits where git has none"
     return 0
   fi
