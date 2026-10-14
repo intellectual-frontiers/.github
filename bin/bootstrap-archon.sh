@@ -9,13 +9,16 @@
 # It is a self-contained port of what ws-host (workspaces-host) installs for its default kits (base, shell and embedded-sql) and does for the
 # terminal's look, git and the workspaces folder. It never calls, clones or needs ws-host. It:
 #
-#   1. installs what is missing with apt (it says so and asks for your password once, first),
-#   2. gets the pinned mise, and through it Python and uv, then the modern command line tools, each checked against a checksum,
-#   3. installs fish 4, Oh My Posh with ws-host's themes and chezmoi, and has chezmoi give bash and fish the prompt,
-#   4. signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none,
-#   5. copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by fast-forward only),
-#   6. offers to make fish your login shell,
-#   7. runs, in the clone, ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
+#   1. Packages: installs what is missing with apt (it says so and asks for your password once, first; nothing there touches GitHub),
+#   2. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
+#      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so mise and archon use it and are not held to GitHub's hourly limit for no sign-in;
+#      with no token at all, everything that comes from GitHub is skipped and listed in the summary, to be done by running this again after sign-in,
+#   3. Python and tools: gets the pinned mise, and through it Python and uv, then the modern command line tools, each checked against a checksum,
+#   4. Shell and prompt: installs fish 4, Oh My Posh with ws-host's themes and chezmoi, and has chezmoi give bash and fish the prompt,
+#   5. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
+#      fast-forward only),
+#   6. Login shell: offers to make fish your login shell,
+#   7. First checks: runs, in the clone, ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
 #
 # Safe to run again: what is already in place changes nothing, your own files change only between marked lines (a copy is kept first), and a
 # clone with your work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is
@@ -27,14 +30,15 @@
 # Environment, so it can be tested (a "1" switches it on):
 #   ARCHON_POSTHOG_KEY     optional: your PostHog project API key, set (export ARCHON_POSTHOG_KEY=...) before starting so the archon commands the setup runs are
 #                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
-#   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to archon; with it no interactive `gh auth login` is needed, and no sign-in is asked for
+#   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to archon; with it no interactive `gh auth login` is needed, and no sign-in is asked for. It is the way to get the tools that come from GitHub where no browser is
+#                          (without a token or a sign-in they are skipped, and listed at the end)
 #   BOOTSTRAP_URL          where the data files come from when run from a pipe (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
 #   BOOTSTRAP_NO_APT=1     never install a package
 #   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (mise, chezmoi, Oh My Posh, fish, the modern tools)
 #   BOOTSTRAP_NO_RUNTIME=1 do not install Python and uv with mise (the uv already on the PATH is used)
 #   BOOTSTRAP_NO_DOTFILES=1   do not touch ~/.bashrc, fish's config.fish or ~/.gitconfig
-#   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email
+#   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CHSH=1    never offer to change the login shell (BOOTSTRAP_CHSH=yes changes it without asking, no never does)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update archon (and so run nothing in it)
 #   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
@@ -50,6 +54,7 @@
 # Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the machine cannot be set up yet, 4 a step failed (setup stops, and
 # says where the log and the support file are), 5 the GitHub sign-in did not finish.
 # Everything is logged to ~/.archon-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
+# What was skipped for want of a GitHub token is not a failed step: it is listed in the summary and the exit status stays 0.
 # shellcheck disable=SC2034  # the pinned checksums are read by arch_sha, through eval
 set -eu
 
@@ -232,6 +237,8 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT TERM
 
+skipped=$work/skipped       # one line for each thing left for a GitHub sign-in (not a failure), shown at the end
+: >"$skipped"
 problem() { printf '%s\n' "$*" >>"$problems"; logf "problem: $*"; }
 
 # ---- the log: everything this does is written to ~/.archon-bootstrap/log/, so a problem can be looked into (and shown to the support team) later ----
@@ -891,6 +898,29 @@ gh_token() {
   printf '%s' "$t"
 }
 
+# Everything that talks to GitHub (the release lookups, mise's downloads, fish, chezmoi, archon's toolchain) waits for github_init, which main runs right after
+# sign_in. It exports the token to the programs started from here on (mise, archon, gh) and records whether there is one. Without one, those installs are
+# skipped and listed, not tried: unauthenticated, GitHub answers 403 and 429 after a few dozen requests, and a failed step list helps nobody.
+have_github=0
+github_init() {
+  [ "$dry" = 1 ] && return 0
+  gi_tok=$(gh_token)
+  if [ -n "$gi_tok" ]; then
+    [ -n "${GH_TOKEN:-}" ] || GH_TOKEN=$gi_tok
+    [ -n "${GITHUB_TOKEN:-}" ] || GITHUB_TOKEN=$gi_tok
+    export GH_TOKEN GITHUB_TOKEN
+    have_github=1
+  else
+    warn "There is no GitHub sign-in or token, so what is downloaded from GitHub is left until there is one (Python and uv, most tools, fish, chezmoi, archon's programs). To get them: gh auth login, or export GH_TOKEN=<a token>, then run this again."
+  fi
+  gi_tok=""
+  return 0
+}
+github_ready() { [ "$dry" = 1 ] || [ "$have_github" = 1 ]; }
+skip_github() {  # skip_github WHAT: left for a GitHub sign-in; says so, and the summary lists it
+  printf '%s\n' "$1" >>"$skipped"; phase_bad=1; logf "left until a GitHub sign-in: $1"
+}
+
 api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when there is one (it lifts the hourly limit); never sent elsewhere
   tok=$(gh_token)
   if [ -n "$tok" ]; then curl -fsSL $net --retry 2 -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json" -o "$2" "$1"
@@ -1098,6 +1128,7 @@ each_tool() {
 release_step() {
   n=$1; repo=$2; shift 2
   if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
+  if ! github_ready; then skip_github "$n"; return 0; fi
   pstep "${e_dl}Installing $n (the newest release)" install_release "$n" "$repo" "" "$@"
   return 0
 }
@@ -1154,6 +1185,7 @@ setup_runtime() {
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
   if [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_RUNTIME=1)."; return 0; fi
   if ! runtime_ready; then
+    if ! github_ready; then say "Left until you sign in to GitHub: Python and uv (mise gets them from GitHub)."; skip_github "Python and uv"; return 0; fi
     step "${e_py}Installing Python and uv" install_runtime || { problem "Python and uv could not be installed"; return 0; }
   fi
   [ "$dry" = 1 ] || link_uv
@@ -1183,7 +1215,11 @@ setup_tools() {
       pstep "${e_dl}Installing glab $GLAB_VERSION" install_pinned glab "$GLAB_VERSION" \
         "https://gitlab.com/gitlab-org/cli/-/releases/v$GLAB_VERSION/downloads/glab_${GLAB_VERSION}_linux_$goarch.tar.gz" "$(arch_sha GLAB)" tar 0 glab=bin/glab
     fi
-    if ! tool_present duckdb duckdb=duckdb || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; then
+    if ! github_ready; then
+      say "Left until you sign in to GitHub: duckdb and the tools that come from GitHub releases."
+      tool_present duckdb duckdb=duckdb || skip_github duckdb
+    fi
+    if github_ready && { ! tool_present duckdb duckdb=duckdb || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
       case $arch in x86_64) dpat='^duckdb_cli-linux-amd64\.zip$' ;; *) dpat='^duckdb_cli-linux-(arm64|aarch64)\.zip$' ;; esac
       pstep "${e_dl}Installing duckdb (the newest release)" install_release duckdb duckdb/duckdb "$dpat" duckdb=duckdb
     fi
@@ -1196,6 +1232,7 @@ setup_tools() {
   if kit_on embedded-sql; then
     phase "${e_dl}Installing tools for working with data"
     pool_begin "Installing data tools"
+    github_ready || say "Left until you sign in to GitHub: the data tools that come from GitHub releases."
     each_tool "$SQL_TOOLS" release_step
     each_tool "$PY_TOOLS" pypi_step
     pool_end
@@ -1231,6 +1268,7 @@ setup_shell_kit() {
   # fish 4 came from apt where the distribution has it (installed with the packages); anywhere it does not, the fish project's own release
   if ! have_fish4; then
     if [ "$dry" = 1 ] && fish_from_apt; then :   # listed with the packages above
+    elif ! github_ready; then say "Left until you sign in to GitHub: fish $FISH_VERSION (it comes from the fish project's GitHub release)."; skip_github "fish $FISH_VERSION"
     else
       step "${e_dl}Installing fish $FISH_VERSION" install_pinned fish "$FISH_VERSION" "$(fish_url)" "$(arch_sha FISH)" tar 0 fish=fish ||
         problem "fish 4 could not be installed"
@@ -1331,6 +1369,11 @@ configure_dotfiles() {
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] && ! chezmoi_bin >/dev/null; then say "Skipped: chezmoi is not here and downloads are off."; return 0; fi
   if [ "$prompt" = no ] && [ "$modern" = 0 ]; then say "Your prompt and commands stay yours (WS_HOST_PROMPT=no, WS_HOST_MODERN=no)."; return 0; fi
   if ! tool_present chezmoi chezmoi=chezmoi; then
+    if ! github_ready; then
+      say "Left until you sign in to GitHub: chezmoi, so your terminal's prompt and commands are not set up yet."
+      skip_github "chezmoi (and so the prompt and the modern commands in your shell files)"
+      return 0
+    fi
     step "${e_dl}Installing chezmoi $CHEZMOI_VERSION" install_pinned chezmoi "$CHEZMOI_VERSION" \
       "https://github.com/twpayne/chezmoi/releases/download/v$CHEZMOI_VERSION/chezmoi_${CHEZMOI_VERSION}_linux_$goarch.tar.gz" "$(arch_sha CHEZMOI)" tar 0 chezmoi=chezmoi ||
       { problem "chezmoi could not be installed, so your terminal was not set up"; return 0; }
@@ -1439,6 +1482,7 @@ sign_in() {
   if [ "$dry" = 1 ]; then
     would "check that you are signed in to GitHub; if not, run: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https (a code to type into your own browser)"
     would "make gh git's credential helper for github.com, and set the name and email on your commits where git has none"
+    would "export the GitHub token (GH_TOKEN) to mise and archon; with none, skip what comes from GitHub and list it at the end"
     return 0
   fi
   have_cmd gh || { warn "gh, the tool that signs you in to GitHub, is not installed."; problem "gh is not installed"; return 0; }
@@ -1669,7 +1713,12 @@ run_archon() {
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
   phase "${e_rocket}Getting archon ready ${d}(the first time takes a few minutes)${z}"
   # Every question archon could ask (install a program with apt?) is answered yes; sudo's password was asked once, above, and is kept alive.
-  if [ -n "$names" ]; then
+  tool_skipped=0
+  if [ -n "$names" ] && ! github_ready; then
+    tool_skipped=1
+    say "Left until you sign in to GitHub: ./archon toolchain ensure ($names)."
+    skip_github "archon toolchain ensure: $names"
+  elif [ -n "$names" ]; then
     # shellcheck disable=SC2086
     step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
   fi
@@ -1693,7 +1742,8 @@ finish() {
   if [ "${archon_ran:-0}" = 1 ]; then
     for pair in "doctor:$status_doctor" "toolchain ensure:$status_tool" "check:$status_check"; do
       n=${pair%%:*}; s=${pair##*:}
-      if [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./archon $n"; else say "  ${r}${cross}${z} ./archon $n (exit status $s)"; failed=1; fi
+      if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
+      elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./archon $n"; else say "  ${r}${cross}${z} ./archon $n (exit status $s)"; failed=1; fi
     done
   fi
   if [ -s "$problems" ]; then
@@ -1701,6 +1751,12 @@ finish() {
     say "${b}These did not work, and nothing else depended on them:${z}"
     sed 's/^/  - /' "$problems"
     say "Run this again to retry; what is installed stays."
+  fi
+  if [ -s "$skipped" ]; then
+    say ""
+    say "${y}${b}${e_key}Left until you sign in to GitHub${z} (not a failure):"
+    say "  $(paste -sd, "$skipped" | sed 's/,/, /g')"
+    say "Sign in with ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}, or export ${b}GH_TOKEN${z}, then run this again: it installs just these."
   fi
   if [ "$prompt" = pretty ] && kit_on shell && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
     font_where="in the program that shows your terminal window (not inside Debian)"
@@ -1767,8 +1823,11 @@ main() {
   ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}"
   signin_needed=0; cloned=0; archon_ran=0
   # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.
+  # Order matters: packages (apt only; the one in the background installs Debian packages and never touches GitHub), then the sign-in, then github_init, and only
+  # then anything that downloads from GitHub. sign_in_stop exits (5) before setup_runtime, and BOOTSTRAP_NO_AUTH=1 leaves github_init to find a token or none.
   install_packages
   sign_in
+  github_init
   identity
   setup_runtime
   setup_tools
