@@ -217,8 +217,9 @@ store=$data/mise/data/installs
 work=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-archon.XXXXXX")
 problems=$work/problems     # one line for each thing that did not work, shown at the end
 : >"$problems"
-ka_pid=""
+ka_pid=""; rem_pid=""
 cleanup() {
+  [ -n "$rem_pid" ] && kill "$rem_pid" 2>/dev/null
   ec=$?
   if [ "$dry" = 0 ] && command -v ph_event >/dev/null 2>&1; then
     case $ec in 0) oc=finished ;; 4) oc=stopped ;; 5) oc=sign-in-pending ;; 130) oc=interrupted ;; *) oc=failed ;; esac
@@ -1461,15 +1462,23 @@ sign_in() {
     say ""
     say "${c}${e_one}1.${z} GitHub asks ${b}Authenticate Git with your GitHub credentials?${z}"
     say "   Press ${b}Enter${z} (that means yes)."
-    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it${z}, then press ${b}Enter${z} if it says "Press Enter to open" (nothing opens)."
-    say "${c}${e_three}3.${z} In your normal web browser (Chrome, Edge, Safari, on this computer or"
-    say "   your phone), open ${b}https://github.com/login/device${z} ${d}(nothing opens by itself)${z}."
-    say "   Type the code, sign in if asked, click ${g}${b}Authorize${z}."
+    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it.${z}"
+    say "   ${d}GitHub's tool then says \"Press Enter to open github.com in your browser\". Nothing will open,${z}"
+    say "   ${d}and that is expected: it is fine to press Enter, or to ignore the line.${z}"
+    say "${c}${e_three}3.${z} In your normal web browser (Chrome, Edge, Safari, on this computer or your phone),"
+    say "   open ${b}https://github.com/login/device${z}, type the code, sign in if asked, click ${g}${b}Authorize${z}."
     say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
     si0=$(date +%s)
+    # gh goes quiet after it shows the code, so say every so often what it is waiting for (on the terminal itself, until it is done)
+    ( sleep 6; while :; do
+        printf '\n%s%s⏳ Waiting for you:%s open %shttps://github.com/login/device%s in your browser and type the code shown above.\n   %sThis window carries on by itself once you click Authorize. Nothing else to press.%s\n' "$y" "$b" "$z" "$b" "$z" "$d" "$z" >/dev/tty
+        sleep 25
+      done ) &
+    rem_pid=$!
     GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
+    kill "$rem_pid" 2>/dev/null; wait "$rem_pid" 2>/dev/null || true; rem_pid=""
     if signed_in; then si_ok=ok; else si_ok=unfinished; fi
     ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
     [ "$si_ok" = ok ] || sign_in_stop

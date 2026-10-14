@@ -76,6 +76,13 @@ class Shape(unittest.TestCase):
         for t in ("ws-host-pretty", "ws-host-plain"):
             json.loads((THEMES / f"{t}.omp.json").read_text())
 
+    def test_the_sign_in_says_what_it_waits_for_while_gh_is_quiet(self):
+        """gh prints the code and then nothing; the script says on the terminal, every so often, the address to open and that nothing else is to be pressed."""
+        text = SCRIPT.read_text()
+        self.assertIn("Waiting for you:", text)
+        self.assertIn("rem_pid", text)
+        self.assertNotIn("your browser opens", text)
+
     def test_it_parses_in_every_posix_shell_here(self):
         for shell in ("sh", "dash", "bash", "ash"):
             exe = shutil.which(shell)
