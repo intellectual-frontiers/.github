@@ -103,6 +103,13 @@ person in to GitHub before it clones.
 
 ## Documentation
 
+- **FR-023**: The only things the script asks of a person are the Linux password (once, up front, with the reason) and the GitHub sign-in, which comes right after the packages so that everything
+  after it runs by itself. The answer to every other question, among them the login shell and every program `archon` would ask to install with `apt`, is yes without asking: the script sets
+  `ARCHON_ASSUME_YES=1` for the `archon` commands it runs (0003-runtime FR-011), and fish becomes the login shell unless `BOOTSTRAP_CHSH=no`.
+- **FR-024**: The screen MUST stay calm: a group of steps is one line when it is done (a tick, or a warning when something needs attention), a step that worked leaves no line behind
+  (`BOOTSTRAP_VERBOSE=1` shows them), no progress line is wider than the terminal, and the names of packages and versions stay in the log, which is shown only when a step fails.
+- **FR-025**: Every environment variable name in a message (capitals with an underscore, such as `BOOTSTRAP_PROMPT`) MUST be shown in bright yellow where the terminal has colour.
+- **FR-026**: The last instruction MUST be `exec fish -l` when fish was set up, and `exec bash -l` only when it was not.
 - **FR-022**: The `README.md` of this repository MUST carry a section, *Set up a new computer*, with the one-line command, what it does, what it
   needs, and each term of art (WSL, chezmoi, Oh My Posh, Nerd Font, fish, login shell, workspace) defined where it is used.
 

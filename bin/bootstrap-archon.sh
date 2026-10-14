@@ -150,9 +150,9 @@ fi
 # ---- how it looks: colour and emoji only at a terminal (never with NO_COLOR), so a log or a pipe stays plain -------------------------------------
 
 if [ -t 2 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ]; then
-  b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); g=$(printf '\033[32m'); r=$(printf '\033[31m'); y=$(printf '\033[33m'); d=$(printf '\033[2m'); z=$(printf '\033[0m')
+  b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); g=$(printf '\033[32m'); r=$(printf '\033[31m'); y=$(printf '\033[33m'); d=$(printf '\033[2m'); z=$(printf '\033[0m'); yb=$(printf '\033[1;93m')
 else
-  b=""; c=""; g=""; r=""; y=""; d=""; z=""
+  b=""; c=""; g=""; r=""; y=""; d=""; z=""; yb=""
 fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
@@ -162,9 +162,30 @@ case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
      e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
 esac
 
-say() { printf '%s\n' "$*"; }
-warn() { printf '%s%s%s %s\n' "$y" "$warnmark" "$z" "$*" >&2; }
-heading() { printf '\n%s%s%s\n' "$b" "$*" "$z"; }
+# Every environment variable name in a message (capitals with an underscore, like BOOTSTRAP_PROMPT) is shown in bright yellow where there is colour.
+envcolor() {
+  if [ -n "$yb" ]; then
+    printf '%s' "$*" | sed -E "s/(^|[^A-Za-z0-9_-])([A-Z][A-Z0-9]*(_[A-Z0-9]+)+)/\1${yb}\2${z}/g; s/(^|[^A-Za-z0-9_-])([A-Z][A-Z0-9]*(_[A-Z0-9]+)+)/\1${yb}\2${z}/g"
+  else printf '%s' "$*"; fi
+}
+say() { printf '%s\n' "$(envcolor "$*")"; }
+warn() { printf '%s%s%s %s\n' "$y" "$warnmark" "$z" "$(envcolor "$*")" >&2; }
+cur_phase=""; phase_bad=0
+# A phase is a group of steps shown as ONE line when it is done (a tick, or a warning when something needs attention), so the screen stays calm.
+phase_close() {
+  [ -n "$cur_phase" ] || return 0
+  if [ "$dry" = 1 ]; then cur_phase=""; return 0; fi
+  if [ "$phase_bad" = 1 ]; then printf '%s%s%s %s %s(something needs attention, see below)%s\n' "$y" "$warnmark" "$z" "$cur_phase" "$d" "$z"
+  else printf '%s%s%s %s\n' "$g" "$tick" "$z" "$cur_phase"; fi
+  cur_phase=""; phase_bad=0
+}
+phase() {
+  phase_close
+  cur_phase=$1
+  [ "$dry" = 1 ] && printf '\n%s%s%s\n' "$b" "$1" "$z"
+  return 0
+}
+heading() { phase_close; printf '\n%s%s%s\n' "$b" "$*" "$z"; }
 would() { printf '  %swould%s %s\n' "$d" "$z" "$*"; }
 
 need() {
@@ -210,6 +231,15 @@ esac
 if ( : </dev/tty ) 2>/dev/null; then has_tty=1; else has_tty=0; fi
 [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && tty_ui=1 || tty_ui=0
 
+# How wide the terminal is, so a progress line never wraps (a wrapped line cannot be redrawn, and each redraw would leave another copy behind).
+cols=80
+if [ "$tty_ui" = 1 ]; then
+  w=$(stty size 2>/dev/null </dev/tty | awk '{print $2}')
+  case $w in '' | *[!0-9]*) w=$(tput cols 2>/dev/null || true) ;; esac
+  case $w in '' | *[!0-9]*) ;; *) [ "$w" -ge 40 ] && cols=$w ;; esac
+fi
+clip() { awk -v n="$1" -v s="$2" 'BEGIN { if (length(s) > n) s = substr(s, 1, n - 1) "..."; print s }'; }
+
 # ask QUESTION: yes or no, on the terminal; the default is yes. Without a terminal the answer is no.
 ask() {
   [ "$has_tty" = 1 ] || return 1
@@ -242,6 +272,7 @@ step() {
   label=$1; shift
   if [ "$dry" = 1 ]; then printf '  - %s\n' "$label"; return 0; fi
   log=$(mktemp "$work/step.XXXXXX")
+  slabel=$(clip $((cols - 16)) "$label")
   [ "$tty_ui" = 1 ] || printf '%s...\n' "$label" >&2
   "$@" >"$log" 2>&1 </dev/null &
   pid=$!
@@ -256,7 +287,7 @@ step() {
         shown=1
         n=$(( ticks % nframes )); f=""; i=0
         for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
-        printf '\r\033[K%s%s%s %s %s(%ss)%s' "$c" "$f" "$z" "$label" "$d" "$(( $(date +%s) - start ))" "$z" >&2
+        printf '\r\033[K%s%s%s %s %s(%ss)%s' "$c" "$f" "$z" "$slabel" "$d" "$(( $(date +%s) - start ))" "$z" >&2
       fi
       sleep 0.1
     done
@@ -266,6 +297,7 @@ step() {
   trap 'exit 130' INT TERM
   [ "$shown" = 1 ] && printf '\r\033[K' >&2
   if [ "$rc" != 0 ]; then
+    phase_bad=1
     printf '%s%s%s %s\n' "$r" "$cross" "$z" "$label" >&2
     tail -n 8 "$log" >&2
     if [ -z "$logfile" ]; then
@@ -275,8 +307,8 @@ step() {
       { printf '== %s\n' "$label"; cat "$log"; } >>"$logfile" 2>/dev/null && printf '%s   The whole output is in %s%s\n' "$d" "$logfile" "$z" >&2
     fi
     cp "$log" "$work/last.log"
-  elif [ "$shown" = 1 ] && [ $(( $(date +%s) - start )) -ge 2 ]; then
-    printf '%s%s%s %s\n' "$g" "$tick" "$z" "$label" >&2
+  elif [ "${BOOTSTRAP_VERBOSE:-}" = 1 ] && [ "$shown" = 1 ]; then
+    printf '%s%s%s %s\n' "$g" "$tick" "$z" "$label" >&2   # a step that worked leaves no line behind unless asked: the phase it belongs to says it is done
   fi
   rm -f "$log"
   return "$rc"
@@ -412,13 +444,13 @@ apt_update() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get update -qq -
 
 # Whether apt can give fish 4 on this distribution: its candidate says so; with no package lists yet (a fresh image), its release does.
 fish_from_apt() {
-  c=$(pkg_candidate fish)
-  if [ -n "$c" ]; then [ "$(cand_major "$c")" -ge 4 ]; return; fi
+  cand=$(pkg_candidate fish)
+  if [ -n "$cand" ]; then [ "$(cand_major "$cand")" -ge 4 ]; return; fi
   case $d_codename in bookworm | bullseye | buster | focal | jammy | noble) return 1 ;; *) return 0 ;; esac
 }
 
 install_packages() {
-  heading "${e_pkg}Packages"
+  phase "${e_pkg}Setting up Debian's everyday programs"
   if [ "$tested" = 0 ]; then
     warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13; I will go on, and say what does not work."
   fi
@@ -446,7 +478,7 @@ install_packages() {
   fi
   if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
   sudo_for "install:$missing" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to run: apt install$missing"
-  step "${e_list}Refreshing the package list" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
+  step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
   # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
   chosen=""; lacking=""
   for spec in $missing; do
@@ -460,7 +492,7 @@ install_packages() {
   if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
   if [ -n "$chosen" ]; then
     # shellcheck disable=SC2086
-    step "${e_pkg}Installing$chosen" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
+    step "${e_pkg}Installing everyday programs" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
   fi
   return 0
 }
@@ -816,14 +848,13 @@ link_uv() {
 }
 
 setup_runtime() {
-  heading "${e_py}Python and uv"
+  phase "${e_py}Getting Python ready"
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
   if [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_RUNTIME=1)."; return 0; fi
   if ! runtime_ready; then
-    step "${e_py}Installing Python $PYTHON_VERSION and uv $UV_VERSION with mise $MISE_VERSION (once)" install_runtime || { problem "Python and uv could not be installed"; return 0; }
+    step "${e_py}Installing Python and uv" install_runtime || { problem "Python and uv could not be installed"; return 0; }
   fi
   [ "$dry" = 1 ] || link_uv
-  [ "$dry" = 1 ] || say "Python $PYTHON_VERSION and uv $UV_VERSION are in place."
   return 0
 }
 
@@ -840,10 +871,10 @@ data_file() {  # data_file NAME DEST
 # ---- the tools of the kits -----------------------------------------------------------------------------------------------------------------------
 
 setup_tools() {
-  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then heading "${e_dl}Tools"; say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
+  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then phase "${e_dl}Handy tools"; say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
   [ "$dry" = 1 ] || mkdir -p "$bin" "$tools"
   if kit_on base; then
-    heading "${e_dl}Everyday tools (the base kit)"
+    phase "${e_dl}Installing handy command-line tools"
     # glab: Debian 13 and Ubuntu carry it as a package (installed above); where the archive has none, the pinned release
     if ! have_cmd glab && ! tool_present glab glab=bin/glab; then
       step "${e_dl}Installing glab $GLAB_VERSION" install_pinned glab "$GLAB_VERSION" \
@@ -860,7 +891,7 @@ setup_tools() {
     each_tool "$MODERN_TOOLS" release_step
   fi
   if kit_on embedded-sql; then
-    heading "${e_dl}Embedded SQL tools (the embedded-sql kit)"
+    phase "${e_dl}Installing tools for working with data"
     each_tool "$SQL_TOOLS" release_step
     each_tool "$PY_TOOLS" pypi_step
   fi
@@ -886,7 +917,7 @@ install_themes() {
 
 setup_shell_kit() {
   kit_on shell || return 0
-  heading "${e_shell}Shell tools (the shell kit)"
+  phase "${e_shell}Installing a friendlier shell and prompt"
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
   if ! tool_present oh-my-posh oh-my-posh=oh-my-posh; then
     step "${e_dl}Installing Oh My Posh $POSH_VERSION" install_pinned oh-my-posh "$POSH_VERSION" "$(posh_url)" "$(arch_sha POSH)" raw 0 oh-my-posh=oh-my-posh ||
@@ -990,7 +1021,7 @@ plan_file() {
 }
 
 configure_dotfiles() {
-  heading "${e_paint}Your terminal (chezmoi)"
+  phase "${e_paint}Making your terminal look good"
   if [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOTFILES=1)."; return 0; fi
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] && ! chezmoi_bin >/dev/null; then say "Skipped: chezmoi is not here and downloads are off."; return 0; fi
   if [ "$prompt" = no ] && [ "$modern" = 0 ]; then say "Your prompt and commands stay yours (WS_HOST_PROMPT=no, WS_HOST_MODERN=no)."; return 0; fi
@@ -1043,7 +1074,6 @@ configure_dotfiles() {
       step "${e_paint}Setting up $t" apply_managed "$t" || problem "$t could not be set up (a copy of what was there is in $state/backups)"
     fi
   done
-  [ "$changed" = 1 ] || say "Your terminal already has its prompt and commands."
   return 0
 }
 
@@ -1052,7 +1082,7 @@ configure_dotfiles() {
 have_cmd() { command -v "$1" >/dev/null 2>&1 || [ -x "$bin/$1" ]; }
 
 verify_install() {
-  heading "Checking what was installed"
+  phase "${e_ok}Checking that everything works"
   if [ "$dry" = 1 ]; then would "check that each program the kits install is here, that fish is version 4 or later, and that Oh My Posh draws its prompts"; return 0; fi
   absent=""
   if kit_on base; then
@@ -1068,10 +1098,10 @@ verify_install() {
   if kit_on embedded-sql; then
     for p in turso usql litestream sqruff dbmate sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
   fi
-  if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; else say "Every program the kits install is here."; fi
+  if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; fi
   if kit_on shell && have_cmd fish; then
     fp=$(command -v fish 2>/dev/null || printf '%s' "$bin/fish")
-    if [ "$(fish_major "$fp")" -ge 4 ]; then say "fish is $("$fp" --version | awk '{print $NF}')."
+    if [ "$(fish_major "$fp")" -ge 4 ]; then :
     else warn "fish is older than version 4."; problem "fish is older than version 4"; fi
     "$fp" -c 'echo (math 1 + 2)' </dev/null 2>/dev/null | grep -q 3 || { warn "fish did not run a command."; problem "fish did not run a command"; }
   fi
@@ -1087,7 +1117,7 @@ verify_install() {
 signed_in() { command -v gh >/dev/null 2>&1 && gh auth status --hostname github.com >/dev/null 2>&1 </dev/null; }
 
 sign_in() {
-  heading "${e_key}GitHub"
+  heading "${e_key}Signing in to GitHub ${d}(the one thing that needs you)${z}"
   if [ "${BOOTSTRAP_NO_AUTH:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_AUTH=1)."; return 0; fi
   if [ "$dry" = 1 ]; then
     would "check that you are signed in to GitHub; if not, run: gh auth login --hostname github.com --web --git-protocol https (a code and your browser)"
@@ -1099,16 +1129,18 @@ sign_in() {
     say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
     say ""
-    say "${b}${e_key}Let's sign you in to GitHub${z}"
-    say "${d}GitHub is the website where this organization keeps its work. A \"repository\" is one project's folder there, and the one this setup copies"
-    say "to your computer, archon, is private, so GitHub must know who you are. You need a GitHub account that the organization's owner has given"
-    say "access to archon; if you have none yet, stop now (Ctrl+C), ask the owner, and run this setup again.${z}"
+    say "${d}GitHub is the website where this organization keeps its work."
+    say "archon, the project this setup copies, is ${b}private${z}${d}: only people the"
+    say "owner has added can open it. Need access? Press Ctrl+C, ask the"
+    say "owner, then run this setup again.${z}"
     say ""
-    say "${c}${e_one}1.${z} In a moment a ${b}one-time code${z} appears, like ${b}ABCD-1234${z}."
-    say "${c}${e_two}2.${z} Press ${b}Enter${z}. Your web browser opens ${b}github.com/login/device${z}."
-    say "   ${d}No page? Copy that address into any browser, on Windows or on your phone.${z}"
-    say "${c}${e_three}3.${z} Type the code there, sign in if asked, and click ${g}${b}Authorize${z}."
-    say "${c}${e_four}4.${z} Come back here: the setup carries on by itself."
+    say "${c}${e_one}1.${z} GitHub asks ${b}Authenticate Git with your GitHub credentials?${z}"
+    say "   Press ${b}Enter${z} (that means yes)."
+    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears, like ${b}ABCD-1234${z}. Press ${b}Enter${z}"
+    say "   and your browser opens ${b}github.com/login/device${z}."
+    say "   ${d}No page? Copy that address into any browser, even on your phone.${z}"
+    say "${c}${e_three}3.${z} Type the code there, sign in if asked, click ${g}${b}Authorize${z}."
+    say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
     gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
@@ -1219,20 +1251,15 @@ offer_fish() {
   heading "${e_shell}Your login shell"
   fp=$(command -v fish 2>/dev/null || true); [ -n "$fp" ] || fp=$bin/fish
   if [ "$dry" = 1 ]; then
-    would "ask whether to make fish your login shell (the program that starts in each new terminal); if you say yes: chsh -s fish"
+    would "make fish your login shell (the program that starts in each new terminal): chsh -s fish; bash keeps working"
     return 0
   fi
   if [ ! -x "$fp" ] || [ "$(fish_major "$fp")" -lt 4 ]; then say "fish 4 is not installed, so your login shell stays as it is."; return 0; fi
   case $(login_shell) in */fish) say "fish is already your login shell."; return 0 ;; esac
-  case $(cfg BOOTSTRAP_CHSH ask) in
+  case $(cfg BOOTSTRAP_CHSH yes) in
     no | NO | false | 0) say "Your login shell stays as it is. To use fish: chsh -s $fp"; return 0 ;;
-    yes | YES | true | 1) ;;
-    *)
-      if ! ask "Make fish your login shell? bash keeps working (type bash any time)."; then
-        say "Your login shell stays as it is. Try fish by typing fish; to make it your login shell later: chsh -s $fp"
-        return 0
-      fi ;;
   esac
+  say "${e_shell}Making fish your login shell. ${d}bash keeps working: type bash any time.${z}"
   # chsh accepts only a shell listed in /etc/shells
   if ! grep -qx "$fp" /etc/shells 2>/dev/null; then
     if sudo_for "add fish to the list of login shells (/etc/shells)"; then
@@ -1262,6 +1289,10 @@ link_archon() {
   fi
 }
 
+# in_archon_quiet COMMAND...: the same, for a step: every question is answered yes, and the progress lines archon draws for a person are off.
+in_archon_quiet() {
+  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_PROGRESS=never "$@" </dev/null )
+}
 in_archon() {  # in_archon COMMAND...: run in the clone, showing its output; asking nothing of standard input unless there is a terminal
   if [ "$has_tty" = 1 ]; then ( cd "$target" && "$@" </dev/tty ); else ( cd "$target" && "$@" </dev/null ); fi
 }
@@ -1281,11 +1312,8 @@ run_archon() {
   link_archon
   if [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ]; then say "Skipped archon's commands (BOOTSTRAP_NO_ARCHON=1)."; archon_ran=0; return 0; fi
   have_cmd uv || { warn "uv is not here, so archon cannot start (its launcher needs only uv)."; problem "archon was not run: uv is missing"; archon_ran=0; return 0; }
-  say "The first run fetches archon's Python and packages, which takes a few minutes."
   archon_ran=1
   status_doctor=0; status_tool=0; status_check=0
-  say ""; say "${b}./archon doctor${z}"
-  in_archon ./archon doctor || status_doctor=$?
   names=""
   case $(cfg BOOTSTRAP_TOOLCHAIN '') in
     none) ;;
@@ -1295,16 +1323,20 @@ run_archon() {
     *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
-  say ""
+  phase "${e_rocket}Getting archon ready ${d}(the first time takes a few minutes)${z}"
+  # Every question archon could ask (install a program with apt?) is answered yes; sudo's password was asked once, above, and is kept alive.
   if [ -n "$names" ]; then
-    say "${b}./archon toolchain ensure $names${z}"
     # shellcheck disable=SC2086
-    in_archon ./archon toolchain ensure $names || status_tool=$?
-  else
-    say "${b}./archon toolchain ensure${z} has nothing to do: every program archon needs by default is ready."
+    step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
   fi
-  say ""; say "${b}./archon check${z}"
-  in_archon ./archon check || status_check=$?
+  step "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
+  step "${e_ok}Checking that archon is healthy" in_archon_quiet ./archon check || status_check=$?
+  phase_close
+  if [ "$status_check" != 0 ] && [ -f "$work/last.log" ]; then
+    say "${y}${warnmark}archon's own checks found things to look at (setup itself is fine):${z}"
+    grep -E '❎|\[[a-z-]+\]' "$work/last.log" 2>/dev/null | grep -v 'not observable' | head -12 | sed 's/^/   /' || true
+    say "${d}   Run ${b}archon check${z}${d} any time to see them all.${z}"
+  fi
   return 0
 }
 
@@ -1331,20 +1363,25 @@ finish() {
     [ "$wsl" = 1 ] && font_where="in Windows (not in Debian)"
     say ""
     say "${b}${e_font}One thing for the prompt: a Nerd Font${z}"
-    say "Your prompt (the ws-host-pretty theme) and ls draw small icons from a Nerd Font, a font that carries icon characters. Until one is installed and"
-    say "chosen in your terminal you will see boxes in place of the icons. It takes two minutes and you do it once, $font_where:"
-    say "  1. Download CaskaydiaCove Nerd Font (https://www.nerdfonts.com/font-downloads) and unzip it."
-    say "  2. Select the font files, right-click, and choose \"Install for all users\"."
-    say "  3. In Windows Terminal open Settings, Profiles, Debian, Appearance, and set Font face to \"CaskaydiaCove Nerd Font\"."
-    say "If you would rather not install a font, run this again with BOOTSTRAP_PROMPT=plain: the same prompt made of emoji and lines."
+    say "Your prompt draws small icons from a Nerd Font, a font that carries"
+    say "icon characters. Until one is chosen in your terminal you will see"
+    say "boxes instead. It takes two minutes, once, $font_where:"
+    say "  ${c}1.${z} Download CaskaydiaCove Nerd Font and unzip it:"
+    say "     ${b}https://www.nerdfonts.com/font-downloads${z}"
+    say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
+    say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
+    say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
+    say "${d}No font wanted? Run this again with BOOTSTRAP_PROMPT=plain: the same${z}"
+    say "${d}prompt made of emoji and lines.${z}"
   fi
   case ":$orig_path:" in
     *":$bin:"*) ;;
     *)
-      sh_name=${SHELL:-bash}; sh_name=${sh_name##*/}
-      have_cmd fish && case $(login_shell) in */fish) sh_name=fish ;; esac
+      sh_name=bash
+      kit_on shell && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
       say ""
-      say "${b}${e_sync}One last thing:${z} this window does not know your new commands or prompt yet. Type the line below, or close this window and open a new one."
+      say "${b}${e_sync}One last thing:${z} this window does not know your new shell yet."
+      say "Type the line below, or close this window and open a new one."
       say ""
       say "    ${c}exec $sh_name -l${z}"
       ;;
@@ -1377,15 +1414,16 @@ main() {
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
 
   signin_needed=0; cloned=0; archon_ran=0
+  # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.
   install_packages
   [ "$dry" = 1 ] || link_fd
+  sign_in
+  identity
   setup_runtime
   setup_tools
   setup_shell_kit
   configure_dotfiles
   verify_install
-  sign_in
-  identity
   workspace_and_clone
   offer_fish
   run_archon

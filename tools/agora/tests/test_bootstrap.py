@@ -192,7 +192,7 @@ class Clone(Fixture):
     """The clone, its fast-forward-only update and the three archon commands, against a local repository with a stand-in launcher."""
 
     LAUNCHER = """#!/bin/sh
-[ "$1 $2" = "toolchain list" ] || echo "ARCHON $*"
+[ "$1 $2" = "toolchain list" ] || echo "ARCHON $* assume_yes=${ARCHON_ASSUME_YES:-}" >>"${CALLS:?}"
 case "$1 $2" in
   "toolchain list") echo '{"data":{"entries":[{"name":"node","ready":true,"summary":"Node.js"},{"name":"python","ready":false,"summary":"Python"},{"name":"docker","ready":false,"summary":"Docker (optional: only an image needs it)"},{"name":"jre","ready":false,"summary":"A Java runtime"}]}}' ;;
 esac
@@ -214,7 +214,9 @@ exit 0
 
     def go(self, **extra):
         off = {k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON")}
-        return self.run_script(**off, BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
+        self.calls = self.tmp / "archon-calls.txt"
+        self.calls.write_text("")
+        return self.run_script(**off, BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), CALLS=str(self.calls), PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
 
     def push(self, name, text="x\n"):
         (self.upstream / name).write_text(text)
@@ -226,10 +228,11 @@ exit 0
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertTrue((self.clone / "archon").is_file())
         out = p.stdout
-        order = [out.index(s) for s in ("./archon doctor", "./archon toolchain ensure python jre", "./archon check")]
-        self.assertEqual(order, sorted(order), "doctor, then toolchain ensure, then check")
-        self.assertIn("ARCHON toolchain ensure python jre", out, "what is not ready and not optional")
-        self.assertNotIn("ensure python docker", out)
+        calls = self.calls.read_text()
+        order = [calls.index(c) for c in ("toolchain ensure python jre", "doctor", "check")]
+        self.assertEqual(order, sorted(order), "toolchain ensure, then doctor, then check")
+        self.assertNotIn("ensure python docker", calls, "what is not ready and not optional")
+        self.assertEqual(calls.count("assume_yes=1"), 3, "every question archon could ask is answered yes")
         self.assertIn("archon orch status", out)
         self.assertIn("archon orch dev", out)
         wrapper = self.home / ".local" / "bin" / "archon"
@@ -237,16 +240,17 @@ exit 0
         self.assertTrue(os.access(wrapper, os.X_OK))
 
     def test_the_toolchain_can_be_named_or_skipped(self):
-        self.assertIn("ARCHON toolchain ensure node", self.go(BOOTSTRAP_TOOLCHAIN="node").stdout)
-        out = self.go(BOOTSTRAP_TOOLCHAIN="none").stdout
-        self.assertNotIn("ARCHON toolchain ensure", out)
+        self.go(BOOTSTRAP_TOOLCHAIN="node")
+        self.assertIn("ARCHON toolchain ensure node", self.calls.read_text())
+        self.go(BOOTSTRAP_TOOLCHAIN="none")
+        self.assertNotIn("ARCHON toolchain ensure", self.calls.read_text())
 
     def test_all_three_commands_run_when_one_fails_and_the_status_says_so(self):
         p = self.go(FAKE_FAIL="1")
         self.assertEqual(p.returncode, 1)
-        self.assertIn("ARCHON doctor", p.stdout)
-        self.assertIn("ARCHON toolchain ensure", p.stdout)
-        self.assertIn("ARCHON check", p.stdout)
+        calls = self.calls.read_text()
+        for name in ("doctor", "toolchain ensure", "check"):
+            self.assertIn(f"ARCHON {name}", calls)
         self.assertRegex(p.stdout, r"(x|❌).*\./archon check \(exit status 4\)")
 
     def test_an_existing_clone_is_updated_by_fast_forward_alone(self):
