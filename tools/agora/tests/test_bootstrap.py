@@ -142,6 +142,19 @@ class Entry(Fixture):
             self.assertIn(step, p.stdout)
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
+    def test_dry_run_lists_the_ai_assistants_and_a_switch_leaves_them_out(self):
+        """0053-machine-bootstrap FR-042: Claude Code, Codex, OpenCode and Aider are in the default kits."""
+        p = self.run_script("--dry-run")
+        for tool in ("claude", "codex", "opencode", "aider"):
+            self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
+        self.assertIn("Installing the AI assistants", p.stdout)
+        off = self.run_script("--dry-run", BOOTSTRAP_NO_AGENTS="1")
+        self.assertNotIn("AI assistants", off.stdout)
+        self.assertIn("Installing glab", off.stdout, "the other kits stay")
+        only = self.run_script("--dry-run", BOOTSTRAP_KIT="agents")
+        self.assertIn("Installing claude", only.stdout)
+        self.assertNotIn("Installing eza", only.stdout)
+
     def test_dry_run_follows_the_switches(self):
         p = self.run_script("--dry-run", **OFF)
         self.assertEqual(p.returncode, 0, p.stderr)
@@ -416,6 +429,47 @@ class Rules(Fixture):
         self.assertNotEqual(bad.returncode, 0)
         self.assertIn("nothing was installed", bad.stderr)
         self.assertFalse((self.home / ".cache" / "workspaces-host" / "downloads" / ("0" * 64)).exists())
+
+    def registry(self, package_ok=True):
+        """A registry on disk with one tool, `demo`, whose per-platform package holds a program that answers --version."""
+        import base64
+        import io
+        import tarfile
+
+        reg = self.tmp / "registry"
+        (reg / "demo-linux-x64").mkdir(parents=True)
+        (reg / "demo-meta").mkdir()
+        buf = io.BytesIO()
+        with tarfile.open(fileobj=buf, mode="w:gz") as t:
+            body = b"#!/bin/sh\necho demo 1.0.0\n"
+            info = tarfile.TarInfo("package/bin/demo")
+            info.size, info.mode = len(body), 0o755
+            t.addfile(info, io.BytesIO(body))
+        data = buf.getvalue()
+        (reg / "demo.tgz").write_bytes(data)
+        digest = hashlib.sha512(data if package_ok else b"something else").digest()
+        (reg / "demo-meta" / "latest").write_text(json.dumps({"version": "1.0.0"}))
+        (reg / "demo-linux-x64" / "1.0.0").write_text(json.dumps({"dist": {"tarball": f"file://{reg / 'demo.tgz'}", "integrity": "sha512-" + base64.b64encode(digest).decode()}}))
+        return f"file://{reg}"
+
+    def test_an_ai_assistant_is_installed_only_with_the_checksum_npm_lists_for_it(self):
+        """0053-machine-bootstrap FR-043: the program is verified, run once, linked, and a second run changes nothing."""
+        setup = 'mkdir -p "$work" "$tools" "$bin"; '
+        call = "install_npm_native demo demo-meta demo-linux-{arch}@{ver} demo"
+        reg = self.registry()
+        ok = self.call(setup + call + '; echo "rc=$?"; "$bin/demo" --version', BOOTSTRAP_NPM=reg)
+        self.assertIn("rc=0", ok.stdout, ok.stderr)
+        self.assertIn("demo 1.0.0", ok.stdout)
+        self.assertTrue((self.home / ".local" / "bin" / "demo").is_symlink())
+        again = self.call(setup + call + '; echo "rc=$?"', BOOTSTRAP_NPM=reg)
+        self.assertIn("rc=0", again.stdout, again.stderr)
+
+    def test_an_ai_assistant_whose_checksum_differs_is_refused_and_nothing_is_installed(self):
+        setup = 'mkdir -p "$work" "$tools" "$bin"; '
+        bad = self.call(setup + 'install_npm_native demo demo-meta demo-linux-{arch}@{ver} demo; echo "rc=$?"', BOOTSTRAP_NPM=self.registry(package_ok=False))
+        self.assertNotIn("rc=0", bad.stdout)
+        self.assertIn("nothing was installed", bad.stderr)
+        self.assertFalse((self.home / ".local" / "bin" / "demo").exists())
 
     def release(self, tag, assets, name="rel.json"):
         f = self.tmp / name

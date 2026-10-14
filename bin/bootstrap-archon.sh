@@ -13,7 +13,8 @@
 #   2. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
 #      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so mise and archon use it and are not held to GitHub's hourly limit for no sign-in;
 #      with no token at all, everything that comes from GitHub is skipped and listed in the summary, to be done by running this again after sign-in,
-#   3. Python and tools: gets the pinned mise, and through it Python and uv, then the modern command line tools, each checked against a checksum,
+#   3. Python and tools: gets the pinned mise, and through it Python and uv, then the modern command line tools, each checked against a checksum, and
+#      the AI assistants for the terminal (Claude Code, Codex, OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists,
 #   4. Shell and prompt: installs fish 4, Oh My Posh with ws-host's themes and chezmoi, and has chezmoi give bash and fish the prompt,
 #   5. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
 #      fast-forward only),
@@ -42,7 +43,8 @@
 #   BOOTSTRAP_NO_CHSH=1    never offer to change the login shell (BOOTSTRAP_CHSH=yes changes it without asking, no never does)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update archon (and so run nothing in it)
 #   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
-#   BOOTSTRAP_KIT          the kits to install, space-separated (default: base shell embedded-sql; WS_HOST_KIT is read too)
+#   BOOTSTRAP_KIT          the kits to install, space-separated (default: base shell embedded-sql agents; WS_HOST_KIT is read too)
+#   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the default kits
 #   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no; naming one here also replaces a prompt block already in ~/.bashrc
 #   BOOTSTRAP_TOOLCHAIN    the names for `archon toolchain ensure` (default: every entry not ready and not marked optional; none; all)
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
@@ -126,12 +128,27 @@ harlequin harlequin harlequin=bin/harlequin
 visidata visidata vd=bin/vd visidata=bin/visidata
 '
 
+# The AI assistants for the terminal, so that a person who has never installed one can type `claude`, `codex`, `opencode` or `aider` the day the computer is set up.
+# Each of the first three is one program that its publisher ships inside a per-platform npm package, so no Node.js is needed to run it; the newest version is
+# taken, and only with the SHA-512 that npm's registry lists for the file. Fields: name, the npm package that names the newest version, the per-platform package
+# ({arch} is x64 or arm64, {ver} the newest version), then the file to link.
+AGENT_TOOLS='
+claude @anthropic-ai/claude-code @anthropic-ai/claude-code-linux-{arch}@{ver} claude
+codex @openai/codex @openai/codex@{ver}-linux-{arch} codex
+opencode opencode-ai opencode-linux-{arch}@{ver} opencode
+'
+# Aider is a Python program: name, PyPI package, then link=path inside its virtual environment
+AGENT_PY_TOOLS='
+aider aider-chat aider=bin/aider
+'
+
 # ---- settings ----------------------------------------------------------------------------------------------------------------------------------
 
 raw_url=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
 archon_url=${ARCHON_URL:-https://github.com/intellectual-frontiers/archon}
 github_api=${BOOTSTRAP_GITHUB_API:-${WS_HOST_GITHUB_API:-https://api.github.com}}
 pypi_url=${BOOTSTRAP_PYPI:-${WS_HOST_PYPI:-https://pypi.org}}
+npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 
 dry=0
 orig_path=$PATH
@@ -610,8 +627,9 @@ detect_platform() {
 # ---- configuration of this run -----------------------------------------------------------------------------------------------------------------
 
 load_config() {
-  kits=$(cfg BOOTSTRAP_KIT "$(cfg WS_HOST_KIT 'base shell embedded-sql')")
+  kits=$(cfg BOOTSTRAP_KIT "$(cfg WS_HOST_KIT 'base shell embedded-sql agents')")
   kits=$(printf '%s' "$kits" | tr ',' ' ')
+  if [ "${BOOTSTRAP_NO_AGENTS:-}" = 1 ]; then kits=$(printf ' %s ' "$kits" | sed 's/ agents / /g'); fi
   p=$(cfg WS_HOST_PROMPT pretty)
   reset_prompt=0
   if [ -n "${BOOTSTRAP_PROMPT:-}" ]; then p=$BOOTSTRAP_PROMPT; reset_prompt=1; fi
@@ -1121,6 +1139,45 @@ install_pypi() {
   link_into "$troot" $linked
 }
 
+# install_npm_native NAME PACKAGE TEMPLATE FILE: a program that its publisher ships as one file inside a per-platform npm package (Claude Code, Codex, OpenCode).
+# The newest version of PACKAGE is asked of the npm registry, the platform package TEMPLATE names is fetched, and it is kept only if its SHA-512 is the one the
+# registry lists for it; the file is unpacked into tools/NAME/VERSION, run once with --version, and linked into ~/.local/bin as NAME.
+install_npm_native() {
+  name=$1; pkg=$2; tmpl=$3; file=$4
+  if tool_present "$name" "$name=$file" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
+  command -v jq >/dev/null 2>&1 || { echo "jq is not here, so $name cannot be installed" >&2; return 1; }
+  fetch_to "$npm_url/$pkg/latest" "$work/npm-latest.json" || { echo "could not ask npm about $pkg" >&2; return 1; }
+  ver=$(jq -r '.version // ""' "$work/npm-latest.json")
+  [ -n "$ver" ] || { echo "npm named no version of $pkg" >&2; return 1; }
+  troot=$tools/$name
+  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$name=$file"; then return 0; fi
+  case $arch in x86_64) npm_arch=x64 ;; *) npm_arch=arm64 ;; esac
+  spec=$(printf '%s' "$tmpl" | sed "s/{arch}/$npm_arch/; s/{ver}/$ver/")
+  fetch_to "$npm_url/${spec%@*}/${spec##*@}" "$work/npm-platform.json" || { echo "npm has no $spec for this computer" >&2; return 1; }
+  tarball=$(jq -r '.dist.tarball // ""' "$work/npm-platform.json"); integrity=$(jq -r '.dist.integrity // ""' "$work/npm-platform.json")
+  case $integrity in sha512-*) ;; *) echo "npm lists no SHA-512 for $spec, so I will not install it" >&2; return 1 ;; esac
+  want=$(printf '%s' "${integrity#sha512-}" | base64 -d 2>/dev/null | od -An -vtx1 | tr -d ' \n')
+  [ "${#want}" = 128 ] || { echo "the checksum npm lists for $spec cannot be read, so I will not install it" >&2; return 1; }
+  [ -n "$tarball" ] || { echo "npm lists no file for $spec" >&2; return 1; }
+  fetch_to "$tarball" "$work/$name.tgz" || { echo "could not fetch $tarball" >&2; return 1; }
+  got=$(sha512sum "$work/$name.tgz" | cut -d' ' -f1)
+  [ "$got" = "$want" ] || { rm -f "$work/$name.tgz"; echo "the file at $tarball is not the one npm lists (its SHA-512 differs); nothing was installed" >&2; return 1; }
+  mkdir -p "$troot"
+  rm -rf "$troot/$ver.partial"; mkdir -p "$troot/$ver.partial"
+  tar -xzf "$work/$name.tgz" -C "$troot/$ver.partial" --strip-components=1 || { rm -rf "$troot/$ver.partial"; return 1; }
+  rm -f "$work/$name.tgz"
+  rel=$(locate "$troot/$ver.partial" "$file")
+  if [ -z "$rel" ]; then echo "$file is not in what $spec holds, so I installed nothing" >&2; rm -rf "$troot/$ver.partial"; return 1; fi
+  chmod 755 "$troot/$ver.partial/$rel"
+  if ! "$troot/$ver.partial/$rel" --version </dev/null >/dev/null 2>&1; then echo "$name $ver did not run on this computer, so I installed nothing" >&2; rm -rf "$troot/$ver.partial"; return 1; fi
+  rm -rf "${troot:?}/$ver"; mv "$troot/$ver.partial" "$troot/$ver"
+  set_current "$troot" "$ver"
+  link_into "$troot" "$name=$ver/$rel"
+  find "$troot" -mindepth 1 -maxdepth 1 -type d ! -name '*.partial' -printf '%T@ %f\n' | sort -rn | tail -n +3 | cut -d' ' -f2- |
+    while read -r old; do [ "$old" = "$ver" ] || rm -rf "${troot:?}/$old"; done
+  return 0
+}
+
 # each_tool LIST FUNCTION: calls FUNCTION name repo links... for each line of LIST
 each_tool() {
   list=$1; fn=$2
@@ -1145,6 +1202,14 @@ release_step() {
   if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
   if ! github_ready; then skip_github "$n"; return 0; fi
   pstep "${e_dl}Installing $n (the newest release)" install_release "$n" "$repo" "" "$@"
+  return 0
+}
+
+# npm_step NAME PACKAGE TEMPLATE FILE: one AI assistant, one step; one that cannot be installed is listed at the end and does not stop the run
+npm_step() {
+  n=$1
+  if tool_present "$n" "$n=$4" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
+  pstep "${e_dl}Installing $n (the newest version)" install_npm_native "$@"
   return 0
 }
 
@@ -1250,6 +1315,13 @@ setup_tools() {
     github_ready || say "Left until you sign in to GitHub: the data tools that come from GitHub releases."
     each_tool "$SQL_TOOLS" release_step
     each_tool "$PY_TOOLS" pypi_step
+    pool_end
+  fi
+  if kit_on agents; then
+    phase "${e_dl}Installing the AI assistants (Claude Code, Codex, OpenCode, Aider)"
+    pool_begin "Installing AI assistants"
+    each_tool "$AGENT_TOOLS" npm_step
+    each_tool "$AGENT_PY_TOOLS" pypi_step
     pool_end
   fi
   return 0
@@ -1452,6 +1524,9 @@ verify_install() {
     for p in git gh jq rg fd curl wget python3 uv sqlite3 shellcheck eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
     have_cmd magick || have_cmd convert || absent="$absent ImageMagick"
     have_cmd duckdb || absent="$absent duckdb"
+  fi
+  if kit_on agents; then
+    for p in claude codex opencode aider; do have_cmd "$p" || absent="$absent $p"; done
   fi
   if kit_on shell; then
     have_cmd fish || absent="$absent fish"
@@ -1800,6 +1875,15 @@ finish() {
       say "    ${c}exec $sh_name -l${z}"
       ;;
   esac
+  if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
+    say ""
+    say "${b}${e_what}AI assistants are installed${z} (they work in the folder you start them in, and ask before they change anything):"
+    have_cmd claude && say "  ${c}claude${z}     Claude Code, from Anthropic. The first time it opens a browser page to sign in with your Claude account."
+    have_cmd codex && say "  ${c}codex${z}      Codex, from OpenAI. The first time, choose \"Sign in with ChatGPT\"."
+    have_cmd opencode && say "  ${c}opencode${z}   OpenCode, which works with many providers (${c}opencode auth login${z} adds one)."
+    have_cmd aider && say "  ${c}aider${z}      Aider, which needs a key from the provider you choose (${c}aider --help${z} says how)."
+    say "${d}Start one in a project folder, for example: cd ${target} && claude${z}"
+  fi
   say ""
   if [ "${cloned:-0}" = 1 ]; then
     say "${b}${e_next}Next${z}"
