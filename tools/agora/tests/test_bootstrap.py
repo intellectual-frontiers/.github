@@ -560,7 +560,7 @@ class Telemetry(Fixture):
             self.assertEqual(e["properties"]["environment"], "bootstrap")
             self.assertTrue(e["distinct_id"].startswith("dev-"))
             self.assertEqual(e["distinct_id"], e["properties"]["device_id"])
-            for k in ("host_kind", "os_id", "arch", "cpus", "bootstrap_run"):
+            for k in ("host_kind", "os_id", "arch", "cpus", "bootstrap_run", "hostname", "os_user"):
                 self.assertIn(k, e["properties"])
         failed = next(e for e in ev if e["event"] == "bootstrap_failed")["properties"]
         self.assertIn("~/.archon-bootstrap/log/bootstrap-", failed["log_file"])
