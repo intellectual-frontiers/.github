@@ -110,6 +110,13 @@ person in to GitHub before it clones.
   (`BOOTSTRAP_VERBOSE=1` shows them), no progress line is wider than the terminal, and the names of packages and versions stay in the log, which is shown only when a step fails.
 - **FR-026**: Every environment variable name in a message (capitals with an underscore, such as `BOOTSTRAP_PROMPT`) MUST be shown in bright yellow where the terminal has colour.
 - **FR-027**: The last instruction MUST be `exec fish -l` when fish was set up, and `exec bash -l` only when it was not.
+- **FR-028**: The script MUST write everything it does to a log, `~/.archon-bootstrap/log/bootstrap-<date>-<time>.log` (`BOOTSTRAP_LOG_DIR` changes the folder): every message, and the whole output of every
+  step, whether it worked or not, under a header naming the step and its exit status.
+- **FR-029**: A step that fails MUST stop the setup (exit status 4), never leaving the person at a prompt in the middle of a wall of text: it MUST say in colour and emoji what failed and what it said,
+  name the log and the line where the problem starts, as a path relative to the home folder, and write `support-<date>-<time>.txt` beside the log, with the computer, the failed step and the end of the log
+  and no password, token or key. It MUST tell a person who does not know what to do how to ask for help: copy the support file's path, send that one file to the support team (`BOOTSTRAP_SUPPORT`
+  names who) and say what they were doing. A sign-in that did not finish is the one stop that is not an error (exit status 5) and says how to sign in and run the setup again.
+- **FR-030**: `archon doctor` MUST NOT run before every installation is complete, since a program that is not installed yet would show as missing.
 - **FR-022**: The `README.md` of this repository MUST carry a section, *Set up a new computer*, with the one-line command, what it does, what it
   needs, and each term of art (WSL, chezmoi, Oh My Posh, Nerd Font, fish, login shell, workspace) defined where it is used.
 

@@ -179,10 +179,12 @@ class Switches(Fixture):
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         made = tree(self.home)
         self.assertIn("workspaces/github.com/intellectual-frontiers", made)
-        self.assertEqual([m for m in made if (self.home / m).is_file()], [], "folders only: no file of the person's changes")
+        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith(".archon-bootstrap/log/")], [], "folders only: no file of the person's changes, but the log")
+        self.assertTrue(any(m.startswith(".archon-bootstrap/log/bootstrap-") for m in made), "everything is logged to ~/.archon-bootstrap/log/")
         again = self.run_script(**OFF, BOOTSTRAP_KIT="")
         self.assertEqual(again.returncode, 0)
-        self.assertEqual(tree(self.home), made, "a second run changes nothing")
+        without_logs = lambda names: [m for m in names if not m.startswith(".archon-bootstrap/log/")]
+        self.assertEqual(without_logs(tree(self.home)), without_logs(made), "a second run changes nothing (but writes its own log)")
 
     def test_the_workspaces_folder_can_be_named(self):
         p = self.run_script(**OFF, BOOTSTRAP_KIT="", WS_HOST_HOME=str(self.tmp / "elsewhere"))
@@ -297,8 +299,9 @@ exit 0
         self.stub("gh", 'case "$1 $2" in "auth status") exit 1 ;; esac\nexit 0')
         p = self.run_script(**{k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_AUTH")},
                             BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), PATH=f"{self.bin}:{os.environ['PATH']}")
-        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(p.returncode, 5, p.stderr)
         self.assertIn("gh auth login --hostname github.com --web --git-protocol https", p.stdout)
+        self.assertIn(".archon-bootstrap/log/", p.stdout)
         self.assertFalse(self.clone.exists())
 
     def test_git_identity_comes_from_the_account_only_where_git_has_none(self):
@@ -488,3 +491,28 @@ class Optional(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Stops(Fixture):
+    """0053-machine-bootstrap FR-028 to FR-030: a failed step stops the setup, is logged, and says where to look and how to ask for help."""
+
+    def test_a_failed_step_stops_with_the_log_the_support_file_and_how_to_ask_for_help(self):
+        script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; step 'Installing everything' sh -c 'echo broke the thing; exit 7'; echo SHOULD_NOT_GET_HERE"
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SUPPORT="the help desk"))
+        self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
+        self.assertNotIn("SHOULD_NOT_GET_HERE", p.stdout)
+        out = p.stdout
+        for need in ("Setup stopped", "Installing everything", "broke the thing", "~/.archon-bootstrap/log/bootstrap-", "support-", "the help desk"):
+            self.assertIn(need, out, need)
+        logs = sorted((self.home / ".archon-bootstrap" / "log").glob("*"))
+        self.assertEqual([f.name.split("-")[0] for f in logs], ["bootstrap", "support"])
+        self.assertIn("==== STEP 1: Installing everything (exit 7)", logs[0].read_text())
+        self.assertIn("broke the thing", logs[1].read_text())
+
+    def test_a_secret_in_the_output_is_removed_from_the_support_file(self):
+        script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; step 'x' sh -c 'echo token=abc123 ghp_ABCDEFGHIJKLMNOP1234; exit 1'"
+        subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        support = next((self.home / ".archon-bootstrap" / "log").glob("support-*")).read_text()
+        self.assertNotIn("abc123", support)
+        self.assertNotIn("ghp_ABCDEFGHIJKLMNOP1234", support)

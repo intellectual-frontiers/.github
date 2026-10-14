@@ -44,7 +44,9 @@
 # ws-host's own names are honoured where it has them: WS_HOST_HOME (the workspaces folder, default ~/workspaces), WS_HOST_WORKSPACES, WS_HOST_KIT,
 # WS_HOST_PROMPT, WS_HOST_MODERN, WS_HOST_GIT_NAME, WS_HOST_GIT_EMAIL, WS_HOST_NO_APT, in the environment or in ~/.config/workspaces-host/ws-host.env.
 #
-# Exit status: 0 done (a tool that could not be installed is listed, not fatal), 1 an archon command failed, 2 usage, 3 the machine cannot be set up yet.
+# Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the machine cannot be set up yet, 4 a step failed (setup stops, and
+# says where the log and the support file are), 5 the GitHub sign-in did not finish.
+# Everything is logged to ~/.archon-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
 # shellcheck disable=SC2034  # the pinned checksums are read by arch_sha, through eval
 set -eu
 
@@ -157,9 +159,9 @@ fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
   *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_font='🔤 '
-     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 ' ;;
+     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 ' ;;
   *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_font=''
-     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
+     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
 esac
 
 # Every environment variable name in a message (capitals with an underscore, like BOOTSTRAP_PROMPT) is shown in bright yellow where there is colour.
@@ -168,8 +170,8 @@ envcolor() {
     printf '%s' "$*" | sed -E "s/(^|[^A-Za-z0-9_-])([A-Z][A-Z0-9]*(_[A-Z0-9]+)+)/\1${yb}\2${z}/g; s/(^|[^A-Za-z0-9_-])([A-Z][A-Z0-9]*(_[A-Z0-9]+)+)/\1${yb}\2${z}/g"
   else printf '%s' "$*"; fi
 }
-say() { printf '%s\n' "$(envcolor "$*")"; }
-warn() { printf '%s%s%s %s\n' "$y" "$warnmark" "$z" "$(envcolor "$*")" >&2; }
+say() { printf '%s\n' "$(envcolor "$*")"; command -v logf >/dev/null 2>&1 && logf "$*"; return 0; }
+warn() { printf '%s%s%s %s\n' "$y" "$warnmark" "$z" "$(envcolor "$*")" >&2; command -v logf >/dev/null 2>&1 && logf "WARNING: $*"; return 0; }
 cur_phase=""; phase_bad=0
 # A phase is a group of steps shown as ONE line when it is done (a tick, or a warning when something needs attention), so the screen stays calm.
 phase_close() {
@@ -189,7 +191,8 @@ heading() { phase_close; printf '\n%s%s%s\n' "$b" "$*" "$z"; }
 would() { printf '  %swould%s %s\n' "$d" "$z" "$*"; }
 
 need() {
-  say "The computer cannot be set up yet: $1" >&2
+  logf "cannot continue: $1 (fix: $2)"
+  say "${r}${b}${e_stop}The computer cannot be set up yet:${z} $1" >&2
   say "Fix: $2" >&2
   exit 3
 }
@@ -219,7 +222,20 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT TERM
 
-problem() { printf '%s\n' "$*" >>"$problems"; }
+problem() { printf '%s\n' "$*" >>"$problems"; logf "problem: $*"; }
+
+# ---- the log: everything this does is written to ~/.archon-bootstrap/log/, so a problem can be looked into (and shown to the support team) later ----
+log_dir=${BOOTSTRAP_LOG_DIR:-$HOME/.archon-bootstrap/log}
+stamp=$(date +%Y%m%d-%H%M%S)
+logfile=$log_dir/bootstrap-$stamp.log
+support_file=$log_dir/support-$stamp.txt
+log_ok=0
+if [ "$dry" = 0 ] && mkdir -p "$log_dir" 2>/dev/null && : >"$logfile" 2>/dev/null; then log_ok=1; fi
+logf() {  # logf TEXT: one timestamped line in the log, without colour codes
+  [ "$log_ok" = 1 ] || return 0
+  printf '%s %s\n' "$(date +%H:%M:%S)" "$(printf '%s' "$*" | sed 's/\x1b\[[0-9;]*m//g')" >>"$logfile" 2>/dev/null || true
+}
+short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
 
 # Where this script is, when it is a file; the data files beside it are used then, else they are fetched from raw_url.
 script_dir=""
@@ -265,13 +281,15 @@ cfg() {  # cfg NAME DEFAULT
 
 # ---- steps: one line with a spinner, the output kept for when it fails ------------------------------------------------------------------------------
 
-logfile=""
+step_no=0
+keep_going=${BOOTSTRAP_KEEP_GOING:-0}
 # step LABEL COMMAND...: run COMMAND quietly with a one-line spinner (a terminal, after half a second). Shows its output only if it fails; returns its
 # status. With --dry-run it only says what it would do. COMMAND runs in a subshell, so what it sets is not seen afterwards: it writes files instead.
 step() {
   label=$1; shift
   if [ "$dry" = 1 ]; then printf '  - %s\n' "$label"; return 0; fi
   log=$(mktemp "$work/step.XXXXXX")
+  step_no=$((step_no + 1))
   slabel=$(clip $((cols - 16)) "$label")
   [ "$tty_ui" = 1 ] || printf '%s...\n' "$label" >&2
   "$@" >"$log" 2>&1 </dev/null &
@@ -296,22 +314,77 @@ step() {
   wait "$pid" || rc=$?
   trap 'exit 130' INT TERM
   [ "$shown" = 1 ] && printf '\r\033[K' >&2
+  # Everything a step printed goes into the log, whether it worked or not.
+  if [ "$log_ok" = 1 ]; then
+    log_from=$(( $(wc -l <"$logfile") + 1 ))
+    { printf '\n==== STEP %s: %s (exit %s)\n' "$step_no" "$label" "$rc"; cat "$log"; } >>"$logfile" 2>/dev/null || true
+  fi
   if [ "$rc" != 0 ]; then
     phase_bad=1
-    printf '%s%s%s %s\n' "$r" "$cross" "$z" "$label" >&2
-    tail -n 8 "$log" >&2
-    if [ -z "$logfile" ]; then
-      mkdir -p "$state/logs" 2>/dev/null && logfile=$state/logs/bootstrap-$(date +%Y%m%d-%H%M%S).log
-    fi
-    if [ -n "$logfile" ]; then
-      { printf '== %s\n' "$label"; cat "$log"; } >>"$logfile" 2>/dev/null && printf '%s   The whole output is in %s%s\n' "$d" "$logfile" "$z" >&2
-    fi
     cp "$log" "$work/last.log"
+    if [ "$soft_ok" = 1 ] || [ "$keep_going" = 1 ]; then
+      printf '%s%s%s %s\n' "$r" "$cross" "$z" "$label" >&2
+      tail -n 8 "$log" >&2
+    else
+      stop_here "$label" "$log" "${log_from:-0}"
+    fi
   elif [ "${BOOTSTRAP_VERBOSE:-}" = 1 ] && [ "$shown" = 1 ]; then
     printf '%s%s%s %s\n' "$g" "$tick" "$z" "$label" >&2   # a step that worked leaves no line behind unless asked: the phase it belongs to says it is done
   fi
   rm -f "$log"
   return "$rc"
+}
+
+soft_ok=0
+step_soft() { soft_ok=1; step "$@"; rc_soft=$?; soft_ok=0; return "$rc_soft"; }   # a step whose failure the caller explains and handles itself
+
+# The one way setup ends when something went wrong: stop, say what failed in plain words with colour and emoji, say where to look (a path
+# relative to your home folder), and say how to ask for help. A support file with what the team needs (and no secrets) is written beside the log.
+support_who=${BOOTSTRAP_SUPPORT:-the Intellectual Frontiers support team}
+stop_here() {  # stop_here LABEL STEPLOG LOGLINE
+  trap - INT TERM
+  [ -n "$ka_pid" ] && kill "$ka_pid" 2>/dev/null
+  phase_close_quiet
+  say ""
+  say "${r}${b}${e_stop}Setup stopped: something went wrong${z}"
+  say "${d}Nothing is half-installed in a way that matters; it is safe to run the setup again once this is fixed.${z}"
+  say ""
+  say "${y}${e_what}What failed:${z}  ${b}$1${z}"
+  say "${y}${e_why}What it said:${z}"
+  tail -n 6 "$2" 2>/dev/null | cut -c1-$((cols - 6)) | sed 's/^/     /'
+  say ""
+  if [ "$log_ok" = 1 ]; then
+    write_support_file "$1" "$2" "$3"
+    say "${c}${e_log}Where to look:${z}   ${b}$(short_path "$logfile")${z}  ${d}(the problem starts at line $3)${z}"
+    say "${c}${e_pack}Support file:${z}    ${b}$(short_path "$support_file")${z}  ${d}(everything the team needs, with no passwords)${z}"
+  else
+    say "${d}The log could not be written (is your disk full?). Free some space and run the setup again.${z}"
+  fi
+  say ""
+  say "${g}${b}${e_help}Not sure what to do? That is fine. Here is how to get help:${z}"
+  say "   ${c}1.${z} Copy the support file path above."
+  say "   ${c}2.${z} Send that one file to ${b}${support_who}${z}, and say what you were doing"
+  say "      ${d}(for example: \"I ran the Debian setup on Windows and it stopped at ${1}\").${z}"
+  say "   ${c}3.${z} You can see the file any time with:  ${b}cat $(short_path "$support_file")${z}"
+  say ""
+  exit 4
+}
+phase_close_quiet() { cur_phase=""; phase_bad=0; }
+write_support_file() {  # write_support_file LABEL STEPLOG LOGLINE
+  {
+    printf 'Intellectual Frontiers bootstrap: support file\n'
+    printf 'When:        %s\n' "$(date '+%Y-%m-%d %H:%M:%S %z')"
+    printf 'Failed step: %s (step %s, log line %s)\n' "$1" "$step_no" "$3"
+    printf 'Computer:    %s, %s%s\n' "${d_pretty:-unknown}" "${arch:-unknown}" "${wsl_txt:-}"
+    printf 'User:        %s (id %s)   Shell: %s\n' "$(id -un)" "$(id -u)" "${SHELL:-unknown}"
+    printf 'Disk free:   %s\n' "$(df -h "$HOME" 2>/dev/null | awk 'NR==2 {print $4" of "$2}')"
+    printf 'Network:     %s\n' "$(curl -fsS -o /dev/null -m 6 -w 'github.com answers (%{http_code})' https://github.com 2>&1 | tail -n 1)"
+    printf 'Log file:    %s\n\n' "$(short_path "$logfile")"
+    printf -- '--- what the failed step printed (last 60 lines) ---\n'
+    tail -n 60 "$2" 2>/dev/null
+    printf '\n--- the setup log, last 120 lines ---\n'
+    tail -n 120 "$logfile" 2>/dev/null
+  } 2>/dev/null | sed -E 's/(gh[pousr]_|github_pat_)[A-Za-z0-9_]+/\1[removed]/g; s/(token|password|secret|key)=[^ ]+/\1=[removed]/Ig' >"$support_file" 2>/dev/null || true
 }
 
 # ---- the machine ---------------------------------------------------------------------------------------------------------------------------------
@@ -1114,6 +1187,18 @@ verify_install() {
 
 # ---- GitHub, git and the clone -------------------------------------------------------------------------------------------------------------
 
+sign_in_stop() {  # not signed in: the one stop that is not an error, so it asks for nothing but a second try
+  say ""
+  say "${y}${b}${e_key}The GitHub sign-in did not finish, so setup paused here.${z}"
+  say "${d}Nothing is wrong with your computer. The sign-in is needed because archon is private.${z}"
+  say ""
+  say "${c}${e_one}1.${z} Type:  ${b}gh auth login --hostname github.com --web --git-protocol https${z}"
+  say "${c}${e_two}2.${z} Follow the code and the web page, click ${g}${b}Authorize${z}."
+  say "${c}${e_three}3.${z} Run this setup again: it picks up where it left off."
+  say "${d}Still stuck? The log is $(short_path "$logfile") ; send it to ${support_who:-the support team}.${z}"
+  say ""
+  exit 5
+}
 signed_in() { command -v gh >/dev/null 2>&1 && gh auth status --hostname github.com >/dev/null 2>&1 </dev/null; }
 
 sign_in() {
@@ -1144,11 +1229,9 @@ sign_in() {
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
     gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
-    signed_in || { signin_needed=1; return 0; }
+    signed_in || sign_in_stop
   else
-    say "${y}${e_key}You are not signed in to GitHub${z}, and nobody can answer here (there is no terminal), so I stop before copying archon."
-    signin_needed=1
-    return 0
+    sign_in_stop
   fi
   gh auth setup-git --hostname github.com </dev/null >/dev/null 2>&1 || warn "gh could not be made git's credential helper; run: gh auth setup-git"
   return 0
@@ -1214,7 +1297,7 @@ workspace_and_clone() {
     return 0
   fi
   if [ -d "$target/.git" ]; then
-    if step "${e_sync}Checking archon for news" fetch_step; then
+    if step_soft "${e_sync}Checking archon for news" fetch_step; then
       git -C "$target" merge --ff-only --quiet '@{upstream}' >/dev/null 2>&1 </dev/null ||
         say "Your copy of archon was left exactly as it was; your work is safe."
       cloned=1
@@ -1225,7 +1308,7 @@ workspace_and_clone() {
     return 0
   fi
   mkdir -p "$(dirname "$target")"
-  if step "${e_dir}Copying archon" clone_step; then
+  if step_soft "${e_dir}Copying archon" clone_step; then
     cloned=1
   else
     cloned=0
@@ -1329,8 +1412,8 @@ run_archon() {
     # shellcheck disable=SC2086
     step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
   fi
-  step "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
-  step "${e_ok}Checking that archon is healthy" in_archon_quiet ./archon check || status_check=$?
+  step_soft "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
+  step_soft "${e_ok}Checking that archon is healthy" in_archon_quiet ./archon check || status_check=$?
   phase_close
   if [ "$status_check" != 0 ] && [ -f "$work/last.log" ]; then
     say "${y}${warnmark}archon's own checks found things to look at (setup itself is fine):${z}"
