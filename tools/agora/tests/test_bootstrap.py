@@ -628,6 +628,64 @@ class Telemetry(Fixture):
 
 
 @unittest.skipUnless(SH, "sh is not installed")
+class Settings(Fixture):
+    """0053-machine-bootstrap FR-041: the PostHog settings the setup was given are kept for every new terminal, in the file and blocks `archon secrets` uses."""
+
+    def keep(self, **extra):
+        return self.run_script(**OFF, BOOTSTRAP_KIT="", **extra)
+
+    def test_the_key_is_kept_privately_and_bash_and_fish_are_told_to_read_it_once(self):
+        p = self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        f = self.home / ".config" / "archon" / "secrets.env"
+        self.assertEqual(oct(f.stat().st_mode & 0o777), "0o600")
+        self.assertEqual(oct(f.parent.stat().st_mode & 0o777), "0o700")
+        self.assertIn("ARCHON_POSTHOG_KEY='phc_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
+        self.assertIn("ARCHON_PERSON='ifcore:A B'", f.read_text())
+        self.assertNotIn("phc_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
+        for name in (".profile", ".bashrc"):
+            self.assertEqual((self.home / name).read_text().count("# >>> archon: secrets"), 1, name)
+        self.assertIn("string match -r", (self.home / ".config" / "fish" / "conf.d" / "archon-secrets.fish").read_text())
+        before = (f.read_text(), (self.home / ".bashrc").read_text())
+        self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
+        self.assertEqual(before, (f.read_text(), (self.home / ".bashrc").read_text()), "a second run changes nothing")
+
+    def test_a_new_bash_has_the_key_and_a_changed_key_replaces_the_old_one(self):
+        self.keep(ARCHON_POSTHOG_KEY="phc_oldoldoldoldoldoldold")
+        self.keep(ARCHON_POSTHOG_KEY="phc_newnewnewnewnewnewnew")
+        text = (self.home / ".config" / "archon" / "secrets.env").read_text()
+        self.assertEqual(text.count("ARCHON_POSTHOG_KEY="), 1)
+        out = subprocess.run(["bash", "-c", '. "$HOME/.profile"; printf %s "$ARCHON_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
+        self.assertEqual(out, "phc_newnewnewnewnewnewnew")
+
+    def test_a_shell_file_of_the_persons_keeps_its_text_and_a_copy_is_made(self):
+        (self.home / ".bashrc").write_text("alias mine=1")
+        self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+        self.assertEqual((self.home / ".bashrc.before-archon").read_text(), "alias mine=1")
+        self.assertTrue((self.home / ".bashrc").read_text().startswith("alias mine=1\n"))
+
+    def test_nothing_is_kept_without_a_setting_a_github_token_is_not_kept_and_a_quote_is_refused(self):
+        p = self.keep(GH_TOKEN="ghp_" + "x" * 30)
+        self.assertFalse((self.home / ".config" / "archon").exists())
+        self.assertIn("not saved", p.stdout + p.stderr)
+        self.assertIn("archon secrets set GH_TOKEN", p.stdout + p.stderr)
+        q = self.keep(ARCHON_POSTHOG_KEY="phc_it's")
+        self.assertIn("not saved", q.stdout + q.stderr)
+        self.assertNotIn("phc_it", (self.home / ".config" / "archon" / "secrets.env").read_text() if (self.home / ".config" / "archon" / "secrets.env").exists() else "")
+
+    def test_a_dry_run_writes_nothing_and_a_kept_key_counts_for_telemetry_where_the_terminal_has_none(self):
+        p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("would keep ARCHON_POSTHOG_KEY", p.stdout)
+        self.assertFalse((self.home / ".config" / "archon").exists())
+        f = self.home / ".config" / "archon"
+        f.mkdir(parents=True)
+        (f / "secrets.env").write_text("ARCHON_POSTHOG_KEY='phc_fromthefile'\n")
+        q = subprocess.run([SH, "-c", f". {SCRIPT}; printf %s \"$ph_key\""], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        self.assertEqual(q.stdout, "phc_fromthefile")
+
+
+@unittest.skipUnless(SH, "sh is not installed")
 class Pool(Fixture):
     """0053-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
 

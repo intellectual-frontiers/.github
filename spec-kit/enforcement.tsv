@@ -1542,3 +1542,4 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0053-machine-bootstrap FR-038	check	.github: agora test	tests receive the events on a local server: environment, device id, failure log paths, nothing without a key or with DO_NOT_TRACK, and an unreachable host changes nothing
 0053-machine-bootstrap FR-039	check	.github: agora test	tests run the setup with a stand-in gh: a token means no login call, a rejected token stops with status 5
 0053-machine-bootstrap FR-040	check	.github: agora test	a test reads the script for the waiting reminder; the live wait is judged by a person on a real Debian
+0053-machine-bootstrap FR-041	check	.github: agora test	tests keep the key privately, add one block to each shell file once, keep a copy, replace a changed key, refuse a quote, keep no token, and read a kept key for telemetry

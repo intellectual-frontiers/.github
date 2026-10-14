@@ -258,8 +258,15 @@ short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf 
 # With the key set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can see how long
 # things take and where people get stuck: environment `bootstrap`, a device id made from the machine (never its name), and the kind of computer. No name, host name,
 # password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ARCHON_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
-ph_key=${ARCHON_POSTHOG_KEY:-}
-ph_host=${ARCHON_POSTHOG_HOST:-https://us.i.posthog.com}
+# The settings a person kept earlier (`archon secrets`, 0053 FR-041) count where this terminal did not load them.
+secrets_file=$cfgdir/archon/secrets.env
+sf_get() {  # sf_get NAME: the value kept in the file, or nothing
+  [ -r "$secrets_file" ] || return 0
+  sed -n "s/^$1='\\(.*\\)'\$/\\1/p" "$secrets_file" | tail -n 1
+}
+ph_key=${ARCHON_POSTHOG_KEY:-$(sf_get ARCHON_POSTHOG_KEY)}
+ph_host=${ARCHON_POSTHOG_HOST:-$(sf_get ARCHON_POSTHOG_HOST)}
+ph_host=${ph_host:-https://us.i.posthog.com}
 ph_host=${ph_host%/}
 ph_pids=""
 ph_on=0
@@ -317,7 +324,7 @@ ph_event() {
       *) pe_props="$pe_props,\"$pe_k\":\"$(ph_str "$pe_v")\"" ;;
     esac
   done
-  pe_who=${ARCHON_PERSON:-$ph_dev}
+  pe_who=${ARCHON_PERSON:-$(sf_get ARCHON_PERSON)}; pe_who=${pe_who:-$ph_dev}
   pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"archon-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
     "$ph_key" "$pe_name" "$(ph_str "$pe_who")" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
   # the journal `archon observe` reads: the event, PostHog's answer and every property, never the key
@@ -1823,7 +1830,7 @@ main() {
     say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
     say "${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as archon's own telemetry does. Never a password, a token or a file.${z}"
   else
-    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ARCHON_POSTHOG_KEY=<your project key>${z}${d}, then start again."
+    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ARCHON_POSTHOG_KEY=<your project key>${z}${d}, then start again; the setup keeps it for every new terminal."
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
@@ -1836,6 +1843,7 @@ main() {
   sign_in
   github_init
   identity
+  keep_settings
   setup_runtime
   setup_tools
   setup_shell_kit
@@ -1847,6 +1855,83 @@ main() {
   offer_fish
   run_archon
   finish
+}
+
+# ---- keep the PostHog settings for every new terminal (0053 FR-041; the same file and blocks as `archon secrets`, archon's 0074-secrets) --------------------------
+# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read, and bash and fish are told to read it.
+sf_begin='# >>> archon: secrets (managed by `archon secrets`; change them there) >>>'
+sf_end='# <<''< archon: secrets <<''<'   # written so, since the shape test reads a literal three-less-than as a bash here-string
+secrets_block() {
+  printf '%s\n' "$sf_begin"
+  cat <<'EOF'
+if [ -r "${XDG_CONFIG_HOME:-$HOME/.config}/archon/secrets.env" ]; then set -a; . "${XDG_CONFIG_HOME:-$HOME/.config}/archon/secrets.env"; set +a; fi
+EOF
+  printf '%s\n' "$sf_end"
+}
+secrets_fish() {
+  cat <<'EOF'
+# archon: secrets. Managed by `archon secrets`; change them there. Every NAME='value' line of the file becomes an exported variable.
+set -l archon_secrets (set -q XDG_CONFIG_HOME[1]; and echo $XDG_CONFIG_HOME; or echo $HOME/.config)/archon/secrets.env
+if test -r $archon_secrets
+    for line in (string match -r '^[A-Z][A-Z0-9_]*=.*$' < $archon_secrets)
+        set -l pair (string split -m 1 '=' -- $line)
+        set -gx $pair[1] (string replace -r "^'(.*)'\$" '$1' -- $pair[2])
+    end
+end
+EOF
+}
+sf_put_block() {  # sf_put_block FILE: the block in a shell file, once; a copy is kept before the first time; returns 1 where nothing changed
+  pb_f=$1
+  [ -f "$pb_f" ] || : >"$pb_f"
+  secrets_block >"$work/sf.block"
+  if grep -qF "$sf_begin" "$pb_f" 2>/dev/null; then
+    awk -v b="$sf_begin" -v e="$sf_end" -v bf="$work/sf.block" 'index($0, b) == 1 { while ((getline l < bf) > 0) print l; skip = 1; next } skip { if (index($0, e) == 1) skip = 0; next } { print }' "$pb_f" >"$pb_f.new"
+  else
+    { cat "$pb_f"; [ -s "$pb_f" ] && { [ -n "$(tail -c 1 "$pb_f")" ] && echo; echo; }; cat "$work/sf.block"; } >"$pb_f.new"
+  fi
+  if cmp -s "$pb_f" "$pb_f.new"; then rm -f "$pb_f.new"; return 1; fi
+  { [ -s "$pb_f" ] && [ ! -e "$pb_f.before-archon" ] && cp "$pb_f" "$pb_f.before-archon"; } || true
+  cat "$pb_f.new" >"$pb_f"; rm -f "$pb_f.new"
+  return 0
+}
+sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, else added; written privately and atomically
+  pv_dir=$(dirname "$secrets_file")
+  mkdir -p "$pv_dir" && chmod 700 "$pv_dir" || return 1
+  pv_tmp=$(umask 077; mktemp "$pv_dir/.secrets.XXXXXX") || return 1
+  if [ -f "$secrets_file" ]; then cat "$secrets_file" >"$pv_tmp"; else printf '%s\n' "# Private to you (mode 600). Written by \`archon secrets\`; bash and fish read it when a terminal starts." >"$pv_tmp"; fi
+  if grep -q "^$1=" "$pv_tmp"; then
+    awk -v n="$1" -v v="$2" 'index($0, n "=") == 1 { print n "='"'"'" v "'"'"'"; next } { print }' "$pv_tmp" >"$pv_tmp.2" && mv "$pv_tmp.2" "$pv_tmp"
+  else
+    printf "%s='%s'\n" "$1" "$2" >>"$pv_tmp"
+  fi
+  chmod 600 "$pv_tmp" && mv "$pv_tmp" "$secrets_file"
+}
+keep_settings() {
+  ks_names=""
+  for ks_n in ARCHON_POSTHOG_KEY ARCHON_POSTHOG_HOST ARCHON_PERSON; do
+    eval "ks_v=\${$ks_n:-}"
+    [ -n "$ks_v" ] && ks_names="$ks_names $ks_n"
+  done
+  if [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && [ "$dry" = 0 ]; then
+    say "${d}🔑 Your GitHub token was used for this setup only and is not saved. To keep it for every terminal: archon secrets set GH_TOKEN${z}"
+  fi
+  [ -n "$ks_names" ] || return 0
+  phase "${e_key}Keeping your PostHog settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
+  if [ "$dry" = 1 ]; then
+    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600), and make ~/.profile, ~/.bashrc and fish read it in every new terminal"
+    return 0
+  fi
+  for ks_n in $ks_names; do
+    eval "ks_v=\${$ks_n}"
+    case $ks_v in *"'"* | *"
+"*) warn "$ks_n holds a quote or a line break, which the file cannot keep, so it was not saved."; problem "$ks_n was not saved"; continue ;; esac
+    sf_put "$ks_n" "$ks_v" || { warn "$ks_n could not be saved in $(short_path "$secrets_file")."; problem "$ks_n was not saved"; continue; }
+    logf "kept $ks_n in $secrets_file"
+  done
+  sf_put_block "$HOME/.profile" || true
+  sf_put_block "$HOME/.bashrc" || true
+  mkdir -p "$cfgdir/fish/conf.d" && secrets_fish >"$cfgdir/fish/conf.d/archon-secrets.fish" || { warn "fish could not be told to read your settings."; problem "fish does not read the settings"; }
+  return 0
 }
 
 # BOOTSTRAP_SOURCE_ONLY=1 loads the functions and runs nothing, so a test can call one
