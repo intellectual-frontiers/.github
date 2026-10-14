@@ -161,6 +161,17 @@ class Entry(Fixture):
         self.assertIn("Your prompt and commands stay yours", p.stdout)
 
 
+@unittest.skipUnless(SH, "sh is not installed")
+class Colour(Fixture):
+    """0053-machine-bootstrap FR-026: an environment variable name in a message is bright yellow where there is colour."""
+
+    def test_an_environment_variable_name_is_bright_yellow_and_other_words_are_not(self):
+        script = f". {SCRIPT}; yb=$(printf '\\033[1;93m'); z=$(printf '\\033[0m'); say 'set BOOTSTRAP_PROMPT=plain, not FR-001 or git'"
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        self.assertIn("\033[1;93mBOOTSTRAP_PROMPT\033[0m", p.stdout, p.stderr)
+        self.assertNotIn("\033[1;93mFR", p.stdout)
+
+
 @unittest.skipUnless(SH and shutil.which("git"), "sh and git are needed")
 class Switches(Fixture):
     def test_with_every_installation_off_only_the_workspaces_folder_appears(self):

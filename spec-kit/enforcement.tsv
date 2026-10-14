@@ -1525,3 +1525,7 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0053-machine-bootstrap FR-021	none	-	archon's own behavior, not this script's
 0053-machine-bootstrap FR-022	check	.github: agora test	test_bootstrap reads the README section for the command and each term
 0053-machine-bootstrap FR-023	check	.github: agora test	test_bootstrap scans the workflows, hooks and agora's code for a reference
+0053-machine-bootstrap FR-024	check	.github: agora test	test_bootstrap counts that every archon command runs with ARCHON_ASSUME_YES=1
+0053-machine-bootstrap FR-025	none	-	the terminal's look is judged by a person; no test draws a terminal
+0053-machine-bootstrap FR-026	check	.github: agora test	test_bootstrap shows an environment variable name in bright yellow
+0053-machine-bootstrap FR-027	none	-	the closing instruction is judged by a person; no test runs the whole setup with fish
