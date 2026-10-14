@@ -1,42 +1,23 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design-systems/frontiers-brand/logos/if-logo-dark-672x189-2026-Sept.png">
-    <img alt="Intellectual Frontiers" src="design-systems/frontiers-brand/logos/if-logo-672x189-2026-Sept.png" width="336">
+    <source media="(prefers-color-scheme: dark)" srcset="profile/logos/if-logo-dark-672x189-2026-Sept.png">
+    <img alt="Intellectual Frontiers" src="profile/logos/if-logo-672x189-2026-Sept.png" width="336">
   </picture>
 </p>
 
 # Intellectual Frontiers — `.github`
 
-This is the public root of Intellectual Frontiers' Eidolon: the company's own account of what it is and how it works, written as
-testable specs and typed against an ontology, so that a person or an AI can check it instead of guessing. The organization's public
-landing page is [`profile/README.md`](profile/README.md).
+This small public repository holds two things:
 
-One command line, `agora`, runs every check, build and record here. It needs only [`uv`](https://docs.astral.sh/uv/) on your machine: `uv` fetches
-[`archon`](https://github.com/intellectual-frontiers/workspaces-host), the command runner, and `archon` supplies the newest Python (3.14), the locked
-packages and any program outside Python (a typesetter, a browser, a Java runtime) that a command names, from one already on your machine when it is
-new enough, else from your package manager, else its own download checked by fingerprint. A person, a CI job and an AI agent run the same commands;
-`./agora doctor` says what this machine has.
+- **The organization's landing page**, [`profile/README.md`](profile/README.md), which GitHub shows at <https://github.com/intellectual-frontiers>.
+- **The machine setup script**, in [`bin/`](bin/), which turns a fresh Debian computer (under WSL or a virtual machine) into a working
+  place for the Intellectual Frontiers AI Workforce® Harness: it installs what Debian lacks, signs you in to GitHub, and copies the private `archon` repository. It is public so that
+  a brand-new computer can fetch it before it can sign in to anything. What it does is specified in [`spec/0053-machine-bootstrap.md`](spec/0053-machine-bootstrap.md) and tested in
+  [`tests/`](tests/).
 
-## The flow
+The harness itself, its specifications, its ontology and everything it builds live in the private `archon` repository. The setup instructions are in that repository's README,
+which the people who may run the script can read.
 
-1. Clone this repository, install `uv` ([how](https://docs.astral.sh/uv/getting-started/installation/)) and run `./agora help start`. Nothing else is
-   installed by hand: the first run fetches what the command needs and says what it is doing, with progress at a terminal. A machine with no person
-   at it works the same way ([`AGENTS.md`](AGENTS.md)). [`ws-host`](https://github.com/intellectual-frontiers/workspaces-host) is the friendlier
-   environment for a person, and is optional.
-2. The daily work is documented in one place, the program, and in VS Code every step is a button ([IF Console](tools/if-console/), Learn).
-3. Work spec first: the spec, then the ontology, then everything else. `./agora help specs` has the steps.
-4. Before you push, run `./agora check --suite spec` (with `--available` where a program cannot be had), `./agora test` and `./agora fresh`. `./agora help check` says what else.
+## Tests
 
-## The guide
-
-Everything else lives in the guide, a book in four editions (a website, one page, a PDF and an EPUB), published at
-**<https://intellectual-frontiers.github.io/.github/>**. It explains what an Eidolon is, how the repositories and the working order fit,
-what `agora` is, and lists every command, check, help topic, toolchain entry, design system and spec, taken from the code. Build it
-yourself with `./agora docs build`; the result is in `build/docs/`.
-
-## Contributors
-
-Every change is a commit to a spec, then the ontology, then code or content, and `./agora check --suite spec` must pass before you push;
-CI runs it too. Add a command with an AI, spec first: `./agora help extend`. The source of the guide is [`docs-src/`](docs-src/); its
-reference chapters are generated, so edit the code they come from and run `./agora docs generate`. Nothing is written to a README that a
-topic or the guide already says.
+`python3 -m unittest discover -s tests` runs them with the standard library alone (`shellcheck` is used where it is installed); nothing here needs `uv`, `archon` or the network.

@@ -1,3 +1,0 @@
-name = "selftest"
-help = "The packages agora's own tests import, to run the libraries against this repository's design systems; no command of its own"
-

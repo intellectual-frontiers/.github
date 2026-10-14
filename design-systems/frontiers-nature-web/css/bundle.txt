@@ -1,5 +1,0 @@
-fonts.css
-tokens.css
-base.css
-chrome.css
-components.css

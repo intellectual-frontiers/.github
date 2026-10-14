@@ -1,3 +1,0 @@
-name = "vcs"
-help = "Reads of Git's state, through the pinned dulwich package, for --changed; no command of its own"
-

@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-brand/logos/if-logo-dark-672x189-2026-Sept.png">
-    <img alt="Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/design-systems/frontiers-brand/logos/if-logo-672x189-2026-Sept.png" width="336">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/profile/logos/if-logo-dark-672x189-2026-Sept.png">
+    <img alt="Intellectual Frontiers" src="https://raw.githubusercontent.com/intellectual-frontiers/.github/main/profile/logos/if-logo-672x189-2026-Sept.png" width="336">
   </picture>
 </p>
 
@@ -25,12 +25,12 @@ the strength of it. Most of the companies we have built are in healthcare.
   reflects what exists (a person, a company, a facility, a device); an Ergon
   reflects what is built (a product, a service, a system, a workflow); a Noema
   reflects what is conceived (a concept, a hypothesis, a theory, a method),
-  with the evidence for it and against it. This repository is a working one, and the essay
-  [Eidolons: A Working Digital Reflection](https://github.com/intellectual-frontiers/.github/blob/main/content/journal/eidolons.html)
+  with the evidence for it and against it. Our own work is built this way, and the essay
+  *Eidolons: A Working Digital Reflection* in [our journal](https://www.intellectualfrontiers.com/journal)
   explains why.
 - **Intellectual Product-Led Growth.** How a knowledge-heavy organization turns
   its research into something a visitor can use directly, before any sales
-  pitch: [the framework](https://github.com/intellectual-frontiers/.github/blob/main/content/journal/iplg.html).
+  pitch: the framework is in [our journal](https://www.intellectualfrontiers.com/journal).
 
 ## Companies and services we have built
 
@@ -69,7 +69,7 @@ find an audience and turn it into revenue, are running.
 - **Patents** in marketplaces and payments, evidence and decisions,
   healthcare delivery, trusted data and authorization, and learning and
   content.
-- **Design systems** anyone may reuse, for our brand and our web pages: [design-systems](https://github.com/intellectual-frontiers/.github/tree/main/design-systems).
+- **Design systems** for our brand and our web pages (a release others can reuse is planned).
 
 ## How we work
 
@@ -90,10 +90,7 @@ The work above is made by five units: **Research & IP** and **Studios**
 discover where the advantage is; **Press** (Intellectual Frontiers Press) makes it
 legible; **Capital** funds what the evidence supports; and **Network** finds
 the people who can carry it. Everything we do is specified, typed in an
-ontology, and only then made: browse the
-[public specs](https://github.com/intellectual-frontiers/.github/tree/main/spec-kit/specs),
-the [ontology](https://github.com/intellectual-frontiers/.github/tree/main/ontology),
-or [what an Eidolon is, and why specs + ontology + work](https://github.com/intellectual-frontiers/.github#readme).
+ontology, and only then made.
 
 <p align="center">
   <a href="https://www.intellectualfrontiers.com">intellectualfrontiers.com</a>

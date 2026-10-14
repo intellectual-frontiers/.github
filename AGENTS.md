@@ -1,20 +1,13 @@
-# Intellectual Frontiers public root — agent entry point
+# `.github` — agent entry point
 
-Read [`README.md`](README.md) first, then the agora skill, which `agora skill generate` writes from the registry.
-`./agora` at the repository root is the one command line. It needs only `uv` on the machine; `uv` fetches `archon` (workspaces-host's command runner), which fetches the newest Python and the
-locked packages, and every command runs with no further step.
+This repository is small on purpose: the organization's public profile (`profile/`), the machine setup script and its helpers (`bin/`), the script's specification (`spec/`) and its tests
+(`tests/`). Everything else (the harness, specs, ontology, design systems, content) is in the private `archon` repository; do not add any of it here.
 
-`./agora doctor` says what you have: whether a person is at the invocation (`unattended` unless you are at a terminal or `ARCHON_ATTENDANCE`
-says so), the package manager it found, and where each program outside Python would come from. A command that names a toolchain entry (building
-the guide, the design systems' browser and TeX harnesses) has `archon` obtain it first, with nobody asked: from a program already on the machine
-when it is new enough, else from the machine's package manager, else from the entry's verified download. Nothing is installed by hand and there is no
-step to run first; `./agora` is the whole bootstrap ([`0025-tooling-environment`](spec-kit/specs/0025-tooling-environment/spec.md) FR-033). If no
-source can supply a program (offline, no administrator rights, no build for the platform) the command exits 3 and says why, and nothing is
-reported as passed that did not run. `./agora check --suite spec --available` runs what can run, lists what was skipped, and exits 0 when what ran
-passed.
+- Work spec first: change `spec/0053-machine-bootstrap.md`, then the script, then the tests. Every requirement has a test or says why it has none.
+- Run `python3 -m unittest discover -s tests` before you push. It needs only the standard library, and a `Slim` test fails if a new top-level entry appears.
+- `bin/bootstrap-archon.sh` is POSIX `sh`, runs from a pipe (`curl ... | sh`), and must stay readable by a newcomer. The settings blocks it writes (`secrets_block`, `secrets_fish`) must stay byte for byte what
+  `archon secrets` writes in the `archon` repository.
+- Never put a secret, a token or a person's data in this repository: it is public.
 
-Work spec first: the spec, then the ontology, then everything else (`./agora help specs`). Before you push, run
-`./agora check --suite spec`, `./agora test` and `./agora fresh`.
-
-Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the
-author of that commit in its message; an agent's part is a `Co-Authored-By` trailer (`0001-eidolon-architecture` FR-038).
+Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the author of that commit in its message; an agent's part is a
+`Co-Authored-By` trailer.
