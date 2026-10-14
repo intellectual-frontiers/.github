@@ -1485,9 +1485,18 @@ offer_fish() {
       return 0
     fi
   fi
-  if [ "$(id -u)" = 0 ]; then chsh -s "$fp" "$(id -un)" </dev/null || warn "chsh failed. Run: chsh -s $fp"
-  elif [ "$has_tty" = 1 ]; then chsh -s "$fp" </dev/tty || warn "chsh did not change your shell. Run: chsh -s $fp"
-  else warn "chsh needs your password and there is no terminal. Run: chsh -s $fp"; fi
+  me=$(id -un)
+  if [ "$(id -u)" = 0 ]; then
+    chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
+  elif [ "$sudo_ready" = 1 ] && [ -n "$sudo_cmd" ] && $sudo_cmd -n true 2>/dev/null; then
+    # the administrator rights asked for at the start are still good, so the change needs no second password
+    $sudo_cmd chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
+  elif [ "$has_tty" = 1 ]; then
+    say "${b}${e_key}One password, once more.${z} Debian is about to ask for ${b}Password:${z}."
+    say "That is ${b}the Linux password for ${me}${z}, the same one you typed when this setup first asked for administrator rights."
+    say "${d}Nothing shows while you type: that is normal. Press Enter when done.${z}"
+    chsh -s "$fp" </dev/tty || warn "chsh did not change your shell. Run: chsh -s $fp"
+  else warn "chsh needs the Linux password of $me and there is no terminal. Run: chsh -s $fp"; fi
   case $(login_shell) in */fish) say "fish is now your login shell; it starts in each new terminal window." ;; esac
   return 0
 }
