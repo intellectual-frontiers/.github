@@ -130,7 +130,7 @@ class Entry(Fixture):
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before, "a dry run writes nothing")
         for step in ("Installing Oh My Posh", "Installing chezmoi", "archon doctor", "archon toolchain ensure", "archon check", "intellectual-frontiers/archon",
-                     "gh auth login --hostname github.com --web --skip-browser --git-protocol https", "login shell"):
+                     "GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https", "login shell"):
             self.assertIn(step, p.stdout)
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
@@ -300,7 +300,7 @@ exit 0
         p = self.run_script(**{k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_AUTH")},
                             BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), PATH=f"{self.bin}:{os.environ['PATH']}")
         self.assertEqual(p.returncode, 5, p.stderr)
-        self.assertIn("gh auth login --hostname github.com --web --skip-browser --git-protocol https", p.stdout)
+        self.assertIn("GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https", p.stdout)
         self.assertIn(".archon-bootstrap/log/", p.stdout)
         self.assertFalse(self.clone.exists())
 

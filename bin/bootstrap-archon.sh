@@ -1421,7 +1421,7 @@ sign_in_stop() {  # not signed in: the one stop that is not an error, so it asks
   say "${y}${b}${e_key}The GitHub sign-in did not finish, so setup paused here.${z}"
   say "${d}Nothing is wrong with your computer. The sign-in is needed because archon is private.${z}"
   say ""
-  say "${c}${e_one}1.${z} Type:  ${b}gh auth login --hostname github.com --web --skip-browser --git-protocol https${z}"
+  say "${c}${e_one}1.${z} Type:  ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}"
   say "${c}${e_two}2.${z} Copy the code, open ${b}https://github.com/login/device${z} in your normal browser, type it, click ${g}${b}Authorize${z}."
   say "${c}${e_three}3.${z} Run this setup again: it picks up where it left off."
   say "${d}Still stuck? The log is $(short_path "$logfile") ; send it to ${support_who:-the support team}.${z}"
@@ -1434,7 +1434,7 @@ sign_in() {
   heading "${e_key}Signing in to GitHub ${d}(the one thing that needs you)${z}"
   if [ "${BOOTSTRAP_NO_AUTH:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_AUTH=1)."; return 0; fi
   if [ "$dry" = 1 ]; then
-    would "check that you are signed in to GitHub; if not, run: gh auth login --hostname github.com --web --skip-browser --git-protocol https (a code to type into your own browser)"
+    would "check that you are signed in to GitHub; if not, run: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https (a code to type into your own browser)"
     would "make gh git's credential helper for github.com, and set the name and email on your commits where git has none"
     return 0
   fi
@@ -1450,15 +1450,15 @@ sign_in() {
     say ""
     say "${c}${e_one}1.${z} GitHub asks ${b}Authenticate Git with your GitHub credentials?${z}"
     say "   Press ${b}Enter${z} (that means yes)."
-    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it${z}."
+    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it${z}, then press ${b}Enter${z} if it says "Press Enter to open" (nothing opens)."
     say "${c}${e_three}3.${z} In your normal web browser (Chrome, Edge, Safari, on this computer or"
-    say "   your phone), open ${b}https://github.com/login/device${z} ${d}(this setup does not open it for you)${z}."
+    say "   your phone), open ${b}https://github.com/login/device${z} ${d}(nothing opens by itself)${z}."
     say "   Type the code, sign in if asked, click ${g}${b}Authorize${z}."
     say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
     say "${d}No password, token or SSH key is typed in this window.${z}"
     say ""
     si0=$(date +%s)
-    BROWSER=true gh auth login --hostname github.com --web --skip-browser --git-protocol https </dev/tty || true
+    GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
     if signed_in; then si_ok=ok; else si_ok=unfinished; fi
     ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
     [ "$si_ok" = ok ] || sign_in_stop
@@ -1523,7 +1523,7 @@ workspace_and_clone() {
     say ""
     say "${b}${e_key}Sign in to GitHub first${z}; the archon repository (the project's folder on GitHub) is private. In a terminal, type:"
     say ""
-    say "    ${c}gh auth login --hostname github.com --web --skip-browser --git-protocol https${z}"
+    say "    ${c}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}"
     say ""
     say "Copy the code it shows, open ${b}https://github.com/login/device${z} in your normal browser, type the code, click ${g}${b}Authorize${z}, then run this setup again ${e_next}it picks up where it left off."
     return 0
@@ -1545,7 +1545,7 @@ workspace_and_clone() {
   else
     cloned=0
     if grep -qiE 'could not read Username|could not read Password|Authentication failed|terminal prompts disabled|Invalid username or password' "$work/last.log" 2>/dev/null; then
-      say "GitHub did not accept a login for $archon_url. Sign in with: gh auth login --hostname github.com --web --skip-browser --git-protocol https, then run this again."
+      say "GitHub did not accept a login for $archon_url. Sign in with: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https, then run this again."
     elif grep -qiE 'not found|Repository not found' "$work/last.log" 2>/dev/null; then
       say "GitHub says $archon_url does not exist for your account. Your GitHub login (signed in as $(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)) may not have access to the repository: ask an administrator of the intellectual-frontiers organization to add you, then run this again."
     else
