@@ -219,8 +219,8 @@ problems=$work/problems     # one line for each thing that did not work, shown a
 : >"$problems"
 ka_pid=""; rem_pid=""
 cleanup() {
-  [ -n "$rem_pid" ] && kill "$rem_pid" 2>/dev/null
   ec=$?
+  [ -n "$rem_pid" ] && kill "$rem_pid" 2>/dev/null
   if [ "$dry" = 0 ] && command -v ph_event >/dev/null 2>&1; then
     case $ec in 0) oc=finished ;; 4) oc=stopped ;; 5) oc=sign-in-pending ;; 130) oc=interrupted ;; *) oc=failed ;; esac
     ph_event bootstrap_finished "s:outcome=$oc" "n:exit_code=$ec" "n:duration_ms=$(( ($(date +%s) - ph_started) * 1000 ))" "n:steps=${step_no:-0}" "n:problems=$(wc -l <"$problems" 2>/dev/null | tr -d ' ')" "s:log_file=$(short_path "${logfile:-}")"
