@@ -82,6 +82,7 @@ class Shape(unittest.TestCase):
         self.assertIn("Waiting for you:", text)
         self.assertIn("rem_pid", text)
         self.assertNotIn("your browser opens", text)
+        self.assertNotIn("ABCD-1234", text)
 
     def test_it_parses_in_every_posix_shell_here(self):
         for shell in ("sh", "dash", "bash", "ash"):
@@ -322,6 +323,17 @@ exit 0
         bad = run(GITHUB_TOKEN="ghp_bad")
         self.assertEqual(bad.returncode, 5, bad.stdout)
         self.assertIn("did not accept the token in", bad.stdout)
+
+    def test_the_sign_in_shows_the_code_gh_printed_and_asks_nothing(self):
+        flag = self.tmp / "signed"
+        self.stub("gh", f'case "$1 $2" in\n"auth status") [ -f {flag} ] ;;\n"auth login") [ -t 0 ] && echo TERMINAL_ASKED; echo "! First copy your one-time code: WXYZ-5678"; sleep 2; touch {flag} ;;\n"auth setup-git") ;;\nesac')
+        script = f". {SCRIPT}; has_tty=1; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; sign_in; echo SIGNED_IN"
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"), timeout=60)
+        self.assertIn("SIGNED_IN", p.stdout, p.stdout + p.stderr)
+        self.assertIn("type this code: WXYZ-5678", p.stdout)
+        self.assertIn("https://github.com/login/device", p.stdout)
+        self.assertNotIn("TERMINAL_ASKED", p.stdout)
+        self.assertNotIn("ABCD-1234", p.stdout)
 
     def test_git_identity_comes_from_the_account_only_where_git_has_none(self):
         self.stub("gh", 'case "$1 $2" in "auth status") exit 0 ;; "api user") echo \'{"login":"ada","id":42,"name":"Ada Lovelace"}\' ;; esac\nexit 0')

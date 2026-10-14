@@ -1455,33 +1455,33 @@ sign_in() {
     say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
     say ""
-    say "${d}GitHub is the website where this organization keeps its work."
-    say "archon, the project this setup copies, is ${b}private${z}${d}: only people the"
-    say "owner has added can open it. Need access? Press Ctrl+C, ask the"
-    say "owner, then run this setup again.${z}"
+    say "${d}GitHub is where this organization keeps its work. archon is ${z}${b}private${z}${d}: only people the owner added can open it."
+    say "Need access? Press Ctrl+C, ask the owner, then run this setup again.${z}"
     say ""
-    say "${c}${e_one}1.${z} GitHub asks ${b}Authenticate Git with your GitHub credentials?${z}"
-    say "   Press ${b}Enter${z} (that means yes)."
-    say "${c}${e_two}2.${z} A ${b}one-time code${z} appears here, like ${b}ABCD-1234${z}. ${b}Copy it.${z}"
-    say "   ${d}GitHub's tool then says \"Press Enter to open github.com in your browser\". Nothing will open,${z}"
-    say "   ${d}and that is expected: it is fine to press Enter, or to ignore the line.${z}"
-    say "${c}${e_three}3.${z} In your normal web browser (Chrome, Edge, Safari, on this computer or your phone),"
-    say "   open ${b}https://github.com/login/device${z}, type the code, sign in if asked, click ${g}${b}Authorize${z}."
-    say "${c}${e_four}4.${z} Come back here. ${g}${b}Everything after this is automatic.${z} ${e_rocket}"
-    say "${d}No password, token or SSH key is typed in this window.${z}"
-    say ""
+    say "${c}${e_key}Next, GitHub gives you a one-time code to type in your browser.${z} ${g}${b}After that, everything is automatic.${z} ${e_rocket}"
     si0=$(date +%s)
-    # gh goes quiet after it shows the code, so say every so often what it is waiting for (on the terminal itself, until it is done)
-    ( sleep 6; while :; do
-        printf '\n%s%s⏳ Waiting for you:%s open %shttps://github.com/login/device%s in your browser and type the code shown above.\n   %sThis window carries on by itself once you click Authorize. Nothing else to press.%s\n' "$y" "$b" "$z" "$b" "$z" "$d" "$z" >/dev/tty
-        sleep 25
-      done ) &
+    gh_out=$work/gh-login.out; gh_rc=$work/gh-login.rc; rm -f "$gh_out" "$gh_rc"
+    # gh runs without a terminal, so it asks nothing (it answers yes to its own questions), opens no browser, and prints the code; the code is shown here, and repeated now and then
+    ( GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/null >"$gh_out" 2>&1; echo $? >"$gh_rc" ) &
     rem_pid=$!
-    GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/tty || true
-    kill "$rem_pid" 2>/dev/null; wait "$rem_pid" 2>/dev/null || true; rem_pid=""
+    shown=""; waited=0
+    while [ ! -f "$gh_rc" ]; do
+      code=$(grep -oE '[A-Z0-9]{4}-[A-Z0-9]{4}' "$gh_out" 2>/dev/null | head -n 1)
+      if [ -n "$code" ] && { [ -z "$shown" ] || [ $((waited % 30)) = 0 ]; }; then
+        say ""
+        say "${y}${b}⏳ Waiting for you:${z} open ${b}https://github.com/login/device${z} in your browser and type this code: ${y}${b}$code${z}"
+        shown=$code
+      fi
+      waited=$((waited + 1)); sleep 1
+    done
+    wait "$rem_pid" 2>/dev/null || true; rem_pid=""
+    logf "gh auth login said: $(sed 's/\x1b\[[0-9;]*m//g' "$gh_out" | tr '\n' ' ' | sed -E 's/[A-Z0-9]{4}-[A-Z0-9]{4}/<code>/')"
     if signed_in; then si_ok=ok; else si_ok=unfinished; fi
     ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
-    [ "$si_ok" = ok ] || sign_in_stop
+    if [ "$si_ok" != ok ]; then
+      [ -n "$shown" ] || { say ""; say "${d}GitHub's tool said:${z}"; sed 's/\x1b\[[0-9;]*m//g' "$gh_out" | tail -n 5 | cut -c1-$((cols - 6)) | sed 's/^/     /'; }
+      sign_in_stop
+    fi
   else
     sign_in_stop
   fi
