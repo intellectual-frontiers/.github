@@ -283,6 +283,8 @@ cfg() {  # cfg NAME DEFAULT
 
 step_no=0
 keep_going=${BOOTSTRAP_KEEP_GOING:-0}
+# A step may count its own progress: count_re is a pattern for the lines its output prints as each piece is done, count_total how many to expect (empty: unknown).
+count_re=""; count_total=""
 # step LABEL COMMAND...: run COMMAND quietly with a one-line spinner (a terminal, after half a second). Shows its output only if it fails; returns its
 # status. With --dry-run it only says what it would do. COMMAND runs in a subshell, so what it sets is not seen afterwards: it writes files instead.
 step() {
@@ -305,7 +307,13 @@ step() {
         shown=1
         n=$(( ticks % nframes )); f=""; i=0
         for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
-        printf '\r\033[K%s%s%s %s %s(%ss)%s' "$c" "$f" "$z" "$slabel" "$d" "$(( $(date +%s) - start ))" "$z" >&2
+        cnt=""
+        if [ -n "$count_re" ]; then
+          n=$(grep -c "$count_re" "$log" 2>/dev/null || true)
+          cnt=": ${b}${n}${z}"
+          [ -n "$count_total" ] && cnt="$cnt of $count_total"
+        fi
+        printf '\r\033[K%s%s%s %s%s %s(%ss)%s' "$c" "$f" "$z" "$slabel" "$cnt" "$d" "$(( $(date +%s) - start ))" "$z" >&2
       fi
       sleep 0.1
     done
@@ -498,7 +506,8 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
   if [ "$(id -u)" = 0 ]; then sudo_ready=1; return 0; fi
   command -v sudo >/dev/null 2>&1 || return 1
   sudo_cmd=sudo
-  say "${b}I need administrator rights to $1.${z} Your password may be asked, once; nothing shows while you type."
+  say "${b}${e_key}I need administrator rights to $1.${z}"
+  say "${d}Type your Linux password when asked, once. Nothing shows while you type: that is normal.${z}"
   if [ "$has_tty" = 1 ]; then
     # shellcheck disable=SC2024  # the terminal is for sudo to read the password from
     sudo -v </dev/tty || return 1
@@ -550,7 +559,7 @@ install_packages() {
     return 0
   fi
   if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
-  sudo_for "install:$missing" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to run: apt install$missing"
+  sudo_for "install Debian's everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to run: apt install$missing"
   step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
   # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
   chosen=""; lacking=""
@@ -565,7 +574,11 @@ install_packages() {
   if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
   if [ -n "$chosen" ]; then
     # shellcheck disable=SC2086
-    step "${e_pkg}Installing everyday programs" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
+    count_re='^Setting up '
+    count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
+    [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
+    step "${e_pkg}Installing programs" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
+    count_re=""; count_total=""
   fi
   return 0
 }

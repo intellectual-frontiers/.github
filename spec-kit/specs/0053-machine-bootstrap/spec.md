@@ -117,6 +117,7 @@ person in to GitHub before it clones.
   and no password, token or key. It MUST tell a person who does not know what to do how to ask for help: copy the support file's path, send that one file to the support team (`BOOTSTRAP_SUPPORT`
   names who) and say what they were doing. A sign-in that did not finish is the one stop that is not an error (exit status 5) and says how to sign in and run the setup again.
 - **FR-030**: `archon doctor` MUST NOT run before every installation is complete, since a program that is not installed yet would show as missing.
+- **FR-031**: A long step that can count its work (installing the programs) MUST show how many are done of how many, beside the seconds it has taken (`Installing programs: 57 of 130 (176s)`), so a person can tell it is working and not stuck.
 - **FR-022**: The `README.md` of this repository MUST carry a section, *Set up a new computer*, with the one-line command, what it does, what it
   needs, and each term of art (WSL, chezmoi, Oh My Posh, Nerd Font, fish, login shell, workspace) defined where it is used.
 

@@ -1532,3 +1532,4 @@ frontiers-signage-print FR-013	check	.github: agora check design-systems --runne
 0053-machine-bootstrap FR-028	check	.github: agora test	test_bootstrap finds the log of a run and the whole output of a step in it
 0053-machine-bootstrap FR-029	check	.github: agora test	test_bootstrap stops a failed step with the log, the support file and the help instructions, and removes secrets
 0053-machine-bootstrap FR-030	check	.github: agora test	test_bootstrap runs toolchain ensure before doctor
+0053-machine-bootstrap FR-031	none	-	the progress line is judged by a person at a terminal; a test cannot watch a spinner
