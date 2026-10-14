@@ -640,9 +640,8 @@ wanted_packages() {
   echo "git ca-certificates curl wget tar xz-utils unzip jq gh"
   if kit_on base; then
     echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk"
-    echo "ripgrep fd-find bash-completion python3 nodejs npm imagemagick webp sqlite3 shellcheck"
+    echo "ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck"
     echo "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra"
-    [ "$is_debian" = 1 ] && echo "chromium"
     if [ "$is_debian" = 1 ]; then case $d_codename in bookworm | bullseye | "") ;; *) echo "glab" ;; esac; fi
   fi
   return 0
@@ -1434,10 +1433,9 @@ verify_install() {
   if [ "$dry" = 1 ]; then would "check that each program the kits install is here, that fish is version 4 or later, and that Oh My Posh draws its prompts"; return 0; fi
   absent=""
   if kit_on base; then
-    for p in git gh jq rg fd curl wget python3 uv node sqlite3 shellcheck eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
+    for p in git gh jq rg fd curl wget python3 uv sqlite3 shellcheck eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
     have_cmd magick || have_cmd convert || absent="$absent ImageMagick"
     have_cmd duckdb || absent="$absent duckdb"
-    have_cmd chromium || [ "$is_debian" = 0 ] || absent="$absent chromium"
   fi
   if kit_on shell; then
     have_cmd fish || absent="$absent fish"

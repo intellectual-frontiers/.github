@@ -34,10 +34,12 @@ person in to GitHub before it clones.
   needs it, and MUST ask for none when the person is already administrator, when nothing needs it, or when `BOOTSTRAP_NO_APT=1`. Rights
   MUST be kept for the length of the run and MUST NOT be requested again.
 - **FR-007**: The script MUST install with `apt` the packages the default kits name for Debian and that the machine lacks: the standard
-  userland, `git`, `gh`, `curl`, `wget`, `xz-utils`, `unzip`, `ca-certificates`, `jq`, `ripgrep`, `fd-find`, `bash-completion`, `python3`, `nodejs`,
-  `npm`, ImageMagick with WebP, `sqlite3`, `shellcheck`, `chromium` and, where the distribution ships it, `glab`. It MUST install no compiler
-  or build tool itself; a program that needs one is installed by `archon` (FR-021). A package the distribution lacks MUST be reported, not
-  fatal.
+  userland, `git`, `gh`, `curl`, `wget`, `xz-utils`, `unzip`, `ca-certificates`, `jq`, `ripgrep`, `fd-find`, `bash-completion`, `python3`,
+  ImageMagick with WebP, `sqlite3`, `shellcheck` and, where the distribution ships it, `glab`. It MUST install no compiler or build tool
+  itself, and MUST NOT install with `apt` a program that `archon` declares in its `toolchain/` (Node.js, a browser for tests, a Java
+  runtime and the rest): a distribution's version is rarely the pinned one, and a second copy is a mismatch waiting to happen. Those
+  programs are installed once, at the version `archon` pins, by `archon toolchain ensure` (FR-021), and the script's own check of what is
+  installed MUST NOT ask for them. A package the distribution lacks MUST be reported, not fatal.
 - **FR-008**: Every program the script fetches outside the package manager MUST be checked before it is unpacked: against a SHA-256 written
   in the script for a pinned release, or against the checksum its publisher states for the release file for a program that follows its newest
   release. A mismatch, or a release with no checksum, MUST install nothing and be reported. A pinned program: `mise` (which installs `uv` and
@@ -131,8 +133,9 @@ person in to GitHub before it clones.
 - **FR-038**: With `ARCHON_POSTHOG_KEY` set (and not `DO_NOT_TRACK=1` or `ARCHON_OBSERVE=off`, and not a dry run) the script MUST report to PostHog, with environment `bootstrap`: `bootstrap_started`, one `bootstrap_step` for each step (name, phase, outcome, exit code, duration; the GitHub sign-in is a step, so the time a person takes is seen), `bootstrap_failed` (the step, the log and support file paths relative to the home folder, the last lines the step printed with tokens removed and the home folder shortened) and `bootstrap_finished` (outcome, duration, step and problem counts). Each event carries a device id made from the machine (a hash of its machine id, else a random id kept in `~/.archon-bootstrap/device-id`), the kind of computer (WSL and its version, virtual machine, container or machine), the system and its version, kernel, architecture, processors, memory and free disk, the host name and the Linux user name (as archon's own events carry), and never a password, token or file content. Sending MUST NOT fail or slow the setup beyond three seconds at its end; the `archon` commands it runs carry `ARCHON_ENVIRONMENT=bootstrap`.
 - **FR-039**: Where `GH_TOKEN` or `GITHUB_TOKEN` is set and GitHub accepts it, the script MUST NOT ask for an interactive `gh auth login` (it says which variable it uses); where GitHub does not accept it, it MUST stop (exit status 5) and say how to fix or unset it, since `gh auth login` refuses to run while the variable is set.
 - **FR-040**: The GitHub sign-in MUST ask nothing (`gh auth login` runs without a terminal, so its own questions, such as authenticating git, are answered yes) and MUST show the one-time code `gh` printed, in the line `⏳ Waiting for you: open https://github.com/login/device in your browser and type this code: <code>`, repeated every half minute until GitHub has accepted it; it MUST NOT show an example code. Where `gh` printed no code, it MUST show what `gh` said and stop as for an unfinished sign-in.
-- **FR-022**: The `README.md` of this repository MUST carry a section, *Set up a new computer*, with the one-line command, what it does, what it
-  needs, and each term of art (WSL, chezmoi, Oh My Posh, Nerd Font, fish, login shell, workspace) defined where it is used.
+- **FR-022**: The setup instructions (the one-line command, what it does, what it needs, and each term of art defined where it is used)
+  MUST be written once, in the `README.md` and `docs/getting-started.md` of `archon`, which are what a person who may run the script can
+  read. The `README.md` of this repository is public and MUST NOT carry them, because a reader without access to `archon` cannot use them.
 
 ## Out of scope
 

@@ -27,58 +27,6 @@ new enough, else from your package manager, else its own download checked by fin
 3. Work spec first: the spec, then the ontology, then everything else. `./agora help specs` has the steps.
 4. Before you push, run `./agora check --suite spec` (with `--available` where a program cannot be had), `./agora test` and `./agora fresh`. `./agora help check` says what else.
 
-## Set up a new computer
-
-One line in a Debian terminal gives a new computer everything this organization's work needs, and copies the harness to it. The harness is the
-Intellectual Frontiers AI Workforce® Harness; `archon` is its command line (the Console is the web interface built into the website).
-
-A bare Debian has neither `curl` nor `wget` (the programs that fetch files from the internet), so first install them, from your home folder, then run the setup:
-
-```sh
-cd && sudo apt update && sudo apt install -y curl wget
-curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh
-```
-
-**✅ Before you start,** have these ready:
-
-- 🧑‍💻 **A GitHub account** (free at github.com) that the organization's owner has **given access to `archon`**. `archon` is a *private repository*: a repository is one project's folder on GitHub, and a private one can be opened only by people the owner has added. No account or no access yet? Ask the owner to add you, then come back.
-- 🌐 **A web browser** on the same computer, or any other device. The sign-in happens on a GitHub web page.
-- 🔑 **Your Linux password** (the one you made when Debian first started), typed once so the setup may install programs.
-
-- 📡 **Optional: a PostHog project key.** PostHog is the service that records how the harness is used (its telemetry). To have this setup recorded too, run `export ARCHON_POSTHOG_KEY=<your project key>` in the terminal **before** you start (`ARCHON_POSTHOG_HOST` names a PostHog other than the default). Without it **nothing breaks**; there is simply no telemetry recorded. The setup says which case it is on its first lines.
-- 🔑 **Optional: a GitHub token instead of the sign-in.** If `GH_TOKEN` (or `GITHUB_TOKEN`) is set in the terminal before you start, for example `export GH_TOKEN=<your token>`, and it has access to `archon`, the setup uses it and **no interactive `gh auth login` is needed**: there is nothing to copy or type in a browser, and the setup runs from start to finish by itself. If GitHub does not accept the token, the setup stops and says so (fix it or `unset GH_TOKEN`). Never paste a token into a shared file or a chat.
-
-**🔐 The GitHub sign-in, step by step** (skipped when a token is set, above). Partway through, the setup shows `⏳ Waiting for you: open https://github.com/login/device in your browser and type this code: <code>`. In your normal web browser (on this computer or your phone) open that address, type the code, sign in if asked, and click **Authorize**. The setup asks nothing else and carries on by itself. You never type a password, token or SSH key into the terminal.
-
-**What it needs.** A Debian 12 or 13 terminal, `amd64` or `arm64`: either a Debian window under **WSL** (Windows Subsystem for Linux, the
-Linux that runs inside Windows 11; install Debian from the Microsoft Store) or a Debian virtual machine. Also an internet connection, a
-Linux account that may use `sudo`, and your GitHub login with access to the harness repository (`archon` is private).
-
-**What it does,** each step showing one line with a spinner, and nothing you did not ask for:
-
-1. Says why it needs administrator rights, asks for your Linux password once, and installs what Debian lacks: `git`, `gh` (GitHub's command
-   line), `curl`, `jq`, `ripgrep`, `python3`, `nodejs`, a browser for tests and the rest of the everyday tools.
-2. Installs `uv` (the Python package runner every repository's launcher needs) and Python 3.14, through the pinned `mise`, and the modern
-   command line tools (`eza`, `bat`, `zoxide`, `fzf`, `delta`, `btop` and others), each checked against its publisher's checksum.
-3. Installs **fish** (a friendlier shell, version 4 or later), **Oh My Posh** (the program that draws your prompt, with the `ws-host-pretty`
-   theme) and **chezmoi** (the program that edits your startup files, `~/.bashrc` and fish's `config.fish`, only between marked lines,
-   after keeping a copy).
-4. Signs you in to GitHub with a one-time code and your browser (no password, token or SSH key), and puts your GitHub name and private
-   address on your git commits where git has none.
-5. Creates your **workspace**, the folder `~/workspaces` where repositories live as `github.com/<organization>/<repository>`, and copies
-   `archon` to `~/workspaces/github.com/intellectual-frontiers/archon` (an existing copy is only moved forward, never over your work).
-6. Offers to make fish your **login shell**, the program that starts in each new terminal window. Say no and bash stays; no question is
-   asked when nobody is at the terminal.
-7. In the copy, runs `./archon doctor` (what this computer has), `./archon toolchain ensure` (the programs archon's commands need) and
-   `./archon check`, and says what to do next: `archon orch status`, then `archon orch dev`.
-
-**The prompt needs a Nerd Font,** a font that carries icon characters, installed once on Windows and chosen in Windows Terminal (the
-script prints the steps). Without one, run the line again with `BOOTSTRAP_PROMPT=plain`.
-
-It is safe to run again: what is in place changes nothing. To see the steps without taking them, add `-s -- --dry-run` after `sh`. The
-switches that turn a step off (`BOOTSTRAP_NO_APT`, `BOOTSTRAP_NO_CHSH`, `BOOTSTRAP_NO_CLONE` and the others) are listed at the top of
-[`bin/bootstrap-archon.sh`](bin/bootstrap-archon.sh); the rules are [`0053-machine-bootstrap`](spec-kit/specs/0053-machine-bootstrap/spec.md).
-
 ## The guide
 
 Everything else lives in the guide, a book in four editions (a website, one page, a PDF and an EPUB), published at

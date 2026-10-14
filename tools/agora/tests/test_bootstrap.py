@@ -496,17 +496,23 @@ class Data(Fixture):
 
 
 class Readme(unittest.TestCase):
-    def test_the_readme_has_the_section_with_the_command_and_the_terms_defined(self):
+    def test_the_public_readme_carries_no_setup_instructions(self):
+        """0053-machine-bootstrap FR-022: the instructions live in archon's README, which the people who may run the script can read."""
         text = (HOME / "README.md").read_text()
-        self.assertIn("## Set up a new computer", text)
-        section = text.split("## Set up a new computer", 1)[1].split("\n## ", 1)[0]
-        self.assertIn("curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh", section)
-        for term in ("WSL", "chezmoi", "Oh My Posh", "Nerd Font", "fish", "login shell", "workspace"):
-            self.assertIn(term, section, term)
-        self.assertIn("archon orch status", section)
-        self.assertIn("archon orch dev", section)
-        for need in ("internet", "GitHub", "Debian"):
-            self.assertIn(need, section)
+        self.assertNotIn("## Set up a new computer", text)
+        self.assertNotIn("bootstrap-archon", text)
+
+
+class Packages(unittest.TestCase):
+    def test_no_package_duplicates_a_program_archon_pins(self):
+        """0053-machine-bootstrap FR-007: Node.js and the browser come from `archon toolchain ensure`, at the pinned version, not from apt."""
+        text = SCRIPT.read_text()
+        start = text.index("wanted_packages() {")
+        body = text[start:text.index("\n}\n", start)]
+        for pkg in ("nodejs", "npm", "chromium"):
+            self.assertNotRegex(body, rf"\b{pkg}\b", pkg)
+        verify = text[text.index("verify_install() {"):]
+        self.assertNotRegex(verify.split("kit_on shell", 1)[0], r"\bnode\b|chromium")
 
 
 class Optional(unittest.TestCase):
