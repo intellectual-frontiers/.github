@@ -25,6 +25,8 @@
 #                                          -h, --help  this text
 #
 # Environment, so it can be tested (a "1" switches it on):
+#   ARCHON_POSTHOG_KEY     optional: your PostHog project API key, set (export ARCHON_POSTHOG_KEY=...) before starting so the archon commands the setup runs are
+#                          recorded in PostHog (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
 #   BOOTSTRAP_URL          where the data files come from when run from a pipe (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
 #   BOOTSTRAP_NO_APT=1     never install a package
@@ -366,7 +368,13 @@ pool_draw() {  # one progress line: how many of the programs started so far are 
   [ "$ticks" -ge 2 ] || return 0
   n=$(( ticks % nframes )); f=""; i=0
   for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
-  printf '\r\033[K%s%s%s %s: %s%s%s of %s %s(%ss)%s' "$c" "$f" "$z" "$pool_title" "$b" "$(pool_done)" "$z" "$pool_total" "$d" "$(( $(date +%s) - pool_start ))" "$z" >&2
+  busy=""; k=1
+  while [ "$k" -le "$pool_n" ]; do
+    if [ ! -e "$pool_dir/$k.rc" ]; then busy=$(sed 's/^[^ ]* //; s/^Installing //' "$pool_dir/$k.label"); break; fi
+    k=$((k + 1))
+  done
+  pdraw=$(printf '%s: %s of %s (%ss) %s' "$pool_title" "$(pool_done)" "$pool_total" "$(( $(date +%s) - pool_start ))" "$busy")
+  printf '\r\033[K%s%s%s %s' "$c" "$f" "$z" "$(clip $((cols - 4)) "$pdraw")" >&2
 }
 pstep() {  # pstep LABEL COMMAND...
   label=$1; shift
@@ -707,11 +715,13 @@ link_fd() {
 
 # ---- fetching and verifying -------------------------------------------------------------------------------------------------------------------------
 
+# A download that stalls must fail, not wait for ever: no answer in 20 seconds, or under 1 KB a second for 60 seconds, ends it (and curl retries).
+net="--connect-timeout 20 --speed-limit 1024 --speed-time 60"
 sha_of() { sha256sum "$1" | cut -d' ' -f1; }
 
 fetch_to() {  # fetch_to URL DEST
-  if command -v curl >/dev/null 2>&1; then curl -fsSL --retry 3 -o "$2" "$1"
-  elif command -v wget >/dev/null 2>&1; then wget -q -O "$2" "$1"
+  if command -v curl >/dev/null 2>&1; then curl -fsSL $net --retry 3 -o "$2" "$1"
+  elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$2" "$1"
   else echo "neither curl nor wget is installed" >&2; return 1; fi
 }
 
@@ -792,8 +802,8 @@ gh_token() {
 
 api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when there is one (it lifts the hourly limit); never sent elsewhere
   tok=$(gh_token)
-  if [ -n "$tok" ]; then curl -fsSL --retry 2 -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json" -o "$2" "$1"
-  else curl -fsSL --retry 2 -H "Accept: application/vnd.github+json" -o "$2" "$1"; fi
+  if [ -n "$tok" ]; then curl -fsSL $net --retry 2 -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json" -o "$2" "$1"
+  else curl -fsSL $net --retry 2 -H "Accept: application/vnd.github+json" -o "$2" "$1"; fi
 }
 
 # The release file for Linux on this architecture, chosen by its name (ws-host's pick_asset): the one that says linux and the architecture, is not for
@@ -840,7 +850,7 @@ candidate() {
   if [ -z "$c_sha" ]; then
     # an older release: a checksum file the publisher put beside it
     for c_sums in $(jq -r '.assets[] | select(.name | test("(checksums?|sha256sums?)(\\.txt)?$|\\.sha256(sum)?$"; "i")) | .browser_download_url' "$c_rel"); do
-      curl -fsSL --retry 2 -o "$work/sums" "$c_sums" 2>/dev/null || continue
+      curl -fsSL $net --retry 2 -o "$work/sums" "$c_sums" 2>/dev/null || continue
       c_base=${c_sums##*/}
       c_found=$(awk -v n="$c_name" -v b="$c_base" 'tolower(b) ~ /\.sha256(sum)?$/ && index(tolower(b), tolower(n)) == 1 && length($1) == 64 && $1 ~ /^[0-9a-f]+$/ {print $1; exit}
                                                  length($1) == 64 && $1 ~ /^[0-9a-f]+$/ && index($0, n) {print $1; exit}' "$work/sums")
@@ -1635,6 +1645,12 @@ main() {
 
   say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for the Intellectual Frontiers harness."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
+  if [ -n "${ARCHON_POSTHOG_KEY:-}" ]; then
+    say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so the archon commands this setup runs are recorded in PostHog."
+  else
+    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ARCHON_POSTHOG_KEY=<your project key>${z}${d}, then start again."
+    say "   Without the key nothing breaks; there is just no telemetry.${z}"
+  fi
 
   signin_needed=0; cloned=0; archon_ran=0
   # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.

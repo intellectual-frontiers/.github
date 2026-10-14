@@ -45,7 +45,9 @@ curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main
 - 🌐 **A web browser** on the same computer, or any other device. The sign-in happens on a GitHub web page.
 - 🔑 **Your Linux password** (the one you made when Debian first started), typed once so the setup may install programs.
 
-**🔐 The GitHub sign-in, step by step.** Partway through, the setup shows a **one-time code** such as `ABCD-1234`. Press **Enter**: your browser opens **github.com/login/device** (no page? copy that address into any browser). Type the code, sign in if asked, and click **Authorize**. Then return to the terminal: from here on the setup is fully automatic, with one tidy line for each part of the work, and asks you nothing more. You never type a password, token or SSH key into the terminal.
+- 📡 **Optional: a PostHog project key.** PostHog is the service that records how the harness is used (its telemetry). To have this setup recorded too, run `export ARCHON_POSTHOG_KEY=<your project key>` in the terminal **before** you start (`ARCHON_POSTHOG_HOST` names a PostHog other than the default). Without it **nothing breaks**; there is simply no telemetry recorded. The setup says which case it is on its first lines.
+
+**🔐 The GitHub sign-in, step by step.** Partway through, the setup shows a **one-time code** such as `ABCD-1234`. **Copy it.** The setup does not open a browser for you: in your normal web browser (on this computer or your phone) open **https://github.com/login/device**. Type the code, sign in if asked, and click **Authorize**. Then return to the terminal: from here on the setup is fully automatic, with one tidy line for each part of the work, and asks you nothing more. You never type a password, token or SSH key into the terminal.
 
 **What it needs.** A Debian 12 or 13 terminal, `amd64` or `arm64`: either a Debian window under **WSL** (Windows Subsystem for Linux, the
 Linux that runs inside Windows 11; install Debian from the Microsoft Store) or a Debian virtual machine. Also an internet connection, a

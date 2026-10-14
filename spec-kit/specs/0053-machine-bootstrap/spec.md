@@ -125,6 +125,9 @@ person in to GitHub before it clones.
   the person; the other packages MAY be installed by `apt` in the background while the person signs in and the tools download, because `apt` and those downloads touch different files. At most one
   `apt` runs at a time: the setup MUST wait for the background install before it checks what was installed and before it runs an `archon` command, which may use `apt` itself.
 - **FR-034**: Making fish the login shell MUST NOT ask a second password while the administrator rights asked for at the start are still good (it runs `chsh` through `sudo`); where a password is still needed, the script MUST say right before `chsh` runs which password it is: the Linux password of the named user, the same one typed at the start.
+- **FR-035**: The GitHub sign-in MUST NOT open a browser (it runs `gh auth login --web --skip-browser`, with no `BROWSER` that could start a text browser); it MUST show the one-time code step and the address `https://github.com/login/device` for the person to open in their own browser.
+- **FR-036**: A download MUST NOT wait for ever: no connection in 20 seconds, or under 1 KB a second for 60 seconds, fails it (and it is retried); the progress line of the parallel installs MUST show while jobs are being started as well as while they finish, and name a program still being fetched.
+- **FR-037**: The script MUST say at its start whether `ARCHON_POSTHOG_KEY` is set (telemetry on) or not (telemetry off), and in the second case how to set it before starting and that nothing breaks without it.
 - **FR-022**: The `README.md` of this repository MUST carry a section, *Set up a new computer*, with the one-line command, what it does, what it
   needs, and each term of art (WSL, chezmoi, Oh My Posh, Nerd Font, fish, login shell, workspace) defined where it is used.
 
