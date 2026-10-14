@@ -269,6 +269,7 @@ logf() {  # logf TEXT: one timestamped line in the log, without colour codes
   [ "$log_ok" = 1 ] || return 0
   printf '%s %s\n' "$(date +%H:%M:%S)" "$(printf '%s' "$*" | sed 's/\x1b\[[0-9;]*m//g')" >>"$logfile" 2>/dev/null || true
 }
+# shellcheck disable=SC2088  # the tilde is meant literally: it is how a path in the home folder is shown to a person
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
 
 # ---- telemetry: optional, to PostHog, only with ARCHON_POSTHOG_KEY (0053 FR-038) ----------------------------------------------------------------------

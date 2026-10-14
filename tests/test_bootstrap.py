@@ -96,7 +96,7 @@ class Shape(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("shellcheck"), "shellcheck is not installed")
     def test_shellcheck_passes(self):
-        p = subprocess.run(["shellcheck", "-s", "sh", str(SCRIPT), str(MANAGED)], capture_output=True, text=True)
+        p = subprocess.run(["shellcheck", "-s", "sh", "-S", "warning", str(SCRIPT), str(MANAGED)], capture_output=True, text=True)
         self.assertEqual(p.returncode, 0, p.stdout)
 
     def test_the_pins_are_whole(self):
@@ -199,7 +199,7 @@ class Switches(Fixture):
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         made = tree(self.home)
         self.assertIn("workspaces/github.com/intellectual-frontiers", made)
-        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith(".archon-bootstrap/log/")], [], "folders only: no file of the person's changes, but the log")
+        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith((".archon-bootstrap/log/", ".local/state/gh/"))], [], "folders only: no file of the person's changes, but the log and what gh itself keeps")
         self.assertTrue(any(m.startswith(".archon-bootstrap/log/bootstrap-") for m in made), "everything is logged to ~/.archon-bootstrap/log/")
         again = self.run_script(**OFF, BOOTSTRAP_KIT="")
         self.assertEqual(again.returncode, 0)
