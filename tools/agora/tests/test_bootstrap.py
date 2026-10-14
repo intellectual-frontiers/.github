@@ -304,6 +304,18 @@ exit 0
         self.assertIn(".archon-bootstrap/log/", p.stdout)
         self.assertFalse(self.clone.exists())
 
+    def test_a_token_in_the_environment_means_no_sign_in_is_asked_for(self):
+        self.stub("gh", 'case "$1 $2" in "auth status") [ -n "$GH_TOKEN" ] && exit 0 || exit 1 ;; "auth login") echo LOGIN_CALLED; exit 9 ;; esac\nexit 0')
+        run = lambda **more: self.run_script(**{k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_AUTH"}, BOOTSTRAP_KIT="", PATH=f"{self.bin}:{os.environ['PATH']}", **more)
+        p = run(GH_TOKEN="ghp_example")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("GH_TOKEN", p.stdout)
+        self.assertNotIn("LOGIN_CALLED", p.stdout + p.stderr)
+        self.stub("gh", 'case "$1 $2" in "auth status") exit 1 ;; esac\nexit 0')
+        bad = run(GITHUB_TOKEN="ghp_bad")
+        self.assertEqual(bad.returncode, 5, bad.stdout)
+        self.assertIn("did not accept the token in", bad.stdout)
+
     def test_git_identity_comes_from_the_account_only_where_git_has_none(self):
         self.stub("gh", 'case "$1 $2" in "auth status") exit 0 ;; "api user") echo \'{"login":"ada","id":42,"name":"Ada Lovelace"}\' ;; esac\nexit 0')
         extra = dict(PATH=f"{self.bin}:{os.environ['PATH']}", GIT_CONFIG_GLOBAL=str(self.home / ".gitconfig"))
@@ -602,6 +614,15 @@ class Pool(Fixture):
         self.assertLess(time.time() - started, 4.5, "six one-second jobs in parallel take about one second, not six")
         folders = (self.home / "folders").read_text().split()
         self.assertEqual(len(set(folders)), 6, "no two jobs share a temporary folder")
+
+    def test_the_pool_does_not_wait_for_the_apt_running_in_the_background(self):
+        """The hang of a real run: a bare `wait` after the jobs also waited for the background apt, with nothing on the screen."""
+        import time
+
+        started = time.time()
+        p = self.run_pool("sleep 20 >/dev/null 2>&1 & pool_begin T; pstep \"job\" sleep 1; pool_end; echo DONE; kill $!")
+        self.assertIn("DONE", p.stdout, p.stdout + p.stderr)
+        self.assertLess(time.time() - started, 8, "the pool waits for its own jobs only")
 
     def test_the_number_of_jobs_at_once_is_capped(self):
         import time

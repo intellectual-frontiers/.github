@@ -27,6 +27,7 @@
 # Environment, so it can be tested (a "1" switches it on):
 #   ARCHON_POSTHOG_KEY     optional: your PostHog project API key, set (export ARCHON_POSTHOG_KEY=...) before starting so the archon commands the setup runs are
 #                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
+#   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to archon; with it no interactive `gh auth login` is needed, and no sign-in is asked for
 #   BOOTSTRAP_URL          where the data files come from when run from a pipe (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
 #   BOOTSTRAP_NO_APT=1     never install a package
@@ -441,10 +442,9 @@ cpus=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
 case $cpus in '' | *[!0-9]*) cpus=2 ;; esac
 par_default=$((cpus * 2)); [ "$par_default" -lt 2 ] && par_default=2; [ "$par_default" -gt 6 ] && par_default=6
 par=${BOOTSTRAP_JOBS:-$par_default}
-pool_n=0; pool_started=0; pool_title=""; pool_total=""; pool_start=0; ticks=0
-pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_total=0; pool_start=$(date +%s); ticks=0;
-  # shellcheck disable=SC2086
-  set -- $frames; nframes=$#; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
+pool_n=0; pool_started=0; pool_title=""; pool_total=""; pool_start=0; ticks=0; pool_pids=""
+nframes=$(printf '%s\n' "$frames" | awk '{print NF}')
+pool_begin() { pool_title=$1; pool_n=0; pool_started=0; pool_total=0; pool_start=$(date +%s); ticks=0; pool_pids=""; pool_dir=$work/pool$$-$1; rm -rf "$pool_dir"; mkdir -p "$pool_dir"; }
 pool_done() { n=0; for f in "$pool_dir"/*.rc; do [ -e "$f" ] && n=$((n + 1)); done; printf '%s' "$n"; }
 pool_draw() {  # one progress line: how many of the programs started so far are done, and for how long
   [ "$tty_ui" = 1 ] || return 0
@@ -473,6 +473,7 @@ pstep() {  # pstep LABEL COMMAND...
     echo $(( $(date +%s) - t0 )) >"$j.secs"
     echo "$rc" >"$j.rc.tmp"; mv "$j.rc.tmp" "$j.rc"
   ) &
+  pool_pids="$pool_pids $!"
 }
 pool_end() {
   [ "$dry" = 1 ] && return 0
@@ -480,7 +481,8 @@ pool_end() {
   pool_total=$pool_started
   while [ "$(pool_done)" -lt "$pool_started" ]; do pool_draw; sleep 0.1; done
   [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
-  wait 2>/dev/null || true
+  for wp in $pool_pids; do wait "$wp" 2>/dev/null || true; done   # these jobs only: a bare `wait` would also wait for the apt running in the background, with nothing on the screen
+  pool_pids=""
   failed_label=""; failed_log=""; failed_from=0
   i=1
   while [ "$i" -le "$pool_n" ]; do
@@ -1439,7 +1441,16 @@ sign_in() {
     return 0
   fi
   have_cmd gh || { warn "gh, the tool that signs you in to GitHub, is not installed."; problem "gh is not installed"; return 0; }
-  if signed_in; then
+  token_var=""
+  if [ -n "${GH_TOKEN:-}" ]; then token_var=GH_TOKEN; elif [ -n "${GITHUB_TOKEN:-}" ]; then token_var=GITHUB_TOKEN; fi
+  if [ -n "$token_var" ] && signed_in; then
+    say "${g}${e_ok}Using the GitHub token in ${z}${b}$token_var${z}${g}: no sign-in is needed.${z}"
+  elif [ -n "$token_var" ]; then
+    say "${r}${b}${e_stop}GitHub did not accept the token in${z} ${b}$token_var${z}${r}.${z}"
+    say "Fix it (it needs the ${b}repo${z} scope, and access to archon), or unset it: ${b}unset $token_var${z}, to sign in by hand instead. Then run this setup again."
+    problem "the token in $token_var was not accepted by GitHub"
+    exit 5
+  elif signed_in; then
     say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
     say ""
