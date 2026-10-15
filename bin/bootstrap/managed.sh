@@ -1,6 +1,6 @@
 #!/bin/sh
 # What bootstrap-archon.sh puts in the files it manages for a person, as a filter from a file's text to its new text
-# (0053-machine-bootstrap FR-009). It is the POSIX sh port of ws-host's ws_host/lib/managed.py: the same marker lines, so that ws-host
+# (0136-machine-bootstrap FR-009). It is the POSIX sh port of ws-host's ws_host/lib/managed.py: the same marker lines, so that ws-host
 # and this script recognise each other's blocks, and the same rule that running it twice gives the same text.
 #
 # chezmoi runs it from a `modify_` script: the file's current text on standard input, the new text on standard output.

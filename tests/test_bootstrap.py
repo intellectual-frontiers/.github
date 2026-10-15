@@ -1,4 +1,4 @@
-"""The machine bootstrap (0053-machine-bootstrap): `bin/bootstrap-archon.sh` and the data beside it, tested without root, apt or the network.
+"""The machine bootstrap (0136-machine-bootstrap): `bin/bootstrap-archon.sh` and the data beside it, tested without root, apt or the network.
 
 What runs here: the script's syntax in every POSIX shell on the machine, `--dry-run`, every switch that turns an installation off, the clone and its
 fast-forward-only update against a local repository, the three `archon` commands against a stand-in launcher, the file editor
@@ -142,7 +142,7 @@ class Entry(Fixture):
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
     def test_dry_run_lists_the_ai_assistants_and_a_switch_leaves_them_out(self):
-        """0053-machine-bootstrap FR-042: Claude Code, Codex, OpenCode and Aider are in the default kits."""
+        """0136-machine-bootstrap FR-042: Claude Code, Codex, OpenCode and Aider are in the default kits."""
         p = self.run_script("--dry-run")
         for tool in ("claude", "codex", "opencode", "aider"):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
@@ -183,7 +183,7 @@ class Entry(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Colour(Fixture):
-    """0053-machine-bootstrap FR-026: an environment variable name in a message is bright yellow where there is colour."""
+    """0136-machine-bootstrap FR-026: an environment variable name in a message is bright yellow where there is colour."""
 
     def test_an_environment_variable_name_is_bright_yellow_and_other_words_are_not(self):
         script = f". {SCRIPT}; yb=$(printf '\\033[1;93m'); z=$(printf '\\033[0m'); say 'set BOOTSTRAP_PROMPT=plain, not FR-001 or git'"
@@ -453,7 +453,7 @@ class Rules(Fixture):
         return f"file://{reg}"
 
     def test_an_ai_assistant_is_installed_only_with_the_checksum_npm_lists_for_it(self):
-        """0053-machine-bootstrap FR-043: the program is verified, run once, linked, and a second run changes nothing."""
+        """0136-machine-bootstrap FR-043: the program is verified, run once, linked, and a second run changes nothing."""
         setup = 'mkdir -p "$work" "$tools" "$bin"; '
         call = "install_npm_native demo demo-meta demo-linux-{arch}@{ver} demo"
         reg = self.registry()
@@ -551,7 +551,7 @@ class Data(Fixture):
 
 class Readme(unittest.TestCase):
     def test_the_public_readme_carries_no_setup_instructions(self):
-        """0053-machine-bootstrap FR-022: the instructions live in archon's README, which the people who may run the script can read."""
+        """0136-machine-bootstrap FR-022: the instructions live in archon's README, which the people who may run the script can read."""
         text = (HOME / "README.md").read_text()
         self.assertNotIn("## Set up a new computer", text)
         self.assertNotIn("bootstrap-archon", text)
@@ -559,7 +559,7 @@ class Readme(unittest.TestCase):
 
 class Packages(unittest.TestCase):
     def test_no_package_duplicates_a_program_archon_pins(self):
-        """0053-machine-bootstrap FR-007: Node.js and the browser come from `archon toolchain ensure`, at the pinned version, not from apt."""
+        """0136-machine-bootstrap FR-007: Node.js and the browser come from `archon toolchain ensure`, at the pinned version, not from apt."""
         text = SCRIPT.read_text()
         start = text.index("wanted_packages() {")
         body = text[start:text.index("\n}\n", start)]
@@ -570,18 +570,18 @@ class Packages(unittest.TestCase):
 
 
 class Slim(unittest.TestCase):
-    def test_the_repository_holds_only_the_bootstrap_its_tests_and_specification_and_the_organizations_profile(self):
+    def test_the_repository_holds_only_the_bootstrap_its_tests_and_the_organizations_profile(self):
         """The rest of the harness lives in the private archon repository; this one stays small and public."""
         tracked = subprocess.run(["git", "ls-files"], cwd=HOME, capture_output=True, text=True, check=True).stdout.split()
         top = {t.split("/")[0] for t in tracked}
-        self.assertLessEqual(top, {".github", "bin", "profile", "spec", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
+        self.assertLessEqual(top, {".github", "bin", "profile", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
 
 
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Stops(Fixture):
-    """0053-machine-bootstrap FR-028 to FR-030: a failed step stops the setup, is logged, and says where to look and how to ask for help."""
+    """0136-machine-bootstrap FR-028 to FR-030: a failed step stops the setup, is logged, and says where to look and how to ask for help."""
 
     def test_a_failed_step_stops_with_the_log_the_support_file_and_how_to_ask_for_help(self):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; step 'Installing everything' sh -c 'echo broke the thing; exit 7'; echo SHOULD_NOT_GET_HERE"
@@ -606,7 +606,7 @@ class Stops(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Telemetry(Fixture):
-    """0053-machine-bootstrap FR-038: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
+    """0136-machine-bootstrap FR-038: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
 
     def serve(self):
         import http.server
@@ -678,7 +678,7 @@ class Telemetry(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Settings(Fixture):
-    """0053-machine-bootstrap FR-041: the PostHog settings the setup was given are kept for every new terminal, in the file and blocks `archon secrets` uses."""
+    """0136-machine-bootstrap FR-041: the PostHog settings the setup was given are kept for every new terminal, in the file and blocks `archon secrets` uses."""
 
     def keep(self, **extra):
         return self.run_script(**OFF, BOOTSTRAP_KIT="", **extra)
@@ -736,7 +736,7 @@ class Settings(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Pool(Fixture):
-    """0053-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
+    """0136-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
 
     def run_pool(self, body, **extra):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; {body}"

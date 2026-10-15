@@ -12,7 +12,7 @@ This small public repository holds two things:
 - **The organization's landing page**, [`profile/README.md`](profile/README.md), which GitHub shows at <https://github.com/intellectual-frontiers>.
 - **The machine setup script**, in [`bin/`](bin/), which turns a fresh Debian computer (under WSL or a virtual machine) into a working
   place for the Intellectual Frontiers AI Workforce® Harness: it installs what Debian lacks, signs you in to GitHub, and copies the private `archon` repository. It is public so that
-  a brand-new computer can fetch it before it can sign in to anything. What it does is specified in [`spec/0053-machine-bootstrap.md`](spec/0053-machine-bootstrap.md) and tested in
+  a brand-new computer can fetch it before it can sign in to anything. What it does is specified in `archon`'s `0136-machine-bootstrap` and tested in
   [`tests/`](tests/).
 
 The harness itself, its specifications, its ontology and everything it builds live in the private `archon` repository. The setup instructions are in that repository's README,

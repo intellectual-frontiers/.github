@@ -1,6 +1,6 @@
 #!/bin/sh
 # Set up a new computer for the Intellectual Frontiers harness: a slim Debian 12 or 13 (amd64 or arm64), under WSL 2 or in a virtual machine, becomes
-# a complete working environment with a clone of the harness repository, `archon` (0053-machine-bootstrap).
+# a complete working environment with a clone of the harness repository, `archon` (0136-machine-bootstrap).
 #
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh
@@ -272,11 +272,11 @@ logf() {  # logf TEXT: one timestamped line in the log, without colour codes
 # shellcheck disable=SC2088  # the tilde is meant literally: it is how a path in the home folder is shown to a person
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
 
-# ---- telemetry: optional, to PostHog, only with ARCHON_POSTHOG_KEY (0053 FR-038) ----------------------------------------------------------------------
+# ---- telemetry: optional, to PostHog, only with ARCHON_POSTHOG_KEY (0136 FR-038) ----------------------------------------------------------------------
 # With the key set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can see how long
 # things take and where people get stuck: environment `bootstrap`, a device id made from the machine (never its name), and the kind of computer. No name, host name,
 # password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ARCHON_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
-# The settings a person kept earlier (`archon secrets`, 0053 FR-041) count where this terminal did not load them.
+# The settings a person kept earlier (`archon secrets`, 0136 FR-041) count where this terminal did not load them.
 secrets_file=$cfgdir/archon/secrets.env
 sf_get() {  # sf_get NAME: the value kept in the file, or nothing
   [ -r "$secrets_file" ] || return 0
@@ -1942,7 +1942,7 @@ main() {
   finish
 }
 
-# ---- keep the PostHog settings for every new terminal (0053 FR-041; the same file and blocks as `archon secrets`, archon's 0074-secrets) --------------------------
+# ---- keep the PostHog settings for every new terminal (0136 FR-041; the same file and blocks as `archon secrets`, archon's 0074-secrets) --------------------------
 # The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read, and bash and fish are told to read it.
 sf_begin='# >>> archon: secrets (managed by `archon secrets`; change them there) >>>'
 sf_end='# <<''< archon: secrets <<''<'   # written so, since the shape test reads a literal three-less-than as a bash here-string
