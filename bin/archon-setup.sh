@@ -1,32 +1,37 @@
 #!/bin/sh
-# Set up a new computer for the Intellectual Frontiers harness: a slim Debian 12 or 13 (amd64 or arm64), under WSL 2 or in a virtual machine, becomes
-# a complete working environment with a clone of the harness repository, `archon` (0136-machine-bootstrap).
+# Set up one Linux account for the Intellectual Frontiers harness, without administrator rights (0136-machine-bootstrap, the setup). Run it in the account that
+# will use `archon`: everything it writes is inside that account's home folder, so deleting the account and its home folder removes all of it. A person who has
+# a computer already makes an account for archon (`sudo adduser archon`), switches to it (`sudo -iu archon`) and runs this there; `archon-bootstrap.sh` does
+# those steps on a blank computer, and runs this one as the account.
 #
-#   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh -s -- --dry-run
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --dry-run
 #
-# It is a self-contained port of what ws-host (workspaces-host) installs for its default kits (base, shell and embedded-sql) and does for the
-# terminal's look, git and the workspaces folder. It never calls, clones or needs ws-host. It:
+# It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian has none of them):
+#   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs)
 #
-#   1. Packages: installs what is missing with apt (it says so and asks for your password once, first; nothing there touches GitHub),
-#   2. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
+# It is a self-contained port of what ws-host (workspaces-host) installs for its default kits and does for git and the workspaces folder. It never calls,
+# clones or needs ws-host. It:
+#
+#   1. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
 #      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so mise and archon use it and are not held to GitHub's hourly limit for no sign-in;
 #      with no token at all, everything that comes from GitHub is skipped and listed in the summary, to be done by running this again after sign-in,
-#   3. Python and tools: gets the pinned mise, and through it Python and uv, then the modern command line tools, each checked against a checksum, and
-#      the AI assistants for the terminal (Claude Code, Codex, OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists,
-#   4. Shell and prompt: installs fish 4, Oh My Posh with ws-host's themes and chezmoi, and has chezmoi give bash and fish the prompt,
-#   5. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
+#   2. Python and tools: gets the pinned mise, and through it Python and uv, then the AI assistants for the terminal (Claude Code, Codex, OpenCode and
+#      Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4, the modern command line tools,
+#      DuckDB, the SQLite tools and the embedded-SQL tools, each checked against a checksum,
+#   3. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
 #      fast-forward only),
-#   6. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
-#      Login shell: offers to make fish your login shell,
-#   7. First checks: runs, in the clone, ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
+#   4. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
+#   5. First checks: runs, in the clone, ./archon shell ensure (the startup files of bash, zsh and fish: archon keeps them, with chezmoi),
+#      ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
 #
-# Safe to run again: what is already in place changes nothing, your own files change only between marked lines (a copy is kept first), and a
-# clone with your work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is
-# kept in a log and shown only if the step fails.
+# It writes no startup file itself: `archon shell` does (0138-shell). Safe to run again: what is already in place changes nothing, and a clone with your
+# work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is kept in a log and shown only if
+# the step fails.
 #
 # Options (after `sh -s --` when piped):  --dry-run   list every step it would take, change nothing, fetch nothing, ask for nothing
+#                                          --dedicated this account is for archon alone: archon keeps its startup files whole (`archon shell ensure --mode owned`)
+#                                          --comfort   also install what no archon command needs (fish, the modern command line tools, the data tools)
 #                                          -h, --help  this text
 #
 # Environment, so it can be tested (a "1" switches it on):
@@ -34,54 +39,40 @@
 #                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
 #   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to archon; with it no interactive `gh auth login` is needed, and no sign-in is asked for. It is the way to get the tools that come from GitHub where no browser is
 #                          (without a token or a sign-in they are skipped, and listed at the end)
-#   BOOTSTRAP_URL          where the data files come from when run from a pipe (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
+#   BOOTSTRAP_URL          where the bootstrap fetches this script from when it is piped (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
-#   BOOTSTRAP_NO_APT=1     never install a package
-#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (mise, chezmoi, Oh My Posh, fish, the modern tools)
+#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (mise, fish, the modern tools)
 #   BOOTSTRAP_NO_RUNTIME=1 do not install Python and uv with mise (the uv already on the PATH is used)
-#   BOOTSTRAP_NO_DOTFILES=1   do not touch ~/.bashrc, fish's config.fish or ~/.gitconfig
+#   BOOTSTRAP_NO_DOTFILES=1   do not run `archon shell ensure` (so no startup file is touched)
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
-#   BOOTSTRAP_NO_CHSH=1    never offer to change the login shell (BOOTSTRAP_CHSH=yes changes it without asking, no never does)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update archon (and so run nothing in it)
 #   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
-#   BOOTSTRAP_KIT          the kits to install, space-separated (default: base shell embedded-sql agents; WS_HOST_KIT is read too)
-#   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the default kits
-#   BOOTSTRAP_NO_EDITOR=1  do not install VS Code or put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing;
-#                          elsewhere Microsoft's apt repository, on a machine with a desktop) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
-#   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no; naming one here also replaces a prompt block already in ~/.bashrc
+#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql; WS_HOST_KIT is read too)
+#   BOOTSTRAP_NO_COMFORT=1 never install the comfort kits, even when --comfort is given
+#   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the kits
+#   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
+#   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no: the prompt `archon shell set prompt` is told to draw
 #   BOOTSTRAP_TOOLCHAIN    the names for `archon toolchain ensure` (default: every entry not ready and not marked optional; none; all)
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
 # ws-host's own names are honoured where it has them: WS_HOST_HOME (the workspaces folder, default ~/workspaces), WS_HOST_WORKSPACES, WS_HOST_KIT,
-# WS_HOST_PROMPT, WS_HOST_MODERN, WS_HOST_GIT_NAME, WS_HOST_GIT_EMAIL, WS_HOST_NO_APT, in the environment or in ~/.config/workspaces-host/ws-host.env.
+# WS_HOST_PROMPT, WS_HOST_MODERN, WS_HOST_GIT_NAME, WS_HOST_GIT_EMAIL, in the environment or in ~/.config/workspaces-host/ws-host.env.
 #
-# Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the machine cannot be set up yet, 4 a step failed (setup stops, and
-# says where the log and the support file are), 5 the GitHub sign-in did not finish.
+# Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
+# 4 a step failed (setup stops, and says where the log and the support file are), 5 the GitHub sign-in did not finish.
 # Everything is logged to ~/.archon-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
 # What was skipped for want of a GitHub token is not a failed step: it is listed in the summary and the exit status stays 0.
 # shellcheck disable=SC2034  # the pinned checksums are read by arch_sha, through eval
 set -eu
 
-# ---- what is pinned (the same releases ws-host pins; each is checked by SHA-256 before it is unpacked) -------------------------------------------
+# ---- what is pinned (each is checked by SHA-256 before it is unpacked; chezmoi and Oh My Posh are pinned by archon, in toolchain/) ------------------
 
 MISE_VERSION=2026.10.3
 MISE_SHA256_X86_64=ff0870ddad7f8c5ba673ceb3e7659f0353da8263eabe8b82220f5816a772c786
 MISE_SHA256_AARCH64=a5141f834d883239c2542b9a2136e75428779b2040206537399714d8c534d91f
 PYTHON_VERSION=3.14.8
 UV_VERSION=0.12.23
-
-CHEZMOI_VERSION=2.73.0
-CHEZMOI_SHA256_X86_64=b597729b687af4488a848240134cb633de8ca0f04e0d26d48f400ee2ac338ffa
-CHEZMOI_SHA256_AARCH64=abcb840401d3c1f2356e0f53f5d52aa10d10f572654d9626db9ad0ca4dc03355
-
-# Microsoft's apt signing key (fingerprint BC52 8686 B50D 79E3 39D3 721C EB3E 94AD BE12 29CF), for VS Code on a Debian machine that is not under WSL
-MS_KEY_URL=https://packages.microsoft.com/keys/microsoft.asc
-MS_KEY_SHA256=2fa9c05d591a1582a9aba276272478c262e95ad00acf60eaee1644d93941e3c6
-
-POSH_VERSION=31.4.1
-POSH_SHA256_X86_64=bfd0ccab85dc031c848b09b68226f1be942d2ce18978f94c9659b6e7e1b259af
-POSH_SHA256_AARCH64=9649d66f978e65dc669307546bee61b7ff45fa0621c333be85db029382f1e859
 
 # fish 4 for a distribution whose own fish is older (Debian 12 has 3.6). ws-host unpacks the fish project's Ubuntu package, which needs a newer C
 # library than Debian 12 has; the project's own static release runs on any Linux, so that is what is pinned here.
@@ -158,6 +149,8 @@ pypi_url=${BOOTSTRAP_PYPI:-${WS_HOST_PYPI:-https://pypi.org}}
 npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 
 dry=0
+dedicated=0
+comfort=0
 orig_path=$PATH
 
 usage() {
@@ -167,10 +160,12 @@ usage() {
 for arg in "$@"; do
   case $arg in
     --dry-run | -n) dry=1 ;;
+    --dedicated) dedicated=1 ;;
+    --comfort) comfort=1 ;;
     -h | --help)
-      case $0 in *bootstrap-archon.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run]   (see the header of bootstrap-archon.sh)" ;; esac
+      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--dedicated] [--comfort]   (see the header of archon-setup.sh)" ;; esac
       exit 0 ;;
-    *) echo "bootstrap-archon: unknown option $arg (try --help)" >&2; exit 2 ;;
+    *) echo "archon-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
   esac
 done
 
@@ -243,7 +238,7 @@ bin=$HOME/.local/bin
 tools=$data/tools
 store=$data/mise/data/installs
 
-work=$(mktemp -d "${TMPDIR:-/tmp}/bootstrap-archon.XXXXXX")
+work=$(mktemp -d "${TMPDIR:-/tmp}/archon-setup.XXXXXX")
 problems=$work/problems     # one line for each thing that did not work, shown at the end
 : >"$problems"
 ka_pid=""; rem_pid=""
@@ -372,12 +367,6 @@ ph_wait() {  # wait (a few seconds at most) for what is still being sent
 }
 ph_home() { printf '%s' "$1" | sed "s#$HOME#~#g"; }   # a path or an error line without the person's user name in it
 
-# Where this script is, when it is a file; the data files beside it are used then, else they are fetched from raw_url.
-script_dir=""
-case $0 in
-  *bootstrap-archon.sh) [ -f "$0" ] && script_dir=$(cd "$(dirname "$0")" && pwd -P) ;;
-esac
-
 # A terminal to ask on, even when standard input is the script (a pipe).
 if ( : </dev/tty ) 2>/dev/null; then has_tty=1; else has_tty=0; fi
 [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && tty_ui=1 || tty_ui=0
@@ -484,7 +473,7 @@ step_soft() { soft_ok=1; step "$@"; rc_soft=$?; soft_ok=0; return "$rc_soft"; } 
 
 # ---- parallel downloads: tools that do not touch each other are fetched at the same time ------------------------------------------------------------
 # Each job runs in the background with a work folder of its own (so no two share a temporary file), writes only to its own folder under $tools and to
-# its own link in ~/.local/bin, and never touches apt. The caller waits for all of them with one progress line, then stops if any failed.
+# its own link in ~/.local/bin, and never uses a package manager. The caller waits for all of them with one progress line, then stops if any failed.
 # How many at once: the work waits mostly on the network, so cores are not the limit (bandwidth and the servers' own limits are, which is why 6 is the ceiling), but unpacking is
 # some work for the processor, so a small computer gets fewer: twice its processors, at least 2 and at most 6. BOOTSTRAP_JOBS sets it.
 cpus=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
@@ -530,7 +519,7 @@ pool_end() {
   pool_total=$pool_started
   while [ "$(pool_done)" -lt "$pool_started" ]; do pool_draw; sleep 0.1; done
   [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
-  for wp in $pool_pids; do wait "$wp" 2>/dev/null || true; done   # these jobs only: a bare `wait` would also wait for the apt running in the background, with nothing on the screen
+  for wp in $pool_pids; do wait "$wp" 2>/dev/null || true; done   # these jobs only: a bare `wait` would also wait for any other job of this shell, with nothing on the screen
   pool_pids=""
   failed_label=""; failed_log=""; failed_from=0
   i=1
@@ -608,7 +597,7 @@ write_support_file() {  # write_support_file LABEL STEPLOG LOGLINE
 
 detect_platform() {
   os=$(uname -s)
-  [ "$os" = Linux ] || need "this is $os, and the bootstrap sets up Debian under WSL 2 or in a virtual machine." "open your Debian window (or start the virtual machine) and run it there"
+  [ "$os" = Linux ] || need "this is $os, and the setup is made for Debian under WSL 2 or in a virtual machine." "open your Debian window (or start the virtual machine) and run it there"
   case $(uname -m) in
     x86_64 | amd64) arch=x86_64; goarch=amd64; miseArch=x64 ;;
     aarch64 | arm64) arch=aarch64; goarch=arm64; miseArch=arm64 ;;
@@ -623,7 +612,7 @@ detect_platform() {
   fi
   case " $d_id $d_like " in
     *" debian "* | *" ubuntu "*) ;;
-    *) need "this is $d_pretty, and the bootstrap sets up Debian." "use Debian 12 or 13 (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
+    *) need "this is $d_pretty, and the setup is made for Debian." "use Debian 12 or 13 (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
   esac
   wsl=0; wsl_txt=""
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then wsl=1; wsl_txt=", under WSL"; fi
@@ -632,15 +621,35 @@ detect_platform() {
   case "$d_id:$d_version" in debian:12 | debian:12.* | debian:13 | debian:13.*) tested=1 ;; esac
 }
 
+# ---- what the computer must already have (the setup installs no package: archon-bootstrap.sh does) -------------------------------------------------------
+
+check_prereqs() {
+  for cmd in git curl; do
+    command -v "$cmd" >/dev/null 2>&1 || need "this account has no $cmd, and the setup installs no package (it never uses administrator rights)." \
+      "from an account that has them, run:  sudo apt-get install -y $cmd   (or run archon-bootstrap.sh, which installs what is needed and then runs this setup)"
+  done
+  missing=""
+  for cmd in tar xz unzip jq gh; do
+    command -v "$cmd" >/dev/null 2>&1 || missing="$missing $cmd"
+  done
+  [ -z "$missing" ] && return 0
+  pkgs=$(printf '%s' "$missing" | sed 's/ xz/ xz-utils/')
+  warn "This account has no$missing, which the setup needs for some steps, and it installs no package."
+  problem "missing programs:$missing (from an account with administrator rights: sudo apt-get install -y$pkgs)"
+}
+
 # ---- configuration of this run -----------------------------------------------------------------------------------------------------------------
 
 load_config() {
-  kits=$(cfg BOOTSTRAP_KIT "$(cfg WS_HOST_KIT 'base shell embedded-sql agents')")
+  [ "${BOOTSTRAP_NO_COMFORT:-}" = 1 ] && comfort=0
+  default_kits=agents
+  [ "$comfort" = 1 ] && default_kits='agents base shell embedded-sql'
+  kits=$(cfg BOOTSTRAP_KIT "$(cfg WS_HOST_KIT "$default_kits")")
   kits=$(printf '%s' "$kits" | tr ',' ' ')
   if [ "${BOOTSTRAP_NO_AGENTS:-}" = 1 ]; then kits=$(printf ' %s ' "$kits" | sed 's/ agents / /g'); fi
   p=$(cfg WS_HOST_PROMPT pretty)
-  reset_prompt=0
-  if [ -n "${BOOTSTRAP_PROMPT:-}" ]; then p=$BOOTSTRAP_PROMPT; reset_prompt=1; fi
+  prompt_given=0
+  if [ -n "${BOOTSTRAP_PROMPT:-}" ]; then p=$BOOTSTRAP_PROMPT; prompt_given=1; fi
   case $(printf '%s' "$p" | tr '[:upper:]' '[:lower:]') in
     plain) prompt=plain ;;
     no | false | 0 | off | none | "") prompt=no ;;
@@ -654,49 +663,16 @@ load_config() {
   # shellcheck disable=SC2088  # a literal ~ is expanded here, by hand
   case $root in "~") root=$HOME ;; "~/"*) root=$HOME/${root#"~/"} ;; esac
   target=$root/github.com/intellectual-frontiers/archon
-  no_apt=0; { [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ]; } && no_apt=1
-  command -v apt-get >/dev/null 2>&1 || no_apt=1
 }
 
 kit_on() {  # kit_on NAME
   case " $kits " in *" $1 "*) return 0 ;; *) return 1 ;; esac
 }
 
-# ---- packages (apt) --------------------------------------------------------------------------------------------------------------------------
-
-pkg_installed() {  # pkg_installed "a|b": any alternative installed
-  for alt in $(printf '%s' "$1" | tr '|' ' '); do
-    dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q 'install ok installed' && return 0
-  done
-  return 1
-}
-
-pkg_candidate() {  # pkg_candidate NAME: the version apt would install, empty when none
-  v=$(apt-cache policy "$1" 2>/dev/null | sed -n 's/^ *Candidate: *//p' | head -n 1)
-  [ "$v" = "(none)" ] && v=""
-  printf '%s' "$v"
-}
-
-# The packages the kits name for Debian (ws-host's base.py and shell.py), plus what this script itself needs to fetch and unpack.
-wanted_packages() {
-  echo "git ca-certificates curl wget tar xz-utils unzip jq gh"
-  if kit_on base; then
-    echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk"
-    echo "ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck"
-    echo "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra"
-    if [ "$is_debian" = 1 ]; then case $d_codename in bookworm | bullseye | "") ;; *) echo "glab" ;; esac; fi
-  fi
-  return 0
-}
+# ---- fish ------------------------------------------------------------------------------------------------------------------------------------------
 
 fish_major() {  # the major version of the fish program given, or 0
   m=$("$1" --version 2>/dev/null | awk '{print $NF}' | sed 's/\..*//')
-  case $m in '' | *[!0-9]*) m=0 ;; esac
-  printf '%s' "$m"
-}
-
-cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
-  m=${1#*:}; m=${m%%.*}
   case $m in '' | *[!0-9]*) m=0 ;; esac
   printf '%s' "$m"
 }
@@ -706,143 +682,6 @@ have_fish4() {
     [ -n "$f" ] && [ -x "$f" ] && [ "$(fish_major "$f")" -ge 4 ] && return 0
   done
   return 1
-}
-
-sudo_cmd=""
-sudo_ready=0
-sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
-  [ "$sudo_ready" = 1 ] && return 0
-  if [ "$(id -u)" = 0 ]; then sudo_ready=1; return 0; fi
-  command -v sudo >/dev/null 2>&1 || return 1
-  sudo_cmd=sudo
-  say "${b}${e_key}I need administrator rights to $1.${z}"
-  say "${d}Type your Linux password when asked, once. Nothing shows while you type: that is normal.${z}"
-  if [ "$has_tty" = 1 ]; then
-    # shellcheck disable=SC2024  # the terminal is for sudo to read the password from
-    sudo -v </dev/tty || return 1
-  elif ! sudo -n true 2>/dev/null; then
-    return 1
-  fi
-  sudo_ready=1
-  # keep the password alive for the length of the run, so it is not asked again
-  ( while :; do sleep 50; sudo -n true 2>/dev/null || exit 0; done ) >/dev/null 2>&1 </dev/null &
-  ka_pid=$!
-  return 0
-}
-
-apt_install() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o DPkg::Lock::Timeout=180 "$@"; }
-apt_update() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get update -qq -o DPkg::Lock::Timeout=180; }
-
-# Whether apt can give fish 4 on this distribution: its candidate says so; with no package lists yet (a fresh image), its release does.
-fish_from_apt() {
-  cand=$(pkg_candidate fish)
-  if [ -n "$cand" ]; then [ "$(cand_major "$cand")" -ge 4 ]; return; fi
-  case $d_codename in bookworm | bullseye | buster | focal | jammy | noble) return 1 ;; *) return 0 ;; esac
-}
-
-install_packages() {
-  phase "${e_pkg}Setting up Debian's everyday programs"
-  if [ "$tested" = 0 ]; then
-    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13; I will go on, and say what does not work."
-  fi
-  missing=""
-  for spec in $(wanted_packages); do
-    pkg_installed "$spec" 2>/dev/null || missing="$missing $spec"
-  done
-  if kit_on shell && ! have_fish4 && fish_from_apt; then missing="$missing fish"; fi
-  if [ -z "$missing" ]; then
-    say "Everything the packages give is here."
-    return 0
-  fi
-  if [ "$no_apt" = 1 ]; then
-    for cmd in git curl; do
-      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "sudo apt install$missing"
-    done
-    warn "Not installed, because packages are off here:$missing"
-    problem "packages not installed:$missing"
-    return 0
-  fi
-  if [ "$dry" = 1 ]; then
-    [ "$(id -u)" = 0 ] || would "say why administrator rights are needed and ask for your password, once"
-    would "refresh the package list, then install with apt:$missing"
-    return 0
-  fi
-  if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
-  sudo_for "install Debian's everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to run: apt install$missing"
-  step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
-  # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
-  chosen=""; lacking=""
-  for spec in $missing; do
-    pick=""
-    for alt in $(printf '%s' "$spec" | tr '|' ' '); do
-      if [ -n "$(pkg_candidate "$alt")" ]; then pick=$alt; break; fi
-    done
-    if [ "$pick" = fish ] && [ "$(cand_major "$(pkg_candidate fish)")" -lt 4 ]; then pick=""; fi   # fish 3 is not the shell this sets up; the pinned release is
-    if [ -n "$pick" ]; then chosen="$chosen $pick"; elif [ "$spec" != fish ]; then lacking="$lacking $spec"; fi
-  done
-  if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
-  if [ -n "$chosen" ]; then
-    # The few programs the rest of this setup itself needs (to download, unpack, sign in) are installed first, in front of you. The rest are installed in the
-    # background while you sign in to GitHub and while the tools download: apt and those downloads touch different files, so they cannot get in each other's way.
-    first=""; rest=""
-    for pkg in $chosen; do
-      case $pkg in git | ca-certificates | curl | wget | tar | xz-utils | unzip | jq | gh | fish) first="$first $pkg" ;; *) rest="$rest $pkg" ;; esac
-    done
-    if [ -n "$first" ]; then
-      count_re='^Setting up '
-      count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $first 2>/dev/null | grep -c '^Inst ' || true)
-      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
-      step "${e_pkg}Installing programs" apt_install $first || need "the packages could not be installed." "run: sudo apt install$first"
-      count_re=""; count_total=""
-    fi
-    if [ -n "$rest" ]; then bg_apt_start $rest; fi
-  fi
-  return 0
-}
-
-# ---- the rest of the packages, installed in the background -----------------------------------------------------------------------------------------
-bgapt_on=0; bgapt_total=""
-bg_apt_start() {
-  bgapt_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y "$@" 2>/dev/null | grep -c '^Inst ' || true)
-  [ "${bgapt_total:-0}" -gt 0 ] 2>/dev/null || bgapt_total=""
-  rm -f "$work/bgapt.rc" "$work/bgapt.log"
-  ( rc=0; apt_install "$@" >"$work/bgapt.log" 2>&1 </dev/null || rc=$?; echo "$rc" >"$work/bgapt.rc.tmp"; mv "$work/bgapt.rc.tmp" "$work/bgapt.rc" ) &
-  bgapt_on=1; bgapt_list="$*"
-  logf "started installing in the background:$bgapt_list"
-}
-bg_apt_wait() {  # waits for the background install, with the same progress line as any install, and stops if it failed
-  [ "$bgapt_on" = 1 ] || return 0
-  start=$(date +%s); ticks=0
-  # shellcheck disable=SC2086
-  set -- $frames; nframes=$#
-  while [ ! -f "$work/bgapt.rc" ]; do
-    if [ "$tty_ui" = 1 ]; then
-      ticks=$((ticks + 1))
-      if [ "$ticks" -ge 5 ]; then
-        n=$(( ticks % nframes )); f=""; i=0
-        for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
-        done_n=$(grep -c '^Setting up ' "$work/bgapt.log" 2>/dev/null || true)
-        of=""; [ -n "$bgapt_total" ] && of=" of $bgapt_total"
-        printf '\r\033[K%s%s%s %sFinishing the programs: %s%s%s%s %s(%ss)%s' "$c" "$f" "$z" "$e_pkg" "$b" "$done_n" "$z" "$of" "$d" "$(( $(date +%s) - start ))" "$z" >&2
-      fi
-    fi
-    sleep 0.1
-  done
-  [ "$tty_ui" = 1 ] && printf '\r\033[K' >&2
-  bgapt_on=0
-  rc=$(cat "$work/bgapt.rc" 2>/dev/null || echo 1)
-  step_no=$((step_no + 1))
-  log_from=0
-  if [ "$log_ok" = 1 ]; then
-    log_from=$(( $(wc -l <"$logfile") + 1 ))
-    { printf '\n==== STEP %s: Installing the rest of the programs (exit %s)\n' "$step_no" "$rc"; cat "$work/bgapt.log"; } >>"$logfile" 2>/dev/null || true
-  fi
-  if [ "$rc" != 0 ]; then
-    phase_bad=1
-    cp "$work/bgapt.log" "$work/last.log"
-    if [ "$keep_going" = 1 ]; then warn "the rest of the programs did not install"; else stop_here "Installing the rest of the programs" "$work/bgapt.log" "$log_from"; fi
-  fi
-  return 0
 }
 
 # Debian calls the fd program fdfind; link the plain name when nothing else holds it
@@ -939,7 +778,7 @@ gh_token() {
   printf '%s' "$t"
 }
 
-# Everything that talks to GitHub (the release lookups, mise's downloads, fish, chezmoi, archon's toolchain) waits for github_init, which main runs right after
+# Everything that talks to GitHub (the release lookups, mise's downloads, fish, archon's toolchain and shell) waits for github_init, which main runs right after
 # sign_in. It exports the token to the programs started from here on (mise, archon, gh) and records whether there is one. Without one, those installs are
 # skipped and listed, not tried: unauthenticated, GitHub answers 403 and 429 after a few dozen requests, and a failed step list helps nobody.
 have_github=0
@@ -1280,16 +1119,6 @@ setup_runtime() {
   return 0
 }
 
-# ---- data files: beside the script in a checkout, from BOOTSTRAP_URL in a pipe ----------------------------------------------------------------------
-
-data_file() {  # data_file NAME DEST
-  mkdir -p "$(dirname "$2")"
-  if [ -n "$script_dir" ] && [ -f "$script_dir/bootstrap/$1" ]; then cp "$script_dir/bootstrap/$1" "$2.new"
-  else fetch_to "$raw_url/bin/bootstrap/$1" "$2.new" || { rm -f "$2.new"; echo "could not fetch $raw_url/bin/bootstrap/$1" >&2; return 1; }
-  fi
-  mv "$2.new" "$2"
-}
-
 # ---- the tools of the kits -----------------------------------------------------------------------------------------------------------------------
 
 setup_tools() {
@@ -1314,7 +1143,7 @@ setup_tools() {
     if [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
       pstep "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org
     fi
-    each_tool "$MODERN_TOOLS" release_step
+    [ "$modern" = 0 ] || each_tool "$MODERN_TOOLS" release_step
     pool_end
   fi
   if kit_on embedded-sql; then
@@ -1337,186 +1166,20 @@ setup_tools() {
 
 # ---- the shell kit: fish 4 and Oh My Posh with ws-host's themes ----------------------------------------------------------------------------------
 
-posh_url() { printf 'https://cdn.ohmyposh.dev/releases/v%s/posh-linux-%s' "$POSH_VERSION" "$goarch"; }
 fish_url() { printf 'https://github.com/fish-shell/fish-shell/releases/download/%s/fish-%s-linux-%s.tar.xz' "$FISH_VERSION" "$FISH_VERSION" "$arch"; }
-
-install_themes() {
-  mkdir -p "$data/themes"
-  for t in ws-host-pretty ws-host-plain; do
-    data_file "themes/$t.omp.json" "$work/$t.json" || return 1
-    dest=$data/themes/$t.omp.json
-    if [ -f "$dest" ] && ! cmp -s "$work/$t.json" "$dest"; then
-      mkdir -p "$state/backups"; cp "$dest" "$state/backups/$t.omp.json.$(date +%Y%m%d-%H%M%S)"
-    fi
-    cmp -s "$work/$t.json" "$dest" 2>/dev/null || cp "$work/$t.json" "$dest"
-  done
-}
 
 setup_shell_kit() {
   kit_on shell || return 0
-  phase "${e_shell}Installing a friendlier shell and prompt"
+  phase "${e_shell}Installing fish, a friendlier shell"
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-  if ! tool_present oh-my-posh oh-my-posh=oh-my-posh; then
-    step "${e_dl}Installing Oh My Posh $POSH_VERSION" install_pinned oh-my-posh "$POSH_VERSION" "$(posh_url)" "$(arch_sha POSH)" raw 0 oh-my-posh=oh-my-posh ||
-      problem "Oh My Posh could not be installed"
-  fi
-  # fish 4 came from apt where the distribution has it (installed with the packages); anywhere it does not, the fish project's own release
+  # fish 4 is the system's where the distribution has it (installed by archon-bootstrap.sh); anywhere it does not, the fish project's own release
   if ! have_fish4; then
-    if [ "$dry" = 1 ] && fish_from_apt; then :   # listed with the packages above
-    elif ! github_ready; then say "Left until you sign in to GitHub: fish $FISH_VERSION (it comes from the fish project's GitHub release)."; skip_github "fish $FISH_VERSION"
+    if ! github_ready; then say "Left until you sign in to GitHub: fish $FISH_VERSION (it comes from the fish project's GitHub release)."; skip_github "fish $FISH_VERSION"
     else
       step "${e_dl}Installing fish $FISH_VERSION" install_pinned fish "$FISH_VERSION" "$(fish_url)" "$(arch_sha FISH)" tar 0 fish=fish ||
         problem "fish 4 could not be installed"
     fi
   fi
-  step "${e_paint}Putting the prompt themes in place" install_themes || problem "the prompt themes could not be put in place"
-  return 0
-}
-
-# ---- chezmoi and the files it manages --------------------------------------------------------------------------------------------------------------
-
-chezmoi_bin() {
-  for f in "$bin/chezmoi" "$(command -v chezmoi 2>/dev/null || true)"; do
-    [ -n "$f" ] && [ -x "$f" ] && { printf '%s' "$f"; return 0; }
-  done
-  return 1
-}
-
-run_chezmoi() {  # run_chezmoi ARGS...: ws-host's own configuration, state and source on every call; a person's own chezmoi is never read
-  "$chezmoi" --source "$cm_source" --destination "$HOME" --config "$state/chezmoi/chezmoi.toml" --persistent-state "$state/chezmoi/state.boltdb" \
-    --cache "$cache/chezmoi" --no-tty --no-pager --force "$@"
-}
-
-# render_source: the source state, rewritten at every run: a `modify_` script for each managed file, which runs managed.sh on the file's text.
-# source_name REL: chezmoi's name for the modify script of REL: dot_ for a leading dot in every part, and modify_ on the file.
-source_name() {
-  out=""; rest=$1
-  while :; do
-    part=${rest%%/*}
-    case $part in .*) part=dot_${part#.} ;; esac
-    case $rest in
-      */*) out=$out$part/; rest=${rest#*/} ;;
-      *) out=$out"modify_"$part; break ;;
-    esac
-  done
-  printf '%s' "$out"
-}
-
-add_script() {  # add_script REL ARGS...: the modify script for the file REL (relative to the home folder) that applies managed.sh with ARGS
-  rel=$1; shift
-  f=$cm_source/$(source_name "$rel")
-  mkdir -p "$(dirname "$f")"
-  {
-    printf '#!/bin/sh\n# Written by bootstrap-archon.sh; chezmoi runs it on the file'"'"'s text. Do not edit: the next run rewrites it.\n'
-    printf "exec sh '%s'" "$managed"
-    for a in "$@"; do printf " '%s'" "$a"; done
-    printf '\n'
-  } >"$f"
-  chmod 755 "$f"
-}
-
-# home_rel PATH: PATH relative to the home folder, following a symbolic link (the file it points to is the one that changes); empty, with a
-# note, when the file is outside the home folder, which is chezmoi's destination
-home_rel() {
-  p=$1
-  [ -L "$p" ] && p=$(readlink -f "$p")
-  case $p in
-    "$HOME"/*) printf '%s' "${p#"$HOME"/}" ;;
-    *) warn "$1 is outside your home folder, so I left it alone."; printf '' ;;
-  esac
-}
-
-# managed_differs PATH: whether chezmoi would change the file (0), or not (1); a file it cannot work out counts as different
-managed_differs() {
-  after=$(run_chezmoi cat "$1" 2>/dev/null) || return 0
-  [ -e "$1" ] && [ "$after" = "$(cat "$1")" ] && return 1
-  return 0
-}
-
-apply_managed() {  # apply_managed PATH: chezmoi writes the file, after a copy of it is kept
-  tgt=$1
-  if [ -e "$tgt" ]; then
-    mkdir -p "$state/backups"
-    cp -p "$tgt" "$state/backups/$(basename "$tgt").$(date +%Y%m%d-%H%M%S)"
-  fi
-  mkdir -p "$(dirname "$tgt")"
-  run_chezmoi apply "$tgt"
-}
-
-# plan_file PATH KIND THEME ICONS: the blocks for one startup file (KIND is bash or fish, or git for ~/.gitconfig), as managed.sh arguments
-plan_file() {
-  rel=$(home_rel "$1")
-  [ -n "$rel" ] || return 0
-  kind=$2; theme_arg=$3; icons_arg=$4
-  set --
-  if [ "$kind" != git ] && [ "$prompt" != no ]; then set -- "$kind" "$theme_arg"; fi
-  if [ "$modern" = 1 ] && [ "$modern_ok" = 1 ]; then set -- "$@" "modern-$kind" "$icons_arg"; fi
-  if [ "$#" -gt 0 ]; then
-    add_script "$rel" "$@"
-    targets="$targets $HOME/$rel"
-  fi
-  return 0
-}
-
-configure_dotfiles() {
-  phase "${e_paint}Making your terminal look good"
-  if [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOTFILES=1)."; return 0; fi
-  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] && ! chezmoi_bin >/dev/null; then say "Skipped: chezmoi is not here and downloads are off."; return 0; fi
-  if [ "$prompt" = no ] && [ "$modern" = 0 ]; then say "Your prompt and commands stay yours (WS_HOST_PROMPT=no, WS_HOST_MODERN=no)."; return 0; fi
-  if ! tool_present chezmoi chezmoi=chezmoi; then
-    if ! github_ready; then
-      say "Left until you sign in to GitHub: chezmoi, so your terminal's prompt and commands are not set up yet."
-      skip_github "chezmoi (and so the prompt and the modern commands in your shell files)"
-      return 0
-    fi
-    step "${e_dl}Installing chezmoi $CHEZMOI_VERSION" install_pinned chezmoi "$CHEZMOI_VERSION" \
-      "https://github.com/twpayne/chezmoi/releases/download/v$CHEZMOI_VERSION/chezmoi_${CHEZMOI_VERSION}_linux_$goarch.tar.gz" "$(arch_sha CHEZMOI)" tar 0 chezmoi=chezmoi ||
-      { problem "chezmoi could not be installed, so your terminal was not set up"; return 0; }
-  fi
-  if [ "$dry" = 1 ]; then
-    [ "$prompt" = no ] || would "give ~/.bashrc (and fish's config.fish when fish is there) the Oh My Posh prompt, in a marked block, after a copy is kept"
-    [ "$modern" = 0 ] || would "make bash, fish and git use the modern tools (eza, bat, zoxide, fzf, delta, btop), in marked blocks"
-    return 0
-  fi
-  chezmoi=$(chezmoi_bin) || { problem "chezmoi is not here, so your terminal was not set up"; return 0; }
-  data_file managed.sh "$data/bootstrap/managed.sh" || { problem "the helper that edits your shell files could not be put in place"; return 0; }
-  managed=$data/bootstrap/managed.sh
-  kit_on shell || step "${e_paint}Putting the prompt themes in place" install_themes || { problem "the prompt themes could not be put in place"; return 0; }
-  cm_source=$data/chezmoi/source
-  mkdir -p "$state/chezmoi" "$cache/chezmoi"
-  [ -f "$state/chezmoi/chezmoi.toml" ] || printf "# ws-host's own chezmoi configuration: empty on purpose.\n" >"$state/chezmoi/chezmoi.toml"
-  for v in $(env | sed -n 's/^\(CHEZMOI[A-Za-z_]*\)=.*/\1/p'); do unset "$v"; done
-
-  theme=ws-host-pretty; icons=icons
-  if [ "$prompt" = plain ]; then theme=ws-host-plain; icons=plain; fi
-  case $data in
-    "$HOME"/*) themeref=\$HOME/${data#"$HOME"/}/themes/$theme.omp.json ;;
-    *) themeref=$data/themes/$theme.omp.json ;;
-  esac
-  fish_here=0; { [ -x "$bin/fish" ] || command -v fish >/dev/null 2>&1; } && fish_here=1
-  modern_ok=0; { [ -x "$bin/eza" ] || command -v eza >/dev/null 2>&1; } && modern_ok=1
-
-  rm -rf "$cm_source"; mkdir -p "$cm_source"
-  targets=""
-  plan_file "$HOME/.bashrc" bash "$themeref" "$icons"
-  if [ "$fish_here" = 1 ]; then
-    plan_file "$(abs_or "${XDG_CONFIG_HOME:-}" "$HOME/.config")/fish/config.fish" fish "$themeref" "$icons"
-  fi
-  # git's pager block needs delta, so it is added only where delta is
-  if [ "$modern" = 1 ] && { [ -x "$bin/delta" ] || command -v delta >/dev/null 2>&1; }; then
-    plan_file "$HOME/.gitconfig" git "$themeref" "$icons"
-  fi
-  if [ "$modern" = 1 ] && [ "$modern_ok" = 0 ]; then say "The modern tools are not installed yet, so your terminal keeps its old commands."; fi
-  # a prompt block a person edited is kept, unless they name a prompt on the command line
-  if [ "$reset_prompt" = 1 ]; then BOOTSTRAP_KEEP_BLOCK=0; else BOOTSTRAP_KEEP_BLOCK=1; fi
-  export BOOTSTRAP_KEEP_BLOCK
-  changed=0
-  for t in $targets; do
-    if managed_differs "$t"; then
-      changed=1
-      step "${e_paint}Setting up $t" apply_managed "$t" || problem "$t could not be set up (a copy of what was there is in $state/backups)"
-    fi
-  done
   return 0
 }
 
@@ -1526,11 +1189,10 @@ have_cmd() { command -v "$1" >/dev/null 2>&1 || [ -x "$bin/$1" ]; }
 
 verify_install() {
   phase "${e_ok}Checking that everything works"
-  if [ "$dry" = 1 ]; then would "check that each program the kits install is here, that fish is version 4 or later, and that Oh My Posh draws its prompts"; return 0; fi
+  if [ "$dry" = 1 ]; then would "check that each program the kits install is here, and that fish is version 4 or later where it was asked for"; return 0; fi
   absent=""
   if kit_on base; then
-    for p in git gh jq rg fd curl wget python3 uv sqlite3 shellcheck eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
-    have_cmd magick || have_cmd convert || absent="$absent ImageMagick"
+    for p in uv eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
     have_cmd duckdb || absent="$absent duckdb"
   fi
   if kit_on agents; then
@@ -1538,7 +1200,6 @@ verify_install() {
   fi
   if kit_on shell; then
     have_cmd fish || absent="$absent fish"
-    have_cmd oh-my-posh || absent="$absent oh-my-posh"
   fi
   if kit_on embedded-sql; then
     for p in turso usql litestream sqruff dbmate sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
@@ -1549,10 +1210,6 @@ verify_install() {
     if [ "$(fish_major "$fp")" -ge 4 ]; then :
     else warn "fish is older than version 4."; problem "fish is older than version 4"; fi
     "$fp" -c 'echo (math 1 + 2)' </dev/null 2>/dev/null | grep -q 3 || { warn "fish did not run a command."; problem "fish did not run a command"; }
-  fi
-  if kit_on shell && have_cmd oh-my-posh && [ -f "$data/themes/ws-host-pretty.omp.json" ]; then
-    oh-my-posh print primary --config "$data/themes/ws-host-pretty.omp.json" --shell bash </dev/null >/dev/null 2>&1 ||
-      { warn "Oh My Posh did not print a prompt."; problem "Oh My Posh did not print a prompt"; }
   fi
   return 0
 }
@@ -1719,55 +1376,13 @@ workspace_and_clone() {
 
 # ---- the login shell -------------------------------------------------------------------------------------------------------------------------------
 
-login_shell() { getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7; }
-
-offer_fish() {
-  kit_on shell || return 0
-  [ "${BOOTSTRAP_NO_CHSH:-}" = 1 ] && return 0
-  heading "${e_shell}Your login shell"
-  fp=$(command -v fish 2>/dev/null || true); [ -n "$fp" ] || fp=$bin/fish
-  if [ "$dry" = 1 ]; then
-    would "make fish your login shell (the program that starts in each new terminal): chsh -s fish; bash keeps working"
-    return 0
-  fi
-  if [ ! -x "$fp" ] || [ "$(fish_major "$fp")" -lt 4 ]; then say "fish 4 is not installed, so your login shell stays as it is."; return 0; fi
-  case $(login_shell) in */fish) say "fish is already your login shell."; return 0 ;; esac
-  case $(cfg BOOTSTRAP_CHSH yes) in
-    no | NO | false | 0) say "Your login shell stays as it is. To use fish: chsh -s $fp"; return 0 ;;
-  esac
-  say "${e_shell}Making fish your login shell. ${d}bash keeps working: type bash any time.${z}"
-  # chsh accepts only a shell listed in /etc/shells
-  if ! grep -qx "$fp" /etc/shells 2>/dev/null; then
-    if sudo_for "add fish to the list of login shells (/etc/shells)"; then
-      printf '%s\n' "$fp" | $sudo_cmd tee -a /etc/shells >/dev/null || { warn "Could not add $fp to /etc/shells."; return 0; }
-    else
-      warn "I could not get administrator rights to list fish as a login shell. Run: command -v fish | sudo tee -a /etc/shells; chsh -s $fp"
-      return 0
-    fi
-  fi
-  me=$(id -un)
-  if [ "$(id -u)" = 0 ]; then
-    chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
-  elif [ "$sudo_ready" = 1 ] && [ -n "$sudo_cmd" ] && $sudo_cmd -n true 2>/dev/null; then
-    # the administrator rights asked for at the start are still good, so the change needs no second password
-    $sudo_cmd chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
-  elif [ "$has_tty" = 1 ]; then
-    say "${b}${e_key}One password, once more.${z} Debian is about to ask for ${b}Password:${z}."
-    say "That is ${b}the Linux password for ${me}${z}, the same one you typed when this setup first asked for administrator rights."
-    say "${d}Nothing shows while you type: that is normal. Press Enter when done.${z}"
-    chsh -s "$fp" </dev/tty || warn "chsh did not change your shell. Run: chsh -s $fp"
-  else warn "chsh needs the Linux password of $me and there is no terminal. Run: chsh -s $fp"; fi
-  case $(login_shell) in */fish) say "fish is now your login shell; it starts in each new terminal window." ;; esac
-  return 0
-}
-
 # ---- archon -----------------------------------------------------------------------------------------------------------------------------------
 
 link_archon() {
   mkdir -p "$bin"
   w=$bin/archon
-  if [ ! -e "$w" ] || grep -q 'bootstrap-archon wrapper' "$w" 2>/dev/null; then
-    printf '#!/bin/sh\n# bootstrap-archon wrapper: runs the clone'"'"'s launcher, so archon works from any folder\nexec "%s/archon" "$@"\n' "$target" >"$w"
+  if [ ! -e "$w" ] || grep -q 'archon-setup wrapper\|bootstrap-archon wrapper' "$w" 2>/dev/null; then
+    printf '#!/bin/sh\n# archon-setup wrapper: runs the clone'"'"'s launcher, so archon works from any folder\nexec "%s/archon" "$@"\n' "$target" >"$w"
     chmod 755 "$w"
   else
     warn "$w exists and is not mine, so I left it; run archon as $target/archon"
@@ -1776,10 +1391,10 @@ link_archon() {
 
 # in_archon_quiet COMMAND...: the same, for a step: every question is answered yes, and the progress lines archon draws for a person are off.
 in_archon_quiet() {
-  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_ENVIRONMENT=bootstrap ARCHON_PROGRESS=never "$@" </dev/null )
+  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_NO_ADMIN=1 ARCHON_ENVIRONMENT=bootstrap ARCHON_PROGRESS=never "$@" </dev/null )
 }
 in_archon() {  # in_archon COMMAND...: run in the clone, showing its output; asking nothing of standard input unless there is a terminal
-  if [ "$has_tty" = 1 ]; then ( cd "$target" && "$@" </dev/tty ); else ( cd "$target" && "$@" </dev/null ); fi
+  if [ "$has_tty" = 1 ]; then ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/tty ); else ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/null ); fi
 }
 
 run_archon() {
@@ -1787,6 +1402,8 @@ run_archon() {
   if [ "$dry" = 1 ]; then
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ] || {
       would "link ~/.local/bin/archon to the clone's launcher"
+      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./archon shell ensure$([ "$dedicated" = 1 ] && printf ' --mode owned') (the startup files of bash, zsh and fish, kept with chezmoi)"
+      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./archon shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       would "run in the clone: ./archon doctor"
       would "run in the clone: ./archon toolchain ensure (every entry of ./archon toolchain list that is not ready and not optional)"
       would "run in the clone: ./archon check"
@@ -1798,7 +1415,7 @@ run_archon() {
   if [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ]; then say "Skipped archon's commands (BOOTSTRAP_NO_ARCHON=1)."; archon_ran=0; return 0; fi
   have_cmd uv || { warn "uv is not here, so archon cannot start (its launcher needs only uv)."; problem "archon was not run: uv is missing"; archon_ran=0; return 0; }
   archon_ran=1
-  status_doctor=0; status_tool=0; status_check=0
+  status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0
   names=""
   case $(cfg BOOTSTRAP_TOOLCHAIN '') in
     none) ;;
@@ -1809,7 +1426,7 @@ run_archon() {
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
   phase "${e_rocket}Getting archon ready ${d}(the first time takes a few minutes)${z}"
-  # Every question archon could ask (install a program with apt?) is answered yes; sudo's password was asked once, above, and is kept alive.
+  # Every question archon could ask is answered yes, and none may use administrator rights (ARCHON_NO_ADMIN=1): a package only they can install is named, with the command to run.
   tool_skipped=0
   if [ -n "$names" ] && ! github_ready; then
     tool_skipped=1
@@ -1818,6 +1435,24 @@ run_archon() {
   elif [ -n "$names" ]; then
     # shellcheck disable=SC2086
     step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
+  fi
+  # The shells of this account: archon keeps their startup files, with chezmoi (0138-shell); a dedicated account's are archon's whole
+  if [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
+    if ! github_ready; then
+      shell_skipped=1
+      say "Left until you sign in to GitHub: ./archon shell ensure (chezmoi and Oh My Posh come from GitHub)."
+      skip_github "archon shell ensure (your shells' startup files)"
+    else
+      shell_ran=1
+      shell_mode=""; [ "$dedicated" = 1 ] && shell_mode="--mode owned"
+      # shellcheck disable=SC2086
+      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_archon_quiet ./archon shell ensure $shell_mode || status_shell=$?
+      if [ "$status_shell" = 0 ] && [ "$prompt_given" = 1 ]; then
+        pchoice=$prompt; [ "$prompt" = no ] && pchoice=none
+        step_soft "${e_paint}Choosing the $pchoice prompt" in_archon_quiet ./archon shell set prompt "$pchoice" || status_shell=$?
+      fi
+      [ "$status_shell" = 0 ] || problem "archon shell ensure did not finish (run ./archon shell status in $target to see why)"
+    fi
   fi
   step_soft "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
   step_soft "${e_ok}Checking that archon is healthy" in_archon_quiet ./archon check || status_check=$?
@@ -1837,8 +1472,12 @@ finish() {
   heading "Summary"
   failed=0
   if [ "${archon_ran:-0}" = 1 ]; then
-    for pair in "doctor:$status_doctor" "toolchain ensure:$status_tool" "check:$status_check"; do
+    for pair in "shell ensure:$status_shell" "doctor:$status_doctor" "toolchain ensure:$status_tool" "check:$status_check"; do
       n=${pair%%:*}; s=${pair##*:}
+      if [ "$n" = "shell ensure" ] && [ "${shell_ran:-0}" = 0 ]; then
+        [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
+        continue
+      fi
       if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
       elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./archon $n"; else say "  ${r}${cross}${z} ./archon $n (exit status $s)"; failed=1; fi
     done
@@ -1855,7 +1494,7 @@ finish() {
     say "  $(paste -sd, "$skipped" | sed 's/,/, /g')"
     say "Sign in with ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}, or export ${b}GH_TOKEN${z}, then run this again: it installs just these."
   fi
-  if [ "$prompt" = pretty ] && kit_on shell && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
+  if [ "$prompt" = pretty ] && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ] && [ "${shell_ran:-0}" = 1 ]; then
     font_where="in the program that shows your terminal window (not inside Debian)"
     [ "$wsl" = 1 ] && font_where="in Windows (not in Debian)"
     say ""
@@ -1868,7 +1507,7 @@ finish() {
     say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
     say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
     say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
-    say "${d}No font wanted? Run this again with BOOTSTRAP_PROMPT=plain: the same${z}"
+    say "${d}No font wanted? Run ${z}${b}archon shell set prompt plain${z}${d}: the same${z}"
     say "${d}prompt made of emoji and lines.${z}"
   fi
   if [ "${editor_linked:-0}" = 1 ]; then
@@ -1887,6 +1526,11 @@ finish() {
       say "    ${c}exec $sh_name -l${z}"
       ;;
   esac
+  if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
+    say ""
+    say "${d}Not installed, because no archon command needs them: fish, the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
+    say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (archon-bootstrap.sh does by default).${z}"
+  fi
   if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
     say ""
     say "${b}${e_what}AI assistants are installed${z} (they work in the folder you start them in, and ask before they change anything):"
@@ -1911,12 +1555,13 @@ finish() {
   return 0
 }
 
-# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044; `archon update` runs this script again, quietly, FR-045) --------------------------------------------------------------------------
+# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044) --------------------------------------------------------------------------
 # Under WSL VS Code runs on Windows and reaches Debian through its WSL extension; its `code` command is a script in its Windows folder, on the PATH
 # only while WSL appends Windows' PATH. So `code` is a small script in ~/.local/bin that runs it, which every shell has; where VS Code is not on
-# Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, from its apt
-# repository signed by its pinned key, on a machine with a desktop; a machine without one is opened from VS Code on another computer (Remote - SSH).
-editor_mark='# made by bootstrap-archon.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
+# Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, which
+# archon-bootstrap.sh installs (it needs administrator rights); a machine without a desktop is opened from VS Code on another computer (Remote - SSH).
+editor_mark='# made by archon-setup.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
+editor_mark_old='# made by bootstrap-archon.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
 win_root=${BOOTSTRAP_WINDOWS_ROOT:-/mnt/c}
 
 windows_code() {  # the `code` script of VS Code on Windows: this Windows user's own install first, then one for all users, then any user's
@@ -1936,7 +1581,7 @@ winget_exe() {  # Windows' winget, through the PATH WSL appends or in this Windo
   return 1
 }
 
-ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
+ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
 
 link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
   mkdir -p "$bin"
@@ -1944,14 +1589,6 @@ link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
 }
 
 winget_code() { "$(winget_exe)" install --id Microsoft.VisualStudioCode --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity; }
-
-apt_code() {  # Microsoft's repository, signed by its pinned key, then the package
-  key=$(download_verified "$MS_KEY_URL" "$MS_KEY_SHA256") || return 1
-  $sudo_cmd install -D -m 644 "$key" /usr/share/keyrings/microsoft.asc || return 1
-  printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64 arm64\nSigned-By: /usr/share/keyrings/microsoft.asc\n' |
-    $sudo_cmd tee /etc/apt/sources.list.d/vscode.sources >/dev/null || return 1
-  apt_update && apt_install code
-}
 
 setup_editor() {
   [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
@@ -1977,10 +1614,8 @@ setup_editor() {
     say "This machine has no desktop: open it from VS Code on your own computer (its Remote - SSH extension), and ${c}code${z} works in VS Code's terminal."
     return 0
   fi
-  if [ "$dry" = 1 ]; then would "install VS Code from Microsoft's apt repository (its signing key checked against its pinned SHA-256)"; return 0; fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ]; then say "Skipped installing VS Code (BOOTSTRAP_NO_APT=1)."; return 0; fi
-  sudo_for "install VS Code from Microsoft's apt repository" || { problem "VS Code: no administrator rights to install it"; return 0; }
-  if step "${e_dl}Installing VS Code from Microsoft's apt repository" apt_code; then editor_linked=1; else problem "VS Code could not be installed from Microsoft's apt repository"; fi
+  # a desktop with no VS Code: Microsoft's package needs administrator rights, which this setup never uses; archon-bootstrap.sh installs it
+  say "VS Code is not installed here. To install it, run archon-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
   return 0
 }
 
@@ -1993,7 +1628,7 @@ main() {
   export PATH
   if [ "$dry" = 0 ]; then mkdir -p "$bin" "$data" "$state" "$cache"; fi
 
-  say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for the Intellectual Frontiers harness."
+  say "${b}${e_rocket}Setting up this account${z} (${d_pretty}, $arch$wsl_txt, user $(id -un)) for the Intellectual Frontiers harness."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
   if [ -n "${ARCHON_POSTHOG_KEY:-}" ]; then
     say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
@@ -2003,12 +1638,15 @@ main() {
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
-  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}"
+  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:dedicated=$([ "$dedicated" = 1 ] && echo yes || echo no)" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
   signin_needed=0; cloned=0; archon_ran=0
-  # Two things need a person, once each and up front: the Linux password (to install programs) and the GitHub sign-in. Then it all runs by itself.
-  # Order matters: packages (apt only; the one in the background installs Debian packages and never touches GitHub), then the sign-in, then github_init, and only
-  # then anything that downloads from GitHub. sign_in_stop exits (5) before setup_runtime, and BOOTSTRAP_NO_AUTH=1 leaves github_init to find a token or none.
-  install_packages
+  if [ "$dry" = 1 ]; then
+    heading "${e_pkg}What this computer must already have"
+    would "check that git and curl are here (and tar, xz, unzip, jq and gh, which some steps need); this setup installs no package"
+  else
+    check_prereqs
+  fi
+  # The one thing that needs a person, up front: the GitHub sign-in. Then it all runs by itself. Everything that downloads from GitHub waits for github_init.
   sign_in
   github_init
   identity
@@ -2016,54 +1654,16 @@ main() {
   setup_runtime
   setup_tools
   setup_shell_kit
-  configure_dotfiles
-  bg_apt_wait
-  [ "$dry" = 1 ] || link_fd
+  [ "$dry" = 1 ] || ! kit_on base || link_fd
   setup_editor
   verify_install
   workspace_and_clone
-  offer_fish
   run_archon
   finish
 }
 
 # ---- keep the PostHog settings for every new terminal (0136 FR-041; the same file and blocks as `archon secrets`, archon's 0074-secrets) --------------------------
-# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read, and bash and fish are told to read it.
-sf_begin='# >>> archon: secrets (managed by `archon secrets`; change them there) >>>'
-sf_end='# <<''< archon: secrets <<''<'   # written so, since the shape test reads a literal three-less-than as a bash here-string
-secrets_block() {
-  printf '%s\n' "$sf_begin"
-  cat <<'EOF'
-if [ -r "${XDG_CONFIG_HOME:-$HOME/.config}/archon/secrets.env" ]; then set -a; . "${XDG_CONFIG_HOME:-$HOME/.config}/archon/secrets.env"; set +a; fi
-EOF
-  printf '%s\n' "$sf_end"
-}
-secrets_fish() {
-  cat <<'EOF'
-# archon: secrets. Managed by `archon secrets`; change them there. Every NAME='value' line of the file becomes an exported variable.
-set -l archon_secrets (set -q XDG_CONFIG_HOME[1]; and echo $XDG_CONFIG_HOME; or echo $HOME/.config)/archon/secrets.env
-if test -r $archon_secrets
-    for line in (string match -r '^[A-Z][A-Z0-9_]*=.*$' < $archon_secrets)
-        set -l pair (string split -m 1 '=' -- $line)
-        set -gx $pair[1] (string replace -r "^'(.*)'\$" '$1' -- $pair[2])
-    end
-end
-EOF
-}
-sf_put_block() {  # sf_put_block FILE: the block in a shell file, once; a copy is kept before the first time; returns 1 where nothing changed
-  pb_f=$1
-  [ -f "$pb_f" ] || : >"$pb_f"
-  secrets_block >"$work/sf.block"
-  if grep -qF "$sf_begin" "$pb_f" 2>/dev/null; then
-    awk -v b="$sf_begin" -v e="$sf_end" -v bf="$work/sf.block" 'index($0, b) == 1 { while ((getline l < bf) > 0) print l; skip = 1; next } skip { if (index($0, e) == 1) skip = 0; next } { print }' "$pb_f" >"$pb_f.new"
-  else
-    { cat "$pb_f"; [ -s "$pb_f" ] && { [ -n "$(tail -c 1 "$pb_f")" ] && echo; echo; }; cat "$work/sf.block"; } >"$pb_f.new"
-  fi
-  if cmp -s "$pb_f" "$pb_f.new"; then rm -f "$pb_f.new"; return 1; fi
-  { [ -s "$pb_f" ] && [ ! -e "$pb_f.before-archon" ] && cp "$pb_f" "$pb_f.before-archon"; } || true
-  cat "$pb_f.new" >"$pb_f"; rm -f "$pb_f.new"
-  return 0
-}
+# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read; `archon shell ensure` tells the shells to read it.
 sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, else added; written privately and atomically
   pv_dir=$(dirname "$secrets_file")
   mkdir -p "$pv_dir" && chmod 700 "$pv_dir" || return 1
@@ -2088,7 +1688,7 @@ keep_settings() {
   [ -n "$ks_names" ] || return 0
   phase "${e_key}Keeping your PostHog settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
   if [ "$dry" = 1 ]; then
-    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600), and make ~/.profile, ~/.bashrc and fish read it in every new terminal"
+    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); archon shell ensure makes your shells read it in every new terminal"
     return 0
   fi
   for ks_n in $ks_names; do
@@ -2098,9 +1698,6 @@ keep_settings() {
     sf_put "$ks_n" "$ks_v" || { warn "$ks_n could not be saved in $(short_path "$secrets_file")."; problem "$ks_n was not saved"; continue; }
     logf "kept $ks_n in $secrets_file"
   done
-  sf_put_block "$HOME/.profile" || true
-  sf_put_block "$HOME/.bashrc" || true
-  mkdir -p "$cfgdir/fish/conf.d" && secrets_fish >"$cfgdir/fish/conf.d/archon-secrets.fish" || { warn "fish could not be told to read your settings."; problem "fish does not read the settings"; }
   return 0
 }
 

@@ -1,4 +1,4 @@
-"""The machine bootstrap (0136-machine-bootstrap): `bin/bootstrap-archon.sh` and the data beside it, tested without root, apt or the network.
+"""The machine bootstrap (0136-machine-bootstrap): `bin/archon-setup.sh` (no administrator rights) and `bin/archon-bootstrap.sh` (the one that may use them), tested without root, apt or the network.
 
 What runs here: the script's syntax in every POSIX shell on the machine, `--dry-run`, every switch that turns an installation off, the clone and its
 fast-forward-only update against a local repository, the three `archon` commands against a stand-in launcher, the file editor
@@ -17,12 +17,12 @@ from pathlib import Path
 HOME = Path(__file__).resolve().parents[1]
 
 BIN = HOME / "bin"
-SCRIPT = BIN / "bootstrap-archon.sh"
-MANAGED = BIN / "bootstrap" / "managed.sh"
-THEMES = BIN / "bootstrap" / "themes"
+SCRIPT = BIN / "archon-setup.sh"
+BOOT = BIN / "archon-bootstrap.sh"
 SH = shutil.which("sh")
 
 # every switch that stops an installation, so that a run changes nothing but the workspaces folder and the script's own directories
+OFF_BUT_ARCHON = {"BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
 OFF = {"BOOTSTRAP_NO_APT": "1", "BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_DOTFILES": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_CHSH": "1",
        "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
 
@@ -65,16 +65,20 @@ class Fixture(unittest.TestCase):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Shape(unittest.TestCase):
-    def test_the_files_exist_and_the_script_is_posix_sh(self):
-        text = SCRIPT.read_text()
-        self.assertEqual(text.splitlines()[0], "#!/bin/sh")
-        self.assertTrue(os.access(SCRIPT, os.X_OK))
+    def test_the_files_exist_and_the_scripts_are_posix_sh(self):
         bashism = re.compile(r"\[\[ | \]\]|<<<|\$\{!|\$\(\(.*\+\+|(^|[;&|(]\s*)(source|local|declare|typeset|function|mapfile|readarray|shopt)\s")
-        for line in text.splitlines():
-            if not line.lstrip().startswith("#"):
-                self.assertIsNone(bashism.search(line), f"a bashism in: {line}")
-        for t in ("ws-host-pretty", "ws-host-plain"):
-            json.loads((THEMES / f"{t}.omp.json").read_text())
+        for f in (SCRIPT, BOOT):
+            text = f.read_text()
+            self.assertEqual(text.splitlines()[0], "#!/bin/sh", f.name)
+            self.assertTrue(os.access(f, os.X_OK), f.name)
+            for line in text.splitlines():
+                if not line.lstrip().startswith("#"):
+                    self.assertIsNone(bashism.search(line), f"a bashism in {f.name}: {line}")
+
+    def test_no_file_of_the_earlier_name_or_its_data_is_kept(self):
+        """0136-machine-bootstrap FR-051: the names are archon-bootstrap.sh and archon-setup.sh, and the templates and themes live in archon."""
+        self.assertFalse((BIN / "bootstrap-archon.sh").exists())
+        self.assertFalse((BIN / "bootstrap").exists())
 
     def test_the_sign_in_says_what_it_waits_for_while_gh_is_quiet(self):
         """gh prints the code and then nothing; the script says on the terminal, every so often, the address to open and that nothing else is to be pressed."""
@@ -89,25 +93,26 @@ class Shape(unittest.TestCase):
             exe = shutil.which(shell)
             if not exe:
                 continue
-            for f in (SCRIPT, MANAGED):
+            for f in (SCRIPT, BOOT):
                 with self.subTest(shell=shell, file=f.name):
                     p = subprocess.run([exe, "-n", str(f)], capture_output=True, text=True)
                     self.assertEqual(p.returncode, 0, p.stderr)
 
     @unittest.skipUnless(shutil.which("shellcheck"), "shellcheck is not installed")
     def test_shellcheck_passes(self):
-        p = subprocess.run(["shellcheck", "-s", "sh", "-S", "warning", str(SCRIPT), str(MANAGED)], capture_output=True, text=True)
+        p = subprocess.run(["shellcheck", "-s", "sh", "-S", "warning", str(SCRIPT), str(BOOT)], capture_output=True, text=True)
         self.assertEqual(p.returncode, 0, p.stdout)
 
     def test_the_pins_are_whole(self):
         text = SCRIPT.read_text()
         sums = re.findall(r"^([A-Z]+)_SHA256_(X86_64|AARCH64)=(\S+)$", text, re.M)
-        self.assertEqual(sorted({n for n, _, _ in sums}), ["CHEZMOI", "FISH", "GLAB", "MISE", "POSH"])
+        self.assertEqual(sorted({n for n, _, _ in sums}), ["FISH", "GLAB", "MISE"], "chezmoi and Oh My Posh are pinned by archon, in toolchain/")
         for name, arch, digest in sums:
             self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} {arch}")
-        self.assertEqual(len(sums), 10)
+        self.assertEqual(len(sums), 6)
         for var in ("UV_VERSION", "PYTHON_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
+        self.assertRegex(re.search(r"^MS_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "Microsoft's key, pinned by the bootstrap")
 
 
 @unittest.skipUnless(SH, "sh is not installed")
@@ -115,7 +120,7 @@ class Entry(Fixture):
     def test_help_and_a_bad_option(self):
         p = self.run_script("--help")
         self.assertEqual(p.returncode, 0)
-        self.assertIn("curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/bootstrap-archon.sh | sh", p.stdout)
+        self.assertIn("curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh", p.stdout)
         self.assertEqual(self.run_script("--nonsense").returncode, 2)
 
     def test_it_refuses_a_home_that_is_not_a_folder(self):
@@ -136,49 +141,58 @@ class Entry(Fixture):
         p = self.run_script("--dry-run")
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before, "a dry run writes nothing")
-        for step in ("Installing Oh My Posh", "Installing chezmoi", "archon doctor", "archon toolchain ensure", "archon check", "intellectual-frontiers/archon",
-                     "GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https", "login shell"):
+        for step in ("archon shell ensure", "archon doctor", "archon toolchain ensure", "archon check", "intellectual-frontiers/archon",
+                     "GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https"):
             self.assertIn(step, p.stdout)
+        for gone in ("Oh My Posh", "Installing chezmoi", "login shell", "apt install", "administrator rights"):
+            self.assertNotIn(gone, p.stdout, f"the setup has no {gone} step")
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
-    def test_dry_run_lists_the_ai_assistants_and_a_switch_leaves_them_out(self):
-        """0136-machine-bootstrap FR-042: Claude Code, Codex, OpenCode and Aider are in the default kits."""
+    def test_dry_run_lists_the_ai_assistants_and_the_comfort_kits_only_when_asked(self):
+        """0136-machine-bootstrap FR-042, FR-047: the assistants are in the setup; the comfort kits are in only with --comfort."""
         p = self.run_script("--dry-run")
         for tool in ("claude", "codex", "opencode", "aider"):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
         self.assertIn("Installing the AI assistants", p.stdout)
-        off = self.run_script("--dry-run", BOOTSTRAP_NO_AGENTS="1")
+        self.assertNotIn("Installing glab", p.stdout, "the comfort kits are off without --comfort")
+        self.assertNotIn("Installing eza", p.stdout)
+        comfy = self.run_script("--dry-run", "--comfort")
+        self.assertIn("Installing glab", comfy.stdout)
+        self.assertIn("Installing eza", comfy.stdout)
+        self.assertIn("Installing fish", comfy.stdout)
+        self.assertIn("Installing claude", comfy.stdout)
+        off = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_AGENTS="1")
         self.assertNotIn("AI assistants", off.stdout)
         self.assertIn("Installing glab", off.stdout, "the other kits stay")
-        only = self.run_script("--dry-run", BOOTSTRAP_KIT="agents")
+        never = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_COMFORT="1")
+        self.assertNotIn("Installing eza", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
+        only = self.run_script("--dry-run", "--comfort", BOOTSTRAP_KIT="agents")
         self.assertIn("Installing claude", only.stdout)
         self.assertNotIn("Installing eza", only.stdout)
 
     def test_dry_run_follows_the_switches(self):
         p = self.run_script("--dry-run", **OFF)
         self.assertEqual(p.returncode, 0, p.stderr)
-        for gone in ("Installing Oh My Posh", "Installing chezmoi", "intellectual-frontiers/archon", "archon doctor", "login shell"):
+        for gone in ("intellectual-frontiers/archon", "archon doctor", "archon shell ensure"):
             self.assertNotIn(gone, p.stdout, f"{gone} is switched off")
 
     def test_dry_run_lists_the_same_steps_from_a_pipe(self):
-        piped = subprocess.run([SH, "-s", "--", "--dry-run"], input=SCRIPT.read_text(), capture_output=True, text=True, env=self.env(BOOTSTRAP_URL=f"file://{HOME}"))
+        piped = subprocess.run([SH, "-s", "--", "--dry-run"], input=SCRIPT.read_text(), capture_output=True, text=True, env=self.env())
         self.assertEqual(piped.returncode, 0, piped.stderr)
         self.assertEqual(piped.stdout, self.run_script("--dry-run").stdout.replace(str(SCRIPT), "sh"))
 
-    def test_the_nerd_font_hint_comes_with_the_pretty_prompt_and_not_with_the_plain_one(self):
-        base = {k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_DOTFILES"}
-        pretty = self.run_script(**base, BOOTSTRAP_KIT="shell", WS_HOST_HOME=str(self.tmp / "w"))
-        self.assertEqual(pretty.returncode, 0, pretty.stderr)
-        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "Install for all users", "Windows Terminal", "BOOTSTRAP_PROMPT=plain"):
-            self.assertIn(line, pretty.stdout)
-        plain = self.run_script(**base, BOOTSTRAP_KIT="shell", BOOTSTRAP_PROMPT="plain", WS_HOST_HOME=str(self.tmp / "w"))
-        self.assertNotIn("Nerd Font", plain.stdout)
+    def test_the_prompt_choice_is_handed_to_archon_shell(self):
+        """0138-shell FR-009: the setup tells `archon shell set prompt` what was asked for; without a choice archon's default stands."""
+        none = self.run_script("--dry-run", BOOTSTRAP_PROMPT="no")
+        self.assertIn("archon shell set prompt none", none.stdout)
+        plain = self.run_script("--dry-run", BOOTSTRAP_PROMPT="plain", **OFF_BUT_ARCHON)
+        self.assertIn("archon shell set prompt plain", plain.stdout)
+        self.assertNotIn("shell set prompt", self.run_script("--dry-run").stdout)
 
-    def test_the_prompt_and_kit_choices_change_the_plan(self):
-        p = self.run_script("--dry-run", BOOTSTRAP_KIT="shell", BOOTSTRAP_PROMPT="no", WS_HOST_MODERN="no")
-        self.assertNotIn("Everyday tools", p.stdout)
-        self.assertNotIn("Embedded SQL", p.stdout)
-        self.assertIn("Your prompt and commands stay yours", p.stdout)
+    def test_a_dedicated_account_asks_archon_for_owned_files(self):
+        """0136-machine-bootstrap FR-051"""
+        self.assertIn("archon shell ensure --mode owned", self.run_script("--dry-run", "--dedicated").stdout)
+        self.assertNotIn("--mode owned", self.run_script("--dry-run").stdout)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
@@ -225,11 +239,12 @@ class Clone(Fixture):
     """The clone, its fast-forward-only update and the three archon commands, against a local repository with a stand-in launcher."""
 
     LAUNCHER = """#!/bin/sh
-[ "$1 $2" = "toolchain list" ] || echo "ARCHON $* assume_yes=${ARCHON_ASSUME_YES:-}" >>"${CALLS:?}"
+[ "$1 $2" = "toolchain list" ] || echo "ARCHON $* assume_yes=${ARCHON_ASSUME_YES:-} no_admin=${ARCHON_NO_ADMIN:-}" >>"${CALLS:?}"
 case "$1 $2" in
   "toolchain list") echo '{"data":{"entries":[{"name":"node","ready":true,"summary":"Node.js"},{"name":"python","ready":false,"summary":"Python"},{"name":"docker","ready":false,"summary":"Docker (optional: only an image needs it)"},{"name":"jre","ready":false,"summary":"A Java runtime"}]}}' ;;
 esac
 [ "$1" = check ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
+[ "$1 $2" = "shell ensure" ] && [ -n "${FAKE_FAIL_SHELL:-}" ] && exit 3
 exit 0
 """
 
@@ -246,11 +261,12 @@ exit 0
         self.clone = self.home / "workspaces" / "github.com" / "intellectual-frontiers" / "archon"
 
     def go(self, **extra):
-        off = {k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON")}
+        off = {k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_DOTFILES")}
         self.calls = self.tmp / "archon-calls.txt"
         self.calls.write_text("")
+        argv = extra.pop("argv", ())
         # a token stands for the GitHub sign-in: without one the setup leaves everything that downloads from GitHub, archon's programs included, until there is one
-        return self.run_script(**off, BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), CALLS=str(self.calls), PATH=f"{self.bin}:{os.environ['PATH']}", **{"GH_TOKEN": "test-token", **extra})
+        return self.run_script(*argv, **off, BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), CALLS=str(self.calls), PATH=f"{self.bin}:{os.environ['PATH']}", **{"GH_TOKEN": "test-token", **extra})
 
     def push(self, name, text="x\n"):
         (self.upstream / name).write_text(text)
@@ -263,15 +279,46 @@ exit 0
         self.assertTrue((self.clone / "archon").is_file())
         out = p.stdout
         calls = self.calls.read_text()
-        order = [calls.index(c) for c in ("toolchain ensure python jre", "doctor", "check")]
-        self.assertEqual(order, sorted(order), "toolchain ensure, then doctor, then check")
+        order = [calls.index(c) for c in ("toolchain ensure python jre", "shell ensure", "doctor", "check")]
+        self.assertEqual(order, sorted(order), "toolchain ensure, then the shells, then doctor, then check")
         self.assertNotIn("ensure python docker", calls, "what is not ready and not optional")
-        self.assertEqual(calls.count("assume_yes=1"), 3, "every question archon could ask is answered yes")
+        self.assertEqual(calls.count("assume_yes=1"), 4, "every question archon could ask is answered yes")
+        self.assertEqual(calls.count("no_admin=1"), 4, "0136-machine-bootstrap FR-046: no archon command the setup runs may use administrator rights")
         self.assertIn("archon orch status", out)
         self.assertIn("archon orch dev", out)
         wrapper = self.home / ".local" / "bin" / "archon"
         self.assertIn(str(self.clone / "archon"), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
+
+    def test_the_shells_are_archons_to_set_up_and_a_dedicated_account_is_owned(self):
+        """0136-machine-bootstrap FR-049, FR-051; 0138-shell FR-008: the setup writes no startup file, it runs `archon shell ensure`."""
+        self.go()
+        shell = [l for l in self.calls.read_text().splitlines() if "shell ensure" in l]
+        self.assertEqual(len(shell), 1)
+        self.assertNotIn("--mode", shell[0])
+        for name in (".bashrc", ".profile", ".zshrc", ".zshenv", ".zprofile", ".config/fish"):
+            self.assertFalse((self.home / name).exists(), f"the setup wrote {name}")
+        self.go(argv=("--dedicated",))
+        self.assertIn("shell ensure --mode owned", self.calls.read_text())
+
+    def test_the_prompt_choice_is_handed_to_archon_shell_and_the_font_hint_comes_with_the_pretty_prompt(self):
+        """0136-machine-bootstrap FR-010; 0138-shell FR-009"""
+        pretty = self.go()
+        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "Install for all users", "Windows Terminal", "archon shell set prompt plain"):
+            self.assertIn(line, pretty.stdout)
+        self.assertNotIn("shell set prompt", self.calls.read_text(), "without a choice archon's default stands")
+        plain = self.go(BOOTSTRAP_PROMPT="plain")
+        self.assertIn("ARCHON shell set prompt plain", self.calls.read_text())
+        self.assertNotIn("Nerd Font", plain.stdout)
+
+    def test_the_shells_are_left_alone_with_the_switch_and_without_a_sign_in_and_a_failure_is_a_problem_not_a_stop(self):
+        self.go(BOOTSTRAP_NO_DOTFILES="1")
+        self.assertNotIn("shell ensure", self.calls.read_text())
+        p = self.go(FAKE_FAIL_SHELL="1")
+        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
+        self.assertIn("archon shell ensure did not finish", p.stdout)
+        self.assertIn("ARCHON doctor", self.calls.read_text(), "the rest goes on")
+        self.assertRegex(p.stdout, r"(x|❌).*\./archon shell ensure \(exit status 3\)")
 
     def test_the_toolchain_can_be_named_or_skipped(self):
         self.go(BOOTSTRAP_TOOLCHAIN="node")
@@ -283,7 +330,7 @@ exit 0
         p = self.go(FAKE_FAIL="1")
         self.assertEqual(p.returncode, 1)
         calls = self.calls.read_text()
-        for name in ("doctor", "toolchain ensure", "check"):
+        for name in ("doctor", "toolchain ensure", "shell ensure", "check"):
             self.assertIn(f"ARCHON {name}", calls)
         self.assertRegex(p.stdout, r"(x|❌).*\./archon check \(exit status 4\)")
 
@@ -361,53 +408,6 @@ exit 0
         self.assertEqual(cfg("user.name"), "Mine", "what a person set is never changed")
         run(BOOTSTRAP_GIT_NAME="Asked", BOOTSTRAP_GIT_EMAIL="a@example.com")
         self.assertEqual((cfg("user.name"), cfg("user.email")), ("Asked", "a@example.com"), "what was asked for is set")
-
-
-@unittest.skipUnless(SH, "sh is not installed")
-class Managed(Fixture):
-    """bin/bootstrap/managed.sh: the marked blocks, as a filter from a file's text to its new text."""
-
-    def filter(self, text, *argv, **env):
-        return subprocess.run([SH, str(MANAGED), *argv], input=text, capture_output=True, text=True, env=self.env(**env))
-
-    def test_a_block_is_added_after_what_is_there_and_a_second_run_changes_nothing(self):
-        first = self.filter("export A=1\n", "bash", "$HOME/t.json", "modern-bash", "icons").stdout
-        self.assertTrue(first.startswith("export A=1\n\n# >>> workspaces-host: prompt (ws-host shell add bash) >>>\n"))
-        self.assertIn('eval "$(oh-my-posh init bash --config "$HOME/t.json")"', first)
-        self.assertIn("alias ll='eza -l --group-directories-first --git --icons=auto'", first)
-        self.assertEqual(first.count("# <<< workspaces-host <<<"), 2)
-        self.assertEqual(self.filter(first, "bash", "$HOME/t.json", "modern-bash", "icons").stdout, first)
-
-    def test_plain_leaves_the_icons_out_and_fish_gets_its_own_syntax(self):
-        out = self.filter("", "fish", "$HOME/p.json", "modern-fish", "plain").stdout
-        self.assertIn('oh-my-posh init fish --config "$HOME/p.json" | source', out)
-        self.assertIn("alias ll 'eza -l --group-directories-first --git'", out)
-        self.assertNotIn("icons", out.replace("Icons need", ""))
-
-    def test_git_gets_its_block_first_so_that_the_persons_own_settings_win(self):
-        out = self.filter("[user]\n\tname = X\n", "modern-git", "icons").stdout
-        self.assertTrue(out.startswith("# >>> workspaces-host: modern-cli"))
-        self.assertTrue(out.endswith("[user]\n\tname = X\n"))
-        self.assertIn("pager = delta", out)
-
-    def test_an_existing_prompt_block_is_replaced_or_kept_as_asked(self):
-        have = self.filter("", "bash", "$HOME/mine.json").stdout
-        self.assertIn("$HOME/new.json", self.filter(have, "bash", "$HOME/new.json").stdout)
-        kept = self.filter(have, "bash", "$HOME/new.json", BOOTSTRAP_KEEP_BLOCK="1").stdout
-        self.assertEqual(kept, have)
-
-    def test_a_block_that_lost_its_end_line_is_left_alone(self):
-        cut = "export A=1\n# >>> workspaces-host: prompt (ws-host shell add bash) >>>\nmine\n"
-        self.assertEqual(self.filter(cut, "bash", "$HOME/t.json").stdout, cut)
-
-    def test_text_outside_the_markers_is_never_touched(self):
-        have = self.filter("a\nb\n", "bash", "$HOME/t.json").stdout
-        edited = "top\n" + have + "bottom\n"
-        out = self.filter(edited, "bash", "$HOME/other.json").stdout
-        self.assertTrue(out.startswith("top\na\nb\n") and out.endswith("bottom\n"))
-
-    def test_an_unknown_kind_fails(self):
-        self.assertNotEqual(self.filter("", "nonsense", "x").returncode, 0)
 
 
 @unittest.skipUnless(SH and shutil.which("jq") and shutil.which("curl"), "sh, jq and curl are needed")
@@ -524,31 +524,6 @@ class Rules(Fixture):
         self.assertEqual(self.call(f'locate "{d}" "missing"').stdout.strip(), "")
 
 
-@unittest.skipUnless(SH and shutil.which("curl"), "sh and curl are needed")
-class Data(Fixture):
-    """The data files come from beside the script in a checkout and from BOOTSTRAP_URL in a pipe."""
-
-    def fetch(self, as_file, dest):
-        """Source the script as $0 = as_file (a path ending in bootstrap-archon.sh is a checkout; `sh` is a pipe) and ask for one data file."""
-        code = f'. "{SCRIPT}"; data_file themes/ws-host-pretty.omp.json "{dest}"'
-        return subprocess.run([SH, "-c", code, as_file], capture_output=True, text=True,
-                              env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_URL=f"file://{self.tmp / 'remote'}"))
-
-    def test_a_checkout_uses_the_copies_beside_the_script_and_a_pipe_fetches_them(self):
-        pretty = (THEMES / "ws-host-pretty.omp.json").read_text()
-        remote = self.tmp / "remote" / "bin" / "bootstrap" / "themes"
-        remote.mkdir(parents=True)
-        (remote / "ws-host-pretty.omp.json").write_text('{"from": "remote"}')
-        # a checkout: the folder beside the script is used, whatever BOOTSTRAP_URL says
-        p = self.fetch(str(SCRIPT), self.tmp / "checkout.json")
-        self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertEqual((self.tmp / "checkout.json").read_text(), pretty)
-        # a pipe: $0 is the shell, so the files come from BOOTSTRAP_URL
-        p = self.fetch("sh", self.tmp / "piped.json")
-        self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertEqual((self.tmp / "piped.json").read_text(), '{"from": "remote"}')
-
-
 class Readme(unittest.TestCase):
     def test_the_public_readme_carries_no_setup_instructions(self):
         """0136-machine-bootstrap FR-022: the instructions live in archon's README, which the people who may run the script can read."""
@@ -560,12 +535,13 @@ class Readme(unittest.TestCase):
 class Packages(unittest.TestCase):
     def test_no_package_duplicates_a_program_archon_pins(self):
         """0136-machine-bootstrap FR-007: Node.js and the browser come from `archon toolchain ensure`, at the pinned version, not from apt."""
-        text = SCRIPT.read_text()
+        text = BOOT.read_text()
         start = text.index("wanted_packages() {")
         body = text[start:text.index("\n}\n", start)]
         for pkg in ("nodejs", "npm", "chromium"):
             self.assertNotRegex(body, rf"\b{pkg}\b", pkg)
-        verify = text[text.index("verify_install() {"):]
+        setup = SCRIPT.read_text()
+        verify = setup[setup.index("verify_install() {"):]
         self.assertNotRegex(verify.split("kit_on shell", 1)[0], r"\bnode\b|chromium")
 
 
@@ -678,12 +654,12 @@ class Telemetry(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Settings(Fixture):
-    """0136-machine-bootstrap FR-041: the PostHog settings the setup was given are kept for every new terminal, in the file and blocks `archon secrets` uses."""
+    """0136-machine-bootstrap FR-041, FR-050: the PostHog settings the setup was given are kept for every new terminal, in the file `archon secrets` uses; the lines that make a shell read it are `archon shell ensure`'s."""
 
     def keep(self, **extra):
         return self.run_script(**OFF, BOOTSTRAP_KIT="", **extra)
 
-    def test_the_key_is_kept_privately_and_bash_and_fish_are_told_to_read_it_once(self):
+    def test_the_key_is_kept_privately_and_the_setup_writes_no_startup_file(self):
         p = self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         f = self.home / ".config" / "archon" / "secrets.env"
@@ -692,26 +668,25 @@ class Settings(Fixture):
         self.assertIn("ARCHON_POSTHOG_KEY='phc_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
         self.assertIn("ARCHON_PERSON='ifcore:A B'", f.read_text())
         self.assertNotIn("phc_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
-        for name in (".profile", ".bashrc"):
-            self.assertEqual((self.home / name).read_text().count("# >>> archon: secrets"), 1, name)
-        self.assertIn("string match -r", (self.home / ".config" / "fish" / "conf.d" / "archon-secrets.fish").read_text())
-        before = (f.read_text(), (self.home / ".bashrc").read_text())
+        for name in (".profile", ".bashrc", ".zshenv", ".config/fish"):
+            self.assertFalse((self.home / name).exists(), f"0136-machine-bootstrap FR-049: the setup wrote {name}")
+        before = f.read_text()
         self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
-        self.assertEqual(before, (f.read_text(), (self.home / ".bashrc").read_text()), "a second run changes nothing")
+        self.assertEqual(before, f.read_text(), "a second run changes nothing")
 
-    def test_a_new_bash_has_the_key_and_a_changed_key_replaces_the_old_one(self):
+    def test_a_changed_key_replaces_the_old_one(self):
         self.keep(ARCHON_POSTHOG_KEY="phc_oldoldoldoldoldoldold")
         self.keep(ARCHON_POSTHOG_KEY="phc_newnewnewnewnewnewnew")
         text = (self.home / ".config" / "archon" / "secrets.env").read_text()
         self.assertEqual(text.count("ARCHON_POSTHOG_KEY="), 1)
-        out = subprocess.run(["bash", "-c", '. "$HOME/.profile"; printf %s "$ARCHON_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
+        out = subprocess.run(["sh", "-c", 'set -a; . "$HOME/.config/archon/secrets.env"; set +a; printf %s "$ARCHON_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
         self.assertEqual(out, "phc_newnewnewnewnewnewnew")
 
-    def test_a_shell_file_of_the_persons_keeps_its_text_and_a_copy_is_made(self):
+    def test_a_shell_file_of_the_persons_is_never_touched_by_the_setup(self):
         (self.home / ".bashrc").write_text("alias mine=1")
         self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
-        self.assertEqual((self.home / ".bashrc.before-archon").read_text(), "alias mine=1")
-        self.assertTrue((self.home / ".bashrc").read_text().startswith("alias mine=1\n"))
+        self.assertEqual((self.home / ".bashrc").read_text(), "alias mine=1")
+        self.assertFalse((self.home / ".bashrc.before-archon").exists(), "archon shell ensure keeps that copy, when it first changes the file")
 
     def test_nothing_is_kept_without_a_setting_a_github_token_is_not_kept_and_a_quote_is_refused(self):
         p = self.keep(GH_TOKEN="ghp_" + "x" * 30)
@@ -752,8 +727,8 @@ class Pool(Fixture):
         folders = (self.home / "folders").read_text().split()
         self.assertEqual(len(set(folders)), 6, "no two jobs share a temporary folder")
 
-    def test_the_pool_does_not_wait_for_the_apt_running_in_the_background(self):
-        """The hang of a real run: a bare `wait` after the jobs also waited for the background apt, with nothing on the screen."""
+    def test_the_pool_does_not_wait_for_a_job_of_its_own_shell_that_is_not_in_it(self):
+        """The hang of a real run: a bare `wait` after the jobs also waited for a background job that was not theirs, with nothing on the screen."""
         import time
 
         started = time.time()
@@ -778,10 +753,6 @@ class Pool(Fixture):
         log = next((self.home / ".archon-bootstrap" / "log").glob("bootstrap-*")).read_text()
         self.assertIn("(exit 9)", log)
         self.assertEqual(log.count("==== STEP"), 3, "every job is in the log, whether it worked or not")
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 @unittest.skipUnless(SH, "sh is not installed")
@@ -850,3 +821,145 @@ class Editor(Fixture):
         self.assertIn("VS Code on Windows", p.stdout)
         off = self.run_script("--dry-run", WSL_DISTRO_NAME="Debian", BOOTSTRAP_NO_EDITOR="1")
         self.assertNotIn("VS Code", off.stdout)
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Setup(Fixture):
+    """0136-machine-bootstrap FR-046: the setup never uses administrator rights, and says what it needs of the computer."""
+
+    def test_the_setup_never_invokes_sudo_a_package_manager_or_chsh(self):
+        text = SCRIPT.read_text()
+        code = [l for l in text.splitlines() if not l.lstrip().startswith("#")]
+        command = re.compile(r"(^|[;&|(]\s*|\$\()\s*(sudo|\$sudo_cmd|apt-get|apt|dpkg|chsh|useradd|adduser|runuser)\b")
+        for line in code:
+            self.assertIsNone(command.search(line), f"the setup runs an administrator's command: {line}")
+        for name in ("sudo_for", "apt_install", "apt_update", "install_packages", "offer_fish", "/etc/shells"):
+            self.assertNotIn(name, text, name)
+
+    def test_without_git_or_curl_it_stops_before_changing_anything_with_the_one_command_to_run(self):
+        names = [n for n in os.listdir("/usr/bin") if n not in ("git", "curl")]
+        for n in names:
+            try:
+                os.symlink(f"/usr/bin/{n}", self.bin / n)
+            except OSError:
+                pass
+        p = self.run_script(**OFF, PATH=str(self.bin))
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("no git", p.stderr)
+        self.assertIn("sudo apt-get install -y git", p.stderr)
+        self.assertIn("archon-bootstrap.sh", p.stderr)
+        self.assertFalse((self.home / "workspaces").exists())
+
+    def test_a_missing_program_that_only_some_steps_need_is_named_and_the_setup_goes_on(self):
+        p = self.run_script(**OFF, BOOTSTRAP_KIT="")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        if shutil.which("gh") and shutil.which("jq") and shutil.which("xz") and shutil.which("unzip"):
+            self.skipTest("this computer has every program, so nothing is missing")
+        self.assertIn("sudo apt-get install -y", p.stdout + p.stderr)
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Bootstrap(Fixture):
+    """0136-machine-bootstrap FR-046 to FR-048: the bootstrap installs packages, may make the account, and runs the setup as it."""
+
+    def run_boot(self, *argv, stdin=None, **extra):
+        return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(**extra), input=stdin, stdin=None if stdin else subprocess.DEVNULL)
+
+    def test_help_a_bad_option_and_a_name_an_account_cannot_have(self):
+        p = self.run_boot("--help")
+        self.assertEqual(p.returncode, 0)
+        for text in ("archon-bootstrap.sh | sh", "--user NAME", "--dedicated", "--dry-run"):
+            self.assertIn(text, p.stdout)
+        self.assertEqual(self.run_boot("--nonsense").returncode, 2)
+        bad = self.run_boot("--dry-run", "--user", "Bad Name")
+        self.assertEqual(bad.returncode, 2)
+        self.assertIn("not a name a Linux account can have", bad.stderr)
+        self.assertEqual(self.run_boot("--user").returncode, 2)
+
+    def test_it_refuses_a_machine_that_is_not_debian_family(self):
+        osr = self.tmp / "os-release"
+        osr.write_text('ID=fedora\nPRETTY_NAME="Fedora Linux 40"\nVERSION_ID=40\n')
+        p = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=str(osr))
+        self.assertEqual(p.returncode, 3)
+        self.assertIn("Fedora Linux 40", p.stderr)
+
+    def test_dry_run_for_this_account_lists_the_packages_and_the_setup_in_one_plan_and_writes_nothing(self):
+        before = tree(self.home)
+        p = self.run_boot("--dry-run")
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(tree(self.home), before)
+        for step in ("install with apt", "Setting up archon in this account", "archon shell ensure", "archon doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
+            self.assertIn(step, p.stdout)
+        self.assertNotIn("create the Linux account", p.stdout)
+
+    def test_dry_run_for_a_dedicated_account_makes_it_and_runs_the_setup_as_it(self):
+        p = self.run_boot("--dry-run", "--dedicated")
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("create the Linux account archon with a home folder and no administrator rights", p.stdout)
+        self.assertIn("run archon-setup.sh as archon: --dry-run --dedicated --comfort", p.stdout)
+        named = self.run_boot("--dry-run", "--user", "bob")
+        self.assertIn("create the Linux account bob", named.stdout)
+        self.assertIn("as bob: --dry-run --comfort", named.stdout)
+
+    def test_the_bootstrap_is_opinionated_the_comfort_kits_are_on_unless_it_is_told_not(self):
+        """0136-machine-bootstrap FR-047"""
+        def wanted(**env):
+            p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages; echo "kits=$kits"'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), **env))
+            return p.stdout
+        self.assertIn("ripgrep", wanted())
+        self.assertIn("base", wanted().split("kits=")[1])
+        off = wanted(BOOTSTRAP_NO_COMFORT="1")
+        self.assertNotIn("ripgrep", off)
+        self.assertIn("git ca-certificates curl wget tar xz-utils unzip jq gh", off, "what the setup needs is still installed")
+        self.assertNotIn("--comfort", self.run_boot("--dry-run", "--dedicated", BOOTSTRAP_NO_COMFORT="1").stdout)
+        self.assertIn("--comfort", self.run_boot("--dry-run", "--dedicated").stdout)
+
+    @unittest.skipUnless(shutil.which("curl"), "curl is needed")
+    def test_run_from_a_pipe_it_fetches_the_setup_and_plans_the_same(self):
+        piped = subprocess.run([SH, "-s", "--", "--dry-run", "--dedicated"], input=BOOT.read_text(), capture_output=True, text=True, env=self.env(BOOTSTRAP_URL=f"file://{HOME}"))
+        self.assertEqual(piped.returncode, 0, piped.stderr)
+        self.assertEqual(piped.stdout, self.run_boot("--dry-run", "--dedicated").stdout)
+
+    def account_stubs(self, exists=False):
+        state = self.tmp / "account-made"
+        log = self.tmp / "calls.log"
+        log.write_text("")
+        if exists:
+            state.write_text("")
+        self.stub("getent", f'[ "$1" = passwd ] && [ -f {state} ] && {{ echo "$2:x:1001:1001::/home/$2:/bin/bash"; exit 0; }}\nexit 2')
+        self.stub("adduser", f'echo "adduser $*" >>{log}\n: >{state}')
+        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
+        self.stub("runuser", f'echo "AS runuser $*" >>{log}')
+        return log
+
+    def go(self, *argv, **extra):
+        return self.run_boot(*argv, BOOTSTRAP_NO_APT="1", BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
+
+    def test_it_makes_the_account_without_administrator_rights_and_runs_the_setup_as_it_with_the_settings_passed_on(self):
+        log = self.account_stubs()
+        p = self.go("--dedicated", ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", GH_TOKEN="ghp_example")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        calls = log.read_text()
+        self.assertIn("adduser --disabled-password --gecos  archon", calls)
+        self.assertNotIn("sudo-group", calls)
+        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
+        for part in ("archon", "HOME=/home/archon", "ARCHON_POSTHOG_KEY=phc_abcdefghijklmnopqrstuvwxyz1234", "GH_TOKEN=ghp_example", "--dedicated", "--comfort", "archon-setup.sh"):
+            self.assertIn(part, run)
+        self.assertNotIn("BOOTSTRAP_SOURCE_ONLY", run)
+        self.assertIn("sudo -iu archon", p.stdout, "it says how to switch to the account")
+        self.assertIn("deluser --remove-home archon", p.stdout, "and how to remove it with everything archon wrote")
+
+    def test_an_account_that_exists_is_not_changed(self):
+        log = self.account_stubs(exists=True)
+        p = self.go("--user", "bob")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        calls = log.read_text()
+        self.assertNotIn("adduser", calls)
+        self.assertIn("already there", p.stdout)
+        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
+        self.assertIn("--comfort", run)
+        self.assertNotIn("--dedicated", run, "an account the person named is not declared dedicated")
+
+
+if __name__ == "__main__":
+    unittest.main()
