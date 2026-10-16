@@ -191,9 +191,9 @@ fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
   *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_font='🔤 '
-     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 ' ;;
+     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 ' ;;
   *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_font=''
-     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> ' ;;
+     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code='' ;;
 esac
 
 # Every environment variable name in a message (capitals with an underscore, like BOOTSTRAP_PROMPT) is shown in bright yellow where there is colour.
@@ -1873,7 +1873,7 @@ finish() {
   fi
   if [ "${editor_linked:-0}" = 1 ]; then
     say ""
-    say "${b}${e_what}VS Code${z}: ${c}code .${z} in a folder opens it there. Under WSL it opens VS Code on Windows, which installs its WSL extension the first time."
+    say "${b}${e_code}VS Code${z}: ${c}code .${z} in a folder opens it there. Under WSL it opens VS Code on Windows, which installs its WSL extension the first time."
   fi
   case ":$orig_path:" in
     *":$bin:"*) ;;
@@ -1911,7 +1911,7 @@ finish() {
   return 0
 }
 
-# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044) --------------------------------------------------------------------------
+# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044; `archon update` runs this script again, quietly, FR-045) --------------------------------------------------------------------------
 # Under WSL VS Code runs on Windows and reaches Debian through its WSL extension; its `code` command is a script in its Windows folder, on the PATH
 # only while WSL appends Windows' PATH. So `code` is a small script in ~/.local/bin that runs it, which every shell has; where VS Code is not on
 # Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, from its apt
@@ -1955,7 +1955,7 @@ apt_code() {  # Microsoft's repository, signed by its pinned key, then the packa
 
 setup_editor() {
   [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
-  phase "${e_what}Making ${c}code${z} open VS Code"
+  phase "${e_code}Making ${c}code${z} open VS Code"
   if [ "$wsl" = 1 ]; then
     if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code on Windows, installing it with winget for this Windows user where it is not there"; return 0; fi
     if ! ours_or_free; then say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; fi
