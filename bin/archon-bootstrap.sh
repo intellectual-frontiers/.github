@@ -273,6 +273,7 @@ install_code_package() {
 
 run_setup() {
   heading "${e_rocket}Setting up archon in this account"
+  install_method=bootstrap   # what archon-setup.sh records (0136-machine-bootstrap FR-060)
   # the setup's own steps, in this process, which is already set up with the log, the steps and the telemetry (it uses no administrator rights)
   main || return $?
   return 0

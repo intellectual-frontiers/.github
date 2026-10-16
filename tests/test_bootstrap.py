@@ -213,7 +213,7 @@ class Switches(Fixture):
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         made = tree(self.home)
         self.assertIn("workspaces/github.com/intellectual-frontiers", made)
-        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith((".archon-bootstrap/log/", ".local/state/gh/"))], [], "folders only: no file of the person's changes, but the log and what gh itself keeps")
+        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith((".archon-bootstrap/log/", ".local/state/gh/")) and m != ".config/archon/install.toml"], [], "folders only: no file of the person's changes, but the log, what gh itself keeps and the record of how it was set up")
         self.assertTrue(any(m.startswith(".archon-bootstrap/log/bootstrap-") for m in made), "everything is logged to ~/.archon-bootstrap/log/")
         again = self.run_script(**OFF, BOOTSTRAP_KIT="")
         self.assertEqual(again.returncode, 0)
@@ -688,7 +688,7 @@ class Settings(Fixture):
 
     def test_nothing_is_kept_without_a_setting_a_github_token_is_not_kept_and_a_quote_is_refused(self):
         p = self.keep(GH_TOKEN="ghp_" + "x" * 30)
-        self.assertFalse((self.home / ".config" / "archon").exists())
+        self.assertFalse((self.home / ".config" / "archon" / "secrets.env").exists())
         self.assertIn("not saved", p.stdout + p.stderr)
         self.assertIn("archon secrets set GH_TOKEN", p.stdout + p.stderr)
         q = self.keep(ARCHON_POSTHOG_KEY="phc_it's")
@@ -1234,6 +1234,93 @@ class MacOS(Fixture):
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertIn("exec zsh -l", run.stdout)
         self.assertNotIn("login shell", run.stdout, "fish is not set up on a Mac")
+
+
+DEBIAN13 = 'ID=debian\nPRETTY_NAME="Debian GNU/Linux 13 (trixie)"\nVERSION_ID=13\nVERSION_CODENAME=trixie\n'
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Installation(Fixture):
+    """0136-machine-bootstrap FR-060, FR-061: the record of how this account was set up, the checks before the long installs, and no drift between the two ways in."""
+
+    def record(self):
+        f = self.home / ".config" / "archon" / "install.toml"
+        return f.read_text() if f.exists() else ""
+
+    def osr(self):
+        f = self.tmp / "os-release"
+        f.write_text(DEBIAN13)
+        return str(f)
+
+    def test_the_setup_records_how_the_account_was_set_up_and_a_later_run_keeps_the_first_method(self):
+        p = self.run_script(**OFF, BOOTSTRAP_OS_RELEASE=self.osr(), BOOTSTRAP_KIT="")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        text = self.record()
+        for line in ('method = "setup"', 'family = "debian"', 'arch = "', 'comfort = false', 'distro = "Debian GNU/Linux 13 (trixie)"'):
+            self.assertIn(line, text)
+        self.assertRegex(text, r'installed = "\d{4}-\d\d-\d\d"')
+        self.assertEqual((self.home / ".config" / "archon" / "install.toml").stat().st_mode & 0o777, 0o644)
+        (self.home / ".config" / "archon" / "install.toml").write_text(text.replace('method = "setup"', 'method = "bootstrap"').replace('installed = "', 'installed = "2020-01-01" #').replace("comfort = false", "comfort = true"))
+        self.run_script("--comfort", **OFF, BOOTSTRAP_OS_RELEASE=self.osr(), BOOTSTRAP_KIT="")
+        again = self.record()
+        self.assertIn('method = "bootstrap"', again, "the first method stays")
+        self.assertIn("comfort = true", again, "a comfort kit once asked for is remembered")
+
+    def test_the_bootstrap_records_itself_as_the_method(self):
+        p = self.run_boot_with_stubs()
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn('method = "bootstrap"', self.record())
+        self.assertIn("comfort = true", self.record(), "the bootstrap is opinionated")
+
+    def run_boot_with_stubs(self):
+        for name in ("sudo", "apt-get"):
+            self.stub(name, "exit 0")
+        return subprocess.run([SH, str(BOOT)], capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                              env=self.env(**OFF, BOOTSTRAP_OS_RELEASE=self.osr(), PATH=f"{self.bin}:{os.environ['PATH']}"))
+
+    def test_a_dry_run_names_the_record_and_the_access_check_and_writes_none(self):
+        p = self.run_script("--dry-run", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertIn("install.toml (setup)", p.stdout)
+        self.assertIn("can open the private archon repository", p.stdout)
+        self.assertEqual(self.record(), "")
+        self.assertIn("install.toml (bootstrap)", subprocess.run([SH, str(BOOT), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr()), stdin=subprocess.DEVNULL).stdout)
+
+    def test_an_account_that_cannot_open_archon_is_told_before_anything_is_installed(self):
+        self.stub("git", 'echo "remote: Repository not found." >&2; echo "fatal: repository not found" >&2; exit 128')
+        self.stub("gh", 'case "$1" in auth) exit 0 ;; api) echo someone ;; esac')
+        p = self.run_script(BOOTSTRAP_NO_DOWNLOAD="1", BOOTSTRAP_NO_EDITOR="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertEqual(p.returncode, 5, p.stdout + p.stderr)
+        self.assertIn("does not let this account open archon", p.stdout)
+        self.assertIn("Nothing has been installed", p.stdout)
+        self.assertEqual(self.record(), "", "stopped before the record, and before any installation")
+
+    def test_a_network_failure_in_the_access_check_does_not_stop_the_setup(self):
+        self.stub("git", 'echo "fatal: unable to access: Could not resolve host" >&2; exit 128')
+        self.stub("gh", 'case "$1" in auth) exit 0 ;; esac')
+        p = self.run_script(**OFF_BUT_ARCHON, BOOTSTRAP_NO_CLONE="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertNotIn("does not let this account open archon", p.stdout)
+
+    def test_a_computer_with_too_little_room_or_run_as_root_is_warned_first(self):
+        self.stub("df", 'echo "Filesystem 1K-blocks Used Available Use% Mounted"; echo "x 100 90 2097152 5% /"')
+        p = self.run_script(**OFF, PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertIn("Only 2 GB are free", p.stdout + p.stderr)
+        if os.geteuid() == 0:
+            self.assertIn("This runs as root", p.stdout + p.stderr)
+
+    def test_the_two_ways_in_run_the_same_steps_so_they_cannot_drift(self):
+        """the bootstrap runs the setup's own code, in the same process: every step the setup lists with --comfort is a step of the bootstrap's plan, in the same order"""
+        steps = lambda text: [l for l in text.splitlines() if l.startswith("  - ") or l.startswith("  would ")]   # noqa: E731
+        setup = steps(self.run_script("--dry-run", "--comfort", BOOTSTRAP_OS_RELEASE=self.osr()).stdout)
+        boot = steps(subprocess.run([SH, str(BOOT), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr()), stdin=subprocess.DEVNULL).stdout)
+        self.assertGreater(len(setup), 20)
+        it = iter(boot)
+        for step in setup:
+            if "install.toml (setup)" in step:
+                step = step.replace("(setup)", "(bootstrap)")
+            self.assertIn(step, it, f"the bootstrap's plan lacks, or reorders, a step of the setup's: {step}")
+        extra = [b for b in boot if b not in setup]
+        for b in extra:
+            self.assertRegex(b, r"apt|package|administrator|login shell|chsh|fish|install.toml", f"a step only the bootstrap takes must be about packages or the login shell: {b}")
 
 
 if __name__ == "__main__":

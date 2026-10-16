@@ -321,14 +321,20 @@ ph_device() {
   printf '%s' "$id"
 }
 
-# what kind of computer, and no more: WSL or a virtual machine or a container or real hardware, the system, the processors, memory and free disk
-ph_machine() {
+# what kind of computer: WSL, a container, a virtual machine, or a machine (real hardware, or a Mac)
+host_kind() {
   kind=machine
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then kind=wsl
   elif [ -f /.dockerenv ] || grep -qaE 'docker|containerd|lxc|kubepods' /proc/1/cgroup 2>/dev/null; then kind=container
   elif v=$(systemd-detect-virt 2>/dev/null) && [ "$v" != none ]; then kind=vm-$v
   elif grep -qw hypervisor /proc/cpuinfo 2>/dev/null; then kind=vm
   elif [ "$(sysctl -n kern.hv_vmm_present 2>/dev/null || true)" = 1 ]; then kind=vm; fi
+  printf '%s' "$kind"
+}
+
+# what kind of computer, and no more: WSL or a virtual machine or a container or real hardware, the system, the processors, memory and free disk
+ph_machine() {
+  kind=$(host_kind)
   wslv=""; case $(cat /proc/version 2>/dev/null) in *WSL2*) wslv=2 ;; *[Mm]icrosoft*) wslv=1 ;; esac
   os_id=""; os_ver=""
   if [ -r /etc/os-release ]; then
@@ -1766,6 +1772,69 @@ setup_editor() {
   return 0
 }
 
+# ---- how this copy was installed (0136-machine-bootstrap FR-060) ----------------------------------------------------------------------------------
+# One small file, ~/.config/archon/install.toml, says how this account was set up, so that `archon doctor`, `archon update` and `archon orch status` can say it and warn when the
+# computer no longer matches it. The first method is kept (`bootstrap` for a computer set up whole, `setup` for a user made for archon on a machine in use); a later run only
+# refreshes the date and adds the comfort kits.
+install_method=${install_method:-setup}
+install_file=$cfgdir/archon/install.toml
+record_install() {
+  if [ "$dry" = 1 ]; then would "record how this account was set up in ~/.config/archon/install.toml ($install_method), which the commands that say how things stand show"; return 0; fi
+  ri_method=$install_method; ri_first=$(date +%Y-%m-%d); ri_comfort=$comfort
+  if [ -r "$install_file" ]; then
+    ri_old=$(sed -n 's/^method = "\(.*\)"$/\1/p' "$install_file" | head -n 1); [ -z "$ri_old" ] || ri_method=$ri_old
+    ri_o=$(sed -n 's/^installed = "\(.*\)"$/\1/p' "$install_file" | head -n 1); [ -z "$ri_o" ] || ri_first=$ri_o
+    grep -q '^comfort = true' "$install_file" && ri_comfort=1
+  fi
+  [ "$ri_comfort" = 1 ] && ri_c=true || ri_c=false
+  ri_dir=$(dirname "$install_file")
+  mkdir -p "$ri_dir" || return 0
+  ri_tmp=$(mktemp "$ri_dir/.install.XXXXXX") || return 0
+  {
+    printf '%s\n' "# Written by archon-setup.sh: how this account was set up. Read by `archon doctor`, `archon update` and `archon orch status`; safe to delete (they then say it is not recorded)."
+    printf 'method = "%s"\n' "$ri_method"
+    printf 'family = "%s"\n' "$family"
+    printf 'host = "%s"\n' "$(host_kind | sed 's/^vm-.*/vm/')"
+    printf 'distro = "%s"\n' "$(printf '%s' "$d_pretty" | tr -d '"\\')"
+    printf 'arch = "%s"\n' "$arch"
+    printf 'comfort = %s\n' "$ri_c"
+    printf 'installed = "%s"\n' "$ri_first"
+    printf 'refreshed = "%s"\n' "$(date +%Y-%m-%d)"
+  } >"$ri_tmp" && chmod 644 "$ri_tmp" && mv "$ri_tmp" "$install_file" || rm -f "$ri_tmp"
+  logf "recorded the installation: $ri_method, $family, comfort $ri_c"
+}
+
+# ---- before anything is fetched: what would make a long run fail late (0136-machine-bootstrap FR-061) -----------------------------------------------------------
+preflight() {
+  [ "$dry" = 1 ] && return 0
+  if [ "$(id -u)" = 0 ]; then
+    warn "This runs as root. It works, but everything is then kept in root's home folder; a user of your own (any name) is the usual choice."
+  fi
+  if [ "$wsl" = 1 ]; then
+    case $(cat /proc/version 2>/dev/null) in *WSL2*) ;; *) warn "This looks like WSL 1, which lacks what some programs need. Move it to WSL 2 in PowerShell: wsl --set-version <distribution> 2" ;; esac
+  fi
+  pf_free=$(df -k "$HOME" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1048576}')
+  case $pf_free in '' | *[!0-9]*) ;; *) if [ "$pf_free" -lt 10 ]; then warn "Only ${pf_free} GB are free in your home folder, and everything archon uses (the typesetter, the test browser, Java and more) needs about 10 GB. It may stop for want of room; free some space first."; fi ;; esac
+  return 0
+}
+
+# the private archon repository is read with the person's sign-in: say now, before the long installs, that this account cannot open it (0136-machine-bootstrap FR-061)
+check_access() {
+  if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private archon repository"; return 0; fi
+  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
+  [ "$have_github" = 1 ] || return 0
+  ca_out=$(GIT_TERMINAL_PROMPT=0 git ls-remote "$archon_url" HEAD 2>&1 </dev/null) && return 0
+  case $ca_out in
+    *"not found"* | *"Not Found"* | *"Authentication failed"* | *"could not read"* | *"denied"* | *"403"*)
+      logf "no access to $archon_url: $ca_out"
+      say "${r}${b}${e_stop}GitHub does not let this account open archon.${z} archon is a private repository: only people the owner added can open it."
+      say "Ask the owner of the intellectual-frontiers organization on GitHub to add the GitHub user you signed in as ($(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)), then run this again. Nothing has been installed."
+      exit 5 ;;
+  esac
+  logf "could not check access to $archon_url (a network problem?): $ca_out"
+  return 0
+}
+
 # ---- the plan, and the run ------------------------------------------------------------------------------------------------------------------
 
 main() {
@@ -1785,7 +1854,7 @@ main() {
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
-  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
+  ph_event bootstrap_started "s:method=$install_method" "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
   signin_needed=0; cloned=0; archon_ran=0
   if [ "$dry" = 1 ]; then
     heading "${e_pkg}What this computer must already have"
@@ -1799,8 +1868,10 @@ main() {
     check_prereqs
   fi
   # The one thing that needs a person, up front: the GitHub sign-in. Then it all runs by itself. Everything that downloads from GitHub waits for github_init.
+  preflight
   sign_in
   github_init
+  check_access
   identity
   keep_settings
   setup_runtime
@@ -1809,6 +1880,7 @@ main() {
   [ "$dry" = 1 ] || ! kit_on base || link_fd
   setup_editor
   verify_install
+  record_install
   workspace_and_clone
   run_archon
   finish
