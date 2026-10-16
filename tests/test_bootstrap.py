@@ -330,7 +330,7 @@ exit 0
         calls = self.calls.read_text()
         for name in ("doctor", "toolchain ensure", "shell ensure", "check"):
             self.assertIn(f"ARCHON {name}", calls)
-        self.assertRegex(p.stdout, r"(x|❌).*\./archon check \(exit status 4\)")
+        self.assertRegex(p.stdout, r"(x|❌).*\./archon check --quick \(exit status 4\)")
 
     def test_an_existing_clone_is_updated_by_fast_forward_alone(self):
         self.assertEqual(self.go(BOOTSTRAP_NO_ARCHON="1").returncode, 0)
@@ -1306,6 +1306,27 @@ class Installation(Fixture):
         self.assertIn("Only 2 GB are free", p.stdout + p.stderr)
         if os.geteuid() == 0:
             self.assertIn("This runs as root", p.stdout + p.stderr)
+
+
+    def test_the_record_holds_only_what_the_setup_wrote_even_where_archon_is_on_the_path(self):
+        """a backtick in a double-quoted header once ran `archon doctor` inside the setup and put its output in the file, so the record could not be read"""
+        import tomllib
+
+        marker = self.tmp / "ran"
+        self.stub("archon", f'echo "ran $*" >>{marker}; echo "JUNK from archon $*"')
+        p = self.run_script(**OFF, BOOTSTRAP_OS_RELEASE=self.osr(), BOOTSTRAP_KIT="", PATH=f"{self.bin}:{os.environ['PATH']}")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertFalse(marker.exists(), "the setup ran archon while writing the record")
+        parsed = tomllib.loads(self.record())
+        self.assertEqual(parsed["method"], "setup")
+        self.assertNotIn("JUNK", self.record())
+
+    def test_no_script_line_runs_a_command_by_accident_with_an_unescaped_backtick(self):
+        for f in (SCRIPT, BOOT):
+            for n, line in enumerate(f.read_text().splitlines(), 1):
+                code = re.sub(r"\s#\s.*$", "", line)
+                if not line.lstrip().startswith("#"):
+                    self.assertIsNone(re.search(r"(?<!\\)`", code), f"{f.name}:{n} has a backtick, which the shell runs as a command: {line.strip()}")
 
     def test_the_two_ways_in_run_the_same_steps_so_they_cannot_drift(self):
         """the bootstrap runs the setup's own code, in the same process: every step the setup lists with --comfort is a step of the bootstrap's plan, in the same order"""

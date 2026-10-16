@@ -25,7 +25,7 @@
 #      fast-forward only),
 #   4. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
 #   5. First checks: runs, in the clone, ./archon shell ensure (the startup files of bash, zsh and fish: archon keeps them, with chezmoi),
-#      ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
+#      ./archon doctor, ./archon toolchain ensure and ./archon check --quick (seconds; the full `archon check` takes minutes and is yours to run), and says what to do next.
 #
 # It writes no startup file itself: `archon shell` does (0138-shell). Safe to run again: what is already in place changes nothing, and a clone with your
 # work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is kept in a log and shown only if
@@ -1528,7 +1528,7 @@ run_archon() {
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./archon shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       would "run in the clone: ./archon doctor"
       would "run in the clone: ./archon toolchain ensure (every entry of ./archon toolchain list that is not ready and not optional)"
-      would "run in the clone: ./archon check"
+      would "run in the clone: ./archon check --quick (a few sections, in seconds; the full ./archon check takes minutes and is left to you)"
     }
     return 0
   fi
@@ -1575,12 +1575,12 @@ run_archon() {
     fi
   fi
   step_soft "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
-  step_soft "${e_ok}Checking that archon is healthy" in_archon_quiet ./archon check || status_check=$?
+  step_soft "${e_ok}Checking that archon is healthy (a quick check)" in_archon_quiet ./archon check --quick || status_check=$?
   phase_close
   if [ "$status_check" != 0 ] && [ -f "$work/last.log" ]; then
     say "${y}${warnmark}archon's own checks found things to look at (setup itself is fine):${z}"
     grep -E '❎|\[[a-z-]+\]' "$work/last.log" 2>/dev/null | grep -v 'not observable' | head -12 | sed 's/^/   /' || true
-    say "${d}   Run ${b}archon check${z}${d} any time to see them all.${z}"
+    say "${d}   Run ${b}archon check${z}${d} any time for the full check (a few minutes).${z}"
   fi
   return 0
 }
@@ -1592,7 +1592,7 @@ finish() {
   heading "Summary"
   failed=0
   if [ "${archon_ran:-0}" = 1 ]; then
-    for pair in "shell ensure:$status_shell" "doctor:$status_doctor" "toolchain ensure:$status_tool" "check:$status_check"; do
+    for pair in "shell ensure:$status_shell" "doctor:$status_doctor" "toolchain ensure:$status_tool" "check --quick:$status_check"; do
       n=${pair%%:*}; s=${pair##*:}
       if [ "$n" = "shell ensure" ] && [ "${shell_ran:-0}" = 0 ]; then
         [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
@@ -1791,7 +1791,7 @@ record_install() {
   mkdir -p "$ri_dir" || return 0
   ri_tmp=$(mktemp "$ri_dir/.install.XXXXXX") || return 0
   {
-    printf '%s\n' "# Written by archon-setup.sh: how this account was set up. Read by `archon doctor`, `archon update` and `archon orch status`; safe to delete (they then say it is not recorded)."
+    printf '%s\n' '# Written by archon-setup.sh: how this account was set up. Read by archon doctor, archon update and archon orch status; safe to delete (they then say it is not recorded yet).'
     printf 'method = "%s"\n' "$ri_method"
     printf 'family = "%s"\n' "$family"
     printf 'host = "%s"\n' "$(host_kind | sed 's/^vm-.*/vm/')"
