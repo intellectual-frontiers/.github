@@ -1,65 +1,52 @@
 #!/bin/sh
 # Set up a computer for the Intellectual Frontiers harness (0136-machine-bootstrap, the bootstrap): the one script that may use administrator rights. A blank Debian 12
-# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs and, if you ask, an account made for `archon`; then it runs
-# `archon-setup.sh` as that account, which does the rest without administrator rights and writes only inside the account's home folder. A Mac with Apple silicon gets no package (the
-# setup fetches what it needs into the account's own folder): the bootstrap checks the Command Line Tools, makes the account with sysadminctl when asked, and runs the setup as it.
+# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs, and then `archon-setup.sh` runs
+# for the account that runs this, which does the rest without administrator rights and writes only inside that account's home folder. The account is whichever user you
+# start this as (it can be called anything); this script makes no account. To undo it all, delete the WSL distribution or the virtual machine. On a computer you already use,
+# make a user for archon yourself, log in as it and run archon-setup.sh there; deleting that user removes everything. A Mac with Apple silicon gets no package (the setup
+# fetches what it needs into the account's own folder): the bootstrap only checks the Command Line Tools and runs the setup.
 #
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --dedicated
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --dry-run
 #
-#   1. Packages: installs what is missing with apt (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq and the
+#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq and the
 #      other programs the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the everyday programs (ripgrep, ImageMagick, sqlite3 and the rest),
 #   2. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
-#   3. Account: with --user NAME (or --dedicated, which is --user archon) creates that Linux account if it does not exist, with a home folder and no administrator rights,
-#   4. Setup: runs archon-setup.sh as that account (or as you, without --user) with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out),
-#      and --dedicated for an account made for archon,
-#   5. Login shell: offers to make fish that account's login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
+#   3. Setup: runs archon-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out),
+#   4. Login shell: offers to make fish your login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
 #
 # Safe to run again. Options (after `sh -s --` when piped):
 #   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
-#   --user NAME        the account to set up: created if it is not there; without it, the account that runs this
-#   --dedicated        the account is for archon alone (--user archon unless --user names another): archon keeps its startup files whole, and deleting the account removes everything
 #   -h, --help         this text
 #
 # Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
-# archon-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable archon-setup.sh reads, which are passed on to the account.
+# archon-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable archon-setup.sh reads.
 # Exit status: 0 done, 1 archon's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
 # shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
 set -eu
 
-boot_dry=0; boot_user=""; boot_dedicated=0
+boot_dry=0
 boot_source_only=${BOOTSTRAP_SOURCE_ONLY:-}   # 1: load the functions and run nothing, so a test can call one
 while [ "$#" -gt 0 ]; do
   case $1 in
     --dry-run | -n) boot_dry=1 ;;
-    --dedicated) boot_dedicated=1 ;;
-    --user) shift; [ "$#" -gt 0 ] || { echo "archon-bootstrap: --user needs a name (try --help)" >&2; exit 2; }; boot_user=$1 ;;
-    --user=*) boot_user=${1#--user=} ;;
     -h | --help)
-      case $0 in *archon-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--user NAME] [--dedicated]   (see the header of archon-bootstrap.sh)" ;; esac
+      case $0 in *archon-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run]   (see the header of archon-bootstrap.sh)" ;; esac
       exit 0 ;;
     *) echo "archon-bootstrap: unknown option $1 (try --help)" >&2; exit 2 ;;
   esac
   shift
 done
-[ "$boot_dedicated" = 1 ] && [ -z "$boot_user" ] && boot_user=archon
-case $boot_user in
-  "" | [a-z_][a-z0-9_-]*) ;;
-  *) echo "archon-bootstrap: '$boot_user' is not a name an account can have (lower-case letters, digits, - and _)" >&2; exit 2 ;;
-esac
 
 # ---- the setup: beside this script in a checkout, fetched from BOOTSTRAP_URL when this is piped. Its functions (the log, the steps, the support file, the
-# telemetry) are this script's too, so it is loaded without running it; the account it sets up runs the same file.
+# telemetry) are this script's too, so it is loaded without running it; this account runs the same file.
 boot_dir=""
 case $0 in */archon-bootstrap.sh | archon-bootstrap.sh) [ -f "$0" ] && boot_dir=$(cd "$(dirname "$0")" && pwd -P) ;; esac
 setup_file=${BOOTSTRAP_SETUP:-}
 if [ -z "$setup_file" ] && [ -n "$boot_dir" ] && [ -f "$boot_dir/archon-setup.sh" ]; then setup_file=$boot_dir/archon-setup.sh; fi
 if [ -z "$setup_file" ]; then
-  setup_tmp=${TMPDIR:-/tmp}
-  [ "$(uname -s)" = Darwin ] && setup_tmp=/tmp   # a Mac's own temporary folder is private to the person, and the account the setup runs as must read this file
-  setup_dir=$(mktemp -d "$setup_tmp/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
+  setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
   setup_file=$setup_dir/archon-setup.sh
   raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
   if command -v curl >/dev/null 2>&1; then curl -fsSL --connect-timeout 20 --retry 3 -o "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
@@ -170,7 +157,6 @@ fish_from_apt() {   # whether the package manager can give fish 4 on this distri
 }
 
 # the account database: getent on Linux, dscl on a Mac
-acct_exists() { if [ "$family" = macos ]; then dscl . -read "/Users/$1" UniqueID >/dev/null 2>&1; else getent passwd "$1" >/dev/null 2>&1; fi; }
 acct_field() {  # acct_field NAME home|shell
   if [ "$family" = macos ]; then
     case $2 in home) f=NFSHomeDirectory ;; *) f=UserShell ;; esac
@@ -181,46 +167,6 @@ acct_field() {  # acct_field NAME home|shell
   fi
 }
 login_shell() { acct_field "$(id -un)" shell; }
-
-offer_fish() {
-  kit_on shell || return 0
-  [ "${BOOTSTRAP_NO_CHSH:-}" = 1 ] && return 0
-  heading "${e_shell}Your login shell"
-  fp=$(command -v fish 2>/dev/null || true); [ -n "$fp" ] || fp=$bin/fish
-  if [ "$dry" = 1 ]; then
-    would "make fish your login shell (the program that starts in each new terminal): chsh -s fish; bash keeps working"
-    return 0
-  fi
-  if [ ! -x "$fp" ] || [ "$(fish_major "$fp")" -lt 4 ]; then say "fish 4 is not installed, so your login shell stays as it is."; return 0; fi
-  case $(login_shell) in */fish) say "fish is already your login shell."; return 0 ;; esac
-  case $(cfg BOOTSTRAP_CHSH yes) in
-    no | NO | false | 0) say "Your login shell stays as it is. To use fish: chsh -s $fp"; return 0 ;;
-  esac
-  say "${e_shell}Making fish your login shell. ${d}bash keeps working: type bash any time.${z}"
-  # chsh accepts only a shell listed in /etc/shells
-  if ! grep -qx "$fp" /etc/shells 2>/dev/null; then
-    if sudo_for "add fish to the list of login shells (/etc/shells)"; then
-      printf '%s\n' "$fp" | $sudo_cmd tee -a /etc/shells >/dev/null || { warn "Could not add $fp to /etc/shells."; return 0; }
-    else
-      warn "I could not get administrator rights to list fish as a login shell. Run: command -v fish | sudo tee -a /etc/shells; chsh -s $fp"
-      return 0
-    fi
-  fi
-  me=$(id -un)
-  if [ "$(id -u)" = 0 ]; then
-    chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
-  elif [ "$sudo_ready" = 1 ] && [ -n "$sudo_cmd" ] && $sudo_cmd -n true 2>/dev/null; then
-    # the administrator rights asked for at the start are still good, so the change needs no second password
-    $sudo_cmd chsh -s "$fp" "$me" </dev/null || warn "chsh failed. Run: chsh -s $fp"
-  elif [ "$has_tty" = 1 ]; then
-    say "${b}${e_key}One password, once more.${z} Debian is about to ask for ${b}Password:${z}."
-    say "That is ${b}the Linux password for ${me}${z}, the same one you typed when this setup first asked for administrator rights."
-    say "${d}Nothing shows while you type: that is normal. Press Enter when done.${z}"
-    chsh -s "$fp" </dev/tty || warn "chsh did not change your shell. Run: chsh -s $fp"
-  else warn "chsh needs the Linux password of $me and there is no terminal. Run: chsh -s $fp"; fi
-  case $(login_shell) in */fish) say "fish is now your login shell; it starts in each new terminal window." ;; esac
-  return 0
-}
 
 # A Mac: no package manager and no package (0136-machine-bootstrap FR-058). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
 mac_packages() {
@@ -323,95 +269,23 @@ install_code_package() {
   return 0
 }
 
-# ---- the account --------------------------------------------------------------------------------------------------------------------------------------
-
-account_home=""
-make_account() {
-  [ -n "$boot_user" ] || return 0
-  heading "${e_dir}The account ${boot_user}"
-  if acct_exists "$boot_user"; then
-    say "The account $boot_user is already there; I change nothing about it."
-  elif [ "$family" = macos ]; then
-    if [ "$dry" = 1 ]; then
-      would "create the standard account $boot_user (not an administrator) with sysadminctl -addUser, asking you to type its password, then its home folder with createhomedir"
-      account_home=/Users/$boot_user; return 0
-    fi
-    [ "$has_tty" = 1 ] || need "a Mac account needs a password typed at a terminal, and there is none here." "run this in Terminal, or make the account in System Settings, Users & Groups, then run this with --user $boot_user"
-    sudo_for "create the account $boot_user" || need "I could not get administrator rights, so I cannot create the account $boot_user." "make the account in System Settings, Users & Groups (a standard account), then run this again"
-    say "${b}${e_key}Choose a password for the new account $boot_user${z} ${d}(you type it twice; nothing shows while you type)${z}"
-    # not a step: the password is asked on the terminal, which a step does not give its command
-    $sudo_cmd sysadminctl -addUser "$boot_user" -fullName "$boot_user" -home "/Users/$boot_user" -password - </dev/tty ||
-      need "the account $boot_user could not be created." "make it in System Settings, Users & Groups (a standard account), then run this again"
-    step "${e_dir}Making its home folder" $sudo_cmd createhomedir -c -u "$boot_user" || need "the home folder of $boot_user could not be made." "run: sudo createhomedir -c -u $boot_user"
-  else
-    if [ "$dry" = 1 ]; then
-      if [ "$family" = debian ]; then would "create the Linux account $boot_user with a home folder and no administrator rights (adduser)"
-      else would "create the Linux account $boot_user with a home folder and no administrator rights (useradd -m -s /bin/bash)"; fi
-      account_home=/home/$boot_user; return 0
-    fi
-    sudo_for "create the Linux account $boot_user" || need "I could not get administrator rights, so I cannot create the account $boot_user." "ask an administrator to run: sudo $([ "$family" = debian ] && echo adduser || echo "useradd -m -s /bin/bash") $boot_user"
-    if [ "$family" = debian ] && command -v adduser >/dev/null 2>&1; then
-      step "${e_dir}Creating the account $boot_user" $sudo_cmd adduser --disabled-password --gecos "" "$boot_user" || need "the account $boot_user could not be created." "run: sudo adduser $boot_user"
-    else
-      step "${e_dir}Creating the account $boot_user" $sudo_cmd useradd -m -s /bin/bash "$boot_user" || need "the account $boot_user could not be created." "run: sudo useradd -m -s /bin/bash $boot_user"
-    fi
-  fi
-  account_home=$(acct_field "$boot_user" home || true)
-  [ -n "$account_home" ] || { [ "$family" = macos ] && account_home=/Users/$boot_user || account_home=/home/$boot_user; }
-  case $family in
-    macos) rm_cmd="sudo sysadminctl -deleteUser $boot_user" ;;
-    debian) rm_cmd="sudo deluser --remove-home $boot_user" ;;
-    *) rm_cmd="sudo userdel -r $boot_user" ;;
-  esac
-  say "To work in it later: ${b}sudo -iu $boot_user${z}   (or ${b}su - $boot_user${z} once you have given it a password with ${b}sudo passwd $boot_user${z}). To remove it with everything archon wrote: ${b}${rm_cmd}${z}."
-  return 0
-}
-
-# ---- the setup, run as the account -------------------------------------------------------------------------------------------------------------------
-
-setup_args() {
-  [ "$boot_dry" = 1 ] && printf '%s\n' --dry-run
-  [ "$boot_dedicated" = 1 ] && printf '%s\n' --dedicated
-  [ "$comfort" = 1 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ] && printf '%s\n' --comfort
-  return 0
-}
+# ---- the setup, run as this account -------------------------------------------------------------------------------------------------------------------
 
 run_setup() {
-  heading "${e_rocket}Setting up archon in $([ -n "$boot_user" ] && echo "the account $boot_user" || echo "this account")"
-  if [ -z "$boot_user" ]; then
-    # this account: the setup's own steps, in this process, which is already set up with the log, the steps and the telemetry (it uses no administrator rights)
-    dedicated=0
-    main || return $?
-    return 0
-  fi
-  sargs=$(setup_args | tr '\n' ' ')
-  if [ "$dry" = 1 ]; then
-    would "run archon-setup.sh as $boot_user: $sargs(every GH_TOKEN, ARCHON_*, BOOTSTRAP_* and WS_HOST_* variable you set is passed on)"
-    return 0
-  fi
-  # the variables the setup reads are passed to the account by name and value; its own home folder and a plain PATH are its own
-  set -- env -i HOME="$account_home" USER="$boot_user" LOGNAME="$boot_user" PATH=/usr/local/bin:/usr/bin:/bin
-  for v in $(env | sed -n -E 's/^((ARCHON|BOOTSTRAP|WS_HOST)_[A-Z0-9_]*|GH_TOKEN|GITHUB_TOKEN|DO_NOT_TRACK|NO_COLOR|TERM|LANG|LC_ALL)=.*/\1/p'); do
-    case $v in BOOTSTRAP_SOURCE_ONLY | BOOTSTRAP_SETUP) continue ;; esac
-    eval "set -- \"\$@\" \"$v=\${$v}\""
-  done
-  phase_close
-  tty_in=/dev/null; [ "$has_tty" = 1 ] && tty_in=/dev/tty
-  if [ "$(id -u)" = 0 ] && [ "$family" != macos ]; then runas="runuser -u $boot_user --"; else runas="sudo -H -u $boot_user"; fi
-  # the folder this was started in may be one the account cannot read, which breaks git and others: start in its own home folder
-  # shellcheck disable=SC2086  # $runas and $sargs are words on purpose
-  ( cd "$account_home" 2>/dev/null || cd /; $runas "$@" sh "$setup_file" $sargs <"$tty_in" ) || return $?
+  heading "${e_rocket}Setting up archon in this account"
+  # the setup's own steps, in this process, which is already set up with the log, the steps and the telemetry (it uses no administrator rights)
+  main || return $?
   return 0
 }
 
-# ---- the login shell of the account -----------------------------------------------------------------------------------------------------------------------
+# ---- the login shell -----------------------------------------------------------------------------------------------------------------------
 
 offer_fish() {
   kit_on shell || return 0
   [ "${BOOTSTRAP_NO_CHSH:-}" = 1 ] && return 0
   [ "$family" = macos ] && return 0   # fish is not set up on a Mac: zsh stays the login shell
   fp=$(command -v fish 2>/dev/null || true)
-  who=${boot_user:-$(id -un)}
+  who=$(id -un)
   heading "${e_shell}The login shell of $who"
   if [ "$dry" = 1 ]; then
     would "make fish the login shell of $who (the program that starts in each new terminal): chsh -s fish; bash keeps working"
@@ -444,10 +318,9 @@ main_bootstrap() {
   load_config
   say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for the Intellectual Frontiers harness."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
-  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap" "s:user=$([ -n "$boot_user" ] && echo dedicated || echo self)"
+  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap"
   install_packages
   install_code_package
-  make_account
   setup_rc=0
   run_setup || setup_rc=$?
   offer_fish

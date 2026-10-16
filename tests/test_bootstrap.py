@@ -189,10 +189,10 @@ class Entry(Fixture):
         self.assertIn("archon shell set prompt plain", plain.stdout)
         self.assertNotIn("shell set prompt", self.run_script("--dry-run").stdout)
 
-    def test_a_dedicated_account_asks_archon_for_owned_files(self):
-        """0136-machine-bootstrap FR-051"""
-        self.assertIn("archon shell ensure --mode owned", self.run_script("--dry-run", "--dedicated").stdout)
-        self.assertNotIn("--mode owned", self.run_script("--dry-run").stdout)
+    def test_the_setup_has_no_dedicated_option_and_asks_archon_for_the_default_shell_mode(self):
+        """0136-machine-bootstrap FR-051: the account can have any name; the mode is `archon shell`'s own choice"""
+        self.assertEqual(self.run_script("--dedicated").returncode, 2)
+        self.assertNotIn("--mode", self.run_script("--dry-run").stdout)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
@@ -290,7 +290,7 @@ exit 0
         self.assertIn(str(self.clone / "archon"), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
 
-    def test_the_shells_are_archons_to_set_up_and_a_dedicated_account_is_owned(self):
+    def test_the_shells_are_archons_to_set_up(self):
         """0136-machine-bootstrap FR-049, FR-051; 0138-shell FR-008: the setup writes no startup file, it runs `archon shell ensure`."""
         self.go()
         shell = [l for l in self.calls.read_text().splitlines() if "shell ensure" in l]
@@ -298,8 +298,6 @@ exit 0
         self.assertNotIn("--mode", shell[0])
         for name in (".bashrc", ".profile", ".zshrc", ".zshenv", ".zprofile", ".config/fish"):
             self.assertFalse((self.home / name).exists(), f"the setup wrote {name}")
-        self.go(argv=("--dedicated",))
-        self.assertIn("shell ensure --mode owned", self.calls.read_text())
 
     def test_the_prompt_choice_is_handed_to_archon_shell_and_the_font_hint_comes_with_the_pretty_prompt(self):
         """0136-machine-bootstrap FR-010; 0138-shell FR-009"""
@@ -860,21 +858,21 @@ class Setup(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Bootstrap(Fixture):
-    """0136-machine-bootstrap FR-046 to FR-048: the bootstrap installs packages, may make the account, and runs the setup as it."""
+    """0136-machine-bootstrap FR-046 to FR-048: the bootstrap installs packages and runs the setup for the account that runs it; it makes no account."""
 
     def run_boot(self, *argv, stdin=None, **extra):
         return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(**extra), input=stdin, stdin=None if stdin else subprocess.DEVNULL)
 
-    def test_help_a_bad_option_and_a_name_an_account_cannot_have(self):
+    def test_help_a_bad_option_and_no_option_makes_an_account(self):
         p = self.run_boot("--help")
         self.assertEqual(p.returncode, 0)
-        for text in ("archon-bootstrap.sh | sh", "--user NAME", "--dedicated", "--dry-run"):
+        for text in ("archon-bootstrap.sh | sh", "--dry-run"):
             self.assertIn(text, p.stdout)
+        for text in ("--user", "--dedicated", "adduser"):
+            self.assertNotIn(text, p.stdout)
         self.assertEqual(self.run_boot("--nonsense").returncode, 2)
-        bad = self.run_boot("--dry-run", "--user", "Bad Name")
-        self.assertEqual(bad.returncode, 2)
-        self.assertIn("not a name an account can have", bad.stderr)
-        self.assertEqual(self.run_boot("--user").returncode, 2)
+        for gone in (("--user", "bob"), ("--dedicated",)):
+            self.assertEqual(self.run_boot("--dry-run", *gone).returncode, 2, gone)
 
     def test_it_refuses_a_machine_that_is_not_debian_family(self):
         osr = self.tmp / "os-release"
@@ -890,16 +888,8 @@ class Bootstrap(Fixture):
         self.assertEqual(tree(self.home), before)
         for step in ("install with apt", "Setting up archon in this account", "archon shell ensure", "archon doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
             self.assertIn(step, p.stdout)
-        self.assertNotIn("create the Linux account", p.stdout)
-
-    def test_dry_run_for_a_dedicated_account_makes_it_and_runs_the_setup_as_it(self):
-        p = self.run_boot("--dry-run", "--dedicated")
-        self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertIn("create the Linux account archon with a home folder and no administrator rights", p.stdout)
-        self.assertIn("run archon-setup.sh as archon: --dry-run --dedicated --comfort", p.stdout)
-        named = self.run_boot("--dry-run", "--user", "bob")
-        self.assertIn("create the Linux account bob", named.stdout)
-        self.assertIn("as bob: --dry-run --comfort", named.stdout)
+        for text in ("create the Linux account", "adduser", "useradd"):
+            self.assertNotIn(text, p.stdout)
 
     def test_the_bootstrap_is_opinionated_the_comfort_kits_are_on_unless_it_is_told_not(self):
         """0136-machine-bootstrap FR-047"""
@@ -911,54 +901,28 @@ class Bootstrap(Fixture):
         off = wanted(BOOTSTRAP_NO_COMFORT="1")
         self.assertNotIn("ripgrep", off)
         self.assertIn("git ca-certificates curl wget tar xz-utils unzip jq gh", off, "what the setup needs is still installed")
-        self.assertNotIn("--comfort", self.run_boot("--dry-run", "--dedicated", BOOTSTRAP_NO_COMFORT="1").stdout)
-        self.assertIn("--comfort", self.run_boot("--dry-run", "--dedicated").stdout)
+        self.assertNotIn("Installing eza", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
+        self.assertIn("Installing eza", self.run_boot("--dry-run").stdout)
 
     @unittest.skipUnless(shutil.which("curl"), "curl is needed")
     def test_run_from_a_pipe_it_fetches_the_setup_and_plans_the_same(self):
-        piped = subprocess.run([SH, "-s", "--", "--dry-run", "--dedicated"], input=BOOT.read_text(), capture_output=True, text=True, env=self.env(BOOTSTRAP_URL=f"file://{HOME}"))
+        piped = subprocess.run([SH, "-s", "--", "--dry-run"], input=BOOT.read_text(), capture_output=True, text=True, env=self.env(BOOTSTRAP_URL=f"file://{HOME}"))
         self.assertEqual(piped.returncode, 0, piped.stderr)
-        self.assertEqual(piped.stdout, self.run_boot("--dry-run", "--dedicated").stdout)
+        self.assertEqual(piped.stdout, self.run_boot("--dry-run").stdout)
 
-    def account_stubs(self, exists=False):
-        state = self.tmp / "account-made"
+    def test_it_makes_no_account_and_runs_the_setup_in_this_one_whatever_it_is_called(self):
+        """0136-machine-bootstrap FR-046: the account is the user that runs the bootstrap (snshah, archon, or any name)"""
         log = self.tmp / "calls.log"
         log.write_text("")
-        if exists:
-            state.write_text("")
-        self.stub("getent", f'[ "$1" = passwd ] && [ -f {state} ] && {{ echo "$2:x:1001:1001::/home/$2:/bin/bash"; exit 0; }}\nexit 2')
-        self.stub("adduser", f'echo "adduser $*" >>{log}\n: >{state}')
-        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
-        self.stub("runuser", f'echo "AS runuser $*" >>{log}')
-        return log
-
-    def go(self, *argv, **extra):
-        return self.run_boot(*argv, BOOTSTRAP_NO_APT="1", BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
-
-    def test_it_makes_the_account_without_administrator_rights_and_runs_the_setup_as_it_with_the_settings_passed_on(self):
-        log = self.account_stubs()
-        p = self.go("--dedicated", ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", GH_TOKEN="ghp_example")
+        for name in ("adduser", "useradd", "runuser", "sysadminctl", "sudo"):
+            self.stub(name, f'echo "{name} $*" >>{log}')
+        env = {**OFF, "PATH": f"{self.bin}:{os.environ['PATH']}", "USER": "snshah"}
+        p = self.run_boot(**env)
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        calls = log.read_text()
-        self.assertIn("adduser --disabled-password --gecos  archon", calls)
-        self.assertNotIn("sudo-group", calls)
-        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
-        for part in ("archon", "HOME=/home/archon", "ARCHON_POSTHOG_KEY=phc_abcdefghijklmnopqrstuvwxyz1234", "GH_TOKEN=ghp_example", "--dedicated", "--comfort", "archon-setup.sh"):
-            self.assertIn(part, run)
-        self.assertNotIn("BOOTSTRAP_SOURCE_ONLY", run)
-        self.assertIn("sudo -iu archon", p.stdout, "it says how to switch to the account")
-        self.assertIn("deluser --remove-home archon", p.stdout, "and how to remove it with everything archon wrote")
-
-    def test_an_account_that_exists_is_not_changed(self):
-        log = self.account_stubs(exists=True)
-        p = self.go("--user", "bob")
-        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        calls = log.read_text()
-        self.assertNotIn("adduser", calls)
-        self.assertIn("already there", p.stdout)
-        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
-        self.assertIn("--comfort", run)
-        self.assertNotIn("--dedicated", run, "an account the person named is not declared dedicated")
+        self.assertNotRegex(log.read_text(), r"adduser|useradd|runuser|sysadminctl|sudo -")
+        self.assertIn("Setting up archon in this account", p.stdout)
+        for gone in ("sudo -iu", "deluser", "userdel", "the account archon"):
+            self.assertNotIn(gone, p.stdout)
 
 
 ARCH = 'ID=arch\nPRETTY_NAME="Arch Linux"\n'
@@ -1028,57 +992,50 @@ class ArchFamily(Fixture):
         self.assertIn("git ca-certificates curl wget tar xz unzip jq github-cli", lean)
         self.assertNotIn("ripgrep", lean)
 
-    def test_dry_run_on_arch_says_pacman_never_refreshes_the_list_and_makes_the_account_with_useradd(self):
-        """0136-machine-bootstrap FR-053, FR-054"""
+    def test_dry_run_on_arch_says_pacman_never_refreshes_the_list_and_makes_no_account(self):
+        """0136-machine-bootstrap FR-053"""
         self.stub("pacman", "exit 1")   # an Arch computer has one; nothing is installed
-        arch = self.run_boot("--dry-run", "--dedicated", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}")
+        arch = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}")
         self.assertEqual(arch.returncode, 0, arch.stderr)
         self.assertIn("(arch family)", arch.stdout)
         self.assertIn("install with pacman (--needed, never refreshing the package list alone)", arch.stdout)
-        self.assertIn("useradd -m -s /bin/bash", arch.stdout)
+        self.assertNotIn("useradd", arch.stdout)
         self.assertNotIn("apt", arch.stdout)
         self.assertNotIn("Installing VS Code", arch.stdout, "Arch has no Microsoft repository to add")
-        debian = self.run_boot("--dry-run", "--dedicated")
+        debian = self.run_boot("--dry-run")
         self.assertIn("refresh the package list, then install with apt", debian.stdout)
-        self.assertIn("(adduser)", debian.stdout)
+        self.assertNotIn("adduser", debian.stdout)
 
     def stubs(self, pacman_body):
-        state = self.tmp / "account-made"
         log = self.tmp / "calls.log"
         log.write_text("")
         self.stub("pacman", f'echo "pacman $*" >>{log}\n{pacman_body}')
-        self.stub("getent", f'[ "$1" = passwd ] && [ -f {state} ] && {{ echo "$2:x:1001:1001::/home/$2:/bin/bash"; exit 0; }}\nexit 2')
-        self.stub("useradd", f'echo "useradd $*" >>{log}\n: >{state}')
-        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
-        self.stub("runuser", f'echo "AS runuser $*" >>{log}')
+        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
         return log
 
     def go(self, *argv, **extra):
-        return self.run_boot(*argv, BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
+        off = {k: "1" for k in ("BOOTSTRAP_NO_DOWNLOAD", "BOOTSTRAP_NO_DOTFILES", "BOOTSTRAP_NO_AUTH", "BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_RUNTIME")}
+        return self.run_boot(*argv, BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}", **off, **extra)
 
-    def test_it_installs_with_needed_makes_the_account_with_useradd_and_says_how_to_remove_it(self):
-        """0136-machine-bootstrap FR-053, FR-054"""
+    def test_it_installs_with_needed_and_makes_no_account(self):
+        """0136-machine-bootstrap FR-053"""
         log = self.stubs('case "$1" in -Qi) exit 1 ;; esac\nexit 0')
-        p = self.go("--dedicated")
+        p = self.go()
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         calls = log.read_text()
         self.assertIn("pacman -S --needed --noconfirm", calls)
         for refresh in ("pacman -Sy", "pacman -Syu", "pacman -y"):
             self.assertNotIn(refresh, calls)
-        self.assertIn("useradd -m -s /bin/bash archon", calls)
-        self.assertNotIn("adduser", calls)
-        self.assertIn("userdel -r archon", p.stdout)
-        self.assertIn("sudo -iu archon", p.stdout)
-        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
-        self.assertIn("--dedicated", run)
+        for gone in ("useradd", "adduser", "userdel", "sudo -iu"):
+            self.assertNotIn(gone, calls + p.stdout)
 
     def test_a_package_pacman_cannot_find_stops_with_the_full_upgrade_to_run_first(self):
         """0136-machine-bootstrap FR-053"""
         log = self.stubs('case "$1" in -Qi) exit 1 ;; -S) echo "error: target not found: github-cli" >&2; exit 1 ;; esac\nexit 0')
-        p = self.go("--dedicated")
+        p = self.go()
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("sudo pacman -Syu", p.stdout + p.stderr)
-        self.assertNotIn("useradd", log.read_text(), "nothing else is done after the stop")
+        self.assertNotIn("Setting up archon in this account", p.stdout, "nothing else is done after the stop")
         self.assertNotIn("pacman -Sy ", log.read_text())
 
 
@@ -1262,51 +1219,21 @@ class MacOS(Fixture):
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(sorted(os.listdir(root)), ["3", "4", "5.partial", "current"])
 
-    def account_stubs(self, exists=False):
-        state = self.tmp / "account-made"
-        log = self.tmp / "calls.log"
-        log.write_text("")
-        if exists:
-            state.write_text("")
-        self.stub("dscl", f'[ -f {state} ] || exit 1\ncase "$4" in NFSHomeDirectory) echo "NFSHomeDirectory: /Users/$(basename "$3")" ;; UserShell) echo "UserShell: /bin/zsh" ;; *) echo "UniqueID: 502" ;; esac')
-        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
-        self.stub("sysadminctl", f'echo "sysadminctl $*" >>{log}')
-        self.stub("createhomedir", f'echo "createhomedir $*" >>{log}')
-        return log
-
-    def test_the_bootstrap_installs_nothing_makes_the_account_with_sysadminctl_and_says_how_to_remove_it(self):
+    def test_the_bootstrap_installs_nothing_makes_no_account_and_runs_the_setup_in_this_one(self):
         """FR-058"""
         self.mac()
-        p = self.boot("--dry-run", "--dedicated")
+        p = self.boot("--dry-run")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        for text in ("xcode-select --install", "install no package", "sysadminctl -addUser", "createhomedir", "run archon-setup.sh as archon: --dry-run --dedicated --comfort"):
+        for text in ("xcode-select --install", "install no package", "Setting up archon in this account"):
             self.assertIn(text, p.stdout, text)
-        for text in ("apt", "pacman", "chsh", "fish"):
-            self.assertNotIn(text, p.stdout.replace("fish has no", ""), text)
-
-    @unittest.skipIf(has_terminal(), "this run has a terminal, and the test is of a run without one")
-    def test_without_a_terminal_it_will_not_make_an_account_it_cannot_ask_a_password_for(self):
-        self.mac()
-        log = self.account_stubs()
-        p = self.boot("--dedicated", BOOTSTRAP_NO_EDITOR="1")
-        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("password typed at a terminal", p.stdout + p.stderr)
-        self.assertNotIn("sysadminctl", log.read_text())
-
-    def test_an_account_that_exists_runs_the_setup_as_it_with_sudo_dash_h_dash_u_and_zsh_stays(self):
-        """FR-058"""
-        self.mac()
-        log = self.account_stubs(exists=True)
-        p = self.boot("--user", "bob", BOOTSTRAP_NO_EDITOR="1")
-        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        calls = log.read_text()
-        self.assertNotIn("sysadminctl", calls)
-        run = [line for line in calls.splitlines() if line.startswith("AS")][0]
-        for part in ("-u bob", "HOME=/Users/bob", "--comfort", "archon-setup.sh"):
-            self.assertIn(part, run)
-        self.assertNotIn("runuser", calls)
-        self.assertIn("sudo sysadminctl -deleteUser bob", p.stdout, "how to remove it with its home folder")
-        self.assertNotIn("login shell", p.stdout, "fish is not set up on a Mac")
+        for text in ("apt", "pacman", "chsh", "sysadminctl", "createhomedir", "account archon"):
+            self.assertNotIn(text, p.stdout, text)
+        self.stub("jq", "exit 0")
+        self.stub("gh", "exit 0")
+        run = self.boot(**{k: "1" for k in MAC_OFF})
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("exec zsh -l", run.stdout)
+        self.assertNotIn("login shell", run.stdout, "fish is not set up on a Mac")
 
 
 if __name__ == "__main__":

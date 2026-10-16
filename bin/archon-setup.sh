@@ -1,8 +1,8 @@
 #!/bin/sh
 # Set up one account (Linux, or a Mac with Apple silicon) for the Intellectual Frontiers harness, without administrator rights (0136-machine-bootstrap, the setup). Run it in the account that
 # will use `archon`: everything it writes is inside that account's home folder, so deleting the account and its home folder removes all of it. A person who has
-# a computer already makes an account for archon (`sudo adduser archon`), switches to it (`sudo -iu archon`) and runs this there; `archon-bootstrap.sh` does
-# those steps on a blank computer, and runs this one as the account.
+# a computer already makes a user for archon (any name: `sudo adduser NAME`), logs in as it and runs this there; deleting that user removes everything. `archon-bootstrap.sh`
+# installs the programs on a blank computer (a new WSL or virtual machine) and runs this one for the account that runs it.
 #
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --dry-run
@@ -32,7 +32,6 @@
 # the step fails.
 #
 # Options (after `sh -s --` when piped):  --dry-run   list every step it would take, change nothing, fetch nothing, ask for nothing
-#                                          --dedicated this account is for archon alone: archon keeps its startup files whole (`archon shell ensure --mode owned`)
 #                                          --comfort   also install what no archon command needs (fish, the modern command line tools, the data tools)
 #                                          -h, --help  this text
 #
@@ -159,7 +158,6 @@ pypi_url=${BOOTSTRAP_PYPI:-${WS_HOST_PYPI:-https://pypi.org}}
 npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 
 dry=0
-dedicated=0
 comfort=0
 orig_path=$PATH
 goos=linux; miseOs=linux   # detect_platform sets them
@@ -172,10 +170,9 @@ usage() {
 for arg in "$@"; do
   case $arg in
     --dry-run | -n) dry=1 ;;
-    --dedicated) dedicated=1 ;;
     --comfort) comfort=1 ;;
     -h | --help)
-      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--dedicated] [--comfort]   (see the header of archon-setup.sh)" ;; esac
+      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort]   (see the header of archon-setup.sh)" ;; esac
       exit 0 ;;
     *) echo "archon-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
   esac
@@ -1521,7 +1518,7 @@ run_archon() {
   if [ "$dry" = 1 ]; then
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ] || {
       would "link ~/.local/bin/archon to the clone's launcher"
-      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./archon shell ensure$([ "$dedicated" = 1 ] && printf ' --mode owned') (the startup files of bash, zsh and fish, kept with chezmoi)"
+      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./archon shell ensure (the startup files of bash, zsh and fish, kept with chezmoi)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./archon shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       would "run in the clone: ./archon doctor"
       would "run in the clone: ./archon toolchain ensure (every entry of ./archon toolchain list that is not ready and not optional)"
@@ -1555,7 +1552,7 @@ run_archon() {
     # shellcheck disable=SC2086
     step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
   fi
-  # The shells of this account: archon keeps their startup files, with chezmoi (0138-shell); a dedicated account's are archon's whole
+  # The shells of this account: archon keeps their startup files, with chezmoi (0138-shell)
   if [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
     if ! github_ready; then
       shell_skipped=1
@@ -1563,9 +1560,7 @@ run_archon() {
       skip_github "archon shell ensure (your shells' startup files)"
     else
       shell_ran=1
-      shell_mode=""; [ "$dedicated" = 1 ] && shell_mode="--mode owned"
-      # shellcheck disable=SC2086
-      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_archon_quiet ./archon shell ensure $shell_mode || status_shell=$?
+      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_archon_quiet ./archon shell ensure || status_shell=$?
       if [ "$status_shell" = 0 ] && [ "$prompt_given" = 1 ]; then
         pchoice=$prompt; [ "$prompt" = no ] && pchoice=none
         step_soft "${e_paint}Choosing the $pchoice prompt" in_archon_quiet ./archon shell set prompt "$pchoice" || status_shell=$?
@@ -1790,7 +1785,7 @@ main() {
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
-  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:dedicated=$([ "$dedicated" = 1 ] && echo yes || echo no)" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
+  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
   signin_needed=0; cloned=0; archon_ran=0
   if [ "$dry" = 1 ]; then
     heading "${e_pkg}What this computer must already have"
