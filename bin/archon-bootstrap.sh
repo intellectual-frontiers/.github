@@ -1,7 +1,8 @@
 #!/bin/sh
 # Set up a computer for the Intellectual Frontiers harness (0136-machine-bootstrap, the bootstrap): the one script that may use administrator rights. A blank Debian 12
 # or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs and, if you ask, an account made for `archon`; then it runs
-# `archon-setup.sh` as that account, which does the rest without administrator rights and writes only inside the account's home folder.
+# `archon-setup.sh` as that account, which does the rest without administrator rights and writes only inside the account's home folder. A Mac with Apple silicon gets no package (the
+# setup fetches what it needs into the account's own folder): the bootstrap checks the Command Line Tools, makes the account with sysadminctl when asked, and runs the setup as it.
 #
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh
@@ -14,7 +15,7 @@
 #   3. Account: with --user NAME (or --dedicated, which is --user archon) creates that Linux account if it does not exist, with a home folder and no administrator rights,
 #   4. Setup: runs archon-setup.sh as that account (or as you, without --user) with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out),
 #      and --dedicated for an account made for archon,
-#   5. Login shell: offers to make fish that account's login shell (chsh), where fish is installed as a package.
+#   5. Login shell: offers to make fish that account's login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
 #
 # Safe to run again. Options (after `sh -s --` when piped):
 #   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
@@ -46,7 +47,7 @@ done
 [ "$boot_dedicated" = 1 ] && [ -z "$boot_user" ] && boot_user=archon
 case $boot_user in
   "" | [a-z_][a-z0-9_-]*) ;;
-  *) echo "archon-bootstrap: '$boot_user' is not a name a Linux account can have (lower-case letters, digits, - and _)" >&2; exit 2 ;;
+  *) echo "archon-bootstrap: '$boot_user' is not a name an account can have (lower-case letters, digits, - and _)" >&2; exit 2 ;;
 esac
 
 # ---- the setup: beside this script in a checkout, fetched from BOOTSTRAP_URL when this is piped. Its functions (the log, the steps, the support file, the
@@ -56,7 +57,9 @@ case $0 in */archon-bootstrap.sh | archon-bootstrap.sh) [ -f "$0" ] && boot_dir=
 setup_file=${BOOTSTRAP_SETUP:-}
 if [ -z "$setup_file" ] && [ -n "$boot_dir" ] && [ -f "$boot_dir/archon-setup.sh" ]; then setup_file=$boot_dir/archon-setup.sh; fi
 if [ -z "$setup_file" ]; then
-  setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
+  setup_tmp=${TMPDIR:-/tmp}
+  [ "$(uname -s)" = Darwin ] && setup_tmp=/tmp   # a Mac's own temporary folder is private to the person, and the account the setup runs as must read this file
+  setup_dir=$(mktemp -d "$setup_tmp/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
   setup_file=$setup_dir/archon-setup.sh
   raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
   if command -v curl >/dev/null 2>&1; then curl -fsSL --connect-timeout 20 --retry 3 -o "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
@@ -138,7 +141,7 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
   command -v sudo >/dev/null 2>&1 || return 1
   sudo_cmd=sudo
   say "${b}${e_key}I need administrator rights to $1.${z}"
-  say "${d}Type your Linux password when asked, once. Nothing shows while you type: that is normal.${z}"
+  say "${d}Type your $([ "$family" = macos ] && echo Mac || echo Linux) password when asked, once. Nothing shows while you type: that is normal.${z}"
   if [ "$has_tty" = 1 ]; then
     # shellcheck disable=SC2024  # the terminal is for sudo to read the password from
     sudo -v </dev/tty || return 1
@@ -166,7 +169,18 @@ fish_from_apt() {   # whether the package manager can give fish 4 on this distri
   case $d_codename in bookworm | bullseye | buster | focal | jammy | noble) return 1 ;; *) return 0 ;; esac
 }
 
-login_shell() { getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7; }
+# the account database: getent on Linux, dscl on a Mac
+acct_exists() { if [ "$family" = macos ]; then dscl . -read "/Users/$1" UniqueID >/dev/null 2>&1; else getent passwd "$1" >/dev/null 2>&1; fi; }
+acct_field() {  # acct_field NAME home|shell
+  if [ "$family" = macos ]; then
+    case $2 in home) f=NFSHomeDirectory ;; *) f=UserShell ;; esac
+    dscl . -read "/Users/$1" "$f" 2>/dev/null | sed "s/^$f: *//"
+  else
+    case $2 in home) n=6 ;; *) n=7 ;; esac
+    getent passwd "$1" 2>/dev/null | cut -d: -f"$n"
+  fi
+}
+login_shell() { acct_field "$(id -un)" shell; }
 
 offer_fish() {
   kit_on shell || return 0
@@ -208,7 +222,20 @@ offer_fish() {
   return 0
 }
 
+# A Mac: no package manager and no package (0136-machine-bootstrap FR-058). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
+mac_packages() {
+  phase "${e_pkg}Checking this Mac"
+  if [ "$dry" = 1 ]; then
+    would "check that the Command Line Tools are here (git); if not, stop and say to run: xcode-select --install"
+    would "install no package: macOS has curl, tar and unzip, and the setup gets jq and gh itself"
+    return 0
+  fi
+  mac_need_clt
+  say "A Mac needs no package from this script: the setup fetches jq and gh itself, into the account's own folder."
+}
+
 install_packages() {
+  if [ "$family" = macos ]; then mac_packages; return 0; fi
   phase "${e_pkg}Setting up the everyday programs ($family family)"
   if [ "$tested" = 0 ]; then
     warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13 and for Arch; I will go on, and say what does not work."
@@ -302,8 +329,20 @@ account_home=""
 make_account() {
   [ -n "$boot_user" ] || return 0
   heading "${e_dir}The account ${boot_user}"
-  if getent passwd "$boot_user" >/dev/null 2>&1; then
+  if acct_exists "$boot_user"; then
     say "The account $boot_user is already there; I change nothing about it."
+  elif [ "$family" = macos ]; then
+    if [ "$dry" = 1 ]; then
+      would "create the standard account $boot_user (not an administrator) with sysadminctl -addUser, asking you to type its password, then its home folder with createhomedir"
+      account_home=/Users/$boot_user; return 0
+    fi
+    [ "$has_tty" = 1 ] || need "a Mac account needs a password typed at a terminal, and there is none here." "run this in Terminal, or make the account in System Settings, Users & Groups, then run this with --user $boot_user"
+    sudo_for "create the account $boot_user" || need "I could not get administrator rights, so I cannot create the account $boot_user." "make the account in System Settings, Users & Groups (a standard account), then run this again"
+    say "${b}${e_key}Choose a password for the new account $boot_user${z} ${d}(you type it twice; nothing shows while you type)${z}"
+    # not a step: the password is asked on the terminal, which a step does not give its command
+    $sudo_cmd sysadminctl -addUser "$boot_user" -fullName "$boot_user" -home "/Users/$boot_user" -password - </dev/tty ||
+      need "the account $boot_user could not be created." "make it in System Settings, Users & Groups (a standard account), then run this again"
+    step "${e_dir}Making its home folder" $sudo_cmd createhomedir -c -u "$boot_user" || need "the home folder of $boot_user could not be made." "run: sudo createhomedir -c -u $boot_user"
   else
     if [ "$dry" = 1 ]; then
       if [ "$family" = debian ]; then would "create the Linux account $boot_user with a home folder and no administrator rights (adduser)"
@@ -317,9 +356,13 @@ make_account() {
       step "${e_dir}Creating the account $boot_user" $sudo_cmd useradd -m -s /bin/bash "$boot_user" || need "the account $boot_user could not be created." "run: sudo useradd -m -s /bin/bash $boot_user"
     fi
   fi
-  account_home=$(getent passwd "$boot_user" 2>/dev/null | cut -d: -f6 || true)
-  [ -n "$account_home" ] || account_home=/home/$boot_user
-  if [ "$family" = debian ]; then rm_cmd="sudo deluser --remove-home $boot_user"; else rm_cmd="sudo userdel -r $boot_user"; fi
+  account_home=$(acct_field "$boot_user" home || true)
+  [ -n "$account_home" ] || { [ "$family" = macos ] && account_home=/Users/$boot_user || account_home=/home/$boot_user; }
+  case $family in
+    macos) rm_cmd="sudo sysadminctl -deleteUser $boot_user" ;;
+    debian) rm_cmd="sudo deluser --remove-home $boot_user" ;;
+    *) rm_cmd="sudo userdel -r $boot_user" ;;
+  esac
   say "To work in it later: ${b}sudo -iu $boot_user${z}   (or ${b}su - $boot_user${z} once you have given it a password with ${b}sudo passwd $boot_user${z}). To remove it with everything archon wrote: ${b}${rm_cmd}${z}."
   return 0
 }
@@ -348,15 +391,16 @@ run_setup() {
   fi
   # the variables the setup reads are passed to the account by name and value; its own home folder and a plain PATH are its own
   set -- env -i HOME="$account_home" USER="$boot_user" LOGNAME="$boot_user" PATH=/usr/local/bin:/usr/bin:/bin
-  for v in $(env | sed -n 's/^\(\(ARCHON\|BOOTSTRAP\|WS_HOST\)_[A-Z0-9_]*\|GH_TOKEN\|GITHUB_TOKEN\|DO_NOT_TRACK\|NO_COLOR\|TERM\|LANG\|LC_ALL\)=.*/\1/p'); do
+  for v in $(env | sed -n -E 's/^((ARCHON|BOOTSTRAP|WS_HOST)_[A-Z0-9_]*|GH_TOKEN|GITHUB_TOKEN|DO_NOT_TRACK|NO_COLOR|TERM|LANG|LC_ALL)=.*/\1/p'); do
     case $v in BOOTSTRAP_SOURCE_ONLY | BOOTSTRAP_SETUP) continue ;; esac
     eval "set -- \"\$@\" \"$v=\${$v}\""
   done
   phase_close
   tty_in=/dev/null; [ "$has_tty" = 1 ] && tty_in=/dev/tty
-  if [ "$(id -u)" = 0 ]; then runas="runuser -u $boot_user --"; else runas="sudo -H -u $boot_user"; fi
+  if [ "$(id -u)" = 0 ] && [ "$family" != macos ]; then runas="runuser -u $boot_user --"; else runas="sudo -H -u $boot_user"; fi
+  # the folder this was started in may be one the account cannot read, which breaks git and others: start in its own home folder
   # shellcheck disable=SC2086  # $runas and $sargs are words on purpose
-  $runas "$@" sh "$setup_file" $sargs <"$tty_in" || return $?
+  ( cd "$account_home" 2>/dev/null || cd /; $runas "$@" sh "$setup_file" $sargs <"$tty_in" ) || return $?
   return 0
 }
 
@@ -365,6 +409,7 @@ run_setup() {
 offer_fish() {
   kit_on shell || return 0
   [ "${BOOTSTRAP_NO_CHSH:-}" = 1 ] && return 0
+  [ "$family" = macos ] && return 0   # fish is not set up on a Mac: zsh stays the login shell
   fp=$(command -v fish 2>/dev/null || true)
   who=${boot_user:-$(id -un)}
   heading "${e_shell}The login shell of $who"
@@ -373,7 +418,7 @@ offer_fish() {
     return 0
   fi
   if [ -z "$fp" ] || [ ! -x "$fp" ] || [ "$(fish_major "$fp")" -lt 4 ]; then say "fish 4 is not installed as a package, so the login shell stays as it is."; return 0; fi
-  case $(getent passwd "$who" | cut -d: -f7) in */fish) say "fish is already the login shell of $who."; return 0 ;; esac
+  case $(acct_field "$who" shell) in */fish) say "fish is already the login shell of $who."; return 0 ;; esac
   case $(cfg BOOTSTRAP_CHSH yes) in
     no | NO | false | 0) say "The login shell stays as it is. To use fish: sudo chsh -s $fp $who"; return 0 ;;
   esac
@@ -388,7 +433,7 @@ offer_fish() {
   if sudo_for "change the login shell of $who"; then
     $sudo_cmd chsh -s "$fp" "$who" </dev/null || warn "chsh failed. Run: sudo chsh -s $fp $who"
   else warn "chsh needs administrator rights. Run: sudo chsh -s $fp $who"; fi
-  case $(getent passwd "$who" | cut -d: -f7) in */fish) say "fish is now the login shell of $who; it starts in each new terminal window." ;; esac
+  case $(acct_field "$who" shell) in */fish) say "fish is now the login shell of $who; it starts in each new terminal window." ;; esac
   return 0
 }
 

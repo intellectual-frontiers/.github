@@ -105,12 +105,12 @@ class Shape(unittest.TestCase):
 
     def test_the_pins_are_whole(self):
         text = SCRIPT.read_text()
-        sums = re.findall(r"^([A-Z]+)_SHA256_(X86_64|AARCH64)=(\S+)$", text, re.M)
-        self.assertEqual(sorted({n for n, _, _ in sums}), ["FISH", "GLAB", "MISE"], "chezmoi and Oh My Posh are pinned by archon, in toolchain/")
+        sums = re.findall(r"^([A-Z]+)_SHA256_(X86_64|AARCH64|MACOS_ARM64)=(\S+)$", text, re.M)
+        self.assertEqual(sorted({n for n, _, _ in sums}), ["FISH", "GH", "GLAB", "JQ", "MISE"], "chezmoi and Oh My Posh are pinned by archon, in toolchain/")
         for name, arch, digest in sums:
             self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} {arch}")
-        self.assertEqual(len(sums), 6)
-        for var in ("UV_VERSION", "PYTHON_VERSION"):
+        self.assertEqual(len(sums), 10, "fish has no Mac build; gh and jq are pinned for a Mac alone (0136-machine-bootstrap FR-057)")
+        for var in ("UV_VERSION", "PYTHON_VERSION", "GH_VERSION", "JQ_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
         self.assertRegex(re.search(r"^MS_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "Microsoft's key, pinned by the bootstrap")
 
@@ -873,7 +873,7 @@ class Bootstrap(Fixture):
         self.assertEqual(self.run_boot("--nonsense").returncode, 2)
         bad = self.run_boot("--dry-run", "--user", "Bad Name")
         self.assertEqual(bad.returncode, 2)
-        self.assertIn("not a name a Linux account can have", bad.stderr)
+        self.assertIn("not a name an account can have", bad.stderr)
         self.assertEqual(self.run_boot("--user").returncode, 2)
 
     def test_it_refuses_a_machine_that_is_not_debian_family(self):
@@ -1080,6 +1080,233 @@ class ArchFamily(Fixture):
         self.assertIn("sudo pacman -Syu", p.stdout + p.stderr)
         self.assertNotIn("useradd", log.read_text(), "nothing else is done after the stop")
         self.assertNotIn("pacman -Sy ", log.read_text())
+
+
+MAC_OFF = {**OFF_BUT_ARCHON, "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_DOTFILES": "1"}
+
+
+def has_terminal():
+    try:
+        with open("/dev/tty"):
+            return True
+    except OSError:
+        return False
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class MacOS(Fixture):
+    """0136-machine-bootstrap FR-057 to FR-059: a Mac with Apple silicon, faked here with stand-ins for `uname`, `sw_vers`, `sysctl`, `xcode-select` and
+    `dscl`; no CI runs on a Mac, so what only a Mac shows (Gatekeeper, `sysadminctl`, the Command Line Tools window) is tested by hand (OQ-7)."""
+
+    def setUp(self):
+        super().setUp()
+        self.path = f"{self.bin}:{os.environ['PATH']}"
+
+    def mac(self, machine="arm64", version="15.1", arm_hardware="1", clt=True):
+        self.stub("uname", f'case "$1" in -s) echo Darwin ;; -m) echo {machine} ;; -r) echo 24.1.0 ;; *) echo Darwin ;; esac')
+        self.stub("sw_vers", f'case "$1" in -productVersion) echo {version} ;; *) echo "ProductName: macOS" ;; esac')
+        self.stub("sysctl", f'case "$2" in hw.optional.arm64) echo {arm_hardware} ;; hw.memsize) echo 17179869184 ;; kern.hv_vmm_present) echo 0 ;; *) exit 1 ;; esac')
+        self.stub("xcode-select", "exit 0" if clt else "exit 2")
+        self.path = f"{self.bin}:{os.environ['PATH']}"
+
+    def setup(self, *argv, **extra):
+        return subprocess.run([SH, str(SCRIPT), *argv], capture_output=True, text=True, env=self.env(PATH=self.path, **extra), stdin=subprocess.DEVNULL)
+
+    def boot(self, *argv, **extra):
+        return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(PATH=self.path, **extra), stdin=subprocess.DEVNULL)
+
+    def call(self, code, **env):
+        return subprocess.run([SH, "-c", f'. "{SCRIPT}"; arch=aarch64; goarch=arm64; goos=darwin; miseOs=macos; miseArch=arm64\n{code}'], capture_output=True, text=True,
+                              env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=self.path, **env))
+
+    def test_an_apple_silicon_mac_is_a_family_of_its_own_and_the_dry_run_names_what_differs(self):
+        """FR-057, FR-059"""
+        self.mac()
+        before = tree(self.home)
+        p = self.setup("--dry-run", "--comfort")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertEqual(tree(self.home), before)
+        for text in ("macOS 15.1, aarch64", "xcode-select --install", f"jq {re.search(r'^JQ_VERSION=(.*)$', SCRIPT.read_text(), re.M).group(1)}", "Installing claude", "Skipped on a Mac"):
+            self.assertIn(text, p.stdout, text)
+        self.assertNotIn("sudo apt", p.stdout + p.stderr)
+        self.assertNotIn("Installing fish 4", p.stdout, "fish has no build the setup can check on a Mac")
+        self.assertNotIn("Installing btop", p.stdout, "btop publishes no build for a Mac")
+        self.assertIn("Installing eza", p.stdout)
+
+    def test_an_intel_mac_an_old_macos_and_a_missing_command_line_tools_each_stop_with_the_fix(self):
+        """FR-057, 0003-runtime FR-027"""
+        self.mac(machine="x86_64", arm_hardware="0")
+        p = self.setup("--dry-run")
+        self.assertEqual(p.returncode, 3)
+        self.assertIn("Intel", p.stderr + p.stdout)
+        self.assertIn("Linux virtual machine", p.stdout + p.stderr)
+        self.mac(version="12.7")
+        old = self.setup("--dry-run")
+        self.assertEqual(old.returncode, 3)
+        self.assertIn("macOS 13", old.stdout + old.stderr)
+        self.mac(clt=False)
+        none = self.setup(**{k: "1" for k in MAC_OFF})
+        self.assertEqual(none.returncode, 3, none.stdout + none.stderr)
+        self.assertIn("xcode-select --install", none.stdout + none.stderr)
+        self.assertFalse((self.home / ".local" / "share" / "workspaces-host" / "tools").exists(), "nothing was fetched")
+
+    def test_a_terminal_under_rosetta_is_still_apple_silicon(self):
+        self.mac(machine="x86_64", arm_hardware="1")
+        p = self.setup("--dry-run")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("aarch64", p.stdout)
+
+    def test_with_the_tools_here_the_setup_runs_on_a_mac_and_ends_with_zsh_to_start(self):
+        """FR-057"""
+        self.mac()
+        self.stub("jq", "exit 0")
+        self.stub("gh", "exit 0")
+        p = self.setup(**{k: "1" for k in MAC_OFF})
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("macOS 15.1", p.stdout)
+        self.assertIn("exec zsh -l", p.stdout)
+        self.assertNotIn("exec fish", p.stdout)
+
+    def test_the_scripts_use_no_option_only_gnu_tools_have_outside_the_branch_for_linux(self):
+        """FR-057: bash 3.2 in POSIX mode and BSD sed, find, date, stat and tar"""
+        gnu = [
+            (r"\bfind\b[^|;]*-printf", "find -printf"), (r"\bmv\s+-[a-zA-Z]*T", "mv -T"), (r"\\x1b", "sed \\x1b"), (r"\breadlink\s+-f", "readlink -f"),
+            (r"\bsed\s+-i\b", "sed -i"), (r"\bdate\s+-d\b", "date -d"), (r"\bgrep\s+-[a-zA-Z]*P", "grep -P"), (r"\bstat\s+-c", "stat -c"), (r"\bxargs\s+-r", "xargs -r"),
+            (r"\btar\s+-x[a-zA-Z]*J", "tar -xJ"), (r"/[gI]*I[gI]*[\"']", "sed s///I"), (r"\bls\s+--", "ls --"), (r"\\\|", "BRE alternation"), (r"\bsha(256|512)sum\b", "sha*sum"),
+            (r"\bbase64\s+-d", "base64 -d"), (r"\bsort\s+-[a-zA-Z]*V", "sort -V"), (r"\bcp\s+-[a-zA-Z]*[uT]", "cp -u/-T"), (r"\bln\s+-[a-zA-Z]*T", "ln -T"),
+        ]
+        allowed = ('[ "$goos" = linux ]; then mv -Tf', "command -v sha256sum", "sha256sum()", "sha512sum \"$1\"", "sha256sum; }", "sha256sum \"$1\"", "base64 -d 2>/dev/null || base64 -D")
+        for f in (SCRIPT, BOOT):
+            for n, line in enumerate(f.read_text().splitlines(), 1):
+                if line.lstrip().startswith("#") or any(a in line for a in allowed):
+                    continue
+                code = re.sub(r"\s#\s.*$", "", line)   # a trailing comment may name what it avoids
+                for rx, name in gnu:
+                    self.assertIsNone(re.search(rx, code), f"{f.name}:{n} uses {name}, which a Mac's tools lack: {line.strip()}")
+
+    def test_the_checksum_programs_are_shasum_where_sha256sum_is_absent(self):
+        lean = self.tmp / "lean"
+        lean.mkdir()
+        for tool in ("cat", "cut", "tr", "sed", "awk", "grep", "date", "mktemp", "dirname", "id", "head", "tail", "mkdir", "rm", "wc", "env", "sh", "printf", "uname"):
+            real = shutil.which(tool)
+            if real:
+                (lean / tool).symlink_to(real)
+        real = shutil.which("sha256sum")
+        (lean / "shasum").write_text(f'#!/bin/sh\n[ "$1" = -a ] && shift 2\nexec {real} "$@"\n')
+        (lean / "shasum").chmod(0o755)
+        f = self.tmp / "x"
+        f.write_bytes(b"abc")
+        p = subprocess.run([SH, "-c", f'. "{SCRIPT}"; sha_of "{f}"; command -v sha256sum >/dev/null 2>&1 && echo HAS'], capture_output=True, text=True,
+                           env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=str(lean)))
+        self.assertEqual(p.stdout.split()[0], hashlib.sha256(b"abc").hexdigest(), p.stderr)
+        self.assertNotIn("HAS", p.stdout)
+
+    def test_a_release_file_is_chosen_for_darwin_and_arm64_and_a_linux_one_never(self):
+        """FR-059"""
+        digest = lambda c: "sha256:" + c * 64   # noqa: E731
+        rel = self.tmp / "rel.json"
+        rel.write_text(json.dumps({"tag_name": "v1", "assets": [
+            {"name": "tool-x86_64-unknown-linux-musl.tar.gz", "browser_download_url": "u/linux", "digest": digest("1")},
+            {"name": "tool-x86_64-apple-darwin.tar.gz", "browser_download_url": "u/intel", "digest": digest("2")},
+            {"name": "tool-aarch64-apple-darwin.tar.gz", "browser_download_url": "u/mac", "digest": digest("3")},
+            {"name": "tool-aarch64-unknown-linux-musl.tar.gz", "browser_download_url": "u/armlinux", "digest": digest("4")}]}))
+        p = self.call(f'candidate "{rel}" ""')
+        self.assertEqual(p.stdout.split("\t")[1], "u/mac", p.stderr)
+        only_linux = self.tmp / "linux.json"
+        only_linux.write_text(json.dumps({"tag_name": "v1", "assets": [{"name": "tool-aarch64-unknown-linux-musl.tar.gz", "browser_download_url": "u/armlinux", "digest": digest("4")}]}))
+        none = self.call(f'rc=0; candidate "{only_linux}" "" || rc=$?; cat "$work/why" >&2; exit $rc')
+        self.assertNotEqual(none.returncode, 0)
+        self.assertIn("no darwin file", none.stderr)
+
+    def test_an_assistant_comes_from_the_darwin_arm64_package_of_npm(self):
+        """FR-059"""
+        asked = self.tmp / "asked"
+        reg = self.tmp / "registry"
+        (reg / "demo-meta").mkdir(parents=True)
+        (reg / "demo-meta" / "latest").write_text(json.dumps({"version": "1.0.0"}))
+        p = self.call(f'mkdir -p "$work" "$tools" "$bin"; fetch_to() {{ case $1 in */demo-meta/latest) cp "${{1#file://}}" "$2" ;; *) echo "$1" >>"{asked}"; return 1 ;; esac; }}; install_npm_native demo demo-meta "demo-{{os}}-{{arch}}@{{ver}}" demo; echo rc=$?',
+                      BOOTSTRAP_NPM=f"file://{reg}")
+        self.assertIn("demo-darwin-arm64/1.0.0", asked.read_text(), p.stdout + p.stderr)
+        text = SCRIPT.read_text()
+        for name in ("claude-code-{os}-{arch}", "@openai/codex@{ver}-{os}-{arch}", "opencode-{os}-{arch}"):
+            self.assertIn(name, text)
+
+    def test_a_pinned_zip_and_a_raw_program_are_installed_and_linked_where_mv_has_no_dash_t(self):
+        """FR-057: gh is a zip with a folder in it, jq is the program alone; a second run with a new version replaces the link"""
+        import zipfile
+
+        z = self.tmp / "gh.zip"
+        with zipfile.ZipFile(z, "w") as zf:
+            info = zipfile.ZipInfo("gh_9.9.9_macOS_arm64/bin/gh")
+            info.external_attr = 0o755 << 16
+            zf.writestr(info, "#!/bin/sh\necho gh 9.9.9\n")
+        raw = self.tmp / "jq-macos-arm64"
+        raw.write_text("#!/bin/sh\necho jq 1\n")
+        zsha, rsha = hashlib.sha256(z.read_bytes()).hexdigest(), hashlib.sha256(raw.read_bytes()).hexdigest()
+        code = (f'mkdir -p "$tools" "$bin"; install_pinned gh 9.9.9 "file://{z}" {zsha} zip 0 gh=gh_9.9.9_macOS_arm64/bin/gh && '
+                f'install_pinned jq 1 "file://{raw}" {rsha} raw 0 jq=jq && install_pinned jq 1 "file://{raw}" {rsha} raw 0 jq=jq && "$bin/gh" && "$bin/jq"')
+        p = self.call(code)
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("gh 9.9.9", p.stdout)
+        self.assertIn("jq 1", p.stdout)
+        self.assertTrue((self.home / ".local" / "bin" / "gh").is_symlink())
+
+    def test_only_the_newest_two_versions_of_a_tool_are_kept_without_find_printf(self):
+        root = self.tmp / "tool"
+        for i, v in enumerate(("1", "2", "3", "4")):
+            (root / v).mkdir(parents=True)
+            os.utime(root / v, (1000 + i, 1000 + i))
+        (root / "current").symlink_to("4")
+        (root / "5.partial").mkdir()
+        p = self.call(f'prune_old "{root}" 4')
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(sorted(os.listdir(root)), ["3", "4", "5.partial", "current"])
+
+    def account_stubs(self, exists=False):
+        state = self.tmp / "account-made"
+        log = self.tmp / "calls.log"
+        log.write_text("")
+        if exists:
+            state.write_text("")
+        self.stub("dscl", f'[ -f {state} ] || exit 1\ncase "$4" in NFSHomeDirectory) echo "NFSHomeDirectory: /Users/$(basename "$3")" ;; UserShell) echo "UserShell: /bin/zsh" ;; *) echo "UniqueID: 502" ;; esac')
+        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
+        self.stub("sysadminctl", f'echo "sysadminctl $*" >>{log}')
+        self.stub("createhomedir", f'echo "createhomedir $*" >>{log}')
+        return log
+
+    def test_the_bootstrap_installs_nothing_makes_the_account_with_sysadminctl_and_says_how_to_remove_it(self):
+        """FR-058"""
+        self.mac()
+        p = self.boot("--dry-run", "--dedicated")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        for text in ("xcode-select --install", "install no package", "sysadminctl -addUser", "createhomedir", "run archon-setup.sh as archon: --dry-run --dedicated --comfort"):
+            self.assertIn(text, p.stdout, text)
+        for text in ("apt", "pacman", "chsh", "fish"):
+            self.assertNotIn(text, p.stdout.replace("fish has no", ""), text)
+
+    @unittest.skipIf(has_terminal(), "this run has a terminal, and the test is of a run without one")
+    def test_without_a_terminal_it_will_not_make_an_account_it_cannot_ask_a_password_for(self):
+        self.mac()
+        log = self.account_stubs()
+        p = self.boot("--dedicated", BOOTSTRAP_NO_EDITOR="1")
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("password typed at a terminal", p.stdout + p.stderr)
+        self.assertNotIn("sysadminctl", log.read_text())
+
+    def test_an_account_that_exists_runs_the_setup_as_it_with_sudo_dash_h_dash_u_and_zsh_stays(self):
+        """FR-058"""
+        self.mac()
+        log = self.account_stubs(exists=True)
+        p = self.boot("--user", "bob", BOOTSTRAP_NO_EDITOR="1")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        calls = log.read_text()
+        self.assertNotIn("sysadminctl", calls)
+        run = [line for line in calls.splitlines() if line.startswith("AS")][0]
+        for part in ("-u bob", "HOME=/Users/bob", "--comfort", "archon-setup.sh"):
+            self.assertIn(part, run)
+        self.assertNotIn("runuser", calls)
+        self.assertIn("sudo sysadminctl -deleteUser bob", p.stdout, "how to remove it with its home folder")
+        self.assertNotIn("login shell", p.stdout, "fish is not set up on a Mac")
 
 
 if __name__ == "__main__":

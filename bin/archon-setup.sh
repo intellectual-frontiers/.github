@@ -1,5 +1,5 @@
 #!/bin/sh
-# Set up one Linux account for the Intellectual Frontiers harness, without administrator rights (0136-machine-bootstrap, the setup). Run it in the account that
+# Set up one account (Linux, or a Mac with Apple silicon) for the Intellectual Frontiers harness, without administrator rights (0136-machine-bootstrap, the setup). Run it in the account that
 # will use `archon`: everything it writes is inside that account's home folder, so deleting the account and its home folder removes all of it. A person who has
 # a computer already makes an account for archon (`sudo adduser archon`), switches to it (`sudo -iu archon`) and runs this there; `archon-bootstrap.sh` does
 # those steps on a blank computer, and runs this one as the account.
@@ -9,6 +9,8 @@
 #
 # It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian or Arch has none of them):
 #   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs: apt-get on the Debian family, pacman on the Arch family)
+# A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window a person answers): macOS carries curl, tar and unzip, and this fetches jq and gh itself,
+# pinned and checked by SHA-256, into ~/.local/share. fish and SQLite's own tools are left out on a Mac, and the shell it sets up is zsh.
 #
 # It is a self-contained port of what ws-host (workspaces-host) installs for its default kits and does for git and the workspaces folder. It never calls,
 # clones or needs ws-host. It:
@@ -71,6 +73,7 @@ set -eu
 MISE_VERSION=2026.10.3
 MISE_SHA256_X86_64=ff0870ddad7f8c5ba673ceb3e7659f0353da8263eabe8b82220f5816a772c786
 MISE_SHA256_AARCH64=a5141f834d883239c2542b9a2136e75428779b2040206537399714d8c534d91f
+MISE_SHA256_MACOS_ARM64=5372494c3027260ddf8efa79504c4d968bbe671a58248ec575f57e1472e5d9c2
 PYTHON_VERSION=3.14.8
 UV_VERSION=0.12.23
 
@@ -84,6 +87,13 @@ FISH_SHA256_AARCH64=57349f0111728c64b703a84e611aa97ff4d1fa8466385d64e67bd5bc3ffa
 GLAB_VERSION=1.120.0
 GLAB_SHA256_X86_64=4e6c59de9f7ed2f304bf93aad01ea8f8a69584f0450ce90ad696ef81f69c69aa
 GLAB_SHA256_AARCH64=c60ebb4cb36f276714847a118845b9b4e69f46a8080c68b21ca63f158722cdea
+GLAB_SHA256_MACOS_ARM64=8769650c49bb5d5ac52156d46e448e87f5570a868fe4e7bfcbd8cc66693c7afb
+
+# gh and jq on a Mac, which has neither (0136-machine-bootstrap FR-057): the publishers' own releases for Apple silicon, put in the account's own folder
+GH_VERSION=2.102.0
+GH_SHA256_MACOS_ARM64=da922c20d1792e5b2cbf375593d7a658acf034c12c84e007e71c76ef959c337e
+JQ_VERSION=1.8.2
+JQ_SHA256_MACOS_ARM64=2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e
 
 # The tools that follow their newest release: name, GitHub repository, then the programs to link (link=file name it may have, a|b). Each is taken
 # only with the checksum GitHub states for the release file or the one its publisher put beside it (ws-host's _tools.py and embedded_sql.py).
@@ -95,7 +105,7 @@ yazi sxyazi/yazi yazi=yazi ya=ya
 bat sharkdp/bat bat=bat
 delta dandavison/delta delta=delta
 sd chmln/sd sd=sd
-yq mikefarah/yq yq=yq_linux_amd64|yq_linux_arm64|yq
+yq mikefarah/yq yq=yq_linux_amd64|yq_linux_arm64|yq_darwin_arm64|yq
 glow charmbracelet/glow glow=glow
 btop aristocratos/btop btop=btop
 dust bootandy/dust dust=dust
@@ -116,7 +126,7 @@ turso tursodatabase/turso-cli turso=turso
 usql xo/usql usql=usql|usql_static
 litestream benbjohnson/litestream litestream=litestream
 sqruff quarylabs/sqruff sqruff=sqruff
-dbmate amacneil/dbmate dbmate=dbmate-linux-amd64|dbmate-linux-arm64|dbmate
+dbmate amacneil/dbmate dbmate=dbmate-linux-amd64|dbmate-linux-arm64|dbmate-macos-arm64|dbmate
 '
 # Python tools, each in a virtual environment of its own: name, PyPI package, then link=path inside it
 PY_TOOLS='
@@ -129,11 +139,11 @@ visidata visidata vd=bin/vd visidata=bin/visidata
 # The AI assistants for the terminal, so that a person who has never installed one can type `claude`, `codex`, `opencode` or `aider` the day the computer is set up.
 # Each of the first three is one program that its publisher ships inside a per-platform npm package, so no Node.js is needed to run it; the newest version is
 # taken, and only with the SHA-512 that npm's registry lists for the file. Fields: name, the npm package that names the newest version, the per-platform package
-# ({arch} is x64 or arm64, {ver} the newest version), then the file to link.
+# ({os} is linux or darwin, {arch} is x64 or arm64, {ver} the newest version), then the file to link.
 AGENT_TOOLS='
-claude @anthropic-ai/claude-code @anthropic-ai/claude-code-linux-{arch}@{ver} claude
-codex @openai/codex @openai/codex@{ver}-linux-{arch} codex
-opencode opencode-ai opencode-linux-{arch}@{ver} opencode
+claude @anthropic-ai/claude-code @anthropic-ai/claude-code-{os}-{arch}@{ver} claude
+codex @openai/codex @openai/codex@{ver}-{os}-{arch} codex
+opencode opencode-ai opencode-{os}-{arch}@{ver} opencode
 '
 # Aider is a Python program: name, PyPI package, then link=path inside its virtual environment
 AGENT_PY_TOOLS='
@@ -152,6 +162,8 @@ dry=0
 dedicated=0
 comfort=0
 orig_path=$PATH
+goos=linux; miseOs=linux   # detect_platform sets them
+esc=$(printf '\033')   # BSD sed has no \x1b, so the escape character is put in by name
 
 usage() {
   sed -n '2,/^# shellcheck disable=SC2034/p' "$0" 2>/dev/null | sed '$d' | sed 's/^# \{0,1\}//' || true
@@ -269,7 +281,7 @@ log_ok=0
 if [ "$dry" = 0 ] && mkdir -p "$log_dir" 2>/dev/null && : >"$logfile" 2>/dev/null; then log_ok=1; fi
 logf() {  # logf TEXT: one timestamped line in the log, without colour codes
   [ "$log_ok" = 1 ] || return 0
-  printf '%s %s\n' "$(date +%H:%M:%S)" "$(printf '%s' "$*" | sed 's/\x1b\[[0-9;]*m//g')" >>"$logfile" 2>/dev/null || true
+  printf '%s %s\n' "$(date +%H:%M:%S)" "$(printf '%s' "$*" | sed "s/${esc}\[[0-9;]*m//g")" >>"$logfile" 2>/dev/null || true
 }
 # shellcheck disable=SC2088  # the tilde is meant literally: it is how a path in the home folder is shown to a person
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
@@ -304,8 +316,8 @@ ph_str() { printf '%s' "$1" | tr -d '\000-\037' | sed 's/\\/\\\\/g; s/"/\\"/g' |
 ph_device() {
   f=${ARCHON_DEVICE_ID_FILE:-$HOME/.archon-bootstrap/device-id}
   if [ -s "$f" ]; then cat "$f"; return 0; fi
-  mid=$(cat /etc/machine-id 2>/dev/null || cat /var/lib/dbus/machine-id 2>/dev/null || true)
-  if [ -n "$mid" ]; then id=dev-$(printf 'archon-device\0%s' "$mid" | sha256sum | cut -c1-16)
+  mid=$(cat /etc/machine-id 2>/dev/null || cat /var/lib/dbus/machine-id 2>/dev/null || ioreg -rd1 -c IOPlatformExpertDevice 2>/dev/null | awk -F'"' '/IOPlatformUUID/ {print $4}' || true)
+  if [ -n "$mid" ]; then id=dev-$(printf 'archon-device\0%s' "$mid" | sha256_stdin | cut -c1-16)
   else id=dev-$(cat /proc/sys/kernel/random/uuid 2>/dev/null | tr -d - | cut -c1-16); fi
   [ "$id" = dev- ] && id=dev-$(date +%s)$$
   mkdir -p "$(dirname "$f")" 2>/dev/null && printf '%s\n' "$id" >"$f" 2>/dev/null || true
@@ -318,13 +330,19 @@ ph_machine() {
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then kind=wsl
   elif [ -f /.dockerenv ] || grep -qaE 'docker|containerd|lxc|kubepods' /proc/1/cgroup 2>/dev/null; then kind=container
   elif v=$(systemd-detect-virt 2>/dev/null) && [ "$v" != none ]; then kind=vm-$v
-  elif grep -qw hypervisor /proc/cpuinfo 2>/dev/null; then kind=vm; fi
+  elif grep -qw hypervisor /proc/cpuinfo 2>/dev/null; then kind=vm
+  elif [ "$(sysctl -n kern.hv_vmm_present 2>/dev/null || true)" = 1 ]; then kind=vm; fi
   wslv=""; case $(cat /proc/version 2>/dev/null) in *WSL2*) wslv=2 ;; *[Mm]icrosoft*) wslv=1 ;; esac
   os_id=""; os_ver=""
   if [ -r /etc/os-release ]; then
     os_id=$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"' | head -n 1); os_ver=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"' | head -n 1)
   fi
-  mem=$(awk '/^MemTotal:/ {printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null || true)
+  if [ "${goos:-linux}" = darwin ]; then
+    os_id=macos; os_ver=$(sw_vers -productVersion 2>/dev/null || true)
+    mem=$(sysctl -n hw.memsize 2>/dev/null | awk '{printf "%d", $1/1073741824}' || true)
+  else
+    mem=$(awk '/^MemTotal:/ {printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null || true)
+  fi
   free=$(df -k "$HOME" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1048576}')
   printf '"hostname":"%s","os_user":"%s","host_kind":"%s","wsl_version":"%s","os_id":"%s","os_version":"%s","kernel":"%s","arch":"%s","cpus":%s,"memory_gb":%s,"disk_free_gb":%s' \
     "$(ph_str "$(hostname 2>/dev/null || uname -n)")" "$(ph_str "$(id -un 2>/dev/null)")" "$(ph_str "$kind")" "$wslv" "$(ph_str "$os_id")" "$(ph_str "$os_ver")" "$(ph_str "$(uname -r)")" "$(uname -m)" "${cpus:-0}" "${mem:-0}" "${free:-0}"
@@ -550,7 +568,7 @@ stop_here() {  # stop_here LABEL STEPLOG LOGLINE
   [ -n "$ka_pid" ] && kill "$ka_pid" 2>/dev/null
   phase_close_quiet
   ph_event bootstrap_failed "s:step=$1" "n:step_no=$step_no" "n:log_line=${3:-0}" "s:log_file=$(short_path "$logfile")" "s:support_file=$(short_path "$support_file")" \
-    "s:error_tail=$(tail -n 3 "$2" 2>/dev/null | tr '\n' ' ' | sed 's/\x1b\[[0-9;]*m//g' | sed -E 's/(gh[pousr]_|github_pat_|ph[cx]_)[A-Za-z0-9_]+/[removed]/g' | sed "s#$HOME#~#g")"
+    "s:error_tail=$(tail -n 3 "$2" 2>/dev/null | tr '\n' ' ' | sed "s/${esc}\[[0-9;]*m//g" | sed -E 's/(gh[pousr]_|github_pat_|ph[cx]_)[A-Za-z0-9_]+/[removed]/g' | sed "s#$HOME#~#g")"
   say ""
   say "${r}${b}${e_stop}Setup stopped: something went wrong${z}"
   say "${d}Nothing is half-installed in a way that matters; it is safe to run the setup again once this is fixed.${z}"
@@ -590,19 +608,36 @@ write_support_file() {  # write_support_file LABEL STEPLOG LOGLINE
     tail -n 60 "$2" 2>/dev/null
     printf '\n--- the setup log, last 120 lines ---\n'
     tail -n 120 "$logfile" 2>/dev/null
-  } 2>/dev/null | sed -E 's/(gh[pousr]_|github_pat_)[A-Za-z0-9_]+/\1[removed]/g; s/(token|password|secret|key)=[^ ]+/\1=[removed]/Ig' >"$support_file" 2>/dev/null || true
+  } 2>/dev/null | sed -E 's/(gh[pousr]_|github_pat_)[A-Za-z0-9_]+/\1[removed]/g; s/([Tt][Oo][Kk][Ee][Nn]|[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]|[Ss][Ee][Cc][Rr][Ee][Tt]|[Kk][Ee][Yy])=[^ ]+/\1=[removed]/g' >"$support_file" 2>/dev/null || true
 }
 
 # ---- the machine ---------------------------------------------------------------------------------------------------------------------------------
 
 detect_platform() {
   os=$(uname -s)
-  [ "$os" = Linux ] || need "this is $os, and the setup is made for Linux (Debian-family or Arch-family) under WSL 2 or in a virtual machine, or on a computer of your own." "open your Linux window (or start the virtual machine) and run it there"
+  goos=linux; miseOs=linux
+  case $os in
+    Linux) ;;
+    Darwin) goos=darwin; miseOs=macos ;;
+    *) need "this is $os, and the setup is made for Linux (Debian-family or Arch-family) and for a Mac with Apple silicon." "use Linux under WSL 2 or in a virtual machine, or a Mac with Apple silicon" ;;
+  esac
   case $(uname -m) in
     x86_64 | amd64) arch=x86_64; goarch=amd64; miseArch=x64 ;;
     aarch64 | arm64) arch=aarch64; goarch=arm64; miseArch=arm64 ;;
     *) need "there are no programs for $(uname -m) here." "use a computer or virtual machine with an amd64 or arm64 processor" ;;
   esac
+  if [ "$goos" = darwin ]; then
+    # a terminal run under Rosetta says x86_64 on Apple silicon: the hardware is what counts, and the programs fetched are for it
+    if [ "$arch" = x86_64 ] && [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" = 1 ]; then arch=aarch64; goarch=arm64; miseArch=arm64; fi
+    [ "$arch" = aarch64 ] || need "this Mac has an Intel processor, and the setup is made for Macs with Apple silicon (M1 and later)." "run the setup in a Linux virtual machine on this Mac, or on a Mac with Apple silicon"
+    family=macos
+    mac_ver=$(sw_vers -productVersion 2>/dev/null || echo 0)
+    d_id=macos; d_like=""; d_version=$mac_ver; d_codename=""; d_pretty="macOS $mac_ver"
+    case ${mac_ver%%.*} in '' | *[!0-9]*) mac_major=0 ;; *) mac_major=${mac_ver%%.*} ;; esac
+    [ "$mac_major" -ge 13 ] || need "this is macOS $mac_ver, and the setup needs macOS 13 (Ventura) or later." "update macOS in System Settings, then run it again"
+    wsl=0; wsl_txt=""; is_debian=0; tested=1
+    return 0
+  fi
   osr=${BOOTSTRAP_OS_RELEASE:-/etc/os-release}
   d_id=unknown; d_like=""; d_version=""; d_codename=""; d_pretty=Linux
   if [ -r "$osr" ]; then
@@ -614,7 +649,7 @@ detect_platform() {
   case " $d_id $d_like " in
     *" debian "* | *" ubuntu "*) family=debian ;;
     *" arch "*) family=arch ;;
-    *) need "this is $d_pretty, and the setup is made for the Debian family (Debian, Ubuntu) and the Arch family (Arch Linux, Omarchy)." "use Debian 12 or 13, or an Arch-based distribution (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
+    *) need "this is $d_pretty, and the setup is made for the Debian family (Debian, Ubuntu), the Arch family (Arch Linux, Omarchy) and Macs with Apple silicon." "use Debian 12 or 13, or an Arch-based distribution (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
   esac
   wsl=0; wsl_txt=""
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then wsl=1; wsl_txt=", under WSL"; fi
@@ -645,7 +680,31 @@ admin_install_cmd() {  # admin_install_cmd PROGRAMS...
   esac
 }
 
+# On a Mac: the Command Line Tools (git and the compiler's helpers) are Apple's, and installing them asks for a person at the screen, so the setup says so and stops
+# (0136-machine-bootstrap FR-057); jq and gh are not Apple's, so the publishers' releases are put in the account's own folder.
+mac_need_clt() {
+  if ! xcode-select -p >/dev/null 2>&1 || ! [ -x /usr/bin/git ]; then
+    need "this Mac has no Command Line Tools, Apple's own set of programs (git among them), and installing them needs a person at the screen." \
+      "run  xcode-select --install  in a terminal, click Install in the window that opens, wait for it to finish, then run this setup again"
+  fi
+  command -v curl >/dev/null 2>&1 || need "this Mac has no curl, which macOS always carries." "repair macOS, or run the setup from a Mac that has it"
+}
+
+mac_prereqs() {
+  mac_need_clt
+  if ! command -v jq >/dev/null 2>&1 && ! [ -x "$bin/jq" ]; then
+    step "${e_dl}Getting jq $JQ_VERSION" install_pinned jq "$JQ_VERSION" "https://github.com/jqlang/jq/releases/download/jq-$JQ_VERSION/jq-macos-arm64" "$JQ_SHA256_MACOS_ARM64" raw 0 jq=jq ||
+      problem "jq could not be installed"
+  fi
+  if ! command -v gh >/dev/null 2>&1 && ! [ -x "$bin/gh" ]; then
+    step "${e_dl}Getting gh $GH_VERSION" install_pinned gh "$GH_VERSION" "https://github.com/cli/cli/releases/download/v$GH_VERSION/gh_${GH_VERSION}_macOS_arm64.zip" "$GH_SHA256_MACOS_ARM64" zip 0 "gh=gh_${GH_VERSION}_macOS_arm64/bin/gh" ||
+      problem "gh could not be installed"
+  fi
+  return 0
+}
+
 check_prereqs() {
+  if [ "$family" = macos ]; then mac_prereqs; return 0; fi
   for cmd in git curl; do
     command -v "$cmd" >/dev/null 2>&1 || need "this account has no $cmd, and the setup installs no package (it never uses administrator rights)." \
       "from an account that has them, run:  $(admin_install_cmd "$cmd")   (or run archon-bootstrap.sh, which installs what is needed and then runs this setup)"
@@ -718,7 +777,17 @@ link_fd() {
 
 # A download that stalls must fail, not wait for ever: no answer in 20 seconds, or under 1 KB a second for 60 seconds, ends it (and curl retries).
 net="--connect-timeout 20 --speed-limit 1024 --speed-time 60"
-sha_of() { sha256sum "$1" | cut -d' ' -f1; }
+# SHA-256 and SHA-512 of a file (Linux has sha256sum; macOS has shasum): the digest alone
+if command -v sha256sum >/dev/null 2>&1; then
+  sha_of() { sha256sum "$1" | cut -d' ' -f1; }
+  sha256_stdin() { sha256sum; }
+  sha512_of() { sha512sum "$1" | cut -d' ' -f1; }
+else
+  sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+  sha256_stdin() { shasum -a 256; }
+  sha512_of() { shasum -a 512 "$1" | cut -d' ' -f1; }
+fi
+b64_decode() { base64 -d 2>/dev/null || base64 -D; }   # GNU and BSD spell it differently
 
 fetch_to() {  # fetch_to URL DEST
   if command -v curl >/dev/null 2>&1; then curl -fsSL $net --retry 3 -o "$2" "$1"
@@ -743,13 +812,18 @@ download_verified() {
   printf '%s\n' "$f"
 }
 
+# swap_link NEW DEST: put the link NEW where DEST is, in one step where the system can (GNU mv -T), else by removing DEST first (BSD mv has no -T, and would move NEW into the folder DEST points to)
+swap_link() {
+  if [ "$goos" = linux ]; then mv -Tf "$1" "$2"; else rm -f "$2" && mv "$1" "$2"; fi
+}
+
 # link_into DIR LINKS: link each "name=path" (path inside DIR) into ~/.local/bin, replacing the link atomically.
 link_into() {
   dir=$1; shift
   mkdir -p "$bin"
   for item in "$@"; do
     name=${item%%=*}; rel=${item#*=}
-    ln -sfn "$dir/$rel" "$bin/.$name.new" && mv -Tf "$bin/.$name.new" "$bin/$name"
+    ln -sfn "$dir/$rel" "$bin/.$name.new" && swap_link "$bin/.$name.new" "$bin/$name"
   done
 }
 
@@ -759,7 +833,7 @@ links_present() {  # links_present LINKS...: every program is linked
 }
 
 set_current() {  # set_current ROOT VERSION
-  ln -sfn "$2" "$1/current.new" && mv -Tf "$1/current.new" "$1/current"
+  ln -sfn "$2" "$1/current.new" && swap_link "$1/current.new" "$1/current"
 }
 
 # unpack FILE KIND DEST STRIP FIRSTNAME: tar (any tarball), zip, or raw (one program, kept as FIRSTNAME)
@@ -790,7 +864,11 @@ install_pinned() {
 }
 
 arch_sha() {  # arch_sha PREFIX: the pinned SHA-256 for this architecture, from PREFIX_SHA256_X86_64 / _AARCH64
-  case $arch in x86_64) eval "printf '%s' \"\$${1}_SHA256_X86_64\"" ;; *) eval "printf '%s' \"\$${1}_SHA256_AARCH64\"" ;; esac
+  case $goos:$arch in
+    darwin:*) eval "printf '%s' \"\$${1}_SHA256_MACOS_ARM64\"" ;;
+    *:x86_64) eval "printf '%s' \"\$${1}_SHA256_X86_64\"" ;;
+    *) eval "printf '%s' \"\$${1}_SHA256_AARCH64\"" ;;
+  esac
 }
 
 # ---- tools that follow their newest release ----------------------------------------------------------------------------------------------------
@@ -830,24 +908,26 @@ api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when t
   else curl -fsSL $net --retry 2 -H "Accept: application/vnd.github+json" -o "$2" "$1"; fi
 }
 
-# The release file for Linux on this architecture, chosen by its name (ws-host's pick_asset): the one that says linux and the architecture, is not for
+# The release file for this system (Linux or macOS) on this architecture, chosen by its name (ws-host's pick_asset): the one that says linux and the architecture, is not for
 # another system, a package or a signature, and, of the rest, is a static (musl) build if there is one, then an archive. With a pattern, the first file
 # whose name matches it. Reads a release's JSON; prints the asset's name and download address, tab-separated, and its stated digest.
 # shellcheck disable=SC2016  # a jq program: its $variables are jq's
 PICK_JQ='
 def anyin($l; $xs): any($xs[]; . as $s | $l | contains($s));
 def endsany($l; $xs): any($xs[]; . as $s | $l | endswith($s));
-def wrongfile: ["darwin","macos","apple","windows","win32","win64",".exe","freebsd","netbsd","openbsd","android",".deb",".rpm",".apk",".msi",".pkg",".dmg",".sig",".asc",".pem",".sbom",".sha",".md5","checksum","sha256",".json",".txt",".sh",".intoto",".sigstore",".bundle","source","src.","debug","-symbols"];
+def oswords: if $os == "darwin" then ["darwin","macos","apple","osx"] else ["linux"] end;
+def otheros: if $os == "darwin" then ["linux"] else ["darwin","macos","apple","osx"] end;
+def wrongfile: ["windows","win32","win64",".exe","freebsd","netbsd","openbsd","android",".deb",".rpm",".apk",".msi",".pkg",".dmg",".sig",".asc",".pem",".sbom",".sha",".md5","checksum","sha256",".json",".txt",".sh",".intoto",".sigstore",".bundle","source","src.","debug","-symbols"] + otheros;
 def wrongarch: ["armv","arm32","i686","i386","riscv","s390","ppc","mips","loong","386","x86.","-32bit"];
 def archives: [".tar.gz",".tgz",".tar.xz",".txz",".tar.bz2",".tbz",".tbz2",".zip"];
-( {x86_64: ["x86_64","amd64","x64"], aarch64: ["aarch64","arm64"]}[$arch] ) as $w
+( {x86_64: ["x86_64","amd64","x64"], aarch64: (["aarch64","arm64"] + (if $os == "darwin" then ["universal"] else [] end))}[$arch] ) as $w
 | ( {x86_64: ["aarch64","arm64"], aarch64: ["x86_64","amd64","x64"]}[$arch] ) as $o
 | (if $pat != "" then
     [ .assets | to_entries[] | select(.value.name | test($pat)) ] | first // empty | .value
   else
     [ .assets | to_entries[]
       | .key as $i | .value as $a | ($a.name | ascii_downcase) as $l
-      | select($l | contains("linux"))
+      | select(anyin($l; oswords))
       | select(anyin($l; $w))
       | select(anyin($l; $o) | not)
       | select(anyin($l; wrongfile) | not)
@@ -867,8 +947,8 @@ def archives: [".tar.gz",".tgz",".tar.xz",".txz",".tar.bz2",".tbz",".tbz2",".zip
 # checksum file beside it; returns 1 (and says why in $work/why) when the release has no such file or no checksum.
 candidate() {
   c_rel=$1; c_pat=$2
-  c_line=$(jq -r --arg arch "$arch" --arg pat "$c_pat" "$PICK_JQ" "$c_rel") || c_line=""
-  if [ -z "$c_line" ]; then echo "the release has no Linux file for $arch that I can choose by its name" >"$work/why"; return 1; fi
+  c_line=$(jq -r --arg arch "$arch" --arg os "$goos" --arg pat "$c_pat" "$PICK_JQ" "$c_rel") || c_line=""
+  if [ -z "$c_line" ]; then echo "the release has no $goos file for $arch that I can choose by its name" >"$work/why"; return 1; fi
   c_name=$(printf '%s' "$c_line" | cut -f1); c_url=$(printf '%s' "$c_line" | cut -f2); c_sha=$(printf '%s' "$c_line" | cut -f3)
   c_tag=$(jq -r '.tag_name // ""' "$c_rel")
   if [ -z "$c_sha" ]; then
@@ -899,7 +979,7 @@ resolve() {
     printf '%s' "$r_one" >"$work/one.json"
     if candidate "$work/one.json" "$2" >"$work/pick" 2>/dev/null; then return 0; fi
   done <"$work/rels.ndjson"
-  echo "I found no release of $1 with a Linux file for $arch and a checksum from its publisher ($r_why), so I will not install it" >&2
+  echo "I found no release of $1 with a $goos file for $arch and a checksum from its publisher ($r_why), so I will not install it" >&2
   return 1
 }
 
@@ -914,7 +994,9 @@ locate() {
   idx=0; out=""
   for n in $(printf '%s' "$2" | tr '|' ' '); do
     idx=$((idx + 1))
-    out="$out$(find "$1" -type f -name "$n" -perm -100 -printf "%d $idx %P\n" 2>/dev/null)
+    out="$out$(find "$1" -type f -name "$n" -perm -100 2>/dev/null | while IFS= read -r lp; do
+      lr=${lp#"$1"/}; printf '%s %s %s\n' "$(printf '%s' "$lr" | awk -F/ '{print NF}')" "$idx" "$lr"
+    done)
 "
   done
   printf '%s' "$out" | grep -v '^$' | sort -k1,1n -k2,2n | head -n 1 | cut -d' ' -f3-
@@ -923,6 +1005,15 @@ locate() {
 tool_present() {  # tool_present NAME LINKS...: installed, and every program linked
   n=$1; shift
   [ -L "$tools/$n/current" ] && [ -d "$tools/$n/$(readlink "$tools/$n/current")" ] && links_present "$@"
+}
+
+# prune_old TROOT VERSION: keep this version and the one before it (the newest two folders, which are not links or unfinished); no find -printf, which BSD has not
+prune_old() {
+  ls -t "$1" 2>/dev/null | while IFS= read -r po_n; do
+    [ -d "$1/$po_n" ] && [ ! -L "$1/$po_n" ] || continue
+    case $po_n in *.partial) continue ;; esac
+    printf '%s\n' "$po_n"
+  done | tail -n +3 | while IFS= read -r po_old; do [ "$po_old" = "$2" ] || rm -rf "${1:?}/$po_old"; done
 }
 
 # install_release NAME REPO PATTERN LINKS...: the newest release of a GitHub repository, verified, unpacked into tools/NAME/VERSION. LINKS are
@@ -959,14 +1050,13 @@ install_release() {
   # shellcheck disable=SC2086
   link_into "$troot" $linked
   # keep this version and the one before it
-  find "$troot" -mindepth 1 -maxdepth 1 -type d ! -name '*.partial' -printf '%T@ %f\n' | sort -rn | tail -n +3 | cut -d' ' -f2- |
-    while read -r old; do [ "$old" = "$ver" ] || rm -rf "${troot:?}/$old"; done
+  prune_old "$troot" "$ver"
   return 0
 }
 
 # install_sqlite_org: SQLite's own command line tools (sqlite.org lists the newest version and its SHA3-256); x86-64 only, as sqlite.org builds them
 install_sqlite_org() {
-  [ "$arch" = x86_64 ] || return 0
+  [ "$goos" = linux ] && [ "$arch" = x86_64 ] || return 0   # macOS carries sqlite3 itself
   tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer && [ "${BOOTSTRAP_FRESH:-}" != 1 ] && return 0
   site=${BOOTSTRAP_SQLITE_URL:-${WS_HOST_SQLITE_URL:-https://www.sqlite.org}}
   fetch_to "$site/download.html" "$work/sqlite.html" || { echo "could not ask $site" >&2; return 1; }
@@ -981,7 +1071,7 @@ install_sqlite_org() {
   [ "$got" = "$sha3" ] || { echo "the file at $site/$path is not the one sqlite.org lists (its SHA3-256 differs); nothing was installed" >&2; return 1; }
   mkdir -p "$troot/$ver"
   unzip -q -o "$work/sqlite.zip" -d "$troot/$ver"
-  sub=$(find "$troot/$ver" -name sqlite3 -type f -printf '%P\n' | head -n 1)
+  sub=$(find "$troot/$ver" -name sqlite3 -type f | head -n 1); sub=${sub#"$troot/$ver"/}
   set_current "$troot" "$ver"
   link_into "$troot" "sqlite3=$ver/$sub" "sqldiff=$ver/${sub%sqlite3}sqldiff" "sqlite3_analyzer=$ver/${sub%sqlite3}sqlite3_analyzer"
 }
@@ -1022,15 +1112,15 @@ install_npm_native() {
   troot=$tools/$name
   if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$name=$file"; then return 0; fi
   case $arch in x86_64) npm_arch=x64 ;; *) npm_arch=arm64 ;; esac
-  spec=$(printf '%s' "$tmpl" | sed "s/{arch}/$npm_arch/; s/{ver}/$ver/")
+  spec=$(printf '%s' "$tmpl" | sed "s/{os}/$goos/; s/{arch}/$npm_arch/; s/{ver}/$ver/")
   fetch_to "$npm_url/${spec%@*}/${spec##*@}" "$work/npm-platform.json" || { echo "npm has no $spec for this computer" >&2; return 1; }
   tarball=$(jq -r '.dist.tarball // ""' "$work/npm-platform.json"); integrity=$(jq -r '.dist.integrity // ""' "$work/npm-platform.json")
   case $integrity in sha512-*) ;; *) echo "npm lists no SHA-512 for $spec, so I will not install it" >&2; return 1 ;; esac
-  want=$(printf '%s' "${integrity#sha512-}" | base64 -d 2>/dev/null | od -An -vtx1 | tr -d ' \n')
+  want=$(printf '%s' "${integrity#sha512-}" | b64_decode | od -An -vtx1 | tr -d ' \n')
   [ "${#want}" = 128 ] || { echo "the checksum npm lists for $spec cannot be read, so I will not install it" >&2; return 1; }
   [ -n "$tarball" ] || { echo "npm lists no file for $spec" >&2; return 1; }
   fetch_to "$tarball" "$work/$name.tgz" || { echo "could not fetch $tarball" >&2; return 1; }
-  got=$(sha512sum "$work/$name.tgz" | cut -d' ' -f1)
+  got=$(sha512_of "$work/$name.tgz")
   [ "$got" = "$want" ] || { rm -f "$work/$name.tgz"; echo "the file at $tarball is not the one npm lists (its SHA-512 differs); nothing was installed" >&2; return 1; }
   mkdir -p "$troot"
   rm -rf "$troot/$ver.partial"; mkdir -p "$troot/$ver.partial"
@@ -1043,8 +1133,7 @@ install_npm_native() {
   rm -rf "${troot:?}/$ver"; mv "$troot/$ver.partial" "$troot/$ver"
   set_current "$troot" "$ver"
   link_into "$troot" "$name=$ver/$rel"
-  find "$troot" -mindepth 1 -maxdepth 1 -type d ! -name '*.partial' -printf '%T@ %f\n' | sort -rn | tail -n +3 | cut -d' ' -f2- |
-    while read -r old; do [ "$old" = "$ver" ] || rm -rf "${troot:?}/$old"; done
+  prune_old "$troot" "$ver"
   return 0
 }
 
@@ -1100,11 +1189,11 @@ install_runtime() {
   sum=$(arch_sha MISE)
   mise=${BOOTSTRAP_MISE:-$data/tools/mise/$MISE_VERSION/bin/mise}
   if [ ! -x "$mise" ]; then
-    url=${BOOTSTRAP_MISE_URL:-${WS_HOST_MISE_URL:-https://mise.jdx.dev/v$MISE_VERSION/mise-v$MISE_VERSION-linux-$miseArch.tar.xz}}
+    url=${BOOTSTRAP_MISE_URL:-${WS_HOST_MISE_URL:-https://mise.jdx.dev/v$MISE_VERSION/mise-v$MISE_VERSION-$miseOs-$miseArch.tar.xz}}
     file=$(download_verified "$url" "$sum") || return 1
     tmp=$data/tools/mise/.unpack.$$
     rm -rf "$tmp"; mkdir -p "$tmp"
-    tar -xJf "$file" -C "$tmp" --strip-components=1 || { rm -rf "$tmp"; echo "mise could not be unpacked (is xz-utils installed?)" >&2; return 1; }
+    tar -xf "$file" -C "$tmp" --strip-components=1 || { rm -rf "$tmp"; echo "mise could not be unpacked (on Linux, is xz installed?)" >&2; return 1; }
     rm -rf "$data/tools/mise/$MISE_VERSION"
     mv "$tmp" "$data/tools/mise/$MISE_VERSION"
   fi
@@ -1153,19 +1242,24 @@ setup_tools() {
     # glab: Debian 13 and Ubuntu carry it as a package (installed above); where the archive has none, the pinned release
     if ! have_cmd glab && ! tool_present glab glab=bin/glab; then
       pstep "${e_dl}Installing glab $GLAB_VERSION" install_pinned glab "$GLAB_VERSION" \
-        "https://gitlab.com/gitlab-org/cli/-/releases/v$GLAB_VERSION/downloads/glab_${GLAB_VERSION}_linux_$goarch.tar.gz" "$(arch_sha GLAB)" tar 0 glab=bin/glab
+        "https://gitlab.com/gitlab-org/cli/-/releases/v$GLAB_VERSION/downloads/glab_${GLAB_VERSION}_${goos}_$goarch.tar.gz" "$(arch_sha GLAB)" tar 0 glab=bin/glab
     fi
     if ! github_ready; then
       say "Left until you sign in to GitHub: duckdb and the tools that come from GitHub releases."
       tool_present duckdb duckdb=duckdb || skip_github duckdb
     fi
     if github_ready && { ! tool_present duckdb duckdb=duckdb || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
-      case $arch in x86_64) dpat='^duckdb_cli-linux-amd64\.zip$' ;; *) dpat='^duckdb_cli-linux-(arm64|aarch64)\.zip$' ;; esac
+      case $goos:$arch in
+        darwin:*) dpat='^duckdb_cli-osx-(universal|arm64)\.zip$' ;;
+        *:x86_64) dpat='^duckdb_cli-linux-amd64\.zip$' ;;
+        *) dpat='^duckdb_cli-linux-(arm64|aarch64)\.zip$' ;;
+      esac
       pstep "${e_dl}Installing duckdb (the newest release)" install_release duckdb duckdb/duckdb "$dpat" duckdb=duckdb
     fi
-    if [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
+    if [ "$goos" = linux ] && [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
       pstep "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org
     fi
+    if [ "$goos" = darwin ]; then MODERN_TOOLS=$(printf '%s\n' "$MODERN_TOOLS" | grep -v '^btop '); fi   # btop publishes no build for a Mac
     [ "$modern" = 0 ] || each_tool "$MODERN_TOOLS" release_step
     pool_end
   fi
@@ -1194,6 +1288,7 @@ fish_url() { printf 'https://github.com/fish-shell/fish-shell/releases/download/
 setup_shell_kit() {
   kit_on shell || return 0
   phase "${e_shell}Installing fish, a friendlier shell"
+  if [ "$goos" = darwin ]; then say "Skipped on a Mac: zsh, which macOS starts, is set up instead (fish publishes no build for a Mac that the setup can check)."; return 0; fi
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
   # fish 4 is the system's where the distribution has it (installed by archon-bootstrap.sh); anywhere it does not, the fish project's own release
   if ! have_fish4; then
@@ -1215,20 +1310,21 @@ verify_install() {
   if [ "$dry" = 1 ]; then would "check that each program the kits install is here, and that fish is version 4 or later where it was asked for"; return 0; fi
   absent=""
   if kit_on base; then
-    for p in uv eza zoxide fzf bat delta btop just; do have_cmd "$p" || absent="$absent $p"; done
+    for p in uv eza zoxide fzf bat delta just; do have_cmd "$p" || absent="$absent $p"; done
+    [ "$goos" = linux ] && { have_cmd btop || absent="$absent btop"; }
     have_cmd duckdb || absent="$absent duckdb"
   fi
   if kit_on agents; then
     for p in claude codex opencode aider; do have_cmd "$p" || absent="$absent $p"; done
   fi
-  if kit_on shell; then
+  if kit_on shell && [ "$goos" = linux ]; then
     have_cmd fish || absent="$absent fish"
   fi
   if kit_on embedded-sql; then
     for p in turso usql litestream sqruff dbmate sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
   fi
   if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; fi
-  if kit_on shell && have_cmd fish; then
+  if kit_on shell && [ "$goos" = linux ] && have_cmd fish; then
     fp=$(command -v fish 2>/dev/null || printf '%s' "$bin/fish")
     if [ "$(fish_major "$fp")" -ge 4 ]; then :
     else warn "fish is older than version 4."; problem "fish is older than version 4"; fi
@@ -1296,11 +1392,11 @@ sign_in() {
       waited=$((waited + 1)); sleep 1
     done
     wait "$rem_pid" 2>/dev/null || true; rem_pid=""
-    logf "gh auth login said: $(sed 's/\x1b\[[0-9;]*m//g' "$gh_out" | tr '\n' ' ' | sed -E 's/[A-Z0-9]{4}-[A-Z0-9]{4}/<code>/')"
+    logf "gh auth login said: $(sed "s/${esc}\[[0-9;]*m//g" "$gh_out" | tr '\n' ' ' | sed -E 's/[A-Z0-9]{4}-[A-Z0-9]{4}/<code>/')"
     if signed_in; then si_ok=ok; else si_ok=unfinished; fi
     ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
     if [ "$si_ok" != ok ]; then
-      [ -n "$shown" ] || { say ""; say "${d}GitHub's tool said:${z}"; sed 's/\x1b\[[0-9;]*m//g' "$gh_out" | tail -n 5 | cut -c1-$((cols - 6)) | sed 's/^/     /'; }
+      [ -n "$shown" ] || { say ""; say "${d}GitHub's tool said:${z}"; sed "s/${esc}\[[0-9;]*m//g" "$gh_out" | tail -n 5 | cut -c1-$((cols - 6)) | sed 's/^/     /'; }
       sign_in_stop
     fi
   else
@@ -1404,7 +1500,7 @@ workspace_and_clone() {
 link_archon() {
   mkdir -p "$bin"
   w=$bin/archon
-  if [ ! -e "$w" ] || grep -q 'archon-setup wrapper\|bootstrap-archon wrapper' "$w" 2>/dev/null; then
+  if [ ! -e "$w" ] || grep -qE 'archon-setup wrapper|bootstrap-archon wrapper' "$w" 2>/dev/null; then
     printf '#!/bin/sh\n# archon-setup wrapper: runs the clone'"'"'s launcher, so archon works from any folder\nexec "%s/archon" "$@"\n' "$target" >"$w"
     chmod 755 "$w"
   else
@@ -1520,6 +1616,7 @@ finish() {
   if [ "$prompt" = pretty ] && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ] && [ "${shell_ran:-0}" = 1 ]; then
     font_where="in the program that shows your terminal window (not inside Debian)"
     [ "$wsl" = 1 ] && font_where="in Windows (not in Debian)"
+    [ "$goos" = darwin ] && font_where="on this Mac"
     say ""
     say "${b}${e_font}One thing for the prompt: a Nerd Font${z}"
     say "Your prompt draws small icons from a Nerd Font, a font that carries"
@@ -1527,21 +1624,28 @@ finish() {
     say "boxes instead. It takes two minutes, once, $font_where:"
     say "  ${c}1.${z} Download CaskaydiaCove Nerd Font and unzip it:"
     say "     ${b}https://www.nerdfonts.com/font-downloads${z}"
-    say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
-    say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
-    say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
+    if [ "$goos" = darwin ]; then
+      say "  ${c}2.${z} Open the font files and click Install Font in Font Book."
+      say "  ${c}3.${z} In Terminal: Settings, Profiles, Text, Change, choose"
+      say "     ${b}CaskaydiaCove Nerd Font${z} (iTerm2 and VS Code have a font setting too)."
+    else
+      say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
+      say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
+      say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
+    fi
     say "${d}No font wanted? Run ${z}${b}archon shell set prompt plain${z}${d}: the same${z}"
     say "${d}prompt made of emoji and lines.${z}"
   fi
   if [ "${editor_linked:-0}" = 1 ]; then
     say ""
-    say "${b}${e_code}VS Code${z}: ${c}code .${z} in a folder opens it there. Under WSL it opens VS Code on Windows, which installs its WSL extension the first time."
+    say "${b}${e_code}VS Code${z}: ${c}code .${z} in a folder opens it there.$([ "$wsl" = 1 ] && printf ' Under WSL it opens VS Code on Windows, which installs its WSL extension the first time.')"
   fi
   case ":$orig_path:" in
     *":$bin:"*) ;;
     *)
       sh_name=bash
-      kit_on shell && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
+      [ "$goos" = darwin ] && sh_name=zsh
+      kit_on shell && [ "$goos" = linux ] && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
       say ""
       say "${b}${e_sync}One last thing:${z} this window does not know your new shell yet."
       say "Type the line below, or close this window and open a new one."
@@ -1551,7 +1655,7 @@ finish() {
   esac
   if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
     say ""
-    say "${d}Not installed, because no archon command needs them: fish, the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
+    say "${d}Not installed, because no archon command needs them: fish (not on a Mac), the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
     say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (archon-bootstrap.sh does by default).${z}"
   fi
   if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
@@ -1604,11 +1708,20 @@ winget_exe() {  # Windows' winget, through the PATH WSL appends or in this Windo
   return 1
 }
 
-ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
+editor_mark_mac='# made by archon-setup.sh: VS Code on a Mac, opened from the command line (0136-machine-bootstrap FR-044)'
+ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_mac" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
 
 link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
   mkdir -p "$bin"
   printf '#!/bin/sh\n%s\nexec "%s" "$@"\n' "$editor_mark" "$1" >"$bin/code.$$" && chmod 755 "$bin/code.$$" && mv "$bin/code.$$" "$bin/code"
+}
+
+# VS Code on a Mac is an app; its `code` command is inside it, and a Mac adds it to the PATH only when a person asks from VS Code's own command palette
+mac_code() {
+  for c in "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"; do
+    [ -x "$c" ] && { printf '%s' "$c"; return 0; }
+  done
+  return 1
 }
 
 winget_code() { "$(winget_exe)" install --id Microsoft.VisualStudioCode --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity; }
@@ -1616,6 +1729,18 @@ winget_code() { "$(winget_exe)" install --id Microsoft.VisualStudioCode --exact 
 setup_editor() {
   [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
   phase "${e_code}Making ${c}code${z} open VS Code"
+  if [ "$goos" = darwin ]; then
+    if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code where the app is (it is a Mac app: from code.visualstudio.com, which this setup does not install)"; return 0; fi
+    command -v code >/dev/null 2>&1 && { editor_linked=1; return 0; }
+    if mc_path=$(mac_code); then
+      ours_or_free || { say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; }
+      printf '#!/bin/sh\n%s\nexec "%s" "$@"\n' "$editor_mark_mac" "$mc_path" >"$bin/code.$$" && chmod 755 "$bin/code.$$" && mv "$bin/code.$$" "$bin/code" && editor_linked=1 ||
+        problem "$(short_path "$bin/code") could not be written"
+    else
+      say "VS Code is not on this Mac. It is an app: download it from ${b}https://code.visualstudio.com${z}, drag it to Applications, then run this setup again to make ${c}code${z} open it."
+    fi
+    return 0
+  fi
   if [ "$wsl" = 1 ]; then
     if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code on Windows, installing it with winget for this Windows user where it is not there"; return 0; fi
     if ! ours_or_free; then say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; fi
@@ -1669,7 +1794,12 @@ main() {
   signin_needed=0; cloned=0; archon_ran=0
   if [ "$dry" = 1 ]; then
     heading "${e_pkg}What this computer must already have"
-    would "check that git and curl are here (and tar, xz, unzip, jq and gh, which some steps need); this setup installs no package"
+    if [ "$family" = macos ]; then
+      would "check that the Command Line Tools are here (git); if not, stop and say to run: xcode-select --install"
+      would "get jq $JQ_VERSION and gh $GH_VERSION from their publishers' releases (checked by SHA-256) into ~/.local/share, where this Mac has neither"
+    else
+      would "check that git and curl are here (and tar, xz, unzip, jq and gh, which some steps need); this setup installs no package"
+    fi
   else
     check_prereqs
   fi
