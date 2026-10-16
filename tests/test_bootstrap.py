@@ -24,7 +24,7 @@ SH = shutil.which("sh")
 
 # every switch that stops an installation, so that a run changes nothing but the workspaces folder and the script's own directories
 OFF = {"BOOTSTRAP_NO_APT": "1", "BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_DOTFILES": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_CHSH": "1",
-       "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_RUNTIME": "1"}
+       "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
 
 
 def tree(root: Path) -> list[str]:
@@ -782,3 +782,71 @@ class Pool(Fixture):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Editor(Fixture):
+    """0136-machine-bootstrap FR-044: `code` opens VS Code; under WSL it is VS Code on Windows, installed with winget where it is missing."""
+
+    def windows(self, with_code=True, with_winget=False):
+        root = self.tmp / "c"
+        user = root / "Users" / "me" / "AppData" / "Local"
+        code = user / "Programs" / "Microsoft VS Code" / "bin" / "code"
+        if with_code:
+            code.parent.mkdir(parents=True)
+            code.write_text('#!/bin/sh\necho "vs code on windows: $*"\n')
+            code.chmod(0o755)
+        if with_winget:
+            w = user / "Microsoft" / "WindowsApps" / "winget.exe"
+            w.parent.mkdir(parents=True)
+            w.write_text(f'#!/bin/sh\necho "$*" > "{self.tmp}/winget-args"\nmkdir -p "{code.parent}"\nprintf \'#!/bin/sh\\necho installed: "$*"\\n\' > "{code}"\nchmod 755 "{code}"\n')
+            w.chmod(0o755)
+        return root
+
+    def run_wsl(self, root, **more):
+        off = {k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_EDITOR"}
+        off.update(more)
+        return self.run_script(**off, BOOTSTRAP_KIT="", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(root), WS_HOST_HOME=str(self.tmp / "w"))
+
+    def test_under_wsl_code_runs_vs_code_on_windows_and_a_second_run_changes_nothing(self):
+        root = self.windows()
+        p = self.run_wsl(root)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        code = self.home / ".local" / "bin" / "code"
+        out = subprocess.run([str(code), "."], capture_output=True, text=True)
+        self.assertEqual(out.stdout.strip(), "vs code on windows: .")
+        self.assertIn("code .", p.stdout, "the summary says how to open it")
+        before = code.read_text()
+        self.assertEqual(self.run_wsl(root).returncode, 0)
+        self.assertEqual(code.read_text(), before)
+
+    def test_a_code_command_of_the_persons_own_is_left_alone(self):
+        code = self.home / ".local" / "bin" / "code"
+        code.parent.mkdir(parents=True)
+        code.write_text("#!/bin/sh\necho mine\n")
+        p = self.run_wsl(self.windows())
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(code.read_text(), "#!/bin/sh\necho mine\n")
+        self.assertIn("not this setup's", p.stdout)
+
+    def test_under_wsl_without_vs_code_winget_installs_it_for_this_windows_user(self):
+        root = self.windows(with_code=False, with_winget=True)
+        p = self.run_wsl(root, BOOTSTRAP_NO_DOWNLOAD="")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        args = (self.tmp / "winget-args").read_text()
+        for a in ("install", "--id Microsoft.VisualStudioCode", "--exact", "--scope user", "--accept-package-agreements"):
+            self.assertIn(a, args)
+        out = subprocess.run([str(self.home / ".local" / "bin" / "code"), "x"], capture_output=True, text=True)
+        self.assertEqual(out.stdout.strip(), "installed: x")
+
+    def test_under_wsl_without_vs_code_or_winget_it_says_how_and_goes_on(self):
+        p = self.run_wsl(self.windows(with_code=False), BOOTSTRAP_NO_DOWNLOAD="")
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("winget install -e --id Microsoft.VisualStudioCode", p.stdout)
+        self.assertFalse((self.home / ".local" / "bin" / "code").exists())
+
+    def test_the_dry_run_names_the_step_and_the_switch_leaves_it_out(self):
+        p = self.run_script("--dry-run", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(self.tmp / "c"))
+        self.assertIn("VS Code on Windows", p.stdout)
+        off = self.run_script("--dry-run", WSL_DISTRO_NAME="Debian", BOOTSTRAP_NO_EDITOR="1")
+        self.assertNotIn("VS Code", off.stdout)

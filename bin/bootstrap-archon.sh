@@ -18,7 +18,8 @@
 #   4. Shell and prompt: installs fish 4, Oh My Posh with ws-host's themes and chezmoi, and has chezmoi give bash and fish the prompt,
 #   5. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
 #      fast-forward only),
-#   6. Login shell: offers to make fish your login shell,
+#   6. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
+#      Login shell: offers to make fish your login shell,
 #   7. First checks: runs, in the clone, ./archon doctor, ./archon toolchain ensure and ./archon check, and says what to do next.
 #
 # Safe to run again: what is already in place changes nothing, your own files change only between marked lines (a copy is kept first), and a
@@ -45,6 +46,8 @@
 #   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
 #   BOOTSTRAP_KIT          the kits to install, space-separated (default: base shell embedded-sql agents; WS_HOST_KIT is read too)
 #   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the default kits
+#   BOOTSTRAP_NO_EDITOR=1  do not install VS Code or put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing;
+#                          elsewhere Microsoft's apt repository, on a machine with a desktop) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
 #   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no; naming one here also replaces a prompt block already in ~/.bashrc
 #   BOOTSTRAP_TOOLCHAIN    the names for `archon toolchain ensure` (default: every entry not ready and not marked optional; none; all)
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
@@ -71,6 +74,10 @@ UV_VERSION=0.12.23
 CHEZMOI_VERSION=2.73.0
 CHEZMOI_SHA256_X86_64=b597729b687af4488a848240134cb633de8ca0f04e0d26d48f400ee2ac338ffa
 CHEZMOI_SHA256_AARCH64=abcb840401d3c1f2356e0f53f5d52aa10d10f572654d9626db9ad0ca4dc03355
+
+# Microsoft's apt signing key (fingerprint BC52 8686 B50D 79E3 39D3 721C EB3E 94AD BE12 29CF), for VS Code on a Debian machine that is not under WSL
+MS_KEY_URL=https://packages.microsoft.com/keys/microsoft.asc
+MS_KEY_SHA256=2fa9c05d591a1582a9aba276272478c262e95ad00acf60eaee1644d93941e3c6
 
 POSH_VERSION=31.4.1
 POSH_SHA256_X86_64=bfd0ccab85dc031c848b09b68226f1be942d2ce18978f94c9659b6e7e1b259af
@@ -1864,6 +1871,10 @@ finish() {
     say "${d}No font wanted? Run this again with BOOTSTRAP_PROMPT=plain: the same${z}"
     say "${d}prompt made of emoji and lines.${z}"
   fi
+  if [ "${editor_linked:-0}" = 1 ]; then
+    say ""
+    say "${b}${e_what}VS Code${z}: ${c}code .${z} in a folder opens it there. Under WSL it opens VS Code on Windows, which installs its WSL extension the first time."
+  fi
   case ":$orig_path:" in
     *":$bin:"*) ;;
     *)
@@ -1897,6 +1908,79 @@ finish() {
     say "${b}${e_next}Next${z}: sign in to GitHub (above), then run this setup again."
   fi
   [ "$failed" = 0 ] || return 1
+  return 0
+}
+
+# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044) --------------------------------------------------------------------------
+# Under WSL VS Code runs on Windows and reaches Debian through its WSL extension; its `code` command is a script in its Windows folder, on the PATH
+# only while WSL appends Windows' PATH. So `code` is a small script in ~/.local/bin that runs it, which every shell has; where VS Code is not on
+# Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, from its apt
+# repository signed by its pinned key, on a machine with a desktop; a machine without one is opened from VS Code on another computer (Remote - SSH).
+editor_mark='# made by bootstrap-archon.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
+win_root=${BOOTSTRAP_WINDOWS_ROOT:-/mnt/c}
+
+windows_code() {  # the `code` script of VS Code on Windows: this Windows user's own install first, then one for all users, then any user's
+  if command -v cmd.exe >/dev/null 2>&1 && command -v wslpath >/dev/null 2>&1; then
+    la=$(cmd.exe /c 'echo %LOCALAPPDATA%' 2>/dev/null </dev/null | tr -d '\r') || la=""
+    case $la in *:\\*) c="$(wslpath -u "$la" 2>/dev/null)/Programs/Microsoft VS Code/bin/code"; [ -f "$c" ] && { printf '%s' "$c"; return 0; } ;; esac
+  fi
+  for c in "$win_root/Program Files/Microsoft VS Code/bin/code" "$win_root"/Users/*/AppData/Local/Programs/"Microsoft VS Code"/bin/code; do
+    [ -f "$c" ] && { printf '%s' "$c"; return 0; }
+  done
+  return 1
+}
+
+winget_exe() {  # Windows' winget, through the PATH WSL appends or in this Windows user's WindowsApps folder
+  command -v winget.exe 2>/dev/null && return 0
+  for w in "$win_root"/Users/*/AppData/Local/Microsoft/WindowsApps/winget.exe; do [ -f "$w" ] && { printf '%s' "$w"; return 0; }; done
+  return 1
+}
+
+ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
+
+link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
+  mkdir -p "$bin"
+  printf '#!/bin/sh\n%s\nexec "%s" "$@"\n' "$editor_mark" "$1" >"$bin/code.$$" && chmod 755 "$bin/code.$$" && mv "$bin/code.$$" "$bin/code"
+}
+
+winget_code() { "$(winget_exe)" install --id Microsoft.VisualStudioCode --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity; }
+
+apt_code() {  # Microsoft's repository, signed by its pinned key, then the package
+  key=$(download_verified "$MS_KEY_URL" "$MS_KEY_SHA256") || return 1
+  $sudo_cmd install -D -m 644 "$key" /usr/share/keyrings/microsoft.asc || return 1
+  printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64 arm64\nSigned-By: /usr/share/keyrings/microsoft.asc\n' |
+    $sudo_cmd tee /etc/apt/sources.list.d/vscode.sources >/dev/null || return 1
+  apt_update && apt_install code
+}
+
+setup_editor() {
+  [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
+  phase "${e_what}Making ${c}code${z} open VS Code"
+  if [ "$wsl" = 1 ]; then
+    if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code on Windows, installing it with winget for this Windows user where it is not there"; return 0; fi
+    if ! ours_or_free; then say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; fi
+    if ! wc_path=$(windows_code); then
+      if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "VS Code is not on Windows; skipped installing it (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
+      if ! winget_exe >/dev/null; then
+        warn "VS Code is not on Windows, and winget cannot be reached from here to install it."
+        problem "VS Code: install it on Windows (in PowerShell: winget install -e --id Microsoft.VisualStudioCode, or from https://code.visualstudio.com), then run this again"
+        return 0
+      fi
+      step "${e_dl}Installing VS Code on Windows, for this Windows user (winget)" winget_code || { problem "VS Code could not be installed on Windows with winget"; return 0; }
+      wc_path=$(windows_code) || { problem "VS Code was installed with winget but its code command was not found; open a new terminal and run this again"; return 0; }
+    fi
+    if link_windows_code "$wc_path"; then editor_linked=1; else problem "$(short_path "$bin/code") could not be written"; fi
+    return 0
+  fi
+  if command -v code >/dev/null 2>&1; then editor_linked=1; return 0; fi
+  if [ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+    say "This machine has no desktop: open it from VS Code on your own computer (its Remote - SSH extension), and ${c}code${z} works in VS Code's terminal."
+    return 0
+  fi
+  if [ "$dry" = 1 ]; then would "install VS Code from Microsoft's apt repository (its signing key checked against its pinned SHA-256)"; return 0; fi
+  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ]; then say "Skipped installing VS Code (BOOTSTRAP_NO_APT=1)."; return 0; fi
+  sudo_for "install VS Code from Microsoft's apt repository" || { problem "VS Code: no administrator rights to install it"; return 0; }
+  if step "${e_dl}Installing VS Code from Microsoft's apt repository" apt_code; then editor_linked=1; else problem "VS Code could not be installed from Microsoft's apt repository"; fi
   return 0
 }
 
@@ -1935,6 +2019,7 @@ main() {
   configure_dotfiles
   bg_apt_wait
   [ "$dry" = 1 ] || link_fd
+  setup_editor
   verify_install
   workspace_and_clone
   offer_fish
