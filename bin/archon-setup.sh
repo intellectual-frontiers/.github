@@ -7,8 +7,8 @@
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --dry-run
 #
-# It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian has none of them):
-#   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs)
+# It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian or Arch has none of them):
+#   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs: apt-get on the Debian family, pacman on the Arch family)
 #
 # It is a self-contained port of what ws-host (workspaces-host) installs for its default kits and does for git and the workspaces folder. It never calls,
 # clones or needs ws-host. It:
@@ -597,7 +597,7 @@ write_support_file() {  # write_support_file LABEL STEPLOG LOGLINE
 
 detect_platform() {
   os=$(uname -s)
-  [ "$os" = Linux ] || need "this is $os, and the setup is made for Debian under WSL 2 or in a virtual machine." "open your Debian window (or start the virtual machine) and run it there"
+  [ "$os" = Linux ] || need "this is $os, and the setup is made for Linux (Debian-family or Arch-family) under WSL 2 or in a virtual machine, or on a computer of your own." "open your Linux window (or start the virtual machine) and run it there"
   case $(uname -m) in
     x86_64 | amd64) arch=x86_64; goarch=amd64; miseArch=x64 ;;
     aarch64 | arm64) arch=aarch64; goarch=arm64; miseArch=arm64 ;;
@@ -610,32 +610,55 @@ detect_platform() {
     d_id=$(osval ID); d_like=$(osval ID_LIKE); d_version=$(osval VERSION_ID); d_codename=$(osval VERSION_CODENAME); d_pretty=$(osval PRETTY_NAME)
     : "${d_id:=unknown}" "${d_pretty:=Linux}"
   fi
+  # the family: what differs between distributions (the package manager and the names of its packages) is chosen from it (0136-machine-bootstrap FR-052)
   case " $d_id $d_like " in
-    *" debian "* | *" ubuntu "*) ;;
-    *) need "this is $d_pretty, and the setup is made for Debian." "use Debian 12 or 13 (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
+    *" debian "* | *" ubuntu "*) family=debian ;;
+    *" arch "*) family=arch ;;
+    *) need "this is $d_pretty, and the setup is made for the Debian family (Debian, Ubuntu) and the Arch family (Arch Linux, Omarchy)." "use Debian 12 or 13, or an Arch-based distribution (from the Microsoft Store under WSL 2, or in a virtual machine)" ;;
   esac
   wsl=0; wsl_txt=""
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then wsl=1; wsl_txt=", under WSL"; fi
   is_debian=0; [ "$d_id" = debian ] && is_debian=1
   tested=0
   case "$d_id:$d_version" in debian:12 | debian:12.* | debian:13 | debian:13.*) tested=1 ;; esac
+  if [ "$family" = arch ]; then tested=1; fi   # a rolling release: the current one
 }
 
 # ---- what the computer must already have (the setup installs no package: archon-bootstrap.sh does) -------------------------------------------------------
 
+# the package a program comes in, on this family
+pkg_of() {
+  case "$family:$1" in
+    debian:xz) echo xz-utils ;;
+    arch:gh) echo github-cli ;;
+    *) echo "$1" ;;
+  esac
+}
+
+# the one command a person with administrator rights runs to install programs, on this family (0136-machine-bootstrap FR-055)
+admin_install_cmd() {  # admin_install_cmd PROGRAMS...
+  pk=""
+  for prog in "$@"; do pk="$pk $(pkg_of "$prog")"; done
+  case $family in
+    arch) printf 'sudo pacman -S --needed%s' "$pk" ;;
+    *) printf 'sudo apt-get install -y%s' "$pk" ;;
+  esac
+}
+
 check_prereqs() {
   for cmd in git curl; do
     command -v "$cmd" >/dev/null 2>&1 || need "this account has no $cmd, and the setup installs no package (it never uses administrator rights)." \
-      "from an account that has them, run:  sudo apt-get install -y $cmd   (or run archon-bootstrap.sh, which installs what is needed and then runs this setup)"
+      "from an account that has them, run:  $(admin_install_cmd "$cmd")   (or run archon-bootstrap.sh, which installs what is needed and then runs this setup)"
   done
   missing=""
   for cmd in tar xz unzip jq gh; do
     command -v "$cmd" >/dev/null 2>&1 || missing="$missing $cmd"
   done
   [ -z "$missing" ] && return 0
-  pkgs=$(printf '%s' "$missing" | sed 's/ xz/ xz-utils/')
+  # shellcheck disable=SC2086  # a list of program names
+  cmd=$(admin_install_cmd $missing)
   warn "This account has no$missing, which the setup needs for some steps, and it installs no package."
-  problem "missing programs:$missing (from an account with administrator rights: sudo apt-get install -y$pkgs)"
+  problem "missing programs:$missing (from an account with administrator rights: $cmd)"
 }
 
 # ---- configuration of this run -----------------------------------------------------------------------------------------------------------------
@@ -1614,8 +1637,12 @@ setup_editor() {
     say "This machine has no desktop: open it from VS Code on your own computer (its Remote - SSH extension), and ${c}code${z} works in VS Code's terminal."
     return 0
   fi
-  # a desktop with no VS Code: Microsoft's package needs administrator rights, which this setup never uses; archon-bootstrap.sh installs it
-  say "VS Code is not installed here. To install it, run archon-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
+  # a desktop with no VS Code: a package needs administrator rights, which this setup never uses
+  if [ "$family" = arch ]; then
+    say "VS Code is not installed here. From an account with administrator rights, ${b}sudo pacman -S code${z} installs Code - OSS from the extra repository (Microsoft's own build is in the AUR as visual-studio-code-bin)."
+  else
+    say "VS Code is not installed here. To install it, run archon-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
+  fi
   return 0
 }
 

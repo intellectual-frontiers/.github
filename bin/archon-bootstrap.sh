@@ -1,6 +1,6 @@
 #!/bin/sh
 # Set up a computer for the Intellectual Frontiers harness (0136-machine-bootstrap, the bootstrap): the one script that may use administrator rights. A blank Debian 12
-# or 13 (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs and, if you ask, an account made for `archon`; then it runs
+# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs and, if you ask, an account made for `archon`; then it runs
 # `archon-setup.sh` as that account, which does the rest without administrator rights and writes only inside the account's home folder.
 #
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
@@ -22,7 +22,7 @@
 #   --dedicated        the account is for archon alone (--user archon unless --user names another): archon keeps its startup files whole, and deleting the account removes everything
 #   -h, --help         this text
 #
-# Environment (a "1" switches it on): BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
+# Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
 # archon-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable archon-setup.sh reads, which are passed on to the account.
 # Exit status: 0 done, 1 archon's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
 # shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
@@ -61,7 +61,7 @@ if [ -z "$setup_file" ]; then
   raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
   if command -v curl >/dev/null 2>&1; then curl -fsSL --connect-timeout 20 --retry 3 -o "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
   elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
-  else echo "archon-bootstrap: neither curl nor wget is installed. Run: cd && sudo apt update && sudo apt install -y curl wget" >&2; exit 3; fi
+  else echo "archon-bootstrap: neither curl nor wget is installed. Install them with your package manager first (Debian: sudo apt update && sudo apt install -y curl wget; Arch: sudo pacman -S --needed curl wget)" >&2; exit 3; fi
   chmod 644 "$setup_file"
 fi
 [ -r "$setup_file" ] || { echo "archon-bootstrap: $setup_file cannot be read" >&2; exit 3; }
@@ -88,13 +88,19 @@ sudo_ready=0
 
 pkg_installed() {  # pkg_installed "a|b": any alternative installed
   for alt in $(printf '%s' "$1" | tr '|' ' '); do
-    dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q 'install ok installed' && return 0
+    case $family in
+      arch) pacman -Qi "$alt" >/dev/null 2>&1 && return 0 ;;
+      *) dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q 'install ok installed' && return 0 ;;
+    esac
   done
   return 1
 }
 
-pkg_candidate() {  # pkg_candidate NAME: the version apt would install, empty when none
-  v=$(apt-cache policy "$1" 2>/dev/null | sed -n 's/^ *Candidate: *//p' | head -n 1)
+pkg_candidate() {  # pkg_candidate NAME: the version the package manager would install, empty when none
+  case $family in
+    arch) v=$(pacman -Si "$1" 2>/dev/null | sed -n 's/^Version *: *//p' | head -n 1) ;;
+    *) v=$(apt-cache policy "$1" 2>/dev/null | sed -n 's/^ *Candidate: *//p' | head -n 1) ;;
+  esac
   [ "$v" = "(none)" ] && v=""
   printf '%s' "$v"
 }
@@ -107,13 +113,22 @@ cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
 
 # The packages the setup needs from the computer (it installs none itself), then the everyday programs of the comfort kits (ws-host's base.py).
 wanted_packages() {
-  echo "git ca-certificates curl wget tar xz-utils unzip jq gh"
-  if kit_on base; then
-    echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk"
-    echo "ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck"
-    echo "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra"
-    if [ "$is_debian" = 1 ]; then case $d_codename in bookworm | bullseye | "") ;; *) echo "glab" ;; esac; fi
-  fi
+  case $family in
+    arch)
+      echo "git ca-certificates curl wget tar xz unzip jq github-cli"
+      if kit_on base; then
+        echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk"
+        echo "ripgrep fd bash-completion python imagemagick libwebp sqlite shellcheck glab"
+      fi ;;
+    *)
+      echo "git ca-certificates curl wget tar xz-utils unzip jq gh"
+      if kit_on base; then
+        echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk"
+        echo "ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck"
+        echo "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra"
+        if [ "$is_debian" = 1 ]; then case $d_codename in bookworm | bullseye | "") ;; *) echo "glab" ;; esac; fi
+      fi ;;
+  esac
   return 0
 }
 
@@ -138,10 +153,14 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
 }
 
 apt_install() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o DPkg::Lock::Timeout=180 "$@"; }
+# --needed: what is installed stays; never -Sy, which refreshes the list alone and leaves a rolling release partly upgraded (0136-machine-bootstrap FR-053)
+pacman_install() { $sudo_cmd pacman -S --needed --noconfirm "$@"; }
+pm_install() { if [ "$family" = arch ]; then pacman_install "$@"; else apt_install "$@"; fi; }
 apt_update() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get update -qq -o DPkg::Lock::Timeout=180; }
 
 # Whether apt can give fish 4 on this distribution: its candidate says so; with no package lists yet (a fresh image), its release does.
-fish_from_apt() {
+fish_from_apt() {   # whether the package manager can give fish 4 on this distribution
+  [ "$family" = arch ] && return 0
   cand=$(pkg_candidate fish)
   if [ -n "$cand" ]; then [ "$(cand_major "$cand")" -ge 4 ]; return; fi
   case $d_codename in bookworm | bullseye | buster | focal | jammy | noble) return 1 ;; *) return 0 ;; esac
@@ -190,9 +209,9 @@ offer_fish() {
 }
 
 install_packages() {
-  phase "${e_pkg}Setting up Debian's everyday programs"
+  phase "${e_pkg}Setting up the everyday programs ($family family)"
   if [ "$tested" = 0 ]; then
-    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13; I will go on, and say what does not work."
+    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13 and for Arch; I will go on, and say what does not work."
   fi
   missing=""
   for spec in $(wanted_packages); do
@@ -203,9 +222,9 @@ install_packages() {
     say "Everything the packages give is here."
     return 0
   fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ] || ! command -v apt-get >/dev/null 2>&1; then
+  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ] || ! command -v "$([ "$family" = arch ] && echo pacman || echo apt-get)" >/dev/null 2>&1; then
     for cmd in git curl; do
-      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "sudo apt install$missing"
+      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "$([ "$family" = arch ] && echo "sudo pacman -S --needed" || echo "sudo apt install")$missing"
     done
     warn "Not installed, because packages are off here:$missing"
     problem "packages not installed:$missing"
@@ -213,29 +232,42 @@ install_packages() {
   fi
   if [ "$dry" = 1 ]; then
     [ "$(id -u)" = 0 ] || would "say why administrator rights are needed and ask for your password, once"
-    would "refresh the package list, then install with apt:$missing"
+    if [ "$family" = arch ]; then would "install with pacman (--needed, never refreshing the package list alone):$missing"
+    else would "refresh the package list, then install with apt:$missing"; fi
     return 0
   fi
   if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
-  sudo_for "install Debian's everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to run: sudo apt install$missing"
-  step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
-  # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
-  chosen=""; lacking=""
-  for spec in $missing; do
-    pick=""
-    for alt in $(printf '%s' "$spec" | tr '|' ' '); do
-      if [ -n "$(pkg_candidate "$alt")" ]; then pick=$alt; break; fi
+  sudo_for "install the everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to install:$missing"
+  if [ "$family" = arch ]; then
+    # the names are Arch's own and unique, so pacman decides what it has: a package it cannot find means a package list older than the repositories
+    chosen=$missing
+  else
+    step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
+    # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
+    chosen=""; lacking=""
+    for spec in $missing; do
+      pick=""
+      for alt in $(printf '%s' "$spec" | tr '|' ' '); do
+        if [ -n "$(pkg_candidate "$alt")" ]; then pick=$alt; break; fi
+      done
+      if [ "$pick" = fish ] && [ "$(cand_major "$(pkg_candidate fish)")" -lt 4 ]; then pick=""; fi   # fish 3 is not the shell this sets up; the setup's pinned release is
+      if [ -n "$pick" ]; then chosen="$chosen $pick"; elif [ "$spec" != fish ]; then lacking="$lacking $spec"; fi
     done
-    if [ "$pick" = fish ] && [ "$(cand_major "$(pkg_candidate fish)")" -lt 4 ]; then pick=""; fi   # fish 3 is not the shell this sets up; the setup's pinned release is
-    if [ -n "$pick" ]; then chosen="$chosen $pick"; elif [ "$spec" != fish ]; then lacking="$lacking $spec"; fi
-  done
-  if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
+    if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
+  fi
   if [ -n "$chosen" ]; then
-    count_re='^Setting up '
-    count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
-    [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
+    if [ "$family" != arch ]; then
+      count_re='^Setting up '
+      count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
+      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
+    fi
     # shellcheck disable=SC2086
-    step "${e_pkg}Installing programs" apt_install $chosen || need "the packages could not be installed." "run: sudo apt install$chosen"
+    if ! step_soft "${e_pkg}Installing programs" pm_install $chosen; then
+      if [ "$family" = arch ] && grep -qiE 'target not found|failed retrieving file|could not find' "$work/last.log" 2>/dev/null; then
+        need "pacman could not find a package, so its package list is probably older than the repositories (it was not refreshed here: that alone would leave the system partly upgraded)." "run: sudo pacman -Syu   then run this again"
+      fi
+      need "the packages could not be installed." "run: $([ "$family" = arch ] && echo "sudo pacman -S --needed" || echo "sudo apt install")$chosen"
+    fi
     count_re=""; count_total=""
   fi
   return 0
@@ -253,6 +285,7 @@ apt_code() {  # Microsoft's repository, signed by its pinned key, then the packa
 install_code_package() {
   [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
   [ "$wsl" = 1 ] && return 0
+  [ "$family" = debian ] || return 0   # Arch has no Microsoft repository to add; the setup says what to run
   command -v code >/dev/null 2>&1 && return 0
   [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] || return 0
   phase "${e_code}Installing VS Code"
@@ -272,14 +305,22 @@ make_account() {
   if getent passwd "$boot_user" >/dev/null 2>&1; then
     say "The account $boot_user is already there; I change nothing about it."
   else
-    if [ "$dry" = 1 ]; then would "create the Linux account $boot_user with a home folder and no administrator rights (adduser)"; account_home=/home/$boot_user; return 0; fi
-    sudo_for "create the Linux account $boot_user" || need "I could not get administrator rights, so I cannot create the account $boot_user." "ask an administrator to run: sudo adduser $boot_user"
-    command -v adduser >/dev/null 2>&1 || need "this computer has no adduser." "run: sudo useradd -m -s /bin/bash $boot_user"
-    step "${e_dir}Creating the account $boot_user" $sudo_cmd adduser --disabled-password --gecos "" "$boot_user" || need "the account $boot_user could not be created." "run: sudo adduser $boot_user"
+    if [ "$dry" = 1 ]; then
+      if [ "$family" = debian ]; then would "create the Linux account $boot_user with a home folder and no administrator rights (adduser)"
+      else would "create the Linux account $boot_user with a home folder and no administrator rights (useradd -m -s /bin/bash)"; fi
+      account_home=/home/$boot_user; return 0
+    fi
+    sudo_for "create the Linux account $boot_user" || need "I could not get administrator rights, so I cannot create the account $boot_user." "ask an administrator to run: sudo $([ "$family" = debian ] && echo adduser || echo "useradd -m -s /bin/bash") $boot_user"
+    if [ "$family" = debian ] && command -v adduser >/dev/null 2>&1; then
+      step "${e_dir}Creating the account $boot_user" $sudo_cmd adduser --disabled-password --gecos "" "$boot_user" || need "the account $boot_user could not be created." "run: sudo adduser $boot_user"
+    else
+      step "${e_dir}Creating the account $boot_user" $sudo_cmd useradd -m -s /bin/bash "$boot_user" || need "the account $boot_user could not be created." "run: sudo useradd -m -s /bin/bash $boot_user"
+    fi
   fi
   account_home=$(getent passwd "$boot_user" 2>/dev/null | cut -d: -f6 || true)
   [ -n "$account_home" ] || account_home=/home/$boot_user
-  say "To work in it later: ${b}sudo -iu $boot_user${z}   (or ${b}su - $boot_user${z} once you have given it a password with ${b}sudo passwd $boot_user${z}). To remove it with everything archon wrote: ${b}sudo deluser --remove-home $boot_user${z}."
+  if [ "$family" = debian ]; then rm_cmd="sudo deluser --remove-home $boot_user"; else rm_cmd="sudo userdel -r $boot_user"; fi
+  say "To work in it later: ${b}sudo -iu $boot_user${z}   (or ${b}su - $boot_user${z} once you have given it a password with ${b}sudo passwd $boot_user${z}). To remove it with everything archon wrote: ${b}${rm_cmd}${z}."
   return 0
 }
 

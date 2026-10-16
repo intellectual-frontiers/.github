@@ -961,5 +961,126 @@ class Bootstrap(Fixture):
         self.assertNotIn("--dedicated", run, "an account the person named is not declared dedicated")
 
 
+ARCH = 'ID=arch\nPRETTY_NAME="Arch Linux"\n'
+OMARCHY = 'ID=omarchy\nID_LIKE=arch\nPRETTY_NAME="Omarchy"\n'   # an Arch-based distribution, named by ID_LIKE (0136-machine-bootstrap OQ-6)
+FEDORA = 'ID=fedora\nPRETTY_NAME="Fedora Linux 40"\nVERSION_ID=40\n'
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class ArchFamily(Fixture):
+    """0136-machine-bootstrap FR-052 to FR-056: the Arch family (Arch Linux, Omarchy), with `pacman`, beside the Debian family."""
+
+    def osr(self, text):
+        f = self.tmp / "os-release"
+        f.write_text(text)
+        return str(f)
+
+    def run_boot(self, *argv, **extra):
+        return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(**extra), stdin=subprocess.DEVNULL)
+
+    def test_both_scripts_know_the_arch_family_by_id_or_id_like_and_refuse_another(self):
+        """0136-machine-bootstrap FR-052"""
+        for text in (ARCH, OMARCHY):
+            for script in (SCRIPT, BOOT):
+                p = subprocess.run([SH, str(script), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr(text)), stdin=subprocess.DEVNULL)
+                self.assertEqual(p.returncode, 0, f"{script.name} on {text!r}: {p.stdout}{p.stderr}")
+                self.assertNotIn("The bootstrap is made for Debian", p.stdout + p.stderr, "Arch is a tested family: no warning")
+        for script in (SCRIPT, BOOT):
+            p = subprocess.run([SH, str(script), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr(FEDORA)), stdin=subprocess.DEVNULL)
+            self.assertEqual(p.returncode, 3, script.name)
+            self.assertIn("Fedora Linux 40", p.stderr)
+            self.assertIn("Arch family", p.stderr)
+            self.assertIn("Fix:", p.stderr)
+
+    def test_the_command_for_a_person_with_administrator_rights_is_the_computers_own(self):
+        """0136-machine-bootstrap FR-055"""
+        def hint(family):
+            p = subprocess.run([SH, "-c", f'. "{SCRIPT}"; family={family}; admin_install_cmd git xz gh'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+            return p.stdout
+        self.assertEqual(hint("debian"), "sudo apt-get install -y git xz-utils gh")
+        self.assertEqual(hint("arch"), "sudo pacman -S --needed git xz github-cli")
+
+    def test_without_git_or_curl_the_setup_on_arch_names_the_pacman_command(self):
+        """0136-machine-bootstrap FR-055"""
+        for n in os.listdir("/usr/bin"):
+            if n not in ("git", "curl"):
+                try:
+                    os.symlink(f"/usr/bin/{n}", self.bin / n)
+                except OSError:
+                    pass
+        p = self.run_script(**OFF, PATH=str(self.bin), BOOTSTRAP_OS_RELEASE=self.osr(ARCH))
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("sudo pacman -S --needed git", p.stderr)
+        self.assertNotIn("apt", p.stderr.replace("archon-bootstrap", ""))
+
+    def test_the_bootstraps_packages_are_arch_names_and_the_comfort_ones_only_when_asked(self):
+        """0136-machine-bootstrap FR-053"""
+        def wanted(**env):
+            p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages'], capture_output=True, text=True,
+                               env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.osr(ARCH), **env))
+            return p.stdout
+        full = wanted()
+        for name in ("github-cli", "xz ", "ripgrep", "fd ", "python", "sqlite"):
+            self.assertIn(name, full)
+        for debian_only in ("xz-utils", "fd-find", "python3", "debianutils", "libmagickcore"):
+            self.assertNotIn(debian_only, full)
+        lean = wanted(BOOTSTRAP_NO_COMFORT="1")
+        self.assertIn("git ca-certificates curl wget tar xz unzip jq github-cli", lean)
+        self.assertNotIn("ripgrep", lean)
+
+    def test_dry_run_on_arch_says_pacman_never_refreshes_the_list_and_makes_the_account_with_useradd(self):
+        """0136-machine-bootstrap FR-053, FR-054"""
+        self.stub("pacman", "exit 1")   # an Arch computer has one; nothing is installed
+        arch = self.run_boot("--dry-run", "--dedicated", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}")
+        self.assertEqual(arch.returncode, 0, arch.stderr)
+        self.assertIn("(arch family)", arch.stdout)
+        self.assertIn("install with pacman (--needed, never refreshing the package list alone)", arch.stdout)
+        self.assertIn("useradd -m -s /bin/bash", arch.stdout)
+        self.assertNotIn("apt", arch.stdout)
+        self.assertNotIn("Installing VS Code", arch.stdout, "Arch has no Microsoft repository to add")
+        debian = self.run_boot("--dry-run", "--dedicated")
+        self.assertIn("refresh the package list, then install with apt", debian.stdout)
+        self.assertIn("(adduser)", debian.stdout)
+
+    def stubs(self, pacman_body):
+        state = self.tmp / "account-made"
+        log = self.tmp / "calls.log"
+        log.write_text("")
+        self.stub("pacman", f'echo "pacman $*" >>{log}\n{pacman_body}')
+        self.stub("getent", f'[ "$1" = passwd ] && [ -f {state} ] && {{ echo "$2:x:1001:1001::/home/$2:/bin/bash"; exit 0; }}\nexit 2')
+        self.stub("useradd", f'echo "useradd $*" >>{log}\n: >{state}')
+        self.stub("sudo", f'case "$1" in -v) exit 0 ;; -n) exit 0 ;; -H) echo "AS $*" >>{log}; exit 0 ;; esac\necho "sudo $*" >>{log}\nexec "$@"')
+        self.stub("runuser", f'echo "AS runuser $*" >>{log}')
+        return log
+
+    def go(self, *argv, **extra):
+        return self.run_boot(*argv, BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}", **extra)
+
+    def test_it_installs_with_needed_makes_the_account_with_useradd_and_says_how_to_remove_it(self):
+        """0136-machine-bootstrap FR-053, FR-054"""
+        log = self.stubs('case "$1" in -Qi) exit 1 ;; esac\nexit 0')
+        p = self.go("--dedicated")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        calls = log.read_text()
+        self.assertIn("pacman -S --needed --noconfirm", calls)
+        for refresh in ("pacman -Sy", "pacman -Syu", "pacman -y"):
+            self.assertNotIn(refresh, calls)
+        self.assertIn("useradd -m -s /bin/bash archon", calls)
+        self.assertNotIn("adduser", calls)
+        self.assertIn("userdel -r archon", p.stdout)
+        self.assertIn("sudo -iu archon", p.stdout)
+        run = [l for l in calls.splitlines() if l.startswith("AS")][0]
+        self.assertIn("--dedicated", run)
+
+    def test_a_package_pacman_cannot_find_stops_with_the_full_upgrade_to_run_first(self):
+        """0136-machine-bootstrap FR-053"""
+        log = self.stubs('case "$1" in -Qi) exit 1 ;; -S) echo "error: target not found: github-cli" >&2; exit 1 ;; esac\nexit 0')
+        p = self.go("--dedicated")
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("sudo pacman -Syu", p.stdout + p.stderr)
+        self.assertNotIn("useradd", log.read_text(), "nothing else is done after the stop")
+        self.assertNotIn("pacman -Sy ", log.read_text())
+
+
 if __name__ == "__main__":
     unittest.main()
