@@ -406,7 +406,7 @@ class Specs(unittest.TestCase):
         for r in rows_:
             self.assertIn(r[1], ("check", "gate", "review", "none"), r[0])
             if r[1] == "check":
-                self.assertTrue(r[2].startswith(".github: "), r[0])
+                self.assertTrue(r[2].startswith((".github: ", "archon: ")), r[0])   # a consumer harness may enforce a requirement in its own tests
             if r[1] == "none":
                 self.assertTrue(r[3], f"{r[0]} says why it is enforced by nothing")
 
