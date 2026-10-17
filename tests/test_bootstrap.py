@@ -1154,20 +1154,13 @@ class MacOS(Fixture):
 
     def test_the_scripts_use_no_option_only_gnu_tools_have_outside_the_branch_for_linux(self):
         """FR-057: bash 3.2 in POSIX mode and BSD sed, find, date, stat and tar"""
-        gnu = [
-            (r"\bfind\b[^|;]*-printf", "find -printf"), (r"\bmv\s+-[a-zA-Z]*T", "mv -T"), (r"\\x1b", "sed \\x1b"), (r"\breadlink\s+-f", "readlink -f"),
-            (r"\bsed\s+-i\b", "sed -i"), (r"\bdate\s+-d\b", "date -d"), (r"\bgrep\s+-[a-zA-Z]*P", "grep -P"), (r"\bstat\s+-c", "stat -c"), (r"\bxargs\s+-r", "xargs -r"),
-            (r"\btar\s+-x[a-zA-Z]*J", "tar -xJ"), (r"/[gI]*I[gI]*[\"']", "sed s///I"), (r"\bls\s+--", "ls --"), (r"\\\|", "BRE alternation"), (r"\bsha(256|512)sum\b", "sha*sum"),
-            (r"\bbase64\s+-d", "base64 -d"), (r"\bsort\s+-[a-zA-Z]*V", "sort -V"), (r"\bcp\s+-[a-zA-Z]*[uT]", "cp -u/-T"), (r"\bln\s+-[a-zA-Z]*T", "ln -T"),
-        ]
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("shell_portability_check", HOME / "commons" / "tools" / "shell-portability-check.py")
+        tool = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tool)   # the rules are commons' (0004-rules), not a list kept in this test
         allowed = ('[ "$goos" = linux ]; then mv -Tf', "command -v sha256sum", "sha256sum()", "sha512sum \"$1\"", "sha256sum; }", "sha256sum \"$1\"", "base64 -d 2>/dev/null || base64 -D")
         for f in (SCRIPT, BOOT):
-            for n, line in enumerate(f.read_text().splitlines(), 1):
-                if line.lstrip().startswith("#") or any(a in line for a in allowed):
-                    continue
-                code = re.sub(r"\s#\s.*$", "", line)   # a trailing comment may name what it avoids
-                for rx, name in gnu:
-                    self.assertIsNone(re.search(rx, code), f"{f.name}:{n} uses {name}, which a Mac's tools lack: {line.strip()}")
+            self.assertEqual(tool.scan(f, allowed), [])
 
     def test_the_checksum_programs_are_shasum_where_sha256sum_is_absent(self):
         lean = self.tmp / "lean"

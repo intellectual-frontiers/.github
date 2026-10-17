@@ -8,6 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import tomllib
 import unittest
@@ -195,6 +196,113 @@ class Pins(unittest.TestCase):
             self.assertRegex(name, r"^(linux|macos)-(x64|arm64)$")
             self.assertIn(pl["os"], ("linux", "macos"))
             self.assertIn(pl["processor"], ("x86_64", "aarch64"))
+
+
+SETUP = COMMONS.parent / "bin" / "archon-setup.sh"
+RULES = COMMONS / "generated" / "rules.auto.toml"
+RECORD = COMMONS / "generated" / "install-record.auto.toml"
+
+
+class Rules(unittest.TestCase):
+    """The rules a harness applies (0004-rules)."""
+
+    def load(self):
+        return tomllib.loads(RULES.read_text())["rules"]
+
+    def test_every_rule_is_in_a_set_with_a_pattern_a_name_and_a_reason(self):
+        """0004-rules FR-001, FR-002"""
+        rules = self.load()
+        self.assertEqual({r["set"] for r in rules}, {"shell-portability", "ci-forbidden-program", "ci-forbidden-action", "host-program", "installer"})
+        self.assertEqual(len({r["id"] for r in rules}), len(rules))
+        for r in rules:
+            re.compile(r["pattern"])
+            self.assertTrue(r["label"] and r["reason"], r["id"])
+        self.assertTrue(tomllib.loads(RULES.read_text())["source_sha256"])
+
+    def tool(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("spc", COMMONS / "tools" / "shell-portability-check.py")
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    def test_the_portability_tool_reports_a_gnu_only_line_and_skips_comments_and_excused_lines(self):
+        """0004-rules FR-003"""
+        tool = self.tool()
+        f = Path(tempfile.mkdtemp()) / "x.sh"
+        self.addCleanup(shutil.rmtree, f.parent, True)
+        f.write_text("# sed -i is avoided\nsed -i s/a/b/ file\nls # not sed -i here\nreadlink -f x # ok\nsha256sum x\ndate -d today\n")
+        found = tool.scan(f, allow=("sha256sum",))
+        self.assertEqual(len(found), 3, found)
+        self.assertIn("x.sh:2: uses sed -i", found[0])
+        self.assertTrue(any("readlink -f" in x for x in found) and any("date -d" in x for x in found))
+        p = subprocess.run([sys.executable, str(COMMONS / "tools" / "shell-portability-check.py"), str(f)], capture_output=True, text=True)
+        self.assertEqual(p.returncode, 1)
+        ok = f.parent / "ok.sh"
+        ok.write_text("echo hi\n")
+        self.assertEqual(subprocess.run([sys.executable, str(COMMONS / "tools" / "shell-portability-check.py"), str(ok)]).returncode, 0)
+
+    def test_the_tool_needs_only_the_standard_library(self):
+        """0004-rules FR-003"""
+        for line in (COMMONS / "tools" / "shell-portability-check.py").read_text().splitlines():
+            if line.startswith(("import ", "from ")):
+                self.assertIn(line.split()[1], ("__future__", "re", "sys", "tomllib", "pathlib"))
+
+    def test_the_scripts_have_no_line_the_tool_reports(self):
+        """0004-rules SC-001"""
+        tool = self.tool()
+        allowed = ('[ "$goos" = linux ]; then mv -Tf', "command -v sha256sum", "sha256sum()", 'sha512sum "$1"', "sha256sum; }", 'sha256sum "$1"', "base64 -d 2>/dev/null || base64 -D")
+        for f in (SETUP, COMMONS.parent / "bin" / "archon-bootstrap.sh"):
+            self.assertEqual(tool.scan(f, allowed), [])
+
+
+class Record(unittest.TestCase):
+    """The record of how an account was set up (0002-packaging FR-016)."""
+
+    def fields(self):
+        return tomllib.loads(RECORD.read_text())["fields"]
+
+    def test_the_script_writes_the_fields_of_the_record_in_order_with_the_right_form(self):
+        """0002-packaging FR-016"""
+        text = SETUP.read_text()
+        block = text[text.index("record_install() {"):]
+        block = block[:block.index("\n}\n")]
+        written = re.findall(r"printf '(\w+) = (\"?)%s(\"?)\\n'", block)
+        fields = self.fields()
+        self.assertEqual([w[0] for w in written], [f["name"] for f in fields])
+        for (name, open_q, close_q), f in zip(written, fields):
+            self.assertEqual((open_q, close_q), ("", "") if f["type"] == "boolean" else ('"', '"'), name)
+
+    def test_methods_and_hosts_the_script_can_write_are_the_allowed_values(self):
+        """0002-packaging FR-016"""
+        by = {f["name"]: f for f in self.fields()}
+        text = SETUP.read_text() + (COMMONS.parent / "bin" / "archon-bootstrap.sh").read_text()
+        for m in by["method"]["values"]:
+            self.assertRegex(text, rf"install_method=(\$\{{install_method:-)?{m}")
+        host = SETUP.read_text()
+        host = host[host.index("host_kind() {"):]
+        host = host[:host.index("\n}\n")]
+        for h in by["host"]["values"]:
+            self.assertIn(h, host)
+
+    def test_a_bad_rule_or_field_is_refused(self):
+        """0004-rules FR-002, 0002-packaging FR-016"""
+        for old, new, said in (('pm:pattern "apt-get"', 'pm:pattern "(apt"', "not a regular expression"), ('pm:ruleSet "installer"', 'pm:ruleSet "installers"', "needs a set"),
+                               ('pm:fieldType "boolean"', 'pm:fieldType "number"', "needs a name, a type")):
+            tmp = Path(tempfile.mkdtemp())
+            self.addCleanup(shutil.rmtree, tmp, True)
+            root = tmp / "commons"
+            shutil.copytree(COMMONS, root, ignore=shutil.ignore_patterns("spec-kit", "__pycache__"))
+            for f in (root / "ontology" / "supply-chain" / "packaging").glob("*.ttl"):
+                t = f.read_text()
+                if old in t:
+                    f.write_text(t.replace(old, new, 1))
+                    break
+            else:
+                self.fail(old)
+            p = subprocess.run(["uv", "run", "--quiet", str(root / "tools" / "generate-packaging.py")], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 2, p.stderr)
+            self.assertIn(said, p.stderr)
 
 
 class ShellFragment(unittest.TestCase):

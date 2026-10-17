@@ -1,6 +1,6 @@
 # Feature Specification: Identity and roles
 
-**Spec ID:** 0004-identity-and-roles
+**Spec ID:** 0005-identity-and-roles
 **Status:** Draft
 **Owner:** if
 **Domain:** commons

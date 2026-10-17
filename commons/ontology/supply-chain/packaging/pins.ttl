@@ -8,6 +8,7 @@
 
 pmid:platform-linux-x64 a pm:Platform ; rdfs:label "Linux, x86-64"@en ; pm:platformName "linux-x64" ; pm:operatingSystem "linux" ; pm:processor "x86_64" ; pm:pinSuffix "X86_64" .
 pmid:platform-linux-arm64 a pm:Platform ; rdfs:label "Linux, 64-bit Arm"@en ; pm:platformName "linux-arm64" ; pm:operatingSystem "linux" ; pm:processor "aarch64" ; pm:pinSuffix "AARCH64" .
+pmid:platform-macos-x64 a pm:Platform ; rdfs:label "macOS, Intel"@en ; pm:platformName "macos-x64" ; pm:operatingSystem "macos" ; pm:processor "x86_64" ; pm:pinSuffix "MACOS_X64" .
 pmid:platform-macos-arm64 a pm:Platform ; rdfs:label "macOS, Apple silicon"@en ; pm:platformName "macos-arm64" ; pm:operatingSystem "macos" ; pm:processor "aarch64" ; pm:pinSuffix "MACOS_ARM64" .
 
 pmid:pin-mise a pm:PinnedDownload ;

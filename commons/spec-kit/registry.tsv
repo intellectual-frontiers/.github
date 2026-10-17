@@ -2,4 +2,5 @@ number	slug	state
 0001	software-supply-chain	in force
 0002	packaging	in force
 0003	spec-kit	in force
-0004	identity-and-roles	in force
+0004	rules	in force
+0005	identity-and-roles	in force

@@ -1,4 +1,4 @@
-# The role catalog of a book imprint and a think tank, its permissions and the depth levels of a work (commons 0004-identity-and-roles FR-022). Data only: no person, company, layer name,
+# The role catalog of a book imprint and a think tank, its permissions and the depth levels of a work (commons 0005-identity-and-roles FR-022). Data only: no person, company, layer name,
 # price or secret. A harness reads the table commons/generated/identity.auto.toml made from this file.
 
 @prefix idn: <https://www.intellectualfrontiers.com/ontology/identity#> .

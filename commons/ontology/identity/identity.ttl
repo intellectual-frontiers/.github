@@ -1,4 +1,4 @@
-# The identity vocabulary (commons 0004-identity-and-roles): what a role, a permission, a layer and a depth level are, so that any site or platform of the group names who a person is
+# The identity vocabulary (commons 0005-identity-and-roles): what a role, a permission, a layer and a depth level are, so that any site or platform of the group names who a person is
 # and what the person may do the same way. It names no provider, company, person, layer or price. Terms specialize schema.org and SKOS where they have a class; every other term is this
 # namespace's own, because no established vocabulary names it.
 
