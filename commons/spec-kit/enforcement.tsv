@@ -21,3 +21,5 @@ requirement	mechanism	by	note
 0002-packaging FR-011	check	.github: python3 -m unittest discover -s tests	Generated: the schema, the source hash and the content
 0002-packaging FR-012	check	.github: python3 -m unittest discover -s tests	ShellFragment: marks, POSIX sh, shellcheck, and what each function answers
 0002-packaging FR-013	check	archon: archon test	archon's packaging tests: only an allowed executable is run, shell syntax and forbidden commands are refused
+0002-packaging FR-014	check	.github: python3 -m unittest discover -s tests	Generated: pins and platforms are in the env file, the TOML and the script; Generator: a bad checksum, a pin with no version and a repeated key are refused
+0002-packaging FR-015	check	archon: archon test	archon's pin tests: its built-in pins are the file commons generates, and the store reads them

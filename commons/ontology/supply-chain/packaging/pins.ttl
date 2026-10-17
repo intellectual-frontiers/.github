@@ -1,0 +1,67 @@
+# The platforms a harness runs on and the downloads it pins (commons 0002-packaging FR-014, FR-015): one version and one SHA-256 per platform for each program a script fetches
+# before any harness exists. The shell fragment and the env file are generated from this; change a pin here and nowhere else.
+
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+pmid:platform-linux-x64 a pm:Platform ; rdfs:label "Linux, x86-64"@en ; pm:platformName "linux-x64" ; pm:operatingSystem "linux" ; pm:processor "x86_64" ; pm:pinSuffix "X86_64" .
+pmid:platform-linux-arm64 a pm:Platform ; rdfs:label "Linux, 64-bit Arm"@en ; pm:platformName "linux-arm64" ; pm:operatingSystem "linux" ; pm:processor "aarch64" ; pm:pinSuffix "AARCH64" .
+pmid:platform-macos-arm64 a pm:Platform ; rdfs:label "macOS, Apple silicon"@en ; pm:platformName "macos-arm64" ; pm:operatingSystem "macos" ; pm:processor "aarch64" ; pm:pinSuffix "MACOS_ARM64" .
+
+pmid:pin-mise a pm:PinnedDownload ;
+    rdfs:label "mise, the one program archon installs everything else with"@en ;
+    pm:programName "mise" ;
+    pm:pinKey "MISE" ;
+    pm:version "2026.10.3" ;
+    pm:note "Read before any Python exists."@en .
+pmid:sum-mise-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-mise ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "ff0870ddad7f8c5ba673ceb3e7659f0353da8263eabe8b82220f5816a772c786" .
+pmid:sum-mise-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-mise ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "a5141f834d883239c2542b9a2136e75428779b2040206537399714d8c534d91f" .
+pmid:sum-mise-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-mise ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "5372494c3027260ddf8efa79504c4d968bbe671a58248ec575f57e1472e5d9c2" .
+
+pmid:pin-python a pm:PinnedDownload ;
+    rdfs:label "the Python archon runs on"@en ;
+    pm:programName "python" ;
+    pm:pinKey "PYTHON" ;
+    pm:version "3.14.8" .
+
+pmid:pin-uv a pm:PinnedDownload ;
+    rdfs:label "uv, the launcher archon starts Python with"@en ;
+    pm:programName "uv" ;
+    pm:pinKey "UV" ;
+    pm:version "0.12.23" .
+
+pmid:pin-fish a pm:PinnedDownload ;
+    rdfs:label "fish 4 for a distribution whose own fish is older (Debian 12 has 3.6)"@en ;
+    pm:programName "fish" ;
+    pm:pinKey "FISH" ;
+    pm:version "4.9.3" ;
+    pm:note "The fish project's own static release runs on any Linux; its Ubuntu package needs a newer C library than Debian 12 has."@en .
+pmid:sum-fish-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-fish ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "8f643d10ad1abb0ef7072764c01ceb5cf61b2d373fda400cf60f0bad69b7e095" .
+pmid:sum-fish-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-fish ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "57349f0111728c64b703a84e611aa97ff4d1fa8466385d64e67bd5bc3ffa49fc" .
+
+pmid:pin-glab a pm:PinnedDownload ;
+    rdfs:label "glab for a Debian whose archive has none (Debian 12)"@en ;
+    pm:programName "glab" ;
+    pm:pinKey "GLAB" ;
+    pm:version "1.120.0" .
+pmid:sum-glab-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "4e6c59de9f7ed2f304bf93aad01ea8f8a69584f0450ce90ad696ef81f69c69aa" .
+pmid:sum-glab-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "c60ebb4cb36f276714847a118845b9b4e69f46a8080c68b21ca63f158722cdea" .
+pmid:sum-glab-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "8769650c49bb5d5ac52156d46e448e87f5570a868fe4e7bfcbd8cc66693c7afb" .
+
+pmid:pin-gh a pm:PinnedDownload ;
+    rdfs:label "gh on a Mac, which has none"@en ;
+    pm:programName "gh" ;
+    pm:pinKey "GH" ;
+    pm:version "2.102.0" ;
+    pm:note "The publisher's own release for Apple silicon, put in the account's own folder (0136-machine-bootstrap FR-057)."@en .
+pmid:sum-gh-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-gh ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "da922c20d1792e5b2cbf375593d7a658acf034c12c84e007e71c76ef959c337e" .
+
+pmid:pin-jq a pm:PinnedDownload ;
+    rdfs:label "jq on a Mac, which has none"@en ;
+    pm:programName "jq" ;
+    pm:pinKey "JQ" ;
+    pm:version "1.8.2" ;
+    pm:note "The publisher's own release for Apple silicon, put in the account's own folder (0136-machine-bootstrap FR-057)."@en .
+pmid:sum-jq-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e" .

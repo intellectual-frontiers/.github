@@ -5,7 +5,7 @@
 # ///
 """Generate the packaging table from the packaging ontology (commons 0002-packaging).
 
-    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml and packaging.auto.sh, and the marked block of bin/archon-setup.sh
+    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml, packaging.auto.sh and pins.auto.env, and the marked blocks of bin/archon-setup.sh
     uv run commons/tools/generate-packaging.py --check    exit 1, writing nothing, where either file is not what the ontology makes
 
 The ontology (commons/ontology/supply-chain/packaging/*.ttl) is the source; the two generated files are never edited by hand. The TOML is for programs (a harness reads it),
@@ -26,8 +26,11 @@ COMMONS = Path(__file__).resolve().parent.parent
 ONTOLOGY = COMMONS / "ontology" / "supply-chain" / "packaging"
 OUT_TOML = COMMONS / "generated" / "packaging.auto.toml"
 OUT_SH = COMMONS / "generated" / "packaging.auto.sh"
+OUT_PINS = COMMONS / "generated" / "pins.auto.env"
 SCRIPTS = [COMMONS.parent / "bin" / "archon-setup.sh"]   # carry the fragment between its marks, as a script piped from the internet has no file beside it
 BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
+PINS_BLOCK = re.compile(r"# >>> pins\.auto >>>\n.*?# <<< pins\.auto <<<\n", re.S)
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 PM = Namespace("https://www.intellectualfrontiers.com/ontology/packaging#")
 SCHEMA_VERSION = 1
@@ -213,7 +216,44 @@ def model(g: Graph) -> tuple[dict, list[str]]:
         for fid in p["names"]:
             if families[fid]["status"] != "supported":
                 bad.append(f"program {name} names a package for {fid}, which is not supported")
-    return {"managers": managers, "families": families, "programs": programs, "prohibitions": prohibitions}, bad
+    platforms: dict[str, dict] = {}
+    plat_iri: dict[URIRef, str] = {}
+    suffixes: set[str] = set()
+    for pl in sorted(g.subjects(RDF.type, PM.Platform)):
+        name = one(g, pl, PM.platformName)
+        rec = {"os": one(g, pl, PM.operatingSystem) or "", "processor": one(g, pl, PM.processor) or "", "suffix": one(g, pl, PM.pinSuffix) or "", "label": one(g, pl, RDFS.label) or ""}
+        if not name or not all(rec.values()):
+            bad.append(f"platform {pl} needs a name, an operating system, a processor, a pin suffix and a label")
+            continue
+        if rec["suffix"] in suffixes:
+            bad.append(f"two platforms share the pin suffix {rec['suffix']}")
+        suffixes.add(rec["suffix"])
+        plat_iri[pl] = name
+        platforms[name] = rec
+    pins: dict[str, dict] = {}
+    pin_iri: dict[URIRef, str] = {}
+    keys: set[str] = set()
+    for pn in sorted(g.subjects(RDF.type, PM.PinnedDownload)):
+        name, key, version = one(g, pn, PM.programName), one(g, pn, PM.pinKey), one(g, pn, PM.version)
+        if not (name and key and version):
+            bad.append(f"pinned download {pn} needs a name, a key and a version")
+            continue
+        if key in keys:
+            bad.append(f"two pinned downloads share the key {key}")
+        keys.add(key)
+        pin_iri[pn] = name
+        pins[name] = {"key": key, "version": version, "label": one(g, pn, RDFS.label) or name, "note": one(g, pn, PM.note) or "", "sha256": {}}
+    for c in sorted(g.subjects(RDF.type, PM.Checksum)):
+        pn, pl, digest = next(g.objects(c, PM.forPin), None), next(g.objects(c, PM.forPlatform), None), one(g, c, PM.sha256)
+        if pn not in pin_iri or pl not in plat_iri or not digest:
+            bad.append(f"checksum {c} needs a pinned download, a platform and a SHA-256")
+            continue
+        if not HEX64.match(digest):
+            bad.append(f"the checksum of {pin_iri[pn]} on {plat_iri[pl]} is not 64 lower-case hexadecimal digits")
+        if plat_iri[pl] in pins[pin_iri[pn]]["sha256"]:
+            bad.append(f"{pin_iri[pn]} has two checksums for {plat_iri[pl]}")
+        pins[pin_iri[pn]]["sha256"][plat_iri[pl]] = digest
+    return {"managers": managers, "families": families, "programs": programs, "prohibitions": prohibitions, "platforms": platforms, "pins": pins}, bad
 
 
 # ---- TOML ------------------------------------------------------------------------------------------------------------------------------------------
@@ -253,6 +293,12 @@ def toml(t: dict, digest: str) -> str:
             if c["verified"]:
                 out.append(f"verified = {s(c['verified'])}")
             out.append("")
+    for name, pl in sorted(t["platforms"].items()):
+        out += [f"[platforms.{s(name)}]", f"label = {s(pl['label'])}", f"os = {s(pl['os'])}", f"processor = {s(pl['processor'])}", f"pin_suffix = {s(pl['suffix'])}", ""]
+    for name, pn in sorted(t["pins"].items()):
+        out += [f"[pins.{s(name)}]", f"key = {s(pn['key'])}", f"version = {s(pn['version'])}", f"label = {s(pn['label'])}"]
+        out += [f"sha256.{s(pf)} = {s(h)}" for pf, h in sorted(pn["sha256"].items())]
+        out.append("")
     for p in t["prohibitions"]:
         out += ["[[prohibitions]]", f"manager = {s(p['manager'])}", f"argv = {arr(p['argv'])}", f"reason = {s(p['reason'])}", ""]
     for name, p in sorted(t["programs"].items(), key=lambda kv: (kv[1]["order"], kv[0])):
@@ -338,6 +384,32 @@ def shell(t: dict, digest: str) -> str:
     return "\n".join(out)
 
 
+def pin_lines(t: dict, comments: bool) -> list[str]:
+    out: list[str] = []
+    for name, pn in t["pins"].items():
+        if comments:
+            out.append(f"# {pn['label']}" + (f": {pn['note']}" if pn["note"] else ""))
+        out.append(f"{pn['key']}_VERSION={pn['version']}")
+        for pf, h in sorted(pn["sha256"].items(), key=lambda kv: t["platforms"][kv[0]]["suffix"]):
+            out.append(f"{pn['key']}_SHA256_{t['platforms'][pf]['suffix']}={h}")
+        if comments:
+            out.append("")
+    return out
+
+
+def pins_env(t: dict, digest: str) -> str:
+    head = ["# AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/pins.ttl (commons 0002-packaging FR-014). Do not edit: change the ontology.",
+            f"# source_sha256={digest}"]
+    return "\n".join(head + pin_lines(t, False)) + "\n"
+
+
+def pins_block(t: dict, digest: str) -> str:
+    head = ["# >>> pins.auto >>>",
+            "# AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/pins.ttl (commons 0002-packaging FR-014). Do not edit: change the ontology.",
+            "# shellcheck disable=SC2034  # read by the script this is part of", ""]
+    return "\n".join(head + pin_lines(t, True)) .rstrip("\n") + "\n# <<< pins.auto <<<\n"
+
+
 def main(argv: list[str]) -> int:
     g, digest = load()
     t, bad = model(g)
@@ -347,14 +419,18 @@ def main(argv: list[str]) -> int:
             print(f"  - {b}", file=sys.stderr)
         return 2
     fragment = shell(t, digest)
-    want = {OUT_TOML: toml(t, digest), OUT_SH: fragment}
+    want = {OUT_TOML: toml(t, digest), OUT_SH: fragment, OUT_PINS: pins_env(t, digest)}
+    pblock = pins_block(t, digest)
     for script in SCRIPTS:
         if script.exists():   # a copy of commons alone (a test's) has no scripts beside it
             text = script.read_text()
             if not BLOCK.search(text):
                 print(f"{script.relative_to(COMMONS.parent)} has no block between '# >>> packaging.auto >>>' and '# <<< packaging.auto <<<' to put the table in", file=sys.stderr)
                 return 2
-            want[script] = BLOCK.sub(lambda _m: fragment, text, count=1)
+            if not PINS_BLOCK.search(text):
+                print(f"{script.relative_to(COMMONS.parent)} has no block between '# >>> pins.auto >>>' and '# <<< pins.auto <<<' to put the pins in", file=sys.stderr)
+                return 2
+            want[script] = PINS_BLOCK.sub(lambda _m: pblock, BLOCK.sub(lambda _m: fragment, text, count=1), count=1)
     if "--check" in argv:
         stale = [p for p, text in want.items() if not p.exists() or p.read_text() != text]
         for p in stale:

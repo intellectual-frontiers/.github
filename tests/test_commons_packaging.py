@@ -168,6 +168,35 @@ class Generated(unittest.TestCase):
 
 
 @unittest.skipUnless(SH, "sh is not installed")
+class Pins(unittest.TestCase):
+    """The platforms and the pinned downloads (0002-packaging FR-014)."""
+
+    def env(self):
+        return dict(l.split("=", 1) for l in (COMMONS / "generated" / "pins.auto.env").read_text().splitlines() if l and not l.startswith("#"))
+
+    def test_the_env_file_the_toml_and_the_script_agree(self):
+        """0002-packaging FR-014"""
+        t = tomllib.loads(TOML.read_text())
+        env = self.env()
+        script = (COMMONS.parent / "bin" / "archon-setup.sh").read_text()
+        self.assertTrue(t["pins"] and t["platforms"])
+        for name, pin in t["pins"].items():
+            self.assertEqual(env[f"{pin['key']}_VERSION"], pin["version"], name)
+            self.assertIn(f"{pin['key']}_VERSION={pin['version']}\n", script)
+            for plat, digest in pin.get("sha256", {}).items():
+                var = f"{pin['key']}_SHA256_{t['platforms'][plat]['pin_suffix']}"
+                self.assertEqual(env[var], digest, var)
+                self.assertRegex(digest, r"^[0-9a-f]{64}$")
+                self.assertIn(f"{var}={digest}\n", script)
+
+    def test_every_platform_names_an_os_and_a_processor(self):
+        """0002-packaging FR-014"""
+        for name, pl in tomllib.loads(TOML.read_text())["platforms"].items():
+            self.assertRegex(name, r"^(linux|macos)-(x64|arm64)$")
+            self.assertIn(pl["os"], ("linux", "macos"))
+            self.assertIn(pl["processor"], ("x86_64", "aarch64"))
+
+
 class ShellFragment(unittest.TestCase):
     """The shell fragment a script carries."""
 
@@ -233,6 +262,45 @@ class Generator(unittest.TestCase):
         """0002-packaging FR-009, 0001-software-supply-chain FR-002"""
         p = self.run_tool(COMMONS, "--check")
         self.assertEqual(p.returncode, 0, p.stderr)
+
+    def pins(self, root: Path) -> Path:
+        return root / "ontology" / "supply-chain" / "packaging" / "pins.ttl"
+
+    def test_a_bad_checksum_is_refused(self):
+        """0002-packaging FR-014"""
+        root = self.copy()
+        f = self.pins(root)
+        f.write_text(re.sub(r'pm:sha256 "[0-9a-f]{64}"', 'pm:sha256 "abc"', f.read_text(), count=1))
+        p = self.run_tool(root)
+        self.assertEqual(p.returncode, 2)
+        self.assertIn("is not 64 lower-case hexadecimal digits", p.stderr)
+
+    def test_a_pin_with_no_version_and_a_repeated_key_are_refused(self):
+        """0002-packaging FR-014"""
+        root = self.copy()
+        f = self.pins(root)
+        text = f.read_text().replace('pm:pinKey "FISH"', 'pm:pinKey "GH"', 1)
+        text = re.sub(r'\n    pm:version "[^"]*"', "", text, count=1)
+        f.write_text(text)
+        p = self.run_tool(root)
+        self.assertEqual(p.returncode, 2)
+        self.assertIn("needs a name, a key and a version", p.stderr)
+
+    def test_a_repeated_key_is_refused(self):
+        """0002-packaging FR-014"""
+        root = self.copy()
+        f = self.pins(root)
+        f.write_text(f.read_text().replace('pm:pinKey "FISH"', 'pm:pinKey "GH"', 1))
+        p = self.run_tool(root)
+        self.assertEqual(p.returncode, 2)
+        self.assertIn("share the key GH", p.stderr)
+
+    def test_a_checksum_for_nothing_is_refused(self):
+        """0002-packaging FR-014"""
+        root = self.copy()
+        f = self.pins(root)
+        f.write_text(f.read_text().replace("pm:forPlatform pmid:platform-linux-x64", "pm:forPlatform pmid:platform-nowhere", 1))
+        self.assertIn("needs a pinned download, a platform and a SHA-256", self.run_tool(root).stderr)
 
     def copy(self) -> Path:
         tmp = Path(tempfile.mkdtemp())

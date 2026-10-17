@@ -46,6 +46,9 @@ commands that drive each manager, the package each family calls a program, what 
 - **FR-013**: A program that reads the TOML MUST ignore a table whose `schema` is newer than it understands and say so, MUST run a command as a list of words (never through a shell), and
   MUST run only executables its own allowlist names, so that a changed table cannot make it run something it does not know.
 
+- **FR-014**: The ontology MUST name the platforms a harness runs on (each with its name, operating system, processor and the ending of its pin variables) and the downloads a script pins before any harness exists (each with a key, one version and a SHA-256 of 64 lower-case hexadecimal digits per platform), and the tool MUST write them to `commons/generated/pins.auto.env` (one `KEY=value` line each) and between `# >>> pins.auto >>>` and `# <<< pins.auto <<<` of `bin/archon-setup.sh`, and the platforms and pins into the TOML, so that a version or a checksum is written once. It MUST refuse, naming it, a pin with no version, a checksum that is not 64 digits, a platform or pin key used twice and a checksum for a platform or pin that does not exist.
+- **FR-015**: A harness that keeps a copy of the pins MUST take it from `pins.auto.env` and not from a person's hand, and MUST NOT fetch pins at run time: a pin is trusted because a maintainer committed it, so it is the one thing in the table that is not refreshed by an update.
+
 ## Out of scope
 
 - Acting on a family: what a harness does with the table (`archon`'s machine bootstrap specification).
