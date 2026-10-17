@@ -1563,3 +1563,21 @@ pmid:cmd-brew-query-candidate a pm:Command ;
     pm:template "brew info --json=v2 {package}" ;
     pm:origin "archon" .
 
+pmid:cmd-apt-query-version a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:QueryVersion ;
+    pm:template "dpkg-query -W -f=${Version} {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-pacman-query-version a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:QueryVersion ;
+    pm:template "pacman -Q {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-dnf-query-version a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:QueryVersion ;
+    pm:template "rpm -q --qf %{VERSION}-%{RELEASE} {package}" ;
+    pm:origin "archon" .
+

@@ -31,9 +31,9 @@ BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n",
 
 PM = Namespace("https://www.intellectualfrontiers.com/ontology/packaging#")
 SCHEMA_VERSION = 1
-OPS = ("install", "remove", "upgrade", "upgrade-all", "search", "info", "refresh", "list-installed", "query-installed", "query-candidate")
+OPS = ("install", "remove", "upgrade", "upgrade-all", "search", "info", "refresh", "list-installed", "query-installed", "query-candidate", "query-version")
 OP_OF = {PM.Install: "install", PM.Remove: "remove", PM.Upgrade: "upgrade", PM.UpgradeAll: "upgrade-all", PM.Search: "search", PM.Info: "info", PM.Refresh: "refresh",
-         PM.ListInstalled: "list-installed", PM.QueryInstalled: "query-installed", PM.QueryCandidate: "query-candidate"}
+         PM.ListInstalled: "list-installed", PM.QueryInstalled: "query-installed", PM.QueryCandidate: "query-candidate", PM.QueryVersion: "query-version"}
 ASSURANCE = {PM.Verified: "verified", PM.StandIn: "stand-in", PM.Untested: "untested", PM.NoAssurance: "none"}
 KIND = {PM.SystemKind: "system", PM.HelperKind: "helper", PM.UniversalKind: "universal"}
 TIER = {PM.Required: "required", PM.Comfort: "comfort"}

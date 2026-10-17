@@ -62,6 +62,7 @@ pm:Info a pm:Operation ; rdfs:label "info"@en .
 pm:Refresh a pm:Operation ; rdfs:label "refresh index"@en .
 pm:ListInstalled a pm:Operation ; rdfs:label "list installed"@en .
 pm:QueryInstalled a pm:Operation ; rdfs:label "query installed"@en ; skos:definition "Whether one package is installed: the exit status answers."@en .
+pm:QueryVersion a pm:Operation ; rdfs:label "query version"@en ; skos:definition "The version of one installed package, for an SBOM: the command prints it."@en .
 pm:QueryCandidate a pm:Operation ; rdfs:label "query candidate"@en ; skos:definition "Whether the repositories offer one package, and which version."@en .
 
 pm:Supported a pm:SupportStatus ; rdfs:label "supported"@en .
