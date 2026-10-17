@@ -330,8 +330,13 @@ exit 0
     def test_the_prompt_choice_is_handed_to_archon_shell_and_the_font_hint_comes_with_the_pretty_prompt(self):
         """0136-machine-bootstrap FR-010; 0138-shell FR-009"""
         pretty = self.go()
-        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "Install for all users", "Windows Terminal", "archon shell set prompt plain"):
+        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "~/.local/share/fonts", "fc-cache", "archon shell set prompt plain"):
             self.assertIn(line, pretty.stdout)
+        for line in ("Windows Terminal", "Install for all users", "not inside Debian"):
+            self.assertNotIn(line, pretty.stdout, "the steps for Windows are for WSL alone")
+        wsl = self.go(WSL_DISTRO_NAME="Debian")
+        for line in ("Install for all users", "Windows Terminal"):
+            self.assertIn(line, wsl.stdout)
         self.assertNotIn("shell set prompt", self.calls.read_text(), "without a choice archon's default stands")
         plain = self.go(BOOTSTRAP_PROMPT="plain")
         self.assertIn("ARCHON shell set prompt plain", self.calls.read_text())

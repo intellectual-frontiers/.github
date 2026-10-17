@@ -1976,7 +1976,7 @@ finish() {
     say "Sign in with ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}, or export ${b}GH_TOKEN${z}, then run this again: it installs just these."
   fi
   if [ "$prompt" = pretty ] && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ] && [ "${shell_ran:-0}" = 1 ]; then
-    font_where="in the program that shows your terminal window (not inside Debian)"
+    font_where="in the settings of your terminal program"
     [ "$wsl" = 1 ] && font_where="in Windows (not in Debian)"
     [ "$goos" = darwin ] && font_where="on this Mac"
     say ""
@@ -1990,10 +1990,13 @@ finish() {
       say "  ${c}2.${z} Open the font files and click Install Font in Font Book."
       say "  ${c}3.${z} In Terminal: Settings, Profiles, Text, Change, choose"
       say "     ${b}CaskaydiaCove Nerd Font${z} (iTerm2 and VS Code have a font setting too)."
-    else
+    elif [ "$wsl" = 1 ]; then
       say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
       say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
       say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
+    else
+      say "  ${c}2.${z} Copy the font files into ${b}~/.local/share/fonts${z}, then run ${b}fc-cache -f${z}."
+      say "  ${c}3.${z} In your terminal program's settings, set the font to ${b}CaskaydiaCove Nerd Font${z}."
     fi
     say "${d}No font wanted? Run ${z}${b}archon shell set prompt plain${z}${d}: the same${z}"
     say "${d}prompt made of emoji and lines.${z}"
@@ -2017,7 +2020,8 @@ finish() {
   esac
   if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
     say ""
-    say "${d}Not installed, because no archon command needs them: fish (not on a Mac), the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
+    no_fish="fish,"; [ "$goos" = darwin ] && no_fish="fish (there is none for a Mac),"
+    say "${d}Not installed, because no archon command needs them: $no_fish the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
     say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (archon-bootstrap.sh does by default).${z}"
   fi
   if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
