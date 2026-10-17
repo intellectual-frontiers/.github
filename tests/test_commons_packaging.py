@@ -444,49 +444,13 @@ class Consumers(unittest.TestCase):
 
 
 class Specs(unittest.TestCase):
-    """The commons specifications keep archon's format (0024-spec-format there), checked here by shape because archon's own checks read archon's ontology (0001-software-supply-chain FR-001)."""
+    """What only commons asks of its own specifications; the format is the shared tool's (test_commons_speckit)."""
 
-    def specs(self):
-        return sorted(p for p in SPECS.iterdir() if p.is_dir())
-
-    def test_every_spec_is_numbered_registered_and_in_the_order_of_sections_archon_uses(self):
-        registry = [l.split("\t") for l in (COMMONS / "spec-kit" / "registry.tsv").read_text().splitlines()[1:]]
-        self.assertEqual([(r[0] + "-" + r[1]) for r in registry], [p.name for p in self.specs()])
-        order = ["**Input:**", "## Out of scope", "## Edge cases", "## Assumptions", "## Open questions", "## Key entities", "## Success criteria", "## Review & acceptance checklist"]
-        for d in self.specs():
+    def test_every_commons_spec_is_of_the_commons_domain_and_cites_archons_by_repository(self):
+        for d in sorted(p for p in SPECS.iterdir() if p.is_dir()):
             text = (d / "spec.md").read_text()
-            self.assertTrue(re.match(r"^# Feature Specification: ", text), d.name)
-            self.assertIn(f"**Spec ID:** {d.name}", text)
-            self.assertIn("**Domain:** commons", text)
-            at = [text.index(h) for h in order]
-            self.assertEqual(at, sorted(at), f"{d.name}: sections out of order")
-            self.assertNotIn("0136-machine-bootstrap", text, "a spec of archon is not cited by its bare id from here")
-
-    def test_every_requirement_has_one_row_in_the_register_and_no_row_names_none_that_exists(self):
-        """0001-software-supply-chain: every requirement has a test or says why it has none"""
-        reqs = []
-        for d in self.specs():
-            nums = re.findall(r"^- \*\*FR-(\d+)\*\*", (d / "spec.md").read_text(), re.M)
-            self.assertEqual(nums, sorted(set(nums)), f"{d.name}: requirement numbers repeat or are out of order")
-            reqs += [f"{d.name} FR-{n}" for n in nums]
-        rows_ = [l.split("\t") for l in (COMMONS / "spec-kit" / "enforcement.tsv").read_text().splitlines() if l and not l.startswith("#") and not l.startswith("requirement")]
-        self.assertEqual(sorted(r[0] for r in rows_), sorted(reqs))
-        for r in rows_:
-            self.assertIn(r[1], ("check", "gate", "review", "none"), r[0])
-            if r[1] == "check":
-                self.assertTrue(r[2].startswith((".github: ", "archon: ")), r[0])   # a consumer harness may enforce a requirement in its own tests
-            if r[1] == "none":
-                self.assertTrue(r[3], f"{r[0]} says why it is enforced by nothing")
-
-    def test_every_edge_case_cites_a_requirement_that_exists(self):
-        for d in self.specs():
-            text = (d / "spec.md").read_text()
-            frs = set(re.findall(r"^- \*\*(FR-\d+)\*\*", text, re.M))
-            section = text.split("## Edge cases")[1].split("## Assumptions")[0]
-            for line in (b.replace("\n  ", " ") for b in re.split(r"\n(?=- )", section.strip())):
-                cited = re.findall(r"FR-\d+", line)
-                self.assertTrue(cited, f"{d.name}: an edge case cites no requirement: {line[:60]}")
-                self.assertTrue(set(cited) <= frs, f"{d.name}: an edge case cites a requirement that is not here: {line[:60]}")
+            self.assertIn("**Domain:** commons", text, d.name)
+            self.assertNotRegex(text, r"(?<!archon )0136-machine-bootstrap", "a spec of archon is not cited by its bare id from here")
 
 
 if __name__ == "__main__":

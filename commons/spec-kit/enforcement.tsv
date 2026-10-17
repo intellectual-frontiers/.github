@@ -23,3 +23,10 @@ requirement	mechanism	by	note
 0002-packaging FR-013	check	archon: archon test	archon's packaging tests: only an allowed executable is run, shell syntax and forbidden commands are refused
 0002-packaging FR-014	check	.github: python3 -m unittest discover -s tests	Generated: pins and platforms are in the env file, the TOML and the script; Generator: a bad checksum, a pin with no version and a repeated key are refused
 0002-packaging FR-015	check	archon: archon test	archon's pin tests: its built-in pins are the file commons generates, and the store reads them
+0003-spec-kit FR-001	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-002	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-003	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-004	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-005	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-006	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-007	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named

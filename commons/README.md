@@ -7,6 +7,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 |---|---|---|
 | **Software supply chain** | Know what software a computer is made of, where each piece came from, and how to install it the same way everywhere. | [`0001-software-supply-chain`](spec-kit/specs/0001-software-supply-chain/spec.md) |
 | ↳ **Packaging** | The package managers and system families of every computer, the commands that drive them, the package each family calls a program, and how far each family has been tried. | [`0002-packaging`](spec-kit/specs/0002-packaging/spec.md) |
+| **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the standard-library tool that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
 
 ## Layout
 
