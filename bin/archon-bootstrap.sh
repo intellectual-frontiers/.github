@@ -147,11 +147,11 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
 }
 
 # The words are the table's: what is installed stays (--needed), and never -Sy on Arch, which refreshes the list alone and leaves a rolling release partly upgraded (0136-machine-bootstrap FR-053;
-# commons 0002-packaging FR-005). apt's lock wait is this script's own.
+# commons 0002-packaging FR-005). apt's quiet flag and lock wait are this script's own.
 pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
   pr_fam=$1; pr_words=$2; shift 2
   pr_env=$(pm_environment "$pr_fam")
-  case $pr_fam in debian) pr_extra="-o DPkg::Lock::Timeout=180" ;; *) pr_extra="" ;; esac
+  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=180" ;; *) pr_extra="" ;; esac
   # shellcheck disable=SC2086  # the table's words
   if [ -n "$pr_env" ]; then $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else $sudo_cmd $pr_words $pr_extra "$@"; fi
 }

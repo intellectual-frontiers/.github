@@ -223,7 +223,8 @@ pmid:cmd-apk-install a pm:Command ;
     pm:commandOf pmid:manager-apk ;
     pm:operation pm:Install ;
     pm:template "apk add {packages}" ;
-    pm:origin "upt" .
+    pm:nonInteractive "apk add --no-cache {packages}" ;
+    pm:origin "archon" .
 
 pmid:cmd-apk-remove a pm:Command ;
     pm:commandOf pmid:manager-apk ;
@@ -271,7 +272,7 @@ pmid:cmd-apt-install a pm:Command ;
     pm:commandOf pmid:manager-apt ;
     pm:operation pm:Install ;
     pm:template "apt install {packages}" ;
-    pm:nonInteractive "apt-get install -y -qq {packages}" ;
+    pm:nonInteractive "apt-get install -y {packages}" ;
     pm:origin "archon" ;
     pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
 
@@ -303,7 +304,7 @@ pmid:cmd-apt-refresh a pm:Command ;
     pm:commandOf pmid:manager-apt ;
     pm:operation pm:Refresh ;
     pm:template "apt update" ;
-    pm:nonInteractive "apt-get update -qq" ;
+    pm:nonInteractive "apt-get update" ;
     pm:origin "archon" ;
     pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
 
@@ -337,7 +338,8 @@ pmid:cmd-brew-install a pm:Command ;
     pm:commandOf pmid:manager-brew ;
     pm:operation pm:Install ;
     pm:template "brew install {packages}" ;
-    pm:origin "upt" .
+    pm:nonInteractive "brew install {packages}" ;
+    pm:origin "archon" .
 
 pmid:cmd-brew-remove a pm:Command ;
     pm:commandOf pmid:manager-brew ;
@@ -477,7 +479,7 @@ pmid:cmd-dnf-install a pm:Command ;
     pm:operation pm:Install ;
     pm:template "dnf install {packages}" ;
     pm:nonInteractive "dnf install -y {packages}" ;
-    pm:origin "upt+memory" .
+    pm:origin "archon" .
 
 pmid:cmd-dnf-remove a pm:Command ;
     pm:commandOf pmid:manager-dnf ;
@@ -1524,4 +1526,40 @@ pmid:cmd-zypper-list-installed a pm:Command ;
     pm:operation pm:ListInstalled ;
     pm:template "zypper search --installed-only" ;
     pm:origin "upt" .
+
+pmid:cmd-dnf-query-installed a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:QueryInstalled ;
+    pm:template "rpm -q {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-dnf-query-candidate a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:QueryCandidate ;
+    pm:template "dnf -q repoquery --latest-limit=1 --qf %{version} {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-apk-query-installed a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:QueryInstalled ;
+    pm:template "apk info -e {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-apk-query-candidate a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:QueryCandidate ;
+    pm:template "apk policy {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-brew-query-installed a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:QueryInstalled ;
+    pm:template "brew list --formula {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-brew-query-candidate a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:QueryCandidate ;
+    pm:template "brew info --json=v2 {package}" ;
+    pm:origin "archon" .
 

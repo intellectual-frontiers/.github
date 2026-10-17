@@ -66,6 +66,7 @@ pmid:family-debian a pm:SystemFamily ;
     pm:harnessInstallsPackages true .
 
 pmid:family-redhat a pm:SystemFamily ;
+    pm:note "archon's runtime can use dnf to install the libraries a program links against, untested; no script acts on this family." ;
     rdfs:label "Red Hat family"@en ;
     dcterms:identifier "redhat" ;
     pm:detectSource "os-release" ;
@@ -106,6 +107,7 @@ pmid:family-arch a pm:SystemFamily ;
     pm:harnessInstallsPackages true .
 
 pmid:family-alpine a pm:SystemFamily ;
+    pm:note "archon's runtime can use apk to install the libraries a program links against, untested; no script acts on this family." ;
     rdfs:label "Alpine family"@en ;
     dcterms:identifier "alpine" ;
     pm:detectSource "os-release" ;

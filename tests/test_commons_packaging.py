@@ -192,11 +192,11 @@ class ShellFragment(unittest.TestCase):
         facts = {
             "pm_manager debian": "apt", "pm_manager arch": "pacman", "pm_manager macos": "", "pm_manager redhat": "dnf",
             "pm_status debian": "supported", "pm_status redhat": "catalogued", "pm_assurance debian": "verified", "pm_assurance macos": "untested",
-            "pm_install_words debian": "apt-get install -y -qq", "pm_install_words arch": "pacman -S --needed --noconfirm", "pm_install_words redhat": "",
+            "pm_install_words debian": "apt-get install -y", "pm_install_words arch": "pacman -S --needed --noconfirm", "pm_install_words redhat": "",
             "pm_environment debian": "DEBIAN_FRONTEND=noninteractive", "pm_admin_install arch": "pacman -S --needed {packages}", "pm_admin_install redhat": "dnf install {packages}",
             "pm_removal_hint debian": "sudo deluser --remove-home NAME", "pm_removal_hint arch": "sudo userdel -r NAME", "pm_installs_packages macos": "no",
             "pm_package debian xz": "xz-utils", "pm_package arch xz": "xz", "pm_package arch gh": "github-cli", "pm_package debian gh": "gh", "pm_package macos git": "",
-            "pm_query_installed_words arch": "pacman -Qi", "pm_refresh_words debian": "apt-get update -qq", "pm_refresh_words arch": "",
+            "pm_query_installed_words arch": "pacman -Qi", "pm_refresh_words debian": "apt-get update", "pm_refresh_words arch": "",
         }
         for call, want in facts.items():
             self.assertEqual(self.call(f"{call}").stdout, want, call)
@@ -319,7 +319,7 @@ class Consumers(unittest.TestCase):
         for f in (SETUP, BOOT):
             text = outside_the_block(f.read_text())
             code = "\n".join(l for l in text.splitlines() if not l.lstrip().startswith("#"))
-            for needle in ("xz-utils", "github-cli", "apt-get install -y -qq", "pacman -S --needed --noconfirm", "dpkg-query -W", "apt-cache policy", "pacman -Qi", "pacman -Si", "DEBIAN_FRONTEND=noninteractive",
+            for needle in ("xz-utils", "github-cli", "apt-get install -y", "pacman -S --needed --noconfirm", "dpkg-query -W", "apt-cache policy", "pacman -Qi", "pacman -Si", "DEBIAN_FRONTEND=noninteractive",
                            "libmagickcore", "build-essential"):
                 self.assertNotIn(needle, code, f"{f.name} keeps {needle!r}, which the table holds")
             for fid, fam in t["families"].items():
