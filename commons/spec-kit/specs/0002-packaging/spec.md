@@ -49,6 +49,8 @@ commands that drive each manager, the package each family calls a program, what 
 - **FR-014**: The ontology MUST name the platforms a harness runs on (each with its name, operating system, processor and the ending of its pin variables) and the downloads a script pins before any harness exists (each with a key, one version and a SHA-256 of 64 lower-case hexadecimal digits per platform), and the tool MUST write them to `commons/generated/pins.auto.env` (one `KEY=value` line each) and between `# >>> pins.auto >>>` and `# <<< pins.auto <<<` of `bin/archon-setup.sh`, and the platforms and pins into the TOML, so that a version or a checksum is written once. It MUST refuse, naming it, a pin with no version, a checksum that is not 64 digits, a platform or pin key used twice and a checksum for a platform or pin that does not exist.
 - **FR-015**: A harness that keeps a copy of the pins MUST take it from `pins.auto.env` and not from a person's hand, and MUST NOT fetch pins at run time: a pin is trusted because a maintainer committed it, so it is the one thing in the table that is not refreshed by an update.
 
+- **FR-016**: The ontology MUST name the fields of the record a setup keeps of how an account was set up (`~/.config/archon/install.toml`): each with a name, a type (`text`, `boolean` or `date`), an order and a definition, and the values it may hold where it may hold only some; the tool MUST write them, in order, to `commons/generated/install-record.auto.toml`, and the script that writes the record MUST write exactly those fields in that order, so that what writes the record and what reads it cannot drift.
+
 ## Out of scope
 
 - Acting on a family: what a harness does with the table (`archon`'s machine bootstrap specification).

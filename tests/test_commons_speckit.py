@@ -47,11 +47,11 @@ class SpecKit(unittest.TestCase):
     def test_a_gap_a_repeated_number_and_a_missing_folder_in_the_register(self):
         """0003-spec-kit FR-001"""
         root = self.copy()
-        self.edit(root, "registry.tsv", "0003\tspec-kit\tin force", "0003\tspec-kit\tin force\n0003\tother\tin force\n0006\tnone\tin force")
+        self.edit(root, "registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0007\tnone\tin force")
         out = self.findings(root)
         self.assertIn("assigned twice", out)
-        self.assertIn("gap at 0004", out)
-        self.assertIn("0006-none is in force but its specification does not exist", out)
+        self.assertIn("gap at 0005", out)
+        self.assertIn("0007-none is in force but its specification does not exist", out)
 
     def test_a_spec_with_no_row_and_a_register_that_is_missing(self):
         """0003-spec-kit FR-001, FR-006"""

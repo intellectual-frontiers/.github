@@ -1,0 +1,62 @@
+# The record a setup script keeps of how an account was set up (commons 0002-packaging FR-016): the fields of ~/.config/archon/install.toml, in the order written, so that the script
+# that writes it and the harness that reads it cannot drift.
+
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pmid:record-method a pm:RecordField ;
+    pm:fieldName "method" ;
+    pm:fieldType "text" ;
+    pm:order 1 ;
+    skos:definition "How the account was set up: bootstrap (a computer set up whole) or setup (an account on a computer in use)."@en ;
+    pm:allowedValue "bootstrap" ;
+    pm:allowedValue "setup" .
+
+pmid:record-family a pm:RecordField ;
+    pm:fieldName "family" ;
+    pm:fieldType "text" ;
+    pm:order 2 ;
+    skos:definition "The system family, as the packaging table names it (debian, arch, macos)."@en .
+
+pmid:record-host a pm:RecordField ;
+    pm:fieldName "host" ;
+    pm:fieldType "text" ;
+    pm:order 3 ;
+    skos:definition "What the computer is: wsl, vm, container or machine."@en ;
+    pm:allowedValue "wsl" ;
+    pm:allowedValue "vm" ;
+    pm:allowedValue "container" ;
+    pm:allowedValue "machine" .
+
+pmid:record-distro a pm:RecordField ;
+    pm:fieldName "distro" ;
+    pm:fieldType "text" ;
+    pm:order 4 ;
+    skos:definition "The name the operating system gives itself (PRETTY_NAME of os-release, or the macOS version)."@en .
+
+pmid:record-arch a pm:RecordField ;
+    pm:fieldName "arch" ;
+    pm:fieldType "text" ;
+    pm:order 5 ;
+    skos:definition "The processor, as uname -m says it (x86_64, aarch64)."@en .
+
+pmid:record-comfort a pm:RecordField ;
+    pm:fieldName "comfort" ;
+    pm:fieldType "boolean" ;
+    pm:order 6 ;
+    skos:definition "Whether the everyday comfort programs were installed."@en .
+
+pmid:record-installed a pm:RecordField ;
+    pm:fieldName "installed" ;
+    pm:fieldType "date" ;
+    pm:order 7 ;
+    skos:definition "The day (YYYY-MM-DD) the account was first set up; a rerun keeps it."@en .
+
+pmid:record-refreshed a pm:RecordField ;
+    pm:fieldName "refreshed" ;
+    pm:fieldType "date" ;
+    pm:order 8 ;
+    skos:definition "The day (YYYY-MM-DD) the setup last ran."@en .

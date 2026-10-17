@@ -30,3 +30,8 @@ requirement	mechanism	by	note
 0003-spec-kit FR-005	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-006	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-007	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0002-packaging FR-016	check	.github: python3 -m unittest discover -s tests	Record: the script writes the fields of the generated record in order, with the allowed values; Generator: a bad field is refused
+0004-rules FR-001	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
+0004-rules FR-002	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
+0004-rules FR-003	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
+0004-rules FR-004	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts

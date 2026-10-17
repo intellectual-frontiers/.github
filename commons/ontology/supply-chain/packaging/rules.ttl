@@ -1,0 +1,511 @@
+# Rules a harness applies to its scripts, its CI and its code (commons 0004-rules): each is a pattern, a short name and the reason, in a set. A harness reads them from
+# generated/rules.auto.toml and decides where to apply them; the rules do not name any harness's paths.
+
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+pmid:rule-sh-find-printf a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bfind\\b[^|;]*-printf" ;
+    rdfs:label "find -printf"@en ;
+    skos:definition "BSD find has no -printf; use find with -exec stat or a shell loop"@en .
+
+pmid:rule-sh-mv-t a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bmv\\s+-[a-zA-Z]*T" ;
+    rdfs:label "mv -T"@en ;
+    skos:definition "BSD mv has no -T"@en .
+
+pmid:rule-sh-sed-x1b a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\\\x1b" ;
+    rdfs:label "sed \\x1b"@en ;
+    skos:definition "BSD sed does not read \\x1b; use printf to make the byte"@en .
+
+pmid:rule-sh-readlink-f a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\breadlink\\s+-f" ;
+    rdfs:label "readlink -f"@en ;
+    skos:definition "macOS readlink has no -f"@en .
+
+pmid:rule-sh-sed-i a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bsed\\s+-i\\b" ;
+    rdfs:label "sed -i"@en ;
+    skos:definition "sed -i differs between GNU and BSD"@en .
+
+pmid:rule-sh-date-d a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bdate\\s+-d\\b" ;
+    rdfs:label "date -d"@en ;
+    skos:definition "BSD date has no -d"@en .
+
+pmid:rule-sh-grep-p a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bgrep\\s+-[a-zA-Z]*P" ;
+    rdfs:label "grep -P"@en ;
+    skos:definition "BSD grep has no -P"@en .
+
+pmid:rule-sh-stat-c a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bstat\\s+-c" ;
+    rdfs:label "stat -c"@en ;
+    skos:definition "BSD stat uses -f"@en .
+
+pmid:rule-sh-xargs-r a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bxargs\\s+-r" ;
+    rdfs:label "xargs -r"@en ;
+    skos:definition "BSD xargs has no -r"@en .
+
+pmid:rule-sh-tar-xj a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\btar\\s+-x[a-zA-Z]*J" ;
+    rdfs:label "tar -xJ"@en ;
+    skos:definition "name the compressor, as bsdtar and GNU tar differ"@en .
+
+pmid:rule-sh-sed-s-i a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "/[gI]*I[gI]*[\\\"']" ;
+    rdfs:label "sed s///I"@en ;
+    skos:definition "the I flag of s is GNU only"@en .
+
+pmid:rule-sh-ls a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bls\\s+--" ;
+    rdfs:label "ls --"@en ;
+    skos:definition "long options of ls are GNU only"@en .
+
+pmid:rule-sh-bre-alternation a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\\\\\|" ;
+    rdfs:label "BRE alternation"@en ;
+    skos:definition "a backslash-pipe in a basic regular expression is GNU only; use sed -E or grep -E"@en .
+
+pmid:rule-sh-sha-sum a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bsha(256|512)sum\\b" ;
+    rdfs:label "sha*sum"@en ;
+    skos:definition "macOS has shasum; use the helper that picks one"@en .
+
+pmid:rule-sh-base64-d a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bbase64\\s+-d" ;
+    rdfs:label "base64 -d"@en ;
+    skos:definition "macOS base64 uses -D in older releases"@en .
+
+pmid:rule-sh-sort-v a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bsort\\s+-[a-zA-Z]*V" ;
+    rdfs:label "sort -V"@en ;
+    skos:definition "BSD sort has no -V"@en .
+
+pmid:rule-sh-cp-u-t a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bcp\\s+-[a-zA-Z]*[uT]" ;
+    rdfs:label "cp -u/-T"@en ;
+    skos:definition "BSD cp has no -u or -T"@en .
+
+pmid:rule-sh-ln-t a pm:Rule ;
+    pm:ruleSet "shell-portability" ;
+    pm:pattern "\\bln\\s+-[a-zA-Z]*T" ;
+    rdfs:label "ln -T"@en ;
+    skos:definition "BSD ln has no -T"@en .
+
+pmid:rule-ci-apt-get a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "apt-get" ;
+    rdfs:label "apt-get"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-apt a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "apt" ;
+    rdfs:label "apt"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-aptitude a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "aptitude" ;
+    rdfs:label "aptitude"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-dpkg a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "dpkg" ;
+    rdfs:label "dpkg"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-brew a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "brew" ;
+    rdfs:label "brew"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-yum a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "yum" ;
+    rdfs:label "yum"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-dnf a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "dnf" ;
+    rdfs:label "dnf"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-pacman a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "pacman" ;
+    rdfs:label "pacman"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-apk a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "apk" ;
+    rdfs:label "apk"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-snap a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "snap" ;
+    rdfs:label "snap"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-choco a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "choco" ;
+    rdfs:label "choco"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-winget a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "winget" ;
+    rdfs:label "winget"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-pip a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "pip" ;
+    rdfs:label "pip"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-pip3 a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "pip3" ;
+    rdfs:label "pip3"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-pipx a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "pipx" ;
+    rdfs:label "pipx"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-npm a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "npm" ;
+    rdfs:label "npm"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-npx a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "npx" ;
+    rdfs:label "npx"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-yarn a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "yarn" ;
+    rdfs:label "yarn"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-pnpm a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "pnpm" ;
+    rdfs:label "pnpm"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-corepack a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "corepack" ;
+    rdfs:label "corepack"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-gem a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "gem" ;
+    rdfs:label "gem"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-bundle a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "bundle" ;
+    rdfs:label "bundle"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-cargo a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "cargo" ;
+    rdfs:label "cargo"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-go-s-install a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "go\\s+install" ;
+    rdfs:label "go\\s+install"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-curl a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "curl" ;
+    rdfs:label "curl"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-wget a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "wget" ;
+    rdfs:label "wget"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-docker a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "docker" ;
+    rdfs:label "docker"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-podman a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "podman" ;
+    rdfs:label "podman"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-sudo a pm:Rule ;
+    pm:ruleSet "ci-forbidden-program" ;
+    pm:pattern "sudo" ;
+    rdfs:label "sudo"@en ;
+    skos:definition "a CI step does not install or fetch software, or take administrator rights, outside the launcher: the launcher fetches what it needs, pinned and checked"@en .
+
+pmid:rule-ci-setup-action a pm:Rule ;
+    pm:ruleSet "ci-forbidden-action" ;
+    pm:pattern "uses:\\s*actions/setup-(?:node|java|ruby|go|dotnet)" ;
+    rdfs:label "setup-action"@en ;
+    skos:definition "a CI step that installs a language with a setup action instead of the launcher"@en .
+
+pmid:rule-ci-docker-uses a pm:Rule ;
+    pm:ruleSet "ci-forbidden-action" ;
+    pm:pattern "uses:\\s*docker://" ;
+    rdfs:label "docker-uses"@en ;
+    skos:definition "a CI step that runs in a container image"@en .
+
+pmid:rule-ci-image-key a pm:Rule ;
+    pm:ruleSet "ci-forbidden-action" ;
+    pm:pattern "^\\s*(?:-\\s*)?(?:container|services|image):" ;
+    rdfs:label "image-key"@en ;
+    skos:definition "a CI job that runs in or beside a container image"@en .
+
+pmid:rule-host-convert a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "convert" ;
+    rdfs:label "convert"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-identify a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "identify" ;
+    rdfs:label "identify"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-magick a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "magick" ;
+    rdfs:label "magick"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdftotext a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdftotext" ;
+    rdfs:label "pdftotext"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdfinfo a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdfinfo" ;
+    rdfs:label "pdfinfo"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdffonts a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdffonts" ;
+    rdfs:label "pdffonts"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdfimages a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdfimages" ;
+    rdfs:label "pdfimages"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdftoppm a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdftoppm" ;
+    rdfs:label "pdftoppm"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-rsvg-convert a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "rsvg-convert" ;
+    rdfs:label "rsvg-convert"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-potrace a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "potrace" ;
+    rdfs:label "potrace"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-latexmk a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "latexmk" ;
+    rdfs:label "latexmk"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-xelatex a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "xelatex" ;
+    rdfs:label "xelatex"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-lualatex a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "lualatex" ;
+    rdfs:label "lualatex"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-pdflatex a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "pdflatex" ;
+    rdfs:label "pdflatex"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-node a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "node" ;
+    rdfs:label "node"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-npm a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "npm" ;
+    rdfs:label "npm"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-npx a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "npx" ;
+    rdfs:label "npx"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-chromium a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "chromium" ;
+    rdfs:label "chromium"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-chrome a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "chrome" ;
+    rdfs:label "chrome"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-java a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "java" ;
+    rdfs:label "java"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-host-asciidoctor a pm:Rule ;
+    pm:ruleSet "host-program" ;
+    pm:pattern "asciidoctor" ;
+    rdfs:label "asciidoctor"@en ;
+    skos:definition "a program a harness's command must get from its own toolchain, never from whatever the host has"@en .
+
+pmid:rule-installer-apt-get a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "apt-get" ;
+    rdfs:label "apt-get"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-apt a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "apt" ;
+    rdfs:label "apt"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-dpkg a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "dpkg" ;
+    rdfs:label "dpkg"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-brew a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "brew" ;
+    rdfs:label "brew"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-yum a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "yum" ;
+    rdfs:label "yum"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-dnf a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "dnf" ;
+    rdfs:label "dnf"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-pip a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "pip" ;
+    rdfs:label "pip"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-pip3 a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "pip3" ;
+    rdfs:label "pip3"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-pipx a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "pipx" ;
+    rdfs:label "pipx"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-npm a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "npm" ;
+    rdfs:label "npm"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-npx a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "npx" ;
+    rdfs:label "npx"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-gem a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "gem" ;
+    rdfs:label "gem"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
+
+pmid:rule-installer-cargo a pm:Rule ;
+    pm:ruleSet "installer" ;
+    pm:pattern "cargo" ;
+    rdfs:label "cargo"@en ;
+    skos:definition "a package manager or installer a harness's code must not call directly; it goes through the packaging table"@en .
