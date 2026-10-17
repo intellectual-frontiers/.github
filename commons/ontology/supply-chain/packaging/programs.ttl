@@ -1,0 +1,555 @@
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# The programs a computer needs for a harness's setup (required) and for the everyday comfort tools (comfort), and what each family calls their packages.
+# From archon-bootstrap.sh's package lists. A name left out for a family means that family needs no package for it.
+
+pmid:prog-git a pm:Program ;
+    rdfs:label "git"@en ;
+    pm:programName "git" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-git a pm:PackageName ;
+    pm:forProgram pmid:prog-git ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "git" .
+
+pmid:pkg-arch-git a pm:PackageName ;
+    pm:forProgram pmid:prog-git ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "git" .
+
+pmid:prog-ca-certificates a pm:Program ;
+    rdfs:label "ca-certificates"@en ;
+    pm:programName "ca-certificates" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-ca-certificates a pm:PackageName ;
+    pm:forProgram pmid:prog-ca-certificates ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "ca-certificates" .
+
+pmid:pkg-arch-ca-certificates a pm:PackageName ;
+    pm:forProgram pmid:prog-ca-certificates ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "ca-certificates" .
+
+pmid:prog-curl a pm:Program ;
+    rdfs:label "curl"@en ;
+    pm:programName "curl" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-curl a pm:PackageName ;
+    pm:forProgram pmid:prog-curl ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "curl" .
+
+pmid:pkg-arch-curl a pm:PackageName ;
+    pm:forProgram pmid:prog-curl ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "curl" .
+
+pmid:prog-wget a pm:Program ;
+    rdfs:label "wget"@en ;
+    pm:programName "wget" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-wget a pm:PackageName ;
+    pm:forProgram pmid:prog-wget ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "wget" .
+
+pmid:pkg-arch-wget a pm:PackageName ;
+    pm:forProgram pmid:prog-wget ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "wget" .
+
+pmid:prog-tar a pm:Program ;
+    rdfs:label "tar"@en ;
+    pm:programName "tar" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-tar a pm:PackageName ;
+    pm:forProgram pmid:prog-tar ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "tar" .
+
+pmid:pkg-arch-tar a pm:PackageName ;
+    pm:forProgram pmid:prog-tar ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "tar" .
+
+pmid:prog-xz a pm:Program ;
+    rdfs:label "xz"@en ;
+    pm:programName "xz" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-xz a pm:PackageName ;
+    pm:forProgram pmid:prog-xz ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "xz-utils" .
+
+pmid:pkg-arch-xz a pm:PackageName ;
+    pm:forProgram pmid:prog-xz ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "xz" .
+
+pmid:prog-unzip a pm:Program ;
+    rdfs:label "unzip"@en ;
+    pm:programName "unzip" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-unzip a pm:PackageName ;
+    pm:forProgram pmid:prog-unzip ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "unzip" .
+
+pmid:pkg-arch-unzip a pm:PackageName ;
+    pm:forProgram pmid:prog-unzip ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "unzip" .
+
+pmid:prog-jq a pm:Program ;
+    rdfs:label "jq"@en ;
+    pm:programName "jq" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-jq a pm:PackageName ;
+    pm:forProgram pmid:prog-jq ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "jq" .
+
+pmid:pkg-arch-jq a pm:PackageName ;
+    pm:forProgram pmid:prog-jq ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "jq" .
+
+pmid:prog-gh a pm:Program ;
+    rdfs:label "gh"@en ;
+    pm:programName "gh" ;
+    pm:tier pm:Required .
+
+pmid:pkg-debian-gh a pm:PackageName ;
+    pm:forProgram pmid:prog-gh ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "gh" .
+
+pmid:pkg-arch-gh a pm:PackageName ;
+    pm:forProgram pmid:prog-gh ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "github-cli" .
+
+pmid:prog-coreutils a pm:Program ;
+    rdfs:label "coreutils"@en ;
+    pm:programName "coreutils" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-coreutils a pm:PackageName ;
+    pm:forProgram pmid:prog-coreutils ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "coreutils" .
+
+pmid:pkg-arch-coreutils a pm:PackageName ;
+    pm:forProgram pmid:prog-coreutils ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "coreutils" .
+
+pmid:prog-sed a pm:Program ;
+    rdfs:label "sed"@en ;
+    pm:programName "sed" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-sed a pm:PackageName ;
+    pm:forProgram pmid:prog-sed ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "sed" .
+
+pmid:pkg-arch-sed a pm:PackageName ;
+    pm:forProgram pmid:prog-sed ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "sed" .
+
+pmid:prog-findutils a pm:Program ;
+    rdfs:label "findutils"@en ;
+    pm:programName "findutils" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-findutils a pm:PackageName ;
+    pm:forProgram pmid:prog-findutils ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "findutils" .
+
+pmid:pkg-arch-findutils a pm:PackageName ;
+    pm:forProgram pmid:prog-findutils ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "findutils" .
+
+pmid:prog-diffutils a pm:Program ;
+    rdfs:label "diffutils"@en ;
+    pm:programName "diffutils" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-diffutils a pm:PackageName ;
+    pm:forProgram pmid:prog-diffutils ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "diffutils" .
+
+pmid:pkg-arch-diffutils a pm:PackageName ;
+    pm:forProgram pmid:prog-diffutils ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "diffutils" .
+
+pmid:prog-patch a pm:Program ;
+    rdfs:label "patch"@en ;
+    pm:programName "patch" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-patch a pm:PackageName ;
+    pm:forProgram pmid:prog-patch ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "patch" .
+
+pmid:pkg-arch-patch a pm:PackageName ;
+    pm:forProgram pmid:prog-patch ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "patch" .
+
+pmid:prog-gzip a pm:Program ;
+    rdfs:label "gzip"@en ;
+    pm:programName "gzip" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-gzip a pm:PackageName ;
+    pm:forProgram pmid:prog-gzip ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "gzip" .
+
+pmid:pkg-arch-gzip a pm:PackageName ;
+    pm:forProgram pmid:prog-gzip ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "gzip" .
+
+pmid:prog-zip a pm:Program ;
+    rdfs:label "zip"@en ;
+    pm:programName "zip" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-zip a pm:PackageName ;
+    pm:forProgram pmid:prog-zip ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "zip" .
+
+pmid:pkg-arch-zip a pm:PackageName ;
+    pm:forProgram pmid:prog-zip ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "zip" .
+
+pmid:prog-bzip2 a pm:Program ;
+    rdfs:label "bzip2"@en ;
+    pm:programName "bzip2" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-bzip2 a pm:PackageName ;
+    pm:forProgram pmid:prog-bzip2 ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "bzip2" .
+
+pmid:pkg-arch-bzip2 a pm:PackageName ;
+    pm:forProgram pmid:prog-bzip2 ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "bzip2" .
+
+pmid:prog-file a pm:Program ;
+    rdfs:label "file"@en ;
+    pm:programName "file" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-file a pm:PackageName ;
+    pm:forProgram pmid:prog-file ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "file" .
+
+pmid:pkg-arch-file a pm:PackageName ;
+    pm:forProgram pmid:prog-file ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "file" .
+
+pmid:prog-less a pm:Program ;
+    rdfs:label "less"@en ;
+    pm:programName "less" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-less a pm:PackageName ;
+    pm:forProgram pmid:prog-less ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "less" .
+
+pmid:pkg-arch-less a pm:PackageName ;
+    pm:forProgram pmid:prog-less ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "less" .
+
+pmid:prog-debianutils a pm:Program ;
+    rdfs:label "debianutils"@en ;
+    pm:programName "debianutils" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-debianutils a pm:PackageName ;
+    pm:forProgram pmid:prog-debianutils ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "debianutils" .
+
+pmid:prog-procps a pm:Program ;
+    rdfs:label "procps"@en ;
+    pm:programName "procps" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-procps a pm:PackageName ;
+    pm:forProgram pmid:prog-procps ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "procps" .
+
+pmid:pkg-arch-procps a pm:PackageName ;
+    pm:forProgram pmid:prog-procps ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "procps-ng" .
+
+pmid:prog-hostname a pm:Program ;
+    rdfs:label "hostname"@en ;
+    pm:programName "hostname" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-hostname a pm:PackageName ;
+    pm:forProgram pmid:prog-hostname ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "hostname" .
+
+pmid:pkg-arch-hostname a pm:PackageName ;
+    pm:forProgram pmid:prog-hostname ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "inetutils" .
+
+pmid:prog-ncurses a pm:Program ;
+    rdfs:label "ncurses"@en ;
+    pm:programName "ncurses" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-ncurses a pm:PackageName ;
+    pm:forProgram pmid:prog-ncurses ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "ncurses-bin" .
+
+pmid:pkg-arch-ncurses a pm:PackageName ;
+    pm:forProgram pmid:prog-ncurses ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "ncurses" .
+
+pmid:prog-rsync a pm:Program ;
+    rdfs:label "rsync"@en ;
+    pm:programName "rsync" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-rsync a pm:PackageName ;
+    pm:forProgram pmid:prog-rsync ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "rsync" .
+
+pmid:pkg-arch-rsync a pm:PackageName ;
+    pm:forProgram pmid:prog-rsync ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "rsync" .
+
+pmid:prog-bc a pm:Program ;
+    rdfs:label "bc"@en ;
+    pm:programName "bc" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-bc a pm:PackageName ;
+    pm:forProgram pmid:prog-bc ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "bc" .
+
+pmid:pkg-arch-bc a pm:PackageName ;
+    pm:forProgram pmid:prog-bc ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "bc" .
+
+pmid:prog-grep a pm:Program ;
+    rdfs:label "grep"@en ;
+    pm:programName "grep" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-grep a pm:PackageName ;
+    pm:forProgram pmid:prog-grep ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "grep" .
+
+pmid:pkg-arch-grep a pm:PackageName ;
+    pm:forProgram pmid:prog-grep ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "grep" .
+
+pmid:prog-gawk a pm:Program ;
+    rdfs:label "gawk"@en ;
+    pm:programName "gawk" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-gawk a pm:PackageName ;
+    pm:forProgram pmid:prog-gawk ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "gawk" .
+
+pmid:pkg-arch-gawk a pm:PackageName ;
+    pm:forProgram pmid:prog-gawk ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "gawk" .
+
+pmid:prog-ripgrep a pm:Program ;
+    rdfs:label "ripgrep"@en ;
+    pm:programName "ripgrep" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-ripgrep a pm:PackageName ;
+    pm:forProgram pmid:prog-ripgrep ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "ripgrep" .
+
+pmid:pkg-arch-ripgrep a pm:PackageName ;
+    pm:forProgram pmid:prog-ripgrep ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "ripgrep" .
+
+pmid:prog-fd a pm:Program ;
+    rdfs:label "fd"@en ;
+    pm:programName "fd" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-fd a pm:PackageName ;
+    pm:forProgram pmid:prog-fd ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "fd-find" .
+
+pmid:pkg-arch-fd a pm:PackageName ;
+    pm:forProgram pmid:prog-fd ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "fd" .
+
+pmid:prog-bash-completion a pm:Program ;
+    rdfs:label "bash-completion"@en ;
+    pm:programName "bash-completion" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-bash-completion a pm:PackageName ;
+    pm:forProgram pmid:prog-bash-completion ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "bash-completion" .
+
+pmid:pkg-arch-bash-completion a pm:PackageName ;
+    pm:forProgram pmid:prog-bash-completion ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "bash-completion" .
+
+pmid:prog-python a pm:Program ;
+    rdfs:label "python"@en ;
+    pm:programName "python" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-python a pm:PackageName ;
+    pm:forProgram pmid:prog-python ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "python3" .
+
+pmid:pkg-arch-python a pm:PackageName ;
+    pm:forProgram pmid:prog-python ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "python" .
+
+pmid:prog-imagemagick a pm:Program ;
+    rdfs:label "imagemagick"@en ;
+    pm:programName "imagemagick" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-imagemagick a pm:PackageName ;
+    pm:forProgram pmid:prog-imagemagick ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "imagemagick" .
+
+pmid:pkg-arch-imagemagick a pm:PackageName ;
+    pm:forProgram pmid:prog-imagemagick ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "imagemagick" .
+
+pmid:prog-webp a pm:Program ;
+    rdfs:label "webp"@en ;
+    pm:programName "webp" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-webp a pm:PackageName ;
+    pm:forProgram pmid:prog-webp ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "webp" .
+
+pmid:pkg-arch-webp a pm:PackageName ;
+    pm:forProgram pmid:prog-webp ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "libwebp" .
+
+pmid:prog-sqlite a pm:Program ;
+    rdfs:label "sqlite"@en ;
+    pm:programName "sqlite" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-sqlite a pm:PackageName ;
+    pm:forProgram pmid:prog-sqlite ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "sqlite3" .
+
+pmid:pkg-arch-sqlite a pm:PackageName ;
+    pm:forProgram pmid:prog-sqlite ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "sqlite" .
+
+pmid:prog-shellcheck a pm:Program ;
+    rdfs:label "shellcheck"@en ;
+    pm:programName "shellcheck" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-shellcheck a pm:PackageName ;
+    pm:forProgram pmid:prog-shellcheck ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "shellcheck" .
+
+pmid:pkg-arch-shellcheck a pm:PackageName ;
+    pm:forProgram pmid:prog-shellcheck ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "shellcheck" .
+
+pmid:prog-imagemagick-codecs a pm:Program ;
+    rdfs:label "imagemagick-codecs"@en ;
+    pm:programName "imagemagick-codecs" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-imagemagick-codecs a pm:PackageName ;
+    pm:forProgram pmid:prog-imagemagick-codecs ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra" .
+
+pmid:prog-glab a pm:Program ;
+    rdfs:label "glab"@en ;
+    pm:programName "glab" ;
+    pm:tier pm:Comfort .
+
+pmid:pkg-debian-glab a pm:PackageName ;
+    pm:forProgram pmid:prog-glab ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "glab" .
+
+pmid:pkg-arch-glab a pm:PackageName ;
+    pm:forProgram pmid:prog-glab ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "glab" .
+

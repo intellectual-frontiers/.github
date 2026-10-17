@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5   # runs commons' generator, whose tests are skipped without it
       - name: Tools the tests use
         run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck jq git
       - name: Run the tests

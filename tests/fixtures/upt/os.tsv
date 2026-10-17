@@ -1,0 +1,22 @@
+family	os_ids	tools
+windows	windows	scoop,choco,winget
+macos	macos	brew,port
+debian	ubuntu debian linuxmint pop deepin elementary kali raspbian aosc zorin antix devuan bodhi lxle sparky	apt
+redhat	fedora redhat rhel amzn ol almalinux rocky oubes centos qubes eurolinux	dnf,yum
+arch	arch manjaro endeavouros arcolinux garuda antergos kaos	pacman
+alpine	alpine postmarket	apk
+suse	opensuse opensuse-leap opensuse-tumbleweed	zypper
+nixos	nixos	nix-env
+gentoo	gentoo funtoo	emerge
+void	void	xbps
+mageia	mageia	urpm
+slackware	slackware	slackpkg
+solus	solus	eopkg
+openwrt	openwrt	opkg
+nutyx	nutyx	cards
+crux	crux	prt-get
+freebsd	freebsd ghostbsd	pkg
+android	android	pkg(termux)
+haiku	haiku	pkgman
+msys2	windows/msys2	pacman
+any	*	apt,dnf,pacman

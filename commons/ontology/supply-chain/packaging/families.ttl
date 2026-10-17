@@ -1,0 +1,276 @@
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Seeded from the tables of sigoden/upt (https://github.com/sigoden/upt), dual-licensed MIT or Apache-2.0, copyright its authors; see tests/fixtures/upt/README.md.
+# What archon (a harness) runs, and what it knows about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
+# is written from knowledge and unverified: nothing acts on it until its family is supported and the command carries pm:verifiedOn.
+# `oubes`, which upt lists with the Red Hat family, is not an os-release ID this repository recognises and is left out.
+
+pmid:family-windows a pm:SystemFamily ;
+    rdfs:label "Windows"@en ;
+    dcterms:identifier "windows" ;
+    pm:detectSource "platform" ;
+    pm:detectedBy "windows" ;
+    pm:usesManager pmid:manager-scoop ;
+    pm:usesManager pmid:manager-choco ;
+    pm:usesManager pmid:manager-winget ;
+    pm:preferredManager pmid:manager-scoop ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-macos a pm:SystemFamily ;
+    pm:unameName "Darwin" ;
+    rdfs:label "macOS"@en ;
+    dcterms:identifier "macos" ;
+    pm:detectSource "platform" ;
+    pm:detectedBy "macos" ;
+    pm:usesManager pmid:manager-brew ;
+    pm:usesManager pmid:manager-port ;
+    pm:supportStatus pm:Supported ;
+    pm:assurance pm:Untested ;
+    pm:note "Written against stand-ins on Linux; no run on a Mac yet (0136-machine-bootstrap OQ-7)." ;
+    pm:removalHint "delete the user in System Settings, Users & Groups, with its home folder" ;
+    pm:harnessInstallsPackages false .
+
+pmid:family-debian a pm:SystemFamily ;
+    rdfs:label "Debian family"@en ;
+    dcterms:identifier "debian" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "ubuntu" ;
+    pm:detectedBy "debian" ;
+    pm:detectedBy "linuxmint" ;
+    pm:detectedBy "pop" ;
+    pm:detectedBy "deepin" ;
+    pm:detectedBy "elementary" ;
+    pm:detectedBy "kali" ;
+    pm:detectedBy "raspbian" ;
+    pm:detectedBy "aosc" ;
+    pm:detectedBy "zorin" ;
+    pm:detectedBy "antix" ;
+    pm:detectedBy "devuan" ;
+    pm:detectedBy "bodhi" ;
+    pm:detectedBy "lxle" ;
+    pm:detectedBy "sparky" ;
+    pm:usesManager pmid:manager-apt ;
+    pm:preferredManager pmid:manager-apt ;
+    pm:supportStatus pm:Supported ;
+    pm:assurance pm:Verified ;
+    pm:note "Debian is verified on Debian 13 under WSL 2. Ubuntu and Debian 12 are exercised by the container tests only." ;
+    pm:removalHint "sudo deluser --remove-home NAME" ;
+    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" ;
+    pm:adminInstall "apt-get install -y {packages}" ;
+    pm:harnessInstallsPackages true .
+
+pmid:family-redhat a pm:SystemFamily ;
+    rdfs:label "Red Hat family"@en ;
+    dcterms:identifier "redhat" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "fedora" ;
+    pm:detectedBy "redhat" ;
+    pm:detectedBy "rhel" ;
+    pm:detectedBy "amzn" ;
+    pm:detectedBy "ol" ;
+    pm:detectedBy "almalinux" ;
+    pm:detectedBy "rocky" ;
+    pm:detectedBy "centos" ;
+    pm:detectedBy "qubes" ;
+    pm:detectedBy "eurolinux" ;
+    pm:usesManager pmid:manager-dnf ;
+    pm:usesManager pmid:manager-yum ;
+    pm:preferredManager pmid:manager-dnf ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-arch a pm:SystemFamily ;
+    rdfs:label "Arch family"@en ;
+    dcterms:identifier "arch" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "arch" ;
+    pm:detectedBy "manjaro" ;
+    pm:detectedBy "endeavouros" ;
+    pm:detectedBy "arcolinux" ;
+    pm:detectedBy "garuda" ;
+    pm:detectedBy "antergos" ;
+    pm:detectedBy "kaos" ;
+    pm:usesManager pmid:manager-pacman ;
+    pm:preferredManager pmid:manager-pacman ;
+    pm:supportStatus pm:Supported ;
+    pm:assurance pm:StandIn ;
+    pm:note "Arch Linux is exercised in a container with stand-ins for pacman; Omarchy (ID_LIKE=arch) is untested (0136-machine-bootstrap OQ-6)." ;
+    pm:removalHint "sudo userdel -r NAME" ;
+    pm:adminInstall "pacman -S --needed {packages}" ;
+    pm:harnessInstallsPackages true .
+
+pmid:family-alpine a pm:SystemFamily ;
+    rdfs:label "Alpine family"@en ;
+    dcterms:identifier "alpine" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "alpine" ;
+    pm:detectedBy "postmarket" ;
+    pm:usesManager pmid:manager-apk ;
+    pm:preferredManager pmid:manager-apk ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-suse a pm:SystemFamily ;
+    rdfs:label "SUSE family"@en ;
+    dcterms:identifier "suse" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "opensuse" ;
+    pm:detectedBy "opensuse-leap" ;
+    pm:detectedBy "opensuse-tumbleweed" ;
+    pm:usesManager pmid:manager-zypper ;
+    pm:preferredManager pmid:manager-zypper ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-nixos a pm:SystemFamily ;
+    rdfs:label "NixOS"@en ;
+    dcterms:identifier "nixos" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "nixos" ;
+    pm:usesManager pmid:manager-nix-env ;
+    pm:preferredManager pmid:manager-nix-env ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-gentoo a pm:SystemFamily ;
+    rdfs:label "Gentoo family"@en ;
+    dcterms:identifier "gentoo" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "gentoo" ;
+    pm:detectedBy "funtoo" ;
+    pm:usesManager pmid:manager-emerge ;
+    pm:preferredManager pmid:manager-emerge ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-void a pm:SystemFamily ;
+    rdfs:label "Void Linux"@en ;
+    dcterms:identifier "void" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "void" ;
+    pm:usesManager pmid:manager-xbps ;
+    pm:preferredManager pmid:manager-xbps ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-mageia a pm:SystemFamily ;
+    rdfs:label "Mageia"@en ;
+    dcterms:identifier "mageia" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "mageia" ;
+    pm:usesManager pmid:manager-urpm ;
+    pm:preferredManager pmid:manager-urpm ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-slackware a pm:SystemFamily ;
+    rdfs:label "Slackware"@en ;
+    dcterms:identifier "slackware" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "slackware" ;
+    pm:usesManager pmid:manager-slackpkg ;
+    pm:preferredManager pmid:manager-slackpkg ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-solus a pm:SystemFamily ;
+    rdfs:label "Solus"@en ;
+    dcterms:identifier "solus" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "solus" ;
+    pm:usesManager pmid:manager-eopkg ;
+    pm:preferredManager pmid:manager-eopkg ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-openwrt a pm:SystemFamily ;
+    rdfs:label "OpenWrt"@en ;
+    dcterms:identifier "openwrt" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "openwrt" ;
+    pm:usesManager pmid:manager-opkg ;
+    pm:preferredManager pmid:manager-opkg ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-nutyx a pm:SystemFamily ;
+    rdfs:label "NuTyX"@en ;
+    dcterms:identifier "nutyx" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "nutyx" ;
+    pm:usesManager pmid:manager-cards ;
+    pm:preferredManager pmid:manager-cards ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-crux a pm:SystemFamily ;
+    rdfs:label "CRUX"@en ;
+    dcterms:identifier "crux" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "crux" ;
+    pm:usesManager pmid:manager-prt-get ;
+    pm:preferredManager pmid:manager-prt-get ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-freebsd a pm:SystemFamily ;
+    pm:unameName "FreeBSD" ;
+    rdfs:label "FreeBSD family"@en ;
+    dcterms:identifier "freebsd" ;
+    pm:detectSource "os-release" ;
+    pm:detectedBy "freebsd" ;
+    pm:detectedBy "ghostbsd" ;
+    pm:usesManager pmid:manager-freebsd-pkg ;
+    pm:preferredManager pmid:manager-freebsd-pkg ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-android a pm:SystemFamily ;
+    pm:unameName "Android" ;
+    rdfs:label "Android (Termux)"@en ;
+    dcterms:identifier "android" ;
+    pm:detectSource "platform" ;
+    pm:detectedBy "android" ;
+    pm:usesManager pmid:manager-termux-pkg ;
+    pm:preferredManager pmid:manager-termux-pkg ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-haiku a pm:SystemFamily ;
+    pm:unameName "Haiku" ;
+    rdfs:label "Haiku"@en ;
+    dcterms:identifier "haiku" ;
+    pm:detectSource "platform" ;
+    pm:detectedBy "haiku" ;
+    pm:usesManager pmid:manager-pkgman ;
+    pm:preferredManager pmid:manager-pkgman ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-msys2 a pm:SystemFamily ;
+    rdfs:label "Windows (MSYS2)"@en ;
+    dcterms:identifier "msys2" ;
+    pm:detectSource "platform" ;
+    pm:detectedBy "windows/msys2" ;
+    pm:usesManager pmid:manager-pacman ;
+    pm:preferredManager pmid:manager-pacman ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+
+pmid:family-any a pm:SystemFamily ;
+    rdfs:label "Any other computer"@en ;
+    dcterms:identifier "any" ;
+    pm:detectSource "any" ;
+    pm:detectedBy "*" ;
+    pm:usesManager pmid:manager-apt ;
+    pm:usesManager pmid:manager-dnf ;
+    pm:usesManager pmid:manager-pacman ;
+    pm:supportStatus pm:Catalogued ;
+    pm:assurance pm:NoAssurance .
+

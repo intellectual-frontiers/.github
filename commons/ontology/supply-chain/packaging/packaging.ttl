@@ -1,0 +1,120 @@
+# The packaging vocabulary of the software supply chain capability (commons 0002-packaging): what a package manager, a system family, a command and a package name are,
+# so that any harness can name what it installs, where each piece comes from and how to install it the same way on every computer.
+# Terms specialize schema.org where it has a class (schema:SoftwareApplication, schema:Action); an SBOM made from this capability writes a package URL with SPDX 3.0.1's Software/packageUrl;
+# every other term is this namespace's own, because no established vocabulary names it.
+
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.intellectualfrontiers.com/ontology/packaging> a owl:Ontology ;
+    rdfs:label "Packaging"@en ;
+    dcterms:description "The package managers and system families a harness installs software with, the commands that drive them, and the package each program is called."@en ;
+    owl:versionInfo "1" .
+
+# ---- classes ----------------------------------------------------------------------------------------------------------------------------------------
+
+pm:PackageManager a owl:Class ;
+    rdfs:label "Package manager"@en ;
+    rdfs:subClassOf schema:SoftwareApplication ;
+    skos:definition "A program that installs, upgrades and removes the software of a computer or of a user: apt, pacman, dnf, brew and the rest."@en .
+
+pm:SystemFamily a owl:Class ;
+    rdfs:label "System family"@en ;
+    rdfs:subClassOf schema:Thing ;
+    skos:definition "Operating systems that share a package manager and the names of their packages, named in the way a harness detects them: by the ID or ID_LIKE of /etc/os-release, or by the platform where there is none."@en .
+
+pm:Command a owl:Class ;
+    rdfs:label "Command"@en ;
+    rdfs:subClassOf schema:Action ;
+    skos:definition "One operation of one package manager as a command template: its words, with {packages} or {package} where the names go, and the form a script runs without asking a person."@en .
+
+pm:Prohibition a owl:Class ;
+    rdfs:label "Prohibition"@en ;
+    skos:definition "A command a harness must never run, with the reason: the rule is data, not a comment in a script."@en .
+
+pm:Program a owl:Class ;
+    rdfs:label "Program"@en ;
+    rdfs:subClassOf schema:SoftwareApplication ;
+    skos:definition "A program a computer needs, named once, whatever each family calls its package."@en .
+
+pm:PackageName a owl:Class ;
+    rdfs:label "Package name"@en ;
+    skos:definition "What one family calls the package that gives a program: xz-utils on the Debian family and xz on the Arch family, or alternatives (a|b) for releases that renamed it."@en .
+
+# individuals that name a kind
+pm:Operation a owl:Class ; rdfs:label "Operation"@en ; skos:definition "A thing a package manager does, named the same for every manager."@en .
+pm:SupportStatus a owl:Class ; rdfs:label "Support status"@en ; skos:definition "Whether a harness acts on a family (supported), or only knows of it (catalogued)."@en .
+pm:Assurance a owl:Class ; rdfs:label "Assurance"@en ; skos:definition "How far a family has been tried: on a real computer (verified), only against stand-ins (stand-in), not at all (untested), or not applicable (none, for what is only catalogued)."@en .
+pm:ManagerKind a owl:Class ; rdfs:label "Manager kind"@en ; skos:definition "system (the computer's own), helper (a front end to another manager or to a user repository) or universal (works on many systems)."@en .
+pm:Tier a owl:Class ; rdfs:label "Tier"@en ; skos:definition "required (what a setup needs from the computer) or comfort (the everyday programs a bootstrap adds)."@en .
+
+pm:Install a pm:Operation ; rdfs:label "install"@en .
+pm:Remove a pm:Operation ; rdfs:label "remove"@en .
+pm:Upgrade a pm:Operation ; rdfs:label "upgrade"@en .
+pm:UpgradeAll a pm:Operation ; rdfs:label "upgrade all"@en .
+pm:Search a pm:Operation ; rdfs:label "search"@en .
+pm:Info a pm:Operation ; rdfs:label "info"@en .
+pm:Refresh a pm:Operation ; rdfs:label "refresh index"@en .
+pm:ListInstalled a pm:Operation ; rdfs:label "list installed"@en .
+pm:QueryInstalled a pm:Operation ; rdfs:label "query installed"@en ; skos:definition "Whether one package is installed: the exit status answers."@en .
+pm:QueryCandidate a pm:Operation ; rdfs:label "query candidate"@en ; skos:definition "Whether the repositories offer one package, and which version."@en .
+
+pm:Supported a pm:SupportStatus ; rdfs:label "supported"@en .
+pm:Catalogued a pm:SupportStatus ; rdfs:label "catalogued"@en .
+pm:Verified a pm:Assurance ; rdfs:label "verified"@en .
+pm:StandIn a pm:Assurance ; rdfs:label "stand-in"@en .
+pm:Untested a pm:Assurance ; rdfs:label "untested"@en .
+pm:NoAssurance a pm:Assurance ; rdfs:label "none"@en .
+pm:SystemKind a pm:ManagerKind ; rdfs:label "system"@en .
+pm:HelperKind a pm:ManagerKind ; rdfs:label "helper"@en .
+pm:UniversalKind a pm:ManagerKind ; rdfs:label "universal"@en .
+pm:Required a pm:Tier ; rdfs:label "required"@en .
+pm:Comfort a pm:Tier ; rdfs:label "comfort"@en .
+
+# ---- properties: managers -------------------------------------------------------------------------------------------------------------------------
+
+pm:executable a owl:DatatypeProperty ; rdfs:domain pm:PackageManager ; rdfs:range xsd:string ; skos:definition "The program that is run (argv[0] of its commands)."@en .
+pm:kind a owl:ObjectProperty ; rdfs:domain pm:PackageManager ; rdfs:range pm:ManagerKind ; skos:definition "system, helper or universal."@en .
+pm:needsAdministrator a owl:DatatypeProperty ; rdfs:domain pm:PackageManager ; rdfs:range xsd:boolean ; skos:definition "Whether installing with it needs administrator rights. Not from upt; unverified unless the manager is verified."@en .
+pm:environment a owl:DatatypeProperty ; rdfs:domain pm:PackageManager ; rdfs:range xsd:string ; skos:definition "NAME=value that its non-interactive commands run with, such as DEBIAN_FRONTEND=noninteractive."@en .
+pm:purlType a owl:DatatypeProperty ; rdfs:domain pm:PackageManager ; rdfs:range xsd:string ; skos:definition "The package URL type of the packages it installs (deb, rpm, apk, alpm, brew); absent where the package URL specification has none."@en .
+pm:harnessUse a owl:DatatypeProperty ; rdfs:domain pm:PackageManager ; rdfs:range xsd:string ; skos:definition "never where a harness must not drive it (an AUR helper runs build scripts of unreviewed packages)."@en .
+
+# ---- properties: commands --------------------------------------------------------------------------------------------------------------------------
+
+pm:commandOf a owl:ObjectProperty ; rdfs:domain pm:Command ; rdfs:range pm:PackageManager ; skos:definition "The manager the command belongs to."@en .
+pm:operation a owl:ObjectProperty ; rdfs:domain pm:Command ; rdfs:range pm:Operation ; skos:definition "What the command does."@en .
+pm:template a owl:DatatypeProperty ; rdfs:domain pm:Command ; rdfs:range xsd:string ; skos:definition "Its words, separated by spaces, with {packages} (one or more names) or {package} (one) where the names go. No shell syntax: it is run as a list of words."@en .
+pm:nonInteractive a owl:DatatypeProperty ; rdfs:domain pm:Command ; rdfs:range xsd:string ; skos:definition "The same command in the form a script runs without asking anyone."@en .
+pm:origin a owl:DatatypeProperty ; rdfs:domain pm:Command ; rdfs:range xsd:string ; skos:definition "Where the command comes from: upt, archon (what a harness runs) or memory (written from knowledge, unverified)."@en .
+pm:verifiedOn a owl:DatatypeProperty ; skos:definition "Where and when it was run for real, in words. Without it, a command, a family or a flag is not verified."@en .
+
+pm:prohibitionOf a owl:ObjectProperty ; rdfs:domain pm:Prohibition ; rdfs:range pm:PackageManager ; skos:definition "The manager the prohibition is about."@en .
+pm:forbiddenTemplate a owl:DatatypeProperty ; rdfs:domain pm:Prohibition ; rdfs:range xsd:string ; skos:definition "The command (a template, as pm:template) that must never be run."@en .
+
+# ---- properties: families --------------------------------------------------------------------------------------------------------------------------
+
+pm:detectedBy a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:string ; skos:definition "An ID that puts a computer in the family: a word of the ID or ID_LIKE of /etc/os-release, or a platform name where there is no such file."@en .
+pm:detectSource a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:string ; skos:definition "os-release (the IDs are those of /etc/os-release), platform (they are names of a platform), or any (the fallback, the managers found on the PATH)."@en .
+pm:unameName a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:string ; skos:definition "What `uname -s` says on a platform family (Darwin for macOS), where /etc/os-release has none."@en .
+pm:usesManager a owl:ObjectProperty ; rdfs:domain pm:SystemFamily ; rdfs:range pm:PackageManager ; skos:definition "A manager the family has, in upt's order of preference when pm:preferredManager is not set."@en .
+pm:preferredManager a owl:ObjectProperty ; rdfs:domain pm:SystemFamily ; rdfs:range pm:PackageManager ; skos:definition "The manager a harness drives on the family."@en .
+pm:supportStatus a owl:ObjectProperty ; rdfs:domain pm:SystemFamily ; rdfs:range pm:SupportStatus ; skos:definition "Whether a harness acts on the family."@en .
+pm:assurance a owl:ObjectProperty ; rdfs:domain pm:SystemFamily ; rdfs:range pm:Assurance ; skos:definition "How far the family has been tried."@en .
+pm:harnessInstallsPackages a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:boolean ; skos:definition "False where a supported family installs no package (a Mac: the setup fetches what it needs itself)."@en .
+pm:removalHint a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:string ; skos:definition "How a user made for a harness is removed with its home folder, with NAME for the user."@en .
+pm:adminInstall a owl:DatatypeProperty ; rdfs:domain pm:SystemFamily ; rdfs:range xsd:string ; skos:definition "The command a person with administrator rights runs to install packages (a pm:template with {packages})."@en .
+pm:note a owl:DatatypeProperty ; skos:definition "A sentence a person needs, such as what is not covered by an assurance."@en .
+
+# ---- properties: programs and names ----------------------------------------------------------------------------------------------------------------
+
+pm:programName a owl:DatatypeProperty ; rdfs:domain pm:Program ; rdfs:range xsd:string ; skos:definition "What the program is called when it is run."@en .
+pm:tier a owl:ObjectProperty ; rdfs:domain pm:Program ; rdfs:range pm:Tier ; skos:definition "required or comfort."@en .
+pm:forProgram a owl:ObjectProperty ; rdfs:domain pm:PackageName ; rdfs:range pm:Program ; skos:definition "The program the package gives."@en .
+pm:forFamily a owl:ObjectProperty ; rdfs:domain pm:PackageName ; rdfs:range pm:SystemFamily ; skos:definition "The family that calls the package this."@en .
+pm:name a owl:DatatypeProperty ; rdfs:domain pm:PackageName ; rdfs:range xsd:string ; skos:definition "The package, or alternatives separated by | where a release renamed it."@en .

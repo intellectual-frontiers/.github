@@ -1,0 +1,23 @@
+# What enforces each requirement in this repository's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-software-supply-chain FR-001	check	.github: python3 -m unittest discover -s tests	Layout: the files the specification names are there
+0001-software-supply-chain FR-002	check	.github: python3 -m unittest discover -s tests	Generated and Generator: the files say they are generated, carry .auto. and are what the tool makes
+0001-software-supply-chain FR-003	none	-	a harness's own check names a copy of a fact the ontology holds; archon's lands with its wiring (0002-packaging FR-013)
+0001-software-supply-chain FR-004	none	-	the package URL is written into an SBOM, which is made in a later step; no SBOM exists yet
+0001-software-supply-chain FR-005	none	-	provenance is recorded by the harness that installs; the ontology holds the field, no check reads a harness's record yet
+0001-software-supply-chain FR-006	check	.github: python3 -m unittest discover -s tests	Generated: a family is verified only with where and when, and a catalogued family has no assurance
+0001-software-supply-chain FR-007	none	-	a property of the text, read by a person
+0002-packaging FR-001	check	.github: python3 -m unittest discover -s tests	Generator: a term with no definition is refused; Layout: the files are there
+0002-packaging FR-002	check	.github: python3 -m unittest discover -s tests	Generated: every manager and operating-system row of upt is in the table
+0002-packaging FR-003	check	.github: python3 -m unittest discover -s tests	Generated: upt is credited with its licence and the identifier left out is said
+0002-packaging FR-004	check	.github: python3 -m unittest discover -s tests	Generated: a supported family is complete and says how far it has been tried; Generator: a verified family with no where or when is refused
+0002-packaging FR-005	check	.github: python3 -m unittest discover -s tests	Generated: pacman -Sy and AUR helpers are prohibitions with reasons, and nothing usable is forbidden; Generator: a forbidden command is refused
+0002-packaging FR-006	check	.github: python3 -m unittest discover -s tests	Generated: a command is a list of words with no shell syntax; Generator: shell syntax is refused
+0002-packaging FR-007	check	.github: python3 -m unittest discover -s tests	Generated: every detecting ID detects one family; Generator: two families claiming one ID are refused
+0002-packaging FR-008	check	.github: python3 -m unittest discover -s tests	Generated: required programs are named for every supported family
+0002-packaging FR-009	check	.github: python3 -m unittest discover -s tests	Generator: the committed files are what the ontology makes, the same bytes twice, and a hand edit fails --check
+0002-packaging FR-010	check	.github: python3 -m unittest discover -s tests	Generator: every rule broken is named and nothing is written
+0002-packaging FR-011	check	.github: python3 -m unittest discover -s tests	Generated: the schema, the source hash and the content
+0002-packaging FR-012	check	.github: python3 -m unittest discover -s tests	ShellFragment: marks, POSIX sh, shellcheck, and what each function answers
+0002-packaging FR-013	none	-	what a reader of the table does is the harness's; archon's lands with its wiring and its tests

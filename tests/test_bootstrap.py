@@ -572,11 +572,11 @@ class Packages(unittest.TestCase):
 
 
 class Slim(unittest.TestCase):
-    def test_the_repository_holds_only_the_bootstrap_its_tests_and_the_organizations_profile(self):
+    def test_the_repository_holds_only_the_bootstrap_commons_its_tests_and_the_organizations_profile(self):
         """The rest of the harness lives in the private archon repository; this one stays small and public."""
         tracked = subprocess.run(["git", "ls-files"], cwd=HOME, capture_output=True, text=True, check=True).stdout.split()
         top = {t.split("/")[0] for t in tracked}
-        self.assertLessEqual(top, {".github", "bin", "profile", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
+        self.assertLessEqual(top, {".github", "bin", "commons", "profile", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
 
 
 

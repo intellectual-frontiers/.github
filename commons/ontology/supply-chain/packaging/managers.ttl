@@ -1,0 +1,1527 @@
+@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .
+@prefix pmid: <https://www.intellectualfrontiers.com/id/packaging/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Seeded from the tables of sigoden/upt (https://github.com/sigoden/upt), dual-licensed MIT or Apache-2.0, copyright its authors; see tests/fixtures/upt/README.md.
+# What archon (a harness) runs, and what it knows about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
+# is written from knowledge and unverified: nothing acts on it until its family is supported and the command carries pm:verifiedOn.
+
+pmid:manager-apk a pm:PackageManager ;
+    rdfs:label "apk"@en ;
+    dcterms:identifier "apk" ;
+    pm:executable "apk" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "apk" .
+
+pmid:manager-apt a pm:PackageManager ;
+    rdfs:label "apt"@en ;
+    dcterms:identifier "apt" ;
+    pm:executable "apt-get" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:environment "DEBIAN_FRONTEND=noninteractive" ;
+    pm:purlType "deb" .
+
+pmid:manager-brew a pm:PackageManager ;
+    rdfs:label "brew"@en ;
+    dcterms:identifier "brew" ;
+    pm:executable "brew" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false ;
+    pm:purlType "brew" .
+
+pmid:manager-cards a pm:PackageManager ;
+    rdfs:label "cards"@en ;
+    dcterms:identifier "cards" ;
+    pm:executable "cards" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-choco a pm:PackageManager ;
+    rdfs:label "choco"@en ;
+    dcterms:identifier "choco" ;
+    pm:executable "choco" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-dnf a pm:PackageManager ;
+    rdfs:label "dnf"@en ;
+    dcterms:identifier "dnf" ;
+    pm:executable "dnf" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "rpm" .
+
+pmid:manager-emerge a pm:PackageManager ;
+    rdfs:label "emerge"@en ;
+    dcterms:identifier "emerge" ;
+    pm:executable "emerge" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-eopkg a pm:PackageManager ;
+    rdfs:label "eopkg"@en ;
+    dcterms:identifier "eopkg" ;
+    pm:executable "eopkg" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-flatpak a pm:PackageManager ;
+    rdfs:label "flatpak"@en ;
+    dcterms:identifier "flatpak" ;
+    pm:executable "flatpak" ;
+    pm:kind pm:UniversalKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-guix a pm:PackageManager ;
+    rdfs:label "guix"@en ;
+    dcterms:identifier "guix" ;
+    pm:executable "guix" ;
+    pm:kind pm:UniversalKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-nala a pm:PackageManager ;
+    rdfs:label "nala"@en ;
+    dcterms:identifier "nala" ;
+    pm:executable "nala" ;
+    pm:kind pm:HelperKind ;
+    pm:needsAdministrator true ;
+    pm:environment "DEBIAN_FRONTEND=noninteractive" ;
+    pm:purlType "deb" .
+
+pmid:manager-nix-env a pm:PackageManager ;
+    rdfs:label "nix-env"@en ;
+    dcterms:identifier "nix-env" ;
+    pm:executable "nix-env" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-opkg a pm:PackageManager ;
+    rdfs:label "opkg"@en ;
+    dcterms:identifier "opkg" ;
+    pm:executable "opkg" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-pacman a pm:PackageManager ;
+    rdfs:label "pacman"@en ;
+    dcterms:identifier "pacman" ;
+    pm:executable "pacman" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "alpm" .
+
+pmid:manager-freebsd-pkg a pm:PackageManager ;
+    rdfs:label "pkg"@en ;
+    dcterms:identifier "freebsd-pkg" ;
+    pm:executable "pkg" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-termux-pkg a pm:PackageManager ;
+    rdfs:label "pkg(termux)"@en ;
+    dcterms:identifier "termux-pkg" ;
+    pm:executable "pkg" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-pkgman a pm:PackageManager ;
+    rdfs:label "pkgman"@en ;
+    dcterms:identifier "pkgman" ;
+    pm:executable "pkgman" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-prt-get a pm:PackageManager ;
+    rdfs:label "prt-get"@en ;
+    dcterms:identifier "prt-get" ;
+    pm:executable "prt-get" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-scoop a pm:PackageManager ;
+    rdfs:label "scoop"@en ;
+    dcterms:identifier "scoop" ;
+    pm:executable "scoop" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-slackpkg a pm:PackageManager ;
+    rdfs:label "slackpkg"@en ;
+    dcterms:identifier "slackpkg" ;
+    pm:executable "slackpkg" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-snap a pm:PackageManager ;
+    rdfs:label "snap"@en ;
+    dcterms:identifier "snap" ;
+    pm:executable "snap" ;
+    pm:kind pm:UniversalKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-urpm a pm:PackageManager ;
+    rdfs:label "urpm"@en ;
+    dcterms:identifier "urpm" ;
+    pm:executable "urpmi" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "rpm" .
+
+pmid:manager-winget a pm:PackageManager ;
+    rdfs:label "winget"@en ;
+    dcterms:identifier "winget" ;
+    pm:executable "winget" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator false .
+
+pmid:manager-xbps a pm:PackageManager ;
+    rdfs:label "xbps"@en ;
+    dcterms:identifier "xbps" ;
+    pm:executable "xbps-install" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true .
+
+pmid:manager-yay a pm:PackageManager ;
+    rdfs:label "yay"@en ;
+    dcterms:identifier "yay" ;
+    pm:executable "yay" ;
+    pm:kind pm:HelperKind ;
+    pm:needsAdministrator false ;
+    pm:purlType "alpm" ;
+    pm:harnessUse "never" .
+
+pmid:manager-yum a pm:PackageManager ;
+    rdfs:label "yum"@en ;
+    dcterms:identifier "yum" ;
+    pm:executable "yum" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "rpm" .
+
+pmid:manager-zypper a pm:PackageManager ;
+    rdfs:label "zypper"@en ;
+    dcterms:identifier "zypper" ;
+    pm:executable "zypper" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:purlType "rpm" .
+
+pmid:manager-port a pm:PackageManager ;
+    rdfs:label "port"@en ;
+    dcterms:identifier "port" ;
+    pm:executable "port" ;
+    pm:kind pm:SystemKind ;
+    pm:needsAdministrator true ;
+    pm:note "MacPorts: upt names it for macOS but gives no commands, so none are recorded." .
+
+pmid:cmd-apk-install a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Install ;
+    pm:template "apk add {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-remove a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Remove ;
+    pm:template "apk del {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Upgrade ;
+    pm:template "apk upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-search a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Search ;
+    pm:template "apk search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-info a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Info ;
+    pm:template "apk info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-refresh a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:Refresh ;
+    pm:template "apk update" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "apk upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-apk-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-apk ;
+    pm:operation pm:ListInstalled ;
+    pm:template "apk list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-install a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Install ;
+    pm:template "apt install {packages}" ;
+    pm:nonInteractive "apt-get install -y -qq {packages}" ;
+    pm:origin "archon" ;
+    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
+
+pmid:cmd-apt-remove a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Remove ;
+    pm:template "apt remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Upgrade ;
+    pm:template "apt install --only-upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-search a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Search ;
+    pm:template "apt search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-info a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Info ;
+    pm:template "apt show {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-refresh a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:Refresh ;
+    pm:template "apt update" ;
+    pm:nonInteractive "apt-get update -qq" ;
+    pm:origin "archon" ;
+    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
+
+pmid:cmd-apt-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "apt upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:ListInstalled ;
+    pm:template "apt list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-apt-query-installed a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:QueryInstalled ;
+    pm:template "dpkg-query -W -f=${Status} {package}" ;
+    pm:origin "archon" ;
+    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
+
+pmid:cmd-apt-query-candidate a pm:Command ;
+    pm:commandOf pmid:manager-apt ;
+    pm:operation pm:QueryCandidate ;
+    pm:template "apt-cache policy {package}" ;
+    pm:origin "archon" ;
+    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" .
+
+pmid:cmd-brew-install a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Install ;
+    pm:template "brew install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-remove a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Remove ;
+    pm:template "brew uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Upgrade ;
+    pm:template "brew upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-search a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Search ;
+    pm:template "brew search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-info a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Info ;
+    pm:template "brew info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-refresh a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:Refresh ;
+    pm:template "brew update" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "brew upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-brew-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-brew ;
+    pm:operation pm:ListInstalled ;
+    pm:template "brew list" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-install a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Install ;
+    pm:template "cards install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-remove a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Remove ;
+    pm:template "cards remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Upgrade ;
+    pm:template "cards install --upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-search a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Search ;
+    pm:template "cards search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-info a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Info ;
+    pm:template "cards info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-refresh a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:Refresh ;
+    pm:template "cards sync" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "cards upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-cards-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-cards ;
+    pm:operation pm:ListInstalled ;
+    pm:template "cards list" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-install a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:Install ;
+    pm:template "choco install {packages}" ;
+    pm:nonInteractive "choco install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-choco-remove a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:Remove ;
+    pm:template "choco uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:Upgrade ;
+    pm:template "choco upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-search a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:Search ;
+    pm:template "choco search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-info a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:Info ;
+    pm:template "choco info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "choco upgrade all" ;
+    pm:origin "upt" .
+
+pmid:cmd-choco-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-choco ;
+    pm:operation pm:ListInstalled ;
+    pm:template "choco list" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-install a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Install ;
+    pm:template "dnf install {packages}" ;
+    pm:nonInteractive "dnf install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-dnf-remove a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Remove ;
+    pm:template "dnf remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Upgrade ;
+    pm:template "dnf upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-search a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Search ;
+    pm:template "dnf search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-info a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Info ;
+    pm:template "dnf info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-refresh a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:Refresh ;
+    pm:template "dnf check-update" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "dnf update" ;
+    pm:origin "upt" .
+
+pmid:cmd-dnf-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-dnf ;
+    pm:operation pm:ListInstalled ;
+    pm:template "dnf list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-install a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Install ;
+    pm:template "emerge {packages}" ;
+    pm:nonInteractive "emerge --ask=n {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-emerge-remove a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Remove ;
+    pm:template "emerge --depclean {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Upgrade ;
+    pm:template "emerge --update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-search a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Search ;
+    pm:template "emerge --search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-info a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Info ;
+    pm:template "emerge --info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-refresh a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:Refresh ;
+    pm:template "emerge --sync" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "emerge -vuDN @world" ;
+    pm:origin "upt" .
+
+pmid:cmd-emerge-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-emerge ;
+    pm:operation pm:ListInstalled ;
+    pm:template "qlist -lv" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-install a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Install ;
+    pm:template "eopkg install {packages}" ;
+    pm:nonInteractive "eopkg install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-eopkg-remove a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Remove ;
+    pm:template "eopkg remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Upgrade ;
+    pm:template "eopkg upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-search a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Search ;
+    pm:template "eopkg search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-info a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Info ;
+    pm:template "eopkg info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-refresh a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:Refresh ;
+    pm:template "eopkg update-repo" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "eopkg upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-eopkg-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-eopkg ;
+    pm:operation pm:ListInstalled ;
+    pm:template "eopkg list-installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-install a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:Install ;
+    pm:template "flatpak install {packages}" ;
+    pm:nonInteractive "flatpak install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-flatpak-remove a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:Remove ;
+    pm:template "flatpak uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:Upgrade ;
+    pm:template "flatpak update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-search a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:Search ;
+    pm:template "flatpak search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-info a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:Info ;
+    pm:template "flatpak info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "flatpak update" ;
+    pm:origin "upt" .
+
+pmid:cmd-flatpak-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-flatpak ;
+    pm:operation pm:ListInstalled ;
+    pm:template "flatpak list" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-install a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Install ;
+    pm:template "guix install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-remove a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Remove ;
+    pm:template "guix remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Upgrade ;
+    pm:template "guix upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-search a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Search ;
+    pm:template "guix search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-info a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Info ;
+    pm:template "guix show {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-refresh a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:Refresh ;
+    pm:template "guix refresh" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "guix upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-guix-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-guix ;
+    pm:operation pm:ListInstalled ;
+    pm:template "guix package --list-installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-install a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Install ;
+    pm:template "nala install {packages}" ;
+    pm:nonInteractive "nala install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-nala-remove a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Remove ;
+    pm:template "nala remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Upgrade ;
+    pm:template "nala install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-search a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Search ;
+    pm:template "nala search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-info a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Info ;
+    pm:template "nala show {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-refresh a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:Refresh ;
+    pm:template "nala update" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "nala upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-nala-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-nala ;
+    pm:operation pm:ListInstalled ;
+    pm:template "nala list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-install a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Install ;
+    pm:template "nix-env --install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-remove a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Remove ;
+    pm:template "nix-env --uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Upgrade ;
+    pm:template "nix-env --upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-search a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Search ;
+    pm:template "nix-env -qaP {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-info a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Info ;
+    pm:template "nix-env -qa --description {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-refresh a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:Refresh ;
+    pm:template "nix-channel --update" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "nix-env --upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-nix-env-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-nix-env ;
+    pm:operation pm:ListInstalled ;
+    pm:template "nix-env --query --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-install a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Install ;
+    pm:template "opkg install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-remove a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Remove ;
+    pm:template "opkg remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Upgrade ;
+    pm:template "opkg upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-search a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Search ;
+    pm:template "opkg find {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-info a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Info ;
+    pm:template "opkg info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-refresh a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:Refresh ;
+    pm:template "opkg update" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "opkg upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-opkg-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-opkg ;
+    pm:operation pm:ListInstalled ;
+    pm:template "opkg list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-install a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:Install ;
+    pm:template "pacman -S {packages}" ;
+    pm:nonInteractive "pacman -S --needed --noconfirm {packages}" ;
+    pm:origin "archon" .
+
+pmid:cmd-pacman-remove a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:Remove ;
+    pm:template "pacman -Rs {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:Upgrade ;
+    pm:template "pacman -S {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-search a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:Search ;
+    pm:template "pacman -Ss {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-info a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:Info ;
+    pm:template "pacman -Si {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "pacman -Syu" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:ListInstalled ;
+    pm:template "pacman -Q" ;
+    pm:origin "upt" .
+
+pmid:cmd-pacman-query-installed a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:QueryInstalled ;
+    pm:template "pacman -Qi {package}" ;
+    pm:origin "archon" .
+
+pmid:cmd-pacman-query-candidate a pm:Command ;
+    pm:commandOf pmid:manager-pacman ;
+    pm:operation pm:QueryCandidate ;
+    pm:template "pacman -Si {package}" ;
+    pm:origin "archon" .
+
+pmid:prohibition-pacman-1 a pm:Prohibition ;
+    pm:prohibitionOf pmid:manager-pacman ;
+    pm:forbiddenTemplate "pacman -Sy" ;
+    skos:definition "Refreshing the package list alone leaves a rolling release partly upgraded; upgrade with -Syu, or install with -S --needed and let a missing package say the list is old."@en .
+
+pmid:prohibition-pacman-2 a pm:Prohibition ;
+    pm:prohibitionOf pmid:manager-pacman ;
+    pm:forbiddenTemplate "pacman -Sy {packages}" ;
+    skos:definition "Installing from a freshly refreshed list without upgrading the rest of the system is a partial upgrade."@en .
+
+pmid:cmd-freebsd-pkg-install a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Install ;
+    pm:template "pkg install {packages}" ;
+    pm:nonInteractive "pkg install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-freebsd-pkg-remove a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Remove ;
+    pm:template "pkg remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Upgrade ;
+    pm:template "pkg install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-search a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Search ;
+    pm:template "pkg search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-info a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Info ;
+    pm:template "pkg info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-refresh a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:Refresh ;
+    pm:template "pkg update" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "pkg upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-freebsd-pkg-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-freebsd-pkg ;
+    pm:operation pm:ListInstalled ;
+    pm:template "pkg info --all" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-install a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Install ;
+    pm:template "pkg install {packages}" ;
+    pm:nonInteractive "pkg install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-termux-pkg-remove a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Remove ;
+    pm:template "pkg uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Upgrade ;
+    pm:template "pkg install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-search a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Search ;
+    pm:template "pkg search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-info a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Info ;
+    pm:template "pkg show {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-refresh a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:Refresh ;
+    pm:template "pkg update" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "pkg upgrade" ;
+    pm:origin "upt" .
+
+pmid:cmd-termux-pkg-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-termux-pkg ;
+    pm:operation pm:ListInstalled ;
+    pm:template "pkg list-installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-install a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:Install ;
+    pm:template "pkgman install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-remove a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:Remove ;
+    pm:template "pkgman uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:Upgrade ;
+    pm:template "pkgman update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-search a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:Search ;
+    pm:template "pkgman search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-refresh a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:Refresh ;
+    pm:template "pkgman refresh" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "pkgman update" ;
+    pm:origin "upt" .
+
+pmid:cmd-pkgman-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-pkgman ;
+    pm:operation pm:ListInstalled ;
+    pm:template "pkgman search -i -a" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-install a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Install ;
+    pm:template "prt-get install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-remove a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Remove ;
+    pm:template "prt-get remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Upgrade ;
+    pm:template "prt-get update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-search a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Search ;
+    pm:template "prt-get search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-info a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Info ;
+    pm:template "prt-get info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-refresh a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:Refresh ;
+    pm:template "ports -u" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "prt-get sysup" ;
+    pm:origin "upt" .
+
+pmid:cmd-prt-get-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-prt-get ;
+    pm:operation pm:ListInstalled ;
+    pm:template "prt-get listinst" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-install a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Install ;
+    pm:template "scoop install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-remove a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Remove ;
+    pm:template "scoop uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Upgrade ;
+    pm:template "scoop update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-search a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Search ;
+    pm:template "scoop search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-info a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Info ;
+    pm:template "scoop info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-refresh a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:Refresh ;
+    pm:template "scoop update" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "scoop update *" ;
+    pm:origin "upt" .
+
+pmid:cmd-scoop-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-scoop ;
+    pm:operation pm:ListInstalled ;
+    pm:template "scoop list" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-install a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Install ;
+    pm:template "slackpkg install {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-remove a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Remove ;
+    pm:template "slackpkg remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Upgrade ;
+    pm:template "slackpkg upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-search a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Search ;
+    pm:template "slackpkg search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-info a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Info ;
+    pm:template "slackpkg info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-refresh a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:Refresh ;
+    pm:template "slackpkg update" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "slackpkg upgrade-all" ;
+    pm:origin "upt" .
+
+pmid:cmd-slackpkg-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-slackpkg ;
+    pm:operation pm:ListInstalled ;
+    pm:template "ls -1 /var/log/packages" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-install a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:Install ;
+    pm:template "snap install --classic {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-remove a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:Remove ;
+    pm:template "snap remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:Upgrade ;
+    pm:template "snap refresh {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-search a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:Search ;
+    pm:template "snap find {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-info a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:Info ;
+    pm:template "snap info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "snap refresh" ;
+    pm:origin "upt" .
+
+pmid:cmd-snap-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-snap ;
+    pm:operation pm:ListInstalled ;
+    pm:template "snap list" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-install a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Install ;
+    pm:template "urpmi {packages}" ;
+    pm:nonInteractive "urpmi --auto {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-urpm-remove a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Remove ;
+    pm:template "urpme {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Upgrade ;
+    pm:template "urpmi {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-search a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Search ;
+    pm:template "urpmq --fuzzy {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-info a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Info ;
+    pm:template "urpmq -i {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-refresh a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:Refresh ;
+    pm:template "urpmi.update -a" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "urpmi --auto-update" ;
+    pm:origin "upt" .
+
+pmid:cmd-urpm-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-urpm ;
+    pm:operation pm:ListInstalled ;
+    pm:template "rpm --query --all" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-install a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:Install ;
+    pm:template "winget install {packages}" ;
+    pm:nonInteractive "winget install --accept-package-agreements --accept-source-agreements {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-winget-remove a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:Remove ;
+    pm:template "winget uninstall {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:Upgrade ;
+    pm:template "winget upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-search a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:Search ;
+    pm:template "winget search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-info a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:Info ;
+    pm:template "winget show {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "winget upgrade --all" ;
+    pm:origin "upt" .
+
+pmid:cmd-winget-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-winget ;
+    pm:operation pm:ListInstalled ;
+    pm:template "winget list" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-install a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Install ;
+    pm:template "xbps-install {packages}" ;
+    pm:nonInteractive "xbps-install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-xbps-remove a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Remove ;
+    pm:template "xbps-remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Upgrade ;
+    pm:template "xbps-install --update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-search a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Search ;
+    pm:template "xbps-query -Rs {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-info a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Info ;
+    pm:template "xbps-query -RS {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-refresh a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:Refresh ;
+    pm:template "xbps-install --sync" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "xbps-install --update" ;
+    pm:origin "upt" .
+
+pmid:cmd-xbps-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-xbps ;
+    pm:operation pm:ListInstalled ;
+    pm:template "xbps-query --list-pkgs" ;
+    pm:origin "upt" .
+
+pmid:cmd-yay-remove a pm:Command ;
+    pm:commandOf pmid:manager-yay ;
+    pm:operation pm:Remove ;
+    pm:template "yay -Rs {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yay-search a pm:Command ;
+    pm:commandOf pmid:manager-yay ;
+    pm:operation pm:Search ;
+    pm:template "yay -Ss {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yay-info a pm:Command ;
+    pm:commandOf pmid:manager-yay ;
+    pm:operation pm:Info ;
+    pm:template "yay -Si {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yay-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-yay ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "yay -Syu" ;
+    pm:origin "upt" .
+
+pmid:cmd-yay-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-yay ;
+    pm:operation pm:ListInstalled ;
+    pm:template "yay -Q" ;
+    pm:origin "upt" .
+
+pmid:prohibition-yay-1 a pm:Prohibition ;
+    pm:prohibitionOf pmid:manager-yay ;
+    pm:forbiddenTemplate "yay -S {packages}" ;
+    skos:definition "An AUR helper builds and runs scripts of packages nobody reviewed with the person's rights; a harness never drives one."@en .
+
+pmid:prohibition-yay-2 a pm:Prohibition ;
+    pm:prohibitionOf pmid:manager-yay ;
+    pm:forbiddenTemplate "yay -Sy" ;
+    skos:definition "A refresh alone is a partial upgrade, and a harness never drives an AUR helper."@en .
+
+pmid:cmd-yum-install a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Install ;
+    pm:template "yum install {packages}" ;
+    pm:nonInteractive "yum install -y {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-yum-remove a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Remove ;
+    pm:template "yum remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Upgrade ;
+    pm:template "yum upgrade {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-search a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Search ;
+    pm:template "yum search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-info a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Info ;
+    pm:template "yum info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-refresh a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:Refresh ;
+    pm:template "yum check-update" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "yum update" ;
+    pm:origin "upt" .
+
+pmid:cmd-yum-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-yum ;
+    pm:operation pm:ListInstalled ;
+    pm:template "yum list --installed" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-install a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Install ;
+    pm:template "zypper install {packages}" ;
+    pm:nonInteractive "zypper --non-interactive install {packages}" ;
+    pm:origin "upt+memory" .
+
+pmid:cmd-zypper-remove a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Remove ;
+    pm:template "zypper remove {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-upgrade a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Upgrade ;
+    pm:template "zypper update {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-search a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Search ;
+    pm:template "zypper search {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-info a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Info ;
+    pm:template "zypper info {packages}" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-refresh a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:Refresh ;
+    pm:template "zypper refresh" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-upgrade-all a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:UpgradeAll ;
+    pm:template "zypper update" ;
+    pm:origin "upt" .
+
+pmid:cmd-zypper-list-installed a pm:Command ;
+    pm:commandOf pmid:manager-zypper ;
+    pm:operation pm:ListInstalled ;
+    pm:template "zypper search --installed-only" ;
+    pm:origin "upt" .
+
