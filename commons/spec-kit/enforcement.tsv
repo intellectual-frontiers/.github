@@ -4,8 +4,8 @@ requirement	mechanism	by	note
 0001-software-supply-chain FR-001	check	.github: python3 -m unittest discover -s tests	Layout: the files the specification names are there
 0001-software-supply-chain FR-002	check	.github: python3 -m unittest discover -s tests	Generated and Generator: the files say they are generated, carry .auto. and are what the tool makes
 0001-software-supply-chain FR-003	check	.github: python3 -m unittest discover -s tests	Consumers: the setup carries exactly the generated fragment, and neither script keeps a package name, a command or a detecting ID the table holds; archon's own check follows its wiring
-0001-software-supply-chain FR-004	none	-	the package URL is written into an SBOM, which is made in a later step; no SBOM exists yet
-0001-software-supply-chain FR-005	none	-	provenance is recorded by the harness that installs; the ontology holds the field, no check reads a harness's record yet
+0001-software-supply-chain FR-004	check	archon: archon test	archon's SBOM tests: components carry package URLs of the type the table names, percent-encoded, and the document validates against SPDX 3.0.1
+0001-software-supply-chain FR-005	check	archon: archon test	archon's SBOM tests: pinned programs carry the lock's download address and SHA-256, system packages the manager that supplied them
 0001-software-supply-chain FR-006	check	.github: python3 -m unittest discover -s tests	Generated: a family is verified only with where and when, and a catalogued family has no assurance
 0001-software-supply-chain FR-007	none	-	a property of the text, read by a person
 0002-packaging FR-001	check	.github: python3 -m unittest discover -s tests	Generator: a term with no definition is refused; Layout: the files are there
@@ -20,4 +20,4 @@ requirement	mechanism	by	note
 0002-packaging FR-010	check	.github: python3 -m unittest discover -s tests	Generator: every rule broken is named and nothing is written
 0002-packaging FR-011	check	.github: python3 -m unittest discover -s tests	Generated: the schema, the source hash and the content
 0002-packaging FR-012	check	.github: python3 -m unittest discover -s tests	ShellFragment: marks, POSIX sh, shellcheck, and what each function answers
-0002-packaging FR-013	none	-	what a reader of the table does is the harness's; archon's lands with its wiring and its tests
+0002-packaging FR-013	check	archon: archon test	archon's packaging tests: only an allowed executable is run, shell syntax and forbidden commands are refused
