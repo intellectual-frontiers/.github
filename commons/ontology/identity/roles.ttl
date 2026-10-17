@@ -1,0 +1,149 @@
+# The role catalog of a book imprint and a think tank, its permissions and the depth levels of a work (commons 0004-identity-and-roles FR-022). Data only: no person, company, layer name,
+# price or secret. A harness reads the table commons/generated/identity.auto.toml made from this file.
+
+@prefix idn: <https://www.intellectualfrontiers.com/ontology/identity#> .
+@prefix idnid: <https://www.intellectualfrontiers.com/id/identity/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ---- role kinds -------------------------------------------------------------------------------------------------------------------------------------
+
+idnid:visitor a idn:RoleKind ; skos:inScheme idn:RoleKindScheme ; skos:prefLabel "visitor"@en ; skos:notation "visitor" ;
+    skos:definition "Holds no account."@en .
+idnid:member a idn:RoleKind ; skos:inScheme idn:RoleKindScheme ; skos:prefLabel "member"@en ; skos:notation "member" ;
+    skos:definition "Holds an account and uses the works as a reader."@en .
+idnid:staff a idn:RoleKind ; skos:inScheme idn:RoleKindScheme ; skos:prefLabel "staff"@en ; skos:notation "staff" ;
+    skos:definition "Given by a decision to work on, or to look after, the works."@en .
+
+# ---- depth levels -----------------------------------------------------------------------------------------------------------------------------------
+
+idnid:depth-answer a idn:DepthLevel ; skos:inScheme idn:DepthScheme ; skos:prefLabel "answer"@en ; skos:notation "answer" ; idn:depthOrder 1 ;
+    skos:definition "The claim, the answer in a few sentences, the kind of each claim, its sources, the work's identifier and its citation: what lets a reader check a claim."@en .
+idnid:depth-reader a idn:DepthLevel ; skos:inScheme idn:DepthScheme ; skos:prefLabel "reader"@en ; skos:notation "reader" ; idn:depthOrder 2 ;
+    skos:definition "The full text read in the page's own reader, with no download."@en .
+idnid:depth-own a idn:DepthLevel ; skos:inScheme idn:DepthScheme ; skos:prefLabel "own"@en ; skos:notation "own" ; idn:depthOrder 3 ;
+    skos:definition "The work to keep: its files, its data, its code and its executable artifacts."@en .
+idnid:depth-connect a idn:DepthLevel ; skos:inScheme idn:DepthScheme ; skos:prefLabel "connect"@en ; skos:notation "connect" ; idn:depthOrder 4 ;
+    skos:definition "The work reached by a person's own program or assistant, with attribution, through an interface the harness offers."@en .
+idnid:depth-team a idn:DepthLevel ; skos:inScheme idn:DepthScheme ; skos:prefLabel "team"@en ; skos:notation "team" ; idn:depthOrder 5 ;
+    skos:definition "The work for an organization's members together: seats, a reading group's kit and citation export."@en .
+
+# ---- permissions ------------------------------------------------------------------------------------------------------------------------------------
+
+idnid:p-answer-read a idn:Permission ; idn:slug "answer:read" ; rdfs:label "Read the answer"@en ;
+    skos:definition "Read the answer level of a work that is public."@en .
+idnid:p-preview-read a idn:Permission ; idn:slug "preview:read" ; rdfs:label "Read a preview"@en ;
+    skos:definition "Read a book's preview in the page's reader."@en .
+idnid:p-paper-read a idn:Permission ; idn:slug "paper:read" ; rdfs:label "Read a paper"@en ;
+    skos:definition "Read a published paper in full in the page's reader."@en .
+idnid:p-review-read a idn:Permission ; idn:slug "review:read" ; rdfs:label "Read a work in review"@en ;
+    skos:definition "Read a work that is in a review round the person has been given."@en .
+idnid:p-review-comment a idn:Permission ; idn:slug "review:comment" ; rdfs:label "Comment in review"@en ;
+    skos:definition "Write a comment on a work in a review round."@en .
+idnid:p-review-approve a idn:Permission ; idn:slug "review:approve" ; rdfs:label "Approve a review request"@en ;
+    skos:definition "Approve or decline a person's request to take part in a review round."@en .
+idnid:p-work-own a idn:Permission ; idn:slug "work:own" ; rdfs:label "Own a work"@en ;
+    skos:definition "Act as the author of the person's own works."@en .
+idnid:p-work-edit a idn:Permission ; idn:slug "work:edit" ; rdfs:label "Edit a work"@en ;
+    skos:definition "Change the text of a work."@en .
+idnid:p-work-advance a idn:Permission ; idn:slug "work:advance" ; rdfs:label "Advance a work"@en ;
+    skos:definition "Move a work to its next stage."@en .
+idnid:p-work-read-assigned a idn:Permission ; idn:slug "work:read:assigned" ; rdfs:label "Read an assigned work"@en ;
+    skos:definition "Read the works the person has been assigned to advise on."@en .
+idnid:p-publish-decide a idn:Permission ; idn:slug "publish:decide" ; rdfs:label "Decide to publish"@en ;
+    skos:definition "Decide that a work is published."@en .
+idnid:p-rendition-read-own a idn:Permission ; idn:slug "rendition:read:own" ; rdfs:label "Read one's own renditions"@en ;
+    skos:definition "Read every rendition of the person's own works."@en .
+idnid:p-rendition-read-draft a idn:Permission ; idn:slug "rendition:read:draft" ; rdfs:label "Read draft renditions"@en ;
+    skos:definition "Read renditions that are not yet released."@en .
+idnid:p-rendition-read-published a idn:Permission ; idn:slug "rendition:read:published" ; rdfs:label "Read published renditions"@en ;
+    skos:definition "Read renditions that have been released."@en .
+idnid:p-rendition-build a idn:Permission ; idn:slug "rendition:build" ; rdfs:label "Build renditions"@en ;
+    skos:definition "Make a work's files from its text."@en .
+idnid:p-asset-edit a idn:Permission ; idn:slug "asset:edit" ; rdfs:label "Edit assets"@en ;
+    skos:definition "Change covers, pictures, figures and other design assets."@en .
+idnid:p-news-edit a idn:Permission ; idn:slug "news:edit" ; rdfs:label "Edit announcements"@en ;
+    skos:definition "Write and change announcements, news and promotion records."@en .
+idnid:p-rights-read a idn:Permission ; idn:slug "rights:read" ; rdfs:label "Read rights"@en ;
+    skos:definition "Read the rights and permissions records of works."@en .
+idnid:p-agreement-read a idn:Permission ; idn:slug "agreement:read" ; rdfs:label "Read agreements"@en ;
+    skos:definition "Read the agreements that cover works."@en .
+idnid:p-sales-read a idn:Permission ; idn:slug "sales:read" ; rdfs:label "Read sales"@en ;
+    skos:definition "Read sales and distribution results."@en .
+idnid:p-subscribers-read a idn:Permission ; idn:slug "subscribers:read" ; rdfs:label "Read subscribers"@en ;
+    skos:definition "Read the counts and the standing of subscribers, not their personal details."@en .
+idnid:p-staff-manage a idn:Permission ; idn:slug "staff:manage" ; rdfs:label "Manage staff"@en ;
+    skos:definition "Propose the roles of staff for a decision."@en .
+idnid:p-grant-decide a idn:Permission ; idn:slug "grant:decide" ; rdfs:label "Decide a grant"@en ;
+    skos:definition "Decide that a person is granted an audience or a role."@en .
+idnid:p-role-assign a idn:Permission ; idn:slug "role:assign" ; rdfs:label "Assign a role"@en ;
+    skos:definition "Give a role to a person after a decision, and take it away."@en .
+
+# ---- roles ------------------------------------------------------------------------------------------------------------------------------------------
+
+idnid:guest a idn:Role ; dcterms:identifier "guest" ; rdfs:label "Guest"@en ; idn:roleKind idnid:visitor ;
+    skos:definition "A visitor with no account. Reads the answer level of what is public."@en ;
+    idn:grants idnid:p-answer-read .
+
+idnid:reader a idn:Role ; dcterms:identifier "reader" ; rdfs:label "Reader"@en ; idn:roleKind idnid:member ;
+    skos:definition "A person with a free account. Reads previews and papers in the page's reader."@en ;
+    idn:knownInPublishingAs "Reader" ; idn:knownInResearchAs "Reader" ;
+    idn:grants idnid:p-answer-read, idnid:p-preview-read, idnid:p-paper-read .
+
+idnid:reviewer a idn:Role ; dcterms:identifier "reviewer" ; rdfs:label "Reviewer"@en ; idn:roleKind idnid:member ;
+    skos:definition "An outside person invited, or approved on request, to read and comment on a work in a review round, for a time."@en ;
+    idn:knownInPublishingAs "Outside reader" ; idn:knownInResearchAs "Peer reviewer" ;
+    idn:grants idnid:p-answer-read, idnid:p-preview-read, idnid:p-paper-read, idnid:p-review-read, idnid:p-review-comment .
+
+idnid:author a idn:Role ; dcterms:identifier "author" ; rdfs:label "Author"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who writes the works and looks after their own."@en ;
+    idn:knownInPublishingAs "Author" ; idn:knownInResearchAs "Fellow or researcher" ;
+    idn:grants idnid:p-answer-read, idnid:p-preview-read, idnid:p-paper-read, idnid:p-work-own, idnid:p-rendition-read-own .
+
+idnid:editor a idn:Role ; dcterms:identifier "editor" ; rdfs:label "Editor"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who improves the text of works before they are released."@en ;
+    idn:knownInPublishingAs "Acquiring, developmental or copy editor" ; idn:knownInResearchAs "Publications or policy editor" ;
+    idn:grants idnid:p-answer-read, idnid:p-work-edit, idnid:p-rendition-read-draft, idnid:p-review-read, idnid:p-review-comment .
+
+idnid:producer a idn:Role ; dcterms:identifier "producer" ; rdfs:label "Producer"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who makes a work's files from its text and checks them."@en ;
+    idn:knownInPublishingAs "Production editor, typesetter or proofreader" ; idn:knownInResearchAs "Production and layout" ;
+    idn:grants idnid:p-answer-read, idnid:p-rendition-build, idnid:p-rendition-read-draft .
+
+idnid:designer a idn:Role ; dcterms:identifier "designer" ; rdfs:label "Designer"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who makes covers, pictures, figures and layouts."@en ;
+    idn:knownInPublishingAs "Cover and interior designer" ; idn:knownInResearchAs "Visual and data-visualization designer" ;
+    idn:grants idnid:p-answer-read, idnid:p-asset-edit, idnid:p-rendition-read-draft .
+
+idnid:communications a idn:Role ; dcterms:identifier "communications" ; rdfs:label "Communications"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who tells readers and the press about the works."@en ;
+    idn:knownInPublishingAs "Marketing or publicist" ; idn:knownInResearchAs "Communications and outreach" ;
+    idn:grants idnid:p-answer-read, idnid:p-news-edit, idnid:p-rendition-read-published .
+
+idnid:rights a idn:Role ; dcterms:identifier "rights" ; rdfs:label "Rights"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who looks after the rights, permissions and agreements that cover works."@en ;
+    idn:knownInPublishingAs "Rights and permissions" ; idn:knownInResearchAs "Counsel or compliance" ;
+    idn:grants idnid:p-answer-read, idnid:p-rights-read, idnid:p-agreement-read .
+
+idnid:operations a idn:Role ; dcterms:identifier "operations" ; rdfs:label "Operations"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person who looks after sales, subscriptions and money."@en ;
+    idn:knownInPublishingAs "Sales, distribution or finance" ; idn:knownInResearchAs "Operations, development or finance" ;
+    idn:grants idnid:p-answer-read, idnid:p-sales-read, idnid:p-subscribers-read .
+
+idnid:advisor a idn:Role ; dcterms:identifier "advisor" ; rdfs:label "Advisor"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person outside the staff who advises on the works they are assigned."@en ;
+    idn:knownInPublishingAs "Agent or advisory board member" ; idn:knownInResearchAs "Board or advisory council member" ;
+    idn:grants idnid:p-answer-read, idnid:p-work-read-assigned .
+
+idnid:director a idn:Role ; dcterms:identifier "director" ; rdfs:label "Director"@en ; idn:roleKind idnid:staff ;
+    skos:definition "A person accountable for a body of works and the staff who make them."@en ;
+    idn:knownInPublishingAs "Editorial director or managing editor" ; idn:knownInResearchAs "Research director" ;
+    idn:grants idnid:p-answer-read, idnid:p-work-edit, idnid:p-work-advance, idnid:p-review-approve, idnid:p-rendition-read-draft, idnid:p-staff-manage .
+
+idnid:owner a idn:Role ; dcterms:identifier "owner" ; rdfs:label "Owner"@en ; idn:roleKind idnid:staff ;
+    skos:definition "The person who decides what is published and who is given a role."@en ;
+    idn:knownInPublishingAs "Publisher" ; idn:knownInResearchAs "President or executive director" ;
+    idn:grants idnid:p-answer-read, idnid:p-work-edit, idnid:p-work-advance, idnid:p-review-approve, idnid:p-rendition-read-draft, idnid:p-staff-manage,
+        idnid:p-publish-decide, idnid:p-grant-decide, idnid:p-role-assign .

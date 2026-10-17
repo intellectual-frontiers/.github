@@ -30,3 +30,27 @@ requirement	mechanism	by	note
 0003-spec-kit FR-005	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-006	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-007	check	.github: python3 -m unittest discover -s tests	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0004-identity-and-roles FR-001	none	-	a property of a harness's design, shown by its adapter tests when a consumer exists
+0004-identity-and-roles FR-002	none	-	a property of how a harness names its pool, read by a person
+0004-identity-and-roles FR-003	none	-	a property of a harness's design, shown by its adapter tests when a consumer exists
+0004-identity-and-roles FR-004	check	.github: python3 -m unittest discover -s tests	Generator: a role with no definition, kind, valid identifier or granted permission is refused
+0004-identity-and-roles FR-005	check	.github: python3 -m unittest discover -s tests	Generator: a slug that is too long or has a forbidden character is refused; every permission is granted by a role
+0004-identity-and-roles FR-006	none	-	enforced by a consumer harness's access-store tests; the table carries no visibility
+0004-identity-and-roles FR-007	none	-	a property of a harness's records; the ontology holds no layer name, which FR-022 checks
+0004-identity-and-roles FR-008	none	-	a decision of a person, recorded by the harness
+0004-identity-and-roles FR-009	none	-	enforced by a consumer harness's sync, when one exists
+0004-identity-and-roles FR-010	none	-	enforced by a consumer harness's agent tests, when one exists
+0004-identity-and-roles FR-011	none	-	a statement in the harness's own specification, read by a person
+0004-identity-and-roles FR-012	none	-	enforced by a consumer harness's tests, when one exists
+0004-identity-and-roles FR-013	none	-	enforced by a consumer harness's session tests, when one exists
+0004-identity-and-roles FR-014	none	-	enforced by a consumer harness's tests, when one exists
+0004-identity-and-roles FR-015	none	-	enforced by a consumer harness's drift check, when one exists
+0004-identity-and-roles FR-016	none	-	enforced by a consumer harness's yearly export test, when one exists
+0004-identity-and-roles FR-017	none	-	enforced by a consumer harness's tests, when one exists
+0004-identity-and-roles FR-018	check	.github: python3 -m unittest discover -s tests	Generator: the five levels exist, in order, each with a definition
+0004-identity-and-roles FR-019	none	-	a property of a work's pages, enforced by a consumer harness's site check
+0004-identity-and-roles FR-020	none	-	enforced by a consumer harness's site check, when one exists
+0004-identity-and-roles FR-021	none	-	enforced by a consumer harness's site check, when one exists
+0004-identity-and-roles FR-022	check	.github: python3 -m unittest discover -s tests	Generated: the table holds no person, company, layer, price or secret
+0004-identity-and-roles FR-023	check	.github: python3 -m unittest discover -s tests	Generator: every finding is named; --check fails where the file is stale
+0004-identity-and-roles FR-024	none	-	enforced by a consumer harness's drift check, when one exists

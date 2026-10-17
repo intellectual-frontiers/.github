@@ -1,0 +1,89 @@
+# The identity vocabulary (commons 0004-identity-and-roles): what a role, a permission, a layer and a depth level are, so that any site or platform of the group names who a person is
+# and what the person may do the same way. It names no provider, company, person, layer or price. Terms specialize schema.org and SKOS where they have a class; every other term is this
+# namespace's own, because no established vocabulary names it.
+
+@prefix idn: <https://www.intellectualfrontiers.com/ontology/identity#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.intellectualfrontiers.com/ontology/identity> a owl:Ontology ;
+    rdfs:label "Identity"@en ;
+    dcterms:description "The roles, permissions, layers and depth levels by which a harness decides what an identified person may do."@en ;
+    owl:versionInfo "1" .
+
+# ---- classes ----------------------------------------------------------------------------------------------------------------------------------------
+
+idn:Role a owl:Class ;
+    rdfs:label "Role"@en ;
+    rdfs:subClassOf schema:Role ;
+    skos:definition "A named part a person plays in an organization, given by a decision, that makes a list of actions possible. A role never makes a fact visible that the person's grants do not already cover."@en .
+
+idn:Permission a owl:Class ;
+    rdfs:label "Permission"@en ;
+    skos:definition "One action on a kind of thing, such as editing a work, named by a short slug so that an identity provider may carry it in a token."@en .
+
+idn:Layer a owl:Class ;
+    rdfs:label "Layer"@en ;
+    skos:definition "What a person or an organization has bought: a level of service an entitlement states. A layer is not a role. The ontology defines the concept and holds no layer's name or price."@en .
+
+idn:DepthLevel a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Depth level"@en ;
+    skos:definition "How deeply a work is offered, from the shallowest to the deepest. Each level has its own audience."@en .
+
+idn:RoleKind a owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Role kind"@en ;
+    skos:definition "Whether a role is held by a visitor (no account), a member (an account) or a member of staff (given by a decision to work on the harness's works)."@en .
+
+# ---- schemes ----------------------------------------------------------------------------------------------------------------------------------------
+
+idn:DepthScheme a skos:ConceptScheme ;
+    rdfs:label "Depth levels"@en ;
+    skos:definition "The levels at which a work is offered, in order."@en .
+
+idn:RoleKindScheme a skos:ConceptScheme ;
+    rdfs:label "Role kinds"@en ;
+    skos:definition "The kinds of role."@en .
+
+# ---- properties -------------------------------------------------------------------------------------------------------------------------------------
+
+idn:grants a owl:ObjectProperty ;
+    rdfs:label "grants"@en ;
+    rdfs:domain idn:Role ;
+    rdfs:range idn:Permission ;
+    skos:definition "A permission a role carries."@en .
+
+idn:slug a owl:DatatypeProperty ;
+    rdfs:label "slug"@en ;
+    rdfs:domain idn:Permission ;
+    rdfs:range xsd:string ;
+    skos:definition "The permission's short name: lower-case letters, digits and the characters - : and ., at most forty characters. It is never reused for another meaning."@en .
+
+idn:roleKind a owl:ObjectProperty ;
+    rdfs:label "role kind"@en ;
+    rdfs:domain idn:Role ;
+    rdfs:range idn:RoleKind ;
+    skos:definition "The kind of a role."@en .
+
+idn:knownInPublishingAs a owl:DatatypeProperty ;
+    rdfs:label "known in publishing as"@en ;
+    rdfs:domain idn:Role ;
+    rdfs:range xsd:string ;
+    skos:definition "What a book imprint calls the part this role plays."@en .
+
+idn:knownInResearchAs a owl:DatatypeProperty ;
+    rdfs:label "known in research as"@en ;
+    rdfs:domain idn:Role ;
+    rdfs:range xsd:string ;
+    skos:definition "What a think tank calls the part this role plays."@en .
+
+idn:depthOrder a owl:DatatypeProperty ;
+    rdfs:label "depth order"@en ;
+    rdfs:domain idn:DepthLevel ;
+    rdfs:range xsd:integer ;
+    skos:definition "The place of the level from the shallowest (1) to the deepest."@en .
