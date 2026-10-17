@@ -11,7 +11,8 @@
 pmid:prog-git a pm:Program ;
     rdfs:label "git"@en ;
     pm:programName "git" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 1 .
 
 pmid:pkg-debian-git a pm:PackageName ;
     pm:forProgram pmid:prog-git ;
@@ -26,7 +27,8 @@ pmid:pkg-arch-git a pm:PackageName ;
 pmid:prog-ca-certificates a pm:Program ;
     rdfs:label "ca-certificates"@en ;
     pm:programName "ca-certificates" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 2 .
 
 pmid:pkg-debian-ca-certificates a pm:PackageName ;
     pm:forProgram pmid:prog-ca-certificates ;
@@ -41,7 +43,8 @@ pmid:pkg-arch-ca-certificates a pm:PackageName ;
 pmid:prog-curl a pm:Program ;
     rdfs:label "curl"@en ;
     pm:programName "curl" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 3 .
 
 pmid:pkg-debian-curl a pm:PackageName ;
     pm:forProgram pmid:prog-curl ;
@@ -56,7 +59,8 @@ pmid:pkg-arch-curl a pm:PackageName ;
 pmid:prog-wget a pm:Program ;
     rdfs:label "wget"@en ;
     pm:programName "wget" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 4 .
 
 pmid:pkg-debian-wget a pm:PackageName ;
     pm:forProgram pmid:prog-wget ;
@@ -71,7 +75,8 @@ pmid:pkg-arch-wget a pm:PackageName ;
 pmid:prog-tar a pm:Program ;
     rdfs:label "tar"@en ;
     pm:programName "tar" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 5 .
 
 pmid:pkg-debian-tar a pm:PackageName ;
     pm:forProgram pmid:prog-tar ;
@@ -86,7 +91,8 @@ pmid:pkg-arch-tar a pm:PackageName ;
 pmid:prog-xz a pm:Program ;
     rdfs:label "xz"@en ;
     pm:programName "xz" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 6 .
 
 pmid:pkg-debian-xz a pm:PackageName ;
     pm:forProgram pmid:prog-xz ;
@@ -101,7 +107,8 @@ pmid:pkg-arch-xz a pm:PackageName ;
 pmid:prog-unzip a pm:Program ;
     rdfs:label "unzip"@en ;
     pm:programName "unzip" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 7 .
 
 pmid:pkg-debian-unzip a pm:PackageName ;
     pm:forProgram pmid:prog-unzip ;
@@ -116,7 +123,8 @@ pmid:pkg-arch-unzip a pm:PackageName ;
 pmid:prog-jq a pm:Program ;
     rdfs:label "jq"@en ;
     pm:programName "jq" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 8 .
 
 pmid:pkg-debian-jq a pm:PackageName ;
     pm:forProgram pmid:prog-jq ;
@@ -131,7 +139,8 @@ pmid:pkg-arch-jq a pm:PackageName ;
 pmid:prog-gh a pm:Program ;
     rdfs:label "gh"@en ;
     pm:programName "gh" ;
-    pm:tier pm:Required .
+    pm:tier pm:Required  ;
+    pm:order 9 .
 
 pmid:pkg-debian-gh a pm:PackageName ;
     pm:forProgram pmid:prog-gh ;
@@ -146,7 +155,8 @@ pmid:pkg-arch-gh a pm:PackageName ;
 pmid:prog-coreutils a pm:Program ;
     rdfs:label "coreutils"@en ;
     pm:programName "coreutils" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 10 .
 
 pmid:pkg-debian-coreutils a pm:PackageName ;
     pm:forProgram pmid:prog-coreutils ;
@@ -161,7 +171,8 @@ pmid:pkg-arch-coreutils a pm:PackageName ;
 pmid:prog-sed a pm:Program ;
     rdfs:label "sed"@en ;
     pm:programName "sed" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 11 .
 
 pmid:pkg-debian-sed a pm:PackageName ;
     pm:forProgram pmid:prog-sed ;
@@ -176,7 +187,8 @@ pmid:pkg-arch-sed a pm:PackageName ;
 pmid:prog-findutils a pm:Program ;
     rdfs:label "findutils"@en ;
     pm:programName "findutils" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 12 .
 
 pmid:pkg-debian-findutils a pm:PackageName ;
     pm:forProgram pmid:prog-findutils ;
@@ -191,7 +203,8 @@ pmid:pkg-arch-findutils a pm:PackageName ;
 pmid:prog-diffutils a pm:Program ;
     rdfs:label "diffutils"@en ;
     pm:programName "diffutils" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 13 .
 
 pmid:pkg-debian-diffutils a pm:PackageName ;
     pm:forProgram pmid:prog-diffutils ;
@@ -206,7 +219,8 @@ pmid:pkg-arch-diffutils a pm:PackageName ;
 pmid:prog-patch a pm:Program ;
     rdfs:label "patch"@en ;
     pm:programName "patch" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 14 .
 
 pmid:pkg-debian-patch a pm:PackageName ;
     pm:forProgram pmid:prog-patch ;
@@ -221,7 +235,8 @@ pmid:pkg-arch-patch a pm:PackageName ;
 pmid:prog-gzip a pm:Program ;
     rdfs:label "gzip"@en ;
     pm:programName "gzip" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 15 .
 
 pmid:pkg-debian-gzip a pm:PackageName ;
     pm:forProgram pmid:prog-gzip ;
@@ -236,7 +251,8 @@ pmid:pkg-arch-gzip a pm:PackageName ;
 pmid:prog-zip a pm:Program ;
     rdfs:label "zip"@en ;
     pm:programName "zip" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 16 .
 
 pmid:pkg-debian-zip a pm:PackageName ;
     pm:forProgram pmid:prog-zip ;
@@ -251,7 +267,8 @@ pmid:pkg-arch-zip a pm:PackageName ;
 pmid:prog-bzip2 a pm:Program ;
     rdfs:label "bzip2"@en ;
     pm:programName "bzip2" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 17 .
 
 pmid:pkg-debian-bzip2 a pm:PackageName ;
     pm:forProgram pmid:prog-bzip2 ;
@@ -266,7 +283,8 @@ pmid:pkg-arch-bzip2 a pm:PackageName ;
 pmid:prog-file a pm:Program ;
     rdfs:label "file"@en ;
     pm:programName "file" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 18 .
 
 pmid:pkg-debian-file a pm:PackageName ;
     pm:forProgram pmid:prog-file ;
@@ -281,7 +299,8 @@ pmid:pkg-arch-file a pm:PackageName ;
 pmid:prog-less a pm:Program ;
     rdfs:label "less"@en ;
     pm:programName "less" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 19 .
 
 pmid:pkg-debian-less a pm:PackageName ;
     pm:forProgram pmid:prog-less ;
@@ -296,7 +315,8 @@ pmid:pkg-arch-less a pm:PackageName ;
 pmid:prog-debianutils a pm:Program ;
     rdfs:label "debianutils"@en ;
     pm:programName "debianutils" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 20 .
 
 pmid:pkg-debian-debianutils a pm:PackageName ;
     pm:forProgram pmid:prog-debianutils ;
@@ -306,7 +326,8 @@ pmid:pkg-debian-debianutils a pm:PackageName ;
 pmid:prog-procps a pm:Program ;
     rdfs:label "procps"@en ;
     pm:programName "procps" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 21 .
 
 pmid:pkg-debian-procps a pm:PackageName ;
     pm:forProgram pmid:prog-procps ;
@@ -321,7 +342,8 @@ pmid:pkg-arch-procps a pm:PackageName ;
 pmid:prog-hostname a pm:Program ;
     rdfs:label "hostname"@en ;
     pm:programName "hostname" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 22 .
 
 pmid:pkg-debian-hostname a pm:PackageName ;
     pm:forProgram pmid:prog-hostname ;
@@ -336,7 +358,8 @@ pmid:pkg-arch-hostname a pm:PackageName ;
 pmid:prog-ncurses a pm:Program ;
     rdfs:label "ncurses"@en ;
     pm:programName "ncurses" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 23 .
 
 pmid:pkg-debian-ncurses a pm:PackageName ;
     pm:forProgram pmid:prog-ncurses ;
@@ -351,7 +374,8 @@ pmid:pkg-arch-ncurses a pm:PackageName ;
 pmid:prog-rsync a pm:Program ;
     rdfs:label "rsync"@en ;
     pm:programName "rsync" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 24 .
 
 pmid:pkg-debian-rsync a pm:PackageName ;
     pm:forProgram pmid:prog-rsync ;
@@ -366,7 +390,8 @@ pmid:pkg-arch-rsync a pm:PackageName ;
 pmid:prog-bc a pm:Program ;
     rdfs:label "bc"@en ;
     pm:programName "bc" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 25 .
 
 pmid:pkg-debian-bc a pm:PackageName ;
     pm:forProgram pmid:prog-bc ;
@@ -381,7 +406,8 @@ pmid:pkg-arch-bc a pm:PackageName ;
 pmid:prog-grep a pm:Program ;
     rdfs:label "grep"@en ;
     pm:programName "grep" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 26 .
 
 pmid:pkg-debian-grep a pm:PackageName ;
     pm:forProgram pmid:prog-grep ;
@@ -396,7 +422,8 @@ pmid:pkg-arch-grep a pm:PackageName ;
 pmid:prog-gawk a pm:Program ;
     rdfs:label "gawk"@en ;
     pm:programName "gawk" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 27 .
 
 pmid:pkg-debian-gawk a pm:PackageName ;
     pm:forProgram pmid:prog-gawk ;
@@ -411,7 +438,8 @@ pmid:pkg-arch-gawk a pm:PackageName ;
 pmid:prog-ripgrep a pm:Program ;
     rdfs:label "ripgrep"@en ;
     pm:programName "ripgrep" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 28 .
 
 pmid:pkg-debian-ripgrep a pm:PackageName ;
     pm:forProgram pmid:prog-ripgrep ;
@@ -426,7 +454,8 @@ pmid:pkg-arch-ripgrep a pm:PackageName ;
 pmid:prog-fd a pm:Program ;
     rdfs:label "fd"@en ;
     pm:programName "fd" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 29 .
 
 pmid:pkg-debian-fd a pm:PackageName ;
     pm:forProgram pmid:prog-fd ;
@@ -441,7 +470,8 @@ pmid:pkg-arch-fd a pm:PackageName ;
 pmid:prog-bash-completion a pm:Program ;
     rdfs:label "bash-completion"@en ;
     pm:programName "bash-completion" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 30 .
 
 pmid:pkg-debian-bash-completion a pm:PackageName ;
     pm:forProgram pmid:prog-bash-completion ;
@@ -456,7 +486,8 @@ pmid:pkg-arch-bash-completion a pm:PackageName ;
 pmid:prog-python a pm:Program ;
     rdfs:label "python"@en ;
     pm:programName "python" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 31 .
 
 pmid:pkg-debian-python a pm:PackageName ;
     pm:forProgram pmid:prog-python ;
@@ -471,7 +502,8 @@ pmid:pkg-arch-python a pm:PackageName ;
 pmid:prog-imagemagick a pm:Program ;
     rdfs:label "imagemagick"@en ;
     pm:programName "imagemagick" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 32 .
 
 pmid:pkg-debian-imagemagick a pm:PackageName ;
     pm:forProgram pmid:prog-imagemagick ;
@@ -486,7 +518,8 @@ pmid:pkg-arch-imagemagick a pm:PackageName ;
 pmid:prog-webp a pm:Program ;
     rdfs:label "webp"@en ;
     pm:programName "webp" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 33 .
 
 pmid:pkg-debian-webp a pm:PackageName ;
     pm:forProgram pmid:prog-webp ;
@@ -501,7 +534,8 @@ pmid:pkg-arch-webp a pm:PackageName ;
 pmid:prog-sqlite a pm:Program ;
     rdfs:label "sqlite"@en ;
     pm:programName "sqlite" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 34 .
 
 pmid:pkg-debian-sqlite a pm:PackageName ;
     pm:forProgram pmid:prog-sqlite ;
@@ -516,7 +550,8 @@ pmid:pkg-arch-sqlite a pm:PackageName ;
 pmid:prog-shellcheck a pm:Program ;
     rdfs:label "shellcheck"@en ;
     pm:programName "shellcheck" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 35 .
 
 pmid:pkg-debian-shellcheck a pm:PackageName ;
     pm:forProgram pmid:prog-shellcheck ;
@@ -531,7 +566,8 @@ pmid:pkg-arch-shellcheck a pm:PackageName ;
 pmid:prog-imagemagick-codecs a pm:Program ;
     rdfs:label "imagemagick-codecs"@en ;
     pm:programName "imagemagick-codecs" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 36 .
 
 pmid:pkg-debian-imagemagick-codecs a pm:PackageName ;
     pm:forProgram pmid:prog-imagemagick-codecs ;
@@ -541,7 +577,8 @@ pmid:pkg-debian-imagemagick-codecs a pm:PackageName ;
 pmid:prog-glab a pm:Program ;
     rdfs:label "glab"@en ;
     pm:programName "glab" ;
-    pm:tier pm:Comfort .
+    pm:tier pm:Comfort  ;
+    pm:order 37 .
 
 pmid:pkg-debian-glab a pm:PackageName ;
     pm:forProgram pmid:prog-glab ;

@@ -76,20 +76,26 @@ sudo_ready=0
 
 # ---- packages (apt): what the setup needs, and the everyday programs ------------------------------------------------------------------------------------
 
+# The commands are the table's (commons 0002-packaging); what each prints is read here, because it differs by manager.
 pkg_installed() {  # pkg_installed "a|b": any alternative installed
+  pi_cmd=$(pm_query_installed_words "$family")
+  [ -n "$pi_cmd" ] || return 1
   for alt in $(printf '%s' "$1" | tr '|' ' '); do
-    case $family in
-      arch) pacman -Qi "$alt" >/dev/null 2>&1 && return 0 ;;
-      *) dpkg-query -W -f='${Status}' "$alt" 2>/dev/null | grep -q 'install ok installed' && return 0 ;;
-    esac
+    # shellcheck disable=SC2086  # the table's words
+    pi_out=$($pi_cmd "$alt" 2>/dev/null) || continue
+    case $family in debian) printf '%s' "$pi_out" | grep -q 'install ok installed' || continue ;; esac
+    return 0
   done
   return 1
 }
 
 pkg_candidate() {  # pkg_candidate NAME: the version the package manager would install, empty when none
+  pc_cmd=$(pm_query_candidate_words "$family")
+  # shellcheck disable=SC2086  # the table's words
+  pc_out=$([ -n "$pc_cmd" ] && $pc_cmd "$1" 2>/dev/null || true)
   case $family in
-    arch) v=$(pacman -Si "$1" 2>/dev/null | sed -n 's/^Version *: *//p' | head -n 1) ;;
-    *) v=$(apt-cache policy "$1" 2>/dev/null | sed -n 's/^ *Candidate: *//p' | head -n 1) ;;
+    arch) v=$(printf '%s\n' "$pc_out" | sed -n 's/^Version *: *//p' | head -n 1) ;;
+    *) v=$(printf '%s\n' "$pc_out" | sed -n 's/^ *Candidate: *//p' | head -n 1) ;;
   esac
   [ "$v" = "(none)" ] && v=""
   printf '%s' "$v"
@@ -102,23 +108,21 @@ cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
 }
 
 # The packages the setup needs from the computer (it installs none itself), then the everyday programs of the comfort kits (ws-host's base.py).
+# The names are the table's, by family (commons 0002-packaging); only what depends on the release is decided here.
 wanted_packages() {
-  case $family in
-    arch)
-      echo "git ca-certificates curl wget tar xz unzip jq github-cli"
-      if kit_on base; then
-        echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk"
-        echo "ripgrep fd bash-completion python imagemagick libwebp sqlite shellcheck glab"
-      fi ;;
-    *)
-      echo "git ca-certificates curl wget tar xz-utils unzip jq gh"
-      if kit_on base; then
-        echo "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk"
-        echo "ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck"
-        echo "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra"
-        if [ "$is_debian" = 1 ]; then case $d_codename in bookworm | bullseye | "") ;; *) echo "glab" ;; esac; fi
-      fi ;;
-  esac
+  wp_line=""
+  for wp_prog in $(pm_programs required); do wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"; done
+  echo "${wp_line# }"
+  kit_on base || return 0
+  wp_line=""
+  for wp_prog in $(pm_programs comfort); do
+    if [ "$wp_prog" = glab ] && [ "$family" = debian ]; then   # Debian 12 has no package (the setup fetches the release); Ubuntu is left to it too
+      [ "$is_debian" = 1 ] || continue
+      case $d_codename in bookworm | bullseye | "") continue ;; esac
+    fi
+    wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"
+  done
+  echo "${wp_line# }"
   return 0
 }
 
@@ -142,11 +146,18 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
   return 0
 }
 
-apt_install() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq -o DPkg::Lock::Timeout=180 "$@"; }
-# --needed: what is installed stays; never -Sy, which refreshes the list alone and leaves a rolling release partly upgraded (0136-machine-bootstrap FR-053)
-pacman_install() { $sudo_cmd pacman -S --needed --noconfirm "$@"; }
-pm_install() { if [ "$family" = arch ]; then pacman_install "$@"; else apt_install "$@"; fi; }
-apt_update() { $sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get update -qq -o DPkg::Lock::Timeout=180; }
+# The words are the table's: what is installed stays (--needed), and never -Sy on Arch, which refreshes the list alone and leaves a rolling release partly upgraded (0136-machine-bootstrap FR-053;
+# commons 0002-packaging FR-005). apt's lock wait is this script's own.
+pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
+  pr_fam=$1; pr_words=$2; shift 2
+  pr_env=$(pm_environment "$pr_fam")
+  case $pr_fam in debian) pr_extra="-o DPkg::Lock::Timeout=180" ;; *) pr_extra="" ;; esac
+  # shellcheck disable=SC2086  # the table's words
+  if [ -n "$pr_env" ]; then $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else $sudo_cmd $pr_words $pr_extra "$@"; fi
+}
+pm_install() { pm_run "$family" "$(pm_install_words "$family")" "$@"; }
+apt_install() { pm_run debian "$(pm_install_words debian)" "$@"; }
+apt_update() { pm_run debian "$(pm_refresh_words debian)"; }
 
 # Whether apt can give fish 4 on this distribution: its candidate says so; with no package lists yet (a fresh image), its release does.
 fish_from_apt() {   # whether the package manager can give fish 4 on this distribution
@@ -195,9 +206,9 @@ install_packages() {
     say "Everything the packages give is here."
     return 0
   fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ] || ! command -v "$([ "$family" = arch ] && echo pacman || echo apt-get)" >/dev/null 2>&1; then
+  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ] || ! command -v "$(pm_install_words "$family" | cut -d' ' -f1)" >/dev/null 2>&1; then
     for cmd in git curl; do
-      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "$([ "$family" = arch ] && echo "sudo pacman -S --needed" || echo "sudo apt install")$missing"
+      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "$(admin_install_names $missing)"
     done
     warn "Not installed, because packages are off here:$missing"
     problem "packages not installed:$missing"
@@ -205,14 +216,14 @@ install_packages() {
   fi
   if [ "$dry" = 1 ]; then
     [ "$(id -u)" = 0 ] || would "say why administrator rights are needed and ask for your password, once"
-    if [ "$family" = arch ]; then would "install with pacman (--needed, never refreshing the package list alone):$missing"
-    else would "refresh the package list, then install with apt:$missing"; fi
+    if [ -z "$(pm_refresh_words "$family")" ]; then would "install with $(pm_manager "$family") (--needed, never refreshing the package list alone):$missing"
+    else would "refresh the package list, then install with $(pm_manager "$family"):$missing"; fi
     return 0
   fi
   if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
   sudo_for "install the everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to install:$missing"
-  if [ "$family" = arch ]; then
-    # the names are Arch's own and unique, so pacman decides what it has: a package it cannot find means a package list older than the repositories
+  if [ -z "$(pm_refresh_words "$family")" ]; then
+    # the table has no refresh for the family (Arch: never -Sy), and the names are its own and unique, so the manager decides what it has: a package it cannot find means a package list older than the repositories
     chosen=$missing
   else
     step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
@@ -229,9 +240,9 @@ install_packages() {
     if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
   fi
   if [ -n "$chosen" ]; then
-    if [ "$family" != arch ]; then
+    if [ "$family" = debian ]; then
       count_re='^Setting up '
-      count_total=$($sudo_cmd env DEBIAN_FRONTEND=noninteractive apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
+      count_total=$($sudo_cmd env "$(pm_environment debian)" apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
       [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
     fi
     # shellcheck disable=SC2086
@@ -239,7 +250,7 @@ install_packages() {
       if [ "$family" = arch ] && grep -qiE 'target not found|failed retrieving file|could not find' "$work/last.log" 2>/dev/null; then
         need "pacman could not find a package, so its package list is probably older than the repositories (it was not refreshed here: that alone would leave the system partly upgraded)." "run: sudo pacman -Syu   then run this again"
       fi
-      need "the packages could not be installed." "run: $([ "$family" = arch ] && echo "sudo pacman -S --needed" || echo "sudo apt install")$chosen"
+      need "the packages could not be installed." "run: $(admin_install_names $chosen)"
     fi
     count_re=""; count_total=""
   fi

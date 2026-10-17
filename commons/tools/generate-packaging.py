@@ -5,7 +5,7 @@
 # ///
 """Generate the packaging table from the packaging ontology (commons 0002-packaging).
 
-    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml and packaging.auto.sh
+    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml and packaging.auto.sh, and the marked block of bin/archon-setup.sh
     uv run commons/tools/generate-packaging.py --check    exit 1, writing nothing, where either file is not what the ontology makes
 
 The ontology (commons/ontology/supply-chain/packaging/*.ttl) is the source; the two generated files are never edited by hand. The TOML is for programs (a harness reads it),
@@ -26,6 +26,8 @@ COMMONS = Path(__file__).resolve().parent.parent
 ONTOLOGY = COMMONS / "ontology" / "supply-chain" / "packaging"
 OUT_TOML = COMMONS / "generated" / "packaging.auto.toml"
 OUT_SH = COMMONS / "generated" / "packaging.auto.sh"
+SCRIPTS = [COMMONS.parent / "bin" / "archon-setup.sh"]   # carry the fragment between its marks, as a script piped from the internet has no file beside it
+BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
 
 PM = Namespace("https://www.intellectualfrontiers.com/ontology/packaging#")
 SCHEMA_VERSION = 1
@@ -167,7 +169,10 @@ def model(g: Graph) -> tuple[dict, list[str]]:
             bad.append(f"program {p} needs a name and a tier")
             continue
         prog_iri[p] = name
-        programs[name] = {"tier": tier, "names": {}}
+        order = one(g, p, PM.order)
+        if order is None or not order.isdigit():
+            bad.append(f"program {name} has no order")
+        programs[name] = {"tier": tier, "order": int(order) if order and order.isdigit() else 0, "names": {}}
     for n in sorted(g.subjects(RDF.type, PM.PackageName)):
         prog = next(g.objects(n, PM.forProgram), None)
         fam = next(g.objects(n, PM.forFamily), None)
@@ -250,8 +255,8 @@ def toml(t: dict, digest: str) -> str:
             out.append("")
     for p in t["prohibitions"]:
         out += ["[[prohibitions]]", f"manager = {s(p['manager'])}", f"argv = {arr(p['argv'])}", f"reason = {s(p['reason'])}", ""]
-    for name, p in sorted(t["programs"].items()):
-        out += [f"[programs.{s(name)}]", f"tier = {s(p['tier'])}"]
+    for name, p in sorted(t["programs"].items(), key=lambda kv: (kv[1]["order"], kv[0])):
+        out += [f"[programs.{s(name)}]", f"tier = {s(p['tier'])}", f"order = {p['order']}"]
         out += [f"names.{fid} = {s(n)}" for fid, n in sorted(p["names"].items())]
         out.append("")
     return "\n".join(out).rstrip("\n") + "\n"
@@ -328,7 +333,7 @@ def shell(t: dict, digest: str) -> str:
     out.append("pm_programs() {  # pm_programs TIER: the programs of the tier (required or comfort), one word each, in order")
     out.append("  case ${1:-} in")
     for tier in ("required", "comfort"):
-        out.append(f"    {tier}) printf '%s\\n' " + " ".join(q(n) for n, p in sorted(t["programs"].items()) if p["tier"] == tier) + " ;;")
+        out.append(f"    {tier}) printf '%s\\n' " + " ".join(q(n) for n, p in sorted(t["programs"].items(), key=lambda kv: (kv[1]["order"], kv[0])) if p["tier"] == tier) + " ;;")
     out += ["  esac", "}", "# <<< packaging.auto <<<", ""]
     return "\n".join(out)
 
@@ -341,7 +346,15 @@ def main(argv: list[str]) -> int:
         for b in bad:
             print(f"  - {b}", file=sys.stderr)
         return 2
-    want = {OUT_TOML: toml(t, digest), OUT_SH: shell(t, digest)}
+    fragment = shell(t, digest)
+    want = {OUT_TOML: toml(t, digest), OUT_SH: fragment}
+    for script in SCRIPTS:
+        if script.exists():   # a copy of commons alone (a test's) has no scripts beside it
+            text = script.read_text()
+            if not BLOCK.search(text):
+                print(f"{script.relative_to(COMMONS.parent)} has no block between '# >>> packaging.auto >>>' and '# <<< packaging.auto <<<' to put the table in", file=sys.stderr)
+                return 2
+            want[script] = BLOCK.sub(lambda _m: fragment, text, count=1)
     if "--check" in argv:
         stale = [p for p, text in want.items() if not p.exists() or p.read_text() != text]
         for p in stale:

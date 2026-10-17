@@ -297,6 +297,84 @@ class Layout(unittest.TestCase):
         self.assertTrue((COMMONS / "README.md").read_text().startswith("# commons"))
 
 
+SETUP = HOME / "bin" / "archon-setup.sh"
+BOOT = HOME / "bin" / "archon-bootstrap.sh"
+BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
+
+
+def outside_the_block(text: str) -> str:
+    return BLOCK.sub("", text)
+
+
+@unittest.skipUnless(SH, "sh is not installed")
+class Consumers(unittest.TestCase):
+    """The scripts read the table (0001-software-supply-chain FR-003; 0136-machine-bootstrap in archon): no second copy of a fact it holds."""
+
+    def test_the_setup_carries_exactly_the_generated_fragment(self):
+        """0001-software-supply-chain FR-002, FR-003: a script piped from the internet has no file beside it, so the block is generated into it"""
+        self.assertEqual(BLOCK.search(SETUP.read_text()).group(0), SH_FRAGMENT.read_text())
+
+    def test_neither_script_keeps_a_package_name_a_command_or_a_detecting_id_the_table_holds(self):
+        t = table()
+        for f in (SETUP, BOOT):
+            text = outside_the_block(f.read_text())
+            code = "\n".join(l for l in text.splitlines() if not l.lstrip().startswith("#"))
+            for needle in ("xz-utils", "github-cli", "apt-get install -y -qq", "pacman -S --needed --noconfirm", "dpkg-query -W", "apt-cache policy", "pacman -Qi", "pacman -Si", "DEBIAN_FRONTEND=noninteractive",
+                           "libmagickcore", "build-essential"):
+                self.assertNotIn(needle, code, f"{f.name} keeps {needle!r}, which the table holds")
+            for fid, fam in t["families"].items():
+                if fam["status"] == "supported" and fam["detect_source"] == "os-release":
+                    self.assertNotRegex(code, rf'\*" ?(?:{"|".join(map(re.escape, fam["detect"]))}) ?"\*', f"{f.name} detects {fid} on its own")
+
+    def bootstrap(self, code, **env):
+        import os
+        return subprocess.run([SH, "-c", f'. "{BOOT}"; {code}'], capture_output=True, text=True,
+                              env={**os.environ, "BOOTSTRAP_SOURCE_ONLY": "1", "BOOTSTRAP_SETUP": str(SETUP), "HOME": tempfile.mkdtemp(), **env})
+
+    def test_what_the_bootstrap_installs_is_what_it_installed_before_the_table(self):
+        """the migration changes no list: these are the lists the scripts held in their case branches"""
+        want = {
+            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip jq gh",
+            ("arch", "required"): "git ca-certificates curl wget tar xz unzip jq github-cli",
+        }
+        comfort = {
+            "debian": "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck "
+                      "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra",
+            "arch": "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk ripgrep fd bash-completion python imagemagick libwebp sqlite shellcheck glab",
+        }
+        for fam in ("debian", "arch"):
+            out = self.bootstrap(f"family={fam}; is_debian=0; d_codename=''; kits=base; wanted_packages").stdout.splitlines()
+            self.assertEqual(out[0], want[(fam, "required")], fam)
+            self.assertEqual(sorted(out[1].split()), sorted(comfort[fam].split()), fam)
+        deb13 = self.bootstrap("family=debian; is_debian=1; d_codename=trixie; kits=base; wanted_packages").stdout.splitlines()
+        self.assertIn("glab", deb13[1].split())
+        deb12 = self.bootstrap("family=debian; is_debian=1; d_codename=bookworm; kits=base; wanted_packages").stdout.splitlines()
+        self.assertNotIn("glab", deb12[1].split())
+        self.assertEqual(self.bootstrap("family=debian; is_debian=1; d_codename=trixie; kits=agents; wanted_packages").stdout.splitlines(), [want[("debian", "required")]])
+
+    def test_the_install_commands_and_hints_are_the_table_s(self):
+        out = self.bootstrap('family=debian; admin_install_cmd git xz gh; echo; family=arch; admin_install_cmd git xz gh; echo; family=debian; admin_install_names a b').stdout.split("\n")
+        self.assertEqual(out[0], "sudo apt-get install -y git xz-utils gh")
+        self.assertEqual(out[1], "sudo pacman -S --needed git xz github-cli")
+        self.assertEqual(out[2], "sudo apt-get install -y a b")
+
+    def test_a_family_the_table_knows_but_no_script_acts_on_is_named_with_its_manager(self):
+        import os
+        for ident, label, manager in (("fedora", "Red Hat family", "dnf"), ("alpine", "Alpine family", "apk"), ("opensuse-leap", "SUSE family", "zypper")):
+            osr = Path(tempfile.mkdtemp()) / "os-release"
+            osr.write_text(f'ID={ident}\nPRETTY_NAME="Test {ident}"\n')
+            p = subprocess.run([SH, str(SETUP), "--dry-run"], capture_output=True, text=True, env={**os.environ, "BOOTSTRAP_OS_RELEASE": str(osr), "HOME": tempfile.mkdtemp()}, stdin=subprocess.DEVNULL)
+            self.assertEqual(p.returncode, 3, ident)
+            self.assertIn(f"{label}: it uses {manager}, and this setup does not support it yet", p.stderr, ident)
+            self.assertIn("Fix:", p.stderr)
+        osr = Path(tempfile.mkdtemp()) / "os-release"
+        osr.write_text('ID=plan9\nPRETTY_NAME="Plan 9"\n')
+        p = subprocess.run([SH, str(SETUP), "--dry-run"], capture_output=True, text=True, env={**os.environ, "BOOTSTRAP_OS_RELEASE": str(osr), "HOME": tempfile.mkdtemp()}, stdin=subprocess.DEVNULL)
+        self.assertEqual(p.returncode, 3)
+        self.assertNotIn("it uses", p.stderr)
+        self.assertIn("Plan 9", p.stderr)
+
+
 class Specs(unittest.TestCase):
     """The commons specifications keep archon's format (0024-spec-format there), checked here by shape because archon's own checks read archon's ontology (0001-software-supply-chain FR-001)."""
 

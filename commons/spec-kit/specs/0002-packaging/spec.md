@@ -33,7 +33,8 @@ commands that drive each manager, the package each family calls a program, what 
 
 ## The generated tables
 
-- **FR-009**: `commons/tools/generate-packaging.py` MUST read the ontology and write `commons/generated/packaging.auto.toml` and `commons/generated/packaging.auto.sh`, MUST write the same bytes
+- **FR-009**: `commons/tools/generate-packaging.py` MUST read the ontology and write `commons/generated/packaging.auto.toml` and `commons/generated/packaging.auto.sh`, and put the shell fragment between
+  the marks `# >>> packaging.auto >>>` and `# <<< packaging.auto <<<` of `bin/archon-setup.sh` (a script piped from the internet has no file beside it, and the bootstrap loads the setup's functions), MUST write the same bytes
   from the same ontology, and with `--check` MUST write nothing and fail where either file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST need only `uv`: its
   one dependency is declared in its own header.
 - **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing where one is.
@@ -57,7 +58,8 @@ commands that drive each manager, the package each family calls a program, what 
 - A family whose non-interactive form was written from knowledge: it stays `catalogued`, and no harness runs it until it is run on a real computer, per FR-003 and FR-004.
 - A computer whose `ID` is unknown but whose `ID_LIKE` names a family (Omarchy, `ID_LIKE=arch`): the first word that detects a family decides it, per FR-007.
 - A required program with no package for a supported family: the tool names it and writes nothing, per FR-008 and FR-010.
-- The ontology and a generated file disagree: `--check` fails and says to run the tool, per FR-009.
+- The ontology and a generated file, or the block in the setup script, disagree: `--check` fails and says to run the tool, per FR-009.
+- A computer whose family the table knows but no script acts on (Fedora, `ID=fedora`): the setup stops before changing anything and names the family and its package manager, per FR-004.
 
 ## Assumptions
 

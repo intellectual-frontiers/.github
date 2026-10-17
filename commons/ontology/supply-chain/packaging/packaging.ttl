@@ -114,6 +114,7 @@ pm:note a owl:DatatypeProperty ; skos:definition "A sentence a person needs, suc
 # ---- properties: programs and names ----------------------------------------------------------------------------------------------------------------
 
 pm:programName a owl:DatatypeProperty ; rdfs:domain pm:Program ; rdfs:range xsd:string ; skos:definition "What the program is called when it is run."@en .
+pm:order a owl:DatatypeProperty ; rdfs:domain pm:Program ; rdfs:range xsd:integer ; skos:definition "Where the program stands in the lists a harness shows or installs from; lower comes first."@en .
 pm:tier a owl:ObjectProperty ; rdfs:domain pm:Program ; rdfs:range pm:Tier ; skos:definition "required or comfort."@en .
 pm:forProgram a owl:ObjectProperty ; rdfs:domain pm:PackageName ; rdfs:range pm:Program ; skos:definition "The program the package gives."@en .
 pm:forFamily a owl:ObjectProperty ; rdfs:domain pm:PackageName ; rdfs:range pm:SystemFamily ; skos:definition "The family that calls the package this."@en .
