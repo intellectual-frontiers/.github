@@ -6,6 +6,7 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --dry-run
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
 # It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian or Arch has none of them):
 #   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs: apt-get on the Debian family, pacman on the Arch family)
@@ -57,6 +58,10 @@
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
+#   ARCHON_RETRIES         how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
+#   ARCHON_RETRY_DELAY     seconds to wait before the second try; it doubles each time up to ARCHON_RETRY_MAX_DELAY (default 3, and 60)
+#   BOOTSTRAP_PATIENT=1    the same as --patient: for a network that drops often (15 tries, 5 seconds to start, 120 at most)
+#   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub cannot be reached)
 # ws-host's own names are honoured where it has them: WS_HOST_HOME (the workspaces folder, default ~/workspaces), WS_HOST_WORKSPACES, WS_HOST_KIT,
 # WS_HOST_PROMPT, WS_HOST_MODERN, WS_HOST_GIT_NAME, WS_HOST_GIT_EMAIL, in the environment or in ~/.config/workspaces-host/ws-host.env.
 #
@@ -507,8 +512,9 @@ for arg in "$@"; do
   case $arg in
     --dry-run | -n) dry=1 ;;
     --comfort) comfort=1 ;;
+    --patient) BOOTSTRAP_PATIENT=1 ;;
     -h | --help)
-      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort]   (see the header of archon-setup.sh)" ;; esac
+      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort] [--patient]   (see the header of archon-setup.sh)" ;; esac
       exit 0 ;;
     *) echo "archon-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
   esac
@@ -531,9 +537,9 @@ fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
   *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_font='🔤 '
-     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 ' ;;
+     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 '; e_retry='🔁 ' ;;
   *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_font=''
-     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code='' ;;
+     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code=''; e_retry='~ ' ;;
 esac
 
 # Every environment variable name in a message (capitals with an underscore, like BOOTSTRAP_PROMPT) is shown in bright yellow where there is colour.
@@ -794,7 +800,8 @@ step() {
           cnt=": ${b}${n}${z}"
           [ -n "$count_total" ] && cnt="$cnt of $count_total"
         fi
-        printf '\r\033[K%s%s%s %s%s %s(%ss)%s' "$c" "$f" "$z" "$slabel" "$cnt" "$d" "$(( $(date +%s) - start ))" "$z" >&2
+        rt=""; [ -s "$retry_log" ] && rt=" ${y}${e_retry}$(wc -l <"$retry_log" | tr -d ' ') retries${z}"
+        printf '\r\033[K%s%s%s %s%s %s(%ss)%s%s' "$c" "$f" "$z" "$slabel" "$cnt" "$d" "$(( $(date +%s) - start ))" "$z" "$rt" >&2
       fi
       sleep 0.1
     done
@@ -916,6 +923,13 @@ stop_here() {  # stop_here LABEL STEPLOG LOGLINE
   say "${y}${e_why}What it said:${z}"
   tail -n 6 "$2" 2>/dev/null | cut -c1-$((cols - 6)) | sed 's/^/     /'
   say ""
+  if [ -f "$2" ] && net_words "$2"; then
+    say "${y}${e_retry}This looks like the network (a name that would not resolve, a connection that broke), not your computer.${z}"
+    say "   Nothing needs undoing: run the setup again and it carries on where it stopped. What was fetched is kept, and a download that stopped half way resumes."
+    say "   On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits) or set ${b}ARCHON_RETRIES=20${z}."
+    retry_summary
+    say ""
+  fi
   if [ "$log_ok" = 1 ]; then
     write_support_file "$1" "$2" "$3"
     say "${c}${e_log}Where to look:${z}   ${b}$(short_path "$logfile")${z}  ${d}(the problem starts at line $3)${z}"
@@ -942,9 +956,12 @@ write_support_file() {  # write_support_file LABEL STEPLOG LOGLINE
     printf 'User:        %s (id %s)   Shell: %s\n' "$(id -un)" "$(id -u)" "${SHELL:-unknown}"
     printf 'Disk free:   %s\n' "$(df -h "$HOME" 2>/dev/null | awk 'NR==2 {print $4" of "$2}')"
     printf 'Network:     %s\n' "$(curl -fsS -o /dev/null -m 6 -w 'github.com answers (%{http_code})' https://github.com 2>&1 | tail -n 1)"
+    printf 'Retries:     %s (tries %s, wait %ss doubling to %ss)\n' "$(wc -l <"$retry_log" 2>/dev/null | tr -d ' ')" "$retry_tries" "$retry_base" "$retry_cap"
     printf 'Log file:    %s\n\n' "$(short_path "$logfile")"
     printf -- '--- what the failed step printed (last 60 lines) ---\n'
     tail -n 60 "$2" 2>/dev/null
+    printf '\n--- the retries (what, why, which try) ---\n'
+    tail -n 40 "$retry_log" 2>/dev/null
     printf '\n--- the setup log, last 120 lines ---\n'
     tail -n 120 "$logfile" 2>/dev/null
   } 2>/dev/null | sed -E 's/(gh[pousr]_|github_pat_)[A-Za-z0-9_]+/\1[removed]/g; s/([Tt][Oo][Kk][Ee][Nn]|[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]|[Ss][Ee][Cc][Rr][Ee][Tt]|[Kk][Ee][Yy])=[^ ]+/\1=[removed]/g' >"$support_file" 2>/dev/null || true
@@ -1121,7 +1138,83 @@ link_fd() {
 
 # ---- fetching and verifying -------------------------------------------------------------------------------------------------------------------------
 
-# A download that stalls must fail, not wait for ever: no answer in 20 seconds, or under 1 KB a second for 60 seconds, ends it (and curl retries).
+# ---- a network that fails now and works in a minute (0136-machine-bootstrap FR-081 to FR-086) -------------------------------------------------------------
+# Every download and every step that needs the network is tried again where the network is what failed, with a longer wait each time, and each retry is said and kept for the
+# summary. A refusal (not allowed, not found, a file that is not the one expected) is not tried again: another try cannot change it.
+retry_num() {  # retry_num VALUE DEFAULT: VALUE where it is a whole number of one or more, else DEFAULT
+  case ${1:-} in '' | *[!0-9]* | 0) printf '%s' "$2" ;; *) printf '%s' "$1" ;; esac
+}
+if [ "${BOOTSTRAP_PATIENT:-}" = 1 ]; then retry_def_tries=15; retry_def_base=5; retry_def_cap=120; else retry_def_tries=8; retry_def_base=3; retry_def_cap=60; fi
+retry_tries=$(retry_num "${ARCHON_RETRIES:-}" "$retry_def_tries")
+retry_base=$(retry_num "${ARCHON_RETRY_DELAY:-}" "$retry_def_base")
+retry_cap=$(retry_num "${ARCHON_RETRY_MAX_DELAY:-}" "$retry_def_cap")
+retry_log=$work/retries.log   # one line for each retry: what, why, which try (a path fixed here, since a parallel step has a work folder of its own)
+: >"$retry_log"
+
+retry_wait() {  # retry_wait ATTEMPT: the seconds to wait after the attempt that just failed: the base doubled each time, no more than the cap, and up to 2 more so that many computers do not try together
+  rw_d=$retry_base; rw_i=1
+  while [ "$rw_i" -lt "$1" ] && [ "$rw_d" -lt "$retry_cap" ]; do rw_d=$((rw_d * 2)); rw_i=$((rw_i + 1)); done
+  [ "$rw_d" -le "$retry_cap" ] || rw_d=$retry_cap
+  printf '%s' $((rw_d + ($(date +%s) + $$) % 3))
+}
+
+retry_note() {  # retry_note WHAT WHY SECONDS NEXT_ATTEMPT: say that an attempt failed and when the next is, and keep it for the summary
+  printf '%s\t%s\t%s\n' "$1" "$2" "$4" >>"$retry_log" 2>/dev/null || true
+  logf "retry: $1: $2; waiting $3s (attempt $4 of $retry_tries)"
+  printf '  %s%s: %s; trying again in %ss (attempt %s of %s)\n' "$e_retry" "$1" "$2" "$3" "$4" "$retry_tries" >&2
+}
+
+# curl_why RC HTTPCODE: sets retry_why to words for a failure; returns 0 where a new try may help (the name could not be looked up, the connection broke, the server is busy), 1 where it cannot
+curl_why() {
+  case $1 in
+    5 | 6) retry_why="the name could not be looked up (DNS)"; return 0 ;;
+    7) retry_why="no connection could be made"; return 0 ;;
+    16 | 18 | 52 | 55 | 56 | 92) retry_why="the connection broke or the download stopped early"; return 0 ;;
+    28) retry_why="it took too long"; return 0 ;;
+    35) retry_why="the secure connection could not be made"; return 0 ;;
+    33 | 36) retry_why="the download could not be resumed, so it starts again"; return 0 ;;
+    58 | 59 | 60 | 77 | 82 | 83) retry_why="the certificate was not accepted (a proxy, or the computer's clock?)"; return 1 ;;
+    22)
+      case ${2:-} in
+        408 | 425 | 429 | 5??) retry_why="the server answered $2 (busy or not ready)"; return 0 ;;
+        416) retry_why="the part already fetched did not fit, so it starts again"; return 0 ;;
+        *) retry_why="the server answered ${2:-an error}"; return 1 ;;
+      esac ;;
+    *) retry_why="curl stopped with status $1"; return 1 ;;
+  esac
+}
+
+# net_words FILE: 0 where the words in FILE say the network failed (not a refusal, not a bad certificate), so the command that wrote them is worth running again
+net_words() {
+  grep -Eiq 'certificate problem|self[ -]signed|unknown ca|not allowed|denied|authentication failed|not found|404' "$1" && return 1
+  grep -Eiq 'could not resolve|temporary failure (in name )?resolution|temporary failure resolving|name or service not known|connection failed|unable to connect|could not connect|dns error|connection (reset|refused|timed out|closed)|timed out|timeout|network is unreachable|no route to host|early eof|rpc failed|unexpected disconnect|broken pipe|handshake|tls|ssl|error sending request|failed to (fetch|download)|unable to access|\b50[0234]\b|too many requests' "$1"
+}
+
+# retry_cmd WHAT COMMAND...: a command that uses the network, run again when its own words say the network failed; anything else fails at once with what it said
+retry_cmd() {
+  rc_what=$1; shift; rc_n=1; rc_out=${work:-${TMPDIR:-/tmp}}/retry.out.$$
+  while :; do
+    rc_rc=0
+    "$@" >"$rc_out" 2>&1 || rc_rc=$?
+    if [ "$rc_rc" = 0 ]; then cat "$rc_out"; rm -f "$rc_out"; return 0; fi
+    if [ "$rc_n" -ge "$retry_tries" ] || ! net_words "$rc_out"; then cat "$rc_out" >&2; rm -f "$rc_out"; return "$rc_rc"; fi
+    rc_w=$(retry_wait "$rc_n"); rc_n=$((rc_n + 1))
+    retry_note "$rc_what" "$(grep -Ei 'could not resolve|name resolution|name or service|timed out|timeout|reset|refused|unreachable|early eof|rpc failed|50[0234]|tls|ssl' "$rc_out" | head -n 1 | cut -c1-90)" "$rc_w" "$rc_n"
+    sleep "$rc_w"
+  done
+}
+
+# retry_summary: what the network cost this run, so that a network that needed retries is known to have, and what to do if that is common
+retry_summary() {
+  [ -s "$retry_log" ] || return 0
+  rs_n=$(wc -l <"$retry_log" | tr -d ' ')
+  rs_top=$(cut -f1 "$retry_log" | sort | uniq -c | sort -rn | head -n 4 | awk '{c=$1; $1=""; sub(/^ /, ""); printf "%s%s (%d)", sep, $0, c; sep=", "}')
+  say ""
+  say "${d}${e_retry}The network needed $rs_n retries in this run, most for: $rs_top.${z}"
+  say "${d}   If that happens often here, add ${z}${b}--patient${z}${d} (15 tries, longer waits) or set ${z}${b}ARCHON_RETRIES=20${z}${d}; fewer: ARCHON_RETRIES=3.${z}"
+}
+
+# A download that stalls must fail, not wait for ever: no answer in 20 seconds, or under 1 KB a second for 60 seconds, ends it (and is tried again).
 net="--connect-timeout 20 --speed-limit 1024 --speed-time 60"
 # SHA-256 and SHA-512 of a file (Linux has sha256sum; macOS has shasum): the digest alone
 if command -v sha256sum >/dev/null 2>&1; then
@@ -1135,9 +1228,34 @@ else
 fi
 b64_decode() { base64 -d 2>/dev/null || base64 -D; }   # GNU and BSD spell it differently
 
-fetch_to() {  # fetch_to URL DEST
-  if command -v curl >/dev/null 2>&1; then curl -fsSL $net --retry 3 -o "$2" "$1"
-  elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$2" "$1"
+fetch_to() {  # fetch_to URL DEST [CURL ARGS]: the file; a name ending .part is resumed from what an earlier try left. Tried again where the network failed, said each time, and kept in the summary.
+  ft_url=$1; ft_dest=$2; shift 2
+  ft_name=${ft_url#*://}; ft_name=${ft_name%%/*}
+  ft_resume=""; case $ft_dest in *.part) ft_resume="-C -" ;; esac
+  if command -v curl >/dev/null 2>&1; then
+    ft_n=1
+    while :; do
+      # shellcheck disable=SC2086  # $net and $ft_resume are words
+      ft_code=$(curl -fsSL $net $ft_resume -o "$ft_dest" -w '%{http_code}' "$@" "$ft_url" 2>/dev/null) && return 0
+      ft_rc=$?
+      if curl_why "$ft_rc" "$ft_code" && [ "$ft_n" -lt "$retry_tries" ]; then
+        case $ft_rc:$ft_code in 33:* | 36:* | 22:416) rm -f "$ft_dest" ;; esac
+        ft_w=$(retry_wait "$ft_n"); ft_n=$((ft_n + 1))
+        retry_note "$ft_name" "$retry_why" "$ft_w" "$ft_n"
+        sleep "$ft_w"
+      else
+        echo "$ft_name: $retry_why (after $ft_n of $retry_tries attempts)" >&2
+        return 1
+      fi
+    done
+  elif command -v wget >/dev/null 2>&1; then
+    ft_n=1
+    until wget -q -T 30 -O "$ft_dest" "$ft_url"; do
+      [ "$ft_n" -lt "$retry_tries" ] || { echo "$ft_name: could not be fetched (after $ft_n of $retry_tries attempts)" >&2; return 1; }
+      ft_w=$(retry_wait "$ft_n"); ft_n=$((ft_n + 1))
+      retry_note "$ft_name" "wget failed" "$ft_w" "$ft_n"
+      sleep "$ft_w"
+    done
   else echo "neither curl nor wget is installed" >&2; return 1; fi
 }
 
@@ -1146,8 +1264,8 @@ download_verified() {
   mkdir -p "$cache/downloads"
   f=$cache/downloads/$2
   if [ -f "$f" ] && [ "$(sha_of "$f")" = "$2" ]; then printf '%s\n' "$f"; return 0; fi
-  part=$f.part.$$
-  if ! fetch_to "$1" "$part"; then rm -f "$part"; echo "could not fetch $1" >&2; return 1; fi
+  part=$f.part   # kept when a try fails, so the next try (or the next run) resumes where it stopped
+  if ! fetch_to "$1" "$part"; then echo "could not fetch $1" >&2; return 1; fi
   got=$(sha_of "$part")
   if [ "$got" != "$2" ]; then
     rm -f "$part"
@@ -1250,8 +1368,8 @@ skip_github() {  # skip_github WHAT: left for a GitHub sign-in; says so, and the
 
 api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when there is one (it lifts the hourly limit); never sent elsewhere
   tok=$(gh_token)
-  if [ -n "$tok" ]; then curl -fsSL $net --retry 2 -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json" -o "$2" "$1"
-  else curl -fsSL $net --retry 2 -H "Accept: application/vnd.github+json" -o "$2" "$1"; fi
+  if [ -n "$tok" ]; then fetch_to "$1" "$2" -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json"
+  else fetch_to "$1" "$2" -H "Accept: application/vnd.github+json"; fi
 }
 
 # The release file for this system (Linux or macOS) on this architecture, chosen by its name (ws-host's pick_asset): the one that says linux and the architecture, is not for
@@ -1300,7 +1418,7 @@ candidate() {
   if [ -z "$c_sha" ]; then
     # an older release: a checksum file the publisher put beside it
     for c_sums in $(jq -r '.assets[] | select(.name | test("(checksums?|sha256sums?)(\\.txt)?$|\\.sha256(sum)?$"; "i")) | .browser_download_url' "$c_rel"); do
-      curl -fsSL $net --retry 2 -o "$work/sums" "$c_sums" 2>/dev/null || continue
+      fetch_to "$c_sums" "$work/sums" 2>/dev/null || continue
       c_base=${c_sums##*/}
       c_found=$(awk -v n="$c_name" -v b="$c_base" 'tolower(b) ~ /\.sha256(sum)?$/ && index(tolower(b), tolower(n)) == 1 && length($1) == 64 && $1 ~ /^[0-9a-f]+$/ {print $1; exit}
                                                  length($1) == 64 && $1 ~ /^[0-9a-f]+$/ && index($0, n) {print $1; exit}' "$work/sums")
@@ -1433,11 +1551,11 @@ install_pypi() {
   if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$@"; then return 0; fi
   rm -rf "${troot:?}/$ver"; mkdir -p "$troot"
   # a Python of uv's own stays put when the machine's moves on; failing that, any Python that is new enough
-  if ! uv venv --python 3.12 --managed-python --quiet "$troot/$ver"; then
+  if ! retry_cmd "Python for $pkg" uv venv --python 3.12 --managed-python --quiet "$troot/$ver"; then
     rm -rf "${troot:?}/$ver"
-    uv venv --python '>=3.10' --quiet "$troot/$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
+    retry_cmd "Python for $pkg" uv venv --python '>=3.10' --quiet "$troot/$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
   fi
-  uv pip install --quiet --python "$troot/$ver/bin/python" "$pkg==$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
+  retry_cmd "$pkg from PyPI" uv pip install --quiet --python "$troot/$ver/bin/python" "$pkg==$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
   linked=""
   for item in "$@"; do linked="$linked ${item%%=*}=$ver/${item#*=}"; done
   set_current "$troot" "$ver"
@@ -1545,7 +1663,7 @@ install_runtime() {
   fi
   mkdir -p "$data/mise/data" "$state/mise/config"
   for v in $(env | sed -n 's/^\(MISE_[A-Z_]*\)=.*/\1/p'); do unset "$v"; done
-  MISE_DATA_DIR=$data/mise/data MISE_CACHE_DIR=$cache/mise MISE_STATE_DIR=$state/mise/state MISE_CONFIG_DIR=$state/mise/config \
+  retry_cmd "Python and uv (mise)" env MISE_DATA_DIR="$data/mise/data" MISE_CACHE_DIR="$cache/mise" MISE_STATE_DIR="$state/mise/state" MISE_CONFIG_DIR="$state/mise/config" \
     MISE_SAFE=1 MISE_YES=1 NO_COLOR=1 MISE_QUIET=1 "$mise" install "python@$PYTHON_VERSION" "uv@$UV_VERSION"
 }
 
@@ -1785,8 +1903,10 @@ identity() {
   return 0
 }
 
-clone_step() { GIT_TERMINAL_PROMPT=0 git clone --quiet "$archon_url" "$target"; }
-fetch_step() { GIT_TERMINAL_PROMPT=0 git -C "$target" fetch --quiet origin; }
+# a copy that stops half way is cloned beside the place and moved in whole, so a try again starts clean and never touches a folder that was not made here
+clone_attempt() { rm -rf "$target.partial"; GIT_TERMINAL_PROMPT=0 git clone --quiet "$archon_url" "$target.partial" && mv "$target.partial" "$target"; }
+clone_step() { retry_cmd "copying archon from GitHub" clone_attempt; }
+fetch_step() { retry_cmd "updating archon from GitHub" env GIT_TERMINAL_PROMPT=0 git -C "$target" fetch --quiet origin; }
 
 workspace_and_clone() {
   heading "${e_dir}Your workspace"
@@ -1969,6 +2089,7 @@ finish() {
     sed 's/^/  - /' "$problems"
     say "Run this again to retry; what is installed stays."
   fi
+  retry_summary
   if [ -s "$skipped" ]; then
     say ""
     say "${y}${b}${e_key}Left until you sign in to GitHub${z} (not a failure):"
@@ -2183,6 +2304,42 @@ preflight() {
   return 0
 }
 
+# ---- the network, looked at before the long installs: a name that will not resolve is found in a minute, not ten minutes in (0136-machine-bootstrap FR-086) ----
+# reach HOST: 0 where HOST answers over https (any answer counts, even a refusal), trying again where it does not; 1 with retry_why set
+reach() {
+  rh_n=1; rh_max=$retry_tries; [ "$rh_max" -le 5 ] || rh_max=5
+  while :; do
+    rh_rc=0
+    curl -sS -o /dev/null -I --connect-timeout 10 -m 20 "https://$1/" >/dev/null 2>&1 || rh_rc=$?
+    [ "$rh_rc" = 0 ] && return 0
+    curl_why "$rh_rc" "" || true
+    [ "$rh_n" -lt "$rh_max" ] || return 1
+    rh_w=$(retry_wait "$rh_n"); rh_n=$((rh_n + 1))
+    retry_note "$1" "$retry_why" "$rh_w" "$rh_n"
+    sleep "$rh_w"
+  done
+}
+check_network() {
+  [ "$dry" = 1 ] && return 0
+  [ "${BOOTSTRAP_NO_NETCHECK:-}" = 1 ] && return 0
+  [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] && [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
+  command -v curl >/dev/null 2>&1 || return 0
+  phase "${e_sync}Checking the network"
+  cn_bad=""
+  for cn_h in github.com api.github.com raw.githubusercontent.com objects.githubusercontent.com; do
+    if reach "$cn_h"; then logf "network: $cn_h answers"; else logf "network: $cn_h does not answer ($retry_why)"; cn_bad="$cn_bad $cn_h"; fi
+  done
+  [ -n "$cn_bad" ] || return 0
+  cn_bad=${cn_bad# }
+  say "${r}${b}${e_stop}This computer cannot reach: ${z}${b}$cn_bad${z}${r} (${retry_why}).${z}"
+  say "That is the network or DNS, not this setup, and nothing has been changed. Things that usually fix it:"
+  say "  ${c}1.${z} Try another network (a phone hotspot is a quick test), or turn a VPN off."
+  say "  ${c}2.${z} Use a different DNS server: 1.1.1.1 or 8.8.8.8."
+  [ "$wsl" = 1 ] && say "  ${c}3.${z} On WSL: in PowerShell run ${b}wsl --shutdown${z}, open Debian again, and check that ${b}/etc/resolv.conf${z} lists a server."
+  say "Then run this again. On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits), or set ${b}ARCHON_RETRIES=20${z}; ${b}BOOTSTRAP_NO_NETCHECK=1${z} skips this look."
+  exit 3
+}
+
 # the private archon repository is read with the person's sign-in: say now, before the long installs, that this account cannot open it (0136-machine-bootstrap FR-061)
 check_access() {
   if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private archon repository"; return 0; fi
@@ -2234,6 +2391,7 @@ main() {
   fi
   # The one thing that needs a person, up front: the GitHub sign-in. Then it all runs by itself. Everything that downloads from GitHub waits for github_init.
   preflight
+  check_network
   sign_in
   github_init
   check_access

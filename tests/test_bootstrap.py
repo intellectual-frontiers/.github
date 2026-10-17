@@ -49,7 +49,7 @@ class Fixture(unittest.TestCase):
 
     def env(self, **extra):
         env = {k: v for k, v in os.environ.items() if not k.startswith(("BOOTSTRAP_", "WS_HOST_", "XDG_")) and k not in ("NO_COLOR", "GH_TOKEN", "GITHUB_TOKEN")}
-        env.update(HOME=str(self.home), TERM="dumb", LANG="C", TMPDIR=str(self.tmp))
+        env.update(HOME=str(self.home), TERM="dumb", LANG="C", TMPDIR=str(self.tmp), BOOTSTRAP_NO_NETCHECK="1")
         env.update(extra)
         return env
 

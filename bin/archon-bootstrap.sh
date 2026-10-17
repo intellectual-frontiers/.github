@@ -9,6 +9,7 @@
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --dry-run
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
 #   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq and the
 #      other programs the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the everyday programs (ripgrep, ImageMagick, sqlite3 and the rest),
@@ -31,8 +32,9 @@ boot_source_only=${BOOTSTRAP_SOURCE_ONLY:-}   # 1: load the functions and run no
 while [ "$#" -gt 0 ]; do
   case $1 in
     --dry-run | -n) boot_dry=1 ;;
+    --patient) BOOTSTRAP_PATIENT=1; export BOOTSTRAP_PATIENT ;;
     -h | --help)
-      case $0 in *archon-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run]   (see the header of archon-bootstrap.sh)" ;; esac
+      case $0 in *archon-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--patient]   (see the header of archon-bootstrap.sh)" ;; esac
       exit 0 ;;
     *) echo "archon-bootstrap: unknown option $1 (try --help)" >&2; exit 2 ;;
   esac
@@ -49,7 +51,16 @@ if [ -z "$setup_file" ]; then
   setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
   setup_file=$setup_dir/archon-setup.sh
   raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
-  if command -v curl >/dev/null 2>&1; then curl -fsSL --connect-timeout 20 --retry 3 -o "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
+  # the first download, before the setup's own retry code is here: tried again with a longer wait each time (ARCHON_RETRIES, default 8; --patient 15)
+  boot_tries=${ARCHON_RETRIES:-8}; [ "${BOOTSTRAP_PATIENT:-}" = 1 ] && boot_tries=${ARCHON_RETRIES:-15}
+  case $boot_tries in '' | *[!0-9]* | 0) boot_tries=8 ;; esac
+  if command -v curl >/dev/null 2>&1; then
+    boot_n=1; boot_wait=${ARCHON_RETRY_DELAY:-3}
+    until curl -fsSL --connect-timeout 20 -o "$setup_file" "$raw/bin/archon-setup.sh"; do
+      [ "$boot_n" -lt "$boot_tries" ] || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh (after $boot_n tries; the network or DNS is the likely cause)" >&2; exit 3; }
+      boot_n=$((boot_n + 1)); echo "  could not fetch the setup; trying again in ${boot_wait}s (attempt $boot_n of $boot_tries)" >&2
+      sleep "$boot_wait"; boot_wait=$((boot_wait * 2)); [ "$boot_wait" -le 60 ] || boot_wait=60
+    done
   elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
   else echo "archon-bootstrap: neither curl nor wget is installed. Install them with your package manager first (Debian: sudo apt update && sudo apt install -y curl wget; Arch: sudo pacman -S --needed curl wget)" >&2; exit 3; fi
   chmod 644 "$setup_file"
@@ -151,9 +162,9 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
 pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
   pr_fam=$1; pr_words=$2; shift 2
   pr_env=$(pm_environment "$pr_fam")
-  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=180" ;; *) pr_extra="" ;; esac
+  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=180 -o Acquire::Retries=3" ;; *) pr_extra="" ;; esac
   # shellcheck disable=SC2086  # the table's words
-  if [ -n "$pr_env" ]; then $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else $sudo_cmd $pr_words $pr_extra "$@"; fi
+  if [ -n "$pr_env" ]; then retry_cmd "packages ($pr_fam)" $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else retry_cmd "packages ($pr_fam)" $sudo_cmd $pr_words $pr_extra "$@"; fi
 }
 pm_install() { pm_run "$family" "$(pm_install_words "$family")" "$@"; }
 apt_install() { pm_run debian "$(pm_install_words debian)" "$@"; }
