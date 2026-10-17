@@ -1519,6 +1519,22 @@ in_archon() {  # in_archon COMMAND...: run in the clone, showing its output; ask
   if [ "$has_tty" = 1 ]; then ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/tty ); else ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/null ); fi
 }
 
+# The system libraries archon's own programs link against (the C compiler for Rust, the browser's libraries), which only administrator rights can install. archon says which this
+# computer lacks, from its own declarations, so this script holds no second list (0136-machine-bootstrap FR-063). The bootstrap, which has those rights, installs them (it defines
+# bootstrap_install_libraries); the setup alone names the one command for a person who has them, and goes on.
+system_libraries() {
+  sl_json=$( ( cd "$target" && ./archon toolchain list --json </dev/null 2>/dev/null ) ) || return 0
+  sl_pk=$(printf '%s' "$sl_json" | jq -r '.data.system_packages // [] | join(" ")' 2>/dev/null) || return 0
+  [ -n "$sl_pk" ] || return 0
+  sl_cmd=$(printf '%s' "$sl_json" | jq -r '.data.system_command // ""' 2>/dev/null)
+  if command -v bootstrap_install_libraries >/dev/null 2>&1; then
+    bootstrap_install_libraries "$sl_pk" && return 0
+  fi
+  warn "archon's programs need these system libraries, which only an account with administrator rights can install: $sl_pk. From such an account run: sudo $sl_cmd"
+  problem "system libraries are missing: $sl_pk (from an account with administrator rights: sudo $sl_cmd)"
+  return 0
+}
+
 run_archon() {
   heading "${e_rocket}archon"
   if [ "$dry" = 1 ]; then
@@ -1527,6 +1543,7 @@ run_archon() {
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./archon shell ensure (the startup files of bash, zsh and fish, kept with chezmoi)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./archon shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       would "run in the clone: ./archon doctor"
+      would "ask archon which system libraries its programs need that this computer lacks (./archon toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
       would "run in the clone: ./archon toolchain ensure (every entry of ./archon toolchain list that is not ready and not optional)"
       would "run in the clone: ./archon check --quick (a few sections, in seconds; the full ./archon check takes minutes and is left to you)"
     }
@@ -1555,6 +1572,7 @@ run_archon() {
     say "Left until you sign in to GitHub: ./archon toolchain ensure ($names)."
     skip_github "archon toolchain ensure: $names"
   elif [ -n "$names" ]; then
+    system_libraries
     # shellcheck disable=SC2086
     step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
   fi

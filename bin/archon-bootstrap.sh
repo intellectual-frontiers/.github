@@ -269,6 +269,14 @@ install_code_package() {
   return 0
 }
 
+# The setup asks archon which system libraries its programs need (0136-machine-bootstrap FR-063) and calls this to install them: the bootstrap has the administrator rights, once, already.
+bootstrap_install_libraries() {  # bootstrap_install_libraries "package package ..."
+  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ]; then return 1; fi
+  sudo_for "install the system libraries archon's programs link against ($1)" || return 1
+  # shellcheck disable=SC2086  # a list of package names
+  step_soft "${e_pkg}Installing system libraries for archon's programs" pm_install $1
+}
+
 # ---- the setup, run as this account -------------------------------------------------------------------------------------------------------------------
 
 run_setup() {

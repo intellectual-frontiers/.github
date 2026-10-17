@@ -241,7 +241,9 @@ class Clone(Fixture):
     LAUNCHER = """#!/bin/sh
 [ "$1 $2" = "toolchain list" ] || echo "ARCHON $* assume_yes=${ARCHON_ASSUME_YES:-} no_admin=${ARCHON_NO_ADMIN:-}" >>"${CALLS:?}"
 case "$1 $2" in
-  "toolchain list") echo '{"data":{"entries":[{"name":"node","ready":true,"summary":"Node.js"},{"name":"python","ready":false,"summary":"Python"},{"name":"docker","ready":false,"summary":"Docker (optional: only an image needs it)"},{"name":"jre","ready":false,"summary":"A Java runtime"}]}}' ;;
+  "toolchain list") libs='[]'; cmd=''
+    [ -n "${FAKE_LIBS:-}" ] && { libs='["build-essential","cmake"]'; cmd='apt-get install -y build-essential cmake'; }
+    echo '{"data":{"entries":[{"name":"node","ready":true,"summary":"Node.js"},{"name":"python","ready":false,"summary":"Python"},{"name":"docker","ready":false,"summary":"Docker (optional: only an image needs it)"},{"name":"jre","ready":false,"summary":"A Java runtime"}],"system_packages":'"$libs"',"system_command":"'"$cmd"'"}}' ;;
 esac
 [ "$1" = check ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
 [ "$1 $2" = "shell ensure" ] && [ -n "${FAKE_FAIL_SHELL:-}" ] && exit 3
@@ -272,6 +274,32 @@ exit 0
         (self.upstream / name).write_text(text)
         git("add", name, cwd=self.upstream)
         git("commit", "-qm", name, cwd=self.upstream)
+
+    def test_the_setup_alone_names_the_one_command_for_system_libraries_archon_says_it_lacks(self):
+        """0136-machine-bootstrap FR-063: archon holds the list; the setup has no copy, and installs nothing itself"""
+        p = self.go(FAKE_LIBS="1")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("sudo apt-get install -y build-essential cmake", p.stdout + p.stderr)
+        self.assertIn("system libraries are missing: build-essential cmake", p.stdout)
+        self.assertIn("ARCHON toolchain ensure", self.calls.read_text(), "the programs are still installed")
+        self.assertNotIn("system libraries", self.go().stdout + self.go().stderr, "nothing is said where nothing is lacking")
+        self.assertNotIn("build-essential", SCRIPT.read_text().split("system_libraries()")[0].split("MODERN_TOOLS")[0], "no second list of packages in the setup")
+
+    def test_the_bootstrap_installs_those_libraries_with_the_rights_it_has_and_only_when_packages_are_on(self):
+        """0136-machine-bootstrap FR-063"""
+        log = self.tmp / "pm.log"
+        log.write_text("")
+        self.stub("sudo", f'case "$1" in -v | -n) exit 0 ;; esac\nexec "$@"')
+        self.stub("apt-get", f'echo "apt-get $*" >>{log}')
+        call = lambda **env: subprocess.run([SH, "-c", f'. "{BOOT}"; family=debian; sudo_ready=0; has_tty=0; dry=0; if bootstrap_install_libraries "build-essential cmake"; then echo rc=0; else echo rc=1; fi'], capture_output=True, text=True,   # noqa: E731
+                                            env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), PATH=f"{self.bin}:{os.environ['PATH']}", **env))
+        ok = call()
+        self.assertIn("rc=0", ok.stdout, ok.stdout + ok.stderr)
+        self.assertRegex(log.read_text(), r"apt-get install -y -qq .*build-essential cmake")
+        log.write_text("")
+        off = call(BOOTSTRAP_NO_APT="1")
+        self.assertIn("rc=1", off.stdout)
+        self.assertEqual(log.read_text(), "")
 
     def test_it_copies_archon_runs_its_three_commands_and_says_what_is_next(self):
         p = self.go()
