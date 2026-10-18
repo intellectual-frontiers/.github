@@ -728,6 +728,22 @@ class Settings(Fixture):
         self.assertIn("not saved", q.stdout + q.stderr)
         self.assertNotIn("phc_it", (self.home / ".config" / "archon" / "secrets.env").read_text() if (self.home / ".config" / "archon" / "secrets.env").exists() else "")
 
+    def test_a_sign_in_made_with_gh_is_said_to_be_kept_on_this_computer_and_a_token_of_the_environment_is_not(self):
+        env = self.env(BOOTSTRAP_SOURCE_ONLY="1", GH_TOKEN="ghp_" + "x" * 30)
+        said = lambda how: subprocess.run([SH, "-c", f". {SCRIPT}; signin_how={how}; dry=0; secrets_file=/nonexistent/x; keep_settings"], capture_output=True, text=True, env=env).stdout
+        kept = said("gh")
+        self.assertIn("Your GitHub sign-in is kept on this computer", kept)
+        self.assertIn("gh auth logout", kept)
+        self.assertNotIn("not saved", kept)
+        self.assertNotIn("archon secrets set GH_TOKEN", kept)
+        token = said("env")
+        self.assertIn("not saved", token)
+        self.assertIn("archon secrets set GH_TOKEN", token)
+        self.assertIn("gh auth login", token)
+        self.assertIn("The GitHub token in GH_TOKEN was used", token)
+        for output in (kept, token):
+            self.assertNotIn("ghp_xxxx", output, "the token is never shown")
+
     def test_a_dry_run_writes_nothing_and_a_kept_key_counts_for_telemetry_where_the_terminal_has_none(self):
         p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)

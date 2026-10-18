@@ -1826,6 +1826,7 @@ sign_in() {
   token_var=""
   if [ -n "${GH_TOKEN:-}" ]; then token_var=GH_TOKEN; elif [ -n "${GITHUB_TOKEN:-}" ]; then token_var=GITHUB_TOKEN; fi
   if [ -n "$token_var" ] && signed_in; then
+    signin_how="env"
     say "${g}${e_ok}Using the GitHub token in ${z}${b}$token_var${z}${g}: no sign-in is needed.${z}"
   elif [ -n "$token_var" ]; then
     say "${r}${b}${e_stop}GitHub did not accept the token in${z} ${b}$token_var${z}${r}.${z}"
@@ -1833,6 +1834,7 @@ sign_in() {
     problem "the token in $token_var was not accepted by GitHub"
     exit 5
   elif signed_in; then
+    signin_how=gh
     say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
     say ""
@@ -1857,7 +1859,7 @@ sign_in() {
     done
     wait "$rem_pid" 2>/dev/null || true; rem_pid=""
     logf "gh auth login said: $(sed "s/${esc}\[[0-9;]*m//g" "$gh_out" | tr '\n' ' ' | sed -E 's/[A-Z0-9]{4}-[A-Z0-9]{4}/<code>/')"
-    if signed_in; then si_ok=ok; else si_ok=unfinished; fi
+    if signed_in; then si_ok=ok; signin_how=gh; else si_ok=unfinished; fi
     ph_event bootstrap_step "s:step=GitHub sign-in" "s:phase=sign-in" "s:outcome=$si_ok" "n:duration_ms=$(( ($(date +%s) - si0) * 1000 ))" "s:attended=yes"
     if [ "$si_ok" != ok ]; then
       [ -n "$shown" ] || { say ""; say "${d}GitHub's tool said:${z}"; sed "s/${esc}\[[0-9;]*m//g" "$gh_out" | tail -n 5 | cut -c1-$((cols - 6)) | sed 's/^/     /'; }
@@ -2429,8 +2431,15 @@ keep_settings() {
     eval "ks_v=\${$ks_n:-}"
     [ -n "$ks_v" ] && ks_names="$ks_names $ks_n"
   done
-  if [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && [ "$dry" = 0 ]; then
-    say "${d}🔑 Your GitHub token was used for this setup only and is not saved. To keep it for every terminal: archon secrets set GH_TOKEN${z}"
+  if [ "$dry" = 0 ] && [ "${signin_how:-}" = gh ]; then
+    # signed in with gh (now or before): gh keeps the login for this Linux user and is git's credential helper, so it lasts
+    say "${g}🔐 Your GitHub sign-in is kept on this computer.${z}${d} gh stores it for your Linux user ($(id -un 2>/dev/null || echo you)) in its own private store (the system keyring, or ~/.config/gh/hosts.yml that only you can read),"
+    say "   and git uses it, so every new terminal, git and archon reach GitHub without asking you again. It is not shared and nothing was sent to anyone else."
+    say "   To remove it: gh auth logout --hostname github.com (or revoke it at https://github.com/settings/applications).${z}"
+  elif [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && [ "$dry" = 0 ]; then
+    ks_var=GITHUB_TOKEN; [ -z "${GH_TOKEN:-}" ] || ks_var=GH_TOKEN
+    say "${d}🔑 The GitHub token in $ks_var was used for this setup only: it lives in this terminal's environment and is not saved."
+    say "   To keep it for every terminal: archon secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
   fi
   [ -n "$ks_names" ] || return 0
   phase "${e_key}Keeping your PostHog settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
