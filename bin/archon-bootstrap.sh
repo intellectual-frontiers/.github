@@ -118,7 +118,7 @@ cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
   printf '%s' "$m"
 }
 
-# The packages the setup needs from the computer (it installs none itself), then the everyday programs of the comfort kits (ws-host's base.py).
+# The packages the setup needs from the computer (it installs none itself), then the everyday programs of the comfort kits.
 # The names are the table's, by family (commons 0002-packaging); only what depends on the release is decided here.
 wanted_packages() {
   wp_line=""
@@ -217,7 +217,7 @@ install_packages() {
     say "Everything the packages give is here."
     return 0
   fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || [ "${WS_HOST_NO_APT:-}" = 1 ] || ! command -v "$(pm_install_words "$family" | cut -d' ' -f1)" >/dev/null 2>&1; then
+  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || ! command -v "$(pm_install_words "$family" | cut -d' ' -f1)" >/dev/null 2>&1; then
     for cmd in git curl; do
       command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "$(admin_install_names $missing)"
     done

@@ -13,8 +13,7 @@
 # A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window a person answers): macOS carries curl, tar and unzip, and this fetches jq and gh itself,
 # pinned and checked by SHA-256, into ~/.local/share. fish and SQLite's own tools are left out on a Mac, and the shell it sets up is zsh.
 #
-# It is a self-contained port of what ws-host (workspaces-host) installs for its default kits and does for git and the workspaces folder. It never calls,
-# clones or needs ws-host. It:
+# It is self-contained: it installs the kits, sets up git and the workspaces folder, and needs no other program of the organization's. It:
 #
 #   1. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
 #      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so mise and archon use it and are not held to GitHub's hourly limit for no sign-in;
@@ -49,7 +48,7 @@
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update archon (and so run nothing in it)
 #   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
-#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql; WS_HOST_KIT is read too)
+#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql)
 #   BOOTSTRAP_NO_COMFORT=1 never install the comfort kits, even when --comfort is given
 #   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the kits
 #   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
@@ -62,8 +61,10 @@
 #   ARCHON_RETRY_DELAY     seconds to wait before the second try; it doubles each time up to ARCHON_RETRY_MAX_DELAY (default 3, and 60)
 #   BOOTSTRAP_PATIENT=1    the same as --patient: for a network that drops often (15 tries, 5 seconds to start, 120 at most)
 #   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub cannot be reached)
-# ws-host's own names are honoured where it has them: WS_HOST_HOME (the workspaces folder, default ~/workspaces), WS_HOST_WORKSPACES, WS_HOST_KIT,
-# WS_HOST_PROMPT, WS_HOST_MODERN, WS_HOST_GIT_NAME, WS_HOST_GIT_EMAIL, in the environment or in ~/.config/workspaces-host/ws-host.env.
+#   BOOTSTRAP_MODERN       no: keep bash's and fish's own commands instead of the modern tools (default yes)
+#   ARCHON_WORKSPACES      the workspaces folder (default ~/workspaces), the folder `archon workspace` uses too
+# BOOTSTRAP_KIT, BOOTSTRAP_PROMPT, BOOTSTRAP_MODERN, BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL and ARCHON_WORKSPACES are read from the environment, then from
+# ~/.config/archon/setup.env (one NAME=value line each).
 #
 # Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
 # 4 a step failed (setup stops, and says where the log and the support file are), 5 the GitHub sign-in did not finish.
@@ -436,7 +437,7 @@ UV_VERSION=0.12.23
 # <<< pins.auto <<<
 
 # The tools that follow their newest release: name, GitHub repository, then the programs to link (link=file name it may have, a|b). Each is taken
-# only with the checksum GitHub states for the release file or the one its publisher put beside it (ws-host's _tools.py and embedded_sql.py).
+# only with the checksum GitHub states for the release file or the one its publisher put beside it.
 MODERN_TOOLS='
 eza eza-community/eza eza=eza
 zoxide ajeetdsouza/zoxide zoxide=zoxide
@@ -494,8 +495,8 @@ aider aider-chat aider=bin/aider
 
 raw_url=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
 archon_url=${ARCHON_URL:-https://github.com/intellectual-frontiers/archon}
-github_api=${BOOTSTRAP_GITHUB_API:-${WS_HOST_GITHUB_API:-https://api.github.com}}
-pypi_url=${BOOTSTRAP_PYPI:-${WS_HOST_PYPI:-https://pypi.org}}
+github_api=${BOOTSTRAP_GITHUB_API:-https://api.github.com}
+pypi_url=${BOOTSTRAP_PYPI:-https://pypi.org}
 npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 
 dry=0
@@ -580,11 +581,11 @@ need() {
 abs_or() {  # abs_or VALUE DEFAULT: VALUE if it is an absolute path, else DEFAULT (the XDG rule)
   case ${1:-} in /*) printf '%s' "$1" ;; *) printf '%s' "$2" ;; esac
 }
-data=$(abs_or "${XDG_DATA_HOME:-}" "$HOME/.local/share")/workspaces-host
-state=$(abs_or "${XDG_STATE_HOME:-}" "$HOME/.local/state")/workspaces-host
-cache=$(abs_or "${XDG_CACHE_HOME:-}" "$HOME/.cache")/workspaces-host
+data=$(abs_or "${XDG_DATA_HOME:-}" "$HOME/.local/share")/archon-setup
+state=$(abs_or "${XDG_STATE_HOME:-}" "$HOME/.local/state")/archon-setup
+cache=$(abs_or "${XDG_CACHE_HOME:-}" "$HOME/.cache")/archon-setup
 cfgdir=$(abs_or "${XDG_CONFIG_HOME:-}" "$HOME/.config")
-cfg_file=$cfgdir/workspaces-host/ws-host.env
+cfg_file=$cfgdir/archon/setup.env
 bin=$HOME/.local/bin
 tools=$data/tools
 store=$data/mise/data/installs
@@ -753,7 +754,7 @@ ask() {
   case $ans in "" | [Yy]*) return 0 ;; *) return 1 ;; esac
 }
 
-# ---- configuration: the environment, then ~/.config/workspaces-host/ws-host.env (the file ws-host reads), then the default -------------------------
+# ---- configuration: the environment, then ~/.config/archon/setup.env, then the default ----------------------------------------------------------------
 
 cfg() {  # cfg NAME DEFAULT
   if eval "[ \"\${$1+x}\" = x ]"; then eval "printf '%s' \"\${$1}\""; return 0; fi
@@ -1089,22 +1090,22 @@ load_config() {
   [ "${BOOTSTRAP_NO_COMFORT:-}" = 1 ] && comfort=0
   default_kits=agents
   [ "$comfort" = 1 ] && default_kits='agents base shell embedded-sql'
-  kits=$(cfg BOOTSTRAP_KIT "$(cfg WS_HOST_KIT "$default_kits")")
+  kits=$(cfg BOOTSTRAP_KIT "$default_kits")
   kits=$(printf '%s' "$kits" | tr ',' ' ')
   if [ "${BOOTSTRAP_NO_AGENTS:-}" = 1 ]; then kits=$(printf ' %s ' "$kits" | sed 's/ agents / /g'); fi
-  p=$(cfg WS_HOST_PROMPT pretty)
+  p=$(cfg BOOTSTRAP_PROMPT '')
   prompt_given=0
-  if [ -n "${BOOTSTRAP_PROMPT:-}" ]; then p=$BOOTSTRAP_PROMPT; prompt_given=1; fi
+  if [ -n "$p" ]; then prompt_given=1; else p=pretty; fi
   case $(printf '%s' "$p" | tr '[:upper:]' '[:lower:]') in
     plain) prompt=plain ;;
     no | false | 0 | off | none | "") prompt=no ;;
     *) prompt=pretty ;;
   esac
-  case $(printf '%s' "$(cfg WS_HOST_MODERN yes)" | tr '[:upper:]' '[:lower:]') in
+  case $(printf '%s' "$(cfg BOOTSTRAP_MODERN yes)" | tr '[:upper:]' '[:lower:]') in
     no | false | 0 | off | none) modern=0 ;;
     *) modern=1 ;;
   esac
-  root=$(cfg WS_HOST_HOME "$(cfg WS_HOST_WORKSPACES "$HOME/workspaces")")
+  root=$(cfg ARCHON_WORKSPACES "$HOME/workspaces")
   # shellcheck disable=SC2088  # a literal ~ is expanded here, by hand
   case $root in "~") root=$HOME ;; "~/"*) root=$HOME/${root#"~/"} ;; esac
   target=$root/github.com/intellectual-frontiers/archon
@@ -1372,7 +1373,7 @@ api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when t
   else fetch_to "$1" "$2" -H "Accept: application/vnd.github+json"; fi
 }
 
-# The release file for this system (Linux or macOS) on this architecture, chosen by its name (ws-host's pick_asset): the one that says linux and the architecture, is not for
+# The release file for this system (Linux or macOS) on this architecture, chosen by its name: the one that says linux and the architecture, is not for
 # another system, a package or a signature, and, of the rest, is a static (musl) build if there is one, then an archive. With a pattern, the first file
 # whose name matches it. Reads a release's JSON; prints the asset's name and download address, tab-separated, and its stated digest.
 # shellcheck disable=SC2016  # a jq program: its $variables are jq's
@@ -1522,7 +1523,7 @@ install_release() {
 install_sqlite_org() {
   [ "$goos" = linux ] && [ "$arch" = x86_64 ] || return 0   # macOS carries sqlite3 itself
   tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer && [ "${BOOTSTRAP_FRESH:-}" != 1 ] && return 0
-  site=${BOOTSTRAP_SQLITE_URL:-${WS_HOST_SQLITE_URL:-https://www.sqlite.org}}
+  site=${BOOTSTRAP_SQLITE_URL:-https://www.sqlite.org}
   fetch_to "$site/download.html" "$work/sqlite.html" || { echo "could not ask $site" >&2; return 1; }
   row=$(awk -F, '$1 == "PRODUCT" && $3 ~ /sqlite-tools-linux-x64-[0-9]+\.zip$/ && length($5) >= 64 {print $2 "," $3 "," $5; exit}' "$work/sqlite.html" | tr -d '\r')
   [ -n "$row" ] || { echo "sqlite.org publishes no command line tools for $arch" >&2; return 1; }
@@ -1643,7 +1644,7 @@ pypi_step() {
   return 0
 }
 
-# ---- ws-host's own runtime: the pinned mise, and through it Python and uv -------------------------------------------------------------------------
+# ---- the runtime: the pinned mise, and through it Python and uv ----------------------------------------------------------------------------------
 
 runtime_ready() {
   [ -x "$store/python/$PYTHON_VERSION/bin/python3" ] && { [ -x "$store/uv/$UV_VERSION/.mise-bins/uv" ] || [ -x "$store/uv/$UV_VERSION/uv" ]; }
@@ -1653,7 +1654,7 @@ install_runtime() {
   sum=$(arch_sha MISE)
   mise=${BOOTSTRAP_MISE:-$data/tools/mise/$MISE_VERSION/bin/mise}
   if [ ! -x "$mise" ]; then
-    url=${BOOTSTRAP_MISE_URL:-${WS_HOST_MISE_URL:-https://mise.jdx.dev/v$MISE_VERSION/mise-v$MISE_VERSION-$miseOs-$miseArch.tar.xz}}
+    url=${BOOTSTRAP_MISE_URL:-https://mise.jdx.dev/v$MISE_VERSION/mise-v$MISE_VERSION-$miseOs-$miseArch.tar.xz}
     file=$(download_verified "$url" "$sum") || return 1
     tmp=$data/tools/mise/.unpack.$$
     rm -rf "$tmp"; mkdir -p "$tmp"
@@ -1745,7 +1746,7 @@ setup_tools() {
   return 0
 }
 
-# ---- the shell kit: fish 4 and Oh My Posh with ws-host's themes ----------------------------------------------------------------------------------
+# ---- the shell kit: fish 4 and Oh My Posh with archon shell's themes ----------------------------------------------------------------------------
 
 fish_url() { printf 'https://github.com/fish-shell/fish-shell/releases/download/%s/fish-%s-linux-%s.tar.xz' "$FISH_VERSION" "$FISH_VERSION" "$arch"; }
 
@@ -1878,8 +1879,8 @@ identity() {
   have_cmd git || return 0
   cur_name=$(git config --global --get user.name 2>/dev/null || true)
   cur_email=$(git config --global --get user.email 2>/dev/null || true)
-  ask_name=${BOOTSTRAP_GIT_NAME:-$(cfg WS_HOST_GIT_NAME '')}
-  ask_email=${BOOTSTRAP_GIT_EMAIL:-$(cfg WS_HOST_GIT_EMAIL '')}
+  ask_name=$(cfg BOOTSTRAP_GIT_NAME '')
+  ask_email=$(cfg BOOTSTRAP_GIT_EMAIL '')
   prof_name=""; prof_email=""
   if signed_in && { [ -z "$cur_name" ] || [ -z "$cur_email" ] || [ -z "$ask_name" ] || [ -z "$ask_email" ]; }; then
     gh api user </dev/null >"$work/profile.json" 2>/dev/null || : >"$work/profile.json"

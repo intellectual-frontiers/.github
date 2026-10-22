@@ -48,7 +48,7 @@ class Fixture(unittest.TestCase):
         self.bin.mkdir()
 
     def env(self, **extra):
-        env = {k: v for k, v in os.environ.items() if not k.startswith(("BOOTSTRAP_", "WS_HOST_", "XDG_")) and k not in ("NO_COLOR", "GH_TOKEN", "GITHUB_TOKEN")}
+        env = {k: v for k, v in os.environ.items() if not k.startswith(("BOOTSTRAP_", "ARCHON_WORKSPACES", "XDG_")) and k not in ("NO_COLOR", "GH_TOKEN", "GITHUB_TOKEN")}
         env.update(HOME=str(self.home), TERM="dumb", LANG="C", TMPDIR=str(self.tmp), BOOTSTRAP_NO_NETCHECK="1")
         env.update(extra)
         return env
@@ -221,15 +221,15 @@ class Switches(Fixture):
         self.assertEqual(without_logs(tree(self.home)), without_logs(made), "a second run changes nothing (but writes its own log)")
 
     def test_the_workspaces_folder_can_be_named(self):
-        p = self.run_script(**OFF, BOOTSTRAP_KIT="", WS_HOST_HOME=str(self.tmp / "elsewhere"))
+        p = self.run_script(**OFF, BOOTSTRAP_KIT="", ARCHON_WORKSPACES=str(self.tmp / "elsewhere"))
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertTrue((self.tmp / "elsewhere" / "github.com" / "intellectual-frontiers").is_dir())
         self.assertFalse((self.home / "workspaces").exists())
 
-    def test_the_workspaces_folder_can_be_named_in_the_ws_host_file(self):
-        cfg = self.home / ".config" / "workspaces-host"
+    def test_the_workspaces_folder_can_be_named_in_the_settings_file(self):
+        cfg = self.home / ".config" / "archon"
         cfg.mkdir(parents=True)
-        (cfg / "ws-host.env").write_text(f'WS_HOST_WORKSPACES="{self.tmp / "named"}"\n')
+        (cfg / "setup.env").write_text(f'ARCHON_WORKSPACES="{self.tmp / "named"}"\n')
         self.assertEqual(self.run_script(**OFF, BOOTSTRAP_KIT="").returncode, 0)
         self.assertTrue((self.tmp / "named" / "github.com" / "intellectual-frontiers").is_dir())
 
@@ -459,7 +459,7 @@ class Rules(Fixture):
         bad = self.call(f'download_verified "file://{f}" {"0" * 64}')
         self.assertNotEqual(bad.returncode, 0)
         self.assertIn("nothing was installed", bad.stderr)
-        self.assertFalse((self.home / ".cache" / "workspaces-host" / "downloads" / ("0" * 64)).exists())
+        self.assertFalse((self.home / ".cache" / "archon-setup" / "downloads" / ("0" * 64)).exists())
 
     def registry(self, package_ok=True):
         """A registry on disk with one tool, `demo`, whose per-platform package holds a program that answers --version."""
@@ -824,7 +824,7 @@ class Editor(Fixture):
     def run_wsl(self, root, **more):
         off = {k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_EDITOR"}
         off.update(more)
-        return self.run_script(**off, BOOTSTRAP_KIT="", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(root), WS_HOST_HOME=str(self.tmp / "w"))
+        return self.run_script(**off, BOOTSTRAP_KIT="", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(root), ARCHON_WORKSPACES=str(self.tmp / "w"))
 
     def test_under_wsl_code_runs_vs_code_on_windows_and_a_second_run_changes_nothing(self):
         root = self.windows()
@@ -1154,7 +1154,7 @@ class MacOS(Fixture):
         none = self.setup(**{k: "1" for k in MAC_OFF})
         self.assertEqual(none.returncode, 3, none.stdout + none.stderr)
         self.assertIn("xcode-select --install", none.stdout + none.stderr)
-        self.assertFalse((self.home / ".local" / "share" / "workspaces-host" / "tools").exists(), "nothing was fetched")
+        self.assertFalse((self.home / ".local" / "share" / "archon-setup" / "tools").exists(), "nothing was fetched")
 
     def test_a_terminal_under_rosetta_is_still_apple_silicon(self):
         self.mac(machine="x86_64", arm_hardware="1")
