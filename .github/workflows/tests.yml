@@ -28,7 +28,7 @@ jobs:
     container: archlinux:latest
     steps:
       - name: Tools the tests use
-        run: pacman -Syu --noconfirm python git shellcheck jq curl diffutils unzip
+        run: pacman -Syu --noconfirm python git shellcheck jq curl diffutils unzip uv
       - uses: actions/checkout@v4
       - name: Let git read the checkout (the container's user is not its owner)
         run: git config --global --add safe.directory '*'
