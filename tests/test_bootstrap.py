@@ -170,6 +170,20 @@ class Entry(Fixture):
         self.assertIn("Installing claude", only.stdout)
         self.assertNotIn("Installing eza", only.stdout)
 
+    def test_the_summary_says_how_to_start_remote_control_where_claude_is_installed(self):
+        """0136-machine-bootstrap FR-088: the summary names `claude remote-control` with Claude Code, starts nothing and asks for no key."""
+        claude = self.home / ".local" / "bin" / "claude"
+        claude.parent.mkdir(parents=True)
+        claude.write_text(f'#!/bin/sh\necho ran >>"{self.tmp}/claude-ran"\n')
+        claude.chmod(0o755)
+        p = self.run_script(**OFF, ARCHON_WORKSPACES=str(self.tmp / "w"))
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("claude remote-control", p.stdout)
+        self.assertIn("not an API key", p.stdout)
+        self.assertFalse((self.tmp / "claude-ran").exists(), "the setup does not start Remote Control")
+        off = self.run_script(**OFF, BOOTSTRAP_NO_AGENTS="1", ARCHON_WORKSPACES=str(self.tmp / "w"))
+        self.assertNotIn("remote-control", off.stdout, "without the agents kit it is not named")
+
     def test_dry_run_follows_the_switches(self):
         p = self.run_script("--dry-run", **OFF)
         self.assertEqual(p.returncode, 0, p.stderr)

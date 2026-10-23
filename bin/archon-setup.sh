@@ -2152,6 +2152,7 @@ finish() {
     say ""
     say "${b}${e_what}AI assistants are installed${z} (they work in the folder you start them in, and ask before they change anything):"
     have_cmd claude && say "  ${c}claude${z}     Claude Code, from Anthropic. The first time it opens a browser page to sign in with your Claude account."
+    have_cmd claude && say "             ${d}Remote Control: ${z}${c}claude remote-control${z}${d} in a project folder lets you go on with that session from the Claude app or claude.ai/code. It needs the sign-in with your Claude account (not an API key), and it lasts while that terminal stays open.${z}"
     have_cmd codex && say "  ${c}codex${z}      Codex, from OpenAI. The first time, choose \"Sign in with ChatGPT\"."
     have_cmd opencode && say "  ${c}opencode${z}   OpenCode, which works with many providers (${c}opencode auth login${z} adds one)."
     have_cmd aider && say "  ${c}aider${z}      Aider, which needs a key from the provider you choose (${c}aider --help${z} says how)."
