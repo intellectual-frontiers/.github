@@ -56,6 +56,18 @@ class Fixture(unittest.TestCase):
     def run_script(self, *argv, stdin=None, **extra):
         return subprocess.run([SH, str(SCRIPT), *argv], capture_output=True, text=True, env=self.env(**extra), input=stdin, stdin=None if stdin else subprocess.DEVNULL)
 
+    def debian(self):
+        """An os-release of Debian 13, for a test that expects apt whatever computer runs it (the CI also runs these on Arch Linux)."""
+        f = self.tmp / "os-release-debian"
+        f.write_text(DEBIAN13)
+        return str(f)
+
+    def with_apt(self):
+        """A PATH with stand-ins for apt-get and dpkg-query (nothing installed), as a Debian computer has; a dry run runs neither."""
+        self.stub("apt-get")
+        self.stub("dpkg-query", "exit 1")
+        return f"{self.bin}:{os.environ['PATH']}"
+
     def stub(self, name, body="exit 0"):
         f = self.bin / name
         f.write_text(f"#!/bin/sh\n{body}\n")
@@ -904,7 +916,7 @@ class Setup(Fixture):
                 os.symlink(f"/usr/bin/{n}", self.bin / n)
             except OSError:
                 pass
-        p = self.run_script(**OFF, PATH=str(self.bin))
+        p = self.run_script(**OFF, PATH=str(self.bin), BOOTSTRAP_OS_RELEASE=self.debian())
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("no git", p.stderr)
         self.assertIn("sudo apt-get install -y git", p.stderr)
@@ -912,7 +924,7 @@ class Setup(Fixture):
         self.assertFalse((self.home / "workspaces").exists())
 
     def test_a_missing_program_that_only_some_steps_need_is_named_and_the_setup_goes_on(self):
-        p = self.run_script(**OFF, BOOTSTRAP_KIT="")
+        p = self.run_script(**OFF, BOOTSTRAP_KIT="", BOOTSTRAP_OS_RELEASE=self.debian())
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         if shutil.which("gh") and shutil.which("jq") and shutil.which("xz") and shutil.which("unzip"):
             self.skipTest("this computer has every program, so nothing is missing")
@@ -946,7 +958,7 @@ class Bootstrap(Fixture):
 
     def test_dry_run_for_this_account_lists_the_packages_and_the_setup_in_one_plan_and_writes_nothing(self):
         before = tree(self.home)
-        p = self.run_boot("--dry-run")
+        p = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.debian(), PATH=self.with_apt())
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before)
         for step in ("install with apt", "Setting up archon in this account", "archon shell ensure", "archon doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
@@ -957,7 +969,7 @@ class Bootstrap(Fixture):
     def test_the_bootstrap_is_opinionated_the_comfort_kits_are_on_unless_it_is_told_not(self):
         """0136-machine-bootstrap FR-047"""
         def wanted(**env):
-            p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages; echo "kits=$kits"'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), **env))
+            p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages; echo "kits=$kits"'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.debian(), **env))
             return p.stdout
         self.assertIn("ripgrep", wanted())
         self.assertIn("base", wanted().split("kits=")[1])
@@ -1065,7 +1077,7 @@ class ArchFamily(Fixture):
         self.assertNotIn("useradd", arch.stdout)
         self.assertNotIn("apt", arch.stdout)
         self.assertNotIn("Installing VS Code", arch.stdout, "Arch has no Microsoft repository to add")
-        debian = self.run_boot("--dry-run")
+        debian = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.debian(), PATH=self.with_apt())
         self.assertIn("refresh the package list, then install with apt", debian.stdout)
         self.assertNotIn("adduser", debian.stdout)
 

@@ -285,6 +285,7 @@ class Record(unittest.TestCase):
         for h in by["host"]["values"]:
             self.assertIn(h, host)
 
+    @unittest.skipUnless(UV, "uv is not installed (it runs the generator)")
     def test_a_bad_rule_or_field_is_refused(self):
         """0004-rules FR-002, 0002-packaging FR-016"""
         for old, new, said in (('pm:pattern "apt-get"', 'pm:pattern "(apt"', "not a regular expression"), ('pm:ruleSet "installer"', 'pm:ruleSet "installers"', "needs a set"),
