@@ -39,7 +39,7 @@
 
 ## Success criteria
 
-- **SC-001**: `archon-setup.sh` and `archon-bootstrap.sh` have no line the tool reports.
+- **SC-001**: `erga-setup.sh` and `erga-bootstrap.sh` have no line the tool reports.
 - **SC-002**: A harness's toolchain checks read these sets and keep no pattern of their own.
 
 ## Review & acceptance checklist

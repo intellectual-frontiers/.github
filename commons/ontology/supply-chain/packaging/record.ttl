@@ -1,4 +1,4 @@
-# The record a setup script keeps of how an account was set up (commons 0002-packaging FR-016): the fields of ~/.config/archon/install.toml, in the order written, so that the script
+# The record a setup script keeps of how an account was set up (commons 0002-packaging FR-016): the fields of ~/.config/erga/install.toml (archon kept it in ~/.config/archon/), in the order written, so that the script
 # that writes it and the harness that reads it cannot drift.
 
 @prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .

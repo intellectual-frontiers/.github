@@ -21,7 +21,7 @@ jobs:
       - name: Run the tests
         run: python3 -m unittest discover -s tests -v
 
-  # The same tests inside an Arch Linux container (0136-machine-bootstrap FR-052 to FR-056): the setup's own checks on a computer whose package manager is pacman.
+  # The same tests inside an Arch Linux container (erga's 009-machine-bootstrap FR-014 to FR-016): bin/erga-setup.sh's and bin/erga-bootstrap.sh's own checks on a computer whose package manager is pacman.
   arch:
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -8,7 +8,7 @@
 **Input:** The packaging ontology of the software supply chain capability (0001-software-supply-chain): the package managers and system families of every computer a harness may meet, the
 commands that drive each manager, the package each family calls a program, what a harness must never run, and how far each family has been tried. It is seeded from the tables of `upt`
 (a universal package-management tool) and from what `archon` runs; a tool generates from it the TOML table a harness reads and the shell fragment a script carries. It exists so that
-`archon-bootstrap.sh`, `archon-setup.sh` and `archon` read one set of facts, and so that a new family is a change to data and a run on a real computer, not new branches in two languages.
+`erga-bootstrap.sh`, `erga-setup.sh`, `archon` and `erga` read one set of facts, and so that a new family is a change to data and a run on a real computer, not new branches in two languages.
 
 ## The ontology
 
@@ -34,7 +34,7 @@ commands that drive each manager, the package each family calls a program, what 
 ## The generated tables
 
 - **FR-009**: `commons/tools/generate-packaging.py` MUST read the ontology and write `commons/generated/packaging.auto.toml` and `commons/generated/packaging.auto.sh`, and put the shell fragment between
-  the marks `# >>> packaging.auto >>>` and `# <<< packaging.auto <<<` of `bin/archon-setup.sh` (a script piped from the internet has no file beside it, and the bootstrap loads the setup's functions), MUST write the same bytes
+  the marks `# >>> packaging.auto >>>` and `# <<< packaging.auto <<<` of `bin/erga-setup.sh` (a script piped from the internet has no file beside it, and the bootstrap loads the setup's functions), MUST write the same bytes
   from the same ontology, and with `--check` MUST write nothing and fail where either file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST need only `uv`: its
   one dependency is declared in its own header.
 - **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing where one is.
@@ -46,10 +46,10 @@ commands that drive each manager, the package each family calls a program, what 
 - **FR-013**: A program that reads the TOML MUST ignore a table whose `schema` is newer than it understands and say so, MUST run a command as a list of words (never through a shell), and
   MUST run only executables its own allowlist names, so that a changed table cannot make it run something it does not know.
 
-- **FR-014**: The ontology MUST name the platforms a harness runs on (each with its name, operating system, processor and the ending of its pin variables) and the downloads a script pins before any harness exists (each with a key, one version and a SHA-256 of 64 lower-case hexadecimal digits per platform), and the tool MUST write them to `commons/generated/pins.auto.env` (one `KEY=value` line each) and between `# >>> pins.auto >>>` and `# <<< pins.auto <<<` of `bin/archon-setup.sh`, and the platforms and pins into the TOML, so that a version or a checksum is written once. It MUST refuse, naming it, a pin with no version, a checksum that is not 64 digits, a platform or pin key used twice and a checksum for a platform or pin that does not exist.
+- **FR-014**: The ontology MUST name the platforms a harness runs on (each with its name, operating system, processor and the ending of its pin variables) and the downloads a script pins before any harness exists (each with a key, one version and a SHA-256 of 64 lower-case hexadecimal digits per platform), and the tool MUST write them to `commons/generated/pins.auto.env` (one `KEY=value` line each) and between `# >>> pins.auto >>>` and `# <<< pins.auto <<<` of `bin/erga-setup.sh`, and the platforms and pins into the TOML, so that a version or a checksum is written once. It MUST refuse, naming it, a pin with no version, a checksum that is not 64 digits, a platform or pin key used twice and a checksum for a platform or pin that does not exist.
 - **FR-015**: A harness that keeps a copy of the pins MUST take it from `pins.auto.env` and not from a person's hand, and MUST NOT fetch pins at run time: a pin is trusted because a maintainer committed it, so it is the one thing in the table that is not refreshed by an update.
 
-- **FR-016**: The ontology MUST name the fields of the record a setup keeps of how an account was set up (`~/.config/archon/install.toml`): each with a name, a type (`text`, `boolean` or `date`), an order and a definition, and the values it may hold where it may hold only some; the tool MUST write them, in order, to `commons/generated/install-record.auto.toml`, and the script that writes the record MUST write exactly those fields in that order, so that what writes the record and what reads it cannot drift.
+- **FR-016**: The ontology MUST name the fields of the record a setup keeps of how an account was set up (`~/.config/erga/install.toml`): each with a name, a type (`text`, `boolean` or `date`), an order and a definition, and the values it may hold where it may hold only some; the tool MUST write them, in order, to `commons/generated/install-record.auto.toml`, and the script that writes the record MUST write exactly those fields in that order, so that what writes the record and what reads it cannot drift.
 
 ## Out of scope
 

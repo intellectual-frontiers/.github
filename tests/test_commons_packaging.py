@@ -179,7 +179,7 @@ class Pins(unittest.TestCase):
         """0002-packaging FR-014"""
         t = tomllib.loads(TOML.read_text())
         env = self.env()
-        script = (COMMONS.parent / "bin" / "archon-setup.sh").read_text()
+        script = (COMMONS.parent / "bin" / "erga-setup.sh").read_text()
         self.assertTrue(t["pins"] and t["platforms"])
         for name, pin in t["pins"].items():
             self.assertEqual(env[f"{pin['key']}_VERSION"], pin["version"], name)
@@ -198,7 +198,7 @@ class Pins(unittest.TestCase):
             self.assertIn(pl["processor"], ("x86_64", "aarch64"))
 
 
-SETUP = COMMONS.parent / "bin" / "archon-setup.sh"
+SETUP = COMMONS.parent / "bin" / "erga-setup.sh"
 RULES = COMMONS / "generated" / "rules.auto.toml"
 RECORD = COMMONS / "generated" / "install-record.auto.toml"
 
@@ -252,7 +252,7 @@ class Rules(unittest.TestCase):
         """0004-rules SC-001"""
         tool = self.tool()
         allowed = ('[ "$goos" = linux ]; then mv -Tf', "command -v sha256sum", "sha256sum()", 'sha512sum "$1"', "sha256sum; }", 'sha256sum "$1"', "base64 -d 2>/dev/null || base64 -D")
-        for f in (SETUP, COMMONS.parent / "bin" / "archon-bootstrap.sh"):
+        for f in (SETUP, COMMONS.parent / "bin" / "erga-bootstrap.sh"):
             self.assertEqual(tool.scan(f, allowed), [])
 
 
@@ -276,7 +276,7 @@ class Record(unittest.TestCase):
     def test_methods_and_hosts_the_script_can_write_are_the_allowed_values(self):
         """0002-packaging FR-016"""
         by = {f["name"]: f for f in self.fields()}
-        text = SETUP.read_text() + (COMMONS.parent / "bin" / "archon-bootstrap.sh").read_text()
+        text = SETUP.read_text() + (COMMONS.parent / "bin" / "erga-bootstrap.sh").read_text()
         for m in by["method"]["values"]:
             self.assertRegex(text, rf"install_method=(\$\{{install_method:-)?{m}")
         host = SETUP.read_text()
@@ -474,8 +474,8 @@ class Layout(unittest.TestCase):
         self.assertTrue((COMMONS / "README.md").read_text().startswith("# commons"))
 
 
-SETUP = HOME / "bin" / "archon-setup.sh"
-BOOT = HOME / "bin" / "archon-bootstrap.sh"
+SETUP = HOME / "bin" / "erga-setup.sh"
+BOOT = HOME / "bin" / "erga-bootstrap.sh"
 BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
 
 
@@ -485,7 +485,7 @@ def outside_the_block(text: str) -> str:
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Consumers(unittest.TestCase):
-    """The scripts read the table (0001-software-supply-chain FR-003; 0136-machine-bootstrap in archon): no second copy of a fact it holds."""
+    """The scripts read the table (0001-software-supply-chain FR-003; erga 009-machine-bootstrap FR-014): no second copy of a fact it holds."""
 
     def test_the_setup_carries_exactly_the_generated_fragment(self):
         """0001-software-supply-chain FR-002, FR-003: a script piped from the internet has no file beside it, so the block is generated into it"""
@@ -509,10 +509,10 @@ class Consumers(unittest.TestCase):
                               env={**os.environ, "BOOTSTRAP_SOURCE_ONLY": "1", "BOOTSTRAP_SETUP": str(SETUP), "HOME": tempfile.mkdtemp(), **env})
 
     def test_what_the_bootstrap_installs_is_what_it_installed_before_the_table(self):
-        """the migration changes no list: these are the lists the scripts held in their case branches"""
+        """the migration changed no list (these are the lists the scripts held in their case branches), but for the C compiler and linker Rust needs (erga 009-machine-bootstrap FR-021)"""
         want = {
-            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip jq gh",
-            ("arch", "required"): "git ca-certificates curl wget tar xz unzip jq github-cli",
+            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip jq gh build-essential",
+            ("arch", "required"): "git ca-certificates curl wget tar xz unzip jq github-cli gcc",
         }
         comfort = {
             "debian": "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck "
@@ -560,6 +560,7 @@ class Specs(unittest.TestCase):
             text = (d / "spec.md").read_text()
             self.assertIn("**Domain:** commons", text, d.name)
             self.assertNotRegex(text, r"(?<!archon )0136-machine-bootstrap", "a spec of archon is not cited by its bare id from here")
+            self.assertNotRegex(text, r"(?<!erga )009-machine-bootstrap", "a spec of erga is not cited by its bare id from here")
 
 
 if __name__ == "__main__":

@@ -1,74 +1,77 @@
 #!/bin/sh
-# Set up one account (Linux, or a Mac with Apple silicon) for the Intellectual Frontiers harness, without administrator rights (0136-machine-bootstrap, the setup). Run it in the account that
-# will use `archon`: everything it writes is inside that account's home folder, so deleting the account and its home folder removes all of it. A person who has
-# a computer already makes a user for archon (any name: `sudo adduser NAME`), logs in as it and runs this there; deleting that user removes everything. `archon-bootstrap.sh`
-# installs the programs on a blank computer (a new WSL or virtual machine) and runs this one for the account that runs it.
+# Set up one account (Linux, or a Mac with Apple silicon) for erga, the company's repository, without administrator rights (erga's 009-machine-bootstrap: the setup).
+# Run it in the account that will use `erga`: everything it writes is inside that account's home folder, so deleting the account and its home folder removes all of it.
+# A person who has a computer already makes a user for erga (any name: `sudo adduser NAME`), logs in as it and runs this there; deleting that user removes everything.
+# `erga-bootstrap.sh` installs the programs on a blank computer (a new WSL or virtual machine) and runs this one for the account that runs it.
 #
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --dry-run
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-setup.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-setup.sh | sh -s -- --dry-run
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-setup.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
-# It never uses sudo or a package manager. It needs these programs from the computer, which `archon-bootstrap.sh` installs (a bare Debian or Arch has none of them):
-#   git curl tar xz unzip jq gh  (a missing one is named, with the one command a person with administrator rights runs: apt-get on the Debian family, pacman on the Arch family)
-# A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window a person answers): macOS carries curl, tar and unzip, and this fetches jq and gh itself,
-# pinned and checked by SHA-256, into ~/.local/share. fish and SQLite's own tools are left out on a Mac, and the shell it sets up is zsh.
+# It never uses sudo or a package manager. It needs these programs from the computer, which `erga-bootstrap.sh` installs (a bare Debian or Arch has none of them):
+#   git curl tar xz unzip jq gh, and a C compiler and linker (cc), which Rust links with  (a missing one is named, with the one command a person with administrator
+#   rights runs: apt-get on the Debian family, pacman on the Arch family)
+# A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window a person answers: git and the C compiler): macOS carries curl, tar and unzip, and
+# this fetches jq and gh itself, pinned and checked by SHA-256, into ~/.local/share. fish and SQLite's own tools are left out on a Mac, and the shell it sets up is zsh.
 #
 # It is self-contained: it installs the kits, sets up git and the workspaces folder, and needs no other program of the organization's. It:
 #
 #   1. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
-#      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so mise and archon use it and are not held to GitHub's hourly limit for no sign-in;
-#      with no token at all, everything that comes from GitHub is skipped and listed in the summary, to be done by running this again after sign-in,
-#   2. Python and tools: gets the pinned mise, and through it Python and uv, then the AI assistants for the terminal (Claude Code, Codex, OpenCode and
-#      Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4, the modern command line tools,
+#      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so erga and the release lookups use it and are not held to GitHub's hourly limit for no sign-in;
+#      with no token at all, everything that comes from GitHub's releases is skipped and listed in the summary, to be done by running this again after sign-in,
+#   2. Rust, uv and tools: installs Rust's installer, rustup, from the pinned rustup-init (checked by SHA-256) into ~/.rustup and ~/.cargo, with no toolchain yet and
+#      no startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs; then the AI assistants for the terminal (Claude Code, Codex,
+#      OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4, the modern command line tools,
 #      DuckDB, the SQLite tools and the embedded-SQL tools, each checked against a checksum,
-#   3. Workspace and clone: copies the private archon repository to ~/workspaces/github.com/intellectual-frontiers/archon (or updates it by
-#      fast-forward only),
+#   3. Workspace and clone: copies the private erga repository to ~/workspaces/github.com/intellectual-frontiers/erga (or updates it by
+#      fast-forward only), then installs there the Rust toolchain its rust-toolchain.toml pins (rustup checks each part against its manifest),
 #   4. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
-#   5. First checks: runs, in the clone, ./archon shell ensure (the startup files of bash, zsh and fish: archon keeps them, with chezmoi),
-#      ./archon doctor, ./archon toolchain ensure and ./archon check --quick (seconds; the full `archon check` takes minutes and is yours to run), and says what to do next.
+#   5. erga: runs, in the clone, ./erga shell ensure (the startup files of bash, zsh and fish: erga keeps them), ./erga toolchain ensure, ./erga check --quick
+#      where erga has it (seconds; the full `erga check` takes minutes and is yours to run) and, last, ./erga doctor, which says what to do next.
 #
-# It writes no startup file itself: `archon shell` does (0138-shell). Safe to run again: what is already in place changes nothing, and a clone with your
+# It writes no startup file itself: `erga shell` does (erga's 010-shell). Safe to run again: what is already in place changes nothing, and a clone with your
 # work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is kept in a log and shown only if
 # the step fails.
 #
 # Options (after `sh -s --` when piped):  --dry-run   list every step it would take, change nothing, fetch nothing, ask for nothing
-#                                          --comfort   also install what no archon command needs (fish, the modern command line tools, the data tools)
+#                                          --comfort   also install what no erga command needs (fish, the modern command line tools, the data tools)
+#                                          --patient   for a network that drops often (15 tries, longer waits)
 #                                          -h, --help  this text
 #
 # Environment, so it can be tested (a "1" switches it on):
-#   ARCHON_POSTHOG_KEY     optional: your PostHog project API key, set (export ARCHON_POSTHOG_KEY=...) before starting so the archon commands the setup runs are
-#                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ARCHON_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
-#   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to archon; with it no interactive `gh auth login` is needed, and no sign-in is asked for. It is the way to get the tools that come from GitHub where no browser is
+#   ERGA_POSTHOG_KEY       optional: your PostHog project API key, set (export ERGA_POSTHOG_KEY=...) before starting so the erga commands the setup runs are
+#                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ERGA_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
+#   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to erga; with it no interactive `gh auth login` is needed, and no sign-in is asked for. It is the way to get the tools that come from GitHub where no browser is
 #                          (without a token or a sign-in they are skipped, and listed at the end)
 #   BOOTSTRAP_URL          where the bootstrap fetches this script from when it is piped (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
-#   ARCHON_URL             where to clone archon from (default: https://github.com/intellectual-frontiers/archon)
-#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (mise, fish, the modern tools)
-#   BOOTSTRAP_NO_RUNTIME=1 do not install Python and uv with mise (the uv already on the PATH is used)
-#   BOOTSTRAP_NO_DOTFILES=1   do not run `archon shell ensure` (so no startup file is touched)
+#   ERGA_URL               where to clone erga from (default: https://github.com/intellectual-frontiers/erga)
+#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (rustup, uv, fish, the modern tools)
+#   BOOTSTRAP_NO_RUNTIME=1 install neither rustup, the Rust toolchain nor uv (those already on the PATH are used)
+#   BOOTSTRAP_NO_DOTFILES=1   do not run `erga shell ensure` (so no startup file is touched)
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
-#   BOOTSTRAP_NO_CLONE=1   do not copy or update archon (and so run nothing in it)
-#   BOOTSTRAP_NO_ARCHON=1  copy archon but run none of its commands
+#   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
+#   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
 #   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql)
 #   BOOTSTRAP_NO_COMFORT=1 never install the comfort kits, even when --comfort is given
 #   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the kits
 #   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
-#   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no: the prompt `archon shell set prompt` is told to draw
-#   BOOTSTRAP_TOOLCHAIN    the names for `archon toolchain ensure` (default: every entry not ready and not marked optional; none; all)
+#   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no: the prompt `erga shell set prompt` is told to draw
+#   BOOTSTRAP_TOOLCHAIN    the names for `erga toolchain ensure` (default: every entry of `erga toolchain list` not here and not marked optional; none; all)
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
-#   ARCHON_RETRIES         how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
-#   ARCHON_RETRY_DELAY     seconds to wait before the second try; it doubles each time up to ARCHON_RETRY_MAX_DELAY (default 3, and 60)
+#   ERGA_RETRIES           how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
+#   ERGA_RETRY_DELAY       seconds to wait before the second try; it doubles each time up to ERGA_RETRY_MAX_DELAY (default 3, and 60)
 #   BOOTSTRAP_PATIENT=1    the same as --patient: for a network that drops often (15 tries, 5 seconds to start, 120 at most)
-#   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub cannot be reached)
+#   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub or Rust's servers cannot be reached)
 #   BOOTSTRAP_MODERN       no: keep bash's and fish's own commands instead of the modern tools (default yes)
-#   ARCHON_WORKSPACES      the workspaces folder (default ~/workspaces), the folder `archon workspace` uses too
-# BOOTSTRAP_KIT, BOOTSTRAP_PROMPT, BOOTSTRAP_MODERN, BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL and ARCHON_WORKSPACES are read from the environment, then from
-# ~/.config/archon/setup.env (one NAME=value line each).
+#   ERGA_WORKSPACES        the workspaces folder (default ~/workspaces), the folder `erga workspace` uses too
+# BOOTSTRAP_KIT, BOOTSTRAP_PROMPT, BOOTSTRAP_MODERN, BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL and ERGA_WORKSPACES are read from the environment, then from
+# ~/.config/erga/setup.env (one NAME=value line each).
 #
-# Exit status: 0 done, 1 archon's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
+# Exit status: 0 done, 1 erga's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
 # 4 a step failed (setup stops, and says where the log and the support file are), 5 the GitHub sign-in did not finish.
-# Everything is logged to ~/.archon-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
+# Everything is logged to ~/.erga-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
 # What was skipped for want of a GitHub token is not a failed step: it is listed in the summary and the exit status stays 0.
 # shellcheck disable=SC2034  # the pinned checksums are read by arch_sha, through eval
 set -eu
@@ -78,7 +81,7 @@ set -eu
 # AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/*.ttl (commons 0002-packaging). Do not edit: change the ontology.
 # shellcheck disable=SC2034  # read by the script this is part of
 pm_schema=1
-pm_source_sha256='b8da763a0359890d6cd8c44bfff0b5b15f9dc2d037794ee9bf4dcfd1941cfe6b'
+pm_source_sha256='9283283e142ef03911a5e698464d25132cca4c90795aad6f3bae8411ad54293e'
 
 pm_family_of() {  # pm_family_of WORDS: the family a computer's os-release ID and ID_LIKE words name, or nothing
   for pm_w in $1; do
@@ -323,6 +326,8 @@ pm_package() {  # pm_package FAMILY PROGRAM: what the family calls the package, 
     debian:bzip2) printf '%s' 'bzip2' ;;
     arch:ca-certificates) printf '%s' 'ca-certificates' ;;
     debian:ca-certificates) printf '%s' 'ca-certificates' ;;
+    arch:cc) printf '%s' 'gcc' ;;
+    debian:cc) printf '%s' 'build-essential' ;;
     arch:coreutils) printf '%s' 'coreutils' ;;
     debian:coreutils) printf '%s' 'coreutils' ;;
     arch:curl) printf '%s' 'curl' ;;
@@ -392,13 +397,13 @@ pm_package() {  # pm_package FAMILY PROGRAM: what the family calls the package, 
 
 pm_programs() {  # pm_programs TIER: the programs of the tier (required or comfort), one word each, in order
   case ${1:-} in
-    required) printf '%s\n' 'git' 'ca-certificates' 'curl' 'wget' 'tar' 'xz' 'unzip' 'jq' 'gh' ;;
+    required) printf '%s\n' 'git' 'ca-certificates' 'curl' 'wget' 'tar' 'xz' 'unzip' 'jq' 'gh' 'cc' ;;
     comfort) printf '%s\n' 'coreutils' 'sed' 'findutils' 'diffutils' 'patch' 'gzip' 'zip' 'bzip2' 'file' 'less' 'debianutils' 'procps' 'hostname' 'ncurses' 'rsync' 'bc' 'grep' 'gawk' 'ripgrep' 'fd' 'bash-completion' 'python' 'imagemagick' 'webp' 'sqlite' 'shellcheck' 'imagemagick-codecs' 'glab' ;;
   esac
 }
 # <<< packaging.auto <<<
 
-# ---- what is pinned (each is checked by SHA-256 before it is unpacked; chezmoi and Oh My Posh are pinned by archon, in toolchain/) ------------------
+# ---- what is pinned: commons' pins (each is checked by SHA-256 before it is unpacked; Oh My Posh and the other programs of erga's toolchain are pinned by erga) ----
 
 # >>> pins.auto >>>
 # AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/pins.ttl (commons 0002-packaging FR-014). Do not edit: change the ontology.
@@ -432,8 +437,17 @@ MISE_SHA256_X86_64=ff0870ddad7f8c5ba673ceb3e7659f0353da8263eabe8b82220f5816a772c
 # the Python archon runs on
 PYTHON_VERSION=3.14.8
 
+# rustup-init, the installer of rustup, through which erga gets the Rust toolchain its rust-toolchain.toml pins: From https://static.rust-lang.org/rustup/archive/VERSION/TARGET/rustup-init, checked against the .sha256 beside it (erga 009-machine-bootstrap FR-025, FR-026, FR-078).
+RUSTUP_INIT_VERSION=1.29.2
+RUSTUP_INIT_SHA256_AARCH64=a9c168dbea81a84671c6b7a5c1795cb0eb699020110d107ddfca427bd797e697
+RUSTUP_INIT_SHA256_MACOS_ARM64=f7c7e11eb2e07f006e532a8aaac77b32f4527d305ac386c0c633ca6133d35ca9
+RUSTUP_INIT_SHA256_X86_64=5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4
+
 # uv, the launcher archon starts Python with
 UV_VERSION=0.12.23
+UV_SHA256_AARCH64=6524bd338177ed50d035d39354e12545e993bbeba2ecbddf0480c5b3a81d313f
+UV_SHA256_MACOS_ARM64=50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6a1b544
+UV_SHA256_X86_64=9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6
 # <<< pins.auto <<<
 
 # The tools that follow their newest release: name, GitHub repository, then the programs to link (link=file name it may have, a|b). Each is taken
@@ -494,7 +508,7 @@ aider aider-chat aider=bin/aider
 # ---- settings ----------------------------------------------------------------------------------------------------------------------------------
 
 raw_url=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
-archon_url=${ARCHON_URL:-https://github.com/intellectual-frontiers/archon}
+erga_url=${ERGA_URL:-https://github.com/intellectual-frontiers/erga}
 github_api=${BOOTSTRAP_GITHUB_API:-https://api.github.com}
 pypi_url=${BOOTSTRAP_PYPI:-https://pypi.org}
 npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
@@ -502,7 +516,7 @@ npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 dry=0
 comfort=0
 orig_path=$PATH
-goos=linux; miseOs=linux   # detect_platform sets them
+goos=linux; rust_target=x86_64-unknown-linux-gnu   # detect_platform sets them
 esc=$(printf '\033')   # BSD sed has no \x1b, so the escape character is put in by name
 
 usage() {
@@ -515,9 +529,9 @@ for arg in "$@"; do
     --comfort) comfort=1 ;;
     --patient) BOOTSTRAP_PATIENT=1 ;;
     -h | --help)
-      case $0 in *archon-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort] [--patient]   (see the header of archon-setup.sh)" ;; esac
+      case $0 in *erga-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort] [--patient]   (see the header of erga-setup.sh)" ;; esac
       exit 0 ;;
-    *) echo "archon-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
+    *) echo "erga-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
   esac
 done
 
@@ -537,9 +551,9 @@ else
 fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
-  *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_font='🔤 '
+  *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_rust='🦀 '; e_font='🔤 '
      e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 '; e_retry='🔁 ' ;;
-  *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_font=''
+  *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_rust=''; e_font=''
      e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code=''; e_retry='~ ' ;;
 esac
 
@@ -581,16 +595,18 @@ need() {
 abs_or() {  # abs_or VALUE DEFAULT: VALUE if it is an absolute path, else DEFAULT (the XDG rule)
   case ${1:-} in /*) printf '%s' "$1" ;; *) printf '%s' "$2" ;; esac
 }
-data=$(abs_or "${XDG_DATA_HOME:-}" "$HOME/.local/share")/archon-setup
-state=$(abs_or "${XDG_STATE_HOME:-}" "$HOME/.local/state")/archon-setup
-cache=$(abs_or "${XDG_CACHE_HOME:-}" "$HOME/.cache")/archon-setup
+data=$(abs_or "${XDG_DATA_HOME:-}" "$HOME/.local/share")/erga-setup
+state=$(abs_or "${XDG_STATE_HOME:-}" "$HOME/.local/state")/erga-setup
+cache=$(abs_or "${XDG_CACHE_HOME:-}" "$HOME/.cache")/erga-setup
 cfgdir=$(abs_or "${XDG_CONFIG_HOME:-}" "$HOME/.config")
-cfg_file=$cfgdir/archon/setup.env
+cfg_file=$cfgdir/erga/setup.env
 bin=$HOME/.local/bin
 tools=$data/tools
-store=$data/mise/data/installs
+erga_state=$(abs_or "${XDG_STATE_HOME:-}" "$HOME/.local/state")/erga   # erga's own state folder: the telemetry journal is written there
+cargo_home=$(abs_or "${CARGO_HOME:-}" "$HOME/.cargo")   # rustup and Cargo live in ~/.rustup and ~/.cargo, inside the home folder
+cargo_bin=$cargo_home/bin
 
-work=$(mktemp -d "${TMPDIR:-/tmp}/archon-setup.XXXXXX")
+work=$(mktemp -d "${TMPDIR:-/tmp}/erga-setup.XXXXXX")
 problems=$work/problems     # one line for each thing that did not work, shown at the end
 : >"$problems"
 ka_pid=""; rem_pid=""
@@ -612,8 +628,8 @@ skipped=$work/skipped       # one line for each thing left for a GitHub sign-in 
 : >"$skipped"
 problem() { printf '%s\n' "$*" >>"$problems"; logf "problem: $*"; }
 
-# ---- the log: everything this does is written to ~/.archon-bootstrap/log/, so a problem can be looked into (and shown to the support team) later ----
-log_dir=${BOOTSTRAP_LOG_DIR:-$HOME/.archon-bootstrap/log}
+# ---- the log: everything this does is written to ~/.erga-bootstrap/log/, so a problem can be looked into (and shown to the support team) later ----
+log_dir=${BOOTSTRAP_LOG_DIR:-$HOME/.erga-bootstrap/log}
 stamp=$(date +%Y%m%d-%H%M%S)
 logfile=$log_dir/bootstrap-$stamp.log
 support_file=$log_dir/support-$stamp.txt
@@ -626,24 +642,24 @@ logf() {  # logf TEXT: one timestamped line in the log, without colour codes
 # shellcheck disable=SC2088  # the tilde is meant literally: it is how a path in the home folder is shown to a person
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
 
-# ---- telemetry: optional, to PostHog, only with ARCHON_POSTHOG_KEY (0136 FR-038) ----------------------------------------------------------------------
+# ---- telemetry: optional, to PostHog, only with ERGA_POSTHOG_KEY (009 FR-054) ----------------------------------------------------------------------
 # With the key set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can see how long
-# things take and where people get stuck: environment `bootstrap`, a device id made from the machine (never its name), and the kind of computer. No name, host name,
-# password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ARCHON_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
-# The settings a person kept earlier (`archon secrets`, 0136 FR-041) count where this terminal did not load them.
-secrets_file=$cfgdir/archon/secrets.env
+# things take and where people get stuck: environment `bootstrap`, a device id made from the machine, the kind of computer, and the host name and Linux user name
+# (as erga's own events carry). No password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ERGA_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
+# The settings a person kept earlier (`erga secrets`, 009 FR-052) count where this terminal did not load them.
+secrets_file=$cfgdir/erga/secrets.env
 sf_get() {  # sf_get NAME: the value kept in the file, or nothing
   [ -r "$secrets_file" ] || return 0
   sed -n "s/^$1='\\(.*\\)'\$/\\1/p" "$secrets_file" | tail -n 1
 }
-ph_key=${ARCHON_POSTHOG_KEY:-$(sf_get ARCHON_POSTHOG_KEY)}
-ph_host=${ARCHON_POSTHOG_HOST:-$(sf_get ARCHON_POSTHOG_HOST)}
+ph_key=${ERGA_POSTHOG_KEY:-$(sf_get ERGA_POSTHOG_KEY)}
+ph_host=${ERGA_POSTHOG_HOST:-$(sf_get ERGA_POSTHOG_HOST)}
 ph_host=${ph_host:-https://us.i.posthog.com}
 ph_host=${ph_host%/}
 ph_pids=""
 ph_on=0
 if [ -n "$ph_key" ] && [ "$dry" = 0 ] && command -v curl >/dev/null 2>&1; then
-  case $(printf '%s' "${ARCHON_OBSERVE:-}" | tr 'A-Z' 'a-z') in off | 0 | false | no) ;; *)
+  case $(printf '%s' "${ERGA_OBSERVE:-}" | tr 'A-Z' 'a-z') in off | 0 | false | no) ;; *)
     case $(printf '%s' "${DO_NOT_TRACK:-}" | tr 'A-Z' 'a-z') in 1 | true | yes) ;; *) ph_on=1 ;; esac ;;
   esac
 fi
@@ -654,10 +670,10 @@ ph_str() { printf '%s' "$1" | tr -d '\000-\037' | sed 's/\\/\\\\/g; s/"/\\"/g' |
 
 # the device id: the same on every run on this machine or distro, made from its machine id (hashed, so the id itself is never sent), else a random one kept in a file
 ph_device() {
-  f=${ARCHON_DEVICE_ID_FILE:-$HOME/.archon-bootstrap/device-id}
+  f=${ERGA_DEVICE_ID_FILE:-$HOME/.erga-bootstrap/device-id}
   if [ -s "$f" ]; then cat "$f"; return 0; fi
   mid=$(cat /etc/machine-id 2>/dev/null || cat /var/lib/dbus/machine-id 2>/dev/null || ioreg -rd1 -c IOPlatformExpertDevice 2>/dev/null | awk -F'"' '/IOPlatformUUID/ {print $4}' || true)
-  if [ -n "$mid" ]; then id=dev-$(printf 'archon-device\0%s' "$mid" | sha256_stdin | cut -c1-16)
+  if [ -n "$mid" ]; then id=dev-$(printf 'erga-device\0%s' "$mid" | sha256_stdin | cut -c1-16)
   else id=dev-$(cat /proc/sys/kernel/random/uuid 2>/dev/null | tr -d - | cut -c1-16); fi
   [ "$id" = dev- ] && id=dev-$(date +%s)$$
   mkdir -p "$(dirname "$f")" 2>/dev/null && printf '%s\n' "$id" >"$f" 2>/dev/null || true
@@ -708,17 +724,17 @@ ph_event() {
       *) pe_props="$pe_props,\"$pe_k\":\"$(ph_str "$pe_v")\"" ;;
     esac
   done
-  pe_who=${ARCHON_PERSON:-$(sf_get ARCHON_PERSON)}; pe_who=${pe_who:-$ph_dev}
-  pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"archon-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
+  pe_who=${ERGA_PERSON:-$(sf_get ERGA_PERSON)}; pe_who=${pe_who:-$ph_dev}
+  pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"erga-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
     "$ph_key" "$pe_name" "$(ph_str "$pe_who")" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
-  # the journal `archon observe` reads: the event, PostHog's answer and every property, never the key
+  # erga's journal of what was sent, in its state folder (telemetry/sent.jsonl): the event, PostHog's answer and every property, never the key
   pe_journal=$(printf '{"at":"%s","source":"bootstrap","event":"%s","host":"%s","status":STATUS,"error":null,"properties":{"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}' \
     "$(date -u +%Y-%m-%dT%H:%M:%S)" "$pe_name" "$ph_host" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
   ( code=$(printf '%s' "$pe_body" | curl -sS -m 3 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' --data-binary @- "$ph_host/batch/" 2>/dev/null || true)
     case $code in '' | *[!0-9]*) code=0 ;; esac
-    jd=${ARCHON_HOME:-$HOME/.archon}/telemetry
+    jd=$erga_state/telemetry
     if mkdir -p "$jd" 2>/dev/null; then
-      [ -f "$jd/README.txt" ] || printf '%s\n' "This folder is archon's own record of what it reports to PostHog: sent.jsonl has one line for each event sent, with PostHog's answer and every property; the project key is never written here. Read it with: archon observe" >"$jd/README.txt" 2>/dev/null
+      [ -f "$jd/README.txt" ] || printf '%s\n' "This folder is erga's own record of what it reports to PostHog: sent.jsonl has one line for each event sent, with PostHog's answer and every property; the project key is never written here." >"$jd/README.txt" 2>/dev/null
       printf '%s\n' "$pe_journal" | sed "s/\"status\":STATUS/\"status\":$code/" >>"$jd/sent.jsonl" 2>/dev/null
     fi ) &
   ph_pids="$ph_pids $!"
@@ -754,7 +770,7 @@ ask() {
   case $ans in "" | [Yy]*) return 0 ;; *) return 1 ;; esac
 }
 
-# ---- configuration: the environment, then ~/.config/archon/setup.env, then the default ----------------------------------------------------------------
+# ---- configuration: the environment, then ~/.config/erga/setup.env, then the default ----------------------------------------------------------------
 
 cfg() {  # cfg NAME DEFAULT
   if eval "[ \"\${$1+x}\" = x ]"; then eval "printf '%s' \"\${$1}\""; return 0; fi
@@ -927,7 +943,7 @@ stop_here() {  # stop_here LABEL STEPLOG LOGLINE
   if [ -f "$2" ] && net_words "$2"; then
     say "${y}${e_retry}This looks like the network (a name that would not resolve, a connection that broke), not your computer.${z}"
     say "   Nothing needs undoing: run the setup again and it carries on where it stopped. What was fetched is kept, and a download that stopped half way resumes."
-    say "   On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits) or set ${b}ARCHON_RETRIES=20${z}."
+    say "   On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits) or set ${b}ERGA_RETRIES=20${z}."
     retry_summary
     say ""
   fi
@@ -978,21 +994,23 @@ known_family_note() {  # known_family_note FAMILY
 
 detect_platform() {
   os=$(uname -s)
-  goos=linux; miseOs=linux
+  goos=linux
   case $os in
     Linux) ;;
-    Darwin) goos=darwin; miseOs=macos ;;
+    Darwin) goos=darwin ;;
     *) need "this is $os, and the setup is made for Linux (Debian-family or Arch-family) and for a Mac with Apple silicon." "use Linux under WSL 2 or in a virtual machine, or a Mac with Apple silicon" ;;
   esac
   case $(uname -m) in
-    x86_64 | amd64) arch=x86_64; goarch=amd64; miseArch=x64 ;;
-    aarch64 | arm64) arch=aarch64; goarch=arm64; miseArch=arm64 ;;
+    x86_64 | amd64) arch=x86_64; goarch=amd64 ;;
+    aarch64 | arm64) arch=aarch64; goarch=arm64 ;;
     *) need "there are no programs for $(uname -m) here." "use a computer or virtual machine with an amd64 or arm64 processor" ;;
   esac
+  rust_target=$arch-unknown-linux-gnu   # the name Rust gives this platform, which names the rustup-init to fetch
   if [ "$goos" = darwin ]; then
     # a terminal run under Rosetta says x86_64 on Apple silicon: the hardware is what counts, and the programs fetched are for it
-    if [ "$arch" = x86_64 ] && [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" = 1 ]; then arch=aarch64; goarch=arm64; miseArch=arm64; fi
+    if [ "$arch" = x86_64 ] && [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" = 1 ]; then arch=aarch64; goarch=arm64; fi
     [ "$arch" = aarch64 ] || need "this Mac has an Intel processor, and the setup is made for Macs with Apple silicon (M1 and later)." "run the setup in a Linux virtual machine on this Mac, or on a Mac with Apple silicon"
+    rust_target=aarch64-apple-darwin
     family=$(pm_family_of_uname Darwin)
     mac_ver=$(sw_vers -productVersion 2>/dev/null || echo 0)
     d_id=macos; d_like=""; d_version=$mac_ver; d_codename=""; d_pretty="macOS $mac_ver"
@@ -1009,7 +1027,7 @@ detect_platform() {
     : "${d_id:=unknown}" "${d_pretty:=Linux}"
   fi
   # the family: what differs between distributions (the package manager and the names of its packages) is chosen from it, by the table commons generates
-  # (0136-machine-bootstrap FR-052; commons 0002-packaging). A family the table knows but no script acts on is named, with its package manager.
+  # (009-machine-bootstrap FR-014; commons 0002-packaging). A family the table knows but no script acts on is named, with its package manager.
   family=$(pm_family_of "$d_id $d_like")
   case "$family:$(pm_status "$family")" in
     debian:supported | arch:supported) ;;
@@ -1023,7 +1041,7 @@ detect_platform() {
   if [ "$family" = arch ]; then tested=1; fi   # a rolling release: the current one
 }
 
-# ---- what the computer must already have (the setup installs no package: archon-bootstrap.sh does) -------------------------------------------------------
+# ---- what the computer must already have (the setup installs no package: erga-bootstrap.sh does) -------------------------------------------------------
 
 # the package a program comes in, on this family (the table's; a name it has no entry for is its own package)
 pkg_of() {
@@ -1031,7 +1049,7 @@ pkg_of() {
   printf '%s' "${pk_n:-$1}"
 }
 
-# the one command a person with administrator rights runs to install packages, on this family, from the table (0136-machine-bootstrap FR-055)
+# the one command a person with administrator rights runs to install packages, on this family, from the table (009-machine-bootstrap FR-016)
 admin_install_names() {  # admin_install_names PACKAGES...: the command with these package names
   pk_t=$(pm_admin_install "$family")
   printf 'sudo %s%s' "${pk_t%%\{packages\}*}" "$*"
@@ -1045,10 +1063,10 @@ admin_install_cmd() {  # admin_install_cmd PROGRAMS...
 }
 
 # On a Mac: the Command Line Tools (git and the compiler's helpers) are Apple's, and installing them asks for a person at the screen, so the setup says so and stops
-# (0136-machine-bootstrap FR-057); jq and gh are not Apple's, so the publishers' releases are put in the account's own folder.
+# (009-machine-bootstrap FR-017); jq and gh are not Apple's, so the publishers' releases are put in the account's own folder.
 mac_need_clt() {
   if ! xcode-select -p >/dev/null 2>&1 || ! [ -x /usr/bin/git ]; then
-    need "this Mac has no Command Line Tools, Apple's own set of programs (git among them), and installing them needs a person at the screen." \
+    need "this Mac has no Command Line Tools, Apple's own set of programs (git and the C compiler and linker that Rust needs among them), and installing them needs a person at the screen." \
       "run  xcode-select --install  in a terminal, click Install in the window that opens, wait for it to finish, then run this setup again"
   fi
   command -v curl >/dev/null 2>&1 || need "this Mac has no curl, which macOS always carries." "repair macOS, or run the setup from a Mac that has it"
@@ -1071,10 +1089,10 @@ check_prereqs() {
   if [ "$family" = macos ]; then mac_prereqs; return 0; fi
   for cmd in git curl; do
     command -v "$cmd" >/dev/null 2>&1 || need "this account has no $cmd, and the setup installs no package (it never uses administrator rights)." \
-      "from an account that has them, run:  $(admin_install_cmd "$cmd")   (or run archon-bootstrap.sh, which installs what is needed and then runs this setup)"
+      "from an account that has them, run:  $(admin_install_cmd "$cmd")   (or run erga-bootstrap.sh, which installs what is needed and then runs this setup)"
   done
   missing=""
-  for cmd in tar xz unzip jq gh; do
+  for cmd in tar xz unzip jq gh cc; do   # cc: the C compiler and linker Rust links with, without which ./erga cannot be built
     command -v "$cmd" >/dev/null 2>&1 || missing="$missing $cmd"
   done
   [ -z "$missing" ] && return 0
@@ -1105,10 +1123,10 @@ load_config() {
     no | false | 0 | off | none) modern=0 ;;
     *) modern=1 ;;
   esac
-  root=$(cfg ARCHON_WORKSPACES "$HOME/workspaces")
+  root=$(cfg ERGA_WORKSPACES "$HOME/workspaces")
   # shellcheck disable=SC2088  # a literal ~ is expanded here, by hand
   case $root in "~") root=$HOME ;; "~/"*) root=$HOME/${root#"~/"} ;; esac
-  target=$root/github.com/intellectual-frontiers/archon
+  target=$root/github.com/intellectual-frontiers/erga
 }
 
 kit_on() {  # kit_on NAME
@@ -1139,16 +1157,16 @@ link_fd() {
 
 # ---- fetching and verifying -------------------------------------------------------------------------------------------------------------------------
 
-# ---- a network that fails now and works in a minute (0136-machine-bootstrap FR-081 to FR-086) -------------------------------------------------------------
+# ---- a network that fails now and works in a minute (009-machine-bootstrap FR-032 to FR-037) -------------------------------------------------------------
 # Every download and every step that needs the network is tried again where the network is what failed, with a longer wait each time, and each retry is said and kept for the
 # summary. A refusal (not allowed, not found, a file that is not the one expected) is not tried again: another try cannot change it.
 retry_num() {  # retry_num VALUE DEFAULT: VALUE where it is a whole number of one or more, else DEFAULT
   case ${1:-} in '' | *[!0-9]* | 0) printf '%s' "$2" ;; *) printf '%s' "$1" ;; esac
 }
 if [ "${BOOTSTRAP_PATIENT:-}" = 1 ]; then retry_def_tries=15; retry_def_base=5; retry_def_cap=120; else retry_def_tries=8; retry_def_base=3; retry_def_cap=60; fi
-retry_tries=$(retry_num "${ARCHON_RETRIES:-}" "$retry_def_tries")
-retry_base=$(retry_num "${ARCHON_RETRY_DELAY:-}" "$retry_def_base")
-retry_cap=$(retry_num "${ARCHON_RETRY_MAX_DELAY:-}" "$retry_def_cap")
+retry_tries=$(retry_num "${ERGA_RETRIES:-}" "$retry_def_tries")
+retry_base=$(retry_num "${ERGA_RETRY_DELAY:-}" "$retry_def_base")
+retry_cap=$(retry_num "${ERGA_RETRY_MAX_DELAY:-}" "$retry_def_cap")
 retry_log=$work/retries.log   # one line for each retry: what, why, which try (a path fixed here, since a parallel step has a work folder of its own)
 : >"$retry_log"
 
@@ -1212,7 +1230,7 @@ retry_summary() {
   rs_top=$(cut -f1 "$retry_log" | sort | uniq -c | sort -rn | head -n 4 | awk '{c=$1; $1=""; sub(/^ /, ""); printf "%s%s (%d)", sep, $0, c; sep=", "}')
   say ""
   say "${d}${e_retry}The network needed $rs_n retries in this run, most for: $rs_top.${z}"
-  say "${d}   If that happens often here, add ${z}${b}--patient${z}${d} (15 tries, longer waits) or set ${z}${b}ARCHON_RETRIES=20${z}${d}; fewer: ARCHON_RETRIES=3.${z}"
+  say "${d}   If that happens often here, add ${z}${b}--patient${z}${d} (15 tries, longer waits) or set ${z}${b}ERGA_RETRIES=20${z}${d}; fewer: ERGA_RETRIES=3.${z}"
 }
 
 # A download that stalls must fail, not wait for ever: no answer in 20 seconds, or under 1 KB a second for 60 seconds, ends it (and is tried again).
@@ -1311,21 +1329,26 @@ unpack() {
   esac
 }
 
-# install_pinned NAME VERSION URL SHA KIND STRIP LINKS...: fetched, verified, unpacked into tools/NAME/VERSION, `current` pointed at it, programs linked.
-install_pinned() {
-  name=$1; ver=$2; url=$3; sha=$4; kind=$5; strip=$6; shift 6
+# fetch_pinned NAME VERSION URL SHA KIND STRIP FIRSTNAME: fetched, verified and unpacked into tools/NAME/VERSION (once), and `current` pointed at it.
+fetch_pinned() {
+  name=$1; ver=$2; url=$3; sha=$4; kind=$5; strip=$6; first=$7
   troot=$tools/$name
-  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && [ -d "$troot/$ver" ] && links_present "$@"; then return 0; fi
   if [ ! -d "$troot/$ver" ]; then
     file=$(download_verified "$url" "$sha") || return 1
     mkdir -p "$troot"
     rm -rf "$troot/$ver.partial"; mkdir -p "$troot/$ver.partial"
-    first=${1%%=*}
     if ! unpack "$file" "$kind" "$troot/$ver.partial" "$strip" "$first"; then rm -rf "$troot/$ver.partial"; return 1; fi
     mv "$troot/$ver.partial" "$troot/$ver"
   fi
-  set_current "$troot" "$ver"
-  link_into "$troot/current" "$@"
+  [ "$(readlink "$troot/current" 2>/dev/null)" = "$ver" ] || set_current "$troot" "$ver"
+}
+
+# install_pinned NAME VERSION URL SHA KIND STRIP LINKS...: fetched, verified, unpacked into tools/NAME/VERSION, `current` pointed at it, programs linked.
+install_pinned() {
+  ip_name=$1; ip_ver=$2; ip_url=$3; ip_sha=$4; ip_kind=$5; ip_strip=$6; shift 6
+  if [ -L "$tools/$ip_name/current" ] && [ "$(readlink "$tools/$ip_name/current")" = "$ip_ver" ] && [ -d "$tools/$ip_name/$ip_ver" ] && links_present "$@"; then return 0; fi
+  fetch_pinned "$ip_name" "$ip_ver" "$ip_url" "$ip_sha" "$ip_kind" "$ip_strip" "${1%%=*}" || return 1
+  link_into "$tools/$ip_name/current" "$@"
 }
 
 arch_sha() {  # arch_sha PREFIX: the pinned SHA-256 for this architecture, from PREFIX_SHA256_X86_64 / _AARCH64
@@ -1344,8 +1367,8 @@ gh_token() {
   printf '%s' "$t"
 }
 
-# Everything that talks to GitHub (the release lookups, mise's downloads, fish, archon's toolchain and shell) waits for github_init, which main runs right after
-# sign_in. It exports the token to the programs started from here on (mise, archon, gh) and records whether there is one. Without one, those installs are
+# Everything that talks to GitHub's API (the release lookups, fish, erga's toolchain and shell) waits for github_init, which main runs right after
+# sign_in. It exports the token to the programs started from here on (erga, gh) and records whether there is one. Without one, those installs are
 # skipped and listed, not tried: unauthenticated, GitHub answers 403 and 429 after a few dozen requests, and a failed step list helps nobody.
 have_github=0
 github_init() {
@@ -1357,7 +1380,7 @@ github_init() {
     export GH_TOKEN GITHUB_TOKEN
     have_github=1
   else
-    warn "There is no GitHub sign-in or token, so what is downloaded from GitHub is left until there is one (Python and uv, most tools, fish, chezmoi, archon's programs). To get them: gh auth login, or export GH_TOKEN=<a token>, then run this again."
+    warn "There is no GitHub sign-in or token, so what is downloaded from GitHub is left until there is one (most tools, fish, the programs of erga's toolchain and its prompt). To get them: gh auth login, or export GH_TOKEN=<a token>, then run this again."
   fi
   gi_tok=""
   return 0
@@ -1644,55 +1667,71 @@ pypi_step() {
   return 0
 }
 
-# ---- the runtime: the pinned mise, and through it Python and uv ----------------------------------------------------------------------------------
+# ---- the runtime: Rust through rustup, and uv (009-machine-bootstrap FR-025, FR-026) -----------------------------------------------------------------------
+# `./erga` is compiled by Cargo before it runs, so Rust comes first. rustup, Rust's own installer, is put in ~/.rustup and ~/.cargo from the pinned rustup-init
+# (checked by SHA-256), with no toolchain yet and without touching a startup file (`erga shell ensure` puts ~/.cargo/bin on the PATH of every shell). The toolchain
+# itself is the one the clone's rust-toolchain.toml pins, installed once the clone is there. uv, which runs the few Python programs, is the pinned release.
 
-runtime_ready() {
-  [ -x "$store/python/$PYTHON_VERSION/bin/python3" ] && { [ -x "$store/uv/$UV_VERSION/.mise-bins/uv" ] || [ -x "$store/uv/$UV_VERSION/uv" ]; }
+rustup_url() { printf 'https://static.rust-lang.org/rustup/archive/%s/%s/rustup-init' "$RUSTUP_INIT_VERSION" "$rust_target"; }
+uv_url() { printf 'https://github.com/astral-sh/uv/releases/download/%s/uv-%s.tar.gz' "$UV_VERSION" "$rust_target"; }
+
+have_rustup() { command -v rustup >/dev/null 2>&1 || [ -x "$cargo_bin/rustup" ]; }
+
+install_rustup() {  # the pinned rustup-init, verified, run once: rustup and Cargo's folder, no toolchain, no startup file
+  file=$(download_verified "${BOOTSTRAP_RUSTUP_URL:-$(rustup_url)}" "$(arch_sha RUSTUP_INIT)") || return 1
+  cp "$file" "$work/rustup-init" && chmod 755 "$work/rustup-init" || return 1
+  retry_cmd "rustup (static.rust-lang.org)" "$work/rustup-init" -y --no-modify-path --default-toolchain none --profile minimal
 }
 
-install_runtime() {
-  sum=$(arch_sha MISE)
-  mise=${BOOTSTRAP_MISE:-$data/tools/mise/$MISE_VERSION/bin/mise}
-  if [ ! -x "$mise" ]; then
-    url=${BOOTSTRAP_MISE_URL:-https://mise.jdx.dev/v$MISE_VERSION/mise-v$MISE_VERSION-$miseOs-$miseArch.tar.xz}
-    file=$(download_verified "$url" "$sum") || return 1
-    tmp=$data/tools/mise/.unpack.$$
-    rm -rf "$tmp"; mkdir -p "$tmp"
-    tar -xf "$file" -C "$tmp" --strip-components=1 || { rm -rf "$tmp"; echo "mise could not be unpacked (on Linux, is xz installed?)" >&2; return 1; }
-    rm -rf "$data/tools/mise/$MISE_VERSION"
-    mv "$tmp" "$data/tools/mise/$MISE_VERSION"
-  fi
-  mkdir -p "$data/mise/data" "$state/mise/config"
-  for v in $(env | sed -n 's/^\(MISE_[A-Z_]*\)=.*/\1/p'); do unset "$v"; done
-  retry_cmd "Python and uv (mise)" env MISE_DATA_DIR="$data/mise/data" MISE_CACHE_DIR="$cache/mise" MISE_STATE_DIR="$state/mise/state" MISE_CONFIG_DIR="$state/mise/config" \
-    MISE_SAFE=1 MISE_YES=1 NO_COLOR=1 MISE_QUIET=1 "$mise" install "python@$PYTHON_VERSION" "uv@$UV_VERSION"
-}
-
-# uv is the one prerequisite of a repository's launcher: put the one of this runtime where a PATH has it, and never replace a uv it did not link
+# uv's two programs, linked into ~/.local/bin where nothing else holds the name (a uv a person installed there is theirs, and stays)
 link_uv() {
   mkdir -p "$bin"
   for t in uv uvx; do
-    src=$store/uv/$UV_VERSION/.mise-bins/$t
-    [ -x "$src" ] || src=$store/uv/$UV_VERSION/$t
+    src=$tools/uv/current/$t
     [ -x "$src" ] || continue
     dst=$bin/$t
     if [ ! -e "$dst" ] && [ ! -L "$dst" ]; then ln -s "$src" "$dst"
     elif [ -L "$dst" ]; then
-      case $(readlink "$dst") in "$store"/uv/*) [ "$(readlink "$dst")" = "$src" ] || ln -sfn "$src" "$dst" ;; esac
+      case $(readlink "$dst") in "$tools"/uv/*) [ "$(readlink "$dst")" = "$src" ] || ln -sfn "$src" "$dst" ;; esac
     fi
   done
   return 0
 }
 
+install_uv() { fetch_pinned uv "$UV_VERSION" "$(uv_url)" "$(arch_sha UV)" tar 1 uv; }
+
 setup_runtime() {
-  phase "${e_py}Getting Python ready"
+  phase "${e_rust}Getting Rust and uv ready"
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-  if [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_RUNTIME=1)."; return 0; fi
-  if ! runtime_ready; then
-    if ! github_ready; then say "Left until you sign in to GitHub: Python and uv (mise gets them from GitHub)."; skip_github "Python and uv"; return 0; fi
-    step "${e_py}Installing Python and uv" install_runtime || { problem "Python and uv could not be installed"; return 0; }
+  if [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_RUNTIME=1): the rustup, Rust and uv on the PATH are used."; return 0; fi
+  if have_rustup; then
+    [ "$dry" = 1 ] && would "use the rustup already here; the clone's rust-toolchain.toml chooses the version of Rust"
+  else
+    step "${e_dl}Installing rustup $RUSTUP_INIT_VERSION, Rust's installer (into ~/.rustup and ~/.cargo)" install_rustup || { problem "rustup could not be installed, so erga cannot be built"; }
+  fi
+  if [ ! -x "$tools/uv/$UV_VERSION/uv" ] || [ "$(readlink "$tools/uv/current" 2>/dev/null)" != "$UV_VERSION" ]; then
+    step "${e_dl}Installing uv $UV_VERSION" install_uv || { problem "uv could not be installed"; return 0; }
   fi
   [ "$dry" = 1 ] || link_uv
+  return 0
+}
+
+# In the clone: the Rust toolchain its rust-toolchain.toml pins, with the components it names, before the first ./erga (rustup checks each part against its manifest)
+rust_toolchain_step() {   # rustup 1.28 and later install what the file names with `rustup toolchain install`; an older rustup does it on `rustup show`
+  ( cd "$target" && { retry_cmd "the Rust toolchain (static.rust-lang.org)" rustup toolchain install || retry_cmd "the Rust toolchain (static.rust-lang.org)" rustup show; } )
+}
+setup_rust_toolchain() {
+  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
+  if [ "$dry" = 1 ]; then
+    [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] || [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ] || would "install, in the clone, the Rust toolchain its rust-toolchain.toml pins, with its components (rustup toolchain install)"
+    return 0
+  fi
+  [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ] && return 0
+  [ "${BOOTSTRAP_NO_RUNTIME:-}" = 1 ] && return 0
+  [ "${cloned:-0}" = 1 ] && [ -f "$target/rust-toolchain.toml" ] || return 0
+  if ! command -v rustup >/dev/null 2>&1; then problem "rustup is not here, so the Rust toolchain of erga was not installed"; return 0; fi
+  phase "${e_rust}Installing the Rust toolchain erga pins"
+  step "${e_dl}Installing the Rust toolchain rust-toolchain.toml pins" rust_toolchain_step || problem "the Rust toolchain could not be installed (in $(short_path "$target") run: rustup toolchain install)"
   return 0
 }
 
@@ -1746,7 +1785,7 @@ setup_tools() {
   return 0
 }
 
-# ---- the shell kit: fish 4 and Oh My Posh with archon shell's themes ----------------------------------------------------------------------------
+# ---- the shell kit: fish 4 and Oh My Posh with erga shell's themes ----------------------------------------------------------------------------
 
 fish_url() { printf 'https://github.com/fish-shell/fish-shell/releases/download/%s/fish-%s-linux-%s.tar.xz' "$FISH_VERSION" "$FISH_VERSION" "$arch"; }
 
@@ -1755,7 +1794,7 @@ setup_shell_kit() {
   phase "${e_shell}Installing fish, a friendlier shell"
   if [ "$goos" = darwin ]; then say "Skipped on a Mac: zsh, which macOS starts, is set up instead (fish publishes no build for a Mac that the setup can check)."; return 0; fi
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-  # fish 4 is the system's where the distribution has it (installed by archon-bootstrap.sh); anywhere it does not, the fish project's own release
+  # fish 4 is the system's where the distribution has it (installed by erga-bootstrap.sh); anywhere it does not, the fish project's own release
   if ! have_fish4; then
     if ! github_ready; then say "Left until you sign in to GitHub: fish $FISH_VERSION (it comes from the fish project's GitHub release)."; skip_github "fish $FISH_VERSION"
     else
@@ -1803,7 +1842,7 @@ verify_install() {
 sign_in_stop() {  # not signed in: the one stop that is not an error, so it asks for nothing but a second try
   say ""
   say "${y}${b}${e_key}The GitHub sign-in did not finish, so setup paused here.${z}"
-  say "${d}Nothing is wrong with your computer. The sign-in is needed because archon is private.${z}"
+  say "${d}Nothing is wrong with your computer. The sign-in is needed because erga is private.${z}"
   say ""
   say "${c}${e_one}1.${z} Type:  ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}"
   say "${c}${e_two}2.${z} Copy the code, open ${b}https://github.com/login/device${z} in your normal browser, type it, click ${g}${b}Authorize${z}."
@@ -1820,7 +1859,7 @@ sign_in() {
   if [ "$dry" = 1 ]; then
     would "check that you are signed in to GitHub; if not, run: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https (a code to type into your own browser)"
     would "make gh git's credential helper for github.com, and set the name and email on your commits where git has none"
-    would "export the GitHub token (GH_TOKEN) to mise and archon; with none, skip what comes from GitHub and list it at the end"
+    would "export the GitHub token (GH_TOKEN) to erga and the release lookups; with none, skip what comes from GitHub and list it at the end"
     return 0
   fi
   have_cmd gh || { warn "gh, the tool that signs you in to GitHub, is not installed."; problem "gh is not installed"; return 0; }
@@ -1831,7 +1870,7 @@ sign_in() {
     say "${g}${e_ok}Using the GitHub token in ${z}${b}$token_var${z}${g}: no sign-in is needed.${z}"
   elif [ -n "$token_var" ]; then
     say "${r}${b}${e_stop}GitHub did not accept the token in${z} ${b}$token_var${z}${r}.${z}"
-    say "Fix it (it needs the ${b}repo${z} scope, and access to archon), or unset it: ${b}unset $token_var${z}, to sign in by hand instead. Then run this setup again."
+    say "Fix it (it needs the ${b}repo${z} scope, and access to erga), or unset it: ${b}unset $token_var${z}, to sign in by hand instead. Then run this setup again."
     problem "the token in $token_var was not accepted by GitHub"
     exit 5
   elif signed_in; then
@@ -1839,7 +1878,7 @@ sign_in() {
     say "${g}${e_ok}You are signed in to GitHub.${z}"
   elif [ "$has_tty" = 1 ]; then
     say ""
-    say "${d}GitHub is where this organization keeps its work. archon is ${z}${b}private${z}${d}: only people the owner added can open it."
+    say "${d}GitHub is where this organization keeps its work. erga is ${z}${b}private${z}${d}: only people the owner added can open it."
     say "Need access? Press Ctrl+C, ask the owner, then run this setup again.${z}"
     say ""
     say "${c}${e_key}Next, GitHub gives you a one-time code to type in your browser.${z} ${g}${b}After that, everything is automatic.${z} ${e_rocket}"
@@ -1907,27 +1946,27 @@ identity() {
 }
 
 # a copy that stops half way is cloned beside the place and moved in whole, so a try again starts clean and never touches a folder that was not made here
-clone_attempt() { rm -rf "$target.partial"; GIT_TERMINAL_PROMPT=0 git clone --quiet "$archon_url" "$target.partial" && mv "$target.partial" "$target"; }
-clone_step() { retry_cmd "copying archon from GitHub" clone_attempt; }
-fetch_step() { retry_cmd "updating archon from GitHub" env GIT_TERMINAL_PROMPT=0 git -C "$target" fetch --quiet origin; }
+clone_attempt() { rm -rf "$target.partial"; GIT_TERMINAL_PROMPT=0 git clone --quiet "$erga_url" "$target.partial" && mv "$target.partial" "$target"; }
+clone_step() { retry_cmd "copying erga from GitHub" clone_attempt; }
+fetch_step() { retry_cmd "updating erga from GitHub" env GIT_TERMINAL_PROMPT=0 git -C "$target" fetch --quiet origin; }
 
 workspace_and_clone() {
   heading "${e_dir}Your workspace"
   if [ "$dry" = 1 ]; then
     would "create $root/github.com/intellectual-frontiers"
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || {
-      if [ -d "$target/.git" ]; then would "update $target by fast-forward only"; else would "copy $archon_url to $target"; fi
+      if [ -d "$target/.git" ]; then would "update $target by fast-forward only"; else would "copy $erga_url to $target"; fi
     }
     return 0
   fi
   mkdir -p "$root/github.com/intellectual-frontiers"
   say "Your workspaces folder is $root."
-  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && { cloned=0; say "Skipped the copy of archon (BOOTSTRAP_NO_CLONE=1)."; return 0; }
-  have_cmd git || { problem "git is not installed, so archon was not copied"; cloned=0; return 0; }
+  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && { cloned=0; say "Skipped the copy of erga (BOOTSTRAP_NO_CLONE=1)."; return 0; }
+  have_cmd git || { problem "git is not installed, so erga was not copied"; cloned=0; return 0; }
   if [ "${signin_needed:-0}" = 1 ]; then
     cloned=0
     say ""
-    say "${b}${e_key}Sign in to GitHub first${z}; the archon repository (the project's folder on GitHub) is private. In a terminal, type:"
+    say "${b}${e_key}Sign in to GitHub first${z}; the erga repository (the project's folder on GitHub) is private. In a terminal, type:"
     say ""
     say "    ${c}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}"
     say ""
@@ -1935,137 +1974,165 @@ workspace_and_clone() {
     return 0
   fi
   if [ -d "$target/.git" ]; then
-    if step_soft "${e_sync}Checking archon for news" fetch_step; then
+    if step_soft "${e_sync}Checking erga for news" fetch_step; then
       git -C "$target" merge --ff-only --quiet '@{upstream}' >/dev/null 2>&1 </dev/null ||
-        say "Your copy of archon was left exactly as it was; your work is safe."
+        say "Your copy of erga was left exactly as it was; your work is safe."
       cloned=1
     else
-      say "Could not reach $archon_url, so your copy was left as it was; your work is safe."
+      say "Could not reach $erga_url, so your copy was left as it was; your work is safe."
       cloned=1
     fi
     return 0
   fi
   mkdir -p "$(dirname "$target")"
-  if step_soft "${e_dir}Copying archon" clone_step; then
+  if step_soft "${e_dir}Copying erga" clone_step; then
     cloned=1
   else
     cloned=0
     if grep -qiE 'could not read Username|could not read Password|Authentication failed|terminal prompts disabled|Invalid username or password' "$work/last.log" 2>/dev/null; then
-      say "GitHub did not accept a login for $archon_url. Sign in with: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https, then run this again."
+      say "GitHub did not accept a login for $erga_url. Sign in with: GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https, then run this again."
     elif grep -qiE 'not found|Repository not found' "$work/last.log" 2>/dev/null; then
-      say "GitHub says $archon_url does not exist for your account. Your GitHub login (signed in as $(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)) may not have access to the repository: ask an administrator of the intellectual-frontiers organization to add you, then run this again."
+      say "GitHub says $erga_url does not exist for your account. Your GitHub login (signed in as $(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)) may not have access to the repository: ask an administrator of the intellectual-frontiers organization to add you, then run this again."
     else
-      say "Could not copy $archon_url. Check your network, then run this again."
+      say "Could not copy $erga_url. Check your network, then run this again."
     fi
-    problem "archon was not copied"
+    problem "erga was not copied"
   fi
   return 0
 }
 
-# ---- the login shell -------------------------------------------------------------------------------------------------------------------------------
+# ---- erga -----------------------------------------------------------------------------------------------------------------------------------
 
-# ---- archon -----------------------------------------------------------------------------------------------------------------------------------
-
-link_archon() {
+link_erga() {  # ~/.local/bin/erga runs the clone's launcher, so `erga` works from any folder (009-machine-bootstrap FR-058)
   mkdir -p "$bin"
-  w=$bin/archon
-  if [ ! -e "$w" ] || grep -qE 'archon-setup wrapper|bootstrap-archon wrapper' "$w" 2>/dev/null; then
-    printf '#!/bin/sh\n# archon-setup wrapper: runs the clone'"'"'s launcher, so archon works from any folder\nexec "%s/archon" "$@"\n' "$target" >"$w"
+  w=$bin/erga
+  if [ ! -e "$w" ] || grep -q 'erga-setup wrapper' "$w" 2>/dev/null; then
+    printf '#!/bin/sh\n# erga-setup wrapper: runs the clone'"'"'s launcher, so erga works from any folder\nexec "%s/erga" "$@"\n' "$target" >"$w"
     chmod 755 "$w"
   else
-    warn "$w exists and is not mine, so I left it; run archon as $target/archon"
+    warn "$w exists and is not mine, so I left it; run erga as $target/erga"
   fi
 }
 
-# in_archon_quiet COMMAND...: the same, for a step: every question is answered yes, and the progress lines archon draws for a person are off.
-in_archon_quiet() {
-  ( cd "$target" && ARCHON_ASSUME_YES=1 ARCHON_NO_ADMIN=1 ARCHON_ENVIRONMENT=bootstrap ARCHON_PROGRESS=never "$@" </dev/null )
+# in_erga_quiet COMMAND...: run in the clone, for a step: every question is answered yes (009-machine-bootstrap FR-065), none may use administrator rights,
+# the progress lines erga draws for a person are off, and the events it sends say they come from a setup.
+in_erga_quiet() {
+  ( cd "$target" && ERGA_ASSUME_YES=1 ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap ERGA_PROGRESS=never "$@" </dev/null )
 }
-in_archon() {  # in_archon COMMAND...: run in the clone, showing its output; asking nothing of standard input unless there is a terminal
-  if [ "$has_tty" = 1 ]; then ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/tty ); else ( cd "$target" && ARCHON_NO_ADMIN=1 "$@" </dev/null ); fi
+in_erga() {  # in_erga COMMAND...: the same, for a command whose output is shown as it is
+  ( cd "$target" && ERGA_ASSUME_YES=1 ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/null )
 }
+erga_list_json() { ( cd "$target" && ./erga toolchain list --json </dev/null 2>/dev/null ); }
 
-# The system libraries archon's own programs link against (the C compiler for Rust, the browser's libraries), which only administrator rights can install. archon says which this
-# computer lacks, from its own declarations, so this script holds no second list (0136-machine-bootstrap FR-063). The bootstrap, which has those rights, installs them (it defines
-# bootstrap_install_libraries); the setup alone names the one command for a person who has them, and goes on.
+# The system libraries erga's own programs link against (the browser's libraries and the like), which only administrator rights can install. erga says which this
+# computer lacks, from its own declarations, so this script holds no second list (009-machine-bootstrap FR-023). The bootstrap, which has those rights, installs them (it defines
+# bootstrap_install_libraries); the setup alone names the one command for a person who has them, and goes on. Where erga names none, nothing is said.
 system_libraries() {
-  sl_json=$( ( cd "$target" && ./archon toolchain list --json </dev/null 2>/dev/null ) ) || return 0
-  sl_pk=$(printf '%s' "$sl_json" | jq -r '.data.system_packages // [] | join(" ")' 2>/dev/null) || return 0
+  sl_json=$(erga_list_json) || return 0
+  sl_pk=$(printf '%s' "$sl_json" | jq -r '(.system_packages // (if (.data | type) == "object" then .data.system_packages else null end) // []) | join(" ")' 2>/dev/null) || return 0
   [ -n "$sl_pk" ] || return 0
-  sl_cmd=$(printf '%s' "$sl_json" | jq -r '.data.system_command // ""' 2>/dev/null)
+  sl_cmd=$(printf '%s' "$sl_json" | jq -r '.system_command // (if (.data | type) == "object" then .data.system_command else null end) // ""' 2>/dev/null)
   if command -v bootstrap_install_libraries >/dev/null 2>&1; then
     bootstrap_install_libraries "$sl_pk" && return 0
   fi
-  warn "archon's programs need these system libraries, which only an account with administrator rights can install: $sl_pk. From such an account run: sudo $sl_cmd"
+  warn "erga's programs need these system libraries, which only an account with administrator rights can install: $sl_pk. From such an account run: sudo $sl_cmd"
   problem "system libraries are missing: $sl_pk (from an account with administrator rights: sudo $sl_cmd)"
   return 0
 }
 
-run_archon() {
-  heading "${e_rocket}archon"
+# Whether this erga has the quick check: `erga check --quick` (009-machine-bootstrap FR-057) runs the sections that finish in seconds; an erga without it is not given a
+# check that takes minutes in its place.
+erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
+
+# In the clone, in this order (009-machine-bootstrap FR-055): ./erga shell ensure, ./erga toolchain ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
+# once everything is installed (FR-056). Every one runs even when one before it failed.
+run_erga() {
+  heading "${e_rocket}erga"
   if [ "$dry" = 1 ]; then
-    [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ] || {
-      would "link ~/.local/bin/archon to the clone's launcher"
-      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./archon shell ensure (the startup files of bash, zsh and fish, kept with chezmoi)"
-      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./archon shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
-      would "run in the clone: ./archon doctor"
-      would "ask archon which system libraries its programs need that this computer lacks (./archon toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
-      would "run in the clone: ./archon toolchain ensure (every entry of ./archon toolchain list that is not ready and not optional)"
-      would "run in the clone: ./archon check --quick (a few sections, in seconds; the full ./archon check takes minutes and is left to you)"
+    [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] || {
+      would "link ~/.local/bin/erga to the clone's launcher"
+      would "build erga in the clone with Cargo (./erga --version; the first time takes a few minutes)"
+      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./erga shell ensure (the startup files of bash, zsh and fish)"
+      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
+      would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
+      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
+      would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
+      would "run in the clone, last: ./erga doctor, which says what to do next"
     }
     return 0
   fi
-  if [ "${cloned:-0}" != 1 ] || [ ! -x "$target/archon" ]; then say "archon is not here yet, so I ran none of its commands."; archon_ran=0; return 0; fi
-  link_archon
-  if [ "${BOOTSTRAP_NO_ARCHON:-}" = 1 ]; then say "Skipped archon's commands (BOOTSTRAP_NO_ARCHON=1)."; archon_ran=0; return 0; fi
-  have_cmd uv || { warn "uv is not here, so archon cannot start (its launcher needs only uv)."; problem "archon was not run: uv is missing"; archon_ran=0; return 0; }
-  archon_ran=1
-  status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0
-  names=""
-  case $(cfg BOOTSTRAP_TOOLCHAIN '') in
-    none) ;;
-    all) names=$( ( cd "$target" && ./archon toolchain list --json </dev/null 2>/dev/null ) | jq -r '.data.entries[].name' 2>/dev/null || true) ;;
-    "") names=$( ( cd "$target" && ./archon toolchain list --json </dev/null 2>/dev/null ) |
-           jq -r '.data.entries[] | select(.ready | not) | select((.summary | ascii_downcase | contains("optional")) | not) | .name' 2>/dev/null || true) ;;
-    *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
-  esac
-  names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
-  phase "${e_rocket}Getting archon ready ${d}(the first time takes a few minutes)${z}"
-  # Every question archon could ask is answered yes, and none may use administrator rights (ARCHON_NO_ADMIN=1): a package only they can install is named, with the command to run.
-  tool_skipped=0
-  if [ -n "$names" ] && ! github_ready; then
-    tool_skipped=1
-    say "Left until you sign in to GitHub: ./archon toolchain ensure ($names)."
-    skip_github "archon toolchain ensure: $names"
-  elif [ -n "$names" ]; then
-    system_libraries
-    # shellcheck disable=SC2086
-    step "${e_pkg}Installing the programs archon uses" in_archon_quiet ./archon toolchain ensure $names || status_tool=$?
+  if [ "${cloned:-0}" != 1 ] || [ ! -x "$target/erga" ]; then say "erga is not here yet, so I ran none of its commands."; erga_ran=0; return 0; fi
+  link_erga
+  if [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ]; then say "Skipped erga's commands (BOOTSTRAP_NO_ERGA=1)."; erga_ran=0; return 0; fi
+  have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
+  erga_ran=1
+  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0
+  phase "${e_rocket}Getting erga ready ${d}(the first time takes a few minutes)${z}"
+  step_soft "${e_rust}Building erga with Cargo" in_erga_quiet ./erga --version || status_build=$?
+  if [ "$status_build" != 0 ]; then
+    problem "erga could not be built (in $(short_path "$target") run: cargo build -p erga, to see why)"
+    phase_close
+    return 0
   fi
-  # The shells of this account: archon keeps their startup files, with chezmoi (0138-shell)
+  # The shells of this account: erga keeps their startup files (010-shell); the mode is erga shell's own choice
   if [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
     if ! github_ready; then
       shell_skipped=1
-      say "Left until you sign in to GitHub: ./archon shell ensure (chezmoi and Oh My Posh come from GitHub)."
-      skip_github "archon shell ensure (your shells' startup files)"
+      say "Left until you sign in to GitHub: ./erga shell ensure (the prompt, Oh My Posh, comes from GitHub)."
+      skip_github "erga shell ensure (your shells' startup files)"
     else
       shell_ran=1
-      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_archon_quiet ./archon shell ensure || status_shell=$?
+      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_erga_quiet ./erga shell ensure || status_shell=$?
       if [ "$status_shell" = 0 ] && [ "$prompt_given" = 1 ]; then
         pchoice=$prompt; [ "$prompt" = no ] && pchoice=none
-        step_soft "${e_paint}Choosing the $pchoice prompt" in_archon_quiet ./archon shell set prompt "$pchoice" || status_shell=$?
+        step_soft "${e_paint}Choosing the $pchoice prompt" in_erga_quiet ./erga shell set prompt "$pchoice" || status_shell=$?
       fi
-      [ "$status_shell" = 0 ] || problem "archon shell ensure did not finish (run ./archon shell status in $target to see why)"
+      [ "$status_shell" = 0 ] || problem "erga shell ensure did not finish (run ./erga shell status in $target to see why)"
     fi
   fi
-  step_soft "${e_ok}Checking that this computer is ready" in_archon_quiet ./archon doctor || status_doctor=$?
-  step_soft "${e_ok}Checking that archon is healthy (a quick check)" in_archon_quiet ./archon check --quick || status_check=$?
+  # The programs erga's commands use: every entry erga lists that is not here and not marked optional, unless BOOTSTRAP_TOOLCHAIN names others
+  names=""
+  case $(cfg BOOTSTRAP_TOOLCHAIN '') in
+    none) ;;
+    all) names=$(erga_list_json | jq -r '.data[].name' 2>/dev/null || true) ;;
+    "") names=$(erga_list_json | jq -r '.data[] | select(.found == null) | select((.optional // false) | not) | .name' 2>/dev/null || true) ;;
+    *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
+  esac
+  names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
+  if [ -n "$names" ] && ! github_ready; then
+    tool_skipped=1
+    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names)."
+    skip_github "erga toolchain ensure: $names"
+  elif [ -n "$names" ]; then
+    system_libraries
+    tool_ran=1
+    # shellcheck disable=SC2086
+    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names || status_tool=$?
+  fi
+  if erga_has_quick_check; then
+    check_ran=1
+    step_soft "${e_ok}Checking that erga is healthy (a quick check)" in_erga_quiet ./erga check --quick || status_check=$?
+  else
+    logf "this erga has no check --quick, so no check was run; the full check is ./erga check"
+  fi
   phase_close
   if [ "$status_check" != 0 ] && [ -f "$work/last.log" ]; then
-    say "${y}${warnmark}archon's own checks found things to look at (setup itself is fine):${z}"
-    grep -E '❎|\[[a-z-]+\]' "$work/last.log" 2>/dev/null | grep -v 'not observable' | head -12 | sed 's/^/   /' || true
-    say "${d}   Run ${b}archon check${z}${d} any time for the full check (a few minutes).${z}"
+    say "${y}${warnmark}erga's own checks found things to look at (setup itself is fine):${z}"
+    grep -E '❌|❎|\[[a-z-]+\]' "$work/last.log" 2>/dev/null | head -12 | sed 's/^/   /' || true
   fi
+  return 0
+}
+
+# ./erga doctor, last (009-machine-bootstrap FR-055, FR-056): it says how this computer stands and the next step; its output is shown whole, and kept in the log
+hand_over() {
+  [ "${erga_ran:-0}" = 1 ] && [ "${status_build:-0}" = 0 ] || return 0
+  heading "${e_ok}erga doctor: how this computer stands"
+  do_out=$work/doctor.out
+  in_erga ./erga doctor >"$do_out" 2>&1 || status_doctor=$?
+  cat "$do_out"
+  step_no=$((step_no + 1))
+  if [ "$log_ok" = 1 ]; then { printf '\n==== STEP %s: ./erga doctor (exit %s)\n' "$step_no" "$status_doctor"; cat "$do_out"; } >>"$logfile" 2>/dev/null || true; fi
+  ph_event bootstrap_step "s:step=erga doctor" "s:phase=erga" "s:outcome=$([ "$status_doctor" = 0 ] && echo ok || echo failed)" "n:exit_code=$status_doctor" "n:step_no=$step_no"
   return 0
 }
 
@@ -2075,16 +2142,24 @@ finish() {
   [ "$dry" = 1 ] && { say ""; say "That was a dry run: nothing was changed, fetched or asked."; return 0; }
   heading "Summary"
   failed=0
-  if [ "${archon_ran:-0}" = 1 ]; then
-    for pair in "shell ensure:$status_shell" "doctor:$status_doctor" "toolchain ensure:$status_tool" "check --quick:$status_check"; do
+  if [ "${erga_ran:-0}" = 1 ]; then
+    if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} ./erga --version: erga could not be built (exit status $status_build)"; failed=1; fi
+    for pair in "shell ensure:${status_shell:-0}" "toolchain ensure:${status_tool:-0}" "check --quick:${status_check:-0}"; do
+      [ "${status_build:-0}" = 0 ] || break
       n=${pair%%:*}; s=${pair##*:}
       if [ "$n" = "shell ensure" ] && [ "${shell_ran:-0}" = 0 ]; then
-        [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
+        [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./erga $n (left until you sign in to GitHub)"
         continue
       fi
-      if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./archon $n (left until you sign in to GitHub)"
-      elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./archon $n"; else say "  ${r}${cross}${z} ./archon $n (exit status $s)"; failed=1; fi
+      if [ "$n" = "check --quick" ] && [ "${check_ran:-0}" = 0 ]; then
+        say "  ${y}-${z} ./erga check --quick: this erga has no quick check yet; the full ${b}./erga check${z} takes minutes and is yours to run"
+        continue
+      fi
+      if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./erga $n (left until you sign in to GitHub)"
+      elif [ "$n" = "toolchain ensure" ] && [ "${tool_ran:-0}" = 0 ]; then say "  ${g}-${z} ./erga $n: nothing to install"
+      elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./erga $n"; else say "  ${r}${cross}${z} ./erga $n (exit status $s)"; failed=1; fi
     done
+    [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./erga check${z}${d}, compiles and tests the whole repository (minutes): run it yourself when you want it.${z}"
   fi
   if [ -s "$problems" ]; then
     say ""
@@ -2122,31 +2197,18 @@ finish() {
       say "  ${c}2.${z} Copy the font files into ${b}~/.local/share/fonts${z}, then run ${b}fc-cache -f${z}."
       say "  ${c}3.${z} In your terminal program's settings, set the font to ${b}CaskaydiaCove Nerd Font${z}."
     fi
-    say "${d}No font wanted? Run ${z}${b}archon shell set prompt plain${z}${d}: the same${z}"
+    say "${d}No font wanted? Run ${z}${b}erga shell set prompt plain${z}${d}: the same${z}"
     say "${d}prompt made of emoji and lines.${z}"
   fi
   if [ "${editor_linked:-0}" = 1 ]; then
     say ""
     say "${b}${e_code}VS Code${z}: ${c}code .${z} in a folder opens it there.$([ "$wsl" = 1 ] && printf ' Under WSL it opens VS Code on Windows, which installs its WSL extension the first time.')"
   fi
-  case ":$orig_path:" in
-    *":$bin:"*) ;;
-    *)
-      sh_name=bash
-      [ "$goos" = darwin ] && sh_name=zsh
-      kit_on shell && [ "$goos" = linux ] && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
-      say ""
-      say "${b}${e_sync}One last thing:${z} this window does not know your new shell yet."
-      say "Type the line below, or close this window and open a new one."
-      say ""
-      say "    ${c}exec $sh_name -l${z}"
-      ;;
-  esac
   if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
     say ""
     no_fish="fish,"; [ "$goos" = darwin ] && no_fish="fish (there is none for a Mac),"
-    say "${d}Not installed, because no archon command needs them: $no_fish the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
-    say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (archon-bootstrap.sh does by default).${z}"
+    say "${d}Not installed, because no erga command needs them: $no_fish the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
+    say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (erga-bootstrap.sh does by default).${z}"
   fi
   if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
     say ""
@@ -2158,28 +2220,40 @@ finish() {
     have_cmd aider && say "  ${c}aider${z}      Aider, which needs a key from the provider you choose (${c}aider --help${z} says how)."
     say "${d}Start one in a project folder, for example: cd ${target} && claude${z}"
   fi
+  hand_over
+  if [ "${status_doctor:-0}" != 0 ]; then say "  ${y}${warnmark}${z} ./erga doctor found something to look at (exit status $status_doctor): its next step, above, says what to do."; failed=1; fi
   say ""
   if [ "${cloned:-0}" = 1 ]; then
-    say "${b}${e_next}Next${z}"
-    say ""
-    say "    ${c}archon orch status${z}    see the state of the harness"
-    say "    ${c}archon orch dev${z}       then run the development site, with the Console"
-    say ""
-    say "Run them from any folder (${bin}/archon runs the clone's launcher), or in ${target}."
+    say "${b}${e_next}Next${z}: the step ${c}./erga doctor${z} names above. ${c}erga help start${z} walks through your first day."
+    say "Run erga from any folder ($(short_path "$bin")/erga runs the clone's launcher), or as ./erga in $(short_path "$target")."
   elif [ "${signin_needed:-0}" = 1 ]; then
     say "${b}${e_next}Next${z}: sign in to GitHub (above), then run this setup again."
   fi
+  # The last instruction: a new login shell, which reads the startup files erga shell wrote and finds ~/.local/bin (009-machine-bootstrap FR-058, FR-059)
+  sh_name=bash
+  [ "$goos" = darwin ] && sh_name=zsh
+  kit_on shell && [ "$goos" = linux ] && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
+  say ""
+  case ":$orig_path:" in
+    *":$bin:"*) say "${b}${e_sync}One last thing:${z} start a new shell, so that this window reads what was set up." ;;
+    *) say "${b}${e_sync}One last thing:${z} this window does not know your new shell yet (nor ~/.local/bin, where erga is)." ;;
+  esac
+  say "Type the line below, or close this window and open a new one."
+  say ""
+  say "    ${c}exec $sh_name -l${z}"
   [ "$failed" = 0 ] || return 1
   return 0
 }
 
-# ---- the editor: `code` opens VS Code (0136-machine-bootstrap FR-044) --------------------------------------------------------------------------
+# ---- the editor: `code` opens VS Code (009-machine-bootstrap FR-043) --------------------------------------------------------------------------
 # Under WSL VS Code runs on Windows and reaches Debian through its WSL extension; its `code` command is a script in its Windows folder, on the PATH
 # only while WSL appends Windows' PATH. So `code` is a small script in ~/.local/bin that runs it, which every shell has; where VS Code is not on
 # Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, which
-# archon-bootstrap.sh installs (it needs administrator rights); a machine without a desktop is opened from VS Code on another computer (Remote - SSH).
-editor_mark='# made by archon-setup.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
-editor_mark_old='# made by bootstrap-archon.sh: VS Code on Windows, opened from WSL (0136-machine-bootstrap FR-044)'
+# erga-bootstrap.sh installs (it needs administrator rights); a machine without a desktop is opened from VS Code on another computer (Remote - SSH).
+editor_mark='# made by erga-setup.sh: VS Code on Windows, opened from WSL (009-machine-bootstrap FR-043)'
+# The marks of the scripts erga's came from (archon's), so that a `code` one of them wrote is still known as the setup's own
+editor_mark_older='# made by archon-setup.sh: VS Code'
+editor_mark_old='# made by bootstrap-archon.sh: VS Code'
 win_root=${BOOTSTRAP_WINDOWS_ROOT:-/mnt/c}
 
 windows_code() {  # the `code` script of VS Code on Windows: this Windows user's own install first, then one for all users, then any user's
@@ -2199,8 +2273,8 @@ winget_exe() {  # Windows' winget, through the PATH WSL appends or in this Windo
   return 1
 }
 
-editor_mark_mac='# made by archon-setup.sh: VS Code on a Mac, opened from the command line (0136-machine-bootstrap FR-044)'
-ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_mac" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
+editor_mark_mac='# made by erga-setup.sh: VS Code on a Mac, opened from the command line (009-machine-bootstrap FR-043)'
+ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_older" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_mac" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
 
 link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
   mkdir -p "$bin"
@@ -2257,19 +2331,19 @@ setup_editor() {
   if [ "$family" = arch ]; then
     say "VS Code is not installed here. From an account with administrator rights, ${b}sudo pacman -S code${z} installs Code - OSS from the extra repository (Microsoft's own build is in the AUR as visual-studio-code-bin)."
   else
-    say "VS Code is not installed here. To install it, run archon-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
+    say "VS Code is not installed here. To install it, run erga-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
   fi
   return 0
 }
 
-# ---- how this copy was installed (0136-machine-bootstrap FR-060) ----------------------------------------------------------------------------------
-# One small file, ~/.config/archon/install.toml, says how this account was set up, so that `archon doctor`, `archon update` and `archon orch status` can say it and warn when the
-# computer no longer matches it. The first method is kept (`bootstrap` for a computer set up whole, `setup` for a user made for archon on a machine in use); a later run only
+# ---- how this copy was installed (009-machine-bootstrap FR-069) ----------------------------------------------------------------------------------
+# One small file, ~/.config/erga/install.toml, says how this account was set up, so that `erga doctor` and `erga update` can say it and warn when the
+# computer no longer matches it. The first method is kept (`bootstrap` for a computer set up whole, `setup` for a user made for erga on a machine in use); a later run only
 # refreshes the date and adds the comfort kits.
 install_method=${install_method:-setup}
-install_file=$cfgdir/archon/install.toml
+install_file=$cfgdir/erga/install.toml
 record_install() {
-  if [ "$dry" = 1 ]; then would "record how this account was set up in ~/.config/archon/install.toml ($install_method), which the commands that say how things stand show"; return 0; fi
+  if [ "$dry" = 1 ]; then would "record how this account was set up in ~/.config/erga/install.toml ($install_method), which the commands that say how things stand show"; return 0; fi
   ri_method=$install_method; ri_first=$(date +%Y-%m-%d); ri_comfort=$comfort
   if [ -r "$install_file" ]; then
     ri_old=$(sed -n 's/^method = "\(.*\)"$/\1/p' "$install_file" | head -n 1); [ -z "$ri_old" ] || ri_method=$ri_old
@@ -2281,7 +2355,7 @@ record_install() {
   mkdir -p "$ri_dir" || return 0
   ri_tmp=$(mktemp "$ri_dir/.install.XXXXXX") || return 0
   {
-    printf '%s\n' '# Written by archon-setup.sh: how this account was set up. Read by archon doctor, archon update and archon orch status; safe to delete (they then say it is not recorded yet).'
+    printf '%s\n' '# Written by erga-setup.sh: how this account was set up. Read by erga doctor and erga update; safe to delete (they then say it is not recorded yet).'
     printf 'method = "%s"\n' "$ri_method"
     printf 'family = "%s"\n' "$family"
     printf 'host = "%s"\n' "$(host_kind | sed 's/^vm-.*/vm/')"
@@ -2294,7 +2368,7 @@ record_install() {
   logf "recorded the installation: $ri_method, $family, comfort $ri_c"
 }
 
-# ---- before anything is fetched: what would make a long run fail late (0136-machine-bootstrap FR-061) -----------------------------------------------------------
+# ---- before anything is fetched: what would make a long run fail late (009-machine-bootstrap FR-050) -----------------------------------------------------------
 preflight() {
   [ "$dry" = 1 ] && return 0
   if [ "$(id -u)" = 0 ]; then
@@ -2304,11 +2378,11 @@ preflight() {
     case $(cat /proc/version 2>/dev/null) in *WSL2*) ;; *) warn "This looks like WSL 1, which lacks what some programs need. Move it to WSL 2 in PowerShell: wsl --set-version <distribution> 2" ;; esac
   fi
   pf_free=$(df -k "$HOME" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1048576}')
-  case $pf_free in '' | *[!0-9]*) ;; *) if [ "$pf_free" -lt 10 ]; then warn "Only ${pf_free} GB are free in your home folder, and everything archon uses (the typesetter, the test browser, Java and more) needs about 10 GB. It may stop for want of room; free some space first."; fi ;; esac
+  case $pf_free in '' | *[!0-9]*) ;; *) if [ "$pf_free" -lt 10 ]; then warn "Only ${pf_free} GB are free in your home folder, and everything erga uses (the typesetter, the test browser, Java and more) needs about 10 GB. It may stop for want of room; free some space first."; fi ;; esac
   return 0
 }
 
-# ---- the network, looked at before the long installs: a name that will not resolve is found in a minute, not ten minutes in (0136-machine-bootstrap FR-086) ----
+# ---- the network, looked at before the long installs: a name that will not resolve is found in a minute, not ten minutes in (009-machine-bootstrap FR-037) ----
 # reach HOST: 0 where HOST answers over https (any answer counts, even a refusal), trying again where it does not; 1 with retry_why set
 reach() {
   rh_n=1; rh_max=$retry_tries; [ "$rh_max" -le 5 ] || rh_max=5
@@ -2330,7 +2404,7 @@ check_network() {
   command -v curl >/dev/null 2>&1 || return 0
   phase "${e_sync}Checking the network"
   cn_bad=""
-  for cn_h in github.com api.github.com raw.githubusercontent.com objects.githubusercontent.com; do
+  for cn_h in github.com api.github.com raw.githubusercontent.com objects.githubusercontent.com static.rust-lang.org index.crates.io static.crates.io; do
     if reach "$cn_h"; then logf "network: $cn_h answers"; else logf "network: $cn_h does not answer ($retry_why)"; cn_bad="$cn_bad $cn_h"; fi
   done
   [ -n "$cn_bad" ] || return 0
@@ -2340,24 +2414,24 @@ check_network() {
   say "  ${c}1.${z} Try another network (a phone hotspot is a quick test), or turn a VPN off."
   say "  ${c}2.${z} Use a different DNS server: 1.1.1.1 or 8.8.8.8."
   [ "$wsl" = 1 ] && say "  ${c}3.${z} On WSL: in PowerShell run ${b}wsl --shutdown${z}, open Debian again, and check that ${b}/etc/resolv.conf${z} lists a server."
-  say "Then run this again. On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits), or set ${b}ARCHON_RETRIES=20${z}; ${b}BOOTSTRAP_NO_NETCHECK=1${z} skips this look."
+  say "Then run this again. On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits), or set ${b}ERGA_RETRIES=20${z}; ${b}BOOTSTRAP_NO_NETCHECK=1${z} skips this look."
   exit 3
 }
 
-# the private archon repository is read with the person's sign-in: say now, before the long installs, that this account cannot open it (0136-machine-bootstrap FR-061)
+# the private erga repository is read with the person's sign-in: say now, before the long installs, that this account cannot open it (009-machine-bootstrap FR-050)
 check_access() {
-  if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private archon repository"; return 0; fi
+  if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private erga repository"; return 0; fi
   [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
   [ "$have_github" = 1 ] || return 0
-  ca_out=$(GIT_TERMINAL_PROMPT=0 git ls-remote "$archon_url" HEAD 2>&1 </dev/null) && return 0
+  ca_out=$(GIT_TERMINAL_PROMPT=0 git ls-remote "$erga_url" HEAD 2>&1 </dev/null) && return 0
   case $ca_out in
     *"not found"* | *"Not Found"* | *"Authentication failed"* | *"could not read"* | *"denied"* | *"403"*)
-      logf "no access to $archon_url: $ca_out"
-      say "${r}${b}${e_stop}GitHub does not let this account open archon.${z} archon is a private repository: only people the owner added can open it."
+      logf "no access to $erga_url: $ca_out"
+      say "${r}${b}${e_stop}GitHub does not let this account open erga.${z} erga is a private repository: only people the owner added can open it."
       say "Ask the owner of the intellectual-frontiers organization on GitHub to add the GitHub user you signed in as ($(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)), then run this again. Nothing has been installed."
       exit 5 ;;
   esac
-  logf "could not check access to $archon_url (a network problem?): $ca_out"
+  logf "could not check access to $erga_url (a network problem?): $ca_out"
   return 0
 }
 
@@ -2366,29 +2440,29 @@ check_access() {
 main() {
   detect_platform
   load_config
-  PATH=$bin:$PATH
+  PATH=$bin:$cargo_bin:$PATH   # ~/.local/bin and ~/.cargo/bin, for this run alone: erga shell ensure puts them on the PATH of every shell
   export PATH
   if [ "$dry" = 0 ]; then mkdir -p "$bin" "$data" "$state" "$cache"; fi
 
-  say "${b}${e_rocket}Setting up this account${z} (${d_pretty}, $arch$wsl_txt, user $(id -un)) for the Intellectual Frontiers harness."
+  say "${b}${e_rocket}Setting up this account${z} (${d_pretty}, $arch$wsl_txt, user $(id -un)) for erga."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
-  if [ -n "${ARCHON_POSTHOG_KEY:-}" ]; then
-    say "${g}📡 Telemetry is on:${z} ${b}ARCHON_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
-    say "${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as archon's own telemetry does. Never a password, a token or a file.${z}"
+  if [ -n "${ERGA_POSTHOG_KEY:-}" ]; then
+    say "${g}📡 Telemetry is on:${z} ${b}ERGA_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
+    say "${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as erga's own telemetry does. Never a password, a token or a file.${z}"
   else
-    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ARCHON_POSTHOG_KEY=<your project key>${z}${d}, then start again; the setup keeps it for every new terminal."
+    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ERGA_POSTHOG_KEY=<your project key>${z}${d}, then start again; the setup keeps it for every new terminal."
     say "   Without the key nothing breaks; there is just no telemetry.${z}"
   fi
 
   ph_event bootstrap_started "s:method=$install_method" "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
-  signin_needed=0; cloned=0; archon_ran=0
+  signin_needed=0; cloned=0; erga_ran=0
   if [ "$dry" = 1 ]; then
     heading "${e_pkg}What this computer must already have"
     if [ "$family" = macos ]; then
       would "check that the Command Line Tools are here (git); if not, stop and say to run: xcode-select --install"
       would "get jq $JQ_VERSION and gh $GH_VERSION from their publishers' releases (checked by SHA-256) into ~/.local/share, where this Mac has neither"
     else
-      would "check that git and curl are here (and tar, xz, unzip, jq and gh, which some steps need); this setup installs no package"
+      would "check that git and curl are here (and tar, xz, unzip, jq, gh and a C compiler and linker, cc, which some steps need); this setup installs no package"
     fi
   else
     check_prereqs
@@ -2409,17 +2483,18 @@ main() {
   verify_install
   record_install
   workspace_and_clone
-  run_archon
+  setup_rust_toolchain
+  run_erga
   finish
 }
 
-# ---- keep the PostHog settings for every new terminal (0136 FR-041; the same file and blocks as `archon secrets`, archon's 0074-secrets) --------------------------
-# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read; `archon shell ensure` tells the shells to read it.
+# ---- keep the PostHog settings for every new terminal (009-machine-bootstrap FR-052; the same file as `erga secrets`, erga's 011-secrets FR-009) --------------------------
+# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read; `erga shell ensure` tells the shells to read it.
 sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, else added; written privately and atomically
   pv_dir=$(dirname "$secrets_file")
   mkdir -p "$pv_dir" && chmod 700 "$pv_dir" || return 1
   pv_tmp=$(umask 077; mktemp "$pv_dir/.secrets.XXXXXX") || return 1
-  if [ -f "$secrets_file" ]; then cat "$secrets_file" >"$pv_tmp"; else printf '%s\n' "# Private to you (mode 600). Written by \`archon secrets\`; bash and fish read it when a terminal starts." >"$pv_tmp"; fi
+  if [ -f "$secrets_file" ]; then cat "$secrets_file" >"$pv_tmp"; else printf '%s\n' "# Kept by \`erga secrets\`; change it with \`erga secrets set\` and \`erga secrets remove\`." >"$pv_tmp"; fi   # the first line erga secrets writes, byte for byte
   if grep -q "^$1=" "$pv_tmp"; then
     awk -v n="$1" -v v="$2" 'index($0, n "=") == 1 { print n "='"'"'" v "'"'"'"; next } { print }' "$pv_tmp" >"$pv_tmp.2" && mv "$pv_tmp.2" "$pv_tmp"
   else
@@ -2429,30 +2504,30 @@ sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, els
 }
 keep_settings() {
   ks_names=""
-  for ks_n in ARCHON_POSTHOG_KEY ARCHON_POSTHOG_HOST ARCHON_PERSON; do
+  for ks_n in ERGA_POSTHOG_KEY ERGA_POSTHOG_HOST ERGA_PERSON; do
     eval "ks_v=\${$ks_n:-}"
     [ -n "$ks_v" ] && ks_names="$ks_names $ks_n"
   done
   if [ "$dry" = 0 ] && [ "${signin_how:-}" = gh ]; then
     # signed in with gh (now or before): gh keeps the login for this Linux user and is git's credential helper, so it lasts
     say "${g}🔐 Your GitHub sign-in is kept on this computer.${z}${d} gh stores it for your Linux user ($(id -un 2>/dev/null || echo you)) in its own private store (the system keyring, or ~/.config/gh/hosts.yml that only you can read),"
-    say "   and git uses it, so every new terminal, git and archon reach GitHub without asking you again. It is not shared and nothing was sent to anyone else."
+    say "   and git uses it, so every new terminal, git and erga reach GitHub without asking you again. It is not shared and nothing was sent to anyone else."
     say "   To remove it: gh auth logout --hostname github.com (or revoke it at https://github.com/settings/applications).${z}"
   elif [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && [ "$dry" = 0 ]; then
     ks_var=GITHUB_TOKEN; [ -z "${GH_TOKEN:-}" ] || ks_var=GH_TOKEN
     say "${d}🔑 The GitHub token in $ks_var was used for this setup only: it lives in this terminal's environment and is not saved."
-    say "   To keep it for every terminal: archon secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
+    say "   To keep it for every terminal: erga secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
   fi
   [ -n "$ks_names" ] || return 0
   phase "${e_key}Keeping your PostHog settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
   if [ "$dry" = 1 ]; then
-    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); archon shell ensure makes your shells read it in every new terminal"
+    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); erga shell ensure makes your shells read it in every new terminal"
     return 0
   fi
   for ks_n in $ks_names; do
     eval "ks_v=\${$ks_n}"
-    case $ks_v in *"'"* | *"
-"*) warn "$ks_n holds a quote or a line break, which the file cannot keep, so it was not saved."; problem "$ks_n was not saved"; continue ;; esac
+    case $ks_v in *"'"* | *'"'* | *"
+"*) warn "$ks_n holds a quote or a line break, which the file cannot keep (erga secrets refuses them too), so it was not saved."; problem "$ks_n was not saved"; continue ;; esac
     sf_put "$ks_n" "$ks_v" || { warn "$ks_n could not be saved in $(short_path "$secrets_file")."; problem "$ks_n was not saved"; continue; }
     logf "kept $ks_n in $secrets_file"
   done

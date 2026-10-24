@@ -5,7 +5,7 @@
 # ///
 """Generate the packaging table from the packaging ontology (commons 0002-packaging).
 
-    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml, packaging.auto.sh and pins.auto.env, and the marked blocks of bin/archon-setup.sh
+    uv run commons/tools/generate-packaging.py            write commons/generated/packaging.auto.toml, packaging.auto.sh and pins.auto.env, and the marked blocks of bin/erga-setup.sh
     uv run commons/tools/generate-packaging.py --check    exit 1, writing nothing, where either file is not what the ontology makes
 
 The ontology (commons/ontology/supply-chain/packaging/*.ttl) is the source; the two generated files are never edited by hand. The TOML is for programs (a harness reads it),
@@ -31,7 +31,7 @@ OUT_RULES = COMMONS / "generated" / "rules.auto.toml"
 OUT_RECORD = COMMONS / "generated" / "install-record.auto.toml"
 RULE_SETS = ("shell-portability", "ci-forbidden-program", "ci-forbidden-action", "host-program", "installer")
 FIELD_TYPES = ("text", "boolean", "date")
-SCRIPTS = [COMMONS.parent / "bin" / "archon-setup.sh"]   # carry the fragment between its marks, as a script piped from the internet has no file beside it
+SCRIPTS = [COMMONS.parent / "bin" / "erga-setup.sh"]   # carry the fragment between its marks, as a script piped from the internet has no file beside it
 BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
 PINS_BLOCK = re.compile(r"# >>> pins\.auto >>>\n.*?# <<< pins\.auto <<<\n", re.S)
 HEX64 = re.compile(r"^[0-9a-f]{64}$")

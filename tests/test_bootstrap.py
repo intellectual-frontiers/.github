@@ -1,9 +1,9 @@
-"""The machine bootstrap (0136-machine-bootstrap): `bin/archon-setup.sh` (no administrator rights) and `bin/archon-bootstrap.sh` (the one that may use them), tested without root, apt or the network.
+"""The machine bootstrap (009-machine-bootstrap): `bin/erga-setup.sh` (no administrator rights) and `bin/erga-bootstrap.sh` (the one that may use them), tested without root, apt or the network.
 
 What runs here: the script's syntax in every POSIX shell on the machine, `--dry-run`, every switch that turns an installation off, the clone and its
-fast-forward-only update against a local repository, the three `archon` commands against a stand-in launcher, the file editor
-(`bin/bootstrap/managed.sh`) on text, the checksum and release-file rules on local fixtures. What does not: installing packages with apt, fetching
-the pinned programs, signing in to GitHub, `chsh` (they need a Debian machine, a network and a person)."""
+fast-forward-only update against a local repository, the `erga` commands against a stand-in launcher, rustup-init, uv and the Rust toolchain against stand-ins,
+the checksum and release-file rules on local fixtures. What does not: installing packages with apt, fetching the pinned programs, signing in to GitHub, `chsh`
+(they need a Debian machine, a network and a person). The specification is erga's 009-machine-bootstrap."""
 import hashlib
 import json
 import os
@@ -17,14 +17,14 @@ from pathlib import Path
 HOME = Path(__file__).resolve().parents[1]
 
 BIN = HOME / "bin"
-SCRIPT = BIN / "archon-setup.sh"
-BOOT = BIN / "archon-bootstrap.sh"
+SCRIPT = BIN / "erga-setup.sh"
+BOOT = BIN / "erga-bootstrap.sh"
 SH = shutil.which("sh")
 
 # every switch that stops an installation, so that a run changes nothing but the workspaces folder and the script's own directories
-OFF_BUT_ARCHON = {"BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
+OFF_BUT_ERGA = {"BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
 OFF = {"BOOTSTRAP_NO_APT": "1", "BOOTSTRAP_NO_DOWNLOAD": "1", "BOOTSTRAP_NO_DOTFILES": "1", "BOOTSTRAP_NO_AUTH": "1", "BOOTSTRAP_NO_CHSH": "1",
-       "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
+       "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ERGA": "1", "BOOTSTRAP_NO_RUNTIME": "1", "BOOTSTRAP_NO_EDITOR": "1"}
 
 
 def tree(root: Path) -> list[str]:
@@ -48,7 +48,7 @@ class Fixture(unittest.TestCase):
         self.bin.mkdir()
 
     def env(self, **extra):
-        env = {k: v for k, v in os.environ.items() if not k.startswith(("BOOTSTRAP_", "ARCHON_WORKSPACES", "XDG_")) and k not in ("NO_COLOR", "GH_TOKEN", "GITHUB_TOKEN")}
+        env = {k: v for k, v in os.environ.items() if not k.startswith(("BOOTSTRAP_", "ERGA_WORKSPACES", "XDG_")) and k not in ("NO_COLOR", "GH_TOKEN", "GITHUB_TOKEN")}
         env.update(HOME=str(self.home), TERM="dumb", LANG="C", TMPDIR=str(self.tmp), BOOTSTRAP_NO_NETCHECK="1")
         env.update(extra)
         return env
@@ -88,9 +88,8 @@ class Shape(unittest.TestCase):
                     self.assertIsNone(bashism.search(line), f"a bashism in {f.name}: {line}")
 
     def test_no_file_of_the_earlier_name_or_its_data_is_kept(self):
-        """0136-machine-bootstrap FR-051: the names are archon-bootstrap.sh and archon-setup.sh, and the templates and themes live in archon."""
-        self.assertFalse((BIN / "bootstrap-archon.sh").exists())
-        self.assertFalse((BIN / "bootstrap").exists())
+        """009-machine-bootstrap FR-006, FR-013: bin/ holds erga-bootstrap.sh and erga-setup.sh alone, and the templates and themes live in erga."""
+        self.assertEqual(sorted(p.name for p in BIN.iterdir()), ["erga-bootstrap.sh", "erga-setup.sh"])
 
     def test_the_sign_in_says_what_it_waits_for_while_gh_is_quiet(self):
         """gh prints the code and then nothing; the script says on the terminal, every so often, the address to open and that nothing else is to be pressed."""
@@ -117,12 +116,15 @@ class Shape(unittest.TestCase):
 
     def test_the_pins_are_whole(self):
         text = SCRIPT.read_text()
-        sums = re.findall(r"^([A-Z]+)_SHA256_(X86_64|AARCH64|MACOS_ARM64)=(\S+)$", text, re.M)
-        self.assertEqual(sorted({n for n, _, _ in sums}), ["FISH", "GH", "GLAB", "JQ", "MISE"], "chezmoi and Oh My Posh are pinned by archon, in toolchain/")
+        sums = re.findall(r"^([A-Z_]+?)_SHA256_(X86_64|AARCH64|MACOS_ARM64)=(\S+)$", text, re.M)
+        names = {n for n, _, _ in sums}
+        self.assertLessEqual({"FISH", "GH", "GLAB", "JQ", "RUSTUP_INIT", "UV"}, names, "Oh My Posh and the rest of erga's toolchain are pinned by erga")
         for name, arch, digest in sums:
             self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} {arch}")
-        self.assertEqual(len(sums), 10, "fish has no Mac build; gh and jq are pinned for a Mac alone (0136-machine-bootstrap FR-057)")
-        for var in ("UV_VERSION", "PYTHON_VERSION", "GH_VERSION", "JQ_VERSION"):
+        for name in ("RUSTUP_INIT", "UV"):   # 009-machine-bootstrap FR-025, FR-078: pinned for every platform a script runs on
+            self.assertEqual({a for n, a, _ in sums if n == name}, {"X86_64", "AARCH64", "MACOS_ARM64"}, name)
+        self.assertEqual({a for n, a, _ in sums if n in ("GH", "JQ")}, {"MACOS_ARM64"}, "gh and jq are pinned for a Mac alone (009-machine-bootstrap FR-017)")
+        for var in ("UV_VERSION", "RUSTUP_INIT_VERSION", "GH_VERSION", "JQ_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
         self.assertRegex(re.search(r"^MS_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "Microsoft's key, pinned by the bootstrap")
 
@@ -132,7 +134,7 @@ class Entry(Fixture):
     def test_help_and_a_bad_option(self):
         p = self.run_script("--help")
         self.assertEqual(p.returncode, 0)
-        self.assertIn("curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-setup.sh | sh", p.stdout)
+        self.assertIn("curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-setup.sh | sh", p.stdout)
         self.assertEqual(self.run_script("--nonsense").returncode, 2)
 
     def test_it_refuses_a_home_that_is_not_a_folder(self):
@@ -153,15 +155,34 @@ class Entry(Fixture):
         p = self.run_script("--dry-run")
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before, "a dry run writes nothing")
-        for step in ("archon shell ensure", "archon doctor", "archon toolchain ensure", "archon check", "intellectual-frontiers/archon",
+        for step in ("erga shell ensure", "erga doctor", "erga toolchain ensure", "erga check", "intellectual-frontiers/erga",
                      "GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https"):
             self.assertIn(step, p.stdout)
-        for gone in ("Oh My Posh", "Installing chezmoi", "login shell", "apt install", "administrator rights"):
+        for gone in ("Oh My Posh", "Installing chezmoi", "login shell", "apt install", "administrator rights", "mise", "Python and uv"):
             self.assertNotIn(gone, p.stdout, f"the setup has no {gone} step")
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
+    def test_dry_run_installs_rust_through_rustup_and_runs_ergas_commands_in_the_order_of_the_spec(self):
+        """009-machine-bootstrap FR-026, FR-055, FR-056: rustup and uv first; in the clone the toolchain rust-toolchain.toml pins, then shell ensure, toolchain ensure,
+        check --quick and, last, doctor."""
+        out = self.run_script("--dry-run").stdout
+        for text in ("rustup", f"Installing uv {re.search(r'^UV_VERSION=(.*)$', SCRIPT.read_text(), re.M).group(1)}", "rust-toolchain.toml", "./erga --version"):
+            self.assertIn(text, out)
+        order = [out.index(s) for s in ("rustup", "Installing uv", "copy https://github.com/intellectual-frontiers/erga", "rust-toolchain.toml pins",
+                                         "./erga shell ensure", "./erga toolchain ensure", "./erga check --quick", "last: ./erga doctor")]
+        self.assertEqual(order, sorted(order), out)
+        off = self.run_script("--dry-run", BOOTSTRAP_NO_RUNTIME="1").stdout
+        self.assertNotIn("rust-toolchain.toml pins", off, "BOOTSTRAP_NO_RUNTIME=1 installs no Rust")
+        self.assertNotIn("Installing uv", off)
+
+    def test_the_setup_names_only_commands_erga_has(self):
+        """009-machine-bootstrap FR-058: no command erga lacks (orch, observe, packaging and sbom are not erga's)"""
+        text = SCRIPT.read_text()
+        for gone in ("erga orch", "erga observe", "erga packaging", "erga sbom", "orch status"):
+            self.assertNotIn(gone, text)
+
     def test_dry_run_lists_the_ai_assistants_and_the_comfort_kits_only_when_asked(self):
-        """0136-machine-bootstrap FR-042, FR-047: the assistants are in the setup; the comfort kits are in only with --comfort."""
+        """009-machine-bootstrap FR-028, FR-005: the assistants are in the setup; the comfort kits are in only with --comfort."""
         p = self.run_script("--dry-run")
         for tool in ("claude", "codex", "opencode", "aider"):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
@@ -183,23 +204,23 @@ class Entry(Fixture):
         self.assertNotIn("Installing eza", only.stdout)
 
     def test_the_summary_says_how_to_start_remote_control_where_claude_is_installed(self):
-        """0136-machine-bootstrap FR-088: the summary names `claude remote-control` with Claude Code, starts nothing and asks for no key."""
+        """009-machine-bootstrap FR-060: the summary names `claude remote-control` with Claude Code, starts nothing and asks for no key."""
         claude = self.home / ".local" / "bin" / "claude"
         claude.parent.mkdir(parents=True)
         claude.write_text(f'#!/bin/sh\necho ran >>"{self.tmp}/claude-ran"\n')
         claude.chmod(0o755)
-        p = self.run_script(**OFF, ARCHON_WORKSPACES=str(self.tmp / "w"))
+        p = self.run_script(**OFF, ERGA_WORKSPACES=str(self.tmp / "w"))
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertIn("claude remote-control", p.stdout)
         self.assertIn("not an API key", p.stdout)
         self.assertFalse((self.tmp / "claude-ran").exists(), "the setup does not start Remote Control")
-        off = self.run_script(**OFF, BOOTSTRAP_NO_AGENTS="1", ARCHON_WORKSPACES=str(self.tmp / "w"))
+        off = self.run_script(**OFF, BOOTSTRAP_NO_AGENTS="1", ERGA_WORKSPACES=str(self.tmp / "w"))
         self.assertNotIn("remote-control", off.stdout, "without the agents kit it is not named")
 
     def test_dry_run_follows_the_switches(self):
         p = self.run_script("--dry-run", **OFF)
         self.assertEqual(p.returncode, 0, p.stderr)
-        for gone in ("intellectual-frontiers/archon", "archon doctor", "archon shell ensure"):
+        for gone in ("intellectual-frontiers/erga", "erga doctor", "erga shell ensure"):
             self.assertNotIn(gone, p.stdout, f"{gone} is switched off")
 
     def test_dry_run_lists_the_same_steps_from_a_pipe(self):
@@ -207,23 +228,23 @@ class Entry(Fixture):
         self.assertEqual(piped.returncode, 0, piped.stderr)
         self.assertEqual(piped.stdout, self.run_script("--dry-run").stdout.replace(str(SCRIPT), "sh"))
 
-    def test_the_prompt_choice_is_handed_to_archon_shell(self):
-        """0138-shell FR-009: the setup tells `archon shell set prompt` what was asked for; without a choice archon's default stands."""
+    def test_the_prompt_choice_is_handed_to_erga_shell(self):
+        """010-shell FR-009: the setup tells `erga shell set prompt` what was asked for; without a choice erga's default stands."""
         none = self.run_script("--dry-run", BOOTSTRAP_PROMPT="no")
-        self.assertIn("archon shell set prompt none", none.stdout)
-        plain = self.run_script("--dry-run", BOOTSTRAP_PROMPT="plain", **OFF_BUT_ARCHON)
-        self.assertIn("archon shell set prompt plain", plain.stdout)
+        self.assertIn("erga shell set prompt none", none.stdout)
+        plain = self.run_script("--dry-run", BOOTSTRAP_PROMPT="plain", **OFF_BUT_ERGA)
+        self.assertIn("erga shell set prompt plain", plain.stdout)
         self.assertNotIn("shell set prompt", self.run_script("--dry-run").stdout)
 
-    def test_the_setup_has_no_dedicated_option_and_asks_archon_for_the_default_shell_mode(self):
-        """0136-machine-bootstrap FR-051: the account can have any name; the mode is `archon shell`'s own choice"""
+    def test_the_setup_has_no_dedicated_option_and_asks_erga_for_the_default_shell_mode(self):
+        """009-machine-bootstrap FR-006: the account can have any name; the mode is `erga shell`'s own choice"""
         self.assertEqual(self.run_script("--dedicated").returncode, 2)
         self.assertNotIn("--mode", self.run_script("--dry-run").stdout)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Colour(Fixture):
-    """0136-machine-bootstrap FR-026: an environment variable name in a message is bright yellow where there is colour."""
+    """009-machine-bootstrap FR-063: an environment variable name in a message is bright yellow where there is colour."""
 
     def test_an_environment_variable_name_is_bright_yellow_and_other_words_are_not(self):
         script = f". {SCRIPT}; yb=$(printf '\\033[1;93m'); z=$(printf '\\033[0m'); say 'set BOOTSTRAP_PROMPT=plain, not FR-001 or git'"
@@ -239,39 +260,43 @@ class Switches(Fixture):
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         made = tree(self.home)
         self.assertIn("workspaces/github.com/intellectual-frontiers", made)
-        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith((".archon-bootstrap/log/", ".local/state/gh/")) and m != ".config/archon/install.toml"], [], "folders only: no file of the person's changes, but the log, what gh itself keeps and the record of how it was set up")
-        self.assertTrue(any(m.startswith(".archon-bootstrap/log/bootstrap-") for m in made), "everything is logged to ~/.archon-bootstrap/log/")
+        self.assertEqual([m for m in made if (self.home / m).is_file() and not m.startswith((".erga-bootstrap/log/", ".local/state/gh/")) and m != ".config/erga/install.toml"], [], "folders only: no file of the person's changes, but the log, what gh itself keeps and the record of how it was set up")
+        self.assertTrue(any(m.startswith(".erga-bootstrap/log/bootstrap-") for m in made), "everything is logged to ~/.erga-bootstrap/log/")
         again = self.run_script(**OFF, BOOTSTRAP_KIT="")
         self.assertEqual(again.returncode, 0)
-        without_logs = lambda names: [m for m in names if not m.startswith(".archon-bootstrap/log/")]
+        without_logs = lambda names: [m for m in names if not m.startswith(".erga-bootstrap/log/")]
         self.assertEqual(without_logs(tree(self.home)), without_logs(made), "a second run changes nothing (but writes its own log)")
 
     def test_the_workspaces_folder_can_be_named(self):
-        p = self.run_script(**OFF, BOOTSTRAP_KIT="", ARCHON_WORKSPACES=str(self.tmp / "elsewhere"))
+        p = self.run_script(**OFF, BOOTSTRAP_KIT="", ERGA_WORKSPACES=str(self.tmp / "elsewhere"))
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertTrue((self.tmp / "elsewhere" / "github.com" / "intellectual-frontiers").is_dir())
         self.assertFalse((self.home / "workspaces").exists())
 
     def test_the_workspaces_folder_can_be_named_in_the_settings_file(self):
-        cfg = self.home / ".config" / "archon"
+        cfg = self.home / ".config" / "erga"
         cfg.mkdir(parents=True)
-        (cfg / "setup.env").write_text(f'ARCHON_WORKSPACES="{self.tmp / "named"}"\n')
+        (cfg / "setup.env").write_text(f'ERGA_WORKSPACES="{self.tmp / "named"}"\n')
         self.assertEqual(self.run_script(**OFF, BOOTSTRAP_KIT="").returncode, 0)
         self.assertTrue((self.tmp / "named" / "github.com" / "intellectual-frontiers").is_dir())
 
 
 @unittest.skipUnless(SH and shutil.which("git") and shutil.which("jq"), "sh, git and jq are needed")
 class Clone(Fixture):
-    """The clone, its fast-forward-only update and the three archon commands, against a local repository with a stand-in launcher."""
+    """The clone, its fast-forward-only update and the erga commands, against a local repository with a stand-in launcher that answers as erga does."""
 
+    # The shape of `erga toolchain list --json`: entries in `data`, `found` null where the program is not here. FAKE_NO_QUICK stands for an erga whose check has no --quick.
     LAUNCHER = """#!/bin/sh
-[ "$1 $2" = "toolchain list" ] || echo "ARCHON $* assume_yes=${ARCHON_ASSUME_YES:-} no_admin=${ARCHON_NO_ADMIN:-}" >>"${CALLS:?}"
-case "$1 $2" in
-  "toolchain list") libs='[]'; cmd=''
-    [ -n "${FAKE_LIBS:-}" ] && { libs='["build-essential","cmake"]'; cmd='apt-get install -y build-essential cmake'; }
-    echo '{"data":{"entries":[{"name":"node","ready":true,"summary":"Node.js"},{"name":"python","ready":false,"summary":"Python"},{"name":"docker","ready":false,"summary":"Docker (optional: only an image needs it)"},{"name":"jre","ready":false,"summary":"A Java runtime"}],"system_packages":'"$libs"',"system_command":"'"$cmd"'"}}' ;;
+case "$*" in "toolchain list --json" | "--version" | "check --help") ;; *) echo "ERGA $* assume_yes=${ERGA_ASSUME_YES:-} no_admin=${ERGA_NO_ADMIN:-} env=${ERGA_ENVIRONMENT:-}" >>"${CALLS:?}" ;; esac
+case "$*" in
+  "toolchain list --json") libs=''
+    [ -n "${FAKE_LIBS:-}" ] && libs=',"system_packages":["libnss3","libgbm1"],"system_command":"apt-get install -y libnss3 libgbm1"'
+    echo '{"schema":"erga/toolchain-list@1","data":[{"name":"node","phase":"Dev","found":{"version":"22"}},{"name":"python","phase":"Dev","found":null},{"name":"docker","phase":"Dev","found":null,"optional":true},{"name":"jre","phase":"Dev","found":null}]'"$libs"'}' ;;
+  "check --help") [ -n "${FAKE_NO_QUICK:-}" ] || echo "      --quick     Run the sections that finish in seconds" ;;
+  "doctor") echo "DOCTOR SAYS: Next: erga toolchain ensure jre" ;;
 esac
-[ "$1" = check ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
+[ "$1" = --version ] && [ -n "${FAKE_NO_BUILD:-}" ] && exit 3
+[ "$1 $2" = "check --quick" ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
 [ "$1 $2" = "shell ensure" ] && [ -n "${FAKE_FAIL_SHELL:-}" ] && exit 3
 exit 0
 """
@@ -281,38 +306,38 @@ exit 0
         self.upstream = self.tmp / "upstream"
         self.upstream.mkdir()
         git("init", "-q", "-b", "main", cwd=self.upstream)
-        (self.upstream / "archon").write_text(self.LAUNCHER)
-        (self.upstream / "archon").chmod(0o755)
+        (self.upstream / "erga").write_text(self.LAUNCHER)
+        (self.upstream / "erga").chmod(0o755)
         git("add", ".", cwd=self.upstream)
         git("commit", "-qm", "one", cwd=self.upstream)
-        self.stub("uv")      # archon's launcher needs only uv; the stand-in does not run it, the script only checks it is there
-        self.clone = self.home / "workspaces" / "github.com" / "intellectual-frontiers" / "archon"
+        self.stub("cargo")      # erga's launcher builds it with Cargo; the stand-in does not run it, the script only checks it is there
+        self.clone = self.home / "workspaces" / "github.com" / "intellectual-frontiers" / "erga"
 
     def go(self, **extra):
-        off = {k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_DOTFILES")}
-        self.calls = self.tmp / "archon-calls.txt"
+        off = {k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ERGA", "BOOTSTRAP_NO_DOTFILES")}
+        self.calls = self.tmp / "erga-calls.txt"
         self.calls.write_text("")
         argv = extra.pop("argv", ())
-        # a token stands for the GitHub sign-in: without one the setup leaves everything that downloads from GitHub, archon's programs included, until there is one
-        return self.run_script(*argv, **off, BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), CALLS=str(self.calls), PATH=f"{self.bin}:{os.environ['PATH']}", **{"GH_TOKEN": "test-token", **extra})
+        # a token stands for the GitHub sign-in: without one the setup leaves everything that downloads from GitHub, erga's programs included, until there is one
+        return self.run_script(*argv, **off, BOOTSTRAP_KIT="", ERGA_URL=str(self.upstream), CALLS=str(self.calls), **{"PATH": f"{self.bin}:{os.environ['PATH']}", "GH_TOKEN": "test-token", **extra})
 
     def push(self, name, text="x\n"):
         (self.upstream / name).write_text(text)
         git("add", name, cwd=self.upstream)
         git("commit", "-qm", name, cwd=self.upstream)
 
-    def test_the_setup_alone_names_the_one_command_for_system_libraries_archon_says_it_lacks(self):
-        """0136-machine-bootstrap FR-063: archon holds the list; the setup has no copy, and installs nothing itself"""
+    def test_the_setup_alone_names_the_one_command_for_system_libraries_erga_says_it_lacks(self):
+        """009-machine-bootstrap FR-023: erga holds the list; the setup has no copy, and installs nothing itself"""
         p = self.go(FAKE_LIBS="1")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertIn("sudo apt-get install -y build-essential cmake", p.stdout + p.stderr)
-        self.assertIn("system libraries are missing: build-essential cmake", p.stdout)
-        self.assertIn("ARCHON toolchain ensure", self.calls.read_text(), "the programs are still installed")
+        self.assertIn("sudo apt-get install -y libnss3 libgbm1", p.stdout + p.stderr)
+        self.assertIn("system libraries are missing: libnss3 libgbm1", p.stdout)
+        self.assertIn("ERGA toolchain ensure", self.calls.read_text(), "the programs are still installed")
         self.assertNotIn("system libraries", self.go().stdout + self.go().stderr, "nothing is said where nothing is lacking")
-        self.assertNotIn("build-essential", SCRIPT.read_text().split("system_libraries()")[0].split("MODERN_TOOLS")[0], "no second list of packages in the setup")
+        self.assertNotIn("libnss3", SCRIPT.read_text(), "no second list of packages in the setup")
 
     def test_the_bootstrap_installs_those_libraries_with_the_rights_it_has_and_only_when_packages_are_on(self):
-        """0136-machine-bootstrap FR-063"""
+        """009-machine-bootstrap FR-023"""
         log = self.tmp / "pm.log"
         log.write_text("")
         self.stub("sudo", f'case "$1" in -v | -n) exit 0 ;; esac\nexec "$@"')
@@ -327,25 +352,30 @@ exit 0
         self.assertIn("rc=1", off.stdout)
         self.assertEqual(log.read_text(), "")
 
-    def test_it_copies_archon_runs_its_three_commands_and_says_what_is_next(self):
+    def test_it_copies_erga_runs_its_commands_and_says_what_is_next(self):
+        """009-machine-bootstrap FR-055 to FR-058, FR-065: shell ensure, toolchain ensure, check --quick and, last, doctor, whose output is shown; then the next step"""
         p = self.go()
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertTrue((self.clone / "archon").is_file())
+        self.assertTrue((self.clone / "erga").is_file())
         out = p.stdout
         calls = self.calls.read_text()
-        order = [calls.index(c) for c in ("toolchain ensure python jre", "shell ensure", "doctor", "check")]
-        self.assertEqual(order, sorted(order), "toolchain ensure, then the shells, then doctor, then check")
-        self.assertNotIn("ensure python docker", calls, "what is not ready and not optional")
-        self.assertEqual(calls.count("assume_yes=1"), 4, "every question archon could ask is answered yes")
-        self.assertEqual(calls.count("no_admin=1"), 4, "0136-machine-bootstrap FR-046: no archon command the setup runs may use administrator rights")
-        self.assertIn("archon orch status", out)
-        self.assertIn("archon orch dev", out)
-        wrapper = self.home / ".local" / "bin" / "archon"
-        self.assertIn(str(self.clone / "archon"), wrapper.read_text())
+        order = [calls.index(c) for c in ("ERGA shell ensure", "ERGA toolchain ensure python jre", "ERGA check --quick", "ERGA doctor")]
+        self.assertEqual(order, sorted(order), "the shells, then toolchain ensure, then the quick check, then doctor")
+        self.assertNotIn("docker", calls, "what is not here and not optional")
+        self.assertEqual(calls.count("assume_yes=1"), 4, "every question erga could ask is answered yes")
+        self.assertEqual(calls.count("no_admin=1"), 4, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
+        self.assertEqual(calls.count("env=bootstrap"), 4, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
+        self.assertIn("DOCTOR SAYS: Next: erga toolchain ensure jre", out, "doctor's own words are shown")
+        self.assertLess(out.index("DOCTOR SAYS"), out.index("exec bash -l"))
+        self.assertEqual(out.rstrip().splitlines()[-1].strip(), "exec bash -l", "009-machine-bootstrap FR-059: the last instruction")
+        self.assertIn("erga help start", out)
+        self.assertNotIn("orch", out)
+        wrapper = self.home / ".local" / "bin" / "erga"
+        self.assertIn(str(self.clone / "erga"), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
 
-    def test_the_shells_are_archons_to_set_up(self):
-        """0136-machine-bootstrap FR-049, FR-051; 0138-shell FR-008: the setup writes no startup file, it runs `archon shell ensure`."""
+    def test_the_shells_are_ergas_to_set_up(self):
+        """009-machine-bootstrap FR-042, FR-006; 010-shell FR-008: the setup writes no startup file, it runs `erga shell ensure`."""
         self.go()
         shell = [l for l in self.calls.read_text().splitlines() if "shell ensure" in l]
         self.assertEqual(len(shell), 1)
@@ -353,19 +383,19 @@ exit 0
         for name in (".bashrc", ".profile", ".zshrc", ".zshenv", ".zprofile", ".config/fish"):
             self.assertFalse((self.home / name).exists(), f"the setup wrote {name}")
 
-    def test_the_prompt_choice_is_handed_to_archon_shell_and_the_font_hint_comes_with_the_pretty_prompt(self):
-        """0136-machine-bootstrap FR-010; 0138-shell FR-009"""
+    def test_the_prompt_choice_is_handed_to_erga_shell_and_the_font_hint_comes_with_the_pretty_prompt(self):
+        """009-machine-bootstrap FR-038; 010-shell FR-009"""
         pretty = self.go()
-        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "~/.local/share/fonts", "fc-cache", "archon shell set prompt plain"):
+        for line in ("Nerd Font", "CaskaydiaCove Nerd Font", "~/.local/share/fonts", "fc-cache", "erga shell set prompt plain"):
             self.assertIn(line, pretty.stdout)
         for line in ("Windows Terminal", "Install for all users", "not inside Debian"):
             self.assertNotIn(line, pretty.stdout, "the steps for Windows are for WSL alone")
         wsl = self.go(WSL_DISTRO_NAME="Debian")
         for line in ("Install for all users", "Windows Terminal"):
             self.assertIn(line, wsl.stdout)
-        self.assertNotIn("shell set prompt", self.calls.read_text(), "without a choice archon's default stands")
+        self.assertNotIn("shell set prompt", self.calls.read_text(), "without a choice erga's default stands")
         plain = self.go(BOOTSTRAP_PROMPT="plain")
-        self.assertIn("ARCHON shell set prompt plain", self.calls.read_text())
+        self.assertIn("ERGA shell set prompt plain", self.calls.read_text())
         self.assertNotIn("Nerd Font", plain.stdout)
 
     def test_the_shells_are_left_alone_with_the_switch_and_without_a_sign_in_and_a_failure_is_a_problem_not_a_stop(self):
@@ -373,38 +403,61 @@ exit 0
         self.assertNotIn("shell ensure", self.calls.read_text())
         p = self.go(FAKE_FAIL_SHELL="1")
         self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
-        self.assertIn("archon shell ensure did not finish", p.stdout)
-        self.assertIn("ARCHON doctor", self.calls.read_text(), "the rest goes on")
-        self.assertRegex(p.stdout, r"(x|❌).*\./archon shell ensure \(exit status 3\)")
+        self.assertIn("erga shell ensure did not finish", p.stdout)
+        self.assertIn("ERGA doctor", self.calls.read_text(), "the rest goes on")
+        self.assertRegex(p.stdout, r"(x|❌).*\./erga shell ensure \(exit status 3\)")
 
     def test_the_toolchain_can_be_named_or_skipped(self):
         self.go(BOOTSTRAP_TOOLCHAIN="node")
-        self.assertIn("ARCHON toolchain ensure node", self.calls.read_text())
+        self.assertIn("ERGA toolchain ensure node", self.calls.read_text())
         self.go(BOOTSTRAP_TOOLCHAIN="none")
-        self.assertNotIn("ARCHON toolchain ensure", self.calls.read_text())
+        self.assertNotIn("ERGA toolchain ensure", self.calls.read_text())
 
-    def test_all_three_commands_run_when_one_fails_and_the_status_says_so(self):
+    def test_every_command_runs_when_one_fails_and_the_status_says_so(self):
+        """009-machine-bootstrap FR-055"""
         p = self.go(FAKE_FAIL="1")
         self.assertEqual(p.returncode, 1)
         calls = self.calls.read_text()
-        for name in ("doctor", "toolchain ensure", "shell ensure", "check"):
-            self.assertIn(f"ARCHON {name}", calls)
-        self.assertRegex(p.stdout, r"(x|❌).*\./archon check --quick \(exit status 4\)")
+        for name in ("doctor", "toolchain ensure", "shell ensure", "check --quick"):
+            self.assertIn(f"ERGA {name}", calls)
+        self.assertRegex(p.stdout, r"(x|❌).*\./erga check --quick \(exit status 4\)")
+
+    def test_an_erga_without_the_quick_check_is_given_no_check_and_the_summary_says_so(self):
+        """009-machine-bootstrap FR-057: the full check takes minutes, so it is never run in place of the quick one"""
+        p = self.go(FAKE_NO_QUICK="1")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertNotIn("ERGA check", self.calls.read_text())
+        self.assertIn("ERGA doctor", self.calls.read_text())
+        self.assertIn("no quick check yet", p.stdout)
+
+    def test_an_erga_that_cannot_be_built_runs_nothing_more_and_says_so(self):
+        p = self.go(FAKE_NO_BUILD="1")
+        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
+        self.assertEqual(self.calls.read_text(), "")
+        self.assertIn("erga could not be built", p.stdout)
+
+    def test_without_cargo_erga_is_not_run_and_the_summary_says_why(self):
+        (self.bin / "cargo").unlink()
+        path = ":".join(d for d in os.environ["PATH"].split(":") if not (Path(d) / "cargo").exists())
+        p = self.go(PATH=f"{self.bin}:{path}")
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("Rust (cargo) is missing", p.stdout)
+        self.assertEqual(self.calls.read_text(), "")
 
     def test_an_existing_clone_is_updated_by_fast_forward_alone(self):
-        self.assertEqual(self.go(BOOTSTRAP_NO_ARCHON="1").returncode, 0)
+        self.assertEqual(self.go(BOOTSTRAP_NO_ERGA="1").returncode, 0)
         self.push("two")
-        self.assertEqual(self.go(BOOTSTRAP_NO_ARCHON="1").returncode, 0)
+        self.assertEqual(self.go(BOOTSTRAP_NO_ERGA="1").returncode, 0)
         self.assertTrue((self.clone / "two").is_file(), "fast-forwarded")
 
     def test_a_clone_with_work_in_it_is_left_exactly_as_it_was(self):
-        self.assertEqual(self.go(BOOTSTRAP_NO_ARCHON="1").returncode, 0)
+        self.assertEqual(self.go(BOOTSTRAP_NO_ERGA="1").returncode, 0)
         # uncommitted work in a file upstream changes
         self.push("shared", "upstream 1\n")
-        self.assertEqual(self.go(BOOTSTRAP_NO_ARCHON="1").returncode, 0)
+        self.assertEqual(self.go(BOOTSTRAP_NO_ERGA="1").returncode, 0)
         (self.clone / "shared").write_text("mine\n")
         self.push("shared", "upstream 2\n")
-        p = self.go(BOOTSTRAP_NO_ARCHON="1")
+        p = self.go(BOOTSTRAP_NO_ERGA="1")
         self.assertEqual(p.returncode, 0)
         self.assertEqual((self.clone / "shared").read_text(), "mine\n")
         self.assertIn("your work is safe", p.stdout)
@@ -415,18 +468,18 @@ exit 0
         git("commit", "-qm", "local", cwd=self.clone)
         head = git("rev-parse", "HEAD", cwd=self.clone)
         self.push("three")
-        p = self.go(BOOTSTRAP_NO_ARCHON="1")
+        p = self.go(BOOTSTRAP_NO_ERGA="1")
         self.assertEqual(p.returncode, 0)
         self.assertEqual(git("rev-parse", "HEAD", cwd=self.clone), head)
         self.assertIn("your work is safe", p.stdout)
 
     def test_without_a_sign_in_and_without_a_terminal_it_stops_before_the_clone_with_the_command(self):
         self.stub("gh", 'case "$1 $2" in "auth status") exit 1 ;; esac\nexit 0')
-        p = self.run_script(**{k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_AUTH")},
-                            BOOTSTRAP_KIT="", ARCHON_URL=str(self.upstream), PATH=f"{self.bin}:{os.environ['PATH']}")
+        p = self.run_script(**{k: v for k, v in OFF.items() if k not in ("BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ERGA", "BOOTSTRAP_NO_AUTH")},
+                            BOOTSTRAP_KIT="", ERGA_URL=str(self.upstream), PATH=f"{self.bin}:{os.environ['PATH']}")
         self.assertEqual(p.returncode, 5, p.stderr)
         self.assertIn("GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https", p.stdout)
-        self.assertIn(".archon-bootstrap/log/", p.stdout)
+        self.assertIn(".erga-bootstrap/log/", p.stdout)
         self.assertFalse(self.clone.exists())
 
     def test_a_token_in_the_environment_means_no_sign_in_is_asked_for(self):
@@ -485,7 +538,7 @@ class Rules(Fixture):
         bad = self.call(f'download_verified "file://{f}" {"0" * 64}')
         self.assertNotEqual(bad.returncode, 0)
         self.assertIn("nothing was installed", bad.stderr)
-        self.assertFalse((self.home / ".cache" / "archon-setup" / "downloads" / ("0" * 64)).exists())
+        self.assertFalse((self.home / ".cache" / "erga-setup" / "downloads" / ("0" * 64)).exists())
 
     def registry(self, package_ok=True):
         """A registry on disk with one tool, `demo`, whose per-platform package holds a program that answers --version."""
@@ -510,7 +563,7 @@ class Rules(Fixture):
         return f"file://{reg}"
 
     def test_an_ai_assistant_is_installed_only_with_the_checksum_npm_lists_for_it(self):
-        """0136-machine-bootstrap FR-043: the program is verified, run once, linked, and a second run changes nothing."""
+        """009-machine-bootstrap FR-029: the program is verified, run once, linked, and a second run changes nothing."""
         setup = 'mkdir -p "$work" "$tools" "$bin"; '
         call = "install_npm_native demo demo-meta demo-linux-{arch}@{ver} demo"
         reg = self.registry()
@@ -581,22 +634,118 @@ class Rules(Fixture):
         self.assertEqual(self.call(f'locate "{d}" "missing"').stdout.strip(), "")
 
 
+@unittest.skipUnless(SH, "sh is not installed")
+class Runtime(Fixture):
+    """009-machine-bootstrap FR-025, FR-026: rustup from the pinned rustup-init, the pinned uv, and in the clone the toolchain rust-toolchain.toml pins; stand-ins for the network."""
+
+    def call(self, code, **env):
+        return subprocess.run([SH, "-c", f'. "{SCRIPT}"; arch=x86_64; goarch=amd64; goos=linux; rust_target=x86_64-unknown-linux-gnu; mkdir -p "$work" "$tools" "$bin"\n{code}'],
+                              capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}", **env))
+
+    def test_the_pinned_rustup_init_is_fetched_from_rusts_own_archive_for_each_platform(self):
+        text = SCRIPT.read_text()
+        version = re.search(r"^RUSTUP_INIT_VERSION=(\S+)$", text, re.M).group(1)
+        for target in ("x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin"):
+            self.assertEqual(self.call(f"rust_target={target}; rustup_url").stdout, f"https://static.rust-lang.org/rustup/archive/{version}/{target}/rustup-init")
+        uv = re.search(r"^UV_VERSION=(\S+)$", text, re.M).group(1)
+        self.assertEqual(self.call("uv_url").stdout, f"https://github.com/astral-sh/uv/releases/download/{uv}/uv-x86_64-unknown-linux-gnu.tar.gz")
+
+    def test_rustup_init_runs_only_with_its_pinned_checksum_with_no_toolchain_and_no_startup_file(self):
+        args = self.tmp / "rustup-args"
+        init = self.tmp / "rustup-init"
+        init.write_text(f'#!/bin/sh\necho "$*" >"{args}"\n')
+        good = hashlib.sha256(init.read_bytes()).hexdigest()
+        ok = self.call(f"RUSTUP_INIT_SHA256_X86_64={good}; install_rustup && echo INSTALLED", BOOTSTRAP_RUSTUP_URL=f"file://{init}")
+        self.assertIn("INSTALLED", ok.stdout, ok.stderr)
+        self.assertEqual(args.read_text().split(), ["-y", "--no-modify-path", "--default-toolchain", "none", "--profile", "minimal"])
+        args.unlink()
+        bad = self.call(f"RUSTUP_INIT_SHA256_X86_64={'0' * 64}; install_rustup && echo INSTALLED", BOOTSTRAP_RUSTUP_URL=f"file://{init}")
+        self.assertNotIn("INSTALLED", bad.stdout)
+        self.assertIn("nothing was installed", bad.stderr)
+        self.assertFalse(args.exists(), "a file that is not the pinned one is never run")
+        for name in (".profile", ".bashrc", ".zshrc"):
+            self.assertFalse((self.home / name).exists())
+
+    def test_a_rustup_already_here_is_used_and_not_installed_again(self):
+        self.stub("rustup", "exit 0")
+        p = self.call('dry=1; setup_runtime')
+        self.assertIn("use the rustup already here", p.stdout, p.stderr)
+        self.assertNotIn("Installing rustup", p.stdout)
+
+    def uv_tarball(self):
+        import io
+        import tarfile
+        buf = io.BytesIO()
+        with tarfile.open(fileobj=buf, mode="w:gz") as tf:
+            for name in ("uv", "uvx"):
+                body = f"#!/bin/sh\necho {name} 0.0.1\n".encode()
+                info = tarfile.TarInfo(f"uv-x86_64-unknown-linux-gnu/{name}")
+                info.size, info.mode = len(body), 0o755
+                tf.addfile(info, io.BytesIO(body))
+        f = self.tmp / "uv.tar.gz"
+        f.write_bytes(buf.getvalue())
+        return f, hashlib.sha256(buf.getvalue()).hexdigest()
+
+    def test_the_pinned_uv_is_unpacked_and_linked_but_a_uv_of_the_persons_own_stays(self):
+        f, sha = self.uv_tarball()
+        code = f"uv_url() {{ printf 'file://{f}'; }}; UV_SHA256_X86_64={sha}; install_uv && link_uv && \"$bin/uv\" && \"$bin/uvx\""
+        p = self.call(code)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("uv 0.0.1", p.stdout)
+        self.assertTrue((self.home / ".local" / "bin" / "uv").is_symlink())
+        mine = self.home / ".local" / "bin" / "uvx"
+        mine.unlink()
+        mine.write_text("#!/bin/sh\necho mine\n")
+        self.assertEqual(self.call(code.replace('"$bin/uvx"', "true")).returncode, 0)
+        self.assertEqual(mine.read_text(), "#!/bin/sh\necho mine\n", "a uv the person put there is theirs")
+        bad = self.call(f"uv_url() {{ printf 'file://{f}'; }}; UV_SHA256_X86_64={'0' * 64}; rm -rf \"$tools/uv\"; install_uv && echo INSTALLED")
+        self.assertNotIn("INSTALLED", bad.stdout)
+
+    def test_the_toolchain_the_clone_pins_is_installed_in_the_clone_and_the_switches_leave_it_out(self):
+        clone = self.tmp / "clone"
+        clone.mkdir()
+        (clone / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.97.0"\n')
+        calls = self.tmp / "rustup-calls"
+        self.stub("rustup", f'echo "$(pwd) $*" >>"{calls}"')
+        p = self.call(f'dry=0; cloned=1; target="{clone}"; setup_rust_toolchain; echo DONE')
+        self.assertIn("DONE", p.stdout, p.stderr)
+        self.assertEqual(calls.read_text().strip(), f"{clone} toolchain install")
+        calls.unlink()
+        for switch in ("BOOTSTRAP_NO_RUNTIME", "BOOTSTRAP_NO_DOWNLOAD", "BOOTSTRAP_NO_CLONE"):
+            self.call(f'dry=0; cloned=1; target="{clone}"; setup_rust_toolchain', **{switch: "1"})
+            self.assertFalse(calls.exists(), switch)
+        self.stub("rustup", f'echo "$(pwd) $*" >>"{calls}"; [ "$1" = show ]')   # an older rustup, which installs the file's toolchain on `rustup show`
+        self.call(f'dry=0; cloned=1; target="{clone}"; ERGA_RETRIES=1; setup_rust_toolchain')
+        self.assertEqual(calls.read_text().split("\n")[1], f"{clone} show")
+
+    def test_the_network_look_includes_rusts_hosts(self):
+        """009-machine-bootstrap FR-037"""
+        text = SCRIPT.read_text()
+        for host in ("static.rust-lang.org", "index.crates.io", "static.crates.io"):
+            self.assertIn(host, text[text.index("check_network() {"):])
+
+
 class Readme(unittest.TestCase):
     def test_the_public_readme_carries_no_setup_instructions(self):
-        """0136-machine-bootstrap FR-022: the instructions live in archon's README, which the people who may run the script can read."""
+        """009-machine-bootstrap FR-088: the instructions live in erga's README, which the people who may run the script can read."""
         text = (HOME / "README.md").read_text()
         self.assertNotIn("## Set up a new computer", text)
-        self.assertNotIn("bootstrap-archon", text)
+        for old in ("bootstrap-archon", "archon-bootstrap.sh", "archon-setup.sh"):
+            self.assertNotIn(old, text)
 
 
 class Packages(unittest.TestCase):
-    def test_no_package_duplicates_a_program_archon_pins(self):
-        """0136-machine-bootstrap FR-007: Node.js and the browser come from `archon toolchain ensure`, at the pinned version, not from apt."""
+    def test_no_package_duplicates_a_program_erga_pins(self):
+        """009-machine-bootstrap FR-021: Node.js and the browser come from `erga toolchain ensure`, at the pinned version, not from apt."""
         text = BOOT.read_text()
         start = text.index("wanted_packages() {")
         body = text[start:text.index("\n}\n", start)]
-        for pkg in ("nodejs", "npm", "chromium"):
+        for pkg in ("nodejs", "npm", "chromium", "rustc", "cargo", "rustup"):
             self.assertNotRegex(body, rf"\b{pkg}\b", pkg)
+        names = re.findall(r"^\s+\w+:[\w-]+\) printf '%s' '([^']*)' ;;$", SCRIPT.read_text().split("pm_package() {")[1].split("\n}\n")[0], re.M)
+        self.assertTrue(names)
+        for pkg in ("nodejs", "rustc", "cargo", "rustup", "rust"):
+            self.assertNotIn(pkg, names, "009-machine-bootstrap FR-021: Rust is installed through rustup, at the version rust-toolchain.toml pins")
         setup = SCRIPT.read_text()
         verify = setup[setup.index("verify_install() {"):]
         self.assertNotRegex(verify.split("kit_on shell", 1)[0], r"\bnode\b|chromium")
@@ -604,7 +753,7 @@ class Packages(unittest.TestCase):
 
 class Slim(unittest.TestCase):
     def test_the_repository_holds_only_the_bootstrap_commons_its_tests_and_the_organizations_profile(self):
-        """The rest of the harness lives in the private archon repository; this one stays small and public."""
+        """The rest of the harness lives in the private erga repository; this one stays small and public."""
         tracked = subprocess.run(["git", "ls-files"], cwd=HOME, capture_output=True, text=True, check=True).stdout.split()
         top = {t.split("/")[0] for t in tracked}
         self.assertLessEqual(top, {".github", "bin", "commons", "profile", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore"}, top)
@@ -614,7 +763,7 @@ class Slim(unittest.TestCase):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Stops(Fixture):
-    """0136-machine-bootstrap FR-028 to FR-030: a failed step stops the setup, is logged, and says where to look and how to ask for help."""
+    """009-machine-bootstrap FR-066, FR-067: a failed step stops the setup, is logged, and says where to look and how to ask for help."""
 
     def test_a_failed_step_stops_with_the_log_the_support_file_and_how_to_ask_for_help(self):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; step 'Installing everything' sh -c 'echo broke the thing; exit 7'; echo SHOULD_NOT_GET_HERE"
@@ -622,9 +771,9 @@ class Stops(Fixture):
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
         self.assertNotIn("SHOULD_NOT_GET_HERE", p.stdout)
         out = p.stdout
-        for need in ("Setup stopped", "Installing everything", "broke the thing", "~/.archon-bootstrap/log/bootstrap-", "support-", "the help desk"):
+        for need in ("Setup stopped", "Installing everything", "broke the thing", "~/.erga-bootstrap/log/bootstrap-", "support-", "the help desk"):
             self.assertIn(need, out, need)
-        logs = sorted((self.home / ".archon-bootstrap" / "log").glob("*"))
+        logs = sorted((self.home / ".erga-bootstrap" / "log").glob("*"))
         self.assertEqual([f.name.split("-")[0] for f in logs], ["bootstrap", "support"])
         self.assertIn("==== STEP 1: Installing everything (exit 7)", logs[0].read_text())
         self.assertIn("broke the thing", logs[1].read_text())
@@ -632,14 +781,14 @@ class Stops(Fixture):
     def test_a_secret_in_the_output_is_removed_from_the_support_file(self):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; step 'x' sh -c 'echo token=abc123 ghp_ABCDEFGHIJKLMNOP1234; exit 1'"
         subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
-        support = next((self.home / ".archon-bootstrap" / "log").glob("support-*")).read_text()
+        support = next((self.home / ".erga-bootstrap" / "log").glob("support-*")).read_text()
         self.assertNotIn("abc123", support)
         self.assertNotIn("ghp_ABCDEFGHIJKLMNOP1234", support)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Telemetry(Fixture):
-    """0136-machine-bootstrap FR-038: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
+    """009-machine-bootstrap FR-054: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
 
     def serve(self):
         import http.server
@@ -669,7 +818,7 @@ class Telemetry(Fixture):
 
     def test_steps_a_failure_and_the_end_are_sent_with_the_environment_and_a_stable_device_id(self):
         srv, got = self.serve()
-        p = self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=f"http://127.0.0.1:{srv.server_port}")
+        p = self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=f"http://127.0.0.1:{srv.server_port}")
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
         ev = self.events(got)
         self.assertEqual([e["event"] for e in ev if e["event"] == "bootstrap_step"], ["bootstrap_step", "bootstrap_step"])
@@ -682,77 +831,79 @@ class Telemetry(Fixture):
             for k in ("host_kind", "os_id", "arch", "cpus", "bootstrap_run", "hostname", "os_user"):
                 self.assertIn(k, e["properties"])
         failed = next(e for e in ev if e["event"] == "bootstrap_failed")["properties"]
-        self.assertIn("~/.archon-bootstrap/log/bootstrap-", failed["log_file"])
+        self.assertIn("~/.erga-bootstrap/log/bootstrap-", failed["log_file"])
         self.assertIn("broke at", failed["error_tail"])
         self.assertEqual(next(e for e in ev if e["event"] == "bootstrap_finished")["properties"]["outcome"], "stopped")
         self.assertNotIn(str(self.home), json.dumps(ev))
-        journal = (self.home / ".archon" / "telemetry" / "sent.jsonl").read_text()
+        journal = (self.home / ".local" / "state" / "erga" / "telemetry" / "sent.jsonl").read_text()   # erga's state folder (009-machine-bootstrap FR-054)
         lines = [json.loads(l) for l in journal.splitlines()]
         self.assertEqual([l["event"] for l in lines], [e["event"] for e in ev] or [l["event"] for l in lines])
         self.assertTrue(all(l["source"] == "bootstrap" and l["status"] == 200 for l in lines))
         self.assertNotIn("phc_test", journal)
         first = ev[0]["distinct_id"]
         srv2, got2 = self.serve()
-        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=f"http://127.0.0.1:{srv2.server_port}")
+        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=f"http://127.0.0.1:{srv2.server_port}")
         self.assertEqual(self.events(got2)[0]["distinct_id"], first)
 
     def test_nothing_is_sent_without_a_key_or_when_told_not_to(self):
         srv, got = self.serve()
         host = f"http://127.0.0.1:{srv.server_port}"
-        self.run_failing(ARCHON_POSTHOG_HOST=host)
-        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=host, DO_NOT_TRACK="1")
-        self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST=host, ARCHON_OBSERVE="off")
+        self.run_failing(ERGA_POSTHOG_HOST=host)
+        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=host, DO_NOT_TRACK="1")
+        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=host, ERGA_OBSERVE="off")
         self.assertEqual(got, [])
 
     def test_an_unreachable_host_changes_nothing_but_the_log(self):
-        p = self.run_failing(ARCHON_POSTHOG_KEY="phc_test", ARCHON_POSTHOG_HOST="http://127.0.0.1:9")
+        p = self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST="http://127.0.0.1:9")
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Settings(Fixture):
-    """0136-machine-bootstrap FR-041, FR-050: the PostHog settings the setup was given are kept for every new terminal, in the file `archon secrets` uses; the lines that make a shell read it are `archon shell ensure`'s."""
+    """009-machine-bootstrap FR-052, FR-050: the PostHog settings the setup was given are kept for every new terminal, in the file `erga secrets` uses; the lines that make a shell read it are `erga shell ensure`'s."""
 
     def keep(self, **extra):
         return self.run_script(**OFF, BOOTSTRAP_KIT="", **extra)
 
     def test_the_key_is_kept_privately_and_the_setup_writes_no_startup_file(self):
-        p = self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
+        p = self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ERGA_PERSON="ifcore:A B")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        f = self.home / ".config" / "archon" / "secrets.env"
+        f = self.home / ".config" / "erga" / "secrets.env"
         self.assertEqual(oct(f.stat().st_mode & 0o777), "0o600")
         self.assertEqual(oct(f.parent.stat().st_mode & 0o777), "0o700")
-        self.assertIn("ARCHON_POSTHOG_KEY='phc_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
-        self.assertIn("ARCHON_PERSON='ifcore:A B'", f.read_text())
+        self.assertIn("ERGA_POSTHOG_KEY='phc_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
+        self.assertTrue(f.read_text().startswith("# Kept by `erga secrets`; change it with `erga secrets set` and `erga secrets remove`.\n"), "the first line erga secrets writes, byte for byte (009-machine-bootstrap FR-052)")
+        self.assertIn("ERGA_PERSON='ifcore:A B'", f.read_text())
         self.assertNotIn("phc_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
         for name in (".profile", ".bashrc", ".zshenv", ".config/fish"):
-            self.assertFalse((self.home / name).exists(), f"0136-machine-bootstrap FR-049: the setup wrote {name}")
+            self.assertFalse((self.home / name).exists(), f"009-machine-bootstrap FR-042: the setup wrote {name}")
         before = f.read_text()
-        self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ARCHON_PERSON="ifcore:A B")
+        self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ERGA_PERSON="ifcore:A B")
         self.assertEqual(before, f.read_text(), "a second run changes nothing")
 
     def test_a_changed_key_replaces_the_old_one(self):
-        self.keep(ARCHON_POSTHOG_KEY="phc_oldoldoldoldoldoldold")
-        self.keep(ARCHON_POSTHOG_KEY="phc_newnewnewnewnewnewnew")
-        text = (self.home / ".config" / "archon" / "secrets.env").read_text()
-        self.assertEqual(text.count("ARCHON_POSTHOG_KEY="), 1)
-        out = subprocess.run(["sh", "-c", 'set -a; . "$HOME/.config/archon/secrets.env"; set +a; printf %s "$ARCHON_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
+        self.keep(ERGA_POSTHOG_KEY="phc_oldoldoldoldoldoldold")
+        self.keep(ERGA_POSTHOG_KEY="phc_newnewnewnewnewnewnew")
+        text = (self.home / ".config" / "erga" / "secrets.env").read_text()
+        self.assertEqual(text.count("ERGA_POSTHOG_KEY="), 1)
+        out = subprocess.run(["sh", "-c", 'set -a; . "$HOME/.config/erga/secrets.env"; set +a; printf %s "$ERGA_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
         self.assertEqual(out, "phc_newnewnewnewnewnewnew")
 
     def test_a_shell_file_of_the_persons_is_never_touched_by_the_setup(self):
         (self.home / ".bashrc").write_text("alias mine=1")
-        self.keep(ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+        self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
         self.assertEqual((self.home / ".bashrc").read_text(), "alias mine=1")
-        self.assertFalse((self.home / ".bashrc.before-archon").exists(), "archon shell ensure keeps that copy, when it first changes the file")
+        self.assertFalse((self.home / ".bashrc.before-erga").exists(), "erga shell ensure keeps that copy, when it first changes the file")
 
     def test_nothing_is_kept_without_a_setting_a_github_token_is_not_kept_and_a_quote_is_refused(self):
         p = self.keep(GH_TOKEN="ghp_" + "x" * 30)
-        self.assertFalse((self.home / ".config" / "archon" / "secrets.env").exists())
+        self.assertFalse((self.home / ".config" / "erga" / "secrets.env").exists())
         self.assertIn("not saved", p.stdout + p.stderr)
-        self.assertIn("archon secrets set GH_TOKEN", p.stdout + p.stderr)
-        q = self.keep(ARCHON_POSTHOG_KEY="phc_it's")
+        self.assertIn("erga secrets set GH_TOKEN", p.stdout + p.stderr)
+        q = self.keep(ERGA_POSTHOG_KEY="phc_it's")
         self.assertIn("not saved", q.stdout + q.stderr)
-        self.assertNotIn("phc_it", (self.home / ".config" / "archon" / "secrets.env").read_text() if (self.home / ".config" / "archon" / "secrets.env").exists() else "")
+        self.assertIn("not saved", self.keep(ERGA_POSTHOG_KEY='phc_"quoted"').stdout, "erga secrets refuses a double quote too")
+        self.assertNotIn("phc_it", (self.home / ".config" / "erga" / "secrets.env").read_text() if (self.home / ".config" / "erga" / "secrets.env").exists() else "")
 
     def test_a_sign_in_made_with_gh_is_said_to_be_kept_on_this_computer_and_a_token_of_the_environment_is_not(self):
         env = self.env(BOOTSTRAP_SOURCE_ONLY="1", GH_TOKEN="ghp_" + "x" * 30)
@@ -761,30 +912,30 @@ class Settings(Fixture):
         self.assertIn("Your GitHub sign-in is kept on this computer", kept)
         self.assertIn("gh auth logout", kept)
         self.assertNotIn("not saved", kept)
-        self.assertNotIn("archon secrets set GH_TOKEN", kept)
+        self.assertNotIn("erga secrets set GH_TOKEN", kept)
         token = said("env")
         self.assertIn("not saved", token)
-        self.assertIn("archon secrets set GH_TOKEN", token)
+        self.assertIn("erga secrets set GH_TOKEN", token)
         self.assertIn("gh auth login", token)
         self.assertIn("The GitHub token in GH_TOKEN was used", token)
         for output in (kept, token):
             self.assertNotIn("ghp_xxxx", output, "the token is never shown")
 
     def test_a_dry_run_writes_nothing_and_a_kept_key_counts_for_telemetry_where_the_terminal_has_none(self):
-        p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ARCHON_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+        p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertIn("would keep ARCHON_POSTHOG_KEY", p.stdout)
-        self.assertFalse((self.home / ".config" / "archon").exists())
-        f = self.home / ".config" / "archon"
+        self.assertIn("would keep ERGA_POSTHOG_KEY", p.stdout)
+        self.assertFalse((self.home / ".config" / "erga").exists())
+        f = self.home / ".config" / "erga"
         f.mkdir(parents=True)
-        (f / "secrets.env").write_text("ARCHON_POSTHOG_KEY='phc_fromthefile'\n")
+        (f / "secrets.env").write_text("ERGA_POSTHOG_KEY='phc_fromthefile'\n")
         q = subprocess.run([SH, "-c", f". {SCRIPT}; printf %s \"$ph_key\""], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
         self.assertEqual(q.stdout, "phc_fromthefile")
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Pool(Fixture):
-    """0136-machine-bootstrap FR-032: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
+    """009-machine-bootstrap FR-030: tools that do not touch each other are fetched at the same time, each in a work folder of its own; a failure stops the setup."""
 
     def run_pool(self, body, **extra):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; {body}"
@@ -823,14 +974,14 @@ class Pool(Fixture):
         self.assertNotIn("SHOULD_NOT_GET_HERE", p.stdout)
         self.assertIn("bad one", p.stdout)
         self.assertIn("nope", p.stdout)
-        log = next((self.home / ".archon-bootstrap" / "log").glob("bootstrap-*")).read_text()
+        log = next((self.home / ".erga-bootstrap" / "log").glob("bootstrap-*")).read_text()
         self.assertIn("(exit 9)", log)
         self.assertEqual(log.count("==== STEP"), 3, "every job is in the log, whether it worked or not")
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Editor(Fixture):
-    """0136-machine-bootstrap FR-044: `code` opens VS Code; under WSL it is VS Code on Windows, installed with winget where it is missing."""
+    """009-machine-bootstrap FR-043: `code` opens VS Code; under WSL it is VS Code on Windows, installed with winget where it is missing."""
 
     def windows(self, with_code=True, with_winget=False):
         root = self.tmp / "c"
@@ -850,7 +1001,7 @@ class Editor(Fixture):
     def run_wsl(self, root, **more):
         off = {k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_EDITOR"}
         off.update(more)
-        return self.run_script(**off, BOOTSTRAP_KIT="", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(root), ARCHON_WORKSPACES=str(self.tmp / "w"))
+        return self.run_script(**off, BOOTSTRAP_KIT="", WSL_DISTRO_NAME="Debian", BOOTSTRAP_WINDOWS_ROOT=str(root), ERGA_WORKSPACES=str(self.tmp / "w"))
 
     def test_under_wsl_code_runs_vs_code_on_windows_and_a_second_run_changes_nothing(self):
         root = self.windows()
@@ -898,7 +1049,7 @@ class Editor(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Setup(Fixture):
-    """0136-machine-bootstrap FR-046: the setup never uses administrator rights, and says what it needs of the computer."""
+    """009-machine-bootstrap FR-001: the setup never uses administrator rights, and says what it needs of the computer."""
 
     def test_the_setup_never_invokes_sudo_a_package_manager_or_chsh(self):
         text = SCRIPT.read_text()
@@ -920,20 +1071,20 @@ class Setup(Fixture):
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("no git", p.stderr)
         self.assertIn("sudo apt-get install -y git", p.stderr)
-        self.assertIn("archon-bootstrap.sh", p.stderr)
+        self.assertIn("erga-bootstrap.sh", p.stderr)
         self.assertFalse((self.home / "workspaces").exists())
 
     def test_a_missing_program_that_only_some_steps_need_is_named_and_the_setup_goes_on(self):
         p = self.run_script(**OFF, BOOTSTRAP_KIT="", BOOTSTRAP_OS_RELEASE=self.debian())
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        if shutil.which("gh") and shutil.which("jq") and shutil.which("xz") and shutil.which("unzip"):
+        if all(shutil.which(c) for c in ("gh", "jq", "xz", "unzip", "cc")):
             self.skipTest("this computer has every program, so nothing is missing")
         self.assertIn("sudo apt-get install -y", p.stdout + p.stderr)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Bootstrap(Fixture):
-    """0136-machine-bootstrap FR-046 to FR-048: the bootstrap installs packages and runs the setup for the account that runs it; it makes no account."""
+    """009-machine-bootstrap FR-001, FR-002, FR-005: the bootstrap installs packages and runs the setup for the account that runs it; it makes no account."""
 
     def run_boot(self, *argv, stdin=None, **extra):
         return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(**extra), input=stdin, stdin=None if stdin else subprocess.DEVNULL)
@@ -941,7 +1092,7 @@ class Bootstrap(Fixture):
     def test_help_a_bad_option_and_no_option_makes_an_account(self):
         p = self.run_boot("--help")
         self.assertEqual(p.returncode, 0)
-        for text in ("archon-bootstrap.sh | sh", "--dry-run"):
+        for text in ("erga-bootstrap.sh | sh", "--dry-run"):
             self.assertIn(text, p.stdout)
         for text in ("--user", "--dedicated", "adduser"):
             self.assertNotIn(text, p.stdout)
@@ -961,13 +1112,13 @@ class Bootstrap(Fixture):
         p = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.debian(), PATH=self.with_apt())
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before)
-        for step in ("install with apt", "Setting up archon in this account", "archon shell ensure", "archon doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
+        for step in ("install with apt", "Setting up erga in this account", "erga shell ensure", "erga doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
             self.assertIn(step, p.stdout)
         for text in ("create the Linux account", "adduser", "useradd"):
             self.assertNotIn(text, p.stdout)
 
     def test_the_bootstrap_is_opinionated_the_comfort_kits_are_on_unless_it_is_told_not(self):
-        """0136-machine-bootstrap FR-047"""
+        """009-machine-bootstrap FR-005"""
         def wanted(**env):
             p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages; echo "kits=$kits"'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.debian(), **env))
             return p.stdout
@@ -975,7 +1126,7 @@ class Bootstrap(Fixture):
         self.assertIn("base", wanted().split("kits=")[1])
         off = wanted(BOOTSTRAP_NO_COMFORT="1")
         self.assertNotIn("ripgrep", off)
-        self.assertIn("git ca-certificates curl wget tar xz-utils unzip jq gh", off, "what the setup needs is still installed")
+        self.assertIn("git ca-certificates curl wget tar xz-utils unzip jq gh build-essential", off, "what the setup needs is still installed, with the C compiler Rust links with")
         self.assertNotIn("Installing eza", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
         self.assertIn("Installing eza", self.run_boot("--dry-run").stdout)
 
@@ -986,7 +1137,7 @@ class Bootstrap(Fixture):
         self.assertEqual(piped.stdout, self.run_boot("--dry-run").stdout)
 
     def test_it_makes_no_account_and_runs_the_setup_in_this_one_whatever_it_is_called(self):
-        """0136-machine-bootstrap FR-046: the account is the user that runs the bootstrap (snshah, archon, or any name)"""
+        """009-machine-bootstrap FR-001: the account is the user that runs the bootstrap (snshah, erga, or any name)"""
         log = self.tmp / "calls.log"
         log.write_text("")
         for name in ("adduser", "useradd", "runuser", "sysadminctl", "sudo"):
@@ -995,19 +1146,19 @@ class Bootstrap(Fixture):
         p = self.run_boot(**env)
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertNotRegex(log.read_text(), r"adduser|useradd|runuser|sysadminctl|sudo -")
-        self.assertIn("Setting up archon in this account", p.stdout)
-        for gone in ("sudo -iu", "deluser", "userdel", "the account archon"):
+        self.assertIn("Setting up erga in this account", p.stdout)
+        for gone in ("sudo -iu", "deluser", "userdel", "the account erga"):
             self.assertNotIn(gone, p.stdout)
 
 
 ARCH = 'ID=arch\nPRETTY_NAME="Arch Linux"\n'
-OMARCHY = 'ID=omarchy\nID_LIKE=arch\nPRETTY_NAME="Omarchy"\n'   # an Arch-based distribution, named by ID_LIKE (0136-machine-bootstrap OQ-6)
+OMARCHY = 'ID=omarchy\nID_LIKE=arch\nPRETTY_NAME="Omarchy"\n'   # an Arch-based distribution, named by ID_LIKE (009-machine-bootstrap OQ-005)
 FEDORA = 'ID=fedora\nPRETTY_NAME="Fedora Linux 40"\nVERSION_ID=40\n'
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class ArchFamily(Fixture):
-    """0136-machine-bootstrap FR-052 to FR-056: the Arch family (Arch Linux, Omarchy), with `pacman`, beside the Debian family."""
+    """009-machine-bootstrap FR-014 to FR-016: the Arch family (Arch Linux, Omarchy), with `pacman`, beside the Debian family."""
 
     def osr(self, text):
         f = self.tmp / "os-release"
@@ -1018,7 +1169,7 @@ class ArchFamily(Fixture):
         return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(**extra), stdin=subprocess.DEVNULL)
 
     def test_both_scripts_know_the_arch_family_by_id_or_id_like_and_refuse_another(self):
-        """0136-machine-bootstrap FR-052"""
+        """009-machine-bootstrap FR-014"""
         for text in (ARCH, OMARCHY):
             for script in (SCRIPT, BOOT):
                 p = subprocess.run([SH, str(script), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr(text)), stdin=subprocess.DEVNULL)
@@ -1032,7 +1183,7 @@ class ArchFamily(Fixture):
             self.assertIn("Fix:", p.stderr)
 
     def test_the_command_for_a_person_with_administrator_rights_is_the_computers_own(self):
-        """0136-machine-bootstrap FR-055"""
+        """009-machine-bootstrap FR-016"""
         def hint(family):
             p = subprocess.run([SH, "-c", f'. "{SCRIPT}"; family={family}; admin_install_cmd git xz gh'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
             return p.stdout
@@ -1040,7 +1191,7 @@ class ArchFamily(Fixture):
         self.assertEqual(hint("arch"), "sudo pacman -S --needed git xz github-cli")
 
     def test_without_git_or_curl_the_setup_on_arch_names_the_pacman_command(self):
-        """0136-machine-bootstrap FR-055"""
+        """009-machine-bootstrap FR-016"""
         for n in os.listdir("/usr/bin"):
             if n not in ("git", "curl"):
                 try:
@@ -1050,10 +1201,10 @@ class ArchFamily(Fixture):
         p = self.run_script(**OFF, PATH=str(self.bin), BOOTSTRAP_OS_RELEASE=self.osr(ARCH))
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("sudo pacman -S --needed git", p.stderr)
-        self.assertNotIn("apt", p.stderr.replace("archon-bootstrap", ""))
+        self.assertNotIn("apt", p.stderr.replace("erga-bootstrap", ""))
 
     def test_the_bootstraps_packages_are_arch_names_and_the_comfort_ones_only_when_asked(self):
-        """0136-machine-bootstrap FR-053"""
+        """009-machine-bootstrap FR-015"""
         def wanted(**env):
             p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages'], capture_output=True, text=True,
                                env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.osr(ARCH), **env))
@@ -1064,11 +1215,11 @@ class ArchFamily(Fixture):
         for debian_only in ("xz-utils", "fd-find", "python3", "debianutils", "libmagickcore"):
             self.assertNotIn(debian_only, full)
         lean = wanted(BOOTSTRAP_NO_COMFORT="1")
-        self.assertIn("git ca-certificates curl wget tar xz unzip jq github-cli", lean)
+        self.assertIn("git ca-certificates curl wget tar xz unzip jq github-cli gcc", lean, "009-machine-bootstrap FR-015: the C compiler and linker too")
         self.assertNotIn("ripgrep", lean)
 
     def test_dry_run_on_arch_says_pacman_never_refreshes_the_list_and_makes_no_account(self):
-        """0136-machine-bootstrap FR-053"""
+        """009-machine-bootstrap FR-015"""
         self.stub("pacman", "exit 1")   # an Arch computer has one; nothing is installed
         arch = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}")
         self.assertEqual(arch.returncode, 0, arch.stderr)
@@ -1089,11 +1240,11 @@ class ArchFamily(Fixture):
         return log
 
     def go(self, *argv, **extra):
-        off = {k: "1" for k in ("BOOTSTRAP_NO_DOWNLOAD", "BOOTSTRAP_NO_DOTFILES", "BOOTSTRAP_NO_AUTH", "BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ARCHON", "BOOTSTRAP_NO_RUNTIME")}
+        off = {k: "1" for k in ("BOOTSTRAP_NO_DOWNLOAD", "BOOTSTRAP_NO_DOTFILES", "BOOTSTRAP_NO_AUTH", "BOOTSTRAP_NO_CLONE", "BOOTSTRAP_NO_ERGA", "BOOTSTRAP_NO_RUNTIME")}
         return self.run_boot(*argv, BOOTSTRAP_NO_CHSH="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_OS_RELEASE=self.osr(ARCH), PATH=f"{self.bin}:{os.environ['PATH']}", **off, **extra)
 
     def test_it_installs_with_needed_and_makes_no_account(self):
-        """0136-machine-bootstrap FR-053"""
+        """009-machine-bootstrap FR-015"""
         log = self.stubs('case "$1" in -Qi) exit 1 ;; esac\nexit 0')
         p = self.go()
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
@@ -1105,16 +1256,16 @@ class ArchFamily(Fixture):
             self.assertNotIn(gone, calls + p.stdout)
 
     def test_a_package_pacman_cannot_find_stops_with_the_full_upgrade_to_run_first(self):
-        """0136-machine-bootstrap FR-053"""
+        """009-machine-bootstrap FR-015"""
         log = self.stubs('case "$1" in -Qi) exit 1 ;; -S) echo "error: target not found: github-cli" >&2; exit 1 ;; esac\nexit 0')
         p = self.go()
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("sudo pacman -Syu", p.stdout + p.stderr)
-        self.assertNotIn("Setting up archon in this account", p.stdout, "nothing else is done after the stop")
+        self.assertNotIn("Setting up erga in this account", p.stdout, "nothing else is done after the stop")
         self.assertNotIn("pacman -Sy ", log.read_text())
 
 
-MAC_OFF = {**OFF_BUT_ARCHON, "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ARCHON": "1", "BOOTSTRAP_NO_DOTFILES": "1"}
+MAC_OFF = {**OFF_BUT_ERGA, "BOOTSTRAP_NO_CLONE": "1", "BOOTSTRAP_NO_ERGA": "1", "BOOTSTRAP_NO_DOTFILES": "1"}
 
 
 def has_terminal():
@@ -1127,7 +1278,7 @@ def has_terminal():
 
 @unittest.skipUnless(SH, "sh is not installed")
 class MacOS(Fixture):
-    """0136-machine-bootstrap FR-057 to FR-059: a Mac with Apple silicon, faked here with stand-ins for `uname`, `sw_vers`, `sysctl`, `xcode-select` and
+    """009-machine-bootstrap FR-017 to FR-019: a Mac with Apple silicon, faked here with stand-ins for `uname`, `sw_vers`, `sysctl`, `xcode-select` and
     `dscl`; no CI runs on a Mac, so what only a Mac shows (Gatekeeper, `sysadminctl`, the Command Line Tools window) is tested by hand (OQ-7)."""
 
     def setUp(self):
@@ -1148,11 +1299,11 @@ class MacOS(Fixture):
         return subprocess.run([SH, str(BOOT), *argv], capture_output=True, text=True, env=self.env(PATH=self.path, **extra), stdin=subprocess.DEVNULL)
 
     def call(self, code, **env):
-        return subprocess.run([SH, "-c", f'. "{SCRIPT}"; arch=aarch64; goarch=arm64; goos=darwin; miseOs=macos; miseArch=arm64\n{code}'], capture_output=True, text=True,
+        return subprocess.run([SH, "-c", f'. "{SCRIPT}"; arch=aarch64; goarch=arm64; goos=darwin; rust_target=aarch64-apple-darwin\n{code}'], capture_output=True, text=True,
                               env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=self.path, **env))
 
     def test_an_apple_silicon_mac_is_a_family_of_its_own_and_the_dry_run_names_what_differs(self):
-        """FR-057, FR-059"""
+        """FR-017, FR-019"""
         self.mac()
         before = tree(self.home)
         p = self.setup("--dry-run", "--comfort")
@@ -1166,7 +1317,7 @@ class MacOS(Fixture):
         self.assertIn("Installing eza", p.stdout)
 
     def test_an_intel_mac_an_old_macos_and_a_missing_command_line_tools_each_stop_with_the_fix(self):
-        """FR-057, 0003-runtime FR-027"""
+        """FR-017, 0003-runtime FR-027"""
         self.mac(machine="x86_64", arm_hardware="0")
         p = self.setup("--dry-run")
         self.assertEqual(p.returncode, 3)
@@ -1180,7 +1331,7 @@ class MacOS(Fixture):
         none = self.setup(**{k: "1" for k in MAC_OFF})
         self.assertEqual(none.returncode, 3, none.stdout + none.stderr)
         self.assertIn("xcode-select --install", none.stdout + none.stderr)
-        self.assertFalse((self.home / ".local" / "share" / "archon-setup" / "tools").exists(), "nothing was fetched")
+        self.assertFalse((self.home / ".local" / "share" / "erga-setup" / "tools").exists(), "nothing was fetched")
 
     def test_a_terminal_under_rosetta_is_still_apple_silicon(self):
         self.mac(machine="x86_64", arm_hardware="1")
@@ -1189,7 +1340,7 @@ class MacOS(Fixture):
         self.assertIn("aarch64", p.stdout)
 
     def test_with_the_tools_here_the_setup_runs_on_a_mac_and_ends_with_zsh_to_start(self):
-        """FR-057"""
+        """FR-017"""
         self.mac()
         self.stub("jq", "exit 0")
         self.stub("gh", "exit 0")
@@ -1200,7 +1351,7 @@ class MacOS(Fixture):
         self.assertNotIn("exec fish", p.stdout)
 
     def test_the_scripts_use_no_option_only_gnu_tools_have_outside_the_branch_for_linux(self):
-        """FR-057: bash 3.2 in POSIX mode and BSD sed, find, date, stat and tar"""
+        """FR-017: bash 3.2 in POSIX mode and BSD sed, find, date, stat and tar"""
         import importlib.util
         spec = importlib.util.spec_from_file_location("shell_portability_check", HOME / "commons" / "tools" / "shell-portability-check.py")
         tool = importlib.util.module_from_spec(spec)
@@ -1227,7 +1378,7 @@ class MacOS(Fixture):
         self.assertNotIn("HAS", p.stdout)
 
     def test_a_release_file_is_chosen_for_darwin_and_arm64_and_a_linux_one_never(self):
-        """FR-059"""
+        """FR-019"""
         digest = lambda c: "sha256:" + c * 64   # noqa: E731
         rel = self.tmp / "rel.json"
         rel.write_text(json.dumps({"tag_name": "v1", "assets": [
@@ -1244,7 +1395,7 @@ class MacOS(Fixture):
         self.assertIn("no darwin file", none.stderr)
 
     def test_an_assistant_comes_from_the_darwin_arm64_package_of_npm(self):
-        """FR-059"""
+        """FR-019"""
         asked = self.tmp / "asked"
         reg = self.tmp / "registry"
         (reg / "demo-meta").mkdir(parents=True)
@@ -1257,7 +1408,7 @@ class MacOS(Fixture):
             self.assertIn(name, text)
 
     def test_a_pinned_zip_and_a_raw_program_are_installed_and_linked_where_mv_has_no_dash_t(self):
-        """FR-057: gh is a zip with a folder in it, jq is the program alone; a second run with a new version replaces the link"""
+        """FR-017: gh is a zip with a folder in it, jq is the program alone; a second run with a new version replaces the link"""
         import zipfile
 
         z = self.tmp / "gh.zip"
@@ -1288,13 +1439,13 @@ class MacOS(Fixture):
         self.assertEqual(sorted(os.listdir(root)), ["3", "4", "5.partial", "current"])
 
     def test_the_bootstrap_installs_nothing_makes_no_account_and_runs_the_setup_in_this_one(self):
-        """FR-058"""
+        """FR-018"""
         self.mac()
         p = self.boot("--dry-run")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        for text in ("xcode-select --install", "install no package", "Setting up archon in this account"):
+        for text in ("xcode-select --install", "install no package", "Setting up erga in this account"):
             self.assertIn(text, p.stdout, text)
-        for text in ("apt", "pacman", "chsh", "sysadminctl", "createhomedir", "account archon"):
+        for text in ("apt", "pacman", "chsh", "sysadminctl", "createhomedir", "account erga"):
             self.assertNotIn(text, p.stdout, text)
         self.stub("jq", "exit 0")
         self.stub("gh", "exit 0")
@@ -1309,10 +1460,10 @@ DEBIAN13 = 'ID=debian\nPRETTY_NAME="Debian GNU/Linux 13 (trixie)"\nVERSION_ID=13
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Installation(Fixture):
-    """0136-machine-bootstrap FR-060, FR-061: the record of how this account was set up, the checks before the long installs, and no drift between the two ways in."""
+    """009-machine-bootstrap FR-069, FR-050: the record of how this account was set up, the checks before the long installs, and no drift between the two ways in."""
 
     def record(self):
-        f = self.home / ".config" / "archon" / "install.toml"
+        f = self.home / ".config" / "erga" / "install.toml"
         return f.read_text() if f.exists() else ""
 
     def osr(self):
@@ -1327,8 +1478,8 @@ class Installation(Fixture):
         for line in ('method = "setup"', 'family = "debian"', 'arch = "', 'comfort = false', 'distro = "Debian GNU/Linux 13 (trixie)"'):
             self.assertIn(line, text)
         self.assertRegex(text, r'installed = "\d{4}-\d\d-\d\d"')
-        self.assertEqual((self.home / ".config" / "archon" / "install.toml").stat().st_mode & 0o777, 0o644)
-        (self.home / ".config" / "archon" / "install.toml").write_text(text.replace('method = "setup"', 'method = "bootstrap"').replace('installed = "', 'installed = "2020-01-01" #').replace("comfort = false", "comfort = true"))
+        self.assertEqual((self.home / ".config" / "erga" / "install.toml").stat().st_mode & 0o777, 0o644)
+        (self.home / ".config" / "erga" / "install.toml").write_text(text.replace('method = "setup"', 'method = "bootstrap"').replace('installed = "', 'installed = "2020-01-01" #').replace("comfort = false", "comfort = true"))
         self.run_script("--comfort", **OFF, BOOTSTRAP_OS_RELEASE=self.osr(), BOOTSTRAP_KIT="")
         again = self.record()
         self.assertIn('method = "bootstrap"', again, "the first method stays")
@@ -1349,24 +1500,24 @@ class Installation(Fixture):
     def test_a_dry_run_names_the_record_and_the_access_check_and_writes_none(self):
         p = self.run_script("--dry-run", BOOTSTRAP_OS_RELEASE=self.osr())
         self.assertIn("install.toml (setup)", p.stdout)
-        self.assertIn("can open the private archon repository", p.stdout)
+        self.assertIn("can open the private erga repository", p.stdout)
         self.assertEqual(self.record(), "")
         self.assertIn("install.toml (bootstrap)", subprocess.run([SH, str(BOOT), "--dry-run"], capture_output=True, text=True, env=self.env(BOOTSTRAP_OS_RELEASE=self.osr()), stdin=subprocess.DEVNULL).stdout)
 
-    def test_an_account_that_cannot_open_archon_is_told_before_anything_is_installed(self):
+    def test_an_account_that_cannot_open_erga_is_told_before_anything_is_installed(self):
         self.stub("git", 'echo "remote: Repository not found." >&2; echo "fatal: repository not found" >&2; exit 128')
         self.stub("gh", 'case "$1" in auth) exit 0 ;; api) echo someone ;; esac')
         p = self.run_script(BOOTSTRAP_NO_DOWNLOAD="1", BOOTSTRAP_NO_EDITOR="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
         self.assertEqual(p.returncode, 5, p.stdout + p.stderr)
-        self.assertIn("does not let this account open archon", p.stdout)
+        self.assertIn("does not let this account open erga", p.stdout)
         self.assertIn("Nothing has been installed", p.stdout)
         self.assertEqual(self.record(), "", "stopped before the record, and before any installation")
 
     def test_a_network_failure_in_the_access_check_does_not_stop_the_setup(self):
         self.stub("git", 'echo "fatal: unable to access: Could not resolve host" >&2; exit 128')
         self.stub("gh", 'case "$1" in auth) exit 0 ;; esac')
-        p = self.run_script(**OFF_BUT_ARCHON, BOOTSTRAP_NO_CLONE="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
-        self.assertNotIn("does not let this account open archon", p.stdout)
+        p = self.run_script(**OFF_BUT_ERGA, BOOTSTRAP_NO_CLONE="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertNotIn("does not let this account open erga", p.stdout)
 
     def test_a_computer_with_too_little_room_or_run_as_root_is_warned_first(self):
         self.stub("df", 'echo "Filesystem 1K-blocks Used Available Use% Mounted"; echo "x 100 90 2097152 5% /"')
@@ -1376,15 +1527,15 @@ class Installation(Fixture):
             self.assertIn("This runs as root", p.stdout + p.stderr)
 
 
-    def test_the_record_holds_only_what_the_setup_wrote_even_where_archon_is_on_the_path(self):
-        """a backtick in a double-quoted header once ran `archon doctor` inside the setup and put its output in the file, so the record could not be read"""
+    def test_the_record_holds_only_what_the_setup_wrote_even_where_erga_is_on_the_path(self):
+        """a backtick in a double-quoted header once ran `erga doctor` inside the setup and put its output in the file, so the record could not be read"""
         import tomllib
 
         marker = self.tmp / "ran"
-        self.stub("archon", f'echo "ran $*" >>{marker}; echo "JUNK from archon $*"')
+        self.stub("erga", f'echo "ran $*" >>{marker}; echo "JUNK from erga $*"')
         p = self.run_script(**OFF, BOOTSTRAP_OS_RELEASE=self.osr(), BOOTSTRAP_KIT="", PATH=f"{self.bin}:{os.environ['PATH']}")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertFalse(marker.exists(), "the setup ran archon while writing the record")
+        self.assertFalse(marker.exists(), "the setup ran erga while writing the record")
         parsed = tomllib.loads(self.record())
         self.assertEqual(parsed["method"], "setup")
         self.assertNotIn("JUNK", self.record())

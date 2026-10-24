@@ -1,29 +1,33 @@
 #!/bin/sh
-# Set up a computer for the Intellectual Frontiers harness (0136-machine-bootstrap, the bootstrap): the one script that may use administrator rights. A blank Debian 12
-# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs, and then `archon-setup.sh` runs
+# Set up a computer for erga, the company's repository (erga's 009-machine-bootstrap: the bootstrap): the one script that may use administrator rights. A blank Debian 12
+# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs, and then `erga-setup.sh` runs
 # for the account that runs this, which does the rest without administrator rights and writes only inside that account's home folder. The account is whichever user you
 # start this as (it can be called anything); this script makes no account. To undo it all, delete the WSL distribution or the virtual machine. On a computer you already use,
-# make a user for archon yourself, log in as it and run archon-setup.sh there; deleting that user removes everything. A Mac with Apple silicon gets no package (the setup
+# make a user for erga yourself, log in as it and run erga-setup.sh there; deleting that user removes everything. A Mac with Apple silicon gets no package (the setup
 # fetches what it needs into the account's own folder): the bootstrap only checks the Command Line Tools and runs the setup.
 #
 #   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --dry-run
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/archon-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --dry-run
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
-#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq and the
-#      other programs the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the everyday programs (ripgrep, ImageMagick, sqlite3 and the rest),
+#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq,
+#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other programs the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
+#      everyday programs (ripgrep, ImageMagick, sqlite3 and the rest). Rust itself, Node.js and the other programs erga pins are never packages: rustup and
+#      `erga toolchain ensure` install them at the version erga pins,
 #   2. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
-#   3. Setup: runs archon-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out),
+#   3. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI
+#      assistants, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and ./erga shell ensure, toolchain ensure and doctor,
 #   4. Login shell: offers to make fish your login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
 #
 # Safe to run again. Options (after `sh -s --` when piped):
 #   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
+#   --patient          for a network that drops often (15 tries, longer waits)
 #   -h, --help         this text
 #
 # Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
-# archon-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable archon-setup.sh reads.
-# Exit status: 0 done, 1 archon's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
+# erga-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable erga-setup.sh reads.
+# Exit status: 0 done, 1 erga's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
 # shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
 set -eu
 
@@ -34,9 +38,9 @@ while [ "$#" -gt 0 ]; do
     --dry-run | -n) boot_dry=1 ;;
     --patient) BOOTSTRAP_PATIENT=1; export BOOTSTRAP_PATIENT ;;
     -h | --help)
-      case $0 in *archon-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--patient]   (see the header of archon-bootstrap.sh)" ;; esac
+      case $0 in *erga-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--patient]   (see the header of erga-bootstrap.sh)" ;; esac
       exit 0 ;;
-    *) echo "archon-bootstrap: unknown option $1 (try --help)" >&2; exit 2 ;;
+    *) echo "erga-bootstrap: unknown option $1 (try --help)" >&2; exit 2 ;;
   esac
   shift
 done
@@ -44,33 +48,33 @@ done
 # ---- the setup: beside this script in a checkout, fetched from BOOTSTRAP_URL when this is piped. Its functions (the log, the steps, the support file, the
 # telemetry) are this script's too, so it is loaded without running it; this account runs the same file.
 boot_dir=""
-case $0 in */archon-bootstrap.sh | archon-bootstrap.sh) [ -f "$0" ] && boot_dir=$(cd "$(dirname "$0")" && pwd -P) ;; esac
+case $0 in */erga-bootstrap.sh | erga-bootstrap.sh) [ -f "$0" ] && boot_dir=$(cd "$(dirname "$0")" && pwd -P) ;; esac
 setup_file=${BOOTSTRAP_SETUP:-}
-if [ -z "$setup_file" ] && [ -n "$boot_dir" ] && [ -f "$boot_dir/archon-setup.sh" ]; then setup_file=$boot_dir/archon-setup.sh; fi
+if [ -z "$setup_file" ] && [ -n "$boot_dir" ] && [ -f "$boot_dir/erga-setup.sh" ]; then setup_file=$boot_dir/erga-setup.sh; fi
 if [ -z "$setup_file" ]; then
-  setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/archon-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
-  setup_file=$setup_dir/archon-setup.sh
+  setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/erga-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
+  setup_file=$setup_dir/erga-setup.sh
   raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
-  # the first download, before the setup's own retry code is here: tried again with a longer wait each time (ARCHON_RETRIES, default 8; --patient 15)
-  boot_tries=${ARCHON_RETRIES:-8}; [ "${BOOTSTRAP_PATIENT:-}" = 1 ] && boot_tries=${ARCHON_RETRIES:-15}
+  # the first download, before the setup's own retry code is here: tried again with a longer wait each time (ERGA_RETRIES, default 8; --patient 15)
+  boot_tries=${ERGA_RETRIES:-8}; [ "${BOOTSTRAP_PATIENT:-}" = 1 ] && boot_tries=${ERGA_RETRIES:-15}
   case $boot_tries in '' | *[!0-9]* | 0) boot_tries=8 ;; esac
   if command -v curl >/dev/null 2>&1; then
-    boot_n=1; boot_wait=${ARCHON_RETRY_DELAY:-3}
-    until curl -fsSL --connect-timeout 20 -o "$setup_file" "$raw/bin/archon-setup.sh"; do
-      [ "$boot_n" -lt "$boot_tries" ] || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh (after $boot_n tries; the network or DNS is the likely cause)" >&2; exit 3; }
+    boot_n=1; boot_wait=${ERGA_RETRY_DELAY:-3}
+    until curl -fsSL --connect-timeout 20 -o "$setup_file" "$raw/bin/erga-setup.sh"; do
+      [ "$boot_n" -lt "$boot_tries" ] || { echo "erga-bootstrap: could not fetch $raw/bin/erga-setup.sh (after $boot_n tries; the network or DNS is the likely cause)" >&2; exit 3; }
       boot_n=$((boot_n + 1)); echo "  could not fetch the setup; trying again in ${boot_wait}s (attempt $boot_n of $boot_tries)" >&2
       sleep "$boot_wait"; boot_wait=$((boot_wait * 2)); [ "$boot_wait" -le 60 ] || boot_wait=60
     done
-  elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$setup_file" "$raw/bin/archon-setup.sh" || { echo "archon-bootstrap: could not fetch $raw/bin/archon-setup.sh" >&2; exit 3; }
-  else echo "archon-bootstrap: neither curl nor wget is installed. Install them with your package manager first (Debian: sudo apt update && sudo apt install -y curl wget; Arch: sudo pacman -S --needed curl wget)" >&2; exit 3; fi
+  elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$setup_file" "$raw/bin/erga-setup.sh" || { echo "erga-bootstrap: could not fetch $raw/bin/erga-setup.sh" >&2; exit 3; }
+  else echo "erga-bootstrap: neither curl nor wget is installed. Install them with your package manager first (Debian: sudo apt update && sudo apt install -y curl wget; Arch: sudo pacman -S --needed curl wget)" >&2; exit 3; fi
   chmod 644 "$setup_file"
 fi
-[ -r "$setup_file" ] || { echo "archon-bootstrap: $setup_file cannot be read" >&2; exit 3; }
+[ -r "$setup_file" ] || { echo "erga-bootstrap: $setup_file cannot be read" >&2; exit 3; }
 
 BOOTSTRAP_SOURCE_ONLY=1
 export BOOTSTRAP_SOURCE_ONLY
 if [ "$boot_dry" = 1 ]; then set -- --dry-run; else set --; fi
-# shellcheck source=archon-setup.sh
+# shellcheck source=erga-setup.sh
 . "$setup_file"
 BOOTSTRAP_SOURCE_ONLY=$boot_source_only
 export BOOTSTRAP_SOURCE_ONLY
@@ -157,7 +161,7 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
   return 0
 }
 
-# The words are the table's: what is installed stays (--needed), and never -Sy on Arch, which refreshes the list alone and leaves a rolling release partly upgraded (0136-machine-bootstrap FR-053;
+# The words are the table's: what is installed stays (--needed), and never -Sy on Arch, which refreshes the list alone and leaves a rolling release partly upgraded (009-machine-bootstrap FR-015;
 # commons 0002-packaging FR-005). apt's quiet flag and lock wait are this script's own.
 pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
   pr_fam=$1; pr_words=$2; shift 2
@@ -190,7 +194,7 @@ acct_field() {  # acct_field NAME home|shell
 }
 login_shell() { acct_field "$(id -un)" shell; }
 
-# A Mac: no package manager and no package (0136-machine-bootstrap FR-058). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
+# A Mac: no package manager and no package (009-machine-bootstrap FR-018). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
 mac_packages() {
   phase "${e_pkg}Checking this Mac"
   if [ "$dry" = 1 ]; then
@@ -291,19 +295,19 @@ install_code_package() {
   return 0
 }
 
-# The setup asks archon which system libraries its programs need (0136-machine-bootstrap FR-063) and calls this to install them: the bootstrap has the administrator rights, once, already.
+# The setup asks erga which system libraries its programs need (009-machine-bootstrap FR-023) and calls this to install them: the bootstrap has the administrator rights, once, already.
 bootstrap_install_libraries() {  # bootstrap_install_libraries "package package ..."
   if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ]; then return 1; fi
-  sudo_for "install the system libraries archon's programs link against ($1)" || return 1
+  sudo_for "install the system libraries erga's programs link against ($1)" || return 1
   # shellcheck disable=SC2086  # a list of package names
-  step_soft "${e_pkg}Installing system libraries for archon's programs" pm_install $1
+  step_soft "${e_pkg}Installing system libraries for erga's programs" pm_install $1
 }
 
 # ---- the setup, run as this account -------------------------------------------------------------------------------------------------------------------
 
 run_setup() {
-  heading "${e_rocket}Setting up archon in this account"
-  install_method=bootstrap   # what archon-setup.sh records (0136-machine-bootstrap FR-060)
+  heading "${e_rocket}Setting up erga in this account"
+  install_method=bootstrap   # what erga-setup.sh records (009-machine-bootstrap FR-069)
   # the setup's own steps, in this process, which is already set up with the log, the steps and the telemetry (it uses no administrator rights)
   main || return $?
   return 0
@@ -347,7 +351,7 @@ offer_fish() {
 main_bootstrap() {
   detect_platform
   load_config
-  say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for the Intellectual Frontiers harness."
+  say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for erga."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
   ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap"
   install_packages

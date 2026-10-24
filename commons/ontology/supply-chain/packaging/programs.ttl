@@ -152,6 +152,24 @@ pmid:pkg-arch-gh a pm:PackageName ;
     pm:forFamily pmid:family-arch ;
     pm:name "github-cli" .
 
+# The C compiler and linker that Rust links with: erga's launcher compiles erga with Cargo before any erga command can run (erga 009-machine-bootstrap FR-021).
+# A Mac has them in the Command Line Tools, which only a person at the screen can install.
+pmid:prog-cc a pm:Program ;
+    rdfs:label "a C compiler and linker"@en ;
+    pm:programName "cc" ;
+    pm:tier pm:Required  ;
+    pm:order 10 .
+
+pmid:pkg-debian-cc a pm:PackageName ;
+    pm:forProgram pmid:prog-cc ;
+    pm:forFamily pmid:family-debian ;
+    pm:name "build-essential" .
+
+pmid:pkg-arch-cc a pm:PackageName ;
+    pm:forProgram pmid:prog-cc ;
+    pm:forFamily pmid:family-arch ;
+    pm:name "gcc" .
+
 pmid:prog-coreutils a pm:Program ;
     rdfs:label "coreutils"@en ;
     pm:programName "coreutils" ;
