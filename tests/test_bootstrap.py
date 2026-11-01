@@ -505,6 +505,16 @@ exit 0
         self.assertNotIn("TERMINAL_ASKED", p.stdout)
         self.assertNotIn("ABCD-1234", p.stdout)
 
+    def test_a_sign_in_gh_could_not_start_stops_and_does_not_wait_for_ever(self):
+        """009-machine-bootstrap FR-046: where gh fails before it prints a code (here as GitHub answering HTTP 415), the setup shows what gh said and stops (exit 5), under set -e too."""
+        self.stub("gh", 'case "$1 $2" in\n"auth status") exit 1 ;;\n"auth login") echo "failed to authenticate via web browser: HTTP 415"; exit 1 ;;\nesac')
+        script = f"set -eu; . {SCRIPT}; has_tty=1; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; sign_in; echo SIGNED_IN"
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"), timeout=30)
+        self.assertEqual(p.returncode, 5, p.stdout + p.stderr)
+        self.assertNotIn("SIGNED_IN", p.stdout)
+        self.assertIn("HTTP 415", p.stdout)
+        self.assertIn("did not finish", p.stdout)
+
     def test_git_identity_comes_from_the_account_only_where_git_has_none(self):
         self.stub("gh", 'case "$1 $2" in "auth status") exit 0 ;; "api user") echo \'{"login":"ada","id":42,"name":"Ada Lovelace"}\' ;; esac\nexit 0')
         extra = dict(PATH=f"{self.bin}:{os.environ['PATH']}", GIT_CONFIG_GLOBAL=str(self.home / ".gitconfig"))

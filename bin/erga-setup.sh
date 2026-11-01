@@ -1884,8 +1884,9 @@ sign_in() {
     say "${c}${e_key}Next, GitHub gives you a one-time code to type in your browser.${z} ${g}${b}After that, everything is automatic.${z} ${e_rocket}"
     si0=$(date +%s)
     gh_out=$work/gh-login.out; gh_rc=$work/gh-login.rc; rm -f "$gh_out" "$gh_rc"
-    # gh runs without a terminal, so it asks nothing (it answers yes to its own questions), opens no browser, and prints the code; the code is shown here, and repeated now and then
-    ( GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/null >"$gh_out" 2>&1; echo $? >"$gh_rc" ) &
+    # gh runs without a terminal, so it asks nothing (it answers yes to its own questions), opens no browser, and prints the code; the code is shown here, and repeated now and then.
+    # Its exit status is written whatever it is: under set -e a failing gh would otherwise end the subshell first, and the wait below would never end (FR-046).
+    ( gh_st=0; GH_BROWSER=true BROWSER=true gh auth login --hostname github.com --web --git-protocol https </dev/null >"$gh_out" 2>&1 || gh_st=$?; echo "$gh_st" >"$gh_rc" ) &
     rem_pid=$!
     shown=""; waited=0
     while [ ! -f "$gh_rc" ]; do
