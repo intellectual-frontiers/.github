@@ -2448,7 +2448,10 @@ main() {
 
   say "${b}${e_rocket}Setting up this account${z} (${d_pretty}, $arch$wsl_txt, user $(id -un)) for erga."
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
-  if [ -n "${ERGA_POSTHOG_KEY:-}" ]; then
+  if [ "${DO_NOT_TRACK:-}" = 1 ] || [ "${ERGA_OBSERVE:-}" = off ]; then
+    # a person who said no is told only that (FR-053)
+    if [ "${DO_NOT_TRACK:-}" = 1 ]; then say "${d}📡 Telemetry is off: DO_NOT_TRACK=1 is set.${z}"; else say "${d}📡 Telemetry is off: ERGA_OBSERVE=off is set.${z}"; fi
+  elif [ -n "${ERGA_POSTHOG_KEY:-}" ]; then
     say "${g}📡 Telemetry is on:${z} ${b}ERGA_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
     say "${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as erga's own telemetry does. Never a password, a token or a file.${z}"
   else

@@ -864,6 +864,20 @@ class Telemetry(Fixture):
         self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=host, ERGA_OBSERVE="off")
         self.assertEqual(got, [])
 
+    def test_the_start_says_whether_telemetry_is_on_and_a_person_who_said_no_is_told_only_that(self):
+        """009-machine-bootstrap FR-053"""
+        say = lambda **e: self.run_script("--dry-run", **{"DO_NOT_TRACK": "", "ERGA_OBSERVE": "", **e}).stdout   # noqa: E731
+        self.assertIn("Telemetry is on", say(ERGA_POSTHOG_KEY="phc_test"))
+        off = say()
+        self.assertIn("Telemetry is off (optional)", off)
+        self.assertIn("export ERGA_POSTHOG_KEY=", off)
+        for no in (dict(DO_NOT_TRACK="1"), dict(ERGA_OBSERVE="off"), dict(DO_NOT_TRACK="1", ERGA_POSTHOG_KEY="phc_test")):
+            with self.subTest(**no):
+                out = say(**no)
+                self.assertIn("Telemetry is off: " + ("DO_NOT_TRACK=1" if "DO_NOT_TRACK" in no else "ERGA_OBSERVE=off"), out)
+                self.assertNotIn("ERGA_POSTHOG_KEY=", out)
+                self.assertNotIn("Telemetry is on", out)
+
     def test_an_unreachable_host_changes_nothing_but_the_log(self):
         p = self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST="http://127.0.0.1:9")
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
