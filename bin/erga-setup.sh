@@ -45,6 +45,7 @@
 #                          (without a token or a sign-in they are skipped, and listed at the end)
 #   BOOTSTRAP_URL          where the bootstrap fetches this script from when it is piped (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ERGA_URL               where to clone erga from (default: https://github.com/intellectual-frontiers/erga)
+#   ERGA_ROLE              this workspace's role, developer or operator (default: a developer's; erga 194-workspace-roles)
 #   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (rustup, uv, fish, the modern tools)
 #   BOOTSTRAP_NO_RUNTIME=1 install neither rustup, the Rust toolchain nor uv (those already on the PATH are used)
 #   BOOTSTRAP_NO_DOTFILES=1   do not run `erga shell ensure` (so no startup file is touched)
@@ -2056,6 +2057,7 @@ run_erga() {
       would "build erga in the clone with Cargo (./erga --version; the first time takes a few minutes)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./erga shell ensure (the startup files of bash, zsh and fish)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
+      [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
       would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
@@ -2091,6 +2093,14 @@ run_erga() {
       fi
       [ "$status_shell" = 0 ] || problem "erga shell ensure did not finish (run ./erga shell status in $target to see why)"
     fi
+  fi
+  # The workspace's role, before the programs, so that the toolchain installs what the role needs (erga 009-machine-bootstrap FR-089; 194-workspace-roles
+  # FR-010): ERGA_ROLE, developer or operator; none given, the workspace is a developer's and the summary says how to make it an operator's.
+  role=$(cfg ERGA_ROLE '')
+  if [ -n "$role" ]; then
+    step_soft "${e_ok}Recording this workspace as a $role's" in_erga_quiet ./erga workspace set --role "$role" || problem "erga workspace set --role $role did not finish (run it in $(short_path "$target") to see why)"
+  else
+    say "This workspace is a developer's; ./erga workspace set --role operator makes it an operator's (ERGA_ROLE=operator does it here)."
   fi
   # The programs erga's commands use: every entry erga lists that is not here and not marked optional, unless BOOTSTRAP_TOOLCHAIN names others
   names=""

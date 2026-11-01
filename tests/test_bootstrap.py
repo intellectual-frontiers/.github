@@ -175,6 +175,13 @@ class Entry(Fixture):
         self.assertNotIn("rust-toolchain.toml pins", off, "BOOTSTRAP_NO_RUNTIME=1 installs no Rust")
         self.assertNotIn("Installing uv", off)
 
+    def test_dry_run_records_the_workspace_s_role_before_the_toolchain_only_where_it_is_given(self):
+        """009-machine-bootstrap FR-089: ERGA_ROLE is recorded with ./erga workspace set --role before ./erga toolchain ensure; without it nothing is."""
+        out = self.run_script("--dry-run", ERGA_ROLE="operator").stdout
+        self.assertIn("./erga workspace set --role operator", out)
+        self.assertLess(out.index("./erga workspace set --role operator"), out.index("./erga toolchain ensure"), out)
+        self.assertNotIn("workspace set --role", self.run_script("--dry-run").stdout, "no role given, none is recorded")
+
     def test_the_setup_names_only_commands_erga_has(self):
         """009-machine-bootstrap FR-058: no command erga lacks (orch, observe, packaging and sbom are not erga's)"""
         text = SCRIPT.read_text()
