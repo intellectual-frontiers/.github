@@ -285,13 +285,14 @@ class Switches(Fixture):
 class Clone(Fixture):
     """The clone, its fast-forward-only update and the erga commands, against a local repository with a stand-in launcher that answers as erga does."""
 
-    # The shape of `erga toolchain list --json`: entries in `data`, `found` null where the program is not here. FAKE_NO_QUICK stands for an erga whose check has no --quick.
+    # The shape of `erga toolchain list --json`: entries in `data`, `found` null where the program is not here, `system_packages` what only administrator rights install for it. FAKE_NO_QUICK stands for an erga whose check has no --quick.
     LAUNCHER = """#!/bin/sh
 case "$*" in "toolchain list --json" | "--version" | "check --help") ;; *) echo "ERGA $* assume_yes=${ERGA_ASSUME_YES:-} no_admin=${ERGA_NO_ADMIN:-} env=${ERGA_ENVIRONMENT:-}" >>"${CALLS:?}" ;; esac
 case "$*" in
-  "toolchain list --json") libs=''
-    [ -n "${FAKE_LIBS:-}" ] && libs=',"system_packages":["libnss3","libgbm1"],"system_command":"apt-get install -y libnss3 libgbm1"'
-    echo '{"schema":"erga/toolchain-list@1","data":[{"name":"node","phase":"Dev","found":{"version":"22"}},{"name":"python","phase":"Dev","found":null},{"name":"docker","phase":"Dev","found":null,"optional":true},{"name":"jre","phase":"Dev","found":null}]'"$libs"'}' ;;
+  "toolchain list --json") a='[]'; b='[]'; acts='[]'
+    # as erga says them: each entry's own system_packages, and the one command as the action "Install the system packages"
+    [ -n "${FAKE_LIBS:-}" ] && a='["libnss3","libgbm1"]' && b='["libnss3"]' && acts='[{"title":"Install the system packages","command":"sudo apt-get install -y libnss3 libgbm1"}]'
+    echo '{"schema":"erga/toolchain-list@1","data":[{"name":"node","phase":"Dev","found":{"version":"22"},"system_packages":[]},{"name":"python","phase":"Dev","found":null,"system_packages":'"$a"'},{"name":"docker","phase":"Dev","found":null,"optional":true},{"name":"jre","phase":"Dev","found":null,"system_packages":'"$b"'}],"actions":'"$acts"'}' ;;
   "check --help") [ -n "${FAKE_NO_QUICK:-}" ] || echo "      --quick     Run the sections that finish in seconds" ;;
   "doctor") echo "DOCTOR SAYS: Next: erga toolchain ensure jre" ;;
 esac

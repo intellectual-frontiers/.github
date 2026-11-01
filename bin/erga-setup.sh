@@ -2030,9 +2030,10 @@ erga_list_json() { ( cd "$target" && ./erga toolchain list --json </dev/null 2>/
 # bootstrap_install_libraries); the setup alone names the one command for a person who has them, and goes on. Where erga names none, nothing is said.
 system_libraries() {
   sl_json=$(erga_list_json) || return 0
-  sl_pk=$(printf '%s' "$sl_json" | jq -r '(.system_packages // (if (.data | type) == "object" then .data.system_packages else null end) // []) | join(" ")' 2>/dev/null) || return 0
+  # each entry of the list names what only administrator rights install for it here (system_packages); the action "Install the system packages" is the one command
+  sl_pk=$(printf '%s' "$sl_json" | jq -r '(.system_packages // (if (.data | type) == "object" then .data.system_packages else ([.data[]? | .system_packages[]?] | reduce .[] as $p ([]; if index([$p]) then . else . + [$p] end)) end) // []) | join(" ")' 2>/dev/null) || return 0
   [ -n "$sl_pk" ] || return 0
-  sl_cmd=$(printf '%s' "$sl_json" | jq -r '.system_command // (if (.data | type) == "object" then .data.system_command else null end) // ""' 2>/dev/null)
+  sl_cmd=$(printf '%s' "$sl_json" | jq -r '.system_command // (if (.data | type) == "object" then .data.system_command else null end) // ([.actions[]? | select(.title == "Install the system packages") | .command | sub("^sudo "; "")] | first) // ""' 2>/dev/null)
   if command -v bootstrap_install_libraries >/dev/null 2>&1; then
     bootstrap_install_libraries "$sl_pk" && return 0
   fi
