@@ -49,7 +49,7 @@
 #   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (rustup, uv, fish, the modern tools)
 #   BOOTSTRAP_NO_RUNTIME=1 install neither rustup, the Rust toolchain nor uv (those already on the PATH are used)
 #   BOOTSTRAP_NO_DOTFILES=1   do not run `erga shell ensure` (so no startup file is touched)
-#   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name and email (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
+#   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name, email and pull.ff (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
 #   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
 #   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql)
@@ -1918,6 +1918,10 @@ identity() {
   [ "${BOOTSTRAP_NO_AUTH:-}" = 1 ] && return 0
   [ "$dry" = 1 ] && return 0
   have_cmd git || return 0
+  # Pulls only fast-forward where git says nothing of it, so VS Code's Sync never makes a merge (erga 009 FR-049, 008-workspace FR-010)
+  if [ -z "$(git config --global --get pull.ff 2>/dev/null || true)" ]; then
+    git config --global pull.ff only && say "git pulls only fast-forward (pull.ff only), so a sync never makes a merge."
+  fi
   cur_name=$(git config --global --get user.name 2>/dev/null || true)
   cur_email=$(git config --global --get user.email 2>/dev/null || true)
   ask_name=$(cfg BOOTSTRAP_GIT_NAME '')

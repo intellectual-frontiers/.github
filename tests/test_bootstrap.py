@@ -537,6 +537,20 @@ exit 0
         run(BOOTSTRAP_GIT_NAME="Asked", BOOTSTRAP_GIT_EMAIL="a@example.com")
         self.assertEqual((cfg("user.name"), cfg("user.email")), ("Asked", "a@example.com"), "what was asked for is set")
 
+    def test_pulls_only_fast_forward_where_git_says_nothing_of_it(self):
+        """009-machine-bootstrap FR-049: pull.ff is set to only where git has none, and a value a person set is kept"""
+        self.stub("gh", 'case "$1 $2" in "auth status") exit 0 ;; "api user") echo \'{"login":"ada","id":42,"name":"Ada Lovelace"}\' ;; esac\nexit 0')
+        extra = dict(PATH=f"{self.bin}:{os.environ['PATH']}", GIT_CONFIG_GLOBAL=str(self.home / ".gitconfig"))
+        cfg = lambda: subprocess.run(["git", "config", "--file", str(self.home / ".gitconfig"), "pull.ff"], capture_output=True, text=True).stdout.strip()   # noqa: E731
+        on = {k: v for k, v in OFF.items() if k != "BOOTSTRAP_NO_AUTH"}
+        p = self.run_script(**on, BOOTSTRAP_KIT="", **extra)
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertEqual(cfg(), "only")
+        self.assertIn("pull.ff only", p.stdout)
+        subprocess.run(["git", "config", "--file", str(self.home / ".gitconfig"), "pull.ff", "true"], check=True)
+        self.run_script(**on, BOOTSTRAP_KIT="", **extra)
+        self.assertEqual(cfg(), "true", "what a person set is never changed")
+
 
 @unittest.skipUnless(SH and shutil.which("jq") and shutil.which("curl"), "sh, jq and curl are needed")
 class Rules(Fixture):
