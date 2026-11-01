@@ -6,7 +6,7 @@
 # make a user for erga yourself, log in as it and run erga-setup.sh there; deleting that user removes everything. A Mac with Apple silicon gets no package (the setup
 # fetches what it needs into the account's own folder): the bootstrap only checks the Command Line Tools and runs the setup.
 #
-#   cd && sudo apt update && sudo apt install -y curl wget      (a bare Debian has neither)
+#   cd && sudo apt-get update && sudo apt-get install -y curl wget      (a bare Debian, under WSL too, has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --dry-run
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)

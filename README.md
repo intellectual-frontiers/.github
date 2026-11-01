@@ -19,8 +19,8 @@ This small public repository holds three things:
 - **[`commons/`](commons/README.md)**, what any company or harness of Intellectual Frontiers may use: today the software supply chain capability, a packaging ontology of the package managers and
   system families of every computer, and the tables made from it (with the pinned downloads, such as `rustup-init` and `uv`) that the scripts and `erga` read.
 
-Everything else, its specifications and everything it builds live in the private `erga` repository. The setup instructions are in that repository's README and
-`docs/getting-started.md`, which the people who may run the scripts can read.
+Everything else, its specifications and everything it builds live in the private `erga` repository. The setup instructions are in the "Get started" section of that repository's README, which
+the people who may run the scripts can read.
 
 ## Tests
 
