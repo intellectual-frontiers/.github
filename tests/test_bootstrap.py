@@ -820,7 +820,7 @@ class Stops(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Telemetry(Fixture):
-    """009-machine-bootstrap FR-054: with a PostHog key the setup reports its steps, timings and failures (environment bootstrap); without one, nothing."""
+    """009-machine-bootstrap FR-054: with arca's door and a token the setup reports its steps, timings and failures to ArcaSignals as OpenTelemetry log records (environment bootstrap); without them, nothing."""
 
     def serve(self):
         import http.server
@@ -829,7 +829,10 @@ class Telemetry(Fixture):
 
         class H(http.server.BaseHTTPRequestHandler):
             def do_POST(self):
-                got.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                body["_path"] = self.path
+                body["_authorization"] = self.headers.get("Authorization", "")
+                got.append(body)
                 self.send_response(200)
                 self.end_headers()
 
@@ -845,12 +848,33 @@ class Telemetry(Fixture):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; arch=x86_64; step 'Installing one' true; step 'Installing two' sh -c 'echo broke at /home/x/y; exit 7'"
         return subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", **extra), timeout=60)
 
+    @staticmethod
+    def plain(value):
+        """An OTLP AnyValue as a plain value."""
+        if "stringValue" in value:
+            return value["stringValue"]
+        if "doubleValue" in value:
+            return value["doubleValue"]
+        if "intValue" in value:
+            return int(value["intValue"])
+        return value.get("boolValue")
+
     def events(self, got):
-        return [e for b in got for e in b["batch"]]
+        """Each OTLP export request as one event: its name, the resource's enduser.id as the distinct id, and its attributes as properties."""
+        out = []
+        for b in got:
+            self.assertEqual(b["_path"], "/v1/logs", "one OTLP/JSON export request of logs to arca's door (206-arca-engines FR-015)")
+            self.assertEqual(b["_authorization"], "Bearer arca_test", "the token travels as a bearer header")
+            for rl in b["resourceLogs"]:
+                resource = {a["key"]: self.plain(a["value"]) for a in rl["resource"]["attributes"]}
+                for sl in rl["scopeLogs"]:
+                    for r in sl["logRecords"]:
+                        out.append({"event": r["eventName"], "distinct_id": resource["enduser.id"], "resource": resource, "properties": {a["key"]: self.plain(a["value"]) for a in r["attributes"]}})
+        return out
 
     def test_steps_a_failure_and_the_end_are_sent_with_the_environment_and_a_stable_device_id(self):
         srv, got = self.serve()
-        p = self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=f"http://127.0.0.1:{srv.server_port}")
+        p = self.run_failing(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL=f"http://127.0.0.1:{srv.server_port}")
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
         ev = self.events(got)
         self.assertEqual([e["event"] for e in ev if e["event"] == "bootstrap_step"], ["bootstrap_step", "bootstrap_step"])
@@ -858,8 +882,11 @@ class Telemetry(Fixture):
         self.assertTrue({"bootstrap_failed", "bootstrap_finished"} <= names, names)
         for e in ev:
             self.assertEqual(e["properties"]["environment"], "bootstrap")
+            self.assertEqual(e["resource"]["service.name"], "erga-bootstrap")
+            self.assertEqual(e["resource"]["deployment.environment.name"], "bootstrap")
             self.assertTrue(e["distinct_id"].startswith("dev-"))
             self.assertEqual(e["distinct_id"], e["properties"]["device_id"])
+            self.assertEqual(e["distinct_id"], e["resource"]["device.id"])
             for k in ("host_kind", "os_id", "arch", "cpus", "bootstrap_run", "hostname", "os_user"):
                 self.assertIn(k, e["properties"])
         failed = next(e for e in ev if e["event"] == "bootstrap_failed")["properties"]
@@ -871,73 +898,77 @@ class Telemetry(Fixture):
         lines = [json.loads(l) for l in journal.splitlines()]
         self.assertEqual([l["event"] for l in lines], [e["event"] for e in ev] or [l["event"] for l in lines])
         self.assertTrue(all(l["source"] == "bootstrap" and l["status"] == 200 for l in lines))
-        self.assertNotIn("phc_test", journal)
+        self.assertNotIn("arca_test", journal, "the token is never written to the journal")
         first = ev[0]["distinct_id"]
         srv2, got2 = self.serve()
-        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=f"http://127.0.0.1:{srv2.server_port}")
+        self.run_failing(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL=f"http://127.0.0.1:{srv2.server_port}")
         self.assertEqual(self.events(got2)[0]["distinct_id"], first)
 
-    def test_nothing_is_sent_without_a_key_or_when_told_not_to(self):
+    def test_nothing_is_sent_without_the_address_and_the_token_or_when_told_not_to(self):
         srv, got = self.serve()
-        host = f"http://127.0.0.1:{srv.server_port}"
-        self.run_failing(ERGA_POSTHOG_HOST=host)
-        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=host, DO_NOT_TRACK="1")
-        self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST=host, ERGA_OBSERVE="off")
+        url = f"http://127.0.0.1:{srv.server_port}"
+        self.run_failing(ERGA_SIGNALS_URL=url)
+        self.run_failing(ERGA_SIGNALS_TOKEN="arca_test")
+        self.run_failing(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL=url, DO_NOT_TRACK="1")
+        self.run_failing(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL=url, ERGA_OBSERVE="off")
         self.assertEqual(got, [])
 
     def test_the_start_says_whether_telemetry_is_on_and_a_person_who_said_no_is_told_only_that(self):
         """009-machine-bootstrap FR-053"""
         say = lambda **e: self.run_script("--dry-run", **{"DO_NOT_TRACK": "", "ERGA_OBSERVE": "", **e}).stdout   # noqa: E731
-        self.assertIn("Telemetry is on", say(ERGA_POSTHOG_KEY="phc_test"))
+        self.assertIn("Telemetry is on", say(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL="http://127.0.0.1:9"))
+        self.assertIn("Telemetry is off: ERGA_SIGNALS_URL is not set", say(ERGA_SIGNALS_TOKEN="arca_test"))
         off = say()
         self.assertIn("Telemetry is off (optional)", off)
-        self.assertIn("export ERGA_POSTHOG_KEY=", off)
-        for no in (dict(DO_NOT_TRACK="1"), dict(ERGA_OBSERVE="off"), dict(DO_NOT_TRACK="1", ERGA_POSTHOG_KEY="phc_test")):
+        self.assertIn("export ERGA_SIGNALS_URL=", off)
+        self.assertIn("ERGA_SIGNALS_TOKEN=", off)
+        for no in (dict(DO_NOT_TRACK="1"), dict(ERGA_OBSERVE="off"), dict(DO_NOT_TRACK="1", ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL="http://127.0.0.1:9")):
             with self.subTest(**no):
                 out = say(**no)
                 self.assertIn("Telemetry is off: " + ("DO_NOT_TRACK=1" if "DO_NOT_TRACK" in no else "ERGA_OBSERVE=off"), out)
-                self.assertNotIn("ERGA_POSTHOG_KEY=", out)
+                self.assertNotIn("ERGA_SIGNALS_TOKEN=", out)
                 self.assertNotIn("Telemetry is on", out)
 
-    def test_an_unreachable_host_changes_nothing_but_the_log(self):
-        p = self.run_failing(ERGA_POSTHOG_KEY="phc_test", ERGA_POSTHOG_HOST="http://127.0.0.1:9")
+    def test_an_unreachable_door_changes_nothing_but_the_log(self):
+        p = self.run_failing(ERGA_SIGNALS_TOKEN="arca_test", ERGA_SIGNALS_URL="http://127.0.0.1:9")
         self.assertEqual(p.returncode, 4, p.stdout + p.stderr)
 
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Settings(Fixture):
-    """009-machine-bootstrap FR-052, FR-050: the PostHog settings the setup was given are kept for every new terminal, in the file `erga secrets` uses; the lines that make a shell read it are `erga shell ensure`'s."""
+    """009-machine-bootstrap FR-052, FR-050: the ArcaSignals settings the setup was given are kept for every new terminal, in the file `erga secrets` uses; the lines that make a shell read it are `erga shell ensure`'s."""
 
     def keep(self, **extra):
         return self.run_script(**OFF, BOOTSTRAP_KIT="", **extra)
 
-    def test_the_key_is_kept_privately_and_the_setup_writes_no_startup_file(self):
-        p = self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ERGA_PERSON="ifcore:A B")
+    def test_the_token_is_kept_privately_and_the_setup_writes_no_startup_file(self):
+        p = self.keep(ERGA_SIGNALS_TOKEN="arca_abcdefghijklmnopqrstuvwxyz1234", ERGA_SIGNALS_URL="https://arca.example", ERGA_PERSON="ifcore:A B")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         f = self.home / ".config" / "erga" / "secrets.env"
         self.assertEqual(oct(f.stat().st_mode & 0o777), "0o600")
         self.assertEqual(oct(f.parent.stat().st_mode & 0o777), "0o700")
-        self.assertIn("ERGA_POSTHOG_KEY='phc_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
+        self.assertIn("ERGA_SIGNALS_TOKEN='arca_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
+        self.assertIn("ERGA_SIGNALS_URL='https://arca.example'", f.read_text())
         self.assertTrue(f.read_text().startswith("# Kept by `erga secrets`; change it with `erga secrets set` and `erga secrets remove`.\n"), "the first line erga secrets writes, byte for byte (009-machine-bootstrap FR-052)")
         self.assertIn("ERGA_PERSON='ifcore:A B'", f.read_text())
-        self.assertNotIn("phc_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
+        self.assertNotIn("arca_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
         for name in (".profile", ".bashrc", ".zshenv", ".config/fish"):
             self.assertFalse((self.home / name).exists(), f"009-machine-bootstrap FR-042: the setup wrote {name}")
         before = f.read_text()
-        self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234", ERGA_PERSON="ifcore:A B")
+        self.keep(ERGA_SIGNALS_TOKEN="arca_abcdefghijklmnopqrstuvwxyz1234", ERGA_SIGNALS_URL="https://arca.example", ERGA_PERSON="ifcore:A B")
         self.assertEqual(before, f.read_text(), "a second run changes nothing")
 
-    def test_a_changed_key_replaces_the_old_one(self):
-        self.keep(ERGA_POSTHOG_KEY="phc_oldoldoldoldoldoldold")
-        self.keep(ERGA_POSTHOG_KEY="phc_newnewnewnewnewnewnew")
+    def test_a_changed_token_replaces_the_old_one(self):
+        self.keep(ERGA_SIGNALS_TOKEN="arca_oldoldoldoldoldoldold")
+        self.keep(ERGA_SIGNALS_TOKEN="arca_newnewnewnewnewnewnew")
         text = (self.home / ".config" / "erga" / "secrets.env").read_text()
-        self.assertEqual(text.count("ERGA_POSTHOG_KEY="), 1)
-        out = subprocess.run(["sh", "-c", 'set -a; . "$HOME/.config/erga/secrets.env"; set +a; printf %s "$ERGA_POSTHOG_KEY"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
-        self.assertEqual(out, "phc_newnewnewnewnewnewnew")
+        self.assertEqual(text.count("ERGA_SIGNALS_TOKEN="), 1)
+        out = subprocess.run(["sh", "-c", 'set -a; . "$HOME/.config/erga/secrets.env"; set +a; printf %s "$ERGA_SIGNALS_TOKEN"'], capture_output=True, text=True, env={**self.env(), "HOME": str(self.home)}).stdout
+        self.assertEqual(out, "arca_newnewnewnewnewnewnew")
 
     def test_a_shell_file_of_the_persons_is_never_touched_by_the_setup(self):
         (self.home / ".bashrc").write_text("alias mine=1")
-        self.keep(ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+        self.keep(ERGA_SIGNALS_TOKEN="arca_abcdefghijklmnopqrstuvwxyz1234")
         self.assertEqual((self.home / ".bashrc").read_text(), "alias mine=1")
         self.assertFalse((self.home / ".bashrc.before-erga").exists(), "erga shell ensure keeps that copy, when it first changes the file")
 
@@ -946,10 +977,10 @@ class Settings(Fixture):
         self.assertFalse((self.home / ".config" / "erga" / "secrets.env").exists())
         self.assertIn("not saved", p.stdout + p.stderr)
         self.assertIn("erga secrets set GH_TOKEN", p.stdout + p.stderr)
-        q = self.keep(ERGA_POSTHOG_KEY="phc_it's")
+        q = self.keep(ERGA_SIGNALS_TOKEN="arca_it's")
         self.assertIn("not saved", q.stdout + q.stderr)
-        self.assertIn("not saved", self.keep(ERGA_POSTHOG_KEY='phc_"quoted"').stdout, "erga secrets refuses a double quote too")
-        self.assertNotIn("phc_it", (self.home / ".config" / "erga" / "secrets.env").read_text() if (self.home / ".config" / "erga" / "secrets.env").exists() else "")
+        self.assertIn("not saved", self.keep(ERGA_SIGNALS_TOKEN='arca_"quoted"').stdout, "erga secrets refuses a double quote too")
+        self.assertNotIn("arca_it", (self.home / ".config" / "erga" / "secrets.env").read_text() if (self.home / ".config" / "erga" / "secrets.env").exists() else "")
 
     def test_a_sign_in_made_with_gh_is_said_to_be_kept_on_this_computer_and_a_token_of_the_environment_is_not(self):
         env = self.env(BOOTSTRAP_SOURCE_ONLY="1", GH_TOKEN="ghp_" + "x" * 30)
@@ -967,16 +998,16 @@ class Settings(Fixture):
         for output in (kept, token):
             self.assertNotIn("ghp_xxxx", output, "the token is never shown")
 
-    def test_a_dry_run_writes_nothing_and_a_kept_key_counts_for_telemetry_where_the_terminal_has_none(self):
-        p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ERGA_POSTHOG_KEY="phc_abcdefghijklmnopqrstuvwxyz1234")
+    def test_a_dry_run_writes_nothing_and_a_kept_token_counts_for_telemetry_where_the_terminal_has_none(self):
+        p = self.run_script("--dry-run", **OFF, BOOTSTRAP_KIT="", ERGA_SIGNALS_TOKEN="arca_abcdefghijklmnopqrstuvwxyz1234")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertIn("would keep ERGA_POSTHOG_KEY", p.stdout)
+        self.assertIn("would keep ERGA_SIGNALS_TOKEN", p.stdout)
         self.assertFalse((self.home / ".config" / "erga").exists())
         f = self.home / ".config" / "erga"
         f.mkdir(parents=True)
-        (f / "secrets.env").write_text("ERGA_POSTHOG_KEY='phc_fromthefile'\n")
-        q = subprocess.run([SH, "-c", f". {SCRIPT}; printf %s \"$ph_key\""], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
-        self.assertEqual(q.stdout, "phc_fromthefile")
+        (f / "secrets.env").write_text("ERGA_SIGNALS_TOKEN='arca_fromthefile'\nERGA_SIGNALS_URL='https://arca.example/'\n")
+        q = subprocess.run([SH, "-c", f". {SCRIPT}; printf %s \"$sg_token $sg_url\""], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        self.assertEqual(q.stdout, "arca_fromthefile https://arca.example")
 
 
 @unittest.skipUnless(SH, "sh is not installed")

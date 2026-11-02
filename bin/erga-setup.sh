@@ -39,8 +39,9 @@
 #                                          -h, --help  this text
 #
 # Environment, so it can be tested (a "1" switches it on):
-#   ERGA_POSTHOG_KEY       optional: your PostHog project API key, set (export ERGA_POSTHOG_KEY=...) before starting so the erga commands the setup runs are
-#                          recorded in PostHog, and the setup itself reports its steps, timings and failures (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file) (ERGA_POSTHOG_HOST names a PostHog other than the default). Without it nothing breaks; no telemetry is recorded.
+#   ERGA_SIGNALS_URL       optional: the address of arca's door, and ERGA_SIGNALS_TOKEN an API token arca issued for erga's events, set (export ERGA_SIGNALS_URL=... ERGA_SIGNALS_TOKEN=...)
+#   ERGA_SIGNALS_TOKEN     before starting so the erga commands the setup runs are recorded in ArcaSignals, and the setup itself reports its steps, timings and failures as OpenTelemetry
+#                          log records (environment "bootstrap", a device id made from the machine, the host name and Linux user name, the kind of computer; no password, token or file). Without them nothing breaks; no telemetry is recorded.
 #   GH_TOKEN               optional: a GitHub token (GITHUB_TOKEN too) with access to erga; with it no interactive `gh auth login` is needed, and no sign-in is asked for. It is the way to get the tools that come from GitHub where no browser is
 #                          (without a token or a sign-in they are skipped, and listed at the end)
 #   BOOTSTRAP_URL          where the bootstrap fetches this script from when it is piped (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
@@ -643,23 +644,23 @@ logf() {  # logf TEXT: one timestamped line in the log, without colour codes
 # shellcheck disable=SC2088  # the tilde is meant literally: it is how a path in the home folder is shown to a person
 short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf '%s' "$1" ;; esac; }
 
-# ---- telemetry: optional, to PostHog, only with ERGA_POSTHOG_KEY (009 FR-054) ----------------------------------------------------------------------
-# With the key set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can see how long
-# things take and where people get stuck: environment `bootstrap`, a device id made from the machine, the kind of computer, and the host name and Linux user name
-# (as erga's own events carry). No password, token or file content is sent. Without the key, or with DO_NOT_TRACK=1 or ERGA_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
+# ---- telemetry: optional, to ArcaSignals, only with ERGA_SIGNALS_URL and ERGA_SIGNALS_TOKEN (009 FR-054) -----------------------------------------------
+# With the address and the token set, the setup sends a few events (it started, each step with its time and outcome, where a failure's log is, how it ended) so we can
+# see how long things take and where people get stuck, each one OpenTelemetry log record posted to arca's door as OTLP/JSON (206-arca-engines FR-015): environment
+# `bootstrap`, a device id made from the machine, the kind of computer, and the host name and Linux user name (as erga's own events carry). No password, token or file
+# content is sent. Without them, or with DO_NOT_TRACK=1 or ERGA_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
 # The settings a person kept earlier (`erga secrets`, 009 FR-052) count where this terminal did not load them.
 secrets_file=$cfgdir/erga/secrets.env
 sf_get() {  # sf_get NAME: the value kept in the file, or nothing
   [ -r "$secrets_file" ] || return 0
   sed -n "s/^$1='\\(.*\\)'\$/\\1/p" "$secrets_file" | tail -n 1
 }
-ph_key=${ERGA_POSTHOG_KEY:-$(sf_get ERGA_POSTHOG_KEY)}
-ph_host=${ERGA_POSTHOG_HOST:-$(sf_get ERGA_POSTHOG_HOST)}
-ph_host=${ph_host:-https://us.i.posthog.com}
-ph_host=${ph_host%/}
+sg_url=${ERGA_SIGNALS_URL:-$(sf_get ERGA_SIGNALS_URL)}
+sg_token=${ERGA_SIGNALS_TOKEN:-$(sf_get ERGA_SIGNALS_TOKEN)}
+sg_url=${sg_url%/}
 ph_pids=""
 ph_on=0
-if [ -n "$ph_key" ] && [ "$dry" = 0 ] && command -v curl >/dev/null 2>&1; then
+if [ -n "$sg_url" ] && [ -n "$sg_token" ] && [ "$dry" = 0 ] && command -v curl >/dev/null 2>&1; then
   case $(printf '%s' "${ERGA_OBSERVE:-}" | tr 'A-Z' 'a-z') in off | 0 | false | no) ;; *)
     case $(printf '%s' "${DO_NOT_TRACK:-}" | tr 'A-Z' 'a-z') in 1 | true | yes) ;; *) ph_on=1 ;; esac ;;
   esac
@@ -668,6 +669,8 @@ ph_started=$(date +%s)
 ph_run=$stamp-$$
 
 ph_str() { printf '%s' "$1" | tr -d '\000-\037' | sed 's/\\/\\\\/g; s/"/\\"/g' | cut -c1-400; }   # one JSON string's text
+kv_s() { printf ',{"key":"%s","value":{"stringValue":"%s"}}' "$1" "$(ph_str "$2")"; }   # one OTLP attribute, a string
+kv_n() { case $2 in '' | *[!0-9.]*) set -- "$1" 0 ;; esac; printf ',{"key":"%s","value":{"doubleValue":%s}}' "$1" "$2"; }   # one OTLP attribute, a number
 
 # the device id: the same on every run on this machine or distro, made from its machine id (hashed, so the id itself is never sent), else a random one kept in a file
 ph_device() {
@@ -707,35 +710,44 @@ ph_machine() {
     mem=$(awk '/^MemTotal:/ {printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null || true)
   fi
   free=$(df -k "$HOME" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1048576}')
-  printf '"hostname":"%s","os_user":"%s","host_kind":"%s","wsl_version":"%s","os_id":"%s","os_version":"%s","kernel":"%s","arch":"%s","cpus":%s,"memory_gb":%s,"disk_free_gb":%s' \
-    "$(ph_str "$(hostname 2>/dev/null || uname -n)")" "$(ph_str "$(id -un 2>/dev/null)")" "$(ph_str "$kind")" "$wslv" "$(ph_str "$os_id")" "$(ph_str "$os_ver")" "$(ph_str "$(uname -r)")" "$(uname -m)" "${cpus:-0}" "${mem:-0}" "${free:-0}"
+  kv_s hostname "$(hostname 2>/dev/null || uname -n)"; kv_s os_user "$(id -un 2>/dev/null)"; kv_s host_kind "$kind"; kv_s wsl_version "$wslv"; kv_s os_id "$os_id"
+  kv_s os_version "$os_ver"; kv_s kernel "$(uname -r)"; kv_s arch "$(uname -m)"; kv_n cpus "${cpus:-0}"; kv_n memory_gb "${mem:-0}"; kv_n disk_free_gb "${free:-0}"
 }
 
-# ph_event NAME [s:key=text | n:key=number]...  sends one event in the background (curl, three seconds at most); it never fails the setup
+# ph_event NAME [s:key=text | n:key=number]...  sends one event in the background (curl, three seconds at most) as one OpenTelemetry log record; it never fails the setup
 ph_event() {
   [ "$ph_on" = 1 ] || return 0
   [ -n "${ph_machine_json:-}" ] || ph_machine_json=$(ph_machine 2>/dev/null || true)
   [ -n "${ph_dev:-}" ] || ph_dev=$(ph_device 2>/dev/null || echo dev-unknown)
   pe_name=$1; shift
   pe_props=""
+  pe_plain=""
   for pe_a in "$@"; do
     pe_k=${pe_a%%=*}; pe_v=${pe_a#*=}; pe_t=${pe_k%%:*}; pe_k=${pe_k#*:}
     case $pe_t in
-      n) case $pe_v in '' | *[!0-9.]*) pe_v=0 ;; esac; pe_props="$pe_props,\"$pe_k\":$pe_v" ;;
-      *) pe_props="$pe_props,\"$pe_k\":\"$(ph_str "$pe_v")\"" ;;
+      n) case $pe_v in '' | *[!0-9.]*) pe_v=0 ;; esac; pe_props="$pe_props$(kv_n "$pe_k" "$pe_v")"; pe_plain="$pe_plain,\"$pe_k\":$pe_v" ;;
+      *) pe_props="$pe_props$(kv_s "$pe_k" "$pe_v")"; pe_plain="$pe_plain,\"$pe_k\":\"$(ph_str "$pe_v")\"" ;;
     esac
   done
   pe_who=${ERGA_PERSON:-$(sf_get ERGA_PERSON)}; pe_who=${pe_who:-$ph_dev}
-  pe_body=$(printf '{"api_key":"%s","batch":[{"event":"%s","distinct_id":"%s","timestamp":"%s","properties":{"$lib":"erga-bootstrap","$process_person_profile":false,"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}]}' \
-    "$ph_key" "$pe_name" "$(ph_str "$pe_who")" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
-  # erga's journal of what was sent, in its state folder (telemetry/sent.jsonl): the event, PostHog's answer and every property, never the key
-  pe_journal=$(printf '{"at":"%s","source":"bootstrap","event":"%s","host":"%s","status":STATUS,"error":null,"properties":{"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s",%s%s}}' \
-    "$(date -u +%Y-%m-%dT%H:%M:%S)" "$pe_name" "$ph_host" "$ph_dev" "$ph_run" "$ph_machine_json" "$pe_props")
-  ( code=$(printf '%s' "$pe_body" | curl -sS -m 3 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' --data-binary @- "$ph_host/batch/" 2>/dev/null || true)
+  pe_common="$(kv_s environment bootstrap)$(kv_s device_id "$ph_dev")$(kv_s bootstrap_run "$ph_run")$ph_machine_json$pe_props"
+  pe_body=$(printf '{"resourceLogs":[{"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"erga-bootstrap"}}%s%s%s]},"scopeLogs":[{"scope":{"name":"erga-bootstrap"},"logRecords":[{"timeUnixNano":"%s000000000","severityNumber":9,"severityText":"INFO","eventName":"%s","attributes":[%s]}]}]}]}' \
+    "$(kv_s enduser.id "$pe_who")" "$(kv_s device.id "$ph_dev")" "$(kv_s deployment.environment.name bootstrap)" "$(date +%s)" "$pe_name" "${pe_common#,}")
+  # erga's journal of what was sent, in its state folder (telemetry/sent.jsonl): the event, the door's answer and every property, never the token
+  pe_journal=$(printf '{"at":"%s","source":"bootstrap","event":"%s","url":"%s","status":STATUS,"error":null,"properties":{"environment":"bootstrap","device_id":"%s","bootstrap_run":"%s"%s}}' \
+    "$(date -u +%Y-%m-%dT%H:%M:%S)" "$pe_name" "$(ph_str "$sg_url")" "$ph_dev" "$ph_run" "$pe_plain")
+  ( # the token goes to curl in its configuration on standard input, never on a command line (011-secrets FR-003); the request waits in a private file
+    pe_tmp=$(umask 077; mktemp "${TMPDIR:-/tmp}/erga-signal.XXXXXX" 2>/dev/null || true)
+    code=0
+    if [ -n "$pe_tmp" ] && printf '%s' "$pe_body" >"$pe_tmp" 2>/dev/null; then
+      code=$(printf 'header = "Authorization: Bearer %s"\nheader = "Content-Type: application/json"\ndata-binary = "@%s"\n' "$sg_token" "$pe_tmp" \
+        | curl -sS -m 3 -o /dev/null -w '%{http_code}' -K - "$sg_url/v1/logs" 2>/dev/null || true)
+      rm -f "$pe_tmp"
+    fi
     case $code in '' | *[!0-9]*) code=0 ;; esac
     jd=$erga_state/telemetry
     if mkdir -p "$jd" 2>/dev/null; then
-      [ -f "$jd/README.txt" ] || printf '%s\n' "This folder is erga's own record of what it reports to PostHog: sent.jsonl has one line for each event sent, with PostHog's answer and every property; the project key is never written here." >"$jd/README.txt" 2>/dev/null
+      [ -f "$jd/README.txt" ] || printf '%s\n' "This folder is erga's own record of what it reports to ArcaSignals: sent.jsonl has one line for each event sent, with the door's answer and every property; the token is never written here." >"$jd/README.txt" 2>/dev/null
       printf '%s\n' "$pe_journal" | sed "s/\"status\":STATUS/\"status\":$code/" >>"$jd/sent.jsonl" 2>/dev/null
     fi ) &
   ph_pids="$ph_pids $!"
@@ -2465,12 +2477,15 @@ main() {
   if [ "${DO_NOT_TRACK:-}" = 1 ] || [ "${ERGA_OBSERVE:-}" = off ]; then
     # a person who said no is told only that (FR-053)
     if [ "${DO_NOT_TRACK:-}" = 1 ]; then say "${d}📡 Telemetry is off: DO_NOT_TRACK=1 is set.${z}"; else say "${d}📡 Telemetry is off: ERGA_OBSERVE=off is set.${z}"; fi
-  elif [ -n "${ERGA_POSTHOG_KEY:-}" ]; then
-    say "${g}📡 Telemetry is on:${z} ${b}ERGA_POSTHOG_KEY${z} is set, so this setup reports to PostHog how long each step takes, and where a failure's log is."
+  elif [ -n "${ERGA_SIGNALS_URL:-}" ] && [ -n "${ERGA_SIGNALS_TOKEN:-}" ]; then
+    say "${g}📡 Telemetry is on:${z} ${b}ERGA_SIGNALS_URL${z} and ${b}ERGA_SIGNALS_TOKEN${z} are set, so this setup reports to ArcaSignals how long each step takes, and where a failure's log is."
     say "${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as erga's own telemetry does. Never a password, a token or a file.${z}"
+  elif [ -n "${ERGA_SIGNALS_URL:-}${ERGA_SIGNALS_TOKEN:-}" ]; then
+    [ -n "${ERGA_SIGNALS_URL:-}" ] && sg_missing=ERGA_SIGNALS_TOKEN || sg_missing=ERGA_SIGNALS_URL
+    say "${d}📡 Telemetry is off: $sg_missing is not set (both ERGA_SIGNALS_URL and ERGA_SIGNALS_TOKEN are needed to report to ArcaSignals).${z}"
   else
-    say "${d}📡 Telemetry is off (optional). To record this setup in PostHog, press Ctrl+C, run ${z}${b}export ERGA_POSTHOG_KEY=<your project key>${z}${d}, then start again; the setup keeps it for every new terminal."
-    say "   Without the key nothing breaks; there is just no telemetry.${z}"
+    say "${d}📡 Telemetry is off (optional). To record this setup in ArcaSignals, press Ctrl+C, run ${z}${b}export ERGA_SIGNALS_URL=<arca's door> ERGA_SIGNALS_TOKEN=<a token arca issued>${z}${d}, then start again; the setup keeps them for every new terminal."
+    say "   Without them nothing breaks; there is just no telemetry.${z}"
   fi
 
   ph_event bootstrap_started "s:method=$install_method" "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
@@ -2507,8 +2522,8 @@ main() {
   finish
 }
 
-# ---- keep the PostHog settings for every new terminal (009-machine-bootstrap FR-052; the same file as `erga secrets`, erga's 011-secrets FR-009) --------------------------
-# The key a person gave this setup in the environment is lost when the terminal closes, so it is kept in a file only they can read; `erga shell ensure` tells the shells to read it.
+# ---- keep the ArcaSignals settings for every new terminal (009-machine-bootstrap FR-052; the same file as `erga secrets`, erga's 011-secrets FR-009) ----------------------
+# The address and token a person gave this setup in the environment are lost when the terminal closes, so they are kept in a file only they can read; `erga shell ensure` tells the shells to read it.
 sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, else added; written privately and atomically
   pv_dir=$(dirname "$secrets_file")
   mkdir -p "$pv_dir" && chmod 700 "$pv_dir" || return 1
@@ -2523,7 +2538,7 @@ sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, els
 }
 keep_settings() {
   ks_names=""
-  for ks_n in ERGA_POSTHOG_KEY ERGA_POSTHOG_HOST ERGA_PERSON; do
+  for ks_n in ERGA_SIGNALS_URL ERGA_SIGNALS_TOKEN ERGA_PERSON; do
     eval "ks_v=\${$ks_n:-}"
     [ -n "$ks_v" ] && ks_names="$ks_names $ks_n"
   done
@@ -2538,7 +2553,7 @@ keep_settings() {
     say "   To keep it for every terminal: erga secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
   fi
   [ -n "$ks_names" ] || return 0
-  phase "${e_key}Keeping your PostHog settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
+  phase "${e_key}Keeping your ArcaSignals settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
   if [ "$dry" = 1 ]; then
     would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); erga shell ensure makes your shells read it in every new terminal"
     return 0
