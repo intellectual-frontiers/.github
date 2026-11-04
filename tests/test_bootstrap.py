@@ -88,8 +88,8 @@ class Shape(unittest.TestCase):
                     self.assertIsNone(bashism.search(line), f"a bashism in {f.name}: {line}")
 
     def test_no_file_of_the_earlier_name_or_its_data_is_kept(self):
-        """009-machine-bootstrap FR-006, FR-013: bin/ holds erga-bootstrap.sh and erga-setup.sh alone, and the templates and themes live in erga."""
-        self.assertEqual(sorted(p.name for p in BIN.iterdir()), ["erga-bootstrap.sh", "erga-setup.sh"])
+        """009-machine-bootstrap FR-006, FR-013: bin/ holds erga-bootstrap.sh, erga-setup.sh and the optional erga-windows.ps1 alone, and the templates and themes live in erga."""
+        self.assertEqual(sorted(p.name for p in BIN.iterdir()), ["erga-bootstrap.sh", "erga-setup.sh", "erga-windows.ps1"])
 
     def test_the_sign_in_says_what_it_waits_for_while_gh_is_quiet(self):
         """gh prints the code and then nothing; the script says on the terminal, every so often, the address to open and that nothing else is to be pressed."""
