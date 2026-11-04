@@ -11,10 +11,10 @@
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --dry-run
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
-#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, gh, jq,
-#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other programs the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
-#      everyday programs (ripgrep, ImageMagick, sqlite3 and the rest). Rust itself, Node.js and the other programs erga pins are never packages: rustup and
-#      `erga toolchain ensure` install them at the version erga pins,
+#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, wget,
+#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
+#      everyday userland and ImageMagick. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and
+#      `erga toolchain ensure` install each at a pinned version in your own folders,
 #   2. PostgreSQL: on the Debian family, PostgreSQL's own apt repository (its key checked against a pinned SHA-256), from which erga installs PostgreSQL 18.
 #   3. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
 #   4. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI
@@ -135,10 +135,6 @@ wanted_packages() {
   kit_on base || return 0
   wp_line=""
   for wp_prog in $(pm_programs comfort); do
-    if [ "$wp_prog" = glab ] && [ "$family" = debian ]; then   # Debian 12 has no package (the setup fetches the release); Ubuntu is left to it too
-      [ "$is_debian" = 1 ] || continue
-      case $d_codename in bookworm | bullseye | "") continue ;; esac
-    fi
     wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"
   done
   echo "${wp_line# }"
@@ -240,7 +236,7 @@ install_packages() {
     return 0
   fi
   if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
-  sudo_for "install the everyday programs (git, curl, jq and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to install:$missing"
+  sudo_for "install the common programs (git, curl, wget and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to install:$missing"
   if [ -z "$(pm_refresh_words "$family")" ]; then
     # the table has no refresh for the family (Arch: never -Sy), and the names are its own and unique, so the manager decides what it has: a package it cannot find means a package list older than the repositories
     chosen=$missing

@@ -120,38 +120,6 @@ pmid:pkg-arch-unzip a pm:PackageName ;
     pm:forFamily pmid:family-arch ;
     pm:name "unzip" .
 
-pmid:prog-jq a pm:Program ;
-    rdfs:label "jq"@en ;
-    pm:programName "jq" ;
-    pm:tier pm:Required  ;
-    pm:order 8 .
-
-pmid:pkg-debian-jq a pm:PackageName ;
-    pm:forProgram pmid:prog-jq ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "jq" .
-
-pmid:pkg-arch-jq a pm:PackageName ;
-    pm:forProgram pmid:prog-jq ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "jq" .
-
-pmid:prog-gh a pm:Program ;
-    rdfs:label "gh"@en ;
-    pm:programName "gh" ;
-    pm:tier pm:Required  ;
-    pm:order 9 .
-
-pmid:pkg-debian-gh a pm:PackageName ;
-    pm:forProgram pmid:prog-gh ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "gh" .
-
-pmid:pkg-arch-gh a pm:PackageName ;
-    pm:forProgram pmid:prog-gh ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "github-cli" .
-
 # The C compiler and linker that Rust links with: erga's launcher compiles erga with Cargo before any erga command can run (erga 009-machine-bootstrap FR-021).
 # A Mac has them in the Command Line Tools, which only a person at the screen can install.
 pmid:prog-cc a pm:Program ;
@@ -453,38 +421,6 @@ pmid:pkg-arch-gawk a pm:PackageName ;
     pm:forFamily pmid:family-arch ;
     pm:name "gawk" .
 
-pmid:prog-ripgrep a pm:Program ;
-    rdfs:label "ripgrep"@en ;
-    pm:programName "ripgrep" ;
-    pm:tier pm:Comfort  ;
-    pm:order 28 .
-
-pmid:pkg-debian-ripgrep a pm:PackageName ;
-    pm:forProgram pmid:prog-ripgrep ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "ripgrep" .
-
-pmid:pkg-arch-ripgrep a pm:PackageName ;
-    pm:forProgram pmid:prog-ripgrep ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "ripgrep" .
-
-pmid:prog-fd a pm:Program ;
-    rdfs:label "fd"@en ;
-    pm:programName "fd" ;
-    pm:tier pm:Comfort  ;
-    pm:order 29 .
-
-pmid:pkg-debian-fd a pm:PackageName ;
-    pm:forProgram pmid:prog-fd ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "fd-find" .
-
-pmid:pkg-arch-fd a pm:PackageName ;
-    pm:forProgram pmid:prog-fd ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "fd" .
-
 pmid:prog-bash-completion a pm:Program ;
     rdfs:label "bash-completion"@en ;
     pm:programName "bash-completion" ;
@@ -500,22 +436,6 @@ pmid:pkg-arch-bash-completion a pm:PackageName ;
     pm:forProgram pmid:prog-bash-completion ;
     pm:forFamily pmid:family-arch ;
     pm:name "bash-completion" .
-
-pmid:prog-python a pm:Program ;
-    rdfs:label "python"@en ;
-    pm:programName "python" ;
-    pm:tier pm:Comfort  ;
-    pm:order 31 .
-
-pmid:pkg-debian-python a pm:PackageName ;
-    pm:forProgram pmid:prog-python ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "python3" .
-
-pmid:pkg-arch-python a pm:PackageName ;
-    pm:forProgram pmid:prog-python ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "python" .
 
 pmid:prog-imagemagick a pm:Program ;
     rdfs:label "imagemagick"@en ;
@@ -549,38 +469,6 @@ pmid:pkg-arch-webp a pm:PackageName ;
     pm:forFamily pmid:family-arch ;
     pm:name "libwebp" .
 
-pmid:prog-sqlite a pm:Program ;
-    rdfs:label "sqlite"@en ;
-    pm:programName "sqlite" ;
-    pm:tier pm:Comfort  ;
-    pm:order 34 .
-
-pmid:pkg-debian-sqlite a pm:PackageName ;
-    pm:forProgram pmid:prog-sqlite ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "sqlite3" .
-
-pmid:pkg-arch-sqlite a pm:PackageName ;
-    pm:forProgram pmid:prog-sqlite ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "sqlite" .
-
-pmid:prog-shellcheck a pm:Program ;
-    rdfs:label "shellcheck"@en ;
-    pm:programName "shellcheck" ;
-    pm:tier pm:Comfort  ;
-    pm:order 35 .
-
-pmid:pkg-debian-shellcheck a pm:PackageName ;
-    pm:forProgram pmid:prog-shellcheck ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "shellcheck" .
-
-pmid:pkg-arch-shellcheck a pm:PackageName ;
-    pm:forProgram pmid:prog-shellcheck ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "shellcheck" .
-
 pmid:prog-imagemagick-codecs a pm:Program ;
     rdfs:label "imagemagick-codecs"@en ;
     pm:programName "imagemagick-codecs" ;
@@ -591,20 +479,4 @@ pmid:pkg-debian-imagemagick-codecs a pm:PackageName ;
     pm:forProgram pmid:prog-imagemagick-codecs ;
     pm:forFamily pmid:family-debian ;
     pm:name "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra" .
-
-pmid:prog-glab a pm:Program ;
-    rdfs:label "glab"@en ;
-    pm:programName "glab" ;
-    pm:tier pm:Comfort  ;
-    pm:order 37 .
-
-pmid:pkg-debian-glab a pm:PackageName ;
-    pm:forProgram pmid:prog-glab ;
-    pm:forFamily pmid:family-debian ;
-    pm:name "glab" .
-
-pmid:pkg-arch-glab a pm:PackageName ;
-    pm:forProgram pmid:prog-glab ;
-    pm:forFamily pmid:family-arch ;
-    pm:name "glab" .
 

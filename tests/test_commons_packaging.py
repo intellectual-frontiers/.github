@@ -157,12 +157,13 @@ class Generated(unittest.TestCase):
         t = table()
         supported = [k for k, v in t["families"].items() if v["status"] == "supported" and v["installs_packages"]]
         required = {k: v for k, v in t["programs"].items() if v["tier"] == "required"}
-        self.assertTrue({"git", "curl", "jq", "gh", "xz"} <= set(required))
+        self.assertTrue({"git", "curl", "xz", "wget", "unzip"} <= set(required))
         for name, p in required.items():
             for fid in supported:
                 self.assertIn(fid, p["names"], f"{name} has no package for {fid}")
         self.assertEqual(t["programs"]["xz"]["names"], {"arch": "xz", "debian": "xz-utils"})
-        self.assertEqual(t["programs"]["gh"]["names"], {"arch": "github-cli", "debian": "gh"})
+        for fetched in ("jq", "gh", "ripgrep", "fd", "shellcheck", "glab", "python", "sqlite"):   # 009-machine-bootstrap FR-091: fetched by the setup, never packages
+            self.assertNotIn(fetched, t["programs"])
         for name, p in t["programs"].items():
             for fid in p["names"]:
                 self.assertIn(fid, supported, f"{name} names a package for {fid}, which is not supported")
@@ -333,14 +334,14 @@ class ShellFragment(unittest.TestCase):
             "pm_install_words debian": "apt-get install -y", "pm_install_words arch": "pacman -S --needed --noconfirm", "pm_install_words redhat": "",
             "pm_environment debian": "DEBIAN_FRONTEND=noninteractive", "pm_admin_install arch": "pacman -S --needed {packages}", "pm_admin_install redhat": "dnf install {packages}",
             "pm_removal_hint debian": "sudo deluser --remove-home NAME", "pm_removal_hint arch": "sudo userdel -r NAME", "pm_installs_packages macos": "no",
-            "pm_package debian xz": "xz-utils", "pm_package arch xz": "xz", "pm_package arch gh": "github-cli", "pm_package debian gh": "gh", "pm_package macos git": "",
+            "pm_package debian xz": "xz-utils", "pm_package arch xz": "xz", "pm_package arch procps": "procps-ng", "pm_package debian procps": "procps", "pm_package macos git": "",
             "pm_query_installed_words arch": "pacman -Qi", "pm_refresh_words debian": "apt-get update", "pm_refresh_words arch": "",
         }
         for call, want in facts.items():
             self.assertEqual(self.call(f"{call}").stdout, want, call)
         required = self.call("pm_programs required").stdout.split()
-        self.assertTrue({"git", "curl", "jq", "gh", "xz", "ca-certificates", "tar", "unzip", "wget"} <= set(required), required)
-        self.assertIn("ripgrep", self.call("pm_programs comfort").stdout.split())
+        self.assertTrue({"git", "curl", "xz", "ca-certificates", "tar", "unzip", "wget"} <= set(required), required)
+        self.assertIn("imagemagick", self.call("pm_programs comfort").stdout.split())
 
     def test_the_fragment_and_the_toml_say_the_same(self):
         t = table()
@@ -511,28 +512,24 @@ class Consumers(unittest.TestCase):
     def test_what_the_bootstrap_installs_is_what_it_installed_before_the_table(self):
         """the migration changed no list (these are the lists the scripts held in their case branches), but for the C compiler and linker Rust needs (erga 009-machine-bootstrap FR-021)"""
         want = {
-            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip jq gh build-essential",
-            ("arch", "required"): "git ca-certificates curl wget tar xz unzip jq github-cli gcc",
+            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip build-essential",
+            ("arch", "required"): "git ca-certificates curl wget tar xz unzip gcc",
         }
         comfort = {
-            "debian": "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk ripgrep fd-find bash-completion python3 imagemagick webp sqlite3 shellcheck "
+            "debian": "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk bash-completion imagemagick webp "
                       "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra",
-            "arch": "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk ripgrep fd bash-completion python imagemagick libwebp sqlite shellcheck glab",
+            "arch": "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk bash-completion imagemagick libwebp",
         }
         for fam in ("debian", "arch"):
             out = self.bootstrap(f"family={fam}; is_debian=0; d_codename=''; kits=base; wanted_packages").stdout.splitlines()
             self.assertEqual(out[0], want[(fam, "required")], fam)
             self.assertEqual(sorted(out[1].split()), sorted(comfort[fam].split()), fam)
-        deb13 = self.bootstrap("family=debian; is_debian=1; d_codename=trixie; kits=base; wanted_packages").stdout.splitlines()
-        self.assertIn("glab", deb13[1].split())
-        deb12 = self.bootstrap("family=debian; is_debian=1; d_codename=bookworm; kits=base; wanted_packages").stdout.splitlines()
-        self.assertNotIn("glab", deb12[1].split())
         self.assertEqual(self.bootstrap("family=debian; is_debian=1; d_codename=trixie; kits=agents; wanted_packages").stdout.splitlines(), [want[("debian", "required")]])
 
     def test_the_install_commands_and_hints_are_the_table_s(self):
-        out = self.bootstrap('family=debian; admin_install_cmd git xz gh; echo; family=arch; admin_install_cmd git xz gh; echo; family=debian; admin_install_names a b').stdout.split("\n")
-        self.assertEqual(out[0], "sudo apt-get install -y git xz-utils gh")
-        self.assertEqual(out[1], "sudo pacman -S --needed git xz github-cli")
+        out = self.bootstrap('family=debian; admin_install_cmd git xz unzip; echo; family=arch; admin_install_cmd git xz unzip; echo; family=debian; admin_install_names a b').stdout.split("\n")
+        self.assertEqual(out[0], "sudo apt-get install -y git xz-utils unzip")
+        self.assertEqual(out[1], "sudo pacman -S --needed git xz unzip")
         self.assertEqual(out[2], "sudo apt-get install -y a b")
 
     def test_a_family_the_table_knows_but_no_script_acts_on_is_named_with_its_manager(self):

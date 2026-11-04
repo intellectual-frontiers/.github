@@ -118,12 +118,13 @@ class Shape(unittest.TestCase):
         text = SCRIPT.read_text()
         sums = re.findall(r"^([A-Z_]+?)_SHA256_(X86_64|AARCH64|MACOS_ARM64)=(\S+)$", text, re.M)
         names = {n for n, _, _ in sums}
-        self.assertLessEqual({"FISH", "GH", "GLAB", "JQ", "RUSTUP_INIT", "UV"}, names, "Oh My Posh and the rest of erga's toolchain are pinned by erga")
+        self.assertLessEqual({"FISH", "GH", "GLAB", "JQ", "RIPGREP", "FD", "SHELLCHECK", "RUSTUP_INIT", "UV"}, names, "Oh My Posh and the rest of erga's toolchain are pinned by erga")
         for name, arch, digest in sums:
             self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} {arch}")
         for name in ("RUSTUP_INIT", "UV"):   # 009-machine-bootstrap FR-025, FR-078: pinned for every platform a script runs on
             self.assertEqual({a for n, a, _ in sums if n == name}, {"X86_64", "AARCH64", "MACOS_ARM64"}, name)
-        self.assertEqual({a for n, a, _ in sums if n in ("GH", "JQ")}, {"MACOS_ARM64"}, "gh and jq are pinned for a Mac alone (009-machine-bootstrap FR-017)")
+        for name in ("GH", "JQ", "RIPGREP", "FD", "SHELLCHECK", "GLAB"):   # 009-machine-bootstrap FR-091: fetched on every platform, never installed as packages
+            self.assertEqual({a for n, a, _ in sums if n == name}, {"X86_64", "AARCH64", "MACOS_ARM64"}, name)
         for var in ("UV_VERSION", "RUSTUP_INIT_VERSION", "GH_VERSION", "JQ_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
         self.assertRegex(re.search(r"^MS_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "Microsoft's key, pinned by the bootstrap")
@@ -217,6 +218,10 @@ class Entry(Fixture):
         self.assertNotIn("Installing eza", p.stdout)
         comfy = self.run_script("--dry-run", "--comfort")
         self.assertIn("Installing glab", comfy.stdout)
+        self.assertIn("get jq", comfy.stdout, "009-machine-bootstrap FR-091: jq and gh are the publishers' pinned releases on every platform, never packages")
+        text = SCRIPT.read_text()
+        for pin in ("RIPGREP", "FD", "SHELLCHECK", "GLAB", "JQ", "GH"):   # each is installed from its pin, once (a copy already on the PATH is used: FR-092)
+            self.assertRegex(text, rf'arch_sha {pin}\)', pin)
         self.assertIn("Installing eza", comfy.stdout)
         self.assertIn("Installing fish", comfy.stdout)
         self.assertIn("Installing claude", comfy.stdout)
@@ -1238,11 +1243,11 @@ class Bootstrap(Fixture):
         def wanted(**env):
             p = subprocess.run([SH, "-c", f'. "{BOOT}"; detect_platform; load_config; wanted_packages; echo "kits=$kits"'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.debian(), **env))
             return p.stdout
-        self.assertIn("ripgrep", wanted())
+        self.assertIn("imagemagick", wanted())
         self.assertIn("base", wanted().split("kits=")[1])
         off = wanted(BOOTSTRAP_NO_COMFORT="1")
-        self.assertNotIn("ripgrep", off)
-        self.assertIn("git ca-certificates curl wget tar xz-utils unzip jq gh build-essential", off, "what the setup needs is still installed, with the C compiler Rust links with")
+        self.assertNotIn("imagemagick", off)
+        self.assertIn("git ca-certificates curl wget tar xz-utils unzip build-essential", off, "what the setup needs is still installed, with the C compiler Rust links with")
         self.assertNotIn("Installing eza", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
         self.assertIn("Installing eza", self.run_boot("--dry-run").stdout)
 
@@ -1301,10 +1306,10 @@ class ArchFamily(Fixture):
     def test_the_command_for_a_person_with_administrator_rights_is_the_computers_own(self):
         """009-machine-bootstrap FR-016"""
         def hint(family):
-            p = subprocess.run([SH, "-c", f'. "{SCRIPT}"; family={family}; admin_install_cmd git xz gh'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+            p = subprocess.run([SH, "-c", f'. "{SCRIPT}"; family={family}; admin_install_cmd git xz unzip'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
             return p.stdout
-        self.assertEqual(hint("debian"), "sudo apt-get install -y git xz-utils gh")
-        self.assertEqual(hint("arch"), "sudo pacman -S --needed git xz github-cli")
+        self.assertEqual(hint("debian"), "sudo apt-get install -y git xz-utils unzip")
+        self.assertEqual(hint("arch"), "sudo pacman -S --needed git xz unzip")
 
     def test_without_git_or_curl_the_setup_on_arch_names_the_pacman_command(self):
         """009-machine-bootstrap FR-016"""
@@ -1326,12 +1331,14 @@ class ArchFamily(Fixture):
                                env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_OS_RELEASE=self.osr(ARCH), **env))
             return p.stdout
         full = wanted()
-        for name in ("github-cli", "xz ", "ripgrep", "fd ", "python", "sqlite"):
+        for name in ("xz ", "bash-completion", "imagemagick"):
             self.assertIn(name, full)
+        for programs_of_the_setup in ("github-cli", "ripgrep", "shellcheck", "glab", "sqlite", "python", "jq"):   # fetched by the setup, never packages (009-machine-bootstrap FR-091)
+            self.assertNotIn(programs_of_the_setup, full)
         for debian_only in ("xz-utils", "fd-find", "python3", "debianutils", "libmagickcore"):
             self.assertNotIn(debian_only, full)
         lean = wanted(BOOTSTRAP_NO_COMFORT="1")
-        self.assertIn("git ca-certificates curl wget tar xz unzip jq github-cli gcc", lean, "009-machine-bootstrap FR-015: the C compiler and linker too")
+        self.assertIn("git ca-certificates curl wget tar xz unzip gcc", lean, "009-machine-bootstrap FR-015: the C compiler and linker too")
         self.assertNotIn("ripgrep", lean)
 
     def test_dry_run_on_arch_says_pacman_never_refreshes_the_list_and_makes_no_account(self):
