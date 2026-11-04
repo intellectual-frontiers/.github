@@ -436,39 +436,6 @@ UV_SHA256_MACOS_ARM64=50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6
 UV_SHA256_X86_64=9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6
 # <<< pins.auto <<<
 
-# The tools that follow their newest release: name, GitHub repository, then the programs to link (link=file name it may have, a|b). Each is taken
-# only with the checksum GitHub states for the release file or the one its publisher put beside it.
-MODERN_TOOLS='
-eza eza-community/eza eza=eza
-zoxide ajeetdsouza/zoxide zoxide=zoxide
-fzf junegunn/fzf fzf=fzf
-yazi sxyazi/yazi yazi=yazi ya=ya
-bat sharkdp/bat bat=bat
-delta dandavison/delta delta=delta
-sd chmln/sd sd=sd
-yq mikefarah/yq yq=yq_linux_amd64|yq_linux_arm64|yq_darwin_arm64|yq
-glow charmbracelet/glow glow=glow
-btop aristocratos/btop btop=btop
-dust bootandy/dust dust=dust
-duf muesli/duf duf=duf
-procs dalance/procs procs=procs
-just casey/just just=just
-watchexec watchexec/watchexec watchexec=watchexec
-hyperfine sharkdp/hyperfine hyperfine=hyperfine
-scc boyter/scc scc=scc
-lazygit jesseduffield/lazygit lazygit=lazygit
-tealdeer tealdeer-rs/tealdeer tldr=tldr
-xh ducaale/xh xh=xh
-shfmt mvdan/sh shfmt=shfmt
-actionlint rhysd/actionlint actionlint=actionlint
-'
-SQL_TOOLS='
-turso tursodatabase/turso-cli turso=turso
-usql xo/usql usql=usql|usql_static
-litestream benbjohnson/litestream litestream=litestream
-sqruff quarylabs/sqruff sqruff=sqruff
-dbmate amacneil/dbmate dbmate=dbmate-linux-amd64|dbmate-linux-arm64|dbmate-macos-arm64|dbmate
-'
 # Python tools, each in a virtual environment of its own: name, PyPI package, then link=path inside it
 PY_TOOLS='
 sqlite-utils sqlite-utils sqlite-utils=bin/sqlite-utils
@@ -1391,93 +1358,6 @@ skip_github() {  # skip_github WHAT: left for a GitHub sign-in; says so, and the
   printf '%s\n' "$1" >>"$skipped"; phase_bad=1; logf "left until a GitHub sign-in: $1"
 }
 
-api_get() {  # api_get URL DEST: GitHub's answer, with the person's token when there is one (it lifts the hourly limit); never sent elsewhere
-  tok=$(gh_token)
-  if [ -n "$tok" ]; then fetch_to "$1" "$2" -H "Authorization: Bearer $tok" -H "Accept: application/vnd.github+json"
-  else fetch_to "$1" "$2" -H "Accept: application/vnd.github+json"; fi
-}
-
-# The release file for this system (Linux or macOS) on this architecture, chosen by its name: the one that says linux and the architecture, is not for
-# another system, a package or a signature, and, of the rest, is a static (musl) build if there is one, then an archive. With a pattern, the first file
-# whose name matches it. Reads a release's JSON; prints the asset's name and download address, tab-separated, and its stated digest.
-# shellcheck disable=SC2016  # a jq program: its $variables are jq's
-PICK_JQ='
-def anyin($l; $xs): any($xs[]; . as $s | $l | contains($s));
-def endsany($l; $xs): any($xs[]; . as $s | $l | endswith($s));
-def oswords: if $os == "darwin" then ["darwin","macos","apple","osx"] else ["linux"] end;
-def otheros: if $os == "darwin" then ["linux"] else ["darwin","macos","apple","osx"] end;
-def wrongfile: ["windows","win32","win64",".exe","freebsd","netbsd","openbsd","android",".deb",".rpm",".apk",".msi",".pkg",".dmg",".sig",".asc",".pem",".sbom",".sha",".md5","checksum","sha256",".json",".txt",".sh",".intoto",".sigstore",".bundle","source","src.","debug","-symbols"] + otheros;
-def wrongarch: ["armv","arm32","i686","i386","riscv","s390","ppc","mips","loong","386","x86.","-32bit"];
-def archives: [".tar.gz",".tgz",".tar.xz",".txz",".tar.bz2",".tbz",".tbz2",".zip"];
-( {x86_64: ["x86_64","amd64","x64"], aarch64: (["aarch64","arm64"] + (if $os == "darwin" then ["universal"] else [] end))}[$arch] ) as $w
-| ( {x86_64: ["aarch64","arm64"], aarch64: ["x86_64","amd64","x64"]}[$arch] ) as $o
-| (if $pat != "" then
-    [ .assets | to_entries[] | select(.value.name | test($pat)) ] | first // empty | .value
-  else
-    [ .assets | to_entries[]
-      | .key as $i | .value as $a | ($a.name | ascii_downcase) as $l
-      | select(anyin($l; oswords))
-      | select(anyin($l; $w))
-      | select(anyin($l; $o) | not)
-      | select(anyin($l; wrongfile) | not)
-      | select(anyin($l; wrongarch) | not)
-      | (endsany($l; archives)) as $arc
-      | select($arc or (endsany($l; [".gz",".xz",".bz2",".zst",".7z"]) | not))
-      | {i: $i, a: $a,
-         score: ((if ($l | contains("musl")) then 4 elif ($l | contains("static")) then 2 else 0 end)
-               + (if ($l | contains("gnueabi")) then 0 else 1 end) + (if $arc then 1 else 0 end))}
-    ] | sort_by([-.score, .i]) | first // empty | .a
-  end)
-| select(. != null)
-| [.name, .browser_download_url, ((.digest // "") | if startswith("sha256:") then sub("^sha256:"; "") else "" end)] | @tsv
-'
-
-# candidate RELEASE.json PATTERN: prints "name<TAB>url<TAB>sha256<TAB>tag" for the file to take, with the checksum GitHub states for it or the one in a
-# checksum file beside it; returns 1 (and says why in $work/why) when the release has no such file or no checksum.
-candidate() {
-  c_rel=$1; c_pat=$2
-  c_line=$(jq -r --arg arch "$arch" --arg os "$goos" --arg pat "$c_pat" "$PICK_JQ" "$c_rel") || c_line=""
-  if [ -z "$c_line" ]; then echo "the release has no $goos file for $arch that I can choose by its name" >"$work/why"; return 1; fi
-  c_name=$(printf '%s' "$c_line" | cut -f1); c_url=$(printf '%s' "$c_line" | cut -f2); c_sha=$(printf '%s' "$c_line" | cut -f3)
-  c_tag=$(jq -r '.tag_name // ""' "$c_rel")
-  if [ -z "$c_sha" ]; then
-    # an older release: a checksum file the publisher put beside it
-    for c_sums in $(jq -r '.assets[] | select(.name | test("(checksums?|sha256sums?)(\\.txt)?$|\\.sha256(sum)?$"; "i")) | .browser_download_url' "$c_rel"); do
-      fetch_to "$c_sums" "$work/sums" 2>/dev/null || continue
-      c_base=${c_sums##*/}
-      c_found=$(awk -v n="$c_name" -v b="$c_base" 'tolower(b) ~ /\.sha256(sum)?$/ && index(tolower(b), tolower(n)) == 1 && length($1) == 64 && $1 ~ /^[0-9a-f]+$/ {print $1; exit}
-                                                 length($1) == 64 && $1 ~ /^[0-9a-f]+$/ && index($0, n) {print $1; exit}' "$work/sums")
-      if [ -n "$c_found" ]; then c_sha=$c_found; break; fi
-    done
-  fi
-  if [ -z "$c_sha" ]; then echo "the publisher stated no checksum for $c_name" >"$work/why"; return 1; fi
-  printf '%s\t%s\t%s\t%s\n' "$c_name" "$c_url" "$c_sha" "$c_tag"
-}
-
-# resolve REPO PATTERN: into $work/pick (name, url, sha, tag): the newest release with a Linux file and a checksum, or, when the newest has none, the
-# newest before it that has both (up to fifteen back).
-resolve() {
-  r_api=$github_api/repos/$1/releases
-  api_get "$r_api/latest" "$work/rel.json" || { echo "could not ask $r_api/latest" >&2; return 1; }
-  if candidate "$work/rel.json" "$2" >"$work/pick" 2>/dev/null; then return 0; fi
-  r_why=$(cat "$work/why" 2>/dev/null || true)
-  r_new=$(jq -r '.tag_name // ""' "$work/rel.json")
-  api_get "$r_api?per_page=15" "$work/rels.json" 2>/dev/null || { echo "$1: $r_why, so I will not install it" >&2; return 1; }
-  jq -c --arg t "$r_new" '.[] | select((.draft | not) and (.prerelease | not) and .tag_name != $t)' "$work/rels.json" >"$work/rels.ndjson"
-  while IFS= read -r r_one; do
-    printf '%s' "$r_one" >"$work/one.json"
-    if candidate "$work/one.json" "$2" >"$work/pick" 2>/dev/null; then return 0; fi
-  done <"$work/rels.ndjson"
-  echo "I found no release of $1 with a $goos file for $arch and a checksum from its publisher ($r_why), so I will not install it" >&2
-  return 1
-}
-
-version_of_tag() {
-  v=$(printf '%s' "$1" | grep -oE '[0-9]+(\.[0-9]+)+' | head -n 1)
-  [ -n "$v" ] || v=${1#v}
-  printf '%s' "$v"
-}
-
 # locate DIR NAMES: the shallowest executable file in DIR with one of the names (a|b|c), relative to DIR; empty when none
 locate() {
   idx=0; out=""
@@ -1503,44 +1383,6 @@ prune_old() {
     case $po_n in *.partial) continue ;; esac
     printf '%s\n' "$po_n"
   done | tail -n +3 | while IFS= read -r po_old; do [ "$po_old" = "$2" ] || rm -rf "${1:?}/$po_old"; done
-}
-
-# install_release NAME REPO PATTERN LINKS...: the newest release of a GitHub repository, verified, unpacked into tools/NAME/VERSION. LINKS are
-# link=name|name, the file names the program may have; each is found wherever the archive put it.
-install_release() {
-  name=$1; repo=$2; pat=$3; shift 3
-  if tool_present "$name" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  resolve "$repo" "$pat" || return 1
-  asset=$(cut -f1 "$work/pick"); url=$(cut -f2 "$work/pick"); sha=$(cut -f3 "$work/pick"); tag=$(cut -f4 "$work/pick")
-  ver=$(version_of_tag "$tag")
-  troot=$tools/$name
-  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$@"; then return 0; fi
-  if [ ! -d "$troot/$ver" ]; then
-    file=$(download_verified "$url" "$sha") || return 1
-    case $(printf '%s' "$asset" | tr '[:upper:]' '[:lower:]') in
-      *.zip) kind=zip ;;
-      *.tar.gz | *.tgz | *.tar.xz | *.txz | *.tar.bz2 | *.tbz | *.tbz2) kind=tar ;;
-      *) kind=raw ;;
-    esac
-    mkdir -p "$troot"
-    rm -rf "$troot/$ver.partial"; mkdir -p "$troot/$ver.partial"
-    first=${1%%=*}
-    if ! unpack "$file" "$kind" "$troot/$ver.partial" 0 "$first"; then rm -rf "$troot/$ver.partial"; return 1; fi
-    mv "$troot/$ver.partial" "$troot/$ver"
-  fi
-  linked=""
-  for item in "$@"; do
-    link=${item%%=*}; cands=${item#*=}
-    rel=$(locate "$troot/$ver" "$cands")
-    if [ -z "$rel" ]; then echo "$link is not in what the release holds, so I installed nothing" >&2; rm -rf "${troot:?}/$ver"; return 1; fi
-    linked="$linked $link=$ver/$rel"
-  done
-  set_current "$troot" "$ver"
-  # shellcheck disable=SC2086
-  link_into "$troot" $linked
-  # keep this version and the one before it
-  prune_old "$troot" "$ver"
-  return 0
 }
 
 # install_sqlite_org: SQLite's own command line tools (sqlite.org lists the newest version and its SHA3-256); x86-64 only, as sqlite.org builds them
@@ -1644,15 +1486,6 @@ each_tool() {
   IFS=$oldifs
 }
 
-# release_step NAME REPO LINKS...: one tool, one step; a tool that cannot be installed is listed at the end and does not stop the run
-release_step() {
-  n=$1; repo=$2; shift 2
-  if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  if ! github_ready; then skip_github "$n"; return 0; fi
-  pstep "${e_dl}Installing $n (the newest release)" install_release "$n" "$repo" "" "$@"
-  return 0
-}
-
 # npm_step NAME PACKAGE TEMPLATE FILE: one AI assistant, one step; one that cannot be installed is listed at the end and does not stop the run
 npm_step() {
   n=$1
@@ -1744,30 +1577,16 @@ setup_tools() {
   if kit_on base; then
     phase "${e_dl}Installing handy command-line tools"
     pool_begin "Installing tools"
-    if ! github_ready; then
-      say "Left until you sign in to GitHub: duckdb and the tools that come from GitHub releases."
-      tool_present duckdb duckdb=duckdb || skip_github duckdb
-    fi
-    if github_ready && { ! tool_present duckdb duckdb=duckdb || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
-      case $goos:$arch in
-        darwin:*) dpat='^duckdb_cli-osx-(universal|arm64)\.zip$' ;;
-        *:x86_64) dpat='^duckdb_cli-linux-amd64\.zip$' ;;
-        *) dpat='^duckdb_cli-linux-(arm64|aarch64)\.zip$' ;;
-      esac
-      pstep "${e_dl}Installing duckdb (the newest release)" install_release duckdb duckdb/duckdb "$dpat" duckdb=duckdb
-    fi
     if [ "$goos" = linux ] && [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
       pstep "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org
     fi
-    if [ "$goos" = darwin ]; then MODERN_TOOLS=$(printf '%s\n' "$MODERN_TOOLS" | grep -v '^btop '); fi   # btop publishes no build for a Mac
-    [ "$modern" = 0 ] || each_tool "$MODERN_TOOLS" release_step
+    # duckdb and the modern command line tools follow their newest release: they are erga's (./erga toolchain ensure --kit base, --kit modern), installed in the erga phase below
     pool_end
   fi
   if kit_on embedded-sql; then
     phase "${e_dl}Installing tools for working with data"
     pool_begin "Installing data tools"
-    github_ready || say "Left until you sign in to GitHub: the data tools that come from GitHub releases."
-    each_tool "$SQL_TOOLS" release_step
+    # turso, usql, litestream, sqruff and dbmate follow their newest release: they are erga's (./erga toolchain ensure --kit embedded-sql), installed in the erga phase below
     each_tool "$PY_TOOLS" pypi_step
     pool_end
   fi
@@ -1810,9 +1629,7 @@ verify_install() {
   if [ "$dry" = 1 ]; then would "check that each program the kits install is here, and that fish is version 4 or later where it was asked for"; return 0; fi
   absent=""
   if kit_on base; then
-    for p in uv eza zoxide fzf bat delta just; do have_cmd "$p" || absent="$absent $p"; done
-    [ "$goos" = linux ] && { have_cmd btop || absent="$absent btop"; }
-    have_cmd duckdb || absent="$absent duckdb"
+    have_cmd uv || absent="$absent uv"   # the programs that follow their newest release are erga's, and erga installs them after this check
   fi
   if kit_on agents; then
     for p in claude codex opencode aider; do have_cmd "$p" || absent="$absent $p"; done
@@ -1821,7 +1638,7 @@ verify_install() {
     have_cmd fish || absent="$absent fish"
   fi
   if kit_on embedded-sql; then
-    for p in turso usql litestream sqruff dbmate sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
+    for p in sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
   fi
   if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; fi
   if kit_on shell && [ "$goos" = linux ] && have_cmd fish; then
@@ -2050,6 +1867,17 @@ system_libraries() {
 # check that takes minutes in its place.
 erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
 
+# The groups of programs that follow their newest release which the kits on ask for (erga toolchain ensure --kit, 005-toolchain FR-021): base (duckdb), modern (eza, bat,
+# fzf and the rest, unless BOOTSTRAP_MODERN=no), embedded-sql (the data tools)
+kit_flags() {
+  kf=""
+  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" != 1 ]; then
+    if kit_on base; then kf="$kf --kit base"; [ "$modern" = 0 ] || kf="$kf --kit modern"; fi
+    if kit_on embedded-sql; then kf="$kf --kit embedded-sql"; fi
+  fi
+  printf '%s' "$kf" | sed 's/^ *//'
+}
+
 # In the clone, in this order (009-machine-bootstrap FR-055): ./erga shell ensure, ./erga toolchain ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
 # once everything is installed (FR-056). Every one runs even when one before it failed.
 run_erga() {
@@ -2062,7 +1890,8 @@ run_erga() {
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
-      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
+      dk=$(kit_flags)
+      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)${dk:+ $dk, which also makes the programs that follow their newest release available: eza, bat, duckdb and the rest}"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
       would "run in the clone, last: ./erga doctor, which says what to do next"
     }
@@ -2114,15 +1943,17 @@ run_erga() {
     *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
-  if [ -n "$names" ] && ! github_ready; then
+  # the programs that follow their newest release, by group (005-toolchain FR-021): the base kit's, the modern tools' unless BOOTSTRAP_MODERN=no, the data tools'
+  kit_args=$(kit_flags)
+  if [ -n "$names$kit_args" ] && ! github_ready; then
     tool_skipped=1
-    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names)."
-    skip_github "erga toolchain ensure: $names"
-  elif [ -n "$names" ]; then
+    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names $kit_args)."
+    skip_github "erga toolchain ensure: $names $kit_args"
+  elif [ -n "$names$kit_args" ]; then
     system_libraries
     tool_ran=1
     # shellcheck disable=SC2086
-    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names || status_tool=$?
+    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names $kit_args || status_tool=$?
   fi
   if erga_has_quick_check; then
     check_ran=1

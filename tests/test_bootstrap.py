@@ -214,10 +214,10 @@ class Entry(Fixture):
         for tool in ("claude", "codex", "opencode", "aider"):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
         self.assertIn("Installing the AI assistants", p.stdout)
-        self.assertNotIn("Installing duckdb", p.stdout, "the comfort kits are off without --comfort")
-        self.assertNotIn("Installing eza", p.stdout)
+        self.assertNotIn("--kit base", p.stdout, "the comfort kits are off without --comfort")
+        self.assertNotIn("--kit modern", p.stdout)
         comfy = self.run_script("--dry-run", "--comfort")
-        self.assertIn("Installing duckdb", comfy.stdout)
+        self.assertIn("--kit base", comfy.stdout)
         self.assertNotIn("Installing glab", comfy.stdout, "glab is erga's toolchain (005-toolchain FR-019), not the setup's")
         self.assertIn("get jq", comfy.stdout, "009-machine-bootstrap FR-091: jq and gh are the publishers' pinned releases on every platform, never packages")
         text = SCRIPT.read_text()
@@ -225,17 +225,17 @@ class Entry(Fixture):
             self.assertRegex(text, rf'arch_sha {pin}\)', pin)
         for erga_s in ("RIPGREP", "FD", "SHELLCHECK", "GLAB"):
             self.assertNotIn(f"{erga_s}_VERSION", text, f"{erga_s} is pinned by erga's toolchain, not by the setup script")
-        self.assertIn("Installing eza", comfy.stdout)
+        self.assertIn("--kit modern", comfy.stdout)
         self.assertIn("Installing fish", comfy.stdout)
         self.assertIn("Installing claude", comfy.stdout)
         off = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_AGENTS="1")
         self.assertNotIn("AI assistants", off.stdout)
-        self.assertIn("Installing duckdb", off.stdout, "the other kits stay")
+        self.assertIn("--kit base", off.stdout, "the other kits stay")
         never = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_COMFORT="1")
-        self.assertNotIn("Installing eza", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
+        self.assertNotIn("--kit modern", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
         only = self.run_script("--dry-run", "--comfort", BOOTSTRAP_KIT="agents")
         self.assertIn("Installing claude", only.stdout)
-        self.assertNotIn("Installing eza", only.stdout)
+        self.assertNotIn("--kit modern", only.stdout)
 
     def test_the_summary_says_how_to_start_remote_control_where_claude_is_installed(self):
         """009-machine-bootstrap FR-060: the summary names `claude remote-control` with Claude Code, starts nothing and asks for no key."""
@@ -656,41 +656,6 @@ class Rules(Fixture):
         f = self.tmp / name
         f.write_text(json.dumps({"tag_name": tag, "assets": assets}))
         return f
-
-    def test_the_release_file_is_chosen_by_its_name(self):
-        digest = "sha256:" + "a" * 64
-        rel = self.release("v1.2.3", [
-            {"name": "tool-1.2.3-x86_64-apple-darwin.tar.gz", "browser_download_url": "u/darwin", "digest": "sha256:" + "0" * 64},
-            {"name": "tool_1.2.3_amd64.deb", "browser_download_url": "u/deb", "digest": "sha256:" + "1" * 64},
-            {"name": "tool-1.2.3-aarch64-unknown-linux-gnu.tar.gz", "browser_download_url": "u/arm", "digest": "sha256:" + "2" * 64},
-            {"name": "tool-1.2.3-x86_64-unknown-linux-gnu.tar.gz", "browser_download_url": "u/gnu", "digest": "sha256:" + "3" * 64},
-            {"name": "tool-1.2.3-x86_64-unknown-linux-musl.tar.gz", "browser_download_url": "u/musl", "digest": digest}])
-        p = self.call(f'candidate "{rel}" ""')
-        self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertEqual(p.stdout.rstrip("\n").split("\t"), ["tool-1.2.3-x86_64-unknown-linux-musl.tar.gz", "u/musl", "a" * 64, "v1.2.3"])
-        arm = self.call(f'arch=aarch64; candidate "{rel}" ""')
-        self.assertEqual(arm.stdout.split("\t")[1], "u/arm")
-
-    def test_a_pattern_names_the_file_exactly(self):
-        rel = self.release("v1.1.3", [{"name": "duckdb_cli-linux-arm64.zip", "browser_download_url": "u/arm", "digest": "sha256:" + "5" * 64},
-                                      {"name": "duckdb_cli-linux-amd64.zip", "browser_download_url": "u/amd", "digest": "sha256:" + "6" * 64}])
-        p = self.call(f'candidate "{rel}" \'^duckdb_cli-linux-amd64\\.zip$\'')
-        self.assertEqual(p.stdout.split("\t")[1:3], ["u/amd", "6" * 64])
-
-    def test_a_release_with_no_checksum_from_its_publisher_is_refused(self):
-        rel = self.release("v9", [{"name": "tool-linux-amd64.tar.gz", "browser_download_url": "u/tool"}])
-        p = self.call(f'rc=0; candidate "{rel}" "" || rc=$?; cat "$work/why" >&2; exit $rc')
-        self.assertNotEqual(p.returncode, 0)
-        self.assertEqual(p.stdout, "")
-        self.assertIn("no checksum", p.stderr)
-
-    def test_a_checksum_file_beside_the_release_is_used(self):
-        sums = self.tmp / "tool.sha256"
-        sums.write_text(f"{'7' * 64}  tool-linux-amd64.tar.gz\n{'8' * 64}  tool-linux-arm64.tar.gz\n")
-        rel = self.release("v9", [{"name": "tool-linux-amd64.tar.gz", "browser_download_url": "u/tool"},
-                                  {"name": "checksums.txt", "browser_download_url": f"file://{sums}"}])
-        p = self.call(f'candidate "{rel}" ""')
-        self.assertEqual(p.stdout.split("\t")[2], "7" * 64, p.stderr)
 
     def test_a_program_is_found_wherever_the_archive_put_it(self):
         d = self.tmp / "unpacked"
@@ -1249,7 +1214,7 @@ class Bootstrap(Fixture):
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before)
         for step in ("install with apt", "Setting up erga in this account", "erga shell ensure", "erga doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
-            self.assertIn(step, p.stdout)
+            self.assertIn(step.replace("Installing eza", "--kit modern"), p.stdout)
         for text in ("create the Linux account", "adduser", "useradd"):
             self.assertNotIn(text, p.stdout)
 
@@ -1263,8 +1228,8 @@ class Bootstrap(Fixture):
         off = wanted(BOOTSTRAP_NO_COMFORT="1")
         self.assertNotIn("imagemagick", off)
         self.assertIn("git ca-certificates curl wget tar xz-utils unzip build-essential", off, "what the setup needs is still installed, with the C compiler Rust links with")
-        self.assertNotIn("Installing eza", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
-        self.assertIn("Installing eza", self.run_boot("--dry-run").stdout)
+        self.assertNotIn("--kit modern", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
+        self.assertIn("--kit modern", self.run_boot("--dry-run").stdout)
 
     @unittest.skipUnless(shutil.which("curl"), "curl is needed")
     def test_run_from_a_pipe_it_fetches_the_setup_and_plans_the_same(self):
@@ -1452,7 +1417,7 @@ class MacOS(Fixture):
         self.assertNotIn("sudo apt", p.stdout + p.stderr)
         self.assertNotIn("Installing fish 4", p.stdout, "fish has no build the setup can check on a Mac")
         self.assertNotIn("Installing btop", p.stdout, "btop publishes no build for a Mac")
-        self.assertIn("Installing eza", p.stdout)
+        self.assertIn("--kit modern", p.stdout)
 
     def test_an_intel_mac_an_old_macos_and_a_missing_command_line_tools_each_stop_with_the_fix(self):
         """FR-017, 0003-runtime FR-027"""
@@ -1514,23 +1479,6 @@ class MacOS(Fixture):
                            env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=str(lean)))
         self.assertEqual(p.stdout.split()[0], hashlib.sha256(b"abc").hexdigest(), p.stderr)
         self.assertNotIn("HAS", p.stdout)
-
-    def test_a_release_file_is_chosen_for_darwin_and_arm64_and_a_linux_one_never(self):
-        """FR-019"""
-        digest = lambda c: "sha256:" + c * 64   # noqa: E731
-        rel = self.tmp / "rel.json"
-        rel.write_text(json.dumps({"tag_name": "v1", "assets": [
-            {"name": "tool-x86_64-unknown-linux-musl.tar.gz", "browser_download_url": "u/linux", "digest": digest("1")},
-            {"name": "tool-x86_64-apple-darwin.tar.gz", "browser_download_url": "u/intel", "digest": digest("2")},
-            {"name": "tool-aarch64-apple-darwin.tar.gz", "browser_download_url": "u/mac", "digest": digest("3")},
-            {"name": "tool-aarch64-unknown-linux-musl.tar.gz", "browser_download_url": "u/armlinux", "digest": digest("4")}]}))
-        p = self.call(f'candidate "{rel}" ""')
-        self.assertEqual(p.stdout.split("\t")[1], "u/mac", p.stderr)
-        only_linux = self.tmp / "linux.json"
-        only_linux.write_text(json.dumps({"tag_name": "v1", "assets": [{"name": "tool-aarch64-unknown-linux-musl.tar.gz", "browser_download_url": "u/armlinux", "digest": digest("4")}]}))
-        none = self.call(f'rc=0; candidate "{only_linux}" "" || rc=$?; cat "$work/why" >&2; exit $rc')
-        self.assertNotEqual(none.returncode, 0)
-        self.assertIn("no darwin file", none.stderr)
 
     def test_an_assistant_comes_from_the_darwin_arm64_package_of_npm(self):
         """FR-019"""
