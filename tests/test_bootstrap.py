@@ -182,16 +182,16 @@ class Entry(Fixture):
         self.assertLess(boot.index("  install_packages\n  add_postgresql_repository"), boot.index("  install_code_package"), "after the packages, in the bootstrap's own steps")
 
     def test_dry_run_installs_rust_through_rustup_and_runs_ergas_commands_in_the_order_of_the_spec(self):
-        """009-machine-bootstrap FR-026, FR-055, FR-056: rustup and uv first; in the clone the toolchain rust-toolchain.toml pins, then shell ensure, toolchain ensure,
+        """009-machine-bootstrap FR-026, FR-055, FR-056: rustup and uv first; in the clone the toolchain rust-toolchain.toml names, then shell ensure, toolchain ensure,
         check --quick and, last, doctor."""
         out = self.run_script("--dry-run").stdout
         for text in ("rustup", f"Installing uv {re.search(r'^UV_VERSION=(.*)$', SCRIPT.read_text(), re.M).group(1)}", "rust-toolchain.toml", "./erga --version"):
             self.assertIn(text, out)
-        order = [out.index(s) for s in ("rustup", "Installing uv", "copy https://github.com/intellectual-frontiers/erga", "rust-toolchain.toml pins",
+        order = [out.index(s) for s in ("rustup", "Installing uv", "copy https://github.com/intellectual-frontiers/erga", "rust-toolchain.toml names",
                                          "./erga shell ensure", "./erga toolchain ensure", "./erga check --quick", "last: ./erga doctor")]
         self.assertEqual(order, sorted(order), out)
         off = self.run_script("--dry-run", BOOTSTRAP_NO_RUNTIME="1").stdout
-        self.assertNotIn("rust-toolchain.toml pins", off, "BOOTSTRAP_NO_RUNTIME=1 installs no Rust")
+        self.assertNotIn("rust-toolchain.toml names", off, "BOOTSTRAP_NO_RUNTIME=1 installs no Rust")
         self.assertNotIn("Installing uv", off)
 
     def test_dry_run_records_the_workspace_s_role_before_the_toolchain_only_where_it_is_given(self):
@@ -687,7 +687,7 @@ class Rules(Fixture):
 
 @unittest.skipUnless(SH, "sh is not installed")
 class Runtime(Fixture):
-    """009-machine-bootstrap FR-025, FR-026: rustup from the pinned rustup-init, the pinned uv, and in the clone the toolchain rust-toolchain.toml pins; stand-ins for the network."""
+    """009-machine-bootstrap FR-025, FR-026: rustup from the pinned rustup-init, the pinned uv, and in the clone the toolchain rust-toolchain.toml names; stand-ins for the network."""
 
     def call(self, code, **env):
         return subprocess.run([SH, "-c", f'. "{SCRIPT}"; arch=x86_64; goarch=amd64; goos=linux; rust_target=x86_64-unknown-linux-gnu; mkdir -p "$work" "$tools" "$bin"\n{code}'],
@@ -708,7 +708,7 @@ class Runtime(Fixture):
         good = hashlib.sha256(init.read_bytes()).hexdigest()
         ok = self.call(f"RUSTUP_INIT_SHA256_X86_64={good}; install_rustup && echo INSTALLED", BOOTSTRAP_RUSTUP_URL=f"file://{init}")
         self.assertIn("INSTALLED", ok.stdout, ok.stderr)
-        self.assertEqual(args.read_text().split(), ["-y", "--no-modify-path", "--default-toolchain", "none", "--profile", "minimal"])
+        self.assertEqual(args.read_text().split(), ["-y", "--no-modify-path", "--default-toolchain", "stable", "--profile", "minimal"])
         args.unlink()
         bad = self.call(f"RUSTUP_INIT_SHA256_X86_64={'0' * 64}; install_rustup && echo INSTALLED", BOOTSTRAP_RUSTUP_URL=f"file://{init}")
         self.assertNotIn("INSTALLED", bad.stdout)
@@ -755,7 +755,7 @@ class Runtime(Fixture):
     def test_the_toolchain_the_clone_pins_is_installed_in_the_clone_and_the_switches_leave_it_out(self):
         clone = self.tmp / "clone"
         clone.mkdir()
-        (clone / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.97.0"\n')
+        (clone / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "stable"\n')
         calls = self.tmp / "rustup-calls"
         self.stub("rustup", f'echo "$(pwd) $*" >>"{calls}"')
         p = self.call(f'dry=0; cloned=1; target="{clone}"; setup_rust_toolchain; echo DONE')
@@ -796,7 +796,7 @@ class Packages(unittest.TestCase):
         names = re.findall(r"^\s+\w+:[\w-]+\) printf '%s' '([^']*)' ;;$", SCRIPT.read_text().split("pm_package() {")[1].split("\n}\n")[0], re.M)
         self.assertTrue(names)
         for pkg in ("nodejs", "rustc", "cargo", "rustup", "rust"):
-            self.assertNotIn(pkg, names, "009-machine-bootstrap FR-021: Rust is installed through rustup, at the version rust-toolchain.toml pins")
+            self.assertNotIn(pkg, names, "009-machine-bootstrap FR-021: Rust is installed through rustup, at the version rust-toolchain.toml names")
         setup = SCRIPT.read_text()
         verify = setup[setup.index("verify_install() {"):]
         self.assertNotRegex(verify.split("kit_on shell", 1)[0], r"\bnode\b|chromium")

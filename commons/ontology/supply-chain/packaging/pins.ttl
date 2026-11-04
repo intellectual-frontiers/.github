@@ -37,7 +37,7 @@ pmid:sum-uv-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-uv ; pm:forPlatform p
 pmid:sum-uv-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-uv ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6a1b544" .
 
 pmid:pin-rustup-init a pm:PinnedDownload ;
-    rdfs:label "rustup-init, the installer of rustup, through which erga gets the Rust toolchain its rust-toolchain.toml pins"@en ;
+    rdfs:label "rustup-init, the installer of rustup, through which erga gets the Rust toolchain its rust-toolchain.toml names"@en ;
     pm:programName "rustup-init" ;
     pm:pinKey "RUSTUP_INIT" ;
     pm:version "1.29.2" ;
