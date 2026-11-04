@@ -2056,16 +2056,20 @@ workspace_and_clone() {
 
 # ---- erga -----------------------------------------------------------------------------------------------------------------------------------
 
-link_erga() {  # ~/.local/bin/erga runs the clone's launcher, so `erga` works from any folder (009-machine-bootstrap FR-058)
+link_launcher() {  # link_launcher NAME: ~/.local/bin/NAME runs the clone's launcher of that name, so the command works from any folder
+  ll_name=$1
+  [ -x "$target/$ll_name" ] || return 0   # a copy of erga with no such launcher (an older one) has nothing to link
   mkdir -p "$bin"
-  w=$bin/erga
+  w=$bin/$ll_name
   if [ ! -e "$w" ] || grep -q 'erga-setup wrapper' "$w" 2>/dev/null; then
-    printf '#!/bin/sh\n# erga-setup wrapper: runs the clone'"'"'s launcher, so erga works from any folder\nexec "%s/erga" "$@"\n' "$target" >"$w"
+    printf '#!/bin/sh\n# erga-setup wrapper: runs the clone'"'"'s launcher, so %s works from any folder\nexec "%s/%s" "$@"\n' "$ll_name" "$target" "$ll_name" >"$w"
     chmod 755 "$w"
   else
-    warn "$w exists and is not mine, so I left it; run erga as $target/erga"
+    warn "$w exists and is not mine, so I left it; run $ll_name as $target/$ll_name"
   fi
 }
+# erga and arca, the two commands of the clone (009-machine-bootstrap FR-058)
+link_erga() { link_launcher erga; link_launcher arca; }
 
 # in_erga_quiet COMMAND...: run in the clone, for a step: every question is answered yes (009-machine-bootstrap FR-065), none may use administrator rights,
 # the progress lines erga draws for a person are off, and the events it sends say they come from a setup.
@@ -2104,8 +2108,8 @@ run_erga() {
   heading "${e_rocket}erga"
   if [ "$dry" = 1 ]; then
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] || {
-      would "link ~/.local/bin/erga to the clone's launcher"
-      would "build erga in the clone with Cargo (./erga --version; the first time takes about 5 to 15 minutes, once)"
+      would "link ~/.local/bin/erga and ~/.local/bin/arca to the clone's launchers"
+      would "build erga and arca in the clone with Cargo, in one command (./erga --version; the first time takes about 5 to 15 minutes, once)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./erga shell ensure (the startup files of bash, zsh and fish)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
@@ -2123,7 +2127,7 @@ run_erga() {
   erga_ran=1
   status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0
   phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
-  step_soft "${e_rust}Building erga with Cargo" in_erga_quiet ./erga --version || status_build=$?
+  step_soft "${e_rust}Building erga and arca with Cargo" in_erga_quiet ./erga --version || status_build=$?
   if [ "$status_build" != 0 ]; then
     problem "erga could not be built (in $(short_path "$target") run: cargo build -p erga, to see why)"
     phase_close

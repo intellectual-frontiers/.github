@@ -405,6 +405,18 @@ exit 0
         wrapper = self.home / ".local" / "bin" / "erga"
         self.assertIn(str(self.clone / "erga"), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
+        self.assertFalse((self.home / ".local" / "bin" / "arca").exists(), "a copy of erga with no arca launcher has nothing to link")
+
+    def test_arca_is_linked_beside_erga_when_the_clone_has_its_launcher(self):
+        """009-machine-bootstrap FR-058: `arca` works from any folder, as `erga` does."""
+        self.go()
+        launcher = self.clone / "arca"
+        launcher.write_text("#!/bin/sh\necho arca ran\n")
+        launcher.chmod(0o755)
+        self.go()
+        wrapper = self.home / ".local" / "bin" / "arca"
+        self.assertIn(str(launcher), wrapper.read_text())
+        self.assertTrue(os.access(wrapper, os.X_OK))
 
     def test_the_shells_are_ergas_to_set_up(self):
         """009-machine-bootstrap FR-042, FR-006; 010-shell FR-008: the setup writes no startup file, it runs `erga shell ensure`."""
