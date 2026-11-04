@@ -14,7 +14,8 @@ This small public repository holds three things:
   into a working place for `erga`, the company's repository (it is the one script that may use administrator rights, and it sets up the account that runs it), and
   `erga-setup.sh` sets up one account without administrator rights: it installs Rust through `rustup`, signs you in to GitHub, copies the private `erga` repository
   and hands over to `./erga doctor`. They are public so that a brand-new computer can fetch them before it can sign in to anything. What they do is specified in
-  `erga`'s `009-machine-bootstrap` and tested in [`tests/`](tests/).
+  `erga`'s `009-machine-bootstrap` and tested in [`tests/`](tests/). `erga-windows.ps1` is an optional extra for Windows 11: it installs WSL 2 and Debian, makes the Linux user and then runs the bootstrap; Linux and Mac computers
+  never need it.
 
 - **[`commons/`](commons/README.md)**, what any company or harness of Intellectual Frontiers may use: today the software supply chain capability, a packaging ontology of the package managers and
   system families of every computer, and the tables made from it (with the pinned downloads, such as `rustup-init` and `uv`) that the scripts and `erga` read.

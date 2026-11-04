@@ -802,6 +802,26 @@ class Packages(unittest.TestCase):
         self.assertNotRegex(verify.split("kit_on shell", 1)[0], r"\bnode\b|chromium")
 
 
+class WindowsScript(unittest.TestCase):
+    """009-machine-bootstrap FR-093: the optional Windows 11 script prepares WSL and hands over to the bootstrap; it never deletes a distribution."""
+    PS1 = HOME / "bin" / "erga-windows.ps1"
+
+    def test_it_installs_wsl_makes_the_user_and_runs_the_bootstrap_without_deleting_anything(self):
+        text = self.PS1.read_text()
+        for needle in ("wsl.exe --install", "--no-launch", "usermod -aG sudo", "/etc/wsl.conf", "apt-get install -y curl wget", "bin/erga-bootstrap.sh"):
+            self.assertIn(needle.replace("wsl.exe --install", "--install"), text, needle)
+        for forbidden in ("--unregister", "--shutdown", "Remove-Item", "Set-ExecutionPolicy", "Invoke-Expression"):
+            self.assertNotIn(forbidden, text, f"FR-093: the script never removes or resets a distribution or loosens Windows ({forbidden})")
+
+    def test_it_parses_where_powershell_is_installed(self):
+        ps = shutil.which("pwsh") or shutil.which("powershell")
+        if not ps:
+            self.skipTest("PowerShell is not installed")
+        code = "$e=$null; [void][System.Management.Automation.Language.Parser]::ParseFile('%s',[ref]$null,[ref]$e); if($e){$e; exit 1}" % self.PS1
+        out = subprocess.run([ps, "-NoProfile", "-Command", code], capture_output=True, text=True)
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+
+
 class Slim(unittest.TestCase):
     def test_the_repository_holds_only_the_bootstrap_commons_its_tests_and_the_organizations_profile(self):
         """The rest of the harness lives in the private erga repository; this one stays small and public."""

@@ -2070,7 +2070,7 @@ run_erga() {
   if [ "$dry" = 1 ]; then
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] || {
       would "link ~/.local/bin/erga to the clone's launcher"
-      would "build erga in the clone with Cargo (./erga --version; the first time takes a few minutes)"
+      would "build erga in the clone with Cargo (./erga --version; the first time takes about 5 to 15 minutes, once)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./erga shell ensure (the startup files of bash, zsh and fish)"
       [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
@@ -2087,7 +2087,7 @@ run_erga() {
   have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
   erga_ran=1
   status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0
-  phase "${e_rocket}Getting erga ready ${d}(the first time takes a few minutes)${z}"
+  phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
   step_soft "${e_rust}Building erga with Cargo" in_erga_quiet ./erga --version || status_build=$?
   if [ "$status_build" != 0 ]; then
     problem "erga could not be built (in $(short_path "$target") run: cargo build -p erga, to see why)"

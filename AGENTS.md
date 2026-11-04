@@ -1,6 +1,6 @@
 # `.github` — agent entry point
 
-This repository is small on purpose: the organization's public profile (`profile/`), the two machine setup scripts (`bin/`), `commons/` and its tests
+This repository is small on purpose: the organization's public profile (`profile/`), the two machine setup scripts and the optional Windows 11 script that prepares WSL for them (`bin/`), `commons/` and its tests
 (`tests/`). `commons/` holds what any company or harness of Intellectual Frontiers may use, with its own ontology, specifications and generated tables (see `commons/README.md`); a capability goes there when more than one harness should read the same facts. Its specifications are in `commons/spec-kit/`, not in a company's repository. The scripts' specification is `009-machine-bootstrap` in `erga`, the company's private monorepo, like every other specification of erga. Everything else (erga itself, its specifications, ontology and content) is in the private `erga` repository; do not add any of it here.
 
 - Work spec first: change `009-machine-bootstrap` in `erga`, then the scripts, then the tests. Every requirement has a test or says why it has none.
