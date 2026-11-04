@@ -14,7 +14,7 @@
 # Of the other programs this script fetches only what it needs before erga exists, as the publisher's release pinned and checked by SHA-256, into ~/.local/share and linked
 # into ~/.local/bin: jq and gh (a copy already on the PATH is used, not installed again). The rest (glab, ripgrep, fd, shellcheck, Node.js and the others) are erga's toolchain,
 # which `./erga toolchain ensure` installs here and `erga update` keeps current. A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window
-# a person answers: git and the C compiler): macOS carries curl, tar and unzip. fish and SQLite's own tools are left out on a Mac, and the shell it sets up is zsh.
+# a person answers: git and the C compiler): macOS carries curl, tar and unzip. fish is left out on a Mac, and the shell it sets up is zsh.
 #
 # It is self-contained: it installs the kits, sets up git and the workspaces folder, and needs no other program of the organization's. It:
 #
@@ -23,8 +23,8 @@
 #      with no token at all, everything that comes from GitHub's releases is skipped and listed in the summary, to be done by running this again after sign-in,
 #   2. Rust, uv and tools: installs Rust's installer, rustup, from the pinned rustup-init (checked by SHA-256) into ~/.rustup and ~/.cargo, with the stable toolchain as its default and
 #      no startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs; then the AI assistants for the terminal (Claude Code, Codex,
-#      OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4, the modern command line tools,
-#      DuckDB, the SQLite tools and the embedded-SQL tools, each checked against a checksum,
+#      OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4 and the shell's own programs (eza, bat, zoxide, fzf, which erga's shell uses and
+#      `erga toolchain ensure --kit base` installs), each checked against a checksum,
 #   3. Workspace and clone: copies the private erga repository to ~/workspaces/github.com/intellectual-frontiers/erga (or updates it by
 #      fast-forward only), then installs there the Rust toolchain its rust-toolchain.toml names (stable) (rustup checks each part against its manifest),
 #   4. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
@@ -36,7 +36,7 @@
 # the step fails.
 #
 # Options (after `sh -s --` when piped):  --dry-run   list every step it would take, change nothing, fetch nothing, ask for nothing
-#                                          --comfort   also install what no erga command needs (fish, the modern command line tools, the data tools)
+#                                          --comfort   also install what no erga command needs (fish, and the shell's programs eza, bat, zoxide and fzf)
 #                                          --patient   for a network that drops often (15 tries, longer waits)
 #                                          -h, --help  this text
 #
@@ -55,7 +55,7 @@
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name, email and pull.ff (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
 #   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
-#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell embedded-sql)
+#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell)
 #   BOOTSTRAP_NO_COMFORT=1 never install the comfort kits, even when --comfort is given
 #   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the kits
 #   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
@@ -437,13 +437,6 @@ UV_SHA256_X86_64=9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d
 # <<< pins.auto <<<
 
 # Python tools, each in a virtual environment of its own: name, PyPI package, then link=path inside it
-PY_TOOLS='
-sqlite-utils sqlite-utils sqlite-utils=bin/sqlite-utils
-datasette datasette datasette=bin/datasette
-harlequin harlequin harlequin=bin/harlequin
-visidata visidata vd=bin/vd visidata=bin/visidata
-'
-
 # The AI assistants for the terminal, so that a person who has never installed one can type `claude`, `codex`, `opencode` or `aider` the day the computer is set up.
 # Each of the first three is one program that its publisher ships inside a per-platform npm package, so no Node.js is needed to run it; the newest version is
 # taken, and only with the SHA-512 that npm's registry lists for the file. Fields: name, the npm package that names the newest version, the per-platform package
@@ -1082,7 +1075,7 @@ check_prereqs() {
 load_config() {
   [ "${BOOTSTRAP_NO_COMFORT:-}" = 1 ] && comfort=0
   default_kits=agents
-  [ "$comfort" = 1 ] && default_kits='agents base shell embedded-sql'
+  [ "$comfort" = 1 ] && default_kits='agents base shell'
   kits=$(cfg BOOTSTRAP_KIT "$default_kits")
   kits=$(printf '%s' "$kits" | tr ',' ' ')
   if [ "${BOOTSTRAP_NO_AGENTS:-}" = 1 ]; then kits=$(printf ' %s ' "$kits" | sed 's/ agents / /g'); fi
@@ -1385,28 +1378,6 @@ prune_old() {
   done | tail -n +3 | while IFS= read -r po_old; do [ "$po_old" = "$2" ] || rm -rf "${1:?}/$po_old"; done
 }
 
-# install_sqlite_org: SQLite's own command line tools (sqlite.org lists the newest version and its SHA3-256); x86-64 only, as sqlite.org builds them
-install_sqlite_org() {
-  [ "$goos" = linux ] && [ "$arch" = x86_64 ] || return 0   # macOS carries sqlite3 itself
-  tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer && [ "${BOOTSTRAP_FRESH:-}" != 1 ] && return 0
-  site=${BOOTSTRAP_SQLITE_URL:-https://www.sqlite.org}
-  fetch_to "$site/download.html" "$work/sqlite.html" || { echo "could not ask $site" >&2; return 1; }
-  row=$(awk -F, '$1 == "PRODUCT" && $3 ~ /sqlite-tools-linux-x64-[0-9]+\.zip$/ && length($5) >= 64 {print $2 "," $3 "," $5; exit}' "$work/sqlite.html" | tr -d '\r')
-  [ -n "$row" ] || { echo "sqlite.org publishes no command line tools for $arch" >&2; return 1; }
-  ver=${row%%,*}; rest=${row#*,}; path=${rest%%,*}; sha3=${rest#*,}
-  troot=$tools/sqlite3
-  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ]; then return 0; fi
-  fetch_to "$site/$path" "$work/sqlite.zip" || return 1
-  got=$(openssl dgst -sha3-256 "$work/sqlite.zip" 2>/dev/null | sed 's/.*= *//')
-  [ -n "$got" ] || got=$(python3 -c 'import hashlib,sys;print(hashlib.sha3_256(open(sys.argv[1],"rb").read()).hexdigest())' "$work/sqlite.zip" 2>/dev/null || true)
-  [ "$got" = "$sha3" ] || { echo "the file at $site/$path is not the one sqlite.org lists (its SHA3-256 differs); nothing was installed" >&2; return 1; }
-  mkdir -p "$troot/$ver"
-  unzip -q -o "$work/sqlite.zip" -d "$troot/$ver"
-  sub=$(find "$troot/$ver" -name sqlite3 -type f | head -n 1); sub=${sub#"$troot/$ver"/}
-  set_current "$troot" "$ver"
-  link_into "$troot" "sqlite3=$ver/$sub" "sqldiff=$ver/${sub%sqlite3}sqldiff" "sqlite3_analyzer=$ver/${sub%sqlite3}sqlite3_analyzer"
-}
-
 # install_pypi NAME PACKAGE LINKS...: the newest version on PyPI in a virtual environment of its own, tools/NAME/VERSION
 install_pypi() {
   name=$1; pkg=$2; shift 2
@@ -1577,17 +1548,7 @@ setup_tools() {
   if kit_on base; then
     phase "${e_dl}Installing handy command-line tools"
     pool_begin "Installing tools"
-    if [ "$goos" = linux ] && [ "$arch" = x86_64 ] && { ! tool_present sqlite3 sqlite3=sqlite3 sqldiff=sqldiff sqlite3_analyzer=sqlite3_analyzer || [ "${BOOTSTRAP_FRESH:-}" = 1 ]; }; then
-      pstep "${e_dl}Installing the SQLite command line tools (sqlite.org)" install_sqlite_org
-    fi
-    # duckdb and the modern command line tools follow their newest release: they are erga's (./erga toolchain ensure --kit base, --kit modern), installed in the erga phase below
-    pool_end
-  fi
-  if kit_on embedded-sql; then
-    phase "${e_dl}Installing tools for working with data"
-    pool_begin "Installing data tools"
-    # turso, usql, litestream, sqruff and dbmate follow their newest release: they are erga's (./erga toolchain ensure --kit embedded-sql), installed in the erga phase below
-    each_tool "$PY_TOOLS" pypi_step
+    # eza, bat, zoxide and fzf, which erga's shell uses, follow their newest release: they are erga's (./erga toolchain ensure --kit base), installed in the erga phase below
     pool_end
   fi
   if kit_on agents; then
@@ -1636,9 +1597,6 @@ verify_install() {
   fi
   if kit_on shell && [ "$goos" = linux ]; then
     have_cmd fish || absent="$absent fish"
-  fi
-  if kit_on embedded-sql; then
-    for p in sqlite-utils datasette harlequin vd; do have_cmd "$p" || absent="$absent $p"; done
   fi
   if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; fi
   if kit_on shell && [ "$goos" = linux ] && have_cmd fish; then
@@ -1867,13 +1825,12 @@ system_libraries() {
 # check that takes minutes in its place.
 erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
 
-# The groups of programs that follow their newest release which the kits on ask for (erga toolchain ensure --kit, 005-toolchain FR-021): base (duckdb), modern (eza, bat,
-# fzf and the rest, unless BOOTSTRAP_MODERN=no), embedded-sql (the data tools)
+# The group of programs that follow their newest release which the kits on ask for (erga toolchain ensure --kit, 005-toolchain FR-021): base (eza, bat, zoxide and fzf,
+# which erga's shell uses), unless BOOTSTRAP_MODERN=no
 kit_flags() {
   kf=""
   if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" != 1 ]; then
-    if kit_on base; then kf="$kf --kit base"; [ "$modern" = 0 ] || kf="$kf --kit modern"; fi
-    if kit_on embedded-sql; then kf="$kf --kit embedded-sql"; fi
+    if kit_on base && [ "$modern" != 0 ]; then kf="$kf --kit base"; fi
   fi
   printf '%s' "$kf" | sed 's/^ *//'
 }
@@ -1891,7 +1848,7 @@ run_erga() {
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
       dk=$(kit_flags)
-      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)${dk:+ $dk, which also makes the programs that follow their newest release available: eza, bat, duckdb and the rest}"
+      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)${dk:+ $dk, which also makes the programs that follow their newest release available: eza, bat, zoxide and fzf}"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
       would "run in the clone, last: ./erga doctor, which says what to do next"
     }
@@ -1943,7 +1900,7 @@ run_erga() {
     *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
-  # the programs that follow their newest release, by group (005-toolchain FR-021): the base kit's, the modern tools' unless BOOTSTRAP_MODERN=no, the data tools'
+  # the programs that follow their newest release, by group (005-toolchain FR-021): the base kit's (eza, bat, zoxide, fzf) unless BOOTSTRAP_MODERN=no
   kit_args=$(kit_flags)
   if [ -n "$names$kit_args" ] && ! github_ready; then
     tool_skipped=1
@@ -2053,7 +2010,7 @@ finish() {
   if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
     say ""
     no_fish="fish,"; [ "$goos" = darwin ] && no_fish="fish (there is none for a Mac),"
-    say "${d}Not installed, because no erga command needs them: $no_fish the modern command line tools (eza, bat, zoxide, fzf, delta, btop) and the data tools (DuckDB, the SQLite tools).${z}"
+    say "${d}Not installed, because no erga command needs them: $no_fish the shell's programs (eza, bat, zoxide, fzf).${z}"
     say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (erga-bootstrap.sh does by default).${z}"
   fi
   if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then

@@ -215,7 +215,7 @@ class Entry(Fixture):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
         self.assertIn("Installing the AI assistants", p.stdout)
         self.assertNotIn("--kit base", p.stdout, "the comfort kits are off without --comfort")
-        self.assertNotIn("--kit modern", p.stdout)
+        self.assertNotIn("--kit base", p.stdout)
         comfy = self.run_script("--dry-run", "--comfort")
         self.assertIn("--kit base", comfy.stdout)
         self.assertNotIn("Installing glab", comfy.stdout, "glab is erga's toolchain (005-toolchain FR-019), not the setup's")
@@ -225,17 +225,17 @@ class Entry(Fixture):
             self.assertRegex(text, rf'arch_sha {pin}\)', pin)
         for erga_s in ("RIPGREP", "FD", "SHELLCHECK", "GLAB"):
             self.assertNotIn(f"{erga_s}_VERSION", text, f"{erga_s} is pinned by erga's toolchain, not by the setup script")
-        self.assertIn("--kit modern", comfy.stdout)
+        self.assertIn("--kit base", comfy.stdout)
         self.assertIn("Installing fish", comfy.stdout)
         self.assertIn("Installing claude", comfy.stdout)
         off = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_AGENTS="1")
         self.assertNotIn("AI assistants", off.stdout)
         self.assertIn("--kit base", off.stdout, "the other kits stay")
         never = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_COMFORT="1")
-        self.assertNotIn("--kit modern", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
+        self.assertNotIn("--kit base", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
         only = self.run_script("--dry-run", "--comfort", BOOTSTRAP_KIT="agents")
         self.assertIn("Installing claude", only.stdout)
-        self.assertNotIn("--kit modern", only.stdout)
+        self.assertNotIn("--kit base", only.stdout)
 
     def test_the_summary_says_how_to_start_remote_control_where_claude_is_installed(self):
         """009-machine-bootstrap FR-060: the summary names `claude remote-control` with Claude Code, starts nothing and asks for no key."""
@@ -1213,8 +1213,8 @@ class Bootstrap(Fixture):
         p = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.debian(), PATH=self.with_apt())
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before)
-        for step in ("install with apt", "Setting up erga in this account", "erga shell ensure", "erga doctor", "Installing claude", "Installing eza", "Installing fish", "login shell"):
-            self.assertIn(step.replace("Installing eza", "--kit modern"), p.stdout)
+        for step in ("install with apt", "Setting up erga in this account", "erga shell ensure", "erga doctor", "Installing claude", "--kit base", "Installing fish", "login shell"):
+            self.assertIn(step, p.stdout)
         for text in ("create the Linux account", "adduser", "useradd"):
             self.assertNotIn(text, p.stdout)
 
@@ -1228,8 +1228,8 @@ class Bootstrap(Fixture):
         off = wanted(BOOTSTRAP_NO_COMFORT="1")
         self.assertNotIn("imagemagick", off)
         self.assertIn("git ca-certificates curl wget tar xz-utils unzip build-essential", off, "what the setup needs is still installed, with the C compiler Rust links with")
-        self.assertNotIn("--kit modern", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
-        self.assertIn("--kit modern", self.run_boot("--dry-run").stdout)
+        self.assertNotIn("--kit base", self.run_boot("--dry-run", BOOTSTRAP_NO_COMFORT="1").stdout)
+        self.assertIn("--kit base", self.run_boot("--dry-run").stdout)
 
     @unittest.skipUnless(shutil.which("curl"), "curl is needed")
     def test_run_from_a_pipe_it_fetches_the_setup_and_plans_the_same(self):
@@ -1417,7 +1417,7 @@ class MacOS(Fixture):
         self.assertNotIn("sudo apt", p.stdout + p.stderr)
         self.assertNotIn("Installing fish 4", p.stdout, "fish has no build the setup can check on a Mac")
         self.assertNotIn("Installing btop", p.stdout, "btop publishes no build for a Mac")
-        self.assertIn("--kit modern", p.stdout)
+        self.assertIn("--kit base", p.stdout)
 
     def test_an_intel_mac_an_old_macos_and_a_missing_command_line_tools_each_stop_with_the_fix(self):
         """FR-017, 0003-runtime FR-027"""
