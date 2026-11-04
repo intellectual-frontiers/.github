@@ -55,15 +55,6 @@ pmid:pin-fish a pm:PinnedDownload ;
 pmid:sum-fish-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-fish ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "8f643d10ad1abb0ef7072764c01ceb5cf61b2d373fda400cf60f0bad69b7e095" .
 pmid:sum-fish-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-fish ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "57349f0111728c64b703a84e611aa97ff4d1fa8466385d64e67bd5bc3ffa49fc" .
 
-pmid:pin-glab a pm:PinnedDownload ;
-    rdfs:label "glab, GitLab's command line, from the publisher's release on every platform"@en ;
-    pm:programName "glab" ;
-    pm:pinKey "GLAB" ;
-    pm:version "1.120.0" .
-pmid:sum-glab-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "4e6c59de9f7ed2f304bf93aad01ea8f8a69584f0450ce90ad696ef81f69c69aa" .
-pmid:sum-glab-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "c60ebb4cb36f276714847a118845b9b4e69f46a8080c68b21ca63f158722cdea" .
-pmid:sum-glab-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-glab ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "8769650c49bb5d5ac52156d46e448e87f5570a868fe4e7bfcbd8cc66693c7afb" .
-
 pmid:pin-gh a pm:PinnedDownload ;
     rdfs:label "gh, GitHub's command line, from the publisher's release on every platform"@en ;
     pm:programName "gh" ;
@@ -83,33 +74,3 @@ pmid:pin-jq a pm:PinnedDownload ;
 pmid:sum-jq-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f" .
 pmid:sum-jq-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309" .
 pmid:sum-jq-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e" .
-
-pmid:pin-ripgrep a pm:PinnedDownload ;
-    rdfs:label "ripgrep, the fast search"@en ;
-    pm:programName "ripgrep" ;
-    pm:pinKey "RIPGREP" ;
-    pm:version "15.2.0" ;
-    pm:note "The publisher's own release (x86-64 Linux is its static musl build), the checksum the publisher states beside it; in the account's own folder (erga 009-machine-bootstrap FR-091)."@en .
-pmid:sum-ripgrep-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-ripgrep ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c" .
-pmid:sum-ripgrep-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-ripgrep ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "a740b91c82eaf9914cfedd353572f2791cbe0162c84101ee0951058f4dcbc90d" .
-pmid:sum-ripgrep-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-ripgrep ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "3750b2e93f37e0c692657da574d7019a101c0084da05a790c83fd335bad973e4" .
-
-pmid:pin-fd a pm:PinnedDownload ;
-    rdfs:label "fd, the friendly find"@en ;
-    pm:programName "fd" ;
-    pm:pinKey "FD" ;
-    pm:version "10.5.1" ;
-    pm:note "The publisher's own release (x86-64 Linux is its static musl build), in the account's own folder (erga 009-machine-bootstrap FR-091). The publisher states no checksum: this one was computed from the release file once, over TLS."@en .
-pmid:sum-fd-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-fd ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "f6c95edb190c241df6fddc815a5bab4051444993ac5d92ddc6eec0e0dc2342c7" .
-pmid:sum-fd-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-fd ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "86800e7dbe423cc7ed14076f40983f1bc739a299ca9a5ae5604cf261a87b3865" .
-pmid:sum-fd-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-fd ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "2d336895ed27b14c5cc9fc5eb22df03b3ee842b5dce80060e99d9cdc1b1b9fc7" .
-
-pmid:pin-shellcheck a pm:PinnedDownload ;
-    rdfs:label "shellcheck, which checks shell scripts"@en ;
-    pm:programName "shellcheck" ;
-    pm:pinKey "SHELLCHECK" ;
-    pm:version "0.11.0" ;
-    pm:note "The publisher's own static release, in the account's own folder (erga 009-machine-bootstrap FR-091). The publisher states no checksum: this one was computed from the release file once, over TLS."@en .
-pmid:sum-shellcheck-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-shellcheck ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198" .
-pmid:sum-shellcheck-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-shellcheck ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588" .
-pmid:sum-shellcheck-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-shellcheck ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79" .

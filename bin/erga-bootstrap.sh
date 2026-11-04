@@ -14,7 +14,7 @@
 #   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, wget,
 #      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
 #      everyday userland and ImageMagick. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and
-#      `erga toolchain ensure` install each at a pinned version in your own folders,
+#      `erga toolchain ensure` install each at a pinned version in your own folders, and `erga update` keeps them current,
 #   2. PostgreSQL: on the Debian family, PostgreSQL's own apt repository (its key checked against a pinned SHA-256), from which erga installs PostgreSQL 18.
 #   3. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
 #   4. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI

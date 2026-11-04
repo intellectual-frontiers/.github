@@ -118,12 +118,12 @@ class Shape(unittest.TestCase):
         text = SCRIPT.read_text()
         sums = re.findall(r"^([A-Z_]+?)_SHA256_(X86_64|AARCH64|MACOS_ARM64)=(\S+)$", text, re.M)
         names = {n for n, _, _ in sums}
-        self.assertLessEqual({"FISH", "GH", "GLAB", "JQ", "RIPGREP", "FD", "SHELLCHECK", "RUSTUP_INIT", "UV"}, names, "Oh My Posh and the rest of erga's toolchain are pinned by erga")
+        self.assertLessEqual({"FISH", "GH", "JQ", "RUSTUP_INIT", "UV"}, names, "Oh My Posh and the rest of erga's toolchain are pinned by erga")
         for name, arch, digest in sums:
             self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} {arch}")
         for name in ("RUSTUP_INIT", "UV"):   # 009-machine-bootstrap FR-025, FR-078: pinned for every platform a script runs on
             self.assertEqual({a for n, a, _ in sums if n == name}, {"X86_64", "AARCH64", "MACOS_ARM64"}, name)
-        for name in ("GH", "JQ", "RIPGREP", "FD", "SHELLCHECK", "GLAB"):   # 009-machine-bootstrap FR-091: fetched on every platform, never installed as packages
+        for name in ("GH", "JQ"):   # 009-machine-bootstrap FR-091, FR-025: the seed, fetched on every platform, never installed as packages
             self.assertEqual({a for n, a, _ in sums if n == name}, {"X86_64", "AARCH64", "MACOS_ARM64"}, name)
         for var in ("UV_VERSION", "RUSTUP_INIT_VERSION", "GH_VERSION", "JQ_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
@@ -214,20 +214,23 @@ class Entry(Fixture):
         for tool in ("claude", "codex", "opencode", "aider"):
             self.assertIn(f"Installing {tool} (the newest version)", p.stdout)
         self.assertIn("Installing the AI assistants", p.stdout)
-        self.assertNotIn("Installing glab", p.stdout, "the comfort kits are off without --comfort")
+        self.assertNotIn("Installing duckdb", p.stdout, "the comfort kits are off without --comfort")
         self.assertNotIn("Installing eza", p.stdout)
         comfy = self.run_script("--dry-run", "--comfort")
-        self.assertIn("Installing glab", comfy.stdout)
+        self.assertIn("Installing duckdb", comfy.stdout)
+        self.assertNotIn("Installing glab", comfy.stdout, "glab is erga's toolchain (005-toolchain FR-019), not the setup's")
         self.assertIn("get jq", comfy.stdout, "009-machine-bootstrap FR-091: jq and gh are the publishers' pinned releases on every platform, never packages")
         text = SCRIPT.read_text()
-        for pin in ("RIPGREP", "FD", "SHELLCHECK", "GLAB", "JQ", "GH"):   # each is installed from its pin, once (a copy already on the PATH is used: FR-092)
+        for pin in ("JQ", "GH"):   # the seed: installed from its pin, once (a copy already on the PATH is used: FR-092); the rest of the pinned programs are erga's toolchain (005-toolchain FR-019)
             self.assertRegex(text, rf'arch_sha {pin}\)', pin)
+        for erga_s in ("RIPGREP", "FD", "SHELLCHECK", "GLAB"):
+            self.assertNotIn(f"{erga_s}_VERSION", text, f"{erga_s} is pinned by erga's toolchain, not by the setup script")
         self.assertIn("Installing eza", comfy.stdout)
         self.assertIn("Installing fish", comfy.stdout)
         self.assertIn("Installing claude", comfy.stdout)
         off = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_AGENTS="1")
         self.assertNotIn("AI assistants", off.stdout)
-        self.assertIn("Installing glab", off.stdout, "the other kits stay")
+        self.assertIn("Installing duckdb", off.stdout, "the other kits stay")
         never = self.run_script("--dry-run", "--comfort", BOOTSTRAP_NO_COMFORT="1")
         self.assertNotIn("Installing eza", never.stdout, "BOOTSTRAP_NO_COMFORT=1 beats --comfort")
         only = self.run_script("--dry-run", "--comfort", BOOTSTRAP_KIT="agents")
