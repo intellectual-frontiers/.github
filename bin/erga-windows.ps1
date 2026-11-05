@@ -79,6 +79,13 @@ Invoke-Linux 'root' 'apt-get update && apt-get install -y curl wget'
 # 4. erga's own bootstrap, as the user, in front of the person (it asks for the Linux password once, and for the GitHub sign-in)
 Say "`nRunning erga's setup inside $Distro. It asks for your Linux password once and for a GitHub sign-in. The build of erga takes about 5 to 15 minutes, once."
 & wsl.exe -d $Distro -u $User -- sh -c "cd && curl -fsSL '$Url' | sh"
-if ($LASTEXITCODE -ne 0) { Stop-Here "erga's setup stopped (exit $LASTEXITCODE). Its last lines say why; run this line again to continue, it repeats nothing that is done." }
+$setup = $LASTEXITCODE
+# Exit 1 is the setup's own word for "set up, and erga's checks found something to look at" (erga-setup.sh, 009-machine-bootstrap FR-055): the computer is ready, so it is a note, not a stop.
+if ($setup -ne 0 -and $setup -ne 1) { Stop-Here "erga's setup stopped (exit $setup). Its last lines say why; run this line again to continue, it repeats nothing that is done." }
 
-Say "`nDone. Open Debian from the Start menu or Windows Terminal (a new tab, Debian) to use erga."
+if ($setup -eq 1) {
+    Say "`nDone, with notes: erga is installed, and its own checks found things to look at (listed above; ./erga doctor and ./erga check say what to do)."
+} else {
+    Say "`nDone."
+}
+Say "Open Debian from the Start menu or Windows Terminal (a new tab, Debian) to use erga."
