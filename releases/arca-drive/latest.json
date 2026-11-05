@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "notes": "Adds search, previews with a Code tab, sharing places in a password-protected file, provider logos and updating from inside the app.",
+  "assets": {
+    "windows-x86_64": {
+      "url": "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/releases/arca-drive/0.2.0/ArcaDrive-0.2.0-windows-x64.exe",
+      "size": 6437376,
+      "sha256": "7921bc98231aa227ebb1bc29d8c86b65e189c6f1a2ba43856f58c6660d734211",
+      "signature": "b99a7d2962107655fddac94b58a1f8735c9b2308c156782ed21a2626df6bb1fe3b495b19497af3c912d56fce87e3c78d66b42925b7b87891d45be0187da3c00a"
+    }
+  }
+}
