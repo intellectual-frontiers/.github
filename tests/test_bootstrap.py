@@ -798,6 +798,13 @@ class WindowsScript(unittest.TestCase):
         for forbidden in ("--unregister", "--shutdown", "Remove-Item", "Set-ExecutionPolicy", "Invoke-Expression"):
             self.assertNotIn(forbidden, text, f"FR-093: the script never removes or resets a distribution or loosens Windows ({forbidden})")
 
+    def test_an_exit_status_of_1_from_the_bootstrap_is_done_with_notes_and_any_other_failure_stops(self):
+        """009-machine-bootstrap FR-093, FR-055: the status 1 means set up and erga's own checks found something to look at, which is no stop."""
+        text = self.PS1.read_text()
+        self.assertIn("$setup = $LASTEXITCODE", text)
+        self.assertIn("$setup -ne 0 -and $setup -ne 1", text)
+        self.assertIn("Done, with notes", text)
+
     def test_it_parses_where_powershell_is_installed(self):
         ps = shutil.which("pwsh") or shutil.which("powershell")
         if not ps:
