@@ -841,6 +841,19 @@ class Stops(Fixture):
         self.assertIn("==== STEP 1: Installing everything (exit 7)", logs[0].read_text())
         self.assertIn("broke the thing", logs[1].read_text())
 
+    def test_a_counted_step_shows_a_number_that_rises_through_every_phase_and_ends_at_the_total(self):
+        """009-machine-bootstrap FR-032: apt prints a line for each package when it is downloaded, unpacked and set up; the count shown rises through all three."""
+        inner = "for p in a b c; do echo Get: $p; sleep 0.25; done; for p in a b c; do echo Unpacking $p; sleep 0.25; done; for p in a b c; do echo Setting up $p; sleep 0.25; done"
+        script = (f". {SCRIPT}; log_ok=0; tty_ui=1; cols=100; count_re='^(Get:|Unpacking |Setting up )'; count_div=3; count_total=3; "
+                  f"step 'Installing programs' sh -c '{inner}'")
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        import re
+        text = re.sub(r"\x1b\[[0-9;]*[mK]", "", p.stderr.replace("\r", "\n"))
+        shown = [int(n) for n in re.findall(r"Installing programs: (\d+) of 3", text)]
+        self.assertIn(3, shown, text)
+        self.assertEqual(shown, sorted(shown), "the number never goes down")
+        self.assertGreaterEqual(len(set(shown)), 3, f"the number rises as the work is done: {shown}")
+
     def test_a_secret_in_the_output_is_removed_from_the_support_file(self):
         script = f". {SCRIPT}; log_ok=1; mkdir -p \"$log_dir\"; : >\"$logfile\"; step 'x' sh -c 'echo token=abc123 ghp_ABCDEFGHIJKLMNOP1234; exit 1'"
         subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))

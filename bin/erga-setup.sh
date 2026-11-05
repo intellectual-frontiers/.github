@@ -744,8 +744,10 @@ cfg() {  # cfg NAME DEFAULT
 
 step_no=0
 keep_going=${BOOTSTRAP_KEEP_GOING:-0}
-# A step may count its own progress: count_re is a pattern for the lines its output prints as each piece is done, count_total how many to expect (empty: unknown).
-count_re=""; count_total=""
+# A step may count its own progress: count_re is an extended pattern for the lines its output prints as each piece advances, count_total how many to expect
+# (empty: unknown), and count_div how many such lines each piece prints in all (apt prints three for a package: downloaded, unpacked, set up), so that the
+# number shown rises through the whole step and reaches the total only when the last piece is done.
+count_re=""; count_total=""; count_div=1
 # step LABEL COMMAND...: run COMMAND quietly with a one-line spinner (a terminal, after half a second). Shows its output only if it fails; returns its
 # status. With --dry-run it only says what it would do. COMMAND runs in a subshell, so what it sets is not seen afterwards: it writes files instead.
 step() {
@@ -770,7 +772,9 @@ step() {
         for f in $frames; do [ "$i" = "$n" ] && break; i=$((i + 1)); done
         cnt=""
         if [ -n "$count_re" ]; then
-          n=$(grep -c "$count_re" "$log" 2>/dev/null || true)
+          n=$(grep -cE "$count_re" "$log" 2>/dev/null || true)
+          n=$(( ${n:-0} / count_div ))
+          [ -n "$count_total" ] && [ "$n" -gt "$count_total" ] && n=$count_total
           cnt=": ${b}${n}${z}"
           [ -n "$count_total" ] && cnt="$cnt of $count_total"
         fi
