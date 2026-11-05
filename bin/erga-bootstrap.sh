@@ -256,9 +256,10 @@ install_packages() {
   fi
   if [ -n "$chosen" ]; then
     if [ "$family" = debian ]; then
-      count_re='^Setting up '
+      # apt prints a line for each package three times: Get (downloaded), Unpacking, Setting up; counting all three makes the number rise from the start
+      count_re='^(Get:|Unpacking |Setting up )'; count_div=3
       count_total=$($sudo_cmd env "$(pm_environment debian)" apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
-      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || count_total=""
+      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || { count_total=""; count_re=""; }
     fi
     # shellcheck disable=SC2086
     if ! step_soft "${e_pkg}Installing programs" pm_install $chosen; then
@@ -267,7 +268,7 @@ install_packages() {
       fi
       need "the packages could not be installed." "run: $(admin_install_names $chosen)"
     fi
-    count_re=""; count_total=""
+    count_re=""; count_total=""; count_div=1
   fi
   return 0
 }
