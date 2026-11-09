@@ -131,4 +131,4 @@ if ($setup -eq 1) {
     Say "`nDone."
 }
 Say "Open Debian from the Start menu or Windows Terminal (a new tab, Debian) to use erga."
-Say "Your local Erga database is off until you need it: in Debian, ./erga local start starts it, ./erga local status shows how DBeaver or psql connects, ./erga local stop stops it."
+Say "Your local Erga database is off until you need it: in Debian, ./erga local start starts it, ./erga arca ensure --env local fills it the first time, ./erga local status shows how DBeaver or psql connects, ./erga local stop stops it. ./erga local run thyra runs Thyra, and ./erga man serve shows the Erga Manuals at http://127.0.0.1:8080/man/."

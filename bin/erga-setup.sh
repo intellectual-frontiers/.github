@@ -1996,7 +1996,8 @@ finish() {
       elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./erga $n"; else say "  ${r}${cross}${z} ./erga $n (exit status $s)"; failed=1; fi
     done
     if [ "${local_ran:-0}" = 1 ] && [ "${status_local:-0}" = 0 ]; then
-      say "  ${d}Your local Erga database is off until you need it:${z} ${b}./erga local start${z}${d}, then${z} ${b}./erga local status${z} ${d}shows how DBeaver or psql connects;${z} ${b}./erga local stop${z} ${d}stops it.${z}"
+      say "  ${d}Your local Erga database is off until you need it:${z} ${b}./erga local start${z}${d}, then${z} ${b}./erga arca ensure --env local${z} ${d}fills it the first time, and${z} ${b}./erga local status${z} ${d}shows how DBeaver or psql connects;${z} ${b}./erga local stop${z} ${d}stops it.${z}"
+      say "  ${d}Then${z} ${b}./erga local run thyra${z} ${d}runs Thyra on this computer, and${z} ${b}./erga man serve${z} ${d}shows the Erga Manuals at http://127.0.0.1:8080/man/.${z}"
     fi
     [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./erga check${z}${d}, compiles and tests the whole repository (minutes): run it yourself when you want it.${z}"
   fi
