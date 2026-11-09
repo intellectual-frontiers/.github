@@ -333,6 +333,7 @@ esac
 [ "$1" = --version ] && [ -n "${FAKE_NO_BUILD:-}" ] && exit 3
 [ "$1 $2" = "check --quick" ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
 [ "$1 $2" = "shell ensure" ] && [ -n "${FAKE_FAIL_SHELL:-}" ] && exit 3
+[ "$1 $2" = "local ensure" ] && [ -n "${FAKE_FAIL_LOCAL:-}" ] && exit 3
 exit 0
 """
 
@@ -387,6 +388,35 @@ exit 0
         self.assertIn("rc=1", off.stdout)
         self.assertEqual(log.read_text(), "")
 
+    def test_debians_own_postgresql_server_made_by_the_install_is_deleted_by_default_or_kept_stopped(self):
+        """009-machine-bootstrap FR-097, FR-023: Debian's postgresql-18 makes 18/main; erga needs it not"""
+        log = self.tmp / "pg.log"
+        etc = self.tmp / "etc-postgresql"
+        self.stub("sudo", 'case "$1" in -v | -n) exit 0 ;; esac\nexec "$@"')
+        for prog in ("pg_dropcluster", "pg_ctlcluster", "systemctl"):
+            self.stub(prog, f'echo "{prog} $*" >>{log}')
+
+        def call(packages="libfoo postgresql-18", made=True, before=False, **env):
+            log.write_text("")
+            shutil.rmtree(etc, ignore_errors=True)
+            if before:
+                (etc / "18" / "main").mkdir(parents=True)
+            mk = f'mkdir -p "{etc}/18/main"' if made else "true"
+            script = f'. "{BOOT}"; family=debian; sudo_ready=0; has_tty=0; dry=0; pm_install() {{ {mk}; }}; bootstrap_install_libraries "{packages}"; echo rc=$?'
+            p = subprocess.run([SH, "-c", script], capture_output=True, text=True,
+                               env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_PG_ETC=str(etc), PATH=f"{self.bin}:{os.environ['PATH']}", **env))
+            self.assertIn("rc=0", p.stdout, p.stdout + p.stderr)
+            return log.read_text()
+
+        self.assertIn("pg_dropcluster --stop 18 main", call(), "without a terminal it is deleted")
+        kept = call(ERGA_PG_DEBIAN_MAIN="keep")
+        self.assertNotIn("pg_dropcluster", kept)
+        self.assertIn("pg_ctlcluster 18 main stop", kept)
+        self.assertIn("pg_dropcluster --stop 18 main", call(ERGA_PG_DEBIAN_MAIN="delete"))
+        self.assertEqual(call(before=True), "", "a server that was there before is the person's, never touched")
+        self.assertEqual(call(packages="libfoo"), "", "nothing without PostgreSQL's package")
+        self.assertEqual(call(made=False), "", "nothing where Debian made no server")
+
     def test_it_copies_erga_runs_its_commands_and_says_what_is_next(self):
         """009-machine-bootstrap FR-055 to FR-058, FR-065: shell ensure, toolchain ensure, check --quick and, last, doctor, whose output is shown; then the next step"""
         p = self.go()
@@ -394,12 +424,12 @@ exit 0
         self.assertTrue((self.clone / "erga").is_file())
         out = p.stdout
         calls = self.calls.read_text()
-        order = [calls.index(c) for c in ("ERGA shell ensure", "ERGA toolchain ensure python jre", "ERGA check --quick", "ERGA doctor")]
-        self.assertEqual(order, sorted(order), "the shells, then toolchain ensure, then the quick check, then doctor")
+        order = [calls.index(c) for c in ("ERGA shell ensure", "ERGA toolchain ensure python jre", "ERGA local ensure", "ERGA check --quick", "ERGA doctor")]
+        self.assertEqual(order, sorted(order), "the shells, then toolchain ensure, then the local database, then the quick check, then doctor")
         self.assertNotIn("docker", calls, "what is not here and not optional")
-        self.assertEqual(calls.count("assume_yes=1"), 4, "every question erga could ask is answered yes")
-        self.assertEqual(calls.count("no_admin=1"), 4, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
-        self.assertEqual(calls.count("env=bootstrap"), 4, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
+        self.assertEqual(calls.count("assume_yes=1"), 5, "every question erga could ask is answered yes")
+        self.assertEqual(calls.count("no_admin=1"), 5, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
+        self.assertEqual(calls.count("env=bootstrap"), 5, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
         self.assertIn("DOCTOR SAYS: Next: erga toolchain ensure jre", out, "doctor's own words are shown")
         self.assertLess(out.index("DOCTOR SAYS"), out.index("exec bash -l"))
         self.assertEqual(out.rstrip().splitlines()[-1].strip(), "exec bash -l", "009-machine-bootstrap FR-059: the last instruction")
@@ -459,6 +489,32 @@ exit 0
         self.assertIn("ERGA toolchain ensure node", self.calls.read_text())
         self.go(BOOTSTRAP_TOOLCHAIN="none")
         self.assertNotIn("ERGA toolchain ensure", self.calls.read_text())
+
+    def test_the_local_database_is_made_once_left_off_and_its_home_can_be_chosen(self):
+        """009-machine-bootstrap FR-055, FR-098: ./erga local ensure after the programs; BOOTSTRAP_POSTGRES chooses without a question; the summary says how to start it"""
+        p = self.go()
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        line = [l for l in self.calls.read_text().splitlines() if "local ensure" in l]
+        self.assertEqual(len(line), 1)
+        self.assertNotIn("--use", line[0], "unset, erga chooses (and asks at a terminal only where there is a choice)")
+        for words in ("./erga local start", "./erga local status", "./erga local stop", "off until you need it"):
+            self.assertIn(words, p.stdout)
+        self.go(BOOTSTRAP_POSTGRES="service=my-windows-pg")
+        self.assertIn("ERGA local ensure --use service=my-windows-pg", self.calls.read_text())
+        self.go(BOOTSTRAP_POSTGRES="none")
+        self.assertNotIn("local ensure", self.calls.read_text())
+        dry = self.run_script("--dry-run", BOOTSTRAP_POSTGRES="erga").stdout
+        self.assertIn("./erga local ensure --use erga", dry)
+        self.assertNotIn("./erga local ensure", self.run_script("--dry-run", BOOTSTRAP_POSTGRES="none").stdout)
+
+    def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
+        """009-machine-bootstrap FR-055"""
+        p = self.go(FAKE_FAIL_LOCAL="1")
+        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
+        self.assertIn("erga local ensure did not finish", p.stdout)
+        self.assertRegex(p.stdout, r"(x|❌).*\./erga local ensure \(exit status 3\)")
+        self.assertNotIn("off until you need it", p.stdout, "how to start it is said only where it was made")
+        self.assertIn("ERGA doctor", self.calls.read_text(), "the rest goes on")
 
     def test_every_command_runs_when_one_fails_and_the_status_says_so(self):
         """009-machine-bootstrap FR-055"""
@@ -804,6 +860,17 @@ class WindowsScript(unittest.TestCase):
         self.assertIn("$setup = $LASTEXITCODE", text)
         self.assertIn("$setup -ne 0 -and $setup -ne 1", text)
         self.assertIn("Done, with notes", text)
+
+    def test_it_looks_for_postgresql_on_windows_reading_only_and_hands_what_it_found_to_wsl(self):
+        """009-machine-bootstrap FR-093: the registry, the services and the programs' folder are read; ERGA_WINDOWS_POSTGRES reaches WSL through WSLENV."""
+        text = self.PS1.read_text()
+        for needle in ("HKLM:\\SOFTWARE\\PostgreSQL\\Installations", "Get-Service -Name 'postgresql*'", "PostgreSQL\" -Directory", "pg_ctl.exe",
+                       "$env:ERGA_WINDOWS_POSTGRES", "$env:WSLENV", "ERGA_WINDOWS_POSTGRES'"):
+            self.assertIn(needle, text, needle)
+        for forbidden in ("Stop-Service", "Set-Service", "Restart-Service", "Set-ItemProperty", "New-ItemProperty", "Remove-ItemProperty", "netsh"):
+            self.assertNotIn(forbidden, text, f"FR-093: a PostgreSQL on Windows is read, never changed ({forbidden})")
+        self.assertLess(text.index("Find-WindowsPostgres)"), text.index("curl -fsSL"), "found before the bootstrap runs, so that the setup is told")
+        self.assertIn("./erga local start", text)
 
     def test_it_parses_where_powershell_is_installed(self):
         ps = shutil.which("pwsh") or shutil.which("powershell")

@@ -61,6 +61,9 @@
 #   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
 #   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no: the prompt `erga shell set prompt` is told to draw
 #   BOOTSTRAP_TOOLCHAIN    the names for `erga toolchain ensure` (default: every entry of `erga toolchain list` not here and not marked optional; none; all)
+#   BOOTSTRAP_POSTGRES     where your local Erga database lives, for `erga local ensure --use`: erga (erga's own, in the workspace, off until started) or
+#                          service=NAME (a PostgreSQL 18 you already run, by its [NAME] in ~/.pg_service.conf); none skips it. Unset, erga asks once at
+#                          a terminal where it finds a PostgreSQL 18 of yours (on Windows too, ERGA_WINDOWS_POSTGRES), and otherwise makes its own
 #   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
@@ -1807,6 +1810,28 @@ in_erga() {  # in_erga COMMAND...: the same, for a command whose output is shown
   ( cd "$target" && ERGA_ASSUME_YES=1 ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/null )
 }
 erga_list_json() { ( cd "$target" && ./erga toolchain list --json </dev/null 2>/dev/null ); }
+in_erga_asking() {  # in_erga_asking COMMAND...: in front of the person, at the terminal, so that erga may ask its one question; never with administrator rights
+  ( cd "$target" && ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/tty )
+}
+
+# Your local Erga database (009-machine-bootstrap FR-055, FR-098; erga's 195-local-development): ./erga local ensure finds PostgreSQL 18, makes erga's own small data folder
+# or uses a PostgreSQL 18 you already run, records which in ~/.pg_service.conf as [arca-local], and leaves it off. BOOTSTRAP_POSTGRES chooses without a question;
+# unset, at a terminal, erga asks once and only where there is a real choice; without a terminal it makes its own.
+local_database() {
+  local_use=$(cfg BOOTSTRAP_POSTGRES '')
+  [ "$local_use" = none ] && { say "Skipped your local Erga database (BOOTSTRAP_POSTGRES=none); ./erga local ensure makes it when you want it."; return 0; }
+  local_ran=1
+  if [ -n "$local_use" ]; then
+    step_soft "${e_ok}Making your local Erga database (off until you start it)" in_erga_quiet ./erga local ensure --use "$local_use" || status_local=$?
+  elif [ "$has_tty" = 1 ] && [ "${BOOTSTRAP_YES:-}" != 1 ]; then
+    say "${b}Your local Erga database${z} ${d}(erga may ask you one question: where it should live)${z}"
+    in_erga_asking ./erga local ensure || status_local=$?
+  else
+    step_soft "${e_ok}Making your local Erga database (off until you start it)" in_erga_quiet ./erga local ensure || status_local=$?
+  fi
+  [ "$status_local" = 0 ] || problem "erga local ensure did not finish (run ./erga local ensure in $(short_path "$target") to see why)"
+  return 0
+}
 
 # The system libraries erga's own programs link against (the browser's libraries and the like), which only administrator rights can install. erga says which this
 # computer lacks, from its own declarations, so this script holds no second list (009-machine-bootstrap FR-023). The bootstrap, which has those rights, installs them (it defines
@@ -1839,7 +1864,7 @@ kit_flags() {
   printf '%s' "$kf" | sed 's/^ *//'
 }
 
-# In the clone, in this order (009-machine-bootstrap FR-055): ./erga shell ensure, ./erga toolchain ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
+# In the clone, in this order (009-machine-bootstrap FR-055): ./erga shell ensure, ./erga toolchain ensure, ./erga local ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
 # once everything is installed (FR-056). Every one runs even when one before it failed.
 run_erga() {
   heading "${e_rocket}erga"
@@ -1853,6 +1878,8 @@ run_erga() {
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
       dk=$(kit_flags)
       would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)${dk:+ $dk, which also makes the programs that follow their newest release available: eza, bat, zoxide and fzf}"
+      local_use=$(cfg BOOTSTRAP_POSTGRES '')
+      [ "$local_use" = none ] || would "run in the clone: ./erga local ensure${local_use:+ --use $local_use} (your local Erga database: made once, then left off; ./erga local start starts it)"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
       would "run in the clone, last: ./erga doctor, which says what to do next"
     }
@@ -1863,7 +1890,7 @@ run_erga() {
   if [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ]; then say "Skipped erga's commands (BOOTSTRAP_NO_ERGA=1)."; erga_ran=0; return 0; fi
   have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
   erga_ran=1
-  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0
+  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; status_local=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0; local_ran=0
   phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
   step_soft "${e_rust}Building erga and arca with Cargo" in_erga_quiet ./erga --version || status_build=$?
   if [ "$status_build" != 0 ]; then
@@ -1916,6 +1943,7 @@ run_erga() {
     # shellcheck disable=SC2086
     step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names $kit_args || status_tool=$?
   fi
+  local_database
   if erga_has_quick_check; then
     check_ran=1
     step_soft "${e_ok}Checking that erga is healthy (a quick check)" in_erga_quiet ./erga check --quick || status_check=$?
@@ -1951,13 +1979,14 @@ finish() {
   failed=0
   if [ "${erga_ran:-0}" = 1 ]; then
     if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} ./erga --version: erga could not be built (exit status $status_build)"; failed=1; fi
-    for pair in "shell ensure:${status_shell:-0}" "toolchain ensure:${status_tool:-0}" "check --quick:${status_check:-0}"; do
+    for pair in "shell ensure:${status_shell:-0}" "toolchain ensure:${status_tool:-0}" "local ensure:${status_local:-0}" "check --quick:${status_check:-0}"; do
       [ "${status_build:-0}" = 0 ] || break
       n=${pair%%:*}; s=${pair##*:}
       if [ "$n" = "shell ensure" ] && [ "${shell_ran:-0}" = 0 ]; then
         [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./erga $n (left until you sign in to GitHub)"
         continue
       fi
+      if [ "$n" = "local ensure" ] && [ "${local_ran:-0}" = 0 ]; then continue; fi
       if [ "$n" = "check --quick" ] && [ "${check_ran:-0}" = 0 ]; then
         say "  ${y}-${z} ./erga check --quick: this erga has no quick check yet; the full ${b}./erga check${z} takes minutes and is yours to run"
         continue
@@ -1966,6 +1995,9 @@ finish() {
       elif [ "$n" = "toolchain ensure" ] && [ "${tool_ran:-0}" = 0 ]; then say "  ${g}-${z} ./erga $n: nothing to install"
       elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./erga $n"; else say "  ${r}${cross}${z} ./erga $n (exit status $s)"; failed=1; fi
     done
+    if [ "${local_ran:-0}" = 1 ] && [ "${status_local:-0}" = 0 ]; then
+      say "  ${d}Your local Erga database is off until you need it:${z} ${b}./erga local start${z}${d}, then${z} ${b}./erga local status${z} ${d}shows how DBeaver or psql connects;${z} ${b}./erga local stop${z} ${d}stops it.${z}"
+    fi
     [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./erga check${z}${d}, compiles and tests the whole repository (minutes): run it yourself when you want it.${z}"
   fi
   if [ -s "$problems" ]; then

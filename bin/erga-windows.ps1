@@ -7,7 +7,10 @@
 #   1. installs WSL 2 and Debian if they are not there (wsl --install -d Debian --no-launch); if Windows must restart first, it says so: restart, then run this again,
 #   2. makes your Linux user (the name you choose; you type its password once), gives it sudo, and makes it the default user of Debian,
 #   3. installs curl and wget, which a new Debian lacks,
-#   4. runs the bootstrap as that user. The bootstrap then asks for your password once and for the GitHub sign-in.
+#   4. looks for a PostgreSQL already installed on Windows (it only reads: the registry, the services and C:\Program Files\PostgreSQL) and tells the
+#      setup inside Debian what it found (ERGA_WINDOWS_POSTGRES, e.g. 18@5432), so that `erga local ensure` can offer a PostgreSQL 18 on Windows as the
+#      home of your local Erga database; it changes nothing about any PostgreSQL,
+#   5. runs the bootstrap as that user. The bootstrap then asks for your password once and for the GitHub sign-in.
 # It never deletes or resets a Debian that exists: it continues in it, or stops and says why. It changes nothing outside WSL.
 # Options (set before running, e.g. $env:ERGA_WSL_DISTRO='Ubuntu'): ERGA_WSL_DISTRO (default Debian), ERGA_WSL_USER (default: asked), ERGA_BOOTSTRAP_URL.
 
@@ -76,7 +79,46 @@ Invoke-Linux 'root' "grep -qs '^default=$User' /etc/wsl.conf || printf '[user]\n
 # 3. curl and wget, which a new Debian lacks
 Invoke-Linux 'root' 'apt-get update && apt-get install -y curl wget'
 
-# 4. erga's own bootstrap, as the user, in front of the person (it asks for the Linux password once, and for the GitHub sign-in)
+# 4. PostgreSQL already on Windows, read only (009-machine-bootstrap FR-093): each installation as <major>@<port>
+function Find-WindowsPostgres {
+    $found = @{}
+    # the EnterpriseDB installer records each installation here, with its version and port
+    foreach ($key in @(Get-ChildItem 'HKLM:\SOFTWARE\PostgreSQL\Installations' -ErrorAction SilentlyContinue)) {
+        $p = Get-ItemProperty $key.PSPath -ErrorAction SilentlyContinue
+        $version = if ($p -and $p.PSObject.Properties['Version']) { [string]$p.Version } else { '' }
+        $port = '5432'
+        $svcName = if ($p -and $p.PSObject.Properties['Service ID']) { [string]$p.'Service ID' } else { '' }
+        if ($svcName) {
+            $svc = Get-ItemProperty "HKLM:\SOFTWARE\PostgreSQL\Services\$svcName" -ErrorAction SilentlyContinue
+            if ($svc -and $svc.PSObject.Properties['Port']) { $port = [string]$svc.Port }
+        }
+        if ($version -match '^(\d+)') { $found["$($Matches[1])"] = "$($Matches[1])@$port" }
+    }
+    # a service named postgresql-x64-<major>, where the registry says nothing of it
+    foreach ($svc in @(Get-Service -Name 'postgresql*' -ErrorAction SilentlyContinue)) {
+        if ($svc.Name -match '(\d+)$' -and -not $found.ContainsKey($Matches[1])) { $found[$Matches[1]] = "$($Matches[1])@5432" }
+    }
+    # the programs' folder, C:\Program Files\PostgreSQL\<major>\bin
+    foreach ($dir in @(Get-ChildItem "$env:ProgramFiles\PostgreSQL" -Directory -ErrorAction SilentlyContinue)) {
+        if ($dir.Name -match '^(\d+)' -and (Test-Path (Join-Path $dir.FullName 'bin\pg_ctl.exe')) -and -not $found.ContainsKey($Matches[1])) {
+            $found[$Matches[1]] = "$($Matches[1])@5432"
+        }
+    }
+    return @($found.Values | Sort-Object)
+}
+
+$WindowsPostgres = @(Find-WindowsPostgres)
+if ($WindowsPostgres.Count -gt 0) {
+    Say "PostgreSQL on Windows: $($WindowsPostgres -join ', ') (version@port). Nothing about it is changed."
+    Say "  erga's setup can use a PostgreSQL 18 here as the home of your local Erga database; it asks you once, inside $Distro."
+    $env:ERGA_WINDOWS_POSTGRES = ($WindowsPostgres -join ',')
+    # WSLENV hands this one variable to the commands run inside WSL
+    $env:WSLENV = if ($env:WSLENV) { "$($env:WSLENV):ERGA_WINDOWS_POSTGRES" } else { 'ERGA_WINDOWS_POSTGRES' }
+} else {
+    Say 'No PostgreSQL on Windows: your local Erga database will be erga''s own, inside Debian (off until you start it).'
+}
+
+# 5. erga's own bootstrap, as the user, in front of the person (it asks for the Linux password once, and for the GitHub sign-in)
 Say "`nRunning erga's setup inside $Distro. It asks for your Linux password once and for a GitHub sign-in. The build of erga takes about 5 to 15 minutes, once."
 & wsl.exe -d $Distro -u $User -- sh -c "cd && curl -fsSL '$Url' | sh"
 $setup = $LASTEXITCODE
@@ -89,3 +131,4 @@ if ($setup -eq 1) {
     Say "`nDone."
 }
 Say "Open Debian from the Start menu or Windows Terminal (a new tab, Debian) to use erga."
+Say "Your local Erga database is off until you need it: in Debian, ./erga local start starts it, ./erga local status shows how DBeaver or psql connects, ./erga local stop stops it."
