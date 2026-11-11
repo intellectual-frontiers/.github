@@ -502,9 +502,9 @@ fi
 # shellcheck disable=SC1003  # the last frame is a backslash
 case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
   *[Uu][Tt][Ff]*) frames='⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏'; tick='✅'; cross='❌'; warnmark='⚠️ '; e_rocket='🚀 '; e_pkg='📦 '; e_dl='📥 '; e_list='📋 '; e_py='🐍 '; e_rust='🦀 '; e_font='🔤 '
-     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 '; e_retry='🔁 '; e_db='🐘 ' ;;
+     e_one='1️⃣ '; e_two='2️⃣ '; e_three='3️⃣ '; e_four='4️⃣ '; e_ok='✅ '; e_stop='🛑 '; e_what='❓ '; e_why='💬 '; e_log='📄 '; e_pack='🎁 '; e_help='🤝 '; e_key='🔐 '; e_dir='📂 '; e_sync='🔄 '; e_paint='🎨 '; e_shell='🐟 '; e_next='👉 '; e_code='🧑‍💻 '; e_retry='🔁 '; e_db='🐘 '; e_home='🏠 ' ;;
   *) frames='| / - \'; tick='ok'; cross='x'; warnmark='!'; e_rocket=''; e_pkg=''; e_dl=''; e_list=''; e_py=''; e_rust=''; e_font=''
-     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code=''; e_retry='~ '; e_db='' ;;
+     e_one=''; e_two=''; e_three=''; e_four=''; e_ok=''; e_stop=''; e_what=''; e_why=''; e_log=''; e_pack=''; e_help=''; e_key=''; e_dir=''; e_sync=''; e_paint=''; e_shell=''; e_next='-> '; e_code=''; e_retry='~ '; e_db=''; e_home='' ;;
 esac
 
 # Every environment variable name in a message (capitals with an underscore, like BOOTSTRAP_PROMPT) is shown in bright yellow where there is colour.
@@ -1688,9 +1688,75 @@ sign_in() {
   else
     sign_in_stop
   fi
-  gh auth setup-git --hostname github.com </dev/null >/dev/null 2>&1 || warn "gh could not be made git's credential helper; run: gh auth setup-git"
+  git_credentials_setup
   [ "${signin_how:-}" = gh ] && verify_git_login
   return 0
+}
+
+# ---- dotfiles that chezmoi keeps (009-machine-bootstrap FR-101) -----------------------------------------------------------------------------------
+# Where chezmoi keeps ~/.gitconfig, a change to the file itself is put back by the next `chezmoi apply`. So the change is made in chezmoi's source of the file, in a block of its own
+# between two marker lines, and applied; the person is told (🏠, bright yellow) to commit it in their dotfiles repository. Where chezmoi is not used, git is told directly, as it was.
+cm_locate() {  # cm_locate FILE: cm_mode is plain (not kept by chezmoi), kept (its source can be edited) or cannot (it cannot); cm_src is the source
+  cm_mode=plain; cm_src=""
+  command -v chezmoi >/dev/null 2>&1 || return 0
+  cm_s=$(chezmoi source-path "$1" 2>/dev/null </dev/null) || return 0
+  [ -n "$cm_s" ] || return 0
+  cm_src=$cm_s
+  case $(basename "$cm_s") in encrypted_* | *.age | *.asc | modify_* | create_* | run_* | symlink_*) cm_mode=cannot; return 0 ;; esac
+  if [ -f "$cm_s" ]; then cm_mode=kept; else cm_mode=cannot; fi
+}
+home_say() { printf '%s\n' "${yb}${e_home}$*${z}"; }   # a notice about the person's own dotfiles: 🏠 and bright yellow
+cm_put_block() {  # cm_put_block SOURCE BEGIN END CONTENT: the block between the markers in the source is this content (put at the end where it is not there yet)
+  pb_text=$(awk -v b="$2" -v e="$3" '$0 == b {skip=1; next} $0 == e {skip=0; next} !skip' "$1")
+  { [ -z "$pb_text" ] || printf '%s\n' "$pb_text"; printf '%s\n%s\n%s\n' "$2" "$4" "$3"; } >"$work/cm-block.$$" && cat "$work/cm-block.$$" >"$1"
+  rm -f "$work/cm-block.$$"
+}
+git_block_begin='# erga-setup begin: settings erga needs for GitHub and your commits (kept by erga; edit outside these two lines)'
+git_block_end='# erga-setup end'
+gd_name=""; gd_email=""
+cm_block_value() {  # cm_block_value SOURCE KEY: a setting of the [user] part of erga's block in the source, so that a run that has nothing new to say does not drop it
+  awk -v b="$git_block_begin" -v e="$git_block_end" -v k="$2" '$0 == b {on=1; next} $0 == e {on=0} on && $1 == k && $2 == "=" {sub(/^[^=]*= */, ""); print; exit}' "$1" 2>/dev/null
+}
+git_block_text() {  # what erga's block of ~/.gitconfig holds
+  printf '[credential "https://github.com"]\n\thelper =\n\thelper = !gh auth git-credential\n'
+  case $(git config --global --get pull.ff 2>/dev/null || true) in "" | only) printf '[pull]\n\tff = only\n' ;; esac
+  if [ -n "${cm_src:-}" ]; then
+    [ -n "$gd_name" ] || gd_name=$(cm_block_value "$cm_src" name)
+    [ -n "$gd_email" ] || gd_email=$(cm_block_value "$cm_src" email)
+  fi
+  if [ -n "$gd_name$gd_email" ]; then
+    printf '[user]\n'
+    [ -z "$gd_name" ] || printf '\tname = %s\n' "$gd_name"
+    [ -z "$gd_email" ] || printf '\temail = %s\n' "$gd_email"
+  fi
+}
+git_dotfile_put() {  # make ~/.gitconfig have erga's block, through chezmoi's source of it
+  cm_locate "$HOME/.gitconfig"
+  case $cm_mode in
+    kept)
+      gb_new=$(git_block_text)
+      gb_old=$(awk -v b="$git_block_begin" -v e="$git_block_end" '$0 == b {on=1; next} $0 == e {on=0} on' "$cm_src")
+      [ "$gb_new" != "$gb_old" ] || return 0   # already there: nothing to change, so nothing to say
+      cm_put_block "$cm_src" "$git_block_begin" "$git_block_end" "$gb_new"
+      if chezmoi apply --force "$HOME/.gitconfig" </dev/null >/dev/null 2>&1; then
+        home_say "~/.gitconfig is kept by chezmoi, so erga changed its source ($cm_src) and ran chezmoi apply. Commit that change in your dotfiles repository, or the next chezmoi update may take it away."
+        return 0
+      fi
+      warn "chezmoi apply of ~/.gitconfig did not finish; erga changed its source ($cm_src). Run: chezmoi apply ~/.gitconfig"
+      return 1 ;;
+    cannot)
+      home_say "~/.gitconfig is kept by chezmoi in a form erga cannot edit ($cm_src), so erga left it. Add this to its source by hand:"
+      git_block_text | sed 's/^/    /'
+      return 1 ;;
+  esac
+  return 2   # plain: not kept by chezmoi
+}
+git_credentials_setup() {
+  git_dotfile_put && return 0
+  case $? in
+    1) problem "git's GitHub login could not be set in your chezmoi-kept ~/.gitconfig (see above)"; return 0 ;;
+  esac
+  gh auth setup-git --hostname github.com </dev/null >/dev/null 2>&1 || warn "gh could not be made git's credential helper; run: gh auth setup-git"
 }
 
 # Whether git reaches GitHub the way a NEW terminal will: with no token in the environment, only gh as git's credential helper and the sign-in gh kept. The setup itself exports a
@@ -1701,16 +1767,23 @@ verify_git_login() {
   [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
   git_clean_ok && { logf "git reaches GitHub with no token in the environment"; return 0; }
   logf "git does not reach GitHub in a clean environment; repairing"
-  gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
-  git_clean_ok && return 0
+  cm_locate "$HOME/.gitconfig"
+  if [ "$cm_mode" != plain ]; then   # kept by chezmoi: its source holds the helper already (above); only the sign-in below can be repaired here
+    :
+  else
+    gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
+    git_clean_ok && return 0
+  fi
   # the helper written by name, so that it does not depend on where gh was when it was set up: an empty one first, which ends any helper before it for this host
-  git config --global --unset-all credential.https://github.com.helper >/dev/null 2>&1 || true
-  git config --global --add credential.https://github.com.helper '' >/dev/null 2>&1 || true
-  git config --global --add credential.https://github.com.helper '!gh auth git-credential' >/dev/null 2>&1 || true
-  git_clean_ok && return 0
+  if [ "$cm_mode" = plain ]; then
+    git config --global --unset-all credential.https://github.com.helper >/dev/null 2>&1 || true
+    git config --global --add credential.https://github.com.helper '' >/dev/null 2>&1 || true
+    git config --global --add credential.https://github.com.helper '!gh auth git-credential' >/dev/null 2>&1 || true
+    git_clean_ok && return 0
+  fi
   # the sign-in is in a store a later terminal cannot open: keep it in gh's own file (hosts.yml, readable by this account alone)
   if gh auth token --hostname github.com </dev/null 2>/dev/null | gh auth login --hostname github.com --with-token --insecure-storage >/dev/null 2>&1; then
-    gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
+    [ "$cm_mode" != plain ] || gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
     if git_clean_ok; then say "${d}${e_key}Your GitHub sign-in is kept in ~/.config/gh/hosts.yml (readable by you alone), because this computer's keyring cannot be opened from a new terminal.${z}"; return 0; fi
   fi
   warn "git in a new terminal may ask for your GitHub user name. Run: gh auth setup-git --hostname github.com    and, if it still asks: gh auth login --hostname github.com --git-protocol https --insecure-storage"
@@ -1723,7 +1796,8 @@ identity() {
   [ "$dry" = 1 ] && return 0
   have_cmd git || return 0
   # Pulls only fast-forward where git says nothing of it, so VS Code's Sync never makes a merge (erga 009 FR-049, 008-workspace FR-010)
-  if [ -z "$(git config --global --get pull.ff 2>/dev/null || true)" ]; then
+  cm_locate "$HOME/.gitconfig"
+  if [ "$cm_mode" = plain ] && [ -z "$(git config --global --get pull.ff 2>/dev/null || true)" ]; then
     git config --global pull.ff only && say "git pulls only fast-forward (pull.ff only), so a sync never makes a merge."
   fi
   cur_name=$(git config --global --get user.name 2>/dev/null || true)
@@ -1745,8 +1819,15 @@ identity() {
     printf '%sWhat name should go on your commits?%s (for example Ada Lovelace; Enter to skip) ' "$b" "$z" >/dev/tty
     read -r want_name </dev/tty || want_name=""
   fi
-  [ -n "$want_name" ] && [ "$want_name" != "$cur_name" ] && { git config --global user.name "$want_name"; cur_name=$want_name; say "Commits will carry the name $want_name."; }
-  [ -n "$want_email" ] && [ "$want_email" != "$cur_email" ] && { git config --global user.email "$want_email"; cur_email=$want_email; say "Commits will carry the email $want_email."; }
+  if [ "$cm_mode" = plain ]; then
+    [ -n "$want_name" ] && [ "$want_name" != "$cur_name" ] && { git config --global user.name "$want_name"; cur_name=$want_name; say "Commits will carry the name $want_name."; }
+    [ -n "$want_email" ] && [ "$want_email" != "$cur_email" ] && { git config --global user.email "$want_email"; cur_email=$want_email; say "Commits will carry the email $want_email."; }
+  else
+    # kept by chezmoi: the name and email go into erga's block of its source, with the rest of the block (a name chezmoi already gives is not changed unless asked)
+    [ -n "$want_name" ] && [ "$want_name" != "$cur_name" ] && { gd_name=$want_name; cur_name=$want_name; say "Commits will carry the name $want_name."; }
+    [ -n "$want_email" ] && [ "$want_email" != "$cur_email" ] && { gd_email=$want_email; cur_email=$want_email; say "Commits will carry the email $want_email."; }
+    if [ -n "$gd_name$gd_email" ] || [ "$cm_mode" = kept ]; then git_dotfile_put || true; fi
+  fi
   if [ -z "$cur_name" ]; then
     warn "Git has no name for your commits yet. Run: git config --global user.name \"Your Name\""
   else

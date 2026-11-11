@@ -609,6 +609,41 @@ esac'''
         self.assertEqual(run().returncode, 0)
         self.assertIn("erga-setup wrapper", (binf / "erga").read_text(), "no file: the wrapper is made")
 
+    def test_a_gitconfig_that_chezmoi_keeps_is_changed_in_its_source_and_applied_and_one_it_does_not_is_left_to_git(self):
+        """009-machine-bootstrap FR-101: where chezmoi keeps ~/.gitconfig the change is made in its source and applied, with a notice; where it does not, nothing is written here"""
+        src = self.tmp / "chezmoi-src"
+        src.mkdir()
+        (self.tmp / "work").mkdir()
+        gitconfig = src / "dot_gitconfig.tmpl"
+        gitconfig.write_text("[user]\n\tname = {{ .name }}\n")
+        applied = self.tmp / "applied"
+        self.stub("chezmoi", f'case "$1" in source-path) echo "{gitconfig}" ;; apply) echo "$*" >"{applied}" ;; esac')
+        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put; echo rc=$?; git_dotfile_put; echo rc=$?'
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
+        self.assertEqual(p.stdout.count("rc=0"), 2, p.stdout + p.stderr)
+        text = gitconfig.read_text()
+        self.assertIn("{{ .name }}", text, "what was there is kept")
+        self.assertIn("# erga-setup begin", text)
+        self.assertIn('helper = !gh auth git-credential', text)
+        self.assertEqual(text.count("# erga-setup begin"), 1, "the block is put once, not again on a second run")
+        self.assertIn("apply --force", applied.read_text())
+        self.assertEqual(p.stdout.count("is kept by chezmoi"), 1, "said once: the second run had nothing to change")
+        self.assertFalse((self.home / ".gitconfig").exists(), "the file in the home folder is not written by erga")
+        # not kept by chezmoi: git_dotfile_put does nothing and says it is for git (status 2)
+        (self.tmp / "work").mkdir(exist_ok=True)
+        self.stub("chezmoi", "exit 1")
+        q = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put || echo rc=$?'], capture_output=True, text=True,
+                           env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
+        self.assertIn("rc=2", q.stdout, q.stdout + q.stderr)
+        # a source erga cannot edit is left, with the block to add by hand
+        (self.tmp / "work").mkdir(exist_ok=True)
+        self.stub("chezmoi", f'case "$1" in source-path) echo "{src}/encrypted_dot_gitconfig.age" ;; esac')
+        r = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put || echo rc=$?'], capture_output=True, text=True,
+                           env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
+        self.assertIn("rc=1", r.stdout)
+        self.assertIn("cannot edit", r.stdout)
+        self.assertIn("helper = !gh auth git-credential", r.stdout)
+
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""
         p = self.go(FAKE_FAIL_LOCAL="1")
