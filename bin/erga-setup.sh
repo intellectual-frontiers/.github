@@ -1819,7 +1819,7 @@ link_launcher() {  # link_launcher NAME: ~/.local/bin/NAME runs the clone's laun
   mkdir -p "$bin"
   w=$bin/$ll_name
   # `erga shell ensure` makes this a link to the clone's launcher (and replaces the wrapper below with it): already right, nothing to say
-  if [ -L "$w" ] && [ "$(readlink -f "$w" 2>/dev/null)" = "$(readlink -f "$target/$ll_name" 2>/dev/null)" ]; then return 0; fi
+  if [ -L "$w" ] && [ "$w" -ef "$target/$ll_name" ]; then return 0; fi
   if [ -L "$w" ] && [ ! -e "$w" ]; then rm -f "$w"; fi   # a link to a clone that is gone
   if [ ! -e "$w" ] || grep -q 'erga-setup wrapper' "$w" 2>/dev/null; then
     printf '#!/bin/sh\n# erga-setup wrapper: runs the clone'"'"'s launcher, so %s works from any folder\nexec "%s/%s" "$@"\n' "$ll_name" "$target" "$ll_name" >"$w"
