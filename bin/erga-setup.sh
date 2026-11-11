@@ -2317,6 +2317,8 @@ pg_found_psql() {  # the psql of PostgreSQL 18 on this computer, or nothing
   return 1
 }
 pg_found_server() {  # whether PostgreSQL 18's server programs (initdb) are on this computer
+  pf_path=$(command -v initdb 2>/dev/null || true)
+  [ -n "$pf_path" ] && [ "$("$pf_path" --version 2>/dev/null | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n 1)" = 18 ] && return 0
   for pf in /usr/lib/postgresql/18/bin /usr/pgsql-18/bin /opt/homebrew/opt/postgresql@18/bin /usr/local/opt/postgresql@18/bin /Applications/Postgres.app/Contents/Versions/18/bin /usr/bin /usr/local/bin; do
     [ -x "$pf/initdb" ] && [ "$("$pf/initdb" --version 2>/dev/null | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n 1)" = 18 ] && return 0
   done
@@ -2363,9 +2365,22 @@ pg_service_file() { printf '%s' "${PGSERVICEFILE:-$HOME/.pg_service.conf}"; }
 pg_pass_file() { printf '%s' "${PGPASSFILE:-$HOME/.pgpass}"; }
 pg_has_service() { [ -r "$(pg_service_file)" ] && grep -q "^\[$1\][[:space:]]*$" "$(pg_service_file)"; }
 pg_test() {  # pg_test SERVICE: the server of that service answers, and is PostgreSQL 18; prints why not
-  pt_out=$(PGCONNECT_TIMEOUT=10 "$pg_psql" "service=$1 dbname=postgres" -X -Atqc 'show server_version_num' </dev/null 2>&1) || { printf '%s' "$pt_out" | tail -n 1; return 1; }
+  # -w: never ask for a password here (psql would ask on the terminal in the middle of the setup); a missing one is said, with what to do
+  pt_out=$(PGCONNECT_TIMEOUT=10 "$pg_psql" "service=$1 dbname=postgres" -w -X -Atqc 'show server_version_num' </dev/null 2>&1) || { pt_msg=$(printf '%s' "$pt_out" | tail -n 1 | sed 's/^[[:space:]]*//'); printf '%s' "$pt_msg"; pg_hint "$pt_msg"; return 1; }
   case $pt_out in 18[0-9][0-9][0-9][0-9]) return 0 ;; *) printf 'that server is not PostgreSQL 18 (it says %s)' "$pt_out"; return 1 ;; esac
 }
+pg_hint() {  # what to do about what psql said, as a second line after it
+  case $1 in
+    *"no password supplied"* | *"password authentication failed"*) printf '\n     That server wants a password for that user. Enter it when asked. (A fresh Debian or Ubuntu PostgreSQL has none for postgres: sudo -u postgres psql -c "ALTER USER postgres PASSWORD '"'"'a-password'"'"'")' ;;
+    *"Connection refused"* | *"Is the server running"*) printf '\n     Nothing answers there: is the server started, and is the host and port right?' ;;
+    *"does not exist"*) printf '\n     That user or database is not there: check the name.' ;;
+  esac
+}
+pg_service_value() {  # pg_service_value NAME KEY: a setting of a [NAME] section of libpq's service file
+  [ -r "$(pg_service_file)" ] && awk -v n="[$1]" -v k="$2" '$0 == n {on=1; next} /^\[/ {on=0} on && index($0, k "=") == 1 {print substr($0, length(k) + 2); exit}' "$(pg_service_file)"
+}
+# [arca-local] written by `erga local ensure` for erga's own database in the workspace: its host is a folder (a socket), and the server is off until `erga local start`
+pg_service_is_ergas_own() { case $(pg_service_value "$1" host) in /*) return 0 ;; *) return 1 ;; esac; }
 pg_read() {  # pg_read PROMPT DEFAULT: one line from the terminal
   printf '%s [%s] ' "$1" "$2" >/dev/tty
   pr_ans=""; read -r pr_ans </dev/tty || pr_ans=""
@@ -2415,7 +2430,13 @@ postgres_destination() {
     erga) pg_pick=2 ;;
     service=*) pg_pick=1; pg_name=${pg_want#service=} ;;
   esac
-  if [ -z "$pg_pick" ] && pg_has_service arca-local; then pg_pick=existing; pg_name=arca-local; fi
+  if [ -z "$pg_pick" ] && pg_has_service arca-local; then
+    if pg_service_is_ergas_own arca-local; then
+      pg_pick=2; say "${e_ok}[arca-local] in $(pg_service_file) is erga's own database in the workspace, made by an earlier run; it is off until you start it, so it is not tested now."
+    else
+      pg_pick=existing; pg_name=arca-local
+    fi
+  fi
   if [ -z "$pg_pick" ]; then
     if [ "$has_tty" != 1 ]; then
       need "no PostgreSQL has been named, and nobody is here to ask." "name one and run this again: write a service in ~/.pg_service.conf (and its password in ~/.pgpass) and run with BOOTSTRAP_POSTGRES=service=NAME, or, with PostgreSQL 18 installed on this computer, BOOTSTRAP_POSTGRES=erga; BOOTSTRAP_POSTGRES=none skips this"

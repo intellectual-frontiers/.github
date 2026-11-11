@@ -568,6 +568,24 @@ esac'''
         self.assertIn("auth login --hostname github.com --with-token --insecure-storage", text, "then the sign-in is kept in gh's own private file")
         self.assertIn("hosts.yml", p.stdout, "and the person is told where")
 
+    def test_a_service_of_ergas_own_database_is_not_tested_and_a_missing_password_is_said_without_asking_for_it(self):
+        """009-machine-bootstrap FR-099: [arca-local] that erga made for its own server (a folder as host, off by design) is kept; psql never asks for a password in the middle of the setup"""
+        (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=/home/x/workspaces/erga/build/arca/local\nport=55432\ndbname=arca\nuser=postgres\n")
+        self.stub("psql", 'case "$*" in *--version*) echo "psql (PostgreSQL) 18.6" ;; *) echo "psql: error: connection failed" >&2; exit 2 ;; esac')
+        self.stub("initdb", 'echo "initdb (PostgreSQL) 18.6"')
+        p = self.go()
+        self.assertNotIn("did not work", p.stdout + p.stderr, "the own server is off on purpose: no test")
+        self.assertIn("erga's own database in the workspace", p.stdout)
+        self.assertIn("--use erga", self.calls.read_text())
+        # a missing password: psql is run with -w (never prompts) and the hint says what to do
+        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; pg_psql=psql; pg_test arca-local'
+        self.stub("psql", 'case "$*" in *" -w "*) ;; *) echo "psql asked for a password" >&2; exit 9 ;; esac; echo \'psql: error: connection to server at "db" failed: fe_sendauth: no password supplied\' >&2; exit 2')
+        (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=db.example\nport=5432\nuser=postgres\ndbname=arca\n")
+        q = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
+        self.assertIn("no password supplied", q.stdout)
+        self.assertIn("wants a password", q.stdout)
+        self.assertNotIn("asked for a password", q.stdout + q.stderr)
+
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""
         p = self.go(FAKE_FAIL_LOCAL="1")
