@@ -339,6 +339,9 @@ exit 0
         (self.upstream / "erga").chmod(0o755)
         git("add", ".", cwd=self.upstream)
         git("commit", "-qm", "one", cwd=self.upstream)
+        # the PostgreSQL destination every setup needs (009-machine-bootstrap FR-099): a psql 18 that answers, and the service [arca-local] of an earlier run
+        self.stub("psql", 'case "$*" in *--version*) echo "psql (PostgreSQL) 18.6" ;; *server_version_num*) echo 180006 ;; esac')
+        (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=db.example\nport=5432\nuser=postgres\ndbname=arca\n")
         self.stub("cargo")      # erga's launcher builds it with Cargo; the stand-in does not run it, the script only checks it is there
         self.clone = self.home / "workspaces" / "github.com" / "intellectual-frontiers" / "erga"
 
@@ -475,9 +478,11 @@ exit 0
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         line = [l for l in self.calls.read_text().splitlines() if "local ensure" in l]
         self.assertEqual(len(line), 1)
-        self.assertNotIn("--use", line[0], "unset, erga chooses (and asks at a terminal only where there is a choice)")
+        self.assertIn("--use service=arca-local", line[0], "the destination settled early is handed to erga")
         for words in ("./erga local start", "./erga local status", "./erga local stop", "off until you need it"):
             self.assertIn(words, p.stdout)
+        with (self.home / ".pg_service.conf").open("a") as f:
+            f.write("[my-windows-pg]\nhost=win.example\nport=5432\nuser=postgres\n")
         self.go(BOOTSTRAP_POSTGRES="service=my-windows-pg")
         self.assertIn("ERGA local ensure --use service=my-windows-pg", self.calls.read_text())
         self.go(BOOTSTRAP_POSTGRES="none")
@@ -485,6 +490,36 @@ exit 0
         dry = self.run_script("--dry-run", BOOTSTRAP_POSTGRES="erga").stdout
         self.assertIn("./erga local ensure --use erga", dry)
         self.assertNotIn("./erga local ensure", self.run_script("--dry-run", BOOTSTRAP_POSTGRES="none").stdout)
+
+    def test_a_postgresql_destination_is_a_prerequisite_settled_before_anything_is_installed(self):
+        """009-machine-bootstrap FR-099: psql 18 and a PostgreSQL to use, asked for right after the GitHub sign-in, never installed"""
+        (self.home / ".pg_service.conf").unlink()
+        p = self.go()   # a psql 18 that answers, but no service, and nobody to ask
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("no PostgreSQL has been named", p.stdout + p.stderr)
+        self.assertIn("BOOTSTRAP_POSTGRES=service=NAME", p.stdout + p.stderr)
+        self.assertNotIn("ERGA ", self.calls.read_text(), "nothing of erga ran")
+        (self.bin / "psql").unlink()
+        p = self.go()
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("psql, is not on this computer, and erga installs no PostgreSQL", p.stdout + p.stderr)
+        self.assertIn("postgresql-client-18", p.stdout + p.stderr, "the commands a person runs")
+        self.assertEqual(self.go(BOOTSTRAP_POSTGRES="none").returncode, 0, "none skips it")
+
+    def test_the_destination_is_written_in_postgresql_s_own_private_files(self):
+        """009-machine-bootstrap FR-099: [NAME] in ~/.pg_service.conf and the password in ~/.pgpass, both readable by the account alone, a colon escaped"""
+        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; pg_write_service arca-local db.example 5432 app "pa:ss\\w"; pg_write_service other h 5433 u ""; pg_write_service arca-local db2.example 5432 app "x"'
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        svc = (self.home / ".pg_service.conf").read_text()
+        self.assertEqual(svc.count("[arca-local]"), 1, "a service written again replaces the old one")
+        self.assertIn("host=db2.example", svc)
+        self.assertNotIn("db.example\n", svc)
+        self.assertIn("[other]", svc)
+        pgpass = (self.home / ".pgpass").read_text()
+        self.assertIn("db2.example:5432:*:app:x", pgpass)
+        for f in (".pg_service.conf", ".pgpass"):
+            self.assertEqual(oct((self.home / f).stat().st_mode & 0o777), "0o600", f)
 
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""

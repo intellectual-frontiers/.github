@@ -161,7 +161,7 @@ sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
 pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
   pr_fam=$1; pr_words=$2; shift 2
   pr_env=$(pm_environment "$pr_fam")
-  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=180 -o Acquire::Retries=3" ;; *) pr_extra="" ;; esac
+  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=900 -o Acquire::Retries=3" ;; *) pr_extra="" ;; esac
   # shellcheck disable=SC2086  # the table's words
   if [ -n "$pr_env" ]; then retry_cmd "packages ($pr_fam)" $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else retry_cmd "packages ($pr_fam)" $sudo_cmd $pr_words $pr_extra "$@"; fi
 }
