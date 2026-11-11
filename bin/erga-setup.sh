@@ -1703,13 +1703,18 @@ verify_git_login() {
   logf "git does not reach GitHub in a clean environment; repairing"
   gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
   git_clean_ok && return 0
+  # the helper written by name, so that it does not depend on where gh was when it was set up: an empty one first, which ends any helper before it for this host
+  git config --global --unset-all credential.https://github.com.helper >/dev/null 2>&1 || true
+  git config --global --add credential.https://github.com.helper '' >/dev/null 2>&1 || true
+  git config --global --add credential.https://github.com.helper '!gh auth git-credential' >/dev/null 2>&1 || true
+  git_clean_ok && return 0
   # the sign-in is in a store a later terminal cannot open: keep it in gh's own file (hosts.yml, readable by this account alone)
   if gh auth token --hostname github.com </dev/null 2>/dev/null | gh auth login --hostname github.com --with-token --insecure-storage >/dev/null 2>&1; then
     gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
     if git_clean_ok; then say "${d}${e_key}Your GitHub sign-in is kept in ~/.config/gh/hosts.yml (readable by you alone), because this computer's keyring cannot be opened from a new terminal.${z}"; return 0; fi
   fi
-  warn "git in a new terminal may ask for your GitHub user name. Run: gh auth setup-git --force    and, if it still asks: gh auth login --hostname github.com --git-protocol https --insecure-storage"
-  problem "git does not reach GitHub from a new terminal (run: gh auth setup-git --force)"
+  warn "git in a new terminal may ask for your GitHub user name. Run: gh auth setup-git --hostname github.com    and, if it still asks: gh auth login --hostname github.com --git-protocol https --insecure-storage"
+  problem "git does not reach GitHub from a new terminal (run: gh auth setup-git --hostname github.com)"
   return 0
 }
 
