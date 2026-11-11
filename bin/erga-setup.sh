@@ -1001,7 +1001,7 @@ detect_platform() {
   if grep -qi microsoft /proc/version 2>/dev/null || [ -n "${WSL_DISTRO_NAME:-}" ]; then wsl=1; wsl_txt=", under WSL"; fi
   is_debian=0; [ "$d_id" = debian ] && is_debian=1
   tested=0
-  case "$d_id:$d_version" in debian:12 | debian:12.* | debian:13 | debian:13.*) tested=1 ;; esac
+  case "$d_id:$d_version" in debian:12 | debian:12.* | debian:13 | debian:13.* | ubuntu:24.04* | ubuntu:26.04*) tested=1 ;; esac
   if [ "$family" = arch ]; then tested=1; fi   # a rolling release: the current one
 }
 

@@ -15,11 +15,10 @@
 #      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
 #      everyday userland and ImageMagick. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and
 #      `erga toolchain ensure` install each at a pinned version in your own folders, and `erga update` keeps them current,
-#   2. PostgreSQL: on the Debian family, PostgreSQL's own apt repository (its key checked against a pinned SHA-256), from which erga installs PostgreSQL 18.
-#   3. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
-#   4. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI
+#   2. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
+#   3. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI
 #      assistants, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and ./erga shell ensure, toolchain ensure and doctor,
-#   5. Login shell: offers to make fish your login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
+#   4. Login shell: offers to make fish your login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
 #
 # Safe to run again. Options (after `sh -s --` when piped):
 #   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
@@ -86,10 +85,6 @@ comfort=1   # the bootstrap is opinionated: the comfort kits are on unless BOOTS
 # Microsoft's apt signing key (fingerprint BC52 8686 B50D 79E3 39D3 721C EB3E 94AD BE12 29CF), for VS Code on a Debian machine that is not under WSL
 MS_KEY_URL=https://packages.microsoft.com/keys/microsoft.asc
 MS_KEY_SHA256=2fa9c05d591a1582a9aba276272478c262e95ad00acf60eaee1644d93941e3c6
-# PostgreSQL's apt signing key (fingerprint B97B 0AFC AA1A 47F0 44F2 44A0 7FCC 7D46 ACCC 4CF8), for PostgreSQL 18, which Debian and Ubuntu do not ship
-PGDG_KEY_URL=https://www.postgresql.org/media/keys/ACCC4CF8.asc
-PGDG_KEY_SHA256=0144068502a1eddd2a0280ede10ef607d1ec592ce819940991203941564e8e76
-
 sudo_cmd=""
 sudo_ready=0
 
@@ -210,7 +205,7 @@ install_packages() {
   if [ "$family" = macos ]; then mac_packages; return 0; fi
   phase "${e_pkg}Setting up the everyday programs ($family family)"
   if [ "$tested" = 0 ]; then
-    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13 and for Arch; I will go on, and say what does not work."
+    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13, Ubuntu 24.04 and 26.04, and Arch; I will go on, and say what does not work."
   fi
   missing=""
   for spec in $(wanted_packages); do
@@ -280,28 +275,6 @@ apt_code() {  # Microsoft's repository, signed by its pinned key, then the packa
   printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64 arm64\nSigned-By: /usr/share/keyrings/microsoft.asc\n' |
     $sudo_cmd tee /etc/apt/sources.list.d/vscode.sources >/dev/null || return 1
   apt_update && apt_install code
-}
-
-apt_pgdg() {  # PostgreSQL's repository for this release, signed by its pinned key; PostgreSQL 18 is installed from it only where no PostgreSQL 18 is here
-  key=$(download_verified "$PGDG_KEY_URL" "$PGDG_KEY_SHA256") || return 1
-  $sudo_cmd install -D -m 644 "$key" /usr/share/keyrings/postgresql.asc || return 1
-  printf 'Types: deb\nURIs: https://apt.postgresql.org/pub/repos/apt\nSuites: %s-pgdg\nComponents: main\nSigned-By: /usr/share/keyrings/postgresql.asc\n' "$d_codename" |
-    $sudo_cmd tee /etc/apt/sources.list.d/pgdg.sources >/dev/null || return 1
-  apt_update
-}
-
-# PostgreSQL's own apt repository on the Debian family, so that erga's toolchain finds PostgreSQL 18 there where none is installed yet (009-machine-bootstrap FR-090)
-add_postgresql_repository() {
-  [ "$family" = debian ] || return 0   # Arch and Homebrew ship PostgreSQL 18 themselves
-  apt_sources=${BOOTSTRAP_APT_SOURCES:-/etc/apt}   # where apt keeps its sources; a test names its own
-  grep -rqs 'apt.postgresql.org' "$apt_sources/sources.list" "$apt_sources/sources.list.d/" && return 0
-  phase "${e_list}Adding PostgreSQL's apt repository"
-  if [ -z "${d_codename:-}" ]; then problem "PostgreSQL's apt repository: this release names no codename"; return 0; fi
-  if [ "$dry" = 1 ]; then would "add PostgreSQL's apt repository for $d_codename (its signing key checked against its pinned SHA-256), for erga's PostgreSQL 18"; return 0; fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ]; then say "Skipped adding PostgreSQL's apt repository (BOOTSTRAP_NO_APT=1)."; return 0; fi
-  sudo_for "add PostgreSQL's apt repository" || { problem "PostgreSQL's apt repository: no administrator rights to add it"; return 0; }
-  step "${e_dl}Adding PostgreSQL's apt repository for $d_codename" apt_pgdg || problem "PostgreSQL's apt repository could not be added for $d_codename"
-  return 0
 }
 
 # VS Code's Microsoft package, on a machine with a desktop that is not under WSL (under WSL the setup makes `code` run VS Code on Windows)
@@ -381,7 +354,6 @@ main_bootstrap() {
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
   ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap"
   install_packages
-  add_postgresql_repository
   install_code_package
   setup_rc=0
   run_setup || setup_rc=$?

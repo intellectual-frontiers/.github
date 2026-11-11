@@ -128,7 +128,6 @@ class Shape(unittest.TestCase):
         for var in ("UV_VERSION", "RUSTUP_INIT_VERSION", "GH_VERSION", "JQ_VERSION"):
             self.assertRegex(re.search(rf"^{var}=(\S+)$", text, re.M).group(1), r"^\d+\.\d+(\.\d+)?$", var)
         self.assertRegex(re.search(r"^MS_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "Microsoft's key, pinned by the bootstrap")
-        self.assertRegex(re.search(r"^PGDG_KEY_SHA256=(\S+)$", BOOT.read_text(), re.M).group(1), r"^[0-9a-f]{64}$", "PostgreSQL's key, pinned by the bootstrap (009-machine-bootstrap FR-090)")
 
 
 @unittest.skipUnless(SH, "sh is not installed")
@@ -164,23 +163,17 @@ class Entry(Fixture):
             self.assertNotIn(gone, p.stdout, f"the setup has no {gone} step")
         self.assertNotIn("\x1b", p.stdout + p.stderr, "no colour away from a terminal")
 
-    def test_the_bootstrap_adds_postgresql_s_apt_repository_once_on_the_debian_family_alone(self):
-        """009-machine-bootstrap FR-090: PostgreSQL's own repository for the release, its key pinned, so that erga's toolchain finds PostgreSQL 18"""
-        sources = self.tmp / "apt"
-        (sources / "sources.list.d").mkdir(parents=True, exist_ok=True)
-        call = lambda family, codename="trixie", **env: subprocess.run(   # noqa: E731
-            [SH, "-c", f'. "{BOOT}"; family={family}; d_codename={codename}; dry=1; has_tty=0; add_postgresql_repository'],
-            capture_output=True, text=True,
-            env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_APT_SOURCES=str(sources), **env))
-        first = call("debian")
-        self.assertIn("would add PostgreSQL's apt repository for trixie", first.stdout, first.stdout + first.stderr)
-        self.assertNotRegex(first.stdout, r"(?i)install(ing)? postgresql", "the toolchain installs PostgreSQL, never the bootstrap (FR-021)")
-        self.assertEqual(call("arch").stdout, "", "Arch ships PostgreSQL 18 itself")
-        self.assertNotIn("would add", call("debian", codename="").stdout, "a release that names no codename gets no repository, reported at the end")
-        (sources / "sources.list.d" / "pgdg.sources").write_text("URIs: https://apt.postgresql.org/pub/repos/apt\n")
-        self.assertEqual(call("debian").stdout, "", "a computer that has it is left as it is")
+    def test_the_bootstrap_neither_installs_postgresql_nor_adds_its_repository(self):
+        """009-machine-bootstrap FR-090: PostgreSQL is not the bootstrap's; it adds no repository and installs no PostgreSQL package"""
         boot = BOOT.read_text()
-        self.assertLess(boot.index("  install_packages\n  add_postgresql_repository"), boot.index("  install_code_package"), "after the packages, in the bootstrap's own steps")
+        for gone in ("apt.postgresql.org", "PGDG", "add_postgresql_repository", "pg_dropcluster"):
+            self.assertNotIn(gone, boot, f"the bootstrap has no {gone}")
+
+    def test_ubuntu_lts_releases_are_tested(self):
+        """009-machine-bootstrap FR-001: Ubuntu 24.04 and 26.04 carry no 'untested' warning"""
+        text = SCRIPT.read_text()
+        for release in ("ubuntu:24.04*", "ubuntu:26.04*"):
+            self.assertIn(release, text)
 
     def test_dry_run_installs_rust_through_rustup_and_runs_ergas_commands_in_the_order_of_the_spec(self):
         """009-machine-bootstrap FR-026, FR-055, FR-056: rustup and uv first; in the clone the toolchain rust-toolchain.toml names, then shell ensure, toolchain ensure,
