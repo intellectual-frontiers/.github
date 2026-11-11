@@ -586,6 +586,29 @@ esac'''
         self.assertIn("wants a password", q.stdout)
         self.assertNotIn("asked for a password", q.stdout + q.stderr)
 
+    def test_a_launcher_link_that_erga_shell_ensure_made_is_not_warned_about(self):
+        """009-machine-bootstrap FR-058: ~/.local/bin/erga as a link to this clone's launcher is right; a link elsewhere or a file of the person's is left with a line that says which"""
+        target = self.tmp / "clone"
+        target.mkdir()
+        (target / "erga").write_text("#!/bin/sh\n")
+        (target / "erga").chmod(0o755)
+        binf = self.home / ".local" / "bin"
+        binf.mkdir(parents=True)
+        run = lambda: subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; target="{target}"; bin="{binf}"; link_launcher erga'], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
+        (binf / "erga").symlink_to(target / "erga")
+        p = run()
+        self.assertEqual((p.stdout + p.stderr).strip(), "", "its own link: nothing to say")
+        (binf / "erga").unlink()
+        (binf / "erga").symlink_to(self.tmp / "elsewhere-erga")
+        (self.tmp / "elsewhere-erga").write_text("x")
+        self.assertIn("is a link to", run().stderr + run().stdout)
+        (binf / "erga").unlink()
+        (binf / "erga").write_text("#!/bin/sh\necho mine\n")
+        self.assertIn("is a file of yours", run().stderr + run().stdout)
+        (binf / "erga").unlink()
+        self.assertEqual(run().returncode, 0)
+        self.assertIn("erga-setup wrapper", (binf / "erga").read_text(), "no file: the wrapper is made")
+
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""
         p = self.go(FAKE_FAIL_LOCAL="1")
