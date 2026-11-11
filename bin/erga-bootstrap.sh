@@ -27,8 +27,7 @@
 #   -h, --help         this text
 #
 # Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
-# erga-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), ERGA_PG_DEBIAN_MAIN=delete|keep (Debian's own 18/main server, made
-# when this installs postgresql-18: deleted by default), and every variable erga-setup.sh reads.
+# erga-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable erga-setup.sh reads.
 # Exit status: 0 done, 1 erga's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
 # shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
 set -eu
@@ -217,7 +216,8 @@ install_packages() {
   for spec in $(wanted_packages); do
     pkg_installed "$spec" 2>/dev/null || missing="$missing $spec"
   done
-  if kit_on shell && fish_from_apt && ! pkg_installed fish 2>/dev/null; then missing="$missing fish"; fi
+  # a fish 4 already on this computer, from any source (a package, the setup's own copy, Homebrew), is used as it is
+  if kit_on shell && fish_from_apt && ! pkg_installed fish 2>/dev/null && ! have_fish4; then missing="$missing fish"; fi
   if [ -z "$missing" ]; then
     say "Everything the packages give is here."
     return 0
@@ -323,34 +323,9 @@ install_code_package() {
 bootstrap_install_libraries() {  # bootstrap_install_libraries "package package ..."
   if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ]; then return 1; fi
   sudo_for "install the system libraries erga's programs link against ($1)" || return 1
-  pg_main_dir=${BOOTSTRAP_PG_ETC:-/etc/postgresql}/18/main   # where Debian's postgresql-common records the server it makes; a test names its own
-  pg_main_before=0; [ -d "$pg_main_dir" ] && pg_main_before=1
   # shellcheck disable=SC2086  # a list of package names
   step_soft "${e_pkg}Installing system libraries for erga's programs" pm_install $1 || return 1
-  case " $1 " in *" postgresql-18 "*) [ "$pg_main_before" = 0 ] && [ -d "$pg_main_dir" ] && debian_postgres_main ;; esac
-  return 0
-}
-
-# Debian's postgresql-18 package makes and starts a server of its own (18/main, port 5432) when it is installed. erga runs its own small local database, off until
-# started, so this one is not needed (009-machine-bootstrap FR-097; erga's 195-local-development): the person is asked once, and the default deletes it (pg_dropcluster);
-# kept, it is stopped and not started again with the computer. ERGA_PG_DEBIAN_MAIN=delete|keep answers without a question; without a terminal it is deleted.
-debian_postgres_main() {
-  choice=$(cfg ERGA_PG_DEBIAN_MAIN '')
-  if [ -z "$choice" ]; then
-    if [ "$has_tty" = 1 ] && [ "${BOOTSTRAP_YES:-}" != 1 ]; then
-      say "Debian made its own PostgreSQL 18 server (18/main, port 5432) when it installed PostgreSQL. erga does not need it: erga's local database is its own."
-      if ask "Delete Debian's 18/main server (it holds nothing yet)?"; then choice=delete; else choice=keep; fi
-    else
-      choice=delete
-    fi
-  fi
-  if [ "$choice" = keep ]; then
-    step_soft "${e_ok}Stopping Debian's own PostgreSQL server (18/main), kept" sh -c "$sudo_cmd pg_ctlcluster 18 main stop 2>/dev/null; command -v systemctl >/dev/null 2>&1 && $sudo_cmd systemctl disable postgresql >/dev/null 2>&1; true"
-    say "Debian's 18/main server is kept, stopped and not started with the computer. sudo pg_ctlcluster 18 main start starts it; sudo pg_dropcluster --stop 18 main deletes it."
-  else
-    step_soft "${e_ok}Deleting Debian's own PostgreSQL server (18/main)" $sudo_cmd pg_dropcluster --stop 18 main ||
-      problem "Debian's 18/main server could not be deleted (run: sudo pg_dropcluster --stop 18 main)"
-  fi
+  # PostgreSQL is not this script's: whatever server Debian's package makes is left exactly as it is (never deleted, stopped or disabled here)
   return 0
 }
 

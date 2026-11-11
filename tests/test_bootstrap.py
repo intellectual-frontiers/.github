@@ -388,34 +388,20 @@ exit 0
         self.assertIn("rc=1", off.stdout)
         self.assertEqual(log.read_text(), "")
 
-    def test_debians_own_postgresql_server_made_by_the_install_is_deleted_by_default_or_kept_stopped(self):
-        """009-machine-bootstrap FR-097, FR-023: Debian's postgresql-18 makes 18/main; erga needs it not"""
+    def test_debians_own_postgresql_server_is_never_deleted_stopped_or_disabled(self):
+        """009-machine-bootstrap FR-097: PostgreSQL is not the bootstrap's; a server Debian's package makes is left as it is"""
         log = self.tmp / "pg.log"
         etc = self.tmp / "etc-postgresql"
         self.stub("sudo", 'case "$1" in -v | -n) exit 0 ;; esac\nexec "$@"')
         for prog in ("pg_dropcluster", "pg_ctlcluster", "systemctl"):
             self.stub(prog, f'echo "{prog} $*" >>{log}')
-
-        def call(packages="libfoo postgresql-18", made=True, before=False, **env):
-            log.write_text("")
-            shutil.rmtree(etc, ignore_errors=True)
-            if before:
-                (etc / "18" / "main").mkdir(parents=True)
-            mk = f'mkdir -p "{etc}/18/main"' if made else "true"
-            script = f'. "{BOOT}"; family=debian; sudo_ready=0; has_tty=0; dry=0; pm_install() {{ {mk}; }}; bootstrap_install_libraries "{packages}"; echo rc=$?'
+        log.write_text("")
+        script = f'. "{BOOT}"; family=debian; sudo_ready=0; has_tty=0; dry=0; pm_install() {{ mkdir -p "{etc}/18/main"; }}; bootstrap_install_libraries "libfoo postgresql-18"; echo rc=$?'
+        for extra in ({}, {"ERGA_PG_DEBIAN_MAIN": "delete"}, {"ERGA_PG_DEBIAN_MAIN": "keep"}):
             p = subprocess.run([SH, "-c", script], capture_output=True, text=True,
-                               env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_PG_ETC=str(etc), PATH=f"{self.bin}:{os.environ['PATH']}", **env))
+                               env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_PG_ETC=str(etc), PATH=f"{self.bin}:{os.environ['PATH']}", **extra))
             self.assertIn("rc=0", p.stdout, p.stdout + p.stderr)
-            return log.read_text()
-
-        self.assertIn("pg_dropcluster --stop 18 main", call(), "without a terminal it is deleted")
-        kept = call(ERGA_PG_DEBIAN_MAIN="keep")
-        self.assertNotIn("pg_dropcluster", kept)
-        self.assertIn("pg_ctlcluster 18 main stop", kept)
-        self.assertIn("pg_dropcluster --stop 18 main", call(ERGA_PG_DEBIAN_MAIN="delete"))
-        self.assertEqual(call(before=True), "", "a server that was there before is the person's, never touched")
-        self.assertEqual(call(packages="libfoo"), "", "nothing without PostgreSQL's package")
-        self.assertEqual(call(made=False), "", "nothing where Debian made no server")
+            self.assertEqual(log.read_text(), "", "no pg_dropcluster, pg_ctlcluster or systemctl call")
 
     def test_it_copies_erga_runs_its_commands_and_says_what_is_next(self):
         """009-machine-bootstrap FR-055 to FR-058, FR-065: shell ensure, toolchain ensure, check --quick and, last, doctor, whose output is shown; then the next step"""
