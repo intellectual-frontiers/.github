@@ -2322,13 +2322,42 @@ pg_found_server() {  # whether PostgreSQL 18's server programs (initdb) are on t
   done
   return 1
 }
-pg_install_help() {  # the commands a person runs for PostgreSQL 18's client (and its server, where it will live here)
+pg_install_help() {  # pg_install_help "client" or "client server": only the commands still needed, as one block to copy
   case $family in
-    debian) printf '%s\n' "  sudo apt install postgresql-common" "  sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y     (adds PostgreSQL's own apt repository, apt.postgresql.org)" "  sudo apt install postgresql-client-18                       (the client, psql; add postgresql-18 for a server on this computer)" ;;
+    debian)
+      ih_pkgs=postgresql-client-18; case " $1 " in *server*) ih_pkgs="postgresql-client-18 postgresql-18" ;; esac
+      if ! grep -rqs 'apt.postgresql.org' /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
+        printf '%s\n' "  sudo apt install -y postgresql-common" "  sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y     (adds PostgreSQL's own apt repository, apt.postgresql.org)"
+      fi
+      printf '%s\n' "  sudo apt install -y $ih_pkgs"
+      case " $1 " in *server*) printf '%s\n' "  (Debian also starts a server of its own, 18/main on port 5432, when postgresql-18 is installed. erga does not use it and never touches it; to remove it: sudo pg_dropcluster --stop 18 main)" ;; esac ;;
     arch) printf '%s\n' "  sudo pacman -S --needed postgresql                                  (the client and the server)" ;;
     macos) printf '%s\n' "  brew install postgresql@18                                          (or install Postgres.app from https://postgresapp.com)" ;;
     *) printf '%s\n' "  install PostgreSQL 18 with your package manager" ;;
   esac
+}
+# pg_require KIND...: PostgreSQL 18's client (always) and, for "server", its server programs are on this computer. What is missing is said once, as one block of commands; at a
+# terminal the setup waits for them to be run in another window and looks again, so that nothing has to be started over; without one it stops.
+pg_require() {
+  while :; do
+    rq_missing="client"; pg_psql=$(pg_found_psql) && rq_missing=""
+    case " $* " in *" server "*) pg_found_server || rq_missing="${rq_missing:+$rq_missing }server" ;; esac
+    [ -z "$rq_missing" ] && return 0
+    case $rq_missing in
+      client) rq_what="PostgreSQL 18's client (psql) is" ;;
+      server) rq_what="PostgreSQL 18's server programs are" ;;
+      *) rq_what="PostgreSQL 18's client (psql) and server programs are" ;;
+    esac
+    if [ "$has_tty" != 1 ]; then
+      need "$rq_what not on this computer, and erga installs no PostgreSQL." "install it, then run this again (nothing else has been installed yet):
+$(pg_install_help "$rq_missing")"
+    fi
+    say ""
+    say "${y}${b}${e_stop}Missing: PostgreSQL 18's ${rq_missing}.${z} erga installs no PostgreSQL. In another terminal window, run:"
+    pg_install_help "$rq_missing"
+    printf '%sPress Enter here when that is done and I will look again (Ctrl+C stops).%s ' "$b" "$z" >/dev/tty
+    rq_ans=""; read -r rq_ans </dev/tty || need "no answer was given." "run this again"
+  done
 }
 pg_service_file() { printf '%s' "${PGSERVICEFILE:-$HOME/.pg_service.conf}"; }
 pg_pass_file() { printf '%s' "${PGPASSFILE:-$HOME/.pgpass}"; }
@@ -2374,44 +2403,44 @@ postgres_destination() {
   [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
   if [ "$dry" = 1 ]; then
     heading "${e_db}Your PostgreSQL"
-    would "check that PostgreSQL 18's client (psql) is here (erga installs no PostgreSQL), then use the PostgreSQL you name: a service of ~/.pg_service.conf (BOOTSTRAP_POSTGRES=service=NAME), or ask for its host, port, user and password once and write [arca-local] and ~/.pgpass, or, with a PostgreSQL 18 installed on this computer, let erga make its own database in the workspace"
+    would "ask where your PostgreSQL 18 is, before the GitHub sign-in, and say at once everything missing (psql 18, and the server programs where erga is to make its own database); erga installs no PostgreSQL. A service of ~/.pg_service.conf (BOOTSTRAP_POSTGRES=service=NAME), or its host, port, user and password asked once and written as [arca-local] and ~/.pgpass"
     return 0
   fi
-  heading "${e_db}Your PostgreSQL (the second thing that needs you)"
+  heading "${e_db}Your PostgreSQL (the first thing that needs you)"
   say "erga keeps its records in PostgreSQL 18, which it ${b}never installs${z}: it needs one place to put them. That place can be on this computer or on any server you can reach."
   say "${d}It is written down once, in PostgreSQL's own files (a service in ~/.pg_service.conf and its password in ~/.pgpass), so psql, DBeaver and erga all use the same.${z}"
-  if ! pg_psql=$(pg_found_psql); then
-    need "PostgreSQL 18's client, psql, is not on this computer, and erga installs no PostgreSQL." "install it, then run this again (nothing else has been installed yet):
-$(pg_install_help)"
-  fi
-  say "${e_ok}psql 18 is here: $pg_psql"
+  # 1. where it is: named, written down by an earlier run, or asked
+  pg_pick=""
   case $pg_want in
-    erga)
-      pg_found_server || need "BOOTSTRAP_POSTGRES=erga needs PostgreSQL 18's server programs on this computer, and they are not here." "install PostgreSQL 18 with its server, then run this again:
-$(pg_install_help)"
-      pg_choice=erga; say "${e_ok}erga will make its own database in the workspace, with this computer's PostgreSQL 18 programs."; return 0 ;;
-    service=*)
-      pg_name=${pg_want#service=}
-      pg_has_service "$pg_name" || need "BOOTSTRAP_POSTGRES=service=$pg_name names a service that $(pg_service_file) does not have." "add a [$pg_name] section (host, port, user, dbname) and its password to ~/.pgpass, or unset BOOTSTRAP_POSTGRES to be asked"
-      pg_why=$(pg_test "$pg_name") || need "the PostgreSQL of [$pg_name] cannot be used: $pg_why" "fix the service or its password, then run this again"
-      pg_choice="service=$pg_name"; say "${e_ok}Your PostgreSQL 18 of [$pg_name] answers."; return 0 ;;
+    erga) pg_pick=2 ;;
+    service=*) pg_pick=1; pg_name=${pg_want#service=} ;;
   esac
-  # already written down, from an earlier run or by hand: used as it is
-  if pg_has_service arca-local && pg_test arca-local >/dev/null; then
-    pg_choice="service=arca-local"; say "${e_ok}Your PostgreSQL 18 of [arca-local] in $(pg_service_file) answers; erga uses it."; return 0
+  if [ -z "$pg_pick" ] && pg_has_service arca-local; then pg_pick=existing; pg_name=arca-local; fi
+  if [ -z "$pg_pick" ]; then
+    if [ "$has_tty" != 1 ]; then
+      need "no PostgreSQL has been named, and nobody is here to ask." "name one and run this again: write a service in ~/.pg_service.conf (and its password in ~/.pgpass) and run with BOOTSTRAP_POSTGRES=service=NAME, or, with PostgreSQL 18 installed on this computer, BOOTSTRAP_POSTGRES=erga; BOOTSTRAP_POSTGRES=none skips this"
+    fi
+    say ""
+    say "  1) A PostgreSQL 18 server I can reach (on this computer or another): I give its address"
+    say "  2) A PostgreSQL 18 installed on this computer: erga makes its own small database in the workspace, off until started"
+    pg_pick=$(pg_read "Which?" 1)
+    case $pg_pick in 2) ;; *) pg_pick=1 ;; esac
   fi
-  if [ "$has_tty" != 1 ]; then
-    need "no PostgreSQL has been named, and nobody is here to ask." "name one and run this again: write a service in ~/.pg_service.conf (and its password in ~/.pgpass) and run with BOOTSTRAP_POSTGRES=service=NAME, or, with PostgreSQL 18 installed on this computer, BOOTSTRAP_POSTGRES=erga; BOOTSTRAP_POSTGRES=none skips this"
-  fi
-  say ""
-  say "  1) A PostgreSQL 18 server I can reach (on this computer or another): I give its address"
-  say "  2) A PostgreSQL 18 installed on this computer: erga makes its own small database in the workspace, off until started"
-  pg_pick=$(pg_read "Which?" 1)
+  # 2. its programs, all at once: the client always, the server programs where erga makes its own database
+  if [ "$pg_pick" = 2 ]; then pg_require client server; else pg_require client; fi
+  say "${e_ok}psql 18 is here: $pg_psql"
+  # 3. settle it
   case $pg_pick in
-    2)
-      pg_found_server || need "PostgreSQL 18's server programs are not on this computer, and erga installs no PostgreSQL." "install them, then run this again:
-$(pg_install_help)"
-      pg_choice=erga; say "${e_ok}erga will make its own database in the workspace."; return 0 ;;
+    2) pg_choice=erga; say "${e_ok}erga will make its own database in the workspace, with this computer's PostgreSQL 18 programs."; return 0 ;;
+    existing | 1)
+      if [ -n "${pg_name:-}" ]; then
+        pg_has_service "$pg_name" || need "the service [$pg_name] is not in $(pg_service_file)." "add a [$pg_name] section (host, port, user, dbname) and its password to ~/.pgpass, or unset BOOTSTRAP_POSTGRES to be asked"
+        if pg_why=$(pg_test "$pg_name"); then
+          pg_choice="service=$pg_name"; say "${e_ok}Your PostgreSQL 18 of [$pg_name] answers; erga uses it."; return 0
+        fi
+        [ "$has_tty" = 1 ] && [ "$pg_pick" = existing ] || need "the PostgreSQL of [$pg_name] cannot be used: $pg_why" "fix the service or its password, then run this again"
+        warn "The service [$pg_name] did not work: $pg_why"
+      fi ;;
   esac
   pg_try=1
   while [ "$pg_try" -le 3 ]; do
@@ -2472,10 +2501,10 @@ main() {
   preflight
   check_network
   if [ "$dry" = 0 ]; then pinned_prereqs; fi   # jq and gh come after the look at the network, since they are downloads; the sign-in needs gh
+  postgres_destination   # before the GitHub code: what is missing is said at once, and nothing long has been waited for
   sign_in
   github_init
   check_access
-  postgres_destination
   identity
   keep_settings
   setup_runtime

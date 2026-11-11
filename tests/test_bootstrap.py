@@ -518,18 +518,25 @@ esac'''
         self.assertNotIn("./erga local ensure", self.run_script("--dry-run", BOOTSTRAP_POSTGRES="none").stdout)
 
     def test_a_postgresql_destination_is_a_prerequisite_settled_before_anything_is_installed(self):
-        """009-machine-bootstrap FR-099: psql 18 and a PostgreSQL to use, asked for right after the GitHub sign-in, never installed"""
+        """009-machine-bootstrap FR-099: psql 18 and a PostgreSQL to use, asked for before the GitHub sign-in, never installed"""
+        svc = (self.home / ".pg_service.conf").read_text()
         (self.home / ".pg_service.conf").unlink()
         p = self.go()   # a psql 18 that answers, but no service, and nobody to ask
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
         self.assertIn("no PostgreSQL has been named", p.stdout + p.stderr)
         self.assertIn("BOOTSTRAP_POSTGRES=service=NAME", p.stdout + p.stderr)
         self.assertNotIn("ERGA ", self.calls.read_text(), "nothing of erga ran")
+        (self.home / ".pg_service.conf").write_text(svc)
         (self.bin / "psql").unlink()
         p = self.go()
         self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("psql, is not on this computer, and erga installs no PostgreSQL", p.stdout + p.stderr)
+        self.assertIn("client (psql) is not on this computer, and erga installs no PostgreSQL", p.stdout + p.stderr)
         self.assertIn("postgresql-client-18", p.stdout + p.stderr, "the commands a person runs")
+        self.assertIn("sudo apt install -y", p.stdout + p.stderr, "no question for the person to answer in the middle of it")
+        p = self.go(BOOTSTRAP_POSTGRES="erga")   # erga's own database needs the server programs too, and all that is missing is said at once
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("client (psql) and server programs are not on this computer", p.stdout + p.stderr)
+        self.assertIn("postgresql-client-18 postgresql-18", p.stdout + p.stderr)
         self.assertEqual(self.go(BOOTSTRAP_POSTGRES="none").returncode, 0, "none skips it")
 
     def test_the_destination_is_written_in_postgresql_s_own_private_files(self):
@@ -1734,7 +1741,7 @@ class Installation(Fixture):
     def test_an_account_that_cannot_open_erga_is_told_before_anything_is_installed(self):
         self.stub("git", 'echo "remote: Repository not found." >&2; echo "fatal: repository not found" >&2; exit 128')
         self.stub("gh", 'case "$1" in auth) exit 0 ;; api) echo someone ;; esac')
-        p = self.run_script(BOOTSTRAP_NO_DOWNLOAD="1", BOOTSTRAP_NO_EDITOR="1", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        p = self.run_script(BOOTSTRAP_NO_DOWNLOAD="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_POSTGRES="none", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
         self.assertEqual(p.returncode, 5, p.stdout + p.stderr)
         self.assertIn("does not let this account open erga", p.stdout)
         self.assertIn("Nothing has been installed", p.stdout)
