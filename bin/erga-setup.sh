@@ -1689,6 +1689,27 @@ sign_in() {
     sign_in_stop
   fi
   gh auth setup-git --hostname github.com </dev/null >/dev/null 2>&1 || warn "gh could not be made git's credential helper; run: gh auth setup-git"
+  [ "${signin_how:-}" = gh ] && verify_git_login
+  return 0
+}
+
+# Whether git reaches GitHub the way a NEW terminal will: with no token in the environment, only gh as git's credential helper and the sign-in gh kept. The setup itself exports a
+# token (github_init), which would hide a sign-in that a later terminal cannot read (a keyring that is locked or absent over SSH, a helper that was not written), and then
+# `git pull` asks for a user name. Where it does not work, it is repaired here (the helper rewritten; the sign-in kept in gh's private file), not left for the person to find.
+git_clean_ok() { ( unset GH_TOKEN GITHUB_TOKEN; GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never git ls-remote "$erga_url" HEAD </dev/null >/dev/null 2>&1 ); }
+verify_git_login() {
+  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
+  git_clean_ok && { logf "git reaches GitHub with no token in the environment"; return 0; }
+  logf "git does not reach GitHub in a clean environment; repairing"
+  gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
+  git_clean_ok && return 0
+  # the sign-in is in a store a later terminal cannot open: keep it in gh's own file (hosts.yml, readable by this account alone)
+  if gh auth token --hostname github.com </dev/null 2>/dev/null | gh auth login --hostname github.com --with-token --insecure-storage >/dev/null 2>&1; then
+    gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
+    if git_clean_ok; then say "${d}${e_key}Your GitHub sign-in is kept in ~/.config/gh/hosts.yml (readable by you alone), because this computer's keyring cannot be opened from a new terminal.${z}"; return 0; fi
+  fi
+  warn "git in a new terminal may ask for your GitHub user name. Run: gh auth setup-git --force    and, if it still asks: gh auth login --hostname github.com --git-protocol https --insecure-storage"
+  problem "git does not reach GitHub from a new terminal (run: gh auth setup-git --force)"
   return 0
 }
 

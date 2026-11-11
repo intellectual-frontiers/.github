@@ -521,6 +521,20 @@ exit 0
         for f in (".pg_service.conf", ".pgpass"):
             self.assertEqual(oct((self.home / f).stat().st_mode & 0o777), "0o600", f)
 
+    def test_a_github_sign_in_a_new_terminal_cannot_use_is_repaired_before_the_setup_ends(self):
+        """009-machine-bootstrap FR-100: git must reach GitHub with no token in the environment, as a new terminal does; otherwise it is repaired"""
+        mark = self.tmp / "helper-ok"
+        calls = self.tmp / "gh-calls"
+        self.stub("git", f'case "$*" in *ls-remote*) [ -f "{mark}" ] && exit 0; exit 1 ;; esac\nexit 0')
+        self.stub("gh", f'echo "$*" >>"{calls}"\ncase "$*" in "auth token"*) echo tok ;; "auth login"*) cat >/dev/null; touch "{mark}" ;; esac\nexit 0')
+        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; erga_url=https://example.invalid/erga; work=$HOME; signin_how=gh; verify_git_login; echo rc=$?'
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(PATH=f"{self.bin}:{os.environ['PATH']}", GH_TOKEN="from-the-environment"))
+        self.assertIn("rc=0", p.stdout, p.stdout + p.stderr)
+        text = calls.read_text()
+        self.assertIn("auth setup-git --force", text, "the helper is rewritten first")
+        self.assertIn("auth login --hostname github.com --with-token --insecure-storage", text, "then the sign-in is kept in gh's own private file")
+        self.assertIn("hosts.yml", p.stdout, "and the person is told where")
+
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""
         p = self.go(FAKE_FAIL_LOCAL="1")
