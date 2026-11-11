@@ -399,6 +399,32 @@ exit 0
             self.assertIn("rc=0", p.stdout, p.stdout + p.stderr)
             self.assertEqual(log.read_text(), "", "no pg_dropcluster, pg_ctlcluster or systemctl call")
 
+    def test_one_package_source_that_cannot_be_read_does_not_stop_the_packages(self):
+        """009-machine-bootstrap FR-015: apt update failing for one source (no Release file for a pocket) is said and gone on from; only where nothing can be found is it a stop"""
+        log = self.tmp / "pm.log"
+        log.write_text("")
+        self.stub("sudo", 'case "$1" in -v | -n) exit 0 ;; esac\nexec "$@"')
+        self.stub("dpkg-query", "exit 1")
+        has = f'''case "$*" in
+  *update*) echo "E: The repository 'http://security.ubuntu.com/ubuntu resolute-security Release' no longer has a Release file." >&2; exit 100 ;;
+  *install*) echo "apt-get $*" >>{log} ;;
+esac'''
+        self.stub("apt-get", has)
+        policy = lambda cand: self.stub("apt-cache", f'echo "{{}}:"; echo "  Candidate: {cand}"'.replace("{}", "x"))
+        call = lambda: subprocess.run([SH, "-c", f'. "{BOOT}"; family=debian; tested=1; d_codename=resolute; sudo_ready=1; has_tty=0; dry=0; load_config; install_packages; echo rc=$?'],
+                                      capture_output=True, text=True,
+                                      env=self.env(BOOTSTRAP_SOURCE_ONLY="1", BOOTSTRAP_SETUP=str(SCRIPT), BOOTSTRAP_NO_COMFORT="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
+        policy("1.0")
+        p = call()
+        self.assertIn("rc=0", p.stdout, p.stdout + p.stderr)
+        self.assertIn("apt could not read every package source", p.stdout + p.stderr)
+        self.assertIn("no longer has a Release file", p.stdout + p.stderr)
+        self.assertRegex(log.read_text(), r"apt-get .*install", "the packages are installed from what apt could read")
+        policy("(none)")
+        p = call()
+        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+        self.assertIn("none of the packages can be found", p.stdout + p.stderr)
+
     def test_it_copies_erga_runs_its_commands_and_says_what_is_next(self):
         """009-machine-bootstrap FR-055 to FR-058, FR-065: shell ensure, toolchain ensure, check --quick and, last, doctor, whose output is shown; then the next step"""
         p = self.go()

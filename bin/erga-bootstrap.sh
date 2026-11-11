@@ -237,7 +237,14 @@ install_packages() {
     # the table has no refresh for the family (Arch: never -Sy), and the names are its own and unique, so the manager decides what it has: a package it cannot find means a package list older than the repositories
     chosen=$missing
   else
-    step "${e_list}Checking what is new in Debian" apt_update || need "the package list could not be refreshed." "check your network, then run this again"
+    # One package source that cannot be read (a mirror's pocket with no Release file, as Ubuntu's security.ubuntu.com has been for a new release) must not stop the setup: apt has
+    # read the others and keeps what it knew of the one it could not, so the packages are looked for in what it has. Only where none can then be found is it a stop.
+    apt_failed=""
+    if ! step_soft "${e_list}Checking what is new in Debian" apt_update; then
+      apt_failed=$(grep -E '^(E|W):' "$work/last.log" 2>/dev/null | head -n 2 | cut -c1-170 | tr '\n' ' ')
+      warn "apt could not read every package source (${apt_failed:-see the log}); I go on with what it could read."
+      problem "apt update did not read every package source: ${apt_failed:-see the log}"
+    fi
     # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
     chosen=""; lacking=""
     for spec in $missing; do
@@ -248,6 +255,9 @@ install_packages() {
       if [ "$pick" = fish ] && [ "$(cand_major "$(pkg_candidate fish)")" -lt 4 ]; then pick=""; fi   # fish 3 is not the shell this sets up; the setup's pinned release is
       if [ -n "$pick" ]; then chosen="$chosen $pick"; elif [ "$spec" != fish ]; then lacking="$lacking $spec"; fi
     done
+    if [ -n "$apt_failed" ] && [ -z "$chosen" ]; then
+      need "apt could not read its package sources, so none of the packages can be found: $apt_failed" "check your network and /etc/apt/sources.list.d (a mirror that is down can be replaced by http://archive.ubuntu.com/ubuntu), run: sudo apt update, then run this again"
+    fi
     if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
   fi
   if [ -n "$chosen" ]; then
