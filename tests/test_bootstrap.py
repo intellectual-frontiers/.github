@@ -380,12 +380,12 @@ esac'''
         self.assertTrue((self.clone / "erga").is_file())
         out = p.stdout
         calls = self.calls.read_text()
-        order = [calls.index(c) for c in ("ERGA toolchain ensure python jre", "ERGA local ensure", "ERGA check --quick", "ERGA doctor")]
-        self.assertEqual(order, sorted(order), "toolchain ensure, then the local database, then the quick check, then doctor")
+        order = [calls.index(c) for c in ("ERGA toolchain ensure python jre", "ERGA check --quick", "ERGA doctor")]
+        self.assertEqual(order, sorted(order), "toolchain ensure, then the quick check, then doctor")
         self.assertNotIn("docker", calls, "what is not here and not optional")
-        self.assertEqual(calls.count("assume_yes=1"), 4, "every question erga could ask is answered yes")
-        self.assertEqual(calls.count("no_admin=1"), 4, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
-        self.assertEqual(calls.count("env=bootstrap"), 4, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
+        self.assertEqual(calls.count("assume_yes=1"), 3, "every question erga could ask is answered yes")
+        self.assertEqual(calls.count("no_admin=1"), 3, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
+        self.assertEqual(calls.count("env=bootstrap"), 3, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
         self.assertIn("DOCTOR SAYS: Next: erga toolchain ensure jre", out, "doctor's own words are shown")
         self.assertLess(out.index("DOCTOR SAYS"), out.index("erga shell emit bash"))
         self.assertIn('eval "$(erga shell emit bash)"', out, "009-machine-bootstrap FR-101: the one optional line, printed and never written")
@@ -414,80 +414,6 @@ esac'''
         self.go(BOOTSTRAP_TOOLCHAIN="none")
         self.assertNotIn("ERGA toolchain ensure", self.calls.read_text())
 
-    def test_the_local_database_is_made_once_left_off_and_its_home_can_be_chosen(self):
-        """009-machine-bootstrap FR-055, FR-098: ./erga local ensure after the programs; BOOTSTRAP_POSTGRES chooses without a question; the summary says how to start it"""
-        p = self.go()
-        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        line = [l for l in self.calls.read_text().splitlines() if "local ensure" in l]
-        self.assertEqual(len(line), 1)
-        self.assertIn("--use service=arca-local", line[0], "the destination settled early is handed to erga")
-        for words in ("./erga local start", "./erga local status", "./erga local stop", "off until you need it"):
-            self.assertIn(words, p.stdout)
-        with (self.home / ".pg_service.conf").open("a") as f:
-            f.write("[my-windows-pg]\nhost=win.example\nport=5432\nuser=postgres\n")
-        self.go(BOOTSTRAP_POSTGRES="service=my-windows-pg")
-        self.assertIn("ERGA local ensure --use service=my-windows-pg", self.calls.read_text())
-        self.go(BOOTSTRAP_POSTGRES="none")
-        self.assertNotIn("local ensure", self.calls.read_text())
-        dry = self.run_script("--dry-run", BOOTSTRAP_POSTGRES="erga").stdout
-        self.assertIn("./erga local ensure --use erga", dry)
-        self.assertNotIn("./erga local ensure", self.run_script("--dry-run", BOOTSTRAP_POSTGRES="none").stdout)
-
-    def test_a_postgresql_destination_is_a_prerequisite_settled_before_anything_is_installed(self):
-        """009-machine-bootstrap FR-099: psql 18 and a PostgreSQL to use, asked for before the GitHub sign-in, never installed"""
-        svc = (self.home / ".pg_service.conf").read_text()
-        (self.home / ".pg_service.conf").unlink()
-        p = self.go()   # a psql 18 that answers, but no service, and nobody to ask
-        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("no PostgreSQL has been named", p.stdout + p.stderr)
-        self.assertIn("BOOTSTRAP_POSTGRES=service=NAME", p.stdout + p.stderr)
-        self.assertNotIn("ERGA ", self.calls.read_text(), "nothing of erga ran")
-        (self.home / ".pg_service.conf").write_text(svc)
-        (self.bin / "psql").unlink()
-        p = self.go()
-        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("client (psql) is not on this computer, and erga installs no PostgreSQL", p.stdout + p.stderr)
-        self.assertIn("postgresql-client-18", p.stdout + p.stderr, "the commands a person runs")
-        self.assertIn("sudo apt install -y", p.stdout + p.stderr, "no question for the person to answer in the middle of it")
-        p = self.go(BOOTSTRAP_POSTGRES="erga")   # erga's own database needs the server programs too, and all that is missing is said at once
-        self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
-        self.assertIn("client (psql) and server programs are not on this computer", p.stdout + p.stderr)
-        self.assertIn("postgresql-client-18 postgresql-18", p.stdout + p.stderr)
-        self.assertEqual(self.go(BOOTSTRAP_POSTGRES="none").returncode, 0, "none skips it")
-
-    def test_the_destination_is_written_in_postgresql_s_own_private_files(self):
-        """009-machine-bootstrap FR-099: [NAME] in ~/.pg_service.conf and the password in ~/.pgpass, both readable by the account alone, a colon escaped"""
-        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; pg_write_service arca-local db.example 5432 app "pa:ss\\w"; pg_write_service other h 5433 u ""; pg_write_service arca-local db2.example 5432 app "x"'
-        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1"))
-        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        svc = (self.home / ".pg_service.conf").read_text()
-        self.assertEqual(svc.count("[arca-local]"), 1, "a service written again replaces the old one")
-        self.assertIn("host=db2.example", svc)
-        self.assertNotIn("db.example\n", svc)
-        self.assertIn("[other]", svc)
-        pgpass = (self.home / ".pgpass").read_text()
-        self.assertIn("db2.example:5432:*:app:x", pgpass)
-        for f in (".pg_service.conf", ".pgpass"):
-            self.assertEqual(oct((self.home / f).stat().st_mode & 0o777), "0o600", f)
-
-    def test_a_service_of_ergas_own_database_is_not_tested_and_a_missing_password_is_said_without_asking_for_it(self):
-        """009-machine-bootstrap FR-099: [arca-local] that erga made for its own server (a folder as host, off by design) is kept; psql never asks for a password in the middle of the setup"""
-        (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=/home/x/workspaces/erga/build/arca/local\nport=55432\ndbname=arca\nuser=postgres\n")
-        self.stub("psql", 'case "$*" in *--version*) echo "psql (PostgreSQL) 18.6" ;; *) echo "psql: error: connection failed" >&2; exit 2 ;; esac')
-        self.stub("initdb", 'echo "initdb (PostgreSQL) 18.6"')
-        p = self.go()
-        self.assertNotIn("did not work", p.stdout + p.stderr, "the own server is off on purpose: no test")
-        self.assertIn("erga's own database in the workspace", p.stdout)
-        self.assertIn("--use erga", self.calls.read_text())
-        # a missing password: psql is run with -w (never prompts) and the hint says what to do
-        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; pg_psql=psql; pg_test arca-local'
-        self.stub("psql", 'case "$*" in *" -w "*) ;; *) echo "psql asked for a password" >&2; exit 9 ;; esac; echo \'psql: error: connection to server at "db" failed: fe_sendauth: no password supplied\' >&2; exit 2')
-        (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=db.example\nport=5432\nuser=postgres\ndbname=arca\n")
-        q = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
-        self.assertIn("no password supplied", q.stdout)
-        self.assertIn("wants a password", q.stdout)
-        self.assertNotIn("asked for a password", q.stdout + q.stderr)
-
     def test_a_launcher_link_that_erga_shell_ensure_made_is_not_warned_about(self):
         """009-machine-bootstrap FR-058: ~/.local/bin/erga as a link to this clone's launcher is right; a link elsewhere or a file of the person's is left with a line that says which"""
         target = self.tmp / "clone"
@@ -510,15 +436,6 @@ esac'''
         (binf / "erga").unlink()
         self.assertEqual(run().returncode, 0)
         self.assertIn("erga-setup wrapper", (binf / "erga").read_text(), "no file: the wrapper is made")
-
-    def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
-        """009-machine-bootstrap FR-055"""
-        p = self.go(FAKE_FAIL_LOCAL="1")
-        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
-        self.assertIn("erga local ensure did not finish", p.stdout)
-        self.assertRegex(p.stdout, r"(x|❌).*\./erga local ensure \(exit status 3\)")
-        self.assertNotIn("off until you need it", p.stdout, "how to start it is said only where it was made")
-        self.assertIn("ERGA doctor", self.calls.read_text(), "the rest goes on")
 
     def test_every_command_runs_when_one_fails_and_the_status_says_so(self):
         """009-machine-bootstrap FR-055"""

@@ -262,7 +262,7 @@ bootstrap_install_libraries() {  # bootstrap_install_libraries "package package 
   sudo_for "install the system libraries erga's programs link against ($1)" || return 1
   # shellcheck disable=SC2086  # a list of package names
   step_soft "${e_pkg}Installing system libraries for erga's programs" pm_install $1 || return 1
-  # PostgreSQL is not this script's: whatever server Debian's package makes is left exactly as it is (never deleted, stopped or disabled here)
+  # PostgreSQL is nobody here's to install, start or stop: no step of this script touches it
   return 0
 }
 

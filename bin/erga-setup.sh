@@ -26,7 +26,7 @@
 #      startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs,
 #   3. Workspace and clone: copies the private erga repository to ~/workspaces/github.com/intellectual-frontiers/erga (or updates it by
 #      fast-forward only), then installs there the Rust toolchain its rust-toolchain.toml names (stable) (rustup checks each part against its manifest),
-#   4. erga: runs, in the clone, ./erga toolchain ensure, ./erga local ensure, ./erga check --quick where erga has it (seconds; the full `erga check` takes minutes and is yours
+#   4. erga: runs, in the clone, ./erga toolchain ensure, ./erga check --quick where erga has it (seconds; the full `erga check` takes minutes and is yours
 #      to run) and, last, ./erga doctor, which says what to do next. It ends by printing the one optional line that puts erga on your PATH (`erga shell emit`, erga's 010-shell).
 #
 # Safe to run again: what is already in place changes nothing, and a clone with your work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal
@@ -51,10 +51,6 @@
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
 #   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
 #   BOOTSTRAP_TOOLCHAIN    the names for `erga toolchain ensure` (default: every entry of `erga toolchain list` not here and not marked optional; none; all)
-#   BOOTSTRAP_POSTGRES     where your local Erga database lives, for `erga local ensure --use`: erga (erga's own, in the workspace, off until started) or
-#                          service=NAME (a PostgreSQL 18 you run, here or elsewhere, by its [NAME] in ~/.pg_service.conf); none skips it. PostgreSQL 18 is a
-#                          prerequisite erga never installs: right after the GitHub sign-in the setup needs psql 18 and asks, once, where your PostgreSQL is
-#                          (host, port, user, password: written to ~/.pg_service.conf and ~/.pgpass); without a terminal it stops unless this is set
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
 #   ERGA_RETRIES           how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
@@ -1567,26 +1563,6 @@ in_erga_asking() {  # in_erga_asking COMMAND...: in front of the person, at the 
   ( cd "$target" && ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/tty )
 }
 
-# Your local Erga database (009-machine-bootstrap FR-055, FR-098; erga's 195-local-development): ./erga local ensure finds PostgreSQL 18, makes erga's own small data folder
-# or uses a PostgreSQL 18 you already run, records which in ~/.pg_service.conf as [arca-local], and leaves it off. BOOTSTRAP_POSTGRES chooses without a question;
-# unset, at a terminal, erga asks once and only where there is a real choice; without a terminal it makes its own.
-local_database() {
-  local_use=$(cfg BOOTSTRAP_POSTGRES '')
-  [ -n "$local_use" ] || local_use=$pg_choice   # what postgres_destination settled with the person, early
-  [ "$local_use" = none ] && { say "Skipped your local Erga database (BOOTSTRAP_POSTGRES=none); ./erga local ensure makes it when you want it."; return 0; }
-  local_ran=1
-  if [ -n "$local_use" ]; then
-    step_soft "${e_ok}Making your local Erga database (off until you start it)" in_erga_quiet ./erga local ensure --use "$local_use" || status_local=$?
-  elif [ "$has_tty" = 1 ] && [ "${BOOTSTRAP_YES:-}" != 1 ]; then
-    say "${b}Your local Erga database${z} ${d}(erga may ask you one question: where it should live)${z}"
-    in_erga_asking ./erga local ensure || status_local=$?
-  else
-    step_soft "${e_ok}Making your local Erga database (off until you start it)" in_erga_quiet ./erga local ensure || status_local=$?
-  fi
-  [ "$status_local" = 0 ] || problem "erga local ensure did not finish (run ./erga local ensure in $(short_path "$target") to see why)"
-  return 0
-}
-
 # The system libraries erga's own programs link against (the browser's libraries and the like), which only administrator rights can install. erga says which this
 # computer lacks, from its own declarations, so this script holds no second list (009-machine-bootstrap FR-023). The bootstrap, which has those rights, installs them (it defines
 # bootstrap_install_libraries); the setup alone names the one command for a person who has them, and goes on. Where erga names none, nothing is said.
@@ -1608,7 +1584,7 @@ system_libraries() {
 # check that takes minutes in its place.
 erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
 
-# In the clone, in this order (009-machine-bootstrap FR-055): ./erga toolchain ensure, ./erga local ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
+# In the clone, in this order (009-machine-bootstrap FR-055): ./erga toolchain ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
 # once everything is installed (FR-056). Every one runs even when one before it failed.
 run_erga() {
   heading "${e_rocket}erga"
@@ -1619,8 +1595,6 @@ run_erga() {
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
       would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
-      local_use=$(cfg BOOTSTRAP_POSTGRES '')
-      [ "$local_use" = none ] || would "run in the clone: ./erga local ensure${local_use:+ --use $local_use} (your local Erga database: made once, then left off; ./erga local start starts it)"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
       would "run in the clone, last: ./erga doctor, which says what to do next"
     }
@@ -1631,7 +1605,7 @@ run_erga() {
   if [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ]; then say "Skipped erga's commands (BOOTSTRAP_NO_ERGA=1)."; erga_ran=0; return 0; fi
   have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
   erga_ran=1
-  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_local=0; tool_skipped=0; tool_ran=0; check_ran=0; local_ran=0
+  status_build=0; status_doctor=0; status_tool=0; status_check=0; tool_skipped=0; tool_ran=0; check_ran=0
   phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
   step_soft "${e_rust}Building erga and arca with Cargo" in_erga_quiet ./erga --version || status_build=$?
   if [ "$status_build" != 0 ]; then
@@ -1666,7 +1640,6 @@ run_erga() {
     # shellcheck disable=SC2086
     step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names || status_tool=$?
   fi
-  local_database
   if erga_has_quick_check; then
     check_ran=1
     step_soft "${e_ok}Checking that erga is healthy (a quick check)" in_erga_quiet ./erga check --quick || status_check=$?
@@ -1702,10 +1675,9 @@ finish() {
   failed=0
   if [ "${erga_ran:-0}" = 1 ]; then
     if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} ./erga --version: erga could not be built (exit status $status_build)"; failed=1; fi
-    for pair in "toolchain ensure:${status_tool:-0}" "local ensure:${status_local:-0}" "check --quick:${status_check:-0}"; do
+    for pair in "toolchain ensure:${status_tool:-0}" "check --quick:${status_check:-0}"; do
       [ "${status_build:-0}" = 0 ] || break
       n=${pair%%:*}; s=${pair##*:}
-      if [ "$n" = "local ensure" ] && [ "${local_ran:-0}" = 0 ]; then continue; fi
       if [ "$n" = "check --quick" ] && [ "${check_ran:-0}" = 0 ]; then
         say "  ${y}-${z} ./erga check --quick: this erga has no quick check yet; the full ${b}./erga check${z} takes minutes and is yours to run"
         continue
@@ -1714,10 +1686,7 @@ finish() {
       elif [ "$n" = "toolchain ensure" ] && [ "${tool_ran:-0}" = 0 ]; then say "  ${g}-${z} ./erga $n: nothing to install"
       elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./erga $n"; else say "  ${r}${cross}${z} ./erga $n (exit status $s)"; failed=1; fi
     done
-    if [ "${local_ran:-0}" = 1 ] && [ "${status_local:-0}" = 0 ]; then
-      say "  ${d}Your local Erga database is off until you need it:${z} ${b}./erga local start${z}${d}, then${z} ${b}./erga arca ensure --env local${z} ${d}fills it the first time, and${z} ${b}./erga local status${z} ${d}shows how DBeaver or psql connects;${z} ${b}./erga local stop${z} ${d}stops it.${z}"
-      say "  ${d}Then${z} ${b}./erga local run thyra${z} ${d}runs Thyra on this computer, and${z} ${b}./erga man serve${z} ${d}shows the Erga Manuals at http://127.0.0.1:8080/man/.${z}"
-    fi
+    say "  ${d}erga and arca need no database to start. A command that does (records, the Decisions, the journal) uses a PostgreSQL 18 that you provide and says what is missing: ${z}${b}arca doctor${z}${d} checks it. On an archon server: ${z}${b}archon pg connect prime --write${z}${d}.${z}"
     [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./erga check${z}${d}, compiles and tests the whole repository (minutes): run it yourself when you want it.${z}"
   fi
   if [ -s "$problems" ]; then
@@ -1867,182 +1836,6 @@ check_access() {
   return 0
 }
 
-# ---- your PostgreSQL: the second prerequisite, settled right after the GitHub sign-in (009-machine-bootstrap FR-099) ------------------------------------------------
-# erga keeps its records in PostgreSQL 18 and installs none: the person says where it is, once, in PostgreSQL's own configuration (a service in ~/.pg_service.conf and
-# its password in ~/.pgpass), here or on any server. Or, for a PostgreSQL 18 they installed on this computer, erga makes its own small database there.
-# pg_choice is what `erga local ensure --use` is told: service=NAME or erga; empty when nothing was asked (BOOTSTRAP_POSTGRES=none, or no erga).
-pg_choice=""
-pg_found_psql() {  # the psql of PostgreSQL 18 on this computer, or nothing
-  for pf in psql /usr/lib/postgresql/18/bin/psql /usr/pgsql-18/bin/psql /opt/homebrew/opt/postgresql@18/bin/psql /opt/homebrew/opt/libpq/bin/psql /usr/local/opt/postgresql@18/bin/psql /usr/local/opt/libpq/bin/psql /Applications/Postgres.app/Contents/Versions/18/bin/psql; do
-    pf_path=$(command -v "$pf" 2>/dev/null || true)
-    [ -n "$pf_path" ] && [ -x "$pf_path" ] || continue
-    [ "$("$pf_path" --version 2>/dev/null | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n 1)" = 18 ] && { printf '%s' "$pf_path"; return 0; }
-  done
-  return 1
-}
-pg_found_server() {  # whether PostgreSQL 18's server programs (initdb) are on this computer
-  pf_path=$(command -v initdb 2>/dev/null || true)
-  [ -n "$pf_path" ] && [ "$("$pf_path" --version 2>/dev/null | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n 1)" = 18 ] && return 0
-  for pf in /usr/lib/postgresql/18/bin /usr/pgsql-18/bin /opt/homebrew/opt/postgresql@18/bin /usr/local/opt/postgresql@18/bin /Applications/Postgres.app/Contents/Versions/18/bin /usr/bin /usr/local/bin; do
-    [ -x "$pf/initdb" ] && [ "$("$pf/initdb" --version 2>/dev/null | sed -n 's/^[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n 1)" = 18 ] && return 0
-  done
-  return 1
-}
-pg_install_help() {  # pg_install_help "client" or "client server": only the commands still needed, as one block to copy
-  case $family in
-    debian)
-      ih_pkgs=postgresql-client-18; case " $1 " in *server*) ih_pkgs="postgresql-client-18 postgresql-18" ;; esac
-      if ! grep -rqs 'apt.postgresql.org' /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
-        printf '%s\n' "  sudo apt install -y postgresql-common" "  sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y     (adds PostgreSQL's own apt repository, apt.postgresql.org)"
-      fi
-      printf '%s\n' "  sudo apt install -y $ih_pkgs"
-      case " $1 " in *server*) printf '%s\n' "  (Debian also starts a server of its own, 18/main on port 5432, when postgresql-18 is installed. erga does not use it and never touches it; to remove it: sudo pg_dropcluster --stop 18 main)" ;; esac ;;
-    arch) printf '%s\n' "  sudo pacman -S --needed postgresql                                  (the client and the server)" ;;
-    macos) printf '%s\n' "  brew install postgresql@18                                          (or install Postgres.app from https://postgresapp.com)" ;;
-    *) printf '%s\n' "  install PostgreSQL 18 with your package manager" ;;
-  esac
-}
-# pg_require KIND...: PostgreSQL 18's client (always) and, for "server", its server programs are on this computer. What is missing is said once, as one block of commands; at a
-# terminal the setup waits for them to be run in another window and looks again, so that nothing has to be started over; without one it stops.
-pg_require() {
-  while :; do
-    rq_missing="client"; pg_psql=$(pg_found_psql) && rq_missing=""
-    case " $* " in *" server "*) pg_found_server || rq_missing="${rq_missing:+$rq_missing }server" ;; esac
-    [ -z "$rq_missing" ] && return 0
-    case $rq_missing in
-      client) rq_what="PostgreSQL 18's client (psql) is" ;;
-      server) rq_what="PostgreSQL 18's server programs are" ;;
-      *) rq_what="PostgreSQL 18's client (psql) and server programs are" ;;
-    esac
-    if [ "$has_tty" != 1 ]; then
-      need "$rq_what not on this computer, and erga installs no PostgreSQL." "install it, then run this again (nothing else has been installed yet):
-$(pg_install_help "$rq_missing")"
-    fi
-    say ""
-    say "${y}${b}${e_stop}Missing: PostgreSQL 18's ${rq_missing}.${z} erga installs no PostgreSQL. In another terminal window, run:"
-    pg_install_help "$rq_missing"
-    printf '%sPress Enter here when that is done and I will look again (Ctrl+C stops).%s ' "$b" "$z" >/dev/tty
-    rq_ans=""; read -r rq_ans </dev/tty || need "no answer was given." "run this again"
-  done
-}
-pg_service_file() { printf '%s' "${PGSERVICEFILE:-$HOME/.pg_service.conf}"; }
-pg_pass_file() { printf '%s' "${PGPASSFILE:-$HOME/.pgpass}"; }
-pg_has_service() { [ -r "$(pg_service_file)" ] && grep -q "^\[$1\][[:space:]]*$" "$(pg_service_file)"; }
-pg_test() {  # pg_test SERVICE: the server of that service answers, and is PostgreSQL 18; prints why not
-  # -w: never ask for a password here (psql would ask on the terminal in the middle of the setup); a missing one is said, with what to do
-  pt_out=$(PGCONNECT_TIMEOUT=10 "$pg_psql" "service=$1 dbname=postgres" -w -X -Atqc 'show server_version_num' </dev/null 2>&1) || { pt_msg=$(printf '%s' "$pt_out" | tail -n 1 | sed 's/^[[:space:]]*//'); printf '%s' "$pt_msg"; pg_hint "$pt_msg"; return 1; }
-  case $pt_out in 18[0-9][0-9][0-9][0-9]) return 0 ;; *) printf 'that server is not PostgreSQL 18 (it says %s)' "$pt_out"; return 1 ;; esac
-}
-pg_hint() {  # what to do about what psql said, as a second line after it
-  case $1 in
-    *"no password supplied"* | *"password authentication failed"*) printf '\n     That server wants a password for that user. Enter it when asked. (A fresh Debian or Ubuntu PostgreSQL has none for postgres: sudo -u postgres psql -c "ALTER USER postgres PASSWORD '"'"'a-password'"'"'")' ;;
-    *"Connection refused"* | *"Is the server running"*) printf '\n     Nothing answers there: is the server started, and is the host and port right?' ;;
-    *"does not exist"*) printf '\n     That user or database is not there: check the name.' ;;
-  esac
-}
-pg_service_value() {  # pg_service_value NAME KEY: a setting of a [NAME] section of libpq's service file
-  [ -r "$(pg_service_file)" ] && awk -v n="[$1]" -v k="$2" '$0 == n {on=1; next} /^\[/ {on=0} on && index($0, k "=") == 1 {print substr($0, length(k) + 2); exit}' "$(pg_service_file)"
-}
-# [arca-local] written by `erga local ensure` for erga's own database in the workspace: its host is a folder (a socket), and the server is off until `erga local start`
-pg_service_is_ergas_own() { case $(pg_service_value "$1" host) in /*) return 0 ;; *) return 1 ;; esac; }
-pg_read() {  # pg_read PROMPT DEFAULT: one line from the terminal
-  printf '%s [%s] ' "$1" "$2" >/dev/tty
-  pr_ans=""; read -r pr_ans </dev/tty || pr_ans=""
-  [ -n "$pr_ans" ] || pr_ans=$2
-  printf '%s' "$pr_ans"
-}
-pg_read_secret() {  # the password: nothing shows while it is typed
-  printf '%s (nothing shows; Enter if it needs none) ' "$1" >/dev/tty
-  stty -echo </dev/tty 2>/dev/null || true
-  ps_ans=""; read -r ps_ans </dev/tty || ps_ans=""
-  stty echo </dev/tty 2>/dev/null || true
-  printf '\n' >/dev/tty
-  printf '%s' "$ps_ans"
-}
-pg_drop_section() {  # pg_drop_section FILE NAME: the file without the [NAME] section
-  awk -v n="[$2]" '$0 == n {skip=1; next} /^\[/ {skip=0} !skip' "$1"
-}
-pg_write_service() {  # pg_write_service NAME HOST PORT USER PASSWORD: libpq's own files, private to this account
-  pw_file=$(pg_service_file); pw_pass=$(pg_pass_file)
-  pw_old=""; [ -r "$pw_file" ] && pw_old=$(pg_drop_section "$pw_file" "$1")
-  ( umask 077; { [ -z "$pw_old" ] || printf '%s\n' "$pw_old"; printf '[%s]\nhost=%s\nport=%s\nuser=%s\ndbname=arca\n' "$1" "$2" "$3" "$4"; } >"$pw_file.new" ) && mv "$pw_file.new" "$pw_file" && chmod 600 "$pw_file"
-  if [ -n "$5" ]; then
-    # a password-file line is host:port:database:user:password, a colon or backslash escaped with a backslash; an older line for the same server and user is replaced
-    pw_esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/:/\\:/g'; }
-    pw_line="$(pw_esc "$2"):$3:*:$(pw_esc "$4"):$(pw_esc "$5")"
-    pw_keep=""; [ -r "$pw_pass" ] && pw_keep=$(grep -v -F "$(pw_esc "$2"):$3:*:$(pw_esc "$4"):" "$pw_pass" || true)
-    ( umask 077; { [ -z "$pw_keep" ] || printf '%s\n' "$pw_keep"; printf '%s\n' "$pw_line"; } >"$pw_pass.new" ) && mv "$pw_pass.new" "$pw_pass" && chmod 600 "$pw_pass"
-  fi
-}
-
-postgres_destination() {
-  pg_want=$(cfg BOOTSTRAP_POSTGRES '')
-  [ "$pg_want" = none ] && { say "${d}Skipped your PostgreSQL (BOOTSTRAP_POSTGRES=none); erga local ensure sets it up when you want it.${z}"; return 0; }
-  [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] && return 0
-  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
-  if [ "$dry" = 1 ]; then
-    heading "${e_db}Your PostgreSQL"
-    would "ask where your PostgreSQL 18 is, before the GitHub sign-in, and say at once everything missing (psql 18, and the server programs where erga is to make its own database); erga installs no PostgreSQL. A service of ~/.pg_service.conf (BOOTSTRAP_POSTGRES=service=NAME), or its host, port, user and password asked once and written as [arca-local] and ~/.pgpass"
-    return 0
-  fi
-  heading "${e_db}Your PostgreSQL (the first thing that needs you)"
-  say "erga keeps its records in PostgreSQL 18, which it ${b}never installs${z}: it needs one place to put them. That place can be on this computer or on any server you can reach."
-  say "${d}It is written down once, in PostgreSQL's own files (a service in ~/.pg_service.conf and its password in ~/.pgpass), so psql, DBeaver and erga all use the same.${z}"
-  # 1. where it is: named, written down by an earlier run, or asked
-  pg_pick=""
-  case $pg_want in
-    erga) pg_pick=2 ;;
-    service=*) pg_pick=1; pg_name=${pg_want#service=} ;;
-  esac
-  if [ -z "$pg_pick" ] && pg_has_service arca-local; then
-    if pg_service_is_ergas_own arca-local; then
-      pg_pick=2; say "${e_ok}[arca-local] in $(pg_service_file) is erga's own database in the workspace, made by an earlier run; it is off until you start it, so it is not tested now."
-    else
-      pg_pick=existing; pg_name=arca-local
-    fi
-  fi
-  if [ -z "$pg_pick" ]; then
-    if [ "$has_tty" != 1 ]; then
-      need "no PostgreSQL has been named, and nobody is here to ask." "name one and run this again: write a service in ~/.pg_service.conf (and its password in ~/.pgpass) and run with BOOTSTRAP_POSTGRES=service=NAME, or, with PostgreSQL 18 installed on this computer, BOOTSTRAP_POSTGRES=erga; BOOTSTRAP_POSTGRES=none skips this"
-    fi
-    say ""
-    say "  1) A PostgreSQL 18 server I can reach (on this computer or another): I give its address"
-    say "  2) A PostgreSQL 18 installed on this computer: erga makes its own small database in the workspace, off until started"
-    pg_pick=$(pg_read "Which?" 1)
-    case $pg_pick in 2) ;; *) pg_pick=1 ;; esac
-  fi
-  # 2. its programs, all at once: the client always, the server programs where erga makes its own database
-  if [ "$pg_pick" = 2 ]; then pg_require client server; else pg_require client; fi
-  say "${e_ok}psql 18 is here: $pg_psql"
-  # 3. settle it
-  case $pg_pick in
-    2) pg_choice=erga; say "${e_ok}erga will make its own database in the workspace, with this computer's PostgreSQL 18 programs."; return 0 ;;
-    existing | 1)
-      if [ -n "${pg_name:-}" ]; then
-        pg_has_service "$pg_name" || need "the service [$pg_name] is not in $(pg_service_file)." "add a [$pg_name] section (host, port, user, dbname) and its password to ~/.pgpass, or unset BOOTSTRAP_POSTGRES to be asked"
-        if pg_why=$(pg_test "$pg_name"); then
-          pg_choice="service=$pg_name"; say "${e_ok}Your PostgreSQL 18 of [$pg_name] answers; erga uses it."; return 0
-        fi
-        [ "$has_tty" = 1 ] && [ "$pg_pick" = existing ] || need "the PostgreSQL of [$pg_name] cannot be used: $pg_why" "fix the service or its password, then run this again"
-        warn "The service [$pg_name] did not work: $pg_why"
-      fi ;;
-  esac
-  pg_try=1
-  while [ "$pg_try" -le 3 ]; do
-    pg_host=$(pg_read "Server host" localhost); pg_port=$(pg_read "Port" 5432); pg_user=$(pg_read "User" postgres)
-    pg_pw=$(pg_read_secret "Password of $pg_user")
-    pg_name=$(pg_read "Name for this connection in ~/.pg_service.conf" arca-local)
-    pg_write_service "$pg_name" "$pg_host" "$pg_port" "$pg_user" "$pg_pw"
-    say "${d}Wrote [$pg_name] in $(pg_service_file)${pg_pw:+ and the password in $(pg_pass_file)} (readable by you alone). erga adds a database named arca there and touches nothing else.${z}"
-    if pg_why=$(pg_test "$pg_name"); then
-      pg_choice="service=$pg_name"; say "${e_ok}That PostgreSQL 18 answers."; return 0
-    fi
-    warn "That PostgreSQL did not work: $pg_why"
-    pg_try=$((pg_try + 1))
-  done
-  need "no PostgreSQL 18 answered after three tries." "check the host, port, user and password (psql \"service=NAME dbname=postgres\" shows the error), then run this again; what is installed stays"
-}
-
 # ---- the plan, and the run ------------------------------------------------------------------------------------------------------------------
 
 main() {
@@ -2086,7 +1879,6 @@ main() {
   preflight
   check_network
   if [ "$dry" = 0 ]; then pinned_prereqs; fi   # jq and gh come after the look at the network, since they are downloads; the sign-in needs gh
-  postgres_destination   # before the GitHub code: what is missing is said at once, and nothing long has been waited for
   sign_in
   github_init
   check_access
