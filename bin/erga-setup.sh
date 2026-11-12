@@ -1707,9 +1707,23 @@ cm_locate() {  # cm_locate FILE: cm_mode is plain (not kept by chezmoi), kept (i
 }
 home_say() { printf '%s\n' "${yb}${e_home}$*${z}"; }   # a notice about the person's own dotfiles: 🏠 and bright yellow
 cm_put_block() {  # cm_put_block SOURCE BEGIN END CONTENT: the block between the markers in the source is this content (put at the end where it is not there yet)
-  pb_text=$(awk -v b="$2" -v e="$3" '$0 == b {skip=1; next} $0 == e {skip=0; next} !skip' "$1")
-  { [ -z "$pb_text" ] || printf '%s\n' "$pb_text"; printf '%s\n%s\n%s\n' "$2" "$4" "$3"; } >"$work/cm-block.$$" && cat "$work/cm-block.$$" >"$1"
+  pb_text=$(awk -v b="$2" -v e="$3" '$0 == b {skip=1; next} $0 == e {skip=0; next} !skip' "$1" 2>/dev/null || true)
+  pb_rc=0   # the answer is whether the source was written: a folder that archon or another tool keeps may refuse this account, and that must not be mistaken for a change made
+  { { [ -z "$pb_text" ] || printf '%s\n' "$pb_text"; printf '%s\n%s\n%s\n' "$2" "$4" "$3"; } >"$work/cm-block.$$" && cat "$work/cm-block.$$" >"$1"; } 2>/dev/null || pb_rc=1
   rm -f "$work/cm-block.$$"
+  return $pb_rc
+}
+git_xdg_file() { case ${XDG_CONFIG_HOME:-} in /*) printf '%s\n' "$XDG_CONFIG_HOME/git/config" ;; *) printf '%s\n' "$HOME/.config/git/config" ;; esac; }
+git_login_beside() {  # git_login_beside WHY: GitHub's login for git in git's own second config file, where ~/.gitconfig cannot be changed (git reads both; chezmoi keeps only the one)
+  gx=$(git_xdg_file)
+  gx_new=$(printf '[credential "https://github.com"]\n\thelper =\n\thelper = !gh auth git-credential')
+  gx_old=$(awk -v b="$git_block_begin" -v e="$git_block_end" '$0 == b {on=1; next} $0 == e {on=0} on' "$gx" 2>/dev/null || true)
+  [ "$gx_new" != "$gx_old" ] || return 0
+  mkdir -p "$(dirname "$gx")" 2>/dev/null && { [ -f "$gx" ] || : >"$gx"; } 2>/dev/null && cm_put_block "$gx" "$git_block_begin" "$git_block_end" "$gx_new" || {
+    warn "$1, and erga could not write $gx either; GitHub's login for git is not set. Run: gh auth setup-git --hostname github.com"
+    return 1
+  }
+  home_say "$1, so erga put GitHub's login for git in $gx instead: git reads it beside ~/.gitconfig, and chezmoi does not keep it."
 }
 git_block_begin='# erga-setup begin: settings erga needs for GitHub and your commits (kept by erga; edit outside these two lines)'
 git_block_end='# erga-setup end'
@@ -1737,7 +1751,10 @@ git_dotfile_put() {  # make ~/.gitconfig have erga's block, through chezmoi's so
       gb_new=$(git_block_text)
       gb_old=$(awk -v b="$git_block_begin" -v e="$git_block_end" '$0 == b {on=1; next} $0 == e {on=0} on' "$cm_src")
       [ "$gb_new" != "$gb_old" ] || return 0   # already there: nothing to change, so nothing to say
-      cm_put_block "$cm_src" "$git_block_begin" "$git_block_end" "$gb_new"
+      if ! cm_put_block "$cm_src" "$git_block_begin" "$git_block_end" "$gb_new"; then
+        git_login_beside "~/.gitconfig is kept by chezmoi, and its source ($cm_src) cannot be written by this account"
+        return $?
+      fi
       if chezmoi apply --force "$HOME/.gitconfig" </dev/null >/dev/null 2>&1; then
         home_say "~/.gitconfig is kept by chezmoi, so erga changed its source ($cm_src) and ran chezmoi apply. Commit that change in your dotfiles repository, or the next chezmoi update may take it away."
         return 0
@@ -1745,9 +1762,8 @@ git_dotfile_put() {  # make ~/.gitconfig have erga's block, through chezmoi's so
       warn "chezmoi apply of ~/.gitconfig did not finish; erga changed its source ($cm_src). Run: chezmoi apply ~/.gitconfig"
       return 1 ;;
     cannot)
-      home_say "~/.gitconfig is kept by chezmoi in a form erga cannot edit ($cm_src), so erga left it. Add this to its source by hand:"
-      git_block_text | sed 's/^/    /'
-      return 1 ;;
+      git_login_beside "~/.gitconfig is kept by chezmoi in a form erga cannot edit ($cm_src), so erga left it"
+      return $? ;;
   esac
   return 2   # plain: not kept by chezmoi
 }
@@ -2376,9 +2392,10 @@ check_access() {
   if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private erga repository"; return 0; fi
   [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
   [ "$have_github" = 1 ] || return 0
-  ca_out=$(GIT_TERMINAL_PROMPT=0 git ls-remote "$erga_url" HEAD 2>&1 </dev/null) && return 0
+  # asked with gh named as the credential helper, so that a ~/.gitconfig that does not have it (a dotfiles tool keeps it) is not taken for an account that has no access
+  ca_out=$(GIT_TERMINAL_PROMPT=0 git -c credential.helper= -c credential.helper='!gh auth git-credential' ls-remote "$erga_url" HEAD 2>&1 </dev/null) && return 0
   case $ca_out in
-    *"not found"* | *"Not Found"* | *"Authentication failed"* | *"could not read"* | *"denied"* | *"403"*)
+    *"not found"* | *"Not Found"* | *"Authentication failed"* | *"denied"* | *"403"*)
       logf "no access to $erga_url: $ca_out"
       say "${r}${b}${e_stop}GitHub does not let this account open erga.${z} erga is a private repository: only people the owner added can open it."
       say "Ask the owner of the intellectual-frontiers organization on GitHub to add the GitHub user you signed in as ($(gh api user --jq .login </dev/null 2>/dev/null || echo unknown)), then run this again. Nothing has been installed."

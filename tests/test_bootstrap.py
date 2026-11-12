@@ -635,14 +635,35 @@ esac'''
         q = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put || echo rc=$?'], capture_output=True, text=True,
                            env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
         self.assertIn("rc=2", q.stdout, q.stdout + q.stderr)
-        # a source erga cannot edit is left, with the block to add by hand
+        # a source erga cannot edit is left, and GitHub's login goes in git's own second config file, which chezmoi does not keep
         (self.tmp / "work").mkdir(exist_ok=True)
         self.stub("chezmoi", f'case "$1" in source-path) echo "{src}/encrypted_dot_gitconfig.age" ;; esac')
-        r = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put || echo rc=$?'], capture_output=True, text=True,
+        r = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; git_dotfile_put; echo rc=$?'], capture_output=True, text=True,
                            env=self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}"))
-        self.assertIn("rc=1", r.stdout)
+        self.assertIn("rc=0", r.stdout, r.stdout + r.stderr)
         self.assertIn("cannot edit", r.stdout)
-        self.assertIn("helper = !gh auth git-credential", r.stdout)
+        self.assertIn("helper = !gh auth git-credential", (self.home / ".config/git/config").read_text())
+
+    def test_a_chezmoi_source_this_account_cannot_write_is_not_taken_for_a_change_made(self):
+        """009-machine-bootstrap FR-101: a refused write is said, and GitHub's login goes in ~/.config/git/config; no notice claims a change that was not made"""
+        src = self.tmp / "chezmoi-src"
+        src.mkdir()
+        (self.tmp / "work").mkdir(exist_ok=True)
+        gitconfig = src / "dot_gitconfig.tmpl"
+        gitconfig.write_text("[user]\n\tname = {{ .name }}\n")
+        self.stub("chezmoi", f'case "$1" in source-path) echo "{gitconfig}" ;; apply) echo applied >"{self.tmp}/applied" ;; esac')
+        env = self.env(BOOTSTRAP_SOURCE_ONLY="1", PATH=f"{self.bin}:{os.environ['PATH']}")
+        # cm_put_block says whether it wrote: a source in a folder that does not exist is a refusal that is not hidden
+        q = subprocess.run([SH, "-c", f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; cm_put_block "{self.tmp}/nowhere/f" b e text || echo rc=$?'], capture_output=True, text=True, env=env)
+        self.assertEqual((q.stdout.strip(), q.stderr.strip()), ("rc=1", ""), q.stdout + q.stderr)
+        script = f'BOOTSTRAP_SOURCE_ONLY=1; . "{SCRIPT}"; work="{self.tmp}/work"; cm_put_block() {{ case $1 in *chezmoi-src*) return 1 ;; esac; printf "%s\\n%s\\n%s\\n" "$2" "$4" "$3" >"$1"; }}; git_dotfile_put; echo rc=$?; git_dotfile_put; echo rc=$?'
+        p = subprocess.run([SH, "-c", script], capture_output=True, text=True, env=env)
+        self.assertEqual(p.stdout.count("rc=0"), 2, p.stdout + p.stderr)
+        self.assertEqual(gitconfig.read_text(), "[user]\n\tname = {{ .name }}\n", "the source was not changed")
+        self.assertNotIn("ran chezmoi apply", p.stdout, "no notice says a change was made that was not")
+        self.assertFalse((self.tmp / "applied").exists())
+        self.assertIn("cannot be written by this account", p.stdout)
+        self.assertIn("helper = !gh auth git-credential", (self.home / ".config/git/config").read_text())
 
     def test_a_local_ensure_that_fails_is_a_problem_not_a_stop(self):
         """009-machine-bootstrap FR-055"""
@@ -1822,6 +1843,15 @@ class Installation(Fixture):
         self.assertIn("does not let this account open erga", p.stdout)
         self.assertIn("Nothing has been installed", p.stdout)
         self.assertEqual(self.record(), "", "stopped before the record, and before any installation")
+
+    def test_a_git_that_has_no_sign_in_to_give_is_not_an_account_that_has_no_access(self):
+        """009-machine-bootstrap FR-050: the check names gh as the credential helper, and a git that could not sign in at all is not reported as a refusal by GitHub"""
+        log = self.tmp / "git-args"
+        self.stub("git", f'echo "$*" >>"{log}"; echo "fatal: could not read Username for https://github.com: terminal prompts disabled" >&2; exit 128')
+        self.stub("gh", 'case "$1" in auth) exit 0 ;; api) echo someone ;; esac')
+        p = self.run_script(BOOTSTRAP_NO_DOWNLOAD="1", BOOTSTRAP_NO_EDITOR="1", BOOTSTRAP_POSTGRES="none", GH_TOKEN="ghp_example", PATH=f"{self.bin}:{os.environ['PATH']}", BOOTSTRAP_OS_RELEASE=self.osr())
+        self.assertNotIn("does not let this account open erga", p.stdout)
+        self.assertIn("credential.helper=!gh auth git-credential", log.read_text())
 
     def test_a_network_failure_in_the_access_check_does_not_stop_the_setup(self):
         self.stub("git", 'echo "fatal: unable to access: Could not resolve host" >&2; exit 128')
