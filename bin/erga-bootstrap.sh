@@ -12,20 +12,19 @@
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
 #   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, wget,
-#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs and, unless BOOTSTRAP_NO_COMFORT=1, the
-#      everyday userland and ImageMagick. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and
-#      `erga toolchain ensure` install each at a pinned version in your own folders, and `erga update` keeps them current,
-#   2. Editor: on a machine with a desktop that is not under WSL, Microsoft's package for VS Code from Microsoft's apt repository (its key checked against a pinned SHA-256),
-#   3. Setup: runs erga-setup.sh as you with --comfort, so the comfort kits are installed (BOOTSTRAP_NO_COMFORT=1 leaves them out): Rust through rustup, uv, the AI
-#      assistants, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and ./erga shell ensure, toolchain ensure and doctor,
-#   4. Login shell: offers to make fish your login shell (chsh), where fish is installed as a package (not on a Mac, where zsh stays).
+#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs. Every other program (jq, gh, glab,
+#      ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and `erga toolchain ensure` install each at a pinned version in your own folders,
+#      and `erga update` keeps them current,
+#   2. Setup: runs erga-setup.sh as you: Rust through rustup, uv, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and ./erga toolchain
+#      ensure and doctor. It writes none of your dotfiles, installs no shell, prompt, editor or AI assistant and does not change your login shell (those are yours, or your fleet
+#      tool's); it ends by printing the one optional line that puts erga on your PATH.
 #
 # Safe to run again. Options (after `sh -s --` when piped):
 #   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
 #   --patient          for a network that drops often (15 tries, longer waits)
 #   -h, --help         this text
 #
-# Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_NO_COMFORT=1, BOOTSTRAP_NO_EDITOR=1, BOOTSTRAP_NO_CHSH=1 / BOOTSTRAP_CHSH=no, BOOTSTRAP_URL (where
+# Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_URL (where
 # erga-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable erga-setup.sh reads.
 # Exit status: 0 done, 1 erga's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
 # shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
@@ -79,12 +78,8 @@ if [ "$boot_dry" = 1 ]; then set -- --dry-run; else set --; fi
 BOOTSTRAP_SOURCE_ONLY=$boot_source_only
 export BOOTSTRAP_SOURCE_ONLY
 dry=$boot_dry
-comfort=1   # the bootstrap is opinionated: the comfort kits are on unless BOOTSTRAP_NO_COMFORT=1 (load_config reads it)
 
 
-# Microsoft's apt signing key (fingerprint BC52 8686 B50D 79E3 39D3 721C EB3E 94AD BE12 29CF), for VS Code on a Debian machine that is not under WSL
-MS_KEY_URL=https://packages.microsoft.com/keys/microsoft.asc
-MS_KEY_SHA256=2fa9c05d591a1582a9aba276272478c262e95ad00acf60eaee1644d93941e3c6
 sudo_cmd=""
 sudo_ready=0
 
@@ -121,17 +116,11 @@ cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
   printf '%s' "$m"
 }
 
-# The packages the setup needs from the computer (it installs none itself), then the everyday programs of the comfort kits.
-# The names are the table's, by family (commons 0002-packaging); only what depends on the release is decided here.
+# The packages the setup needs from the computer (it installs none itself). The names are the table's, by family (commons 0002-packaging); only what depends on the release is
+# decided here.
 wanted_packages() {
   wp_line=""
   for wp_prog in $(pm_programs required); do wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"; done
-  echo "${wp_line# }"
-  kit_on base || return 0
-  wp_line=""
-  for wp_prog in $(pm_programs comfort); do
-    wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"
-  done
   echo "${wp_line# }"
   return 0
 }
@@ -169,14 +158,6 @@ pm_install() { pm_run "$family" "$(pm_install_words "$family")" "$@"; }
 apt_install() { pm_run debian "$(pm_install_words debian)" "$@"; }
 apt_update() { pm_run debian "$(pm_refresh_words debian)"; }
 
-# Whether apt can give fish 4 on this distribution: its candidate says so; with no package lists yet (a fresh image), its release does.
-fish_from_apt() {   # whether the package manager can give fish 4 on this distribution
-  [ "$family" = arch ] && return 0
-  cand=$(pkg_candidate fish)
-  if [ -n "$cand" ]; then [ "$(cand_major "$cand")" -ge 4 ]; return; fi
-  case $d_codename in bookworm | bullseye | buster | focal | jammy | noble) return 1 ;; *) return 0 ;; esac
-}
-
 # the account database: getent on Linux, dscl on a Mac
 acct_field() {  # acct_field NAME home|shell
   if [ "$family" = macos ]; then
@@ -187,7 +168,6 @@ acct_field() {  # acct_field NAME home|shell
     getent passwd "$1" 2>/dev/null | cut -d: -f"$n"
   fi
 }
-login_shell() { acct_field "$(id -un)" shell; }
 
 # A Mac: no package manager and no package (009-machine-bootstrap FR-018). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
 mac_packages() {
@@ -211,8 +191,6 @@ install_packages() {
   for spec in $(wanted_packages); do
     pkg_installed "$spec" 2>/dev/null || missing="$missing $spec"
   done
-  # a fish 4 already on this computer, from any source (a package, the setup's own copy, Homebrew), is used as it is
-  if kit_on shell && fish_from_apt && ! pkg_installed fish 2>/dev/null && ! have_fish4; then missing="$missing fish"; fi
   if [ -z "$missing" ]; then
     say "Everything the packages give is here."
     return 0
@@ -252,8 +230,7 @@ install_packages() {
       for alt in $(printf '%s' "$spec" | tr '|' ' '); do
         if [ -n "$(pkg_candidate "$alt")" ]; then pick=$alt; break; fi
       done
-      if [ "$pick" = fish ] && [ "$(cand_major "$(pkg_candidate fish)")" -lt 4 ]; then pick=""; fi   # fish 3 is not the shell this sets up; the setup's pinned release is
-      if [ -n "$pick" ]; then chosen="$chosen $pick"; elif [ "$spec" != fish ]; then lacking="$lacking $spec"; fi
+      if [ -n "$pick" ]; then chosen="$chosen $pick"; else lacking="$lacking $spec"; fi
     done
     if [ -n "$apt_failed" ] && [ -z "$chosen" ]; then
       need "apt could not read its package sources, so none of the packages can be found: $apt_failed" "check your network and /etc/apt/sources.list.d (a mirror that is down can be replaced by http://archive.ubuntu.com/ubuntu), run: sudo apt update, then run this again"
@@ -279,29 +256,6 @@ install_packages() {
   return 0
 }
 
-apt_code() {  # Microsoft's repository, signed by its pinned key, then the package
-  key=$(download_verified "$MS_KEY_URL" "$MS_KEY_SHA256") || return 1
-  $sudo_cmd install -D -m 644 "$key" /usr/share/keyrings/microsoft.asc || return 1
-  printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64 arm64\nSigned-By: /usr/share/keyrings/microsoft.asc\n' |
-    $sudo_cmd tee /etc/apt/sources.list.d/vscode.sources >/dev/null || return 1
-  apt_update && apt_install code
-}
-
-# VS Code's Microsoft package, on a machine with a desktop that is not under WSL (under WSL the setup makes `code` run VS Code on Windows)
-install_code_package() {
-  [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
-  [ "$wsl" = 1 ] && return 0
-  [ "$family" = debian ] || return 0   # Arch has no Microsoft repository to add; the setup says what to run
-  command -v code >/dev/null 2>&1 && return 0
-  [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] || return 0
-  phase "${e_code}Installing VS Code"
-  if [ "$dry" = 1 ]; then would "install VS Code from Microsoft's apt repository (its signing key checked against its pinned SHA-256)"; return 0; fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ]; then say "Skipped installing VS Code (BOOTSTRAP_NO_APT=1)."; return 0; fi
-  sudo_for "install VS Code from Microsoft's apt repository" || { problem "VS Code: no administrator rights to install it"; return 0; }
-  step "${e_dl}Installing VS Code from Microsoft's apt repository" apt_code || problem "VS Code could not be installed from Microsoft's apt repository"
-  return 0
-}
-
 # The setup asks erga which system libraries its programs need (009-machine-bootstrap FR-023) and calls this to install them: the bootstrap has the administrator rights, once, already.
 bootstrap_install_libraries() {  # bootstrap_install_libraries "package package ..."
   if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ]; then return 1; fi
@@ -322,39 +276,6 @@ run_setup() {
   return 0
 }
 
-# ---- the login shell -----------------------------------------------------------------------------------------------------------------------
-
-offer_fish() {
-  kit_on shell || return 0
-  [ "${BOOTSTRAP_NO_CHSH:-}" = 1 ] && return 0
-  [ "$family" = macos ] && return 0   # fish is not set up on a Mac: zsh stays the login shell
-  fp=$(command -v fish 2>/dev/null || true)
-  who=$(id -un)
-  heading "${e_shell}The login shell of $who"
-  if [ "$dry" = 1 ]; then
-    would "make fish the login shell of $who (the program that starts in each new terminal): chsh -s fish; bash keeps working"
-    return 0
-  fi
-  if [ -z "$fp" ] || [ ! -x "$fp" ] || [ "$(fish_major "$fp")" -lt 4 ]; then say "fish 4 is not installed as a package, so the login shell stays as it is."; return 0; fi
-  case $(acct_field "$who" shell) in */fish) say "fish is already the login shell of $who."; return 0 ;; esac
-  case $(cfg BOOTSTRAP_CHSH yes) in
-    no | NO | false | 0) say "The login shell stays as it is. To use fish: sudo chsh -s $fp $who"; return 0 ;;
-  esac
-  if ! grep -qx "$fp" /etc/shells 2>/dev/null; then
-    if sudo_for "add fish to the list of login shells (/etc/shells)"; then
-      printf '%s\n' "$fp" | $sudo_cmd tee -a /etc/shells >/dev/null || { warn "Could not add $fp to /etc/shells."; return 0; }
-    else
-      warn "I could not get administrator rights to list fish as a login shell. Run: command -v fish | sudo tee -a /etc/shells; sudo chsh -s $fp $who"
-      return 0
-    fi
-  fi
-  if sudo_for "change the login shell of $who"; then
-    $sudo_cmd chsh -s "$fp" "$who" </dev/null || warn "chsh failed. Run: sudo chsh -s $fp $who"
-  else warn "chsh needs administrator rights. Run: sudo chsh -s $fp $who"; fi
-  case $(acct_field "$who" shell) in */fish) say "fish is now the login shell of $who; it starts in each new terminal window." ;; esac
-  return 0
-}
-
 # ---- the run ------------------------------------------------------------------------------------------------------------------------------------------
 
 main_bootstrap() {
@@ -364,10 +285,8 @@ main_bootstrap() {
   [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
   ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap"
   install_packages
-  install_code_package
   setup_rc=0
   run_setup || setup_rc=$?
-  offer_fish
   phase_close
   [ "$dry" = 1 ] && { say ""; say "That was a dry run: nothing was changed, fetched or asked."; return 0; }
   return "$setup_rc"

@@ -43,20 +43,14 @@ pmid:record-arch a pm:RecordField ;
     pm:order 5 ;
     skos:definition "The processor, as uname -m says it (x86_64, aarch64)."@en .
 
-pmid:record-comfort a pm:RecordField ;
-    pm:fieldName "comfort" ;
-    pm:fieldType "boolean" ;
-    pm:order 6 ;
-    skos:definition "Whether the everyday comfort programs were installed."@en .
-
 pmid:record-installed a pm:RecordField ;
     pm:fieldName "installed" ;
     pm:fieldType "date" ;
-    pm:order 7 ;
+    pm:order 6 ;
     skos:definition "The day (YYYY-MM-DD) the account was first set up; a rerun keeps it."@en .
 
 pmid:record-refreshed a pm:RecordField ;
     pm:fieldName "refreshed" ;
     pm:fieldType "date" ;
-    pm:order 8 ;
+    pm:order 7 ;
     skos:definition "The day (YYYY-MM-DD) the setup last ran."@en .

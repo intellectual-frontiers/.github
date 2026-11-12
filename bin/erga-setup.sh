@@ -14,29 +14,25 @@
 # Of the other programs this script fetches only what it needs before erga exists, as the publisher's release pinned and checked by SHA-256, into ~/.local/share and linked
 # into ~/.local/bin: jq and gh (a copy already on the PATH is used, not installed again). The rest (glab, ripgrep, fd, shellcheck, Node.js and the others) are erga's toolchain,
 # which `./erga toolchain ensure` installs here and `erga update` keeps current. A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window
-# a person answers: git and the C compiler): macOS carries curl, tar and unzip. fish is left out on a Mac, and the shell it sets up is zsh.
+# a person answers: git and the C compiler): macOS carries curl, tar and unzip.
 #
-# It is self-contained: it installs the kits, sets up git and the workspaces folder, and needs no other program of the organization's. It:
+# It is self-contained and needs no other program of the organization's. It writes none of the account's dotfiles (no startup file, git config, prompt or login shell: those are
+# the person's, or their fleet tool's), installs no shell, editor or AI assistant, and writes only erga's XDG folders and the links of ~/.local/bin. It:
 #
-#   1. Git and GitHub: signs you in to GitHub (a code and a browser), sets the name and email on your commits where git has none. From here on the
-#      token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so erga and the release lookups use it and are not held to GitHub's hourly limit for no sign-in;
-#      with no token at all, everything that comes from GitHub's releases is skipped and listed in the summary, to be done by running this again after sign-in,
-#   2. Rust, uv and tools: installs Rust's installer, rustup, from the pinned rustup-init (checked by SHA-256) into ~/.rustup and ~/.cargo, with the stable toolchain as its default and
-#      no startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs; then the AI assistants for the terminal (Claude Code, Codex,
-#      OpenCode and Aider; the `agents` kit), each checked against the checksum its publisher lists; with --comfort, also fish 4 and the shell's own programs (eza, bat, zoxide, fzf, which erga's shell uses and
-#      `erga toolchain ensure --kit base` installs), each checked against a checksum,
+#   1. Git and GitHub: signs you in to GitHub (a code and a browser). From here on the token (GH_TOKEN, GITHUB_TOKEN or gh's own) is exported, so erga and the release lookups use it
+#      and are not held to GitHub's hourly limit for no sign-in; with no token at all, everything that comes from GitHub's releases is skipped and listed in the summary, to be done
+#      by running this again after sign-in. Its own git calls name gh as the credential helper for the call, so no git config is needed,
+#   2. Rust and uv: installs Rust's installer, rustup, from the pinned rustup-init (checked by SHA-256) into ~/.rustup and ~/.cargo, with the stable toolchain as its default and no
+#      startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs,
 #   3. Workspace and clone: copies the private erga repository to ~/workspaces/github.com/intellectual-frontiers/erga (or updates it by
 #      fast-forward only), then installs there the Rust toolchain its rust-toolchain.toml names (stable) (rustup checks each part against its manifest),
-#   4. Editor: makes `code` open VS Code (under WSL the Windows VS Code, installed with winget where it is missing),
-#   5. erga: runs, in the clone, ./erga shell ensure (the startup files of bash, zsh and fish: erga keeps them), ./erga toolchain ensure, ./erga check --quick
-#      where erga has it (seconds; the full `erga check` takes minutes and is yours to run) and, last, ./erga doctor, which says what to do next.
+#   4. erga: runs, in the clone, ./erga toolchain ensure, ./erga local ensure, ./erga check --quick where erga has it (seconds; the full `erga check` takes minutes and is yours
+#      to run) and, last, ./erga doctor, which says what to do next. It ends by printing the one optional line that puts erga on your PATH (`erga shell emit`, erga's 010-shell).
 #
-# It writes no startup file itself: `erga shell` does (erga's 010-shell). Safe to run again: what is already in place changes nothing, and a clone with your
-# work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal only); what a step printed is kept in a log and shown only if
-# the step fails.
+# Safe to run again: what is already in place changes nothing, and a clone with your work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal
+# only); what a step printed is kept in a log and shown only if the step fails.
 #
 # Options (after `sh -s --` when piped):  --dry-run   list every step it would take, change nothing, fetch nothing, ask for nothing
-#                                          --comfort   also install what no erga command needs (fish, and the shell's programs eza, bat, zoxide and fzf)
 #                                          --patient   for a network that drops often (15 tries, longer waits)
 #                                          -h, --help  this text
 #
@@ -49,32 +45,24 @@
 #   BOOTSTRAP_URL          where the bootstrap fetches this script from when it is piped (default: raw.githubusercontent.com/intellectual-frontiers/.github/main)
 #   ERGA_URL               where to clone erga from (default: https://github.com/intellectual-frontiers/erga)
 #   ERGA_ROLE              this workspace's role, developer or operator (default: a developer's; erga 194-workspace-roles)
-#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (rustup, uv, fish, the modern tools)
+#   BOOTSTRAP_NO_DOWNLOAD=1  fetch no program (rustup, uv)
 #   BOOTSTRAP_NO_RUNTIME=1 install neither rustup, the Rust toolchain nor uv (those already on the PATH are used)
-#   BOOTSTRAP_NO_DOTFILES=1   do not run `erga shell ensure` (so no startup file is touched)
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name, email and pull.ff (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
 #   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
-#   BOOTSTRAP_KIT          the kits to install, space-separated (default: agents; with --comfort: agents base shell)
-#   BOOTSTRAP_NO_COMFORT=1 never install the comfort kits, even when --comfort is given
-#   BOOTSTRAP_NO_AGENTS=1  leave the AI assistants (claude, codex, opencode, aider) out of the kits
-#   BOOTSTRAP_NO_EDITOR=1  do not put `code` on the PATH (under WSL it is VS Code on Windows, installed with winget where missing) (BOOTSTRAP_WINDOWS_ROOT: Windows' C: drive, default /mnt/c)
-#   BOOTSTRAP_PROMPT       pretty (default; needs a Nerd Font), plain, or no: the prompt `erga shell set prompt` is told to draw
 #   BOOTSTRAP_TOOLCHAIN    the names for `erga toolchain ensure` (default: every entry of `erga toolchain list` not here and not marked optional; none; all)
 #   BOOTSTRAP_POSTGRES     where your local Erga database lives, for `erga local ensure --use`: erga (erga's own, in the workspace, off until started) or
 #                          service=NAME (a PostgreSQL 18 you run, here or elsewhere, by its [NAME] in ~/.pg_service.conf); none skips it. PostgreSQL 18 is a
 #                          prerequisite erga never installs: right after the GitHub sign-in the setup needs psql 18 and asks, once, where your PostgreSQL is
 #                          (host, port, user, password: written to ~/.pg_service.conf and ~/.pgpass); without a terminal it stops unless this is set
-#   BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL   the name and email to put on your commits (set over what git has)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
 #   ERGA_RETRIES           how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
 #   ERGA_RETRY_DELAY       seconds to wait before the second try; it doubles each time up to ERGA_RETRY_MAX_DELAY (default 3, and 60)
 #   BOOTSTRAP_PATIENT=1    the same as --patient: for a network that drops often (15 tries, 5 seconds to start, 120 at most)
 #   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub or Rust's servers cannot be reached)
-#   BOOTSTRAP_MODERN       no: keep bash's and fish's own commands instead of the modern tools (default yes)
 #   ERGA_WORKSPACES        the workspaces folder (default ~/workspaces), the folder `erga workspace` uses too
-# BOOTSTRAP_KIT, BOOTSTRAP_PROMPT, BOOTSTRAP_MODERN, BOOTSTRAP_GIT_NAME, BOOTSTRAP_GIT_EMAIL and ERGA_WORKSPACES are read from the environment, then from
+# ERGA_WORKSPACES is read from the environment, then from
 # ~/.config/erga/setup.env (one NAME=value line each).
 #
 # Exit status: 0 done, 1 erga's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
@@ -89,7 +77,7 @@ set -eu
 # AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/*.ttl (commons 0002-packaging). Do not edit: change the ontology.
 # shellcheck disable=SC2034  # read by the script this is part of
 pm_schema=1
-pm_source_sha256='26f2fdbaf8ab79cabd42f265f08c975e8e68ae69f27a4f2df7e25d1c4264d58c'
+pm_source_sha256='adf9eb48bd9451971b525ba9754fd71a55eb974a903f7ce524b26123c08e9261'
 
 pm_family_of() {  # pm_family_of WORDS: the family a computer's os-release ID and ID_LIKE words name, or nothing
   for pm_w in $1; do
@@ -401,11 +389,6 @@ pm_programs() {  # pm_programs TIER: the programs of the tier (required or comfo
 # AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/pins.ttl (commons 0002-packaging FR-014). Do not edit: change the ontology.
 # shellcheck disable=SC2034  # read by the script this is part of
 
-# fish 4 for a distribution whose own fish is older (Debian 12 has 3.6): The fish project's own static release runs on any Linux; its Ubuntu package needs a newer C library than Debian 12 has.
-FISH_VERSION=4.9.3
-FISH_SHA256_AARCH64=57349f0111728c64b703a84e611aa97ff4d1fa8466385d64e67bd5bc3ffa49fc
-FISH_SHA256_X86_64=8f643d10ad1abb0ef7072764c01ceb5cf61b2d373fda400cf60f0bad69b7e095
-
 # gh, GitHub's command line, from the publisher's release on every platform: The publisher's own release, put in the account's own folder; no package manager installs it (erga 009-machine-bootstrap FR-091). The checksum is the one the publisher states.
 GH_VERSION=2.102.0
 GH_SHA256_AARCH64=7862c86c72f43df3a2d93ddde6f473285b4e2af61b494849846827e513ef6484
@@ -440,21 +423,6 @@ UV_SHA256_MACOS_ARM64=50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6
 UV_SHA256_X86_64=9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6
 # <<< pins.auto <<<
 
-# Python tools, each in a virtual environment of its own: name, PyPI package, then link=path inside it
-# The AI assistants for the terminal, so that a person who has never installed one can type `claude`, `codex`, `opencode` or `aider` the day the computer is set up.
-# Each of the first three is one program that its publisher ships inside a per-platform npm package, so no Node.js is needed to run it; the newest version is
-# taken, and only with the SHA-512 that npm's registry lists for the file. Fields: name, the npm package that names the newest version, the per-platform package
-# ({os} is linux or darwin, {arch} is x64 or arm64, {ver} the newest version), then the file to link.
-AGENT_TOOLS='
-claude @anthropic-ai/claude-code @anthropic-ai/claude-code-{os}-{arch}@{ver} claude
-codex @openai/codex @openai/codex@{ver}-{os}-{arch} codex
-opencode opencode-ai opencode-{os}-{arch}@{ver} opencode
-'
-# Aider is a Python program: name, PyPI package, then link=path inside its virtual environment
-AGENT_PY_TOOLS='
-aider aider-chat aider=bin/aider
-'
-
 # ---- settings ----------------------------------------------------------------------------------------------------------------------------------
 
 raw_url=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
@@ -464,7 +432,6 @@ pypi_url=${BOOTSTRAP_PYPI:-https://pypi.org}
 npm_url=${BOOTSTRAP_NPM:-https://registry.npmjs.org}
 
 dry=0
-comfort=0
 orig_path=$PATH
 goos=linux; rust_target=x86_64-unknown-linux-gnu   # detect_platform sets them
 esc=$(printf '\033')   # BSD sed has no \x1b, so the escape character is put in by name
@@ -476,10 +443,9 @@ usage() {
 for arg in "$@"; do
   case $arg in
     --dry-run | -n) dry=1 ;;
-    --comfort) comfort=1 ;;
     --patient) BOOTSTRAP_PATIENT=1 ;;
     -h | --help)
-      case $0 in *erga-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--comfort] [--patient]   (see the header of erga-setup.sh)" ;; esac
+      case $0 in *erga-setup.sh) usage ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--patient]   (see the header of erga-setup.sh)" ;; esac
       exit 0 ;;
     *) echo "erga-setup: unknown option $arg (try --help)" >&2; exit 2 ;;
   esac
@@ -1081,47 +1047,10 @@ check_prereqs() {
 # ---- configuration of this run -----------------------------------------------------------------------------------------------------------------
 
 load_config() {
-  [ "${BOOTSTRAP_NO_COMFORT:-}" = 1 ] && comfort=0
-  default_kits=agents
-  [ "$comfort" = 1 ] && default_kits='agents base shell'
-  kits=$(cfg BOOTSTRAP_KIT "$default_kits")
-  kits=$(printf '%s' "$kits" | tr ',' ' ')
-  if [ "${BOOTSTRAP_NO_AGENTS:-}" = 1 ]; then kits=$(printf ' %s ' "$kits" | sed 's/ agents / /g'); fi
-  p=$(cfg BOOTSTRAP_PROMPT '')
-  prompt_given=0
-  if [ -n "$p" ]; then prompt_given=1; else p=pretty; fi
-  case $(printf '%s' "$p" | tr '[:upper:]' '[:lower:]') in
-    plain) prompt=plain ;;
-    no | false | 0 | off | none | "") prompt=no ;;
-    *) prompt=pretty ;;
-  esac
-  case $(printf '%s' "$(cfg BOOTSTRAP_MODERN yes)" | tr '[:upper:]' '[:lower:]') in
-    no | false | 0 | off | none) modern=0 ;;
-    *) modern=1 ;;
-  esac
   root=$(cfg ERGA_WORKSPACES "$HOME/workspaces")
   # shellcheck disable=SC2088  # a literal ~ is expanded here, by hand
   case $root in "~") root=$HOME ;; "~/"*) root=$HOME/${root#"~/"} ;; esac
   target=$root/github.com/intellectual-frontiers/erga
-}
-
-kit_on() {  # kit_on NAME
-  case " $kits " in *" $1 "*) return 0 ;; *) return 1 ;; esac
-}
-
-# ---- fish ------------------------------------------------------------------------------------------------------------------------------------------
-
-fish_major() {  # the major version of the fish program given, or 0
-  m=$("$1" --version 2>/dev/null | awk '{print $NF}' | sed 's/\..*//')
-  case $m in '' | *[!0-9]*) m=0 ;; esac
-  printf '%s' "$m"
-}
-
-have_fish4() {
-  for f in "$bin/fish" "$(command -v fish 2>/dev/null || true)"; do
-    [ -n "$f" ] && [ -x "$f" ] && [ "$(fish_major "$f")" -ge 4 ] && return 0
-  done
-  return 1
 }
 
 # ---- fetching and verifying -------------------------------------------------------------------------------------------------------------------------
@@ -1349,7 +1278,7 @@ github_init() {
     export GH_TOKEN GITHUB_TOKEN
     have_github=1
   else
-    warn "There is no GitHub sign-in or token, so what is downloaded from GitHub is left until there is one (most tools, fish, the programs of erga's toolchain and its prompt). To get them: gh auth login, or export GH_TOKEN=<a token>, then run this again."
+    warn "There is no GitHub sign-in or token, so what is downloaded from GitHub is left until there is one (most tools and the programs of erga's toolchain). To get them: gh auth login, or export GH_TOKEN=<a token>, then run this again."
   fi
   gi_tok=""
   return 0
@@ -1386,103 +1315,9 @@ prune_old() {
   done | tail -n +3 | while IFS= read -r po_old; do [ "$po_old" = "$2" ] || rm -rf "${1:?}/$po_old"; done
 }
 
-# install_pypi NAME PACKAGE LINKS...: the newest version on PyPI in a virtual environment of its own, tools/NAME/VERSION
-install_pypi() {
-  name=$1; pkg=$2; shift 2
-  if tool_present "$name" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  command -v uv >/dev/null 2>&1 || { echo "uv is not here, so $pkg cannot be installed" >&2; return 1; }
-  fetch_to "$pypi_url/pypi/$pkg/json" "$work/pypi.json" || { echo "could not ask PyPI about $pkg" >&2; return 1; }
-  ver=$(jq -r '.info.version' "$work/pypi.json")
-  troot=$tools/$name
-  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$@"; then return 0; fi
-  rm -rf "${troot:?}/$ver"; mkdir -p "$troot"
-  # a Python of uv's own stays put when the machine's moves on; failing that, any Python that is new enough
-  if ! retry_cmd "Python for $pkg" uv venv --python 3.12 --managed-python --quiet "$troot/$ver"; then
-    rm -rf "${troot:?}/$ver"
-    retry_cmd "Python for $pkg" uv venv --python '>=3.10' --quiet "$troot/$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
-  fi
-  retry_cmd "$pkg from PyPI" uv pip install --quiet --python "$troot/$ver/bin/python" "$pkg==$ver" || { rm -rf "${troot:?}/$ver"; return 1; }
-  linked=""
-  for item in "$@"; do linked="$linked ${item%%=*}=$ver/${item#*=}"; done
-  set_current "$troot" "$ver"
-  # shellcheck disable=SC2086
-  link_into "$troot" $linked
-}
-
-# install_npm_native NAME PACKAGE TEMPLATE FILE: a program that its publisher ships as one file inside a per-platform npm package (Claude Code, Codex, OpenCode).
-# The newest version of PACKAGE is asked of the npm registry, the platform package TEMPLATE names is fetched, and it is kept only if its SHA-512 is the one the
-# registry lists for it; the file is unpacked into tools/NAME/VERSION, run once with --version, and linked into ~/.local/bin as NAME.
-install_npm_native() {
-  name=$1; pkg=$2; tmpl=$3; file=$4
-  if tool_present "$name" "$name=$file" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  command -v jq >/dev/null 2>&1 || { echo "jq is not here, so $name cannot be installed" >&2; return 1; }
-  fetch_to "$npm_url/$pkg/latest" "$work/npm-latest.json" || { echo "could not ask npm about $pkg" >&2; return 1; }
-  ver=$(jq -r '.version // ""' "$work/npm-latest.json")
-  [ -n "$ver" ] || { echo "npm named no version of $pkg" >&2; return 1; }
-  troot=$tools/$name
-  if [ -L "$troot/current" ] && [ "$(readlink "$troot/current")" = "$ver" ] && links_present "$name=$file"; then return 0; fi
-  case $arch in x86_64) npm_arch=x64 ;; *) npm_arch=arm64 ;; esac
-  spec=$(printf '%s' "$tmpl" | sed "s/{os}/$goos/; s/{arch}/$npm_arch/; s/{ver}/$ver/")
-  fetch_to "$npm_url/${spec%@*}/${spec##*@}" "$work/npm-platform.json" || { echo "npm has no $spec for this computer" >&2; return 1; }
-  tarball=$(jq -r '.dist.tarball // ""' "$work/npm-platform.json"); integrity=$(jq -r '.dist.integrity // ""' "$work/npm-platform.json")
-  case $integrity in sha512-*) ;; *) echo "npm lists no SHA-512 for $spec, so I will not install it" >&2; return 1 ;; esac
-  want=$(printf '%s' "${integrity#sha512-}" | b64_decode | od -An -vtx1 | tr -d ' \n')
-  [ "${#want}" = 128 ] || { echo "the checksum npm lists for $spec cannot be read, so I will not install it" >&2; return 1; }
-  [ -n "$tarball" ] || { echo "npm lists no file for $spec" >&2; return 1; }
-  fetch_to "$tarball" "$work/$name.tgz" || { echo "could not fetch $tarball" >&2; return 1; }
-  got=$(sha512_of "$work/$name.tgz")
-  [ "$got" = "$want" ] || { rm -f "$work/$name.tgz"; echo "the file at $tarball is not the one npm lists (its SHA-512 differs); nothing was installed" >&2; return 1; }
-  mkdir -p "$troot"
-  rm -rf "$troot/$ver.partial"; mkdir -p "$troot/$ver.partial"
-  tar -xzf "$work/$name.tgz" -C "$troot/$ver.partial" --strip-components=1 || { rm -rf "$troot/$ver.partial"; return 1; }
-  rm -f "$work/$name.tgz"
-  rel=$(locate "$troot/$ver.partial" "$file")
-  if [ -z "$rel" ]; then echo "$file is not in what $spec holds, so I installed nothing" >&2; rm -rf "$troot/$ver.partial"; return 1; fi
-  chmod 755 "$troot/$ver.partial/$rel"
-  if ! "$troot/$ver.partial/$rel" --version </dev/null >/dev/null 2>&1; then echo "$name $ver did not run on this computer, so I installed nothing" >&2; rm -rf "$troot/$ver.partial"; return 1; fi
-  rm -rf "${troot:?}/$ver"; mv "$troot/$ver.partial" "$troot/$ver"
-  set_current "$troot" "$ver"
-  link_into "$troot" "$name=$ver/$rel"
-  prune_old "$troot" "$ver"
-  return 0
-}
-
-# each_tool LIST FUNCTION: calls FUNCTION name repo links... for each line of LIST
-each_tool() {
-  list=$1; fn=$2
-  oldifs=$IFS
-  IFS='
-'
-  for line in $list; do
-    IFS=$oldifs
-    [ -n "$line" ] || continue
-    # shellcheck disable=SC2086
-    set -- $line
-    "$fn" "$@"
-    IFS='
-'
-  done
-  IFS=$oldifs
-}
-
-# npm_step NAME PACKAGE TEMPLATE FILE: one AI assistant, one step; one that cannot be installed is listed at the end and does not stop the run
-npm_step() {
-  n=$1
-  if tool_present "$n" "$n=$4" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  pstep "${e_dl}Installing $n (the newest version)" install_npm_native "$@"
-  return 0
-}
-
-pypi_step() {
-  n=$1; pkg=$2; shift 2
-  if tool_present "$n" "$@" && [ "${BOOTSTRAP_FRESH:-}" != 1 ]; then return 0; fi
-  pstep "${e_py}Installing $n (the newest version)" install_pypi "$n" "$pkg" "$@"
-  return 0
-}
-
 # ---- the runtime: Rust through rustup, and uv (009-machine-bootstrap FR-025, FR-026) -----------------------------------------------------------------------
 # `./erga` is compiled by Cargo before it runs, so Rust comes first. rustup, Rust's own installer, is put in ~/.rustup and ~/.cargo from the pinned rustup-init
-# (checked by SHA-256), with the stable toolchain as its default and without touching a startup file (`erga shell ensure` puts ~/.cargo/bin on the PATH of every shell). The toolchain
+# (checked by SHA-256), with the stable toolchain as its default and without touching a startup file (`erga shell emit` puts ~/.cargo/bin on the PATH where a person asks for it). The toolchain
 # itself is the stable one the clone's rust-toolchain.toml names, installed once the clone is there. uv, which runs the few Python programs, is the pinned release.
 
 rustup_url() { printf 'https://static.rust-lang.org/rustup/archive/%s/%s/rustup-init' "$RUSTUP_INIT_VERSION" "$rust_target"; }
@@ -1548,73 +1383,9 @@ setup_rust_toolchain() {
   return 0
 }
 
-# ---- the tools of the kits -----------------------------------------------------------------------------------------------------------------------
-
-setup_tools() {
-  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then phase "${e_dl}Handy tools"; say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-  [ "$dry" = 1 ] || mkdir -p "$bin" "$tools"
-  if kit_on base; then
-    phase "${e_dl}Installing handy command-line tools"
-    pool_begin "Installing tools"
-    # eza, bat, zoxide and fzf, which erga's shell uses, follow their newest release: they are erga's (./erga toolchain ensure --kit base), installed in the erga phase below
-    pool_end
-  fi
-  if kit_on agents; then
-    phase "${e_dl}Installing the AI assistants (Claude Code, Codex, OpenCode, Aider)"
-    pool_begin "Installing AI assistants"
-    each_tool "$AGENT_TOOLS" npm_step
-    each_tool "$AGENT_PY_TOOLS" pypi_step
-    pool_end
-  fi
-  return 0
-}
-
-# ---- the shell kit: fish 4 and Oh My Posh with erga shell's themes ----------------------------------------------------------------------------
-
-fish_url() { printf 'https://github.com/fish-shell/fish-shell/releases/download/%s/fish-%s-linux-%s.tar.xz' "$FISH_VERSION" "$FISH_VERSION" "$arch"; }
-
-setup_shell_kit() {
-  kit_on shell || return 0
-  phase "${e_shell}Installing fish, a friendlier shell"
-  if [ "$goos" = darwin ]; then say "Skipped on a Mac: zsh, which macOS starts, is set up instead (fish publishes no build for a Mac that the setup can check)."; return 0; fi
-  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "Skipped (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-  # fish 4 is the system's where the distribution has it (installed by erga-bootstrap.sh); anywhere it does not, the fish project's own release
-  if ! have_fish4; then
-    if ! github_ready; then say "Left until you sign in to GitHub: fish $FISH_VERSION (it comes from the fish project's GitHub release)."; skip_github "fish $FISH_VERSION"
-    else
-      step "${e_dl}Installing fish $FISH_VERSION" install_pinned fish "$FISH_VERSION" "$(fish_url)" "$(arch_sha FISH)" tar 0 fish=fish ||
-        problem "fish 4 could not be installed"
-    fi
-  fi
-  return 0
-}
-
-# ---- what was installed ---------------------------------------------------------------------------------------------------------------------------
+# ---- what is here ---------------------------------------------------------------------------------------------------------------------------
 
 have_cmd() { command -v "$1" >/dev/null 2>&1 || [ -x "$bin/$1" ]; }
-
-verify_install() {
-  phase "${e_ok}Checking that everything works"
-  if [ "$dry" = 1 ]; then would "check that each program the kits install is here, and that fish is version 4 or later where it was asked for"; return 0; fi
-  absent=""
-  if kit_on base; then
-    have_cmd uv || absent="$absent uv"   # the programs that follow their newest release are erga's, and erga installs them after this check
-  fi
-  if kit_on agents; then
-    for p in claude codex opencode aider; do have_cmd "$p" || absent="$absent $p"; done
-  fi
-  if kit_on shell && [ "$goos" = linux ]; then
-    have_cmd fish || absent="$absent fish"
-  fi
-  if [ -n "$absent" ]; then warn "Not here:$absent"; problem "not installed:$absent"; fi
-  if kit_on shell && [ "$goos" = linux ] && have_cmd fish; then
-    fp=$(command -v fish 2>/dev/null || printf '%s' "$bin/fish")
-    if [ "$(fish_major "$fp")" -ge 4 ]; then :
-    else warn "fish is older than version 4."; problem "fish is older than version 4"; fi
-    "$fp" -c 'echo (math 1 + 2)' </dev/null 2>/dev/null | grep -q 3 || { warn "fish did not run a command."; problem "fish did not run a command"; }
-  fi
-  return 0
-}
 
 # ---- GitHub, git and the clone -------------------------------------------------------------------------------------------------------------
 
@@ -1688,174 +1459,28 @@ sign_in() {
   else
     sign_in_stop
   fi
-  git_credentials_setup
-  [ "${signin_how:-}" = gh ] && verify_git_login
   return 0
 }
 
-# ---- dotfiles that chezmoi keeps (009-machine-bootstrap FR-101) -----------------------------------------------------------------------------------
-# Where chezmoi keeps ~/.gitconfig, a change to the file itself is put back by the next `chezmoi apply`. So the change is made in chezmoi's source of the file, in a block of its own
-# between two marker lines, and applied; the person is told (🏠, bright yellow) to commit it in their dotfiles repository. Where chezmoi is not used, git is told directly, as it was.
-cm_locate() {  # cm_locate FILE: cm_mode is plain (not kept by chezmoi), kept (its source can be edited) or cannot (it cannot); cm_src is the source
-  cm_mode=plain; cm_src=""
-  command -v chezmoi >/dev/null 2>&1 || return 0
-  cm_s=$(chezmoi source-path "$1" 2>/dev/null </dev/null) || return 0
-  [ -n "$cm_s" ] || return 0
-  cm_src=$cm_s
-  case $(basename "$cm_s") in encrypted_* | *.age | *.asc | modify_* | create_* | run_* | symlink_*) cm_mode=cannot; return 0 ;; esac
-  if [ -f "$cm_s" ]; then cm_mode=kept; else cm_mode=cannot; fi
-}
-home_say() { printf '%s\n' "${yb}${e_home}$*${z}"; }   # a notice about the person's own dotfiles: 🏠 and bright yellow
-cm_put_block() {  # cm_put_block SOURCE BEGIN END CONTENT: the block between the markers in the source is this content (put at the end where it is not there yet)
-  pb_text=$(awk -v b="$2" -v e="$3" '$0 == b {skip=1; next} $0 == e {skip=0; next} !skip' "$1" 2>/dev/null || true)
-  pb_rc=0   # the answer is whether the source was written: a folder that archon or another tool keeps may refuse this account, and that must not be mistaken for a change made
-  { { [ -z "$pb_text" ] || printf '%s\n' "$pb_text"; printf '%s\n%s\n%s\n' "$2" "$4" "$3"; } >"$work/cm-block.$$" && cat "$work/cm-block.$$" >"$1"; } 2>/dev/null || pb_rc=1
-  rm -f "$work/cm-block.$$"
-  return $pb_rc
-}
-git_xdg_file() { case ${XDG_CONFIG_HOME:-} in /*) printf '%s\n' "$XDG_CONFIG_HOME/git/config" ;; *) printf '%s\n' "$HOME/.config/git/config" ;; esac; }
-git_login_beside() {  # git_login_beside WHY: GitHub's login for git in git's own second config file, where ~/.gitconfig cannot be changed (git reads both; chezmoi keeps only the one)
-  gx=$(git_xdg_file)
-  gx_new=$(printf '[credential "https://github.com"]\n\thelper =\n\thelper = !gh auth git-credential')
-  gx_old=$(awk -v b="$git_block_begin" -v e="$git_block_end" '$0 == b {on=1; next} $0 == e {on=0} on' "$gx" 2>/dev/null || true)
-  [ "$gx_new" != "$gx_old" ] || return 0
-  mkdir -p "$(dirname "$gx")" 2>/dev/null && { [ -f "$gx" ] || : >"$gx"; } 2>/dev/null && cm_put_block "$gx" "$git_block_begin" "$git_block_end" "$gx_new" || {
-    warn "$1, and erga could not write $gx either; GitHub's login for git is not set. Run: gh auth setup-git --hostname github.com"
-    return 1
-  }
-  home_say "$1, so erga put GitHub's login for git in $gx instead: git reads it beside ~/.gitconfig, and chezmoi does not keep it."
-}
-git_block_begin='# erga-setup begin: settings erga needs for GitHub and your commits (kept by erga; edit outside these two lines)'
-git_block_end='# erga-setup end'
-gd_name=""; gd_email=""
-cm_block_value() {  # cm_block_value SOURCE KEY: a setting of the [user] part of erga's block in the source, so that a run that has nothing new to say does not drop it
-  awk -v b="$git_block_begin" -v e="$git_block_end" -v k="$2" '$0 == b {on=1; next} $0 == e {on=0} on && $1 == k && $2 == "=" {sub(/^[^=]*= */, ""); print; exit}' "$1" 2>/dev/null
-}
-git_block_text() {  # what erga's block of ~/.gitconfig holds
-  printf '[credential "https://github.com"]\n\thelper =\n\thelper = !gh auth git-credential\n'
-  case $(git config --global --get pull.ff 2>/dev/null || true) in "" | only) printf '[pull]\n\tff = only\n' ;; esac
-  if [ -n "${cm_src:-}" ]; then
-    [ -n "$gd_name" ] || gd_name=$(cm_block_value "$cm_src" name)
-    [ -n "$gd_email" ] || gd_email=$(cm_block_value "$cm_src" email)
-  fi
-  if [ -n "$gd_name$gd_email" ]; then
-    printf '[user]\n'
-    [ -z "$gd_name" ] || printf '\tname = %s\n' "$gd_name"
-    [ -z "$gd_email" ] || printf '\temail = %s\n' "$gd_email"
-  fi
-}
-git_dotfile_put() {  # make ~/.gitconfig have erga's block, through chezmoi's source of it
-  cm_locate "$HOME/.gitconfig"
-  case $cm_mode in
-    kept)
-      gb_new=$(git_block_text)
-      gb_old=$(awk -v b="$git_block_begin" -v e="$git_block_end" '$0 == b {on=1; next} $0 == e {on=0} on' "$cm_src")
-      [ "$gb_new" != "$gb_old" ] || return 0   # already there: nothing to change, so nothing to say
-      if ! cm_put_block "$cm_src" "$git_block_begin" "$git_block_end" "$gb_new"; then
-        git_login_beside "~/.gitconfig is kept by chezmoi, and its source ($cm_src) cannot be written by this account"
-        return $?
-      fi
-      if chezmoi apply --force "$HOME/.gitconfig" </dev/null >/dev/null 2>&1; then
-        home_say "~/.gitconfig is kept by chezmoi, so erga changed its source ($cm_src) and ran chezmoi apply. Commit that change in your dotfiles repository, or the next chezmoi update may take it away."
-        return 0
-      fi
-      warn "chezmoi apply of ~/.gitconfig did not finish; erga changed its source ($cm_src). Run: chezmoi apply ~/.gitconfig"
-      return 1 ;;
-    cannot)
-      git_login_beside "~/.gitconfig is kept by chezmoi in a form erga cannot edit ($cm_src), so erga left it"
-      return $? ;;
-  esac
-  return 2   # plain: not kept by chezmoi
-}
-git_credentials_setup() {
-  git_dotfile_put && return 0
-  case $? in
-    1) problem "git's GitHub login could not be set in your chezmoi-kept ~/.gitconfig (see above)"; return 0 ;;
-  esac
-  gh auth setup-git --hostname github.com </dev/null >/dev/null 2>&1 || warn "gh could not be made git's credential helper; run: gh auth setup-git"
-}
-
-# Whether git reaches GitHub the way a NEW terminal will: with no token in the environment, only gh as git's credential helper and the sign-in gh kept. The setup itself exports a
-# token (github_init), which would hide a sign-in that a later terminal cannot read (a keyring that is locked or absent over SSH, a helper that was not written), and then
-# `git pull` asks for a user name. Where it does not work, it is repaired here (the helper rewritten; the sign-in kept in gh's private file), not left for the person to find.
-git_clean_ok() { ( unset GH_TOKEN GITHUB_TOKEN; GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never git ls-remote "$erga_url" HEAD </dev/null >/dev/null 2>&1 ); }
-verify_git_login() {
-  [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
-  git_clean_ok && { logf "git reaches GitHub with no token in the environment"; return 0; }
-  logf "git does not reach GitHub in a clean environment; repairing"
-  cm_locate "$HOME/.gitconfig"
-  if [ "$cm_mode" != plain ]; then   # kept by chezmoi: its source holds the helper already (above); only the sign-in below can be repaired here
-    :
-  else
-    gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
-    git_clean_ok && return 0
-  fi
-  # the helper written by name, so that it does not depend on where gh was when it was set up: an empty one first, which ends any helper before it for this host
-  if [ "$cm_mode" = plain ]; then
-    git config --global --unset-all credential.https://github.com.helper >/dev/null 2>&1 || true
-    git config --global --add credential.https://github.com.helper '' >/dev/null 2>&1 || true
-    git config --global --add credential.https://github.com.helper '!gh auth git-credential' >/dev/null 2>&1 || true
-    git_clean_ok && return 0
-  fi
-  # the sign-in is in a store a later terminal cannot open: keep it in gh's own file (hosts.yml, readable by this account alone)
-  if gh auth token --hostname github.com </dev/null 2>/dev/null | gh auth login --hostname github.com --with-token --insecure-storage >/dev/null 2>&1; then
-    [ "$cm_mode" != plain ] || gh auth setup-git --force --hostname github.com </dev/null >/dev/null 2>&1 || true
-    if git_clean_ok; then say "${d}${e_key}Your GitHub sign-in is kept in ~/.config/gh/hosts.yml (readable by you alone), because this computer's keyring cannot be opened from a new terminal.${z}"; return 0; fi
-  fi
-  warn "git in a new terminal may ask for your GitHub user name. Run: gh auth setup-git --hostname github.com    and, if it still asks: gh auth login --hostname github.com --git-protocol https --insecure-storage"
-  problem "git does not reach GitHub from a new terminal (run: gh auth setup-git --hostname github.com)"
-  return 0
-}
-
-identity() {
+identity() {  # says what git lacks for a person's commits; writes no git config (009-machine-bootstrap FR-101)
   [ "${BOOTSTRAP_NO_AUTH:-}" = 1 ] && return 0
   [ "$dry" = 1 ] && return 0
   have_cmd git || return 0
-  # Pulls only fast-forward where git says nothing of it, so VS Code's Sync never makes a merge (erga 009 FR-049, 008-workspace FR-010)
-  cm_locate "$HOME/.gitconfig"
-  if [ "$cm_mode" = plain ] && [ -z "$(git config --global --get pull.ff 2>/dev/null || true)" ]; then
-    git config --global pull.ff only && say "git pulls only fast-forward (pull.ff only), so a sync never makes a merge."
+  if [ -z "$(git config --get user.name 2>/dev/null || true)" ]; then
+    gi_login=""
+    signed_in && gi_login=$(gh api user --jq .login </dev/null 2>/dev/null || true)
+    say "${d}Git has no name for your commits yet. When you want one: ${z}${b}git config --global user.name \"Your Name\"${z}${d}${gi_login:+ (your GitHub login is $gi_login)}.${z}"
   fi
-  cur_name=$(git config --global --get user.name 2>/dev/null || true)
-  cur_email=$(git config --global --get user.email 2>/dev/null || true)
-  ask_name=$(cfg BOOTSTRAP_GIT_NAME '')
-  ask_email=$(cfg BOOTSTRAP_GIT_EMAIL '')
-  prof_name=""; prof_email=""
-  if signed_in && { [ -z "$cur_name" ] || [ -z "$cur_email" ] || [ -z "$ask_name" ] || [ -z "$ask_email" ]; }; then
-    gh api user </dev/null >"$work/profile.json" 2>/dev/null || : >"$work/profile.json"
-    if jq -e '.login' "$work/profile.json" >/dev/null 2>&1; then
-      prof_name=$(jq -r '.name // empty' "$work/profile.json")
-      # GitHub's private address: it links the commits to the account, and a push that carries it is never refused for exposing an email
-      prof_email=$(jq -r 'if .id then "\(.id)+\(.login)@users.noreply.github.com" else "\(.login)@users.noreply.github.com" end' "$work/profile.json")
-    fi
-  fi
-  want_name=$ask_name; [ -n "$want_name" ] || { [ -n "$cur_name" ] || want_name=$prof_name; }
-  want_email=$ask_email; [ -n "$want_email" ] || { [ -n "$cur_email" ] || want_email=$prof_email; }
-  if [ -z "$want_name" ] && [ -z "$cur_name" ] && [ "$has_tty" = 1 ]; then
-    printf '%sWhat name should go on your commits?%s (for example Ada Lovelace; Enter to skip) ' "$b" "$z" >/dev/tty
-    read -r want_name </dev/tty || want_name=""
-  fi
-  if [ "$cm_mode" = plain ]; then
-    [ -n "$want_name" ] && [ "$want_name" != "$cur_name" ] && { git config --global user.name "$want_name"; cur_name=$want_name; say "Commits will carry the name $want_name."; }
-    [ -n "$want_email" ] && [ "$want_email" != "$cur_email" ] && { git config --global user.email "$want_email"; cur_email=$want_email; say "Commits will carry the email $want_email."; }
-  else
-    # kept by chezmoi: the name and email go into erga's block of its source, with the rest of the block (a name chezmoi already gives is not changed unless asked)
-    [ -n "$want_name" ] && [ "$want_name" != "$cur_name" ] && { gd_name=$want_name; cur_name=$want_name; say "Commits will carry the name $want_name."; }
-    [ -n "$want_email" ] && [ "$want_email" != "$cur_email" ] && { gd_email=$want_email; cur_email=$want_email; say "Commits will carry the email $want_email."; }
-    if [ -n "$gd_name$gd_email" ] || [ "$cm_mode" = kept ]; then git_dotfile_put || true; fi
-  fi
-  if [ -z "$cur_name" ]; then
-    warn "Git has no name for your commits yet. Run: git config --global user.name \"Your Name\""
-  else
-    say "Commits will be made as $cur_name${cur_email:+ <$cur_email>}."
+  if signed_in; then
+    say "${d}For your own git to use your GitHub sign-in: ${z}${b}gh auth setup-git --hostname github.com${z}${d}. erga's own git calls need nothing set.${z}"
   fi
   return 0
 }
 
 # a copy that stops half way is cloned beside the place and moved in whole, so a try again starts clean and never touches a folder that was not made here
-clone_attempt() { rm -rf "$target.partial"; GIT_TERMINAL_PROMPT=0 git clone --quiet "$erga_url" "$target.partial" && mv "$target.partial" "$target"; }
+clone_attempt() { rm -rf "$target.partial"; GIT_TERMINAL_PROMPT=0 git_gh clone --quiet "$erga_url" "$target.partial" && mv "$target.partial" "$target"; }
 clone_step() { retry_cmd "copying erga from GitHub" clone_attempt; }
-fetch_step() { retry_cmd "updating erga from GitHub" env GIT_TERMINAL_PROMPT=0 git -C "$target" fetch --quiet origin; }
+fetch_step() { retry_cmd "updating erga from GitHub" env GIT_TERMINAL_PROMPT=0 git -c credential.helper= -c 'credential.helper=!gh auth git-credential' -C "$target" fetch --quiet origin; }
 
 workspace_and_clone() {
   heading "${e_dir}Your workspace"
@@ -1983,17 +1608,7 @@ system_libraries() {
 # check that takes minutes in its place.
 erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
 
-# The group of programs that follow their newest release which the kits on ask for (erga toolchain ensure --kit, 005-toolchain FR-021): base (eza, bat, zoxide and fzf,
-# which erga's shell uses), unless BOOTSTRAP_MODERN=no
-kit_flags() {
-  kf=""
-  if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" != 1 ]; then
-    if kit_on base && [ "$modern" != 0 ]; then kf="$kf --kit base"; fi
-  fi
-  printf '%s' "$kf" | sed 's/^ *//'
-}
-
-# In the clone, in this order (009-machine-bootstrap FR-055): ./erga shell ensure, ./erga toolchain ensure, ./erga local ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
+# In the clone, in this order (009-machine-bootstrap FR-055): ./erga toolchain ensure, ./erga local ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
 # once everything is installed (FR-056). Every one runs even when one before it failed.
 run_erga() {
   heading "${e_rocket}erga"
@@ -2001,12 +1616,9 @@ run_erga() {
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] || {
       would "link ~/.local/bin/erga and ~/.local/bin/arca to the clone's launchers"
       would "build erga and arca in the clone with Cargo, in one command (./erga --version; the first time takes about 5 to 15 minutes, once)"
-      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || would "run in the clone: ./erga shell ensure (the startup files of bash, zsh and fish)"
-      [ "${BOOTSTRAP_NO_DOTFILES:-}" = 1 ] || [ "$prompt_given" = 0 ] || would "run in the clone: ./erga shell set prompt $([ "$prompt" = no ] && echo none || echo "$prompt")"
       [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
       would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
-      dk=$(kit_flags)
-      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)${dk:+ $dk, which also makes the programs that follow their newest release available: eza, bat, zoxide and fzf}"
+      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
       local_use=$(cfg BOOTSTRAP_POSTGRES '')
       [ "$local_use" = none ] || would "run in the clone: ./erga local ensure${local_use:+ --use $local_use} (your local Erga database: made once, then left off; ./erga local start starts it)"
       would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
@@ -2019,29 +1631,13 @@ run_erga() {
   if [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ]; then say "Skipped erga's commands (BOOTSTRAP_NO_ERGA=1)."; erga_ran=0; return 0; fi
   have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
   erga_ran=1
-  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_shell=0; status_local=0; shell_ran=0; shell_skipped=0; tool_skipped=0; tool_ran=0; check_ran=0; local_ran=0
+  status_build=0; status_doctor=0; status_tool=0; status_check=0; status_local=0; tool_skipped=0; tool_ran=0; check_ran=0; local_ran=0
   phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
   step_soft "${e_rust}Building erga and arca with Cargo" in_erga_quiet ./erga --version || status_build=$?
   if [ "$status_build" != 0 ]; then
     problem "erga could not be built (in $(short_path "$target") run: cargo build -p erga, to see why)"
     phase_close
     return 0
-  fi
-  # The shells of this account: erga keeps their startup files (010-shell); the mode is erga shell's own choice
-  if [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ]; then
-    if ! github_ready; then
-      shell_skipped=1
-      say "Left until you sign in to GitHub: ./erga shell ensure (the prompt, Oh My Posh, comes from GitHub)."
-      skip_github "erga shell ensure (your shells' startup files)"
-    else
-      shell_ran=1
-      step_soft "${e_paint}Setting up your shells (bash, zsh, fish)" in_erga_quiet ./erga shell ensure || status_shell=$?
-      if [ "$status_shell" = 0 ] && [ "$prompt_given" = 1 ]; then
-        pchoice=$prompt; [ "$prompt" = no ] && pchoice=none
-        step_soft "${e_paint}Choosing the $pchoice prompt" in_erga_quiet ./erga shell set prompt "$pchoice" || status_shell=$?
-      fi
-      [ "$status_shell" = 0 ] || problem "erga shell ensure did not finish (run ./erga shell status in $target to see why)"
-    fi
   fi
   # The workspace's role, before the programs, so that the toolchain installs what the role needs (erga 009-machine-bootstrap FR-089; 194-workspace-roles
   # FR-010): ERGA_ROLE, developer or operator; none given, the workspace is a developer's and the summary says how to make it an operator's.
@@ -2060,17 +1656,15 @@ run_erga() {
     *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
-  # the programs that follow their newest release, by group (005-toolchain FR-021): the base kit's (eza, bat, zoxide, fzf) unless BOOTSTRAP_MODERN=no
-  kit_args=$(kit_flags)
-  if [ -n "$names$kit_args" ] && ! github_ready; then
+  if [ -n "$names" ] && ! github_ready; then
     tool_skipped=1
-    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names $kit_args)."
-    skip_github "erga toolchain ensure: $names $kit_args"
-  elif [ -n "$names$kit_args" ]; then
+    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names)."
+    skip_github "erga toolchain ensure: $names"
+  elif [ -n "$names" ]; then
     system_libraries
     tool_ran=1
     # shellcheck disable=SC2086
-    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names $kit_args || status_tool=$?
+    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names || status_tool=$?
   fi
   local_database
   if erga_has_quick_check; then
@@ -2108,13 +1702,9 @@ finish() {
   failed=0
   if [ "${erga_ran:-0}" = 1 ]; then
     if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} ./erga --version: erga could not be built (exit status $status_build)"; failed=1; fi
-    for pair in "shell ensure:${status_shell:-0}" "toolchain ensure:${status_tool:-0}" "local ensure:${status_local:-0}" "check --quick:${status_check:-0}"; do
+    for pair in "toolchain ensure:${status_tool:-0}" "local ensure:${status_local:-0}" "check --quick:${status_check:-0}"; do
       [ "${status_build:-0}" = 0 ] || break
       n=${pair%%:*}; s=${pair##*:}
-      if [ "$n" = "shell ensure" ] && [ "${shell_ran:-0}" = 0 ]; then
-        [ "${shell_skipped:-0}" = 1 ] && say "  ${y}-${z} ./erga $n (left until you sign in to GitHub)"
-        continue
-      fi
       if [ "$n" = "local ensure" ] && [ "${local_ran:-0}" = 0 ]; then continue; fi
       if [ "$n" = "check --quick" ] && [ "${check_ran:-0}" = 0 ]; then
         say "  ${y}-${z} ./erga check --quick: this erga has no quick check yet; the full ${b}./erga check${z} takes minutes and is yours to run"
@@ -2143,52 +1733,6 @@ finish() {
     say "  $(paste -sd, "$skipped" | sed 's/,/, /g')"
     say "Sign in with ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}, or export ${b}GH_TOKEN${z}, then run this again: it installs just these."
   fi
-  if [ "$prompt" = pretty ] && [ "${BOOTSTRAP_NO_DOTFILES:-}" != 1 ] && [ "${shell_ran:-0}" = 1 ]; then
-    font_where="in the settings of your terminal program"
-    [ "$wsl" = 1 ] && font_where="in Windows (not in Debian)"
-    [ "$goos" = darwin ] && font_where="on this Mac"
-    say ""
-    say "${b}${e_font}One thing for the prompt: a Nerd Font${z}"
-    say "Your prompt draws small icons from a Nerd Font, a font that carries"
-    say "icon characters. Until one is chosen in your terminal you will see"
-    say "boxes instead. It takes two minutes, once, $font_where:"
-    say "  ${c}1.${z} Download CaskaydiaCove Nerd Font and unzip it:"
-    say "     ${b}https://www.nerdfonts.com/font-downloads${z}"
-    if [ "$goos" = darwin ]; then
-      say "  ${c}2.${z} Open the font files and click Install Font in Font Book."
-      say "  ${c}3.${z} In Terminal: Settings, Profiles, Text, Change, choose"
-      say "     ${b}CaskaydiaCove Nerd Font${z} (iTerm2 and VS Code have a font setting too)."
-    elif [ "$wsl" = 1 ]; then
-      say "  ${c}2.${z} Select the font files, right-click, \"Install for all users\"."
-      say "  ${c}3.${z} In Windows Terminal: Settings, Profiles, Debian, Appearance,"
-      say "     set Font face to ${b}CaskaydiaCove Nerd Font${z}."
-    else
-      say "  ${c}2.${z} Copy the font files into ${b}~/.local/share/fonts${z}, then run ${b}fc-cache -f${z}."
-      say "  ${c}3.${z} In your terminal program's settings, set the font to ${b}CaskaydiaCove Nerd Font${z}."
-    fi
-    say "${d}No font wanted? Run ${z}${b}erga shell set prompt plain${z}${d}: the same${z}"
-    say "${d}prompt made of emoji and lines.${z}"
-  fi
-  if [ "${editor_linked:-0}" = 1 ]; then
-    say ""
-    say "${b}${e_code}VS Code${z}: ${c}code .${z} in a folder opens it there.$([ "$wsl" = 1 ] && printf ' Under WSL it opens VS Code on Windows, which installs its WSL extension the first time.')"
-  fi
-  if [ "$comfort" = 0 ] && [ "${BOOTSTRAP_NO_COMFORT:-}" != 1 ]; then
-    say ""
-    no_fish="fish,"; [ "$goos" = darwin ] && no_fish="fish (there is none for a Mac),"
-    say "${d}Not installed, because no erga command needs them: $no_fish the shell's programs (eza, bat, zoxide, fzf).${z}"
-    say "${d}To add them, run this setup again with ${z}${b}--comfort${z}${d} (erga-bootstrap.sh does by default).${z}"
-  fi
-  if kit_on agents && { have_cmd claude || have_cmd codex || have_cmd opencode || have_cmd aider; }; then
-    say ""
-    say "${b}${e_what}AI assistants are installed${z} (they work in the folder you start them in, and ask before they change anything):"
-    have_cmd claude && say "  ${c}claude${z}     Claude Code, from Anthropic. The first time it opens a browser page to sign in with your Claude account."
-    have_cmd claude && say "             ${d}Remote Control: ${z}${c}claude remote-control${z}${d} in a project folder lets you go on with that session from the Claude app or claude.ai/code. It needs the sign-in with your Claude account (not an API key), and it lasts while that terminal stays open.${z}"
-    have_cmd codex && say "  ${c}codex${z}      Codex, from OpenAI. The first time, choose \"Sign in with ChatGPT\"."
-    have_cmd opencode && say "  ${c}opencode${z}   OpenCode, which works with many providers (${c}opencode auth login${z} adds one)."
-    have_cmd aider && say "  ${c}aider${z}      Aider, which needs a key from the provider you choose (${c}aider --help${z} says how)."
-    say "${d}Start one in a project folder, for example: cd ${target} && claude${z}"
-  fi
   hand_over
   if [ "${status_doctor:-0}" != 0 ]; then say "  ${y}${warnmark}${z} ./erga doctor found something to look at (exit status $status_doctor): its next step, above, says what to do."; failed=1; fi
   say ""
@@ -2198,110 +1742,28 @@ finish() {
   elif [ "${signin_needed:-0}" = 1 ]; then
     say "${b}${e_next}Next${z}: sign in to GitHub (above), then run this setup again."
   fi
-  # The last instruction: a new login shell, which reads the startup files erga shell wrote and finds ~/.local/bin (009-machine-bootstrap FR-058, FR-059)
+  # The last words: one optional line for the person's own startup file; nothing here wrote any (010-shell FR-007, FR-008; 009-machine-bootstrap FR-101)
   sh_name=bash
-  [ "$goos" = darwin ] && sh_name=zsh
-  kit_on shell && [ "$goos" = linux ] && have_cmd fish && sh_name=fish   # fish is the shell this sets up, so it is the one to start
+  case ${SHELL:-} in */zsh) sh_name=zsh ;; */fish) sh_name=fish ;; esac
+  [ "$goos" = darwin ] && case ${SHELL:-} in */bash) ;; *) sh_name=zsh ;; esac
+  case $sh_name in
+    fish) emit_line="erga shell emit fish | source"; emit_file="~/.config/fish/conf.d/erga.fish" ;;
+    zsh) emit_line="eval \"\$(erga shell emit zsh)\""; emit_file="~/.zshrc" ;;
+    *)
+      emit_line="eval \"\$(erga shell emit bash)\""; emit_file="~/.bashrc"
+      # a managed .bashrc that reads ~/.bashrc.local names the file that is the person's own
+      grep -q '\.bashrc\.local' "$HOME/.bashrc" 2>/dev/null && emit_file="~/.bashrc.local" ;;
+  esac
   say ""
   case ":$orig_path:" in
-    *":$bin:"*) say "${b}${e_sync}One last thing:${z} start a new shell, so that this window reads what was set up." ;;
-    *) say "${b}${e_sync}One last thing:${z} this window does not know your new shell yet (nor ~/.local/bin, where erga is)." ;;
+    *":$bin:"*) say "${b}${e_sync}One optional line${z}: for erga's programs, its completions and your erga settings in every new terminal, add this line to ${b}$emit_file${z}" ;;
+    *) say "${b}${e_sync}One optional line${z}: ${b}$(short_path "$bin")${z}, where erga is, is not on this window's PATH. To have it (and erga's programs, completions and settings) in every new terminal, add this line to ${b}$emit_file${z}" ;;
   esac
-  say "Type the line below, or close this window and open a new one."
   say ""
-  say "    ${c}exec $sh_name -l${z}"
+  say "    ${c}$emit_line${z}"
+  say ""
+  say "${d}Leave it out if you manage your own PATH: this setup wrote none of your files. Until then run erga as ${z}${b}$(short_path "$bin")/erga${z}${d}, or ./erga in the clone. ${z}${b}erga shell status${z}${d} says where things stand.${z}"
   [ "$failed" = 0 ] || return 1
-  return 0
-}
-
-# ---- the editor: `code` opens VS Code (009-machine-bootstrap FR-043) --------------------------------------------------------------------------
-# Under WSL VS Code runs on Windows and reaches Debian through its WSL extension; its `code` command is a script in its Windows folder, on the PATH
-# only while WSL appends Windows' PATH. So `code` is a small script in ~/.local/bin that runs it, which every shell has; where VS Code is not on
-# Windows, winget (Windows' own package manager) installs it for this Windows user. Elsewhere VS Code is Microsoft's Debian package, which
-# erga-bootstrap.sh installs (it needs administrator rights); a machine without a desktop is opened from VS Code on another computer (Remote - SSH).
-editor_mark='# made by erga-setup.sh: VS Code on Windows, opened from WSL (009-machine-bootstrap FR-043)'
-# The marks of the scripts erga's came from (archon's), so that a `code` one of them wrote is still known as the setup's own
-editor_mark_older='# made by archon-setup.sh: VS Code'
-editor_mark_old='# made by bootstrap-archon.sh: VS Code'
-win_root=${BOOTSTRAP_WINDOWS_ROOT:-/mnt/c}
-
-windows_code() {  # the `code` script of VS Code on Windows: this Windows user's own install first, then one for all users, then any user's
-  if command -v cmd.exe >/dev/null 2>&1 && command -v wslpath >/dev/null 2>&1; then
-    la=$(cmd.exe /c 'echo %LOCALAPPDATA%' 2>/dev/null </dev/null | tr -d '\r') || la=""
-    case $la in *:\\*) c="$(wslpath -u "$la" 2>/dev/null)/Programs/Microsoft VS Code/bin/code"; [ -f "$c" ] && { printf '%s' "$c"; return 0; } ;; esac
-  fi
-  for c in "$win_root/Program Files/Microsoft VS Code/bin/code" "$win_root"/Users/*/AppData/Local/Programs/"Microsoft VS Code"/bin/code; do
-    [ -f "$c" ] && { printf '%s' "$c"; return 0; }
-  done
-  return 1
-}
-
-winget_exe() {  # Windows' winget, through the PATH WSL appends or in this Windows user's WindowsApps folder
-  command -v winget.exe 2>/dev/null && return 0
-  for w in "$win_root"/Users/*/AppData/Local/Microsoft/WindowsApps/winget.exe; do [ -f "$w" ] && { printf '%s' "$w"; return 0; }; done
-  return 1
-}
-
-editor_mark_mac='# made by erga-setup.sh: VS Code on a Mac, opened from the command line (009-machine-bootstrap FR-043)'
-ours_or_free() { [ ! -e "$bin/code" ] || grep -qF "$editor_mark" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_old" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_older" "$bin/code" 2>/dev/null || grep -qF "$editor_mark_mac" "$bin/code" 2>/dev/null; }   # ~/.local/bin/code is absent or this script's own
-
-link_windows_code() {  # link_windows_code PATH: ~/.local/bin/code runs it
-  mkdir -p "$bin"
-  printf '#!/bin/sh\n%s\nexec "%s" "$@"\n' "$editor_mark" "$1" >"$bin/code.$$" && chmod 755 "$bin/code.$$" && mv "$bin/code.$$" "$bin/code"
-}
-
-# VS Code on a Mac is an app; its `code` command is inside it, and a Mac adds it to the PATH only when a person asks from VS Code's own command palette
-mac_code() {
-  for c in "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"; do
-    [ -x "$c" ] && { printf '%s' "$c"; return 0; }
-  done
-  return 1
-}
-
-winget_code() { "$(winget_exe)" install --id Microsoft.VisualStudioCode --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity; }
-
-setup_editor() {
-  [ "${BOOTSTRAP_NO_EDITOR:-}" = 1 ] && return 0
-  phase "${e_code}Making ${c}code${z} open VS Code"
-  if [ "$goos" = darwin ]; then
-    if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code where the app is (it is a Mac app: from code.visualstudio.com, which this setup does not install)"; return 0; fi
-    command -v code >/dev/null 2>&1 && { editor_linked=1; return 0; }
-    if mc_path=$(mac_code); then
-      ours_or_free || { say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; }
-      printf '#!/bin/sh\n%s\nexec "%s" "$@"\n' "$editor_mark_mac" "$mc_path" >"$bin/code.$$" && chmod 755 "$bin/code.$$" && mv "$bin/code.$$" "$bin/code" && editor_linked=1 ||
-        problem "$(short_path "$bin/code") could not be written"
-    else
-      say "VS Code is not on this Mac. It is an app: download it from ${b}https://code.visualstudio.com${z}, drag it to Applications, then run this setup again to make ${c}code${z} open it."
-    fi
-    return 0
-  fi
-  if [ "$wsl" = 1 ]; then
-    if [ "$dry" = 1 ]; then would "make ~/.local/bin/code run VS Code on Windows, installing it with winget for this Windows user where it is not there"; return 0; fi
-    if ! ours_or_free; then say "$(short_path "$bin/code") is already there and not this setup's; it is left as it is."; return 0; fi
-    if ! wc_path=$(windows_code); then
-      if [ "${BOOTSTRAP_NO_DOWNLOAD:-}" = 1 ]; then say "VS Code is not on Windows; skipped installing it (BOOTSTRAP_NO_DOWNLOAD=1)."; return 0; fi
-      if ! winget_exe >/dev/null; then
-        warn "VS Code is not on Windows, and winget cannot be reached from here to install it."
-        problem "VS Code: install it on Windows (in PowerShell: winget install -e --id Microsoft.VisualStudioCode, or from https://code.visualstudio.com), then run this again"
-        return 0
-      fi
-      step "${e_dl}Installing VS Code on Windows, for this Windows user (winget)" winget_code || { problem "VS Code could not be installed on Windows with winget"; return 0; }
-      wc_path=$(windows_code) || { problem "VS Code was installed with winget but its code command was not found; open a new terminal and run this again"; return 0; }
-    fi
-    if link_windows_code "$wc_path"; then editor_linked=1; else problem "$(short_path "$bin/code") could not be written"; fi
-    return 0
-  fi
-  if command -v code >/dev/null 2>&1; then editor_linked=1; return 0; fi
-  if [ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
-    say "This machine has no desktop: open it from VS Code on your own computer (its Remote - SSH extension), and ${c}code${z} works in VS Code's terminal."
-    return 0
-  fi
-  # a desktop with no VS Code: a package needs administrator rights, which this setup never uses
-  if [ "$family" = arch ]; then
-    say "VS Code is not installed here. From an account with administrator rights, ${b}sudo pacman -S code${z} installs Code - OSS from the extra repository (Microsoft's own build is in the AUR as visual-studio-code-bin)."
-  else
-    say "VS Code is not installed here. To install it, run erga-bootstrap.sh from an account with administrator rights (it adds Microsoft's apt repository)."
-  fi
   return 0
 }
 
@@ -2313,13 +1775,11 @@ install_method=${install_method:-setup}
 install_file=$cfgdir/erga/install.toml
 record_install() {
   if [ "$dry" = 1 ]; then would "record how this account was set up in ~/.config/erga/install.toml ($install_method), which the commands that say how things stand show"; return 0; fi
-  ri_method=$install_method; ri_first=$(date +%Y-%m-%d); ri_comfort=$comfort
+  ri_method=$install_method; ri_first=$(date +%Y-%m-%d)
   if [ -r "$install_file" ]; then
     ri_old=$(sed -n 's/^method = "\(.*\)"$/\1/p' "$install_file" | head -n 1); [ -z "$ri_old" ] || ri_method=$ri_old
     ri_o=$(sed -n 's/^installed = "\(.*\)"$/\1/p' "$install_file" | head -n 1); [ -z "$ri_o" ] || ri_first=$ri_o
-    grep -q '^comfort = true' "$install_file" && ri_comfort=1
   fi
-  [ "$ri_comfort" = 1 ] && ri_c=true || ri_c=false
   ri_dir=$(dirname "$install_file")
   mkdir -p "$ri_dir" || return 0
   ri_tmp=$(mktemp "$ri_dir/.install.XXXXXX") || return 0
@@ -2330,11 +1790,10 @@ record_install() {
     printf 'host = "%s"\n' "$(host_kind | sed 's/^vm-.*/vm/')"
     printf 'distro = "%s"\n' "$(printf '%s' "$d_pretty" | tr -d '"\\')"
     printf 'arch = "%s"\n' "$arch"
-    printf 'comfort = %s\n' "$ri_c"
     printf 'installed = "%s"\n' "$ri_first"
     printf 'refreshed = "%s"\n' "$(date +%Y-%m-%d)"
   } >"$ri_tmp" && chmod 644 "$ri_tmp" && mv "$ri_tmp" "$install_file" || rm -f "$ri_tmp"
-  logf "recorded the installation: $ri_method, $family, comfort $ri_c"
+  logf "recorded the installation: $ri_method, $family"
 }
 
 # ---- before anything is fetched: what would make a long run fail late (009-machine-bootstrap FR-050) -----------------------------------------------------------
@@ -2387,13 +1846,16 @@ check_network() {
   exit 3
 }
 
+# git as this setup calls it for GitHub: gh is the credential helper for the call, so that no git config of the person's is needed or written (009-machine-bootstrap FR-101)
+git_gh() { git -c credential.helper= -c 'credential.helper=!gh auth git-credential' "$@"; }
+
 # the private erga repository is read with the person's sign-in: say now, before the long installs, that this account cannot open it (009-machine-bootstrap FR-050)
 check_access() {
   if [ "$dry" = 1 ]; then [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || would "check, before installing anything, that this GitHub sign-in can open the private erga repository"; return 0; fi
   [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] && return 0
   [ "$have_github" = 1 ] || return 0
   # asked with gh named as the credential helper, so that a ~/.gitconfig that does not have it (a dotfiles tool keeps it) is not taken for an account that has no access
-  ca_out=$(GIT_TERMINAL_PROMPT=0 git -c credential.helper= -c credential.helper='!gh auth git-credential' ls-remote "$erga_url" HEAD 2>&1 </dev/null) && return 0
+  ca_out=$(GIT_TERMINAL_PROMPT=0 git_gh ls-remote "$erga_url" HEAD 2>&1 </dev/null) && return 0
   case $ca_out in
     *"not found"* | *"Not Found"* | *"Authentication failed"* | *"denied"* | *"403"*)
       logf "no access to $erga_url: $ca_out"
@@ -2606,7 +2068,7 @@ main() {
     say "   Without them nothing breaks; there is just no telemetry.${z}"
   fi
 
-  ph_event bootstrap_started "s:method=$install_method" "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:comfort=$([ "$comfort" = 1 ] && echo yes || echo no)"
+  ph_event bootstrap_started "s:method=$install_method" "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}"
   signin_needed=0; cloned=0; erga_ran=0
   if [ "$dry" = 1 ]; then
     heading "${e_pkg}What this computer must already have"
@@ -2631,10 +2093,6 @@ main() {
   identity
   keep_settings
   setup_runtime
-  setup_tools
-  setup_shell_kit
-  setup_editor
-  verify_install
   record_install
   workspace_and_clone
   setup_rust_toolchain

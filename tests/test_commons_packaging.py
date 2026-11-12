@@ -290,7 +290,7 @@ class Record(unittest.TestCase):
     def test_a_bad_rule_or_field_is_refused(self):
         """0004-rules FR-002, 0002-packaging FR-016"""
         for old, new, said in (('pm:pattern "apt-get"', 'pm:pattern "(apt"', "not a regular expression"), ('pm:ruleSet "installer"', 'pm:ruleSet "installers"', "needs a set"),
-                               ('pm:fieldType "boolean"', 'pm:fieldType "number"', "needs a name, a type")):
+                               ('pm:fieldType "date"', 'pm:fieldType "number"', "needs a name, a type")):
             tmp = Path(tempfile.mkdtemp())
             self.addCleanup(shutil.rmtree, tmp, True)
             root = tmp / "commons"
@@ -400,7 +400,7 @@ class Generator(unittest.TestCase):
         """0002-packaging FR-014"""
         root = self.copy()
         f = self.pins(root)
-        f.write_text(f.read_text().replace('pm:pinKey "FISH"', 'pm:pinKey "GH"', 1))
+        f.write_text(f.read_text().replace('pm:pinKey "JQ"', 'pm:pinKey "GH"', 1))
         p = self.run_tool(root)
         self.assertEqual(p.returncode, 2)
         self.assertIn("share the key GH", p.stderr)
@@ -515,16 +515,10 @@ class Consumers(unittest.TestCase):
             ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip build-essential",
             ("arch", "required"): "git ca-certificates curl wget tar xz unzip gcc",
         }
-        comfort = {
-            "debian": "coreutils sed findutils diffutils patch gzip zip bzip2 file less debianutils procps hostname ncurses-bin rsync bc grep gawk bash-completion imagemagick webp "
-                      "libmagickcore-7.q16-10-extra|libmagickcore-6.q16-7-extra|libmagickcore-6.q16-6-extra",
-            "arch": "coreutils sed findutils diffutils patch gzip zip bzip2 file less procps-ng inetutils ncurses rsync bc grep gawk bash-completion imagemagick libwebp",
-        }
         for fam in ("debian", "arch"):
-            out = self.bootstrap(f"family={fam}; is_debian=0; d_codename=''; kits=base; wanted_packages").stdout.splitlines()
-            self.assertEqual(out[0], want[(fam, "required")], fam)
-            self.assertEqual(sorted(out[1].split()), sorted(comfort[fam].split()), fam)
-        self.assertEqual(self.bootstrap("family=debian; is_debian=1; d_codename=trixie; kits=agents; wanted_packages").stdout.splitlines(), [want[("debian", "required")]])
+            out = self.bootstrap(f"family={fam}; is_debian=0; d_codename=''; wanted_packages").stdout.splitlines()
+            self.assertEqual(out, [want[(fam, "required")]], fam)
+        self.assertEqual(self.bootstrap("family=debian; is_debian=1; d_codename=trixie; wanted_packages").stdout.splitlines(), [want[("debian", "required")]])
 
     def test_the_install_commands_and_hints_are_the_table_s(self):
         out = self.bootstrap('family=debian; admin_install_cmd git xz unzip; echo; family=arch; admin_install_cmd git xz unzip; echo; family=debian; admin_install_names a b').stdout.split("\n")
