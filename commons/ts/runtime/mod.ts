@@ -23,6 +23,7 @@ export * as grc from "./grc.ts";
 export * as http from "./http-client.ts";
 export * as lock from "./lock.ts";
 export * as net from "./net.ts";
+export * as otel from "./otel.ts";
 export * as path from "./path.ts";
 export * as proc from "./proc.ts";
 export * as sign from "./sign.ts";

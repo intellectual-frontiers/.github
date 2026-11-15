@@ -21,6 +21,7 @@ import { array, type Decoder, formatDecodeError, json, literal, number, object, 
 import { isSafeMethod, nextLink, retryAfterMs } from "../kernel/http.ts";
 import { formatJson5Error, parseJson5, toJson5 } from "../kernel/json5.ts";
 import { err, ok, type Result } from "../kernel/result.ts";
+import { traceHttpClient } from "./otel.ts";
 import { sleep } from "./proc.ts";
 
 /** A request a client makes. */
@@ -96,25 +97,33 @@ export function liveTransport(options: LiveOptions = {}): Transport {
         const why = carriesCredential(r);
         if (why !== undefined) return err({ kind: "refused", message: why });
       }
-      try {
-        const res = await fetcher(r.url, {
-          method: r.method,
-          headers: { "user-agent": options.userAgent ?? "ifc-ts", ...r.headers },
-          ...(r.body === undefined ? {} : { body: r.body }),
-          signal: AbortSignal.timeout((options.timeoutSeconds ?? 30) * 1000),
-        });
-        const headers: Record<string, string> = {};
-        for (const k of KEPT) {
-          const v = res.headers.get(k);
-          if (v !== null) headers[k] = v;
-        }
-        return ok({ method: r.method, url: r.url, status: res.status, headers, body: await res.text() });
-      } catch (e) {
-        return err({
-          kind: "network",
-          message: e instanceof Error ? `${e.message}${e.cause instanceof Error ? `: ${e.cause.message}` : ""}` : String(e),
-        });
-      }
+      // Where a telemetry pipeline is installed, the request is an `http.client` span and carries `traceparent` (0006-signals FR-018).
+      return traceHttpClient(
+        r.method,
+        r.url,
+        async (trace): Promise<Result<Exchange, TransportError>> => {
+          try {
+            const res = await fetcher(r.url, {
+              method: r.method,
+              headers: { "user-agent": options.userAgent ?? "ifc-ts", ...trace, ...r.headers },
+              ...(r.body === undefined ? {} : { body: r.body }),
+              signal: AbortSignal.timeout((options.timeoutSeconds ?? 30) * 1000),
+            });
+            const headers: Record<string, string> = {};
+            for (const k of KEPT) {
+              const v = res.headers.get(k);
+              if (v !== null) headers[k] = v;
+            }
+            return ok({ method: r.method, url: r.url, status: res.status, headers, body: await res.text() });
+          } catch (e) {
+            return err({
+              kind: "network",
+              message: e instanceof Error ? `${e.message}${e.cause instanceof Error ? `: ${e.cause.message}` : ""}` : String(e),
+            });
+          }
+        },
+        (x) => (x.kind === "ok" ? x.value.status : undefined),
+      );
     },
   };
 }

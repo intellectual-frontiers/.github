@@ -110,6 +110,7 @@ export * as png from "./png.ts";
 export * as render from "./render.ts";
 export * as jobs from "./schedule.ts";
 export * as signals from "./signals.ts";
+export * as testReport from "./test-report.ts";
 export { formatTomlError, isTomlDateTime, isTomlTable, parseToml, tomlKey, tomlString, toToml } from "./toml.ts";
 export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";

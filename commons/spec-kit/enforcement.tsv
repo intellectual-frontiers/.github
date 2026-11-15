@@ -103,8 +103,8 @@ requirement	mechanism	by	note
 0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
 0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
 0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
-0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the palette's marks and their ASCII fallbacks
-0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: lines cut by display width, elapsed time and progress
+0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts: the palette's roles, marks and their ASCII fallbacks, colour only where allowed
+0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/width.test.ts and render.test.ts: lines cut by display width, elapsed time and progress
 0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
 0006-signals FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/vt.test.ts: the terminal emulator's sequences
 0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
@@ -124,9 +124,9 @@ requirement	mechanism	by	note
 0007-grc FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the risk register and NIST SP 800-30's matrix
 0007-grc FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the requirement trace
 0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF compliance findings and inventory
-0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
+0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts and uuid.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
 0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
-0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: a pack's run as spans and OCSF log records
+0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
 0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
 0007-grc FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
 0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path

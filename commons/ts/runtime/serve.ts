@@ -17,6 +17,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import type { AddressInfo } from "node:net";
 import { Readable } from "node:stream";
 import { mapError } from "./errors.ts";
+import { traceServer } from "./otel.ts";
 
 /** Where the server listens, or where a request came from. */
 export type NetAddr = { readonly hostname: string; readonly port: number };
@@ -106,7 +107,8 @@ export function serve(options: ServeOptions, handler: ServeHandler): Promise<Ser
     void (async () => {
       let response: Response;
       try {
-        response = await handler(request, { remoteAddr });
+        // Where a telemetry pipeline is installed, an `http.server` span, the child of the request's `traceparent` (0006-signals FR-018).
+        response = await traceServer(request, () => handler(request, { remoteAddr }), handler);
       } catch (e) {
         response = await onError(e);
       }

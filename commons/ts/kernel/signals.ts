@@ -606,6 +606,9 @@ export type LinkInput = {
 /** How a span starts: its parent (`null` for a new trace; the current context by default) and its links. */
 export type SpanOptions = { readonly parent?: SpanContext | null; readonly links?: readonly LinkInput[] };
 
+/** How one log record is emitted: a severity of its own instead of its kind's (a finding's, say, where one kind has many severities). */
+export type LogOptions = { readonly severity?: SeverityNumber };
+
 /** A span in progress, as the function it runs sees it. */
 export interface SpanHandle<R extends Declarations, K extends keyof R> {
   /** The span's context. */
@@ -629,8 +632,8 @@ export interface SpanHandle<R extends Declarations, K extends keyof R> {
     fn: (span: SpanHandle<R, C>) => T,
     options?: SpanOptions,
   ): T;
-  /** Emits a log record in this span. */
-  log<L extends KindOf<R, "log">>(kind: L, attributes: AttributesOf<R, L>, body?: AnyValue): void;
+  /** Emits a log record in this span; its severity is the kind's unless `options.severity` gives another. */
+  log<L extends KindOf<R, "log">>(kind: L, attributes: AttributesOf<R, L>, body?: AnyValue, options?: LogOptions): void;
 }
 
 /** The tracer, logger and meter of one resource and scope, typed by a registry. */
@@ -652,8 +655,8 @@ export interface Telemetry<R extends Declarations> {
     fn: (span: SpanHandle<R, K>) => T,
     options?: SpanOptions,
   ): T;
-  /** Emits a log record of a kind, in the current span; its `eventName` is the kind. */
-  log<K extends KindOf<R, "log">>(kind: K, attributes: AttributesOf<R, K>, body?: AnyValue): void;
+  /** Emits a log record of a kind, in the current span; its `eventName` is the kind, its severity the kind's unless `options.severity` gives another. */
+  log<K extends KindOf<R, "log">>(kind: K, attributes: AttributesOf<R, K>, body?: AnyValue, options?: LogOptions): void;
   /** Adds to a counter (a negative or non-finite increment is refused) or an up-down counter. */
   add<K extends KindOf<R, "counter" | "updown">>(kind: K, value: number, attributes: AttributesOf<R, K>): Result<void, string>;
   /** Sets a gauge. */
@@ -971,17 +974,24 @@ export function createTelemetry<const R extends Declarations>(options: Telemetry
     return out;
   };
 
-  const emitLog = (kind: string, attributes: object, body: AnyValue | undefined, active: SpanContext | undefined): void => {
+  const emitLog = (
+    kind: string,
+    attributes: object,
+    body: AnyValue | undefined,
+    active: SpanContext | undefined,
+    logOptions: LogOptions | undefined,
+  ): void => {
     const d = declaration(kind);
     if (d.signal !== "log") throw new Error(`the signal kind ${kind} is not a log event`);
     if (stopped) return;
     const a = clean(toAttributes(d.attributes, attributes), d.secret ?? []);
+    const severity = logOptions?.severity ?? d.severity;
     const time = clock();
     const record: LogRecord = {
       time,
       observedTime: time,
-      severityNumber: d.severity,
-      severityText: severityText(d.severity),
+      severityNumber: severity,
+      severityText: severityText(severity),
       ...(body === undefined ? {} : { body: redactAnyValue(body) }),
       attributes: a.attributes,
       droppedAttributesCount: a.dropped,
@@ -1009,7 +1019,7 @@ export function createTelemetry<const R extends Declarations>(options: Telemetry
       progress: (done, total) =>
         addEvent(o, "progress", total === undefined ? { "progress.done": done } : { "progress.done": done, "progress.total": total }),
       span: (kind, attributes, fn, spanOptions) => runSpan(kind, attributes, fn, spanOptions, o.start.context),
-      log: (kind, attributes, body) => emitLog(kind, attributes, body, o.start.context),
+      log: (kind, attributes, body, logOptions) => emitLog(kind, attributes, body, o.start.context, logOptions),
     };
   };
 
@@ -1141,7 +1151,7 @@ export function createTelemetry<const R extends Declarations>(options: Telemetry
     source,
     active: () => context.active() ?? options.parent,
     span: (kind, attributes, fn, spanOptions) => runSpan(kind, attributes, fn, spanOptions, undefined),
-    log: (kind, attributes, body) => emitLog(kind, attributes, body, context.active() ?? options.parent),
+    log: (kind, attributes, body, logOptions) => emitLog(kind, attributes, body, context.active() ?? options.parent, logOptions),
     add: (kind, value, attributes) => measure(kind, ["counter", "updown"], value, attributes),
     set: (kind, value, attributes) => measure(kind, ["gauge"], value, attributes),
     record: (kind, value, attributes) => measure(kind, ["histogram"], value, attributes),

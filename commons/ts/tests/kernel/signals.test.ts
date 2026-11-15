@@ -155,6 +155,28 @@ proves(
   },
 );
 
+proves([REGISTRY], "a log record has its kind's severity unless the call gives one of its own, in the span or out of it", () => {
+  const { telemetry, memory } = fixture();
+  telemetry.log("build.warning", { path: "a" });
+  telemetry.log("build.warning", { path: "b" }, undefined, { severity: SEVERITY.FATAL });
+  telemetry.log("build.warning", { path: "c" }, "body", {});
+  telemetry.span("build.run", { target: "site" }, (span) => {
+    span.log("build.warning", { path: "d" }, "in the span", { severity: 18 });
+    return ok(undefined);
+  });
+  assertEquals(
+    memory.logs.map((r) => [r.eventName, r.severityNumber, r.severityText]),
+    [
+      ["build.warning", 13, "WARN"],
+      ["build.warning", 21, "FATAL"],
+      ["build.warning", 13, "WARN"],
+      ["build.warning", 18, "ERROR2"],
+    ],
+  );
+  // @ts-expect-error a severity is a number from 1 to 24
+  telemetry.log("build.warning", { path: "e" }, undefined, { severity: 25 });
+});
+
 /** The tree every run of it gives: a run with an event, a child through the context, and a child through the handle. */
 function tree() {
   const { telemetry, memory } = fixture();

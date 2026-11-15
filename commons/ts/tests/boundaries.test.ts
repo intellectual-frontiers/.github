@@ -216,12 +216,18 @@ proves(
   () => {
     const m = manifest();
     assertEquals(m.name, "@intellectual-frontiers/ifc-ts");
-    assertEquals(m.exports, { "./kernel": "./kernel/mod.ts", "./runtime": "./runtime/mod.ts", "./runtime/test": "./runtime/test.ts" });
+    assertEquals(m.exports, {
+      "./kernel": "./kernel/mod.ts",
+      "./runtime": "./runtime/mod.ts",
+      "./runtime/test": "./runtime/test.ts",
+      "./runtime/test-run": "./runtime/test-run.ts",
+    });
     const built = packageManifest(m);
     assertEquals(built["exports"], {
       "./kernel": { types: "./kernel/mod.d.ts", default: "./kernel/mod.js" },
       "./runtime": { types: "./runtime/mod.d.ts", default: "./runtime/mod.js" },
       "./runtime/test": { types: "./runtime/test.d.ts", default: "./runtime/test.js" },
+      "./runtime/test-run": { types: "./runtime/test-run.d.ts", default: "./runtime/test-run.js" },
     });
     assertEquals([built["devDependencies"], built["scripts"], built["dependencies"]], [undefined, undefined, undefined]);
     assertEquals(tarballName({ name: "@intellectual-frontiers/ifc-ts", version: "1.2.3" }), "intellectual-frontiers-ifc-ts-1.2.3.tgz");
