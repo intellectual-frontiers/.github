@@ -46,6 +46,7 @@ export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export type { Brand } from "./brand.ts";
 export * as args from "./args.ts";
+export * as assess from "./assess.ts";
 export * as cms from "./cms.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
@@ -73,6 +74,8 @@ export {
 export type { Decoded, DecodeError, Decoder, Fields, ObjectOf } from "./decode.ts";
 export * as der from "./der.ts";
 export * as dsse from "./dsse.ts";
+export * as evidence from "./evidence.ts";
+export * as grc from "./grc.ts";
 export { order, schedule } from "./graph.ts";
 export type { Cycle, Graph, Ran } from "./graph.ts";
 export {
@@ -97,13 +100,19 @@ export type { Change, Level, SemVer } from "./semver.ts";
 export { fromHex, parseSha256Sums, sameSha256, sha256, sha256Of, toHex } from "./sha256.ts";
 export type { Sha256 } from "./sha256.ts";
 export { ANSI, lf, plain, quoteArgs, splitArgs } from "./text.ts";
+export * as otel from "./otel.ts";
+export * as otlp from "./otlp.ts";
+export * as palette from "./palette.ts";
 export * as png from "./png.ts";
 export * as jobs from "./schedule.ts";
+export * as signals from "./signals.ts";
 export { formatTomlError, isTomlDateTime, isTomlTable, parseToml, tomlKey, tomlString, toToml } from "./toml.ts";
 export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
 export type { Literal, LiteralError } from "./ts-literal.ts";
 export { expectType } from "./types.ts";
+export * as vt from "./vt.ts";
+export * as width from "./width.ts";
 export {
   attribute,
   child,
