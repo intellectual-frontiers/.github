@@ -14,8 +14,9 @@ its own copy. It holds no company fact and no secret: this repository is public.
 
 - `ontology/supply-chain/packaging/`: the vocabulary (`packaging.ttl`) and the data (`managers.ttl`, `families.ttl`, `programs.ttl`), seeded from the tables of
   [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs.
-- `tools/generate-packaging.py`: reads the ontology and writes the two files below; `uv run commons/tools/generate-packaging.py --check` fails where they are stale.
-- `generated/`: `packaging.auto.toml` (for programs) and `packaging.auto.sh` (for scripts). Generated; never edited by hand.
+- `tools/generate-packaging.py`: reads the ontology and writes the files below; `uv run commons/tools/generate-packaging.py --check` fails where they are stale.
+- `generated/`: `packaging.auto.toml` (for programs), `packaging.auto.sh` (for scripts), `packaging.auto.ts` (for the machine setup, which is TypeScript), `pins.auto.env` (the pinned
+  downloads, Deno among them, which the bootstraps also carry between their marks) and the tables of rules and of the installation record. Generated; never edited by hand.
 - `spec-kit/`: the specifications of the capabilities, in the format of `archon`'s specifications.
 
 A harness reads `generated/`; it keeps no fact of its own that the ontology holds.

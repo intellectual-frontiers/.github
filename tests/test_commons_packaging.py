@@ -31,6 +31,14 @@ def table() -> dict:
     return tomllib.loads(TOML.read_text())
 
 
+def ts_module() -> dict:
+    """commons/generated/packaging.auto.ts, read as the data it is: each `export const NAME = <JSON> as const;`."""
+    import json
+    text = (COMMONS / "generated" / "packaging.auto.ts").read_text()
+    out = {name: json.loads(body) for name, body in re.findall(r"^export const (\w+) = (.*?)(?: as const)?;$", text, re.M | re.S)}
+    return out
+
+
 def rows(name: str) -> list[dict]:
     with open(FIXTURES / name) as f:
         return list(csv.DictReader(f, delimiter="\t"))
@@ -176,20 +184,28 @@ class Pins(unittest.TestCase):
     def env(self):
         return dict(l.split("=", 1) for l in (COMMONS / "generated" / "pins.auto.env").read_text().splitlines() if l and not l.startswith("#"))
 
-    def test_the_env_file_the_toml_and_the_script_agree(self):
-        """0002-packaging FR-014"""
+    def test_the_env_file_the_toml_the_module_and_the_bootstraps_agree(self):
+        """0002-packaging FR-014, FR-015: the setup reads the TypeScript module; each bootstrap carries the Deno pins between its marks"""
         t = tomllib.loads(TOML.read_text())
         env = self.env()
-        script = (COMMONS.parent / "bin" / "erga-setup.sh").read_text()
+        module = ts_module()
         self.assertTrue(t["pins"] and t["platforms"])
+        self.assertIn("deno", t["pins"])
         for name, pin in t["pins"].items():
             self.assertEqual(env[f"{pin['key']}_VERSION"], pin["version"], name)
-            self.assertIn(f"{pin['key']}_VERSION={pin['version']}\n", script)
+            self.assertEqual(module["pins"][name]["version"], pin["version"], name)
+            self.assertEqual(module["pins"][name]["sha256"], pin.get("sha256", {}), name)
             for plat, digest in pin.get("sha256", {}).items():
                 var = f"{pin['key']}_SHA256_{t['platforms'][plat]['pin_suffix']}"
                 self.assertEqual(env[var], digest, var)
                 self.assertRegex(digest, r"^[0-9a-f]{64}$")
-                self.assertIn(f"{var}={digest}\n", script)
+        self.assertEqual(set(t["pins"]["deno"]["sha256"]), set(t["platforms"]), "Deno is pinned on every platform, Windows too")
+        boot_sh = (COMMONS.parent / "bin" / "erga-bootstrap.sh").read_text()
+        boot_ps1 = (COMMONS.parent / "bin" / "erga-bootstrap.ps1").read_text()
+        for var, value in env.items():
+            if var.startswith("DENO_"):
+                self.assertIn(f"\n{var}={value}\n", boot_sh)
+                self.assertIn(f"\n${var} = '{value}'\n", boot_ps1)
 
     def test_every_platform_names_an_os_and_a_processor(self):
         """0002-packaging FR-014"""
@@ -199,7 +215,7 @@ class Pins(unittest.TestCase):
             self.assertIn(pl["processor"], ("x86_64", "aarch64"))
 
 
-SETUP = COMMONS.parent / "bin" / "erga-setup.sh"
+BOOT = COMMONS.parent / "bin" / "erga-bootstrap.sh"
 RULES = COMMONS / "generated" / "rules.auto.toml"
 RECORD = COMMONS / "generated" / "install-record.auto.toml"
 
@@ -252,8 +268,8 @@ class Rules(unittest.TestCase):
     def test_the_scripts_have_no_line_the_tool_reports(self):
         """0004-rules SC-001"""
         tool = self.tool()
-        allowed = ('[ "$goos" = linux ]; then mv -Tf', "command -v sha256sum", "sha256sum()", 'sha512sum "$1"', "sha256sum; }", 'sha256sum "$1"', "base64 -d 2>/dev/null || base64 -D")
-        for f in (SETUP, COMMONS.parent / "bin" / "erga-bootstrap.sh"):
+        allowed = ("command -v sha256sum", "neither sha256sum nor shasum")
+        for f in (BOOT, COMMONS.parent / "bin" / "erga-setup.sh"):
             self.assertEqual(tool.scan(f, allowed), [])
 
 
@@ -263,28 +279,14 @@ class Record(unittest.TestCase):
     def fields(self):
         return tomllib.loads(RECORD.read_text())["fields"]
 
-    def test_the_script_writes_the_fields_of_the_record_in_order_with_the_right_form(self):
-        """0002-packaging FR-016"""
-        text = SETUP.read_text()
-        block = text[text.index("record_install() {"):]
-        block = block[:block.index("\n}\n")]
-        written = re.findall(r"printf '(\w+) = (\"?)%s(\"?)\\n'", block)
+    def test_the_fields_are_in_order_with_a_type_and_the_methods_and_hosts_a_setup_can_write(self):
+        """0002-packaging FR-016: the setup that writes the record is TypeScript now, and its own test (tests/table_test.ts) holds it to these fields"""
         fields = self.fields()
-        self.assertEqual([w[0] for w in written], [f["name"] for f in fields])
-        for (name, open_q, close_q), f in zip(written, fields):
-            self.assertEqual((open_q, close_q), ("", "") if f["type"] == "boolean" else ('"', '"'), name)
-
-    def test_methods_and_hosts_the_script_can_write_are_the_allowed_values(self):
-        """0002-packaging FR-016"""
-        by = {f["name"]: f for f in self.fields()}
-        text = SETUP.read_text() + (COMMONS.parent / "bin" / "erga-bootstrap.sh").read_text()
-        for m in by["method"]["values"]:
-            self.assertRegex(text, rf"install_method=(\$\{{install_method:-)?{m}")
-        host = SETUP.read_text()
-        host = host[host.index("host_kind() {"):]
-        host = host[:host.index("\n}\n")]
-        for h in by["host"]["values"]:
-            self.assertIn(h, host)
+        self.assertEqual([f["name"] for f in fields], ["method", "family", "host", "distro", "arch", "installed", "refreshed"])
+        by = {f["name"]: f for f in fields}
+        self.assertEqual(sorted(by["method"]["values"]), ["bootstrap", "setup"])
+        self.assertEqual(sorted(by["host"]["values"]), ["container", "machine", "vm", "wsl"])
+        self.assertEqual(ts_module()["recordFields"], [{"name": f["name"], "type": f["type"], "values": f.get("values", [])} for f in fields])
 
     @unittest.skipUnless(UV, "uv is not installed (it runs the generator)")
     def test_a_bad_rule_or_field_is_refused(self):
@@ -470,77 +472,31 @@ class Layout(unittest.TestCase):
     def test_commons_has_the_layout_the_capability_spec_names(self):
         """0001-software-supply-chain FR-001"""
         for rel in ("README.md", "spec-kit/registry.tsv", "spec-kit/enforcement.tsv", "ontology/supply-chain/packaging/packaging.ttl", "tools/generate-packaging.py",
-                    "generated/packaging.auto.toml", "generated/packaging.auto.sh"):
+                    "generated/packaging.auto.toml", "generated/packaging.auto.sh", "generated/packaging.auto.ts", "generated/pins.auto.env"):
             self.assertTrue((COMMONS / rel).is_file(), rel)
         self.assertTrue((COMMONS / "README.md").read_text().startswith("# commons"))
 
 
-SETUP = HOME / "bin" / "erga-setup.sh"
-BOOT = HOME / "bin" / "erga-bootstrap.sh"
-BLOCK = re.compile(r"# >>> packaging\.auto >>>\n.*?# <<< packaging\.auto <<<\n", re.S)
+class Module(unittest.TestCase):
+    """The TypeScript module the machine setup reads (0001-software-supply-chain FR-003): the same facts as the TOML, as lists of words."""
 
-
-def outside_the_block(text: str) -> str:
-    return BLOCK.sub("", text)
-
-
-@unittest.skipUnless(SH, "sh is not installed")
-class Consumers(unittest.TestCase):
-    """The scripts read the table (0001-software-supply-chain FR-003; erga 009-machine-bootstrap FR-014): no second copy of a fact it holds."""
-
-    def test_the_setup_carries_exactly_the_generated_fragment(self):
-        """0001-software-supply-chain FR-002, FR-003: a script piped from the internet has no file beside it, so the block is generated into it"""
-        self.assertEqual(BLOCK.search(SETUP.read_text()).group(0), SH_FRAGMENT.read_text())
-
-    def test_neither_script_keeps_a_package_name_a_command_or_a_detecting_id_the_table_holds(self):
-        t = table()
-        for f in (SETUP, BOOT):
-            text = outside_the_block(f.read_text())
-            code = "\n".join(l for l in text.splitlines() if not l.lstrip().startswith("#"))
-            for needle in ("xz-utils", "github-cli", "apt-get install -y", "pacman -S --needed --noconfirm", "dpkg-query -W", "apt-cache policy", "pacman -Qi", "pacman -Si", "DEBIAN_FRONTEND=noninteractive",
-                           "libmagickcore", "build-essential"):
-                self.assertNotIn(needle, code, f"{f.name} keeps {needle!r}, which the table holds")
-            for fid, fam in t["families"].items():
-                if fam["status"] == "supported" and fam["detect_source"] == "os-release":
-                    self.assertNotRegex(code, rf'\*" ?(?:{"|".join(map(re.escape, fam["detect"]))}) ?"\*', f"{f.name} detects {fid} on its own")
-
-    def bootstrap(self, code, **env):
-        import os
-        return subprocess.run([SH, "-c", f'. "{BOOT}"; {code}'], capture_output=True, text=True,
-                              env={**os.environ, "BOOTSTRAP_SOURCE_ONLY": "1", "BOOTSTRAP_SETUP": str(SETUP), "HOME": tempfile.mkdtemp(), **env})
-
-    def test_what_the_bootstrap_installs_is_what_it_installed_before_the_table(self):
-        """the migration changed no list (these are the lists the scripts held in their case branches), but for the C compiler and linker Rust needs (erga 009-machine-bootstrap FR-021)"""
-        want = {
-            ("debian", "required"): "git ca-certificates curl wget tar xz-utils unzip build-essential",
-            ("arch", "required"): "git ca-certificates curl wget tar xz unzip gcc",
-        }
-        for fam in ("debian", "arch"):
-            out = self.bootstrap(f"family={fam}; is_debian=0; d_codename=''; wanted_packages").stdout.splitlines()
-            self.assertEqual(out, [want[(fam, "required")]], fam)
-        self.assertEqual(self.bootstrap("family=debian; is_debian=1; d_codename=trixie; wanted_packages").stdout.splitlines(), [want[("debian", "required")]])
-
-    def test_the_install_commands_and_hints_are_the_table_s(self):
-        out = self.bootstrap('family=debian; admin_install_cmd git xz unzip; echo; family=arch; admin_install_cmd git xz unzip; echo; family=debian; admin_install_names a b').stdout.split("\n")
-        self.assertEqual(out[0], "sudo apt-get install -y git xz-utils unzip")
-        self.assertEqual(out[1], "sudo pacman -S --needed git xz unzip")
-        self.assertEqual(out[2], "sudo apt-get install -y a b")
-
-    def test_a_family_the_table_knows_but_no_script_acts_on_is_named_with_its_manager(self):
-        import os
-        for ident, label, manager in (("fedora", "Red Hat family", "dnf"), ("alpine", "Alpine family", "apk"), ("opensuse-leap", "SUSE family", "zypper")):
-            osr = Path(tempfile.mkdtemp()) / "os-release"
-            osr.write_text(f'ID={ident}\nPRETTY_NAME="Test {ident}"\n')
-            p = subprocess.run([SH, str(SETUP), "--dry-run"], capture_output=True, text=True, env={**os.environ, "BOOTSTRAP_OS_RELEASE": str(osr), "HOME": tempfile.mkdtemp()}, stdin=subprocess.DEVNULL)
-            self.assertEqual(p.returncode, 3, ident)
-            self.assertIn(f"{label}: it uses {manager}, and this setup does not support it yet", p.stderr, ident)
-            self.assertIn("Fix:", p.stderr)
-        osr = Path(tempfile.mkdtemp()) / "os-release"
-        osr.write_text('ID=plan9\nPRETTY_NAME="Plan 9"\n')
-        p = subprocess.run([SH, str(SETUP), "--dry-run"], capture_output=True, text=True, env={**os.environ, "BOOTSTRAP_OS_RELEASE": str(osr), "HOME": tempfile.mkdtemp()}, stdin=subprocess.DEVNULL)
-        self.assertEqual(p.returncode, 3)
-        self.assertNotIn("it uses", p.stderr)
-        self.assertIn("Plan 9", p.stderr)
+    def test_it_says_what_the_toml_says_by_family(self):
+        t, m = table(), ts_module()
+        self.assertEqual(set(m["families"]), set(t["families"]))
+        for fid, f in t["families"].items():
+            mf = m["families"][fid]
+            self.assertEqual((mf["label"], mf["status"], mf["assurance"]), (f["label"], f["status"], f["assurance"]), fid)
+            if f["detect_source"] == "os-release":
+                self.assertEqual(sorted(mf["detect"]), sorted(f["detect"]), fid)
+        for fid in ("debian", "arch"):
+            mgr = t["managers"][t["families"][fid]["preferred"]]
+            self.assertEqual(m["families"][fid]["installWords"], [w for w in mgr["commands"]["install"]["noninteractive"] if not w.startswith("{")])
+            for name, p in t["programs"].items():
+                self.assertEqual(m["programs"][name]["names"].get(fid), p["names"].get(fid), f"{fid} {name}")
+        self.assertEqual(m["families"]["debian"]["environment"], "DEBIAN_FRONTEND=noninteractive")
+        self.assertEqual(m["families"]["arch"]["refreshWords"], [], "never -Sy on Arch")
+        self.assertEqual([n for n, p in m["programs"].items() if p["tier"] == "required"], ["git", "ca-certificates", "curl", "wget", "tar", "xz", "unzip", "cc"])
+        self.assertEqual(m["schema"], t["schema"])
 
 
 class Specs(unittest.TestCase):

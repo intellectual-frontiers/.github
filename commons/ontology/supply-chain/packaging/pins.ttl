@@ -66,3 +66,15 @@ pmid:pin-jq a pm:PinnedDownload ;
 pmid:sum-jq-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f" .
 pmid:sum-jq-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309" .
 pmid:sum-jq-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e" .
+
+pmid:pin-deno a pm:PinnedDownload ;
+    rdfs:label "Deno, which runs the machine setup and erga's ergactl"@en ;
+    pm:programName "deno" ;
+    pm:pinKey "DENO" ;
+    pm:version "2.9.8" ;
+    pm:note "From https://github.com/denoland/deno/releases/download/vVERSION/deno-TARGET.zip (TARGET x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin, x86_64-pc-windows-msvc), the same release and checksums as the Deno entry of erga's toolchain (erga 243-repo-setup). The bootstraps fetch it first and run the TypeScript setup with it (erga 009-machine-bootstrap)."@en .
+pmid:sum-deno-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-deno ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "e890975bc2549807bbcc0b584ffafda72cc7c93349dd99c80483dd784f6c4609" .
+pmid:sum-deno-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-deno ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "d49596c20b9788cf8f5d8ddf644103d4bde56ed239753f0bdb92ba9361d51905" .
+pmid:sum-deno-macos-x64 a pm:Checksum ; pm:forPin pmid:pin-deno ; pm:forPlatform pmid:platform-macos-x64 ; pm:sha256 "4b2f5edd2639b7470f034238b321d7002d8dfb4726d8558f52c17afac370eb2c" .
+pmid:sum-deno-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-deno ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "9f0bf660393da2eaff044cdc7444cb08c73f235849b61d224d825a194ce7c98e" .
+pmid:sum-deno-windows-x64 a pm:Checksum ; pm:forPin pmid:pin-deno ; pm:forPlatform pmid:platform-windows-x64 ; pm:sha256 "cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf" .
