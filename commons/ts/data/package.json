@@ -1,0 +1,24 @@
+{
+  "name": "@intellectual-frontiers/ifc-data",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SQL Aide and the libraries that accept it, Arca and Data Vault, built on IFC TypeScript's kernel (commons 0006-sql-aide).",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "docs": "bun sql-aide/runtime/docs.ts arca/party.ts",
+    "docs:check": "bun sql-aide/runtime/docs.ts --check arca/party.ts",
+    "verify": "tsc -p tsconfig.json && bun sql-aide/runtime/docs.ts --check arca/party.ts && bun test tests/",
+    "test": "bun test tests/",
+    "test:node": "node --test \"tests/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@duckdb/node-api": "2.0.0-r.1",
+    "@electric-sql/pglite": "0.5.16",
+    "@types/pg": "8.23.1",
+    "pg": "8.23.1"
+  }
+}

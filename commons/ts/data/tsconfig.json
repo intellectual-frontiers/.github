@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
+  "include": ["sql-aide/**/*.ts", "arca/**/*.ts", "data-vault/**/*.ts", "tests/**/*.ts"]
+}

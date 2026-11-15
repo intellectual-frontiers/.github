@@ -10,6 +10,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 | **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the tool with no dependency that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
 | **Rules** | The rules a harness applies to scripts, CI and code (portable shell, no installs outside the launcher, no host programs), as data with the reason for each, and the tool that finds what breaks the shell ones. | [`0004-rules`](spec-kit/specs/0004-rules/spec.md) |
 | **TypeScript runtime** | IFC TypeScript (`ts/`): a pure kernel and one host runtime on web standards and `node:` builtins, checked by TypeScript 7 and tested on Deno, Node and Bun, that the TypeScript harnesses import instead of each keeping its own helpers or calling one vendor's API. | [`0005-typescript-runtime`](spec-kit/specs/0005-typescript-runtime/spec.md) |
+| ↳ **SQL Aide** | IFC SQL Aide (`ts/data/`): one schema written as TypeScript algebraic types and rendered as SQL for PostgreSQL, SQLite and DuckDB, with typed routines, schema lifecycle (ISLM), integrations, transforms and tests inside the database; Arca (typical data models) and Data Vault are the libraries that accept it. Being built, phase by phase. | [`0006-sql-aide`](spec-kit/specs/0006-sql-aide/spec.md) |
 
 ## Layout
 
