@@ -7,7 +7,8 @@
 import { sha256 } from "../../kernel/sha256.ts";
 import { errors, mapError, RuntimeError } from "../../runtime/errors.ts";
 import * as fs from "../../runtime/fs.ts";
-import { join, toFileUrl } from "../../runtime/path.ts";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve, toFileUrl } from "../../runtime/path.ts";
 import { build } from "../../runtime/proc.ts";
 import { assert, assertEquals, assertInstanceOf, assertRejects, assertThrows, proves } from "../../runtime/test.ts";
 
@@ -77,6 +78,17 @@ proves([FR, ERR], "folders made, listed, stat'd and removed; removing what is no
     await assertRejects(() => fs.stat(join(dir, "a")), errors.NotFound);
     await assertRejects(() => fs.writeTextFile(join(dir, "no", "such", "f"), ""), errors.NotFound);
   });
+});
+
+proves([FR], "regression: a temporary folder with no prefix is made inside the temporary folder, not beside it", async () => {
+  const dir = await fs.makeTempDir();
+  const sync = fs.makeTempDirSync();
+  try {
+    assertEquals([dirname(dir), dirname(sync)], [resolve(tmpdir()), resolve(tmpdir())]);
+  } finally {
+    await fs.remove(dir);
+    await fs.remove(sync);
+  }
 });
 
 proves([FR], "temporary folders and files, rename, copy, chmod, links, realPath, truncate, utime", async () => {

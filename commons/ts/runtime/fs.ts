@@ -20,7 +20,7 @@ import { createHash } from "node:crypto";
 import * as nfs from "node:fs";
 import * as fsp from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import type { Sha256 } from "../kernel/sha256.ts";
@@ -221,9 +221,15 @@ export function readDirSync(path: PathLike): DirEntry[] {
 /** Where and how a temporary file or folder is named: in `dir` (the system's by default), with a `prefix` and `suffix`. */
 export type MakeTempOptions = { readonly dir?: string; readonly prefix?: string; readonly suffix?: string };
 
+/** What `mkdtemp` is given: the folder with a separator, then the prefix, so that the random part is added inside the folder and not to its name. */
+const tempBase = (options: MakeTempOptions): string => {
+  const dir = options.dir ?? tmpdir();
+  return `${dir.endsWith(sep) ? dir : `${dir}${sep}`}${options.prefix ?? ""}`;
+};
+
 /** A new, empty, private folder, and its path. */
 export async function makeTempDir(options: MakeTempOptions = {}): Promise<string> {
-  const base = join(options.dir ?? tmpdir(), options.prefix ?? "");
+  const base = tempBase(options);
   const made = await hostCall(base, () => fsp.mkdtemp(base));
   if (options.suffix === undefined || options.suffix === "") return made;
   await hostCall(made, () => fsp.rename(made, `${made}${options.suffix}`));
@@ -232,7 +238,7 @@ export async function makeTempDir(options: MakeTempOptions = {}): Promise<string
 
 /** A new, empty, private folder, without waiting. */
 export function makeTempDirSync(options: MakeTempOptions = {}): string {
-  const base = join(options.dir ?? tmpdir(), options.prefix ?? "");
+  const base = tempBase(options);
   return hostCallSync(base, () => nfs.mkdtempSync(base));
 }
 
