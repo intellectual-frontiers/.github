@@ -8,7 +8,10 @@ import type { Brand, Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
 import {
+  electronicContact,
   party,
+  partyKind,
+  partyRoleKind,
   partyDocs,
   partyIndexes,
   partyModel,
@@ -26,6 +29,9 @@ import {
   definitions,
   duckdb,
   fails,
+  from,
+  insertInto,
+  isNull,
   apply,
   inspect,
   plan,
@@ -319,5 +325,69 @@ proves(
       const structure = structuralTests({ tables: partyTables, views: partyViews, indexes: partyIndexes }, ctx);
       assertEquals(tally(await runAssertions(structure, engine, ctx)).failed, 0, engine.name);
     });
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-041", "0009-sql-aide FR-047", "0009-sql-aide FR-050"],
+  "the party model is written and read with the query builder, joined by its foreign keys, with the same rows in every engine",
+  async () => {
+    const directory = from(person)
+      .join(party)
+      .leftJoin(electronicContact)
+      .where((s) => isNull(s.party.deleted_at))
+      .select((s) => ({ id: s.person.party_id, name: s.party.display_name, email: s.electronic_contact.address }))
+      .orderBy((s) => [s.person.party_id]);
+    expectType<
+      Equal<RowOf<typeof directory>, { readonly id: Brand<string, "party">; readonly name: string; readonly email: string | null }>
+    >();
+    // @ts-expect-error no foreign key joins a person to a kind of role: the join must say how
+    const unrelated = (): unknown => from(person).join(partyRoleKind);
+    assertEquals(typeof unrelated, "function");
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions(partyModel), ctx));
+      for (const r of partyReference) await engine.exec(render(r.load, ctx));
+      const p1 = party.key("p1"),
+        p2 = party.key("p2");
+      await engine.exec(
+        render(
+          insertInto(party, [
+            { party_id: p1, party_kind_code: partyKind.key("person"), display_name: "Ada Lovelace" },
+            { party_id: p2, party_kind_code: partyKind.key("person"), display_name: "Alan Turing" },
+          ]),
+          ctx,
+        ),
+      );
+      await engine.exec(
+        render(
+          insertInto(person, [
+            { party_id: p1, given_name: "Ada", family_name: "Lovelace" },
+            { party_id: p2, given_name: "Alan", family_name: "Turing" },
+          ]),
+          ctx,
+        ),
+      );
+      await engine.exec(
+        render(
+          insertInto(electronicContact, [
+            { electronic_contact_id: electronicContact.key("e1"), party_id: p1, medium: "email", address: "ada@example.org" },
+          ]),
+          ctx,
+        ),
+      );
+      const rows = (await engine.query(render(directory, ctx))).map((r) => ({ ...r }));
+      assertEquals(
+        rows,
+        [
+          { id: "p1", name: "Ada Lovelace", email: "ada@example.org" },
+          { id: "p2", name: "Alan Turing", email: null },
+        ],
+        engine.name,
+      );
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
   },
 );

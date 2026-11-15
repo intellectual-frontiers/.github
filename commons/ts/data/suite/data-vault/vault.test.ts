@@ -24,6 +24,7 @@ import {
   definitions,
   duckdb,
   fails,
+  from,
   apply,
   inspect,
   plan,
@@ -295,5 +296,37 @@ proves(
       assertEquals([again.changes, again.unplanned], [[], []], `${engine.name}: no drift`);
       assertEquals(await apply(again, engine, ctx, { actor: "vault" }), { kind: "ok", value: { ran: [] } });
     });
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-041", "0009-sql-aide FR-048", "0009-sql-aide FR-050"],
+  "a vault is read with the query builder: a link joined to its hubs by their keys, the same in every engine",
+  async () => {
+    const orders = from(customerOrder)
+      .join(customer)
+      .join(order)
+      .select((s) => ({ customer: s.hub_customer.customer_number, order: s.hub_order.order_number }))
+      .orderBy((s) => [s.hub_order.order_number]);
+    expectType<Equal<RowOf<typeof orders>, { readonly customer: string; readonly order: string }>>();
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...vault, feed]), ctx));
+      await engine.exec(render(feedOf(first).load, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      const rows = (await engine.query(render(orders, ctx))).map((r) => ({ ...r }));
+      assertEquals(
+        rows,
+        [
+          { customer: "C-1", order: "O-1" },
+          { customer: "C-1", order: "O-2" },
+          { customer: "C-2", order: "O-3" },
+        ],
+        engine.name,
+      );
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
   },
 );

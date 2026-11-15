@@ -141,6 +141,23 @@ export type {
   Step,
   TeardownRefused,
 } from "./islm/islm.ts";
+export { cte, deleteFrom, except, from, insertInto, intersect, union, unionAll, update, withCtes } from "./query/builder.ts";
+export type {
+  BrandsIn,
+  Cte,
+  Insert,
+  Joinable,
+  JoinsByKey,
+  Nullable,
+  Query,
+  Relation,
+  Returning,
+  RowOfColumns,
+  SetOf,
+  Which,
+  Writable,
+  YieldOf,
+} from "./query/builder.ts";
 export { desc, rowsAs, select, valueAs } from "./query/select.ts";
 export type { Select } from "./query/select.ts";
 export { fn, nothing, proc, rowsOf, scalar, setOf, trigger } from "./routine/routine.ts";
