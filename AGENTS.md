@@ -20,6 +20,13 @@ This repository is small on purpose: the organization's public profile (`profile
   `rust-toolchain.toml` names the stable channel), copies `intellectual-frontiers/erga` to `~/workspaces/github.com/intellectual-frontiers/erga` and runs only commands `erga` has.
   It writes no startup file: `ergactl agent-tools shell emit` gives the one optional line (erga's 010-shell), and the settings file it keeps must stay what `ergactl secrets` writes
   (erga's 011-secrets).
+- `commons/ts/` is the one place that is not Deno: TypeScript 7 libraries that Bun 1.4+ and Node 26+ run as written (commons 0005-sql-aide), first of them SQL Aide
+  (`commons/ts/data/sql-aide/`) and the libraries that accept it, Arca (`commons/ts/data/arca/`) and Data Vault (`commons/ts/data/data-vault/`). Work spec first there too
+  (`commons/spec-kit/specs/0005-sql-aide/`), and run `bun run --cwd commons/ts check` (the TypeScript 7 compiler, then every test under Bun) and
+  `bun run --cwd commons/ts test:node` (the same tests under Node) before you push; the `sql-aide` job of the workflow runs both, with a PostgreSQL made for the run. The package has no
+  `dependencies` (what it installs is for checking and testing); a file of the library imports only the library, and a runtime's module only under `runtime/`; the same typing rules hold
+  (tagged unions with an exhaustive `switch`, errors as values, no `any`, no non-null `!`), with only syntax a runtime can erase; everything is configured in TypeScript, never in YAML, XML
+  or JSON; and every exported declaration carries a TSDoc comment, which is also what the SQL documentation says. Deno code does not import it, and it does not import Deno code.
 - Never put a secret, a token or a person's data in this repository: it is public.
 
 Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the author of that commit in its message; an agent's part is a

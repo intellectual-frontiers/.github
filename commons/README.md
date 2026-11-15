@@ -9,6 +9,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 | ↳ **Packaging** | The package managers and system families of every computer, the commands that drive them, the package each family calls a program, and how far each family has been tried. | [`0002-packaging`](spec-kit/specs/0002-packaging/spec.md) |
 | **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the tool with no dependency that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
 | **Rules** | The rules a harness applies to scripts, CI and code (portable shell, no installs outside the launcher, no host programs), as data with the reason for each, and the tool that finds what breaks the shell ones. | [`0004-rules`](spec-kit/specs/0004-rules/spec.md) |
+| **SQL Aide** | One schema written as TypeScript algebraic types and rendered as SQL for PostgreSQL, SQLite and DuckDB: typed routines, indexes and partitions, schema lifecycle (ISLM), integrations, transforms and tests that run inside the database, with Arca (typical data models) and Data Vault as the libraries that accept it. | [`0005-sql-aide`](spec-kit/specs/0005-sql-aide/spec.md) |
 
 ## Layout
 
@@ -21,5 +22,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 - `generated/`: `packaging.auto.toml` (for programs), `packaging.auto.sh` (for scripts), `packaging.auto.ts` (for the machine setup, which is TypeScript), `pins.auto.env` (the pinned
   downloads, Deno among them, which the bootstraps also carry between their marks) and the tables of rules and of the installation record. Generated; never edited by hand.
 - `spec-kit/`: the specifications of the capabilities, in the format of `archon`'s specifications.
+- `ts/`: TypeScript 7 libraries that Bun and Node run as written, with their own package (`ts/package.json`, no `dependencies`): `ts/data/sql-aide/` (SQL Aide),
+  `ts/data/arca/` (typical data models) and `ts/data/data-vault/`. `bun run --cwd commons/ts check` checks and tests them; Deno does not run them.
 
 A harness reads `generated/`; it keeps no fact of its own that the ontology holds.

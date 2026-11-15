@@ -1,2 +1,5 @@
 # a build cache that archon's checks leave when they are pointed at commons/
 commons/build/
+
+# what commons/ts installs for checking and testing (commons 0005-sql-aide FR-002)
+commons/ts/node_modules/
