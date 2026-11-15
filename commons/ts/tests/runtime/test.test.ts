@@ -31,6 +31,9 @@ import { relative } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { sha256 } from "../../kernel/sha256.ts";
+import { makeTempDir, readTextFile, remove, writeTextFile } from "../../runtime/fs.ts";
+import { join } from "../../runtime/path.ts";
+import { env, execPath, run, runtimeName } from "../../runtime/proc.ts";
 
 const FR = "0005-typescript-runtime FR-013";
 
@@ -143,3 +146,48 @@ proves(
     assert(heard.includes("helper: a recorded test of high risk"));
   },
 );
+
+const url = (rel: string): string => JSON.stringify(new URL(rel, import.meta.url).href);
+const PIPED = `
+import { appendFileSync } from "node:fs";
+import process from "node:process";
+import { createPipeline, install } from ${url("../../runtime/otel.ts")};
+import { reviewed, test } from ${url("../../runtime/test.ts")};
+const out = process.env["PIPE_OUT"] ?? "";
+const done = () => Promise.resolve({ kind: "done" });
+install(createPipeline({ resource: { attributes: {} }, processors: [{
+  onEnd: (s, src) => appendFileSync(out, "span " + s.name + " " + String(s.attributes["test.case.name"]) + " " + src.scope.name + "\\n"),
+  onLog: (r) => appendFileSync(out, "log " + (r.eventName ?? "") + "\\n"),
+  forceFlush: done,
+  shutdown: done,
+}] }));
+reviewed("fixture FR-001", "why");
+test("piped", () => undefined);
+`;
+
+proves([EV("004")], "without IFC_TEST_RECORD, each test goes to the installed pipeline", async () => {
+  const dir = await makeTempDir({ prefix: "ifc-test-piped-" });
+  try {
+    const fixture = join(dir, "piped.test.ts");
+    await writeTextFile(fixture, PIPED);
+    const out = join(dir, "out.txt");
+    await writeTextFile(out, "");
+    const vars = env.toObject();
+    for (const k of ["IFC_TEST_RECORD", "NODE_TEST_CONTEXT", "TRACEPARENT"]) Reflect.deleteProperty(vars, k);
+    const runtime = runtimeName();
+    const argv =
+      runtime === "node"
+        ? [execPath(), "--test", fixture]
+        : runtime === "deno"
+          ? [execPath(), "test", "-A", "--no-check", fixture]
+          : [execPath(), "test", fixture];
+    const r = await run(argv, { cwd: dir, env: { ...vars, PIPE_OUT: out }, clearEnv: true });
+    assertEquals(r.code, 0, r.stderr);
+    assertEquals(
+      (await readTextFile(out)).split("\n").filter((l) => l !== ""),
+      ["log ifc.test.review", "span test piped ifc-test", "log ifc.test.case"],
+    );
+  } finally {
+    await remove(dir, { recursive: true });
+  }
+});

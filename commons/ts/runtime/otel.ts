@@ -45,7 +45,9 @@ import {
   SEVERITY,
   type SignalName,
   signalEndpoint,
+  type LogRecord,
   type SpanContext,
+  type SpanData,
 } from "../kernel/otel.ts";
 import {
   decodeLogs,
@@ -77,6 +79,7 @@ import {
   type ProcessorStats,
   type Registry,
   type SignalStats,
+  type Source,
   type Telemetry,
 } from "../kernel/signals.ts";
 
@@ -516,6 +519,9 @@ export type PipelineOptions = {
   readonly onError?: (error: unknown) => void;
 };
 
+/** A finished span or a log record handed to a pipeline whole. */
+export type PipelineItem = { readonly kind: "span"; readonly span: SpanData } | { readonly kind: "log"; readonly record: LogRecord };
+
 /** The signals of a process: one resource, one context, the processors, and the telemetries made on them. */
 export interface Pipeline {
   /** The resource every signal carries. */
@@ -528,6 +534,11 @@ export interface Pipeline {
   telemetry<const R extends Declarations>(registry: Registry<R>, scope: Scope): Telemetry<R>;
   /** Adds a processor (a console's renderer, a memory processor); returns what removes it. */
   addProcessor(processor: Processor): () => void;
+  /**
+   * Hands a span or a log record made elsewhere, with its own ids and times (a test's, commons 0008-test-evidence FR-004), to every
+   * processor as a telemetry hands its own (`onEnd`, `onLog`), with the resource and scope it came from; nothing once shut down.
+   */
+  emit(item: PipelineItem, source: Source): void;
   /** Says a warning; only the first of a run is kept, told to the listeners and recorded as an `otel.warning` log record. */
   warn(message: string): void;
   /** The warning of the run, if any: what the console says once, dimmed, at the end (FR-024). */
@@ -660,6 +671,25 @@ export function createPipeline(options: PipelineOptions): Pipeline {
         const i = processors.indexOf(processor);
         if (i >= 0) processors.splice(i, 1);
       };
+    },
+    emit(item, source) {
+      if (stopped) return;
+      for (const p of [...processors]) {
+        try {
+          switch (item.kind) {
+            case "span":
+              p.onEnd?.(item.span, source);
+              break;
+            case "log":
+              p.onLog?.(item.record, source);
+              break;
+            default:
+              absurd(item);
+          }
+        } catch (e) {
+          options.onError?.(e);
+        }
+      }
     },
     warn(message) {
       if (warned !== undefined) return;

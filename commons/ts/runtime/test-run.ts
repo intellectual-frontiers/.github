@@ -27,14 +27,10 @@ import { err, ok, type Result } from "../kernel/result.ts";
 import { type Sha256, sha256 } from "../kernel/sha256.ts";
 import {
   assembleRecord,
-  closeOrphans,
   completionHtml,
   completionMarkdown,
   ctrfJson,
-  decodeLines,
-  formatRecordError,
   formatVerifyProblem,
-  installationFromEnv,
   junitXml,
   type Meaning,
   oscalAssessmentResults,
@@ -42,7 +38,6 @@ import {
   parseReviewList,
   readRecord,
   recordText,
-  type RunnerOutcome,
   runEntry,
   sarif,
   signatureEntry,
@@ -53,6 +48,7 @@ import {
   type Verification,
   verifyEvidence,
 } from "../kernel/test-report.ts";
+import { closeOrphans, decodeLines, formatRecordError, installationFromEnv, type RunnerOutcome } from "../kernel/test-record.ts";
 import { exists, makeTempDir, mkdir, readFile, readTextFile, remove, stat, walkFiles, writeTextFile } from "./fs.ts";
 import { basename, dirname, join, resolve } from "./path.ts";
 import { build, env, execPath, output, runtimeName, runtimeVersion, which } from "./proc.ts";

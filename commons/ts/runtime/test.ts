@@ -25,7 +25,7 @@
  */
 import nodeAssert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, realpathSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import process from "node:process";
 import { test as nodeTest } from "node:test";
@@ -42,12 +42,14 @@ import {
   type Risk,
   type TestCase,
   type TestContext,
+  TEST_SCOPE,
   testCaseLog,
   testCaseSpan,
   testStartLog,
   reviewLog,
   warningLog,
-} from "../kernel/test-report.ts";
+} from "../kernel/test-record.ts";
+import { installed } from "./otel.ts";
 import { build, runtimeName, runtimeVersion } from "./proc.ts";
 
 /** A test's body. */
@@ -173,6 +175,14 @@ function emit(test: TestCase, spanId: SpanId): void {
   if (s.file !== undefined) {
     append(recordLine(s.resource, { spans: [testCaseSpan(test, context)] }));
     append(recordLine(s.resource, { records: [testCaseLog(test, context)] }));
+  } else {
+    // Without IFC_TEST_RECORD, the test goes to the installed pipeline, if any (0008-test-evidence FR-004).
+    const pipeline = installed();
+    if (pipeline !== undefined) {
+      const source = { resource: s.resource, scope: TEST_SCOPE };
+      pipeline.emit({ kind: "span", span: testCaseSpan(test, context) }, source);
+      pipeline.emit({ kind: "log", record: testCaseLog(test, context) }, source);
+    }
   }
   for (const l of listeners) {
     try {
@@ -212,6 +222,7 @@ function hookExit(): void {
 
 // ---------------------------------------------------------------------------------------------------------------------------- the test's file
 
+const reals = new Map<string, string>();
 const SELF = normalise(import.meta.url);
 
 function normalise(location: string): string {
@@ -223,7 +234,21 @@ function normalise(location: string): string {
       return path;
     }
   }
-  return isAbsolute(path) ? path : resolve(path);
+  return real(isAbsolute(path) ? path : resolve(path));
+}
+
+/** A path with its links resolved (macOS's `/var` is `/private/var`, and a stack may name either), or as given where it does not resolve. */
+function real(path: string): string {
+  const known = reals.get(path);
+  if (known !== undefined) return known;
+  let r = path;
+  try {
+    r = realpathSync(path);
+  } catch {
+    // A path that is not there (an eval's) is kept as it is.
+  }
+  reals.set(path, r);
+  return r;
 }
 
 const FRAME = /(?:\(|at\s+)((?:file:\/\/)?[^()\s]+?):\d+:\d+\)?\s*$/;
@@ -237,7 +262,7 @@ function callerFile(): string {
     if (location === undefined || location.startsWith("node:") || location.startsWith("ext:")) continue;
     const path = normalise(location);
     if (path === SELF) continue;
-    return recordPath(relative(process.cwd(), path));
+    return recordPath(relative(real(process.cwd()), path));
   }
   return "unknown";
 }
@@ -363,7 +388,9 @@ export function reviewed(requirement: Requirement, reason: string): void {
   reviews.push({ requirement, reason });
   const r: Review = { requirement, reason };
   const s = current();
-  if (s.file !== undefined) append(recordLine(s.resource, { records: [reviewLog(r, nowNanos(), s.traceId)] }));
+  const record = reviewLog(r, nowNanos(), s.traceId);
+  if (s.file !== undefined) append(recordLine(s.resource, { records: [record] }));
+  else installed()?.emit({ kind: "log", record }, { resource: s.resource, scope: TEST_SCOPE });
 }
 
 /** Fails unless `value` is truthy; narrows its type. */

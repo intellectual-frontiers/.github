@@ -76,15 +76,22 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-      - name: The suite on ${{ matrix.runtime }}
+      - name: The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)
         working-directory: commons/ts
         shell: bash
         run: |
-          case "${{ matrix.runtime }}" in
-            deno) deno --version && deno test -A --no-check tests/ ;;
-            node) node --version && node --test "tests/**/*.test.ts" ;;
-            bun) bun --version && bun test tests/ ;;
-          esac
+          grep -E '^000[5-8]-' ../spec-kit/enforcement.tsv >"$RUNNER_TEMP/requirements.tsv"
+          bun tools/test.ts run --runtime ${{ matrix.runtime }} --out test-results \
+            --report tap,junit,ctrf,sarif,md,html,oscal \
+            --requirements "$RUNNER_TEMP/requirements.tsv" --reviewed ci-reviewed.tsv \
+            --ledger test-results/ledger.jsonl tests
+      - name: The record, its reports and the ledger, kept with the run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ matrix.os }}-${{ matrix.runtime }}
+          path: commons/ts/test-results/
+          if-no-files-found: error
 
   otel-conformance:
     # commons 0006-signals FR-020: the suite's OTLP sent to the pinned OpenTelemetry Collector, read back from its file exporter.
