@@ -21,13 +21,27 @@ import { lineageTable } from "../integrate/lineage.ts";
 import { type Entity, type EntityName, ordered } from "../model/entity.ts";
 import type { Runner } from "../test/assert.ts";
 import { type Catalog, LEDGER } from "./catalog.ts";
+import { type CatalogObject, differences, readObjects } from "./deep.ts";
 
 /** Whether a change may be run on every apply (it makes or replaces what it defines) or changes structure or data that exists. */
 export type Classification = "idempotent" | "non-idempotent";
 
 /** What a change does. */
 export type ChangeKind =
-  "create" | "replace" | "add-column" | "drop-column" | "set-not-null" | "drop-not-null" | "drop" | "drop-index" | "step";
+  | "create"
+  | "replace"
+  | "add-column"
+  | "drop-column"
+  | "set-not-null"
+  | "drop-not-null"
+  | "set-default"
+  | "add-constraint"
+  | "drop-constraint"
+  | "replace-constraint"
+  | "add-enum-values"
+  | "drop"
+  | "drop-index"
+  | "step";
 
 /** A step a person writes: SQL with a name, applied once. */
 export interface Step<Q extends AnySql = AnySql> {
@@ -162,7 +176,9 @@ export async function plan<
   desired: Desired<E, S>,
   catalog: Catalog,
   ctx: C & Fits<DialectOf<C>, ReqOf<E[number]["ddl"]> | ReqOf<S[number]["sql"]>, DxOf<E[number]["ddl"] | S[number]["sql"]>>,
+  options: PlanOptions = {},
 ): Promise<Plan> {
+  const shadowOf = options.shadow;
   const sorted = ordered(desired.entities);
   if (sorted.kind === "err") throw new Error(`entities need each other in a circle: ${sorted.error.entities.join(", ")}`);
   const changes: Change[] = [];
@@ -212,7 +228,8 @@ export async function plan<
             await add(`column:${key}.${cn}:add`, "add-column", "non-idempotent", `ALTER TABLE ${t} ADD COLUMN ${columnLine(ctx, n, c)};`);
           continue;
         }
-        if (c.identity || has.notNull === !c.nullable) continue;
+        // a generated column's nullness is its expression's, whatever the model says
+        if (c.identity || c.generated !== undefined || has.notNull === !c.nullable) continue;
         if (ctx.dialect.name === "sqlite") {
           unplanned.push(
             `${key}.${cn} ${c.nullable ? "refuses" : "allows"} null, and SQLite cannot change that in place: a step must rebuild the table`,
@@ -267,18 +284,22 @@ export async function plan<
       const { key } = keyOf(e.name, e.schema);
       modelled.add(key);
       if (!catalog.views.has(key)) await add(stepName, "create", "idempotent", text0);
-      else if (catalog.applied.get(stepName) !== (await sha256(text0)))
+      else if (shadowOf === undefined && catalog.applied.get(stepName) !== (await sha256(text0)))
         if (e.materialized) unplanned.push(`${key} is a materialized view whose definition may differ: a step must drop and make it again`);
         else await add(stepName, "replace", "idempotent", text0);
       continue;
     }
+    // with a shadow, an entity whose objects the catalog reads is compared object by object below; the ledger's hash decides the rest
+    if (shadowOf !== undefined && [...shadowOf.owners.values()].includes(e)) continue;
     if (catalog.applied.get(stepName) !== (await sha256(text0))) await add(stepName, "replace", "idempotent", text0);
   }
+  for (const o of shadowOf?.objects.values() ?? []) if (o.kind === "column" && o.table !== undefined) modelled.add(o.table);
   for (const key of catalog.tables.keys()) {
     const n = key.slice(key.indexOf(".") + 1);
     if (!modelled.has(key) && !LIBRARY_TABLES.has(n) && !n.endsWith("_landing"))
       unplanned.push(`${key} is in the database and not in the model`);
   }
+  if (shadowOf !== undefined) await deepPlan(shadowOf, catalog, ctx, changes, unplanned, add);
   for (const s of desired.steps ?? []) {
     const textOf = renderUnchecked(s.sql, ctx);
     if (catalog.applied.get(s.name) === (await sha256(textOf))) continue;
@@ -504,4 +525,256 @@ export async function teardown<const E extends readonly Entity[], C extends Emit
     });
   }
   return ok({ dialect: ctx.dialect.name, changes, unplanned });
+}
+
+/** What a plan is compared with beyond the model's entities: the catalog of a shadow database the same engine made from the model. */
+export interface Shadow {
+  /** The objects of the shadow's catalog. */
+  readonly objects: ReadonlyMap<string, CatalogObject>;
+  /** The entity of the model that made each object. */
+  readonly owners: ReadonlyMap<string, Entity>;
+}
+
+/** What a plan may be given beyond the model and the catalog. */
+export interface PlanOptions {
+  /** A shadow of the model (from {@link shadow}): with it, the plan compares every object the dialect's catalog lets it read (FR-035). */
+  readonly shadow?: Shadow;
+}
+
+/**
+ * Makes the shadow of a model: its entities defined, one after another in the order their references give, in an empty database of
+ * the same engine, and the objects each made read from the catalog after it. The database must be empty and is left as the model made
+ * it; it is the caller's to make and to let go (an in-memory SQLite or DuckDB, a PGlite, a database made for the purpose on a server).
+ *
+ * @param entities - the model's entities, as the plan is given them
+ * @param empty - what runs SQL in an empty database of the dialect
+ * @param ctx - the context of the dialect
+ */
+export async function shadow<const E extends readonly Entity[], C extends EmitContext<Dialect, "durable">>(
+  entities: E,
+  empty: Runner,
+  ctx: C & Fits<DialectOf<C>, ReqOf<E[number]["ddl"]>, DxOf<E[number]["ddl"]>>,
+): Promise<Shadow> {
+  const sorted = ordered(entities);
+  if (sorted.kind === "err") throw new Error(`entities need each other in a circle: ${sorted.error.entities.join(", ")}`);
+  const owners = new Map<string, Entity>();
+  let seen = await readObjects(empty, ctx);
+  if ([...seen.values()].some((o) => o.kind !== "schema" && o.kind !== "extension")) throw new Error("the shadow database is not empty");
+  for (const e of sorted.value) {
+    await empty.exec(renderUnchecked(e.ddl, ctx));
+    const now = await readObjects(empty, ctx);
+    for (const k of now.keys()) if (!seen.has(k)) owners.set(k, e);
+    seen = now;
+  }
+  return { objects: seen, owners };
+}
+
+/** What adds a change to a plan. */
+type Add = (
+  step: string,
+  what: ChangeKind,
+  classification: Classification,
+  text: string,
+  flags?: { readonly destructive?: boolean; readonly transactional?: boolean },
+) => Promise<void>;
+
+/** The changes, and the differences no change makes, that the deep comparison finds between the live catalog and the shadow's. */
+async function deepPlan(
+  shadowOf: Shadow,
+  catalog: Catalog,
+  ctx: EmitContext,
+  changes: Change[],
+  unplanned: string[],
+  add: Add,
+): Promise<void> {
+  const live = catalog.objects ?? new Map<string, CatalogObject>();
+  const dialect = ctx.dialect.name;
+  const planned = (step: string): boolean => changes.some((c) => c.step === step);
+  const name = (qualified: string): string =>
+    qualified
+      .split(".")
+      .map((p) => ctx.dialect.quoteName(p))
+      .join(".");
+  const after = (key: string, kind: string): string => key.slice(kind.length + 1);
+  const shadowTables = new Set([...shadowOf.objects.values()].flatMap((o) => (o.table === undefined ? [] : [o.table])));
+  const there = (table: string): boolean => catalog.tables.has(table) || catalog.views.has(table);
+  const reapply = async (o: CatalogObject, why: string): Promise<void> => {
+    const owner = shadowOf.owners.get(o.key);
+    if (owner === undefined) {
+      unplanned.push(`${o.key} ${why}, and no entity of the model makes it: a step written by hand must`);
+      return;
+    }
+    const step = `${owner.entity}:${owner.schema ?? catalog.defaultSchema}.${owner.name}`;
+    if (!planned(step)) await add(step, "replace", "idempotent", renderUnchecked(owner.ddl, ctx));
+  };
+  const handWritten = (o: CatalogObject, what: string, reason: string): void => {
+    unplanned.push(`${o.key}: ${what}; ${reason}: a step written by hand must change it`);
+  };
+  for (const [key, want] of shadowOf.objects) {
+    const has = live.get(key);
+    const owner = shadowOf.owners.get(key);
+    if (has === undefined) {
+      if (want.table !== undefined && !there(want.table)) {
+        // a table or view that is not there is made by the plan's own change for it; what else made it is applied again
+        if (owner !== undefined && !isTable(owner) && !isView(owner)) await reapply(want, "is not in the database");
+        continue;
+      }
+      switch (want.kind) {
+        case "column":
+        case "view":
+          break;
+        case "index":
+          if (owner === undefined || !isIndex(owner)) await reapply(want, "is not in the database");
+          break;
+        case "constraint":
+          if (dialect === "postgres") {
+            const [table, constraintName] = splitLast(after(key, "constraint"));
+            await add(
+              `${key}:add`,
+              "add-constraint",
+              "non-idempotent",
+              `ALTER TABLE ${name(table)} ADD CONSTRAINT ${ctx.dialect.quoteName(constraintName)} ${want.def["text"] ?? ""};`,
+            );
+          } else handWritten(want, "is not in the database", `${dialect} cannot add a constraint to a table that exists`);
+          break;
+        case "partitioned":
+          handWritten(want, "the table is not partitioned", "a table cannot be partitioned in place");
+          break;
+        default:
+          await reapply(want, "is not in the database");
+      }
+      continue;
+    }
+    const diff = differences(has, want);
+    if (diff.length === 0) continue;
+    const what = diff.join("; ");
+    switch (want.kind) {
+      case "column": {
+        const [table, column] = splitLast(after(key, "column"));
+        const fields = new Set(diff.map((d) => d.slice(0, d.indexOf(":"))));
+        if (fields.has("type")) handWritten(want, what, "a change of type may lose data or need a conversion");
+        else if (fields.has("generated") || fields.has("identity"))
+          handWritten(want, what, "a generated or numbered column is made again, not changed");
+        else if (dialect === "sqlite") handWritten(want, what, "SQLite changes a default only by making the table again");
+        else if (dialect === "duckdb" && generatedColumn(owner, column))
+          handWritten(want, what, "a generated column is made again, not changed");
+        else {
+          const wantedDefault = want.def["default"] ?? "";
+          await add(
+            `${key}:default`,
+            "set-default",
+            "non-idempotent",
+            `ALTER TABLE ${name(table)} ALTER COLUMN ${ctx.dialect.quoteName(column)} ${wantedDefault === "" ? "DROP DEFAULT" : `SET DEFAULT ${wantedDefault}`};`,
+          );
+        }
+        break;
+      }
+      case "constraint": {
+        const [table, constraintName] = splitLast(after(key, "constraint"));
+        const named = ctx.dialect.quoteName(constraintName);
+        await add(
+          `${key}:replace`,
+          "replace-constraint",
+          "non-idempotent",
+          `ALTER TABLE ${name(table)} DROP CONSTRAINT ${named};\nALTER TABLE ${name(table)} ADD CONSTRAINT ${named} ${want.def["text"] ?? ""};`,
+        );
+        break;
+      }
+      case "index":
+        await add(
+          `${key}:replace`,
+          "replace",
+          "idempotent",
+          `DROP INDEX IF EXISTS ${name(after(key, "index"))};\n${(want.def["sql"] ?? "").replace(/;?\s*$/, ";")}`,
+        );
+        break;
+      case "view": {
+        if (owner === undefined) {
+          handWritten(want, what, "no entity of the model makes it");
+          break;
+        }
+        const step = `${owner.entity}:${owner.schema ?? catalog.defaultSchema}.${owner.name}`;
+        const dropped = `DROP ${want.def["materialized"] === "yes" ? "MATERIALIZED VIEW" : "VIEW"} IF EXISTS ${name(after(key, "view"))};`;
+        if (!planned(step)) await add(step, "replace", "idempotent", `${dropped}\n${renderUnchecked(owner.ddl, ctx)}`);
+        break;
+      }
+      case "enum": {
+        const had = (has.def["labels"] ?? "").split(",");
+        const wanted = (want.def["labels"] ?? "").split(",");
+        const appended = wanted.length > had.length && had.every((l, i) => wanted[i] === l);
+        if (dialect === "postgres" && appended)
+          await add(
+            `${key}:add-values`,
+            "add-enum-values",
+            "idempotent",
+            wanted
+              .slice(had.length)
+              .map((l) => `ALTER TYPE ${name(after(key, "enum"))} ADD VALUE IF NOT EXISTS ${ctx.dialect.literal(l)};`)
+              .join("\n"),
+          );
+        else
+          handWritten(
+            want,
+            what,
+            dialect === "postgres"
+              ? "a label removed or moved is not changed in place"
+              : `${dialect} does not change an enumerated type in place`,
+          );
+        break;
+      }
+      case "sequence":
+      case "domain":
+      case "partition":
+      case "partitioned":
+        handWritten(want, what, "it is made only if absent, so applying it again changes nothing");
+        break;
+      default:
+        await reapply(want, `differs (${what})`);
+    }
+  }
+  for (const [key, had] of live) {
+    if (shadowOf.objects.has(key)) continue;
+    if (had.table !== undefined && !shadowTables.has(had.table)) continue;
+    switch (had.kind) {
+      case "column":
+        break;
+      case "index":
+        await add(`${key}:drop`, "drop-index", "non-idempotent", `DROP INDEX ${name(after(key, "index"))};`);
+        break;
+      case "constraint":
+        if (dialect === "postgres") {
+          const [table, constraintName] = splitLast(after(key, "constraint"));
+          await add(
+            `${key}:drop`,
+            "drop-constraint",
+            "non-idempotent",
+            `ALTER TABLE ${name(table)} DROP CONSTRAINT ${ctx.dialect.quoteName(constraintName)};`,
+          );
+        } else handWritten(had, "is in the database and not in the model", `${dialect} cannot drop a constraint of a table that exists`);
+        break;
+      case "comment": {
+        const [target = "", ...rest] = after(key, "comment").split(" ");
+        const on = target === "column" ? "COLUMN" : target === "routine" ? "FUNCTION" : target === "view" ? "VIEW" : "TABLE";
+        const object = target === "routine" ? rest.join(" ") : name(rest.join(" "));
+        await add(`${key}:drop`, "replace", "idempotent", `COMMENT ON ${on} ${object} IS NULL;`);
+        break;
+      }
+      case "rls":
+        await add(`${key}:disable`, "replace", "idempotent", `ALTER TABLE ${name(after(key, "rls"))} DISABLE ROW LEVEL SECURITY;`);
+        break;
+      default:
+        unplanned.push(`${key} is in the database and not in the model`);
+    }
+  }
+}
+
+/** A qualified name split at its last dot: the table, and the column or constraint. */
+function splitLast(qualified: string): readonly [string, string] {
+  const i = qualified.lastIndexOf(".");
+  return [qualified.slice(0, i), qualified.slice(i + 1)];
+}
+
+/** Whether the model makes a column of a table as generated. */
+function generatedColumn(owner: Entity | undefined, column: string): boolean {
+  return owner !== undefined && isTable(owner) && owner.spec.columns.some(([n, c]) => n === column && c.generated !== undefined);
 }

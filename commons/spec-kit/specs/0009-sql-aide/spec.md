@@ -67,7 +67,7 @@
 
 ## ISLM
 
-- **FR-035**: ISLM (the information schema lifecycle manager) MUST take the model as the state wanted, read the catalog of a database, and say as a plan what differs.
+- **FR-035**: ISLM (the information schema lifecycle manager) MUST take the model as the state wanted, read the catalog of a database, and say as a plan what differs, as far as each dialect's catalog lets it be read and compared: a difference it cannot change in place is still said, as needing a step written by hand. What an engine rewrites (a default, a check, a view's body) MAY be compared with a shadow database the same engine makes from the model.
 - **FR-036**: Every change of a plan MUST be classified as idempotent (it may be run on every apply: a routine, a view, a trigger, a policy, a comment, an object made only if absent) or non-idempotent (it changes structure or data that exists), and the non-idempotent ones MUST be the fewest the plan needs.
 - **FR-037**: ISLM MUST keep its own history in the database (an append-only ledger of every step run: its name, the hash of its content, its kind, who, when, how long and how it ended), and a step already applied MUST do nothing when it is run again.
 - **FR-038**: ISLM MUST go forward only: nothing is removed from the ledger, and an undo MUST be a new step that names the step it reverses.

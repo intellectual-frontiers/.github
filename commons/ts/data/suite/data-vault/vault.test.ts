@@ -54,6 +54,7 @@ import {
   rustStructs,
   runAssertions,
   seed,
+  shadow,
   SQL,
   sqlite,
   type Sqlite,
@@ -67,7 +68,7 @@ import {
 } from "../../sql-aide/mod.ts";
 import { fs, path } from "../../../runtime/mod.ts";
 import { materialize } from "../../sql-aide/runtime/build.ts";
-import { eachEngine, golden, pgliteEngine } from "../helpers.ts";
+import { anotherLike, eachEngine, golden, pgliteEngine } from "../helpers.ts";
 
 const customer = hub("customer", { customer_number: text().doc("The number the business knows the customer by") });
 const order = hub("order", { order_number: text().doc("The number on the order") });
@@ -495,4 +496,30 @@ proves(
       await fs.remove(dir, { recursive: true });
     }
   },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-050"],
+  "applied by ISLM, a vault plans nothing when compared object by object with a shadow",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const entities = [...vault, feed];
+      const empty = await anotherLike(engine);
+      if (empty === undefined) return;
+      try {
+        const sh = await shadow(entities, empty, ctx);
+        const first = await inspect(engine, ctx);
+        assert(first.kind === "ok");
+        assert((await apply(await plan({ entities }, first.value, ctx, { shadow: sh }), engine, ctx, { actor: "vault" })).kind === "ok");
+        const again = await inspect(engine, ctx);
+        assert(again.kind === "ok");
+        const p = await plan({ entities }, again.value, ctx, { shadow: sh });
+        assertEquals([p.changes.map((c) => c.step), p.unplanned], [[], []], engine.name);
+      } finally {
+        await empty.close();
+      }
+    });
+  },
+  { timeout: 300_000 },
 );

@@ -19,10 +19,10 @@ import {
   POSIX_PATH,
   WINDOWS_PATH,
 } from "../../osquery-atc/mod.ts";
-import { buildSql, context, lint, pk, sqlite, sqliteDriver, table, text } from "../../sql-aide/mod.ts";
+import { apply, buildSql, context, inspect, lint, pk, plan, shadow, sqlite, sqliteDriver, table, text } from "../../sql-aide/mod.ts";
 import { docsAreCurrent } from "../../sql-aide/runtime/docs.ts";
 import { materialize, staleFiles } from "../../sql-aide/runtime/build.ts";
-import { golden } from "../helpers.ts";
+import { golden, sqliteEngine } from "../helpers.ts";
 
 const ephemeral = context({ dialect: sqlite(), durability: "ephemeral", docs: [catalogDocs] });
 const build = { module: "osquery-atc/catalog.ts", entities: catalogTables, data: catalogData } as const;
@@ -132,5 +132,32 @@ proves(
     );
     const other = atcTable("other", policySetting, { path: "/other.db", columns: ["value"] });
     assertEquals(await staleFiles([{ path: json, text: atcJson([...catalogAtc, other]) }]), [json]);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-057"],
+  "the tables behind osquery's ATC, applied to a SQLite file kept as durable, plan nothing against a shadow",
+  async () => {
+    // the database ATC reads is ephemeral where it is shipped; kept as a durable SQLite database, ISLM holds it to the model as any other
+    const durable = context({ dialect: sqlite(), docs: [catalogDocs] });
+    const live = await sqliteEngine();
+    const empty = await sqliteEngine();
+    try {
+      const sh = await shadow(catalogTables, empty, durable);
+      const first = await inspect(live, durable);
+      assert(first.kind === "ok");
+      assert(
+        (await apply(await plan({ entities: catalogTables }, first.value, durable, { shadow: sh }), live, durable, { actor: "atc" }))
+          .kind === "ok",
+      );
+      const again = await inspect(live, durable);
+      assert(again.kind === "ok");
+      const p = await plan({ entities: catalogTables }, again.value, durable, { shadow: sh });
+      assertEquals([p.changes, p.unplanned], [[], []]);
+    } finally {
+      await live.close();
+      await empty.close();
+    }
   },
 );

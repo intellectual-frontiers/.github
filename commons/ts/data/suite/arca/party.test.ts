@@ -55,6 +55,7 @@ import {
   recordFindings,
   relationship,
   render,
+  shadow,
   reportFindings,
   type RowOf,
   rows,
@@ -73,7 +74,7 @@ import { fromLines } from "../../sql-aide/mod.ts";
 import { materialize } from "../../sql-aide/runtime/build.ts";
 import { docsAreCurrent } from "../../sql-aide/runtime/docs.ts";
 import { fs, path } from "../../../runtime/mod.ts";
-import { eachEngine, golden, postgresEngine, postgresUrl } from "../helpers.ts";
+import { anotherLike, eachEngine, golden, postgresEngine, postgresUrl } from "../helpers.ts";
 
 const contexts = {
   postgres: context({ dialect: postgres(), docs: [partyDocs] }),
@@ -548,4 +549,38 @@ proves(
       await fs.remove(dir, { recursive: true });
     }
   },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-050"],
+  "applied by ISLM, the party model plans nothing when every object its catalog shows is compared with a shadow",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const entities =
+        engine.dialect === "postgres"
+          ? [...partyModel, ...partyRoutines]
+          : engine.dialect === "duckdb"
+            ? [...partyModel, peopleBornSince]
+            : partyModel;
+      const empty = await anotherLike(engine);
+      if (empty === undefined) return;
+      try {
+        // the entities are the dialect's own: the list the compiler sees is the union of three
+        const sh = await shadow(entities, empty, ctx as never);
+        const first = await inspect(engine, ctx);
+        assert(first.kind === "ok");
+        const applied = await apply(await plan({ entities }, first.value, ctx as never, { shadow: sh }), engine, ctx, { actor: "arca" });
+        assert(applied.kind === "ok", JSON.stringify(applied));
+        const again = await inspect(engine, ctx);
+        assert(again.kind === "ok");
+        const p = await plan({ entities }, again.value, ctx as never, { shadow: sh });
+        assertEquals([p.changes.map((c) => c.step), p.unplanned], [[], []], engine.name);
+        assert((again.value.objects?.size ?? 0) > 100, `${engine.name}: the catalog was read deeply`);
+      } finally {
+        await empty.close();
+      }
+    });
+  },
+  { timeout: 300_000 },
 );

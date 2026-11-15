@@ -127,7 +127,9 @@ export type {
 export { lineageOf, lineageTable, recordLineage, upstream } from "./integrate/lineage.ts";
 export { inspect, LEDGER } from "./islm/catalog.ts";
 export type { Catalog, CatalogColumn, InspectError } from "./islm/catalog.ts";
-export { apply, ledgerTable, lintPlan, plan, planScript, step, teardown, undo } from "./islm/islm.ts";
+export { differences, readObjects } from "./islm/deep.ts";
+export type { CatalogObject, ObjectKind } from "./islm/deep.ts";
+export { apply, ledgerTable, lintPlan, plan, planScript, shadow, step, teardown, undo } from "./islm/islm.ts";
 export type {
   Applied,
   ApplyError,
@@ -138,6 +140,8 @@ export type {
   Desired,
   Plan,
   PlanFinding,
+  PlanOptions,
+  Shadow,
   Step,
   TeardownRefused,
 } from "./islm/islm.ts";
