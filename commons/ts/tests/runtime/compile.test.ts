@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { readFile, sha256File, withTempDir, writeTextFile } from "../../runtime/fs.ts";
+import { readFile, realPath, sha256File, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {
   binaryPath,
   compile,
@@ -127,7 +127,10 @@ proves(
       assertEquals(built.bunVersion, (await proc.must([BUN ?? "bun", "--version"])).trim());
       const ran = await proc.run([built.path, "one", "two words"]);
       assertEquals(ran.code, 0, ran.stderr);
-      assertEquals(JSON.parse(ran.stdout), { note: "a note", compiled: true, self: [built.path, "again"], args: ["one", "two words"] });
+      const out: { readonly self: readonly string[] } & Record<string, unknown> = JSON.parse(ran.stdout);
+      // The binary sees its own path resolved (macOS's /var is /private/var), so the two are compared as real paths.
+      assertEquals(await realPath(out.self[0] ?? ""), await realPath(built.path));
+      assertEquals({ ...out, self: out.self.slice(1) }, { note: "a note", compiled: true, self: ["again"], args: ["one", "two words"] });
       const binary = new TextDecoder("latin1").decode(await readFile(built.path));
       assert(binary.includes(MARK), "the file given is embedded");
     });
