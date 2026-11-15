@@ -8,6 +8,16 @@ CREATE TABLE IF NOT EXISTS "party_kind" (
     "description" TEXT
 );
 
+-- The roles a party may play, such as customer, supplier or employee
+CREATE TABLE IF NOT EXISTS "party_role_kind" (
+    -- The code other tables point to: a short word that does not change
+    "code" TEXT NOT NULL PRIMARY KEY,
+    -- What a person is shown for the code
+    "label" TEXT NOT NULL,
+    -- What the code means, where the label is not enough
+    "description" TEXT
+);
+
 -- A party: anyone or anything a business deals with as one, whether a person or an organization. What is true of both is here; what is true of one only is in `person` or `organization`, under the same key.
 CREATE TABLE IF NOT EXISTS "party" (
     -- The party's key, a ULID the application makes.
@@ -58,51 +68,26 @@ CREATE TABLE IF NOT EXISTS "electronic_contact" (
     CONSTRAINT "electronic_contact_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
 );
 
--- An organization: a party that is a company, an agency, a club or any other body. Its key is its party's key.
-CREATE TABLE IF NOT EXISTS "organization" (
-    -- The organization's key, which is the key of its party.
-    "party_id" TEXT NOT NULL PRIMARY KEY,
-    -- The name the organization is registered under.
-    "legal_name" TEXT NOT NULL,
-    -- The day the organization was founded.
-    "founded_on" TEXT,
-    -- When the row was made
-    "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    -- Who made the row
-    "created_by" TEXT,
-    -- When the row was last changed
-    "updated_at" TEXT,
-    -- Who last changed the row
-    "updated_by" TEXT,
-    -- When the row was marked as removed
-    "deleted_at" TEXT,
-    -- Who marked the row as removed
-    "deleted_by" TEXT,
-    CONSTRAINT "organization_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
-);
-
--- The kinds of identifier a party may hold
-CREATE TABLE IF NOT EXISTS "party_identifier_kind" (
-    -- The code other tables point to: a short word that does not change
-    "code" TEXT NOT NULL PRIMARY KEY,
-    -- What a person is shown for the code
-    "label" TEXT NOT NULL,
-    -- What the code means, where the label is not enough
-    "description" TEXT
-);
-
--- An identifier a party holds, as someone else issued it: a tax number, a passport number. A party holds one of a kind once.
-CREATE TABLE IF NOT EXISTS "party_identifier" (
-    -- The key of the identifier as Arca keeps it.
-    "party_identifier_id" TEXT NOT NULL PRIMARY KEY,
-    -- The party who holds the identifier.
+-- A place a party receives post or may be visited.
+CREATE TABLE IF NOT EXISTS "postal_address" (
+    -- The key of the address.
+    "postal_address_id" TEXT NOT NULL PRIMARY KEY,
+    -- The party found at the address.
     "party_id" TEXT NOT NULL,
-    -- The kind of identifier.
-    "party_identifier_kind_code" TEXT NOT NULL,
-    -- The identifier itself, as it was issued.
-    "identifier" TEXT NOT NULL,
-    -- Who issued the identifier.
-    "issued_by" TEXT,
+    -- What the address is used for: where the party lives, is billed or receives deliveries.
+    "purpose" TEXT NOT NULL CHECK ("purpose" IN ('home', 'work', 'billing', 'delivery')),
+    -- The first line: usually the building and the street.
+    "line_1" TEXT NOT NULL,
+    -- The second line, where there is one.
+    "line_2" TEXT,
+    -- The town or city.
+    "locality" TEXT NOT NULL,
+    -- The state, province or county, where the country uses one.
+    "region" TEXT,
+    -- The postal code, where the country uses one.
+    "postal_code" TEXT,
+    -- The country, as its two-letter ISO 3166-1 code.
+    "country_code" TEXT NOT NULL,
     -- When the row was made
     "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Who made the row
@@ -115,10 +100,65 @@ CREATE TABLE IF NOT EXISTS "party_identifier" (
     "deleted_at" TEXT,
     -- Who marked the row as removed
     "deleted_by" TEXT,
-    CONSTRAINT "party_identifier_party_id_party_identifier_kind_code_uq" UNIQUE ("party_id", "party_identifier_kind_code"),
-    CONSTRAINT "party_identifier_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id"),
-    CONSTRAINT "party_identifier_party_identifier_kind_code_fk" FOREIGN KEY ("party_identifier_kind_code") REFERENCES "party_identifier_kind" ("code")
+    CONSTRAINT "postal_address_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
 );
+
+-- A person: a party who is a human being. Their key is their party's key.
+CREATE TABLE IF NOT EXISTS "person" (
+    -- The person's key, which is the key of their party.
+    "party_id" TEXT NOT NULL PRIMARY KEY,
+    -- The name a person is given, as they write it.
+    "given_name" TEXT NOT NULL,
+    -- The name a person shares with their family, as they write it.
+    "family_name" TEXT NOT NULL,
+    -- The day the person was born.
+    "birth_date" TEXT,
+    -- When the row was made
+    "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Who made the row
+    "created_by" TEXT,
+    -- When the row was last changed
+    "updated_at" TEXT,
+    -- Who last changed the row
+    "updated_by" TEXT,
+    -- When the row was marked as removed
+    "deleted_at" TEXT,
+    -- Who marked the row as removed
+    "deleted_by" TEXT,
+    CONSTRAINT "person_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
+);
+
+CREATE INDEX IF NOT EXISTS "person_family_name_given_name_idx" ON "person" ("family_name", "given_name");
+
+-- A role a party plays for a time: the same party may be a customer and a supplier at once.
+CREATE TABLE IF NOT EXISTS "party_role" (
+    -- The key of this playing of a role.
+    "party_role_id" TEXT NOT NULL PRIMARY KEY,
+    -- The party who plays the role.
+    "party_id" TEXT NOT NULL,
+    -- The role played.
+    "party_role_kind_code" TEXT NOT NULL,
+    -- The first day the party played the role.
+    "valid_from" TEXT NOT NULL,
+    -- The last day the party played the role; empty while they still do.
+    "valid_to" TEXT,
+    -- When the row was made
+    "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Who made the row
+    "created_by" TEXT,
+    -- When the row was last changed
+    "updated_at" TEXT,
+    -- Who last changed the row
+    "updated_by" TEXT,
+    -- When the row was marked as removed
+    "deleted_at" TEXT,
+    -- Who marked the row as removed
+    "deleted_by" TEXT,
+    CONSTRAINT "party_role_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id"),
+    CONSTRAINT "party_role_party_role_kind_code_fk" FOREIGN KEY ("party_role_kind_code") REFERENCES "party_role_kind" ("code")
+);
+
+CREATE INDEX IF NOT EXISTS "party_role_party_id_party_role_kind_code_idx" ON "party_role" ("party_id", "party_role_kind_code");
 
 -- The ways one party may be related to another
 CREATE TABLE IF NOT EXISTS "party_relation_kind" (
@@ -162,8 +202,23 @@ CREATE TABLE IF NOT EXISTS "party_relation" (
     CONSTRAINT "party_relation_parties_differ_ck" CHECK ("from_party_id" <> "to_party_id")
 );
 
--- The roles a party may play, such as customer, supplier or employee
-CREATE TABLE IF NOT EXISTS "party_role_kind" (
+CREATE INDEX IF NOT EXISTS "party_relation_from_party_id_idx" ON "party_relation" ("from_party_id");
+
+CREATE INDEX IF NOT EXISTS "party_relation_to_party_id_idx" ON "party_relation" ("to_party_id");
+
+CREATE INDEX IF NOT EXISTS "electronic_contact_party_id_medium_idx" ON "electronic_contact" ("party_id", "medium");
+
+CREATE INDEX IF NOT EXISTS "postal_address_party_id_idx" ON "postal_address" ("party_id");
+
+DROP VIEW IF EXISTS "person_directory";
+CREATE VIEW "person_directory" ("party_id", "display_name", "given_name", "family_name") AS
+SELECT "party"."party_id", "party"."display_name", "person"."given_name", "person"."family_name"
+  FROM "party"
+  JOIN "person" ON "person"."party_id" = "party"."party_id"
+ WHERE "party"."deleted_at" IS NULL AND "person"."deleted_at" IS NULL;
+
+-- The kinds of identifier a party may hold
+CREATE TABLE IF NOT EXISTS "party_identifier_kind" (
     -- The code other tables point to: a short word that does not change
     "code" TEXT NOT NULL PRIMARY KEY,
     -- What a person is shown for the code
@@ -172,44 +227,14 @@ CREATE TABLE IF NOT EXISTS "party_role_kind" (
     "description" TEXT
 );
 
--- A role a party plays for a time: the same party may be a customer and a supplier at once.
-CREATE TABLE IF NOT EXISTS "party_role" (
-    -- The key of this playing of a role.
-    "party_role_id" TEXT NOT NULL PRIMARY KEY,
-    -- The party who plays the role.
-    "party_id" TEXT NOT NULL,
-    -- The role played.
-    "party_role_kind_code" TEXT NOT NULL,
-    -- The first day the party played the role.
-    "valid_from" TEXT NOT NULL,
-    -- The last day the party played the role; empty while they still do.
-    "valid_to" TEXT,
-    -- When the row was made
-    "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    -- Who made the row
-    "created_by" TEXT,
-    -- When the row was last changed
-    "updated_at" TEXT,
-    -- Who last changed the row
-    "updated_by" TEXT,
-    -- When the row was marked as removed
-    "deleted_at" TEXT,
-    -- Who marked the row as removed
-    "deleted_by" TEXT,
-    CONSTRAINT "party_role_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id"),
-    CONSTRAINT "party_role_party_role_kind_code_fk" FOREIGN KEY ("party_role_kind_code") REFERENCES "party_role_kind" ("code")
-);
-
--- A person: a party who is a human being. Their key is their party's key.
-CREATE TABLE IF NOT EXISTS "person" (
-    -- The person's key, which is the key of their party.
+-- An organization: a party that is a company, an agency, a club or any other body. Its key is its party's key.
+CREATE TABLE IF NOT EXISTS "organization" (
+    -- The organization's key, which is the key of its party.
     "party_id" TEXT NOT NULL PRIMARY KEY,
-    -- The name a person is given, as they write it.
-    "given_name" TEXT NOT NULL,
-    -- The name a person shares with their family, as they write it.
-    "family_name" TEXT NOT NULL,
-    -- The day the person was born.
-    "birth_date" TEXT,
+    -- The name the organization is registered under.
+    "legal_name" TEXT NOT NULL,
+    -- The day the organization was founded.
+    "founded_on" TEXT,
     -- When the row was made
     "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Who made the row
@@ -222,29 +247,21 @@ CREATE TABLE IF NOT EXISTS "person" (
     "deleted_at" TEXT,
     -- Who marked the row as removed
     "deleted_by" TEXT,
-    CONSTRAINT "person_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
+    CONSTRAINT "organization_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
 );
 
--- A place a party receives post or may be visited.
-CREATE TABLE IF NOT EXISTS "postal_address" (
-    -- The key of the address.
-    "postal_address_id" TEXT NOT NULL PRIMARY KEY,
-    -- The party found at the address.
+-- An identifier a party holds, as someone else issued it: a tax number, a passport number. A party holds one of a kind once.
+CREATE TABLE IF NOT EXISTS "party_identifier" (
+    -- The key of the identifier as Arca keeps it.
+    "party_identifier_id" TEXT NOT NULL PRIMARY KEY,
+    -- The party who holds the identifier.
     "party_id" TEXT NOT NULL,
-    -- What the address is used for: where the party lives, is billed or receives deliveries.
-    "purpose" TEXT NOT NULL CHECK ("purpose" IN ('home', 'work', 'billing', 'delivery')),
-    -- The first line: usually the building and the street.
-    "line_1" TEXT NOT NULL,
-    -- The second line, where there is one.
-    "line_2" TEXT,
-    -- The town or city.
-    "locality" TEXT NOT NULL,
-    -- The state, province or county, where the country uses one.
-    "region" TEXT,
-    -- The postal code, where the country uses one.
-    "postal_code" TEXT,
-    -- The country, as its two-letter ISO 3166-1 code.
-    "country_code" TEXT NOT NULL,
+    -- The kind of identifier.
+    "party_identifier_kind_code" TEXT NOT NULL,
+    -- The identifier itself, as it was issued.
+    "identifier" TEXT NOT NULL,
+    -- Who issued the identifier.
+    "issued_by" TEXT,
     -- When the row was made
     "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Who made the row
@@ -257,5 +274,7 @@ CREATE TABLE IF NOT EXISTS "postal_address" (
     "deleted_at" TEXT,
     -- Who marked the row as removed
     "deleted_by" TEXT,
-    CONSTRAINT "postal_address_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id")
+    CONSTRAINT "party_identifier_party_id_party_identifier_kind_code_uq" UNIQUE ("party_id", "party_identifier_kind_code"),
+    CONSTRAINT "party_identifier_party_id_fk" FOREIGN KEY ("party_id") REFERENCES "party" ("party_id"),
+    CONSTRAINT "party_identifier_party_identifier_kind_code_fk" FOREIGN KEY ("party_identifier_kind_code") REFERENCES "party_identifier_kind" ("code")
 );

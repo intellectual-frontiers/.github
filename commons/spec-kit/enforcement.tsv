@@ -98,20 +98,20 @@ requirement	mechanism	by	note
 0006-sql-aide FR-014	check	.github: cd commons/ts/data && bun run verify	Emit: script and statement renderings
 0006-sql-aide FR-015	check	.github: cd commons/ts/data && bun run verify	Emit: golden files, read on both runtimes
 0006-sql-aide FR-016	check	.github: cd commons/ts/data && bun run verify	Emit: the coordinator and script variables
-0006-sql-aide FR-017	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands. Tables, keys, checks and self-references are emitted and loaded (arca/party.test.ts, data-vault/vault.test.ts); views and indexes are not yet.
-0006-sql-aide FR-018	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-019	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0006-sql-aide FR-017	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: tables, views and indexes committed for three dialects and loaded into each engine
+0006-sql-aide FR-018	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: an index names its own table's columns, and each thing it asks for is a feature (type tests)
+0006-sql-aide FR-019	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: the key is in the primary key and bounds are of its type (type tests); loaded into PGlite
 0006-sql-aide FR-020	none	-	Not whole yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
 0006-sql-aide FR-021	none	-	Not whole yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-022	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0006-sql-aide FR-022	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: schema, sequence, enumerated type, domain, row-level security and policy loaded twice into PGlite; a materialized view refreshed there; an extension as text
 0006-sql-aide FR-023	check	.github: cd commons/ts/data && bun run verify	emit.test.ts: with adds features and types
 0006-sql-aide FR-024	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands. Naming, emit and lint hooks and plugins are there and tested (emit.test.ts, model.test.ts); the hooks of later layers come with them.
 0006-sql-aide FR-025	check	.github: cd commons/ts/data && bun run verify	Governance: descriptions and owners, emitted as comments
 0006-sql-aide FR-026	check	.github: cd commons/ts/data && bun run verify	Governance: DPV terms
 0006-sql-aide FR-027	check	.github: cd commons/ts/data && bun run verify	Governance: lint
 0006-sql-aide FR-028	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-029	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-030	none	-	Not whole yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0006-sql-aide FR-029	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: the same assertions as a query that returns TAP in every engine, from TypeScript, and as pgTAP on a PostgreSQL server that has it
+0006-sql-aide FR-030	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: over a hundred tests made from the party model pass in every engine
 0006-sql-aide FR-031	check	.github: cd commons/ts/data && bun run verify	Tests: the TAP emitter
 0006-sql-aide FR-032	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
 0006-sql-aide FR-033	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
@@ -130,5 +130,5 @@ requirement	mechanism	by	note
 0006-sql-aide FR-046	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
 0006-sql-aide FR-047	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: the party model; conventions.test.ts: the public entry point alone
 0006-sql-aide FR-048	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands. Hubs, satellites and links are there and tested (data-vault/vault.test.ts); loads are not yet.
-0006-sql-aide FR-049	none	-	Not whole yet: it is finished by phase 6 of the library, and this row names its check when that phase lands. Compiling, committed output, loading and constraints are tested on SQLite, DuckDB, PGlite and a PostgreSQL server; the same scenario in every engine and generated tests inside the engine are not yet.
+0006-sql-aide FR-049	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts and data-vault/vault.test.ts: compiling, committed SQL, loading, constraints, one scenario with the same rows in every engine, and the generated tests inside each
 0006-sql-aide FR-050	check	.github: cd commons/ts/data && bun run verify	Arca and Data Vault: tests of each phase run in the same check

@@ -46,7 +46,7 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
 | Phase | What                                                                                                     | State   |
 | ----- | -------------------------------------------------------------------------------------------------------- | ------- |
 | 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                       | not yet |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                       | here    |
 | 3     | Typed routines, triggers, policies, DuckDB macros                                                        | not yet |
 | 4     | Integrations                                                                                             | not yet |
 | 5     | ISLM                                                                                                     | not yet |

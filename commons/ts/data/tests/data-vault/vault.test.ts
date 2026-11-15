@@ -13,16 +13,22 @@ import {
   date,
   definitions,
   duckdb,
+  fails,
   lint,
   type NewRowOf,
   postgres,
+  raw,
   render,
   type RowOf,
+  rows,
+  runAssertions,
   sqlite,
+  structuralTests,
   table,
+  tally,
   text,
 } from "../../sql-aide/mod.ts";
-import { engines, golden } from "../helpers.ts";
+import { eachEngine, golden } from "../helpers.ts";
 
 const customer = hub("customer", { customer_number: text().doc("The number the business knows the customer by") });
 const order = hub("order", { order_number: text().doc("The number on the order") });
@@ -87,40 +93,57 @@ proves(["0006-sql-aide FR-025", "0006-sql-aide FR-027"], "what a vault's functio
 });
 
 proves(["0006-sql-aide FR-049", "0006-sql-aide FR-017"], "a vault loads into every engine at hand, and its keys hold", async () => {
-  for (const engine of await engines()) {
-    try {
-      const ddl = render(definitions(vault), contexts[engine.dialect]);
-      await engine.exec(ddl);
-      await engine.exec(ddl);
+  await eachEngine(async (engine) => {
+    const ddl = render(definitions(vault), contexts[engine.dialect]);
+    await engine.exec(ddl);
+    await engine.exec(ddl);
+    await engine.exec(`INSERT INTO "hub_customer" ("hub_customer_id", "customer_number", "record_source") VALUES ('c1', 'C-001', 'test')`);
+    await engine.exec(`INSERT INTO "hub_order" ("hub_order_id", "order_number", "record_source") VALUES ('o1', 'O-001', 'test')`);
+    await engine.exec(
+      `INSERT INTO "link_customer_order" ("link_customer_order_id", "hub_customer_id", "hub_order_id", "record_source") VALUES ('l1', 'c1', 'o1', 'test')`,
+    );
+    await engine.exec(
+      `INSERT INTO "sat_customer_contact" ("sat_customer_contact_id", "hub_customer_id", "email", "record_source") VALUES ('s1', 'c1', 'a@b.c', 'test')`,
+    );
+    const rows = await engine.query(`SELECT count(*) AS n FROM "link_customer_order"`);
+    assertEquals(Number(rows[0]?.["n"]), 1, engine.name);
+    // the business key is unique, a link's hubs are unique together, and a satellite is of a hub that exists
+    await assertRejects(() =>
+      engine.exec(`INSERT INTO "hub_customer" ("hub_customer_id", "customer_number", "record_source") VALUES ('c2', 'C-001', 'test')`),
+    );
+    await assertRejects(() =>
+      engine.exec(
+        `INSERT INTO "link_customer_order" ("link_customer_order_id", "hub_customer_id", "hub_order_id", "record_source") VALUES ('l2', 'c1', 'o1', 'test')`,
+      ),
+    );
+    await assertRejects(() =>
+      engine.exec(
+        `INSERT INTO "sat_customer_contact" ("sat_customer_contact_id", "hub_customer_id", "record_source") VALUES ('s2', 'nobody', 'test')`,
+      ),
+    );
+    assert(true);
+  });
+});
+
+proves(
+  ["0006-sql-aide FR-029", "0006-sql-aide FR-030", "0006-sql-aide FR-049"],
+  "the tests made from a vault pass in every engine at hand",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions(vault), ctx));
       await engine.exec(
         `INSERT INTO "hub_customer" ("hub_customer_id", "customer_number", "record_source") VALUES ('c1', 'C-001', 'test')`,
       );
-      await engine.exec(`INSERT INTO "hub_order" ("hub_order_id", "order_number", "record_source") VALUES ('o1', 'O-001', 'test')`);
-      await engine.exec(
-        `INSERT INTO "link_customer_order" ("link_customer_order_id", "hub_customer_id", "hub_order_id", "record_source") VALUES ('l1', 'c1', 'o1', 'test')`,
-      );
-      await engine.exec(
-        `INSERT INTO "sat_customer_contact" ("sat_customer_contact_id", "hub_customer_id", "email", "record_source") VALUES ('s1', 'c1', 'a@b.c', 'test')`,
-      );
-      const rows = await engine.query(`SELECT count(*) AS n FROM "link_customer_order"`);
-      assertEquals(Number(rows[0]?.["n"]), 1, engine.name);
-      // the business key is unique, a link's hubs are unique together, and a satellite is of a hub that exists
-      await assertRejects(() =>
-        engine.exec(`INSERT INTO "hub_customer" ("hub_customer_id", "customer_number", "record_source") VALUES ('c2', 'C-001', 'test')`),
-      );
-      await assertRejects(() =>
-        engine.exec(
-          `INSERT INTO "link_customer_order" ("link_customer_order_id", "hub_customer_id", "hub_order_id", "record_source") VALUES ('l2', 'c1', 'o1', 'test')`,
+      const assertions = [
+        ...structuralTests({ tables: vault }, ctx),
+        rows("the hub holds the business key once", raw(`SELECT "customer_number" FROM "hub_customer"`), [["C-001"]]),
+        fails(
+          "a business key is not loaded twice",
+          raw(`INSERT INTO "hub_customer" ("hub_customer_id", "customer_number", "record_source") VALUES ('c2', 'C-001', 't')`),
         ),
-      );
-      await assertRejects(() =>
-        engine.exec(
-          `INSERT INTO "sat_customer_contact" ("sat_customer_contact_id", "hub_customer_id", "record_source") VALUES ('s2', 'nobody', 'test')`,
-        ),
-      );
-      assert(true);
-    } finally {
-      await engine.close();
-    }
-  }
-});
+      ];
+      assertEquals(tally(await runAssertions(assertions, engine, ctx)), { passed: assertions.length, failed: 0, skipped: 0 }, engine.name);
+    });
+  },
+);

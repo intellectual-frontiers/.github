@@ -76,6 +76,8 @@ export interface ColumnSpec {
   readonly check?: (self: AnySql) => AnySql;
   /** Its description, where it is not taken from a TSDoc comment. */
   readonly doc?: string;
+  /** The entities its type is, which must be defined before its table (an enumerated type, a domain). */
+  readonly needs?: readonly { readonly name: string; readonly schema: string | undefined }[];
   /** How personal its data is. */
   readonly personal?: Personal;
   /** Its category, a term of DPV's Personal Data extension. */
@@ -121,6 +123,8 @@ export interface Column<
   on(event: "delete" | "update", action: ReferentialAction): Column<T, Null, F, Key, Req | "fk:actions">;
   /** The column's description, for a column a function makes: a column a person writes takes it from its TSDoc comment. */
   doc(text: string): Column<T, Null, F, Key, Req>;
+  /** The column's type is an entity that must be defined before the column's table. */
+  needs(entity: { readonly name: string; readonly schema: string | undefined }): Column<T, Null, F, Key, Req>;
   /** The column holds personal data: of a category of DPV's Personal Data extension, whose class the vocabulary gives, or of no category said. */
   personal(category?: PdTerm): Column<T, Null, F, Key, Req>;
 }
@@ -153,6 +157,7 @@ function make<T, Null extends boolean, F extends Fill, Key extends boolean, Req 
         ? make(spec)
         : make({ ...spec, references: { ...spec.references, ...(event === "delete" ? { onDelete: action } : { onUpdate: action }) } }),
     doc: (text) => make({ ...spec, doc: text }),
+    needs: (entity) => make({ ...spec, needs: [...(spec.needs ?? []), entity] }),
     personal: (category) =>
       make(category === undefined ? { ...spec, personal: "PersonalData" } : { ...spec, personal: pd[category].kind, category }),
   };

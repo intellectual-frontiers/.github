@@ -46,6 +46,8 @@ export interface Dialect<N extends string = string, F extends string = string> {
   readonly param: (index: number) => string;
   /** The value a driver of this dialect is given for a bound parameter. */
   readonly encode: (value: SqlValue, spec?: DomainSpec) => SqlValue;
+  /** Whether a view is replaced by `CREATE OR REPLACE VIEW`; where not, it is dropped and made again. */
+  readonly replacesViews: boolean;
   /** How a column the database numbers is written after its type, whether that also makes it the primary key, and what must be made first. */
   readonly identity: (sequence: string) => { readonly suffix: string; readonly isPrimaryKey: boolean; readonly before?: string };
   /** How a generated column's expression is written after its type. */

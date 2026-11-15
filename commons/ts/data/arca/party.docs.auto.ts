@@ -16,6 +16,10 @@ export const docs = {
       party_id: "The party reached this way.",
     },
   },
+  electronicContactByParty: {
+    summary: "Finds the ways to reach a party.",
+    members: {},
+  },
   organization: {
     summary: "An organization: a party that is a company, an agency, a club or any other body. Its key is its party's key.",
     members: {
@@ -62,6 +66,14 @@ export const docs = {
       valid_to: "The last day the relation held; empty while it still does.",
     },
   },
+  partyRelationByFrom: {
+    summary: "Finds the relations that start from a party.",
+    members: {},
+  },
+  partyRelationByTo: {
+    summary: "Finds the relations that end at a party.",
+    members: {},
+  },
   partyRelationKind: {
     summary: "The ways one party may be related to another: employed by, parent company of, married to.",
     members: {},
@@ -76,6 +88,10 @@ export const docs = {
       valid_to: "The last day the party played the role; empty while they still do.",
     },
   },
+  partyRoleByParty: {
+    summary: "Finds the roles a party plays.",
+    members: {},
+  },
   partyRoleKind: {
     summary: "The roles a party may play: customer, supplier, employee, and whatever else a business names.",
     members: {},
@@ -87,6 +103,19 @@ export const docs = {
       family_name: "The name a person shares with their family, as they write it.",
       given_name: "The name a person is given, as they write it.",
       party_id: "The person's key, which is the key of their party.",
+    },
+  },
+  personByName: {
+    summary: "Finds people by their family name, then their given name: how a person is usually looked up.",
+    members: {},
+  },
+  personDirectory: {
+    summary: "The people in use, each with the name they are shown by: a person whose party or own row is marked as removed is left out.",
+    members: {
+      display_name: "The name the person is shown by.",
+      family_name: "The name the person shares with their family.",
+      given_name: "The name the person is given.",
+      party_id: "The person's key.",
     },
   },
   postalAddress: {
@@ -102,5 +131,9 @@ export const docs = {
       purpose: "What the address is used for: where the party lives, is billed or receives deliveries.",
       region: "The state, province or county, where the country uses one.",
     },
+  },
+  postalAddressByParty: {
+    summary: "Finds the addresses of a party.",
+    members: {},
   },
 } as const;

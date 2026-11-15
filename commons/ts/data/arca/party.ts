@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { boolean, date, fk, housekeeping, ne, oneOf, pk, table, text } from "../sql-aide/mod.ts";
+import { boolean, date, fk, housekeeping, index, ne, oneOf, pk, SQL, table, text, view } from "../sql-aide/mod.ts";
 import { codeTable } from "./patterns.ts";
 
 /** The kinds of party: a person or an organization. */
@@ -173,4 +173,44 @@ export const postalAddress = table(
     ...housekeeping(),
   },
   { owner: "arca" },
+);
+
+/** Finds people by their family name, then their given name: how a person is usually looked up. */
+export const personByName = index(person, ["family_name", "given_name"]);
+
+/** Finds the roles a party plays. */
+export const partyRoleByParty = index(partyRole, ["party_id", "party_role_kind_code"]);
+
+/** Finds the relations that start from a party. */
+export const partyRelationByFrom = index(partyRelation, ["from_party_id"]);
+
+/** Finds the relations that end at a party. */
+export const partyRelationByTo = index(partyRelation, ["to_party_id"]);
+
+/** Finds the ways to reach a party. */
+export const electronicContactByParty = index(electronicContact, ["party_id", "medium"]);
+
+/** Finds the addresses of a party. */
+export const postalAddressByParty = index(postalAddress, ["party_id"]);
+
+/** The people in use, each with the name they are shown by: a person whose party or own row is marked as removed is left out. */
+export const personDirectory = view(
+  "person_directory",
+  {
+    /** The person's key. */
+    party_id: text(),
+    /** The name the person is shown by. */
+    display_name: text(),
+    /** The name the person is given. */
+    given_name: text(),
+    /** The name the person shares with their family. */
+    family_name: text(),
+  },
+  SQL`
+    SELECT ${party.c.party_id}, ${party.c.display_name}, ${person.c.given_name}, ${person.c.family_name}
+      FROM ${party}
+      JOIN ${person} ON ${person.c.party_id} = ${party.c.party_id}
+     WHERE ${party.c.deleted_at} IS NULL AND ${person.c.deleted_at} IS NULL
+  `,
+  { from: [party, person] },
 );

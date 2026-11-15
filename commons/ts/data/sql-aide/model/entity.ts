@@ -25,32 +25,42 @@ export interface Entity extends EntityName {
   readonly dependsOn: () => readonly EntityName[];
 }
 
-/** The key of an entity in a graph: its schema and name. */
+/** The key of an entity by its schema and name, as a reference to it is written. */
 export const entityKey = (e: EntityName): string => `${e.schema ?? ""}.${e.name}`;
 
 /** A model whose entities need each other in a circle. */
 export type CycleError = { readonly kind: "cycle"; readonly entities: readonly string[] };
 
 /**
- * Puts entities in the order they must be defined in. A reference to an entity outside the list, or to itself, asks for nothing.
+ * Puts entities in the order they must be defined in. An entity is defined after every entity of the list that it names, and after the
+ * schema it lives in where the list has that schema. A reference to an entity outside the list, or to itself, asks for nothing.
  *
  * @param entities - the entities of a model, in the order written
  */
 export function ordered<E extends Entity>(entities: readonly E[]): Result<readonly E[], CycleError> {
-  const byKey = new Map(entities.map((e) => [entityKey(e), e]));
+  const named = new Map<string, number[]>();
+  entities.forEach((e, i) => {
+    if (e.entity === "schema") return;
+    named.set(entityKey(e), [...(named.get(entityKey(e)) ?? []), i]);
+  });
+  const schemas = new Map<string, number>();
+  entities.forEach((e, i) => {
+    if (e.entity === "schema") schemas.set(e.name, i);
+  });
   const needs = new Map<string, readonly string[]>();
-  for (const e of entities) {
-    const k = entityKey(e);
-    needs.set(
-      k,
-      [...new Set(e.dependsOn().map(entityKey))].filter((d) => d !== k && byKey.has(d)),
-    );
-  }
+  entities.forEach((e, i) => {
+    const after = new Set<number>();
+    for (const d of e.dependsOn()) for (const j of named.get(entityKey(d)) ?? []) after.add(j);
+    const home = e.schema === undefined || e.entity === "schema" ? undefined : schemas.get(e.schema);
+    if (home !== undefined) after.add(home);
+    after.delete(i);
+    needs.set(String(i), [...after].sort((a, b) => a - b).map(String));
+  });
   const sorted = order(needs);
-  if (sorted.kind === "err") return err({ kind: "cycle", entities: sorted.error.nodes });
+  if (sorted.kind === "err") return err({ kind: "cycle", entities: sorted.error.nodes.map((n) => entities[Number(n)]?.name ?? n) });
   return ok(
-    sorted.value.flatMap((k) => {
-      const e = byKey.get(k);
+    sorted.value.flatMap((n) => {
+      const e = entities[Number(n)];
       return e === undefined ? [] : [e];
     }),
   );

@@ -7,6 +7,7 @@
 import type { Brand } from "../../../kernel/mod.ts";
 import { fitName } from "../core/text.ts";
 import type { EmitContext } from "../emit/context.ts";
+import type { SqlValue } from "./domain.ts";
 import type { Expr } from "../emit/expr.ts";
 import { type AnySql, type Chunk, chunkOf, chunkText, renderUnchecked, sql, type Sql } from "../emit/sql.ts";
 import type { AnyColumn, ColumnSpec, FillOf, NullOf, Referable, ReqOfColumn, SelfColumn, ValueOf } from "./column.ts";
@@ -80,6 +81,9 @@ export type SelfTargetsExist<C> = {
   readonly [K in keyof C]: C[K] extends SelfColumn<infer Target, boolean> ? (Target extends keyof C ? C[K] : never) : C[K];
 };
 
+/** How the rows of a partitioned table are divided. */
+export type PartitionStrategy = "range" | "list" | "hash";
+
 /** A check on the rows of a table. */
 export interface TableCheck {
   /** The name of the check, unique in its table. */
@@ -120,6 +124,8 @@ export interface TableSpec {
   readonly doc: string | undefined;
   /** Who answers for it. */
   readonly owner: string | undefined;
+  /** How its rows are divided among partitions, where they are. */
+  readonly partitionBy?: { readonly strategy: PartitionStrategy; readonly key: readonly string[] };
 }
 
 /**
@@ -154,8 +160,8 @@ export interface Table<TN extends string, C, Req extends string = never> extends
 /** Any table. */
 export type AnyTable = Table<string, ColumnMap, string>;
 
-/** The row a table gives when read, from the table itself: `RowOf<typeof person>`. */
-export type RowOf<T> = T extends Table<infer TN, infer C, string> ? SelectRow<TN, C> : never;
+/** The row a table or a view gives when read, from the relation itself: `RowOf<typeof person>`. */
+export type RowOf<T> = T extends { readonly __t?: infer R } ? NonNullable<R> : never;
 /** The row a table takes on insert, from the table itself. */
 export type NewRowOf<T> = T extends Table<infer TN, infer C, string> ? InsertRow<TN, C> : never;
 /** The row a table takes on update, from the table itself. */
@@ -269,7 +275,10 @@ function createTable(spec: TableSpec, self: object): (ctx: EmitContext) => reado
       else out.push(chunkText("    "), ...line);
       out.push(chunkText(i === lines.length - 1 ? "\n" : ",\n"));
     });
-    out.push(chunkText(");"));
+    out.push(chunkText(")"));
+    if (spec.partitionBy !== undefined)
+      out.push(chunkText(` PARTITION BY ${spec.partitionBy.strategy.toUpperCase()} (`), ...list(spec.partitionBy.key), chunkText(")"));
+    out.push(chunkText(";"));
 
     if (!inlineDocs) {
       const qualified = renderUnchecked(
@@ -291,7 +300,7 @@ function createTable(spec: TableSpec, self: object): (ctx: EmitContext) => reado
   };
 }
 
-function build<TN extends string, C, Req extends string>(spec: TableSpec, name: TN, columns: C): Table<TN, C, Req> {
+function build<TN extends string, C, Req extends string>(spec: TableSpec, name: TN): Table<TN, C, Req> {
   const owner = (): { readonly name: string; readonly schema: string | undefined } => ({ name: spec.name, schema: spec.schema });
   const refOf = <T, R extends string>(columnName: string, columnSpec: ColumnSpec): ColumnRef<TN, string, T, R> => {
     const bare: Expr<T, R> = sql("expression", (ctx) => [{ kind: "name", parts: [ctx.naming.column(columnName)] }]);
@@ -322,14 +331,13 @@ function build<TN extends string, C, Req extends string>(spec: TableSpec, name: 
     dependsOn: () =>
       spec.columns.flatMap(([, c]) => {
         const t = c.references?.table;
-        return t === undefined ? [] : [t()];
+        return [...(t === undefined ? [] : [t()]), ...(c.needs ?? [])];
       }),
     key: <T extends string | number | bigint>(value: T): Brand<T, TN> => value as Brand<T, TN>,
     check: (checkName, condition) =>
       build<TN, C, Req>(
         { ...spec, checks: [...spec.checks, { name: checkName, condition: condition(bareRefs as Parameters<typeof condition>[0]) }] },
         name,
-        columns,
       ),
   };
   return self;
@@ -364,6 +372,112 @@ export function table<const TN extends string, const C extends ColumnMap>(
       owner: options.owner,
     },
     name,
-    columns,
   );
+}
+
+/** The columns of a table that are in its primary key. */
+export type PkKeys<C> = { [K in keyof C & string]: C[K] extends { readonly __key?: true } ? K : never }[keyof C & string];
+
+/** The values of a partition key, in the order of its columns: plain values, not branded as keys. */
+export type KeyValues<C, K extends readonly (keyof C)[]> = {
+  readonly [I in keyof K]: C[K[I]] extends { readonly __t?: infer T } ? NonNullable<T> : never;
+};
+
+/** The rows a partition holds, by the strategy of its table. */
+export type PartitionBounds<S extends PartitionStrategy, V extends readonly unknown[]> =
+  | "default"
+  | (S extends "range"
+      ? { readonly from: V; readonly to: V }
+      : S extends "list"
+        ? { readonly in: readonly V[0][] }
+        : { readonly modulus: number; readonly remainder: number });
+
+/** A partition of a partitioned table: an entity of its own, defined after its table. */
+export interface Partition extends Sql<"relation", unknown, "partitions"> {
+  /** What kind of entity this is. */
+  readonly entity: "partition";
+  /** The partition's name. */
+  readonly name: string;
+  /** The schema it lives in. */
+  readonly schema: string | undefined;
+  /** The statement that defines it. */
+  readonly ddl: Sql<"statement", unknown, "partitions">;
+  /** The table it is a partition of. */
+  readonly dependsOn: () => readonly { readonly name: string; readonly schema: string | undefined }[];
+}
+
+/** A table whose rows are divided among partitions by a key (FR-019). */
+export interface PartitionedTable<
+  TN extends string,
+  C,
+  Req extends string,
+  S extends PartitionStrategy,
+  K extends readonly (keyof C)[],
+> extends Table<TN, C, Req> {
+  /** How its rows are divided. */
+  readonly strategy: S;
+  /**
+   * Makes a partition of the table.
+   *
+   * @param name - the partition's name
+   * @param bounds - the rows it holds: a range or a list of the key's values, a remainder of its hash, or `"default"` for the rest
+   */
+  readonly partition: (name: string, bounds: PartitionBounds<S, KeyValues<C, K>>) => Partition;
+}
+
+/**
+ * Divides a table's rows among partitions. The key must be columns of the table's primary key, or it does not compile; a dialect needs
+ * the `partitions` feature for the table.
+ *
+ * @param of - the table
+ * @param strategy - range, list or hash
+ * @param key - the columns of the key
+ * @example
+ * const events = partitionBy(table("events", { id: pk.ulid(), at: timestamptz().primaryKey() }), "range", ["at"]);
+ * const y2026 = events.partition("events_2026", { from: [new Date("2026-01-01")], to: [new Date("2027-01-01")] });
+ */
+export function partitionBy<
+  TN extends string,
+  C,
+  Req extends string,
+  const S extends PartitionStrategy,
+  const K extends readonly PkKeys<C>[],
+>(of: Table<TN, C, Req>, strategy: S, key: K): PartitionedTable<TN, C, Req | "partitions", S, K> {
+  const spec: TableSpec = { ...of.spec, partitionBy: { strategy, key } };
+  const made = build<TN, C, Req | "partitions">(spec, of.name);
+  const value = (v: unknown, column: string): Chunk => {
+    const c = spec.columns.find(([n]) => n === column)?.[1];
+    // the bounds were checked by the compiler to be values of the key's columns
+    return c === undefined ? { kind: "value", value: v as SqlValue } : { kind: "value", value: v as SqlValue, spec: c.domain };
+  };
+  const tuple = (values: readonly unknown[]): Chunk[] =>
+    values.flatMap((v, i) => (i === 0 ? [value(v, key[i] ?? "")] : [chunkText(", "), value(v, key[i] ?? "")]));
+  const partition = (name: string, bounds: PartitionBounds<S, KeyValues<C, K>>): Partition => {
+    const chunks = (ctx: EmitContext): Chunk[] => {
+      const head: Chunk[] = [
+        chunkText("CREATE TABLE IF NOT EXISTS "),
+        { kind: "name", parts: ctx.naming.table(name, spec.schema) },
+        chunkText(" PARTITION OF "),
+        { kind: "name", parts: ctx.naming.table(spec.name, spec.schema) },
+      ];
+      if (bounds === "default") return [...head, chunkText(" DEFAULT;")];
+      if ("from" in bounds)
+        return [...head, chunkText(" FOR VALUES FROM ("), ...tuple(bounds.from), chunkText(") TO ("), ...tuple(bounds.to), chunkText(");")];
+      if ("in" in bounds) {
+        const items = bounds.in.flatMap((v, i) => (i === 0 ? [value(v, key[0] ?? "")] : [chunkText(", "), value(v, key[0] ?? "")]));
+        return [...head, chunkText(" FOR VALUES IN ("), ...items, chunkText(");")];
+      }
+      return [...head, chunkText(` FOR VALUES WITH (MODULUS ${bounds.modulus}, REMAINDER ${bounds.remainder});`)];
+    };
+    return {
+      sqlKind: "relation",
+      chunks: (ctx) => [{ kind: "name", parts: ctx.naming.table(name, spec.schema) }],
+      entity: "partition",
+      name,
+      schema: spec.schema,
+      ddl: sql("statement", chunks),
+      dependsOn: () => [{ name: spec.name, schema: spec.schema }],
+    };
+  };
+  return { ...made, strategy, partition };
 }

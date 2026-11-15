@@ -68,13 +68,19 @@ export {
   uuidDomain,
 } from "./algebra/domain.ts";
 export type { Domain, DomainKind, DomainSpec, Json, SqlValue } from "./algebra/domain.ts";
-export { table } from "./algebra/table.ts";
+export { partitionBy, table } from "./algebra/table.ts";
 export type {
   AnyTable,
   ColumnMap,
   ColumnRef,
   InsertRow,
+  KeyValues,
   NewRowOf,
+  Partition,
+  PartitionBounds,
+  PartitionedTable,
+  PartitionStrategy,
+  PkKeys,
   PatchOf,
   RowOf,
   Refs,
@@ -90,6 +96,14 @@ export type {
 } from "./algebra/table.ts";
 export { fitName, token, unindent } from "./core/text.ts";
 export type { Token } from "./core/text.ts";
+export { index } from "./ddl/index.ts";
+export type { BareColumns, Index, IndexMethod } from "./ddl/index.ts";
+export { enumType, extension, pgDomain, policy, rowLevelSecurity, schema, sequence } from "./ddl/objects.ts";
+export type { DbObject, EnumType, PgDomain, PolicyOptions } from "./ddl/objects.ts";
+export { view } from "./ddl/view.ts";
+export type { View, ViewOptions, ViewRefs } from "./ddl/view.ts";
+export { describeAssertion, fails, notRun, pgTapScript, rows, runAssertions, structuralTests, tapQuery } from "./test/assert.ts";
+export type { Assertion, Runner, Structure } from "./test/assert.ts";
 export { duckdb, postgres, sqlite } from "./dialect/dialects.ts";
 export type {
   CommonFeature,

@@ -126,8 +126,20 @@ export async function postgresEngine(): Promise<Engine | undefined> {
   };
 }
 
-/** Every engine at hand: SQLite, DuckDB and PGlite always, and the PostgreSQL server where one is given. */
-export async function engines(): Promise<readonly Engine[]> {
-  const server = await postgresEngine();
-  return [await sqliteEngine(), await duckdbEngine(), await pgliteEngine(), ...(server === undefined ? [] : [server])];
+/**
+ * Runs a test in every engine at hand, one after another: SQLite, DuckDB and PGlite always, and the PostgreSQL server where one is given.
+ * Each engine is made for its turn and let go after it, whether the test passed or not, so that a failure leaves nothing open.
+ *
+ * @param test - what to do with each engine
+ */
+export async function eachEngine(test: (engine: Engine) => Promise<void>): Promise<void> {
+  for (const make of [sqliteEngine, duckdbEngine, pgliteEngine, postgresEngine]) {
+    const engine = await make();
+    if (engine === undefined) continue;
+    try {
+      await test(engine);
+    } finally {
+      await engine.close();
+    }
+  }
 }

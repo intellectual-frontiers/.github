@@ -67,6 +67,7 @@ const isJson = (value: SqlValue): boolean =>
 interface Definition<N extends string> {
   readonly name: N;
   readonly maxNameLength: number | undefined;
+  readonly replacesViews: boolean;
   readonly features: readonly string[];
   readonly typeOf: (spec: DomainSpec, self: (spec: DomainSpec) => string) => string;
   readonly bytes: (bytes: Uint8Array) => string;
@@ -110,6 +111,7 @@ function build<N extends string, F extends string>(def: Definition<N>, extension
   return {
     name: def.name,
     maxNameLength: def.maxNameLength,
+    replacesViews: def.replacesViews,
     features: new Set([...def.features, ...extensions.flatMap((e) => e.features)]),
     extensions,
     typeOf,
@@ -138,6 +140,7 @@ export function postgres(): Postgres {
     {
       name: "postgres",
       maxNameLength: 63,
+      replacesViews: true,
       features: [
         ...common,
         "schemas",
@@ -226,6 +229,7 @@ export function sqlite(): Sqlite {
     {
       name: "sqlite",
       maxNameLength: undefined,
+      replacesViews: false,
       features: [...common, "triggers", "attach", "autoincrement", "fk:actions", "index:partial", "index:expression"],
       typeOf: (spec) => {
         switch (spec.kind) {
@@ -281,6 +285,7 @@ export function duckdb(): Duckdb {
     {
       name: "duckdb",
       maxNameLength: undefined,
+      replacesViews: true,
       features: [...common, "schemas", "comments", "macros", "enums", "sequences", "arrays", "attach", "read-files", "index:expression"],
       typeOf: (spec, self) => {
         switch (spec.kind) {
