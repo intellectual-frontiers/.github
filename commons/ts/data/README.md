@@ -63,3 +63,19 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   and is not tested. Lineage covers integrations and Data Vault's loads; transforms add theirs in phase 7.
 - Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
   nine digits; a landing relation should hold one state of a key in one load.
+
+## File Aide, specified and not built yet
+
+File Aide is SQL Aide's peer for stores of files, specified by [`0010-file-aide`](../../spec-kit/specs/0010-file-aide/spec.md): a store's layout written once as
+TypeScript algebraic types, drivers for memory, a folder and an S3-compatible bucket behind one interface, checks of a store against its layout, and a small SQL-like query
+language compiled into a function that walks a store as `fd` does, honouring `.gitignore` and `.faignore`. It will live in `file-aide/`, which does not exist yet. Each of its
+requirements has a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) naming the phase that finishes it.
+
+| Phase | What                                                                                                    | State   |
+| ----- | ------------------------------------------------------------------------------------------------------- | ------- |
+| 1     | Segments, path patterns and their laws, entries, layouts, names                                         | not yet |
+| 2     | The store interface, the `memory` and `posix` drivers, the conformance suite                            | not yet |
+| 3     | Queries: the builder, the text form, the planner, the compiler, `explain`, ignore files, `fd` parity    | not yet |
+| 4     | The `s3` driver, the local S3 server, tests against real providers                                      | not yet |
+| 5     | Checks and recipes, and stores that fail on purpose                                                     | not yet |
+| 6     | With SQL Aide: the file-reference domain and listings as a source; the two accepting layouts end to end | not yet |

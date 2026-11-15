@@ -194,3 +194,41 @@ requirement	mechanism	by	note
 0009-sql-aide FR-048	check	.github: cd commons/ts/data && bun run verify	data-vault/vault.test.ts: hubs, satellites and links as generic functions; loads that only insert, change nothing run twice and add a satellite row for a changed attribute in every engine; conventions.test.ts: the public entry point alone
 0009-sql-aide FR-049	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts and data-vault/vault.test.ts: compiling, committed SQL, loading, constraints, one scenario with the same rows in every engine, and the generated tests inside each
 0009-sql-aide FR-050	check	.github: cd commons/ts/data && bun run verify	Arca and Data Vault: tests of each phase run in the same check
+0010-file-aide FR-001	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-002	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-003	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-004	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-005	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-006	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-007	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-008	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-009	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-010	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-011	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-012	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-013	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-014	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-015	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-016	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-017	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-018	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-019	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-020	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-021	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-022	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-023	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-024	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-025	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-026	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-027	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-028	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-029	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-030	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-031	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-032	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-033	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-034	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-035	none	-	Not whole yet: the suite starts in phase 2 with memory and posix, takes the local S3 server in phase 4 and fault injection in phase 5; this row names its check when phase 5 lands.
+0010-file-aide FR-036	none	-	Not built yet: the real-provider tests come in phase 4 and the comparison with fd in phase 3; this row names its check when phase 4 lands.
+0010-file-aide FR-037	none	-	Not built yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-038	none	-	Not built yet: each phase adds what the two layouts must pass, and this row names its check when phase 6 lands.
