@@ -2,7 +2,7 @@
  * The kernel of IFC TypeScript (commons 0005-typescript-runtime): pure code that imports nothing outside this folder, has no effect on the
  * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
  * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64, ASN.1 DER (as `der`), CMS
- * encryption (as `cms`) and signed in-toto statements (as `dsse`);
+ * encryption (as `cms`) and signed in-toto statements (as `dsse`); PNG and ICO pictures (as `png`);
  * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; and type-level tests.
  *
  * @example
@@ -95,6 +95,7 @@ export type { Change, Level, SemVer } from "./semver.ts";
 export { fromHex, parseSha256Sums, sameSha256, sha256, sha256Of, toHex } from "./sha256.ts";
 export type { Sha256 } from "./sha256.ts";
 export { ANSI, lf, plain, quoteArgs, splitArgs } from "./text.ts";
+export * as png from "./png.ts";
 export { formatTomlError, isTomlDateTime, isTomlTable, parseToml, tomlKey, tomlString, toToml } from "./toml.ts";
 export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
