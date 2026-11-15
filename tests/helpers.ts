@@ -224,3 +224,48 @@ export function deadUrl(): string {
   l.close();
   return `http://127.0.0.1:${port}`;
 }
+
+/** Copies a folder, recursively, leaving out the entries named in `skip`. */
+export function copyTree(from: string, to: string, skip: readonly string[] = []): void {
+  Deno.mkdirSync(to, { recursive: true });
+  for (const e of Deno.readDirSync(from)) {
+    if (skip.includes(e.name)) continue;
+    if (e.isDirectory) copyTree(`${from}/${e.name}`, `${to}/${e.name}`, skip);
+    else Deno.copyFileSync(`${from}/${e.name}`, `${to}/${e.name}`);
+  }
+}
+
+/** A zip archive of `files`, stored (not compressed), each file executable, as a release's .zip is: what `unzip` reads, made without any other program. */
+export function zipBytes(files: Readonly<Record<string, string>>): Uint8Array {
+  const crcTable = Array.from({ length: 256 }, (_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  const crc32 = (b: Uint8Array): number => {
+    let c = 0xffffffff;
+    for (const x of b) c = (crcTable[(c ^ x) & 0xff] ?? 0) ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const enc = new TextEncoder();
+  const local: number[] = [], central: number[] = [];
+  const u16 = (out: number[], v: number) => out.push(v & 0xff, (v >>> 8) & 0xff);
+  const u32 = (out: number[], v: number) => out.push(v & 0xff, (v >>> 8) & 0xff, (v >>> 16) & 0xff, (v >>> 24) & 0xff);
+  let count = 0;
+  for (const [name, body] of Object.entries(files)) {
+    const n = enc.encode(name), data = enc.encode(body), crc = crc32(data), offset = local.length;
+    // local header: version 2.0, no flags, stored, 1980-01-01 00:00
+    u32(local, 0x04034b50), u16(local, 20), u16(local, 0), u16(local, 0), u16(local, 0), u16(local, 33);
+    u32(local, crc), u32(local, data.length), u32(local, data.length), u16(local, n.length), u16(local, 0);
+    local.push(...n, ...data);
+    // central header: made on Unix, so that the mode in the upper half of the external attributes (0755) is read
+    u32(central, 0x02014b50), u16(central, (3 << 8) | 20), u16(central, 20), u16(central, 0), u16(central, 0), u16(central, 0), u16(central, 33);
+    u32(central, crc), u32(central, data.length), u32(central, data.length), u16(central, n.length), u16(central, 0), u16(central, 0), u16(central, 0), u16(central, 0);
+    u32(central, (0o100755 << 16) >>> 0), u32(central, offset);
+    central.push(...n);
+    count++;
+  }
+  const end: number[] = [];
+  u32(end, 0x06054b50), u16(end, 0), u16(end, 0), u16(end, count), u16(end, count), u32(end, central.length), u32(end, local.length), u16(end, 0);
+  return new Uint8Array([...local, ...central, ...end]);
+}

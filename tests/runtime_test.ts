@@ -1,7 +1,7 @@
 // What the setup fetches itself (009-machine-bootstrap FR-019, FR-025, FR-026, FR-078, FR-091, FR-092): gh, rustup from the pinned rustup-init, the pinned uv,
 // and in the clone the toolchain rust-toolchain.toml names; local files and stand-ins for the network and for rustup.
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
-import { Captured, context, exists, Fx, OFF, sha256Hex, withPath } from "./helpers.ts";
+import { Captured, context, exists, Fx, OFF, sha256Hex, withPath, zipBytes } from "./helpers.ts";
 import { ghPin, installRustup, linkUv, pinnedPrereqs, rustupUrl, setupRuntime, setupRustToolchain, uvPin } from "../bin/setup/runtime.ts";
 import { fetchPinned, installPinned } from "../bin/setup/pinned.ts";
 import type { Sha256 } from "../bin/setup/result.ts";
@@ -24,25 +24,17 @@ const linux = (arch: "x86_64" | "aarch64" = "x86_64"): Platform => ({
 const mac: Platform = { ...linux("aarch64"), os: "darwin", family: "macos", id: "macos", pretty: "macOS 15.1", rustTarget: "aarch64-apple-darwin", name: "macos-arm64" };
 
 async function tarball(fx: Fx, name: string, files: Record<string, string>): Promise<{ path: string; sha: string }> {
+  const out = `${fx.tmp}/${name}`;
+  if (name.endsWith(".zip")) {
+    Deno.writeFileSync(out, zipBytes(files));
+    return { path: out, sha: await sha256Hex(Deno.readFileSync(out)) };
+  }
   const dir = `${fx.tmp}/src-${name}`;
   for (const [rel, body] of Object.entries(files)) {
     Deno.mkdirSync(`${dir}/${rel.replace(/\/[^/]*$/, "")}`, { recursive: true });
     Deno.writeTextFileSync(`${dir}/${rel}`, body, { mode: 0o755 });
   }
-  const out = `${fx.tmp}/${name}`;
-  const p = await new Deno.Command(name.endsWith(".zip") ? "sh" : "tar", {
-    args: name.endsWith(".zip")
-      ? [
-        "-c",
-        `cd "${dir}" && python3 -c 'import os,sys,zipfile
-z=zipfile.ZipFile(sys.argv[1],"w")
-for r,_,fs in os.walk("."):
-  for f in fs:
-    p=os.path.join(r,f); i=zipfile.ZipInfo(p[2:]); i.external_attr=0o755<<16; z.writestr(i,open(p,"rb").read())
-z.close()' "${out}"`,
-      ]
-      : ["-czf", out, "-C", dir, ...new Set(Object.keys(files).map((f) => f.split("/")[0] ?? f))],
-  }).output();
+  const p = await new Deno.Command("tar", { args: ["-czf", out, "-C", dir, ...new Set(Object.keys(files).map((f) => f.split("/")[0] ?? f))] }).output();
   assert(p.success, new TextDecoder().decode(p.stderr));
   return { path: out, sha: await sha256Hex(Deno.readFileSync(out)) };
 }
