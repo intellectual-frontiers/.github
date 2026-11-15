@@ -8,19 +8,19 @@
  * settings with `loadData` and a decoder of its own.
  *
  * Its signals (FR-019): `runPackObserved` runs a pack as `runPack` does, to the same assessment, and says so in the signals of
- * `GRC_SIGNALS` (0006-signals): a `grc.pack` span for the run, a `grc.control` span under it for each control and subject checked, ending
- * `error` where the check's outcome is `fail` or `error` and `ok` otherwise, and each finding a log record in its check's span whose body is
- * its OCSF Compliance Finding (`ocsfBody`; an integer is an OTLP `intValue`). The record's severity is the finding's:
+ * `GRC_SIGNALS` (0006-signals): a `grc.pack` span for the run, ending `error` where any finding's outcome is `fail` or `error` (its
+ * message how many) and `ok` otherwise; a `grc.control` span under it for each control and subject checked, ending `error` where the check's
+ * outcome is `fail` or `error` and `ok` otherwise; and each finding a `grc.finding` log record in its check's span whose body is its OCSF
+ * Compliance Finding (`ocsfBody`; an integer is an OTLP `intValue`). The record's severity is the finding's (`FINDING_SEVERITY`):
  *
- * | finding severity | log record severity | log kind |
- * | --- | --- | --- |
- * | `info`, `low` | 9 `INFO` | `grc.finding.info` |
- * | `medium` | 13 `WARN` | `grc.finding.warn` |
- * | `high` | 17 `ERROR` | `grc.finding.error` |
- * | `critical` | 21 `FATAL` | `grc.finding.fatal` |
+ * | finding severity | log record severity |
+ * | --- | --- |
+ * | `info`, `low` | 9 `INFO` |
+ * | `medium` | 13 `WARN` |
+ * | `high` | 17 `ERROR` |
+ * | `critical` | 21 `FATAL` |
  *
- * A log kind's severity is fixed where it is declared, so each severity is a kind of its own; the finding's own severity is the
- * record's `grc.severity` attribute, which tells `info` from `low`.
+ * The finding's own severity is the record's `grc.severity` attribute, which tells `info` from `low`.
  *
  * @example
  * ```ts
@@ -212,27 +212,7 @@ export function loadImpactDeclarations(path: string): Promise<Result<readonly Im
 
 // ---------------------------------------------------------------------------------------------------------------------------- signals (FR-019)
 
-const FINDING_ATTRIBUTES = {
-  "grc.pack.id": "string",
-  "grc.control.id": "string",
-  "grc.subject.kind": "string",
-  "grc.subject.id": "string",
-  "grc.status": "string",
-  "grc.outcome": "string",
-  "grc.severity": "string",
-  "grc.waiver.id?": "string",
-} as const;
-
-const findingLog = (severity: SeverityNumber, name: string) =>
-  ({
-    signal: "log",
-    severity,
-    role: "none",
-    description: `A finding of ${name} severity; its body is the finding's OCSF Compliance Finding (class 2003).`,
-    attributes: FINDING_ATTRIBUTES,
-  }) as const;
-
-/** The signals of a pack run (0006-signals FR-009): the run's span, a span for each check, and a log kind for each record severity. */
+/** The signals of a pack run (0006-signals FR-009): the run's span, a span for each check, and a log record for each finding. */
 export const GRC_SIGNALS = defineSignals({
   "grc.pack": {
     signal: "span",
@@ -267,10 +247,23 @@ export const GRC_SIGNALS = defineSignals({
       "grc.findings?": "int",
     },
   },
-  "grc.finding.info": findingLog(SEVERITY.INFO, "info or low"),
-  "grc.finding.warn": findingLog(SEVERITY.WARN, "medium"),
-  "grc.finding.error": findingLog(SEVERITY.ERROR, "high"),
-  "grc.finding.fatal": findingLog(SEVERITY.FATAL, "critical"),
+  "grc.finding": {
+    signal: "log",
+    // Declared INFO; each record is emitted with its finding's severity (FINDING_SEVERITY).
+    severity: SEVERITY.INFO,
+    role: "none",
+    description: "A finding; its body is the finding's OCSF Compliance Finding (class 2003), its severity the finding's.",
+    attributes: {
+      "grc.pack.id": "string",
+      "grc.control.id": "string",
+      "grc.subject.kind": "string",
+      "grc.subject.id": "string",
+      "grc.status": "string",
+      "grc.outcome": "string",
+      "grc.severity": "string",
+      "grc.waiver.id?": "string",
+    },
+  },
 });
 
 /** The kinds of the GRC registry. */
@@ -279,14 +272,14 @@ export type GrcKinds = (typeof GRC_SIGNALS)["kinds"];
 /** The scope of the GRC signals. */
 export const GRC_SCOPE: Scope = { name: "ifc-ts/grc" };
 
-/** The log kind of a finding of each severity (the table in the module's documentation). */
-export const FINDING_LOG_KIND = {
-  info: "grc.finding.info",
-  low: "grc.finding.info",
-  medium: "grc.finding.warn",
-  high: "grc.finding.error",
-  critical: "grc.finding.fatal",
-} as const satisfies Readonly<Record<Severity, keyof GrcKinds>>;
+/** The log record severity of a finding of each severity (the table in the module's documentation). */
+export const FINDING_SEVERITY: Readonly<Record<Severity, SeverityNumber>> = {
+  info: SEVERITY.INFO,
+  low: SEVERITY.INFO,
+  medium: SEVERITY.WARN,
+  high: SEVERITY.ERROR,
+  critical: SEVERITY.FATAL,
+};
 
 /** A JSON value as an OTLP `AnyValue`: an integer as an `intValue` (a `bigint`), any other number a `doubleValue`, `null` left out. */
 export function toAnyValue(json: unknown): AnyValue | undefined {
@@ -397,7 +390,7 @@ export async function runPackObserved<S, C extends CheckContext>(
             span.set({ "grc.status": status, "grc.outcome": outcome, "grc.findings": found.length });
             for (const f of found) {
               span.log(
-                FINDING_LOG_KIND[f.severity],
+                "grc.finding",
                 {
                   ...at,
                   "grc.status": f.status,
@@ -406,6 +399,7 @@ export async function runPackObserved<S, C extends CheckContext>(
                   ...(f.waiver === undefined ? {} : { "grc.waiver.id": f.waiver }),
                 },
                 ocsfBody(complianceFinding(f, { product: options.product })),
+                { severity: FINDING_SEVERITY[f.severity] },
               );
             }
             return failing(outcome) ? err({ message: `${control.id} ${outcome} for ${ref.kind} ${ref.id}`, value: found }) : ok(found);

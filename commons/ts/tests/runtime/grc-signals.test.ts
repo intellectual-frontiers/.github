@@ -29,16 +29,8 @@ import {
 import { complianceFinding } from "../../kernel/ocsf.ts";
 import { SEVERITY, type SpanData } from "../../kernel/otel.ts";
 import { decodeLogs, encodeLogs } from "../../kernel/otlp.ts";
-import { createTelemetry, declarationOf, memoryProcessor } from "../../kernel/signals.ts";
-import {
-  FINDING_LOG_KIND,
-  fromAnyValue,
-  GRC_SCOPE,
-  GRC_SIGNALS,
-  type GrcKinds,
-  installedGrcTelemetry,
-  runPackObserved,
-} from "../../runtime/grc.ts";
+import { createTelemetry, memoryProcessor } from "../../kernel/signals.ts";
+import { FINDING_SEVERITY, fromAnyValue, GRC_SCOPE, GRC_SIGNALS, installedGrcTelemetry, runPackObserved } from "../../runtime/grc.ts";
 import { createPipeline, install, installed, uninstall } from "../../runtime/otel.ts";
 import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
@@ -227,7 +219,7 @@ proves([FR], "each finding is a log record in its check's span, its severity fro
     const r = records[i];
     const span = checks.find((s) => s.attributes["grc.control.id"] === f.control.id && s.attributes["grc.subject.id"] === f.subject.id);
     assert(r !== undefined && span !== undefined);
-    assertEquals(r.eventName, FINDING_LOG_KIND[f.severity]);
+    assertEquals(r.eventName, "grc.finding");
     assertEquals([r.severityNumber, r.severityText], severityOf[f.control.id]);
     assertEquals([r.traceId, r.spanId], [span.context.traceId, span.context.spanId]);
     assertEquals(r.attributes, {
@@ -250,21 +242,46 @@ proves([FR], "each finding is a log record in its check's span, its severity fro
   assert(wire.includes(`{"key":"class_uid","value":{"intValue":"2003"}}`));
 });
 
-proves([FR], "the record severity of each finding severity: info and low INFO, medium WARN, high ERROR, critical FATAL", () => {
-  const expected: Readonly<Record<Severity, number>> = {
-    info: SEVERITY.INFO,
-    low: SEVERITY.INFO,
-    medium: SEVERITY.WARN,
-    high: SEVERITY.ERROR,
-    critical: SEVERITY.FATAL,
+proves([FR], "the record severity of each finding severity: info and low INFO, medium WARN, high ERROR, critical FATAL", async () => {
+  const expected: Readonly<Record<Severity, readonly [number, string]>> = {
+    info: [SEVERITY.INFO, "INFO"],
+    low: [SEVERITY.INFO, "INFO"],
+    medium: [SEVERITY.WARN, "WARN"],
+    high: [SEVERITY.ERROR, "ERROR"],
+    critical: [SEVERITY.FATAL, "FATAL"],
   };
-  for (const s of SEVERITIES) {
-    const d = declarationOf(GRC_SIGNALS, FINDING_LOG_KIND[s]);
-    assert(d !== undefined && d.signal === "log");
-    assertEquals(d.severity, expected[s]);
-  }
-  const kinds: readonly (keyof GrcKinds)[] = Object.values(FINDING_LOG_KIND);
-  assertEquals(new Set(kinds).size, 4);
+  assertEquals(
+    SEVERITIES.map((s) => FINDING_SEVERITY[s]),
+    SEVERITIES.map((s) => expected[s][0]),
+  );
+  // One log kind for every finding, declared INFO; each record carries its finding's severity.
+  const logKinds = Object.entries(GRC_SIGNALS.kinds).filter(([, d]) => d.signal === "log");
+  assertEquals(
+    logKinds.map(([k, d]) => [k, d.signal === "log" ? d.severity : 0]),
+    [["grc.finding", SEVERITY.INFO]],
+  );
+  const bySeverity = definePack<string>({
+    id: "severities",
+    title: "One control of each severity",
+    subjectKind: "thing",
+    subjectId: (s) => s,
+    controls: SEVERITIES.map((severity) =>
+      defineControl<string>({
+        id: `sev-${severity}`,
+        title: severity,
+        implements: [],
+        severity,
+        cadence: duration("P1D"),
+        check: () => verdict("fail"),
+      }),
+    ),
+  });
+  const { memory, telemetry } = fixture();
+  await runPackObserved(bySeverity, ["x"], { at: AT }, { telemetry, product });
+  assertEquals(
+    memory.logs.map((r) => [r.eventName, r.attributes["grc.severity"], r.severityNumber, r.severityText]),
+    SEVERITIES.map((s) => ["grc.finding", s, ...expected[s]]),
+  );
 });
 
 type Cell = { readonly status: Status | "throw" | "none"; readonly severity: Severity };
