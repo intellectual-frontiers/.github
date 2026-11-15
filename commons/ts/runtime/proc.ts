@@ -21,6 +21,7 @@ import { delimiter, join } from "node:path";
 import process from "node:process";
 import type { Readable } from "node:stream";
 import { InvalidData, mapError, toError } from "./errors.ts";
+import { traceProcess } from "./otel.ts";
 
 /** The process's environment, by `Deno.env`'s names. */
 export const env = {
@@ -246,10 +247,19 @@ export function signalNumber(name: string): number {
 
 const stdio = (s: Stdio | undefined): "pipe" | "inherit" | "ignore" => (s === "inherit" ? "inherit" : s === "null" ? "ignore" : "pipe");
 
-/** A program run to its end, by its argument vector and never through a shell, with what it did. `NotFound` where there is no such program. */
+/**
+ * A program run to its end, by its argument vector and never through a shell, with what it did. `NotFound` where there is no such program.
+ * Where a telemetry pipeline is installed, the run is a `process` span and the program is given its `TRACEPARENT` (0006-signals FR-018).
+ */
 export function output(argv: readonly string[], options: RunOptions = {}): Promise<Output> {
   const [cmd, ...rest] = argv;
   if (cmd === undefined || cmd === "") return Promise.reject(new InvalidData("nothing to run: the argument vector is empty", "EINVAL"));
+  return traceProcess(argv, (trace) =>
+    spawnOutput(cmd, rest, Object.keys(trace).length === 0 ? options : { ...options, env: { ...trace, ...options.env } }),
+  );
+}
+
+function spawnOutput(cmd: string, rest: readonly string[], options: RunOptions): Promise<Output> {
   const input = options.input;
   const feeds = input !== undefined;
   return new Promise<Output>((resolve, reject) => {
