@@ -1,8 +1,10 @@
 /**
- * The process and the programs it runs (commons 0005-typescript-runtime FR-022), on `node:process`, `node:child_process` and `node:os`.
- * The names follow the `Deno` calls in use (`env.get`, `args`, `exit`, `cwd`, `build.os`, `Command(...).output()`) so a conversion is a
- * rename. A program is always run by its argument vector, never through a shell; one that cannot be found throws `NotFound`, and a non-zero
- * exit is an outcome, not an error. Taken from erga's `lib/ts/process`, Stolos's `src/archon/core/exec.ts` and the setup's `proc.ts`.
+ * The process and the programs it runs (commons 0005-typescript-runtime FR-022, FR-052, FR-053), on `node:process`, `node:child_process`
+ * and `node:os`. The names follow the `Deno` calls in use (`env.get`, `args`, `exit`, `cwd`, `build.os`, `build.target`, `ppid`,
+ * `Command(...).output()`, `Command(...).spawn()`, `unrefTimer`) so a conversion is a rename; `selfCommand` replaces `Deno.execPath()` with
+ * `Deno.mainModule` for a program that runs itself again, from a script or from a compiled binary. A program is always run by its argument
+ * vector, never through a shell; one that cannot be found throws `NotFound`, and a non-zero exit is an outcome, not an error. Taken
+ * from erga's `lib/ts/process`, Stolos's `src/archon/core/exec.ts` and the setup's `proc.ts`.
  *
  * @example
  * ```ts
@@ -14,13 +16,15 @@
  * @module
  */
 import { Buffer } from "node:buffer";
-import { spawn } from "node:child_process";
+import { spawn as spawn_ } from "node:child_process";
 import { statSync } from "node:fs";
 import * as os from "node:os";
-import { delimiter, join } from "node:path";
+import { basename, delimiter, join, resolve as resolvePath } from "node:path";
 import process from "node:process";
-import type { Readable } from "node:stream";
-import { InvalidData, mapError, toError } from "./errors.ts";
+import { Readable, Writable } from "node:stream";
+import { setTimeout as nodeSetTimeout } from "node:timers";
+import { absurd } from "../kernel/absurd.ts";
+import { InvalidData, mapError, NotFound, toError } from "./errors.ts";
 import { traceProcess } from "./otel.ts";
 
 /** The process's environment, by `Deno.env`'s names. */
@@ -73,6 +77,11 @@ export function chdir(path: string): void {
 
 /** The process's id. */
 export const pid: number = process.pid;
+
+/** The id of the process's parent (`Deno.ppid`, FR-053); a function, as the parent changes where the first one ends. */
+export function ppid(): number {
+  return process.ppid;
+}
 
 /** The path of the runtime's executable (deno, node or bun). */
 export function execPath(): string {
@@ -141,8 +150,38 @@ export function archOf(arch: string): Arch {
   }
 }
 
-/** The platform this process runs on, by `Deno.build`'s names. */
-export const build: { readonly os: Os; readonly arch: Arch } = Object.freeze({ os: osOf(process.platform), arch: archOf(process.arch) });
+/**
+ * The target triple Deno names for an operating system and a processor (FR-053): `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`,
+ * `x86_64-pc-windows-msvc`, `aarch64-linux-android`, and `<arch>-unknown-<os>` for the rest.
+ */
+export function tripleOf(os: Os, arch: Arch): string {
+  switch (os) {
+    case "linux":
+      return `${arch}-unknown-linux-gnu`;
+    case "darwin":
+      return `${arch}-apple-darwin`;
+    case "windows":
+      return `${arch}-pc-windows-msvc`;
+    case "android":
+      return `${arch}-linux-android`;
+    case "freebsd":
+    case "netbsd":
+    case "openbsd":
+    case "solaris":
+    case "aix":
+    case "other":
+      return `${arch}-unknown-${os}`;
+    default:
+      return absurd(os);
+  }
+}
+
+/** The platform this process runs on, by `Deno.build`'s names, with the target triple (FR-053). */
+export const build: { readonly os: Os; readonly arch: Arch; readonly target: string } = Object.freeze({
+  os: osOf(process.platform),
+  arch: archOf(process.arch),
+  target: tripleOf(osOf(process.platform), archOf(process.arch)),
+});
 
 /** Which runtime runs this code. */
 export type RuntimeName = "deno" | "bun" | "node";
@@ -212,6 +251,16 @@ export type RunOptions = {
   readonly killAfterMs?: number;
 };
 
+/** How a program ended (`Deno.CommandStatus`). */
+export type Status = {
+  /** Its exit status; 128 plus the signal's number where a signal ended it, as a shell reports it. */
+  readonly code: number;
+  /** Whether its exit status was 0. */
+  readonly success: boolean;
+  /** The signal that ended it (`SIGTERM`), or null. */
+  readonly signal: string | null;
+};
+
 /** What a program did, with its output as bytes (`Deno.CommandOutput`). */
 export type Output = {
   /** Its exit status; 128 plus the signal's number where a signal ended it, as a shell reports it. */
@@ -247,6 +296,29 @@ export function signalNumber(name: string): number {
 
 const stdio = (s: Stdio | undefined): "pipe" | "inherit" | "ignore" => (s === "inherit" ? "inherit" : s === "null" ? "ignore" : "pipe");
 
+/** The environment a program is given: this process's with `env` added, or `env` alone with `clearEnv`. */
+const childEnv = (options: {
+  readonly env?: Readonly<Record<string, string>>;
+  readonly clearEnv?: boolean;
+}): Record<string, string | undefined> => (options.clearEnv === true ? { ...options.env } : { ...process.env, ...options.env });
+
+/** An exit status as a shell reports it: 128 plus the signal's number where a signal ended the program. */
+function exitStatus(code: number | null, signal: string | null): Status {
+  const status = signal !== null ? 128 + signalNumber(signal) : (code ?? 1);
+  return { code: status, success: status === 0, signal };
+}
+
+/** Byte arrays joined into one. */
+function joined(parts: readonly Uint8Array[]): Uint8Array {
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let at = 0;
+  for (const p of parts) {
+    out.set(p, at);
+    at += p.length;
+  }
+  return out;
+}
+
 /**
  * A program run to its end, by its argument vector and never through a shell, with what it did. `NotFound` where there is no such program.
  * Where a telemetry pipeline is installed, the run is a `process` span and the program is given its `TRACEPARENT` (0006-signals FR-018).
@@ -264,9 +336,9 @@ function spawnOutput(cmd: string, rest: readonly string[], options: RunOptions):
   const feeds = input !== undefined;
   return new Promise<Output>((resolve, reject) => {
     let settled = false;
-    const child = spawn(cmd, rest, {
+    const child = spawn_(cmd, rest, {
       ...(options.cwd === undefined ? {} : { cwd: options.cwd }),
-      env: options.clearEnv === true ? { ...options.env } : { ...process.env, ...options.env },
+      env: childEnv(options),
       stdio: [feeds ? "pipe" : options.stdin === "inherit" ? "inherit" : "ignore", stdio(options.stdout), stdio(options.stderr)],
       windowsHide: true,
     });
@@ -309,17 +381,7 @@ function spawnOutput(cmd: string, rest: readonly string[], options: RunOptions):
       settled = true;
       options.signal?.removeEventListener("abort", stop);
       if (killer !== undefined) clearTimeout(killer);
-      const joined = (parts: readonly Uint8Array[]): Uint8Array => {
-        const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
-        let at = 0;
-        for (const p of parts) {
-          out.set(p, at);
-          at += p.length;
-        }
-        return out;
-      };
-      const status = signal !== null ? 128 + signalNumber(signal) : (code ?? 1);
-      resolve({ code: status, success: status === 0, signal, stdout: joined(kept.stdout), stderr: joined(kept.stderr) });
+      resolve({ ...exitStatus(code, signal), stdout: joined(kept.stdout), stderr: joined(kept.stderr) });
     });
     if (input !== undefined && child.stdin !== null) {
       child.stdin.on("error", () => {
@@ -354,6 +416,207 @@ export async function firstLine(argv: readonly string[], options: RunOptions = {
   }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+// A program that runs beside this one (FR-052)
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+/** A signal a program can be sent. */
+export type KillSignal = Signal | "SIGKILL" | "SIGABRT" | "SIGALRM" | "SIGSTOP" | "SIGCONT" | "SIGPIPE";
+
+/** How to start a program that runs beside this one; as `Deno.Command`, each stream is this process's own (`inherit`) unless asked. */
+export type SpawnOptions = {
+  /** Its working folder. */
+  readonly cwd?: string;
+  /** Variables added to its environment (or its whole environment, with `clearEnv`). */
+  readonly env?: Readonly<Record<string, string>>;
+  /** Start it with no variable but those of `env`. */
+  readonly clearEnv?: boolean;
+  /** Its standard input: a `WritableStream` (`piped`), this process's own (the default), or none. */
+  readonly stdin?: Stdio;
+  /** Its standard output: a `ReadableStream` (`piped`), this process's own (the default), or thrown away. */
+  readonly stdout?: Stdio;
+  /** Its standard error: a `ReadableStream` (`piped`), this process's own (the default), or thrown away. */
+  readonly stderr?: Stdio;
+  /** Stopping it: SIGTERM when the signal aborts, then SIGKILL after `killAfterMs`. */
+  readonly signal?: AbortSignal;
+  /** How long a program being stopped has between SIGTERM and SIGKILL (5000 ms by default), by `signal` or by `await using`. */
+  readonly killAfterMs?: number;
+};
+
+/** A program while it runs (`Deno.ChildProcess`). `await using` stops it (SIGTERM, then SIGKILL) where it still runs, and waits for it. */
+export type Child = AsyncDisposable & {
+  /** Its process id. */
+  readonly pid: number;
+  /** Its standard input, where it is piped; closing the stream closes its input. */
+  readonly stdin: WritableStream<Uint8Array> | null;
+  /** Its standard output, where it is piped. */
+  readonly stdout: ReadableStream<Uint8Array> | null;
+  /** Its standard error, where it is piped. */
+  readonly stderr: ReadableStream<Uint8Array> | null;
+  /** How it ended, once it ends; rejected with the runtime's error where it could not be started. */
+  readonly status: Promise<Status>;
+  /** Sends it a signal (SIGTERM by default); nothing where it has already ended. */
+  kill(signal?: KillSignal): void;
+  /** Its whole output and error, read from the piped streams (empty where not piped), and its status, once it ends. */
+  output(): Promise<Output>;
+  /** It keeps this process alive until it ends (the default). */
+  ref(): void;
+  /** It no longer keeps this process alive; nor do its pipes. */
+  unref(): void;
+};
+
+/** The value of `PATH` in an environment, whatever its case on Windows. */
+function pathIn(environment: Readonly<Record<string, string | undefined>>): string {
+  const direct = environment["PATH"];
+  if (direct !== undefined) return direct;
+  const key = Object.keys(environment).find((k) => k.toUpperCase() === "PATH");
+  return key === undefined ? "" : (environment[key] ?? "");
+}
+
+/** Whether a program exists to run: a path (from `cwd`) that is executable, or a name found on the environment's `PATH`. */
+function findable(cmd: string, environment: Readonly<Record<string, string | undefined>>, cwd: string | undefined): boolean {
+  const pathLike = cmd.includes("/") || (process.platform === "win32" && cmd.includes("\\"));
+  return pathLike ? isExecutable(resolvePath(cwd ?? process.cwd(), cmd)) : which(cmd, pathIn(environment)) !== undefined;
+}
+
+/** A Node stream that may be referenced and unreferenced (a pipe's socket). */
+type Refable = { ref?: () => unknown; unref?: () => unknown };
+
+/** Bytes to read to the end, joined; nothing where there is no stream. */
+async function readAll(stream: ReadableStream<Uint8Array> | null): Promise<Uint8Array> {
+  if (stream === null) return new Uint8Array(0);
+  const parts: Uint8Array[] = [];
+  const reader = stream.getReader();
+  try {
+    for (;;) {
+      const r = await reader.read();
+      if (r.done) break;
+      parts.push(r.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return joined(parts);
+}
+
+/**
+ * Starts a program by its argument vector, never through a shell, and gives its handle while it runs (`new Deno.Command(...).spawn()`,
+ * FR-052). A program that cannot be found throws `NotFound` at once, as Deno does: a path that is not an executable file, or a name not
+ * on the `PATH` of the environment it is given. Where a telemetry pipeline is installed, the run is a `process` span that ends when the
+ * program does, and the program is given its `TRACEPARENT` (0006-signals FR-018), as for `output`.
+ *
+ * @example
+ * ```ts
+ * import { spawn } from "./proc.ts";
+ * await using child = spawn(["gzip", "-dc"], { stdin: "piped", stdout: "piped" });
+ * ```
+ */
+export function spawn(argv: readonly string[], options: SpawnOptions = {}): Child {
+  const [cmd, ...rest] = argv;
+  if (cmd === undefined || cmd === "") throw new InvalidData("nothing to run: the argument vector is empty", "EINVAL");
+  if (!findable(cmd, childEnv(options), options.cwd)) throw new NotFound(`no such program: ${cmd}`, "ENOENT", cmd);
+  const box: { started?: Started } = {};
+  const status = traceProcess(argv, (trace) => {
+    const started = startChild(cmd, rest, Object.keys(trace).length === 0 ? options : { ...options, env: { ...trace, ...options.env } });
+    box.started = started;
+    return started.exited;
+  });
+  // A program that could not be started rejects `status`; that is the caller's to see, never an unhandled rejection of its own.
+  status.catch(() => undefined);
+  const started = box.started;
+  // The span's function runs at once (kernel/signals.ts `span`), so the handle is there; this guards against a change to that.
+  if (started === undefined) throw new Error("the program's handle was not made");
+  const { pipes } = started;
+  return {
+    ...pipes,
+    status,
+    output: async (): Promise<Output> => {
+      const [stdout, stderr, st] = await Promise.all([readAll(pipes.stdout), readAll(pipes.stderr), status]);
+      return { ...st, stdout, stderr };
+    },
+    kill: started.kill,
+    ref: started.ref,
+    unref: started.unref,
+    [Symbol.asyncDispose]: started.dispose,
+  };
+}
+
+/** A started program, before its status is traced. */
+type Started = {
+  readonly pipes: Pick<Child, "pid" | "stdin" | "stdout" | "stderr">;
+  readonly exited: Promise<Status>;
+  readonly kill: Child["kill"];
+  readonly ref: () => void;
+  readonly unref: () => void;
+  readonly dispose: () => Promise<void>;
+};
+
+function startChild(cmd: string, rest: readonly string[], options: SpawnOptions): Started {
+  const node = spawn_(cmd, rest, {
+    ...(options.cwd === undefined ? {} : { cwd: options.cwd }),
+    env: childEnv(options),
+    stdio: [stdio(options.stdin ?? "inherit"), stdio(options.stdout ?? "inherit"), stdio(options.stderr ?? "inherit")],
+    windowsHide: true,
+  });
+  let ended = false;
+  let killer: ReturnType<typeof setTimeout> | undefined;
+  const stop = (): void => {
+    if (ended) return;
+    node.kill("SIGTERM");
+    killer ??= setTimeout(() => {
+      if (!ended) node.kill("SIGKILL");
+    }, options.killAfterMs ?? 5000);
+  };
+  const exited = new Promise<Status>((resolve, reject) => {
+    const done = (): void => {
+      ended = true;
+      options.signal?.removeEventListener("abort", stop);
+      if (killer !== undefined) clearTimeout(killer);
+    };
+    node.once("error", (e) => {
+      if (ended) return;
+      done();
+      reject(mapError(e, cmd));
+    });
+    node.once("exit", (code, signal) => {
+      if (ended) return;
+      done();
+      resolve(exitStatus(code, signal));
+    });
+  });
+  options.signal?.addEventListener("abort", stop, { once: true });
+  if (options.signal?.aborted === true) stop();
+  node.stdin?.on("error", () => {
+    /* the program closed its input early; the writer sees the error, and the program's status says what it did */
+  });
+  // Node's streams become web streams; their types are `node:stream/web`'s, which are the same classes as the global ones.
+  const stdin = node.stdin === null ? null : (Writable.toWeb(node.stdin) as WritableStream<Uint8Array>);
+  const stdout = node.stdout === null ? null : (Readable.toWeb(node.stdout) as ReadableStream<Uint8Array>);
+  const stderr = node.stderr === null ? null : (Readable.toWeb(node.stderr) as ReadableStream<Uint8Array>);
+  // A pipe is a `net.Socket`, which can be unreferenced; the stream types do not say so.
+  const pipes = (): Refable[] => [node.stdin, node.stdout, node.stderr].flatMap((s): Refable[] => (s === null ? [] : [s as Refable]));
+  return {
+    pipes: { pid: node.pid ?? 0, stdin, stdout, stderr },
+    exited,
+    kill: (signal: KillSignal = "SIGTERM"): void => {
+      if (!ended) node.kill(signal);
+    },
+    ref: (): void => {
+      node.ref();
+      for (const p of pipes()) p.ref?.();
+    },
+    unref: (): void => {
+      node.unref();
+      for (const p of pipes()) p.unref?.();
+    },
+    dispose: async (): Promise<void> => {
+      stop();
+      await exited.catch(() => undefined);
+      for (const p of [node.stdin, node.stdout, node.stderr]) p?.destroy();
+    },
+  };
+}
+
 /** A signal this process can listen for. */
 export type Signal = "SIGINT" | "SIGTERM" | "SIGHUP" | "SIGQUIT" | "SIGUSR1" | "SIGUSR2" | "SIGWINCH" | "SIGBREAK";
 
@@ -385,3 +648,82 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     signal?.addEventListener("abort", onAbort, { once: true });
   });
 }
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Timers that never keep the process alive, and the program running itself again (FR-053)
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+/** A timer that can be cleared, by call or by `using`. */
+export type Timer = Disposable & {
+  /** The timer cleared: its function is not called. */
+  clear(): void;
+};
+
+/**
+ * Calls `callback` after `ms` milliseconds, with a timer that never keeps the process alive (`Deno.unrefTimer`, FR-053): where nothing
+ * else is left to do, the process ends without waiting for it. It is made on `node:timers`, whose timers can be unreferenced on each
+ * runtime (a global `setTimeout` gives a number on Deno, which only `Deno.unrefTimer` could unreference).
+ */
+export function unrefTimer(callback: () => void, ms: number): Timer {
+  const t = nodeSetTimeout(callback, ms);
+  t.unref();
+  const clear = (): void => clearTimeout(t);
+  return { clear, [Symbol.dispose]: clear };
+}
+
+/** What `selfCommand` reads of the running process: `process.execPath`, `process.argv` and `process.execArgv`, and the runtime. */
+export type SelfFacts = {
+  readonly runtime: RuntimeName;
+  readonly execPath: string;
+  readonly argv: readonly string[];
+  readonly execArgv: readonly string[];
+};
+
+/** The facts of this process, for `selfCommandOf`. */
+export function selfFacts(): SelfFacts {
+  return { runtime: runtimeName(), execPath: process.execPath, argv: [...process.argv], execArgv: [...process.execArgv] };
+}
+
+/** The names a runtime's own executable starts with (`bun`, `bun-debug`, `node`, `nodejs`, `node26`, `deno`, `deno.exe`, ...). */
+const RUNTIME_EXECUTABLE = /^(?:bun|node|deno)(?:[-._\d]|js|$)/i;
+
+/**
+ * Whether the running program is a binary that holds its own code (FR-053), so that running it again needs no script. Either is enough:
+ * - Bun's own mark of a binary it compiled: the script's path, `process.argv[1]`, is in Bun's embedded file system (`/$bunfs/...`, or
+ *   `B:\~BUN\...` on Windows), where it keeps the code it compiled in;
+ * - the executable, `process.execPath`, is not named as a runtime is (`bun`, `node`, `deno`, with any version or `.exe`): the binaries
+ *   that `bun build --compile`, `deno compile` and Node's single executable applications make are named after the program.
+ */
+export function isCompiled(facts: SelfFacts): boolean {
+  const script = facts.argv[1] ?? "";
+  if (script.startsWith("/$bunfs/") || /^[A-Za-z]:[\\/]~BUN[\\/]/.test(script)) return true;
+  return !RUNTIME_EXECUTABLE.test(basename(facts.execPath.replace(/\\/g, "/")));
+}
+
+/**
+ * The argument vector that runs the program again with `args` (FR-053; `Deno.execPath()` with `Deno.mainModule`): from a compiled binary,
+ * the binary alone; on Bun and Node, the runtime with its own options (`process.execArgv`) and the script; on Deno, `deno run -A` and the
+ * script, as the permissions the program was given cannot be read. With no script (code given on the command line), the runtime alone.
+ */
+export function selfCommandOf(facts: SelfFacts, args: readonly string[] = []): readonly string[] {
+  if (isCompiled(facts)) return [facts.execPath, ...args];
+  const script = facts.argv[1];
+  const scriptArgs = script === undefined ? [] : [script];
+  switch (facts.runtime) {
+    case "deno":
+      return [facts.execPath, "run", "-A", ...scriptArgs, ...args];
+    case "bun":
+    case "node":
+      return [facts.execPath, ...facts.execArgv, ...scriptArgs, ...args];
+    default:
+      return absurd(facts.runtime);
+  }
+}
+
+/** The argument vector that runs this program again with `args`, on Bun, Node and Deno and from a binary Bun compiled (FR-053). */
+export function selfCommand(args: readonly string[] = []): readonly string[] {
+  return selfCommandOf(selfFacts(), args);
+}
+
+/** The network interfaces of this computer: name, family, address, netmask and whether each is internal (0005-typescript-runtime FR-056). */
+export { networkInterfaces, type NetworkInterfaceInfo } from "./dns.ts";

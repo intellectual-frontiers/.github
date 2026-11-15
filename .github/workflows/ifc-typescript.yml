@@ -120,6 +120,40 @@ jobs:
           bun test tests/runtime/otel-conformance.test.ts
           node --test tests/runtime/otel-conformance.test.ts
 
+  compile:
+    # commons 0005-typescript-runtime FR-062: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: Built for this computer, with an embedded file, and run
+        working-directory: commons/ts
+        shell: bash
+        run: bun test tests/runtime/compile.test.ts
+      - name: Built for Windows from Linux, by the pinned Bun alone
+        if: runner.os == 'Linux'
+        working-directory: commons/ts
+        shell: bash
+        run: |
+          v=$(sed -n 's/^BUN_VERSION=//p' ../generated/pins.auto.env)
+          mkdir -p "$RUNNER_TEMP/cross"
+          printf 'console.log("ok");\n' >"$RUNNER_TEMP/cross/hello.ts"
+          bun -e '
+            import { compile, describeCompileError } from "./runtime/compile.ts";
+            const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });
+            if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }
+            console.log(r.value.path, r.value.sha256);
+          ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
+          test -f "$RUNNER_TEMP/cross/hello.exe"
+
   pack:
     strategy:
       fail-fast: false
