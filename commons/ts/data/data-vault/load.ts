@@ -4,7 +4,7 @@
  *
  * A hub's key is its business key as text (the columns of a business key of more than one joined by `|`), so that the same business key
  * has the same key in every engine and in every load; a satellite's key is its hub's key with the number of the state; a link's key is
- * the keys of its hubs joined by `~`. Data Vault 2.0's hash keys are not made (open question OQ-3 of the specification).
+ * the keys of its hubs joined by `~`. Hash keys and hash differences, as Data Vault 2.1 may ask for them, are not made: the 2.1 standard was not found published where it could be read, so the library does not implement it from memory (open question OQ-3 of the specification).
  *
  * @module
  */

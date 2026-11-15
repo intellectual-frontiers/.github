@@ -1,5 +1,5 @@
 /**
- * Data Vault as functions: a hub, a satellite and a link are made for whatever names them, each a table whose type is worked out from
+ * Data Vault (the library targets Data Vault 2.1; see the README for what of it is here) as functions: a hub, a satellite and a link are made for whatever names them, each a table whose type is worked out from
  * what it is given (commons 0009-sql-aide FR-048). A satellite belongs to a hub and a link joins hubs; giving either a table that is not
  * a hub does not compile.
  *

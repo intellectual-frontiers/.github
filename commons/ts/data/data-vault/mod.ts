@@ -1,5 +1,5 @@
 /**
- * Data Vault for IFC SQL Aide: hubs, satellites and links as generic functions (commons 0009-sql-aide FR-048).
+ * Data Vault for IFC SQL Aide, targeting Data Vault 2.1: hubs, satellites and links as generic functions (commons 0009-sql-aide FR-048).
  *
  * @example
  * ```ts

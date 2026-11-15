@@ -61,8 +61,16 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   halfway leaves what it did unless the caller wraps it in one. Files are read only by DuckDB (`read_csv`); PostgreSQL's `COPY` is not
   used. An attached database is a file of the same engine: DuckDB attaching SQLite or PostgreSQL needs an extension it would download,
   and is not tested.
-- Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
-  nine digits; a landing relation should hold one state of a key in one load.
+- Data Vault targets Data Vault 2.1. What it gives: hubs of business keys, satellites of attributes a row for each change, links of
+  hubs, a load date (`load_at`) and a record source on every row, and loads that only insert, change nothing when run again and add a
+  satellite row only for a changed attribute. What it does not yet give: hash keys and hash differences (a hub is keyed by its business
+  key as text, and a change is found by comparing attributes with `IS NOT DISTINCT FROM`), point-in-time and bridge tables, ghost
+  records, and any other rule of 2.1. The 2.1 standard was looked for on 2026-11-15 and not found published where it could be read:
+  [datavaultalliance.com](https://datavaultalliance.com/) names only the CDVP2.1 certification of DVA University, its
+  [blog](https://datavaultalliance.com/blog/) has no post on 2.1, and the one page found labelled 2.1
+  ([dv2.org](https://www.dv2.org/2023/01/data-vault-anti-pattern-adding-column.html)) is an unsigned blog post. So nothing of 2.1 is
+  implemented from memory, and open question OQ-3 stays open until a person gives the library the standard to follow. A satellite's
+  states are numbered with nine digits; a landing relation should hold one state of a key in one load.
 - ISLM (phase 5): a plan compares which tables, columns, views and indexes exist and whether a column may be null. It does not compare
   column types, keys, checks, foreign keys or defaults of what exists (so FR-035 is not yet whole); such a change is a step a person
   writes. An added column gets its type, nullness and default, not its references or checks. SQLite cannot change whether a column may
