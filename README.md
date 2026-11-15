@@ -27,6 +27,5 @@ the people who may run the scripts can read.
 ## Tests
 
 `deno test -A` runs the setup's tests (temporary home folders, stand-ins for the programs on the `PATH` and local stand-ins for the network; nothing needs root, `erga`, `ergactl` or
-the network but Deno's test library from jsr.io), and `python3 -m unittest discover -s tests` runs the tests of `commons` with the standard library alone (its generator's own tests
-also use `uv`, and are skipped without it). A GitHub Actions workflow runs both on Linux and on Arch Linux, and the Windows side on Windows, getting Deno through the bootstraps
+the network but Deno's test library from jsr.io), and the tests of `commons` (its generator, run on copies of the ontology that break each rule, and its checkers), which are TypeScript too. A GitHub Actions workflow runs them on Linux and on Arch Linux, and the Windows side on Windows, getting Deno through the bootstraps
 themselves.
