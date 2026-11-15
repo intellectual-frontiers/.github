@@ -39,7 +39,7 @@ declarations with TypeScript 7, packs them, checks the tarball on the three runt
 and its lockfile keeps the tarball's integrity:
 
 ```sh
-bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.1.0/intellectual-frontiers-ifc-ts-0.1.0.tgz
+bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.2.0/intellectual-frontiers-ifc-ts-0.2.0.tgz
 ```
 
 ```ts

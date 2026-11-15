@@ -100,6 +100,14 @@ export type Listener = {
   [Symbol.asyncDispose](): Promise<void>;
 };
 
+/**
+ * Every TCP socket, and each a TLS listener accepts, is half-open, as a `Deno.Conn` is: the end of what the peer sends ends the readable
+ * stream alone, and this side writes on until it closes its own (`closeWrite`, `close`). Node's default ends this side too as soon as the
+ * peer's end is read, so an echo server whose peer half-closed could lose what it had still to send, by the order in which the peer's end
+ * and its own writes happened. A TLS client keeps the TLS socket's own setting, which Node's types do not let one choose.
+ */
+const HALF_OPEN = true;
+
 const MAPPED_V4 = "::ffff:";
 
 function hostOf(address: string | undefined): string {
@@ -260,12 +268,12 @@ function makeListener(server: net.Server, event: "connection" | "secureConnectio
 
 /** Listen for TCP connections (`Deno.listen`); `AddrInUse` where the port is taken. */
 export function listen(options: ListenOptions = {}): Promise<Listener> {
-  return makeListener(net.createServer({ pauseOnConnect: false }), "connection", options);
+  return makeListener(net.createServer({ pauseOnConnect: false, allowHalfOpen: HALF_OPEN }), "connection", options);
 }
 
 /** Listen for TLS connections with a certificate and key in PEM (`Deno.listenTls`); `AddrInUse` where the port is taken. */
 export function listenTls(options: ListenTlsOptions): Promise<Listener> {
-  return makeListener(tls.createServer({ cert: options.cert, key: options.key }), "secureConnection", options);
+  return makeListener(tls.createServer({ cert: options.cert, key: options.key, allowHalfOpen: HALF_OPEN }), "secureConnection", options);
 }
 
 function abortError(signal: AbortSignal): Error {
@@ -311,7 +319,7 @@ export function connect(options: ConnectOptions): Promise<Conn> {
   const host = options.hostname ?? "127.0.0.1";
   const where = `${host}:${options.port}`;
   if (options.signal?.aborted === true) return Promise.reject(abortError(options.signal));
-  return open(net.connect({ host, port: options.port }), "connect", where, options.signal);
+  return open(net.connect({ host, port: options.port, allowHalfOpen: HALF_OPEN }), "connect", where, options.signal);
 }
 
 /**

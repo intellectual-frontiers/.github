@@ -80,6 +80,8 @@ jobs:
         shell: bash
         run: bun x "bun@$BUN_LINT_VERSION" --version
       - name: The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)
+        # A hang ends here, so the record of what ran is still kept below.
+        timeout-minutes: 10
         working-directory: commons/ts
         shell: bash
         run: |
