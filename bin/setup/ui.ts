@@ -1,66 +1,46 @@
-// What a person sees, and the log that keeps it: colour and emoji only at a terminal (never with NO_COLOR), so a log or a pipe stays plain
-// (009-machine-bootstrap FR-061 to FR-066).
+// What a person sees, as a rendering of signals (009-machine-bootstrap FR-061 to FR-066; commons 0006-signals FR-021 to FR-026): every line goes through
+// commons' console (runtime/console.ts), which colours and marks only at a terminal and never with NO_COLOR or TERM=dumb, so a log or a pipe stays plain.
+// Three consoles, so that each line keeps the stream it has always had: what the setup says on standard output; its warnings and stops on standard error;
+// and, on standard error too, the steps in progress (one live line each, nested, with the elapsed time and how far a counting step has come, at a terminal),
+// the step that failed and the network's retries. The messages are log records of a pipeline of their own, which no exporter sees: what the screen says
+// (a user name, a GitHub login, a path) is never sent anywhere. The steps are the spans of the setup's telemetry (signals.ts), which this console renders.
+// The log keeps every message and every step's output, one timestamped line each, without colour (FR-066).
+import { SEVERITY } from "../../commons/ts/kernel/otel.ts";
+import { mark } from "../../commons/ts/kernel/palette.ts";
+import { type Declarations, defineSignals, type Processor, type Registry, type Telemetry } from "../../commons/ts/kernel/signals.ts";
+import { plain } from "../../commons/ts/kernel/text.ts";
+import { consoleProcessor } from "../../commons/ts/runtime/console.ts";
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import { createPipeline, type Pipeline } from "../../commons/ts/runtime/otel.ts";
+import * as proc from "../../commons/ts/runtime/proc.ts";
+import * as tty from "../../commons/ts/runtime/tty.ts";
+import { SETUP_SIGNALS } from "./signals.ts";
 
-const enc = new TextEncoder();
-export type Stream = "out" | "err";
-/** Where the screen's text goes: standard output and error, or, in a test, wherever the test puts it. */
-export const screen: { write: (stream: Stream, text: string) => void } = {
-  write(stream, text) {
-    const f = stream === "out" ? Deno.stdout : Deno.stderr;
-    const bytes = enc.encode(text);
-    let n = 0;
-    while (n < bytes.length) n += f.writeSync(bytes.subarray(n));
-  },
-};
-export function write(stream: Stream, text: string): void {
-  screen.write(stream, text);
-}
+export type Look = tty.Look;
 
-const ESC = "\u001b";
-// deno-lint-ignore no-control-regex
-export const ansi = /\u001b\[[0-9;]*[A-Za-z]/g;
-export const plain = (s: string): string => s.replace(ansi, "");
-
-export type Look = { readonly colour: boolean; readonly utf: boolean; readonly tty: boolean; readonly cols: number };
-
+/** How the screen looks: colour and emoji only at a terminal, as commons' runtime/tty decides from the environment. */
 export function lookOf(env: Readonly<Record<string, string>>): Look {
-  const term = env.TERM ?? "dumb";
-  const tty = Deno.stderr.isTerminal() && term !== "dumb";
-  const colour = tty && (env.NO_COLOR ?? "") === "";
-  const utf = /utf/i.test(env.LC_ALL || env.LC_CTYPE || env.LANG || "");
-  let cols = 80;
-  if (tty) {
-    try {
-      const w = Deno.consoleSize().columns;
-      if (w >= 40) cols = w;
-    } catch { /* not a console */ }
-  }
-  return { colour, utf, tty, cols };
+  const size = tty.consoleSize();
+  return tty.lookOf({ env, terminal: tty.isTerminal("stderr"), os: proc.build.os, ...(size === undefined ? {} : { columns: size.columns }) });
 }
 
-export type Palette = {
-  readonly b: string;
-  readonly c: string;
-  readonly g: string;
-  readonly r: string;
-  readonly y: string;
-  readonly d: string;
-  readonly z: string;
-  readonly yb: string;
-};
-const paint = (on: boolean, code: string) => on ? `${ESC}[${code}m` : "";
-export const paletteOf = (on: boolean): Palette => ({
-  b: paint(on, "1"),
-  c: paint(on, "1;36"),
-  g: paint(on, "32"),
-  r: paint(on, "31"),
-  y: paint(on, "33"),
-  d: paint(on, "2"),
-  z: paint(on, "0"),
-  yb: paint(on, "1;93"),
+/** The lines a person reads, as log records: what is said on standard output and on standard error, a warning, and a retry beside the steps. */
+export const DISPLAY_SIGNALS = defineSignals({
+  "setup.say": { signal: "log", role: "result", severity: SEVERITY.INFO, attributes: {}, description: "A line on standard output." },
+  "setup.attention": {
+    signal: "log",
+    role: "warning",
+    severity: SEVERITY.WARN,
+    attributes: {},
+    description: "A group of steps that needs attention, on standard output.",
+  },
+  "setup.tell": { signal: "log", role: "result", severity: SEVERITY.INFO, attributes: {}, description: "A line on standard error." },
+  "setup.warn": { signal: "log", role: "warning", severity: SEVERITY.WARN, attributes: {}, description: "A warning, on standard error." },
+  "setup.retry": { signal: "log", role: "result", severity: SEVERITY.INFO, attributes: {}, description: "A retry of the network, beside the steps." },
 });
+type DisplayKinds = (typeof DISPLAY_SIGNALS)["kinds"];
 
-/** The emoji of each role, or plain words where the terminal has no UTF-8. */
+/** The emoji of each role, or plain words where the terminal has none. */
 export type Marks = Readonly<
   Record<
     | "tick"
@@ -91,12 +71,12 @@ export type Marks = Readonly<
     string
   >
 >;
-export const marksOf = (utf: boolean): Marks =>
-  utf
+export const marksOf = (emoji: boolean): Marks =>
+  emoji
     ? {
-      tick: "✅",
-      cross: "❌",
-      warn: "⚠️ ",
+      tick: mark("done", { emoji }),
+      cross: mark("failed", { emoji }),
+      warn: `${mark("warning", { emoji })} `,
       rocket: "🚀 ",
       pkg: "📦 ",
       dl: "📥 ",
@@ -112,7 +92,7 @@ export const marksOf = (utf: boolean): Marks =>
       key: "🔐 ",
       dir: "📂 ",
       sync: "🔄 ",
-      next: "👉 ",
+      next: `${mark("hint", { emoji })} `,
       retry: "🔁 ",
       one: "1️⃣ ",
       two: "2️⃣ ",
@@ -147,21 +127,19 @@ export const marksOf = (utf: boolean): Marks =>
       wait: "",
       radio: "",
     };
-export const framesOf = (utf: boolean): readonly string[] => utf ? ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"] : ["|", "/", "-", "\\"];
 
-/** Every environment variable name (capitals with an underscore) in bright yellow where there is colour (FR-063). */
-export function envColour(text: string, p: Palette): string {
-  if (p.yb === "") return text;
-  return text.replace(/(?<![A-Za-z0-9_-])([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)/g, `${p.yb}$1${p.z}`);
-}
-
-/** At most n characters, the end shown as ... where it is cut, so a progress line never wraps. */
+/** At most n characters, the end shown as ... where it is cut, so that a line of a program's output never wraps. */
 export const clip = (n: number, s: string): string => s.length > n ? `${s.slice(0, n - 1)}...` : s;
 
 /** The log: every message and every step's output, one timestamped line each, without colour (FR-066). */
 export class Log {
   #lines = 0;
-  constructor(readonly path: string | null, readonly supportPath: string | null) {}
+  readonly path: string | null;
+  readonly supportPath: string | null;
+  constructor(path: string | null, supportPath: string | null) {
+    this.path = path;
+    this.supportPath = supportPath;
+  }
   get lines(): number {
     return this.#lines;
   }
@@ -173,45 +151,122 @@ export class Log {
   raw(text: string): void {
     if (this.path === null || text === "") return;
     try {
-      Deno.writeTextFileSync(this.path, plain(text), { append: true });
+      fs.writeTextFileSync(this.path, plain(text), { append: true });
       this.#lines += (text.match(/\n/g) ?? []).length;
     } catch { /* a log that cannot be written changes nothing else */ }
   }
 }
 
-/** The screen: messages, phases (one line each when done), headings, and what a dry run would do. */
+/** A processor that hands on only the log records and spans of the kinds named. */
+function only(kinds: readonly string[], p: Processor): Processor {
+  const k = new Set(kinds);
+  return {
+    onStart: (span, source) => k.has(span.name) && p.onStart?.(span, source),
+    onEvent: (span, event, source) => k.has(span.name) && p.onEvent?.(span, event, source),
+    onEnd: (span, source) => k.has(span.name) && p.onEnd?.(span, source),
+    onLog: (record, source) => record.eventName !== undefined && k.has(record.eventName) && p.onLog?.(record, source),
+    forceFlush: (ms) => p.forceFlush(ms),
+    shutdown: (ms) => p.shutdown(ms),
+  };
+}
+
+const QUIETLY_DONE = "bootstrap.step.done";
+
+/**
+ * The calm screen (FR-062): away from a terminal a step that worked leaves no line behind unless BOOTSTRAP_VERBOSE=1 (its span ends under a name the console
+ * does not show), and a step that shows its own output (the sign-in, ./ergactl doctor) is not drawn at all. At a terminal the console's live region must see
+ * every span end, so there a step that worked leaves its tick.
+ */
+function calm(hideDone: boolean, p: Processor): Processor {
+  const attended = (a: Readonly<Record<string, unknown>>): boolean => a["attended"] === true;
+  return {
+    onStart: (span, source) => !attended(span.attributes) && p.onStart?.(span, source),
+    onEvent: (span, event, source) => !attended(span.attributes) && p.onEvent?.(span, event, source),
+    onEnd: (span, source) => {
+      if (attended(span.attributes)) return;
+      const quiet = hideDone && span.status.kind !== "error" && (span.name === "bootstrap.step" || span.name === "bootstrap.pool");
+      p.onEnd?.(quiet ? { ...span, name: QUIETLY_DONE } : span, source);
+    },
+    onLog: (record, source) => p.onLog?.(record, source),
+    forceFlush: (ms) => p.forceFlush(ms),
+    shutdown: (ms) => p.shutdown(ms),
+  };
+}
+
+/** What a step's line says: its label (or the pool's title), not the kind and every attribute. */
+function stepText(name: string, attributes: Readonly<Record<string, unknown>>): string {
+  const label = attributes["step"] ?? attributes["title"];
+  return typeof label === "string" ? label : name;
+}
+
+/** The screen: messages, groups of steps (one line each when done), headings, and what a dry run would do. */
 export class Ui {
-  readonly p: Palette;
   readonly e: Marks;
-  readonly frames: readonly string[];
+  /** The console of the steps, to be handed every span of the setup's telemetry. */
+  readonly live: Processor;
+  readonly #display: Telemetry<DisplayKinds>;
+  readonly #pipeline: Pipeline;
+  readonly look: Look;
+  readonly log: Log;
+  readonly dry: boolean;
   #phase = "";
   #phaseBad = false;
-  constructor(readonly look: Look, readonly log: Log, readonly dry: boolean) {
-    this.p = paletteOf(look.colour);
-    this.e = marksOf(look.utf);
-    this.frames = framesOf(look.utf);
+  constructor(look: Look, log: Log, dry: boolean, verbose = false) {
+    this.look = look;
+    this.log = log;
+    this.dry = dry;
+    this.e = marksOf(look.emoji);
+    const registry: Registry<Declarations> = { kinds: { ...SETUP_SIGNALS.kinds, ...DISPLAY_SIGNALS.kinds } };
+    // the quiet mode writes every line a person must read, coloured at a terminal and never cut to its width; the live one is the terminal's own
+    const out = consoleProcessor({ registry, mode: "quiet", stream: "stdout", look });
+    const err = consoleProcessor({ registry, mode: "quiet", stream: "stderr", look });
+    const live = consoleProcessor({ registry, mode: look.tty ? "attended" : "plain", stream: "stderr", look, text: stepText });
+    this.live = calm(!verbose && !look.tty, only(["bootstrap.step", "bootstrap.pool", "setup.retry"], live));
+    this.#pipeline = createPipeline({
+      resource: { attributes: { "service.name": "erga-bootstrap" } },
+      processors: [only(["setup.say", "setup.attention"], out), only(["setup.tell", "setup.warn"], err), this.live],
+    });
+    this.#display = this.#pipeline.telemetry(DISPLAY_SIGNALS, { name: "erga-bootstrap.screen" });
   }
+  /** A line on standard output, and in the log; a text of many lines is as many lines. */
   say(text = ""): void {
-    write("out", `${envColour(text, this.p)}\n`);
+    for (const l of text.split("\n")) this.#display.log("setup.say", {}, l);
     this.log.line(text);
   }
-  /** To standard error, as the stops and the warnings are. */
+  /** To standard error, as the stops are. */
   sayErr(text = ""): void {
-    write("err", `${envColour(text, this.p)}\n`);
+    for (const l of text.split("\n")) this.#display.log("setup.tell", {}, l);
     this.log.line(text);
   }
   warn(text: string): void {
-    write("err", `${this.p.y}${this.e.warn}${this.p.z} ${envColour(text, this.p)}\n`);
+    this.#display.log("setup.warn", {}, text);
     this.log.line(`WARNING: ${text}`);
   }
+  /** A retry of the network, said beside the steps (FR-033). */
+  retry(line: string): void {
+    this.#display.log("setup.retry", {}, `  ${this.e.retry}${line}`);
+    this.log.line(`retry: ${line}`);
+  }
+  /** What a dry run would do. */
   would(text: string): void {
-    write("out", `  ${this.p.d}would${this.p.z} ${text}\n`);
+    this.#display.log("setup.say", {}, `  would ${text}`);
+  }
+  /** A step of a dry run's plan. */
+  plan(label: string): void {
+    this.#display.log("setup.say", {}, `  - ${label}`);
+  }
+  /** A step starting, where no terminal shows it in progress (FR-061). */
+  starting(label: string): void {
+    if (!this.look.tty) this.#display.log("setup.tell", {}, `${label}...`);
   }
   /** A group of steps, shown as one line when it is done (a tick, or a warning where something needs attention, FR-062). */
   phase(title: string): void {
     this.phaseClose();
     this.#phase = title;
-    if (this.dry) write("out", `\n${this.p.b}${title}${this.p.z}\n`);
+    if (this.dry) {
+      this.#display.log("setup.say", {}, "");
+      this.#display.log("setup.say", {}, title);
+    }
   }
   get currentPhase(): string {
     return this.#phase;
@@ -222,8 +277,8 @@ export class Ui {
   phaseClose(): void {
     if (this.#phase === "") return;
     if (!this.dry) {
-      const { y, g, z, d } = this.p;
-      write("out", this.#phaseBad ? `${y}${this.e.warn}${z} ${this.#phase} ${d}(something needs attention, see below)${z}\n` : `${g}${this.e.tick}${z} ${this.#phase}\n`);
+      if (this.#phaseBad) this.#display.log("setup.attention", {}, `${this.#phase} (something needs attention, see below)`);
+      else this.#display.log("setup.say", {}, `${this.e.tick} ${this.#phase}`);
     }
     this.#phase = "";
     this.#phaseBad = false;
@@ -234,8 +289,13 @@ export class Ui {
   }
   heading(text: string): void {
     this.phaseClose();
-    write("out", `\n${this.p.b}${text}${this.p.z}\n`);
+    this.#display.log("setup.say", {}, "");
+    this.#display.log("setup.say", {}, text);
     this.log.line(text);
+  }
+  /** The screen finished: what is still in progress is said to have stopped, and every line is written (a second or so at most). */
+  async close(): Promise<void> {
+    await this.#pipeline.shutdown(1000);
   }
 }
 

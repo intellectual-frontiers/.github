@@ -1,5 +1,7 @@
 // The workspaces folder and the copy of erga (009-machine-bootstrap FR-051): cloned beside its place and moved in whole, so that a try again starts clean; an
 // existing copy is updated by fast-forward only, and a copy with work in it is left exactly as it is.
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import * as path from "../../commons/ts/runtime/path.ts";
 import { type Ctx, problem } from "./context.ts";
 import { isDir, run, which } from "./proc.ts";
 import { retryCommand } from "./net.ts";
@@ -16,7 +18,7 @@ export async function workspaceAndClone(ctx: Ctx): Promise<void> {
     if (ctx.opts.switches.clone) ui.would(isDir(`${target}/.git`) ? `update ${target} by fast-forward only` : `copy ${url} to ${target}`);
     return;
   }
-  await Deno.mkdir(`${workspaces}/github.com/intellectual-frontiers`, { recursive: true });
+  await fs.mkdir(`${workspaces}/github.com/intellectual-frontiers`, { recursive: true });
   ui.say(`Your workspaces folder is ${workspaces}.`);
   if (!ctx.opts.switches.clone) {
     ui.say("Skipped the copy of erga (BOOTSTRAP_NO_CLONE=1).");
@@ -43,16 +45,16 @@ export async function workspaceAndClone(ctx: Ctx): Promise<void> {
     ctx.st.cloned = true;
     return;
   }
-  await Deno.mkdir(target.replace(/\/[^/]*$/, ""), { recursive: true });
+  await fs.mkdir(path.dirname(target), { recursive: true });
   const partial = `${target}.partial`;
   const cloned = await stepSoft(
     ctx,
     `${ui.e.dir}Copying erga`,
     task(async (out) => {
-      const clean = () => Deno.remove(partial, { recursive: true }).catch(() => {});
+      const clean = () => fs.remove(partial, { recursive: true }).catch(() => {});
       const r = await retryCommand(ctx.retries, "copying erga from GitHub", gitGh(["clone", "--quiet", url, partial]), { env: noPrompt, onOutput: out }, clean);
       if (r.code !== 0) return r.code;
-      await Deno.rename(partial, target);
+      await fs.rename(partial, target);
       return 0;
     }),
   );

@@ -1,7 +1,9 @@
 // The computer: Linux of a family the packaging table names, or a Mac with Apple silicon, on x86-64 or Arm (009-machine-bootstrap FR-012, FR-014, FR-017).
-import { err, ok, type Result, type Stop } from "./result.ts";
+import { ok, type Result } from "../../commons/ts/kernel/result.ts";
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import { firstLine } from "../../commons/ts/runtime/proc.ts";
+import { cannot, type Stop } from "./stop.ts";
 import { acting, type ActingFamily, family, type FamilyId, familyOf, familyOfUname, type PlatformName } from "./table.ts";
-import { firstLine } from "./proc.ts";
 
 export type Arch = "x86_64" | "aarch64";
 export type Platform = {
@@ -36,8 +38,6 @@ export function knownFamilyNote(id: FamilyId | null): string {
   const f = family(id);
   return ` (${f.label}: it uses ${f.manager}, and this setup does not support it yet)`;
 }
-
-const cannot = (reason: string, fix: string): Result<never, Stop> => err({ kind: "cannot-set-up", reason, fix });
 
 export async function detect(osReleaseFile: string, env: Readonly<Record<string, string>>): Promise<Result<Platform, Stop>> {
   const os = await firstLine(["uname", "-s"]);
@@ -82,7 +82,7 @@ export async function detect(osReleaseFile: string, env: Readonly<Record<string,
   }
   let rel: Readonly<Record<string, string>> = {};
   try {
-    rel = osRelease(await Deno.readTextFile(osReleaseFile));
+    rel = osRelease(await fs.readTextFile(osReleaseFile));
   } catch { /* none: Linux of no known family */ }
   const id = rel.ID || "unknown", like = rel.ID_LIKE ?? "", version = rel.VERSION_ID ?? "", pretty = rel.PRETTY_NAME || "Linux";
   // the family: what differs between distributions (the package manager and the names of its packages) is chosen from it, by the table commons generates
@@ -98,7 +98,7 @@ export async function detect(osReleaseFile: string, env: Readonly<Record<string,
   }
   let procVersion = "";
   try {
-    procVersion = await Deno.readTextFile("/proc/version");
+    procVersion = await fs.readTextFile("/proc/version");
   } catch { /* not Linux's /proc */ }
   const wsl = /microsoft/i.test(procVersion) || (env.WSL_DISTRO_NAME ?? "") !== "";
   const tested = fam === "arch" || /^(debian:1[23](\..*)?|ubuntu:2[46]\.04.*)$/.test(`${id}:${version}`);
@@ -119,19 +119,9 @@ export async function detect(osReleaseFile: string, env: Readonly<Record<string,
 
 /** What kind of computer: WSL, a container, a virtual machine, or a machine (real hardware, or a Mac). */
 export async function hostKind(env: Readonly<Record<string, string>>): Promise<string> {
-  const read = async (f: string) => {
-    try {
-      return await Deno.readTextFile(f);
-    } catch {
-      return "";
-    }
-  };
+  const read = async (f: string) => await fs.readTextFile(f).catch(() => "");
   if (/microsoft/i.test(await read("/proc/version")) || (env.WSL_DISTRO_NAME ?? "") !== "") return "wsl";
-  let docker = false;
-  try {
-    await Deno.lstat("/.dockerenv");
-    docker = true;
-  } catch { /* not docker */ }
+  const docker = await fs.exists("/.dockerenv").catch(() => false);
   if (docker || /docker|containerd|lxc|kubepods/.test(await read("/proc/1/cgroup"))) return "container";
   const virt = await firstLine(["systemd-detect-virt"]);
   if (virt !== "" && virt !== "none") return `vm-${virt}`;

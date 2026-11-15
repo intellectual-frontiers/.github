@@ -1,7 +1,7 @@
 // What every part of the run shares: the options, the screen and its log, the retries, the telemetry, and the state of this run.
+import type { Retries } from "../../commons/ts/runtime/net.ts";
 import type { Env, Options } from "./options.ts";
-import type { Retries } from "./net.ts";
-import type { Signals } from "./telemetry.ts";
+import type { Signals } from "./signals.ts";
 import type { Ui } from "./ui.ts";
 import type { Platform } from "./platform.ts";
 

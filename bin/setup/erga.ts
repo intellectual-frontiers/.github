@@ -1,12 +1,16 @@
 // erga, in the clone (009-machine-bootstrap FR-055 to FR-058, FR-089): bin/setup.sh (the pinned Deno, the workspace's packages and generated files; without it no
 // ./ergactl runs), ./ergactl repo workspace set --role, ./ergactl toolchain ensure, ./ergactl check --quick and, last, ./ergactl doctor. Every one after
 // bin/setup.sh runs even when one before it failed; none runs where bin/setup.sh failed.
+import { absurd } from "../../commons/ts/kernel/absurd.ts";
+import { err, ok } from "../../commons/ts/kernel/result.ts";
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import { isExecutable } from "../../commons/ts/runtime/proc.ts";
 import { type Ctx, problem, skipGithub } from "./context.ts";
 import type { ToolchainChoice } from "./options.ts";
-import { exists, isExecutable, run } from "./proc.ts";
+import { exists, run } from "./proc.ts";
 import { command, stepSoft } from "./steps.ts";
 import { githubReady } from "./github.ts";
-import { shortPath, write } from "./ui.ts";
+import { shortPath } from "./ui.ts";
 
 /** In the clone, for a step: every question answered yes (FR-065), no administrator rights, no progress lines, and its events said to come from a setup. */
 const quiet = { ERGA_ASSUME_YES: "1", ERGA_NO_ADMIN: "1", ERGA_ENVIRONMENT: "bootstrap", ERGA_PROGRESS: "never" };
@@ -19,19 +23,19 @@ export async function linkLauncher(ctx: Ctx, name: string): Promise<void> {
   const { target, bin } = ctx.opts.paths;
   const launcher = `${target}/${name}`;
   if (!isExecutable(launcher)) return; // a copy of erga with no such launcher has nothing to link
-  await Deno.mkdir(bin, { recursive: true });
+  await fs.mkdir(bin, { recursive: true });
   const w = `${bin}/${name}`;
-  const link = await Deno.readLink(w).catch(() => null);
+  const link = await fs.readLink(w).catch(() => null);
   if (link !== null) {
-    const a = await Deno.realPath(w).catch(() => null);
-    const b = await Deno.realPath(launcher).catch(() => null);
+    const a = await fs.realPath(w).catch(() => null);
+    const b = await fs.realPath(launcher).catch(() => null);
     if (a !== null && a === b) return; // a link to the clone's launcher (a person's, or an earlier erga's) is already right
-    if (a === null) await Deno.remove(w); // a link to a clone that is gone
+    if (a === null) await fs.remove(w); // a link to a clone that is gone
   }
-  const mine = !exists(w) || (await Deno.readTextFile(w).catch(() => "")).includes(WRAPPER_MARK);
+  const mine = !exists(w) || (await fs.readTextFile(w).catch(() => "")).includes(WRAPPER_MARK);
   if (mine) {
-    await Deno.writeTextFile(w, `#!/bin/sh\n# ${WRAPPER_MARK}: runs the clone's launcher, so ${name} works from any folder\nexec "${target}/${name}" "$@"\n`);
-    await Deno.chmod(w, 0o755);
+    await fs.writeTextFile(w, `#!/bin/sh\n# ${WRAPPER_MARK}: runs the clone's launcher, so ${name} works from any folder\nexec "${target}/${name}" "$@"\n`);
+    await fs.chmod(w, 0o755);
   } else if (link !== null) {
     ctx.ui.warn(`${w} is a link to ${link}, not to this copy of erga, so I left it; run ${name} as ${launcher}`);
   } else {
@@ -43,8 +47,8 @@ export async function linkLauncher(ctx: Ctx, name: string): Promise<void> {
 async function unlinkRetired(ctx: Ctx, name: string): Promise<void> {
   if (isExecutable(`${ctx.opts.paths.target}/${name}`)) return;
   const w = `${ctx.opts.paths.bin}/${name}`;
-  const st = await Deno.lstat(w).catch(() => null);
-  if (st !== null && st.isFile && (await Deno.readTextFile(w).catch(() => "")).includes(WRAPPER_MARK)) await Deno.remove(w);
+  const st = await fs.lstat(w).catch(() => null);
+  if (st !== null && st.isFile && (await fs.readTextFile(w).catch(() => "")).includes(WRAPPER_MARK)) await fs.remove(w);
 }
 
 /** One entry of `ergactl toolchain list --json`, as far as the setup reads it. */
@@ -133,6 +137,8 @@ async function names(ctx: Ctx, choice: ToolchainChoice): Promise<string[]> {
       return toolchainNamesOf(await listOutput(ctx), "missing");
     case "names":
       return [...choice.names];
+    default:
+      return absurd(choice);
   }
 }
 
@@ -172,7 +178,7 @@ export async function runErga(ctx: Ctx, installLibraries: ((pkgs: readonly strin
   }
   const st = ctx.st.erga;
   st.ran = true;
-  ui.phase(`${ui.e.rocket}Getting erga ready ${ui.p.d}(the first time takes a few minutes, once)${ui.p.z}`);
+  ui.phase(`${ui.e.rocket}Getting erga ready (the first time takes a few minutes, once)`);
   // bin/setup.sh: the pinned Deno (checked by SHA-256) into erga's toolchain store, then deno.json, the packages of deno.lock and the generated files
   st.setup = await stepSoft(ctx, `${ui.e.dl}Getting Deno and erga's packages ready (bin/setup.sh)`, inErga(ctx, ["./bin/setup.sh"]));
   if (st.setup !== 0) {
@@ -205,7 +211,7 @@ export async function runErga(ctx: Ctx, installLibraries: ((pkgs: readonly strin
   }
   ui.phaseClose();
   if (st.check.kind === "ran" && st.check.code !== 0) {
-    ui.say(`${ui.p.y}${ui.e.warn}erga's own checks found things to look at (setup itself is fine):${ui.p.z}`);
+    ui.say(`${ui.e.warn}erga's own checks found things to look at (setup itself is fine):`);
     for (const l of ctx.st.lastOutput.split("\n").filter((x) => /❌|❎|\[[a-z-]+\]/.test(x)).slice(0, 12)) ui.say(`   ${l}`);
   }
 }
@@ -215,10 +221,14 @@ export async function handOver(ctx: Ctx): Promise<void> {
   const st = ctx.st.erga;
   if (!st.ran || st.setup !== 0) return;
   ctx.ui.heading(`${ctx.ui.e.ok}ergactl doctor: how this computer stands`);
-  const r = await run(["./ergactl", "doctor"], { cwd: ctx.opts.paths.target, env: { ERGA_ASSUME_YES: "1", ERGA_NO_ADMIN: "1", ERGA_ENVIRONMENT: "bootstrap" } });
+  const stepNo = ++ctx.st.stepNo;
+  // a step of the telemetry whose output is shown whole, so the console does not draw it
+  const r = await ctx.signals.telemetry.span("bootstrap.step", { step: "ergactl doctor", phase: "erga", step_no: stepNo, attended: true }, async (span) => {
+    const ran = await run(["./ergactl", "doctor"], { cwd: ctx.opts.paths.target, env: { ERGA_ASSUME_YES: "1", ERGA_NO_ADMIN: "1", ERGA_ENVIRONMENT: "bootstrap" } });
+    span.set({ outcome: ran.code === 0 ? "ok" : "failed", exit_code: ran.code });
+    return ran.code === 0 ? ok(ran) : err({ ran, message: `exit status ${ran.code}` });
+  }).then((c) => c.kind === "ok" ? c.value : c.error.ran);
   st.doctor = r.code;
-  write("out", r.output);
-  ctx.st.stepNo++;
-  ctx.ui.log.raw(`\n==== STEP ${ctx.st.stepNo}: ./ergactl doctor (exit ${r.code})\n${r.output}`);
-  ctx.signals.event("bootstrap_step", { step: "ergactl doctor", phase: "erga", outcome: r.code === 0 ? "ok" : "failed", exit_code: r.code, step_no: ctx.st.stepNo });
+  for (const l of r.output.replace(/\n$/, "").split("\n")) ctx.ui.say(l);
+  ctx.ui.log.raw(`\n==== STEP ${stepNo}: ./ergactl doctor (exit ${r.code})\n${r.output}`);
 }

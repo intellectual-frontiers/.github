@@ -355,7 +355,7 @@ Deno.test("the sign-in shows the code gh printed and asks nothing (FR-045, FR-04
   const ctx = context(fx, { BOOTSTRAP_NO_AUTH: "" }, [], { hasTty: true });
   using cap = new Captured();
   const r = await withPath(fx.path, () => signIn(ctx));
-  assert(r.ok, cap.all);
+  assert(r.kind === "ok", cap.all);
   has(cap.out, "type this code: WXYZ-5678", "https://github.com/login/device");
   lacks(cap.all, "TERMINAL_ASKED", "NO_BROWSER_SET", "ABCD-1234");
   assertEquals(ctx.st.signIn, "gh");
@@ -367,7 +367,7 @@ Deno.test("a sign-in gh could not start stops, shows what gh said, and does not 
   const ctx = context(fx, {}, [], { hasTty: true });
   using cap = new Captured();
   const r = await withPath(fx.path, () => signIn(ctx));
-  assert(!r.ok && r.error.kind === "sign-in");
+  assert(r.kind === "err" && r.error.kind === "sign-in");
   has(cap.out, "HTTP 415", "did not finish");
 });
 

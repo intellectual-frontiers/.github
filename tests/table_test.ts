@@ -7,7 +7,7 @@ import { earlier, recordText } from "../bin/setup/record.ts";
 import { parseOptions, settingOf, toolchainChoice } from "../bin/setup/options.ts";
 import { secretOf } from "../bin/setup/github.ts";
 import { ROOT, sh } from "./helpers.ts";
-import type { AbsPath } from "../bin/setup/result.ts";
+import type { AbsPath } from "../bin/setup/stop.ts";
 
 const SETUP_DIR = `${ROOT}/bin/setup`;
 const sources = () => [...Deno.readDirSync(SETUP_DIR)].filter((f) => f.name.endsWith(".ts")).map((f) => ({ name: f.name, text: Deno.readTextFileSync(`${SETUP_DIR}/${f.name}`) }));
@@ -86,7 +86,7 @@ Deno.test("the options are parsed once: switches, the settings file, the toolcha
     () => undefined,
     8,
   );
-  assert(o.ok);
+  assert(o.kind === "ok");
   const v = o.value;
   assertEquals([v.mode, v.dryRun, v.patient, v.jobs, v.role], ["setup", true, true, 3, "operator"]);
   assertEquals([v.switches.packages, v.switches.runtime, v.switches.download, v.switches.auth], [false, false, true, true]);
@@ -94,16 +94,16 @@ Deno.test("the options are parsed once: switches, the settings file, the toolcha
   assertEquals(v.retry, { tries: 15, base: 5, cap: 120 });
   assertEquals(v.paths.target, "/home/x/workspaces/github.com/intellectual-frontiers/erga");
   const d = parseOptions([], { XDG_DATA_HOME: "relative/not/used", XDG_CONFIG_HOME: "/cfg" }, home, "", () => undefined, 1);
-  assert(d.ok);
+  assert(d.kind === "ok");
   assertEquals([d.value.paths.data, d.value.paths.secretsFile, d.value.jobs, d.value.mode], ["/home/x/.local/share/erga-setup", "/cfg/erga/secrets.env", 2, "bootstrap"]);
   const bad = parseOptions(["--user"], {}, home, "", () => undefined, 1);
-  assert(!bad.ok && bad.error.includes("unknown option --user"));
+  assert(bad.kind === "err" && bad.error.includes("--user is not an option of erga-setup"));
   assertEquals(toolchainChoice("none"), { kind: "none" });
   assertEquals(toolchainChoice(" "), { kind: "missing" });
   assertEquals(settingOf("A=1\nA='2'\n", "A"), "2");
   assertEquals(secretOf("ERGA_SIGNALS_TOKEN='a'\nERGA_SIGNALS_TOKEN='b'\n", "ERGA_SIGNALS_TOKEN"), "b");
   const e = parseOptions([], { ERGA_WORKSPACES: "/env" }, home, "ERGA_WORKSPACES=/file\n", () => undefined, 1);
-  assert(e.ok && e.value.paths.workspaces === "/env", "the environment, then the settings file");
+  assert(e.kind === "ok" && e.value.paths.workspaces === "/env", "the environment, then the settings file");
 });
 
 Deno.test("the setup is strongly typed: no any, no non-null escape, an exhaustive switch over each union, and no third-party module", () => {
@@ -112,10 +112,17 @@ Deno.test("the setup is strongly typed: no any, no non-null escape, an exhaustiv
     assertNotMatch(c, /:\s*any\b|as any\b|<any>/, `${name} uses any`);
     assertNotMatch(c, /[\w)\]]!\.|[\w)\]]!\)|[\w)\]]!;|[\w)\]]!,/, `${name} has a non-null assertion`);
     for (const m of c.matchAll(/from "([^"]+)"/g)) {
-      assert(m[1]?.startsWith("./") || m[1]?.startsWith("../../commons/generated/"), `${name} imports ${m[1]}: the setup has no dependency`);
+      const spec = m[1] ?? "";
+      const commons = spec.startsWith("../../commons/generated/") || /^\.\.\/\.\.\/commons\/ts\/(kernel|runtime)\/[a-z0-9-]+\.ts$/.test(spec);
+      assert(spec.startsWith("./") || commons, `${name} imports ${spec}: the setup depends on nothing but commons`);
     }
   }
-  assertStringIncludes(Deno.readTextFileSync(`${SETUP_DIR}/result.ts`), "export function assertNever(x: never): never");
+  // the exhaustive switch is commons' kernel absurd, the setup's own Result and process helpers are commons' kernel and runtime
+  for (const { name, text } of sources()) {
+    const c = code(text);
+    assertNotMatch(c, /\bDeno\./, `${name} calls Deno: the runtime is commons' runtime/`);
+    if (/\bswitch \(/.test(c)) assertStringIncludes(c, "absurd(", `${name} has a switch with no exhaustiveness check`);
+  }
 });
 
 Deno.test("commons' tools are strongly typed: no any, no non-null escape, one audited cast, an exhaustive switch over each union, and no third-party module", () => {

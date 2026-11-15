@@ -1,12 +1,17 @@
 // What the setup fetches before erga exists: gh (for the sign-in), rustup (Rust builds Thyra and ArcaDrive; no erga command needs Cargo) and uv (which runs
 // erga's few Python programs), each the pin commons generates (009-machine-bootstrap FR-025, FR-026, FR-078). jq is not fetched any more: the setup reads JSON
 // itself, and erga's own jq is an entry of its toolchain, which `./ergactl toolchain ensure` installs.
+import { done } from "../../commons/ts/kernel/result.ts";
+import { type Sha256, sha256Of } from "../../commons/ts/kernel/sha256.ts";
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import { downloadVerified } from "../../commons/ts/runtime/net.ts";
+import { isExecutable } from "../../commons/ts/runtime/proc.ts";
 import { type Ctx, problem } from "./context.ts";
-import { done, type Phase, type Sha256, sha256 } from "./result.ts";
+import type { Phase } from "./stop.ts";
 import { pin } from "./table.ts";
 import type { Platform } from "./platform.ts";
-import { exists, isExecutable, which } from "./proc.ts";
-import { downloadVerified, retryCommand } from "./net.ts";
+import { exists, which } from "./proc.ts";
+import { retryCommand } from "./net.ts";
 import { fetchPinned, installPinned, type Pinned, type Where } from "./pinned.ts";
 import { type Job, pool, step, task } from "./steps.ts";
 
@@ -51,8 +56,8 @@ export async function pinnedPrereqs(ctx: Ctx, plat: Platform): Promise<Phase> {
     `${ctx.ui.e.dl}Getting gh ${gh.version}`,
     task(async (out) => {
       const r = await installPinned(ctx.retries, where(ctx), gh);
-      if (!r.ok) out(`${r.error}\n`);
-      return r.ok ? 0 : 1;
+      if (r.kind === "err") out(`${r.error}\n`);
+      return r.kind === "ok" ? 0 : 1;
     }),
   );
 }
@@ -62,13 +67,13 @@ const haveRustup = (ctx: Ctx) => which("rustup") !== null || isExecutable(`${ctx
 /** The pinned rustup-init, verified, run once: rustup and Cargo's folder, the stable toolchain as the default (so cargo works in any folder), no startup file. */
 export async function installRustup(ctx: Ctx, url: string, sum: Sha256, out: (t: string) => void): Promise<number> {
   const f = await downloadVerified(ctx.retries, url, sum, ctx.opts.paths.cache);
-  if (!f.ok) {
+  if (f.kind === "err") {
     out(`${f.error}\n`);
     return 1;
   }
   const exe = `${ctx.work}/rustup-init`;
-  await Deno.copyFile(f.value, exe);
-  await Deno.chmod(exe, 0o755);
+  await fs.copyFile(f.value, exe);
+  await fs.chmod(exe, 0o755);
   return (await retryCommand(ctx.retries, "rustup (static.rust-lang.org)", [exe, "-y", "--no-modify-path", "--default-toolchain", "stable", "--profile", "minimal"], {
     onOutput: out,
   })).code;
@@ -77,16 +82,16 @@ export async function installRustup(ctx: Ctx, url: string, sum: Sha256, out: (t:
 /** uv's two programs, linked into ~/.local/bin where nothing else holds the name: a uv a person installed there is theirs, and stays. */
 export async function linkUv(ctx: Ctx): Promise<void> {
   const { bin, tools } = ctx.opts.paths;
-  await Deno.mkdir(bin, { recursive: true });
+  await fs.mkdir(bin, { recursive: true });
   for (const t of ["uv", "uvx"]) {
     const src = `${tools}/uv/current/${t}`;
     if (!isExecutable(src)) continue;
     const dst = `${bin}/${t}`;
-    const link = await Deno.readLink(dst).catch(() => null);
-    if (!exists(dst)) await Deno.symlink(src, dst);
+    const link = await fs.readLink(dst).catch(() => null);
+    if (!exists(dst)) await fs.symlink(src, dst);
     else if (link !== null && link.startsWith(`${tools}/uv/`) && link !== src) {
-      await Deno.remove(dst);
-      await Deno.symlink(src, dst);
+      await fs.remove(dst);
+      await fs.symlink(src, dst);
     }
   }
 }
@@ -112,26 +117,26 @@ export async function setupRuntime(ctx: Ctx, plat: Platform): Promise<Phase> {
     jobs.push({
       label: `${ui.e.dl}Installing rustup ${ri.version}, Rust's installer (into ~/.rustup and ~/.cargo)`,
       work: task(async (out) => {
-        const sum = sha256(ri.sha256[plat.name] ?? "");
-        if (sum !== null) return await installRustup(ctx, ctx.opts.rustupUrl ?? rustupUrl(plat), sum, out);
+        const sum = sha256Of(ri.sha256[plat.name] ?? "");
+        if (sum !== undefined) return await installRustup(ctx, ctx.opts.rustupUrl ?? rustupUrl(plat), sum, out);
         out(`rustup-init ${ri.version} has no checksum for ${plat.name}\n`);
         return 1;
       }),
     });
   }
   const uv = uvPin(plat);
-  if (!isExecutable(`${ctx.opts.paths.tools}/uv/${uv.version}/uv`) || (await Deno.readLink(`${ctx.opts.paths.tools}/uv/current`).catch(() => "")) !== uv.version) {
+  if (!isExecutable(`${ctx.opts.paths.tools}/uv/${uv.version}/uv`) || (await fs.readLink(`${ctx.opts.paths.tools}/uv/current`).catch(() => "")) !== uv.version) {
     jobs.push({
       label: `${ui.e.dl}Installing uv ${uv.version}`,
       work: task(async (out) => {
         const r = await fetchPinned(ctx.retries, where(ctx), uv);
-        if (!r.ok) out(`${r.error}\n`);
-        return r.ok ? 0 : 1;
+        if (r.kind === "err") out(`${r.error}\n`);
+        return r.kind === "ok" ? 0 : 1;
       }),
     });
   }
   const r = await pool(ctx, "Installing Rust's installer and uv", jobs);
-  if (!r.ok) return r;
+  if (r.kind === "err") return r;
   if (!ctx.opts.dryRun) await linkUv(ctx);
   return done;
 }

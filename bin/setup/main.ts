@@ -5,12 +5,20 @@
 // The run, in order (FR-008: the bootstrap's plan holds every step of the setup's, in the same order, and adds only the packages):
 //   packages (bootstrap) -> what the account must have -> preflight -> the network -> gh -> the sign-in -> the token -> access to erga -> identity -> settings kept
 //   -> rustup and uv -> the installation record -> workspace and clone -> the Rust toolchain -> erga's commands -> summary, doctor and the one optional line
+//
+// It runs on IFC TypeScript (commons/ts, commons 0005-typescript-runtime): the kernel's Result, decoders and command-line parser, and the runtime's file system,
+// processes, terminal, verified downloads and OpenTelemetry signals, imported by relative path so that Deno resolves them from a checkout and from the raw URL
+// the bootstrap gives alike. The run is the root span of its steps (signals.ts), and the screen is their rendering (ui.ts).
+import { absurd } from "../../commons/ts/kernel/absurd.ts";
+import { done, err, ok } from "../../commons/ts/kernel/result.ts";
+import * as fs from "../../commons/ts/runtime/fs.ts";
+import { describeFailure, reach, Retries } from "../../commons/ts/runtime/net.ts";
+import * as proc from "../../commons/ts/runtime/proc.ts";
 import { type Ctx, RunState } from "./context.ts";
-import { absPath, assertNever, done, type ExitStatus, exitStatusOf, type Phase, type Stop } from "./result.ts";
+import { absPath, type ExitStatus, exitStatusOf, type Phase, type Stop, stop } from "./stop.ts";
 import { type Env, HELP, type Options, parseOptions } from "./options.ts";
-import { Log, lookOf, shortPath, Ui, write } from "./ui.ts";
-import { describe, reach, Retries } from "./net.ts";
-import { deviceId, type Props, Signals } from "./telemetry.ts";
+import { Log, lookOf, shortPath, Ui } from "./ui.ts";
+import { deviceId, type Props, resourceOf, startSignals } from "./signals.ts";
 import { detect, hostKind, type Platform } from "./platform.ts";
 import { Admin, checkPrereqs, installLibraries, installPackages } from "./packages.ts";
 import { pinnedPrereqs, setupRuntime, setupRustToolchain } from "./runtime.ts";
@@ -19,16 +27,16 @@ import { workspaceAndClone } from "./clone.ts";
 import { runErga } from "./erga.ts";
 import { recordInstall } from "./record.ts";
 import { finish } from "./finish.ts";
-import { firstLine, isDir, run, which } from "./proc.ts";
+import { hasTerminal, isDir, run, which } from "./proc.ts";
 import { closingWords, prepareWindows, type WindowsHost } from "./windows.ts";
 import { pin } from "./table.ts";
 
-const readText = async (f: string): Promise<string> => await Deno.readTextFile(f).catch(() => "");
+const readText = async (f: string): Promise<string> => await fs.readTextFile(f).catch(() => "");
 
 /** Before anything is fetched: what would make a long run fail late (FR-050). */
 async function preflight(ctx: Ctx, plat: Platform): Promise<void> {
   if (ctx.opts.dryRun) return;
-  if (Deno.uid() === 0) ctx.ui.warn("This runs as root. It works, but everything is then kept in root's home folder; a user of your own (any name) is the usual choice.");
+  if (proc.isRoot()) ctx.ui.warn("This runs as root. It works, but everything is then kept in root's home folder; a user of your own (any name) is the usual choice.");
   if (plat.wsl && !(await readText("/proc/version")).includes("WSL2")) {
     ctx.ui.warn("This looks like WSL 1, which lacks what some programs need. Move it to WSL 2 in PowerShell: wsl --set-version <distribution> 2");
   }
@@ -61,65 +69,62 @@ async function checkNetwork(ctx: Ctx, plat: Platform): Promise<Phase> {
   let why = "";
   for (const h of HOSTS) {
     const r = await reach(ctx.retries, h);
-    if (r.ok) ctx.ui.log.line(`network: ${h} answers`);
+    if (r.kind === "ok") ctx.ui.log.line(`network: ${h} answers`);
     else {
-      why = describe(r.error);
+      why = describeFailure(r.error);
       ctx.ui.log.line(`network: ${h} does not answer (${why})`);
       bad.push(h);
     }
   }
   if (bad.length === 0) return done;
-  const { r, b, z, c } = ctx.ui.p;
   ctx.ui.phaseDrop();
-  ctx.ui.say(`${r}${b}${ctx.ui.e.stop}This computer cannot reach: ${z}${b}${bad.join(" ")}${z}${r} (${why}).${z}`);
+  ctx.ui.say(`${ctx.ui.e.stop}This computer cannot reach: ${bad.join(" ")} (${why}).`);
   ctx.ui.say("That is the network or DNS, not this setup, and nothing has been changed. Things that usually fix it:");
-  ctx.ui.say(`  ${c}1.${z} Try another network (a phone hotspot is a quick test), or turn a VPN off.`);
-  ctx.ui.say(`  ${c}2.${z} Use a different DNS server: 1.1.1.1 or 8.8.8.8.`);
-  if (plat.wsl) ctx.ui.say(`  ${c}3.${z} On WSL: in PowerShell run ${b}wsl --shutdown${z}, open Debian again, and check that ${b}/etc/resolv.conf${z} lists a server.`);
+  ctx.ui.say("  1. Try another network (a phone hotspot is a quick test), or turn a VPN off.");
+  ctx.ui.say("  2. Use a different DNS server: 1.1.1.1 or 8.8.8.8.");
+  if (plat.wsl) ctx.ui.say("  3. On WSL: in PowerShell run wsl --shutdown, open Debian again, and check that /etc/resolv.conf lists a server.");
   ctx.ui.say(
-    `Then run this again. On a network that keeps dropping, add ${b}--patient${z} (15 tries, longer waits), or set ${b}ERGA_RETRIES=20${z}; ${b}BOOTSTRAP_NO_NETCHECK=1${z} skips this look.`,
+    "Then run this again. On a network that keeps dropping, add --patient (15 tries, longer waits), or set ERGA_RETRIES=20; BOOTSTRAP_NO_NETCHECK=1 skips this look.",
   );
-  return { ok: false, error: { kind: "unreachable", hosts: bad } };
+  return stop({ kind: "unreachable", hosts: bad });
 }
 
 function announceTelemetry(ctx: Ctx): void {
-  const { d, z, b, g } = ctx.ui.p;
   const t = ctx.opts.telemetry;
   const e = ctx.ui.e.radio;
   switch (t.kind) {
     case "refused":
-      ctx.ui.say(`${d}${e}Telemetry is off: ${t.why} is set.${z}`); // a person who said no is told only that (FR-053)
+      ctx.ui.say(`${e}Telemetry is off: ${t.why} is set.`); // a person who said no is told only that (FR-053)
       return;
     case "on":
       ctx.ui.say(
-        `${g}${e}Telemetry is on:${z} ${b}ERGA_SIGNALS_URL${z} and ${b}ERGA_SIGNALS_TOKEN${z} are set, so this setup reports to ArcaSignals how long each step takes, and where a failure's log is.`,
+        `${e}Telemetry is on: ERGA_SIGNALS_URL and ERGA_SIGNALS_TOKEN are set, so this setup reports to ArcaSignals how long each step takes, and where a failure's log is.`,
       );
       ctx.ui.say(
-        `${d}   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as erga's own telemetry does. Never a password, a token or a file.${z}`,
+        "   It sends a device id made from this computer, the kind of computer (WSL, virtual machine) and the system. Also this computer's name and your Linux user name, as erga's own telemetry does. Never a password, a token or a file.",
       );
       return;
     case "half":
-      ctx.ui.say(`${d}${e}Telemetry is off: ${t.missing} is not set (both ERGA_SIGNALS_URL and ERGA_SIGNALS_TOKEN are needed to report to ArcaSignals).${z}`);
+      ctx.ui.say(`${e}Telemetry is off: ${t.missing} is not set (both ERGA_SIGNALS_URL and ERGA_SIGNALS_TOKEN are needed to report to ArcaSignals).`);
       return;
     case "off":
       ctx.ui.say(
-        `${d}${e}Telemetry is off (optional). To record this setup in ArcaSignals, press Ctrl+C, run ${z}${b}export ERGA_SIGNALS_URL=<arca's door> ERGA_SIGNALS_TOKEN=<a token arca issued>${z}${d}, then start again; the setup keeps them for every new terminal.`,
+        `${e}Telemetry is off (optional). To record this setup in ArcaSignals, press Ctrl+C, run export ERGA_SIGNALS_URL=<arca's door> ERGA_SIGNALS_TOKEN=<a token arca issued>, then start again; the setup keeps them for every new terminal.`,
       );
-      ctx.ui.say(`   Without them nothing breaks; there is just no telemetry.${z}`);
+      ctx.ui.say("   Without them nothing breaks; there is just no telemetry.");
       return;
     default:
-      return assertNever(t);
+      return absurd(t);
   }
 }
 
 /** The setup of this account (what erga-setup.sh was): no administrator rights; `libraries` is the bootstrap's way to install system libraries, or null. */
 async function setupAccount(ctx: Ctx, plat: Platform, libraries: ((pkgs: readonly string[]) => Promise<boolean>) | null): Promise<Phase> {
   const ui = ctx.ui;
-  const user = await firstLine(["id", "-un"]);
-  ui.say(`${ui.p.b}${ui.e.rocket}Setting up this account${ui.p.z} (${plat.pretty}, ${plat.arch}${plat.wsl ? ", under WSL" : ""}, user ${user}) for erga.`);
-  if (ctx.opts.dryRun) ui.say(`${ui.p.d}Dry run: this lists the steps and changes nothing.${ui.p.z}`);
+  const user = await proc.firstLine(["id", "-un"]);
+  ui.say(`${ui.e.rocket}Setting up this account (${plat.pretty}, ${plat.arch}${plat.wsl ? ", under WSL" : ""}, user ${user}) for erga.`);
+  if (ctx.opts.dryRun) ui.say("Dry run: this lists the steps and changes nothing.");
   announceTelemetry(ctx);
-  ctx.signals.event("bootstrap_started", { method: ctx.opts.mode, tty: ctx.hasTty ? "yes" : "no", distro: plat.id, distro_version: plat.version });
   const gh = pin("gh").version;
   if (ctx.opts.dryRun) {
     ui.heading(`${ui.e.pkg}What this computer must already have`);
@@ -132,7 +137,7 @@ async function setupAccount(ctx: Ctx, plat: Platform, libraries: ((pkgs: readonl
     }
   } else {
     const p = await checkPrereqs(ctx, plat);
-    if (!p.ok) return p;
+    if (p.kind === "err") return p;
   }
   await preflight(ctx, plat);
   const steps: (() => Promise<Phase>)[] = [
@@ -151,30 +156,35 @@ async function setupAccount(ctx: Ctx, plat: Platform, libraries: ((pkgs: readonl
   ];
   for (const s of steps) {
     const r = await s();
-    if (!r.ok) return r;
+    if (r.kind === "err") return r;
   }
   return done;
 }
 
+/** The memory of this computer in GiB: Linux's /proc/meminfo, a Mac's sysctl; 0 where neither says. */
+async function memoryGb(): Promise<number> {
+  const kb = Number((await readText("/proc/meminfo")).match(/^MemTotal:\s+(\d+) kB/m)?.[1] ?? "NaN");
+  if (Number.isFinite(kb)) return Math.floor(kb / 1048576);
+  const bytes = Number(await proc.firstLine(["sysctl", "-n", "hw.memsize"]));
+  return Number.isFinite(bytes) ? Math.floor(bytes / 1073741824) : 0;
+}
+
+/** The machine as every signal of a run carries it (FR-054): read only where telemetry is on. */
 async function machineProps(env: Env, plat: Platform | null, home: string): Promise<Props> {
   const kind = await hostKind(env);
   const pv = await readText("/proc/version");
-  let mem = 0;
-  try {
-    mem = Math.floor(Deno.systemMemoryInfo().total / 1073741824);
-  } catch { /* unknown */ }
   const free = Number((await run(["df", "-k", home])).output.split("\n")[1]?.trim().split(/\s+/)[3] ?? "0") / 1048576;
   return {
-    hostname: Deno.hostname(),
-    os_user: await firstLine(["id", "-un"]),
+    hostname: proc.hostname(),
+    os_user: await proc.firstLine(["id", "-un"]),
     host_kind: kind,
     wsl_version: pv.includes("WSL2") ? "2" : /microsoft/i.test(pv) ? "1" : "",
     os_id: plat?.id ?? "",
     os_version: plat?.version ?? "",
-    kernel: Deno.osRelease(),
-    arch: plat?.arch ?? Deno.build.arch,
+    kernel: await proc.firstLine(["uname", "-r"]),
+    arch: plat?.arch ?? proc.build.arch,
     cpus: navigator.hardwareConcurrency,
-    memory_gb: mem,
+    memory_gb: await memoryGb(),
     disk_free_gb: Number.isFinite(free) ? Math.floor(free) : 0,
   };
 }
@@ -184,6 +194,11 @@ function stamp(d: Date): string {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
+/** How a run ended, as the telemetry says it. */
+function outcomeOf(status: ExitStatus): string {
+  return status === 0 ? "finished" : status === 4 ? "stopped" : status === 5 ? "sign-in-pending" : status === 130 ? "interrupted" : "failed";
+}
+
 /** Linux and a Mac: the bootstrap, or the setup alone. */
 async function posix(opts: Options, env: Env): Promise<ExitStatus> {
   const paths = opts.paths;
@@ -191,103 +206,90 @@ async function posix(opts: Options, env: Env): Promise<ExitStatus> {
   let logPath: string | null = null, supportPath: string | null = null;
   if (!opts.dryRun) {
     try {
-      await Deno.mkdir(paths.logDir, { recursive: true });
-      await Deno.writeTextFile(`${paths.logDir}/bootstrap-${t}.log`, "");
+      await fs.mkdir(paths.logDir, { recursive: true });
+      await fs.writeTextFile(`${paths.logDir}/bootstrap-${t}.log`, "");
       logPath = `${paths.logDir}/bootstrap-${t}.log`;
       supportPath = `${paths.logDir}/support-${t}.txt`;
     } catch { /* no log: the stop message says so */ }
   }
-  const look = lookOf(env);
-  const ui = new Ui(look, new Log(logPath, supportPath), opts.dryRun);
+  const ui = new Ui(lookOf(env), new Log(logPath, supportPath), opts.dryRun, opts.switches.verbose);
   const st = new RunState();
-  const retries = new Retries(opts.retry, (line) => {
-    write("err", `  ${ui.e.retry}${line}\n`);
-    ui.log.line(`retry: ${line}`);
-  });
-  const work = await Deno.makeTempDir({ dir: env.TMPDIR || undefined, prefix: "erga-setup." });
-  const signals = new Signals(
-    opts.dryRun ? { kind: "off" } : opts.telemetry,
-    `${paths.ergaState}/telemetry`,
-    (() => {
-      let id: Promise<string> | null = null;
-      return () => (id ??= deviceId(env.ERGA_DEVICE_ID_FILE || `${paths.home}/.erga-bootstrap/device-id`));
-    })(),
-    (() => {
-      let m: Promise<Props> | null = null;
-      return () => (m ??= machineProps(env, st.platform, paths.home));
-    })(),
-    () => env.ERGA_PERSON || "",
-  );
-  let hasTty = false;
-  try {
-    (await Deno.open("/dev/tty", { read: true })).close();
-    hasTty = true;
-  } catch { /* no terminal to ask on */ }
+  const retries = new Retries(opts.retry, (line) => ui.retry(line));
+  const work = await fs.makeTempDir({ ...(env.TMPDIR ? { dir: env.TMPDIR } : {}), prefix: "erga-setup." });
+  const hasTty = await hasTerminal();
+  const plat = await detect(opts.osRelease, env);
+  if (plat.kind === "ok") st.platform = plat.value;
+  // the telemetry: sent only where it is on and this is no dry run (FR-054); the screen renders its steps either way
+  const settings = opts.dryRun ? { kind: "off" as const } : opts.telemetry;
+  const runId = `${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 8)}-${new Date().toISOString().slice(11, 19).replaceAll(":", "")}-${proc.pid}`;
+  const resource = settings.kind === "on"
+    ? resourceOf(await deviceId(env.ERGA_DEVICE_ID_FILE || `${paths.home}/.erga-bootstrap/device-id`), runId, await machineProps(env, st.platform, paths.home))
+    : {};
+  const signals = startSignals({ settings, resource, journalDir: `${paths.ergaState}/telemetry`, ui });
   const ctx: Ctx = { opts, env, ui, retries, signals, st, work, hasTty };
-  const admin = new Admin(Deno.uid() ?? 1000);
+  const admin = new Admin(proc.uid() ?? 1000);
   const onInt = () => {
-    void Deno.remove(work, { recursive: true }).catch(() => {}).finally(() => Deno.exit(130));
+    void fs.remove(work, { recursive: true }).catch(() => {}).finally(() => proc.exit(130));
   };
-  Deno.addSignalListener("SIGINT", onInt);
-  Deno.addSignalListener("SIGTERM", onInt);
-  const originalPath = Deno.env.get("PATH") ?? "";
+  proc.addSignalListener("SIGINT", onInt);
+  proc.addSignalListener("SIGTERM", onInt);
+  const originalPath = proc.env.get("PATH") ?? "";
 
-  const outcome = await (async (): Promise<Phase | "notes"> => {
-    const plat = await detect(opts.osRelease, env);
-    if (!plat.ok) return plat;
-    st.platform = plat.value;
+  const steps = async (): Promise<Phase | "notes"> => {
+    if (plat.kind === "err") return plat;
     const p = plat.value;
     // ~/.local/bin and ~/.cargo/bin, for this run alone: the line of `ergactl agent-tools shell emit` puts them on the PATH of every shell
-    Deno.env.set("PATH", `${paths.bin}:${paths.cargoBin}:${originalPath}`);
-    if (!opts.dryRun) { for (const d of [paths.bin, paths.data, paths.state, paths.cache]) await Deno.mkdir(d, { recursive: true }); }
+    proc.env.set("PATH", `${paths.bin}:${paths.cargoBin}:${originalPath}`);
+    if (!opts.dryRun) { for (const d of [paths.bin, paths.data, paths.state, paths.cache]) await fs.mkdir(d, { recursive: true }); }
     if (opts.mode === "bootstrap") {
-      ui.say(`${ui.p.b}${ui.e.rocket}Setting up this computer${ui.p.z} (${p.pretty}, ${p.arch}${p.wsl ? ", under WSL" : ""}) for erga.`);
-      if (opts.dryRun) ui.say(`${ui.p.d}Dry run: this lists the steps and changes nothing.${ui.p.z}`);
-      signals.event("bootstrap_started", { tty: hasTty ? "yes" : "no", distro: p.id, distro_version: p.version, script: "bootstrap" });
+      ui.say(`${ui.e.rocket}Setting up this computer (${p.pretty}, ${p.arch}${p.wsl ? ", under WSL" : ""}) for erga.`);
+      if (opts.dryRun) ui.say("Dry run: this lists the steps and changes nothing.");
       const pk = await installPackages(ctx, p, admin);
-      if (!pk.ok) return pk;
+      if (pk.kind === "err") return pk;
       ui.heading(`${ui.e.rocket}Setting up erga in this account`);
     }
     const libraries = opts.mode === "bootstrap" ? (pkgs: readonly string[]) => installLibraries(ctx, admin, p.family, pkgs) : null;
     const r = await setupAccount(ctx, p, libraries);
-    if (!r.ok) return r;
+    if (r.kind === "err") return r;
     ui.phaseClose();
     return (await finish(ctx, p, originalPath)) ? done : "notes";
-  })();
-  admin.release();
+  };
 
-  let status: ExitStatus;
-  if (outcome === "notes") status = 1;
-  else if (outcome.ok) status = 0;
-  else {
-    status = exitStatusOf(outcome.error);
-    say(ctx, outcome.error);
-  }
-  if (!opts.dryRun) {
-    const oc = status === 0 ? "finished" : status === 4 ? "stopped" : status === 5 ? "sign-in-pending" : status === 130 ? "interrupted" : "failed";
-    signals.event("bootstrap_finished", {
-      outcome: oc,
+  // the run is the root span of its steps; it ends with how the run ended (FR-054)
+  const run0 = plat.kind === "ok" ? { distro: plat.value.id, distro_version: plat.value.version } : {};
+  const status = await signals.telemetry.span("bootstrap.run", { method: opts.mode, script: opts.mode, tty: hasTty, ...run0 }, async (span) => {
+    const outcome = await steps();
+    admin.release();
+    let status: ExitStatus;
+    if (outcome === "notes") status = 1;
+    else if (outcome.kind === "ok") status = 0;
+    else {
+      status = exitStatusOf(outcome.error);
+      say(ctx, outcome.error);
+    }
+    span.set({
+      outcome: outcomeOf(status),
       exit_code: status,
-      duration_ms: Date.now() - signals.started,
       steps: st.stepNo,
       problems: st.problems.length,
       log_file: logPath === null ? "" : shortPath(paths.home, logPath),
     });
-    await signals.wait();
-  }
-  await Deno.remove(work, { recursive: true }).catch(() => {});
-  Deno.removeSignalListener("SIGINT", onInt);
-  Deno.removeSignalListener("SIGTERM", onInt);
+    return status === 0 ? ok(status) : err({ status, message: outcomeOf(status) });
+  }).then((r) => r.kind === "ok" ? r.value : r.error.status);
+  await signals.close();
+  await ui.close();
+  await fs.remove(work, { recursive: true }).catch(() => {});
+  proc.removeSignalListener("SIGINT", onInt);
+  proc.removeSignalListener("SIGTERM", onInt);
   return status;
 }
 
 /** What a Stop says, where the part that stopped has not said it already. */
 function say(ctx: Ctx, s: Stop): void {
-  const { r, b, z } = ctx.ui.p;
   switch (s.kind) {
     case "cannot-set-up":
       ctx.ui.log.line(`cannot continue: ${s.reason} (fix: ${s.fix})`);
-      ctx.ui.sayErr(`${r}${b}${ctx.ui.e.stop}The computer cannot be set up yet:${z} ${s.reason}`);
+      ctx.ui.sayErr(`${ctx.ui.e.stop}The computer cannot be set up yet: ${s.reason}`);
       ctx.ui.sayErr(`Fix: ${s.fix}`);
       return;
     case "usage":
@@ -299,42 +301,42 @@ function say(ctx: Ctx, s: Stop): void {
     case "interrupted":
       return; // said where it happened
     default:
-      return assertNever(s);
+      return absurd(s);
   }
 }
 
+/** wsl.exe writes UTF-16 where it is not told otherwise. */
+const decode = (b: Uint8Array): string => new TextDecoder(b.length > 1 && b[1] === 0 ? "utf-16le" : "utf-8").decode(b);
+
 /** Windows: WSL 2, the Linux user, then the Linux bootstrap inside (windows.ts). */
-async function windows(opts: Options, env: Env): Promise<ExitStatus> {
+async function windows(opts: Options, env: Env, ui: Ui): Promise<ExitStatus> {
   const host: WindowsHost = {
     run: async (argv, how, extra) => {
-      const [cmd, ...args] = argv;
-      if (cmd === undefined) return { code: 127, output: "" };
       try {
-        const out = await new Deno.Command(cmd, {
-          args,
-          env: extra as Record<string, string> | undefined,
+        const out = await proc.output(argv, {
+          ...(extra === undefined ? {} : { env: extra }),
           stdin: how === "interactive" ? "inherit" : "null",
           stdout: how === "quiet" ? "piped" : "inherit",
           stderr: how === "quiet" ? "piped" : "inherit",
-        }).output();
-        const dec = (b: Uint8Array) => new TextDecoder(b.length > 1 && b[1] === 0 ? "utf-16le" : "utf-8").decode(b);
-        return { code: out.code, output: how === "quiet" ? dec(out.stdout) + dec(out.stderr) : "" };
+        });
+        return { code: out.code, output: how === "quiet" ? decode(out.stdout) + decode(out.stderr) : "" };
       } catch (e) {
         return { code: 127, output: e instanceof Error ? e.message : String(e) };
       }
     },
     hasWsl: () => which("wsl.exe") !== null || which("wsl") !== null,
+    // the one question the renderer cannot ask: the Linux user name, on the terminal itself
     ask: (q) => Promise.resolve(prompt(q) ?? ""),
     programFiles: async () => {
       const root = `${env.ProgramFiles || "C:\\Program Files"}\\PostgreSQL`;
       const out: { name: string; hasPgCtl: boolean }[] = [];
       try {
-        for await (const d of Deno.readDir(root)) if (d.isDirectory) out.push({ name: d.name, hasPgCtl: isDir(`${root}\\${d.name}\\bin`) });
+        for await (const d of fs.readDir(root)) if (d.isDirectory) out.push({ name: d.name, hasPgCtl: isDir(`${root}\\${d.name}\\bin`) });
       } catch { /* none */ }
       return out;
     },
-    say: (text) => write("out", `${text}\n`),
-    warn: (text) => write("err", `${text}\n`),
+    say: (text) => ui.say(text),
+    warn: (text) => ui.sayErr(text),
   };
   const o = await prepareWindows(host, {
     distro: env.ERGA_WSL_DISTRO || "Debian",
@@ -343,7 +345,10 @@ async function windows(opts: Options, env: Env): Promise<ExitStatus> {
     baseUrl: opts.baseUrl,
     dryRun: opts.dryRun,
   });
-  for (const l of closingWords(o, env.ERGA_WSL_DISTRO || "Debian")) write(o.kind === "stopped" ? "err" : "out", `${l}\n`);
+  for (const l of closingWords(o, env.ERGA_WSL_DISTRO || "Debian")) {
+    if (o.kind === "stopped") ui.sayErr(l);
+    else ui.say(l);
+  }
   switch (o.kind) {
     case "done":
     case "planned":
@@ -353,38 +358,46 @@ async function windows(opts: Options, env: Env): Promise<ExitStatus> {
     case "stopped":
       return o.status === 1 || o.status === 2 || o.status === 3 || o.status === 4 || o.status === 5 || o.status === 130 ? o.status : 4;
     default:
-      return assertNever(o);
+      return absurd(o);
   }
 }
 
 export async function main(argv: readonly string[], env: Env): Promise<ExitStatus> {
-  const isWin = Deno.build.os === "windows";
+  const isWin = proc.build.os === "windows";
+  // what is said before a run has its own screen: the help, a usage error, a home that is not one
+  const screen = new Ui(lookOf(env), new Log(null, null), false);
+  const early = async (status: ExitStatus, text: string, stream: "out" | "err"): Promise<ExitStatus> => {
+    if (stream === "out") screen.say(text);
+    else screen.sayErr(text);
+    await screen.close();
+    return status;
+  };
   const homeRaw = env.HOME || (isWin ? env.USERPROFILE ?? "" : "");
   const home = absPath(homeRaw);
   // Everything lives under the home folder: stop before writing anywhere else (FR-012).
   if (home === null || homeRaw === "/" || !isDir(homeRaw)) {
-    write(
+    return await early(
+      3,
+      `The computer cannot be set up yet: HOME is not a real folder (it is '${homeRaw}').\nFix: run this as the person who will use the computer, in a normal login shell.`,
       "err",
-      `The computer cannot be set up yet: HOME is not a real folder (it is '${homeRaw}').\nFix: run this as the person who will use the computer, in a normal login shell.\n`,
     );
-    return 3;
   }
   const configDir = env.XDG_CONFIG_HOME && absPath(env.XDG_CONFIG_HOME) !== null ? env.XDG_CONFIG_HOME : `${home}/.config`;
   const settings = await readText(`${configDir}/erga/setup.env`);
   const secrets = await readText(`${configDir}/erga/secrets.env`);
   const parsed = parseOptions(argv, env, home, settings, (n) => secretOf(secrets, n), navigator.hardwareConcurrency);
-  if (!parsed.ok) {
-    write("err", `${parsed.error}\n`);
-    return 2;
-  }
+  if (parsed.kind === "err") return await early(2, parsed.error, "err");
   const opts = parsed.value;
-  if (opts.help) {
-    write("out", `${HELP}\n`);
-    return 0;
+  if (opts.help) return await early(0, HELP, "out");
+  if (!isWin) {
+    await screen.close();
+    return await posix(opts, env);
   }
-  return isWin ? await windows(opts, env) : await posix(opts, env);
+  const status = await windows(opts, env, screen);
+  await screen.close();
+  return status;
 }
 
 if (import.meta.main) {
-  Deno.exit(await main(Deno.args, Deno.env.toObject()));
+  proc.exit(await main(proc.args, proc.env.toObject()));
 }

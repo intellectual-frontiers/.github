@@ -4,7 +4,7 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { Captured, context, exists, Fx, OFF, sha256Hex, withPath, zipBytes } from "./helpers.ts";
 import { ghPin, installRustup, linkUv, pinnedPrereqs, rustupUrl, setupRuntime, setupRustToolchain, uvPin } from "../bin/setup/runtime.ts";
 import { fetchPinned, installPinned } from "../bin/setup/pinned.ts";
-import type { Sha256 } from "../bin/setup/result.ts";
+import type { Sha256 } from "../commons/ts/kernel/sha256.ts";
 import type { Platform } from "../bin/setup/platform.ts";
 import { pin } from "../bin/setup/table.ts";
 
@@ -56,11 +56,11 @@ Deno.test("gh is fetched only where none is here, and never with BOOTSTRAP_NO_DO
   await using fx = await Fx.make();
   using cap = new Captured();
   const off = context(fx, { BOOTSTRAP_NO_DOWNLOAD: "1" });
-  assert((await withPath("/nonexistent", () => pinnedPrereqs(off, linux()))).ok);
+  assert((await withPath("/nonexistent", () => pinnedPrereqs(off, linux()))).kind === "ok");
   assertEquals(off.st.stepNo, 0, "no download is tried");
   fx.stub("gh");
   const here = context(fx);
-  assert((await withPath(fx.bin, () => pinnedPrereqs(here, linux()))).ok);
+  assert((await withPath(fx.bin, () => pinnedPrereqs(here, linux()))).kind === "ok");
   assertEquals(here.st.stepNo, 0, "a gh on the PATH is used, not installed again");
   assertEquals(cap.out, "");
 });
@@ -79,7 +79,7 @@ Deno.test("a pinned tarball and a zip are unpacked, linked, and a second run cha
     strip: 0,
     links: [{ name: "gh", path: "gh_9.9.9_linux_amd64/bin/gh" }],
   });
-  assert(r.ok, r.ok ? "" : r.error);
+  assert(r.kind === "ok", r.kind === "ok" ? "" : r.error);
   const out = await new Deno.Command(`${w.bin}/gh`).output();
   assertEquals(new TextDecoder().decode(out.stdout), "gh 9.9.9\n");
   assertEquals(Deno.readLinkSync(`${w.tools}/gh/current`), "9.9.9");
@@ -93,7 +93,7 @@ Deno.test("a pinned tarball and a zip are unpacked, linked, and a second run cha
     strip: 0,
     links: [{ name: "gh", path: "gh_9.9.10_macOS_arm64/bin/gh" }],
   });
-  assert(r2.ok, r2.ok ? "" : r2.error);
+  assert(r2.kind === "ok", r2.kind === "ok" ? "" : r2.error);
   assertEquals(new TextDecoder().decode((await new Deno.Command(`${w.bin}/gh`).output()).stdout), "gh 9.9.10\n", "a new version replaces the link");
   const bad = await installPinned(ctx.retries, w, {
     name: "jq",
@@ -104,8 +104,8 @@ Deno.test("a pinned tarball and a zip are unpacked, linked, and a second run cha
     strip: 0,
     links: [{ name: "jq", path: "jq" }],
   });
-  assert(!bad.ok);
-  assertStringIncludes(bad.error, "nothing was installed");
+  assert(bad.kind === "err");
+  assertStringIncludes(bad.error, "nothing was kept");
   assert(!exists(`${w.bin}/jq`) && !exists(`${w.tools}/jq/1`));
 });
 
@@ -121,7 +121,7 @@ Deno.test("rustup-init runs only with its pinned checksum, with the stable toolc
   assertEquals(Deno.readTextFileSync(args).split(/\s+/).filter((x) => x !== ""), ["-y", "--no-modify-path", "--default-toolchain", "stable", "--profile", "minimal"]);
   Deno.removeSync(args);
   assertEquals(await installRustup(ctx, `file://${init}`, "0".repeat(64) as Sha256, (t) => (said += t)), 1);
-  assertStringIncludes(said, "nothing was installed");
+  assertStringIncludes(said, "nothing was kept");
   assert(!exists(args), "a file that is not the pinned one is never run");
   for (const n of [".profile", ".bashrc", ".zshrc"]) assert(!exists(`${fx.home}/${n}`));
 });
@@ -146,7 +146,7 @@ Deno.test("the pinned uv is unpacked and linked, but a uv of the person's own st
   const t = await tarball(fx, "uv.tar.gz", { "uv-x86_64-unknown-linux-gnu/uv": "#!/bin/sh\necho uv 0.0.1\n", "uv-x86_64-unknown-linux-gnu/uvx": "#!/bin/sh\necho uvx 0.0.1\n" });
   const ctx = context(fx);
   const w = { tools: ctx.opts.paths.tools, bin: ctx.opts.paths.bin, cache: ctx.opts.paths.cache };
-  assert((await fetchPinned(ctx.retries, w, { ...uvPin(linux()), version: "0.0.1", url: `file://${t.path}`, sha256: t.sha })).ok);
+  assert((await fetchPinned(ctx.retries, w, { ...uvPin(linux()), version: "0.0.1", url: `file://${t.path}`, sha256: t.sha })).kind === "ok");
   assert(exists(`${w.tools}/uv/0.0.1/uv`) && exists(`${w.tools}/uv/0.0.1/uvx`), "the leading folder is left out");
   Deno.mkdirSync(w.bin, { recursive: true });
   Deno.writeTextFileSync(`${w.bin}/uvx`, "#!/bin/sh\necho mine\n");
@@ -154,7 +154,7 @@ Deno.test("the pinned uv is unpacked and linked, but a uv of the person's own st
   assertEquals(new TextDecoder().decode((await new Deno.Command(`${w.bin}/uv`).output()).stdout), "uv 0.0.1\n");
   assertEquals(Deno.readTextFileSync(`${w.bin}/uvx`), "#!/bin/sh\necho mine\n", "a uv the person put there is theirs");
   const bad = await fetchPinned(ctx.retries, w, { ...uvPin(linux()), version: "0.0.2", url: `file://${t.path}`, sha256: "0".repeat(64) });
-  assert(!bad.ok && !exists(`${w.tools}/uv/0.0.2`));
+  assert(bad.kind === "err" && !exists(`${w.tools}/uv/0.0.2`));
 });
 
 Deno.test("the toolchain the clone pins is installed in the clone, an older rustup's way too, and the switches leave it out", async () => {
@@ -170,7 +170,7 @@ Deno.test("the toolchain the clone pins is installed in the clone, an older rust
     c.st.cloned = true;
     return await withPath(`${fx.bin}:/usr/bin:/bin`, () => setupRustToolchain(c));
   };
-  assert((await run({})).ok);
+  assert((await run({})).kind === "ok");
   assertEquals(Deno.readTextFileSync(calls).trim(), `${clone} toolchain install`);
   Deno.removeSync(calls);
   for (const sw of ["BOOTSTRAP_NO_RUNTIME", "BOOTSTRAP_NO_DOWNLOAD", "BOOTSTRAP_NO_CLONE"]) {

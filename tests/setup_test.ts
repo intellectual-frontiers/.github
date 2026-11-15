@@ -406,12 +406,28 @@ Deno.test("too little room, or root, is warned of first (FR-050)", async () => {
   if (Deno.uid() === 0) has(p.stdout + p.stderr, "This runs as root");
 });
 
-Deno.test("an environment variable name is bright yellow where there is colour, and other words are not (FR-063)", async () => {
-  const { envColour, paletteOf } = await import("../bin/setup/ui.ts");
-  const out = envColour("set BOOTSTRAP_PROMPT=plain, not FR-001 or git", paletteOf(true));
-  assertStringIncludes(out, "\u001b[1;93mBOOTSTRAP_PROMPT\u001b[0m");
-  assert(!out.includes("\u001b[1;93mFR"));
-  assertEquals(envColour("BOOTSTRAP_PROMPT", paletteOf(false)), "BOOTSTRAP_PROMPT");
+Deno.test("what the setup says is rendered by commons' console: marks and colour only at a terminal, each line on its own stream (FR-061, FR-062)", async () => {
+  const { Captured } = await import("./helpers.ts");
+  const { Log, Ui } = await import("../bin/setup/ui.ts");
+  const said = async (look: { colour: boolean; emoji: boolean; tty: boolean; columns: number }) => {
+    using cap = new Captured();
+    const ui = new Ui(look, new Log(null, null), false);
+    ui.phase("Getting ready");
+    ui.markBad();
+    ui.say("set BOOTSTRAP_NO_AUTH=1 to skip it");
+    ui.warn("a warning");
+    ui.phaseClose();
+    await ui.close();
+    return { out: cap.out, err: cap.err };
+  };
+  const term = await said({ colour: true, emoji: true, tty: true, columns: 100 });
+  has(term.out, "set BOOTSTRAP_NO_AUTH=1 to skip it\n", "Getting ready (something needs attention, see below)", "\u001b[");
+  has(term.err, "\u26a0\ufe0f", "a warning");
+  const pipe = await said({ colour: false, emoji: false, tty: false, columns: 80 });
+  assert(!(pipe.out + pipe.err).includes("\u001b"), "no colour away from a terminal");
+  has(pipe.out, "[!] Getting ready (something needs attention, see below)");
+  has(pipe.err, "[!] a warning");
+  lacks(pipe.out, "a warning");
 });
 
 Deno.test("the telemetry line at the start says whether it is on, and a person who said no is told only that (FR-053)", async () => {

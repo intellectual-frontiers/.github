@@ -1,14 +1,14 @@
 // The one part that uses administrator rights, the bootstrap's (009-machine-bootstrap FR-015, FR-018, FR-020 to FR-023): the packages the computer lacks, with the
 // family's own manager and by the names of commons' packaging table, after saying why and asking for the password once. The setup alone never comes here.
+import { done, ok } from "../../commons/ts/kernel/result.ts";
+import { isExecutable } from "../../commons/ts/runtime/proc.ts";
 import { type Ctx, problem } from "./context.ts";
-import { done, err, ok, type Phase, type Result, type Stop } from "./result.ts";
+import { cannot, type Phase } from "./stop.ts";
 import { adminInstall, adminInstallPrograms, family, type FamilyId, programs, programsOf } from "./table.ts";
-import { isExecutable, run, which } from "./proc.ts";
+import { run, which } from "./proc.ts";
 import { retryCommand } from "./net.ts";
 import { stepSoft, task } from "./steps.ts";
 import type { Platform } from "./platform.ts";
-
-const cannot = (reason: string, fix: string): Result<never, Stop> => err({ kind: "cannot-set-up", reason, fix });
 
 /** The package the family calls a program, or null where the table names none. */
 export function packageName(fam: FamilyId, program: string): string | null {
@@ -21,12 +21,18 @@ export function wantedPackages(fam: FamilyId): string[] {
   return programsOf("required").map((p) => packageName(fam, p)).filter((n): n is string => n !== null);
 }
 
-/** Administrator rights, asked for once, with the reason first (FR-020), and kept alive for the length of the run. */
+/**
+ * Administrator rights, asked for once, with the reason first (FR-020), and kept alive for the length of the run. sudo asks for the password on the terminal
+ * device itself, so its standard input is none.
+ */
 export class Admin {
   #ready = false;
   #prefix: readonly string[] = [];
   #keepAlive: ReturnType<typeof setInterval> | null = null;
-  constructor(readonly uid: number) {}
+  readonly uid: number;
+  constructor(uid: number) {
+    this.uid = uid;
+  }
   get prefix(): readonly string[] {
     return this.#prefix;
   }
@@ -35,15 +41,12 @@ export class Admin {
     if (this.uid === 0) return (this.#ready = true);
     if (which("sudo") === null) return false;
     this.#prefix = ["sudo"];
-    const { b, d, z } = ctx.ui.p;
-    ctx.ui.say(`${b}${ctx.ui.e.key}I need administrator rights to ${why}.${z}`);
-    ctx.ui.say(`${d}Type your ${fam === "macos" ? "Mac" : "Linux"} password when asked, once. Nothing shows while you type: that is normal.${z}`);
-    const r = ctx.hasTty ? await run(["sudo", "-v"], { terminal: true }) : await run(["sudo", "-n", "true"]);
+    ctx.ui.say(`${ctx.ui.e.key}I need administrator rights to ${why}.`);
+    ctx.ui.say(`Type your ${fam === "macos" ? "Mac" : "Linux"} password when asked, once. Nothing shows while you type: that is normal.`);
+    const r = ctx.hasTty ? await run(["sudo", "-v"]) : await run(["sudo", "-n", "true"]);
     if (r.code !== 0) return false;
     this.#ready = true;
-    const keep = setInterval(() => void run(["sudo", "-n", "true"]), 50_000);
-    Deno.unrefTimer(keep);
-    this.#keepAlive = keep;
+    this.#keepAlive = setInterval(() => void run(["sudo", "-n", "true"]), 50_000);
     return true;
   }
   release(): void {
@@ -120,7 +123,7 @@ async function macPackages(ctx: Ctx): Promise<Phase> {
     return done;
   }
   const t = await macNeedTools();
-  if (!t.ok) return t;
+  if (t.kind === "err") return t;
   ctx.ui.say("A Mac needs no package from this script: the setup fetches gh itself, into the account's own folder.");
   return done;
 }

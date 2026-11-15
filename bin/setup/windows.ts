@@ -2,7 +2,7 @@
 // makes it the default user, installs what the Linux bootstrap needs to start (curl and unzip), and runs that bootstrap inside, as the user; it installs the
 // Linux Deno and runs this same setup there. It never unregisters or resets a distribution that exists, changes nothing outside WSL, and only reads what it
 // finds of a PostgreSQL on Windows, which it hands to the setup inside as ERGA_WINDOWS_POSTGRES.
-import { assertNever } from "./result.ts";
+import { absurd } from "../../commons/ts/kernel/absurd.ts";
 import { family } from "./table.ts";
 
 /** The Debian family's own commands, from commons' table: the distribution WSL installs is Debian. */
@@ -184,6 +184,6 @@ export function closingWords(o: WindowsOutcome, distro: string): string[] {
         "Your local Erga database is off until you need it: in Debian, ./erga local start starts it, ./erga arca ensure --env local fills it the first time, ./erga local status shows how DBeaver or psql connects, ./erga local stop stops it. ./erga local run thyra runs Thyra, and ./erga man serve shows the Erga Manuals at http://127.0.0.1:8080/man/.",
       ];
     default:
-      return assertNever(o);
+      return absurd(o);
   }
 }

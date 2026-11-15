@@ -1,10 +1,11 @@
 // A network that fails now and works in a minute (009-machine-bootstrap FR-031 to FR-037): what is tried again and what is not, the waits, a download that
 // resumes, one that is not the file expected, and the look at the network before the long installs. A local HTTP server stands in for the network.
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
-import { classify, describe, downloadVerified, fetchTo, netWords, Retries, retryable, retryCommand } from "../bin/setup/net.ts";
+import type { Sha256 } from "../commons/ts/kernel/sha256.ts";
+import { classify, describeFailure as describe, downloadVerified, fetchTo, Retries, retryable } from "../commons/ts/runtime/net.ts";
+import { netWords, retryCommand } from "../bin/setup/net.ts";
 import { retryPolicy } from "../bin/setup/options.ts";
 import { deadUrl, exists, Fx, OFF, serve, sha256Hex } from "./helpers.ts";
-import type { Sha256 } from "../bin/setup/result.ts";
 
 const quick = (tries = 8) => {
   const said: string[] = [];
@@ -72,7 +73,7 @@ Deno.test("a busy server is tried again, said each time, and works; a refusal is
   try {
     const { r, said, waits } = quick();
     const got = await fetchTo(r, `${s.url}/a`, `${fx.tmp}/a`);
-    assert(got.ok);
+    assert(got.kind === "ok");
     assertEquals(Deno.readTextFileSync(`${fx.tmp}/a`), "payload");
     assertEquals(waits, [3, 6]);
     assertStringIncludes(said[0] ?? "", "the server answered 503 (busy or not ready); trying again in 3s (attempt 2 of 8)");
@@ -85,7 +86,7 @@ Deno.test("a busy server is tried again, said each time, and works; a refusal is
   try {
     const { r, waits } = quick();
     const got = await fetchTo(r, `${refusing.url}/x`, `${fx.tmp}/x`);
-    assert(!got.ok);
+    assert(got.kind === "err");
     assertStringIncludes(got.error, "the server answered 404 (after 1 of 8 attempts)");
     assertEquals(waits, []);
   } finally {
@@ -99,14 +100,14 @@ Deno.test("it gives up after the tries it was given, and says how many (FR-034)"
   try {
     const { r } = quick(3);
     const got = await fetchTo(r, `${s.url}/a`, `${fx.tmp}/a`);
-    assert(!got.ok);
+    assert(got.kind === "err");
     assertStringIncludes(got.error, "(after 3 of 3 attempts)");
   } finally {
     await s.close();
   }
   const { r } = quick(2);
   const dead = await fetchTo(r, `${deadUrl()}/x`, `${fx.tmp}/x`);
-  assert(!dead.ok);
+  assert(dead.kind === "err");
   assertStringIncludes(dead.error, "no connection could be made (after 2 of 2 attempts)");
 });
 
@@ -122,14 +123,14 @@ Deno.test("a .part file is resumed where the server can, and starts again where 
   try {
     const { r } = quick();
     Deno.writeTextFileSync(`${fx.tmp}/f.part`, "payl");
-    assert((await fetchTo(r, `${s.url}/f`, `${fx.tmp}/f.part`)).ok);
+    assert((await fetchTo(r, `${s.url}/f`, `${fx.tmp}/f.part`)).kind === "ok");
     assertEquals(Deno.readTextFileSync(`${fx.tmp}/f.part`), "payload");
     assertEquals(ranges[0], "bytes=4-");
     Deno.writeTextFileSync(`${fx.tmp}/other`, "payl");
-    assert((await fetchTo(r, `${s.url}/f`, `${fx.tmp}/other`)).ok);
+    assert((await fetchTo(r, `${s.url}/f`, `${fx.tmp}/other`)).kind === "ok");
     assertEquals(Deno.readTextFileSync(`${fx.tmp}/other`), "payload", "a name that is not .part is fetched whole");
     Deno.writeTextFileSync(`${fx.tmp}/g.part`, "xx");
-    assert((await fetchTo(r, `${s.url}/no-resume`, `${fx.tmp}/g.part`)).ok);
+    assert((await fetchTo(r, `${s.url}/no-resume`, `${fx.tmp}/g.part`)).kind === "ok");
     assertEquals(Deno.readTextFileSync(`${fx.tmp}/g.part`), "whole");
   } finally {
     await s.close();
@@ -144,19 +145,19 @@ Deno.test("a download is kept only with the SHA-256 given; a wrong one is droppe
   const cache = `${fx.home}/.cache/erga-setup`;
   const { r } = quick();
   const ok = await downloadVerified(r, `file://${fx.tmp}/tool`, good, cache);
-  assert(ok.ok);
+  assert(ok.kind === "ok");
   assertEquals(Deno.readTextFileSync(ok.value), body);
   const again = await downloadVerified(r, `${deadUrl()}/never-fetched`, good, cache);
-  assert(again.ok, "a file already in the cache with its checksum is not fetched again");
+  assert(again.kind === "ok", "a file already in the cache with its checksum is not fetched again");
   const bad = await downloadVerified(r, `file://${fx.tmp}/tool`, "0".repeat(64) as Sha256, cache);
-  assert(!bad.ok);
-  assertStringIncludes(bad.error, "nothing was installed");
+  assert(bad.kind === "err");
+  assertStringIncludes(bad.error, "nothing was kept");
   assert(!exists(`${cache}/downloads/${"0".repeat(64)}`) && !exists(`${cache}/downloads/${"0".repeat(64)}.part`));
   const { r: one } = quick(1);
   const other = await sha256Hex("other") as Sha256;
   Deno.writeTextFileSync(`${cache}/downloads/${other}.part`, "oth");
   const stopped = await downloadVerified(one, `${deadUrl()}/x`, other, cache);
-  assert(!stopped.ok);
+  assert(stopped.kind === "err");
   assert(exists(`${cache}/downloads/${other}.part`), "the part is kept for the next run");
 });
 

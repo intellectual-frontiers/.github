@@ -1,11 +1,13 @@
 // What the tests of the machine setup share: a temporary home folder, stand-ins for programs on the PATH, the setup run as a program (as the bootstrap runs it),
 // and a context to call one part of it in this process. Nothing here needs root, apt, a terminal or the network.
+import process from "node:process";
+import { Retries } from "../commons/ts/runtime/net.ts";
+import type { Look } from "../commons/ts/runtime/tty.ts";
 import { type Ctx, RunState } from "../bin/setup/context.ts";
 import { type Env, type Options, parseOptions } from "../bin/setup/options.ts";
-import { Retries } from "../bin/setup/net.ts";
-import { Signals } from "../bin/setup/telemetry.ts";
-import { Log, screen, Ui } from "../bin/setup/ui.ts";
-import type { AbsPath } from "../bin/setup/result.ts";
+import { startSignals } from "../bin/setup/signals.ts";
+import { Log, Ui } from "../bin/setup/ui.ts";
+import type { AbsPath } from "../bin/setup/stop.ts";
 
 export const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 export const MAIN = `${ROOT}/bin/setup/main.ts`;
@@ -45,7 +47,7 @@ export async function sh(argv: readonly string[], env: Readonly<Record<string, s
     args,
     env: env as Record<string, string>,
     clearEnv: true,
-    cwd: opts.cwd,
+    ...(opts.cwd === undefined ? {} : { cwd: opts.cwd }),
     stdin: opts.stdin === undefined ? "null" : "piped",
     stdout: "piped",
     stderr: "piped",
@@ -158,19 +160,31 @@ function hash(s: string): number {
   return h;
 }
 
-/** What a part of the setup printed, in this process. */
+type Write = typeof process.stdout.write;
+
+/** What a part of the setup printed, in this process: what its consoles wrote to standard output and error. */
 export class Captured {
   out = "";
   err = "";
-  readonly #before = screen.write;
+  readonly #out: Write = process.stdout.write;
+  readonly #err: Write = process.stderr.write;
   constructor() {
-    screen.write = (s, t) => {
-      if (s === "out") this.out += t;
-      else this.err += t;
+    const into = (put: (t: string) => void): Write => {
+      const w = (chunk: unknown, ...rest: unknown[]): boolean => {
+        put(typeof chunk === "string" ? chunk : new TextDecoder().decode(chunk instanceof Uint8Array ? chunk : new Uint8Array()));
+        const done = rest.find((r) => typeof r === "function");
+        if (typeof done === "function") done();
+        return true;
+      };
+      // a stand-in for the stream's write, which takes the same arguments: what it was given is kept, and its callback called
+      return w as Write;
     };
+    process.stdout.write = into((t) => (this.out += t));
+    process.stderr.write = into((t) => (this.err += t));
   }
   [Symbol.dispose](): void {
-    screen.write = this.#before;
+    process.stdout.write = this.#out;
+    process.stderr.write = this.#err;
   }
   get all(): string {
     return this.out + this.err;
@@ -178,20 +192,26 @@ export class Captured {
 }
 
 /** A context to call one part of the setup in this process, with the options the environment gives. */
-export function context(fx: Fx, extra: Readonly<Record<string, string>> = {}, argv: readonly string[] = [], more: { hasTty?: boolean; logPath?: string | null } = {}): Ctx {
+export function context(
+  fx: Fx,
+  extra: Readonly<Record<string, string>> = {},
+  argv: readonly string[] = [],
+  more: { hasTty?: boolean; logPath?: string | null; look?: Look } = {},
+): Ctx {
   const env: Env = fx.env(extra);
   const parsed = parseOptions(argv, env, fx.home as AbsPath, "", () => undefined, 2);
-  if (!parsed.ok) throw new Error(parsed.error);
+  if (parsed.kind === "err") throw new Error(parsed.error);
   const opts: Options = parsed.value;
   const logPath = more.logPath === undefined ? null : more.logPath;
   const ui = new Ui(
-    { colour: false, utf: false, tty: false, cols: 100 },
+    more.look ?? { colour: false, emoji: false, tty: false, columns: 100 },
     new Log(logPath, logPath === null ? null : logPath.replace(/bootstrap-([^/]*)\.log$/, "support-$1.txt")),
     opts.dryRun,
+    opts.switches.verbose,
   );
   const st = new RunState();
-  const retries = new Retries(opts.retry, (l) => screen.write("err", `  ~ ${l}\n`), () => 0, () => Promise.resolve());
-  const signals = new Signals({ kind: "off" }, `${fx.home}/.local/state/erga/telemetry`, () => Promise.resolve("dev-test"), () => Promise.resolve({}), () => "");
+  const retries = new Retries(opts.retry, (l) => ui.retry(l), () => 0, () => Promise.resolve());
+  const signals = startSignals({ settings: { kind: "off" }, resource: {}, journalDir: `${fx.home}/.local/state/erga/telemetry`, ui });
   Deno.mkdirSync(`${fx.tmp}/work`, { recursive: true });
   return { opts, env, ui, retries, signals, st, work: `${fx.tmp}/work`, hasTty: more.hasTty ?? false };
 }

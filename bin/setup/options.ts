@@ -1,5 +1,9 @@
-// The command line and the environment, parsed once at the boundary into typed options: nothing after this reads a raw switch.
-import { type AbsPath, absPath, err, ok, type Result } from "./result.ts";
+// The command line and the environment, parsed once at the boundary into typed options: nothing after this reads a raw switch. The command line is declared
+// once and read by commons' kernel/args; the policy of the retries is commons' runtime/net's.
+import { flag, formatUsageError, parseArgs } from "../../commons/ts/kernel/args.ts";
+import { err, ok, type Result } from "../../commons/ts/kernel/result.ts";
+import type { RetryPolicy } from "../../commons/ts/runtime/net.ts";
+import { type AbsPath, absPath } from "./stop.ts";
 
 export type Env = Readonly<Record<string, string>>;
 /** bootstrap: the computer whole (packages with administrator rights, then the account); setup: the account alone, never with administrator rights. */
@@ -10,9 +14,8 @@ export type ToolchainChoice =
   | { readonly kind: "none" }
   | { readonly kind: "all" }
   | { readonly kind: "names"; readonly names: readonly string[] };
-export type RetryPolicy = { readonly tries: number; readonly base: number; readonly cap: number };
 /** The settings of ArcaSignals (009-machine-bootstrap FR-052 to FR-054). */
-export type Telemetry =
+export type TelemetrySettings =
   | { readonly kind: "on"; readonly url: string; readonly token: string }
   | { readonly kind: "refused"; readonly why: "DO_NOT_TRACK=1" | "ERGA_OBSERVE=off" }
   | { readonly kind: "half"; readonly missing: "ERGA_SIGNALS_URL" | "ERGA_SIGNALS_TOKEN" }
@@ -63,7 +66,7 @@ export type Options = {
   readonly role: string | null; // ERGA_ROLE
   readonly toolchain: ToolchainChoice;
   readonly support: string;
-  readonly telemetry: Telemetry;
+  readonly telemetry: TelemetrySettings;
   readonly osRelease: string;
   readonly paths: Paths;
 };
@@ -132,7 +135,7 @@ export function pathsOf(env: Env, home: AbsPath, workspaces: string): Paths {
   };
 }
 
-export function telemetryOf(env: Env, secrets: (name: string) => string | undefined): Telemetry {
+export function telemetryOf(env: Env, secrets: (name: string) => string | undefined): TelemetrySettings {
   const lower = (v: string | undefined) => (v ?? "").toLowerCase();
   if (["1", "true", "yes"].includes(lower(env.DO_NOT_TRACK))) return { kind: "refused", why: "DO_NOT_TRACK=1" };
   if (["off", "0", "false", "no"].includes(lower(env.ERGA_OBSERVE))) return { kind: "refused", why: "ERGA_OBSERVE=off" };
@@ -147,6 +150,13 @@ export function telemetryOf(env: Env, secrets: (name: string) => string | undefi
 
 export type Cpus = number;
 
+/** The options of the command line; -h and --help are the parser's own. */
+const COMMAND_LINE = {
+  dryRun: flag({ short: "n", help: "list every step it would take, change nothing, fetch nothing, ask for nothing" }),
+  patient: flag({ help: "for a network that drops often (15 tries, longer waits)" }),
+  setup: flag({ help: "this account alone, with no administrator rights and no package" }),
+};
+
 /**
  * The command line and the environment, as options. `home` was checked first (FR-012); `settings` is the text of ~/.config/erga/setup.env, or "".
  */
@@ -158,27 +168,13 @@ export function parseOptions(
   secrets: (name: string) => string | undefined,
   cpus: Cpus,
 ): Result<Options, string> {
-  let dryRun = false, help = false, patient = env.BOOTSTRAP_PATIENT === "1", mode: Mode = "bootstrap";
-  for (const a of argv) {
-    switch (a) {
-      case "--dry-run":
-      case "-n":
-        dryRun = true;
-        break;
-      case "--patient":
-        patient = true;
-        break;
-      case "--setup":
-        mode = "setup";
-        break;
-      case "-h":
-      case "--help":
-        help = true;
-        break;
-      default:
-        return err(`erga-setup: unknown option ${a} (try --help)`);
-    }
-  }
+  const parsed = parseArgs(argv, COMMAND_LINE);
+  if (parsed.kind === "err") return err(`erga-setup: ${formatUsageError(parsed.error, "erga-setup")} (try --help)`);
+  const help = parsed.value.kind === "help";
+  const given = parsed.value.kind === "args" ? parsed.value.options : { dryRun: false, patient: false, setup: false };
+  const dryRun = given.dryRun;
+  const patient = given.patient || env.BOOTSTRAP_PATIENT === "1";
+  const mode: Mode = given.setup ? "setup" : "bootstrap";
   const on = (name: string) => env[name] === "1";
   const jobsDefault = Math.min(6, Math.max(2, cpus * 2));
   const role = setting(env, settings, "ERGA_ROLE");
