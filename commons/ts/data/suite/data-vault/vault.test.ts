@@ -7,7 +7,7 @@
 import type { Brand, Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
-import { hub, link, satellite } from "../../data-vault/mod.ts";
+import { exceptionDiagnostic, exceptionHub, hub, link, recordException, satellite } from "../../data-vault/mod.ts";
 import {
   context,
   date,
@@ -28,7 +28,7 @@ import {
   tally,
   text,
 } from "../../sql-aide/mod.ts";
-import { eachEngine, golden } from "../helpers.ts";
+import { eachEngine, golden, pgliteEngine } from "../helpers.ts";
 
 const customer = hub("customer", { customer_number: text().doc("The number the business knows the customer by") });
 const order = hub("order", { order_number: text().doc("The number on the order") });
@@ -145,5 +145,25 @@ proves(
       ];
       assertEquals(tally(await runAssertions(assertions, engine, ctx)), { passed: assertions.length, failed: 0, skipped: 0 }, engine.name);
     });
+  },
+);
+
+proves(
+  ["0006-sql-aide FR-020", "0006-sql-aide FR-048", "0006-sql-aide FR-050"],
+  "the vault records an exception in PostgreSQL: its hub row once, a diagnostic each time",
+  async () => {
+    const engine = await pgliteEngine();
+    try {
+      await engine.exec(render(definitions([recordException, exceptionDiagnostic, exceptionHub]), contexts.postgres));
+      await engine.exec(render(recordException.call({ key: "bad-date", message: "month 13", source: "feed" }), contexts.postgres));
+      await engine.exec(render(recordException.call({ key: "bad-date", message: "day 32", source: "feed" }), contexts.postgres));
+      assertEquals(Number((await engine.query(`SELECT count(*) AS n FROM "hub_exception"`))[0]?.["n"]), 1);
+      assertEquals(
+        (await engine.query(`SELECT "message" FROM "sat_exception_diagnostic" ORDER BY 1`)).map((r) => r["message"]),
+        ["day 32", "month 13"],
+      );
+    } finally {
+      await engine.close();
+    }
   },
 );

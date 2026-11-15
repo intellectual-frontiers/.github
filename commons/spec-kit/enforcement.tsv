@@ -101,8 +101,8 @@ requirement	mechanism	by	note
 0006-sql-aide FR-017	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: tables, views and indexes committed for three dialects and loaded into each engine
 0006-sql-aide FR-018	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: an index names its own table's columns, and each thing it asks for is a feature (type tests)
 0006-sql-aide FR-019	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: the key is in the primary key and bounds are of its type (type tests); loaded into PGlite
-0006-sql-aide FR-020	none	-	Not whole yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-021	none	-	Not whole yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0006-sql-aide FR-020	check	.github: cd commons/ts/data && bun run verify	routine.test.ts: a body must give what the routine returns (type tests); queries, blocks and templates run in PGlite
+0006-sql-aide FR-021	check	.github: cd commons/ts/data && bun run verify	routine.test.ts and arca/party.test.ts: one definition as a PostgreSQL function, a DuckDB macro and written in for SQLite, with the same answers; triggers in PostgreSQL and SQLite
 0006-sql-aide FR-022	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: schema, sequence, enumerated type, domain, row-level security and policy loaded twice into PGlite; a materialized view refreshed there; an extension as text
 0006-sql-aide FR-023	check	.github: cd commons/ts/data && bun run verify	emit.test.ts: with adds features and types
 0006-sql-aide FR-024	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands. Naming, emit and lint hooks and plugins are there and tested (emit.test.ts, model.test.ts); the hooks of later layers come with them.

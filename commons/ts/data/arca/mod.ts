@@ -30,11 +30,13 @@ import {
   partyRole,
   partyRoleByParty,
   partyRoleKind,
+  peopleBornSince,
   person,
   personByName,
   personDirectory,
   postalAddress,
   postalAddressByParty,
+  retireParty,
 } from "./party.ts";
 
 export { codeTable } from "./patterns.ts";
@@ -54,11 +56,13 @@ export {
   partyRole,
   partyRoleByParty,
   partyRoleKind,
+  peopleBornSince,
   person,
   personByName,
   personDirectory,
   postalAddress,
   postalAddressByParty,
+  retireParty,
 };
 
 /** Every table of the party model, for whatever takes the tables alone (lint, the row types). */
@@ -90,7 +94,10 @@ export const partyIndexes = [
 /** The views of the party model. */
 export const partyViews = [personDirectory] as const;
 
-/** Everything the party model defines, for whatever takes a model whole: its tables, then its indexes and views. */
+/** The routines of the party model: a function for PostgreSQL and DuckDB, and a procedure for PostgreSQL. */
+export const partyRoutines = [peopleBornSince, retireParty] as const;
+
+/** Everything the party model defines for every dialect: its tables, then its indexes and views. */
 export const partyModel = [...partyTables, ...partyIndexes, ...partyViews] as const;
 
 /** The documentation of the party model, from its TSDoc comments: pass it to a context and the SQL carries it. */

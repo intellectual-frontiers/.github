@@ -96,6 +96,12 @@ export const docs = {
     summary: "The roles a party may play: customer, supplier, employee, and whatever else a business names.",
     members: {},
   },
+  peopleBornSince: {
+    summary: "The people born on or after a day. For SQLite, which stores no functions, it is written in where it is called.",
+    members: {
+      since: "The earliest birth date wanted.",
+    },
+  },
   person: {
     summary: "A person: a party who is a human being. Their key is their party's key.",
     members: {
@@ -135,5 +141,12 @@ export const docs = {
   postalAddressByParty: {
     summary: "Finds the addresses of a party.",
     members: {},
+  },
+  retireParty: {
+    summary: "Marks a party as removed and says who did it; a party that is not there, or is already removed, is refused. PostgreSQL only.",
+    members: {
+      by: "Who is removing it.",
+      id: "The party to mark as removed.",
+    },
   },
 } as const;

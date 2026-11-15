@@ -5,7 +5,25 @@
  *
  * @module
  */
-import { boolean, date, fk, housekeeping, index, ne, oneOf, pk, SQL, table, text, view } from "../sql-aide/mod.ts";
+import {
+  boolean,
+  date,
+  fk,
+  fn,
+  gte,
+  housekeeping,
+  index,
+  ne,
+  oneOf,
+  pk,
+  proc,
+  select,
+  setOf,
+  SQL,
+  table,
+  text,
+  view,
+} from "../sql-aide/mod.ts";
 import { codeTable } from "./patterns.ts";
 
 /** The kinds of party: a person or an organization. */
@@ -214,3 +232,32 @@ export const personDirectory = view(
   `,
   { from: [party, person] },
 );
+
+/** The people born on or after a day. For SQLite, which stores no functions, it is written in where it is called. */
+export const peopleBornSince = fn("people_born_since", {
+  args: {
+    /** The earliest birth date wanted. */
+    since: date(),
+  },
+  returns: setOf(person),
+  volatility: "stable",
+  body: ({ since }) => select(person).where(gte(person.c.birth_date, since)),
+});
+
+/** Marks a party as removed and says who did it; a party that is not there, or is already removed, is refused. PostgreSQL only. */
+export const retireParty = proc("retire_party", {
+  args: {
+    /** The party to mark as removed. */
+    id: text(),
+    /** Who is removing it. */
+    by: text(),
+  },
+  uses: [party],
+  body: ({ id, by }, pl) =>
+    pl.block(
+      pl.run(
+        SQL`UPDATE ${party} SET "deleted_at" = CURRENT_TIMESTAMP, "deleted_by" = ${by} WHERE ${party.c.party_id.bare} = ${id} AND ${party.c.deleted_at.bare} IS NULL`,
+      ),
+      pl.when(pl.notFound, [pl.raise("party % is not there, or is already removed", id)]),
+    ),
+});

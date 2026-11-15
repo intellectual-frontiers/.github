@@ -7,7 +7,19 @@
 import type { Brand, Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
-import { party, partyDocs, partyIndexes, partyModel, partyTables, partyViews, person, personDirectory } from "../../arca/mod.ts";
+import {
+  party,
+  partyDocs,
+  partyIndexes,
+  partyModel,
+  partyRoutines,
+  partyTables,
+  partyViews,
+  peopleBornSince,
+  person,
+  personDirectory,
+  retireParty,
+} from "../../arca/mod.ts";
 import {
   context,
   definitions,
@@ -22,6 +34,7 @@ import {
   type RowOf,
   rows,
   runAssertions,
+  SQL,
   sqlite,
   structuralTests,
   tally,
@@ -199,3 +212,36 @@ proves(["0006-sql-aide FR-029"], "on a PostgreSQL server with pgTAP, the same te
     await engine.close();
   }
 });
+
+proves(
+  ["0006-sql-aide FR-020", "0006-sql-aide FR-021", "0006-sql-aide FR-050"],
+  "the party model's routines run in PostgreSQL, and its function gives the same people in DuckDB and SQLite",
+  async () => {
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions(partyModel), ctx));
+      for (const s of SEED) await engine.exec(s);
+      await engine.exec(`UPDATE "person" SET "birth_date" = '1815-12-10' WHERE "party_id" = 'p1'`);
+      if (engine.dialect === "postgres") await engine.exec(render(definitions(partyRoutines), contexts.postgres));
+      if (engine.dialect === "duckdb") await engine.exec(render(peopleBornSince.ddl, contexts.duckdb));
+      const born = SQL`SELECT "party_id" FROM ${peopleBornSince.call({ since: "1800-01-01" })} AS born`;
+      const text0 =
+        engine.dialect === "sqlite"
+          ? render(born, contexts.sqlite)
+          : engine.dialect === "duckdb"
+            ? render(born, contexts.duckdb)
+            : render(born, contexts.postgres);
+      seen.push(JSON.stringify((await engine.query(text0)).map((r) => r["party_id"])));
+      if (engine.dialect !== "postgres") return;
+      await engine.exec(render(retireParty.call({ id: "p1", by: "the test" }), contexts.postgres));
+      assertEquals((await engine.query(`SELECT "deleted_by" FROM "party" WHERE "party_id" = 'p1'`))[0]?.["deleted_by"], "the test");
+      await assertRejects(
+        () => engine.exec(render(retireParty.call({ id: "p1", by: "again" }), contexts.postgres)),
+        Error,
+        "already removed",
+      );
+    });
+    assertEquals([...new Set(seen)], [`["p1"]`]);
+  },
+);

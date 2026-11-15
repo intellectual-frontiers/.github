@@ -13,6 +13,7 @@
  *
  * @module
  */
+export { exceptionDiagnostic, exceptionHub, recordException } from "./exception.ts";
 export { hub, link, satellite } from "./vault.ts";
 export type {
   AnyHub,

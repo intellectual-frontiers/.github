@@ -104,6 +104,29 @@ export { view } from "./ddl/view.ts";
 export type { View, ViewOptions, ViewRefs } from "./ddl/view.ts";
 export { describeAssertion, fails, notRun, pgTapScript, rows, runAssertions, structuralTests, tapQuery } from "./test/assert.ts";
 export type { Assertion, Runner, Structure } from "./test/assert.ts";
+export { desc, rowsAs, select, valueAs } from "./query/select.ts";
+export type { Select } from "./query/select.ts";
+export { fn, nothing, proc, rowsOf, scalar, setOf, trigger } from "./routine/routine.ts";
+export type {
+  ArgMap,
+  ArgRefs,
+  ArgValue,
+  Block,
+  BodyFits,
+  BodyKind,
+  CallableIn,
+  CallArgs,
+  DefinedFor,
+  Pl,
+  Returns,
+  Routine,
+  RoutineOptions,
+  Stmt,
+  Template,
+  Trigger,
+  TriggerOptions,
+  Variable as BlockVariable,
+} from "./routine/routine.ts";
 export { duckdb, postgres, sqlite } from "./dialect/dialects.ts";
 export type {
   CommonFeature,
