@@ -1,37 +1,18 @@
 name: Pinned Bun
 description: >-
-  Bun at the version commons pins (commons/generated/pins.auto.env, commons 0005-typescript-runtime FR-026), downloaded from Bun's release, kept only where its
-  SHA-256 is the pinned one, and put on the PATH. Linux, macOS and Windows, x86-64 and 64-bit Arm.
+  Bun at the version commons pins (commons/generated/pins.auto.env, commons 0005-typescript-runtime FR-026), fetched with retries, kept only where its SHA-256 is
+  the pinned one, unpacked by IFC TypeScript's own zip reader (commons/ts/tools/install-bun.ts, run by Node) and put on the PATH. Linux, macOS and Windows; no
+  shell script, no Python, no unzip.
+inputs:
+  node-version:
+    description: The Node that runs the installer.
+    default: "26.13.1"
 runs:
   using: composite
   steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
     - name: Bun, pinned and checked
       shell: bash
-      run: |
-        pins=commons/generated/pins.auto.env
-        version=$(sed -n 's/^BUN_VERSION=//p' "$pins")
-        case "$RUNNER_OS/$RUNNER_ARCH" in
-          Linux/X64) target=linux-x64; key=X86_64 ;;
-          Linux/ARM64) target=linux-aarch64; key=AARCH64 ;;
-          macOS/X64) target=darwin-x64; key=MACOS_X64 ;;
-          macOS/ARM64) target=darwin-aarch64; key=MACOS_ARM64 ;;
-          Windows/X64) target=windows-x64; key=WINDOWS_X64 ;;
-          *) echo "no pinned Bun for $RUNNER_OS/$RUNNER_ARCH" >&2; exit 1 ;;
-        esac
-        sum=$(sed -n "s/^BUN_SHA256_${key}=//p" "$pins")
-        [ -n "$version" ] && [ -n "$sum" ] || { echo "commons pins no Bun for $key" >&2; exit 1; }
-        dir="$RUNNER_TEMP/bun-$version"
-        mkdir -p "$dir"
-        curl -fsSL --retry 5 --retry-all-errors -o "$dir/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$version/bun-$target.zip"
-        python3 - "$dir/bun.zip" "$sum" "$dir" <<'PY'
-        import hashlib, sys, zipfile
-        path, want, dest = sys.argv[1:]
-        got = hashlib.sha256(open(path, "rb").read()).hexdigest()
-        if got != want:
-            sys.exit(f"Bun's zip has SHA-256 {got}, the pin says {want}: refused")
-        zipfile.ZipFile(path).extractall(dest)
-        PY
-        bin="$dir/bun-$target"
-        chmod +x "$bin"/bun* 2>/dev/null || true
-        echo "$bin" >>"$GITHUB_PATH"
-        "$bin/bun" --version
+      run: node commons/ts/tools/install-bun.ts "$RUNNER_TEMP/bun"
