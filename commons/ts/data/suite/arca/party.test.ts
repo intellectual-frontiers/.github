@@ -12,6 +12,7 @@ import {
   partyDocs,
   partyIndexes,
   partyModel,
+  partyReference,
   partyRoutines,
   partyTables,
   partyViews,
@@ -243,5 +244,40 @@ proves(
       );
     });
     assertEquals([...new Set(seen)], [`["p1"]`]);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-032", "0009-sql-aide FR-033", "0009-sql-aide FR-047", "0009-sql-aide FR-050"],
+  "the party model's reference data is rows written in TypeScript, loaded twice into every engine to the same rows, and committed",
+  async () => {
+    for (const [dialect, ctx] of Object.entries(contexts))
+      await golden(
+        new URL(`./golden/party-reference.${dialect}.sql`, import.meta.url),
+        `${partyReference.map((r) => render(r.load, ctx)).join("\n\n")}\n`,
+      );
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions(partyModel), ctx));
+      for (const r of partyReference) await engine.exec(render(r.load, ctx));
+      const count = async (): Promise<string> => {
+        const n = await engine.query(
+          `SELECT (SELECT count(*) FROM "party_kind") AS a, (SELECT count(*) FROM "party_role_kind") AS b, (SELECT count(*) FROM "party_relation_kind") AS c, (SELECT count(*) FROM "party_identifier_kind") AS d`,
+        );
+        return JSON.stringify(Object.values(n[0] ?? {}).map(Number));
+      };
+      const once = await count();
+      for (const r of partyReference) await engine.exec(render(r.load, ctx));
+      assertEquals(await count(), once, `${engine.name}: loading reference data again adds no row`);
+      // the codes are what the model's foreign keys point to
+      await engine.exec(
+        `INSERT INTO "party" ("party_id", "party_kind_code", "display_name") VALUES ('o1', 'organization', 'Analytical Engines')`,
+      );
+      const labels = await engine.query(`SELECT "code", "label" FROM "party_role_kind" ORDER BY 1`);
+      seen.push(JSON.stringify([once, labels]));
+    });
+    assertEquals(new Set(seen).size, 1, "every engine holds the same reference data");
+    assertEquals(seen[0]?.startsWith(`["[2,4,3,3]"`), true);
   },
 );

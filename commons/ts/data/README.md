@@ -43,14 +43,23 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                     | State   |
-| ----- | -------------------------------------------------------------------------------------------------------- | ------- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                       | here    |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                        | here    |
-| 4     | Integrations                                                                                             | not yet |
-| 5     | ISLM                                                                                                     | not yet |
-| 6     | Query builder                                                                                            | not yet |
-| 7     | Transforms                                                                                               | not yet |
-| 8     | Driver adapters                                                                                          | not yet |
-| 9     | Generators, the command line, plugins                                                                    | not yet |
+| Phase | What                                                                                                             | State   |
+| ----- | ---------------------------------------------------------------------------------------------------------------- | ------- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP         | here    |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                               | here    |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                | here    |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads | here    |
+| 5     | ISLM                                                                                                             | not yet |
+| 6     | Query builder                                                                                                    | not yet |
+| 7     | Transforms                                                                                                       | not yet |
+| 8     | Driver adapters                                                                                                  | not yet |
+| 9     | Generators, the command line, plugins                                                                            | not yet |
+
+### Limits, said plainly
+
+- Integrations (phase 4): a load is a script the caller runs whole; it begins no transaction, so a `replace` or `snapshot` that fails
+  halfway leaves what it did unless the caller wraps it in one. Files are read only by DuckDB (`read_csv`); PostgreSQL's `COPY` is not
+  used. An attached database is a file of the same engine: DuckDB attaching SQLite or PostgreSQL needs an extension it would download,
+  and is not tested. Lineage covers integrations and Data Vault's loads; transforms add theirs in phase 7.
+- Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
+  nine digits; a landing relation should hold one state of a key in one load.

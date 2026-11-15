@@ -7,13 +7,25 @@
 import type { Brand, Equal } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
-import { exceptionDiagnostic, exceptionHub, hub, link, recordException, satellite } from "../../data-vault/mod.ts";
+import {
+  exceptionDiagnostic,
+  exceptionHub,
+  hub,
+  link,
+  loadHub,
+  loadLink,
+  loadSatellite,
+  recordException,
+  satellite,
+} from "../../data-vault/mod.ts";
 import {
   context,
   date,
   definitions,
   duckdb,
   fails,
+  type LandingRow,
+  lineageOf,
   lint,
   type NewRowOf,
   postgres,
@@ -22,6 +34,7 @@ import {
   type RowOf,
   rows,
   runAssertions,
+  seed,
   sqlite,
   structuralTests,
   table,
@@ -165,5 +178,97 @@ proves(
     } finally {
       await engine.close();
     }
+  },
+);
+
+/** What a feed from a shop gives, landed as it came. */
+const feed = table("shop_feed", {
+  customer_number: text(),
+  email: text().nullable(),
+  order_number: text(),
+  status: text(),
+  due: date().nullable(),
+});
+const feedOf = (rows: readonly LandingRow<typeof feed>[]) => seed("shop_feed_load", feed, rows, { strategy: "replace" });
+const loads = [
+  loadHub(customer, feed, "shop"),
+  loadHub(order, feed, "shop"),
+  loadSatellite(customer, customerContact, feed, "shop"),
+  loadSatellite(order, orderState, feed, "shop"),
+  loadLink(customerOrder, { customer, order }, feed, "shop"),
+];
+const first = [
+  { customer_number: "C-1", email: "a@example.org", order_number: "O-1", status: "open", due: "2026-12-01" },
+  { customer_number: "C-1", email: "a@example.org", order_number: "O-2", status: "open", due: null },
+  { customer_number: "C-2", email: null, order_number: "O-3", status: "shipped", due: null },
+];
+
+proves(
+  ["0009-sql-aide FR-048", "0009-sql-aide FR-033", "0009-sql-aide FR-050"],
+  "a vault's loads only insert: run twice they change nothing, and a changed attribute adds one satellite row, the same in every engine",
+  async () => {
+    // @ts-expect-error a satellite of orders is not loaded as the customer's
+    const crossed = (): unknown => loadSatellite(customer, orderState, feed, "x");
+    const noKey = table("no_key", { email: text() });
+    // @ts-expect-error a relation that does not give the customer's business key cannot load the hub
+    const keyless = (): unknown => loadHub(customer, noKey, "x");
+    assertEquals([typeof crossed, typeof keyless], ["function", "function"]);
+    for (const [dialect, ctx] of Object.entries(contexts))
+      await golden(
+        new URL(`./golden/vault-loads.${dialect}.sql`, import.meta.url),
+        `${loads.map((l) => render(l.sql, ctx)).join("\n\n")}\n`,
+      );
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const counts = async (): Promise<readonly number[]> => {
+        const out: number[] = [];
+        for (const t of ["hub_customer", "hub_order", "sat_customer_contact", "sat_order_state", "link_customer_order"])
+          out.push(Number((await engine.query(`SELECT count(*) AS n FROM "${t}"`))[0]?.["n"]));
+        return out;
+      };
+      await engine.exec(render(definitions([...vault, feed]), ctx));
+      await engine.exec(render(feedOf(first).load, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      assertEquals(await counts(), [2, 3, 2, 3, 3], engine.name);
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      assertEquals(await counts(), [2, 3, 2, 3, 3], `${engine.name}: a second run changes nothing`);
+      // the next feed: C-1 has a new address, O-1 is shipped, C-2 is as before
+      await engine.exec(
+        render(
+          feedOf([
+            { customer_number: "C-1", email: "b@example.org", order_number: "O-1", status: "shipped", due: "2026-12-01" },
+            { customer_number: "C-2", email: null, order_number: "O-3", status: "shipped", due: null },
+          ]).load,
+          ctx,
+        ),
+      );
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      assertEquals(await counts(), [2, 3, 3, 4, 3], `${engine.name}: one new state of C-1 and of O-1`);
+      const states = await engine.query(
+        `SELECT "sat_customer_contact_id" AS id, "hub_customer_id" AS hub, "email" FROM "sat_customer_contact" ORDER BY 1`,
+      );
+      seen.push(JSON.stringify(states));
+    });
+    assertEquals(new Set(seen).size, 1, "every engine holds the same states");
+    assertEquals(
+      seen[0],
+      JSON.stringify([
+        { id: "C-1#000000001", hub: "C-1", email: "a@example.org" },
+        { id: "C-1#000000002", hub: "C-1", email: "b@example.org" },
+        { id: "C-2#000000001", hub: "C-2", email: null },
+      ]),
+    );
+    assertEquals(
+      lineageOf(loads).map((e) => `${e.from} -> ${e.to}`),
+      [
+        ".shop_feed -> .hub_customer",
+        ".shop_feed -> .hub_order",
+        ".shop_feed -> .sat_customer_contact",
+        ".shop_feed -> .sat_order_state",
+        ".shop_feed -> .link_customer_order",
+      ],
+    );
   },
 );

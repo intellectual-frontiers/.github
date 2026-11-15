@@ -40,6 +40,7 @@ import {
 } from "./party.ts";
 
 export { codeTable } from "./patterns.ts";
+export { partyIdentifierKinds, partyKinds, partyReference, partyRelationKinds, partyRoleKinds } from "./reference.ts";
 export type { CodeColumns } from "./patterns.ts";
 export {
   electronicContact,

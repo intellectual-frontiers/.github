@@ -14,6 +14,8 @@
  * @module
  */
 export { exceptionDiagnostic, exceptionHub, recordException } from "./exception.ts";
+export { loadHub, loadLink, loadSatellite } from "./load.ts";
+export type { LinkInput, SatelliteAttributes, VaultLoad } from "./load.ts";
 export { hub, link, satellite } from "./vault.ts";
 export type {
   AnyHub,
