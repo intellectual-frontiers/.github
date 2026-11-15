@@ -1,7 +1,7 @@
 """The machine bootstrap (009-machine-bootstrap): `bin/erga-setup.sh` (no administrator rights) and `bin/erga-bootstrap.sh` (the one that may use them), tested without root, apt or the network.
 
 What runs here: the script's syntax in every POSIX shell on the machine, `--dry-run`, every switch that turns an installation off, the clone and its
-fast-forward-only update against a local repository, the `erga` commands against a stand-in launcher, rustup-init, uv and the Rust toolchain against stand-ins,
+fast-forward-only update against a local repository, erga's bin/setup.sh and `ergactl` commands against stand-ins, rustup-init, uv and the Rust toolchain against stand-ins,
 the checksum and release-file rules on local fixtures. What does not: installing packages with apt, fetching the pinned programs, signing in to GitHub, `chsh`
 (they need a Debian machine, a network and a person). The specification is erga's 009-machine-bootstrap."""
 import hashlib
@@ -155,7 +155,7 @@ class Entry(Fixture):
         p = self.run_script("--dry-run")
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before, "a dry run writes nothing")
-        for step in ("erga doctor", "erga toolchain ensure", "erga check", "intellectual-frontiers/erga",
+        for step in ("ergactl doctor", "ergactl toolchain ensure", "ergactl check", "bin/setup.sh", "intellectual-frontiers/erga",
                      "GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https"):
             self.assertIn(step, p.stdout)
         for gone in ("Oh My Posh", "Installing chezmoi", "login shell", "shell ensure", "fish", "VS Code", "AI assistants", "apt install", "administrator rights", "mise", "Python and uv"):
@@ -178,20 +178,23 @@ class Entry(Fixture):
         """009-machine-bootstrap FR-026, FR-055, FR-056: rustup and uv first; in the clone the toolchain rust-toolchain.toml names, then toolchain ensure,
         check --quick and, last, doctor."""
         out = self.run_script("--dry-run").stdout
-        for text in ("rustup", f"Installing uv {re.search(r'^UV_VERSION=(.*)$', SCRIPT.read_text(), re.M).group(1)}", "rust-toolchain.toml", "./erga --version"):
+        for text in ("rustup", f"Installing uv {re.search(r'^UV_VERSION=(.*)$', SCRIPT.read_text(), re.M).group(1)}", "rust-toolchain.toml", "bin/setup.sh"):
             self.assertIn(text, out)
-        order = [out.index(s) for s in ("rustup", "Installing uv", "copy https://github.com/intellectual-frontiers/erga", "rust-toolchain.toml names",
-                                         "./erga toolchain ensure", "./erga check --quick", "last: ./erga doctor")]
+        for gone in ("./erga --version", "Cargo", "cargo build"):
+            self.assertNotIn(gone, out, "ergactl needs no Cargo")
+        order = [out.index(s) for s in ("rustup", "Installing uv", "copy https://github.com/intellectual-frontiers/erga", "rust-toolchain.toml names", "run in the clone: bin/setup.sh",
+                                         "./ergactl toolchain ensure", "./ergactl check --quick", "last: ./ergactl doctor")]
         self.assertEqual(order, sorted(order), out)
         off = self.run_script("--dry-run", BOOTSTRAP_NO_RUNTIME="1").stdout
         self.assertNotIn("rust-toolchain.toml names", off, "BOOTSTRAP_NO_RUNTIME=1 installs no Rust")
         self.assertNotIn("Installing uv", off)
 
     def test_dry_run_records_the_workspace_s_role_before_the_toolchain_only_where_it_is_given(self):
-        """009-machine-bootstrap FR-089: ERGA_ROLE is recorded with ./erga workspace set --role before ./erga toolchain ensure; without it nothing is."""
+        """009-machine-bootstrap FR-089: ERGA_ROLE is recorded with ./ergactl repo workspace set --role before ./ergactl toolchain ensure; without it nothing is."""
         out = self.run_script("--dry-run", ERGA_ROLE="operator").stdout
-        self.assertIn("./erga workspace set --role operator", out)
-        self.assertLess(out.index("./erga workspace set --role operator"), out.index("./erga toolchain ensure"), out)
+        self.assertIn("./ergactl repo workspace set --role operator", out)
+        self.assertLess(out.index("bin/setup.sh"), out.index("./ergactl repo workspace set --role operator"), out)
+        self.assertLess(out.index("./ergactl repo workspace set --role operator"), out.index("./ergactl toolchain ensure"), out)
         self.assertNotIn("workspace set --role", self.run_script("--dry-run").stdout, "no role given, none is recorded")
 
     def test_the_setup_names_only_commands_erga_has(self):
@@ -203,7 +206,7 @@ class Entry(Fixture):
     def test_dry_run_follows_the_switches(self):
         p = self.run_script("--dry-run", **OFF)
         self.assertEqual(p.returncode, 0, p.stderr)
-        for gone in ("intellectual-frontiers/erga", "erga doctor", "erga shell ensure"):
+        for gone in ("intellectual-frontiers/erga", "ergactl doctor", "bin/setup.sh", "erga shell ensure"):
             self.assertNotIn(gone, p.stdout, f"{gone} is switched off")
 
     def test_dry_run_lists_the_same_steps_from_a_pipe(self):
@@ -260,22 +263,38 @@ class Switches(Fixture):
 class Clone(Fixture):
     """The clone, its fast-forward-only update and the erga commands, against a local repository with a stand-in launcher that answers as erga does."""
 
-    # The shape of `erga toolchain list --json`: entries in `data`, `found` null where the program is not here, `system_packages` what only administrator rights install for it. FAKE_NO_QUICK stands for an erga whose check has no --quick.
+    # A stand-in for erga's ./ergactl, answering as it does: `toolchain list` prints its table (name, version, where it comes from, what it is for), with or without --json,
+    # which it ignores; FAKE_JSON stands for an ergactl whose list is JSON (entries in `data`, `found` null where the program is not here, `system_packages` what only
+    # administrator rights install for it). `repository check --help` names --quick, unless FAKE_NO_QUICK stands for an ergactl without it.
     LAUNCHER = """#!/bin/sh
-case "$*" in "toolchain list --json" | "--version" | "check --help") ;; *) echo "ERGA $* assume_yes=${ERGA_ASSUME_YES:-} no_admin=${ERGA_NO_ADMIN:-} env=${ERGA_ENVIRONMENT:-}" >>"${CALLS:?}" ;; esac
+case "$*" in "toolchain list"* | "repository check --help") ;; *) echo "ERGA $* assume_yes=${ERGA_ASSUME_YES:-} no_admin=${ERGA_NO_ADMIN:-} env=${ERGA_ENVIRONMENT:-}" >>"${CALLS:?}" ;; esac
+[ -f "$(dirname "$0")/.setup-done" ] || { echo "Deno 2.9.8 is not here: run bin/setup.sh, then ./ergactl again." >&2; exit 3; }
 case "$*" in
-  "toolchain list --json") a='[]'; b='[]'; acts='[]'
-    # as erga says them: each entry's own system_packages, and the one command as the action "Install the system packages"
-    [ -n "${FAKE_LIBS:-}" ] && a='["libnss3","libgbm1"]' && b='["libnss3"]' && acts='[{"title":"Install the system packages","command":"sudo apt-get install -y libnss3 libgbm1"}]'
-    echo '{"schema":"erga/toolchain-list@1","data":[{"name":"node","phase":"Dev","found":{"version":"22"},"system_packages":[]},{"name":"python","phase":"Dev","found":null,"system_packages":'"$a"'},{"name":"docker","phase":"Dev","found":null,"optional":true},{"name":"jre","phase":"Dev","found":null,"system_packages":'"$b"'}],"actions":'"$acts"'}' ;;
-  "check --help") [ -n "${FAKE_NO_QUICK:-}" ] || echo "      --quick     Run the sections that finish in seconds" ;;
-  "doctor") echo "DOCTOR SAYS: Next: erga toolchain ensure jre" ;;
+  "toolchain list"*)
+    if [ -n "${FAKE_JSON:-}" ]; then
+      a='[]'; b='[]'; acts='[]'
+      # as erga says them: each entry's own system_packages, and the one command as the action "Install the system packages"
+      [ -n "${FAKE_LIBS:-}" ] && a='["libnss3","libgbm1"]' && b='["libnss3"]' && acts='[{"title":"Install the system packages","command":"sudo apt-get install -y libnss3 libgbm1"}]'
+      echo '{"schema":"erga/toolchain-list@1","data":[{"name":"node","phase":"Dev","found":{"version":"22"},"system_packages":[]},{"name":"python","phase":"Dev","found":null,"system_packages":'"$a"'},{"name":"docker","phase":"Dev","found":null,"optional":true},{"name":"jre","phase":"Dev","found":null,"system_packages":'"$b"'}],"actions":'"$acts"'}'
+    else
+      echo "deno         2.9.8          downloaded at its pin  Deno, which runs ergactl and every domain agent"
+      echo "git          >= 2.39        found on the computer  Git, which keeps the history of every clone"
+      echo "node         22.23.3        downloaded at its pin  Node.js, which builds and tests the TypeScript services"
+      echo "podman       >= 4.0         found on the computer  podman, which builds and runs the images of the container services"
+      echo "tex-newunicodechar 77677          downloaded at its pin  the TeX Live 2025 package newunicodechar"
+      echo "paragon      23.23.0        no build here  Paragon's CLI"
+    fi ;;
+  "repository check --help") [ -n "${FAKE_NO_QUICK:-}" ] || echo "  --quick                      Leave out the sections that compile or run every test." ;;
+  "doctor") echo "DOCTOR SAYS: Next: ergactl toolchain ensure jq" ;;
 esac
-[ "$1" = --version ] && [ -n "${FAKE_NO_BUILD:-}" ] && exit 3
 [ "$1 $2" = "check --quick" ] && [ -n "${FAKE_FAIL:-}" ] && exit 4
-[ "$1 $2" = "shell ensure" ] && [ -n "${FAKE_FAIL_SHELL:-}" ] && exit 3
-[ "$1 $2" = "local ensure" ] && [ -n "${FAKE_FAIL_LOCAL:-}" ] && exit 3
 exit 0
+"""
+    # A stand-in for erga's bin/setup.sh: it makes the clone ready for ./ergactl (here, a marker), or fails as one that could not fetch Deno does (FAKE_NO_SETUP).
+    SETUP = """#!/bin/sh
+echo "SETUP $* assume_yes=${ERGA_ASSUME_YES:-} no_admin=${ERGA_NO_ADMIN:-} env=${ERGA_ENVIRONMENT:-}" >>"${CALLS:?}"
+[ -n "${FAKE_NO_SETUP:-}" ] && { echo "Deno 2.9.8 could not be downloaded" >&2; exit 3; }
+: >"$(dirname "$0")/../.setup-done"
 """
 
     def setUp(self):
@@ -283,14 +302,17 @@ exit 0
         self.upstream = self.tmp / "upstream"
         self.upstream.mkdir()
         git("init", "-q", "-b", "main", cwd=self.upstream)
-        (self.upstream / "erga").write_text(self.LAUNCHER)
-        (self.upstream / "erga").chmod(0o755)
+        (self.upstream / "ergactl").write_text(self.LAUNCHER)
+        (self.upstream / "ergactl").chmod(0o755)
+        (self.upstream / "bin").mkdir()
+        (self.upstream / "bin" / "setup.sh").write_text(self.SETUP)
+        (self.upstream / "bin" / "setup.sh").chmod(0o755)
+        (self.upstream / ".gitignore").write_text(".setup-done\n")
         git("add", ".", cwd=self.upstream)
         git("commit", "-qm", "one", cwd=self.upstream)
         # the PostgreSQL destination every setup needs (009-machine-bootstrap FR-099): a psql 18 that answers, and the service [arca-local] of an earlier run
         self.stub("psql", 'case "$*" in *--version*) echo "psql (PostgreSQL) 18.6" ;; *server_version_num*) echo 180006 ;; esac')
         (self.home / ".pg_service.conf").write_text("[arca-local]\nhost=db.example\nport=5432\nuser=postgres\ndbname=arca\n")
-        self.stub("cargo")      # erga's launcher builds it with Cargo; the stand-in does not run it, the script only checks it is there
         self.clone = self.home / "workspaces" / "github.com" / "intellectual-frontiers" / "erga"
 
     def go(self, **extra):
@@ -308,12 +330,13 @@ exit 0
 
     def test_the_setup_alone_names_the_one_command_for_system_libraries_erga_says_it_lacks(self):
         """009-machine-bootstrap FR-023: erga holds the list; the setup has no copy, and installs nothing itself"""
-        p = self.go(FAKE_LIBS="1")
+        p = self.go(FAKE_JSON="1", FAKE_LIBS="1")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertIn("sudo apt-get install -y libnss3 libgbm1", p.stdout + p.stderr)
         self.assertIn("system libraries are missing: libnss3 libgbm1", p.stdout)
-        self.assertIn("ERGA toolchain ensure", self.calls.read_text(), "the programs are still installed")
-        self.assertNotIn("system libraries", self.go().stdout + self.go().stderr, "nothing is said where nothing is lacking")
+        self.assertIn("ERGA toolchain ensure python jre", self.calls.read_text(), "the programs are still installed: what is not here and not optional")
+        self.assertNotIn("system libraries", self.go(FAKE_JSON="1").stdout + self.go(FAKE_JSON="1").stderr, "nothing is said where nothing is lacking")
+        self.assertNotIn("system libraries", self.go().stdout + self.go().stderr, "an ergactl whose list is a table names none: nothing is said")
         self.assertNotIn("libnss3", SCRIPT.read_text(), "no second list of packages in the setup")
 
     def test_the_bootstrap_installs_those_libraries_with_the_rights_it_has_and_only_when_packages_are_on(self):
@@ -374,48 +397,63 @@ esac'''
         self.assertIn("none of the packages can be found", p.stdout + p.stderr)
 
     def test_it_copies_erga_runs_its_commands_and_says_what_is_next(self):
-        """009-machine-bootstrap FR-055 to FR-058, FR-065: toolchain ensure, the local database, check --quick and, last, doctor, whose output is shown; then the one optional line"""
+        """009-machine-bootstrap FR-055 to FR-058, FR-065: bin/setup.sh, toolchain ensure, check --quick and, last, doctor, whose output is shown; then the one optional line"""
         p = self.go()
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertTrue((self.clone / "erga").is_file())
+        self.assertTrue((self.clone / "ergactl").is_file())
         out = p.stdout
         calls = self.calls.read_text()
-        order = [calls.index(c) for c in ("ERGA toolchain ensure python jre", "ERGA check --quick", "ERGA doctor")]
-        self.assertEqual(order, sorted(order), "toolchain ensure, then the quick check, then doctor")
-        self.assertNotIn("docker", calls, "what is not here and not optional")
-        self.assertEqual(calls.count("assume_yes=1"), 3, "every question erga could ask is answered yes")
-        self.assertEqual(calls.count("no_admin=1"), 3, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
-        self.assertEqual(calls.count("env=bootstrap"), 3, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
-        self.assertIn("DOCTOR SAYS: Next: erga toolchain ensure jre", out, "doctor's own words are shown")
-        self.assertLess(out.index("DOCTOR SAYS"), out.index("erga shell emit bash"))
-        self.assertIn('eval "$(erga shell emit bash)"', out, "009-machine-bootstrap FR-101: the one optional line, printed and never written")
+        order = [calls.index(c) for c in ("SETUP ", "ERGA toolchain ensure deno node tex-newunicodechar", "ERGA check --quick", "ERGA doctor")]
+        self.assertEqual(order, sorted(order), "bin/setup.sh, then toolchain ensure, then the quick check, then doctor")
+        for gone in ("git", "podman", "paragon"):
+            self.assertNotIn(f" {gone}", calls.split("ERGA toolchain ensure")[1].splitlines()[0], "only what ergactl downloads at its pin: what is found on the computer is the computer's")
+        self.assertEqual(calls.count("assume_yes=1"), 4, "every question erga could ask is answered yes")
+        self.assertEqual(calls.count("no_admin=1"), 4, "009-machine-bootstrap FR-001: no erga command the setup runs may use administrator rights")
+        self.assertEqual(calls.count("env=bootstrap"), 4, "009-machine-bootstrap FR-054: erga's events say they come from a setup")
+        self.assertNotIn("cargo", calls + out, "no erga command needs Cargo")
+        self.assertIn("DOCTOR SAYS: Next: ergactl toolchain ensure jq", out, "doctor's own words are shown")
+        self.assertLess(out.index("DOCTOR SAYS"), out.index("ergactl agent-tools shell emit bash"))
+        self.assertIn('eval "$(ergactl agent-tools shell emit bash --json | jq -r .text)"', out, "009-machine-bootstrap FR-101: the one optional line, printed and never written")
         self.assertNotIn("exec bash -l", out, "no new shell is started for the person")
-        self.assertIn("erga help start", out)
+        self.assertNotRegex(out, r"(?<![\w-])\./erga\b(?!ctl)", "no command of the retired Rust erga is named")
+        self.assertIn("ergactl help", out)
         self.assertNotIn("orch", out)
-        wrapper = self.home / ".local" / "bin" / "erga"
-        self.assertIn(str(self.clone / "erga"), wrapper.read_text())
+        wrapper = self.home / ".local" / "bin" / "ergactl"
+        self.assertIn(str(self.clone / "ergactl"), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
-        self.assertFalse((self.home / ".local" / "bin" / "arca").exists(), "a copy of erga with no arca launcher has nothing to link")
+        self.assertFalse((self.home / ".local" / "bin" / "arcactl").exists(), "a copy of erga with no arcactl launcher has nothing to link")
 
-    def test_arca_is_linked_beside_erga_when_the_clone_has_its_launcher(self):
-        """009-machine-bootstrap FR-058: `arca` works from any folder, as `erga` does."""
+    def test_the_wrappers_of_the_retired_rust_launchers_are_removed_and_a_file_of_the_persons_is_left(self):
+        """009-machine-bootstrap FR-058; 269-repository-layout FR-128: ~/.local/bin/erga and arca, made by an earlier setup for the Rust launchers, go where the clone has none"""
+        binf = self.home / ".local" / "bin"
+        binf.mkdir(parents=True)
+        (binf / "erga").write_text(f'#!/bin/sh\n# erga-setup wrapper: runs the clone\'s launcher, so erga works from any folder\nexec "{self.clone}/erga" "$@"\n')
+        (binf / "arca").write_text("#!/bin/sh\necho mine\n")
+        self.assertEqual(self.go().returncode, 0)
+        self.assertFalse((binf / "erga").exists(), "the setup's own wrapper for the retired launcher is removed")
+        self.assertEqual((binf / "arca").read_text(), "#!/bin/sh\necho mine\n", "a file of the person's is left")
+
+    def test_arcactl_is_linked_beside_ergactl_when_the_clone_has_its_launcher(self):
+        """009-machine-bootstrap FR-058: `arcactl` works from any folder, as `ergactl` does."""
         self.go()
-        launcher = self.clone / "arca"
-        launcher.write_text("#!/bin/sh\necho arca ran\n")
+        launcher = self.clone / "arcactl"
+        launcher.write_text("#!/bin/sh\necho arcactl ran\n")
         launcher.chmod(0o755)
         self.go()
-        wrapper = self.home / ".local" / "bin" / "arca"
+        wrapper = self.home / ".local" / "bin" / "arcactl"
         self.assertIn(str(launcher), wrapper.read_text())
         self.assertTrue(os.access(wrapper, os.X_OK))
 
     def test_the_toolchain_can_be_named_or_skipped(self):
         self.go(BOOTSTRAP_TOOLCHAIN="node")
-        self.assertIn("ERGA toolchain ensure node", self.calls.read_text())
+        self.assertIn("ERGA toolchain ensure node assume_yes", self.calls.read_text())
+        self.go(BOOTSTRAP_TOOLCHAIN="all")
+        self.assertIn("ERGA toolchain ensure deno git node podman tex-newunicodechar paragon assume_yes", self.calls.read_text(), "every entry of the table")
         self.go(BOOTSTRAP_TOOLCHAIN="none")
         self.assertNotIn("ERGA toolchain ensure", self.calls.read_text())
 
     def test_a_launcher_link_that_erga_shell_ensure_made_is_not_warned_about(self):
-        """009-machine-bootstrap FR-058: ~/.local/bin/erga as a link to this clone's launcher is right; a link elsewhere or a file of the person's is left with a line that says which"""
+        """009-machine-bootstrap FR-058: ~/.local/bin/ergactl as a link to this clone's launcher is right; a link elsewhere or a file of the person's is left with a line that says which"""
         target = self.tmp / "clone"
         target.mkdir()
         (target / "erga").write_text("#!/bin/sh\n")
@@ -444,7 +482,7 @@ esac'''
         calls = self.calls.read_text()
         for name in ("doctor", "toolchain ensure", "check --quick"):
             self.assertIn(f"ERGA {name}", calls)
-        self.assertRegex(p.stdout, r"(x|❌).*\./erga check --quick \(exit status 4\)")
+        self.assertRegex(p.stdout, r"(x|❌).*\./ergactl check --quick \(exit status 4\)")
 
     def test_an_erga_without_the_quick_check_is_given_no_check_and_the_summary_says_so(self):
         """009-machine-bootstrap FR-057: the full check takes minutes, so it is never run in place of the quick one"""
@@ -454,19 +492,32 @@ esac'''
         self.assertIn("ERGA doctor", self.calls.read_text())
         self.assertIn("no quick check yet", p.stdout)
 
-    def test_an_erga_that_cannot_be_built_runs_nothing_more_and_says_so(self):
-        p = self.go(FAKE_NO_BUILD="1")
+    def test_a_clone_bin_setup_cannot_make_ready_runs_nothing_more_and_says_so(self):
+        """009-machine-bootstrap FR-055: without bin/setup.sh's Deno no ./ergactl can run"""
+        p = self.go(FAKE_NO_SETUP="1")
         self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
-        self.assertEqual(self.calls.read_text(), "")
-        self.assertIn("erga could not be built", p.stdout)
+        self.assertNotIn("ERGA", self.calls.read_text())
+        self.assertIn("bin/setup.sh did not finish", p.stdout)
+        self.assertIn("bin/setup.sh: the clone could not be made ready for ./ergactl (exit status 3)", p.stdout)
+        self.assertIn("run bin/setup.sh to see why it stopped", p.stdout, "the next step is bin/setup.sh, since doctor did not run")
+        self.assertNotIn("names above", p.stdout)
 
-    def test_without_cargo_erga_is_not_run_and_the_summary_says_why(self):
-        (self.bin / "cargo").unlink()
+    def test_without_cargo_ergactl_still_runs(self):
+        """009-machine-bootstrap FR-026, FR-055: Rust is for Thyra and ArcaDrive; no erga command needs Cargo (269-repository-layout FR-122)"""
         path = ":".join(d for d in os.environ["PATH"].split(":") if not (Path(d) / "cargo").exists())
         p = self.go(PATH=f"{self.bin}:{path}")
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
-        self.assertIn("Rust (cargo) is missing", p.stdout)
+        self.assertNotIn("cargo", p.stdout.lower())
+        self.assertIn("ERGA doctor", self.calls.read_text())
+
+    def test_a_clone_without_ergactl_runs_nothing(self):
+        """009-machine-bootstrap FR-055: a clone of the retired Rust erga, with ./erga and no ./ergactl, is not run"""
+        git("mv", "ergactl", "erga", cwd=self.upstream)
+        git("commit", "-qm", "rust", cwd=self.upstream)
+        p = self.go()
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertEqual(self.calls.read_text(), "")
+        self.assertIn("./ergactl is not here yet", p.stdout)
 
     def test_an_existing_clone_is_updated_by_fast_forward_alone(self):
         self.assertEqual(self.go(BOOTSTRAP_NO_ERGA="1").returncode, 0)
@@ -926,7 +977,7 @@ class Settings(Fixture):
         self.assertEqual(oct(f.parent.stat().st_mode & 0o777), "0o700")
         self.assertIn("ERGA_SIGNALS_TOKEN='arca_abcdefghijklmnopqrstuvwxyz1234'", f.read_text())
         self.assertIn("ERGA_SIGNALS_URL='https://arca.example'", f.read_text())
-        self.assertTrue(f.read_text().startswith("# Kept by `erga secrets`; change it with `erga secrets set` and `erga secrets remove`.\n"), "the first line erga secrets writes, byte for byte (009-machine-bootstrap FR-052)")
+        self.assertTrue(f.read_text().startswith("# Kept by `ergactl secrets`; change it with `ergactl secrets set` and `ergactl secrets remove`.\n"), "the first line erga secrets writes, byte for byte (009-machine-bootstrap FR-052)")
         self.assertIn("ERGA_PERSON='ifcore:A B'", f.read_text())
         self.assertNotIn("arca_abcdefghijklmnopqrstuvwxyz1234", p.stdout + p.stderr, "the value is never shown")
         for name in (".profile", ".bashrc", ".zshenv", ".config/fish"):
@@ -953,7 +1004,7 @@ class Settings(Fixture):
         p = self.keep(GH_TOKEN="ghp_" + "x" * 30)
         self.assertFalse((self.home / ".config" / "erga" / "secrets.env").exists())
         self.assertIn("not saved", p.stdout + p.stderr)
-        self.assertIn("erga secrets set GH_TOKEN", p.stdout + p.stderr)
+        self.assertIn("ergactl secrets set GH_TOKEN", p.stdout + p.stderr)
         q = self.keep(ERGA_SIGNALS_TOKEN="arca_it's")
         self.assertIn("not saved", q.stdout + q.stderr)
         self.assertIn("not saved", self.keep(ERGA_SIGNALS_TOKEN='arca_"quoted"').stdout, "erga secrets refuses a double quote too")
@@ -966,10 +1017,10 @@ class Settings(Fixture):
         self.assertIn("Your GitHub sign-in is kept on this computer", kept)
         self.assertIn("gh auth logout", kept)
         self.assertNotIn("not saved", kept)
-        self.assertNotIn("erga secrets set GH_TOKEN", kept)
+        self.assertNotIn("ergactl secrets set GH_TOKEN", kept)
         token = said("env")
         self.assertIn("not saved", token)
-        self.assertIn("erga secrets set GH_TOKEN", token)
+        self.assertIn("ergactl secrets set GH_TOKEN", token)
         self.assertIn("gh auth login", token)
         self.assertIn("The GitHub token in GH_TOKEN was used", token)
         for output in (kept, token):
@@ -1098,7 +1149,7 @@ class Bootstrap(Fixture):
         p = self.run_boot("--dry-run", BOOTSTRAP_OS_RELEASE=self.debian(), PATH=self.with_apt())
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertEqual(tree(self.home), before)
-        for step in ("install with apt", "Setting up erga in this account", "erga doctor"):
+        for step in ("install with apt", "Setting up erga in this account", "bin/setup.sh", "ergactl doctor"):
             self.assertIn(step, p.stdout)
         for text in ("create the Linux account", "adduser", "useradd"):
             self.assertNotIn(text, p.stdout)
@@ -1313,7 +1364,7 @@ class MacOS(Fixture):
         p = self.setup(SHELL="/bin/zsh", **{k: "1" for k in MAC_OFF})
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertIn("macOS 15.1", p.stdout)
-        self.assertIn("erga shell emit zsh", p.stdout, "the one optional line, for the shell a Mac starts")
+        self.assertIn("ergactl agent-tools shell emit zsh", p.stdout, "the one optional line, for the shell a Mac starts")
         self.assertIn("~/.zshrc", p.stdout)
         self.assertNotIn("exec ", p.stdout)
 
@@ -1388,7 +1439,7 @@ class MacOS(Fixture):
         self.stub("gh", "exit 0")
         run = self.boot(SHELL="/bin/zsh", **{k: "1" for k in MAC_OFF})
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertIn("erga shell emit zsh", run.stdout)
+        self.assertIn("ergactl agent-tools shell emit zsh", run.stdout)
         self.assertNotIn("login shell", run.stdout, "no login shell is changed")
 
 

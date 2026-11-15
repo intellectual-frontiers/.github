@@ -9,11 +9,11 @@
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-setup.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
 # It never uses sudo or a package manager. It needs these common utilities from the computer, which `erga-bootstrap.sh` installs (a bare Debian or Arch has none of them):
-#   git curl tar xz unzip, and a C compiler and linker (cc), which Rust links with  (a missing one is named, with the one command a person with administrator
-#   rights runs: apt-get on the Debian family, pacman on the Arch family)
+#   git curl tar xz unzip (bin/setup.sh unpacks Deno with unzip), and a C compiler and linker (cc), which Rust links with for Thyra and ArcaDrive  (a missing one is
+#   named, with the one command a person with administrator rights runs: apt-get on the Debian family, pacman on the Arch family)
 # Of the other programs this script fetches only what it needs before erga exists, as the publisher's release pinned and checked by SHA-256, into ~/.local/share and linked
 # into ~/.local/bin: jq and gh (a copy already on the PATH is used, not installed again). The rest (glab, ripgrep, fd, shellcheck, Node.js and the others) are erga's toolchain,
-# which `./erga toolchain ensure` installs here and `erga update` keeps current. A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window
+# which `./ergactl toolchain ensure` installs here and `ergactl repo update` keeps current. A Mac needs only the Command Line Tools (`xcode-select --install`, which opens a window
 # a person answers: git and the C compiler): macOS carries curl, tar and unzip.
 #
 # It is self-contained and needs no other program of the organization's. It writes none of the account's dotfiles (no startup file, git config, prompt or login shell: those are
@@ -23,11 +23,13 @@
 #      and are not held to GitHub's hourly limit for no sign-in; with no token at all, everything that comes from GitHub's releases is skipped and listed in the summary, to be done
 #      by running this again after sign-in. Its own git calls name gh as the credential helper for the call, so no git config is needed,
 #   2. Rust and uv: installs Rust's installer, rustup, from the pinned rustup-init (checked by SHA-256) into ~/.rustup and ~/.cargo, with the stable toolchain as its default and no
-#      startup file touched; the pinned uv (checked by SHA-256), which runs the few Python programs,
+#      startup file touched (Rust builds Thyra and ArcaDrive; no erga command needs Cargo); the pinned uv (checked by SHA-256), which runs the few Python programs,
 #   3. Workspace and clone: copies the private erga repository to ~/workspaces/github.com/intellectual-frontiers/erga (or updates it by
 #      fast-forward only), then installs there the Rust toolchain its rust-toolchain.toml names (stable) (rustup checks each part against its manifest),
-#   4. erga: runs, in the clone, ./erga toolchain ensure, ./erga check --quick where erga has it (seconds; the full `erga check` takes minutes and is yours
-#      to run) and, last, ./erga doctor, which says what to do next. It ends by printing the one optional line that puts erga on your PATH (`erga shell emit`, erga's 010-shell).
+#   4. erga: runs, in the clone, bin/setup.sh (the pinned Deno into erga's toolchain store, then the workspace's deno.json, packages and generated files), then
+#      ./ergactl repo workspace set --role where ERGA_ROLE is given, ./ergactl toolchain ensure, ./ergactl check --quick where ergactl has it (the full `ergactl check` takes
+#      minutes and is yours to run) and, last, ./ergactl doctor, which says what to do next. It ends by printing the one optional line that puts erga on your PATH
+#      (`ergactl agent-tools shell emit`, erga's 010-shell).
 #
 # Safe to run again: what is already in place changes nothing, and a clone with your work in it is left exactly as it is. Long steps show one line with a spinner (at a terminal
 # only); what a step printed is kept in a log and shown only if the step fails.
@@ -50,18 +52,18 @@
 #   BOOTSTRAP_NO_AUTH=1    do not sign in to GitHub or set git's name, email and pull.ff (a GH_TOKEN, or a gh already signed in, is still used; without either, what comes from GitHub is skipped)
 #   BOOTSTRAP_NO_CLONE=1   do not copy or update erga (and so run nothing in it)
 #   BOOTSTRAP_NO_ERGA=1    copy erga but run none of its commands
-#   BOOTSTRAP_TOOLCHAIN    the names for `erga toolchain ensure` (default: every entry of `erga toolchain list` not here and not marked optional; none; all)
+#   BOOTSTRAP_TOOLCHAIN    the names for `ergactl toolchain ensure` (default: every entry `ergactl toolchain list` says ergactl downloads at its pin; none; all)
 #   BOOTSTRAP_FRESH=1      look for a newer release of each tool that follows its newest release, even when one is installed
 #   BOOTSTRAP_YES=1        answer yes to the questions that default to yes
 #   ERGA_RETRIES           how many times to try each download or network step before it counts as failed (default 8; the waits grow, so 8 tries last about three minutes)
 #   ERGA_RETRY_DELAY       seconds to wait before the second try; it doubles each time up to ERGA_RETRY_MAX_DELAY (default 3, and 60)
 #   BOOTSTRAP_PATIENT=1    the same as --patient: for a network that drops often (15 tries, 5 seconds to start, 120 at most)
 #   BOOTSTRAP_NO_NETCHECK=1  do not look at the network before installing (it takes a few seconds, and stops early where GitHub or Rust's servers cannot be reached)
-#   ERGA_WORKSPACES        the workspaces folder (default ~/workspaces), the folder `erga workspace` uses too
+#   ERGA_WORKSPACES        the workspaces folder (default ~/workspaces), the folder `ergactl repo workspace` uses too
 # ERGA_WORKSPACES is read from the environment, then from
 # ~/.config/erga/setup.env (one NAME=value line each).
 #
-# Exit status: 0 done, 1 erga's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
+# Exit status: 0 done, 1 ergactl's own doctor or check found something to look at, 2 usage, 3 the computer cannot be set up yet (a program it needs is missing),
 # 4 a step failed (setup stops, and says where the log and the support file are), 5 the GitHub sign-in did not finish.
 # Everything is logged to ~/.erga-bootstrap/log/ (BOOTSTRAP_LOG_DIR changes it); BOOTSTRAP_SUPPORT names who to send the support file to; BOOTSTRAP_KEEP_GOING=1 does not stop at a failed step.
 # What was skipped for want of a GitHub token is not a failed step: it is listed in the summary and the exit status stays 0.
@@ -559,7 +561,7 @@ short_path() { case $1 in "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;; *) printf 
 # see how long things take and where people get stuck, each one OpenTelemetry log record posted to arca's door as OTLP/JSON (206-arca-engines FR-015): environment
 # `bootstrap`, a device id made from the machine, the kind of computer, and the host name and Linux user name (as erga's own events carry). No password, token or file
 # content is sent. Without them, or with DO_NOT_TRACK=1 or ERGA_OBSERVE=off, nothing is sent and nothing else changes: it is an aid, never a gate.
-# The settings a person kept earlier (`erga secrets`, 009 FR-052) count where this terminal did not load them.
+# The settings a person kept earlier (`ergactl secrets`, 009 FR-052) count where this terminal did not load them.
 secrets_file=$cfgdir/erga/secrets.env
 sf_get() {  # sf_get NAME: the value kept in the file, or nothing
   [ -r "$secrets_file" ] || return 0
@@ -1030,7 +1032,7 @@ check_prereqs() {
       "from an account that has them, run:  $(admin_install_cmd "$cmd")   (or run erga-bootstrap.sh, which installs what is needed and then runs this setup)"
   done
   missing=""
-  for cmd in tar xz unzip cc; do   # cc: the C compiler and linker Rust links with, without which ./erga cannot be built
+  for cmd in tar xz unzip cc; do   # unzip: bin/setup.sh unpacks Deno with it; cc: the C compiler and linker Rust links with (Thyra and ArcaDrive; no erga command needs it)
     command -v "$cmd" >/dev/null 2>&1 || missing="$missing $cmd"
   done
   [ -z "$missing" ] && return 0
@@ -1312,8 +1314,9 @@ prune_old() {
 }
 
 # ---- the runtime: Rust through rustup, and uv (009-machine-bootstrap FR-025, FR-026) -----------------------------------------------------------------------
-# `./erga` is compiled by Cargo before it runs, so Rust comes first. rustup, Rust's own installer, is put in ~/.rustup and ~/.cargo from the pinned rustup-init
-# (checked by SHA-256), with the stable toolchain as its default and without touching a startup file (`erga shell emit` puts ~/.cargo/bin on the PATH where a person asks for it). The toolchain
+# ergactl runs on Deno (bin/setup.sh, in the clone) and needs no Cargo; Rust stays for Thyra and ArcaDrive (269-repository-layout FR-122). rustup, Rust's own installer, is put in ~/.rustup
+# and ~/.cargo from the pinned rustup-init (checked by SHA-256), with the stable toolchain as its default and without touching a startup file (`ergactl agent-tools shell emit` puts
+# ~/.cargo/bin on the PATH where a person asks for it). The toolchain
 # itself is the stable one the clone's rust-toolchain.toml names, installed once the clone is there. uv, which runs the few Python programs, is the pinned release.
 
 rustup_url() { printf 'https://static.rust-lang.org/rustup/archive/%s/%s/rustup-init' "$RUSTUP_INIT_VERSION" "$rust_target"; }
@@ -1351,7 +1354,7 @@ setup_runtime() {
   if have_rustup; then
     [ "$dry" = 1 ] && would "use the rustup already here; the clone's rust-toolchain.toml chooses the toolchain"
   else
-    step "${e_dl}Installing rustup $RUSTUP_INIT_VERSION, Rust's installer (into ~/.rustup and ~/.cargo)" install_rustup || { problem "rustup could not be installed, so erga cannot be built"; }
+    step "${e_dl}Installing rustup $RUSTUP_INIT_VERSION, Rust's installer (into ~/.rustup and ~/.cargo)" install_rustup || { problem "rustup could not be installed, so Thyra and ArcaDrive cannot be built (erga's commands do not need it)"; }
   fi
   if [ ! -x "$tools/uv/$UV_VERSION/uv" ] || [ "$(readlink "$tools/uv/current" 2>/dev/null)" != "$UV_VERSION" ]; then
     step "${e_dl}Installing uv $UV_VERSION" install_uv || { problem "uv could not be installed"; return 0; }
@@ -1360,7 +1363,7 @@ setup_runtime() {
   return 0
 }
 
-# In the clone: the Rust toolchain its rust-toolchain.toml names (stable), with the components it names, before the first ./erga (rustup checks each part against its manifest)
+# In the clone: the Rust toolchain its rust-toolchain.toml names (stable), with the components it names, for Thyra and ArcaDrive (rustup checks each part against its manifest)
 rust_toolchain_step() {   # rustup 1.28 and later install what the file names with `rustup toolchain install`; an older rustup does it on `rustup show`
   ( cd "$target" && { retry_cmd "the Rust toolchain (static.rust-lang.org)" rustup toolchain install || retry_cmd "the Rust toolchain (static.rust-lang.org)" rustup show; } )
 }
@@ -1533,10 +1536,10 @@ workspace_and_clone() {
 
 link_launcher() {  # link_launcher NAME: ~/.local/bin/NAME runs the clone's launcher of that name, so the command works from any folder
   ll_name=$1
-  [ -x "$target/$ll_name" ] || return 0   # a copy of erga with no such launcher (an older one) has nothing to link
+  [ -x "$target/$ll_name" ] || return 0   # a copy of erga with no such launcher has nothing to link
   mkdir -p "$bin"
   w=$bin/$ll_name
-  # `erga shell ensure` makes this a link to the clone's launcher (and replaces the wrapper below with it): already right, nothing to say
+  # a link to the clone's launcher (a person's, or an earlier erga's) is already right: nothing to say
   if [ -L "$w" ] && [ "$w" -ef "$target/$ll_name" ]; then return 0; fi
   if [ -L "$w" ] && [ ! -e "$w" ]; then rm -f "$w"; fi   # a link to a clone that is gone
   if [ ! -e "$w" ] || grep -q 'erga-setup wrapper' "$w" 2>/dev/null; then
@@ -1547,8 +1550,15 @@ link_launcher() {  # link_launcher NAME: ~/.local/bin/NAME runs the clone's laun
     else warn "$w is a file of yours, so I left it; run $ll_name as $target/$ll_name"; fi
   fi
 }
-# erga and arca, the two commands of the clone (009-machine-bootstrap FR-058)
-link_erga() { link_launcher erga; link_launcher arca; }
+# ergactl and arcactl, the two commands of the clone (009-machine-bootstrap FR-058). The wrappers this setup once made for the retired Rust `erga` and `arca`
+# (269-repository-layout FR-122, FR-128) are removed where the clone no longer has those launchers; a file or link of the person's is left.
+unlink_retired() {
+  ul_w=$bin/$1
+  [ -x "$target/$1" ] && return 0
+  if [ -f "$ul_w" ] && [ ! -L "$ul_w" ] && grep -q 'erga-setup wrapper' "$ul_w" 2>/dev/null; then rm -f "$ul_w"; fi
+  return 0
+}
+link_erga() { link_launcher ergactl; link_launcher arcactl; unlink_retired erga; unlink_retired arca; }
 
 # in_erga_quiet COMMAND...: run in the clone, for a step: every question is answered yes (009-machine-bootstrap FR-065), none may use administrator rights,
 # the progress lines erga draws for a person are off, and the events it sends say they come from a setup.
@@ -1558,7 +1568,24 @@ in_erga_quiet() {
 in_erga() {  # in_erga COMMAND...: the same, for a command whose output is shown as it is
   ( cd "$target" && ERGA_ASSUME_YES=1 ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/null )
 }
-erga_list_json() { ( cd "$target" && ./erga toolchain list --json </dev/null 2>/dev/null ); }
+erga_list_json() { ( cd "$target" && ./ergactl toolchain list --json </dev/null 2>/dev/null ); }
+# The names of `ergactl toolchain list`: from its JSON where it gives one (`data[].name`, `found`, `optional`), else from its table, one entry a line: the name, the version,
+# then where it comes from ("downloaded at its pin", "found on the computer" or "no build here"). Only what ergactl downloads can `ergactl toolchain ensure` install; what is
+# found on the computer is the computer's (FR-021), and `ergactl doctor` names what is missing. toolchain_names all|missing
+toolchain_names() {
+  tn_out=$(erga_list_json) || return 0
+  if printf '%s' "$tn_out" | jq -e '.data | type == "array"' >/dev/null 2>&1; then
+    case $1 in
+      all) printf '%s' "$tn_out" | jq -r '.data[].name' ;;
+      *) printf '%s' "$tn_out" | jq -r '.data[] | select(.found == null) | select((.optional // false) | not) | .name' ;;
+    esac
+    return 0
+  fi
+  case $1 in
+    all) printf '%s\n' "$tn_out" | awk 'NF >= 2 && $1 ~ /^[a-z][a-z0-9-]*$/ { print $1 }' ;;
+    *) printf '%s\n' "$tn_out" | awk '$1 ~ /^[a-z][a-z0-9-]*$/ && / downloaded at its pin / { print $1 }' ;;
+  esac
+}
 in_erga_asking() {  # in_erga_asking COMMAND...: in front of the person, at the terminal, so that erga may ask its one question; never with administrator rights
   ( cd "$target" && ERGA_NO_ADMIN=1 ERGA_ENVIRONMENT=bootstrap "$@" </dev/tty )
 }
@@ -1580,36 +1607,38 @@ system_libraries() {
   return 0
 }
 
-# Whether this erga has the quick check: `erga check --quick` (009-machine-bootstrap FR-057) runs the sections that finish in seconds; an erga without it is not given a
-# check that takes minutes in its place.
-erga_has_quick_check() { ( cd "$target" && ./erga check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
+# Whether this ergactl has the quick check: `ergactl check --quick` (009-machine-bootstrap FR-057) leaves out the sections that compile or run every test; an ergactl
+# without it is not given a check that takes minutes in its place. `ergactl check` hands its options to `ergactl repository check`, whose help says them (`ergactl check --help`
+# runs Deno's own checks first, so it is not asked).
+erga_has_quick_check() { ( cd "$target" && ./ergactl repository check --help </dev/null 2>/dev/null ) | grep -q -- '--quick'; }
 
-# In the clone, in this order (009-machine-bootstrap FR-055): ./erga toolchain ensure, ./erga check --quick; ./erga doctor comes last, in the summary,
-# once everything is installed (FR-056). Every one runs even when one before it failed.
+# In the clone, in this order (009-machine-bootstrap FR-055): bin/setup.sh (the pinned Deno, the workspace's packages and generated files; without it no ./ergactl runs),
+# ./ergactl repo workspace set --role, ./ergactl toolchain ensure, ./ergactl check --quick; ./ergactl doctor comes last, in the summary, once everything is installed (FR-056).
+# Every one after bin/setup.sh runs even when one before it failed.
 run_erga() {
   heading "${e_rocket}erga"
   if [ "$dry" = 1 ]; then
     [ "${BOOTSTRAP_NO_CLONE:-}" = 1 ] || [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ] || {
-      would "link ~/.local/bin/erga and ~/.local/bin/arca to the clone's launchers"
-      would "build erga and arca in the clone with Cargo, in one command (./erga --version; the first time takes about 5 to 15 minutes, once)"
-      [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./erga workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
-      would "ask erga which system libraries its programs need that this computer lacks (./erga toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
-      would "run in the clone: ./erga toolchain ensure (every entry of ./erga toolchain list that is not here and not optional)"
-      would "run in the clone: ./erga check --quick, where this erga has it (a few sections, in seconds; the full ./erga check takes minutes and is left to you)"
-      would "run in the clone, last: ./erga doctor, which says what to do next"
+      would "link ~/.local/bin/ergactl and ~/.local/bin/arcactl to the clone's launchers"
+      would "run in the clone: bin/setup.sh (the pinned Deno into erga's toolchain store, then deno.json, the packages of deno.lock and the generated files; a few minutes the first time, once)"
+      [ -z "$(cfg ERGA_ROLE '')" ] || would "run in the clone: ./ergactl repo workspace set --role $(cfg ERGA_ROLE '') (this workspace's role, erga 009-machine-bootstrap FR-089)"
+      would "ask erga which system libraries its programs need that this computer lacks (./ergactl toolchain list); the bootstrap installs them with the package manager, the setup alone names the one command for an administrator"
+      would "run in the clone: ./ergactl toolchain ensure (every entry of ./ergactl toolchain list that ergactl downloads at its pin)"
+      would "run in the clone: ./ergactl check --quick, where this ergactl has it (the sections that compile or run every test left out; the full ./ergactl check takes minutes and is left to you)"
+      would "run in the clone, last: ./ergactl doctor, which says what to do next"
     }
     return 0
   fi
-  if [ "${cloned:-0}" != 1 ] || [ ! -x "$target/erga" ]; then say "erga is not here yet, so I ran none of its commands."; erga_ran=0; return 0; fi
+  if [ "${cloned:-0}" != 1 ] || [ ! -x "$target/ergactl" ]; then say "erga's ./ergactl is not here yet, so I ran none of its commands."; erga_ran=0; return 0; fi
   link_erga
   if [ "${BOOTSTRAP_NO_ERGA:-}" = 1 ]; then say "Skipped erga's commands (BOOTSTRAP_NO_ERGA=1)."; erga_ran=0; return 0; fi
-  have_cmd cargo || { warn "Cargo, Rust's build tool, is not here, so erga cannot be built (its launcher compiles it)."; problem "erga was not run: Rust (cargo) is missing"; erga_ran=0; return 0; }
   erga_ran=1
   status_build=0; status_doctor=0; status_tool=0; status_check=0; tool_skipped=0; tool_ran=0; check_ran=0
-  phase "${e_rocket}Getting erga ready ${d}(the first time takes about 5 to 15 minutes, once)${z}"
-  step_soft "${e_rust}Building erga and arca with Cargo" in_erga_quiet ./erga --version || status_build=$?
+  phase "${e_rocket}Getting erga ready ${d}(the first time takes a few minutes, once)${z}"
+  # bin/setup.sh: the pinned Deno (checked by SHA-256) into erga's toolchain store, then deno.json, the packages of deno.lock and the generated files; safe to run again
+  step_soft "${e_dl}Getting Deno and erga's packages ready (bin/setup.sh)" in_erga_quiet ./bin/setup.sh || status_build=$?
   if [ "$status_build" != 0 ]; then
-    problem "erga could not be built (in $(short_path "$target") run: cargo build -p erga, to see why)"
+    problem "erga's bin/setup.sh did not finish, so no ./ergactl command was run (in $(short_path "$target") run: bin/setup.sh, to see why)"
     phase_close
     return 0
   fi
@@ -1617,34 +1646,34 @@ run_erga() {
   # FR-010): ERGA_ROLE, developer or operator; none given, the workspace is a developer's and the summary says how to make it an operator's.
   role=$(cfg ERGA_ROLE '')
   if [ -n "$role" ]; then
-    step_soft "${e_ok}Recording this workspace as a $role's" in_erga_quiet ./erga workspace set --role "$role" || problem "erga workspace set --role $role did not finish (run it in $(short_path "$target") to see why)"
+    step_soft "${e_ok}Recording this workspace as a $role's" in_erga_quiet ./ergactl repo workspace set --role "$role" || problem "ergactl repo workspace set --role $role did not finish (run it in $(short_path "$target") to see why)"
   else
-    say "This workspace is a developer's; ./erga workspace set --role operator makes it an operator's (ERGA_ROLE=operator does it here)."
+    say "This workspace is a developer's; ./ergactl repo workspace set --role operator makes it an operator's (ERGA_ROLE=operator does it here)."
   fi
-  # The programs erga's commands use: every entry erga lists that is not here and not marked optional, unless BOOTSTRAP_TOOLCHAIN names others
+  # The programs erga's commands use: every entry ergactl downloads at its pin (ensure keeps what is here), unless BOOTSTRAP_TOOLCHAIN names others
   names=""
   case $(cfg BOOTSTRAP_TOOLCHAIN '') in
     none) ;;
-    all) names=$(erga_list_json | jq -r '.data[].name' 2>/dev/null || true) ;;
-    "") names=$(erga_list_json | jq -r '.data[] | select(.found == null) | select((.optional // false) | not) | .name' 2>/dev/null || true) ;;
+    all) names=$(toolchain_names all 2>/dev/null || true) ;;
+    "") names=$(toolchain_names missing 2>/dev/null || true) ;;
     *) names=$(cfg BOOTSTRAP_TOOLCHAIN '') ;;
   esac
   names=$(printf '%s' "$names" | tr '\n' ' ' | sed 's/ *$//')
   if [ -n "$names" ] && ! github_ready; then
     tool_skipped=1
-    say "Left until you sign in to GitHub: ./erga toolchain ensure ($names)."
-    skip_github "erga toolchain ensure: $names"
+    say "Left until you sign in to GitHub: ./ergactl toolchain ensure ($names)."
+    skip_github "ergactl toolchain ensure: $names"
   elif [ -n "$names" ]; then
     system_libraries
     tool_ran=1
     # shellcheck disable=SC2086
-    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./erga toolchain ensure $names || status_tool=$?
+    step_soft "${e_pkg}Installing the programs erga uses" in_erga_quiet ./ergactl toolchain ensure $names || status_tool=$?
   fi
   if erga_has_quick_check; then
     check_ran=1
-    step_soft "${e_ok}Checking that erga is healthy (a quick check)" in_erga_quiet ./erga check --quick || status_check=$?
+    step_soft "${e_ok}Checking that erga is healthy (a quick check)" in_erga_quiet ./ergactl check --quick || status_check=$?
   else
-    logf "this erga has no check --quick, so no check was run; the full check is ./erga check"
+    logf "this ergactl has no check --quick, so no check was run; the full check is ./ergactl check"
   fi
   phase_close
   if [ "$status_check" != 0 ] && [ -f "$work/last.log" ]; then
@@ -1654,16 +1683,16 @@ run_erga() {
   return 0
 }
 
-# ./erga doctor, last (009-machine-bootstrap FR-055, FR-056): it says how this computer stands and the next step; its output is shown whole, and kept in the log
+# ./ergactl doctor, last (009-machine-bootstrap FR-055, FR-056): it says how this computer stands and the next step; its output is shown whole, and kept in the log
 hand_over() {
   [ "${erga_ran:-0}" = 1 ] && [ "${status_build:-0}" = 0 ] || return 0
-  heading "${e_ok}erga doctor: how this computer stands"
+  heading "${e_ok}ergactl doctor: how this computer stands"
   do_out=$work/doctor.out
-  in_erga ./erga doctor >"$do_out" 2>&1 || status_doctor=$?
+  in_erga ./ergactl doctor >"$do_out" 2>&1 || status_doctor=$?
   cat "$do_out"
   step_no=$((step_no + 1))
-  if [ "$log_ok" = 1 ]; then { printf '\n==== STEP %s: ./erga doctor (exit %s)\n' "$step_no" "$status_doctor"; cat "$do_out"; } >>"$logfile" 2>/dev/null || true; fi
-  ph_event bootstrap_step "s:step=erga doctor" "s:phase=erga" "s:outcome=$([ "$status_doctor" = 0 ] && echo ok || echo failed)" "n:exit_code=$status_doctor" "n:step_no=$step_no"
+  if [ "$log_ok" = 1 ]; then { printf '\n==== STEP %s: ./ergactl doctor (exit %s)\n' "$step_no" "$status_doctor"; cat "$do_out"; } >>"$logfile" 2>/dev/null || true; fi
+  ph_event bootstrap_step "s:step=ergactl doctor" "s:phase=erga" "s:outcome=$([ "$status_doctor" = 0 ] && echo ok || echo failed)" "n:exit_code=$status_doctor" "n:step_no=$step_no"
   return 0
 }
 
@@ -1674,20 +1703,20 @@ finish() {
   heading "Summary"
   failed=0
   if [ "${erga_ran:-0}" = 1 ]; then
-    if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} ./erga --version: erga could not be built (exit status $status_build)"; failed=1; fi
+    if [ "${status_build:-0}" != 0 ]; then say "  ${r}${cross}${z} bin/setup.sh: the clone could not be made ready for ./ergactl (exit status $status_build)"; failed=1; fi
     for pair in "toolchain ensure:${status_tool:-0}" "check --quick:${status_check:-0}"; do
       [ "${status_build:-0}" = 0 ] || break
       n=${pair%%:*}; s=${pair##*:}
       if [ "$n" = "check --quick" ] && [ "${check_ran:-0}" = 0 ]; then
-        say "  ${y}-${z} ./erga check --quick: this erga has no quick check yet; the full ${b}./erga check${z} takes minutes and is yours to run"
+        say "  ${y}-${z} ./ergactl check --quick: this ergactl has no quick check yet; the full ${b}./ergactl check${z} takes minutes and is yours to run"
         continue
       fi
-      if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./erga $n (left until you sign in to GitHub)"
-      elif [ "$n" = "toolchain ensure" ] && [ "${tool_ran:-0}" = 0 ]; then say "  ${g}-${z} ./erga $n: nothing to install"
-      elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./erga $n"; else say "  ${r}${cross}${z} ./erga $n (exit status $s)"; failed=1; fi
+      if [ "$n" = "toolchain ensure" ] && [ "${tool_skipped:-0}" = 1 ]; then say "  ${y}-${z} ./ergactl $n (left until you sign in to GitHub)"
+      elif [ "$n" = "toolchain ensure" ] && [ "${tool_ran:-0}" = 0 ]; then say "  ${g}-${z} ./ergactl $n: nothing to install"
+      elif [ "$s" = 0 ]; then say "  ${g}${tick}${z} ./ergactl $n"; else say "  ${r}${cross}${z} ./ergactl $n (exit status $s)"; failed=1; fi
     done
-    say "  ${d}erga and arca need no database to start. A command that does (records, the Decisions, the journal) uses a PostgreSQL 18 that you provide and says what is missing: ${z}${b}arca doctor${z}${d} checks it. On an archon server: ${z}${b}archon pg connect prime --write${z}${d}.${z}"
-    [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./erga check${z}${d}, compiles and tests the whole repository (minutes): run it yourself when you want it.${z}"
+    say "  ${d}ergactl and arcactl need no database to start. A command that does (records, the Decisions, the journal) uses a PostgreSQL 18 that you provide and says what is missing: ${z}${b}arcactl pg doctor${z}${d} checks it. On an archon server: ${z}${b}archon pg connect prime --write${z}${d}.${z}"
+    [ "${check_ran:-0}" = 1 ] && say "  ${d}The full check, ${z}${b}./ergactl check${z}${d}, checks the whole repository (minutes), and ${z}${b}./ergactl test${z}${d} runs its tests: run them yourself when you want them.${z}"
   fi
   if [ -s "$problems" ]; then
     say ""
@@ -1703,11 +1732,13 @@ finish() {
     say "Sign in with ${b}GH_BROWSER=true gh auth login --hostname github.com --web --git-protocol https${z}, or export ${b}GH_TOKEN${z}, then run this again: it installs just these."
   fi
   hand_over
-  if [ "${status_doctor:-0}" != 0 ]; then say "  ${y}${warnmark}${z} ./erga doctor found something to look at (exit status $status_doctor): its next step, above, says what to do."; failed=1; fi
+  if [ "${status_doctor:-0}" != 0 ]; then say "  ${y}${warnmark}${z} ./ergactl doctor found something to look at (exit status $status_doctor): its next step, above, says what to do."; failed=1; fi
   say ""
-  if [ "${cloned:-0}" = 1 ]; then
-    say "${b}${e_next}Next${z}: the step ${c}./erga doctor${z} names above. ${c}erga help start${z} walks through your first day."
-    say "Run erga from any folder ($(short_path "$bin")/erga runs the clone's launcher), or as ./erga in $(short_path "$target")."
+  if [ "${cloned:-0}" = 1 ] && [ "${erga_ran:-0}" = 1 ] && [ "${status_build:-0}" != 0 ]; then
+    say "${b}${e_next}Next${z}: in $(short_path "$target") run ${c}bin/setup.sh${z} to see why it stopped, then run this setup again."
+  elif [ "${cloned:-0}" = 1 ]; then
+    say "${b}${e_next}Next${z}: the step ${c}./ergactl doctor${z} names above. ${c}ergactl help${z} says what each domain of erga does."
+    say "Run ergactl from any folder ($(short_path "$bin")/ergactl runs the clone's launcher), or as ./ergactl in $(short_path "$target")."
   elif [ "${signin_needed:-0}" = 1 ]; then
     say "${b}${e_next}Next${z}: sign in to GitHub (above), then run this setup again."
   fi
@@ -1716,10 +1747,10 @@ finish() {
   case ${SHELL:-} in */zsh) sh_name=zsh ;; */fish) sh_name=fish ;; esac
   [ "$goos" = darwin ] && case ${SHELL:-} in */bash) ;; *) sh_name=zsh ;; esac
   case $sh_name in
-    fish) emit_line="erga shell emit fish | source"; emit_file="~/.config/fish/conf.d/erga.fish" ;;
-    zsh) emit_line="eval \"\$(erga shell emit zsh)\""; emit_file="~/.zshrc" ;;
+    fish) emit_line="ergactl agent-tools shell emit fish --json | jq -r .text | source"; emit_file="~/.config/fish/conf.d/erga.fish" ;;
+    zsh) emit_line="eval \"\$(ergactl agent-tools shell emit zsh --json | jq -r .text)\""; emit_file="~/.zshrc" ;;
     *)
-      emit_line="eval \"\$(erga shell emit bash)\""; emit_file="~/.bashrc"
+      emit_line="eval \"\$(ergactl agent-tools shell emit bash --json | jq -r .text)\""; emit_file="~/.bashrc"
       # a managed .bashrc that reads ~/.bashrc.local names the file that is the person's own
       grep -q '\.bashrc\.local' "$HOME/.bashrc" 2>/dev/null && emit_file="~/.bashrc.local" ;;
   esac
@@ -1731,13 +1762,13 @@ finish() {
   say ""
   say "    ${c}$emit_line${z}"
   say ""
-  say "${d}Leave it out if you manage your own PATH: this setup wrote none of your files. Until then run erga as ${z}${b}$(short_path "$bin")/erga${z}${d}, or ./erga in the clone. ${z}${b}erga shell status${z}${d} says where things stand.${z}"
+  say "${d}Leave it out if you manage your own PATH: this setup wrote none of your files. Until then run ergactl as ${z}${b}$(short_path "$bin")/ergactl${z}${d}, or ./ergactl in the clone. ${z}${b}ergactl agent-tools shell status${z}${d} says where things stand.${z}"
   [ "$failed" = 0 ] || return 1
   return 0
 }
 
 # ---- how this copy was installed (009-machine-bootstrap FR-069) ----------------------------------------------------------------------------------
-# One small file, ~/.config/erga/install.toml, says how this account was set up, so that `erga doctor` and `erga update` can say it and warn when the
+# One small file, ~/.config/erga/install.toml, says how this account was set up, so that `ergactl doctor` and `ergactl repo update` can say it and warn when the
 # computer no longer matches it. The first method is kept (`bootstrap` for a computer set up whole, `setup` for a user made for erga on a machine in use); a later run only
 # refreshes the date and adds the comfort kits.
 install_method=${install_method:-setup}
@@ -1753,7 +1784,7 @@ record_install() {
   mkdir -p "$ri_dir" || return 0
   ri_tmp=$(mktemp "$ri_dir/.install.XXXXXX") || return 0
   {
-    printf '%s\n' '# Written by erga-setup.sh: how this account was set up. Read by erga doctor and erga update; safe to delete (they then say it is not recorded yet).'
+    printf '%s\n' '# Written by erga-setup.sh: how this account was set up. Read by ergactl doctor and ergactl repo update; safe to delete (they then say it is not recorded yet).'
     printf 'method = "%s"\n' "$ri_method"
     printf 'family = "%s"\n' "$family"
     printf 'host = "%s"\n' "$(host_kind | sed 's/^vm-.*/vm/')"
@@ -1841,7 +1872,7 @@ check_access() {
 main() {
   detect_platform
   load_config
-  PATH=$bin:$cargo_bin:$PATH   # ~/.local/bin and ~/.cargo/bin, for this run alone: erga shell ensure puts them on the PATH of every shell
+  PATH=$bin:$cargo_bin:$PATH   # ~/.local/bin and ~/.cargo/bin, for this run alone: the line of `ergactl agent-tools shell emit` puts them on the PATH of every shell
   export PATH
   if [ "$dry" = 0 ]; then mkdir -p "$bin" "$data" "$state" "$cache"; fi
 
@@ -1892,13 +1923,13 @@ main() {
   finish
 }
 
-# ---- keep the ArcaSignals settings for every new terminal (009-machine-bootstrap FR-052; the same file as `erga secrets`, erga's 011-secrets FR-009) ----------------------
-# The address and token a person gave this setup in the environment are lost when the terminal closes, so they are kept in a file only they can read; `erga shell ensure` tells the shells to read it.
+# ---- keep the ArcaSignals settings for every new terminal (009-machine-bootstrap FR-052; the same file as `ergactl secrets`, erga's 011-secrets FR-009) ----------------------
+# The address and token a person gave this setup in the environment are lost when the terminal closes, so they are kept in a file only they can read; the line of `ergactl agent-tools shell emit` tells the shells to read it.
 sf_put() {  # sf_put NAME VALUE: one line of the file, replaced where it is, else added; written privately and atomically
   pv_dir=$(dirname "$secrets_file")
   mkdir -p "$pv_dir" && chmod 700 "$pv_dir" || return 1
   pv_tmp=$(umask 077; mktemp "$pv_dir/.secrets.XXXXXX") || return 1
-  if [ -f "$secrets_file" ]; then cat "$secrets_file" >"$pv_tmp"; else printf '%s\n' "# Kept by \`erga secrets\`; change it with \`erga secrets set\` and \`erga secrets remove\`." >"$pv_tmp"; fi   # the first line erga secrets writes, byte for byte
+  if [ -f "$secrets_file" ]; then cat "$secrets_file" >"$pv_tmp"; else printf '%s\n' "# Kept by \`ergactl secrets\`; change it with \`ergactl secrets set\` and \`ergactl secrets remove\`." >"$pv_tmp"; fi   # the first line erga secrets writes, byte for byte
   if grep -q "^$1=" "$pv_tmp"; then
     awk -v n="$1" -v v="$2" 'index($0, n "=") == 1 { print n "='"'"'" v "'"'"'"; next } { print }' "$pv_tmp" >"$pv_tmp.2" && mv "$pv_tmp.2" "$pv_tmp"
   else
@@ -1920,18 +1951,18 @@ keep_settings() {
   elif [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && [ "$dry" = 0 ]; then
     ks_var=GITHUB_TOKEN; [ -z "${GH_TOKEN:-}" ] || ks_var=GH_TOKEN
     say "${d}🔑 The GitHub token in $ks_var was used for this setup only: it lives in this terminal's environment and is not saved."
-    say "   To keep it for every terminal: erga secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
+    say "   To keep it for every terminal: ergactl secrets set GH_TOKEN. Or sign in once with gh auth login, and gh keeps the sign-in for you.${z}"
   fi
   [ -n "$ks_names" ] || return 0
   phase "${e_key}Keeping your ArcaSignals settings for new terminals ${d}($(short_path "$secrets_file"), private to you)${z}"
   if [ "$dry" = 1 ]; then
-    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); erga shell ensure makes your shells read it in every new terminal"
+    would "keep $(printf '%s' "$ks_names" | sed 's/^ //; s/ /, /g') in $(short_path "$secrets_file") (mode 600); the one line of ergactl agent-tools shell emit makes your shells read it in every new terminal"
     return 0
   fi
   for ks_n in $ks_names; do
     eval "ks_v=\${$ks_n}"
     case $ks_v in *"'"* | *'"'* | *"
-"*) warn "$ks_n holds a quote or a line break, which the file cannot keep (erga secrets refuses them too), so it was not saved."; problem "$ks_n was not saved"; continue ;; esac
+"*) warn "$ks_n holds a quote or a line break, which the file cannot keep (ergactl secrets refuses them too), so it was not saved."; problem "$ks_n was not saved"; continue ;; esac
     sf_put "$ks_n" "$ks_v" || { warn "$ks_n could not be saved in $(short_path "$secrets_file")."; problem "$ks_n was not saved"; continue; }
     logf "kept $ks_n in $secrets_file"
   done

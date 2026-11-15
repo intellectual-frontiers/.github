@@ -12,11 +12,11 @@
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
 #
 #   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, wget,
-#      the C compiler and linker Rust links with (./erga is compiled before it runs) and the other common utilities the setup needs. Every other program (jq, gh, glab,
-#      ripgrep, fd, shellcheck, Rust, Node.js, uv and the rest) is never a package: the setup and `erga toolchain ensure` install each at a pinned version in your own folders,
-#      and `erga update` keeps them current,
-#   2. Setup: runs erga-setup.sh as you: Rust through rustup, uv, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and ./erga toolchain
-#      ensure and doctor. It writes none of your dotfiles, installs no shell, prompt, editor or AI assistant and does not change your login shell (those are yours, or your fleet
+#      unzip (bin/setup.sh unpacks Deno with it), the C compiler and linker Rust links with (for Thyra and ArcaDrive; no erga command needs Cargo) and the other common
+#      utilities the setup needs. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Deno, Rust, Node.js, uv and the rest) is never a package: the setup, bin/setup.sh
+#      and `ergactl toolchain ensure` install each at a pinned version in your own folders, and `ergactl repo update` keeps them current,
+#   2. Setup: runs erga-setup.sh as you: Rust through rustup, uv, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and there
+#      bin/setup.sh, ./ergactl toolchain ensure, ./ergactl check --quick and ./ergactl doctor. It writes none of your dotfiles, installs no shell, prompt, editor or AI assistant and does not change your login shell (those are yours, or your fleet
 #      tool's); it ends by printing the one optional line that puts erga on your PATH.
 #
 # Safe to run again. Options (after `sh -s --` when piped):

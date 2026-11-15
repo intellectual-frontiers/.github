@@ -12,8 +12,8 @@ This small public repository holds three things:
 - **The organization's landing page**, [`profile/README.md`](profile/README.md), which GitHub shows at <https://github.com/intellectual-frontiers>.
 - **The machine setup scripts**, in [`bin/`](bin/): `erga-bootstrap.sh` turns a fresh Linux computer (under WSL or a virtual machine), or a Mac with Apple silicon,
   into a working place for `erga`, the company's repository (it is the one script that may use administrator rights, and it sets up the account that runs it), and
-  `erga-setup.sh` sets up one account without administrator rights: it installs Rust through `rustup`, signs you in to GitHub, copies the private `erga` repository
-  and hands over to `./erga doctor`. They are public so that a brand-new computer can fetch them before it can sign in to anything. What they do is specified in
+  `erga-setup.sh` sets up one account without administrator rights: it installs Rust through `rustup` (for Thyra and ArcaDrive), signs you in to GitHub, copies the private
+  `erga` repository, makes it ready for `ergactl` with its `bin/setup.sh` (the pinned Deno and the workspace's packages) and hands over to `./ergactl doctor`. They are public so that a brand-new computer can fetch them before it can sign in to anything. What they do is specified in
   `erga`'s `009-machine-bootstrap` and tested in [`tests/`](tests/). `erga-windows.ps1` is an optional extra for Windows 11: it installs WSL 2 and Debian, makes the Linux user and then runs the bootstrap; Linux and Mac computers
   never need it.
 
@@ -25,4 +25,4 @@ the people who may run the scripts can read.
 
 ## Tests
 
-`python3 -m unittest discover -s tests` runs them with the standard library alone (`shellcheck` is used where it is installed); the tests of `commons`' generator also use `uv` and are skipped without it; nothing here needs `erga` or the network. A GitHub Actions workflow runs them on every push.
+`python3 -m unittest discover -s tests` runs them with the standard library alone (`shellcheck` is used where it is installed); the tests of `commons`' generator also use `uv` and are skipped without it; nothing here needs `erga`, `ergactl` or the network. A GitHub Actions workflow runs them on every push.
