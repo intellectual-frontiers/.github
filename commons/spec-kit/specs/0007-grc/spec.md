@@ -42,7 +42,7 @@
 - **FR-019**: Running a pack MUST make signals (0006-signals): a span for the run and one for each control, with `grc.control.id`, `grc.subject.kind`, `grc.subject.id` and the status, and each finding as an OTLP log record whose body is its OCSF document, with a severity from its severity.
 - **FR-020**: `runtime/sign.ts` MUST sign and verify with `ssh-keygen -Y` (namespace given, the key a file the caller names, the allowed signers a file), and with Web Crypto keys through DSSE, behind one signer interface; it MUST NOT read a key it was not given.
 - **FR-021**: `runtime/git.ts` MUST read a repository by running `git` with an argument vector: the commit at `HEAD`, whether the tree is clean, the paths changed between two revisions, and a file as it is at a revision; each a `Result`, a repository that is not there an `Err`.
-- **FR-022**: The runtime MUST load packs, waivers, risk registers and impact declarations from TOML, YAML, JSON or JSON5 files through the kernel's decoders, naming the file and the path of what does not decode.
+- **FR-022**: The runtime MUST load the settings of packs (by a decoder the harness gives, since a pack holds code), waivers, risk registers and impact declarations from TOML, YAML, JSON or JSON5 files through the kernel's decoders, naming the file and the path of what does not decode.
 
 ## Out of scope
 
