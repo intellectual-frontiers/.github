@@ -97,6 +97,7 @@ export type { Change, Level, SemVer } from "./semver.ts";
 export { fromHex, parseSha256Sums, sameSha256, sha256, sha256Of, toHex } from "./sha256.ts";
 export type { Sha256 } from "./sha256.ts";
 export { ANSI, lf, plain, quoteArgs, splitArgs } from "./text.ts";
+export * as palette from "./palette.ts";
 export * as png from "./png.ts";
 export * as jobs from "./schedule.ts";
 export { formatTomlError, isTomlDateTime, isTomlTable, parseToml, tomlKey, tomlString, toToml } from "./toml.ts";
@@ -104,6 +105,8 @@ export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
 export type { Literal, LiteralError } from "./ts-literal.ts";
 export { expectType } from "./types.ts";
+export * as vt from "./vt.ts";
+export * as width from "./width.ts";
 export {
   attribute,
   child,
