@@ -1,6 +1,7 @@
 /**
  * Tests of `kernel/archive.ts`: archives written and read back are the files they hold (property-tested), the same files give the same
- * bytes, a damaged or unsafe archive is refused, and a deflated zip and a gzip made by the platform's own `CompressionStream` are read.
+ * bytes, a damaged or unsafe archive is refused, and a deflated zip and a gzip made by the platform's own `CompressionStream` are read;
+ * a tar read as a stream gives what `untar` gives, refuses what it refuses, and reads a large archive fed in small chunks.
  *
  * @module
  */
@@ -15,13 +16,17 @@ import {
   sortedPaths,
   splitName,
   tar,
+  ArchiveFailure,
+  type ArchiveError,
   untar,
+  untarStream,
   unzip,
   zip,
   zipEntries,
 } from "../../kernel/archive.ts";
+import { Md5, md5 } from "../../kernel/md5.ts";
 import { ok } from "../../kernel/result.ts";
-import { assert, assertEquals, proves } from "../../runtime/test.ts";
+import { assert, assertEquals, assertInstanceOf, assertRejects, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-010";
 const enc = new TextEncoder();
@@ -162,29 +167,31 @@ proves([FR], "a zip whose entry is deflated, and a gzip the platform compressed,
   assertEquals(await gunzip(gz), ok(text));
 });
 
-proves([FR], "a tar with a pax path and a GNU long name is read", () => {
-  const block = (name: string, type: string, body: Uint8Array): Uint8Array => {
-    const h = new Uint8Array(512);
-    h.set(enc.encode(name), 0);
-    h.set(enc.encode("0000644\0"), 100);
-    h.set(enc.encode(`${body.length.toString(8).padStart(11, "0")}\0`), 124);
-    h.set(enc.encode("        "), 148);
-    h[156] = type.charCodeAt(0);
-    h.set(enc.encode("ustar\0"), 257);
-    h.set(enc.encode("00"), 263);
-    const sum = h.reduce((s, b) => s + b, 0);
-    h.set(enc.encode(`${sum.toString(8).padStart(6, "0")}\0 `), 148);
-    const pad = new Uint8Array((512 - (body.length % 512)) % 512);
-    return new Uint8Array([...h, ...body, ...pad]);
-  };
-  const record = (key: string, value: string): string => {
-    const tail = ` ${key}=${value}\n`;
-    let n = tail.length + 1;
-    while (`${n}${tail}`.length !== n) n++;
-    return `${n}${tail}`;
-  };
-  const longName = `deep/${"x".repeat(200)}.txt`;
-  const archive = new Uint8Array([
+/** One tar header of a name, type and body (mode 0644), with its body padded. */
+const block = (name: string, type: string, body: Uint8Array): Uint8Array => {
+  const h = new Uint8Array(512);
+  h.set(enc.encode(name), 0);
+  h.set(enc.encode("0000644\0"), 100);
+  h.set(enc.encode(`${body.length.toString(8).padStart(11, "0")}\0`), 124);
+  h.set(enc.encode("        "), 148);
+  h[156] = type.charCodeAt(0);
+  h.set(enc.encode("ustar\0"), 257);
+  h.set(enc.encode("00"), 263);
+  const sum = h.reduce((s, b) => s + b, 0);
+  h.set(enc.encode(`${sum.toString(8).padStart(6, "0")}\0 `), 148);
+  const pad = new Uint8Array((512 - (body.length % 512)) % 512);
+  return new Uint8Array([...h, ...body, ...pad]);
+};
+/** One pax record, its length counted in itself. */
+const record = (key: string, value: string): string => {
+  const tail = ` ${key}=${value}\n`;
+  let n = tail.length + 1;
+  while (`${n}${tail}`.length !== n) n++;
+  return `${n}${tail}`;
+};
+/** A tar with a pax global header, a pax path, a GNU long name and a symlink. */
+const paxArchive = (longName: string): Uint8Array =>
+  new Uint8Array([
     ...block("pax_global_header", "g", enc.encode(record("comment", "a commit"))),
     ...block("PaxHeader", "x", enc.encode(record("path", "pax/named.txt"))),
     ...block("short", "0", enc.encode("one")),
@@ -193,6 +200,10 @@ proves([FR], "a tar with a pax path and a GNU long name is read", () => {
     ...block("link", "2", new Uint8Array()),
     ...new Uint8Array(1024),
   ]);
+
+proves([FR], "a tar with a pax path and a GNU long name is read", () => {
+  const longName = `deep/${"x".repeat(200)}.txt`;
+  const archive = paxArchive(longName);
   const r = untar(archive);
   assert(r.kind === "ok", r.kind === "err" ? formatArchiveError(r.error) : "");
   assertEquals(
@@ -204,4 +215,166 @@ proves([FR], "a tar with a pax path and a GNU long name is read", () => {
     ],
   );
   assertEquals(filesOf(r.value).get(longName), enc.encode("two"));
+});
+
+const STREAM = "0005-typescript-runtime FR-059";
+
+/** The bytes as a stream, cut into chunks of the sizes given in turn (each at least 1). */
+const chunked = (bytes: Uint8Array, sizes: readonly number[]): ReadableStream<Uint8Array> => {
+  let at = 0;
+  let i = 0;
+  return new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (at >= bytes.length) {
+        controller.close();
+        return;
+      }
+      const n = Math.max(1, sizes[i++ % Math.max(1, sizes.length)] ?? bytes.length);
+      controller.enqueue(bytes.slice(at, at + n));
+      at += n;
+    },
+  });
+};
+
+/** Every entry of a tar read as a stream, as `untar` gives its entries, each body read to its end. */
+async function streamed(
+  stream: ReadableStream<Uint8Array>,
+): Promise<
+  { readonly path: string; readonly kind: string; readonly mode: number; readonly data: Uint8Array; readonly linkName: string }[]
+> {
+  const out = [];
+  const reader = stream.pipeThrough(untarStream()).getReader();
+  for (;;) {
+    const r = await reader.read();
+    if (r.done) return out;
+    const { path, kind, mode, linkName, size } = r.value;
+    const data = new Uint8Array(await new Response(r.value.readable).arrayBuffer());
+    assertEquals(data.length, kind === "file" ? size : 0);
+    out.push({ path, kind, mode, data, linkName });
+  }
+}
+
+/** The archive error a stream of entries failed with. */
+async function streamError(stream: ReadableStream<Uint8Array>): Promise<ArchiveError> {
+  const e = await assertRejects(() => streamed(stream));
+  assertInstanceOf(e, ArchiveFailure);
+  return e.error;
+}
+
+proves([STREAM, FR], "untarStream gives the entries and bytes untar gives, gzipped or not, however the bytes are cut", async () => {
+  await fc.assert(
+    fc.asyncProperty(
+      fc.oneof(
+        files.map((f) => tar(f)),
+        fc.constant(ok(paxArchive(`deep/${"y".repeat(150)}`))),
+      ),
+      fc.boolean(),
+      fc.array(fc.integer({ min: 1, max: 1500 }), { minLength: 1, maxLength: 5 }),
+      async (t, gzipped, sizes) => {
+        assert(t.kind === "ok");
+        const expected = untar(t.value);
+        assert(expected.kind === "ok");
+        const bytes = gzipped ? gzip(t.value) : t.value;
+        assertEquals(
+          await streamed(chunked(bytes, sizes)),
+          expected.value.map((e) => ({ ...e })),
+        );
+      },
+    ),
+    { numRuns: 60 },
+  );
+});
+
+proves([STREAM, FR], "untarStream refuses a damaged header, a truncated archive, an unsafe path and a damaged gzip", async () => {
+  const t = tar(
+    new Map([
+      ["a.txt", enc.encode("hello")],
+      ["b/c.txt", enc.encode("world")],
+    ]),
+  );
+  assert(t.kind === "ok");
+  const bad = new Uint8Array(t.value);
+  bad[512 + 3] = (bad[512 + 3] ?? 0) ^ 1;
+  const damaged = await streamError(chunked(bad, [100]));
+  assertEquals(damaged.kind, "damaged");
+  assertEquals((await streamError(chunked(t.value.subarray(0, 512 + 100), [64]))).kind, "damaged");
+  assertEquals((await streamError(chunked(t.value.subarray(0, 1024), [64]))).kind, "damaged");
+  assertEquals((await streamError(chunked(new Uint8Array(), []))).kind, "damaged");
+  const evil = new Uint8Array([...block("../evil", "0", enc.encode("x")), ...new Uint8Array(1024)]);
+  assertEquals(await streamError(chunked(evil, [512])), { kind: "unsafe-path", path: "../evil" });
+  const abs = new Uint8Array([
+    ...block("ok.txt", "0", enc.encode("x")),
+    ...block("/etc/passwd", "0", enc.encode("x")),
+    ...new Uint8Array(1024),
+  ]);
+  assertEquals(await streamError(chunked(abs, [700])), { kind: "unsafe-path", path: "/etc/passwd" });
+  const gz = gzip(t.value);
+  const gzBad = new Uint8Array(gz);
+  gzBad[gz.length - 6] = (gzBad[gz.length - 6] ?? 0) ^ 1;
+  assertEquals((await streamError(chunked(gzBad, [333]))).kind, "damaged");
+});
+
+proves([STREAM], "a large gzipped archive fed in small chunks is read an entry at a time, a body cancelled skipped", async () => {
+  const big = 6 * 1024 * 1024 + 123;
+  const bigBytes = new Uint8Array(big).map((_, i) => (i * 31) >>> 3);
+  const t = tar(
+    new Map([
+      ["a/big.bin", bigBytes],
+      ["a/skipped.bin", new Uint8Array(100_000).fill(7)],
+      ["z.txt", enc.encode("last")],
+    ]),
+  );
+  assert(t.kind === "ok");
+  const gz = new Uint8Array(
+    await new Response(new Blob([new Uint8Array(t.value)]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer(),
+  );
+  const reader = chunked(gz, [4093, 17, 1000]).pipeThrough(untarStream()).getReader();
+  const seen: string[] = [];
+  let digest: Uint8Array | undefined;
+  for (;;) {
+    const r = await reader.read();
+    if (r.done) break;
+    const e = r.value;
+    seen.push(`${e.kind} ${e.path} ${e.size}`);
+    if (e.path === "a/big.bin") {
+      const h = new Md5();
+      let largest = 0;
+      const body = e.readable.getReader();
+      for (;;) {
+        const c = await body.read();
+        if (c.done) break;
+        largest = Math.max(largest, c.value.length);
+        h.update(c.value);
+      }
+      assert(largest < 1024 * 1024, `a chunk of ${largest} bytes was held`);
+      digest = h.digest();
+    } else if (e.path === "z.txt") assertEquals(new TextDecoder().decode(await new Response(e.readable).arrayBuffer()), "last");
+    else await e.readable.cancel();
+  }
+  assertEquals(seen, ["directory a 0", `file a/big.bin ${big}`, "file a/skipped.bin 100000", "file z.txt 4"]);
+  assertEquals(digest, md5(bigBytes));
+});
+
+proves([STREAM], "cancelling the entries cancels the bytes they are read from", async () => {
+  const t = tar(
+    new Map([
+      ["a.txt", enc.encode("hello")],
+      ["b.txt", enc.encode("world")],
+    ]),
+  );
+  assert(t.kind === "ok");
+  let cancelled: unknown;
+  const source = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(t.value.slice(0, 1024));
+    },
+    cancel(reason) {
+      cancelled = reason ?? "cancelled";
+    },
+  });
+  const reader = source.pipeThrough(untarStream()).getReader();
+  const first = await reader.read();
+  assertEquals(first.done ? undefined : first.value.path, "a.txt");
+  await reader.cancel("enough");
+  assert(cancelled !== undefined);
 });

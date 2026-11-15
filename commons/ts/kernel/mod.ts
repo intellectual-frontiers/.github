@@ -23,6 +23,7 @@
  */
 export { absurd } from "./absurd.ts";
 export {
+  ArchiveFailure,
   concat,
   crc32,
   dosDate,
@@ -31,18 +32,20 @@ export {
   gunzip,
   gzip,
   isSafePath,
+  readTarStream,
   sortedPaths,
   splitName,
   tar,
   tarHeader,
   untar,
+  untarStream,
   unzip,
   zip,
   ZIP_EPOCH,
   zipEntries,
   zipRead,
 } from "./archive.ts";
-export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
+export type { ArchiveError, Files, TarEntry, TarHeader, TarStreamEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export type { Brand } from "./brand.ts";
 export * as args from "./args.ts";
@@ -76,6 +79,7 @@ export type { Decoded, DecodeError, Decoder, Fields, ObjectOf } from "./decode.t
 export * as der from "./der.ts";
 export * as dsse from "./dsse.ts";
 export * as evidence from "./evidence.ts";
+export * as glob from "./glob.ts";
 export * as grc from "./grc.ts";
 export { order, schedule } from "./graph.ts";
 export type { Cycle, Graph, Ran } from "./graph.ts";
@@ -93,6 +97,7 @@ export {
 export type { WebLink } from "./http.ts";
 export { formatJson5Error, isBareKey, isJsonObject, parseJson5, toJson5 } from "./json5.ts";
 export type { Json, Json5Error, JsonObject } from "./json5.ts";
+export * as md5 from "./md5.ts";
 export { contentType, extensionOf, isTextual, MEDIA_TYPES, mediaType } from "./media-types.ts";
 export { all, andThen, attempt, done, err, isErr, isOk, map, mapErr, match, ok, orElse, settle, unwrapOr } from "./result.ts";
 export type { Err, Ok, Result } from "./result.ts";
