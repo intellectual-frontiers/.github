@@ -99,6 +99,11 @@ const VENDOR = [
   /["']@erga\//,
   /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/,
 ];
+/** A line with the contents of its single- and double-quoted strings blanked, so that a name such as `"process.runtime.name"` is not taken for the host global. */
+export function withoutStrings(text: string): string {
+  return text.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, (m) => `${m[0]}${" ".repeat(m.length - 2)}${m[0]}`);
+}
+
 const HOST_IN_KERNEL = [/\bprocess\b/, /\bBuffer\b/, /\brequire\s*\(/, /\b__dirname\b/, /\bglobalThis\s*\.\s*(?:process|Deno|Bun)\b/];
 
 proves(["0005-typescript-runtime FR-004"], "no code names Deno, Bun, a registry or a URL import; the kernel names no host global", () => {
@@ -106,7 +111,8 @@ proves(["0005-typescript-runtime FR-004"], "no code names Deno, Bun, a registry 
   for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
     for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
       for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
-      if (f.startsWith("kernel/")) for (const re of HOST_IN_KERNEL) if (re.test(text)) bad.push(`${f}:${line}: ${text.trim()}`);
+      if (f.startsWith("kernel/"))
+        for (const re of HOST_IN_KERNEL) if (re.test(withoutStrings(text))) bad.push(`${f}:${line}: ${text.trim()}`);
     }
   }
   assertEquals(bad, []);
@@ -122,7 +128,8 @@ proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (n
   const code = codeLines("/**\n * Deno.readTextFile\n */\n// Deno.x\nDeno.exit();");
   assertEquals(code, [{ line: 5, text: "Deno.exit();" }]);
   assert(VENDOR.some((re) => re.test(`import x from "jsr:@std/path";`)));
-  assert(HOST_IN_KERNEL.some((re) => re.test("process.env")));
+  assert(HOST_IN_KERNEL.some((re) => re.test(withoutStrings("const e = process.env;"))));
+  assert(!HOST_IN_KERNEL.some((re) => re.test(withoutStrings(`const k = "process.runtime.name", q = 'a \\' process';`))));
 });
 
 proves(["0005-typescript-runtime FR-015"], "every file begins with a JSDoc block that says @module, and every export has JSDoc", () => {

@@ -206,17 +206,7 @@ export type OscalControlImplementation = {
 };
 
 /** The types of an OSCAL component (OSCAL 1.1.2 `component/type`). */
-export const OSCAL_COMPONENT_TYPES = [
-  "software",
-  "hardware",
-  "service",
-  "policy",
-  // OSCAL's "process" type, its first letter escaped so that the kernel's host-global check (0005-typescript-runtime FR-004) does not take
-  // the value for Node's global of that name.
-  "\u0070rocess",
-  "validation",
-  "interconnection",
-] as const;
+export const OSCAL_COMPONENT_TYPES = ["software", "hardware", "service", "policy", "process", "validation", "interconnection"] as const;
 
 /** The type of a component. */
 export type OscalComponentType = (typeof OSCAL_COMPONENT_TYPES)[number];
