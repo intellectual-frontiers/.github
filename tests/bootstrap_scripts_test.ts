@@ -2,7 +2,7 @@
 // is unpacked, kept in erga's toolchain store, a Deno already here used, the setup found beside the script or fetched from where the script came from, and
 // every option handed over. A stand-in Deno records what it was asked to run.
 import { assert, assertEquals, assertMatch, assertStringIncludes } from "@std/assert";
-import { BOOT_PS1, BOOT_SH, DENO, exists, Fx, MAIN, OFF, PERMISSIONS, ROOT, sh, sha256Hex } from "./helpers.ts";
+import { BOOT_PS1, BOOT_SH, DENO, exists, Fx, MAIN, OFF, PERMISSIONS, ROOT, sh, sha256Hex, zipBytes } from "./helpers.ts";
 import { pins } from "../commons/generated/packaging.auto.ts";
 
 const PINNED = pins.deno.version;
@@ -13,14 +13,8 @@ const FAKE_DENO = (version: string) =>
   `#!/bin/sh\n[ "$1" = --version ] && { echo "deno ${version} (stable)"; exit 0; }\nprintf '%s\\n' "$@" >"$RECORD"\necho "ERGA_BOOTSTRAP_DENO=$ERGA_BOOTSTRAP_DENO BOOTSTRAP_URL=$BOOTSTRAP_URL" >>"$RECORD.env"\nread -r x && echo "STDIN: $x" >>"$RECORD.env"\nexit 0\n`;
 
 async function zipOf(fx: Fx, body: string): Promise<{ url: string; sha: string }> {
-  const dir = `${fx.tmp}/zip-src`;
-  Deno.mkdirSync(dir, { recursive: true });
-  Deno.writeTextFileSync(`${dir}/deno`, body, { mode: 0o755 });
   const out = `${fx.tmp}/deno.zip`;
-  const p = await sh(["python3", "-c", "import sys, zipfile\nz = zipfile.ZipFile(sys.argv[1], 'w')\nz.write(sys.argv[2], 'deno')\nz.close()", out, `${dir}/deno`], {
-    PATH: SYSTEM,
-  });
-  assertEquals(p.code, 0, p.stderr);
+  Deno.writeFileSync(out, zipBytes({ deno: body }));
   return { url: `file://${out}`, sha: await sha256Hex(Deno.readFileSync(out)) };
 }
 
@@ -121,23 +115,19 @@ Deno.test({ name: "the first download is tried again with a longer wait, and giv
   assertStringIncludes(patient.stderr, "(attempt 15 of 15)");
 });
 
-Deno.test({ name: "without unzip, Python unpacks the zip; without either, the one package line is named", ignore: skipUnlessX64 }, async () => {
+Deno.test({ name: "without unzip, busybox or bsdtar, the one package line is named and nothing is unpacked", ignore: skipUnlessX64 }, async () => {
   await using fx = await Fx.make();
   const z = await zipOf(fx, FAKE_DENO(PINNED));
   const lean = `${fx.tmp}/lean`;
   Deno.mkdirSync(lean);
-  for (const t of ["sh", "uname", "awk", "mkdir", "mktemp", "dirname", "curl", "sha256sum", "chmod", "mv", "rm", "cat", "sed", "printf", "python3", "sleep"]) {
+  for (const t of ["sh", "uname", "awk", "mkdir", "mktemp", "dirname", "curl", "sha256sum", "chmod", "mv", "rm", "cat", "sed", "printf", "sleep"]) {
     const real = (await sh(["sh", "-c", `command -v ${t}`], { PATH: SYSTEM })).stdout.trim();
     if (real.startsWith("/")) Deno.symlinkSync(real, `${lean}/${t}`);
   }
-  const p = await sh(["sh", BOOT_SH], { ...env(fx, { BOOTSTRAP_DENO_URL: z.url, BOOTSTRAP_DENO_SHA256: z.sha }), PATH: lean });
-  assertEquals(p.code, 0, p.stderr);
-  assert(exists(store(fx)));
-  Deno.removeSync(`${fx.home}/.local/share`, { recursive: true });
-  Deno.removeSync(`${lean}/python3`);
   const none = await sh(["sh", BOOT_SH], { ...env(fx, { BOOTSTRAP_DENO_URL: z.url, BOOTSTRAP_DENO_SHA256: z.sha }), PATH: lean });
   assertEquals(none.code, 3);
   assertStringIncludes(none.stderr, "sudo apt-get install -y unzip");
+  assert(!exists(store(fx)));
 });
 
 Deno.test("a system with no Deno build stops with the Windows line where it is Windows-like", async () => {

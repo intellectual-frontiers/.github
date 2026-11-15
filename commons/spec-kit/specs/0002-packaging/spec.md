@@ -33,11 +33,12 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 
 ## The generated tables
 
-- **FR-009**: `commons/tools/generate-packaging.py` MUST read the ontology and write `commons/generated/packaging.auto.toml`, `commons/generated/packaging.auto.sh` and `commons/generated/packaging.auto.ts`
+- **FR-009**: `commons/tools/generate-packaging.ts` MUST read the ontology and write `commons/generated/packaging.auto.toml`, `commons/generated/packaging.auto.sh` and `commons/generated/packaging.auto.ts`
   (the same facts as typed TypeScript data, which the machine setup of `bin/setup/` imports: the families with their commands as lists of words, the programs, the platforms, the pins and the
-  fields of the record), MUST write the same bytes from the same ontology, and with `--check` MUST write nothing and fail where either file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST need only `uv`: its
-  one dependency is declared in its own header.
-- **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing where one is.
+  fields of the record), MUST write the same bytes from the same ontology, and with `--check` MUST write nothing and fail (exit 1) where a file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST
+  be TypeScript that Deno runs with read and write access alone, importing nothing outside `commons/tools/` (it reads the Turtle itself), and MUST write, from the same ontology, the same bytes
+  and the same `source_sha256` as the Python tool it replaced (amended 2026-11-15: the tool was Python, run by `uv` with `rdflib`).
+- **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing (exit 2) where one is or where the ontology cannot be read.
 - **FR-011**: The TOML MUST begin with a line saying it is generated, `schema = 1` and `source_sha256` of the ontology files; hold every family, every manager with its commands (as lists of
   words, with the origin and verification of each), every prohibition and every program; and be valid TOML.
 - **FR-012**: The shell fragment MUST be POSIX `sh`, free of the warnings of `shellcheck`, between `# >>> packaging.auto >>>` and `# <<< packaging.auto <<<`, and give, by family:
@@ -68,7 +69,7 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 
 ## Assumptions
 
-- `uv` is on the computer that regenerates; the tables are committed, so a computer that only reads them needs nothing.
+- Deno (the version `pins.auto.env` pins, which the bootstraps fetch) is on the computer that regenerates; the tables are committed, so a computer that only reads them needs nothing (amended 2026-11-15: it was `uv`).
 - `upt`'s README stays under its MIT or Apache-2.0 licence.
 
 ## Open questions
@@ -86,7 +87,7 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 
 ## Success criteria
 
-- **SC-001**: `uv run commons/tools/generate-packaging.py --check` succeeds on the committed files.
+- **SC-001**: `deno run --allow-read --allow-write commons/tools/generate-packaging.ts --check` succeeds on the committed files.
 - **SC-002**: Every manager and operating-system row of `upt` is in the table.
 - **SC-003**: Adding a family is a change to the ontology and a run of the tool.
 

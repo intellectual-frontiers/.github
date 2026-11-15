@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The format every Intellectual Frontiers harness keeps for its specifications, its register of numbers and its register of what enforces each requirement, and one standard-library tool that checks a folder against it, so that a new harness starts with the same discipline and `archon` and commons do not each keep their own copy of the rules.
+**Input:** The format every Intellectual Frontiers harness keeps for its specifications, its register of numbers and its register of what enforces each requirement, and one tool with no dependency that checks a folder against it, so that a new harness starts with the same discipline and `archon` and commons do not each keep their own copy of the rules.
 
 ## The format
 
@@ -17,7 +17,7 @@
 
 ## The tool
 
-- **FR-006**: `commons/tools/spec-kit-check.py` MUST check a folder against FR-001 to FR-005 using only the Python standard library, take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message`, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data.
+- **FR-006**: `commons/tools/spec-kit-check.ts` MUST check a folder against FR-001 to FR-005, importing nothing outside `commons/tools/` and needing read access alone (`deno run --no-config --allow-read commons/tools/spec-kit-check.ts`), take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message` on standard error, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data. Its command line, its findings and its exit status MUST be those of the Python tool it replaced, which a harness reads (amended 2026-11-15: the tool was Python, with its standard library alone).
 - **FR-007**: The tool MUST NOT read a harness's ontology or run its commands: who owns a specification and whether a named command exists are the harness's to check, on top of it.
 
 ## Out of scope
@@ -49,7 +49,7 @@
 
 ## Success criteria
 
-- **SC-001**: `python3 commons/tools/spec-kit-check.py` exits 0 on commons' own folder.
+- **SC-001**: `deno run --no-config --allow-read commons/tools/spec-kit-check.ts` exits 0 on commons' own folder.
 - **SC-002**: Each rule has a test that breaks it and sees it named.
 
 ## Review & acceptance checklist

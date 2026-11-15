@@ -118,8 +118,33 @@ Deno.test("the setup is strongly typed: no any, no non-null escape, an exhaustiv
   assertStringIncludes(Deno.readTextFileSync(`${SETUP_DIR}/result.ts`), "export function assertNever(x: never): never");
 });
 
-Deno.test("deno check and deno lint pass on the setup and its tests", async () => {
-  const check = await sh([Deno.execPath(), "check", "--quiet", `${SETUP_DIR}/main.ts`], {
+Deno.test("commons' tools are strongly typed: no any, no non-null escape, one audited cast, an exhaustive switch over each union, and no third-party module", () => {
+  const dir = `${ROOT}/commons/tools`;
+  const files = [...Deno.readDirSync(dir)].filter((f) => f.name.endsWith(".ts")).map((f) => ({ name: f.name, text: Deno.readTextFileSync(`${dir}/${f.name}`) }));
+  assert(files.length >= 3, "the three tools are there");
+  // the code without its comments and the insides of its strings, so that prose cannot pass or fail the test
+  const bare = (text: string) => code(text).replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""').replace(/\/\/.*$/gm, "");
+  for (const { name, text } of files) {
+    const c = bare(text);
+    assertNotMatch(c, /:\s*any\b|as any\b|<any>/, `${name} uses any`);
+    assertNotMatch(c, /[\w)\]]!\.|[\w)\]]!\)|[\w)\]]!;|[\w)\]]!,/, `${name} has a non-null assertion`);
+    const casts = [...c.matchAll(/\bas\s+(?!const\b)[\w<{[(]/g)];
+    if (name === "core.ts") assertEquals(casts.map((m) => m[0]), ["as B"], "core.ts has one cast, in brand()");
+    else assertEquals(casts.map((m) => m[0]), [], `${name} casts: a value is decoded with a guard, or branded with brand()`);
+    if (/\bswitch \(/.test(c)) assertStringIncludes(c, "assertNever(", `${name} has a switch with no exhaustiveness check`);
+    for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
+      const spec = m[1] ?? "";
+      assert(spec.startsWith("./") || (name === "shell-portability-check.ts" && spec === "@std/toml"), `${name} imports ${spec}: the tools have no dependency`);
+    }
+  }
+  assertStringIncludes(Deno.readTextFileSync(`${dir}/core.ts`), "export function assertNever(x: never): never");
+  const brands = files.filter((f) => /\bbrand(<[^>]*>)?\(/.test(bare(f.text).replace(/export function brand/, ""))).map((f) => f.name).sort();
+  assertEquals(brands, ["ontology.ts", "turtle.ts"], "only the decode boundary brands a value");
+});
+
+Deno.test("deno check and deno lint pass on the setup, commons' tools and their tests", async () => {
+  const tools = ["generate-packaging.ts", "spec-kit-check.ts", "shell-portability-check.ts"].map((t) => `${ROOT}/commons/tools/${t}`);
+  const check = await sh([Deno.execPath(), "check", "--quiet", `${SETUP_DIR}/main.ts`, ...tools], {
     PATH: "/usr/bin:/bin",
     HOME: Deno.env.get("HOME") ?? "/tmp",
     DENO_DIR: Deno.env.get("DENO_DIR") ?? `${Deno.env.get("HOME")}/.cache/deno`,

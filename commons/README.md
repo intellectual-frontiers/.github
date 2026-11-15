@@ -7,7 +7,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 |---|---|---|
 | **Software supply chain** | Know what software a computer is made of, where each piece came from, and how to install it the same way everywhere. | [`0001-software-supply-chain`](spec-kit/specs/0001-software-supply-chain/spec.md) |
 | ↳ **Packaging** | The package managers and system families of every computer, the commands that drive them, the package each family calls a program, and how far each family has been tried. | [`0002-packaging`](spec-kit/specs/0002-packaging/spec.md) |
-| **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the standard-library tool that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
+| **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the tool with no dependency that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
 | **Rules** | The rules a harness applies to scripts, CI and code (portable shell, no installs outside the launcher, no host programs), as data with the reason for each, and the tool that finds what breaks the shell ones. | [`0004-rules`](spec-kit/specs/0004-rules/spec.md) |
 | **TypeScript runtime** | IFC TypeScript (`ts/`): a pure kernel and one host runtime on web standards and `node:` builtins, checked by TypeScript 7 and tested on Deno, Node and Bun, that the TypeScript harnesses import instead of each keeping its own helpers or calling one vendor's API. | [`0005-typescript-runtime`](spec-kit/specs/0005-typescript-runtime/spec.md) |
 
@@ -15,7 +15,10 @@ its own copy. It holds no company fact and no secret: this repository is public.
 
 - `ontology/supply-chain/packaging/`: the vocabulary (`packaging.ttl`) and the data (`managers.ttl`, `families.ttl`, `programs.ttl`), seeded from the tables of
   [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs.
-- `tools/generate-packaging.py`: reads the ontology and writes the files below; `uv run commons/tools/generate-packaging.py --check` fails where they are stale.
+- `tools/`: the tools, in TypeScript that Deno runs. `generate-packaging.ts` reads the ontology (with its own strict reader of the Turtle it is written in) and writes the files below:
+  `deno run --allow-read --allow-write commons/tools/generate-packaging.ts`, and with `--check` it fails where they are stale. `spec-kit-check.ts` checks a spec-kit folder
+  (`deno run --no-config --allow-read commons/tools/spec-kit-check.ts [--root DIR]`) and `shell-portability-check.ts` finds what only GNU tools have in shell scripts
+  (`deno run --allow-read commons/tools/shell-portability-check.ts FILE...`).
 - `generated/`: `packaging.auto.toml` (for programs), `packaging.auto.sh` (for scripts), `packaging.auto.ts` (for the machine setup, which is TypeScript), `pins.auto.env` (the pinned
   downloads, Deno among them, which the bootstraps also carry between their marks) and the tables of rules and of the installation record. Generated; never edited by hand.
 - `ts/`: IFC TypeScript, the TypeScript part of the commons: `kernel/` (pure: imports nothing, runs in a browser or a Worker), `runtime/` (the only code that
