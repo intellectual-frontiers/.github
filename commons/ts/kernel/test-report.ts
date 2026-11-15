@@ -6,7 +6,7 @@
  *   (`assembleRecord`), read back only through the OTLP decoders of 0006-signals FR-004 into a typed model (`readRecord`). The requirement
  *   lists a run is held to: ids one per line, or a spec-kit enforcement register's rows of mechanism `check` (`parseRequirementList`), and
  *   requirements declared reviewed (`parseReviewList`).
- * - Reports (FR-008 to FR-010): TAP version 14, JUnit XML, CTRF JSON, SARIF 2.1.0, OSCAL 1.1.2 assessment results and a completion report
+ * - Reports (FR-008 to FR-010): TAP version 14, JUnit XML, CTRF JSON, SARIF 2.1.0, OSCAL 1.2.3 assessment results and a completion report
  *   in Markdown and in self-contained HTML. Each is a function of the model alone (and, for the completion report, of the signatures the
  *   ledger holds), with no clock: rendering a record twice gives the same bytes, and the counts of each agree with the model's.
  * - Evidence (FR-011 to FR-013): the ledger entries of a run and of a signature with its meaning and role, the in-toto Test Result
@@ -908,7 +908,7 @@ function oscalStatus(o: Outcome): Status {
 }
 
 /**
- * The run as OSCAL 1.1.2 assessment results (FR-008, 0007-grc FR-017): one observation per test (its control the test, its subject the
+ * The run as OSCAL 1.2.3 assessment results (FR-008, 0007-grc FR-017): one observation per test (its control the test, its subject the
  * runtime it ran on) and one finding per requirement, satisfied or not by the outcomes of the tests that prove it.
  */
 export async function oscalAssessmentResults(

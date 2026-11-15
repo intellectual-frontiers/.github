@@ -8,7 +8,7 @@ import fc from "fast-check";
 import { absurd } from "../../kernel/absurd.ts";
 import type { Brand } from "../../kernel/brand.ts";
 import { lf, plain, quoteArgs, splitArgs } from "../../kernel/text.ts";
-import { exportedLiteral, type Literal, parseTsLiteral, tsKey, tsLiteral } from "../../kernel/ts-literal.ts";
+import { exportedLiteral, type Literal, type LiteralShape, parseTsLiteral, tsKey, tsLiteral } from "../../kernel/ts-literal.ts";
 import { type Equal, expectType, type Extends, type Not } from "../../kernel/types.ts";
 import { assertEquals, assertThrows, proves } from "../../runtime/test.ts";
 
@@ -63,6 +63,51 @@ proves(["0005-typescript-runtime FR-011"], "keys bare where they can be; comment
   const proto = parseTsLiteral('{ "__proto__": { "x": 1 } }');
   assertEquals(proto.kind === "ok" ? Object.getPrototypeOf(proto.value.value) : undefined, Object.prototype);
 });
+
+interface Fleet {
+  readonly name: string;
+  readonly tags?: readonly string[];
+  readonly owner: { readonly role: string; readonly since: number | null };
+  readonly pair: readonly [string, boolean];
+}
+
+proves(
+  ["0005-typescript-runtime FR-063", "0005-typescript-runtime FR-014"],
+  "tsLiteral takes any type shaped as JSON and refuses one that is not",
+  () => {
+    const fleet: Fleet = { name: "east", owner: { role: "operator", since: null }, pair: ["a", true] };
+    assertEquals(tsLiteral(fleet), tsLiteral({ name: "east", owner: { role: "operator", since: null }, pair: ["a", true] }));
+    const read = parseTsLiteral(tsLiteral({ ...fleet, tags: ["x"] }));
+    assertEquals(read.kind === "ok" ? read.value.value : undefined, { ...fleet, tags: ["x"] });
+    const literal: Literal = { a: [1, "b"] };
+    assertEquals(tsLiteral(literal), '{\n  a: [\n    1,\n    "b",\n  ],\n}');
+    expectType<Extends<Fleet, LiteralShape<Fleet>>>();
+    expectType<Extends<Literal, LiteralShape<Literal>>>();
+    expectType<Not<Extends<{ when: Date }, LiteralShape<{ when: Date }>>>>();
+    expectType<Not<Extends<{ n: bigint }, LiteralShape<{ n: bigint }>>>>();
+    expectType<Not<Extends<{ x: unknown }, LiteralShape<{ x: unknown }>>>>();
+    expectType<Not<Extends<readonly (string | undefined)[], LiteralShape<readonly (string | undefined)[]>>>>();
+    interface WithMethod {
+      readonly name: string;
+      greet(): string;
+    }
+    const withMethod: WithMethod = { name: "x", greet: () => "hi" };
+    // @ts-expect-error a value holding a method is not shaped as JSON
+    tsLiteral(withMethod);
+    // @ts-expect-error a Date is not shaped as JSON
+    tsLiteral({ when: new Date(0) });
+    // @ts-expect-error a Map is not shaped as JSON
+    tsLiteral({ m: new Map<string, string>() });
+    // @ts-expect-error undefined is a property's absence, never an item of an array
+    tsLiteral([1, undefined]);
+    // @ts-expect-error undefined alone is not a literal
+    tsLiteral(undefined);
+    // @ts-expect-error a symbol is not shaped as JSON
+    tsLiteral({ s: Symbol("s") });
+    // @ts-expect-error a bigint is not shaped as JSON
+    tsLiteral({ n: 1n });
+  },
+);
 
 type Shape = { readonly kind: "circle"; readonly r: number } | { readonly kind: "square"; readonly side: number };
 function area(s: Shape): number {

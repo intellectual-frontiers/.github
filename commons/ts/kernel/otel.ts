@@ -531,10 +531,44 @@ const URL_IN_TEXT = /[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^\s"'<>`]+/g;
 const PRIVATE_KEY = /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|$)/g;
 const BEARER = /\b(Bearer)[ \t]+[A-Za-z0-9._~+/-]{8,}=*/gi;
 const BASIC = /\b(Basic)[ \t]+([A-Za-z0-9+/]{4,}={0,2})/gi;
+// `Authorization: <scheme> <credential>` (or `=`), quoted or not: the scheme kept, the credential replaced up to a space, quote, `,` or `;`.
+const AUTHORIZATION = /\b((?:proxy-)?authorization["']?[ \t]*[:=][ \t]*["']?)(?:([A-Za-z][A-Za-z0-9-]*)[ \t]+)?([^\s"',;]+)/gi;
+// `name=value`, `name: value`, `"name": "value"`: the name an identifier (with `-` and `.`), the value quoted or up to a delimiter.
+const PAIR = /(["']?)\b([A-Za-z_][A-Za-z0-9_.-]*)\1([ \t]*[:=][ \t]*)("[^"\n]*"|'[^'\n]*'|[^\s"',;&)}\]]+)/g;
+const SECRET_NAME_ENDINGS = [
+  "token",
+  "secret",
+  "password",
+  "passwd",
+  "passphrase",
+  "apikey",
+  "accesskey",
+  "secretkey",
+  "privatekey",
+  "credential",
+  "signature",
+] as const;
 const KNOWN_TOKENS = [
-  /\bgh[pousr]_[A-Za-z0-9]{30,}\b/g,
+  /\bgh[pousr]_[A-Za-z0-9]{30,}\b/g, // GitHub
   /\bgithub_pat_[A-Za-z0-9_]{30,}\b/g,
-  /\beyJ[A-Za-z0-9_-]{4,}\.eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]+/g,
+  /\bglpat-[A-Za-z0-9_-]{20,}/g, // GitLab
+  /\bxox[abposr]-[A-Za-z0-9-]{10,}/g, // Slack
+  /\bxapp-[0-9]-[A-Za-z0-9-]{10,}/g,
+  /\bya29\.[A-Za-z0-9._-]{20,}/g, // Google access, refresh and client secret, API key
+  /(?<![A-Za-z0-9])1\/\/[A-Za-z0-9_-]{30,}/g,
+  /\bGOCSPX-[A-Za-z0-9_-]{20,}/g,
+  /\bAIza[0-9A-Za-z_-]{35}\b/g,
+  /\bcf[au]t_[A-Za-z0-9_-]{20,}/g, // Cloudflare account and user API tokens
+  /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g, // Anthropic, OpenAI
+  /\b[rs]k_(?:live|test)_[A-Za-z0-9]{16,}/g, // Stripe
+  /\bnpm_[A-Za-z0-9]{36}\b/g, // npm
+  /\bdo[opr]_v1_[a-f0-9]{64}\b/g, // DigitalOcean
+  /\bdckr_pat_[A-Za-z0-9_-]{20,}/g, // Docker
+  /\bhf_[A-Za-z]{30,}\b/g, // Hugging Face
+  /\blin_(?:api|oauth)_[A-Za-z0-9]{30,}\b/g, // Linear
+  /\bAT(?:ATT|BB)[A-Za-z0-9_=-]{20,}/g, // Atlassian, Bitbucket
+  /\beyJ[A-Za-z0-9_-]{4,}\.eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]+/g, // JSON Web Token
+  /\$(?:6|5|y|gy|2[aby])\$[^\s:"']{8,}/g, // crypt password hashes
 ];
 
 function isBasicCredential(token: string): boolean {
@@ -544,14 +578,42 @@ function isBasicCredential(token: string): boolean {
 }
 
 /**
- * Text with its secrets replaced (FR-006): each URL as `redactUrl` writes it, a bearer token, a basic credential (base64 of `user:pass`), a
- * private key block and the token shapes that announce themselves (GitHub tokens, JSON Web Tokens) become `REDACTED`.
+ * Whether a field's name in text says its value is a secret (FR-006): it ends in `token`, `secret`, `password`, `passwd`, `passphrase`,
+ * `apikey`, `accesskey`, `secretkey`, `privatekey`, `credential` or `signature`, with case, `-`, `_` and `.` ignored (`api_token`,
+ * `AWS_SECRET_ACCESS_KEY`, `X-Amz-Signature`, `clientSecret`), but not `max_tokens` or `token_type`. Narrower than
+ * {@link isCredentialName}, which judges a URL's query parameters, because prose is full of `code=` and `key:`.
  */
-export function redactText(text: string): string {
-  let out = text.replace(PRIVATE_KEY, REDACTED);
+export function isSecretFieldName(name: string): boolean {
+  const n = name.toLowerCase().replace(/[-_.]/g, "");
+  return SECRET_NAME_ENDINGS.some((e) => n.endsWith(e));
+}
+
+/**
+ * Text with its secrets replaced (FR-006), the one redaction for signals and for what a harness mails: each exact secret named in
+ * `secrets` (four characters or more; a shorter one would garble the text and hide nothing), a private key block, each URL as
+ * `redactUrl` writes it, a bearer token, a basic credential (base64 of `user:pass`), the credential of an `Authorization` header with any
+ * scheme, the value of a `name=value` or `name: value` pair whose name {@link isSecretFieldName} judges secret (quoted or bare, in prose,
+ * JSON, YAML or an environment file), and the token formats that announce themselves (GitHub, GitLab, Slack, Google, Cloudflare,
+ * Anthropic, OpenAI, Stripe, npm, DigitalOcean, Docker, Hugging Face, Linear, Atlassian, JSON Web Tokens) and crypt password hashes
+ * become `REDACTED`.
+ */
+export function redactText(text: string, secrets: Iterable<string> = []): string {
+  let out = text;
+  const exact = [...new Set(secrets)].filter((s) => s.length >= 4).sort((a, b) => b.length - a.length);
+  for (const s of exact) out = out.split(s).join(REDACTED);
+  out = out.replace(PRIVATE_KEY, REDACTED);
   out = out.replace(URL_IN_TEXT, (u) => redactUrl(u));
+  out = out.replace(
+    AUTHORIZATION,
+    (_m, head: string, scheme: string | undefined) => `${head}${scheme === undefined ? "" : `${scheme} `}${REDACTED}`,
+  );
   out = out.replace(BEARER, (_m, word: string) => `${word} ${REDACTED}`);
   out = out.replace(BASIC, (m, word: string, token: string) => (isBasicCredential(token) ? `${word} ${REDACTED}` : m));
+  out = out.replace(PAIR, (m, quote: string, name: string, sep: string, value: string) => {
+    if (!isSecretFieldName(name)) return m;
+    const q = value.startsWith('"') || value.startsWith("'") ? value.charAt(0) : "";
+    return `${quote}${name}${quote}${sep}${q}${REDACTED}${q}`;
+  });
   for (const re of KNOWN_TOKENS) out = out.replace(re, REDACTED);
   return out;
 }
@@ -559,7 +621,7 @@ export function redactText(text: string): string {
 /** An attribute value with its secrets replaced: `redactText` on a string and on each string of an array. */
 export function redactValue(value: AttributeValue): AttributeValue {
   if (typeof value === "string") return redactText(value);
-  if (Array.isArray(value) && value.every((v): v is string => typeof v === "string")) return value.map(redactText);
+  if (Array.isArray(value) && value.every((v): v is string => typeof v === "string")) return value.map((v) => redactText(v));
   return value;
 }
 

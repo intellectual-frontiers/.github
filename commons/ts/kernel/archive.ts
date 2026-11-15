@@ -1,7 +1,9 @@
 /**
  * Archives in memory, with no outside package (commons 0005-typescript-runtime FR-010). Writing: a POSIX ustar archive, a gzip stream of
- * stored deflate blocks and a zip of stored entries, each entry with a fixed time and mode and in the byte order of its path, so the bytes
- * depend on the files alone (taken from erga's `lib/ts/archive`). Reading: a tar (ustar, pax and GNU long names), a gzip and a zip whose
+ * stored deflate blocks and a zip of stored entries (`zip`), each entry with a fixed time and mode and in the byte order of its path, so the
+ * bytes depend on the files alone (taken from erga's `lib/ts/archive`); and, where size matters more than the same bytes on every runtime,
+ * a zip of deflated entries (`zipDeflated`, through the web standard `CompressionStream`), the same bytes for the same files on one runtime
+ * and the same files unzipped on every runtime. Reading: a tar (ustar, pax and GNU long names), a gzip and a zip whose
  * entries are stored or deflated (through the web standard `DecompressionStream`), each checked (header checksums, CRC-32) and every path
  * refused that would leave the folder it is unpacked into. This is what lets Stolos drop `fflate` and unpack a verified copy of its engine.
  * A tar, gzipped or not, is also read as a stream (`untarStream`, `readTarStream`), an entry at a time with each entry's bytes a stream of
@@ -203,33 +205,39 @@ export function dosDate(year: number, month: number, day: number): number {
 /** The zip's fixed date: 1980-01-01, the first a zip can hold. */
 export const ZIP_EPOCH: number = dosDate(1980, 1, 1);
 
-/** A zip (APPNOTE 6.3) of the files, each stored, dated `date` (1980-01-01 unless another is given) at midnight and readable by everyone. */
-export function zip(files: Files, date: number = ZIP_EPOCH): Uint8Array {
+/** One entry as a zip writer lays it out: its path, CRC-32 and size, and its bytes as written (stored, or deflated). */
+type ZipItem = {
+  readonly path: string;
+  readonly crc: number;
+  readonly size: number;
+  readonly method: 0 | 8;
+  readonly body: Uint8Array;
+};
+
+/** A zip of the entries, in their order, each dated `date` at midnight and readable by everyone. */
+function zipOf(items: readonly ZipItem[], date: number): Uint8Array {
   const out = new Bytes();
   const central = new Bytes();
   const enc = new TextEncoder();
-  const paths = sortedPaths(files.keys());
-  for (const path of paths) {
-    const data = files.get(path) ?? new Uint8Array();
+  for (const item of items) {
     const offset = out.length;
-    const crc = crc32(data);
-    const name = enc.encode(path);
+    const name = enc.encode(item.path);
     const common = (v: Bytes): void => {
       v.u16(20);
       v.u16(0x0800);
-      v.u16(0);
+      v.u16(item.method);
       v.u16(0);
       v.u16(date);
-      v.u32(crc);
-      v.u32(data.length);
-      v.u32(data.length);
+      v.u32(item.crc);
+      v.u32(item.body.length);
+      v.u32(item.size);
       v.u16(name.length);
       v.u16(0);
     };
     out.u32(0x04034b50);
     common(out);
     out.push(name);
-    out.push(data);
+    out.push(item.body);
     central.u32(0x02014b50);
     central.u16((3 << 8) | 20);
     common(central);
@@ -246,26 +254,66 @@ export function zip(files: Files, date: number = ZIP_EPOCH): Uint8Array {
   out.u32(0x06054b50);
   out.u16(0);
   out.u16(0);
-  out.u16(paths.length);
-  out.u16(paths.length);
+  out.u16(items.length);
+  out.u16(items.length);
   out.u32(size);
   out.u32(start);
   out.u16(0);
   return out.done();
 }
 
+/** A zip (APPNOTE 6.3) of the files, each stored, dated `date` (1980-01-01 unless another is given) at midnight and readable by everyone. */
+export function zip(files: Files, date: number = ZIP_EPOCH): Uint8Array {
+  return zipOf(
+    sortedPaths(files.keys()).map((path) => {
+      const data = files.get(path) ?? new Uint8Array();
+      return { path, crc: crc32(data), size: data.length, method: 0, body: data };
+    }),
+    date,
+  );
+}
+
+/**
+ * A zip (APPNOTE 6.3) of the files as `zip` lays them out, but each entry deflated (method 8) through the web standard
+ * `CompressionStream("deflate-raw")`, or stored where deflating would not make it smaller (an empty or incompressible file). The bytes
+ * depend on the files alone on one runtime; another runtime's deflater may choose other (equally valid) bytes, so only what they unzip to
+ * is the same everywhere.
+ */
+export async function zipDeflated(files: Files, date: number = ZIP_EPOCH): Promise<Uint8Array> {
+  const items: ZipItem[] = [];
+  for (const path of sortedPaths(files.keys())) {
+    const data = files.get(path) ?? new Uint8Array();
+    const packed = await deflateRaw(data);
+    items.push(
+      packed.length < data.length
+        ? { path, crc: crc32(data), size: data.length, method: 8, body: packed }
+        : { path, crc: crc32(data), size: data.length, method: 0, body: data },
+    );
+  }
+  return zipOf(items, date);
+}
+
+/** The raw deflate stream (RFC 1951) a web `CompressionStream` gives for the bytes. */
+export async function deflateRaw(data: Uint8Array): Promise<Uint8Array> {
+  return drain(new Blob([new Uint8Array(data)]).stream().pipeThrough(new CompressionStream("deflate-raw")));
+}
+
+/** Every chunk of a stream of bytes, joined. */
+async function drain(stream: ReadableStream<Uint8Array>): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const parts: Uint8Array[] = [];
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parts.push(value);
+  }
+  return concat(parts);
+}
+
 /** The bytes a web `DecompressionStream` gives for the input, or the error it raised. */
 async function decompress(format: "gzip" | "deflate-raw", data: Uint8Array): Promise<Result<Uint8Array, ArchiveError>> {
   try {
-    const stream = new Blob([new Uint8Array(data)]).stream().pipeThrough(new DecompressionStream(format));
-    const reader = stream.getReader();
-    const parts: Uint8Array[] = [];
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      parts.push(value);
-    }
-    return ok(concat(parts));
+    return ok(await drain(new Blob([new Uint8Array(data)]).stream().pipeThrough(new DecompressionStream(format))));
   } catch (e) {
     return damaged(`${format}: ${e instanceof Error ? e.message : String(e)}`);
   }

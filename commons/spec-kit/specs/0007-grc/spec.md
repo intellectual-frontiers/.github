@@ -33,8 +33,8 @@
 
 ## Formats (kernel)
 
-- **FR-016**: Findings MUST be written as OCSF (version 1.3.0): a Compliance Finding (class 2003) with its `type_uid`, `status_id` and `severity_id` mapped from the verdict and severity, the control in `compliance`, and `metadata.product`; and an inventory as Inventory Info (class 5001).
-- **FR-017**: Assessments MUST be written as OSCAL 1.1.2 JSON (`assessment-results`, `plan-of-action-and-milestones`, `component-definition`, and a `system-security-plan` of what is implemented), every `uuid` a version 5 UUID of a namespace and a stable name, so the same input gives the same document.
+- **FR-016**: Findings MUST be written as OCSF (version 1.9.0): a Compliance Finding (class 2003) with its `type_uid`, `status_id` and `severity_id` mapped from the verdict and severity, the control in `compliance`, and `metadata.product`; and, for what a harness reports beside its findings, a Vulnerability Finding (class 2002), and a Device (5001), User (5003) or Cloud Resources (5023) Inventory Info event, each with the metadata the caller adds (`tenant_uid`, `uid`, `correlation_uid`, `labels`). Every event is typed by types generated from the OCSF schema at that version (`tools/ocsf-gen.ts` writes `kernel/ocsf-types.auto.ts`; every response it reads is pinned by its SHA-256 in the generator, it is run by hand and its output committed), so a missing required attribute does not compile.
+- **FR-017**: Assessments MUST be written as OSCAL 1.2.3 JSON (`assessment-results`, `plan-of-action-and-milestones`, `component-definition`, and a `system-security-plan` of what is implemented), every `uuid` a version 5 UUID of a namespace and a stable name, so the same input gives the same document.
 - **FR-018**: Attestations MUST be written as CycloneDX 1.6 `declarations` (assessors, attestations, claims, evidence and targets) and as in-toto Statement v1 with a predicate type the caller names, ready for a DSSE envelope (0005-typescript-runtime FR-045).
 
 ## The host (runtime)
@@ -69,13 +69,12 @@
 
 ## Assumptions
 
-- OCSF 1.3.0, OSCAL 1.1.2 and CycloneDX 1.6 are the versions both harnesses write today.
+- OCSF 1.9.0, OSCAL 1.2.3 and CycloneDX 1.6 are the versions the harnesses write today (`stolos` writes these OCSF classes and OSCAL documents already). From OSCAL 1.1.2 to 1.2.3 the members of the four documents written did not change; 1.2 widened enumerations (component types, the `discovery` observation type, CVSS v4), made an SSP's `users` optional and added the mapping model, which is not written.
 - A role is enough to say who approved a waiver or owns a risk in this public repository; a harness that must name people adds them in its own records.
 
 ## Open questions
 
 - **OQ-1**: Whether to add the OSCAL profile and catalog models when a harness resolves profiles itself.
-- **OQ-2**: Whether OCSF should move to a later version when one harness needs a class 1.3.0 lacks.
 
 ## Key entities
 

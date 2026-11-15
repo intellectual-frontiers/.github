@@ -1,6 +1,7 @@
 /**
  * Tests of `kernel/archive.ts`: archives written and read back are the files they hold (property-tested), the same files give the same
- * bytes, a damaged or unsafe archive is refused, and a deflated zip and a gzip made by the platform's own `CompressionStream` are read;
+ * bytes, a damaged or unsafe archive is refused, and a deflated zip and a gzip made by the platform's own `CompressionStream` are read; a
+ * zip of deflated entries is written through that `CompressionStream`, the same bytes twice on one runtime and the files back everywhere;
  * a tar read as a stream gives what `untar` gives, refuses what it refuses, and reads a large archive fed in small chunks.
  *
  * @module
@@ -22,6 +23,7 @@ import {
   untarStream,
   unzip,
   zip,
+  zipDeflated,
   zipEntries,
 } from "../../kernel/archive.ts";
 import { Md5, md5 } from "../../kernel/md5.ts";
@@ -166,6 +168,51 @@ proves([FR], "a zip whose entry is deflated, and a gzip the platform compressed,
   const gz = new Uint8Array(await new Response(new Blob([text]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
   assertEquals(await gunzip(gz), ok(text));
 });
+
+proves(
+  [FR, "0005-typescript-runtime FR-014"],
+  "a zip of deflated entries: the files back, the same bytes twice, stored where deflate would not shrink",
+  async () => {
+    await fc.assert(
+      fc.asyncProperty(files, async (fs) => {
+        const z = await zipDeflated(fs);
+        assertEquals(z, await zipDeflated(fs));
+        const back = await unzip(z);
+        if (back.kind === "err") throw new Error(formatArchiveError(back.error));
+        assertEquals(sorted(back.value), sorted(fs));
+      }),
+      { numRuns: 30 },
+    );
+    const text = enc.encode("the same line again\n".repeat(200));
+    const noise = Uint8Array.from({ length: 16 }, (_, i) => (i * 167 + 13) & 0xff);
+    const z = await zipDeflated(
+      new Map([
+        ["text.txt", text],
+        ["noise.bin", noise],
+        ["empty", new Uint8Array()],
+      ]),
+    );
+    const entries = zipEntries(z);
+    assert(entries.kind === "ok");
+    assertEquals(
+      entries.value.map((e) => [e.name, e.method, e.size]),
+      [
+        ["empty", 0, 0],
+        ["noise.bin", 0, 16],
+        ["text.txt", 8, text.length],
+      ],
+    );
+    const deflated = entries.value[2];
+    assert(deflated !== undefined && deflated.compressed < deflated.size / 10);
+    assertEquals((await unzip(z)).kind, "ok");
+    // Where nothing shrinks, the deflating writer lays out the same bytes as the stored one.
+    const stored = new Map([
+      ["noise.bin", noise],
+      ["empty", new Uint8Array()],
+    ]);
+    assertEquals(await zipDeflated(stored), zip(stored));
+  },
+);
 
 /** One tar header of a name, type and body (mode 0644), with its body padded. */
 const block = (name: string, type: string, body: Uint8Array): Uint8Array => {

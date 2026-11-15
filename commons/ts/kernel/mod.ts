@@ -2,9 +2,9 @@
  * The kernel of IFC TypeScript (commons 0005-typescript-runtime): pure code that imports nothing outside this folder, has no effect on the
  * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
  * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64, ASN.1 DER (as `der`), CMS
- * encryption (as `cms`) and signed in-toto statements (as `dsse`); PNG and ICO pictures (as `png`); archives, JSON5, TOML, YAML, CSV, XML
- * and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`); OS scheduled jobs planned (as
- * `jobs`); and type-level tests.
+ * encryption (as `cms`), signed in-toto statements (as `dsse`) and AWS Signature Version 4 (as `sigv4`); PNG and ICO pictures (as `png`);
+ * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`);
+ * OS scheduled jobs planned (as `jobs`); and type-level tests.
  *
  * @example
  * ```ts
@@ -26,6 +26,7 @@ export {
   ArchiveFailure,
   concat,
   crc32,
+  deflateRaw,
   dosDate,
   filesOf,
   formatArchiveError,
@@ -42,6 +43,7 @@ export {
   unzip,
   zip,
   ZIP_EPOCH,
+  zipDeflated,
   zipEntries,
   zipRead,
 } from "./archive.ts";
@@ -98,11 +100,27 @@ export type { WebLink } from "./http.ts";
 export { formatJson5Error, isBareKey, isJsonObject, parseJson5, toJson5 } from "./json5.ts";
 export type { Json, Json5Error, JsonObject } from "./json5.ts";
 export * as md5 from "./md5.ts";
+export { compact } from "./objects.ts";
+export type { Compact, Simplify } from "./objects.ts";
 export { contentType, extensionOf, isTextual, MEDIA_TYPES, mediaType } from "./media-types.ts";
 export { all, andThen, attempt, done, err, isErr, isOk, map, mapErr, match, ok, orElse, settle, unwrapOr } from "./result.ts";
 export type { Err, Ok, Result } from "./result.ts";
-export { atLeast, bump, bumpSuffices, compareDotted, compareSemVer, dottedParts, formatSemVer, parseSemVer, versionIn } from "./semver.ts";
-export type { Change, Level, SemVer } from "./semver.ts";
+export {
+  atLeast,
+  bump,
+  bumpSuffices,
+  compareDotted,
+  compareSemVer,
+  dottedParts,
+  formatRange,
+  formatSemVer,
+  maxSatisfying,
+  parseRange,
+  parseSemVer,
+  satisfies,
+  versionIn,
+} from "./semver.ts";
+export type { Change, Comparator, Level, Operator, Range, SatisfiesOptions, SemVer } from "./semver.ts";
 export { fromHex, parseSha256Sums, sameSha256, sha256, sha256Of, toHex } from "./sha256.ts";
 export type { Sha256 } from "./sha256.ts";
 export { ANSI, lf, plain, quoteArgs, splitArgs } from "./text.ts";
@@ -115,12 +133,13 @@ export * as png from "./png.ts";
 export * as render from "./render.ts";
 export * as jobs from "./schedule.ts";
 export * as signals from "./signals.ts";
+export * as sigv4 from "./sigv4.ts";
 export * as testRecord from "./test-record.ts";
 export * as testReport from "./test-report.ts";
 export { formatTomlError, isTomlDateTime, isTomlTable, parseToml, tomlKey, tomlString, toToml } from "./toml.ts";
 export type { TomlDateTime, TomlError, TomlTable, TomlValue } from "./toml.ts";
 export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
-export type { Literal, LiteralError } from "./ts-literal.ts";
+export type { Literal, LiteralError, LiteralShape } from "./ts-literal.ts";
 export { expectType } from "./types.ts";
 export * as uuid from "./uuid.ts";
 export * as vt from "./vt.ts";

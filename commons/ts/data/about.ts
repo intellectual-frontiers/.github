@@ -66,9 +66,9 @@ export const about: About = {
       run: "bun run docs",
       does: "Writes the documentation maps (arca/party.docs.auto.ts and the others) again after a TSDoc comment changes.",
     },
-    { run: "IFCSQL_UPDATE_GOLDEN=1 bun test suite/", does: "Writes the committed SQL again; then read the diff." },
+    { run: "IFCSQL_UPDATE_GOLDEN=1 bun run test", does: "Writes the committed SQL again; then read the diff." },
     {
-      run: "IFCSQL_PG_URL=postgres://... bun test suite/",
+      run: "IFCSQL_PG_URL=postgres://... bun run test",
       does: "Also runs on a PostgreSQL server: each test makes a database and drops it.",
     },
   ],

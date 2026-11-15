@@ -45,7 +45,7 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
 0005-typescript-runtime FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
 0005-typescript-runtime FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: lf, plain, splitArgs and quoteArgs, and their round trip
-0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip, pax and GNU names
+0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip read and written, pax and GNU names
 0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
 0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
 0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under deno test, node --test and bun test in CI
@@ -97,13 +97,20 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
 0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
 0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
+0005-typescript-runtime FR-063	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: tsLiteral takes an interface with no index signature, refuses a Date, a function, undefined in an array (type-level, with negative controls)
+0005-typescript-runtime FR-064	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/objects.test.ts: compact leaves out undefined fields, its type exact under exactOptionalPropertyTypes
+0005-typescript-runtime FR-065	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the gives back the value narrowed, and fails on null and undefined
+0005-typescript-runtime FR-066	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: readOnly lets through the POSTs its predicate says only read, and refuses every other write
+0005-typescript-runtime FR-067	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: ranges against npm's documented desugaring and laws (caret, tilde, x-range, hyphen, union), pre-releases
+0005-typescript-runtime FR-068	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sigv4.test.ts: AWS's published Signature Version 4 examples, canonical request and string to sign, a web Request signed
+0005-typescript-runtime FR-069	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/client.test.ts: a SigV4 transport signs each request to a recorded server, and the live transport still refuses it unless allowed
 0005-typescript-runtime FR-046	check	.github: cd commons/ts && bun test tests/	kernel/schedule.test.ts and runtime/schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips against reference splitters, every schedule kind read back, refusals; install and remove into a temporary home with a fake runner (CI runs them on Linux, macOS and Windows)
 0006-signals FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
 0006-signals FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: ids from given bytes, zeros refused, brands kept apart
 0006-signals FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: traceparent and tracestate against the W3C examples, with property round trips
 0006-signals FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otlp.test.ts: OTLP JSON encode and decode, round-trip properties, int64 as strings, unknown fields ignored
 0006-signals FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: configuration from OTEL_* records, invalid values warned and defaulted
-0006-signals FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: redaction of secret attributes, URLs, tokens and process arguments
+0006-signals FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: redaction of secret attributes, URLs, tokens, name=value pairs, provider token formats, exact secrets and process arguments
 0006-signals FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: attribute, event and link limits with dropped counts
 0006-signals FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the samplers, ratio decided by the trace id alone
 0006-signals FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: defineSignals, with @ts-expect-error for undeclared kinds and wrong attributes
@@ -113,7 +120,7 @@ requirement	mechanism	by	note
 0006-signals FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: counter, up-down, gauge and histogram aggregation
 0006-signals FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: export to a local receiver, retries on 503 with Retry-After, never throws
 0006-signals FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the probe gives up within 150 ms, the exit wait within a second
-0006-signals FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the journal writes OTLP lines and rotates
+0006-signals FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the journal writes OTLP lines, rotates and removes files past their age
 0006-signals FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the current span across await, and the parent from TRACEPARENT
 0006-signals FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: proc, http client and serve spans, with traceparent passed on
 0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
@@ -139,8 +146,8 @@ requirement	mechanism	by	note
 0007-grc FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the change-impact gate
 0007-grc FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the risk register and NIST SP 800-30's matrix
 0007-grc FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the requirement trace
-0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF compliance findings and inventory
-0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts and uuid.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
+0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF 1.9.0 compliance and vulnerability findings, device, user and cloud resources inventories
+0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts and uuid.test.ts: OSCAL 1.2.3 documents, UUIDv5 against RFC 9562's example, determinism
 0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
 0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
 0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE

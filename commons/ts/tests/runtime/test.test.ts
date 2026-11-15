@@ -31,6 +31,7 @@ import {
   reviewed,
   reviews,
   test,
+  the,
 } from "../../runtime/test.ts";
 import { relative } from "node:path";
 import process from "node:process";
@@ -39,6 +40,7 @@ import { sha256 } from "../../kernel/sha256.ts";
 import { STEP_SPAN, decodeLines, installationOf } from "../../kernel/test-record.ts";
 import { assembleRecord, junitXml, readRecord, tap14, testsOf } from "../../kernel/test-report.ts";
 import { parseSpanId, parseTraceId } from "../../kernel/otel.ts";
+import { type Equal, expectType } from "../../kernel/types.ts";
 import { makeTempDir, readTextFile, remove, writeTextFile } from "../../runtime/fs.ts";
 import { join } from "../../runtime/path.ts";
 import { env, execPath, run, runtimeName } from "../../runtime/proc.ts";
@@ -107,6 +109,24 @@ proves([FR], "each assertion passes on what it describes and throws on what it d
 });
 
 reviewed("example-spec FR-001", "an example of a review declared in code");
+
+proves(
+  ["0005-typescript-runtime FR-065", "0005-typescript-runtime FR-014"],
+  "the gives the value back narrowed, and fails on null and undefined",
+  () => {
+    const roles = new Map([["lead", { name: "operator" }]]);
+    const lead = the(roles.get("lead"));
+    expectType<Equal<typeof lead, { name: string }>>();
+    assertEquals(lead.name, "operator");
+    assertEquals(the(0), 0);
+    assertEquals(the(""), "");
+    assertThrows(() => the(roles.get("none")), Error, "expected a value");
+    assertThrows(() => the(null, "the lead is named"), Error, "the lead is named");
+    const maybe: string | undefined = roles.has("lead") ? "x" : undefined;
+    assertExists(maybe);
+    expectType<Equal<typeof maybe, string>>();
+  },
+);
 
 proves([FR], "proves names the test for its requirements and keeps them; reviewed keeps the reason", () => {
   const mine = proofs.find((p) => p.test.endsWith("keeps the reason"));

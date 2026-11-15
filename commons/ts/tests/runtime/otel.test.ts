@@ -7,7 +7,7 @@
  *
  * @module
  */
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
 import process from "node:process";
 import {
   commandShape,
@@ -392,6 +392,34 @@ proves([JOURNAL], "the journal writes one OTLP JSON line per export and rotates 
     assertEquals(JSON.parse(readFileSync(path, "utf8")), encodeTraces([e]));
   });
 });
+
+proves(
+  [JOURNAL],
+  "a journal with a maximum age removes the files last written before it, when it starts and at each rotation",
+  async () => {
+    await withTempDir(async (dir) => {
+      const path = join(dir, "run.jsonl");
+      const day = 24 * 60 * 60 * 1000;
+      let now = Date.now();
+      const writtenAgo = (file: string, days: number): void => {
+        writeFileSync(file, "{}\n");
+        const at = (now - days * day) / 1000;
+        utimesSync(file, at, at);
+      };
+      writtenAgo(path, 40);
+      writtenAgo(`${path}.1`, 10);
+      writtenAgo(`${path}.2`, 31);
+      const journal = journalExporter({ path, maxBytes: 100, keep: 3, maxAgeDays: 30, now: () => now });
+      assertEquals(await journal.exportTraces([traceBatch("a")]), { kind: "success" });
+      assertEquals([existsSync(`${path}.1`), existsSync(`${path}.2`)], [true, false]);
+      assertEquals(readFileSync(path, "utf8").split("\n").length, 2, "the file of 40 days was removed, so the journal holds one line");
+      now += 25 * day;
+      assertEquals(await journal.exportTraces([traceBatch("b")]), { kind: "success" });
+      // rotated: run.jsonl.1 (10 days, now 35) became run.jsonl.2 and was removed; the line of today became run.jsonl.1
+      assertEquals([existsSync(path), existsSync(`${path}.1`), existsSync(`${path}.2`)], [true, true, false]);
+    });
+  },
+);
 
 proves([JOURNAL], "a run keeps a journal of its spans, logs and metrics even with no collector", async () => {
   await withTempDir(async (dir) => {

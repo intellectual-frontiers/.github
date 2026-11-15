@@ -577,6 +577,15 @@ export function assertExists<T>(value: T, message?: string): asserts value is No
   nodeAssert.ok(value !== null && value !== undefined, message ?? "expected a value, found null or undefined");
 }
 
+/**
+ * The value, narrowed to `NonNullable`, or a failure as {@link assertExists} fails where it is `null` or `undefined` (FR-065), so that a
+ * test reads `the(map.get(key)).name` where an assertion would need a statement of its own.
+ */
+export function the<T>(value: T, message?: string): NonNullable<T> {
+  assertExists(value, message);
+  return value;
+}
+
 /** Fails unless the value is an instance of the class; narrows its type. */
 export function assertInstanceOf<T>(value: unknown, Class: abstract new (...args: never[]) => T, message?: string): asserts value is T {
   nodeAssert.ok(value instanceof Class, message ?? `expected an instance of ${Class.name}`);

@@ -68,6 +68,10 @@ export const about: About = {
       does: "Runs the suite on all three runtimes into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",
     },
     { run: "bun run smoke", does: "Installs the tarball and uses it on Bun, Node and Deno, and checks its declarations with tsc 7." },
+    {
+      run: "bun tools/ocsf-gen.ts --check",
+      does: "Checks that kernel/ocsf-types.auto.ts is what the pinned OCSF 1.9.0 schema gives (needs the network; run by hand).",
+    },
   ],
   rules: [
     {

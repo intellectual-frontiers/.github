@@ -4,7 +4,7 @@
  * every test as evidence. A harness installs the release asset first:
  *
  * ```sh
- * bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.2.0/intellectual-frontiers-ifc-ts-0.2.0.tgz
+ * bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.4.0/intellectual-frontiers-ifc-ts-0.4.0.tgz
  * ```
  *
  * @module
