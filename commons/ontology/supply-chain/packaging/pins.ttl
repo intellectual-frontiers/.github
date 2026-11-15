@@ -79,6 +79,14 @@ pmid:sum-bun-macos-x64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform p
 pmid:sum-bun-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "c240d7f0ccb90c263a849fcdb09b7ee62630d921348ed6aafda86b9d577bc510" .
 pmid:sum-bun-windows-x64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-windows-x64 ; pm:sha256 "cd2c0fccc78f3ede1f50ca827a15f063eda13d4d150a3d0674f4f6e323d864a5" .
 
+pmid:pin-otelcol-contrib a pm:PinnedDownload ;
+    rdfs:label "The OpenTelemetry Collector (contrib distribution), which IFC TypeScript's CI sends its OTLP to and reads back from its file exporter"@en ;
+    pm:programName "otelcol-contrib" ;
+    pm:pinKey "OTELCOL_CONTRIB" ;
+    pm:version "0.165.0" ;
+    pm:note "From https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/vVERSION/otelcol-contrib_VERSION_linux_amd64.tar.gz. Used only by the conformance job on Linux x64 (commons 0006-signals FR-020); the checksum was taken from the release asset when it was pinned."@en .
+pmid:sum-otelcol-contrib-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-otelcol-contrib ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "bd6e73d94bf3359ad6fac25529a8ee308adb9b0b8a0e8af034ed3891fbe5aa33" .
+
 pmid:pin-deno a pm:PinnedDownload ;
     rdfs:label "Deno, which runs the machine setup and erga's ergactl"@en ;
     pm:programName "deno" ;

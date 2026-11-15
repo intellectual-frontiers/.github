@@ -1,6 +1,6 @@
 /**
  * Arca's party model: the people and organizations a business deals with, how they relate, what roles they play, how they are identified
- * and how they are reached (commons 0006-sql-aide FR-047). Most business software needs this structure whoever its customers are, which
+ * and how they are reached (commons 0009-sql-aide FR-047). Most business software needs this structure whoever its customers are, which
  * is why it is the first of Arca's typical data models. It is Arca's own work, written for IFC SQL Aide.
  *
  * @module

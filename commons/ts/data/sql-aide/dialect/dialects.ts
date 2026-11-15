@@ -1,5 +1,5 @@
 /**
- * The three dialects the library is written for first: PostgreSQL, SQLite and DuckDB (commons 0006-sql-aide FR-010). Each is a value; its
+ * The three dialects the library is written for first: PostgreSQL, SQLite and DuckDB (commons 0009-sql-aide FR-010). Each is a value; its
  * features are a union the compiler knows, so that a model asking for one a dialect lacks does not compile.
  *
  * @module

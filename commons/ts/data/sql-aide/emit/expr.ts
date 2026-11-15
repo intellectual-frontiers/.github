@@ -1,5 +1,5 @@
 /**
- * Expressions typed by what they yield: two things compare only where their values are of one type (commons 0006-sql-aide FR-013). A
+ * Expressions typed by what they yield: two things compare only where their values are of one type (commons 0009-sql-aide FR-013). A
  * value that is not a partial is bound, never written into the text.
  *
  * @module

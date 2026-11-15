@@ -1,6 +1,6 @@
 /**
  * Tests as typed values: an assertion is written once and run in three ways, inside PostgreSQL as pgTAP, inside any of the dialects as
- * SQL that returns TAP lines, and from TypeScript through whatever can run a query (commons 0006-sql-aide FR-029, FR-030). The tests
+ * SQL that returns TAP lines, and from TypeScript through whatever can run a query (commons 0009-sql-aide FR-029, FR-030). The tests
  * that a model's tables, columns, keys, indexes and views exist are made from the model.
  *
  * @module

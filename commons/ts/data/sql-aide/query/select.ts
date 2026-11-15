@@ -1,6 +1,6 @@
 /**
  * Reading rows: a query over a relation whose rows are the relation's, so that what uses the query (a routine that returns them, a
- * transform, a driver) is typed by it (commons 0006-sql-aide FR-041).
+ * transform, a driver) is typed by it (commons 0009-sql-aide FR-041).
  *
  * @module
  */

@@ -1,5 +1,5 @@
 /**
- * Arca: the typical data models of Intellectual Frontiers Commons, built with IFC SQL Aide (commons 0006-sql-aide FR-047). A model is
+ * Arca: the typical data models of Intellectual Frontiers Commons, built with IFC SQL Aide (commons 0009-sql-aide FR-047). A model is
  * TypeScript: import its tables to make SQL for PostgreSQL, SQLite or DuckDB, to type the rows of an application, or to extend them.
  *
  * @example

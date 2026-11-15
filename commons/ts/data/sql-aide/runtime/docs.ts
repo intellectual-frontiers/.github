@@ -1,6 +1,6 @@
 /**
  * Keeps the documentation maps of model modules: for each module given, `<module>.docs.auto.ts` written from its TSDoc comments, or,
- * with `--check`, a failure where the map is not what the source makes (commons 0006-sql-aide FR-005).
+ * with `--check`, a failure where the map is not what the source makes (commons 0009-sql-aide FR-005).
  *
  * `bun sql-aide/runtime/docs.ts [--check] arca/party.ts ...`
  *

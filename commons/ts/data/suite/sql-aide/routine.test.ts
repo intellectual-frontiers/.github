@@ -1,6 +1,6 @@
 /**
  * Stored routines defined in TypeScript: signatures from columns and relations, bodies the compiler checks, and one definition for three
- * dialects (commons 0006-sql-aide FR-020, FR-021).
+ * dialects (commons 0009-sql-aide FR-020, FR-021).
  *
  * @module
  */
@@ -99,7 +99,7 @@ const families = fn("families", {
     rowsAs<{ readonly family_name: string; readonly people: number }>()(SQL`SELECT "family_name", count(*)::int FROM ${person} GROUP BY 1`),
 });
 
-proves(["0006-sql-aide FR-020"], "a routine's body must give what the routine returns, and a call is typed by its arguments", () => {
+proves(["0009-sql-aide FR-020"], "a routine's body must give what the routine returns, and a call is typed by its arguments", () => {
   expectType<
     Equal<Parameters<typeof initials.call>[0]["given"] extends string | { readonly sqlKind: "expression" } ? true : false, true>
   >();
@@ -128,7 +128,7 @@ proves(["0006-sql-aide FR-020"], "a routine's body must give what the routine re
 });
 
 proves(
-  ["0006-sql-aide FR-021", "0006-sql-aide FR-010"],
+  ["0009-sql-aide FR-021", "0009-sql-aide FR-010"],
   "a definition renders for the dialects that can hold it, and a call for those that can run it",
   () => {
     assertStringIncludes(
@@ -157,7 +157,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-020", "0006-sql-aide FR-015"], "the routines emitted for PostgreSQL are what is committed", async () => {
+proves(["0009-sql-aide FR-020", "0009-sql-aide FR-015"], "the routines emitted for PostgreSQL are what is committed", async () => {
   await golden(
     new URL("./golden/routines.postgres.sql", import.meta.url),
     `${render(definitions([retire, families, familySize, bornSince, initials, person]), pg)}\n`,
@@ -165,7 +165,7 @@ proves(["0006-sql-aide FR-020", "0006-sql-aide FR-015"], "the routines emitted f
 });
 
 proves(
-  ["0006-sql-aide FR-020", "0006-sql-aide FR-021"],
+  ["0009-sql-aide FR-020", "0009-sql-aide FR-021"],
   "one definition gives the same answers in PostgreSQL, DuckDB and SQLite",
   async () => {
     const seen: string[] = [];
@@ -193,7 +193,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-020"], "blocks, procedures and row-returning functions run in PostgreSQL as written", async () => {
+proves(["0009-sql-aide FR-020"], "blocks, procedures and row-returning functions run in PostgreSQL as written", async () => {
   const engine = await pgliteEngine();
   try {
     const ddl = render(definitions([retire, families, familySize, bornSince, initials, person]), pg);
@@ -213,7 +213,7 @@ proves(["0006-sql-aide FR-020"], "blocks, procedures and row-returning functions
   }
 });
 
-proves(["0006-sql-aide FR-021"], "a trigger of statements runs in PostgreSQL and in SQLite", async () => {
+proves(["0009-sql-aide FR-021"], "a trigger of statements runs in PostgreSQL and in SQLite", async () => {
   const log = trigger("person_audit", person, { timing: "after", events: ["insert", "update"] }, (row) => [
     SQL`INSERT INTO ${audit} ("what", "who") VALUES (${row.new.person_id}, ${row.new.family_name})`,
   ]);

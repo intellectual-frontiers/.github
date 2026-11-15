@@ -1,6 +1,6 @@
 # IFC SQL Aide, Arca and Data Vault
 
-The data libraries of Intellectual Frontiers Commons, specified by [`0006-sql-aide`](../../spec-kit/specs/0006-sql-aide/spec.md) and built on
+The data libraries of Intellectual Frontiers Commons, specified by [`0009-sql-aide`](../../spec-kit/specs/0009-sql-aide/spec.md) and built on
 [IFC TypeScript](../README.md)'s kernel. SQL Aide is a SQL generator first and a database client second: a schema is written once as TypeScript algebraic types and rendered as
 SQL for PostgreSQL, SQLite and DuckDB. It replaces `netspective-labs/sql-aide`.
 

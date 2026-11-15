@@ -1,5 +1,5 @@
 /**
- * Arca's party model, as the acceptance test of IFC SQL Aide (commons 0006-sql-aide FR-047, FR-049, FR-050): it compiles for the three
+ * Arca's party model, as the acceptance test of IFC SQL Aide (commons 0009-sql-aide FR-047, FR-049, FR-050): it compiles for the three
  * dialects, what it emits is what is committed, it loads into every engine at hand, its constraints hold, and lint finds nothing.
  *
  * @module
@@ -50,7 +50,7 @@ const contexts = {
   duckdb: context({ dialect: duckdb(), docs: [partyDocs] }),
 };
 
-proves(["0006-sql-aide FR-047", "0006-sql-aide FR-007"], "the rows of the party model are typed from its tables", () => {
+proves(["0009-sql-aide FR-047", "0009-sql-aide FR-007"], "the rows of the party model are typed from its tables", () => {
   expectType<Equal<RowOf<typeof person>["party_id"], Brand<string, "party">>>();
   expectType<Equal<RowOf<typeof person>["birth_date"], string | null>>();
   const ada: NewRowOf<typeof person> = { party_id: party.key("01HX"), given_name: "Ada", family_name: "Lovelace" };
@@ -61,13 +61,13 @@ proves(["0006-sql-aide FR-047", "0006-sql-aide FR-007"], "the rows of the party 
 });
 
 for (const [dialect, ctx] of Object.entries(contexts)) {
-  proves(["0006-sql-aide FR-049", "0006-sql-aide FR-015"], `the party model emitted for ${dialect} is what is committed`, async () => {
+  proves(["0009-sql-aide FR-049", "0009-sql-aide FR-015"], `the party model emitted for ${dialect} is what is committed`, async () => {
     await golden(new URL(`./golden/party.${dialect}.sql`, import.meta.url), `${render(definitions(partyModel), ctx)}\n`);
   });
 }
 
 proves(
-  ["0006-sql-aide FR-005", "0006-sql-aide FR-025", "0006-sql-aide FR-026", "0006-sql-aide FR-027"],
+  ["0009-sql-aide FR-005", "0009-sql-aide FR-025", "0009-sql-aide FR-026", "0009-sql-aide FR-027"],
   "the party model is documented, owned and classified",
   async () => {
     assertEquals(lint(partyTables, contexts.postgres), []);
@@ -81,7 +81,7 @@ proves(
 );
 
 proves(
-  ["0006-sql-aide FR-049", "0006-sql-aide FR-017"],
+  ["0009-sql-aide FR-049", "0009-sql-aide FR-017"],
   "the party model loads into every engine at hand, twice, and its constraints hold",
   async () => {
     await eachEngine(async (engine) => {
@@ -119,7 +119,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-049"], "where no PostgreSQL server is given, the test that needs one says so and the rest run", () => {
+proves(["0009-sql-aide FR-049"], "where no PostgreSQL server is given, the test that needs one says so and the rest run", () => {
   if (postgresUrl() === undefined) console.log("# SKIP the PostgreSQL server tier: IFCSQL_PG_URL is not set");
   assertEquals(typeof postgresUrl(), postgresUrl() === undefined ? "undefined" : "string");
 });
@@ -141,7 +141,7 @@ const scenario = [
 ];
 
 proves(
-  ["0006-sql-aide FR-029", "0006-sql-aide FR-030", "0006-sql-aide FR-049"],
+  ["0009-sql-aide FR-029", "0009-sql-aide FR-030", "0009-sql-aide FR-049"],
   "the tests made from the party model, and its scenario, pass inside every engine and from TypeScript, with the same rows in each",
   async () => {
     const seen: string[] = [];
@@ -181,7 +181,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-029"], "on a PostgreSQL server with pgTAP, the same tests run as pgTAP", async () => {
+proves(["0009-sql-aide FR-029"], "on a PostgreSQL server with pgTAP, the same tests run as pgTAP", async () => {
   const engine = await postgresEngine();
   if (engine === undefined) {
     console.log("# SKIP pgTAP: IFCSQL_PG_URL is not set");
@@ -214,7 +214,7 @@ proves(["0006-sql-aide FR-029"], "on a PostgreSQL server with pgTAP, the same te
 });
 
 proves(
-  ["0006-sql-aide FR-020", "0006-sql-aide FR-021", "0006-sql-aide FR-050"],
+  ["0009-sql-aide FR-020", "0009-sql-aide FR-021", "0009-sql-aide FR-050"],
   "the party model's routines run in PostgreSQL, and its function gives the same people in DuckDB and SQLite",
   async () => {
     const seen: string[] = [];

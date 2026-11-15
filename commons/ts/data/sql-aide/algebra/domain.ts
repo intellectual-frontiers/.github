@@ -1,6 +1,6 @@
 /**
  * Domains: the logical SQL types of the model, as one tagged union, each carrying the TypeScript type of its values
- * (commons 0006-sql-aide FR-006). A dialect says how each is written (FR-010).
+ * (commons 0009-sql-aide FR-006). A dialect says how each is written (FR-010).
  *
  * @module
  */

@@ -82,53 +82,115 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-043	check	.github: cd commons/ts && bun test tests/	kernel/png.test.ts: random pictures written and read back, hand-built PNGs of every filter, colour type and depth with tRNS, every corrupt and hostile file refused by its kind, resize and composite laws, ICO round trips
 0005-typescript-runtime FR-047	check	.github: cd commons/ts && bun test tests/	kernel/args.test.ts: every grammar rule and error kind with its sentence and suggestion, the help text, type inference with negative controls, random argument vectors in random forms parsed back to their values
 0005-typescript-runtime FR-046	check	.github: cd commons/ts && bun test tests/	kernel/schedule.test.ts and runtime/schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips against reference splitters, every schedule kind read back, refusals; install and remove into a temporary home with a fake runner (CI runs them on Linux, macOS and Windows)
-0006-sql-aide FR-001	check	.github: cd commons/ts/data && bun run verify	conventions.test.ts: the package and the compiler's options; every test registers through runtime/test.ts
-0006-sql-aide FR-002	check	.github: cd commons/ts/data && bun run verify	Conventions: no dependencies, and what a file imports
-0006-sql-aide FR-003	check	.github: cd commons/ts/data && bun run verify	Conventions: erasable syntax, no any, no non-null assertion; the compiler's erasableSyntaxOnly
-0006-sql-aide FR-004	check	.github: cd commons/ts/data && bun run verify	Conventions: no configuration file named or read
-0006-sql-aide FR-005	check	.github: cd commons/ts/data && bun run verify	Conventions: TSDoc on every export; Docs: the map is what the source makes
-0006-sql-aide FR-006	check	.github: cd commons/ts/data && bun run verify	Algebra: domains and their value types
-0006-sql-aide FR-007	check	.github: cd commons/ts/data && bun run verify	Algebra: row types computed from columns (type tests)
-0006-sql-aide FR-008	check	.github: cd commons/ts/data && bun run verify	Algebra: literal names and branded keys (type tests)
-0006-sql-aide FR-009	check	.github: cd commons/ts/data && bun run verify	Graph: emit order
-0006-sql-aide FR-010	check	.github: cd commons/ts/data && bun run verify	Dialect: lowering and capabilities (type tests)
-0006-sql-aide FR-011	check	.github: cd commons/ts/data && bun run verify	Dialect: byDialect is exhaustive (type tests)
-0006-sql-aide FR-012	check	.github: cd commons/ts/data && bun run verify	Naming: strategies and tokens
-0006-sql-aide FR-013	check	.github: cd commons/ts/data && bun run verify	Emit: partial kinds, raw (type tests)
-0006-sql-aide FR-014	check	.github: cd commons/ts/data && bun run verify	Emit: script and statement renderings
-0006-sql-aide FR-015	check	.github: cd commons/ts/data && bun run verify	Emit: golden files, read on both runtimes
-0006-sql-aide FR-016	check	.github: cd commons/ts/data && bun run verify	Emit: the coordinator and script variables
-0006-sql-aide FR-017	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: tables, views and indexes committed for three dialects and loaded into each engine
-0006-sql-aide FR-018	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: an index names its own table's columns, and each thing it asks for is a feature (type tests)
-0006-sql-aide FR-019	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: the key is in the primary key and bounds are of its type (type tests); loaded into PGlite
-0006-sql-aide FR-020	check	.github: cd commons/ts/data && bun run verify	routine.test.ts: a body must give what the routine returns (type tests); queries, blocks and templates run in PGlite
-0006-sql-aide FR-021	check	.github: cd commons/ts/data && bun run verify	routine.test.ts and arca/party.test.ts: one definition as a PostgreSQL function, a DuckDB macro and written in for SQLite, with the same answers; triggers in PostgreSQL and SQLite
-0006-sql-aide FR-022	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: schema, sequence, enumerated type, domain, row-level security and policy loaded twice into PGlite; a materialized view refreshed there; an extension as text
-0006-sql-aide FR-023	check	.github: cd commons/ts/data && bun run verify	emit.test.ts: with adds features and types
-0006-sql-aide FR-024	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands. Naming, emit and lint hooks and plugins are there and tested (emit.test.ts, model.test.ts); the hooks of later layers come with them.
-0006-sql-aide FR-025	check	.github: cd commons/ts/data && bun run verify	Governance: descriptions and owners, emitted as comments
-0006-sql-aide FR-026	check	.github: cd commons/ts/data && bun run verify	Governance: DPV terms
-0006-sql-aide FR-027	check	.github: cd commons/ts/data && bun run verify	Governance: lint
-0006-sql-aide FR-028	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-029	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: the same assertions as a query that returns TAP in every engine, from TypeScript, and as pgTAP on a PostgreSQL server that has it
-0006-sql-aide FR-030	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: over a hundred tests made from the party model pass in every engine
-0006-sql-aide FR-031	check	.github: cd commons/ts/data && bun run verify	Tests: the TAP emitter
-0006-sql-aide FR-032	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-033	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-034	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-035	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-036	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-037	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-038	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-039	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-040	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-041	none	-	Not whole yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-042	none	-	Not whole yet: it is finished by phase 8 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-043	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-044	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-045	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-046	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
-0006-sql-aide FR-047	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: the party model; conventions.test.ts: the public entry point alone
-0006-sql-aide FR-048	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands. Hubs, satellites and links are there and tested (data-vault/vault.test.ts); loads are not yet.
-0006-sql-aide FR-049	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts and data-vault/vault.test.ts: compiling, committed SQL, loading, constraints, one scenario with the same rows in every engine, and the generated tests inside each
-0006-sql-aide FR-050	check	.github: cd commons/ts/data && bun run verify	Arca and Data Vault: tests of each phase run in the same check
+0006-signals FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
+0006-signals FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: ids from given bytes, zeros refused, brands kept apart
+0006-signals FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: traceparent and tracestate against the W3C examples, with property round trips
+0006-signals FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otlp.test.ts: OTLP JSON encode and decode, round-trip properties, int64 as strings, unknown fields ignored
+0006-signals FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: configuration from OTEL_* records, invalid values warned and defaulted
+0006-signals FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: redaction of secret attributes, URLs, tokens and process arguments
+0006-signals FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: attribute, event and link limits with dropped counts
+0006-signals FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the samplers, ratio decided by the trace id alone
+0006-signals FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: defineSignals, with @ts-expect-error for undeclared kinds and wrong attributes
+0006-signals FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: span ends by its Result, exceptions recorded and rethrown, one end only
+0006-signals FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: an exact span tree from a fixed clock and random source
+0006-signals FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: in-memory, simple and batch processors, drops counted, flush bounded
+0006-signals FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/signals.test.ts: counter, up-down, gauge and histogram aggregation
+0006-signals FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: export to a local receiver, retries on 503 with Retry-After, never throws
+0006-signals FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the probe gives up within 150 ms, the exit wait within a second
+0006-signals FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the journal writes OTLP lines and rotates
+0006-signals FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the current span across await, and the parent from TRACEPARENT
+0006-signals FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: proc, http client and serve spans, with traceparent passed on
+0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
+0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
+0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
+0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the palette's marks and their ASCII fallbacks
+0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: lines cut by display width, elapsed time and progress
+0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
+0006-signals FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/vt.test.ts: the terminal emulator's sequences
+0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
+0007-grc FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: catalogs with @ts-expect-error for an unknown control id, STRM mappings
+0007-grc FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: controls and packs over typed subjects, a throwing check gives error
+0007-grc FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: the status semilattice laws with fast-check
+0007-grc FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: one finding type and sections
+0007-grc FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: waivers refused without expiry, expired ones not applied, error and gap never accepted
+0007-grc FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: JCS against RFC 8785's examples, digests
+0007-grc FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: the ledger chain, every kind of tampering named
+0007-grc FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: manifests verified, signature by a given function
+0007-grc FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/evidence.test.ts: bundles byte for byte, a file added refused
+0007-grc FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: coverage roll-up
+0007-grc FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: freshness against cadences
+0007-grc FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: drift between two views
+0007-grc FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the change-impact gate
+0007-grc FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the risk register and NIST SP 800-30's matrix
+0007-grc FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the requirement trace
+0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF compliance findings and inventory
+0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
+0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
+0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: a pack's run as spans and OCSF log records
+0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
+0007-grc FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
+0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path
+0008-test-evidence FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test's record with its outcome, values, risk and attempt
+0008-test-evidence FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: a test span and log record with the test.* conventions
+0008-test-evidence FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: the installation record, and a person's name refused
+0008-test-evidence FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: records appended per test, a killed process gives cancelled
+0008-test-evidence FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: one record file per run, gathered from child processes
+0008-test-evidence FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the exit rule, an unproven requirement fails
+0008-test-evidence FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the record read back by the decoder, its digest
+0008-test-evidence FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/test-report.test.ts: TAP 14, JUnit XML, CTRF, SARIF and OSCAL renderings
+0008-test-evidence FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/test-report.test.ts: the completion report in Markdown and HTML with the trace matrix
+0008-test-evidence FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/test-report.test.ts: counts equal across renderings (property), rendering twice the same bytes
+0008-test-evidence FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: the ledger entry and a signed in-toto Test Result
+0008-test-evidence FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: verify fails on a changed record, a broken chain, a bad signature
+0008-test-evidence FR-013	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test-run.test.ts: --require-review for high-risk requirements
+0008-test-evidence FR-014	check	.github: .github/workflows/ifc-typescript.yml test job	CI runs the suite through ifc test on each runtime and system and uploads the record and reports
+0009-sql-aide FR-001	check	.github: cd commons/ts/data && bun run verify	conventions.test.ts: the package and the compiler's options; every test registers through runtime/test.ts
+0009-sql-aide FR-002	check	.github: cd commons/ts/data && bun run verify	Conventions: no dependencies, and what a file imports
+0009-sql-aide FR-003	check	.github: cd commons/ts/data && bun run verify	Conventions: erasable syntax, no any, no non-null assertion; the compiler's erasableSyntaxOnly
+0009-sql-aide FR-004	check	.github: cd commons/ts/data && bun run verify	Conventions: no configuration file named or read
+0009-sql-aide FR-005	check	.github: cd commons/ts/data && bun run verify	Conventions: TSDoc on every export; Docs: the map is what the source makes
+0009-sql-aide FR-006	check	.github: cd commons/ts/data && bun run verify	Algebra: domains and their value types
+0009-sql-aide FR-007	check	.github: cd commons/ts/data && bun run verify	Algebra: row types computed from columns (type tests)
+0009-sql-aide FR-008	check	.github: cd commons/ts/data && bun run verify	Algebra: literal names and branded keys (type tests)
+0009-sql-aide FR-009	check	.github: cd commons/ts/data && bun run verify	Graph: emit order
+0009-sql-aide FR-010	check	.github: cd commons/ts/data && bun run verify	Dialect: lowering and capabilities (type tests)
+0009-sql-aide FR-011	check	.github: cd commons/ts/data && bun run verify	Dialect: byDialect is exhaustive (type tests)
+0009-sql-aide FR-012	check	.github: cd commons/ts/data && bun run verify	Naming: strategies and tokens
+0009-sql-aide FR-013	check	.github: cd commons/ts/data && bun run verify	Emit: partial kinds, raw (type tests)
+0009-sql-aide FR-014	check	.github: cd commons/ts/data && bun run verify	Emit: script and statement renderings
+0009-sql-aide FR-015	check	.github: cd commons/ts/data && bun run verify	Emit: golden files, read on both runtimes
+0009-sql-aide FR-016	check	.github: cd commons/ts/data && bun run verify	Emit: the coordinator and script variables
+0009-sql-aide FR-017	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: tables, views and indexes committed for three dialects and loaded into each engine
+0009-sql-aide FR-018	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: an index names its own table's columns, and each thing it asks for is a feature (type tests)
+0009-sql-aide FR-019	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: the key is in the primary key and bounds are of its type (type tests); loaded into PGlite
+0009-sql-aide FR-020	check	.github: cd commons/ts/data && bun run verify	routine.test.ts: a body must give what the routine returns (type tests); queries, blocks and templates run in PGlite
+0009-sql-aide FR-021	check	.github: cd commons/ts/data && bun run verify	routine.test.ts and arca/party.test.ts: one definition as a PostgreSQL function, a DuckDB macro and written in for SQLite, with the same answers; triggers in PostgreSQL and SQLite
+0009-sql-aide FR-022	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts: schema, sequence, enumerated type, domain, row-level security and policy loaded twice into PGlite; a materialized view refreshed there; an extension as text
+0009-sql-aide FR-023	check	.github: cd commons/ts/data && bun run verify	emit.test.ts: with adds features and types
+0009-sql-aide FR-024	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands. Naming, emit and lint hooks and plugins are there and tested (emit.test.ts, model.test.ts); the hooks of later layers come with them.
+0009-sql-aide FR-025	check	.github: cd commons/ts/data && bun run verify	Governance: descriptions and owners, emitted as comments
+0009-sql-aide FR-026	check	.github: cd commons/ts/data && bun run verify	Governance: DPV terms
+0009-sql-aide FR-027	check	.github: cd commons/ts/data && bun run verify	Governance: lint
+0009-sql-aide FR-028	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-029	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: the same assertions as a query that returns TAP in every engine, from TypeScript, and as pgTAP on a PostgreSQL server that has it
+0009-sql-aide FR-030	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: over a hundred tests made from the party model pass in every engine
+0009-sql-aide FR-031	check	.github: cd commons/ts/data && bun run verify	Tests: the TAP emitter
+0009-sql-aide FR-032	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-033	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-034	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-035	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-036	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-037	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-038	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-039	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-040	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-041	none	-	Not whole yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-042	none	-	Not whole yet: it is finished by phase 8 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-043	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-044	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-045	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-046	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-047	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: the party model; conventions.test.ts: the public entry point alone
+0009-sql-aide FR-048	none	-	Not whole yet: it is finished by phase 4 of the library, and this row names its check when that phase lands. Hubs, satellites and links are there and tested (data-vault/vault.test.ts); loads are not yet.
+0009-sql-aide FR-049	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts and data-vault/vault.test.ts: compiling, committed SQL, loading, constraints, one scenario with the same rows in every engine, and the generated tests inside each
+0009-sql-aide FR-050	check	.github: cd commons/ts/data && bun run verify	Arca and Data Vault: tests of each phase run in the same check

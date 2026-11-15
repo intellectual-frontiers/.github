@@ -1,6 +1,6 @@
 /**
  * TSDoc as the one source of documentation: the comments of a model module are read into a map, which the emitter turns into SQL
- * comments and the generators into a data dictionary (commons 0006-sql-aide FR-005, FR-025). A runtime erases comments with the types,
+ * comments and the generators into a data dictionary (commons 0009-sql-aide FR-005, FR-025). A runtime erases comments with the types,
  * so the map is generated from the source text and committed beside the module.
  *
  * @module

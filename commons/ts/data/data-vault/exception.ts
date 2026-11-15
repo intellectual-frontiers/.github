@@ -1,6 +1,6 @@
 /**
  * The vault's record of what went wrong while loading: a hub of exceptions by their key, a satellite of what was known each time one
- * happened, and a PostgreSQL procedure that records one (commons 0006-sql-aide FR-048).
+ * happened, and a PostgreSQL procedure that records one (commons 0009-sql-aide FR-048).
  *
  * @module
  */

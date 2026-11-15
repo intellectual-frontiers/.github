@@ -1,6 +1,6 @@
 # Feature Specification: SQL Aide
 
-**Spec ID:** 0006-sql-aide
+**Spec ID:** 0009-sql-aide
 **Status:** Draft
 **Owner:** if
 **Domain:** commons

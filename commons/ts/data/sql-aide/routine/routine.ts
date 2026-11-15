@@ -1,5 +1,5 @@
 /**
- * Stored routines defined in TypeScript (commons 0006-sql-aide FR-020, FR-021). A routine has a signature built from columns and
+ * Stored routines defined in TypeScript (commons 0009-sql-aide FR-020, FR-021). A routine has a signature built from columns and
  * relations and a body that is one of three things: a typed query, whose rows or value must be what the routine returns, or the
  * definition does not compile; a typed block of statements, which renders as PL/pgSQL; or a template in any language, with typed
  * references to the arguments.

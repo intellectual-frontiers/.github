@@ -1,6 +1,6 @@
 /**
  * Writes `govern/dpv.auto.ts` from the Personal Data extension of the W3C Data Privacy Vocabulary, as its publishers give it in CSV
- * (commons 0006-sql-aide FR-026): the library names the vocabulary's own terms and invents none.
+ * (commons 0009-sql-aide FR-026): the library names the vocabulary's own terms and invents none.
  *
  * Run it with the CSV downloaded from `https://w3c-cg.github.io/dpv/2.3/pd/pd.csv`:
  * `bun sql-aide/runtime/generate-dpv.ts pd.csv`.
@@ -42,7 +42,7 @@ const lines = [
   " *",
   ` * The terms of the Personal Data extension of the W3C Data Privacy Vocabulary ${VERSION} (DPV-PD), a Final Community Group Report of the`,
   " * W3C Data Privacy Vocabularies and Controls Community Group, each with how DPV classes it: personal data, sensitive personal data or a",
-  " * special category (commons 0006-sql-aide FR-026).",
+  " * special category (commons 0009-sql-aide FR-026).",
   " *",
   ` * Source: ${SOURCE}`,
   ` * Source SHA-256: ${await sha256(csv)}`,

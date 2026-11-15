@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/ifc-data",
   "version": "0.1.0",
   "private": true,
-  "description": "SQL Aide and the libraries that accept it, Arca and Data Vault, built on IFC TypeScript's kernel (commons 0006-sql-aide).",
+  "description": "SQL Aide and the libraries that accept it, Arca and Data Vault, built on IFC TypeScript's kernel (commons 0009-sql-aide).",
   "type": "module",
   "engines": {
     "node": ">=26"

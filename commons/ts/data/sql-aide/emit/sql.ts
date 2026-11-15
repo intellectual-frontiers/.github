@@ -1,6 +1,6 @@
 /**
  * SQL as typed partials: the `SQL` tagged template, the chunk tree it builds and the two ways the tree is rendered, as a script and as a
- * statement with bound parameters (commons 0006-sql-aide FR-011, FR-013, FR-014, FR-015).
+ * statement with bound parameters (commons 0009-sql-aide FR-011, FR-013, FR-014, FR-015).
  *
  * @module
  */

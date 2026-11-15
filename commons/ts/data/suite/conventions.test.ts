@@ -1,5 +1,5 @@
 /**
- * The conventions of the data libraries, held on their own source (commons 0006-sql-aide FR-001 to FR-005, FR-047, FR-048): what a file
+ * The conventions of the data libraries, held on their own source (commons 0009-sql-aide FR-001 to FR-005, FR-047, FR-048): what a file
  * may import, what syntax it may use, that nothing is configured in a file, and that everything exported is documented.
  *
  * @module
@@ -39,7 +39,7 @@ const resolved = (f: string, spec: string): string =>
   path.relative(DATA, path.resolve(path.dirname(path.join(DATA, f)), spec)).replaceAll("\\", "/");
 
 proves(
-  ["0006-sql-aide FR-001", "0006-sql-aide FR-002"],
+  ["0009-sql-aide FR-001", "0009-sql-aide FR-002"],
   "the package installs nothing a harness would run, and is checked by the compiler of IFC TypeScript",
   () => {
     const pkg: unknown = JSON.parse(read("package.json"));
@@ -50,7 +50,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-002"], "a file of the library imports the library and the kernel, and the host only under runtime/", () => {
+proves(["0009-sql-aide FR-002"], "a file of the library imports the library and the kernel, and the host only under runtime/", () => {
   for (const f of library) {
     for (const spec of imports(f)) {
       assert(spec.startsWith("."), `${f} imports ${spec}`);
@@ -65,7 +65,7 @@ proves(["0006-sql-aide FR-002"], "a file of the library imports the library and 
   }
 });
 
-proves(["0006-sql-aide FR-047", "0006-sql-aide FR-048"], "a library built with SQL Aide imports its public entry point alone", () => {
+proves(["0009-sql-aide FR-047", "0009-sql-aide FR-048"], "a library built with SQL Aide imports its public entry point alone", () => {
   for (const f of built) {
     for (const spec of imports(f)) {
       assert(spec.startsWith("."), `${f} imports ${spec}`);
@@ -76,7 +76,7 @@ proves(["0006-sql-aide FR-047", "0006-sql-aide FR-048"], "a library built with S
   }
 });
 
-proves(["0006-sql-aide FR-003"], "only erasable syntax, no any, no non-null assertion", () => {
+proves(["0009-sql-aide FR-003"], "only erasable syntax, no any, no non-null assertion", () => {
   for (const f of written) {
     const c = code(read(f));
     assert(!/^\s*(?:export\s+)?(?:const\s+)?enum\s/m.test(c), `${f}: enum`);
@@ -88,7 +88,7 @@ proves(["0006-sql-aide FR-003"], "only erasable syntax, no any, no non-null asse
   assert(/(?::|<|\bas|,|\|)\s*any\b/.test("const x: any = 1") && /[\w\])]!(?:\.|\[|\)|,|;)/.test("a.b!.c"));
 });
 
-proves(["0006-sql-aide FR-004"], "no configuration file is named, and the host is read only under runtime/", () => {
+proves(["0009-sql-aide FR-004"], "no configuration file is named, and the host is read only under runtime/", () => {
   for (const f of written) {
     assert(!/["'`][^"'`\n]*\.(?:ya?ml|xml|toml)["'`]/.test(read(f)), `${f}: names a configuration file`);
     if (!f.startsWith("sql-aide/runtime/"))
@@ -96,7 +96,7 @@ proves(["0006-sql-aide FR-004"], "no configuration file is named, and the host i
   }
 });
 
-proves(["0006-sql-aide FR-005"], "every file says what it is, and every exported declaration carries a TSDoc comment", () => {
+proves(["0009-sql-aide FR-005"], "every file says what it is, and every exported declaration carries a TSDoc comment", () => {
   const missing: string[] = [];
   for (const f of everything) {
     const text = read(f);

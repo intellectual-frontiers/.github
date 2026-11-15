@@ -1,5 +1,5 @@
 /**
- * Data Vault, as the second acceptance test of IFC SQL Aide (commons 0006-sql-aide FR-048 to FR-050): functions that make tables whose
+ * Data Vault, as the second acceptance test of IFC SQL Aide (commons 0009-sql-aide FR-048 to FR-050): functions that make tables whose
  * types are computed, what they emit for three dialects, and that they load into every engine at hand.
  *
  * @module
@@ -41,7 +41,7 @@ const customerOrder = link("customer_order", { customer, order });
 const vault = [customerOrder, orderState, customerContact, order, customer] as const;
 
 proves(
-  ["0006-sql-aide FR-048", "0006-sql-aide FR-008"],
+  ["0009-sql-aide FR-048", "0009-sql-aide FR-008"],
   "the tables a vault's functions make are named and typed from what they are given",
   () => {
     assertEquals(
@@ -83,16 +83,16 @@ const contexts = {
 };
 
 for (const [dialect, ctx] of Object.entries(contexts)) {
-  proves(["0006-sql-aide FR-049", "0006-sql-aide FR-015"], `a vault emitted for ${dialect} is what is committed`, async () => {
+  proves(["0009-sql-aide FR-049", "0009-sql-aide FR-015"], `a vault emitted for ${dialect} is what is committed`, async () => {
     await golden(new URL(`./golden/vault.${dialect}.sql`, import.meta.url), `${render(definitions(vault), ctx)}\n`);
   });
 }
 
-proves(["0006-sql-aide FR-025", "0006-sql-aide FR-027"], "what a vault's functions make is described and owned", () => {
+proves(["0009-sql-aide FR-025", "0009-sql-aide FR-027"], "what a vault's functions make is described and owned", () => {
   assertEquals(lint(vault, contexts.postgres), []);
 });
 
-proves(["0006-sql-aide FR-049", "0006-sql-aide FR-017"], "a vault loads into every engine at hand, and its keys hold", async () => {
+proves(["0009-sql-aide FR-049", "0009-sql-aide FR-017"], "a vault loads into every engine at hand, and its keys hold", async () => {
   await eachEngine(async (engine) => {
     const ddl = render(definitions(vault), contexts[engine.dialect]);
     await engine.exec(ddl);
@@ -126,7 +126,7 @@ proves(["0006-sql-aide FR-049", "0006-sql-aide FR-017"], "a vault loads into eve
 });
 
 proves(
-  ["0006-sql-aide FR-029", "0006-sql-aide FR-030", "0006-sql-aide FR-049"],
+  ["0009-sql-aide FR-029", "0009-sql-aide FR-030", "0009-sql-aide FR-049"],
   "the tests made from a vault pass in every engine at hand",
   async () => {
     await eachEngine(async (engine) => {
@@ -149,7 +149,7 @@ proves(
 );
 
 proves(
-  ["0006-sql-aide FR-020", "0006-sql-aide FR-048", "0006-sql-aide FR-050"],
+  ["0009-sql-aide FR-020", "0009-sql-aide FR-048", "0009-sql-aide FR-050"],
   "the vault records an exception in PostgreSQL: its hub row once, a diagnostic each time",
   async () => {
     const engine = await pgliteEngine();

@@ -1,5 +1,5 @@
 /**
- * The emit context: the dialect, the naming strategy, the documentation and the hooks of one rendering (commons 0006-sql-aide FR-010,
+ * The emit context: the dialect, the naming strategy, the documentation and the hooks of one rendering (commons 0009-sql-aide FR-010,
  * FR-012, FR-016, FR-024). Nothing here is global: a rendering knows only what its context carries.
  *
  * @module

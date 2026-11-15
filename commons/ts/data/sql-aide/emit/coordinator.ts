@@ -1,6 +1,6 @@
 /**
  * The coordinator: a model emitted as several files, in order, each saying where it came from, and scripts that carry typed variables
- * in their dialect's own way (commons 0006-sql-aide FR-015, FR-016). It writes nothing: what it returns is text, and a runtime module
+ * in their dialect's own way (commons 0009-sql-aide FR-015, FR-016). It writes nothing: what it returns is text, and a runtime module
  * keeps it.
  *
  * @module

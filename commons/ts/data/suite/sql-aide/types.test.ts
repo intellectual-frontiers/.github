@@ -1,6 +1,6 @@
 /**
  * What the compiler holds: row types computed from columns, names as literal types, keys branded by their table, and what does not
- * compile (commons 0006-sql-aide FR-006 to FR-008, FR-010, FR-011, FR-013). Each kind of check has a control that does compile.
+ * compile (commons 0009-sql-aide FR-006 to FR-008, FR-010, FR-011, FR-013). Each kind of check has a control that does compile.
  *
  * @module
  */
@@ -52,7 +52,7 @@ const person = table("person", {
 type PartyId = Brand<string, "party">;
 
 proves(
-  ["0006-sql-aide FR-006", "0006-sql-aide FR-007", "0006-sql-aide FR-008"],
+  ["0009-sql-aide FR-006", "0009-sql-aide FR-007", "0009-sql-aide FR-008"],
   "the rows of a table are computed from its columns",
   () => {
     expectType<
@@ -93,7 +93,7 @@ proves(
 );
 
 proves(
-  ["0006-sql-aide FR-008"],
+  ["0009-sql-aide FR-008"],
   "a key is branded by its table, a foreign key has the type of what it points to, and names are checked",
   () => {
     // a person's key is a party's key: it is not branded a second time
@@ -116,7 +116,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-013"], "a plain string is not an interpolation, and expressions compare only values of one type", () => {
+proves(["0009-sql-aide FR-013"], "a plain string is not an interpolation, and expressions compare only values of one type", () => {
   const typed = "it's";
   // @ts-expect-error a string a person typed must be bound or marked raw, never interpolated
   const bad = (): unknown => SQL`select ${typed}`;
@@ -134,7 +134,7 @@ proves(["0006-sql-aide FR-013"], "a plain string is not an interpolation, and ex
   );
 });
 
-proves(["0006-sql-aide FR-010"], "what a dialect lacks is a compile error where the model is rendered for it", () => {
+proves(["0009-sql-aide FR-010"], "what a dialect lacks is a compile error where the model is rendered for it", () => {
   const tagged = table("tagged", { id: pk.ulid(), tags: arrayOf(text()) });
   const child = table("child", { id: pk.ulid(), party_id: fk(party.c.party_id).on("delete", "cascade") });
   const pg = context({ dialect: postgres() }),

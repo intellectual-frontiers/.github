@@ -1,5 +1,5 @@
 /**
- * IFC SQL Aide: the public entry point (commons 0006-sql-aide). A schema is written once as TypeScript algebraic types and rendered as
+ * IFC SQL Aide: the public entry point (commons 0009-sql-aide). A schema is written once as TypeScript algebraic types and rendered as
  * SQL for PostgreSQL, SQLite and DuckDB; a library built with it (Arca, Data Vault) imports this module and nothing else of it.
  *
  * @example

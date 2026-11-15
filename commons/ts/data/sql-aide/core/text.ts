@@ -1,6 +1,6 @@
 /**
  * Text helpers the emitter stands on: un-indenting template text and writing one name in the case each target uses
- * (commons 0006-sql-aide FR-012, FR-015).
+ * (commons 0009-sql-aide FR-012, FR-015).
  *
  * @module
  */
@@ -44,7 +44,7 @@ function pluralOf(word: string): string {
   return `${word}s`;
 }
 
-/** One name as each target writes it, so that SQL, TypeScript and Rust generated from a model agree (commons 0006-sql-aide FR-012). */
+/** One name as each target writes it, so that SQL, TypeScript and Rust generated from a model agree (commons 0009-sql-aide FR-012). */
 export interface Token {
   /** The name as given, the SQL token. */
   readonly sql: string;

@@ -1,6 +1,6 @@
 name: sql-aide
 
-# IFC SQL Aide and the libraries that accept it, Arca and Data Vault (commons 0006-sql-aide): checked by the TypeScript 7 compiler and tested under Bun and under
+# IFC SQL Aide and the libraries that accept it, Arca and Data Vault (commons 0009-sql-aide): checked by the TypeScript 7 compiler and tested under Bun and under
 # Node, on SQLite, DuckDB, PGlite and a PostgreSQL server that exists only for this run (the runner's own, with pgTAP; its password is the runner's and guards
 # nothing). The formatter is run on all of commons/ts by ifc-typescript.yml.
 on:

@@ -1,6 +1,6 @@
 /**
  * The model as a whole: the order entities are defined in, the examples `netspective-labs/sql-aide` began with rendered for three
- * dialects, lint, the documentation map and TAP (commons 0006-sql-aide FR-005, FR-009, FR-017, FR-025 to FR-027, FR-031).
+ * dialects, lint, the documentation map and TAP (commons 0009-sql-aide FR-005, FR-009, FR-017, FR-025 to FR-027, FR-031).
  *
  * @module
  */
@@ -55,7 +55,7 @@ const withFk = table("synthetic_table_with_foreign_keys", {
   parent: self("auto_inc_primary_key").nullable(),
 });
 
-proves(["0006-sql-aide FR-009"], "entities are defined in the order of their references, whatever order they are written in", () => {
+proves(["0009-sql-aide FR-009"], "entities are defined in the order of their references, whatever order they are written in", () => {
   const sorted = ordered([withFk, withoutPk, autoInc]);
   assert(sorted.kind === "ok");
   const names = sorted.value.map((e) => e.name);
@@ -75,7 +75,7 @@ proves(["0006-sql-aide FR-009"], "entities are defined in the order of their ref
 
 for (const dialect of [postgres(), sqlite(), duckdb()]) {
   proves(
-    ["0006-sql-aide FR-015", "0006-sql-aide FR-017"],
+    ["0009-sql-aide FR-015", "0009-sql-aide FR-017"],
     `the first examples of sql-aide are what is committed, for ${dialect.name}`,
     async () => {
       const text = render(definitions([withFk, withoutPk, autoInc]), context({ dialect }));
@@ -85,7 +85,7 @@ for (const dialect of [postgres(), sqlite(), duckdb()]) {
 }
 
 proves(
-  ["0006-sql-aide FR-025", "0006-sql-aide FR-026", "0006-sql-aide FR-027"],
+  ["0009-sql-aide FR-025", "0009-sql-aide FR-026", "0009-sql-aide FR-027"],
   "lint finds what a governed table lacks, as data, and a plugin may add a rule",
   () => {
     const bare = table("Bare", { Name: text().personal(), email: text().personal("EmailAddress") });
@@ -153,7 +153,7 @@ export const nothing = 1;
 `;
 
 proves(
-  ["0006-sql-aide FR-005", "0006-sql-aide FR-025"],
+  ["0009-sql-aide FR-005", "0009-sql-aide FR-025"],
   "the TSDoc comments of a module become its documentation map, and the map documents what is emitted",
   () => {
     assertEquals(parseComment("/** One.\n * Two.\n * @param a - first\n * @remarks More. */"), {
@@ -194,7 +194,7 @@ proves(
 );
 
 proves(
-  ["0006-sql-aide FR-031"],
+  ["0009-sql-aide FR-031"],
   "results are written as TAP version 14, with subtests, directives and diagnostics, and read back from lines",
   () => {
     const nodes = [

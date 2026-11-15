@@ -3,7 +3,7 @@
  *
  * The terms of the Personal Data extension of the W3C Data Privacy Vocabulary 2.3 (DPV-PD), a Final Community Group Report of the
  * W3C Data Privacy Vocabularies and Controls Community Group, each with how DPV classes it: personal data, sensitive personal data or a
- * special category (commons 0006-sql-aide FR-026).
+ * special category (commons 0009-sql-aide FR-026).
  *
  * Source: https://w3c-cg.github.io/dpv/2.3/pd/pd.csv
  * Source SHA-256: 7f4391700aa88079c9f02526e0164c1c8d251c177c9c45c84cd76d4e4c09b4aa

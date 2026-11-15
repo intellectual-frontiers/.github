@@ -1,6 +1,6 @@
 /**
  * The Test Anything Protocol, version 14, as typed values: the one format every result of the library is reported in
- * (commons 0006-sql-aide FR-031). Results are data first; `tapText` writes them.
+ * (commons 0009-sql-aide FR-031). Results are data first; `tapText` writes them.
  *
  * @module
  */

@@ -1,6 +1,6 @@
 /**
  * Housekeeping: the columns that say who made, changed and removed a row, and when. A table takes them by spreading them among its
- * columns; nothing adds them for it (commons 0006-sql-aide FR-025).
+ * columns; nothing adds them for it (commons 0009-sql-aide FR-025).
  *
  * @module
  */

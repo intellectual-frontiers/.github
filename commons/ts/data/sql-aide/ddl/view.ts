@@ -1,6 +1,6 @@
 /**
  * Views with typed columns: the columns are declared as a table's are, so that a view's rows are typed and what uses the view is checked
- * like what uses a table (commons 0006-sql-aide FR-017, FR-022).
+ * like what uses a table (commons 0009-sql-aide FR-017, FR-022).
  *
  * @module
  */

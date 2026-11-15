@@ -1,6 +1,6 @@
 /**
  * The objects of a database that are not tables, views or indexes: schemas, sequences, enumerated types, and PostgreSQL's extensions,
- * domains, row-level security and policies (commons 0006-sql-aide FR-022). Each is an entity that asks its dialect for the feature it
+ * domains, row-level security and policies (commons 0009-sql-aide FR-022). Each is an entity that asks its dialect for the feature it
  * is, and each is defined so that defining it again changes nothing.
  *
  * @module

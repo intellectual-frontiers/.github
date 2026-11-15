@@ -1,6 +1,6 @@
 /**
  * Typed indexes: an index names columns of its own table, its method is one the dialect has, and each thing it asks for (a condition,
- * covered columns, building without a lock) is a feature the dialect must have (commons 0006-sql-aide FR-018).
+ * covered columns, building without a lock) is a feature the dialect must have (commons 0009-sql-aide FR-018).
  *
  * @module
  */

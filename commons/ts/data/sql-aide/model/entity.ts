@@ -1,6 +1,6 @@
 /**
  * The entities of a model and the order they are emitted in: a referenced entity before the one that refers to it
- * (commons 0006-sql-aide FR-009).
+ * (commons 0009-sql-aide FR-009).
  *
  * @module
  */

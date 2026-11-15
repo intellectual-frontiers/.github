@@ -1,6 +1,6 @@
 /**
  * Data Vault as functions: a hub, a satellite and a link are made for whatever names them, each a table whose type is worked out from
- * what it is given (commons 0006-sql-aide FR-048). A satellite belongs to a hub and a link joins hubs; giving either a table that is not
+ * what it is given (commons 0009-sql-aide FR-048). A satellite belongs to a hub and a link joins hubs; giving either a table that is not
  * a hub does not compile.
  *
  * A hub holds the business key of one thing and nothing else; a satellite holds what is known of it at a moment, one row for each

@@ -1,6 +1,6 @@
 /**
  * Structure beyond tables: views with typed columns, typed indexes, typed partitions and the objects of PostgreSQL, and the tests that run
- * inside the database (commons 0006-sql-aide FR-017 to FR-019, FR-022, FR-029, FR-030).
+ * inside the database (commons 0009-sql-aide FR-017 to FR-019, FR-022, FR-029, FR-030).
  *
  * @module
  */
@@ -74,7 +74,7 @@ const byAuthor = index(book, ["author_id", "title"]);
 const oneTitle = index(book, ["title"]).unique().named("book_title_once");
 const model = [longBooks, oneTitle, byAuthor, book, author] as const;
 
-proves(["0006-sql-aide FR-017"], "a view's rows are typed by its declared columns, and it is defined after what it reads", () => {
+proves(["0009-sql-aide FR-017"], "a view's rows are typed by its declared columns, and it is defined after what it reads", () => {
   expectType<Equal<RowOf<typeof longBooks>, { readonly title: string; readonly author: string; readonly pages: number }>>();
   assertEquals(longBooks.c.pages.table, "long_book");
   const text0 = render(definitions(model), pg);
@@ -88,7 +88,7 @@ proves(["0006-sql-aide FR-017"], "a view's rows are typed by its declared column
 
 for (const [dialect, ctx] of Object.entries(contexts)) {
   proves(
-    ["0006-sql-aide FR-017", "0006-sql-aide FR-018"],
+    ["0009-sql-aide FR-017", "0009-sql-aide FR-018"],
     `tables, a view and indexes emitted for ${dialect} are what is committed`,
     async () => {
       await golden(new URL(`./golden/structure.${dialect}.sql`, import.meta.url), `${render(definitions(model), ctx)}\n`);
@@ -97,7 +97,7 @@ for (const [dialect, ctx] of Object.entries(contexts)) {
 }
 
 proves(
-  ["0006-sql-aide FR-018", "0006-sql-aide FR-008"],
+  ["0009-sql-aide FR-018", "0009-sql-aide FR-008"],
   "an index names columns of its own table, and what it asks for is a feature of the dialect",
   () => {
     assertEquals(render(byAuthor.ddl, pg), `CREATE INDEX IF NOT EXISTS "book_author_id_title_idx" ON "book" ("author_id", "title");`);
@@ -146,7 +146,7 @@ proves(
 );
 
 proves(
-  ["0006-sql-aide FR-019", "0006-sql-aide FR-010"],
+  ["0009-sql-aide FR-019", "0009-sql-aide FR-010"],
   "a partitioned table's key is in its primary key, and a partition's bounds are of the key's type",
   async () => {
     const event = partitionBy(table("event", { event_id: pk.ulid(), at: timestamptz().primaryKey(), kind: text() }), "range", ["at"]);
@@ -195,7 +195,7 @@ proves(
   },
 );
 
-proves(["0006-sql-aide FR-022"], "the objects of PostgreSQL are defined so that defining them again changes nothing", async () => {
+proves(["0009-sql-aide FR-022"], "the objects of PostgreSQL are defined so that defining them again changes nothing", async () => {
   const library = schema("library");
   const numbers = sequence("ticket_number", { schema: "library" });
   const mood = enumType("mood", ["calm", "busy"]);
@@ -246,7 +246,7 @@ proves(["0006-sql-aide FR-022"], "the objects of PostgreSQL are defined so that 
 });
 
 proves(
-  ["0006-sql-aide FR-029", "0006-sql-aide FR-030"],
+  ["0009-sql-aide FR-029", "0009-sql-aide FR-030"],
   "tests are values: made from the model, run inside each engine and from TypeScript, and written as pgTAP",
   async () => {
     const structure = (ctx: typeof pg | typeof lite | typeof duck): ReturnType<typeof structuralTests> =>

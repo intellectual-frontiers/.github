@@ -1,5 +1,5 @@
 /**
- * Lint: rules as typed values whose findings are data (commons 0006-sql-aide FR-025, FR-026, FR-027). A rule looks at the tables of a
+ * Lint: rules as typed values whose findings are data (commons 0009-sql-aide FR-025, FR-026, FR-027). A rule looks at the tables of a
  * model and at the documentation the context carries; a caller may add its own.
  *
  * @module

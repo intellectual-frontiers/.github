@@ -1,6 +1,6 @@
 /**
  * Columns: a domain with its nullability, how it is filled, and its key role. Each of these is in the column's type, so that the row a
- * table gives, takes on insert and takes on update is computed and never written beside it (commons 0006-sql-aide FR-007, FR-008).
+ * table gives, takes on insert and takes on update is computed and never written beside it (commons 0009-sql-aide FR-007, FR-008).
  *
  * @module
  */

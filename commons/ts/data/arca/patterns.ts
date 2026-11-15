@@ -1,6 +1,6 @@
 /**
  * Patterns of Arca, as functions: a structure that many models repeat is written once and made for whatever asks for it
- * (commons 0006-sql-aide FR-047).
+ * (commons 0009-sql-aide FR-047).
  *
  * @module
  */

@@ -1,6 +1,6 @@
 /**
  * Tables: named columns whose row types are computed, whose names are literal types, and which render themselves as a reference where
- * they are used and as `CREATE TABLE` where they are defined (commons 0006-sql-aide FR-007, FR-008, FR-017).
+ * they are used and as `CREATE TABLE` where they are defined (commons 0009-sql-aide FR-007, FR-008, FR-017).
  *
  * @module
  */
