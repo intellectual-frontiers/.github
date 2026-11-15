@@ -1,0 +1,78 @@
+/**
+ * The kernel of IFC TypeScript (commons 0005-typescript-runtime): pure code that imports nothing outside this folder, has no effect on the
+ * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
+ * exhaustive matching, branded identifiers, decoders at the boundary, versions, SHA-256, archives, HTTP headers, TypeScript literals and
+ * type-level tests.
+ *
+ * @example
+ * ```ts
+ * import { absurd, err, ok, type Result } from "./mod.ts";
+ * type Stage = { readonly kind: "intake" } | { readonly kind: "review" };
+ * function next(s: Stage): Result<Stage, string> {
+ *   switch (s.kind) {
+ *     case "intake": return ok({ kind: "review" });
+ *     case "review": return err("review is the last stage");
+ *     default: return absurd(s);
+ *   }
+ * }
+ * ```
+ *
+ * @module
+ */
+export { absurd } from "./absurd.ts";
+export {
+  concat,
+  crc32,
+  dosDate,
+  filesOf,
+  formatArchiveError,
+  gunzip,
+  gzip,
+  isSafePath,
+  sortedPaths,
+  splitName,
+  tar,
+  tarHeader,
+  untar,
+  unzip,
+  zip,
+  ZIP_EPOCH,
+  zipEntries,
+  zipRead,
+} from "./archive.ts";
+export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
+export type { Brand } from "./brand.ts";
+export {
+  array,
+  boolean,
+  describe,
+  formatDecodeError,
+  integer,
+  json,
+  literal,
+  mapDecoder,
+  nullable,
+  number,
+  object,
+  oneOf,
+  record,
+  refine,
+  string,
+  tagged,
+  tuple,
+  unknownValue,
+} from "./decode.ts";
+export type { Decoded, DecodeError, Decoder, Fields, ObjectOf } from "./decode.ts";
+export { isSafeMethod, nextLink, parseLinkHeader, retryAfterMs, SAFE_METHODS } from "./http.ts";
+export type { WebLink } from "./http.ts";
+export { all, andThen, attempt, done, err, isErr, isOk, map, mapErr, match, ok, orElse, settle, unwrapOr } from "./result.ts";
+export type { Err, Ok, Result } from "./result.ts";
+export { atLeast, bump, bumpSuffices, compareDotted, compareSemVer, dottedParts, formatSemVer, parseSemVer, versionIn } from "./semver.ts";
+export type { Change, Level, SemVer } from "./semver.ts";
+export { fromHex, parseSha256Sums, sameSha256, sha256, sha256Of, toHex } from "./sha256.ts";
+export type { Sha256 } from "./sha256.ts";
+export { ANSI, lf, plain, quoteArgs, splitArgs } from "./text.ts";
+export { BARE_KEY, exportedLiteral, parseTsLiteral, tsKey, tsLiteral } from "./ts-literal.ts";
+export type { Literal, LiteralError } from "./ts-literal.ts";
+export { expectType } from "./types.ts";
+export type { Equal, Extends, Not } from "./types.ts";

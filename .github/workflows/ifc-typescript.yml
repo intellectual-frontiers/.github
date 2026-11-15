@@ -1,0 +1,84 @@
+name: ifc-typescript
+
+# IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018): TypeScript 7 is the type checker, and the same tests run unchanged on Deno, Node 26 and
+# Bun, on Linux, macOS and Windows. Deno comes through the repository's own bootstraps (the pinned, checksummed one); Node and Bun at exact versions; the
+# development tools from commons/ts/package-lock.json.
+on:
+  push:
+    paths:
+      - "commons/ts/**"
+      - ".github/workflows/ifc-typescript.yml"
+  pull_request:
+    paths:
+      - "commons/ts/**"
+      - ".github/workflows/ifc-typescript.yml"
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "26.13.1"
+  BUN_VERSION: "1.4.4"
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: commons/ts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: The development tools, from the lockfile
+        run: npm ci
+      - name: TypeScript 7 on everything, with the strict configuration
+        run: npx tsc --version && npx tsc -p tsconfig.json
+      - name: The kernel with no host types (a browser or a Worker)
+        run: npx tsc -p tsconfig.kernel.json
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        runtime: [deno, node, bun]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: The development tools, from the lockfile
+        working-directory: commons/ts
+        run: npm ci
+      - name: Deno, through bin/erga-bootstrap.sh itself
+        if: matrix.runtime == 'deno' && runner.os != 'Windows'
+        shell: bash
+        run: |
+          sh bin/erga-bootstrap.sh --help
+          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
+          for d in "$HOME"/.local/share/erga/toolchain/deno/"$v"/*/; do echo "$d" >>"$GITHUB_PATH"; done
+      - name: Deno, through bin/erga-bootstrap.ps1 itself
+        if: matrix.runtime == 'deno' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./bin/erga-bootstrap.ps1 --help
+          $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
+          "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - uses: oven-sh/setup-bun@v2
+        if: matrix.runtime == 'bun'
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: The suite on ${{ matrix.runtime }}
+        working-directory: commons/ts
+        shell: bash
+        run: |
+          case "${{ matrix.runtime }}" in
+            deno) deno --version && deno test -A --no-check tests/ ;;
+            node) node --version && node --test "tests/**/*.test.ts" ;;
+            bun) bun --version && bun test tests/ ;;
+          esac

@@ -35,3 +35,28 @@ requirement	mechanism	by	note
 0004-rules FR-002	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
 0004-rules FR-003	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
 0004-rules FR-004	check	.github: python3 -m unittest discover -s tests	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
+0005-typescript-runtime FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries: package.json, its lockfile and the folders are there; runtime/mod.ts does not re-export test.ts (FR-001 is also held by the layout the other tests import from)
+0005-typescript-runtime FR-002	check	.github: cd commons/ts && npx tsc -p tsconfig.kernel.json	the kernel type-checks with no host types; boundaries.test.ts: the kernel imports nothing outside kernel/ and names no host global
+0005-typescript-runtime FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the runtime imports only node: builtins, kernel/ and runtime/
+0005-typescript-runtime FR-004	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: no Deno, Bun, jsr:, npm:, @std, @erga or URL import in code, with negative controls; tsc fails on a Deno reference (types: node)
+0005-typescript-runtime FR-005	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/result.test.ts and text.test.ts: Result's helpers, absurd with a switch that leaves an alternative out, brands kept apart
+0005-typescript-runtime FR-006	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/decode.test.ts: each decoder, its error path and the JSON round trip
+0005-typescript-runtime FR-007	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/semver.test.ts: semver.org's example order, round trip, order laws, bumps, dotted versions
+0005-typescript-runtime FR-008	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/sha256.test.ts: FIPS 180-2 vectors, hexadecimal round trip, the brand, SHASUMS files
+0005-typescript-runtime FR-009	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: lf, plain, splitArgs and quoteArgs, and their round trip
+0005-typescript-runtime FR-010	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: round trips of tar, zip and gzip, fixed bytes, unsafe and damaged archives, deflated zip, pax and GNU names
+0005-typescript-runtime FR-011	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/text.test.ts: literals written and read back, keys, comments, refusals
+0005-typescript-runtime FR-012	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/http.test.ts: Link headers, Retry-After in both forms, safe methods
+0005-typescript-runtime FR-013	check	.github: .github/workflows/ifc-typescript.yml	runtime/test.test.ts: the assertions and proves; the same tests pass under deno test, node --test and bun test in CI
+0005-typescript-runtime FR-014	check	.github: cd commons/ts && npx tsc -p tsconfig.json	the type-level tests (expectType, @ts-expect-error) with their negative controls compile; the laws are property-tested with fast-check in the kernel tests
+0005-typescript-runtime FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: every file has an @module block and every export has JSDoc
+0005-typescript-runtime FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	boundaries.test.ts: the development dependencies are exact, the lockfile agrees, no run-time dependency
+0005-typescript-runtime FR-017	check	.github: cd commons/ts && npx tsc -p tsconfig.json	tsc 7 with the strict configuration on every file; boundaries.test.ts checks that TypeScript is 7
+0005-typescript-runtime FR-018	gate	.github: .github/workflows/ifc-typescript.yml	the CI matrix: tsc 7 on both configurations, the suite on Deno, Node 26 and Bun, on Linux, macOS and Windows
+0005-typescript-runtime FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: each Node error code becomes its class with code, path and cause; NotFound, AlreadyExists, IsADirectory, AddrInUse are thrown where the host refuses
+0005-typescript-runtime FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs.test.ts: every call on a real temporary folder, the refusals, Stolos's helpers
+0005-typescript-runtime FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: both platforms' rules and file URLs
+0005-typescript-runtime FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/proc.test.ts: the environment, the platform's names, which, a program with its input and output, lines, NotFound, abort
+0005-typescript-runtime FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: the look for each environment, terminal detection, raw mode refused without a terminal
+0005-typescript-runtime FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
+0005-typescript-runtime FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal

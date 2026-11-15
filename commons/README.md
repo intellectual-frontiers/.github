@@ -9,6 +9,7 @@ its own copy. It holds no company fact and no secret: this repository is public.
 | ↳ **Packaging** | The package managers and system families of every computer, the commands that drive them, the package each family calls a program, and how far each family has been tried. | [`0002-packaging`](spec-kit/specs/0002-packaging/spec.md) |
 | **Specification kit** | The format of specifications, the register of numbers and the register of what enforces each requirement, and the standard-library tool that checks a folder against them. | [`0003-spec-kit`](spec-kit/specs/0003-spec-kit/spec.md) |
 | **Rules** | The rules a harness applies to scripts, CI and code (portable shell, no installs outside the launcher, no host programs), as data with the reason for each, and the tool that finds what breaks the shell ones. | [`0004-rules`](spec-kit/specs/0004-rules/spec.md) |
+| **TypeScript runtime** | IFC TypeScript (`ts/`): a pure kernel and one host runtime on web standards and `node:` builtins, checked by TypeScript 7 and tested on Deno, Node and Bun, that the TypeScript harnesses import instead of each keeping its own helpers or calling one vendor's API. | [`0005-typescript-runtime`](spec-kit/specs/0005-typescript-runtime/spec.md) |
 
 ## Layout
 
@@ -17,6 +18,9 @@ its own copy. It holds no company fact and no secret: this repository is public.
 - `tools/generate-packaging.py`: reads the ontology and writes the files below; `uv run commons/tools/generate-packaging.py --check` fails where they are stale.
 - `generated/`: `packaging.auto.toml` (for programs), `packaging.auto.sh` (for scripts), `packaging.auto.ts` (for the machine setup, which is TypeScript), `pins.auto.env` (the pinned
   downloads, Deno among them, which the bootstraps also carry between their marks) and the tables of rules and of the installation record. Generated; never edited by hand.
+- `ts/`: IFC TypeScript, the TypeScript part of the commons: `kernel/` (pure: imports nothing, runs in a browser or a Worker), `runtime/` (the only code that
+  touches the host, on `node:` builtins), `tests/` (`node:test`, fast-check and type-level tests), and the exact pins of its development tools (`package.json`, TypeScript 7). See
+  [`ts/README.md`](ts/README.md).
 - `spec-kit/`: the specifications of the capabilities, in the format of `archon`'s specifications.
 
 A harness reads `generated/`; it keeps no fact of its own that the ontology holds.

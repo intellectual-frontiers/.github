@@ -50,7 +50,7 @@ class SpecKit(unittest.TestCase):
         self.edit(root, "registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0007\tnone\tin force")
         out = self.findings(root)
         self.assertIn("assigned twice", out)
-        self.assertIn("gap at 0005", out)
+        self.assertIn("gap at 0006", out)
         self.assertIn("0007-none is in force but its specification does not exist", out)
 
     def test_a_spec_with_no_row_and_a_register_that_is_missing(self):

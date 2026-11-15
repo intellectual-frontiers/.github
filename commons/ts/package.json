@@ -1,0 +1,25 @@
+{
+  "name": "@ifc/ts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "IFC TypeScript: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime).",
+  "type": "module",
+  "exports": {
+    "./kernel": "./kernel/mod.ts",
+    "./runtime": "./runtime/mod.ts"
+  },
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test:node": "node --test \"tests/**/*.test.ts\"",
+    "test:deno": "deno test -A --no-check tests/",
+    "test:bun": "bun test tests/"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}
