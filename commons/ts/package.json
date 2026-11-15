@@ -7,7 +7,8 @@
   "exports": {
     "./kernel": "./kernel/mod.ts",
     "./runtime": "./runtime/mod.ts",
-    "./runtime/test": "./runtime/test.ts"
+    "./runtime/test": "./runtime/test.ts",
+    "./runtime/test-run": "./runtime/test-run.ts"
   },
   "engines": {
     "node": ">=26"
@@ -18,7 +19,9 @@
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:deno": "deno test -A --no-check tests/",
     "pack": "bun tools/pack.ts",
-    "smoke": "bun tools/smoke.ts"
+    "smoke": "bun tools/smoke.ts",
+    "test:evidence": "bun tools/test.ts run --runtime node,deno,bun --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
+    "test:verify": "bun tools/test.ts verify --record"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
