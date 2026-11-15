@@ -30,6 +30,7 @@ requirement	mechanism	by	note
 0003-spec-kit FR-005	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-006	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-spec-kit FR-007	check	.github: deno test -A	SpecKit: the tool runs on commons' own folder and each rule is broken in a copy and named
+0003-spec-kit FR-008	check	.github: deno test -A	SpecKit: a Part of line naming no specification of the folder, or the specification itself, is named
 0002-packaging FR-016	check	.github: deno test -A	Record: the fields, their order and their values, as the TypeScript module carries them, and the setup's test (deno test, table_test) holds the record it writes to them; Generator: a bad field is refused
 0004-rules FR-001	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
 0004-rules FR-002	check	.github: deno test -A	Rules: the set, the generator's refusals, the portability tool and its use on the scripts
@@ -254,3 +255,23 @@ requirement	mechanism	by	note
 0010-file-aide FR-036	none	-	Not whole yet: query.test.ts gives the same paths as fd for six filters where fd and git are installed; the tests against a real S3-compatible provider come with phase 4, and this row names its check then.
 0010-file-aide FR-037	none	-	Not built yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-038	none	-	Not whole yet: IFRFS (commons/ts/data/ifrfs/) passes what each phase adds, and this row names its check when phase 6 lands.
+0011-documentation FR-001	check	.github: cd commons/docs && bun run verify	conventions.test.ts: no dependencies, exact pins, and nothing outside commons/docs imports it
+0011-documentation FR-002	check	.github: cd commons/docs && bun run verify	the compiler of the package; conventions.test.ts: what each file imports, no any, no non-null assertion, @module and TSDoc
+0011-documentation FR-003	check	.github: cd commons/docs && bun run verify	main.test.ts: --check writes nothing in the checkout and exits 1 on a finding; two builds give the same bytes
+0011-documentation FR-004	check	.github: cd commons/docs && bun run verify	conventions.test.ts: commons has no README.md and the site reads only commons' TypeScript and the spec kit
+0011-documentation FR-005	check	.github: cd commons/docs && bun run verify	about.test.ts: every area has about.ts, its entry point does not export it, and --check holds its folders, commands and rules to the code
+0011-documentation FR-006	check	.github: cd commons/docs && bun run verify	api.test.ts: the module comment, @remarks, @example, @see, @limits and the tags of an export, read from a fixture
+0011-documentation FR-007	review	0011-documentation FR-006	A reviewer checks that a change to code changes the documentation of its module in the same commit (AGENTS.md says so)
+0011-documentation FR-008	review	0011-documentation FR-006	A reviewer checks that a fact with a shape is a typed value; about.test.ts holds the ones about.ts keeps
+0011-documentation FR-009	check	.github: cd commons/docs && bun run verify	site.test.ts: the four sections, the capability cards and an area's limits on the site made from commons
+0011-documentation FR-010	check	.github: cd commons/docs && bun run verify	api.test.ts: exports, aliases, namespaces, kinds, signatures and pages by source file, from a fixture
+0011-documentation FR-011	check	.github: cd commons/docs && bun run verify	links.test.ts: commons, bare and FR citations become links; another repository's stays text
+0011-documentation FR-012	check	.github: cd commons/docs && bun run verify	links.test.ts: {@link} in an area and across areas, and an unknown name found
+0011-documentation FR-013	check	.github: cd commons/docs && bun run verify	sql-aide.test.ts: a fixture model's diagram, dictionary, table pages, three dialects and governance
+0011-documentation FR-014	check	.github: cd commons/docs && bun run verify	file-aide.test.ts: a fixture layout's tree, patterns and segments
+0011-documentation FR-015	check	.github: cd commons/docs && bun run verify	specs.test.ts: a specification's page, its anchors and enforcement, the register and the matrix
+0011-documentation FR-016	check	.github: cd commons/docs && bun run verify	markdown.test.ts: every construct of the subset, and anything else shown as its text
+0011-documentation FR-017	check	.github: cd commons/docs && bun run verify	html.test.ts: relative links only, nothing from another host, the white reading area; the layout at 360 pixels is reviewed on the published site
+0011-documentation FR-018	check	.github: cd commons/docs && bun run verify	check.test.ts: each finding broken in a fixture and named
+0011-documentation FR-019	check	.github: cd commons/docs && bun run verify	golden.test.ts: the fixtures' HTML is the committed HTML
+0011-documentation FR-020	check	.github: cd commons/docs && bun run verify	workflow.test.ts: docs.yml tests and checks on pull requests and publishes from main with GitHub's Pages actions

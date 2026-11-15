@@ -17,8 +17,12 @@
 
 ## The tool
 
-- **FR-006**: `commons/tools/spec-kit-check.ts` MUST check a folder against FR-001 to FR-005, importing nothing outside `commons/tools/` and needing read access alone (`deno run --no-config --allow-read commons/tools/spec-kit-check.ts`), take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message` on standard error, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data. Its command line, its findings and its exit status MUST be those of the Python tool it replaced, which a harness reads (amended 2026-11-15: the tool was Python, with its standard library alone).
+- **FR-006**: `commons/tools/spec-kit-check.ts` MUST check a folder against FR-001 to FR-005 and FR-008, importing nothing outside `commons/tools/` and needing read access alone (`deno run --no-config --allow-read commons/tools/spec-kit-check.ts`), take the folder with `--root` (default `commons/spec-kit`), print every finding as `where: message` on standard error, write nothing, exit 1 where there is one, and offer `check(root)` for a harness that wants the findings as data. Its command line, its findings and its exit status MUST be those of the Python tool it replaced, which a harness reads (amended 2026-11-15: the tool was Python, with its standard library alone).
 - **FR-007**: The tool MUST NOT read a harness's ontology or run its commands: who owns a specification and whether a named command exists are the harness's to check, on top of it.
+
+## A specification's place
+
+- **FR-008**: A specification MAY carry, after `**Domain:**`, a `**Part of:**` line naming the one specification of the same folder it is a part of (`**Part of:** 0005-typescript-runtime`), which a reader of the folder shows it under. The tool MUST name a `**Part of:**` line that names no specification of the folder, or names the specification itself (amended 2026-11-15, for commons 0011-documentation).
 
 ## Out of scope
 
@@ -33,6 +37,7 @@
 - A requirement with no row in `enforcement.tsv`, or a row for one that was deleted: the tool names it, per FR-005.
 - A `none` row with no reason: the tool names it, per FR-005.
 - A folder with no `registry.tsv`: the tool reports it missing and goes on to check the specifications, per FR-006.
+- A `**Part of:**` line that names a specification the folder does not have, or the specification itself: the tool names it, per FR-008.
 
 ## Assumptions
 

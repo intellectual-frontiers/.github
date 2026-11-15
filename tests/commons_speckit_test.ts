@@ -50,11 +50,11 @@ Deno.test("commons' own folder is clean from the command line, with no configura
 
 Deno.test("a gap, a repeated number and a missing folder in the register (0003-spec-kit FR-001)", () => {
   using k = Kit.make();
-  k.edit("registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0012\tnone\tin force");
+  k.edit("registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0013\tnone\tin force");
   const out = k.findings();
   assertStringIncludes(out, "assigned twice");
-  assertStringIncludes(out, "gap at 0011");
-  assertStringIncludes(out, "0012-none is in force but its specification does not exist");
+  assertStringIncludes(out, "gap at 0012");
+  assertStringIncludes(out, "0013-none is in force but its specification does not exist");
 });
 
 Deno.test("a spec with no row, and a register that is missing (0003-spec-kit FR-001, FR-006)", () => {
@@ -103,6 +103,16 @@ Deno.test("a bare citation of another repository's spec (0003-spec-kit FR-004)",
   using k = Kit.make();
   k.edit("specs/0003-spec-kit/spec.md", "`archon 0024-spec-format` and `archon 0002-specs`.", "0136-machine-bootstrap of archon.");
   assertStringIncludes(k.findings(), "cites 0136-machine-bootstrap");
+});
+
+Deno.test("a Part of line names another specification of the folder (0003-spec-kit FR-008)", () => {
+  using k = Kit.make();
+  assertEquals(k.findings(), "", "commons' own Part of lines name specifications it has");
+  k.edit("specs/0009-sql-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0099-nothing");
+  k.edit("specs/0010-file-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0010-file-aide");
+  const out = k.findings();
+  assertStringIncludes(out, "specs/0009-sql-aide: **Part of:** names 0099-nothing, which is not another specification of this folder");
+  assertStringIncludes(out, "specs/0010-file-aide: **Part of:** names 0010-file-aide");
 });
 
 Deno.test("the enforcement register (0003-spec-kit FR-005)", () => {

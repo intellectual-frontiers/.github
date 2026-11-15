@@ -4,6 +4,7 @@
 **Status:** Draft
 **Owner:** if
 **Domain:** commons
+**Part of:** 0001-software-supply-chain
 
 **Input:** The packaging ontology of the software supply chain capability (0001-software-supply-chain): the package managers and system families of every computer a harness may meet, the
 commands that drive each manager, the package each family calls a program, what a harness must never run, and how far each family has been tried. It is seeded from the tables of `upt`

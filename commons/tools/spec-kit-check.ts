@@ -65,6 +65,7 @@ export type Problem =
   | { readonly kind: "title" }
   | { readonly kind: "no-line"; readonly label: "Spec ID" | "Owner" | "Domain"; readonly spec: string }
   | { readonly kind: "status" }
+  | { readonly kind: "part-of"; readonly named: string }
   | { readonly kind: "no-section"; readonly section: Section }
   | { readonly kind: "section-order" }
   | { readonly kind: "item-twice" }
@@ -113,6 +114,8 @@ export function message(p: Problem): string {
       return `has no **${p.label}:** line${p.label === "Spec ID" ? ` naming ${p.spec}` : ""}`;
     case "status":
       return "**Status:** must be one of ['Draft', 'Adopted', 'Superseded']";
+    case "part-of":
+      return `**Part of:** names ${p.named}, which is not another specification of this folder`;
     case "no-section":
       return `has no ${p.section} section`;
     case "section-order":
@@ -255,6 +258,11 @@ function specFindings(name: string, text: string, present: ReadonlyMap<string, s
   for (const [label, source] of lines) if (search(source, text) === null) add({ kind: "no-line", label, spec: name });
   const status = search(`${BOL}\\*\\*Status:\\*\\*${S}*([^\\n]+?)${S}*${EOL}`, text);
   if (status === null || !isOneOf(STATUSES, status[1] ?? "")) add({ kind: "status" });
+  const part = search(`${BOL}\\*\\*Part of:\\*\\*${S}*([^\\n]*?)${S}*${EOL}`, text);
+  if (part !== null) {
+    const named = part[1] ?? "";
+    if (named === name || !present.has(named)) add({ kind: "part-of", named });
+  }
   const at = SECTIONS.map((h) => [search(`${BOL}${escape(h)}`, text)?.index ?? -1, h] as const);
   for (const [pos, h] of at) if (pos < 0 && !OPTIONAL.has(h)) add({ kind: "no-section", section: h });
   const order = at.map(([p]) => p).filter((p) => p >= 0);

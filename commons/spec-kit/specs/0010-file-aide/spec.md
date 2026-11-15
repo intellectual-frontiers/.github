@@ -4,6 +4,7 @@
 **Status:** Draft
 **Owner:** if
 **Domain:** commons
+**Part of:** 0005-typescript-runtime
 
 **Input:** One library every Intellectual Frontiers harness uses to say what a store of files holds and to reach it: a store's layout (its paths, their names and the files under them) written once as TypeScript algebraic types, a few drivers behind one small interface (memory, a folder of the computer, and an S3-compatible bucket), checks of what a store holds against its layout, a small SQL-like query language compiled into a function that walks a store as `fd` walks a folder, and a few recipes for writes that need more than one step. It is SQL Aide's peer (0009-sql-aide) and is kept thin: a model of paths, a client of stores and a query compiler, and not a file system with handles, streams, locks or caches. Its name is Intellectual Frontiers Commons File Aide.
 

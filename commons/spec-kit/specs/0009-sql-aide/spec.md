@@ -4,6 +4,7 @@
 **Status:** Draft
 **Owner:** if
 **Domain:** commons
+**Part of:** 0005-typescript-runtime
 
 **Input:** One library every Intellectual Frontiers harness uses to say what its data is and to make the SQL for it: a schema written once as TypeScript algebraic types and rendered as SQL for PostgreSQL, SQLite and DuckDB, with stored routines, indexes and partitions that the compiler checks, a way to keep a database's schema as the model says it should be (ISLM), integrations, transforms, tests that run inside the database and in TypeScript, and, where a driver is at hand, typed queries. It is a SQL generator first and a database client second. It takes the ideas of `netspective-labs/sql-aide` (SQL partials in tagged templates, one model for many dialects through an emit context, stored routines as first-class values) and replaces it. Its name is Intellectual Frontiers Commons SQL Aide (IFCSQL).
 

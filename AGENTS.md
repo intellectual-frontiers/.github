@@ -26,6 +26,11 @@ This repository is small on purpose: the organization's public profile (`profile
   a library built with SQL Aide imports `sql-aide/mod.ts` alone; everything is configured in TypeScript, never in YAML, XML or JSON; every exported declaration carries a
   TSDoc comment, which is also what the SQL documentation says (`bun run docs` writes the maps again); and what a model emits is committed under `suite/**/golden/`, so that a
   change shows as a diff of SQL.
+- Documentation is the code's (commons 0011-documentation): `commons/docs/` is the generator of the site published on GitHub Pages, and it reads only commons' TypeScript
+  and the spec kit. Commons keeps no README. A module's documentation is its TSDoc: the module comment says what it is, `@remarks` the longer account, `@limits` what it
+  does not do; an area's typed facts (folders and what each may import, commands, rules, phases, examples) are its `about.ts`. When you change code, change its
+  documentation in the same commit, in the module it is about. In `commons/docs` run `bun run verify` (the compiler, the tests, `--check` on commons) before you push;
+  `bun main.ts --out ../../_site` builds the site, which is never committed. The root `README.md` stays a short pointer to the site, kept by hand.
 - Never put a secret, a token or a person's data in this repository: it is public.
 
 Every commit's author and committer is Shahid Shah <shahid@shah.org> unless a person expressly authorizes an agent to be the author of that commit in its message; an agent's part is a
