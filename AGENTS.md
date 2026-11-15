@@ -24,7 +24,7 @@ This repository is small on purpose: the organization's public profile (`profile
   commons 0005-typescript-runtime) and held to its rules. Work spec first there too, and in `commons/ts/data` run `bun run verify` (the TypeScript 7 compiler, the
   documentation maps, every test under Bun) and `bun run test:node` before you push; `(cd commons/ts && bun fmt --check)` covers its files. Its package has no `dependencies`;
   a library built with SQL Aide imports `sql-aide/mod.ts` alone; everything is configured in TypeScript, never in YAML, XML or JSON; every exported declaration carries a
-  TSDoc comment, which is also what the SQL documentation says (`bun run docs` writes the maps again); and what a model emits is committed under `tests/**/golden/`, so that a
+  TSDoc comment, which is also what the SQL documentation says (`bun run docs` writes the maps again); and what a model emits is committed under `suite/**/golden/`, so that a
   change shows as a diff of SQL.
 - Never put a secret, a token or a person's data in this repository: it is public.
 

@@ -9,7 +9,7 @@ SQL for PostgreSQL, SQLite and DuckDB. It replaces `netspective-labs/sql-aide`.
 | [`sql-aide/`](sql-aide/mod.ts)     | The library: domains, columns and tables whose row types are computed; dialects whose features the compiler knows; the `SQL` template; lint; TAP. | `sql-aide/`, the kernel; `sql-aide/runtime/` the runtime |
 | [`arca/`](arca/mod.ts)             | Arca, the typical data models: the party model first.                                                                                             | `arca/`, `sql-aide/mod.ts`                               |
 | [`data-vault/`](data-vault/mod.ts) | Data Vault: hubs, satellites and links as generic functions.                                                                                      | `data-vault/`, `sql-aide/mod.ts`                         |
-| [`tests/`](tests/)                 | The suite, with committed SQL (`golden/`) for every dialect.                                                                                      | anything here                                            |
+| [`suite/`](suite/)                 | The tests, with committed SQL (`golden/`) for every dialect; not named `tests/`, which is IFC TypeScript's own suite and what its jobs run.       | anything here                                            |
 
 ## Use it
 
@@ -34,8 +34,8 @@ cd data && bun install --frozen-lockfile              # DuckDB, PGlite and pg, f
 bun run verify                                        # tsc 7, the documentation maps, every test under Bun
 bun run test:node                                     # the same tests under Node 26
 bun run docs                                          # write arca/party.docs.auto.ts again after changing a TSDoc comment
-IFCSQL_UPDATE_GOLDEN=1 bun test tests/                # write the committed SQL again, then read the diff
-IFCSQL_PG_URL=postgres://... bun test tests/          # also on a PostgreSQL server: each test makes a database and drops it
+IFCSQL_UPDATE_GOLDEN=1 bun test suite/                # write the committed SQL again, then read the diff
+IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL server: each test makes a database and drops it
 (cd .. && bun fmt)                                    # the formatter of commons/ts
 ```
 

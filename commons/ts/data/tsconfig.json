@@ -3,5 +3,5 @@
   "compilerOptions": {
     "skipLibCheck": true
   },
-  "include": ["sql-aide/**/*.ts", "arca/**/*.ts", "data-vault/**/*.ts", "tests/**/*.ts"]
+  "include": ["sql-aide/**/*.ts", "arca/**/*.ts", "data-vault/**/*.ts", "suite/**/*.ts"]
 }
