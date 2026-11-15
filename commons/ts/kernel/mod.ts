@@ -1,7 +1,8 @@
 /**
  * The kernel of IFC TypeScript (commons 0005-typescript-runtime): pure code that imports nothing outside this folder, has no effect on the
  * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
- * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64 and ASN.1 DER (as `der`);
+ * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64, ASN.1 DER (as `der`) and CMS
+ * encryption (as `cms`);
  * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; and type-level tests.
  *
  * @example
@@ -43,6 +44,7 @@ export {
 export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export type { Brand } from "./brand.ts";
+export * as cms from "./cms.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
 export { CRYPT_ROUNDS, cryptSalt, sha512Crypt, verifySha512Crypt } from "./crypt.ts";

@@ -67,6 +67,7 @@
 - **FR-040**: The runtime MUST give typed HTTP clients a transport, live over `fetch` or recorded (answering by method and URL, and naming a request it has no exchange for), that refuses a request carrying a credential before it is sent unless made to allow credentials; a read-only guard; backoff on 429 and 503 that waits as long as `Retry-After` asks, up to a cap; a JSON read decoded at the boundary whose failures are typed (refused, network, denied for 401 and 403, another status, a decode) and are said without any header or body; every item of a list paged by `Link` or by a cursor; and the JSON5 text a recorded exchange is kept in, read back as the same exchange.
 - **FR-041**: The kernel MUST encode ASN.1 DER (X.690) in its one form (minimal lengths and two's complement integers, negative ones too; OIDs; SEQUENCE; a SET OF sorted; strings, booleans, NULL, explicit and implicit tags) and read it as a `Result` that says the byte where the input stops being DER (an indefinite or non-minimal length, a high tag number, content past the end, a non-minimal integer or OID arc), reading back integers, OIDs and nested structures as written.
 - **FR-042**: The kernel MUST encode and decode base64 and base64url by RFC 4648 (base64url written without padding and read with or without it), refuse rather than skip what is not of the alphabet asked for, and read back what it writes.
+- **FR-044**: The kernel MUST encrypt content as CMS AuthEnvelopedData (RFC 5652, RFC 5083): AES-256-GCM with a 16-byte tag (RFC 5084), the content key encrypted to each recipient's RSA key with RSAES-OAEP, SHA-256 and MGF1 with SHA-256 (RFC 8017, RFC 4055) in a KeyTransRecipientInfo naming the certificate by issuer and serial number; open it with a recipient's private key, accepting SHA-256 parameters written as NULL or absent, and refusing a changed message, a wrong key and a certificate it was not encrypted to with a typed error; read and write PEM; and read an X.509 certificate (RFC 5280) for its issuer, serial, key, addresses, validity and key usage, saying why it cannot encrypt to an address now. The content key and nonce MUST come from the caller.
 
 ## Out of scope
 
@@ -108,6 +109,8 @@
 - A request with an `Authorization` header to a transport that refuses credentials: refused, and the header's value never said, per FR-040.
 - DER whose length `0x81 0x05` could be one byte: refused as not the shortest form, per FR-041.
 - `Zm9v!` given as base64: refused, never read as `foo`, per FR-042.
+- A message encrypted by `openssl cms -encrypt -aes-256-gcm` with OAEP and SHA-256: opened, though OpenSSL writes SHA-256's parameters as absent, per FR-044.
+- An EC certificate given as a recipient: refused as unsupported, never encrypted to, per FR-044.
 - A tag `ifc-ts-v0.2.0` while `package.json` says 0.1.0: the release job stops before building, per FR-029.
 - A packed tarball that holds `.ts` files only (which Node will not strip under `node_modules`): the install check fails on Node, per FR-029 and FR-030.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.
