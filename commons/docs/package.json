@@ -1,0 +1,22 @@
+{
+  "name": "@intellectual-frontiers/ifc-docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The generator of commons' documentation site, made from commons' TypeScript and spec kit alone (commons 0011-documentation).",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "site": "bun main.ts --out ../../_site",
+    "site:check": "bun main.ts --check",
+    "verify": "tsc -p tsconfig.json && bun test suite/ && bun main.ts --check"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "mermaid": "11.17.2",
+    "typescript": "7.1.0-beta"
+  }
+}

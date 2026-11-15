@@ -1,0 +1,9 @@
+{
+  "extends": "../ts/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["*.ts", "extract/**/*.ts", "emit/**/*.ts", "lens/**/*.ts", "pages/**/*.ts", "suite/**/*.ts", "../about.ts"]
+}

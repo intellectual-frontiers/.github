@@ -549,7 +549,7 @@ Deno.test("Layout: commons has the layout the capability spec names (0001-softwa
       "generated/pins.auto.env",
     ]
   ) assert(Deno.statSync(`${COMMONS}/${rel}`).isFile, rel);
-  assert(Deno.readTextFileSync(`${COMMONS}/about.ts`).includes('title: "Intellectual Frontiers Commons"'));
+  assert(Deno.readTextFileSync(`${COMMONS}/about.ts`).includes('title: "Intellectual Frontiers Commons"'), "commons/about.ts is commons' home page (0011-documentation FR-005)");
   assert([...Deno.readDirSync(COMMONS)].every((e) => e.name !== "README.md"), "commons keeps no README (0011-documentation FR-004)");
   assertEquals([...Deno.readDirSync(`${COMMONS}/tools`)].filter((e) => !e.name.endsWith(".ts")).map((e) => e.name), [], "the tools are TypeScript, and nothing else is there");
 });
