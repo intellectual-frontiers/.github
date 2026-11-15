@@ -194,19 +194,19 @@ requirement	mechanism	by	note
 0009-sql-aide FR-048	check	.github: cd commons/ts/data && bun run verify	data-vault/vault.test.ts: hubs, satellites and links as generic functions; loads that only insert, change nothing run twice and add a satellite row for a changed attribute in every engine; conventions.test.ts: the public entry point alone
 0009-sql-aide FR-049	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts and data-vault/vault.test.ts: compiling, committed SQL, loading, constraints, one scenario with the same rows in every engine, and the generated tests inside each
 0009-sql-aide FR-050	check	.github: cd commons/ts/data && bun run verify	Arca and Data Vault: tests of each phase run in the same check
-0010-file-aide FR-001	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-002	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-003	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-004	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-005	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-006	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-007	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-008	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-009	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-010	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-011	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-012	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-013	none	-	Not built yet: it is finished by phase 1 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-001	check	.github: cd commons/ts/data && bun run verify	file-aide/conventions.test.ts: the library is in the data package and its compiler options are IFC TypeScript's
+0010-file-aide FR-002	check	.github: cd commons/ts/data && bun run verify	file-aide/conventions.test.ts: no dependencies; a file imports File Aide, the kernel and SQL Aide's entry point, and the host only under runtime/
+0010-file-aide FR-003	check	.github: cd commons/ts/data && bun run verify	file-aide/conventions.test.ts: erasable syntax, no any, no non-null assertion, no new Function, eval or import()
+0010-file-aide FR-004	check	.github: cd commons/ts/data && bun run verify	file-aide/conventions.test.ts: no configuration file named, and no file read outside runtime/
+0010-file-aide FR-005	none	-	Not whole yet: a @module block and TSDoc on every export are held by file-aide/conventions.test.ts; the documentation map of entries comes with phase 6, and this row names its check then.
+0010-file-aide FR-006	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: each segment reads and writes its own text and refuses text it does not write
+0010-file-aide FR-007	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: the two laws as fast-check properties over five patterns; problems kept and refused by a layout
+0010-file-aide FR-008	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: key types computed from segments (type tests, with controls)
+0010-file-aide FR-009	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: an entry's codec, description and owner; bytes, text, JSON5 and the caller's own
+0010-file-aide FR-010	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: ambiguity found by witnesses; one entry and its key, or unmatched; mounted layouts
+0010-file-aide FR-011	none	-	Not whole yet: matching gives unmatched values (algebra.test.ts, ifrfs.test.ts); listing and reading a store come with phase 2, and this row names its check then.
+0010-file-aide FR-012	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: relative, normalized paths that cannot leave their root
+0010-file-aide FR-013	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: the limits of S3, Linux, macOS and Windows, and case collisions
 0010-file-aide FR-014	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-015	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-016	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.

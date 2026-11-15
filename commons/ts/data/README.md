@@ -64,12 +64,12 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
 - Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
   nine digits; a landing relation should hold one state of a key in one load.
 
-## File Aide, specified and not built yet
+## File Aide, being built
 
 File Aide is SQL Aide's peer for stores of files, specified by [`0010-file-aide`](../../spec-kit/specs/0010-file-aide/spec.md): a store's layout written once as
 TypeScript algebraic types, drivers for memory, a folder and an S3-compatible bucket behind one interface, checks of a store against its layout, and a small SQL-like query
-language compiled into a function that walks a store as `fd` does, honouring `.gitignore` and `.faignore`. It lives in `file-aide/`, and the layout that accepts it, the IF Renditions File System (IFRFS, the
-folder erga's `publication sync` fills), in `ifrfs/`. Each of its
+language compiled into a function that walks a store as `fd` does, honouring `.gitignore` and `.faignore`. It lives in [`file-aide/`](file-aide/mod.ts), and the layout that accepts it, the IF Renditions File System (IFRFS, the
+folder erga's `publication sync` fills), in [`ifrfs/`](ifrfs/mod.ts), tested on the synthetic tree `suite/ifrfs/tree/`. Each of its
 requirements has a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) naming the phase that finishes it.
 
 | Phase | What                                                                                                 | State   |
