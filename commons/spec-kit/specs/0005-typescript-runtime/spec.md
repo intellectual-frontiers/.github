@@ -77,7 +77,7 @@
 
 - Converting the machine setup (`bin/setup/`), `erga` or `stolos` to IFC TypeScript: each is a later, one-pass change of its own, after this one is reviewed (issue #7).
 - Foreign functions (Stolos's PAM binding): they stay in the harness, per runtime, behind its own interface.
-- The pinned tool store, an OpenTelemetry exporter over `fetch`, and a shared terminal palette: each needs a design of its own first.
+- The pinned tool store: it needs a design of its own first. The OpenTelemetry exporter and the terminal palette are 0006-signals; GRC primitives are 0007-grc; test records and reports are 0008-test-evidence.
 - How `stolos` loads its engine (a verified tarball with the SHA-256 of each file, instead of an import by URL): `stolos`'s own specification; the kernel's archive reader is what it will use.
 
 ## Edge cases
