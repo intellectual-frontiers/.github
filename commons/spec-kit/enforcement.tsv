@@ -69,3 +69,9 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-032	check	.github: cd commons/ts && bun test tests/	kernel/formats.test.ts: random trees written and read back, entities, CDATA, prefixes, the finders, refusals with line and column, no entity expansion
 0005-typescript-runtime FR-033	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: random acyclic graphs ordered and scheduled with random outcomes and job limits, cycles, a node that rejects
 0005-typescript-runtime FR-034	check	.github: cd commons/ts && bun test tests/	kernel/graph.test.ts: glibc's own hashes, clamped rounds, verification, random salts from bytes
+0005-typescript-runtime FR-035	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random tables written and read back, TOML 1.0's examples, every rule broken and named with its place
+0005-typescript-runtime FR-036	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random records written and read back with each separator and line ending, RFC 4180's cases, refusals
+0005-typescript-runtime FR-037	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: the types and charsets of paths and extensions, unknown extensions
+0005-typescript-runtime FR-038	check	.github: cd commons/ts && bun test tests/	kernel/data.test.ts: random values written and read back, a front matter with every construct, failsafe, every refusal with its place and reason
+0005-typescript-runtime FR-039	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: taken, refused, waited for, timed out, taken over from a dead holder and an unreadable file, inherited, released twice
+0005-typescript-runtime FR-040	check	.github: cd commons/ts && bun test tests/	runtime/client.test.ts: against a local server: decoded reads, denials, statuses, credentials refused and allowed, read-only, backoff with Retry-After and the cap, Link and cursor paging, recorded exchanges

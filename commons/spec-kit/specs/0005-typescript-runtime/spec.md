@@ -59,6 +59,13 @@
 - **FR-033**: The kernel MUST order a graph so that each node comes after the nodes it needs, the same way every time, or name a cycle; and MUST run a graph's nodes each the moment the nodes it needs are done, no more at once than asked, skipping (and saying) a node whose needed node failed or was skipped, and holding back nothing else.
 - **FR-034**: The kernel MUST hash a password as glibc's SHA-512 crypt (`$6$`, Drepper's algorithm, rounds written where they are given and clamped as glibc clamps them, the salt cut to 16 characters) on Web Crypto alone, giving the bytes glibc's `crypt(3)` gives, and verify a password against such a hash. The salt MUST be given (made from random bytes by the caller), so the kernel has no effect.
 
+- **FR-035**: The kernel MUST read TOML 1.0.0 whole (bare, quoted and dotted keys; tables, arrays of tables and inline tables; the four kinds of string; decimal, hexadecimal, octal and binary integers; floats with `inf` and `nan`; the four kinds of date and time, kept as their text with their kind) and hold to its rules (no key or table defined twice, no inline table or static array extended, no table made by dotted keys reopened by a header), refusing an integer JavaScript cannot hold exactly rather than rounding it and saying the line and column of what is wrong; and MUST write a table as TOML it reads back as the same table.
+- **FR-036**: The kernel MUST read and write CSV by RFC 4180 (any one-character separator, quoted fields with doubled quotes and line breaks, CRLF or LF), refuse a quote in an unquoted field and a quoted field left open with the line and column, give records by a header's names (refusing a record of another length), and read back what it writes.
+- **FR-037**: The kernel MUST give the media type of a path or an extension from one table of the types the harnesses serve and publish, `charset=UTF-8` with every textual type, and `application/octet-stream` where the extension is not known.
+- **FR-038**: The kernel MUST read YAML 1.2 as data: block mappings and sequences (a sequence at its key's indentation, a mapping begun on a dash), flow collections over lines, plain scalars folded over lines, single- and double-quoted scalars with every YAML 1.2 escape, literal and folded block scalars with their indicators, comments and one document; resolve plain scalars by the core schema or, asked, the failsafe one; refuse, with the line, column and reason, anchors and aliases, tags, complex keys, directives, a second document, a key given twice and a tab for indentation; and write a value as block YAML it reads back as the same value.
+- **FR-039**: The runtime MUST give one run at a time by a lock file made only where none exists, holding its holder (process, command, since when, a token): a run that waits polls, says once whom it waits for and may give up after a time; a lock whose holder no longer runs, or whose file cannot be read, is taken over; a child may inherit its parent's lock through an environment variable; and release removes the file only where it still holds the releasing holder's token, on exit too.
+- **FR-040**: The runtime MUST give typed HTTP clients a transport, live over `fetch` or recorded (answering by method and URL, and naming a request it has no exchange for), that refuses a request carrying a credential before it is sent unless made to allow credentials; a read-only guard; backoff on 429 and 503 that waits as long as `Retry-After` asks, up to a cap; a JSON read decoded at the boundary whose failures are typed (refused, network, denied for 401 and 403, another status, a decode) and are said without any header or body; every item of a list paged by `Link` or by a cursor; and the JSON5 text a recorded exchange is kept in, read back as the same exchange.
+
 ## Out of scope
 
 - Converting the machine setup (`bin/setup/`), `erga` or `stolos` to IFC TypeScript: each is a later, one-pass change of its own, after this one is reviewed (issue #7).
@@ -89,6 +96,14 @@
 - `<!DOCTYPE a [<!ENTITY e "x">]>`: refused before any entity is read, per FR-032.
 - A graph where `a` needs `b` and `b` needs `a`: the order names the cycle `a, b, a`, and the schedule rejects, per FR-033.
 - A salt of 20 characters, or rounds of 10: the salt is cut to 16 and the rounds raised to 1000, as glibc does, per FR-034.
+- `x = 9007199254740993` in TOML: refused at its column, never rounded, per FR-035.
+- `a.b = 1` then `[a]` in TOML: refused, as TOML 1.0 refuses it, per FR-035.
+- A CSV field `a"b`: refused at the quote, per FR-036.
+- `notes.unknownext`: `application/octet-stream`, per FR-037.
+- `a: &x 1` and `b: *x` in YAML: refused at the anchor, so nothing is ever repeated or expanded, per FR-038.
+- `on: yes` in YAML 1.2: the text `yes`, not a boolean, per FR-038.
+- A lock left by a process that crashed: taken over by the next run, per FR-039.
+- A request with an `Authorization` header to a transport that refuses credentials: refused, and the header's value never said, per FR-040.
 - A tag `ifc-ts-v0.2.0` while `package.json` says 0.1.0: the release job stops before building, per FR-029.
 - A packed tarball that holds `.ts` files only (which Node will not strip under `node_modules`): the install check fails on Node, per FR-029 and FR-030.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.

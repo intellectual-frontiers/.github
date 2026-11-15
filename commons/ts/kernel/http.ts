@@ -1,8 +1,9 @@
 /**
- * Pure HTTP helpers that API clients keep rewriting (commons 0005-typescript-runtime FR-012): the `Link` header (RFC 8288) read into its
+ * Pure HTTP helpers that API clients and servers keep rewriting (commons 0005-typescript-runtime FR-012): the `Link` header (RFC 8288) read into its
  * links so a client follows `rel="next"` pages, `Retry-After` (RFC 9110 §10.2.3) read as a wait whether it is seconds or a date, and which
- * methods are safe (RFC 9110 §9.2.1) so a read-only client can refuse the rest. Taken from Stolos's connector SDK
- * (`src/archon/connect/sdk.ts`, `connector.ts`), which matched `rel="next"` with a regular expression in two places.
+ * methods are safe (RFC 9110 §9.2.1) so a read-only client can refuse the rest, and the entity-tag conditions of `If-Match` and
+ * `If-None-Match` (RFC 9110 §13.1) a server answers with 412 or 304. Taken from Stolos's connector SDK (`src/archon/connect/sdk.ts`,
+ * `connector.ts`), which matched `rel="next"` with a regular expression in two places, and erga's `lib/ts/http` (on `@std/http/etag`).
  *
  * @example
  * ```ts
@@ -64,4 +65,39 @@ export const SAFE_METHODS: ReadonlySet<string> = new Set(["GET", "HEAD", "OPTION
 /** Whether a method only reads; case does not matter. */
 export function isSafeMethod(method: string): boolean {
   return SAFE_METHODS.has(method.toUpperCase());
+}
+
+/** The entity tags of an `If-Match` or `If-None-Match` header, as written (`"abc"`, `W/"abc"`), or `*`. */
+export function entityTags(header: string): readonly string[] | "*" {
+  if (header.trim() === "*") return "*";
+  return [...header.matchAll(/(?:W\/)?"[^"]*"/g)].map((m) => m[0]);
+}
+
+const opaque = (tag: string): string => tag.replace(/^W\//, "");
+
+/** An entity tag for content by its checksum or another stable token: strong (`"token"`), or weak (`W/"token"`). */
+export function entityTag(token: string, weak = false): string {
+  return `${weak ? "W/" : ""}"${token.replaceAll('"', "")}"`;
+}
+
+/**
+ * Whether a request with this `If-Match` header may go on for content with this entity tag (RFC 9110 §13.1.1): yes where the header is
+ * absent, is `*`, or names the tag by strong comparison (a weak tag never matches).
+ */
+export function ifMatch(header: string | null | undefined, etag: string): boolean {
+  if (header === null || header === undefined) return true;
+  const tags = entityTags(header);
+  if (tags === "*") return true;
+  return !etag.startsWith("W/") && tags.some((t) => !t.startsWith("W/") && t === etag);
+}
+
+/**
+ * Whether a request with this `If-None-Match` header should get the content again (RFC 9110 §13.1.2), rather than 304 or 412: yes where
+ * the header is absent or names no tag equal to this one by weak comparison; no where it is `*`.
+ */
+export function ifNoneMatch(header: string | null | undefined, etag: string): boolean {
+  if (header === null || header === undefined) return true;
+  const tags = entityTags(header);
+  if (tags === "*") return false;
+  return !tags.some((t) => opaque(t) === opaque(etag));
 }
