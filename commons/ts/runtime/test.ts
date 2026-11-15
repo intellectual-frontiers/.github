@@ -14,6 +14,22 @@
  * is the file that called `test` or `proves`, from the call's stack, relative to the working folder, or the option `file`. A test's
  * outcome is never changed by its recording: a failure is still thrown to the runner.
  *
+ * A test's body is given a context `t` whose `t.step(name, fn)` runs a step as a subtest of `node:test` (`TestContext.test`), awaited, and
+ * records it in the test's evidence (commons 0005-typescript-runtime FR-060): a `test step` span, a child of the test's span (or of the
+ * step it is in), as it ends, and the test's `steps`, which its `test` span names in `ifc.test.steps`. A step that fails fails its test
+ * with the step's error, on every runner, so that the test's record says why.
+ *
+ * `only` runs a test alone among the tests of its file (FR-060). Each runner is given `node:test`'s `only`, and this module also skips
+ * the other tests of the file itself, so that "the one marked only runs alone" holds on each runner, and each of the others is recorded
+ * as `skip` with the reason `ONLY_REASON`:
+ * - `node --test --test-only` and `deno test` run only the tests marked `only`, of themselves;
+ * - `node --test` without `--test-only` (Node 26 then says "'only' and 'runOnly' require the --test-only command-line option") and
+ *   `bun test` (Bun's `node:test` ignores `only`) run every test: the others then skip themselves, and a runner shows them as passed
+ *   (Bun, Deno) or skipped (Node);
+ * - `bun test --only` runs no test of `node:test` at all, `only` or not, as its `node:test` never marks one: give `bun test` no `--only`.
+ * The others of the file are those registered before the first test marked `only` that have not started, and every one registered after
+ * it; `bun test` loads every file in one process, so the mark is kept for each file, never for the process.
+ *
  * @example
  * ```ts
  * import { assertEquals, proves } from "./test.ts";
@@ -28,7 +44,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, realpathSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import process from "node:process";
-import { test as nodeTest } from "node:test";
+import { test as nodeTest, type TestContext as NodeTestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 import { inspect } from "node:util";
 import { extractContext, redactText, type Resource, type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
@@ -40,8 +56,11 @@ import {
   recordPath,
   type Review,
   type Risk,
+  type StepOutcome,
   type TestCase,
   type TestContext,
+  type TestStep,
+  testStepSpan,
   TEST_SCOPE,
   testCaseLog,
   testCaseSpan,
@@ -52,20 +71,39 @@ import {
 import { installed } from "./otel.ts";
 import { build, runtimeName, runtimeVersion } from "./proc.ts";
 
-/** A test's body. */
-export type TestFn = () => void | Promise<void>;
+/**
+ * What a test's body, or a step's, is given (FR-060): its `name`; `step`, which runs a step as a subtest of `node:test`, awaited, and
+ * records it in the test's evidence (a step that fails rejects with its error, so that the test fails with it); and `skip`, which marks
+ * the test or the step skipped, with the reason, when its body returns (the body itself returns: `skip` does not stop it).
+ */
+export type StepContext = {
+  readonly name: string;
+  readonly step: (name: string, fn: StepFn) => Promise<void>;
+  readonly skip: (reason?: string) => void;
+};
+
+/** A step's body, given its own context for the steps within it. */
+export type StepFn = (t: StepContext) => void | Promise<void>;
+
+/** A test's body; it may take the context `t` for its steps. */
+export type TestFn = (t: StepContext) => void | Promise<void>;
 
 /**
- * How to run a test: `skip` it or mark it `todo` (with the reason as a string; neither runs its body), give it a `timeout` in milliseconds
- * (a test that does not end by then is `cancelled`), its `risk` (`not-high` by default), or the `file` it is recorded under.
+ * How to run a test: `skip` it or mark it `todo` (with the reason as a string; neither runs its body), run it alone among the tests of
+ * its file (`only`), give it a `timeout` in milliseconds (a test that does not end by then is `cancelled`), its `risk` (`not-high` by
+ * default), or the `file` it is recorded under.
  */
 export type TestOptions = {
   readonly skip?: boolean | string;
   readonly todo?: boolean | string;
+  readonly only?: boolean;
   readonly timeout?: number;
   readonly risk?: Risk;
   readonly file?: string;
 };
+
+/** The reason a test is recorded as skipped where another test of its file is marked `only` (FR-060). */
+export const ONLY_REASON = "another test of this file is marked only";
 
 /** A requirement cited by its specification and number: `0005-typescript-runtime FR-013`, or another repository's `erga 241-typescript-first FR-015`. */
 export type Requirement = string;
@@ -193,6 +231,13 @@ function emit(test: TestCase, spanId: SpanId): void {
   }
 }
 
+function emitStep(step: TestStep, test: Pick<TestCase, "id" | "file" | "name">, spanId: SpanId, parentSpanId: SpanId): void {
+  const s = current();
+  const span = testStepSpan(step, test, { traceId: s.traceId, spanId, parentSpanId });
+  if (s.file !== undefined) append(recordLine(s.resource, { spans: [span] }));
+  else installed()?.emit({ kind: "span", span }, { resource: s.resource, scope: TEST_SCOPE });
+}
+
 type Running = { readonly base: Omit<TestCase, "end" | "outcome">; readonly spanId: SpanId };
 
 const running = new Map<SpanId, Running>();
@@ -301,7 +346,7 @@ class TimedOut extends Error {
   }
 }
 
-async function within(fn: TestFn, ms: number | undefined): Promise<void> {
+async function within(fn: () => void | Promise<void>, ms: number | undefined): Promise<void> {
   if (ms === undefined) {
     await fn();
     return;
@@ -319,34 +364,117 @@ async function within(fn: TestFn, ms: number | undefined): Promise<void> {
   }
 }
 
+/**
+ * The context of a test or a step (FR-060): each step is a subtest of `node:test` on `node`, the runner's context, and is recorded in
+ * `into` and as a span whose parent is `parent` (the test's span or the enclosing step's), as it ends.
+ */
+function stepContext(
+  name: string,
+  node: NodeTestContext,
+  test: Pick<TestCase, "id" | "file" | "name">,
+  testSpanId: SpanId,
+  parent: SpanId,
+  into: TestStep[],
+  skipped: (reason: string | undefined) => void,
+): StepContext {
+  const step = async (stepName: string, fn: StepFn): Promise<void> => {
+    if (!running.has(testSpanId))
+      throw new Error(`the step ${JSON.stringify(stepName)} ran after its test ${JSON.stringify(test.name)} ended`);
+    const spanId = newSpanId();
+    const start = nowNanos();
+    const inner: TestStep[] = [];
+    let ran = false;
+    let skippedHere = false;
+    let thrown: { readonly error: unknown } | undefined;
+    await node.test(stepName, async (sub: NodeTestContext) => {
+      ran = true;
+      try {
+        await fn(
+          stepContext(stepName, sub, test, testSpanId, spanId, inner, () => {
+            skippedHere = true;
+          }),
+        );
+      } catch (e) {
+        thrown = { error: e };
+        throw e;
+      }
+    });
+    const outcome: StepOutcome = thrown !== undefined ? "fail" : ran && !skippedHere ? "pass" : "skip";
+    const recordedStep: TestStep = {
+      name: stepName,
+      start,
+      end: nowNanos(),
+      outcome,
+      ...(thrown === undefined ? {} : { message: failure(thrown.error).message }),
+      ...(inner.length === 0 ? {} : { steps: inner }),
+    };
+    into.push(recordedStep);
+    emitStep(recordedStep, test, spanId, parent);
+    if (thrown !== undefined) throw thrown.error;
+  };
+  const skip = (reason?: string): void => {
+    skipped(reason);
+    if (typeof node.skip === "function") node.skip(reason);
+  };
+  return { name, step, skip };
+}
+
 async function runCase(
   base: Omit<TestCase, "start" | "end" | "outcome" | "attempt">,
   fn: TestFn,
   timeout: number | undefined,
+  node: NodeTestContext,
 ): Promise<void> {
   hookExit();
   const spanId = newSpanId();
   const started = { ...base, start: nowNanos(), attempt: current().attempt };
   running.set(spanId, { base: started, spanId });
   if (current().file !== undefined) append(recordLine(current().resource, { records: [testStartLog(started, contextFor(spanId))] }));
+  const steps: TestStep[] = [];
+  const withSteps = (): { readonly steps?: readonly TestStep[] } => (steps.length === 0 ? {} : { steps: [...steps] });
+  let skipped: { readonly reason: string | undefined } | undefined;
+  const context = stepContext(base.name, node, base, spanId, spanId, steps, (reason) => {
+    skipped = { reason: reason === undefined ? undefined : reasonOf(reason) };
+  });
   try {
-    await within(fn, timeout);
+    await within(() => fn(context), timeout);
   } catch (e) {
     if (running.delete(spanId)) {
       emit(
         e instanceof TimedOut
-          ? { ...started, end: nowNanos(), outcome: "cancelled", reason: e.message }
-          : { ...started, end: nowNanos(), outcome: "fail", ...failure(e) },
+          ? { ...started, end: nowNanos(), outcome: "cancelled", reason: e.message, ...withSteps() }
+          : { ...started, end: nowNanos(), outcome: "fail", ...failure(e), ...withSteps() },
         spanId,
       );
     }
     throw e;
   }
-  if (running.delete(spanId)) emit({ ...started, end: nowNanos(), outcome: "pass" }, spanId);
+  if (!running.delete(spanId)) return;
+  const reason = skipped?.reason;
+  emit(
+    skipped === undefined
+      ? { ...started, end: nowNanos(), outcome: "pass", ...withSteps() }
+      : { ...started, end: nowNanos(), outcome: "skip", ...(reason === undefined ? {} : { reason }), ...withSteps() },
+    spanId,
+  );
 }
 
 function reasonOf(v: boolean | string): string | undefined {
   return typeof v === "string" && v.trim() !== "" ? cut(redactText(v)) : undefined;
+}
+
+/** A test of a file waiting to run, until a test of the file is marked `only` and it is skipped. */
+type Waiting = { started: boolean; skipped: boolean; readonly skip: () => void };
+
+/** For each file, whether a test of it is marked `only`, and its tests that have not started (FR-060). */
+const onlyOf = new Map<string, { marked: boolean; readonly waiting: Set<Waiting> }>();
+
+function onlyState(file: string): { marked: boolean; readonly waiting: Set<Waiting> } {
+  const known = onlyOf.get(file);
+  if (known !== undefined) return known;
+  const state = { marked: false, waiting: new Set<Waiting>() };
+  onlyOf.set(file, state);
+  return state;
 }
 
 function register(name: string, requirements: readonly Requirement[], fn: TestFn, options: TestOptions, file: string): void {
@@ -366,9 +494,36 @@ function register(name: string, requirements: readonly Requirement[], fn: TestFn
     void nodeTest(name, { skip: options.skip }, () => undefined);
     return;
   }
-  const body = (): Promise<void> => runCase(base, fn, options.timeout);
-  if (options.timeout === undefined) void nodeTest(name, body);
-  else void nodeTest(name, { timeout: options.timeout }, body);
+  const state = onlyState(file);
+  const only = options.only === true;
+  if (only && !state.marked) {
+    state.marked = true;
+    for (const w of state.waiting) {
+      if (w.started) continue;
+      w.skipped = true;
+      w.skip();
+    }
+    state.waiting.clear();
+  } else if (!only && state.marked) {
+    notRun("skip", ONLY_REASON);
+    void nodeTest(name, { skip: ONLY_REASON }, () => undefined);
+    return;
+  }
+  const waiting: Waiting | undefined = only ? undefined : { started: false, skipped: false, skip: () => notRun("skip", ONLY_REASON) };
+  if (waiting !== undefined) state.waiting.add(waiting);
+  const body = (t: NodeTestContext): Promise<void> => {
+    if (waiting !== undefined) {
+      state.waiting.delete(waiting);
+      if (waiting.skipped) {
+        // Recorded as skipped when the test marked only was registered; the runner is told where it can be.
+        if (typeof t.skip === "function") t.skip(ONLY_REASON);
+        return Promise.resolve();
+      }
+      waiting.started = true;
+    }
+    return runCase(base, fn, options.timeout, t);
+  };
+  void nodeTest(name, { ...(options.timeout === undefined ? {} : { timeout: options.timeout }), ...(only ? { only: true } : {}) }, body);
 }
 
 /** A test registered with the runtime's runner, and recorded (0008-test-evidence FR-001). */
@@ -430,6 +585,38 @@ export function assertInstanceOf<T>(value: unknown, Class: abstract new (...args
 /** Fails unless the text includes the part. */
 export function assertStringIncludes(actual: string, expected: string, message?: string): void {
   nodeAssert.ok(actual.includes(expected), message ?? `expected ${JSON.stringify(actual)} to include ${JSON.stringify(expected)}`);
+}
+
+/** Fails unless the two are different values (`Object.is`), as `@std/assert`'s `assertNotStrictEquals` (FR-060). */
+export function assertNotStrictEquals<T>(actual: T, expected: T, message?: string): void {
+  if (message === undefined) nodeAssert.notStrictEqual(actual, expected);
+  else nodeAssert.notStrictEqual(actual, expected, message);
+}
+
+/**
+ * Fails unless the two numbers are within `tolerance` of each other (`1e-7` by default), as `@std/assert`'s `assertAlmostEquals`
+ * (FR-060): the same value (`Object.is`, so `NaN` is close to `NaN` and an infinity to itself) passes, else `|expected - actual|` must not
+ * exceed the tolerance.
+ */
+export function assertAlmostEquals(actual: number, expected: number, tolerance = 1e-7, message?: string): void {
+  if (Object.is(actual, expected)) return;
+  const delta = Math.abs(expected - actual);
+  if (delta <= tolerance) return;
+  const f = (n: number): string => (Number.isInteger(n) ? String(n) : n.toExponential());
+  throw new nodeAssert.AssertionError({
+    message: `Expected actual: "${f(actual)}" to be close to "${f(expected)}": delta "${f(delta)}" is greater than "${f(tolerance)}"${
+      message === undefined ? "." : `: ${message}`
+    }`,
+    actual,
+    expected,
+    operator: "assertAlmostEquals",
+  });
+}
+
+/** Fails where the text matches the pattern, as `@std/assert`'s `assertNotMatch` (FR-060). */
+export function assertNotMatch(actual: string, pattern: RegExp, message?: string): void {
+  if (message === undefined) nodeAssert.doesNotMatch(actual, pattern);
+  else nodeAssert.doesNotMatch(actual, pattern, message);
 }
 
 /** Fails unless the text matches the pattern. */

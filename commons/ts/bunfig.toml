@@ -5,6 +5,8 @@ printWidth = 140
 
 [lint]
 typeAware = true
+# IFC TypeScript's own lint plugin (FR-061), with commons' own lists.
+plugins = ["./lint/plugin.ts"]
 
 [lint.rules]
 # Algebraic type safety: no escape from the type system, every alternative handled, every promise awaited (FR-028).
@@ -19,3 +21,18 @@ typeAware = true
 "typescript/no-unnecessary-type-assertion" = "error"
 "typescript/ban-ts-comment" = ["error", { "ts-expect-error" = "allow-with-description", "minimumDescriptionLength" = 10 }]
 "eslint/eqeqeq" = "error"
+# The rules of the plugin (FR-061), as commons applies them to itself.
+"ifc/no-vendor-api" = "error"
+"ifc/no-registry-import" = "error"
+"ifc/import-boundary" = ["error", { roots = ["kernel"] }]
+"ifc/module-doc" = "error"
+"ifc/switch-absurd" = "error"
+"ifc/terminal-writers" = [
+  "error",
+  { allow = [
+    { files = "runtime/console.ts", reason = "the renderer, the one writer for a person (0006-signals FR-026)" },
+    { files = "runtime/tty.ts", reason = "the terminal's own streams, for its size and raw mode" },
+    { files = "runtime/stdio.ts", reason = "the process's standard streams, for what programs read (FR-054)" },
+    { files = "tools/**", reason = "command-line tools print their results" },
+  ] },
+]

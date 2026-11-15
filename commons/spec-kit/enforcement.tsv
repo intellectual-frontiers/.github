@@ -81,6 +81,21 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-045	check	.github: cd commons/ts && bun test tests/	kernel/dsse.test.ts: the DSSE specification's PAE example, sign and verify with six algorithms, a threshold of two over random payloads, every refusal by its kind, statements and their subjects' sha256
 0005-typescript-runtime FR-043	check	.github: cd commons/ts && bun test tests/	kernel/png.test.ts: random pictures written and read back, hand-built PNGs of every filter, colour type and depth with tRNS, every corrupt and hostile file refused by its kind, resize and composite laws, ICO round trips
 0005-typescript-runtime FR-047	check	.github: cd commons/ts && bun test tests/	kernel/args.test.ts: every grammar rule and error kind with its sentence and suggestion, the help text, type inference with negative controls, random argument vectors in random forms parsed back to their values
+0005-typescript-runtime FR-048	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: readDir async, chown, symlinkSync
+0005-typescript-runtime FR-049	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: file handles, seek, streams, using
+0005-typescript-runtime FR-050	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/fs-more.test.ts: copy and walk
+0005-typescript-runtime FR-051	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/watch.test.ts: events joined, recursive, stopped by abort
+0005-typescript-runtime FR-052	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: streams in and out, kill, status, NotFound
+0005-typescript-runtime FR-053	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/spawn.test.ts: ppid, build.target, unrefTimer, selfCommand
+0005-typescript-runtime FR-054	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/stdio.test.ts and console.test.ts: machine output, and the two writers
+0005-typescript-runtime FR-055	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/tcp.test.ts: listen, connect, TLS with a test certificate
+0005-typescript-runtime FR-056	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/dns.test.ts: resolution and its errors, network interfaces
+0005-typescript-runtime FR-057	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/md5.test.ts: RFC 1321's examples
+0005-typescript-runtime FR-058	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/glob.test.ts: globs against @std/path's cases; expandGlob
+0005-typescript-runtime FR-059	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/archive.test.ts: untarStream equals untar, damaged headers refused
+0005-typescript-runtime FR-060	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/test.test.ts: only, steps and the three asserts
+0005-typescript-runtime FR-061	check	.github: cd commons/ts && node --test tests/**/*.test.ts	lint/*.test.ts: each rule against code it refuses and accepts, through bun lint
+0005-typescript-runtime FR-062	check	.github: .github/workflows/ifc-typescript.yml compile job	CI builds a small program on each system and runs it; runtime/compile.test.ts checks the arguments
 0005-typescript-runtime FR-046	check	.github: cd commons/ts && bun test tests/	kernel/schedule.test.ts and runtime/schedule.test.ts: exact units, plist and .cmd per OS, quoting round trips against reference splitters, every schedule kind read back, refusals; install and remove into a temporary home with a fake runner (CI runs them on Linux, macOS and Windows)
 0006-signals FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: the model's types (type-level tests) and the values an attribute can hold
 0006-signals FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/otel.test.ts: ids from given bytes, zeros refused, brands kept apart

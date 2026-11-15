@@ -17,6 +17,7 @@
  *
  * @module
  */
+import { absurd } from "../kernel/absurd.ts";
 import { array, type Decoder, formatDecodeError, json, literal, number, object, record, string } from "../kernel/decode.ts";
 import { isSafeMethod, nextLink, retryAfterMs } from "../kernel/http.ts";
 import { formatJson5Error, parseJson5, toJson5 } from "../kernel/json5.ts";
@@ -196,6 +197,8 @@ export function formatReadError(e: ReadError): string {
       return `${new URL(e.url).pathname}: HTTP ${e.status}`;
     case "decode":
       return `${new URL(e.url).pathname}: ${e.message}`;
+    default:
+      return absurd(e);
   }
 }
 

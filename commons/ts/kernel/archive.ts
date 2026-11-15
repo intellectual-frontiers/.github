@@ -4,6 +4,8 @@
  * depend on the files alone (taken from erga's `lib/ts/archive`). Reading: a tar (ustar, pax and GNU long names), a gzip and a zip whose
  * entries are stored or deflated (through the web standard `DecompressionStream`), each checked (header checksums, CRC-32) and every path
  * refused that would leave the folder it is unpacked into. This is what lets Stolos drop `fflate` and unpack a verified copy of its engine.
+ * A tar, gzipped or not, is also read as a stream (`untarStream`, `readTarStream`), an entry at a time with each entry's bytes a stream of
+ * their own, with the same checks, so that an archive larger than memory can be read (FR-059).
  *
  * @example
  * ```ts
@@ -15,6 +17,7 @@
  *
  * @module
  */
+import { absurd } from "./absurd.ts";
 import { err, ok, type Result } from "./result.ts";
 
 /** The files of an archive, by their path inside it. */
@@ -38,6 +41,8 @@ export function formatArchiveError(e: ArchiveError): string {
       return `the archive holds a path that would leave its folder: ${JSON.stringify(e.path)}`;
     case "too-long":
       return `the path is too long for a ustar header: ${JSON.stringify(e.path)}`;
+    default:
+      return absurd(e);
   }
 }
 
@@ -313,75 +318,382 @@ function paxRecords(data: Uint8Array): ReadonlyMap<string, string> {
   return out;
 }
 
+/** The fields of one tar header block, its checksum checked: what an entry's header says before pax and GNU long names apply. */
+type RawHeader = {
+  readonly block: Uint8Array;
+  readonly size: number;
+  readonly mode: number;
+  readonly mtime: number;
+  readonly type: string;
+};
+
+/** Whether a block of 512 bytes is all zeros, the end of a tar archive. */
+const isZeroBlock = (h: Uint8Array): boolean => h.every((b) => b === 0);
+
+/** The 512 bytes of a body of `n` bytes, padded to a whole number of blocks. */
+const padded = (n: number): number => Math.ceil(n / 512) * 512;
+
+/** The fields of the header block at byte `at`, or why it is damaged (a wrong checksum, a field that is not a number). */
+function readHeader(h: Uint8Array, at: number): Result<RawHeader, ArchiveError> {
+  const stored = readNumber(h.subarray(148, 156));
+  let sum = 0;
+  for (let i = 0; i < 512; i++) sum += i >= 148 && i < 156 ? 0x20 : (h[i] ?? 0);
+  if (stored !== sum) return damaged(`the header at byte ${at} has a wrong checksum`);
+  const size = readNumber(h.subarray(124, 136));
+  const mode = readNumber(h.subarray(100, 108));
+  const mtime = readNumber(h.subarray(136, 148));
+  if (size === undefined || mode === undefined || mtime === undefined)
+    return damaged(`the header at byte ${at} has a field that is not a number`);
+  return ok({ block: h, size, mode, mtime, type: String.fromCharCode(h[156] ?? 0) });
+}
+
+/** What pax extended headers and GNU long names and links say of the entry after them. */
+type Pending = { readonly pax: ReadonlyMap<string, string>; readonly longName: string | undefined; readonly longLink: string | undefined };
+
+const NO_PENDING: Pending = { pax: new Map(), longName: undefined, longLink: undefined };
+
+/** The length of the body after a header, a pax `size` before it taking the place of the header's. */
+function bodyLength(raw: RawHeader, pending: Pending, at: number): Result<number, ArchiveError> {
+  const paxSize = pending.pax.get("size");
+  if (paxSize === undefined) return ok(raw.size);
+  const n = /^[0-9]+$/.test(paxSize) ? Number.parseInt(paxSize, 10) : Number.NaN;
+  return Number.isSafeInteger(n) ? ok(n) : damaged(`the pax size before byte ${at} is not a number`);
+}
+
+/** Whether a header's type is one that only says something of the entry after it (pax `x` and `g`, GNU `L` and `K`). */
+const isMetaType = (type: string): boolean => type === "x" || type === "g" || type === "L" || type === "K";
+
+/** What is pending after a header of a meta type (see `isMetaType`) with its body. */
+function pendingAfter(type: string, body: Uint8Array, pending: Pending): Pending {
+  switch (type) {
+    case "x":
+      return { ...pending, pax: paxRecords(body) };
+    case "L":
+      return { ...pending, longName: cstring(body) };
+    case "K":
+      return { ...pending, longLink: cstring(body) };
+    default:
+      return pending;
+  }
+}
+
+/** The header of one entry of a tar archive: its path (a folder's with no trailing `/`), kind, mode, size of body, time and link target. */
+export type TarHeader = {
+  readonly path: string;
+  readonly kind: TarEntry["kind"];
+  readonly mode: number;
+  readonly size: number;
+  /** Seconds since 1970, as the header (or a pax `mtime`) gives them. */
+  readonly mtime: number;
+  readonly linkName: string;
+};
+
+/** The entry a header names, after what pending headers said; undefined for the archive's own folder (`.`); or why it is refused. */
+function entryHeader(raw: RawHeader, pending: Pending, size: number): Result<TarHeader | undefined, ArchiveError> {
+  const h = raw.block;
+  const isUstar = cstring(h.subarray(257, 263)).startsWith("ustar");
+  const prefix = isUstar ? cstring(h.subarray(345, 500)) : "";
+  const name =
+    pending.pax.get("path") ??
+    pending.longName ??
+    (prefix === "" ? cstring(h.subarray(0, 100)) : `${prefix}/${cstring(h.subarray(0, 100))}`);
+  const linkName = pending.pax.get("linkpath") ?? pending.longLink ?? cstring(h.subarray(157, 257));
+  const paxTime = Number.parseFloat(pending.pax.get("mtime") ?? "");
+  const mtime = Number.isFinite(paxTime) ? paxTime : raw.mtime;
+  const path = name.replace(/^\.\//, "").replace(/\/$/, "");
+  if (path === "" || path === ".") return ok(undefined);
+  if (!isSafePath(path)) return err({ kind: "unsafe-path", path: name });
+  let kind: TarEntry["kind"];
+  switch (raw.type) {
+    case "0":
+    case "\0":
+    case "7":
+      kind = name.endsWith("/") ? "directory" : "file";
+      break;
+    case "5":
+      kind = "directory";
+      break;
+    case "2":
+      kind = "symlink";
+      break;
+    case "1":
+      kind = "hardlink";
+      break;
+    default:
+      return unsupported(`the entry ${JSON.stringify(path)} has type ${JSON.stringify(raw.type)}`);
+  }
+  return ok({ path, kind, mode: raw.mode, size, mtime, linkName });
+}
+
 /** The entries of a tar archive (ustar, with pax extended headers and GNU long names), each header's checksum checked and each path checked safe. */
 export function untar(data: Uint8Array): Result<readonly TarEntry[], ArchiveError> {
   const entries: TarEntry[] = [];
   let at = 0;
-  let longName: string | undefined;
-  let longLink: string | undefined;
-  let pax: ReadonlyMap<string, string> = new Map();
+  let pending = NO_PENDING;
   while (at + 512 <= data.length) {
     const h = data.subarray(at, at + 512);
-    if (h.every((b) => b === 0)) return ok(entries);
-    const stored = readNumber(h.subarray(148, 156));
-    let sum = 0;
-    for (let i = 0; i < 512; i++) sum += i >= 148 && i < 156 ? 0x20 : (h[i] ?? 0);
-    if (stored !== sum) return damaged(`the header at byte ${at} has a wrong checksum`);
-    const size = readNumber(h.subarray(124, 136));
-    const mode = readNumber(h.subarray(100, 108));
-    if (size === undefined || mode === undefined) return damaged(`the header at byte ${at} has a field that is not a number`);
-    const type = String.fromCharCode(h[156] ?? 0);
+    if (isZeroBlock(h)) return ok(entries);
+    const raw = readHeader(h, at);
+    if (raw.kind === "err") return raw;
+    const length = bodyLength(raw.value, pending, at);
+    if (length.kind === "err") return length;
     const bodyAt = at + 512;
-    const paxSize = pax.get("size");
-    const length = paxSize === undefined ? size : Number.parseInt(paxSize, 10);
-    if (bodyAt + length > data.length) return damaged(`the entry at byte ${at} runs past the end`);
-    const body = data.subarray(bodyAt, bodyAt + length);
-    at = bodyAt + Math.ceil(length / 512) * 512;
-    switch (type) {
-      case "x":
-        pax = paxRecords(body);
-        continue;
-      case "g":
-        continue;
-      case "L":
-        longName = cstring(body);
-        continue;
-      case "K":
-        longLink = cstring(body);
-        continue;
+    if (bodyAt + length.value > data.length) return damaged(`the entry at byte ${at} runs past the end`);
+    const body = data.subarray(bodyAt, bodyAt + length.value);
+    at = bodyAt + padded(length.value);
+    if (isMetaType(raw.value.type)) {
+      pending = pendingAfter(raw.value.type, body, pending);
+      continue;
     }
-    const isUstar = cstring(h.subarray(257, 263)).startsWith("ustar");
-    const prefix = isUstar ? cstring(h.subarray(345, 500)) : "";
-    const name = pax.get("path") ?? longName ?? (prefix === "" ? cstring(h.subarray(0, 100)) : `${prefix}/${cstring(h.subarray(0, 100))}`);
-    const linkName = pax.get("linkpath") ?? longLink ?? cstring(h.subarray(157, 257));
-    pax = new Map();
-    longName = undefined;
-    longLink = undefined;
-    const path = name.replace(/^\.\//, "").replace(/\/$/, "");
-    if (path === "" || path === ".") continue;
-    if (!isSafePath(path)) return err({ kind: "unsafe-path", path: name });
-    let kind: TarEntry["kind"];
-    switch (type) {
-      case "0":
-      case "\0":
-      case "7":
-        kind = name.endsWith("/") ? "directory" : "file";
-        break;
-      case "5":
-        kind = "directory";
-        break;
-      case "2":
-        kind = "symlink";
-        break;
-      case "1":
-        kind = "hardlink";
-        break;
-      default:
-        return unsupported(`the entry ${JSON.stringify(path)} has type ${JSON.stringify(type)}`);
-    }
+    const e = entryHeader(raw.value, pending, length.value);
+    pending = NO_PENDING;
+    if (e.kind === "err") return e;
+    if (e.value === undefined) continue;
+    const { path, kind, mode, linkName } = e.value;
     entries.push({ path, kind, mode, data: kind === "file" ? body : new Uint8Array(), linkName });
   }
   return damaged("it ends without the two zero blocks of a tar archive");
+}
+
+/** An archive error raised as an `Error`, which is how a stream reports one: the error itself is in `error`. */
+export class ArchiveFailure extends Error {
+  /** Why the archive could not be read. */
+  readonly error: ArchiveError;
+  /** An `Error` for the archive error, its message the error's sentence. */
+  constructor(error: ArchiveError) {
+    super(formatArchiveError(error));
+    this.name = "ArchiveFailure";
+    this.error = error;
+  }
+}
+
+/**
+ * One entry of a tar archive read as a stream: its header and its body as a stream (empty but for a file). The body MUST be read to its
+ * end or cancelled before the next entry is given, as with `@std/tar`'s `UntarStream`.
+ */
+export type TarStreamEntry = TarHeader & { readonly readable: ReadableStream<Uint8Array> };
+
+/** The largest body of a pax or GNU long-name header read: such a header names one entry, and a larger one is refused as damaged. */
+const MAX_META = 1 << 20;
+
+/** Bytes read from a stream as they are asked for, a chunk at a time, holding no more than one chunk. */
+class ByteSource {
+  readonly #reader: ReadableStreamDefaultReader<Uint8Array>;
+  #chunk: Uint8Array;
+  constructor(reader: ReadableStreamDefaultReader<Uint8Array>, first: Uint8Array = new Uint8Array()) {
+    this.#reader = reader;
+    this.#chunk = first;
+  }
+  /** At least one byte and at most `max` (more than 0), or undefined at the end. */
+  async some(max: number): Promise<Uint8Array | undefined> {
+    while (this.#chunk.length === 0) {
+      const r = await this.#reader.read();
+      if (r.done) return undefined;
+      this.#chunk = r.value;
+    }
+    const out = this.#chunk.subarray(0, max);
+    this.#chunk = this.#chunk.subarray(out.length);
+    return out;
+  }
+  /** `n` bytes, or fewer where the stream ends first. */
+  async exactly(n: number): Promise<Uint8Array> {
+    const parts: Uint8Array[] = [];
+    let got = 0;
+    while (got < n) {
+      const part = await this.some(n - got);
+      if (part === undefined) break;
+      parts.push(part);
+      got += part.length;
+    }
+    return parts.length === 1 && parts[0] !== undefined ? parts[0] : concat(parts);
+  }
+  /** Passes over `n` bytes; false where the stream ends first. */
+  async skip(n: number): Promise<boolean> {
+    for (let left = n; left > 0;) {
+      const part = await this.some(left);
+      if (part === undefined) return false;
+      left -= part.length;
+    }
+    return true;
+  }
+  /** Reads to the end, so that a gzip stream's CRC is checked. */
+  async drain(): Promise<void> {
+    while ((await this.some(Number.MAX_SAFE_INTEGER)) !== undefined);
+  }
+  cancel(reason: unknown): Promise<void> {
+    return this.#reader.cancel(reason);
+  }
+  /** The rest of the bytes as a stream of their own, this source no longer read. */
+  rest(): ReadableStream<Uint8Array> {
+    const reader = this.#reader;
+    const first = this.#chunk;
+    return new ReadableStream<Uint8Array>(
+      {
+        start(controller) {
+          if (first.length > 0) controller.enqueue(first);
+        },
+        async pull(controller) {
+          const r = await reader.read();
+          if (r.done) controller.close();
+          else controller.enqueue(r.value);
+        },
+        cancel(reason) {
+          return reader.cancel(reason);
+        },
+      },
+      { highWaterMark: 0 },
+    );
+  }
+}
+
+/** The tar bytes of a stream: the stream itself, or what it decompresses to where it begins with gzip's magic bytes `1f 8b`. */
+async function tarBytes(stream: ReadableStream<Uint8Array>): Promise<ByteSource> {
+  const peek = new ByteSource(stream.getReader());
+  const head = await peek.exactly(2);
+  const start = new ByteSource(peek.rest().getReader(), head);
+  if (head[0] !== 0x1f || head[1] !== 0x8b) return start;
+  const raw = start.rest() as ReadableStream<Uint8Array<ArrayBuffer>>; // what DecompressionStream's writable takes; the bytes are the same
+  return new ByteSource(raw.pipeThrough(new DecompressionStream("gzip")).getReader());
+}
+
+const failure = (e: unknown): ArchiveFailure =>
+  e instanceof ArchiveFailure ? e : new ArchiveFailure({ kind: "damaged", message: e instanceof Error ? e.message : String(e) });
+
+const emptyStream = (): ReadableStream<Uint8Array> =>
+  new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.close();
+    },
+  });
+
+/**
+ * The entries of a tar archive given as a stream of bytes, gzipped or not (told by its first two bytes), one at a time as they are asked
+ * for, so that an archive larger than memory is read with one chunk held (commons 0005-typescript-runtime FR-059). Every header is checked
+ * as `untar` checks it (checksum, pax and GNU long names, a safe path); a failure errors the stream with an `ArchiveFailure`. Each entry's
+ * `readable` MUST be read to its end or cancelled before the next entry is given; cancelling the stream of entries cancels the bytes.
+ */
+export function readTarStream(stream: ReadableStream<Uint8Array>): ReadableStream<TarStreamEntry> {
+  let source: ByteSource | undefined;
+  let pending = NO_PENDING;
+  let at = 0;
+  let skipNext = 0;
+  let bodyDone: Promise<void> = Promise.resolve();
+  let broken: ArchiveFailure | undefined;
+  const next = async (src: ByteSource): Promise<TarStreamEntry | undefined> => {
+    await bodyDone;
+    if (broken !== undefined) throw broken;
+    if (!(await src.skip(skipNext)))
+      throw new ArchiveFailure({ kind: "damaged", message: `the entry before byte ${at} runs past the end` });
+    skipNext = 0;
+    for (;;) {
+      const h = await src.exactly(512);
+      if (h.length < 512) throw new ArchiveFailure({ kind: "damaged", message: "it ends without the two zero blocks of a tar archive" });
+      if (isZeroBlock(h)) {
+        await src.drain();
+        return undefined;
+      }
+      const raw = readHeader(h, at);
+      if (raw.kind === "err") throw new ArchiveFailure(raw.error);
+      const length = bodyLength(raw.value, pending, at);
+      if (length.kind === "err") throw new ArchiveFailure(length.error);
+      const here = at;
+      const size = length.value;
+      const pad = padded(size) - size;
+      at += 512 + padded(size);
+      const pastEnd = new ArchiveFailure({ kind: "damaged", message: `the entry at byte ${here} runs past the end` });
+      if (isMetaType(raw.value.type)) {
+        if (size > MAX_META)
+          throw new ArchiveFailure({ kind: "damaged", message: `the extended header at byte ${here} is larger than 1 MiB` });
+        const body = await src.exactly(size);
+        if (body.length < size || !(await src.skip(pad))) throw pastEnd;
+        pending = pendingAfter(raw.value.type, body, pending);
+        continue;
+      }
+      const e = entryHeader(raw.value, pending, size);
+      pending = NO_PENDING;
+      if (e.kind === "err") throw new ArchiveFailure(e.error);
+      if (e.value === undefined || e.value.kind !== "file" || size === 0) {
+        if (!(await src.skip(size + pad))) throw pastEnd;
+        if (e.value === undefined) continue;
+        return { ...e.value, readable: emptyStream() };
+      }
+      let remaining = size;
+      skipNext = pad;
+      let finish = (): void => {};
+      bodyDone = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      const readable = new ReadableStream<Uint8Array>(
+        {
+          async pull(controller) {
+            let part: Uint8Array | undefined;
+            try {
+              part = await src.some(remaining);
+            } catch (thrown) {
+              part = undefined;
+              broken = failure(thrown);
+            }
+            if (part === undefined) {
+              broken ??= pastEnd;
+              controller.error(broken);
+              finish();
+              return;
+            }
+            remaining -= part.length;
+            controller.enqueue(part);
+            if (remaining === 0) {
+              controller.close();
+              finish();
+            }
+          },
+          cancel() {
+            skipNext += remaining;
+            remaining = 0;
+            finish();
+          },
+        },
+        { highWaterMark: 0 },
+      );
+      return { ...e.value, readable };
+    }
+  };
+  return new ReadableStream<TarStreamEntry>(
+    {
+      async pull(controller) {
+        try {
+          source ??= await tarBytes(stream);
+          const e = await next(source);
+          if (e === undefined) controller.close();
+          else controller.enqueue(e);
+        } catch (thrown) {
+          const f = failure(thrown);
+          await (source === undefined ? stream.cancel(f) : source.cancel(f)).catch(() => undefined);
+          throw f;
+        }
+      },
+      async cancel(reason) {
+        await (source === undefined ? stream.cancel(reason) : source.cancel(reason));
+      },
+    },
+    { highWaterMark: 0 },
+  );
+}
+
+/**
+ * A stream from a tar archive's bytes, gzipped or not, to its entries, to put in a `pipeThrough` as `@std/tar`'s `UntarStream` is: see
+ * `readTarStream` for what it checks and how each entry's body is read (commons 0005-typescript-runtime FR-059).
+ *
+ * @example
+ * ```ts
+ * for await (const entry of file.readable.pipeThrough(untarStream())) {
+ *   if (entry.path === "bin/tool") await save(entry.readable);
+ *   else await entry.readable.cancel();
+ * }
+ * ```
+ */
+export function untarStream(): ReadableWritablePair<TarStreamEntry, Uint8Array> {
+  const input = new TransformStream<Uint8Array, Uint8Array>();
+  return { writable: input.writable, readable: readTarStream(input.readable) };
 }
 
 /** The files of a list of tar entries, by path: folders and links left out. */
