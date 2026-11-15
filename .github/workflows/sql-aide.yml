@@ -1,0 +1,53 @@
+name: sql-aide
+
+# IFC SQL Aide and the libraries that accept it, Arca and Data Vault (commons 0009-sql-aide): checked by the TypeScript 7 compiler and tested under Bun and under
+# Node, on SQLite, DuckDB, PGlite and a PostgreSQL server that exists only for this run (the runner's own, with pgTAP; its password is the runner's and guards
+# nothing). The formatter is run on all of commons/ts by ifc-typescript.yml.
+on:
+  push:
+    paths:
+      - "commons/ts/**"
+      - "commons/spec-kit/**"
+      - ".github/workflows/sql-aide.yml"
+      - ".github/actions/bun/**"
+  pull_request:
+    paths:
+      - "commons/ts/**"
+      - "commons/spec-kit/**"
+      - ".github/workflows/sql-aide.yml"
+      - ".github/actions/bun/**"
+
+permissions:
+  contents: read
+
+jobs:
+  data:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: A PostgreSQL for the run, with pgTAP
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-16-pgtap
+          sudo systemctl start postgresql
+          sudo -u postgres psql -qc "alter user postgres password 'postgres'"
+          echo "IFCSQL_PG_URL=postgres://postgres:postgres@127.0.0.1:5432/postgres" >>"$GITHUB_ENV"
+      - name: The engines' own clients, for the databases made from .auto.sql (sqlite3 is the runner's; the duckdb client is pinned and checked)
+        run: |
+          sqlite3 --version
+          curl --fail --silent --show-error --location --retry 3 -o "$RUNNER_TEMP/duckdb.tar.gz" https://install.duckdb.org/v2.0.0/duckdb-cli-linux-amd64.tar.gz
+          echo "c6507206baf7793c6013dbd82368469a45f20dc0e17a6f92f204602f652ed2bc  $RUNNER_TEMP/duckdb.tar.gz" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/duckdb" && tar -xzf "$RUNNER_TEMP/duckdb.tar.gz" -C "$RUNNER_TEMP/duckdb"
+          echo "$RUNNER_TEMP/duckdb" >>"$GITHUB_PATH"
+      - name: What IFC TypeScript and the data libraries install for checking and testing
+        run: |
+          bun install --frozen-lockfile
+          cd data && bun install --frozen-lockfile
+        working-directory: commons/ts
+      - name: The TypeScript 7 compiler, the documentation maps, then every test under Bun
+        run: bun run verify
+        working-directory: commons/ts/data
+      - name: The same tests under Node
+        run: bun run test:node
+        working-directory: commons/ts/data

@@ -112,6 +112,10 @@ proves([FR], "temporary folders and files, rename, copy, chmod, links, realPath,
     await fs.writeTextFile(join(dir, "m.txt"), "content");
     await fs.copyFile(join(dir, "m.txt"), join(dir, "copy.txt"));
     assertEquals(await fs.readTextFile(join(dir, "copy.txt")), "content");
+    await fs.link(join(dir, "m.txt"), join(dir, "second.txt"));
+    assertEquals(await fs.readTextFile(join(dir, "second.txt")), "content");
+    await assertRejects(() => fs.link(join(dir, "m.txt"), join(dir, "copy.txt")), errors.AlreadyExists);
+    await fs.remove(join(dir, "second.txt"));
     await fs.truncate(join(dir, "copy.txt"), 3);
     assertEquals(await fs.readTextFile(join(dir, "copy.txt")), "con");
     await fs.utime(join(dir, "copy.txt"), new Date(1_000_000_000_000), new Date(1_000_000_000_000));
