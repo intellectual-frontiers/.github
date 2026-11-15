@@ -53,35 +53,6 @@ jobs:
       - name: The tests of the setup and of commons
         run: deno test -A
 
-  # commons/ts (commons 0005-sql-aide): SQL Aide and the libraries that accept it, checked by the TypeScript 7 compiler and tested under Bun and under Node, on SQLite,
-  # DuckDB, PGlite and a PostgreSQL server that exists only for this run (the runner's own, with pgTAP; its password is the runner's and guards nothing).
-  sql-aide:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: commons/ts
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 26
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.4.4
-      - name: A PostgreSQL for the run, with pgTAP
-        run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-16-pgtap
-          sudo systemctl start postgresql
-          sudo -u postgres psql -qc "alter user postgres password 'postgres'"
-          echo "IFCSQL_PG_URL=postgres://postgres:postgres@127.0.0.1:5432/postgres" >>"$GITHUB_ENV"
-      - name: What checking and testing install
-        run: bun install --frozen-lockfile
-      - name: The TypeScript 7 compiler, then every test under Bun
-        run: bun run check
-      - name: The same tests under Node
-        run: bun run test:node
-
   # Windows: bin/erga-bootstrap.ps1 gets the Windows Deno into erga's store and hands over; the Windows side (WSL, the user, PostgreSQL read only) is tested with
   # stand-ins for wsl.exe and the registry, and its dry run runs for real.
   windows:

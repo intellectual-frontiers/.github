@@ -41,7 +41,7 @@ Deno.test("commons' own folder is clean from the command line, with no configura
   const p = await run([]);
   assertEquals([p.code, p.stdout, p.stderr], [0, "", ""]);
   using bad = Kit.make();
-  bad.edit("registry.tsv", "0003\tspec-kit", "0009\tspec-kit");
+  bad.edit("registry.tsv", "0003\tspec-kit", "0005\tspec-kit");
   const q = await run(["--root", bad.root]);
   assertEquals(q.code, 1);
   assertStringIncludes(q.stderr, "registry.tsv");
@@ -50,10 +50,10 @@ Deno.test("commons' own folder is clean from the command line, with no configura
 
 Deno.test("a gap, a repeated number and a missing folder in the register (0003-spec-kit FR-001)", () => {
   using k = Kit.make();
-  k.edit("registry.tsv", "0005\tsql-aide\tin force", "0005\tsql-aide\tin force\n0005\tother\tin force\n0007\tnone\tin force");
+  k.edit("registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0007\tnone\tin force");
   const out = k.findings();
   assertStringIncludes(out, "assigned twice");
-  assertStringIncludes(out, "gap at 0006");
+  assertStringIncludes(out, "gap at 0005");
   assertStringIncludes(out, "0007-none is in force but its specification does not exist");
 });
 
