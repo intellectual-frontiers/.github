@@ -17,11 +17,11 @@
 
 ## The algebra
 
-- **FR-006**: A segment MUST be one case of a tagged union that carries the TypeScript type of its values: a literal; an enumeration of literals; a slug; a ULID; a UUID; an integer, with its width where it is padded; a date or a time in a stated format, alone or as a `name=value` partition; a digest, with its algorithm and length; a fan-out of the first characters of another segment of the same path; and a custom segment, whose parse and format the caller gives and whose type MAY be branded.
+- **FR-006**: A segment MUST be one case of a tagged union that carries the TypeScript type of its values: a literal; an enumeration of literals; a slug; a ULID; a UUID; an integer, with its width where it is padded; a date or a time in a stated format, alone or as a `name=value` partition; a digest, with its algorithm and length; a fan-out of the first characters of another segment of the same path; a file name, any one element of a path; the rest of a path, one or more elements, which MAY be only the last interpolation of a pattern and MAY name first elements it does not take; and a custom segment, whose parse and format the caller gives and whose type MAY be branded. No segment but the rest of a path holds a `/`.
 - **FR-007**: A path pattern MUST be written with the tagged template `path`, whose interpolations are segments and whose text is literal. A segment MAY share an element of a path with literal text and other segments (`${slug}.${extension}`), but two segments side by side with no literal between them MUST NOT both have a variable length. A pattern MUST give `parse`, from text to a key or a failure, and `format`, from a key to text, such that `parse(format(k))` is `k` for every key and `format(parse(t))` is `t` for every text `parse` accepts; the tests MUST state both laws as properties.
 - **FR-008**: The type of a pattern's key MUST be computed from its segments, in order, by mapping over the tuple of its interpolations, so that a key that lacks a field, has one more, or holds a value of the wrong type fails to compile. It MUST NOT be computed by parsing a template literal type.
 - **FR-009**: An entry MUST be a value with a name, a path pattern, a content codec (bytes, UTF-8 text, the kernel's JSON5, or a decoder and an encoder the caller gives that return a `Result`), a description and an owner. The library MUST NOT carry a codec of any other format.
-- **FR-010**: A layout MUST be a union of entries under a root, and MAY mount another layout under a literal prefix. Making a layout MUST fail, as a value that names both entries and a path they both match, where the patterns of two entries can match the same path. Matching a path against a layout MUST give exactly one entry and its key, or `unmatched`.
+- **FR-010**: A layout MUST be a union of entries under a root, and MAY mount another layout under a literal prefix. Each segment MUST give witnesses, a few values of its own, and making a layout MUST fail, as a value that names both entries and the path, where a path formatted from one entry's witnesses is matched by another entry's pattern. Matching a path against a layout MUST give exactly one entry and its key, or `unmatched`.
 - **FR-011**: A path that a store holds and that no entry matches MUST be given as an `unmatched` value with its path and metadata wherever a store is listed, read or checked, never thrown and never left out without saying so.
 
 ## Names
@@ -77,9 +77,9 @@
 
 - **FR-037**: The library MUST give SQL Aide a column domain for a reference to a file of an entry (its path, version tag and digest), typed by the entry, and MUST make a query's rows a source of SQL Aide's source-adapter hook (0009-sql-aide FR-034), so that a listing lands in a relation and SQL does what this query language does not.
 
-## The layouts that accept it
+## The layout that accepts it
 
-- **FR-038**: Two layouts in the tests MUST accept the library, on the three drivers under Bun and Node: editions (works whose files are published whole as editions, FR-034) and files with manifests (records whose files carry manifests and are erased by tombstones). A phase of the library is done only where both pass what that phase adds.
+- **FR-038**: The IF Renditions File System (IFRFS), the layout of the folder erga's `publication sync` fills (erga's 250-ergactl-publication), MUST be modelled in `commons/ts/data/ifrfs/` with File Aide's public entry point (`commons/ts/data/file-aide/mod.ts`) alone, and MUST accept the library: `README.md` at its root, whose first line is the marker the sync writes; each work's files at `<kind>/<slug>/<rest>`, the kind one of an enumeration, the slug lowercase words joined by hyphens, and the rest any path of names below the work's folder but `issues.d/`; and each work's issues at `<kind>/<slug>/issues.d/<id>.json5`, the id a ULID. Its tests MUST run on a synthetic tree committed beside them and on broken copies of it, on every driver built, under Bun and Node, and a phase of the library is done only where IFRFS passes what that phase adds. IFRFS MUST NOT import anything of erga, and erga is not needed to test it.
 
 ## Out of scope
 
@@ -95,6 +95,8 @@
 - Two entries, `${slug}.pdf` and `${name}.${extension}`, can match `a.pdf`: the layout is not made, per FR-010.
 - A bucket holds a file its layout does not know: it is listed and checked as unmatched, per FR-011 and FR-032.
 - A key's value holds `..` or a `/`: the path is refused before any store is reached, per FR-012.
+- A work's file is at `site/index.html` below its folder: it is matched by the rest of the path, and `issues.d/<id>.json5` is matched as an issue and not as a file, per FR-006 and FR-038.
+- A folder's `README.md` lacks the sync's marker line: IFRFS's check reports it, per FR-032 and FR-038.
 - Two slugs differ only in case and one store folds case: the check reports both, per FR-013.
 - Two writers put the same new file at once: one writes and the other is answered conflict, per FR-016.
 - A process dies while writing to a folder: no reader sees part of the file, per FR-017 and FR-035.
@@ -115,7 +117,8 @@
 - The library is released as SQL Aide is, and with it (0009-sql-aide OQ-2).
 - The S3-compatible providers it is used with honour `If-None-Match: *` and `If-Match` on a write; a provider that does not is not given the conditional-write capability (FR-015, FR-016).
 - Git's ignore rules are those of the `gitignore` manual page; `fd`'s behaviour is that of the version the tests name.
-- A single `PUT` carries a file of up to 5 GiB, which covers the files the acceptance layouts hold.
+- A single `PUT` carries a file of up to 5 GiB, which covers the files IFRFS holds.
+- IFRFS's layout is not confidential, by the owner's decision of 2026-11-15; it is stated here so that erga can use the model when it moves to File Aide, and File Aide is decoupled from erga until then.
 
 ## Open questions
 
@@ -137,11 +140,12 @@
 - **Ignore file** - a `.gitignore` or a `.faignore` of the tree being walked.
 - **Check** - a layout's rules run against a store, with findings as data.
 - **Recipe** - a plan of steps for a write that needs more than one.
+- **IFRFS** - the IF Renditions File System, the layout that accepts the library.
 
 ## Success criteria
 
 - **SC-001**: In `commons/ts/data`, `bun run verify` and `bun run test:node` pass with the library's tests among them, on a computer with Bun and Node.
-- **SC-002**: The two layouts of FR-038 give the same rows for the same queries on `memory`, `posix` and the local S3 server.
+- **SC-002**: IFRFS's tree gives the same rows for the same queries on `memory`, `posix` and the local S3 server.
 - **SC-003**: A query with its leading keys bound has a plan that does not read everything under its root, and its `explain` says so.
 - **SC-004**: A query on a root with no layout gives the same paths as `fd` with the same filters, and takes no more than a few times as long.
 - **SC-005**: The library stays near 3,000 lines without its tests, its query language near 700 of them; this is guidance to keep it thin, not a limit.
@@ -149,5 +153,5 @@
 ## Review & acceptance checklist
 
 - [x] Every requirement is testable (MUST / MUST NOT), not aspirational
-- [x] No company fact is asserted here
+- [x] No confidential company fact is asserted here: IFRFS's layout is public by the owner's decision
 - [x] Every open item is marked, not silently decided

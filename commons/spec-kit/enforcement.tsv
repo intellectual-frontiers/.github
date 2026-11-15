@@ -231,4 +231,4 @@ requirement	mechanism	by	note
 0010-file-aide FR-035	none	-	Not whole yet: the suite starts in phase 2 with memory and posix, takes the local S3 server in phase 4 and fault injection in phase 5; this row names its check when phase 5 lands.
 0010-file-aide FR-036	none	-	Not built yet: the real-provider tests come in phase 4 and the comparison with fd in phase 3; this row names its check when phase 4 lands.
 0010-file-aide FR-037	none	-	Not built yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-038	none	-	Not built yet: each phase adds what the two layouts must pass, and this row names its check when phase 6 lands.
+0010-file-aide FR-038	none	-	Not whole yet: IFRFS (commons/ts/data/ifrfs/) passes what each phase adds, and this row names its check when phase 6 lands.
