@@ -126,7 +126,7 @@ ISLM) or ephemeral (the TypeScript is the system of record and the database a bu
 plan, apply and teardown do not compile with an ephemeral context. `buildSql` writes the one `.auto.sql` of an ephemeral target, which
 is committed; the database is not (see [`.gitignore`](.gitignore)), and `materialize` (in `sql-aide/runtime/build.ts`) makes it
 through a driver in a temporary file renamed over the old one. `clientCommand` gives the command for `sqlite3`, `duckdb` or `psql`;
-only `psql` is on the computer the tests ran on, so the other two commands were not run (FR-054 stays open for that). `staleFiles` and
+each was run with the publisher's own client (`sqlite3` 3.54.1, the `duckdb` client 2.0.0, `psql` 16) and the database read back; a test says so where a client is not installed. `staleFiles` and
 `cli check` fail on a committed file that is not what the source makes, and `sizeFindings` reports a build past a number of rows.
 A PGlite target is a folder, removed before the new one is renamed into its place, so for that moment a reader finds none.
 

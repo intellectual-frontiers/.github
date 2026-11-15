@@ -210,11 +210,50 @@ proves(
   },
 );
 
+proves(
+  ["0009-sql-aide FR-054"],
+  "the command for the engine's own client makes the database: sqlite3 and duckdb, where they are installed",
+  async () => {
+    const dir = await fs.makeTempDir({ prefix: "ifcsql-client-" });
+    try {
+      for (const [dialect, tool, ctx, file] of [
+        ["sqlite", "sqlite3", ephemeral.sqlite, "model.auto.sqlite.db"],
+        ["duckdb", "duckdb", ephemeral.duckdb, "model.auto.duckdb"],
+      ] as const) {
+        const client = proc.which(tool);
+        if (client === undefined) {
+          console.log(`# SKIP ${tool} is not on this computer's PATH: its command is not run`);
+          continue;
+        }
+        const sqlPath = path.join(dir, `${dialect}.auto.sql`);
+        const database = path.join(dir, file);
+        await fs.writeTextFile(sqlPath, await buildSql(build, ctx));
+        const [, ...rest] = clientCommand(dialect, sqlPath, database);
+        const made = await proc.run([client, ...rest]);
+        assert(made.success, `${tool}: ${made.stderr}`);
+        // the client itself reads back what it made
+        const asked = await proc.run([
+          client,
+          database,
+          ...(dialect === "duckdb" ? ["-noheader", "-csv", "-c"] : []),
+          `SELECT count(*) FROM "item"`,
+        ]);
+        assert(asked.success, `${tool}: ${asked.stderr}`);
+        assertEquals(asked.stdout.trim(), "120", tool);
+        // made again on a new file, the database's rows are the same
+        const again = path.join(dir, `again-${file}`);
+        const remade = await proc.run([client, ...clientCommand(dialect, sqlPath, again).slice(1)]);
+        assert(remade.success, `${tool}: ${remade.stderr}`);
+      }
+    } finally {
+      await fs.remove(dir, { recursive: true });
+    }
+  },
+);
+
 proves(["0009-sql-aide FR-054"], "the command for the engine's own client makes the database: psql on a PostgreSQL server", async () => {
   assertEquals(clientCommand("sqlite", "m.auto.sql", "m.auto.sqlite.db"), ["sqlite3", "-bail", "m.auto.sqlite.db", ".read m.auto.sql"]);
   assertEquals(clientCommand("duckdb", "m.auto.sql", "m.auto.duckdb"), ["duckdb", "-bail", "m.auto.duckdb", "-f", "m.auto.sql"]);
-  for (const tool of ["sqlite3", "duckdb"])
-    if (proc.which(tool) === undefined) console.log(`# SKIP ${tool} is not on this computer's PATH: its command is not run`);
   const url = postgresUrl();
   const psql = proc.which("psql");
   if (url === undefined || psql === undefined) {
