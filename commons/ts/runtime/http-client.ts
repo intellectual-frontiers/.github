@@ -1,11 +1,12 @@
 /**
  * How a typed client reaches a system over HTTP (commons 0005-typescript-runtime FR-040): a transport, live (`fetch`) or recorded (the
  * exchanges a test keeps, so it reaches no host), and over it the guards and helpers every client otherwise rewrites: a read-only guard
- * (safe methods only, and POST to the token endpoints named), backoff on 429 and 503 that honours `Retry-After`, a JSON read decoded at the
- * boundary with typed failures (a denied call is told apart, so a caller can record a gap instead of failing), and every item of a list
- * that pages by `Link: rel="next"` or by a cursor in the body. A request that carries a credential is refused before it is sent unless the
- * transport is made to allow it, so a harness whose proxy injects credentials never sends one by mistake. Taken from erga's
- * `lib/ts/http-client` and Stolos's connector SDK (`src/archon/connect/sdk.ts`, `connector.ts`).
+ * (safe methods only, POST to the token endpoints named, and the POSTs a predicate says only read, FR-066), AWS Signature Version 4 on each
+ * request (FR-069), backoff on 429 and 503 that honours `Retry-After`, a JSON read decoded at the boundary with typed failures (a denied
+ * call is told apart, so a caller can record a gap instead of failing), and every item of a list that pages by `Link: rel="next"` or by a
+ * cursor in the body. A request that carries a credential is refused before it is sent unless the transport is made to allow it, so a
+ * harness whose proxy injects credentials never sends one by mistake. Taken from erga's `lib/ts/http-client` and Stolos's connector SDK
+ * (`src/archon/connect/sdk.ts`, `connector.ts`).
  *
  * @example
  * ```ts
@@ -22,6 +23,7 @@ import { array, type Decoder, formatDecodeError, json, literal, number, object, 
 import { isSafeMethod, nextLink, retryAfterMs } from "../kernel/http.ts";
 import { formatJson5Error, parseJson5, toJson5 } from "../kernel/json5.ts";
 import { err, ok, type Result } from "../kernel/result.ts";
+import { type AwsCredentials, sign } from "../kernel/sigv4.ts";
 import { traceHttpClient } from "./otel.ts";
 import { sleep } from "./proc.ts";
 
@@ -140,13 +142,54 @@ export function recordedTransport(exchanges: readonly Exchange[]): Transport {
   };
 }
 
-/** A transport that sends only safe methods (GET, HEAD, ...), and POST to URLs that start with one of `tokenEndpoints`. */
-export function readOnly(t: Transport, tokenEndpoints: readonly string[] = []): Transport {
+/**
+ * Whether a `POST` only reads (FR-066): a GraphQL query, a search, a JSON API's `Describe` and `Get` actions. It is given the whole
+ * request (method, URL, headers and body), as an action may be named in a header (`x-amz-target`) or the body.
+ */
+export type ReadPost = (r: OutRequest) => boolean;
+
+/**
+ * A transport that sends only safe methods (GET, HEAD, ...), POST to URLs that start with one of `tokenEndpoints`, and the POSTs that
+ * `readPost` says only read (FR-066). Every other request (PUT, PATCH, DELETE, any other POST) is refused without being sent.
+ */
+export function readOnly(t: Transport, tokenEndpoints: readonly string[] = [], readPost?: ReadPost): Transport {
   return {
     kind: t.kind,
     send(r) {
-      if (isSafeMethod(r.method) || (r.method === "POST" && tokenEndpoints.some((p) => r.url.startsWith(p)))) return t.send(r);
+      const post = r.method === "POST" && (tokenEndpoints.some((p) => r.url.startsWith(p)) || readPost?.(r) === true);
+      if (isSafeMethod(r.method) || post) return t.send(r);
       return Promise.resolve(err({ kind: "refused", message: `read-only: ${r.method} ${new URL(r.url).origin} is refused` }));
+    },
+  };
+}
+
+/** How {@link withSigV4} signs. */
+export type SigV4TransportOptions = {
+  readonly credentials: AwsCredentials;
+  readonly region: string;
+  readonly service: string;
+  /** The clock read as each request is sent (`new Date()` by default; a test gives its own). */
+  readonly now?: () => Date;
+  /** Sign `UNSIGNED-PAYLOAD` instead of the body's hash (S3 allows it). */
+  readonly unsignedPayload?: boolean;
+};
+
+/**
+ * A transport that signs each request by AWS Signature Version 4 (FR-069, by the kernel's `sigv4`, FR-068) when it is sent. A signed
+ * request carries a credential, so the live transport under it must be made with `credentials: "allow"`, or it refuses the request.
+ */
+export function withSigV4(t: Transport, options: SigV4TransportOptions): Transport {
+  return {
+    kind: t.kind,
+    async send(r) {
+      const signed = await sign(r, {
+        credentials: options.credentials,
+        region: options.region,
+        service: options.service,
+        date: (options.now ?? (() => new Date()))(),
+        ...(options.unsignedPayload === undefined ? {} : { unsignedPayload: options.unsignedPayload }),
+      });
+      return await t.send({ ...r, headers: signed.headers });
     },
   };
 }

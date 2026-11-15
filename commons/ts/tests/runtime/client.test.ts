@@ -6,6 +6,7 @@
  * @module
  */
 import { array, integer, nullable, object, string } from "../../kernel/decode.ts";
+import { sign } from "../../kernel/sigv4.ts";
 import { exists, readTextFile, withTempDir, writeTextFile } from "../../runtime/fs.ts";
 import {
   bearer,
@@ -18,9 +19,11 @@ import {
   linkPages,
   liveTransport,
   readOnly,
+  type ReadPost,
   recordedText,
   recordedTransport,
   withBackoff,
+  withSigV4,
 } from "../../runtime/http-client.ts";
 import { acquireLock, describeHolder, processRuns, readHolder } from "../../runtime/lock.ts";
 import { join } from "../../runtime/path.ts";
@@ -95,6 +98,77 @@ proves([CLIENT], "a credential is refused before anything is sent unless the tra
     },
   );
 });
+
+proves(
+  ["0005-typescript-runtime FR-066"],
+  "read-only lets through the POSTs its predicate says only read, and refuses every other write",
+  async () => {
+    const sent: string[] = [];
+    await withServer(
+      async (req) => {
+        sent.push(`${req.method} ${new URL(req.url).pathname} ${await req.text()}`);
+        return Response.json({ data: {} });
+      },
+      async (base) => {
+        // a GraphQL query reads; a mutation writes; an AWS-style JSON API names its action in a header
+        const readPost: ReadPost = (r) =>
+          (r.url === `${base}/graphql` && /^\s*(query\b|\{)/.test(r.body ?? "")) ||
+          (r.url === `${base}/` && /^Service\.(Describe|Get|List)[A-Za-z]+$/.test(r.headers["x-amz-target"] ?? ""));
+        const ro = readOnly(liveTransport(), [], readPost);
+        const post = (url: string, body: string, headers: Readonly<Record<string, string>> = {}) =>
+          ro.send({ method: "POST", url, headers, body });
+        assertEquals((await post(`${base}/graphql`, "query { viewer { login } }")).kind, "ok");
+        assertEquals((await post(`${base}/graphql`, "{ viewer { login } }")).kind, "ok");
+        const mutation = await post(`${base}/graphql`, "mutation { deleteRepository }");
+        assert(mutation.kind === "err" && mutation.error.kind === "refused" && mutation.error.message.startsWith("read-only: POST"));
+        assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DescribeTrails" })).kind, "ok");
+        assertEquals((await post(`${base}/`, "{}", { "x-amz-target": "Service.DeleteTrail" })).kind, "err");
+        for (const method of ["PUT", "PATCH", "DELETE"] as const) {
+          assertEquals((await ro.send({ method, url: `${base}/graphql`, headers: {}, body: "query { x }" })).kind, "err", method);
+        }
+        assertEquals(sent, ["POST /graphql query { viewer { login } }", "POST /graphql { viewer { login } }", "POST / {}"]);
+      },
+    );
+  },
+);
+
+proves(
+  ["0005-typescript-runtime FR-069", CLIENT],
+  "a SigV4 transport signs each request as it is sent, and the live transport refuses it unless allowed",
+  async () => {
+    const seen: { authorization: string | null; date: string | null; token: string | null }[] = [];
+    await withServer(
+      (req) => {
+        seen.push({
+          authorization: req.headers.get("authorization"),
+          date: req.headers.get("x-amz-date"),
+          token: req.headers.get("x-amz-security-token"),
+        });
+        return Response.json({ id: 1 });
+      },
+      async (base) => {
+        const credentials = {
+          accessKeyId: "AKIDEXAMPLE",
+          secretAccessKey: "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY",
+          sessionToken: "session",
+        };
+        const at = new Date("2015-08-30T12:36:00Z");
+        const options = { credentials, region: "us-east-1", service: "service", now: () => at };
+        const refused = await withSigV4(liveTransport(), options).send({ method: "GET", url: `${base}/a?b=1`, headers: {} });
+        assert(refused.kind === "err" && refused.error.kind === "refused" && refused.error.message.includes("authorization"));
+        assert(refused.kind === "err" && !refused.error.message.includes("Signature="), "the credential is never said");
+        assertEquals(seen.length, 0);
+        const live = withSigV4(liveTransport({ credentials: "allow" }), options);
+        assertEquals(await getJson(live, `${base}/a?b=1`, item), { kind: "ok", value: { id: 1 } });
+        const expected = await sign(
+          { method: "GET", url: `${base}/a?b=1`, headers: { accept: "application/json" } },
+          { credentials, region: "us-east-1", service: "service", date: at },
+        );
+        assertEquals(seen, [{ authorization: expected.authorization, date: "20150830T123600Z", token: "session" }]);
+      },
+    );
+  },
+);
 
 proves([CLIENT], "backoff waits as long as Retry-After asks, up to the cap, else 1, 2, 4 seconds, and gives the last answer", async () => {
   let hits = 0;

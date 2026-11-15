@@ -17,6 +17,7 @@ import {
   formatTraceparent,
   formatTracestate,
   isCredentialName,
+  isSecretFieldName,
   limitAttributes,
   mergeAttributes,
   parseSpanId,
@@ -301,6 +302,90 @@ proves([REDACT], "bearer and basic credentials, private keys and token shapes ar
   assertEquals(
     redactAttributes({ password: "p", "url.full": "https://h/?code=1", note: ["Bearer abcdefghij", "plain"], n: 1n }, ["password"]),
     { "url.full": "https://h/?code=REDACTED", note: ["Bearer REDACTED", "plain"], n: 1n },
+  );
+});
+
+proves([REDACT], "name=value pairs whose name is a secret's lose their values, in prose, JSON, YAML and environment files", () => {
+  assertEquals(redactText("password: hunter22 and api_token:abc123"), "password: REDACTED and api_token:REDACTED");
+  assertEquals(
+    redactText('{"client_secret":"abc def","refresh_token": "r1", "page": 2}'),
+    '{"client_secret":"REDACTED","refresh_token": "REDACTED", "page": 2}',
+  );
+  assertEquals(
+    redactText("GITHUB_OAUTH_TOKEN=gho_x\nAWS_SECRET_ACCESS_KEY=wJalr/K7\nAWS_REGION=us-east-1"),
+    "GITHUB_OAUTH_TOKEN=REDACTED\nAWS_SECRET_ACCESS_KEY=REDACTED\nAWS_REGION=us-east-1",
+  );
+  assertEquals(redactText("token='a b c'; appPassword=xyz123, other=1"), "token='REDACTED'; appPassword=REDACTED, other=1");
+  assertEquals(redactText("password:\n  next line"), "password:\n  next line");
+  for (const kept of ["max_tokens=1024", "token_type: bearer", "status code=200", "key: value", "tokens: 12", "secretName=prod"]) {
+    assertEquals(redactText(kept), kept);
+  }
+  assertEquals(
+    [
+      isSecretFieldName("X-Amz-Signature"),
+      isSecretFieldName("clientSecret"),
+      isSecretFieldName("AWS_ACCESS_KEY_ID"),
+      isSecretFieldName("passphrase"),
+    ],
+    [true, true, false, true],
+  );
+});
+
+proves([REDACT], "an Authorization header keeps its scheme and loses its credential, whatever the scheme", () => {
+  assertEquals(redactText(`Authorization: token ghp_${"b".repeat(36)}`), "Authorization: token REDACTED");
+  assertEquals(
+    redactText(
+      "authorization=AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request, SignedHeaders=host;x-amz-date, Signature=5d672d79",
+    ),
+    "authorization=AWS4-HMAC-SHA256 REDACTED, SignedHeaders=host;x-amz-date, Signature=REDACTED",
+  );
+  assertEquals(redactText('{"Proxy-Authorization": "Basic dXNlcjpwYXNz"}'), '{"Proxy-Authorization": "Basic REDACTED"}');
+  assertEquals(redactText("Authorization: abcdef"), "Authorization: REDACTED");
+});
+
+proves([REDACT], "the token formats providers announce, and crypt hashes, are replaced wherever they stand", () => {
+  const tokens = [
+    `ghs_${"A".repeat(36)}`,
+    `github_pat_${"a1_".repeat(20)}`,
+    `glpat-${"x".repeat(20)}`,
+    `xoxb-${"1234567890-".repeat(2)}abc`,
+    `xapp-1-${"A1".repeat(10)}`,
+    `ya29.${"a0Af".repeat(10)}`,
+    `1//${"0g".repeat(20)}`,
+    `GOCSPX-${"k".repeat(28)}`,
+    `AIza${"S".repeat(35)}`,
+    `cfut_${"c".repeat(40)}`,
+    `cfat_${"d".repeat(40)}`,
+    `sk-ant-api03-${"e".repeat(40)}`,
+    `sk-proj-${"f".repeat(40)}`,
+    `sk_live_${"g".repeat(24)}`,
+    `rk_test_${"h".repeat(24)}`,
+    `npm_${"i".repeat(36)}`,
+    `dop_v1_${"0a".repeat(32)}`,
+    `dckr_pat_${"j".repeat(27)}`,
+    `hf_${"k".repeat(34)}`,
+    `lin_api_${"l".repeat(40)}`,
+    `ATATT3x${"m".repeat(40)}`,
+    `ATBB${"n".repeat(28)}`,
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.c2lnbmF0dXJl",
+    "$6$rounds=5000$saltsalt$abcdefghijklmnop",
+    "$y$j9T$abcdefgh$ijklmnopqrstuvwx",
+    "$2b$12$abcdefghijklmnopqrstuv",
+  ];
+  for (const t of tokens) assertEquals(redactText(`failed with ${t} (retry)`), "failed with REDACTED (retry)", t);
+  for (const kept of ["risk-assessment-of-the-whole-estate-today", "task_live_documentation_here_and_now", "the $6 fee", "1/2 done"]) {
+    assertEquals(redactText(kept), kept);
+  }
+});
+
+proves([REDACT], "the exact secrets a caller names are replaced first, longest first, and one too short to mean anything is kept", () => {
+  assertEquals(redactText("sent with s3cr3t-value and s3cr3t", ["s3cr3t", "s3cr3t-value"]), "sent with REDACTED and REDACTED");
+  assertEquals(redactText("a is a letter", ["a", ""]), "a is a letter");
+  // lower case, so that no secret can be made of the upper-case REDACTED that replaces it
+  fc.assert(
+    fc.property(fc.stringMatching(/^[a-z0-9]{8,24}$/), fc.string(), fc.string(), (secret, before, after) => {
+      assert(!redactText(`${before}${secret}${after}`, [secret]).includes(secret));
+    }),
   );
 });
 

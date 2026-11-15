@@ -93,6 +93,18 @@ What `erga` and `stolos` still call on `Deno.*` or `@std/*` that the sections ab
 - **FR-061**: IFC TypeScript MUST give a lint plugin in the ESLint plugin format, which `bun lint --plugin` loads (`commons/ts/lint/`), with a typed way to define a rule, a way to run a rule against code in a test, and the rules every harness wants: no vendor API (`Deno.*`, `Bun.*`) outside a list of files with their reasons; no `npm:`, `jsr:` or URL import; a relative import that leaves its package refused; every file's `@module` block; a `switch` over a union with `absurd` in its `default`; and no write to the terminal outside a list of files with their reasons. Each rule MUST take its lists from its options, so that a harness keeps its own lists and adds its own rules.
 - **FR-062**: `runtime/compile.ts` MUST build a program into one binary with the pinned Bun (`bun build --compile`) for a target given (`linux-x64`, `linux-arm64`, `darwin-x64`, `darwin-arm64`, `windows-x64`) or for this computer, with the files it embeds, and give the binary's path and SHA-256; CI MUST build a small program for this computer on each system and run it.
 
+## What the ports of the harnesses found
+
+What converting a harness (Stolos first) showed it still wrote for itself, taken here so that the next harness does not.
+
+- **FR-063**: `tsLiteral` MUST take any value whose type is shaped as JSON, checked by the compiler at every depth: an interface or a type with no index signature, optional properties (left out where `undefined`), readonly arrays and tuples; and MUST NOT compile for a value holding a function, a `Date`, a `Map`, a `bigint`, a symbol, `unknown`, or `undefined` anywhere but as an optional property's value.
+- **FR-064**: The kernel MUST give `compact`, which makes an object from fields some of which may be `undefined`, leaving those out, typed exactly for `exactOptionalPropertyTypes`: a field whose type includes `undefined` becomes optional without `undefined`, every other field stays as it is.
+- **FR-065**: `runtime/test.ts` MUST give `the(value, message?)`, which fails as `assertExists` does where the value is `null` or `undefined` and otherwise gives the value back narrowed to `NonNullable`, so that a test reads `the(map.get(k)).name`; `assertExists` MUST keep its form as an assertion.
+- **FR-066**: The read-only guard of FR-040 MUST take, besides the token endpoints, a predicate over a whole `POST` request (method, URL, headers and body) that says it only reads (a GraphQL query, a search, a JSON API's `Describe` and `Get` actions), and MUST let through only those; `PUT`, `PATCH` and `DELETE`, and every other `POST`, MUST still be refused without being sent.
+- **FR-067**: The kernel MUST read npm's version ranges (`node-semver`'s grammar): comparators (`<`, `<=`, `>`, `>=`, `=`), sets of them joined by spaces, sets joined by `||`, hyphen ranges, x-ranges (`*`, `x`, `X`, a missing part), tilde (`~`, `~>`) and caret (`^`) ranges, each made into comparators exactly as `node-semver` documents them (`^1.2.3` as `>=1.2.3 <2.0.0-0`, `~0.2` as `>=0.2.0 <0.3.0-0`, `1.2.3 - 2.3` as `>=1.2.3 <2.4.0-0`); a range that is not of the grammar MUST be an error as a `Result`. `satisfies(version, range)` MUST hold where the version satisfies every comparator of one set, and a pre-release version MUST satisfy a set only where one of its comparators names a pre-release of the same major, minor and patch, unless pre-releases are asked for.
+- **FR-068**: The kernel MUST sign HTTP requests by AWS Signature Version 4 (`AWS4-HMAC-SHA256`) with HMAC-SHA256 on Web Crypto, from a request's parts or a web `Request`, the credentials (an access key, its secret and an optional session token), the region, the service and the time given by the caller (the kernel reads no clock): the canonical request (the path normalized and encoded twice except for S3, which keeps it as given and encoded once; the query sorted and encoded by RFC 3986; the headers in lower case, trimmed, sorted and signed with `host` and `x-amz-date`), the string to sign, the derived key and the `Authorization` header, with the payload's SHA-256 (or `UNSIGNED-PAYLOAD` where asked) also sent as `x-amz-content-sha256` where asked and always for S3. Its signatures MUST be those of AWS's published examples.
+- **FR-069**: The runtime's HTTP clients MUST be able to sign each request of a transport by FR-068 (`withSigV4`), with the time read when the request is sent; a request it signed carries a credential, so the live transport MUST still refuse it unless made to allow credentials (FR-040).
+
 ## Out of scope
 
 - Converting the machine setup (`bin/setup/`), `erga` or `stolos` to IFC TypeScript: each is a later, one-pass change of its own, after this one is reviewed (issue #7).
@@ -165,6 +177,16 @@ What `erga` and `stolos` still call on `Deno.*` or `@std/*` that the sections ab
 - One test marked `only` among a hundred: that one runs, on each of the three runners, per FR-060.
 - `Deno.readTextFile` in a harness file not on the plugin's list: the linter names the file and line, per FR-061.
 - `compile` asked for `windows-x64` on Linux: an `.exe` built, its SHA-256 given, per FR-062.
+- `tsLiteral({ when: new Date() })`, or a value of an interface with a method: does not compile; an interface `{ name: string; tags?: readonly string[] }` with no index signature: compiles, per FR-063.
+- `compact({ a: 1, b: maybe })` where `maybe` is `string | undefined`: the type `{ a: number; b?: string }`, and no `b` key at all where `maybe` is `undefined`, per FR-064.
+- `the(undefined)`: fails with the message given, per FR-065.
+- A `POST` to a GraphQL endpoint holding a `mutation`, where the predicate lets through only `query`: refused, never sent, per FR-066.
+- `satisfies("1.2.4-beta", "^1.2.3")`: false, as the pre-release is of another patch; `satisfies("1.2.3-beta.4", "^1.2.3-beta.2")`: true, per FR-067.
+- `^0.0.3`: `0.0.3` alone (and its builds), as `>=0.0.3 <0.0.4-0`, per FR-067.
+- `>=1.2.3 <`: an error naming the range, never a range that holds every version, per FR-067.
+- AWS's `get-vanilla` example (`AKIDEXAMPLE`, `us-east-1`, service `service`, `20150830T123600Z`): signature `5fa00fa31553b73ebf1942676e86291e8372ff2a2260956d9b8aae1d763fbf31`, per FR-068.
+- A path `/a//b/../c` given as text and signed for a service other than S3: signed as `/a/c`; for S3, as given, per FR-068.
+- A signed request sent by the live transport made with its default options: refused, the `Authorization` header named and its value never said, per FR-040 and FR-069.
 
 ## Assumptions
 

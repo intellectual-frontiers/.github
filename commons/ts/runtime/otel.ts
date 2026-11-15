@@ -353,6 +353,10 @@ export type JournalOptions = {
   readonly maxBytes?: number;
   /** How many older files are kept (3 by default; 0 keeps none). */
   readonly keep?: number;
+  /** Where given, a journal file last written more than this many days ago is removed when the journal starts and at each rotation. */
+  readonly maxAgeDays?: number;
+  /** The clock that ages files, in milliseconds since the epoch (`Date.now` by default; a test gives its own). */
+  readonly now?: () => number;
 };
 
 function sizeOf(path: string): number {
@@ -360,6 +364,19 @@ function sizeOf(path: string): number {
     return nfs.statSync(path).size;
   } catch {
     return 0;
+  }
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Each journal file (the current one and `<path>.1` to `<path>.<keep>`) last written before `oldest` removed. */
+function removeAged(path: string, keep: number, oldest: number): void {
+  for (const file of [path, ...Array.from({ length: keep }, (_, i) => `${path}.${i + 1}`)]) {
+    try {
+      if (nfs.statSync(file).mtimeMs < oldest) nfs.rmSync(file, { force: true });
+    } catch {
+      // not there: nothing to remove
+    }
   }
 }
 
@@ -376,8 +393,9 @@ function rotate(path: string, keep: number): void {
 /**
  * An exporter that writes each export request as one line of OTLP JSON to a file (FR-016), appended synchronously so that what a run made
  * is kept even where it ends abruptly. Before a line is written to a file that already holds `maxBytes` or more, the file is rotated:
- * `<path>.<keep>` removed, each `<path>.<i>` renamed `<path>.<i+1>`, and the file renamed `<path>.1`. A write that fails is a failure
- * result, never a throw.
+ * `<path>.<keep>` removed, each `<path>.<i>` renamed `<path>.<i+1>`, and the file renamed `<path>.1`. Where `maxAgeDays` is given, a
+ * journal file last written longer ago than that is removed before the first line and after each rotation. A write that fails is a
+ * failure result, never a throw.
  */
 export function journalExporter(options: JournalOptions): Exporter {
   const maxBytes = options.maxBytes ?? 10 * 1024 * 1024;
@@ -387,11 +405,18 @@ export function journalExporter(options: JournalOptions): Exporter {
   const write = (line: () => string): Promise<ExportResult> => {
     if (stopped) return Promise.resolve({ kind: "failure", message: "the journal is closed" });
     try {
+      const age = (): void => {
+        if (options.maxAgeDays !== undefined) removeAged(options.path, keep, (options.now ?? Date.now)() - options.maxAgeDays * DAY_MS);
+      };
       if (!ready) {
         nfs.mkdirSync(dirname(options.path), { recursive: true });
+        age();
         ready = true;
       }
-      if (sizeOf(options.path) >= maxBytes) rotate(options.path, keep);
+      if (sizeOf(options.path) >= maxBytes) {
+        rotate(options.path, keep);
+        age();
+      }
       nfs.appendFileSync(options.path, `${line()}\n`);
       return Promise.resolve({ kind: "success" });
     } catch (e) {

@@ -1,8 +1,8 @@
 /**
  * Data as TypeScript object literals, for files a program writes for people to read and edit (keys bare where they are identifiers, strings
  * in double quotes, two-space indentation and trailing commas), and the reader of exactly that subset, which never runs the file, so a past
- * version from `git show` can be read safely (commons 0005-typescript-runtime FR-011). Taken from Stolos's `src/archon/core/ts-literal.ts`;
- * the reader returns a `Result` instead of throwing.
+ * version from `git show` can be read safely (commons 0005-typescript-runtime FR-011); the writer takes any type shaped as JSON (FR-063).
+ * Taken from Stolos's `src/archon/core/ts-literal.ts`; the reader returns a `Result` instead of throwing.
  *
  * @example
  * ```ts
@@ -23,31 +23,58 @@ export function tsKey(key: string): string {
   return BARE_KEY.test(key) ? key : JSON.stringify(key);
 }
 
-/** A value that {@link tsLiteral} writes and {@link parseTsLiteral} reads back: what JSON holds. */
+/** A value that {@link parseTsLiteral} reads back, and so {@link tsLiteral} writes: what JSON holds. */
 export type Literal = null | boolean | number | string | readonly Literal[] | { readonly [key: string]: Literal | undefined };
 
 /**
- * A value as a TypeScript literal, indented for `depth` (two spaces each). Objects and arrays span lines (empty ones stay `{}` and `[]`);
- * properties that are `undefined` are left out, as `JSON.stringify` leaves them out. A number that is not finite is written `null`, as
- * JSON writes it.
+ * `T` itself where `T` is shaped as JSON at every depth, else a type `T` is not assignable to, so that a parameter `T & LiteralShape<T>`
+ * takes any JSON-shaped type (FR-063), an interface with no index signature included: strings, numbers, booleans and `null`; arrays and
+ * tuples of such values; objects whose string keys hold such values, `undefined` allowed only as an optional property's. A function, a
+ * `Date`, a `Map`, a `bigint`, a symbol or `unknown` anywhere makes it `never` there.
  */
-export function tsLiteral(value: Literal, depth = 0): string {
+export type LiteralShape<T> = T extends Literal
+  ? T
+  : T extends readonly unknown[]
+    ? { readonly [I in keyof T]: LiteralShape<T[I]> }
+    : T extends (...args: never) => unknown
+      ? never
+      : T extends object
+        ? { readonly [K in keyof T]: K extends string ? PropertyShape<T[K]> : never }
+        : never;
+
+/** A property's value shaped as JSON: `undefined` allowed, as an absent optional property, beside a JSON-shaped value. */
+type PropertyShape<V> = undefined extends V ? LiteralShape<Exclude<V, undefined>> | undefined : LiteralShape<V>;
+
+/**
+ * A value as a TypeScript literal, indented for `depth` (two spaces each). It takes any value whose type is shaped as JSON (FR-063), an
+ * interface with no index signature included, and refuses at compile time a value holding a function, a `Date`, a `bigint` or another
+ * type JSON has not. Objects and arrays span lines (empty ones stay `{}` and `[]`); properties that are `undefined` are left out, as
+ * `JSON.stringify` leaves them out. A number that is not finite is written `null`, as JSON writes it. (The check is on the parameter,
+ * `T & LiteralShape<T>`, because TypeScript refuses `T extends LiteralShape<T>` as a circular constraint.)
+ */
+export function tsLiteral<T>(value: T & LiteralShape<T>, depth = 0): string {
+  return write(value, depth);
+}
+
+// The type parameter of `tsLiteral` already holds the value to JSON's shape; here it is walked as what it is at run time.
+function write(value: unknown, depth: number): string {
   const pad = "  ".repeat(depth + 1);
   const end = "  ".repeat(depth);
-  if (value === null) return "null";
+  if (value === null || value === undefined) return "null";
   if (Array.isArray(value)) {
-    const items: readonly Literal[] = value;
+    const items: readonly unknown[] = value;
     if (items.length === 0) return "[]";
-    return `[\n${items.map((v) => `${pad}${tsLiteral(v, depth + 1)},\n`).join("")}${end}]`;
+    return `[\n${items.map((v) => `${pad}${write(v, depth + 1)},\n`).join("")}${end}]`;
   }
   if (typeof value === "object") {
-    const entries = Object.entries(value).filter((e): e is [string, Literal] => e[1] !== undefined);
+    const entries = Object.entries(value).filter((e) => e[1] !== undefined);
     if (entries.length === 0) return "{}";
-    return `{\n${entries.map(([k, v]) => `${pad}${tsKey(k)}: ${tsLiteral(v, depth + 1)},\n`).join("")}${end}}`;
+    return `{\n${entries.map(([k, v]) => `${pad}${tsKey(k)}: ${write(v, depth + 1)},\n`).join("")}${end}}`;
   }
   if (typeof value === "string") return JSON.stringify(value);
   if (typeof value === "number") return Number.isFinite(value) ? JSON.stringify(value) : "null";
-  return String(value);
+  if (typeof value === "boolean") return String(value);
+  return "null";
 }
 
 /** Where a text stopped being a literal, and what was expected there. */

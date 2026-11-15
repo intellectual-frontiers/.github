@@ -1,7 +1,8 @@
 /**
  * Versions: semantic versions by the rules of semver.org 2.0.0 (parsed, printed, ordered and bumped), and the looser dotted versions that
- * programs print (`2.9.8`, `1.4.4`, `26.13.1`), compared part by part (commons 0005-typescript-runtime FR-007). Taken from erga's kernel
- * (`semver.ts`) and toolchain (`atLeast`), Stolos's `tools/version.ts` and the machine setup.
+ * programs print (`2.9.8`, `1.4.4`, `26.13.1`), compared part by part (commons 0005-typescript-runtime FR-007); and npm's ranges, read and
+ * satisfied as node-semver reads them (FR-067). Taken from erga's kernel (`semver.ts`) and toolchain (`atLeast`), Stolos's
+ * `tools/version.ts` and the machine setup.
  *
  * @example
  * ```ts
@@ -147,4 +148,226 @@ export function atLeast(have: string, want: string): boolean {
 /** The first dotted version in a program's output (`deno 2.9.8 (stable, ...)` gives `2.9.8`), or undefined. */
 export function versionIn(text: string): string | undefined {
   return /\d+(?:\.\d+)+/.exec(text)?.[0];
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Ranges (FR-067), as npm's node-semver reads them
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+/** How a comparator compares a version with its bound. */
+export type Operator = "<" | "<=" | ">" | ">=" | "=";
+
+/** A version compared with one bound: `>=1.2.3`, `<2.0.0-0`. */
+export type Comparator = { readonly op: Operator; readonly version: SemVer };
+
+/**
+ * A range: sets of comparators joined by `||`. A version satisfies it where it satisfies every comparator of one set; an empty set holds
+ * every version (`*`), and no set at all holds none.
+ */
+export type Range = { readonly kind: "range"; readonly sets: readonly (readonly Comparator[])[] };
+
+const IDENT = "(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)";
+const PART = "(0|[1-9][0-9]*|[xX*])";
+const PARTIAL = new RegExp(
+  `^v?${PART}(?:\\.${PART}(?:\\.${PART}(?:-(${IDENT}(?:\\.${IDENT})*))?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?)?)?$`,
+);
+
+/** A version some of whose parts may be left out or wild (`1`, `1.x`, `1.2.*`); a missing part is `undefined`. */
+type Partial = { readonly major?: number; readonly minor?: number; readonly patch?: number; readonly pre?: string };
+
+function partial(text: string): Result<Partial, string> {
+  const m = PARTIAL.exec(text);
+  if (m === null) return err(`${JSON.stringify(text)} is not a version, nor a partial one such as 1.x`);
+  const [, a, b, c, pre] = m;
+  const parts = [a, b, c].map((p) => (p === undefined || p === "x" || p === "X" || p === "*" ? undefined : Number(p)));
+  const [major, minor, patch] = parts;
+  const wild = parts.findIndex((p) => p === undefined);
+  if (wild >= 0 && parts.slice(wild).some((p) => p !== undefined)) return err(`${JSON.stringify(text)} has a number after a wildcard`);
+  if (!parts.every((p) => p === undefined || Number.isSafeInteger(p))) return err(`${JSON.stringify(text)} has a number too large`);
+  if (pre !== undefined && patch === undefined) return err(`${JSON.stringify(text)} has a pre-release but no patch`);
+  return ok({
+    ...(major === undefined ? {} : { major }),
+    ...(minor === undefined ? {} : { minor }),
+    ...(patch === undefined ? {} : { patch }),
+    ...(pre === undefined ? {} : { pre }),
+  });
+}
+
+const ver = (major: number, minor: number, patch: number, pre?: string): SemVer => ({
+  major,
+  minor,
+  patch,
+  ...(pre === undefined ? {} : { pre }),
+});
+const at = (op: Operator, version: SemVer): Comparator => ({ op, version });
+/** Below every version: what `<0.0.0-0` says, a set no version satisfies. */
+const NOTHING: readonly Comparator[] = [at("<", ver(0, 0, 0, "0"))];
+
+/** `^`: changes that do not modify the left-most non-zero part (`^1.2.3` is `>=1.2.3 <2.0.0-0`, `^0.2.3` is `>=0.2.3 <0.3.0-0`). */
+function caret(p: Partial): readonly Comparator[] {
+  const { major: M, minor: m, patch: q, pre } = p;
+  if (M === undefined) return [];
+  if (m === undefined) return [at(">=", ver(M, 0, 0)), at("<", ver(M + 1, 0, 0, "0"))];
+  if (q === undefined) return [at(">=", ver(M, m, 0)), at("<", M === 0 ? ver(0, m + 1, 0, "0") : ver(M + 1, 0, 0, "0"))];
+  const upper = M > 0 ? ver(M + 1, 0, 0, "0") : m > 0 ? ver(0, m + 1, 0, "0") : ver(0, 0, q + 1, "0");
+  return [at(">=", ver(M, m, q, pre)), at("<", upper)];
+}
+
+/** `~`: patch changes where a minor is given, minor changes where not (`~1.2.3` is `>=1.2.3 <1.3.0-0`, `~1` is `>=1.0.0 <2.0.0-0`). */
+function tilde(p: Partial): readonly Comparator[] {
+  const { major: M, minor: m, patch: q, pre } = p;
+  if (M === undefined) return [];
+  if (m === undefined) return [at(">=", ver(M, 0, 0)), at("<", ver(M + 1, 0, 0, "0"))];
+  return [at(">=", ver(M, m, q ?? 0, q === undefined ? undefined : pre)), at("<", ver(M, m + 1, 0, "0"))];
+}
+
+/** A comparator or a bare version, either maybe partial (`>1.2` is `>=1.3.0`, `<=1` is `<2.0.0-0`, `1.2` is `>=1.2.0 <1.3.0-0`). */
+function primitive(op: Operator, p: Partial): readonly Comparator[] {
+  const { major: M, minor: m, patch: q, pre } = p;
+  if (M === undefined) return op === "<" || op === ">" ? NOTHING : [];
+  if (m !== undefined && q !== undefined) return [at(op, ver(M, m, q, pre))];
+  // the next version a wildcard leaves out: 2.0.0 for 1.x, 1.3.0 for 1.2.x
+  const next = m === undefined ? ver(M + 1, 0, 0) : ver(M, m + 1, 0);
+  const first = ver(M, m ?? 0, 0);
+  switch (op) {
+    case ">":
+      return [at(">=", next)];
+    case ">=":
+      return [at(">=", first)];
+    case "<":
+      return [at("<", ver(first.major, first.minor, 0, "0"))];
+    case "<=":
+      return [at("<", { ...next, pre: "0" })];
+    case "=":
+      return [at(">=", first), at("<", { ...next, pre: "0" })];
+    default:
+      return absurd(op);
+  }
+}
+
+/** `A - B`: at least `A`, at most `B` (`1.2 - 2.3.4` is `>=1.2.0 <=2.3.4`, `1.2.3 - 2` is `>=1.2.3 <3.0.0-0`). */
+function hyphen(from: Partial, to: Partial): readonly Comparator[] {
+  const lower = from.major === undefined ? [] : primitive(">=", from);
+  const upper = to.major === undefined ? [] : primitive("<=", to);
+  return [...lower, ...upper];
+}
+
+const OPERATOR = /^(<=|>=|<|>|=|~>|~|\^)?(.*)$/;
+
+function set(text: string): Result<readonly Comparator[], string> {
+  const trimmed = text.trim();
+  const range = /^(\S+)\s+-\s+(\S+)$/.exec(trimmed);
+  if (range !== null) {
+    const from = partial(range[1] ?? "");
+    if (from.kind === "err") return from;
+    const to = partial(range[2] ?? "");
+    if (to.kind === "err") return to;
+    return ok(hyphen(from.value, to.value));
+  }
+  const words = trimmed
+    .replace(/(<=|>=|<|>|=|~>|~|\^)\s+/g, "$1")
+    .split(/\s+/)
+    .filter((w) => w !== "");
+  const out: Comparator[] = [];
+  for (const word of words) {
+    const m = OPERATOR.exec(word);
+    const op = m?.[1];
+    const rest = m?.[2] ?? "";
+    if (rest === "") return err(`${JSON.stringify(word)} has no version after its operator`);
+    const p = partial(rest);
+    if (p.kind === "err") return p;
+    switch (op) {
+      case "^":
+        out.push(...caret(p.value));
+        break;
+      case "~":
+      case "~>":
+        out.push(...tilde(p.value));
+        break;
+      case "<":
+      case "<=":
+      case ">":
+      case ">=":
+      case "=":
+        out.push(...primitive(op, p.value));
+        break;
+      case undefined:
+        out.push(...primitive("=", p.value));
+        break;
+      default:
+        return err(`${JSON.stringify(word)} has an operator that is not one`);
+    }
+  }
+  return ok(out);
+}
+
+/**
+ * Text read as an npm range (FR-067), by node-semver's grammar and its desugaring: comparators (`<`, `<=`, `>`, `>=`, `=`) joined by
+ * spaces, sets joined by `||`, hyphen ranges (`1.2.3 - 2.3.4`), x-ranges (`*`, `x`, `X` or a missing part), tilde (`~`, `~>`) and caret
+ * (`^`) ranges, a space allowed after an operator, a leading `v` and builds ignored. Anything else is an error naming the part.
+ */
+export function parseRange(text: string): Result<Range, string> {
+  const sets: (readonly Comparator[])[] = [];
+  for (const part of text.split("||")) {
+    const s = set(part);
+    if (s.kind === "err") return err(`${JSON.stringify(text)} is not a range: ${s.error}`);
+    sets.push(s.value);
+  }
+  return ok({ kind: "range", sets });
+}
+
+/** A range as text: each set's comparators joined by spaces (`=` written as the bare version, an empty set as `*`), the sets by ` || `. */
+export function formatRange(range: Range): string {
+  return range.sets
+    .map((s) => (s.length === 0 ? "*" : s.map((c) => `${c.op === "=" ? "" : c.op}${formatSemVer(c.version)}`).join(" ")))
+    .join(" || ");
+}
+
+function holds(c: Comparator, v: SemVer): boolean {
+  const d = compareSemVer(v, c.version);
+  switch (c.op) {
+    case "<":
+      return d < 0;
+    case "<=":
+      return d <= 0;
+    case ">":
+      return d > 0;
+    case ">=":
+      return d >= 0;
+    case "=":
+      return d === 0;
+    default:
+      return absurd(c.op);
+  }
+}
+
+/** Whether pre-releases are held to the comparators alone (`includePrerelease`), rather than only where a bound names their release. */
+export type SatisfiesOptions = { readonly includePrerelease?: boolean };
+
+/**
+ * Whether a version satisfies a range (FR-067): every comparator of one of its sets holds. A pre-release version satisfies a set only where
+ * one of its comparators is a pre-release of the same major, minor and patch (`1.2.3-beta.4` satisfies `^1.2.3-beta.2`, `1.2.4-beta`
+ * does not satisfy `^1.2.3`), as node-semver has it, unless `includePrerelease` is given, when the comparators alone decide.
+ */
+export function satisfies(version: SemVer, range: Range, options: SatisfiesOptions = {}): boolean {
+  return range.sets.some(
+    (s) =>
+      s.every((c) => holds(c, version)) &&
+      (version.pre === undefined ||
+        options.includePrerelease === true ||
+        s.some(
+          (c) =>
+            c.version.pre !== undefined &&
+            c.version.major === version.major &&
+            c.version.minor === version.minor &&
+            c.version.patch === version.patch,
+        )),
+  );
+}
+
+/** The highest of the versions that satisfy the range, or undefined where none does. */
+export function maxSatisfying(versions: readonly SemVer[], range: Range, options: SatisfiesOptions = {}): SemVer | undefined {
+  let best: SemVer | undefined;
+  for (const v of versions) if (satisfies(v, range, options) && (best === undefined || compareSemVer(v, best) > 0)) best = v;
+  return best;
 }
