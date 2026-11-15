@@ -52,6 +52,13 @@
 - **FR-029**: IFC TypeScript MUST be distributed as the package `@intellectual-frontiers/ifc-ts` in a GitHub release of this repository: a tag `ifc-ts-vX.Y.Z` whose version is `package.json`'s makes CI build JavaScript and declarations with `tsc` 7 (`tsconfig.build.json`, relative imports rewritten to `.js`), pack them with `bun pm pack` and attach the tarball and its SHA-256 to the release. The package MUST export `./kernel`, `./runtime` and `./runtime/test`, MUST carry no test, and MUST NOT be released from a version already released. A harness MUST depend on it by the release asset's URL, so that its own lockfile holds the tarball's integrity.
 - **FR-030**: Before a release is made, the packed tarball MUST be installed into an empty project and its three entry points imported and used on Deno, Node and Bun; a failure stops the release.
 
+## Formats and graphs
+
+- **FR-031**: The kernel MUST read JSON5 1.0 (comments, trailing commas, unquoted ECMAScript keys, single-quoted and continued strings, hexadecimal, `Infinity`, `NaN`, a leading `+`, a leading or trailing decimal point) into a typed `Json` value, or say the line and column where the text stops being JSON5; MUST read every JSON text as `JSON.parse` does; MUST define a key named `__proto__` as a member, never as the prototype; and MUST write a value as a person edits it (a `//` comment at its head, bare keys where they can be, two spaces of indent, a comma after every member, a short list of plain values on one line) that it reads back as the same value, `-0`, `NaN` and the infinities included.
+- **FR-032**: The kernel MUST write XML from a typed tree with every value escaped and the characters XML 1.0 forbids removed, and MUST read XML (elements, attributes in either quote, the five named entities and character references, CDATA, comments, processing instructions, the declaration) into the same tree, checking that each element is closed by its own name and each attribute is given once, saying the line and column of what is wrong, and refusing a document type with an internal subset so that no entity is ever expanded.
+- **FR-033**: The kernel MUST order a graph so that each node comes after the nodes it needs, the same way every time, or name a cycle; and MUST run a graph's nodes each the moment the nodes it needs are done, no more at once than asked, skipping (and saying) a node whose needed node failed or was skipped, and holding back nothing else.
+- **FR-034**: The kernel MUST hash a password as glibc's SHA-512 crypt (`$6$`, Drepper's algorithm, rounds written where they are given and clamped as glibc clamps them, the salt cut to 16 characters) on Web Crypto alone, giving the bytes glibc's `crypt(3)` gives, and verify a password against such a hash. The salt MUST be given (made from random bytes by the caller), so the kernel has no effect.
+
 ## Out of scope
 
 - Converting the machine setup (`bin/setup/`), `erga` or `stolos` to IFC TypeScript: each is a later, one-pass change of its own, after this one is reviewed (issue #7).
@@ -78,6 +85,10 @@
 - A dependency written `^7.0.2`: the boundary test names it, per FR-016.
 - A file whose lines are not as `bun fmt` writes them: the format check fails, per FR-027.
 - `const x: any`, `value!.field` or a `switch` that misses a member of a union with no `default`: the linter fails, per FR-028.
+- `{"__proto__": {"polluted": true}}` read as JSON5: a member named `__proto__`, and `Object.prototype` untouched, per FR-031.
+- `<!DOCTYPE a [<!ENTITY e "x">]>`: refused before any entity is read, per FR-032.
+- A graph where `a` needs `b` and `b` needs `a`: the order names the cycle `a, b, a`, and the schedule rejects, per FR-033.
+- A salt of 20 characters, or rounds of 10: the salt is cut to 16 and the rounds raised to 1000, as glibc does, per FR-034.
 - A tag `ifc-ts-v0.2.0` while `package.json` says 0.1.0: the release job stops before building, per FR-029.
 - A packed tarball that holds `.ts` files only (which Node will not strip under `node_modules`): the install check fails on Node, per FR-029 and FR-030.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.
