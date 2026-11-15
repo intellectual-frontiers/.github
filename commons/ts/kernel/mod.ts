@@ -46,6 +46,7 @@ export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export type { Brand } from "./brand.ts";
 export * as args from "./args.ts";
+export * as assess from "./assess.ts";
 export * as cms from "./cms.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
@@ -73,6 +74,8 @@ export {
 export type { Decoded, DecodeError, Decoder, Fields, ObjectOf } from "./decode.ts";
 export * as der from "./der.ts";
 export * as dsse from "./dsse.ts";
+export * as evidence from "./evidence.ts";
+export * as grc from "./grc.ts";
 export { order, schedule } from "./graph.ts";
 export type { Cycle, Graph, Ran } from "./graph.ts";
 export {

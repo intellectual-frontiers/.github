@@ -63,7 +63,7 @@
 - A bundle with a file added after its manifest was written: refused, naming the file, per FR-009.
 - Evidence of 29 days for a cadence of `P30D`: `due`, per FR-011.
 - A change touching `infra/**` declared for a control whose newest verdict is `fail`: `blocked`, naming the control, per FR-013.
-- Likelihood `high` and impact `very-high`: `high`, per FR-014.
+- Likelihood `high` and impact `very-high`: `very-high`, as Table I-2 gives it; the middle level is `moderate`, per FR-014.
 - The same findings written twice to OSCAL: byte for byte the same document, per FR-017.
 - `git` not installed: an `Err`, never a thrown error, per FR-021.
 
