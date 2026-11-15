@@ -204,14 +204,14 @@ requirement	mechanism	by	note
 0010-file-aide FR-008	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: key types computed from segments (type tests, with controls)
 0010-file-aide FR-009	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: an entry's codec, description and owner; bytes, text, JSON5 and the caller's own
 0010-file-aide FR-010	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: ambiguity found by witnesses; one entry and its key, or unmatched; mounted layouts
-0010-file-aide FR-011	none	-	Not whole yet: matching gives unmatched values (algebra.test.ts, ifrfs.test.ts); listing and reading a store come with phase 2, and this row names its check then.
+0010-file-aide FR-011	check	.github: cd commons/ts/data && bun run verify	algebra.test.ts and ifrfs.test.ts: matching and listing a store give unmatched values with their path and metadata (catalog)
 0010-file-aide FR-012	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts: relative, normalized paths that cannot leave their root
 0010-file-aide FR-013	check	.github: cd commons/ts/data && bun run verify	file-aide/algebra.test.ts and ifrfs.test.ts: the limits of S3, Linux, macOS and Windows, and case collisions
-0010-file-aide FR-014	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-015	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-016	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-017	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-018	none	-	Not built yet: it is finished by phase 2 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-014	check	.github: cd commons/ts/data && bun run verify	conformance.ts on memory and posix (stores.test.ts): head, get and ranges, put, delete, copy, pages with a continuation, delimiters, names in many scripts
+0010-file-aide FR-015	check	.github: cd commons/ts/data && bun run verify	stores.test.ts: a condition or range a store lacks does not compile (type tests with controls); conformance.ts: refused as a value at run time
+0010-file-aide FR-016	check	.github: cd commons/ts/data && bun run verify	conformance.ts: one of three racing writers is let in where nothing may be there; a stale version is a conflict; posix does not claim if-match
+0010-file-aide FR-017	check	.github: cd commons/ts/data && bun run verify	stores.test.ts and conformance.ts: memory and posix; no temporary file listed, no folder written, empty folders removed, read-only refused
+0010-file-aide FR-018	check	.github: cd commons/ts/data && bun run verify	conformance.ts and stores.test.ts: failures are values that name the store and the path
 0010-file-aide FR-019	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-020	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-021	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
@@ -228,7 +228,7 @@ requirement	mechanism	by	note
 0010-file-aide FR-032	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-033	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-034	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-035	none	-	Not whole yet: the suite starts in phase 2 with memory and posix, takes the local S3 server in phase 4 and fault injection in phase 5; this row names its check when phase 5 lands.
+0010-file-aide FR-035	none	-	Not whole yet: conformance.ts runs on memory and posix (stores.test.ts); the local S3 server joins it in phase 4 and stores that fail on purpose in phase 5, and this row names its check then.
 0010-file-aide FR-036	none	-	Not built yet: the real-provider tests come in phase 4 and the comparison with fd in phase 3; this row names its check when phase 4 lands.
 0010-file-aide FR-037	none	-	Not built yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-038	none	-	Not whole yet: IFRFS (commons/ts/data/ifrfs/) passes what each phase adds, and this row names its check when phase 6 lands.

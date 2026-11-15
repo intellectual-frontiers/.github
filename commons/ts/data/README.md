@@ -80,3 +80,11 @@ requirements has a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) na
 | 4     | The `s3` driver, the local S3 server, tests against real providers                                   | not yet |
 | 5     | Checks and recipes, and stores that fail on purpose                                                  | not yet |
 | 6     | With SQL Aide: the file-reference domain and listings as a source; IFRFS end to end                  | not yet |
+
+File Aide's limits, said plainly:
+
+- The `posix` driver reads a whole folder to give one page of a listing, and a whole file to give a range; it skips symbolic links, and does
+  not claim a write on a version, which it cannot make atomic. A name on disk that is not in normalization form C is listed in form C and is
+  then reached only where the file system treats the two forms as one (as APFS does).
+- A layout finds two overlapping entries by its segments' witnesses: an overlap that no witness shows is not found when the layout is made,
+  and a path both entries match is unmatched, saying so.

@@ -5,8 +5,24 @@
  * @module
  */
 import { fs, path as hostPath } from "../../../runtime/mod.ts";
-import { assert, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
-import { checkNames, formatLayoutError, MACOS_LIMITS, relPath, S3_LIMITS, WINDOWS_LIMITS } from "../../file-aide/mod.ts";
+import { assert, assertArrayIncludes, assertEquals, assertStringIncludes, proves } from "../../../runtime/test.ts";
+import {
+  catalog,
+  type Capability,
+  checkNames,
+  formatLayoutError,
+  MACOS_LIMITS,
+  memoryStore,
+  readEntry,
+  type RelPath,
+  relPath,
+  S3_LIMITS,
+  type Store,
+  widen,
+  WINDOWS_LIMITS,
+  writeEntry,
+} from "../../file-aide/mod.ts";
+import { posixStore } from "../../file-aide/runtime/mod.ts";
 import { ENTRIES, ifrfs, issue, KINDS, MARKER, readme } from "../../ifrfs/mod.ts";
 
 const TREE = hostPath.fromFileUrl(new URL("./tree/", import.meta.url));
@@ -92,5 +108,82 @@ proves(
     const i = issue.codec.decode(await fs.readFile(hostPath.join(TREE, "book/example-handbook/issues.d/01M6SFSZ7J1T8GX50X1H4RZH7V.json5")));
     assert(i.kind === "ok" && typeof i.value === "object" && i.value !== null && !Array.isArray(i.value));
     assertEquals("id" in i.value ? i.value["id"] : undefined, "01M6SFSZ7J1T8GX50X1H4RZH7V");
+  },
+);
+
+/** The tree in memory, copied file by file. */
+async function inMemory(): Promise<ReturnType<typeof memoryStore>> {
+  const files: [RelPath, Uint8Array][] = [];
+  for (const f of await treeFiles()) {
+    const r = relPath(f);
+    assert(r.kind === "ok");
+    files.push([r.value, await fs.readFile(hostPath.join(TREE, f))]);
+  }
+  return memoryStore({ name: "ifrfs-memory", files });
+}
+
+/** What a store holds as the layout sees it: each path, its entry or why it is unmatched, and its size. */
+async function seen<C extends Capability>(store: Store<C>): Promise<string[]> {
+  assert(made.kind === "ok");
+  const out: string[] = [];
+  for await (const c of catalog(made.value, store)) {
+    assert(c.kind === "ok", c.kind === "err" ? c.error.why : "");
+    const m = c.value.match;
+    out.push(`${m.path} ${m.kind === "matched" ? m.entry : "unmatched"} ${c.value.meta.size}`);
+  }
+  return out;
+}
+
+proves(
+  ["0010-file-aide FR-038", "0010-file-aide FR-011", "0010-file-aide FR-014"],
+  "IFRFS's tree is listed the same through posix and memory, every file matched",
+  async () => {
+    const onDisk = await seen(posixStore(TREE, { readOnly: true, name: "ifrfs-tree" }));
+    assertEquals(onDisk.length, 12);
+    assert(
+      onDisk.every((l) => !l.includes(" unmatched ")),
+      onDisk.join("\n"),
+    );
+    assertEquals(await seen(await inMemory()), onDisk);
+    assertEquals(onDisk[0], "README.md readme " + String((await fs.stat(hostPath.join(TREE, "README.md"))).size));
+  },
+);
+
+proves(
+  ["0010-file-aide FR-038", "0010-file-aide FR-009"],
+  "IFRFS's files are read by entry and key, and a new issue is written by its key",
+  async () => {
+    for (const store of [widen(posixStore(TREE, { readOnly: true })), widen(await inMemory())]) {
+      const r = await readEntry(store, readme, {});
+      assert(r.kind === "ok");
+      assertEquals(r.value.split("\n")[0], MARKER);
+      const i = await readEntry(store, issue, { kind: "book", slug: "example-handbook", id: "01M6SFSZ837831FK61F4S07GZ6" });
+      assert(i.kind === "ok");
+      const missing = await readEntry(store, issue, { kind: "deck", slug: "example-talk", id: "01M6SFSZ837831FK61F4S07GZ6" });
+      assert(missing.kind === "err" && missing.error.kind === "store" && missing.error.error.kind === "not-found");
+    }
+    const m = await inMemory();
+    const key = { kind: "deck", slug: "example-talk", id: "01ARZ3NDEKTSV4RRFFQ69G5FAV" } as const;
+    const w = await writeEntry(m, issue, key, { id: key.id, work: "deck/example-talk", events: [] }, { kind: "if-absent" });
+    assert(w.kind === "ok");
+    assertEquals(w.value.path, "deck/example-talk/issues.d/01ARZ3NDEKTSV4RRFFQ69G5FAV.json5");
+    const again = await writeEntry(m, issue, key, { id: key.id, work: "deck/example-talk", events: [] }, { kind: "if-absent" });
+    assert(again.kind === "err" && again.error.kind === "store" && again.error.error.kind === "conflict");
+    const ro = await writeEntry(posixStore(TREE, { readOnly: true }), issue, key, null, { kind: "if-absent" });
+    assert(ro.kind === "err" && ro.error.kind === "store" && ro.error.error.kind === "refused", "the committed tree is never written");
+  },
+);
+
+proves(
+  ["0010-file-aide FR-038", "0010-file-aide FR-011"],
+  "a stray file in an IFRFS store is listed as unmatched with its metadata",
+  async () => {
+    const m = await inMemory();
+    const stray = relPath(".DS_Store");
+    assert(stray.kind === "ok");
+    assert((await m.put(stray.value, new Uint8Array(3))).kind === "ok");
+    const lines = await seen(m);
+    assertEquals(lines.length, 13);
+    assertArrayIncludes(lines, [".DS_Store unmatched 3"]);
   },
 );

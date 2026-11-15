@@ -31,3 +31,20 @@ export { bytes, codec, entry, formatLayoutError, json5, layout, mount, text } fr
 export type { Codec, Entry, KeyOfEntry, Layout, LayoutError, Match, ValueOfEntry } from "./algebra/entry.ts";
 export { err, ok } from "../../kernel/mod.ts";
 export type { Json, Result } from "../../kernel/mod.ts";
+export { can, checkCondition, compareKeys, listAll, pageOf, pageOfItems, storeError, widen } from "./store/store.ts";
+export type {
+  ByteRange,
+  Capability,
+  Condition,
+  ConditionFor,
+  FileMeta,
+  ListItem,
+  ListRequest,
+  Page,
+  Store,
+  StoreError,
+} from "./store/store.ts";
+export { memoryStore } from "./store/memory.ts";
+export type { MemoryCapability } from "./store/memory.ts";
+export { catalog, readEntry, writeEntry } from "./store/entries.ts";
+export type { Cataloged, EntryError } from "./store/entries.ts";
