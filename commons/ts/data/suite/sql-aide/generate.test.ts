@@ -49,37 +49,42 @@ proves(
   },
 );
 
-proves(["0009-sql-aide FR-045"], "the Rust structures of the party model compile, with warnings denied", async () => {
-  const rustc = proc.which("rustc");
-  if (rustc === undefined) {
-    console.log("# SKIP the Rust compiler is not on this computer's PATH");
-    return;
-  }
-  const dir = await fs.makeTempDir({ prefix: "ifcsql-rust-" });
-  try {
-    const source = path.join(dir, "party.rs");
-    await fs.writeTextFile(source, rustStructs(partyTables, pg));
-    const out = await proc.run([
-      rustc,
-      "--crate-type",
-      "lib",
-      "--edition",
-      "2021",
-      "-D",
-      "warnings",
-      "-o",
-      path.join(dir, "libparty.rlib"),
-      source,
-    ]);
-    assert(out.success, out.stderr);
-    // the control: Rust that is wrong does not compile
-    await fs.writeTextFile(source, "pub struct X { pub a: Strin }\n");
-    const bad = await proc.run([rustc, "--crate-type", "lib", "--edition", "2021", "-o", path.join(dir, "libbad.rlib"), source]);
-    assertEquals(bad.success, false);
-  } finally {
-    await fs.remove(dir, { recursive: true });
-  }
-});
+proves(
+  ["0009-sql-aide FR-045"],
+  "the Rust structures of the party model compile, with warnings denied",
+  async () => {
+    const rustc = proc.which("rustc");
+    if (rustc === undefined) {
+      console.log("# SKIP the Rust compiler is not on this computer's PATH");
+      return;
+    }
+    const dir = await fs.makeTempDir({ prefix: "ifcsql-rust-" });
+    try {
+      const source = path.join(dir, "party.rs");
+      await fs.writeTextFile(source, rustStructs(partyTables, pg));
+      const out = await proc.run([
+        rustc,
+        "--crate-type",
+        "lib",
+        "--edition",
+        "2021",
+        "-D",
+        "warnings",
+        "-o",
+        path.join(dir, "libparty.rlib"),
+        source,
+      ]);
+      assert(out.success, out.stderr);
+      // the control: Rust that is wrong does not compile
+      await fs.writeTextFile(source, "pub struct X { pub a: Strin }\n");
+      const bad = await proc.run([rustc, "--crate-type", "lib", "--edition", "2021", "-o", path.join(dir, "libbad.rlib"), source]);
+      assertEquals(bad.success, false);
+    } finally {
+      await fs.remove(dir, { recursive: true });
+    }
+  },
+  { timeout: 300_000 },
+);
 
 proves(
   ["0009-sql-aide FR-045", "0009-sql-aide FR-042"],

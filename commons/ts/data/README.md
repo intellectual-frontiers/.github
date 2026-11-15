@@ -35,8 +35,8 @@ cd data && bun install --frozen-lockfile              # DuckDB, PGlite and pg, f
 bun run verify                                        # tsc 7, the documentation maps, every test under Bun
 bun run test:node                                     # the same tests under Node 26
 bun run docs                                          # write arca/party.docs.auto.ts again after changing a TSDoc comment
-IFCSQL_UPDATE_GOLDEN=1 bun test suite/                # write the committed SQL again, then read the diff
-IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL server: each test makes a database and drops it
+IFCSQL_UPDATE_GOLDEN=1 bun run test                # write the committed SQL again, then read the diff
+IFCSQL_PG_URL=postgres://... bun run test          # also on a PostgreSQL server: each test makes a database and drops it
 (cd .. && bun fmt)                                    # the formatter of commons/ts
 ```
 
