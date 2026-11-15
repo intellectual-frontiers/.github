@@ -5,6 +5,7 @@
  * @module
  */
 import type { SqlValue } from "../algebra/domain.ts";
+import type { EmitContext } from "./context.ts";
 import { type AnySql, bind, type Chunk, chunkOf, chunkText, sql, type Sql } from "./sql.ts";
 
 /** An expression that yields a `T`. */
@@ -16,8 +17,30 @@ export type Operand<T, Req extends string = never, Dx extends string = string> =
 function isExpr(x: unknown): x is AnySql {
   return typeof x === "object" && x !== null && "sqlKind" in x;
 }
+/** An operand of a comparison: a name or a value as it is, anything else in parentheses, so that `(a > 1) = TRUE` keeps its meaning. */
 function chunk<T>(x: Operand<T, string, never>): Chunk {
-  return isExpr(x) ? chunkOf(x) : chunkOf(bind(x));
+  if (!isExpr(x)) return chunkOf(bind(x));
+  return chunkOf(
+    sql("expression", (ctx) => {
+      const inner = x.chunks(ctx);
+      return atomic(inner, ctx) ? inner : [chunkText("("), ...inner, chunkText(")")];
+    }),
+  );
+}
+
+const PART = String.raw`(?:"(?:[^"]|"")*"|[A-Za-z_][A-Za-z0-9_$]*)`;
+/** A name written as text (`"routine"."arg"`, `n`), a literal or a script's variable: what needs no parentheses. */
+const WORD = new RegExp(
+  String.raw`^(?:${PART}(?:\.${PART})*|:'?[A-Za-z_]\w*'?|getvariable\('[A-Za-z_]\w*'\)|\$\d+|-?\d+(?:\.\d+)?|'(?:[^']|'')*')$`,
+);
+
+/** Whether chunks are one name or one value, however deep in partials. */
+function atomic(chunks: readonly Chunk[], ctx: EmitContext): boolean {
+  const only = chunks[0];
+  if (chunks.length !== 1 || only === undefined) return false;
+  if (only.kind === "name" || only.kind === "value") return true;
+  if (only.kind === "text") return WORD.test(only.text);
+  return atomic(only.sql.chunks(ctx), ctx);
 }
 
 function binary(op: string) {

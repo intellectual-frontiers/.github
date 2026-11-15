@@ -130,7 +130,7 @@
 
 - **OQ-1**: Whether DPV's terms should be kept in `commons/ontology/` and the TypeScript generated from it, as the packaging tables are, instead of a module of the library.
 - **OQ-2**: How the library is released: as part of IFC TypeScript's package, or as a package of its own that depends on it; and whether `isolatedDeclarations` is turned on then, since it asks for a written type on every export, which a model that is inferred does not have.
-- **OQ-3**: Which features of Data Vault 2.0 (hash keys, hash differences, point-in-time and bridge tables) the library gives beyond what `netspective-labs/sql-aide` had.
+- **OQ-3**: Data Vault (FR-048) targets Data Vault 2.1. Which of its features the library gives beyond hubs, satellites and links with a load date, a record source and loads that only insert (hash keys, hash differences, point-in-time and bridge tables, ghost records) is open: the 2.1 standard is taught through the Data Vault Alliance's CDVP2.1 certification and was not found published where it could be read (datavaultalliance.com, its blog, 2026-11-15), so no rule of 2.1 is implemented from memory.
 - **OQ-4**: How far the typed block of a routine can go before the compiler's work on it is too slow.
 
 ## Key entities

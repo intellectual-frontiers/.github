@@ -103,8 +103,8 @@ requirement	mechanism	by	note
 0006-signals FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/otel.test.ts: the receiver decodes, refuses protobuf (415) and bad JSON (400)
 0006-signals FR-020	check	.github: .github/workflows/ifc-typescript.yml otel-conformance job	CI sends the suite's OTLP to the pinned OpenTelemetry Collector and compares its file export
 0006-signals FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the reducer in each mode, snapshots through the terminal emulator
-0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the palette's marks and their ASCII fallbacks
-0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: lines cut by display width, elapsed time and progress
+0006-signals FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts: the palette's roles, marks and their ASCII fallbacks, colour only where allowed
+0006-signals FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/width.test.ts and render.test.ts: lines cut by display width, elapsed time and progress
 0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
 0006-signals FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/vt.test.ts: the terminal emulator's sequences
 0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
@@ -124,9 +124,9 @@ requirement	mechanism	by	note
 0007-grc FR-014	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the risk register and NIST SP 800-30's matrix
 0007-grc FR-015	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/assess.test.ts: the requirement trace
 0007-grc FR-016	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OCSF compliance findings and inventory
-0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
+0007-grc FR-017	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts and uuid.test.ts: OSCAL documents, UUIDv5 against RFC 9562's example, determinism
 0007-grc FR-018	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/compliance-formats.test.ts: CycloneDX declarations and in-toto statements
-0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: a pack's run as spans and OCSF log records
+0007-grc FR-019	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc-signals.test.ts: a pack's run as spans and OCSF log records, the same result as the kernel's run
 0007-grc FR-020	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/sign.test.ts: ssh-keygen -Y sign and verify (where ssh-keygen is), Web Crypto DSSE
 0007-grc FR-021	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/git.test.ts: HEAD, cleanliness, changed paths and files at a revision in a temporary repository
 0007-grc FR-022	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/grc.test.ts: loaders from TOML, YAML, JSON and JSON5, errors naming file and path
@@ -171,23 +171,23 @@ requirement	mechanism	by	note
 0009-sql-aide FR-025	check	.github: cd commons/ts/data && bun run verify	Governance: descriptions and owners, emitted as comments
 0009-sql-aide FR-026	check	.github: cd commons/ts/data && bun run verify	Governance: DPV terms
 0009-sql-aide FR-027	check	.github: cd commons/ts/data && bun run verify	Governance: lint
-0009-sql-aide FR-028	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands. The lineage of integrations and of Data Vault's loads is computed, followed through the graph and kept in ifcsql_lineage (integrate.test.ts); transforms, and the run ledger it is kept beside, are not yet.
+0009-sql-aide FR-028	check	.github: cd commons/ts/data && bun run verify	integrate.test.ts, transform.test.ts, data-vault/vault.test.ts: lineage of integrations, vault loads and transforms (found by walking each model's query) computed, followed upstream across them and kept in ifcsql_lineage, which ISLM makes beside its ledger
 0009-sql-aide FR-029	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: the same assertions as a query that returns TAP in every engine, from TypeScript, and as pgTAP on a PostgreSQL server that has it
 0009-sql-aide FR-030	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: over a hundred tests made from the party model pass in every engine
 0009-sql-aide FR-031	check	.github: cd commons/ts/data && bun run verify	Tests: the TAP emitter
 0009-sql-aide FR-032	check	.github: cd commons/ts/data && bun run verify	integrate.test.ts and arca/party.test.ts: seed, file, attached and adapter integrations typed by their target (type tests with controls); Arca's reference data as rows in TypeScript; CSV made into a module of typed rows
 0009-sql-aide FR-033	check	.github: cd commons/ts/data && bun run verify	integrate.test.ts: append, upsert, replace and snapshot run in SQLite, DuckDB, PGlite and PostgreSQL, upsert twice to the same rows; read_csv in DuckDB; ATTACH in DuckDB and SQLite
 0009-sql-aide FR-034	check	.github: cd commons/ts/data && bun run verify	integrate.test.ts: an adapter's rows land and load; its failure is a value; its load does not render before it is read (type test); the library ships no adapter
-0009-sql-aide FR-035	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-036	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-037	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-038	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-039	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-040	none	-	Not whole yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-041	none	-	Not whole yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-042	none	-	Not whole yet: it is finished by phase 8 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-043	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-044	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-035	none	-	Not whole yet: no phase of the library finishes it yet. ISLM reads each engine's catalog and plans what differs in which tables, columns, views and indexes exist and in whether a column may be null (islm.test.ts, in every engine); it does not compare column types, keys, checks, foreign keys or defaults of what exists, so it does not yet say all that differs. A person must decide how far a plan compares.
+0009-sql-aide FR-036	check	.github: cd commons/ts/data && bun run verify	islm.test.ts: from empty every change is idempotent; a model change gives only the non-idempotent changes it needs (add a column, change nullness, drop a column), in every engine
+0009-sql-aide FR-037	check	.github: cd commons/ts/data && bun run verify	islm.test.ts, arca/party.test.ts, data-vault/vault.test.ts: the ledger records step, hash, kind, who, when, duration and outcome; a second apply runs and records nothing; a failed step is rolled back and recorded
+0009-sql-aide FR-038	check	.github: cd commons/ts/data && bun run verify	islm.test.ts: an undo is a new step naming the one it reverses and the ledger keeps both; the ledger refuses UPDATE and DELETE in PostgreSQL and SQLite by trigger (DuckDB has none: ISLM only appends)
+0009-sql-aide FR-039	check	.github: cd commons/ts/data && bun run verify	islm.test.ts: planScript is the default, apply runs only when called; lint flags destroying data and CREATE INDEX CONCURRENTLY, which applies outside a transaction; a plan that destroys data is refused unless allowed; teardown is refused in production
+0009-sql-aide FR-040	check	.github: cd commons/ts/data && bun run verify	islm.test.ts, arca/party.test.ts, data-vault/vault.test.ts: inspect, plan and apply in SQLite, DuckDB, PGlite and PostgreSQL with nothing outside the library; Arca and Data Vault from empty, with no drift after and nothing done by a second apply
+0009-sql-aide FR-041	check	.github: cd commons/ts/data && bun run verify	query.test.ts, arca/party.test.ts, data-vault/vault.test.ts: select with joins taken from foreign keys, left joins, projections, CTEs, union/intersect/except, insert, update, delete, returning and upsert; rows inferred (type tests with controls); run in every engine with the same rows
+0009-sql-aide FR-042	check	.github: cd commons/ts/data && bun run verify	driver.test.ts, arca/party.test.ts, data-vault/vault.test.ts: adapters typed by the client's shape (node:sqlite, pg, PGlite, DuckDB; type tests with controls) that import no driver, bind values, decode by domain to the same typed rows in every engine, call routines typed, and return failures as values; under Bun and Node
+0009-sql-aide FR-043	check	.github: cd commons/ts/data && bun run verify	transform.test.ts, arca/party.test.ts, data-vault/vault.test.ts: models are typed queries other models read (type tests); build order from their references; view, table, incremental, materialized view and ephemeral built and rebuilt in every engine with the same rows
+0009-sql-aide FR-044	check	.github: cd commons/ts/data && bun run verify	transform.test.ts, arca/party.test.ts, data-vault/vault.test.ts: unique, not null, accepted values, relationship and custom tests typed by their relation (type tests), recorded by run in ifcsql_findings, reported as TAP; controls that must fail do, in every engine
 0009-sql-aide FR-045	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
 0009-sql-aide FR-046	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
 0009-sql-aide FR-047	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: the party model; conventions.test.ts: the public entry point alone

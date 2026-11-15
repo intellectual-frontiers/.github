@@ -76,15 +76,49 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-      - name: The suite on ${{ matrix.runtime }}
+      - name: The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)
         working-directory: commons/ts
         shell: bash
         run: |
-          case "${{ matrix.runtime }}" in
-            deno) deno --version && deno test -A --no-check tests/ ;;
-            node) node --version && node --test "tests/**/*.test.ts" ;;
-            bun) bun --version && bun test tests/ ;;
-          esac
+          grep -E '^000[5-8]-' ../spec-kit/enforcement.tsv >"$RUNNER_TEMP/requirements.tsv"
+          bun tools/test.ts run --runtime ${{ matrix.runtime }} --out test-results \
+            --report tap,junit,ctrf,sarif,md,html,oscal \
+            --requirements "$RUNNER_TEMP/requirements.tsv" --reviewed ci-reviewed.tsv \
+            --ledger test-results/ledger.jsonl tests
+      - name: The record, its reports and the ledger, kept with the run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ matrix.os }}-${{ matrix.runtime }}
+          path: commons/ts/test-results/
+          if-no-files-found: error
+
+  otel-conformance:
+    # commons 0006-signals FR-020: the suite's OTLP sent to the pinned OpenTelemetry Collector, read back from its file exporter.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: The OpenTelemetry Collector, verified against commons' pins
+        shell: bash
+        run: |
+          v=$(sed -n 's/^OTELCOL_CONTRIB_VERSION=//p' commons/generated/pins.auto.env)
+          sum=$(sed -n 's/^OTELCOL_CONTRIB_SHA256_X86_64=//p' commons/generated/pins.auto.env)
+          dir="$RUNNER_TEMP/otelcol"
+          mkdir -p "$dir"
+          curl -fsSL -o "$dir/otelcol.tar.gz" "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v$v/otelcol-contrib_${v}_linux_amd64.tar.gz"
+          echo "$sum  $dir/otelcol.tar.gz" | sha256sum -c -
+          tar -xzf "$dir/otelcol.tar.gz" -C "$dir" otelcol-contrib
+          echo "IFC_OTELCOL=$dir/otelcol-contrib" >>"$GITHUB_ENV"
+      - name: The conformance test, on Bun and on Node
+        working-directory: commons/ts
+        run: |
+          bun test tests/runtime/otel-conformance.test.ts
+          node --test tests/runtime/otel-conformance.test.ts
 
   pack:
     strategy:

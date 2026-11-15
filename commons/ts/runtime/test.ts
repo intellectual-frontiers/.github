@@ -4,42 +4,68 @@
  * requirements a test proves, as erga's kernel `test.ts` does, and keeps them for a report. Kept out of `./mod.ts`, so that importing the
  * runtime never loads a test runner.
  *
+ * Every test registered here is recorded by this module's own code, not by a runner's reporter (commons 0008-test-evidence FR-001 to
+ * FR-004): its id (the SHA-256 of its file and name), file, name, requirements, risk (the option `risk`, `not-high` by default), start and
+ * end, outcome (`pass`, `fail`, `skip`, `todo` or `cancelled`), a skip's or todo's reason, a failure's message, expected and actual values
+ * (redacted and cut to 4096 characters) and attempt (`IFC_TEST_ATTEMPT`, 1 by default), as a `test` span and a log record whose parent is
+ * the run's span from `TRACEPARENT`, on a resource that is the installation record. Where `IFC_TEST_RECORD` names a file, each test's
+ * records are appended to it as OTLP JSON lines as it starts and as it ends, and a test that has not ended when the process exits is
+ * appended as `cancelled`; otherwise they are kept in memory (`recorded`) and given to each listener (`onTestRecord`). The file of a test
+ * is the file that called `test` or `proves`, from the call's stack, relative to the working folder, or the option `file`. A test's
+ * outcome is never changed by its recording: a failure is still thrown to the runner.
+ *
  * @example
  * ```ts
  * import { assertEquals, proves } from "./test.ts";
  * proves(["0005-typescript-runtime FR-013"], "one and one", () => assertEquals(1 + 1, 2));
+ * proves(["0008-test-evidence FR-001"], "a high-risk test", () => assertEquals(2 * 2, 4), { risk: "high" });
  * ```
  *
  * @module
  */
 import nodeAssert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { appendFileSync, realpathSync } from "node:fs";
+import { isAbsolute, relative, resolve } from "node:path";
+import process from "node:process";
 import { test as nodeTest } from "node:test";
+import { fileURLToPath } from "node:url";
+import { inspect } from "node:util";
+import { extractContext, redactText, type Resource, type SpanId, spanIdFrom, type TraceId, traceIdFrom } from "../kernel/otel.ts";
+import {
+  cut,
+  installationFromEnv,
+  installationResource,
+  recordLine,
+  recordPath,
+  type Review,
+  type Risk,
+  type TestCase,
+  type TestContext,
+  TEST_SCOPE,
+  testCaseLog,
+  testCaseSpan,
+  testStartLog,
+  reviewLog,
+  warningLog,
+} from "../kernel/test-record.ts";
+import { installed } from "./otel.ts";
+import { build, runtimeName, runtimeVersion } from "./proc.ts";
 
 /** A test's body. */
 export type TestFn = () => void | Promise<void>;
 
-/** How to run a test: `skip` it (with the reason as a string), or give it a `timeout` in milliseconds. */
-export type TestOptions = { readonly skip?: boolean | string; readonly timeout?: number };
-
-/** A test registered with the runtime's runner. */
-export function test(name: string, fn: TestFn, options: TestOptions = {}): void {
-  if (options.skip === undefined && options.timeout === undefined) {
-    void nodeTest(name, async () => {
-      await fn();
-    });
-    return;
-  }
-  void nodeTest(
-    name,
-    {
-      ...(options.skip === undefined ? {} : { skip: options.skip }),
-      ...(options.timeout === undefined ? {} : { timeout: options.timeout }),
-    },
-    async () => {
-      await fn();
-    },
-  );
-}
+/**
+ * How to run a test: `skip` it or mark it `todo` (with the reason as a string; neither runs its body), give it a `timeout` in milliseconds
+ * (a test that does not end by then is `cancelled`), its `risk` (`not-high` by default), or the `file` it is recorded under.
+ */
+export type TestOptions = {
+  readonly skip?: boolean | string;
+  readonly todo?: boolean | string;
+  readonly timeout?: number;
+  readonly risk?: Risk;
+  readonly file?: string;
+};
 
 /** A requirement cited by its specification and number: `0005-typescript-runtime FR-013`, or another repository's `erga 241-typescript-first FR-015`. */
 export type Requirement = string;
@@ -50,16 +76,321 @@ export const proofs: { readonly test: string; readonly requirements: readonly Re
 /** The requirements declared as proven by review rather than a test, with the reason. */
 export const reviews: { readonly requirement: Requirement; readonly reason: string }[] = [];
 
+/** Every test of this process as it was recorded, in the order they ended (skipped and todo tests as they were registered) (FR-004). */
+export const recorded: TestCase[] = [];
+
+/** What a listener is given for each test that ends: the case, and the resource and context its signals carry. */
+export type TestRecordEvent = { readonly test: TestCase; readonly resource: Resource; readonly context: TestContext };
+
+const listeners: ((e: TestRecordEvent) => void)[] = [];
+
+/**
+ * A listener given each test as it ends, beside `recorded` and `IFC_TEST_RECORD`: where an OpenTelemetry pipeline is installed, it hands
+ * `testCaseSpan` and `testCaseLog` of the event to its processors (0008-test-evidence FR-004). Returns the function that removes it.
+ */
+export function onTestRecord(listener: (e: TestRecordEvent) => void): () => void {
+  listeners.push(listener);
+  return () => {
+    const i = listeners.indexOf(listener);
+    if (i >= 0) listeners.splice(i, 1);
+  };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------- the process's record
+
+type Session = {
+  readonly traceId: TraceId;
+  readonly parentSpanId?: SpanId;
+  readonly resource: Resource;
+  readonly file: string | undefined;
+  readonly attempt: number;
+};
+
+let session: Session | undefined;
+
+function randomBytes(n: number): Uint8Array {
+  const b = new Uint8Array(n);
+  crypto.getRandomValues(b);
+  return b;
+}
+
+function newSpanId(): SpanId {
+  for (;;) {
+    const s = spanIdFrom(randomBytes(8));
+    if (s.kind === "ok") return s.value;
+  }
+}
+
+function newTraceId(): TraceId {
+  for (;;) {
+    const t = traceIdFrom(randomBytes(16));
+    if (t.kind === "ok") return t.value;
+  }
+}
+
+function nowNanos(): bigint {
+  return BigInt(Math.round((performance.timeOrigin + performance.now()) * 1000)) * 1000n;
+}
+
+function append(line: string): void {
+  const file = current().file;
+  if (file === undefined) return;
+  try {
+    appendFileSync(file, `${line}\n`);
+  } catch {
+    // A record that cannot be written never changes the test's outcome; the run sees the test as missing.
+  }
+}
+
+function current(): Session {
+  if (session !== undefined) return session;
+  const env = process.env;
+  const parent = extractContext(env["TRACEPARENT"], env["TRACESTATE"]);
+  const { installation, warnings } = installationFromEnv(
+    { runtime: runtimeName(), runtimeVersion: runtimeVersion(), os: build.os, arch: build.arch },
+    env,
+  );
+  const attempt = Number(env["IFC_TEST_ATTEMPT"] ?? "1");
+  const file = env["IFC_TEST_RECORD"]?.trim();
+  session = {
+    traceId: parent?.traceId ?? newTraceId(),
+    ...(parent === undefined ? {} : { parentSpanId: parent.spanId }),
+    resource: installationResource(installation),
+    file: file === undefined || file === "" ? undefined : file,
+    attempt: Number.isSafeInteger(attempt) && attempt >= 1 ? attempt : 1,
+  };
+  if (warnings.length > 0) append(recordLine(session.resource, { records: warnings.map((w) => warningLog(w, nowNanos())) }));
+  return session;
+}
+
+function contextFor(spanId: SpanId): TestContext {
+  const s = current();
+  return { traceId: s.traceId, spanId, ...(s.parentSpanId === undefined ? {} : { parentSpanId: s.parentSpanId }) };
+}
+
+function emit(test: TestCase, spanId: SpanId): void {
+  const s = current();
+  const context = contextFor(spanId);
+  recorded.push(test);
+  if (s.file !== undefined) {
+    append(recordLine(s.resource, { spans: [testCaseSpan(test, context)] }));
+    append(recordLine(s.resource, { records: [testCaseLog(test, context)] }));
+  } else {
+    // Without IFC_TEST_RECORD, the test goes to the installed pipeline, if any (0008-test-evidence FR-004).
+    const pipeline = installed();
+    if (pipeline !== undefined) {
+      const source = { resource: s.resource, scope: TEST_SCOPE };
+      pipeline.emit({ kind: "span", span: testCaseSpan(test, context) }, source);
+      pipeline.emit({ kind: "log", record: testCaseLog(test, context) }, source);
+    }
+  }
+  for (const l of listeners) {
+    try {
+      l({ test, resource: s.resource, context });
+    } catch {
+      // A listener's failure never changes a test's outcome.
+    }
+  }
+}
+
+type Running = { readonly base: Omit<TestCase, "end" | "outcome">; readonly spanId: SpanId };
+
+const running = new Map<SpanId, Running>();
+let exitHooked = false;
+
+function onExit(): void {
+  for (const [spanId, r] of [...running.entries()]) {
+    running.delete(spanId);
+    emit({ ...r.base, end: nowNanos(), outcome: "cancelled", reason: "the process exited before the test ended" }, spanId);
+  }
+}
+
+function hookExit(): void {
+  if (exitHooked) return;
+  exitHooked = true;
+  process.on("exit", onExit);
+  // Deno does not emit the process's `exit` event under `deno test`; it dispatches the web's `unload` event on the global scope.
+  const g: unknown = globalThis;
+  if (typeof g === "object" && g !== null && "addEventListener" in g && typeof g.addEventListener === "function") {
+    try {
+      Reflect.apply(g.addEventListener, g, ["unload", onExit]);
+    } catch {
+      // No `unload` here; the run closes the test from its start mark.
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------- the test's file
+
+const reals = new Map<string, string>();
+const SELF = normalise(import.meta.url);
+
+function normalise(location: string): string {
+  let path = location;
+  if (path.startsWith("file:")) {
+    try {
+      path = fileURLToPath(path);
+    } catch {
+      return path;
+    }
+  }
+  return real(isAbsolute(path) ? path : resolve(path));
+}
+
+/** A path with its links resolved (macOS's `/var` is `/private/var`, and a stack may name either), or as given where it does not resolve. */
+function real(path: string): string {
+  const known = reals.get(path);
+  if (known !== undefined) return known;
+  let r = path;
+  try {
+    r = realpathSync(path);
+  } catch {
+    // A path that is not there (an eval's) is kept as it is.
+  }
+  reals.set(path, r);
+  return r;
+}
+
+const FRAME = /(?:\(|at\s+)((?:file:\/\/)?[^()\s]+?):\d+:\d+\)?\s*$/;
+
+/** The file of the code that called into this module, relative to the working folder with `/`, from the call's stack. */
+function callerFile(): string {
+  const stack = new Error("where").stack ?? "";
+  for (const line of stack.split("\n").slice(1)) {
+    const m = FRAME.exec(line.trim());
+    const location = m?.[1];
+    if (location === undefined || location.startsWith("node:") || location.startsWith("ext:")) continue;
+    const path = normalise(location);
+    if (path === SELF) continue;
+    return recordPath(relative(real(process.cwd()), path));
+  }
+  return "unknown";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------- recording
+
+function testIdOf(file: string, name: string): string {
+  return createHash("sha256").update(`${file}\0${name}`).digest("hex");
+}
+
+function shown(value: unknown): string {
+  return cut(
+    redactText(typeof value === "string" ? value : inspect(value, { depth: 6, sorted: true, breakLength: 100, maxStringLength: 8192 })),
+  );
+}
+
+function failure(e: unknown): Pick<TestCase, "message" | "expected" | "actual"> {
+  const message = cut(redactText(e instanceof Error ? e.message : String(e)));
+  const assertion =
+    e instanceof Error &&
+    (e.name === "AssertionError" || ("code" in e && e.code === "ERR_ASSERTION")) &&
+    "operator" in e &&
+    e.operator !== "fail" &&
+    e.operator !== undefined;
+  if (!assertion || !("expected" in e) || !("actual" in e)) return { message };
+  return { message, expected: shown(e.expected), actual: shown(e.actual) };
+}
+
+class TimedOut extends Error {
+  /** How long the test was given. */
+  readonly ms: number;
+  constructor(ms: number) {
+    super(`the test did not end within ${ms} ms`);
+    this.name = "TimedOut";
+    this.ms = ms;
+  }
+}
+
+async function within(fn: TestFn, ms: number | undefined): Promise<void> {
+  if (ms === undefined) {
+    await fn();
+    return;
+  }
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      Promise.resolve().then(fn),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new TimedOut(ms)), ms);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+}
+
+async function runCase(
+  base: Omit<TestCase, "start" | "end" | "outcome" | "attempt">,
+  fn: TestFn,
+  timeout: number | undefined,
+): Promise<void> {
+  hookExit();
+  const spanId = newSpanId();
+  const started = { ...base, start: nowNanos(), attempt: current().attempt };
+  running.set(spanId, { base: started, spanId });
+  if (current().file !== undefined) append(recordLine(current().resource, { records: [testStartLog(started, contextFor(spanId))] }));
+  try {
+    await within(fn, timeout);
+  } catch (e) {
+    if (running.delete(spanId)) {
+      emit(
+        e instanceof TimedOut
+          ? { ...started, end: nowNanos(), outcome: "cancelled", reason: e.message }
+          : { ...started, end: nowNanos(), outcome: "fail", ...failure(e) },
+        spanId,
+      );
+    }
+    throw e;
+  }
+  if (running.delete(spanId)) emit({ ...started, end: nowNanos(), outcome: "pass" }, spanId);
+}
+
+function reasonOf(v: boolean | string): string | undefined {
+  return typeof v === "string" && v.trim() !== "" ? cut(redactText(v)) : undefined;
+}
+
+function register(name: string, requirements: readonly Requirement[], fn: TestFn, options: TestOptions, file: string): void {
+  const base = { id: testIdOf(file, name), file, name, requirements: [...requirements], risk: options.risk ?? "not-high" };
+  const notRun = (outcome: "skip" | "todo", v: boolean | string): void => {
+    const at = nowNanos();
+    const reason = reasonOf(v);
+    emit({ ...base, start: at, end: at, outcome, attempt: current().attempt, ...(reason === undefined ? {} : { reason }) }, newSpanId());
+  };
+  if (options.todo !== undefined && options.todo !== false) {
+    notRun("todo", options.todo);
+    void nodeTest(name, { todo: options.todo }, () => undefined);
+    return;
+  }
+  if (options.skip !== undefined && options.skip !== false) {
+    notRun("skip", options.skip);
+    void nodeTest(name, { skip: options.skip }, () => undefined);
+    return;
+  }
+  const body = (): Promise<void> => runCase(base, fn, options.timeout);
+  if (options.timeout === undefined) void nodeTest(name, body);
+  else void nodeTest(name, { timeout: options.timeout }, body);
+}
+
+/** A test registered with the runtime's runner, and recorded (0008-test-evidence FR-001). */
+export function test(name: string, fn: TestFn, options: TestOptions = {}): void {
+  register(name, [], fn, options, options.file === undefined ? callerFile() : recordPath(options.file));
+}
+
 /** A test that proves one or more requirements, named for them: `0005-typescript-runtime FR-013: <name>`. */
 export function proves(requirements: readonly [Requirement, ...Requirement[]], name: string, fn: TestFn, options: TestOptions = {}): void {
   const full = `${requirements.join(", ")}: ${name}`;
   proofs.push({ test: full, requirements });
-  test(full, fn, options);
+  register(full, requirements, fn, options, options.file === undefined ? callerFile() : recordPath(options.file));
 }
 
-/** A requirement proven by review rather than by a test, with the reason. */
+/** A requirement proven by review rather than by a test, with the reason; recorded as an `ifc.test.review` log record (0008-test-evidence FR-006). */
 export function reviewed(requirement: Requirement, reason: string): void {
   reviews.push({ requirement, reason });
+  const r: Review = { requirement, reason };
+  const s = current();
+  const record = reviewLog(r, nowNanos(), s.traceId);
+  if (s.file !== undefined) append(recordLine(s.resource, { records: [record] }));
+  else installed()?.emit({ kind: "log", record }, { resource: s.resource, scope: TEST_SCOPE });
 }
 
 /** Fails unless `value` is truthy; narrows its type. */

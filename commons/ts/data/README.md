@@ -43,26 +43,58 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                             | State   |
-| ----- | ---------------------------------------------------------------------------------------------------------------- | ------- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP         | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                               | here    |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                                | here    |
-| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads | here    |
-| 5     | ISLM                                                                                                             | not yet |
-| 6     | Query builder                                                                                                    | not yet |
-| 7     | Transforms                                                                                                       | not yet |
-| 8     | Driver adapters                                                                                                  | not yet |
-| 9     | Generators, the command line, plugins                                                                            | not yet |
+| Phase | What                                                                                                               | State   |
+| ----- | ------------------------------------------------------------------------------------------------------------------ | ------- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here    |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here    |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here    |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here    |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here    |
+| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here    |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here    |
+| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here    |
+| 9     | Generators, the command line, plugins                                                                              | not yet |
 
 ### Limits, said plainly
 
 - Integrations (phase 4): a load is a script the caller runs whole; it begins no transaction, so a `replace` or `snapshot` that fails
   halfway leaves what it did unless the caller wraps it in one. Files are read only by DuckDB (`read_csv`); PostgreSQL's `COPY` is not
   used. An attached database is a file of the same engine: DuckDB attaching SQLite or PostgreSQL needs an extension it would download,
-  and is not tested. Lineage covers integrations and Data Vault's loads; transforms add theirs in phase 7.
-- Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
-  nine digits; a landing relation should hold one state of a key in one load.
+  and is not tested.
+- Data Vault targets Data Vault 2.1. What it gives: hubs of business keys, satellites of attributes a row for each change, links of
+  hubs, a load date (`load_at`) and a record source on every row, and loads that only insert, change nothing when run again and add a
+  satellite row only for a changed attribute. What it does not yet give: hash keys and hash differences (a hub is keyed by its business
+  key as text, and a change is found by comparing attributes with `IS NOT DISTINCT FROM`), point-in-time and bridge tables, ghost
+  records, and any other rule of 2.1. The 2.1 standard was looked for on 2026-11-15 and not found published where it could be read:
+  [datavaultalliance.com](https://datavaultalliance.com/) names only the CDVP2.1 certification of DVA University, its
+  [blog](https://datavaultalliance.com/blog/) has no post on 2.1, and the one page found labelled 2.1
+  ([dv2.org](https://www.dv2.org/2023/01/data-vault-anti-pattern-adding-column.html)) is an unsigned blog post. So nothing of 2.1 is
+  implemented from memory, and open question OQ-3 stays open until a person gives the library the standard to follow. A satellite's
+  states are numbered with nine digits; a landing relation should hold one state of a key in one load.
+- ISLM (phase 5): a plan compares which tables, columns, views and indexes exist and whether a column may be null. It does not compare
+  column types, keys, checks, foreign keys or defaults of what exists (so FR-035 is not yet whole); such a change is a step a person
+  writes. An added column gets its type, nullness and default, not its references or checks. SQLite cannot change whether a column may
+  be null in place, and the plan says so instead of rebuilding the table. DuckDB will not alter a column of a table that has an index,
+  so the plan drops the table's indexes first and makes the model's again. DuckDB has no triggers, so nothing in the database refuses a
+  change to its ledger there. A materialized view whose definition changed is reported, not replaced. A teardown drops tables, views
+  and indexes and leaves routines, policies and types.
+- Query builder (phase 6): a relation is in a query's scope by its name, so a table cannot be joined to itself (no aliases yet). A join
+  without a condition needs exactly one foreign key between the relation and the scope: the compiler refuses none, and two (a relation
+  that points twice at one table) fail when rendered and ask for the condition. There is no `GROUP BY` or aggregate helper; `valueAs`
+  and `call` type hand-written expressions. A set operation checks at run time that both sides name their columns in the same order.
+  The rows of an insert must all give the same columns. The builder types rows as the model does, and a driver decodes a column of the model by
+  its domain; an expression that is not a column (a `count(*)`) is given as the client gives it.
+- A comparison now parenthesizes an operand that is not a single name or value, so that `(a > 1) = TRUE` keeps its meaning; DuckDB
+  refused the chained form.
+- Transforms (phase 7): a model's references are found by walking its query, rendered for the first of PostgreSQL, DuckDB and SQLite
+  it has a case for. An incremental model adds the rows whose key it does not hold and never changes a row it holds. A materialized view
+  is PostgreSQL's, made if absent and refreshed on each build; a change of its query is not applied (ISLM reports that). A relationship
+  test between a relation and itself is not supported. Lineage covers integrations, Data Vault's loads and transforms.
+- Drivers (phase 8): `run` binds a single statement's values and writes a script's (a fragment of several statements) as literals.
+  Values are decoded where a column's domain is known: a column of a table, view, model or common table expression, or a call of a
+  function that returns a value; anything else comes as the client gives it. SQLite keeps NUMERIC as a floating-point number, so its
+  digits beyond a double's are lost before they are written to the column's scale. `pg` reads a date as local midnight and the driver
+  writes it back in local time; the tests ran in UTC only. DuckDB's blobs are read through its JSON form.
 
 ## File Aide, being built
 
@@ -74,9 +106,9 @@ requirements has a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) na
 
 | Phase | What                                                                                                 | State   |
 | ----- | ---------------------------------------------------------------------------------------------------- | ------- |
-| 1     | Segments, path patterns and their laws, entries, layouts, names                                      | not yet |
-| 2     | The store interface, the `memory` and `posix` drivers, the conformance suite                         | not yet |
-| 3     | Queries: the builder, the text form, the planner, the compiler, `explain`, ignore files, `fd` parity | not yet |
+| 1     | Segments, path patterns and their laws, entries, layouts, names                                      | here    |
+| 2     | The store interface, the `memory` and `posix` drivers, the conformance suite                         | here    |
+| 3     | Queries: the builder, the text form, the planner, the compiler, `explain`, ignore files, `fd` parity | here    |
 | 4     | The `s3` driver, the local S3 server, tests against real providers                                   | not yet |
 | 5     | Checks and recipes, and stores that fail on purpose                                                  | not yet |
 | 6     | With SQL Aide: the file-reference domain and listings as a source; IFRFS end to end                  | not yet |

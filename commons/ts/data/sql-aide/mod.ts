@@ -125,6 +125,40 @@ export type {
   Strategy,
 } from "./integrate/integration.ts";
 export { lineageOf, lineageTable, recordLineage, upstream } from "./integrate/lineage.ts";
+export { inspect, LEDGER } from "./islm/catalog.ts";
+export type { Catalog, CatalogColumn, InspectError } from "./islm/catalog.ts";
+export { apply, ledgerTable, lintPlan, plan, planScript, step, teardown, undo } from "./islm/islm.ts";
+export type {
+  Applied,
+  ApplyError,
+  ApplyOptions,
+  Change,
+  ChangeKind,
+  Classification,
+  Desired,
+  Plan,
+  PlanFinding,
+  Step,
+  TeardownRefused,
+} from "./islm/islm.ts";
+export { cte, deleteFrom, domainOf, except, from, insertInto, intersect, union, unionAll, update, withCtes } from "./query/builder.ts";
+export type {
+  BrandsIn,
+  Cte,
+  Insert,
+  Joinable,
+  JoinsByKey,
+  Nullable,
+  Query,
+  Relation,
+  Returning,
+  RowOfColumns,
+  SetOf,
+  Shaped,
+  Which,
+  Writable,
+  YieldOf,
+} from "./query/builder.ts";
 export { desc, rowsAs, select, valueAs } from "./query/select.ts";
 export type { Select } from "./query/select.ts";
 export { fn, nothing, proc, rowsOf, scalar, setOf, trigger } from "./routine/routine.ts";
@@ -159,6 +193,18 @@ export type {
   SqliteFeature,
   TierOne,
 } from "./dialect/dialects.ts";
+export { decode, duckdbDriver, pgliteDriver, postgresDriver, sqliteDriver } from "./driver/driver.ts";
+export type {
+  Driver,
+  DriverError,
+  DuckdbConnection,
+  DuckdbParam,
+  PgClient,
+  PgliteClient,
+  RunsIn,
+  SqliteClient,
+  SqliteParam,
+} from "./driver/driver.ts";
 export { docsModule, docsOf, extractDocs, parseComment } from "./docs/tsdoc.ts";
 export type { ParsedComment } from "./docs/tsdoc.ts";
 export { bracketNaming, context, emitted, prefixedNaming, qualifiedNaming, typicalNaming } from "./emit/context.ts";
@@ -205,4 +251,18 @@ export type { Finding, Linted, LintRule } from "./govern/lint.ts";
 export { definitions, entityKey, ordered } from "./model/entity.ts";
 export type { CycleError, Entity, EntityName } from "./model/entity.ts";
 export { failed, fromLines, pass, skipped, tally, tapText } from "./test/tap.ts";
+export {
+  acceptedValues,
+  custom,
+  failingRows,
+  findingsTable,
+  notNull,
+  recordFindings,
+  relationship,
+  reportFindings,
+  unique,
+} from "./transform/checks.ts";
+export type { Check, Tested } from "./transform/checks.ts";
+export { model } from "./transform/transform.ts";
+export type { AnyModel, Materialization, MaterializationReq, Model, ModelOptions, ModelQuery } from "./transform/transform.ts";
 export type { Diagnostic, Directive, TapNode } from "./test/tap.ts";

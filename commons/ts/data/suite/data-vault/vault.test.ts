@@ -22,24 +22,42 @@ import {
   context,
   date,
   definitions,
+  type Driver,
+  duckdbDriver,
   duckdb,
+  eq,
   fails,
+  findingsTable,
+  from,
+  apply,
+  inspect,
+  plan,
+  type Plan,
   type LandingRow,
   lineageOf,
   lint,
+  model,
   type NewRowOf,
   postgres,
   raw,
+  recordFindings,
+  relationship,
   render,
+  reportFindings,
   type RowOf,
   rows,
   runAssertions,
   seed,
+  SQL,
   sqlite,
+  type Sqlite,
+  sqliteDriver,
   structuralTests,
   table,
   tally,
   text,
+  unique,
+  valueAs,
 } from "../../sql-aide/mod.ts";
 import { eachEngine, golden, pgliteEngine } from "../helpers.ts";
 
@@ -270,5 +288,138 @@ proves(
         ".shop_feed -> .link_customer_order",
       ],
     );
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-037", "0009-sql-aide FR-040", "0009-sql-aide FR-050"],
+  "ISLM applies a vault from empty in every engine, finds no drift after, and a second apply changes nothing",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const planned = async (): Promise<Plan> => {
+        const catalog = await inspect(engine, ctx);
+        assert(catalog.kind === "ok");
+        return plan({ entities: [...vault, feed] }, catalog.value, ctx);
+      };
+      const first = await planned();
+      assertEquals(first.changes.length, 6);
+      assert((await apply(first, engine, ctx, { actor: "vault" })).kind === "ok", engine.name);
+      const again = await planned();
+      assertEquals([again.changes, again.unplanned], [[], []], `${engine.name}: no drift`);
+      assertEquals(await apply(again, engine, ctx, { actor: "vault" }), { kind: "ok", value: { ran: [] } });
+    });
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-041", "0009-sql-aide FR-048", "0009-sql-aide FR-050"],
+  "a vault is read with the query builder: a link joined to its hubs by their keys, the same in every engine",
+  async () => {
+    const orders = from(customerOrder)
+      .join(customer)
+      .join(order)
+      .select((s) => ({ customer: s.hub_customer.customer_number, order: s.hub_order.order_number }))
+      .orderBy((s) => [s.hub_order.order_number]);
+    expectType<Equal<RowOf<typeof orders>, { readonly customer: string; readonly order: string }>>();
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...vault, feed]), ctx));
+      await engine.exec(render(feedOf(first).load, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      const rows = (await engine.query(render(orders, ctx))).map((r) => ({ ...r }));
+      assertEquals(
+        rows,
+        [
+          { customer: "C-1", order: "O-1" },
+          { customer: "C-1", order: "O-2" },
+          { customer: "C-2", order: "O-3" },
+        ],
+        engine.name,
+      );
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-043", "0009-sql-aide FR-044", "0009-sql-aide FR-050"],
+  "a vault's current state is a transform over its latest satellite rows, the same in every engine, and its tests pass",
+  async () => {
+    /** The latest state of each customer's contact. */
+    const latestState = model(
+      "customer_contact_latest",
+      from(customerContact)
+        .where((s) =>
+          eq(
+            s.sat_customer_contact.sat_customer_contact_id,
+            valueAs<RowOf<typeof customerContact>["sat_customer_contact_id"]>()(
+              SQL`(SELECT max(m."sat_customer_contact_id") FROM ${customerContact} AS m WHERE m."hub_customer_id" = ${customerContact.c.hub_customer_id})`,
+            ),
+          ),
+        )
+        .select((s) => ({ customer: s.sat_customer_contact.hub_customer_id, email: s.sat_customer_contact.email })),
+    );
+    const checks = [unique(latestState, ["customer"]), relationship(latestState, "customer", customer, "hub_customer_id")];
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...vault, feed, findingsTable]), ctx));
+      await engine.exec(render(feedOf(first).load, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      await engine.exec(
+        render(feedOf([{ customer_number: "C-1", email: "b@example.org", order_number: "O-1", status: "open", due: null }]).load, ctx),
+      );
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      await engine.exec(render(latestState.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "run"), ctx));
+      assertEquals(tally(await reportFindings(checks, "run", engine, ctx)), { passed: 2, failed: 0, skipped: 0 }, engine.name);
+      const rows = (await engine.query(`SELECT * FROM "customer_contact_latest" ORDER BY 1`)).map((r) => ({ ...r }));
+      assertEquals(rows, [
+        { customer: "C-1", email: "b@example.org" },
+        { customer: "C-2", email: null },
+      ]);
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-042", "0009-sql-aide FR-048", "0009-sql-aide FR-050"],
+  "a vault is loaded and read through the drivers of DuckDB and SQLite, twice, with typed rows",
+  async () => {
+    const { DatabaseSync } = await import("node:sqlite");
+    const { DuckDBInstance } = await import("@duckdb/node-api");
+    const instance = await DuckDBInstance.create(":memory:");
+    const connection = await instance.connect();
+    const db = new DatabaseSync(":memory:");
+    try {
+      for (const d of [duckdbDriver(connection) as unknown as Driver<Sqlite>, sqliteDriver(db)]) {
+        assertEquals((await d.run(definitions([...vault, feed]))).kind, "ok");
+        assertEquals((await d.run(feedOf(first).load)).kind, "ok");
+        for (let i = 0; i < 2; i++) for (const l of loads) assertEquals((await d.run(l.sql)).kind, "ok", d.ctx.dialect.name);
+        const states = await d.rows(
+          from(orderState).select((s) => ({
+            order: s.sat_order_state.hub_order_id,
+            due: s.sat_order_state.due,
+            at: s.sat_order_state.load_at,
+          })),
+        );
+        assert(states.kind === "ok");
+        expectType<Equal<(typeof states.value)[number]["due"], string | null>>();
+        assertEquals(states.value.length, 3, d.ctx.dialect.name);
+        assert(
+          states.value.every((s) => s.at instanceof Date),
+          d.ctx.dialect.name,
+        );
+      }
+    } finally {
+      db.close();
+      connection.closeSync();
+      instance.closeSync();
+    }
   },
 );

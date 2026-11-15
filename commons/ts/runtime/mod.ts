@@ -18,12 +18,17 @@
  * @module
  */
 export * as fs from "./fs.ts";
+export * as git from "./git.ts";
+export * as grc from "./grc.ts";
 export * as http from "./http-client.ts";
 export * as lock from "./lock.ts";
 export * as net from "./net.ts";
+export * as otel from "./otel.ts";
 export * as path from "./path.ts";
 export * as proc from "./proc.ts";
+export * as sign from "./sign.ts";
 export * as jobs from "./schedule.ts";
+export * as terminal from "./console.ts";
 export * as tty from "./tty.ts";
 export { errors, mapError, RuntimeError, toError } from "./errors.ts";
 export { serve } from "./serve.ts";

@@ -4,11 +4,14 @@
  *
  * @module
  */
-import type { Brand, Equal } from "../../../kernel/mod.ts";
+import type { Brand, Equal, Result } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
 import {
+  electronicContact,
   party,
+  partyKind,
+  partyRoleKind,
   partyDocs,
   partyIndexes,
   partyModel,
@@ -22,24 +25,46 @@ import {
   retireParty,
 } from "../../arca/mod.ts";
 import {
+  acceptedValues,
   context,
   definitions,
+  type Driver,
+  type DriverError,
+  duckdbDriver,
   duckdb,
   fails,
+  findingsTable,
+  from,
+  insertInto,
+  isNull,
+  apply,
+  inspect,
+  plan,
+  type Plan,
   lint,
+  model,
+  notNull,
   type NewRowOf,
+  pgliteDriver,
   pgTapScript,
   postgres,
   raw,
+  recordFindings,
+  relationship,
   render,
+  reportFindings,
   type RowOf,
   rows,
   runAssertions,
   SQL,
   sqlite,
+  type Sqlite,
+  sqliteDriver,
   structuralTests,
   tally,
   tapQuery,
+  tapText,
+  unique,
 } from "../../sql-aide/mod.ts";
 import { fromLines } from "../../sql-aide/mod.ts";
 import { docsAreCurrent } from "../../sql-aide/runtime/docs.ts";
@@ -279,5 +304,211 @@ proves(
     });
     assertEquals(new Set(seen).size, 1, "every engine holds the same reference data");
     assertEquals(seen[0]?.startsWith(`["[2,4,3,3]"`), true);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-037", "0009-sql-aide FR-040", "0009-sql-aide FR-050"],
+  "ISLM applies the party model from empty in every engine, finds no drift after, and a second apply changes nothing",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const planned = async (): Promise<Plan> => {
+        const catalog = await inspect(engine, ctx);
+        assert(catalog.kind === "ok", catalog.kind === "err" ? catalog.error.message : "");
+        if (engine.dialect === "postgres") return plan({ entities: [...partyModel, ...partyRoutines] }, catalog.value, contexts.postgres);
+        if (engine.dialect === "duckdb") return plan({ entities: [...partyModel, peopleBornSince] }, catalog.value, contexts.duckdb);
+        return plan({ entities: partyModel }, catalog.value, contexts.sqlite);
+      };
+      const first = await planned();
+      assertEquals(
+        first.changes.filter((c) => c.classification === "non-idempotent"),
+        [],
+        engine.name,
+      );
+      const applied = await apply(first, engine, ctx, { actor: "arca" });
+      assert(applied.kind === "ok", `${engine.name}: ${JSON.stringify(applied)}`);
+      const again = await planned();
+      assertEquals([again.changes.map((c) => c.step), again.unplanned], [[], []], `${engine.name}: no drift`);
+      assertEquals(await apply(again, engine, ctx, { actor: "arca" }), { kind: "ok", value: { ran: [] } });
+      assertEquals(
+        Number((await engine.query(`SELECT count(*) AS n FROM "ifcsql_ledger"`))[0]?.["n"]),
+        first.changes.length,
+        `${engine.name}: one entry for each change of the first apply, none for the second`,
+      );
+      // what ISLM made is what the model's generated tests hold it to be
+      const structure = structuralTests({ tables: partyTables, views: partyViews, indexes: partyIndexes }, ctx);
+      assertEquals(tally(await runAssertions(structure, engine, ctx)).failed, 0, engine.name);
+    });
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-041", "0009-sql-aide FR-047", "0009-sql-aide FR-050"],
+  "the party model is written and read with the query builder, joined by its foreign keys, with the same rows in every engine",
+  async () => {
+    const directory = from(person)
+      .join(party)
+      .leftJoin(electronicContact)
+      .where((s) => isNull(s.party.deleted_at))
+      .select((s) => ({ id: s.person.party_id, name: s.party.display_name, email: s.electronic_contact.address }))
+      .orderBy((s) => [s.person.party_id]);
+    expectType<
+      Equal<RowOf<typeof directory>, { readonly id: Brand<string, "party">; readonly name: string; readonly email: string | null }>
+    >();
+    // @ts-expect-error no foreign key joins a person to a kind of role: the join must say how
+    const unrelated = (): unknown => from(person).join(partyRoleKind);
+    assertEquals(typeof unrelated, "function");
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions(partyModel), ctx));
+      for (const r of partyReference) await engine.exec(render(r.load, ctx));
+      const p1 = party.key("p1"),
+        p2 = party.key("p2");
+      await engine.exec(
+        render(
+          insertInto(party, [
+            { party_id: p1, party_kind_code: partyKind.key("person"), display_name: "Ada Lovelace" },
+            { party_id: p2, party_kind_code: partyKind.key("person"), display_name: "Alan Turing" },
+          ]),
+          ctx,
+        ),
+      );
+      await engine.exec(
+        render(
+          insertInto(person, [
+            { party_id: p1, given_name: "Ada", family_name: "Lovelace" },
+            { party_id: p2, given_name: "Alan", family_name: "Turing" },
+          ]),
+          ctx,
+        ),
+      );
+      await engine.exec(
+        render(
+          insertInto(electronicContact, [
+            { electronic_contact_id: electronicContact.key("e1"), party_id: p1, medium: "email", address: "ada@example.org" },
+          ]),
+          ctx,
+        ),
+      );
+      const rows = (await engine.query(render(directory, ctx))).map((r) => ({ ...r }));
+      assertEquals(
+        rows,
+        [
+          { id: "p1", name: "Ada Lovelace", email: "ada@example.org" },
+          { id: "p2", name: "Alan Turing", email: null },
+        ],
+        engine.name,
+      );
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-043", "0009-sql-aide FR-044", "0009-sql-aide FR-050"],
+  "a transform of the party model builds in every engine, and its tests record no finding until a row is wrong",
+  async () => {
+    /** Each person in use with how they are reached first by email, where they are. */
+    const reachable = model(
+      "person_reachable",
+      from(person)
+        .join(party)
+        .leftJoin(electronicContact)
+        .where((s) => isNull(s.party.deleted_at))
+        .select((s) => ({ party_id: s.person.party_id, display_name: s.party.display_name, medium: s.electronic_contact.medium })),
+      { materialized: "table" },
+    );
+    const checks = [
+      unique(reachable, ["party_id"]),
+      notNull(reachable, "display_name"),
+      acceptedValues(reachable, "medium", ["email", "telephone"]),
+      relationship(reachable, "party_id", party, "party_id"),
+    ];
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...partyModel, findingsTable]), ctx));
+      for (const s of SEED) await engine.exec(s);
+      await engine.exec(
+        `INSERT INTO "electronic_contact" ("electronic_contact_id", "party_id", "medium", "address") VALUES ('e1', 'p1', 'email', 'ada@example.org')`,
+      );
+      await engine.exec(render(reachable.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "first"), ctx));
+      assertEquals(tally(await reportFindings(checks, "first", engine, ctx)), { passed: 4, failed: 0, skipped: 0 }, engine.name);
+      // a second way to reach Ada makes her appear twice, and on the web, which is not accepted here
+      await engine.exec(
+        `INSERT INTO "electronic_contact" ("electronic_contact_id", "party_id", "medium", "address") VALUES ('e2', 'p1', 'web', 'https://example.org')`,
+      );
+      await engine.exec(render(reachable.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "second"), ctx));
+      const second = await reportFindings(checks, "second", engine, ctx);
+      seen.push(tapText(second));
+      assertEquals(tally(second), { passed: 2, failed: 2, skipped: 0 }, engine.name);
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-042", "0009-sql-aide FR-050"],
+  "the party model is written and read through a driver of each in-process engine, typed and decoded the same",
+  async () => {
+    const { DatabaseSync } = await import("node:sqlite");
+    const { PGlite } = await import("@electric-sql/pglite");
+    const { DuckDBInstance } = await import("@duckdb/node-api");
+    const seen: string[] = [];
+    const scenario = async (d: Driver<Sqlite>): Promise<void> => {
+      const must = <T>(r: Result<T, DriverError>): T => {
+        if (r.kind === "err") throw new Error(`${d.ctx.dialect.name}: ${r.error.message}`);
+        return r.value;
+      };
+      must(await d.run(definitions(partyModel)));
+      for (const r of partyReference) must(await d.run(r.load));
+      must(await d.run(insertInto(party, [{ party_id: party.key("p1"), party_kind_code: partyKind.key("person"), display_name: "Ada" }])));
+      must(
+        await d.run(
+          insertInto(person, [{ party_id: party.key("p1"), given_name: "Ada", family_name: "Lovelace", birth_date: "1815-12-10" }]),
+        ),
+      );
+      const people = must(
+        await d.rows(
+          from(person)
+            .join(party)
+            .select((s) => ({ born: s.person.birth_date, made: s.party.created_at })),
+        ),
+      );
+      expectType<Equal<(typeof people)[number], { readonly born: string | null; readonly made: Date }>>();
+      assert(people[0]?.made instanceof Date, d.ctx.dialect.name);
+      seen.push(JSON.stringify(people.map((p) => p.born)));
+      // a person with no party is refused, as a value
+      const orphan = await d.run(insertInto(person, [{ party_id: party.key("nobody"), given_name: "N", family_name: "O" }]));
+      assertEquals(orphan.kind, "err", d.ctx.dialect.name);
+    };
+    const db = new DatabaseSync(":memory:");
+    db.exec("PRAGMA foreign_keys = ON");
+    try {
+      await scenario(sqliteDriver(db, contexts.sqlite));
+    } finally {
+      db.close();
+    }
+    const pglite = new PGlite();
+    try {
+      // the scenario uses only what all three dialects have
+      await scenario(pgliteDriver(pglite, contexts.postgres) as unknown as Driver<Sqlite>);
+    } finally {
+      await pglite.close();
+    }
+    const instance = await DuckDBInstance.create(":memory:");
+    const connection = await instance.connect();
+    try {
+      await scenario(duckdbDriver(connection, contexts.duckdb) as unknown as Driver<Sqlite>);
+    } finally {
+      connection.closeSync();
+      instance.closeSync();
+    }
+    assertEquals(seen, [`["1815-12-10"]`, `["1815-12-10"]`, `["1815-12-10"]`]);
   },
 );
