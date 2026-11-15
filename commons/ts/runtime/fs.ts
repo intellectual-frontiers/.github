@@ -483,8 +483,31 @@ function openFlags(path: string, o: OpenOptions): number {
   if (o.append === true) f |= c.O_APPEND;
   if (o.create === true || o.createNew === true) f |= c.O_CREAT;
   if (o.createNew === true) f |= c.O_EXCL;
-  if (o.truncate === true) f |= c.O_TRUNC;
+  // No O_TRUNC: Bun on Windows refuses O_TRUNC without O_CREAT with EINVAL, so `truncate` cuts the file once it is open (see `cutIfAsked`),
+  // the same on every runtime and system.
   return f;
+}
+
+/** The file just opened cut to nothing where `truncate` was asked: what O_TRUNC does, done after the open (see {@link openFlags}). */
+async function cutIfAsked(fd: number, path: string, o: OpenOptions): Promise<void> {
+  if (o.truncate !== true) return;
+  try {
+    await hostCall(path, () => new Promise<void>((res, rej) => nfs.ftruncate(fd, 0, (e) => (e === null ? res() : rej(e)))));
+  } catch (e) {
+    nfs.closeSync(fd);
+    throw e;
+  }
+}
+
+/** The same, without waiting. */
+function cutIfAskedSync(fd: number, path: string, o: OpenOptions): void {
+  if (o.truncate !== true) return;
+  try {
+    hostCallSync(path, () => nfs.ftruncateSync(fd, 0));
+  } catch (e) {
+    nfs.closeSync(fd);
+    throw e;
+  }
 }
 
 const CHUNK = 64 * 1024;
@@ -694,6 +717,7 @@ export async function open(path: PathLike, options: OpenOptions = { read: true }
     file,
     () => new Promise<number>((res, rej) => nfs.open(file, flags, modeArg(options), (e, d) => (e === null ? res(d) : rej(e)))),
   );
+  await cutIfAsked(fd, file, options);
   return new FsFile(fd, file, options.append === true);
 }
 
@@ -701,11 +725,9 @@ export async function open(path: PathLike, options: OpenOptions = { read: true }
 export function openSync(path: PathLike, options: OpenOptions = { read: true }): FsFile {
   const file = p(path);
   const flags = openFlags(file, options);
-  return new FsFile(
-    hostCallSync(file, () => nfs.openSync(file, flags, modeArg(options))),
-    file,
-    options.append === true,
-  );
+  const fd = hostCallSync(file, () => nfs.openSync(file, flags, modeArg(options)));
+  cutIfAskedSync(fd, file, options);
+  return new FsFile(fd, file, options.append === true);
 }
 
 // FR-050: copy and walk.

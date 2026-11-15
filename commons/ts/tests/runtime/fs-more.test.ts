@@ -321,7 +321,9 @@ proves(
       const canonical = await collect(fs.walk(w, { includeDirs: false, followSymlinks: true, includeSymlinks: false }));
       assertEquals(
         canonical.map((e) => e.path),
-        [join(await fs.realPath(w), "file.txt"), join(await fs.realPath(join(dir, "t")), "in.txt")],
+        // As @std/fs's walk: a link followed is given by its real path, what is not a link keeps the path walked (macOS's /var, not
+        // /private/var).
+        [join(w, "file.txt"), join(await fs.realPath(join(dir, "t")), "in.txt")],
       );
     });
   },

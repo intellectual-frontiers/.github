@@ -45,33 +45,49 @@ async function send(conn: Conn, text: string): Promise<void> {
   await conn.closeWrite();
 }
 
-proves([TCP], "an echo server on a free port: addresses, web streams both ways, half-close, then the listener closes", async () => {
-  const listener = await listen({ port: 0 });
-  assert(listener.addr.port > 0, "port 0 gives a free port");
-  assertEquals(listener.addr.hostname, "127.0.0.1");
-  const serving = echo(listener);
-  {
-    using conn = await connect({ port: listener.addr.port });
-    assertEquals(conn.remoteAddr, listener.addr);
-    assertEquals(conn.localAddr.hostname, "127.0.0.1");
-    assert(conn.localAddr.port > 0);
-    const big = "x".repeat(1 << 20);
-    const [, back] = await Promise.all([send(conn, `hello ${big}`), readAll(conn)]);
-    assertEquals(back, `hello ${big}`);
-  }
-  listener.close();
-  listener.close();
-  await serving;
-  await assertRejects(() => listener.accept(), errors.ConnectionAborted);
-});
+proves(
+  [TCP],
+  "an echo server on a free port: addresses, web streams both ways, half-close, then the listener closes",
+  async () => {
+    const listener = await listen({ port: 0 });
+    assert(listener.addr.port > 0, "port 0 gives a free port");
+    assertEquals(listener.addr.hostname, "127.0.0.1");
+    const serving = echo(listener);
+    try {
+      using conn = await connect({ port: listener.addr.port });
+      assertEquals(conn.remoteAddr, listener.addr);
+      assertEquals(conn.localAddr.hostname, "127.0.0.1");
+      assert(conn.localAddr.port > 0);
+      const big = `hello ${"x".repeat(1 << 20)}`;
+      const [, back] = await Promise.all([send(conn, big), readAll(conn)]);
+      assertEquals(back.length, big.length, "all of it came back, after the half-close");
+      assert(back === big, "the same text");
+    } finally {
+      // A failure above must not leave the listener open: a test process with a listener open never ends.
+      listener.close();
+    }
+    listener.close();
+    await serving;
+    await assertRejects(() => listener.accept(), errors.ConnectionAborted);
+  },
+  { timeout: 30_000 },
+);
 
-proves([TCP], "a port nothing listens on refuses: ConnectionRefused, with the address", async () => {
-  const listener = await listen({ port: 0 });
-  const port = listener.addr.port;
-  listener.close();
-  const e = await assertRejects(() => connect({ hostname: "127.0.0.1", port }), errors.ConnectionRefused);
-  assertEquals(e.code, "ECONNREFUSED");
-});
+proves(
+  [TCP],
+  "a port nothing listens on refuses: ConnectionRefused, with the address",
+  async () => {
+    const listener = await listen({ port: 0 });
+    const port = listener.addr.port;
+    listener.close();
+    // Refused at once on Linux and macOS, after a few retries on Windows; the signal ends a connect that never settles as a failure here,
+    // not as a hung test run.
+    const signal = AbortSignal.timeout(20_000);
+    const e = await assertRejects(() => connect({ hostname: "127.0.0.1", port, signal }), errors.ConnectionRefused);
+    assertEquals(e.code, "ECONNREFUSED");
+  },
+  { timeout: 30_000 },
+);
 
 proves([TCP], "a port already taken is AddrInUse; `await using` frees it", async () => {
   let port = 0;
@@ -99,16 +115,22 @@ proves(
         conn.close();
       }
     })();
-    const conn = await connect({ port: listener.addr.port });
-    assertEquals(await readAll(conn), "", "the server closed it");
-    conn.close();
-    stop.abort();
+    let port: number | undefined;
+    try {
+      using conn = await connect({ port: listener.addr.port });
+      port = conn.localAddr.port;
+      assertEquals(await readAll(conn), "", "the server closed it");
+    } finally {
+      // Closed whatever happened above, so that a failure is reported rather than a test process that never ends.
+      stop.abort();
+    }
     await iterating;
-    assertEquals(seen, [conn.localAddr.port]);
+    assertEquals(seen, [port ?? -1]);
     await assertRejects(() => connect({ port: listener.addr.port, signal: AbortSignal.abort() }));
     const late = AbortSignal.abort(new DOMException("too late", "TimeoutError"));
     await assertRejects(() => connect({ port: listener.addr.port, signal: late }), errors.TimedOut);
   },
+  { timeout: 30_000 },
 );
 
 const OPENSSL = which("openssl");
