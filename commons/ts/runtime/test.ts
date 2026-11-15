@@ -24,14 +24,21 @@ export type TestOptions = { readonly skip?: boolean | string; readonly timeout?:
 /** A test registered with the runtime's runner. */
 export function test(name: string, fn: TestFn, options: TestOptions = {}): void {
   if (options.skip === undefined && options.timeout === undefined) {
-    nodeTest(name, async () => {
+    void nodeTest(name, async () => {
       await fn();
     });
     return;
   }
-  nodeTest(name, { ...(options.skip === undefined ? {} : { skip: options.skip }), ...(options.timeout === undefined ? {} : { timeout: options.timeout }) }, async () => {
-    await fn();
-  });
+  void nodeTest(
+    name,
+    {
+      ...(options.skip === undefined ? {} : { skip: options.skip }),
+      ...(options.timeout === undefined ? {} : { timeout: options.timeout }),
+    },
+    async () => {
+      await fn();
+    },
+  );
 }
 
 /** A requirement cited by its specification and number: `0005-typescript-runtime FR-013`, or another repository's `erga 241-typescript-first FR-015`. */
@@ -116,7 +123,11 @@ function isDeepStrictEqual(a: unknown, b: unknown): boolean {
 }
 
 /** The error a function throws; fails where it throws none, or one not of `Class`, or one whose message does not include `includes`. */
-export function assertThrows<E extends Error = Error>(fn: () => unknown, Class?: abstract new (...args: never[]) => E, includes?: string): E {
+export function assertThrows<E extends Error = Error>(
+  fn: () => unknown,
+  Class?: abstract new (...args: never[]) => E,
+  includes?: string,
+): E {
   try {
     fn();
   } catch (e) {
@@ -143,7 +154,9 @@ export async function assertRejects<E extends Error = Error>(
 
 function checkThrown(e: unknown, Class: (abstract new (...args: never[]) => Error) | undefined, includes: string | undefined): void {
   if (Class !== undefined && !(e instanceof Class)) {
-    throw new nodeAssert.AssertionError({ message: `expected ${Class.name}, got ${e instanceof Error ? e.name : String(e)}: ${String(e)}` });
+    throw new nodeAssert.AssertionError({
+      message: `expected ${Class.name}, got ${e instanceof Error ? e.name : String(e)}: ${String(e)}`,
+    });
   }
   if (includes !== undefined && !(e instanceof Error && e.message.includes(includes))) {
     throw new nodeAssert.AssertionError({ message: `expected the error to include ${JSON.stringify(includes)}, got ${String(e)}` });

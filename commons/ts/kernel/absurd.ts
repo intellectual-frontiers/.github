@@ -22,4 +22,3 @@
 export function absurd(value: never): never {
   throw new Error(`an alternative was not handled: ${JSON.stringify(value)}`);
 }
-

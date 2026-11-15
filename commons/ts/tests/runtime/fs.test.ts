@@ -27,7 +27,8 @@ proves([ERR], "a Node error code becomes its class, keeping the code, the path a
   assertInstanceOf(mapError(Object.assign(new Error(""), { code: "EADDRINUSE", address: "127.0.0.1" })), errors.AddrInUse);
   const other = new Error("plain");
   assertEquals(mapError(other), other);
-  assertEquals(mapError("text"), "text");
+  const wrapped = mapError("text");
+  assertEquals([wrapped instanceof Error, wrapped.cause], [true, "text"]);
   assertEquals(mapError(mapped), mapped);
 });
 
@@ -63,7 +64,13 @@ proves([FR, ERR], "folders made, listed, stat'd and removed; removing what is no
     const names: string[] = [];
     for await (const e of fs.readDir(join(dir, "a"))) names.push(`${e.name}:${e.isFile ? "f" : e.isDirectory ? "d" : "?"}`);
     assertEquals(names.sort(), ["b:d", "f.txt:f"]);
-    assertEquals(fs.readDirSync(dir).map((e) => e.name).sort(), ["a", "s"]);
+    assertEquals(
+      fs
+        .readDirSync(dir)
+        .map((e) => e.name)
+        .sort(),
+      ["a", "s"],
+    );
     const st = await fs.stat(join(dir, "a", "f.txt"));
     assert(st.isFile && !st.isDirectory && !st.isSymlink);
     assertEquals(st.size, 1);
@@ -127,28 +134,32 @@ proves([FR], "temporary folders and files, rename, copy, chmod, links, realPath,
   assert(!(await fs.exists(dir)));
 });
 
-proves([FR], "Stolos's helpers: readTextOr, ensureDir, writeIfChanged, listDirs, listFiles, walkFiles, sha256File, withTempDir", async () => {
-  let kept = "";
-  await fs.withTempDir(async (dir) => {
-    kept = dir;
-    assertEquals(await fs.readTextOr(join(dir, "none")), undefined);
-    assertEquals(await fs.readTextOr(join(dir, "none"), "fallback"), "fallback");
-    assert(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "1"));
-    assert(!(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "1")));
-    assert(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "2"));
-    assertEquals(await fs.listFiles(join(dir, "deep")), ["x.txt"]);
-    await fs.ensureDir(join(dir, "b", "c"));
-    await fs.writeTextFile(join(dir, "b", "c", "y.md"), "y");
-    await fs.writeTextFile(join(dir, "b", "z.txt"), "z");
-    assertEquals(await fs.listDirs(dir), ["b", "deep"]);
-    assertEquals(await fs.listFiles(join(dir, "b"), ".txt"), ["z.txt"]);
-    assertEquals(await fs.walkFiles(dir), ["b/c/y.md", "b/z.txt", "deep/x.txt"]);
-    assertEquals(await fs.listDirs(join(dir, "none")), []);
-    assertEquals(await fs.walkFiles(join(dir, "none")), []);
-    const big = new Uint8Array(300_000).map((_, i) => i % 251);
-    await fs.writeFile(join(dir, "big"), big);
-    assertEquals(await fs.sha256File(join(dir, "big")), await sha256(big));
-    await assertRejects(() => fs.sha256File(join(dir, "none")), errors.NotFound);
-  });
-  assert(!(await fs.exists(kept)));
-});
+proves(
+  [FR],
+  "Stolos's helpers: readTextOr, ensureDir, writeIfChanged, listDirs, listFiles, walkFiles, sha256File, withTempDir",
+  async () => {
+    let kept = "";
+    await fs.withTempDir(async (dir) => {
+      kept = dir;
+      assertEquals(await fs.readTextOr(join(dir, "none")), undefined);
+      assertEquals(await fs.readTextOr(join(dir, "none"), "fallback"), "fallback");
+      assert(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "1"));
+      assert(!(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "1")));
+      assert(await fs.writeIfChanged(join(dir, "deep", "x.txt"), "2"));
+      assertEquals(await fs.listFiles(join(dir, "deep")), ["x.txt"]);
+      await fs.ensureDir(join(dir, "b", "c"));
+      await fs.writeTextFile(join(dir, "b", "c", "y.md"), "y");
+      await fs.writeTextFile(join(dir, "b", "z.txt"), "z");
+      assertEquals(await fs.listDirs(dir), ["b", "deep"]);
+      assertEquals(await fs.listFiles(join(dir, "b"), ".txt"), ["z.txt"]);
+      assertEquals(await fs.walkFiles(dir), ["b/c/y.md", "b/z.txt", "deep/x.txt"]);
+      assertEquals(await fs.listDirs(join(dir, "none")), []);
+      assertEquals(await fs.walkFiles(join(dir, "none")), []);
+      const big = new Uint8Array(300_000).map((_, i) => i % 251);
+      await fs.writeFile(join(dir, "big"), big);
+      assertEquals(await fs.sha256File(join(dir, "big")), await sha256(big));
+      await assertRejects(() => fs.sha256File(join(dir, "none")), errors.NotFound);
+    });
+    assert(!(await fs.exists(kept)));
+  },
+);

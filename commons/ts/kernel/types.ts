@@ -13,7 +13,7 @@
  */
 
 /** `true` where `A` and `B` are exactly the same type (not merely assignable either way), else `false`. */
-export type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+export type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 
 /** `true` where `A` is assignable to `B`. */
 export type Extends<A, B> = [A] extends [B] ? true : false;

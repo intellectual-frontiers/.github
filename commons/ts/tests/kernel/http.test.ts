@@ -27,10 +27,15 @@ proves([FR], "Link headers are read into their links, and rel=next is found amon
 proves([FR, "0005-typescript-runtime FR-014"], "a Link header written from links reads back to the same targets and rels", () => {
   const url = fc.webUrl({ withQueryParameters: true }).filter((u) => !u.includes(">") && !u.includes(","));
   const rel = fc.constantFrom("next", "prev", "last", "first");
-  fc.assert(fc.property(fc.array(fc.tuple(url, rel), { maxLength: 4 }), (links) => {
-    const header = links.map(([u, r]) => `<${u}>; rel="${r}"`).join(", ");
-    assertEquals(parseLinkHeader(header).map((l) => [l.target, l.params["rel"]]), links);
-  }));
+  fc.assert(
+    fc.property(fc.array(fc.tuple(url, rel), { maxLength: 4 }), (links) => {
+      const header = links.map(([u, r]) => `<${u}>; rel="${r}"`).join(", ");
+      assertEquals(
+        parseLinkHeader(header).map((l) => [l.target, l.params["rel"]]),
+        links,
+      );
+    }),
+  );
 });
 
 proves([FR], "Retry-After as seconds and as an HTTP date, never negative", () => {

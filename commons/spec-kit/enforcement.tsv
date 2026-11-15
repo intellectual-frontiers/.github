@@ -60,3 +60,8 @@ requirement	mechanism	by	note
 0005-typescript-runtime FR-023	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: the look for each environment, terminal detection, raw mode refused without a terminal
 0005-typescript-runtime FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: classification, waits, Retry-After, retries against a local server, resume with Range, the SHA-256 check
 0005-typescript-runtime FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/net.test.ts: a real server on a free port: bodies, cookies, HEAD, a handler that throws, AddrInUse, shutdown by signal
+0005-typescript-runtime FR-026	gate	.github: .github/workflows/ifc-typescript.yml	the jobs take Bun's version from commons/generated/pins.auto.env; boundaries.test.ts: no npm, Prettier, ESLint, dprint or Vitest dependency
+0005-typescript-runtime FR-027	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun fmt --check
+0005-typescript-runtime FR-028	gate	.github: .github/workflows/ifc-typescript.yml	the lint job runs bun lint --type-aware --max-warnings 0 with bunfig.toml's rules; boundaries.test.ts: the rules FR-028 names are errors in bunfig.toml
+0005-typescript-runtime FR-029	gate	.github: .github/workflows/ifc-typescript-release.yml	the release job: the tag matches package.json's version, tsc 7 builds, bun pm pack, the tarball and its SHA-256 attached; boundaries.test.ts: the exports and the build configuration
+0005-typescript-runtime FR-030	gate	.github: .github/workflows/ifc-typescript.yml	the pack job installs the packed tarball into an empty project and runs it on Deno, Node and Bun; the release workflow runs the same before releasing

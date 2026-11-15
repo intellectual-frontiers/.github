@@ -40,7 +40,10 @@ proves([FR], "the environment, by the names Deno gave it", () => {
 });
 
 proves([FR], "the platform, by the names Deno gave it, the runtime's name and version, the process", () => {
-  assertEquals([proc.osOf("win32"), proc.osOf("darwin"), proc.osOf("linux"), proc.osOf("sunos"), proc.osOf("plan9")], ["windows", "darwin", "linux", "solaris", "other"]);
+  assertEquals(
+    [proc.osOf("win32"), proc.osOf("darwin"), proc.osOf("linux"), proc.osOf("sunos"), proc.osOf("plan9")],
+    ["windows", "darwin", "linux", "solaris", "other"],
+  );
   assertEquals([proc.archOf("x64"), proc.archOf("arm64"), proc.archOf("mips")], ["x86_64", "aarch64", "other"]);
   assert(["linux", "darwin", "windows"].includes(proc.build.os));
   assert(["deno", "node", "bun"].includes(proc.runtimeName()));
@@ -67,9 +70,9 @@ proves([FR], "a program runs with its input, environment and working folder, and
   await withTempDir(async (dir) => {
     const script = join(dir, "child.mjs");
     await writeTextFile(script, SCRIPT);
-    const r = await proc.run(runtimeArgv(script, "echo", "3"), { stdin: "hello", env: { IFC_X: "y" }, cwd: dir });
+    const r = await proc.run(runtimeArgv(script, "echo", "3"), { input: "hello", env: { IFC_X: "y" }, cwd: dir });
     assertEquals([r.code, r.success, r.signal, r.stdout, r.stderr], [3, false, null, "out:hello", "err:y"]);
-    const b = await proc.output(runtimeArgv(script, "echo"), { stdin: new TextEncoder().encode("bytes") });
+    const b = await proc.output(runtimeArgv(script, "echo"), { input: new TextEncoder().encode("bytes") });
     assertEquals([b.code, new TextDecoder().decode(b.stdout)], [0, "out:bytes"]);
     const quiet = await proc.run(runtimeArgv(script, "echo"), { stdout: "null", stderr: "null" });
     assertEquals([quiet.code, quiet.stdout, quiet.stderr], [0, "", ""]);
@@ -85,18 +88,28 @@ proves([FR], "each line comes as it is written, without its line ending, and the
     await writeTextFile(script, SCRIPT);
     const lines: string[] = [];
     const r = await proc.run(runtimeArgv(script, "lines"), { onLine: (s, l) => lines.push(`${s}:${l}`) });
-    assertEquals(lines.filter((l) => l.startsWith("stdout")), ["stdout:a", "stdout:b", "stdout:c"]);
-    assertEquals(lines.filter((l) => l.startsWith("stderr")), ["stderr:e1"]);
+    assertEquals(
+      lines.filter((l) => l.startsWith("stdout")),
+      ["stdout:a", "stdout:b", "stdout:c"],
+    );
+    assertEquals(
+      lines.filter((l) => l.startsWith("stderr")),
+      ["stderr:e1"],
+    );
     assertEquals(r.stdout, "a\r\nb\nc");
   });
 });
 
-proves([FR, "0005-typescript-runtime FR-019"], "a program that does not exist is NotFound; an empty argument vector is refused", async () => {
-  const e = await assertRejects(() => proc.run(["no-such-program-ifc-ts"]), errors.NotFound);
-  assertEquals(e.code, "ENOENT");
-  await assertRejects(() => proc.run([]), errors.InvalidData);
-  assertEquals(await proc.firstLine(["no-such-program-ifc-ts"]), "");
-});
+proves(
+  [FR, "0005-typescript-runtime FR-019"],
+  "a program that does not exist is NotFound; an empty argument vector is refused",
+  async () => {
+    const e = await assertRejects(() => proc.run(["no-such-program-ifc-ts"]), errors.NotFound);
+    assertEquals(e.code, "ENOENT");
+    await assertRejects(() => proc.run([]), errors.InvalidData);
+    assertEquals(await proc.firstLine(["no-such-program-ifc-ts"]), "");
+  },
+);
 
 proves([FR], "a program is stopped by its abort signal, with SIGTERM", async () => {
   await withTempDir(async (dir) => {
@@ -105,7 +118,7 @@ proves([FR], "a program is stopped by its abort signal, with SIGTERM", async () 
     const ctl = new AbortController();
     const started = Date.now();
     setTimeout(() => ctl.abort(), 300);
-    const r = await proc.run(runtimeArgv(script, "sleep"), { stdin: "", signal: ctl.signal, killAfterMs: 2000 });
+    const r = await proc.run(runtimeArgv(script, "sleep"), { input: "", signal: ctl.signal, killAfterMs: 2000 });
     assert(Date.now() - started < 10_000);
     assert(!r.success);
     if (proc.build.os !== "windows") assertEquals([r.signal, r.code], ["SIGTERM", 143]);

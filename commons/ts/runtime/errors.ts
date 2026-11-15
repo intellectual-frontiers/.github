@@ -138,16 +138,22 @@ const field = (e: object, key: string): string | undefined => {
   return typeof v === "string" ? v : undefined;
 };
 
+/** What was thrown or rejected, as an `Error`: an `Error` as it is, anything else wrapped, kept as the cause. */
+export function toError(thrown: unknown, message = "a value that is not an Error was thrown"): Error {
+  return thrown instanceof Error ? thrown : new Error(message, { cause: thrown });
+}
+
 /**
  * What the host threw, as an error of the runtime: an error that carries a known `code` becomes its class (keeping the message, code,
- * path and the original as its cause); an error of the runtime is returned as it is; anything else is returned unchanged.
+ * path and the original as its cause); any other `Error`, a runtime error among them, is returned as it is; anything else is wrapped by
+ * {@link toError}.
  */
-export function mapError(thrown: unknown, path?: string): unknown {
-  if (thrown instanceof RuntimeError || typeof thrown !== "object" || thrown === null) return thrown;
+export function mapError(thrown: unknown, path?: string): Error {
+  if (thrown instanceof RuntimeError || typeof thrown !== "object" || thrown === null) return toError(thrown);
   const code = field(thrown, "code");
   const Class = code === undefined ? undefined : BY_CODE[code];
-  if (code === undefined || Class === undefined) return thrown;
-  const message = thrown instanceof Error ? thrown.message : String(thrown);
+  if (code === undefined || Class === undefined) return toError(thrown);
+  const message = thrown instanceof Error ? thrown.message : (field(thrown, "message") ?? code);
   return new Class(message, code, field(thrown, "path") ?? field(thrown, "address") ?? path, thrown);
 }
 

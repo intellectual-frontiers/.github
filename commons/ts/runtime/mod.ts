@@ -21,6 +21,6 @@ export * as net from "./net.ts";
 export * as path from "./path.ts";
 export * as proc from "./proc.ts";
 export * as tty from "./tty.ts";
-export { errors, mapError, RuntimeError } from "./errors.ts";
+export { errors, mapError, RuntimeError, toError } from "./errors.ts";
 export { serve } from "./serve.ts";
 export type { NetAddr, Server, ServeHandler, ServeInfo, ServeOptions } from "./serve.ts";

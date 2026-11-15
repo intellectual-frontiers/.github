@@ -45,8 +45,14 @@ proves([FR, "0005-typescript-runtime FR-014"], "a value written as JSON decodes 
 });
 
 proves([FR], "each decoder names the path, what it expected and what it found", () => {
-  assertEquals(person({ name: "a", age: 1.5, tags: [] }), err({ kind: "decode", path: "$.age", expected: "an integer", found: "number 1.5" }));
-  assertEquals(person({ name: "a", age: 1, tags: ["x", 2] }), err({ kind: "decode", path: "$.tags[1]", expected: "a string", found: "number 2" }));
+  assertEquals(
+    person({ name: "a", age: 1.5, tags: [] }),
+    err({ kind: "decode", path: "$.age", expected: "an integer", found: "number 1.5" }),
+  );
+  assertEquals(
+    person({ name: "a", age: 1, tags: ["x", 2] }),
+    err({ kind: "decode", path: "$.tags[1]", expected: "a string", found: "number 2" }),
+  );
   assertEquals(person([]), err({ kind: "decode", path: "$", expected: "an object", found: "an array" }));
   assertEquals(number(Number.NaN).kind, "err");
   assertEquals(boolean("true").kind, "err");
@@ -61,8 +67,14 @@ proves([FR], "each decoder names the path, what it expected and what it found", 
   assertEquals(unknownValue(Symbol.for("x")).kind, "ok");
   assertEquals(json("{", string).kind, "err");
   assertEquals(describe(undefined), "nothing");
-  assertEquals(describe(() => 1), "a function");
-  assertEquals(formatDecodeError({ kind: "decode", path: "$.a", expected: "a string", found: "null" }), "$.a: expected a string, found null");
+  assertEquals(
+    describe(() => 1),
+    "a function",
+  );
+  assertEquals(
+    formatDecodeError({ kind: "decode", path: "$.a", expected: "a string", found: "null" }),
+    "$.a: expected a string, found null",
+  );
 });
 
 proves([FR], "optional fields absent or undefined are left out; unknown fields are dropped", () => {
@@ -76,7 +88,10 @@ const shape = tagged({
 
 proves([FR], "tagged picks the alternative by kind, and names kind where none fits", () => {
   assertEquals(shape({ kind: "circle", r: 1 }), ok({ kind: "circle", r: 1 }));
-  assertEquals(shape({ kind: "hexagon" }), err({ kind: "decode", path: "$.kind", expected: "one of circle, square", found: 'the string "hexagon"' }));
+  assertEquals(
+    shape({ kind: "hexagon" }),
+    err({ kind: "decode", path: "$.kind", expected: "one of circle, square", found: 'the string "hexagon"' }),
+  );
   assertEquals(shape({ kind: "toString" }).kind, "err");
 });
 

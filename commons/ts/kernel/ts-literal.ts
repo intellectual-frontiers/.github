@@ -53,10 +53,11 @@ export function tsLiteral(value: Literal, depth = 0): string {
 /** Where a text stopped being a literal, and what was expected there. */
 export type LiteralError = { readonly kind: "literal"; readonly at: number; readonly expected: string };
 
-class Stop {
+class Stop extends Error {
   readonly at: number;
   readonly expected: string;
   constructor(at: number, expected: string) {
+    super(`not a literal at ${at}: expected ${expected}`);
     this.at = at;
     this.expected = expected;
   }

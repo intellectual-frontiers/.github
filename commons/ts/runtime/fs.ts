@@ -73,10 +73,20 @@ function info(s: nfs.Stats): FileInfo {
 /** One entry of a folder, by `Deno.DirEntry`'s names. */
 export type DirEntry = { readonly name: string; readonly isFile: boolean; readonly isDirectory: boolean; readonly isSymlink: boolean };
 
-const entry = (d: nfs.Dirent): DirEntry => ({ name: d.name, isFile: d.isFile(), isDirectory: d.isDirectory(), isSymlink: d.isSymbolicLink() });
+const entry = (d: nfs.Dirent): DirEntry => ({
+  name: d.name,
+  isFile: d.isFile(),
+  isDirectory: d.isDirectory(),
+  isSymlink: d.isSymbolicLink(),
+});
 
 /** How to write a file: append instead of replacing, refuse to make it (`create: false`), refuse where it exists (`createNew`), its mode. */
-export type WriteFileOptions = { readonly append?: boolean; readonly create?: boolean; readonly createNew?: boolean; readonly mode?: number };
+export type WriteFileOptions = {
+  readonly append?: boolean;
+  readonly create?: boolean;
+  readonly createNew?: boolean;
+  readonly mode?: number;
+};
 
 function flag(o: WriteFileOptions): string {
   if (o.createNew === true) return o.append === true ? "ax" : "wx";
@@ -176,13 +186,17 @@ export type MkdirOptions = { readonly recursive?: boolean; readonly mode?: numbe
 /** A folder made. */
 export async function mkdir(path: PathLike, options: MkdirOptions = {}): Promise<void> {
   const file = p(path);
-  await hostCall(file, () => fsp.mkdir(file, { recursive: options.recursive === true, ...(options.mode === undefined ? {} : { mode: options.mode }) }));
+  await hostCall(file, () =>
+    fsp.mkdir(file, { recursive: options.recursive === true, ...(options.mode === undefined ? {} : { mode: options.mode }) }),
+  );
 }
 
 /** A folder made, without waiting. */
 export function mkdirSync(path: PathLike, options: MkdirOptions = {}): void {
   const file = p(path);
-  hostCallSync(file, () => nfs.mkdirSync(file, { recursive: options.recursive === true, ...(options.mode === undefined ? {} : { mode: options.mode }) }));
+  hostCallSync(file, () =>
+    nfs.mkdirSync(file, { recursive: options.recursive === true, ...(options.mode === undefined ? {} : { mode: options.mode }) }),
+  );
 }
 
 /** What is at a path, following links. */
@@ -398,14 +412,18 @@ export async function walkFiles(root: PathLike, rel = ""): Promise<string[]> {
 /** The SHA-256 of a file, read as a stream so a large file is not held in memory. */
 export async function sha256File(path: PathLike): Promise<Sha256> {
   const file = p(path);
-  return await hostCall(file, () =>
-    new Promise<Sha256>((resolve, reject) => {
-      const hash = createHash("sha256");
-      nfs.createReadStream(file)
-        .on("error", reject)
-        .on("data", (chunk) => hash.update(chunk))
-        .on("end", () => resolve(hash.digest("hex") as Sha256));
-    }));
+  return await hostCall(
+    file,
+    () =>
+      new Promise<Sha256>((resolve, reject) => {
+        const hash = createHash("sha256");
+        nfs
+          .createReadStream(file)
+          .on("error", reject)
+          .on("data", (chunk) => hash.update(chunk))
+          .on("end", () => resolve(hash.digest("hex") as Sha256));
+      }),
+  );
 }
 
 /** A temporary folder for the length of `f`, removed with everything in it afterwards, whatever `f` does. */

@@ -14,4 +14,3 @@
 
 /** A value of `T` that has been validated as a `B`; the brand exists only for the compiler and costs nothing at run time. */
 export type Brand<T, B extends string> = T & { readonly "@ifc/brand": B };
-

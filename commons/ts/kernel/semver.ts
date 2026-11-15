@@ -120,7 +120,12 @@ export function bumpSuffices(before: SemVer, after: SemVer, change: Change): boo
 
 /** The numbers of a dotted version: split at `.`, `+`, `_` and `-`, each part's leading digits, and 0 where a part has none. */
 export function dottedParts(version: string): readonly number[] {
-  return version.trim().replace(/^v/, "").split(/[.+_-]/).map((p) => Number.parseInt(p, 10)).map((n) => (Number.isNaN(n) ? 0 : n));
+  return version
+    .trim()
+    .replace(/^v/, "")
+    .split(/[.+_-]/)
+    .map((p) => Number.parseInt(p, 10))
+    .map((n) => (Number.isNaN(n) ? 0 : n));
 }
 
 /** Negative, zero or positive as dotted version `a` is below, equal to or above `b`, part by part; a missing part counts as 0. */

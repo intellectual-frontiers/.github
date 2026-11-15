@@ -438,7 +438,8 @@ export function zipEntries(data: Uint8Array): Result<readonly ZipEntry[], Archiv
 /** The bytes of one entry of a zip, stored (method 0) or deflated (method 8), its size and CRC-32 checked. */
 export async function zipRead(data: Uint8Array, e: ZipEntry): Promise<Result<Uint8Array, ArchiveError>> {
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  if (e.offset + 30 > data.length || view.getUint32(e.offset, true) !== 0x04034b50) return damaged(`the entry ${JSON.stringify(e.name)} has no local header`);
+  if (e.offset + 30 > data.length || view.getUint32(e.offset, true) !== 0x04034b50)
+    return damaged(`the entry ${JSON.stringify(e.name)} has no local header`);
   const start = e.offset + 30 + view.getUint16(e.offset + 26, true) + view.getUint16(e.offset + 28, true);
   if (start + e.compressed > data.length) return damaged(`the entry ${JSON.stringify(e.name)} runs past the end`);
   const raw = data.subarray(start, start + e.compressed);
@@ -449,7 +450,8 @@ export async function zipRead(data: Uint8Array, e: ZipEntry): Promise<Result<Uin
     if (r.kind === "err") return r;
     bytes = r.value;
   } else return unsupported(`the entry ${JSON.stringify(e.name)} uses compression method ${e.method}`);
-  if (bytes.length !== e.size || crc32(bytes) !== e.crc) return damaged(`the entry ${JSON.stringify(e.name)} does not match its size and CRC-32`);
+  if (bytes.length !== e.size || crc32(bytes) !== e.crc)
+    return damaged(`the entry ${JSON.stringify(e.name)} does not match its size and CRC-32`);
   return ok(bytes);
 }
 

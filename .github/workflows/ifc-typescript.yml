@@ -1,43 +1,48 @@
 name: ifc-typescript
 
-# IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018): TypeScript 7 is the type checker, and the same tests run unchanged on Deno, Node 26 and
-# Bun, on Linux, macOS and Windows. Deno comes through the repository's own bootstraps (the pinned, checksummed one); Node and Bun at exact versions; the
-# development tools from commons/ts/package-lock.json.
+# IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018, FR-026 to FR-030). TypeScript 7 checks; Bun, pinned in commons' pins, installs, formats, lints
+# and packs; the same tests run unchanged on Deno, Node 26 and Bun, on Linux, macOS and Windows; and the packed tarball is installed and used on the three runtimes.
 on:
   push:
     paths:
       - "commons/ts/**"
-      - ".github/workflows/ifc-typescript.yml"
+      - "commons/generated/pins.auto.env"
+      - ".github/actions/bun/**"
+      - ".github/workflows/ifc-typescript*.yml"
   pull_request:
     paths:
       - "commons/ts/**"
-      - ".github/workflows/ifc-typescript.yml"
+      - "commons/generated/pins.auto.env"
+      - ".github/actions/bun/**"
+      - ".github/workflows/ifc-typescript*.yml"
 
 permissions:
   contents: read
 
 env:
   NODE_VERSION: "26.13.1"
-  BUN_VERSION: "1.4.4"
+  # FR-028: Bun's linter is not in a release yet (1.4.4); this exact canary runs it until one is, then the pin in commons' pins does.
+  BUN_LINT_VERSION: "1.4.4-canary.20261115.1"
 
 jobs:
-  typecheck:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: commons/ts
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: The development tools, from the lockfile
-        run: npm ci
-      - name: TypeScript 7 on everything, with the strict configuration
-        run: npx tsc --version && npx tsc -p tsconfig.json
-      - name: The kernel with no host types (a browser or a Worker)
-        run: npx tsc -p tsconfig.kernel.json
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: TypeScript 7 on everything, then the kernel with no host types
+        working-directory: commons/ts
+        run: bun x tsc --version && bun run check
+      - name: The formatter
+        working-directory: commons/ts
+        run: bun fmt --check
+      - name: The linter, type-aware, no warning allowed
+        working-directory: commons/ts
+        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools
 
   test:
     strategy:
@@ -49,12 +54,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
       - uses: actions/setup-node@v4
+        if: matrix.runtime == 'node'
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: The development tools, from the lockfile
-        working-directory: commons/ts
-        run: npm ci
       - name: Deno, through bin/erga-bootstrap.sh itself
         if: matrix.runtime == 'deno' && runner.os != 'Windows'
         shell: bash
@@ -69,10 +76,6 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-      - uses: oven-sh/setup-bun@v2
-        if: matrix.runtime == 'bun'
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
       - name: The suite on ${{ matrix.runtime }}
         working-directory: commons/ts
         shell: bash
@@ -82,3 +85,38 @@ jobs:
             node) node --version && node --test "tests/**/*.test.ts" ;;
             bun) bun --version && bun test tests/ ;;
           esac
+
+  pack:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Deno, through bin/erga-bootstrap.sh itself
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          sh bin/erga-bootstrap.sh --help
+          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
+          for d in "$HOME"/.local/share/erga/toolchain/deno/"$v"/*/; do echo "$d" >>"$GITHUB_PATH"; done
+      - name: Deno, through bin/erga-bootstrap.ps1 itself
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./bin/erga-bootstrap.ps1 --help
+          $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
+          "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - name: Pack, then install the tarball and use it on Bun, Node and Deno
+        working-directory: commons/ts
+        shell: bash
+        run: |
+          bun install --frozen-lockfile
+          tarball=$(bun run --silent pack)
+          bun run --silent smoke "$tarball"

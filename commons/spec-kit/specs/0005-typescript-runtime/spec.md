@@ -5,11 +5,11 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** IFC TypeScript, the TypeScript part of Intellectual Frontiers Commons: one pure kernel and one host runtime that every TypeScript harness of the company (the machine setup, `erga`, `stolos`) imports instead of each writing its own `Result`, decoders, version comparison, checksums, archives, file, process, terminal, download and server helpers, and instead of calling one vendor's API (`Deno.*`) directly. It rests only on what does not belong to a vendor: TypeScript 7, ECMAScript, the web standards and the `node:` module surface that Deno, Node and Bun all implement, so that the code runs unchanged on each of the three, on Linux, macOS and Windows, and a runtime can be replaced without rewriting the code (Software Sovereignty: replaceable services, tested continuity). The code is treated as new: it carries no name, shape or alias for an older caller's sake, except the names of the `Deno` calls it replaces, kept on purpose so that converting a harness is a rename.
+**Input:** IFC TypeScript, the TypeScript part of Intellectual Frontiers Commons: one pure kernel and one host runtime that every TypeScript harness of the company (the machine setup, `erga`, `stolos`) imports instead of each writing its own `Result`, decoders, version comparison, checksums, archives, file, process, terminal, download and server helpers, and instead of calling one vendor's API (`Deno.*`) directly. It rests only on what does not belong to a vendor: TypeScript 7, ECMAScript, the web standards and the `node:` module surface that Deno, Node and Bun all implement, so that the code runs unchanged on each of the three, on Linux, macOS and Windows, and a runtime can be replaced without rewriting the code (Software Sovereignty: replaceable services, tested continuity). The code is treated as new: it carries no name, shape or alias for an older caller's sake, except the names of the `Deno` calls it replaces, kept on purpose so that converting a harness is a rename. Its one core dependency is TypeScript 7; every other tool (install, format, lint, test, pack) comes from one pinned binary, Bun, as Deno once gave them, so the work is Bun-first while Deno and Node stay runtimes it is tested on.
 
 ## Layout and boundaries
 
-- **FR-001**: IFC TypeScript MUST live in `commons/ts/`: `kernel/` and `runtime/` (each with a `mod.ts` that re-exports its modules), `tests/`, `package.json` (`"type": "module"`), its lockfile, `tsconfig.json` and `tsconfig.kernel.json`. `runtime/test.ts` MUST NOT be re-exported by `runtime/mod.ts`, so that importing the runtime never loads a test runner.
+- **FR-001**: IFC TypeScript MUST live in `commons/ts/`: `kernel/` and `runtime/` (each with a `mod.ts` that re-exports its modules), `tests/`, `package.json` (`"type": "module"`), its lockfile (`bun.lock`), `bunfig.toml`, `tsconfig.json`, `tsconfig.kernel.json` and `tsconfig.build.json`. `runtime/test.ts` MUST NOT be re-exported by `runtime/mod.ts`, so that importing the runtime never loads a test runner.
 - **FR-002**: The kernel MUST be pure: a file of `kernel/` MUST import only other files of `kernel/`, MUST NOT name a host global (`process`, `Buffer`, `require`, `__dirname`) and MUST type-check under `tsconfig.kernel.json`, which gives it no host types (`types: []`, the ECMAScript and DOM libraries only), so that it runs in a browser and a Cloudflare Worker as well as on the three runtimes. The kernel MUST NOT import the runtime.
 - **FR-003**: The runtime is the only code that touches the host: a file of `runtime/` MUST import only `node:` builtins, files of `kernel/` and files of `runtime/`. There MUST be one implementation for all three runtimes; code for one runtime alone is allowed only for foreign functions (which stay in the harness that needs them), raw terminal mode and the HTTP listener, and only where the `node:` surface cannot do it.
 - **FR-004**: No code of `commons/ts/` MUST name `Deno.*` or `Bun.*`, import from `jsr:`, `npm:`, `@std/`, `@erga/` or a URL, or depend on a package at run time. With `types: ["node"]`, a `Deno.` or `Bun.` reference is also a compile error.
@@ -30,9 +30,9 @@
 - **FR-013**: Tests MUST register through `runtime/test.ts`, which MUST run on `node:test` and assert with `node:assert/strict` under the names of `@std/assert`; `proves(requirements, name, fn)` MUST name each test for the requirements it proves and keep them for a report. The same test files MUST pass unchanged under `deno test -A`, `node --test` and `bun test`.
 - **FR-014**: Types MUST be tested by the compiler with no framework: `expectType<Equal<A, B>>()` for what a type is, and `// @ts-expect-error` above what must not compile, each kind of check with a negative control. Algebraic laws MUST be property-tested with fast-check: the functor and monad laws of `Result`, round trips (decode of encode, parse of print, read of write for every archive and literal format, split of quote) and the laws of every order (reflexive, antisymmetric, transitive, total).
 - **FR-015**: Every file of `kernel/`, `runtime/` and `tests/` MUST begin with a JSDoc block that says `@module`, and every declaration a file of `kernel/` or `runtime/` exports MUST carry JSDoc, so that a harness that requires documentation (Stolos) can take the code as it is.
-- **FR-016**: The development dependencies (TypeScript 7, `@types/node`, fast-check, and nothing else) MUST be pinned to exact versions in `commons/ts/package.json`, with `package-lock.json` beside it; there MUST be no run-time dependency.
+- **FR-016**: The development dependencies (TypeScript 7, `@types/node`, fast-check, and nothing else) MUST be pinned to exact versions in `commons/ts/package.json`, with Bun's text lockfile `bun.lock` beside it and installed with `bun install --frozen-lockfile`; there MUST be no run-time dependency.
 - **FR-017**: TypeScript 7 (`tsc`) MUST be the type-checking authority, not `deno check` (whose TypeScript is 6): `tsc -p tsconfig.json` MUST pass on every file with `strict`, `module: nodenext`, `noEmit`, `allowImportingTsExtensions`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `isolatedModules`, `types: ["node"]`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `noPropertyAccessFromIndexSignature`, `noUnusedLocals` and `noUnusedParameters`. `erasableSyntaxOnly` keeps the code to what type stripping runs: no `enum`, no `namespace`, no parameter properties.
-- **FR-018**: CI MUST, on every push and pull request that touches `commons/ts/`, run `tsc` 7 on both configurations and the whole suite on Deno (the pinned version), Node 26 and Bun, each on Linux, macOS and Windows; a test that cannot apply to one platform (file modes, symbolic links, POSIX signals on Windows) MUST say so in its code and still run the rest.
+- **FR-018**: CI MUST, on every push and pull request that touches `commons/ts/`, run `tsc` 7 on both configurations, the formatter and the linter, and the whole suite on Deno (the pinned version), Node 26 and Bun (the pinned version), each on Linux, macOS and Windows; a test that cannot apply to one platform (file modes, symbolic links, POSIX signals on Windows) MUST say so in its code and still run the rest.
 
 ## The runtime
 
@@ -43,6 +43,14 @@
 - **FR-023**: `runtime/tty.ts` MUST say whether a standard stream is a terminal and its size, turn raw mode on and off (`NotSupported` where standard input is not a terminal), and choose colour, emoji and width by a pure function of the environment and the terminal: colour only without `NO_COLOR` and only at a terminal unless `FORCE_COLOR`; `TERM=dumb` as no terminal; emoji where the locale is UTF-8, or on Windows in a terminal that says so, or on macOS with `TERM_PROGRAM`.
 - **FR-024**: `runtime/net.ts` MUST download over `fetch`: classify a failure (DNS, connection, broken, timeout, TLS, certificate, an HTTP status), retry only where another try can help, waiting longer each time up to a cap or as long as the server's `Retry-After` asks (no longer than the cap), say and keep every retry, resume a `.part` file with `Range`, and keep a file only where its SHA-256 is the one expected.
 - **FR-025**: `runtime/serve.ts` MUST serve HTTP on `node:http` with a handler from a web `Request` to a web `Response`, as `Deno.serve` does: streamed bodies both ways, every `set-cookie` kept, `HEAD` without a body, a handler that throws answered by `onError` (500 by default), a client that goes away aborting `request.signal`, `127.0.0.1` unless another address is asked for, `AddrInUse` where the port is taken, and a shutdown by call or by abort signal.
+
+## Toolchain and distribution
+
+- **FR-026**: Bun MUST be the one tool binary beside TypeScript 7: it installs the development dependencies, formats, lints, runs the tests and packs the package. It MUST be pinned in commons' pins (`BUN_VERSION`, with its SHA-256 on every platform, commons 0002-packaging FR-014) and CI MUST use that version. No other formatter, linter, test framework or package manager (npm, Prettier, ESLint, dprint, Vitest) MUST be a dependency of `commons/ts/`; Node and Deno are runtimes the code is tested on, not tools it needs.
+- **FR-027**: `bun fmt --check` MUST pass on every file of `commons/ts/` that is not generated, with the settings of `bunfig.toml`'s `[fmt]` section.
+- **FR-028**: `bun lint --type-aware --max-warnings 0` MUST pass on `kernel/`, `runtime/` and `tests/`, with the settings of `bunfig.toml`'s `[lint]` section, which MUST make errors of at least: `no-explicit-any`, `no-non-null-assertion`, `explicit-module-boundary-types`, `switch-exhaustiveness-check`, `no-floating-promises`, `no-misused-promises`, `consistent-type-imports`, `only-throw-error`, `no-unnecessary-type-assertion`, `ban-ts-comment` (a `@ts-expect-error` allowed only with its reason) and `eqeqeq`. Until a released Bun has `bun lint`, CI MUST run it with one exact canary version, named in the workflow, and move to the release that has it.
+- **FR-029**: IFC TypeScript MUST be distributed as the package `@intellectual-frontiers/ifc-ts` in a GitHub release of this repository: a tag `ifc-ts-vX.Y.Z` whose version is `package.json`'s makes CI build JavaScript and declarations with `tsc` 7 (`tsconfig.build.json`, relative imports rewritten to `.js`), pack them with `bun pm pack` and attach the tarball and its SHA-256 to the release. The package MUST export `./kernel`, `./runtime` and `./runtime/test`, MUST carry no test, and MUST NOT be released from a version already released. A harness MUST depend on it by the release asset's URL, so that its own lockfile holds the tarball's integrity.
+- **FR-030**: Before a release is made, the packed tarball MUST be installed into an empty project and its three entry points imported and used on Deno, Node and Bun; a failure stops the release.
 
 ## Out of scope
 
@@ -68,6 +76,10 @@
 - `Retry-After` as an HTTP date already passed: a wait of 0, never negative, per FR-012.
 - A test that runs under Deno but not under Bun (or the reverse): the CI job of that runtime fails, per FR-013 and FR-018.
 - A dependency written `^7.0.2`: the boundary test names it, per FR-016.
+- A file whose lines are not as `bun fmt` writes them: the format check fails, per FR-027.
+- `const x: any`, `value!.field` or a `switch` that misses a member of a union with no `default`: the linter fails, per FR-028.
+- A tag `ifc-ts-v0.2.0` while `package.json` says 0.1.0: the release job stops before building, per FR-029.
+- A packed tarball that holds `.ts` files only (which Node will not strip under `node_modules`): the install check fails on Node, per FR-029 and FR-030.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.
 - `fs.readTextFile` on a `file:` URL on Windows: the URL is turned into a Windows path, per FR-020.
 - A program that does not exist: `NotFound` with code `ENOENT`, never a status of 127 that a caller could mistake for the program's own, per FR-019 and FR-022.
@@ -86,8 +98,8 @@
 
 - **OQ-1**: Whether to adopt TSTyche (or another dedicated type tester) once TypeScript 7.1 ships its API.
 - **OQ-2**: What replaces `deno check --doc`, so that every `@example` in this code compiles (Stolos requires it).
-- **OQ-3**: Which formatter and linter replace `deno fmt` and `deno lint` for this folder (dprint, a lint tool).
-- **OQ-4**: Whether IFC TypeScript is published as a package (and where), or the harnesses copy or vendor a pinned commit of it, verified by SHA-256.
+- **OQ-3**: Whether the package should also be published to a registry (npm under an owned scope, or GitHub Packages) once a harness outside this organization needs it; the release asset is enough for `erga` and `stolos` (owner, November 15).
+- **OQ-4**: Whether `bun check` (Bun's own TypeScript 7 checker) can replace `tsc` in CI once both are shown to report the same errors here; until then `tsc` 7 is the authority (FR-017).
 - **OQ-5**: How a harness gives the runtime's errors back as `Result` values at its own boundary: one helper here, or each harness its own.
 
 ## Key entities
@@ -102,10 +114,11 @@
 
 ## Success criteria
 
-- **SC-001**: `npx tsc -p tsconfig.json` and `npx tsc -p tsconfig.kernel.json` (TypeScript 7) pass in `commons/ts/`.
+- **SC-001**: `bun x tsc -p tsconfig.json` and `bun x tsc -p tsconfig.kernel.json` (TypeScript 7), `bun fmt --check` and `bun lint --type-aware --max-warnings 0` pass in `commons/ts/`.
 - **SC-002**: `deno test -A --no-check tests/`, `node --test "tests/**/*.test.ts"` and `bun test tests/` pass in `commons/ts/` with the same test files.
 - **SC-003**: Every requirement of this specification is proven by a test named for it, or by the CI job that runs it.
 - **SC-004**: When the machine setup, `erga` and `stolos` are converted, none of them keeps its own `Result`, decoder, version comparison, checksum, archive, file, process, download or server helper that this folder gives.
+- **SC-005**: `erga` and `stolos` depend on IFC TypeScript by a release's tarball URL and keep no copy of its code.
 
 ## Review & acceptance checklist
 

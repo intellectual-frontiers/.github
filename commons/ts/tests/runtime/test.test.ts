@@ -47,12 +47,18 @@ proves([FR], "each assertion passes on what it describes and throws on what it d
     () => assertMatch("a", /b/),
     () => assertArrayIncludes([1], [2]),
     () => assertThrows(() => 1),
-    () => assertThrows(() => {
-      throw new Error("x");
-    }, TypeError),
-    () => assertThrows(() => {
-      throw new Error("x");
-    }, Error, "y"),
+    () =>
+      assertThrows(() => {
+        throw new Error("x");
+      }, TypeError),
+    () =>
+      assertThrows(
+        () => {
+          throw new Error("x");
+        },
+        Error,
+        "y",
+      ),
     () => fail("always"),
   ];
   for (const c of cases) {
@@ -64,9 +70,13 @@ proves([FR], "each assertion passes on what it describes and throws on what it d
     }
     assert(threw, c.toString());
   }
-  const e = assertThrows(() => {
-    throw new RangeError("out of range");
-  }, RangeError, "range");
+  const e = assertThrows(
+    () => {
+      throw new RangeError("out of range");
+    },
+    RangeError,
+    "range",
+  );
   assertEquals(e.message, "out of range");
   await assertRejects(() => Promise.reject(new TypeError("t")), TypeError, "t");
   let rejected = false;
@@ -86,6 +96,10 @@ proves([FR], "proves names the test for its requirements and keeps them; reviewe
 });
 
 test("helper: a skipped test is not run", () => fail("a skipped test ran"), { skip: "it is skipped on purpose" });
-test("helper: a test with a timeout runs", async () => {
-  await Promise.resolve();
-}, { timeout: 10_000 });
+test(
+  "helper: a test with a timeout runs",
+  async () => {
+    await Promise.resolve();
+  },
+  { timeout: 10_000 },
+);

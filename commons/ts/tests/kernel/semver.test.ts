@@ -21,10 +21,7 @@ import { assert, assertEquals, proves } from "../../runtime/test.ts";
 
 const FR = "0005-typescript-runtime FR-007";
 
-const ident = fc.oneof(
-  fc.nat({ max: 1000 }).map(String),
-  fc.stringMatching(/^[0-9]*[A-Za-z-][0-9A-Za-z-]{0,5}$/),
-);
+const ident = fc.oneof(fc.nat({ max: 1000 }).map(String), fc.stringMatching(/^[0-9]*[A-Za-z-][0-9A-Za-z-]{0,5}$/));
 const semver: fc.Arbitrary<SemVer> = fc.record(
   {
     major: fc.nat({ max: 50 }),
@@ -43,20 +40,35 @@ proves([FR, "0005-typescript-runtime FR-014"], "a version printed and parsed is 
 proves([FR, "0005-typescript-runtime FR-014"], "the order is reflexive, antisymmetric, transitive and total", () => {
   fc.assert(fc.property(semver, (a) => assertEquals(compareSemVer(a, a), 0)));
   fc.assert(fc.property(semver, semver, (a, b) => assertEquals(compareSemVer(a, b), -compareSemVer(b, a) || 0)));
-  fc.assert(fc.property(semver, semver, semver, (a, b, c) => {
-    if (compareSemVer(a, b) <= 0 && compareSemVer(b, c) <= 0) assert(compareSemVer(a, c) <= 0);
-  }));
+  fc.assert(
+    fc.property(semver, semver, semver, (a, b, c) => {
+      if (compareSemVer(a, b) <= 0 && compareSemVer(b, c) <= 0) assert(compareSemVer(a, c) <= 0);
+    }),
+  );
   fc.assert(fc.property(semver, semver, (a, b) => assert([-1, 0, 1].includes(compareSemVer(a, b)))));
 });
 
 proves([FR], "the order is semver.org's (§11): its own example list is sorted, and the build is ignored", () => {
-  const list = ["1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0", "2.0.0", "2.1.0", "2.1.1"];
+  const list = [
+    "1.0.0-alpha",
+    "1.0.0-alpha.1",
+    "1.0.0-alpha.beta",
+    "1.0.0-beta",
+    "1.0.0-beta.2",
+    "1.0.0-beta.11",
+    "1.0.0-rc.1",
+    "1.0.0",
+    "2.0.0",
+    "2.1.0",
+    "2.1.1",
+  ];
   const parsed = list.map((t) => {
     const r = parseSemVer(t);
     if (r.kind === "err") throw new Error(r.error);
     return r.value;
   });
-  for (let i = 1; i < parsed.length; i++) assert(compareSemVer(parsed[i - 1] as SemVer, parsed[i] as SemVer) < 0, `${list[i - 1]} < ${list[i]}`);
+  for (let i = 1; i < parsed.length; i++)
+    assert(compareSemVer(parsed[i - 1] as SemVer, parsed[i] as SemVer) < 0, `${list[i - 1]} < ${list[i]}`);
   const shuffled = [...parsed].reverse().sort(compareSemVer).map(formatSemVer);
   assertEquals(shuffled, list);
   assertEquals(compareSemVer({ major: 1, minor: 0, patch: 0, build: "a" }, { major: 1, minor: 0, patch: 0, build: "b" }), 0);
@@ -70,11 +82,13 @@ proves([FR], "what is not a semantic version is refused; a leading v is accepted
 });
 
 proves([FR, "0005-typescript-runtime FR-014"], "a bump is above what it bumps and suffices for its change", () => {
-  fc.assert(fc.property(semver, fc.constantFrom("major", "minor", "patch"), (v, level) => {
-    const next = bump(v, level);
-    assert(compareSemVer(next, v) > 0 || v.pre !== undefined);
-    assert(bumpSuffices(v, next, { kind: "fix" }) || v.pre !== undefined);
-  }));
+  fc.assert(
+    fc.property(semver, fc.constantFrom("major", "minor", "patch"), (v, level) => {
+      const next = bump(v, level);
+      assert(compareSemVer(next, v) > 0 || v.pre !== undefined);
+      assert(bumpSuffices(v, next, { kind: "fix" }) || v.pre !== undefined);
+    }),
+  );
   const v = { major: 1, minor: 2, patch: 3 };
   assert(bumpSuffices(v, bump(v, "major"), { kind: "breaking" }));
   assert(!bumpSuffices(v, bump(v, "minor"), { kind: "breaking" }));
@@ -93,10 +107,12 @@ proves([FR], "dotted versions compare part by part, a missing part as 0", () => 
   assertEquals(dottedParts("1.2-rc3"), [1, 2, 0]);
   assertEquals(versionIn("deno 2.9.8 (stable, release, x86_64-unknown-linux-gnu)"), "2.9.8");
   assertEquals(versionIn("no version"), undefined);
-  fc.assert(fc.property(fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), (a, b) => {
-    const x = a.join(".");
-    const y = b.join(".");
-    assertEquals(compareDotted(x, y), -compareDotted(y, x) || 0);
-    assertEquals(atLeast(x, y) || atLeast(y, x), true);
-  }));
+  fc.assert(
+    fc.property(fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), fc.array(fc.nat(), { minLength: 1, maxLength: 4 }), (a, b) => {
+      const x = a.join(".");
+      const y = b.join(".");
+      assertEquals(compareDotted(x, y), -compareDotted(y, x) || 0);
+      assertEquals(atLeast(x, y) || atLeast(y, x), true);
+    }),
+  );
 });

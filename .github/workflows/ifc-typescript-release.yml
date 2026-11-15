@@ -1,0 +1,53 @@
+name: ifc-typescript-release
+
+# A release of IFC TypeScript (commons 0005-typescript-runtime FR-029, FR-030): a tag ifc-ts-vX.Y.Z whose version is commons/ts/package.json's is built with
+# TypeScript 7, packed by the pinned Bun, installed and used on Bun, Node and Deno, and only then attached, with its SHA-256, to the GitHub release of that tag.
+# A harness depends on the asset's URL, so its own lockfile keeps the tarball's integrity.
+on:
+  push:
+    tags:
+      - "ifc-ts-v*"
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "26.13.1"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Deno, through bin/erga-bootstrap.sh itself
+        run: |
+          sh bin/erga-bootstrap.sh --help
+          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
+          echo "$HOME/.local/share/erga/toolchain/deno/$v/linux-x64" >>"$GITHUB_PATH"
+      - name: Checked, tested, packed for this tag, and used on the three runtimes
+        working-directory: commons/ts
+        run: |
+          bun install --frozen-lockfile
+          bun run check
+          bun test tests/
+          tarball=$(bun run --silent pack --tag "$GITHUB_REF_NAME")
+          bun run --silent smoke "$tarball"
+          echo "TARBALL=commons/ts/${tarball#"$PWD/"}" >>"$GITHUB_ENV"
+      - name: The release, refused where it already exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "$GITHUB_REF_NAME is already released; a version is released once" >&2
+            exit 1
+          fi
+          gh release create "$GITHUB_REF_NAME" "$TARBALL" "$TARBALL.sha256" \
+            --title "IFC TypeScript ${GITHUB_REF_NAME#ifc-ts-v}" \
+            --notes "IFC TypeScript (commons 0005-typescript-runtime), built with TypeScript 7 and checked on Bun, Node and Deno. SHA-256: $(cut -d' ' -f1 "$TARBALL.sha256")"

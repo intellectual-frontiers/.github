@@ -73,7 +73,8 @@ export function lookOf(facts: LookFacts): Look {
   const tty = facts.terminal && (e["TERM"] ?? "") !== "dumb";
   const colour = !set(e["NO_COLOR"]) && (tty || set(e["FORCE_COLOR"]));
   const utf8 = /utf-?8/i.test(e["LC_ALL"] || e["LC_CTYPE"] || e["LANG"] || "");
-  const emoji = utf8 ||
+  const emoji =
+    utf8 ||
     (facts.os === "windows" && (set(e["WT_SESSION"]) || set(e["TERM_PROGRAM"]) || e["ConEmuANSI"] === "ON")) ||
     (facts.os === "darwin" && set(e["TERM_PROGRAM"]));
   const columns = tty && facts.columns !== undefined && facts.columns >= 40 ? facts.columns : 80;
@@ -83,5 +84,10 @@ export function lookOf(facts: LookFacts): Look {
 /** The look for writing to a standard stream (standard error by default) of this process. */
 export function currentLook(stream: StdStream = "stderr"): Look {
   const size = consoleSize();
-  return lookOf({ env: env.toObject(), terminal: isTerminal(stream), os: build.os, ...(size === undefined ? {} : { columns: size.columns }) });
+  return lookOf({
+    env: env.toObject(),
+    terminal: isTerminal(stream),
+    os: build.os,
+    ...(size === undefined ? {} : { columns: size.columns }),
+  });
 }

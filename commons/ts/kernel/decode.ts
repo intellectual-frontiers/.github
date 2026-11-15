@@ -33,7 +33,9 @@ export function describe(input: unknown): string {
   if (t === "string") return `the string ${JSON.stringify(input).slice(0, 60)}`;
   if (t === "object") return "an object";
   if (t === "function") return "a function";
-  return `${t} ${String(input)}`;
+  if (typeof input === "symbol") return "a symbol";
+  if (typeof input === "number" || typeof input === "bigint" || typeof input === "boolean") return `${t} ${String(input)}`;
+  return t;
 }
 
 function fail(path: string, expected: string, input: unknown): Result<never, DecodeError> {
@@ -46,7 +48,7 @@ export function formatDecodeError(e: DecodeError): string {
 }
 
 /** A string. */
-export const string: Decoder<string> = (input, path = "$") => typeof input === "string" ? ok(input) : fail(path, "a string", input);
+export const string: Decoder<string> = (input, path = "$") => (typeof input === "string" ? ok(input) : fail(path, "a string", input));
 
 /** A finite number. */
 export const number: Decoder<number> = (input, path = "$") =>
@@ -57,7 +59,7 @@ export const integer: Decoder<number> = (input, path = "$") =>
   typeof input === "number" && Number.isInteger(input) ? ok(input) : fail(path, "an integer", input);
 
 /** A boolean. */
-export const boolean: Decoder<boolean> = (input, path = "$") => typeof input === "boolean" ? ok(input) : fail(path, "a boolean", input);
+export const boolean: Decoder<boolean> = (input, path = "$") => (typeof input === "boolean" ? ok(input) : fail(path, "a boolean", input));
 
 /** Any value at all, kept as `unknown`: for a field whose contents another decoder reads later. */
 export const unknownValue: Decoder<unknown> = (input) => ok(input);
@@ -70,7 +72,7 @@ export function literal<const L extends readonly string[]>(...values: L): Decode
 
 /** `null`, or what `inner` decodes. */
 export function nullable<T>(inner: Decoder<T>): Decoder<T | null> {
-  return (input, path = "$") => input === null ? ok(null) : inner(input, path);
+  return (input, path = "$") => (input === null ? ok(null) : inner(input, path));
 }
 
 /** An array whose every element decodes. */
@@ -121,7 +123,9 @@ export function record<T>(value: Decoder<T>): Decoder<Readonly<Record<string, T>
 export type Fields = Readonly<Record<string, Decoder<unknown>>>;
 
 /** The value an object decoder gives: the required fields, and the optional ones that may be absent. */
-export type ObjectOf<R extends Fields, O extends Fields> = { readonly [K in keyof R]: Decoded<R[K]> } & { readonly [K in keyof O]?: Decoded<O[K]> };
+export type ObjectOf<R extends Fields, O extends Fields> = { readonly [K in keyof R]: Decoded<R[K]> } & {
+  readonly [K in keyof O]?: Decoded<O[K]>;
+};
 
 /** An object whose every required field decodes; `optional` fields may be absent (or `undefined`), and are then absent from the value. Other fields are dropped. */
 export function object<R extends Fields, O extends Fields = Record<never, never>>(required: R, optional?: O): Decoder<ObjectOf<R, O>> {
@@ -145,7 +149,9 @@ export function object<R extends Fields, O extends Fields = Record<never, never>
 }
 
 /** A union of object types told apart by their `kind`: the decoder of the alternative the input's `kind` names. */
-export function tagged<const D extends Readonly<Record<string, Decoder<{ readonly kind: string }>>>>(alternatives: D): Decoder<Decoded<D[keyof D]>> {
+export function tagged<const D extends Readonly<Record<string, Decoder<{ readonly kind: string }>>>>(
+  alternatives: D,
+): Decoder<Decoded<D[keyof D]>> {
   return (input, path = "$") => {
     const kind: unknown = isPlainObject(input) ? Reflect.get(input, "kind") : undefined;
     const decoder = typeof kind === "string" && Object.hasOwn(alternatives, kind) ? alternatives[kind] : undefined;

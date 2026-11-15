@@ -20,7 +20,7 @@ import * as os from "node:os";
 import { delimiter, join } from "node:path";
 import process from "node:process";
 import type { Readable } from "node:stream";
-import { InvalidData, mapError } from "./errors.ts";
+import { InvalidData, mapError, toError } from "./errors.ts";
 
 /** The process's environment, by `Deno.env`'s names. */
 export const env = {
@@ -174,9 +174,13 @@ export function isExecutable(path: string): boolean {
 export function which(name: string, path: string = env.get("PATH") ?? ""): string | undefined {
   const windows = process.platform === "win32";
   const exts = windows ? ["", ...(env.get("PATHEXT") ?? ".EXE;.CMD;.BAT;.COM").split(";")] : [""];
-  const candidates = name.includes("/") || (windows && name.includes("\\"))
-    ? [name]
-    : path.split(delimiter).filter((d) => d !== "").flatMap((d) => exts.map((e) => join(d, `${name}${e}`)));
+  const candidates =
+    name.includes("/") || (windows && name.includes("\\"))
+      ? [name]
+      : path
+          .split(delimiter)
+          .filter((d) => d !== "")
+          .flatMap((d) => exts.map((e) => join(d, `${name}${e}`)));
   return candidates.find(isExecutable);
 }
 
@@ -191,8 +195,10 @@ export type RunOptions = {
   readonly env?: Readonly<Record<string, string>>;
   /** Start it with no variable but those of `env`. */
   readonly clearEnv?: boolean;
-  /** Its standard input: text or bytes to read, this process's own (`inherit`), or none (`null`, the default). */
-  readonly stdin?: string | Uint8Array | "inherit" | "null";
+  /** Text or bytes it reads as its standard input; without it, `stdin` says what it gets. */
+  readonly input?: string | Uint8Array;
+  /** Its standard input where there is no `input`: this process's own (`inherit`), or none (`null`, the default). */
+  readonly stdin?: "inherit" | "null";
   /** Its standard output: kept (the default), shared, or thrown away. */
   readonly stdout?: Stdio;
   /** Its standard error: kept (the default), shared, or thrown away. */
@@ -222,7 +228,16 @@ export type Output = {
 /** What a program did, with its output as text. */
 export type TextOutput = Omit<Output, "stdout" | "stderr"> & { readonly stdout: string; readonly stderr: string };
 
-const SIGNALS: Readonly<Record<string, number>> = { SIGHUP: 1, SIGINT: 2, SIGQUIT: 3, SIGABRT: 6, SIGKILL: 9, SIGPIPE: 13, SIGALRM: 14, SIGTERM: 15 };
+const SIGNALS: Readonly<Record<string, number>> = {
+  SIGHUP: 1,
+  SIGINT: 2,
+  SIGQUIT: 3,
+  SIGABRT: 6,
+  SIGKILL: 9,
+  SIGPIPE: 13,
+  SIGALRM: 14,
+  SIGTERM: 15,
+};
 
 /** The number of a signal by its name (1 for one it does not know). */
 export function signalNumber(name: string): number {
@@ -235,14 +250,14 @@ const stdio = (s: Stdio | undefined): "pipe" | "inherit" | "ignore" => (s === "i
 export function output(argv: readonly string[], options: RunOptions = {}): Promise<Output> {
   const [cmd, ...rest] = argv;
   if (cmd === undefined || cmd === "") return Promise.reject(new InvalidData("nothing to run: the argument vector is empty", "EINVAL"));
-  const input = options.stdin;
-  const feeds = typeof input === "string" || input instanceof Uint8Array;
+  const input = options.input;
+  const feeds = input !== undefined;
   return new Promise<Output>((resolve, reject) => {
     let settled = false;
     const child = spawn(cmd, rest, {
       ...(options.cwd === undefined ? {} : { cwd: options.cwd }),
       env: options.clearEnv === true ? { ...options.env } : { ...process.env, ...options.env },
-      stdio: [feeds ? "pipe" : input === "inherit" ? "inherit" : "ignore", stdio(options.stdout), stdio(options.stderr)],
+      stdio: [feeds ? "pipe" : options.stdin === "inherit" ? "inherit" : "ignore", stdio(options.stdout), stdio(options.stderr)],
       windowsHide: true,
     });
     const kept = { stdout: [] as Uint8Array[], stderr: [] as Uint8Array[] };
@@ -296,8 +311,10 @@ export function output(argv: readonly string[], options: RunOptions = {}): Promi
       const status = signal !== null ? 128 + signalNumber(signal) : (code ?? 1);
       resolve({ code: status, success: status === 0, signal, stdout: joined(kept.stdout), stderr: joined(kept.stderr) });
     });
-    if (feeds && child.stdin !== null) {
-      child.stdin.on("error", () => {/* the program closed its input early; what it did is still reported */});
+    if (input !== undefined && child.stdin !== null) {
+      child.stdin.on("error", () => {
+        /* the program closed its input early; what it did is still reported */
+      });
       child.stdin.end(typeof input === "string" ? input : Buffer.from(input.buffer, input.byteOffset, input.byteLength));
     }
   });
@@ -344,7 +361,7 @@ export function removeSignalListener(signal: Signal, handler: () => void): void 
 export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted === true) {
-      reject(signal.reason);
+      reject(toError(signal.reason, "aborted"));
       return;
     }
     const t = setTimeout(() => {
@@ -353,7 +370,7 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     }, ms);
     const onAbort = (): void => {
       clearTimeout(t);
-      reject(signal?.reason);
+      reject(toError(signal?.reason, "aborted"));
     };
     signal?.addEventListener("abort", onAbort, { once: true });
   });

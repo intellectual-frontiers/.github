@@ -19,7 +19,7 @@ export function lf(text: string): string {
 }
 
 /** A control sequence of a terminal (CSI): colour, cursor and erase. */
-export const ANSI: RegExp = /\u001b\[[0-9;?]*[A-Za-z]/g;
+export const ANSI: RegExp = new RegExp(`${String.fromCharCode(0x1b)}\\[[0-9;?]*[A-Za-z]`, "g");
 
 /** Text without its terminal control sequences, as a log or a pipe should keep it. */
 export function plain(text: string): string {

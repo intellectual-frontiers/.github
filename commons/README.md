@@ -19,7 +19,8 @@ its own copy. It holds no company fact and no secret: this repository is public.
 - `generated/`: `packaging.auto.toml` (for programs), `packaging.auto.sh` (for scripts), `packaging.auto.ts` (for the machine setup, which is TypeScript), `pins.auto.env` (the pinned
   downloads, Deno among them, which the bootstraps also carry between their marks) and the tables of rules and of the installation record. Generated; never edited by hand.
 - `ts/`: IFC TypeScript, the TypeScript part of the commons: `kernel/` (pure: imports nothing, runs in a browser or a Worker), `runtime/` (the only code that
-  touches the host, on `node:` builtins), `tests/` (`node:test`, fast-check and type-level tests), and the exact pins of its development tools (`package.json`, TypeScript 7). See
+  touches the host, on `node:` builtins), `tests/` (`node:test`, fast-check and type-level tests), and the exact pins of its one core dependency, TypeScript 7 (`package.json`, `bun.lock`); every other
+  tool is Bun, pinned beside Deno in `generated/pins.auto.env`. Released as a tarball on this repository's GitHub releases (`ifc-ts-vX.Y.Z`). See
   [`ts/README.md`](ts/README.md).
 - `spec-kit/`: the specifications of the capabilities, in the format of `archon`'s specifications.
 

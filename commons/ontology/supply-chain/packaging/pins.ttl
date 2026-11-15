@@ -67,6 +67,18 @@ pmid:sum-jq-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmi
 pmid:sum-jq-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309" .
 pmid:sum-jq-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-jq ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e" .
 
+pmid:pin-bun a pm:PinnedDownload ;
+    rdfs:label "Bun, the one tool binary of IFC TypeScript: it installs, formats, lints, tests and packs"@en ;
+    pm:programName "bun" ;
+    pm:pinKey "BUN" ;
+    pm:version "1.4.4" ;
+    pm:note "From https://github.com/oven-sh/bun/releases/download/bun-vVERSION/bun-TARGET.zip (TARGET linux-x64, linux-aarch64, darwin-x64, darwin-aarch64, windows-x64), checksums from the release's SHASUMS256.txt. IFC TypeScript's CI takes its version from here (commons 0005-typescript-runtime FR-026)."@en .
+pmid:sum-bun-linux-x64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-linux-x64 ; pm:sha256 "bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c" .
+pmid:sum-bun-linux-arm64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-linux-arm64 ; pm:sha256 "baa6bb36f51d6e58561e02bbea825038a9df454f673d6d776e8bbf86f8c7850e" .
+pmid:sum-bun-macos-x64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-macos-x64 ; pm:sha256 "50a3491f73abc2fe81673171a85762d3bc2cc1680ccecadd983de99adf77977e" .
+pmid:sum-bun-macos-arm64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-macos-arm64 ; pm:sha256 "c240d7f0ccb90c263a849fcdb09b7ee62630d921348ed6aafda86b9d577bc510" .
+pmid:sum-bun-windows-x64 a pm:Checksum ; pm:forPin pmid:pin-bun ; pm:forPlatform pmid:platform-windows-x64 ; pm:sha256 "cd2c0fccc78f3ede1f50ca827a15f063eda13d4d150a3d0674f4f6e323d864a5" .
+
 pmid:pin-deno a pm:PinnedDownload ;
     rdfs:label "Deno, which runs the machine setup and erga's ergactl"@en ;
     pm:programName "deno" ;

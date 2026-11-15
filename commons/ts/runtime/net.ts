@@ -58,8 +58,8 @@ export function describeFailure(f: NetFailure): string {
       return f.status === 416
         ? "the part already fetched did not fit, so it starts again"
         : busy(f.status)
-        ? `the server answered ${f.status} (busy or not ready)`
-        : `the server answered ${f.status}`;
+          ? `the server answered ${f.status} (busy or not ready)`
+          : `the server answered ${f.status}`;
     case "other":
       return f.message;
     default:
@@ -122,13 +122,22 @@ export function classify(e: unknown): NetFailure {
   if (byCode !== undefined && byCode !== "http" && byCode !== "other") return { kind: byCode };
   const m = e instanceof Error ? `${e.message} ${cause instanceof Error ? cause.message : ""}` : String(e);
   if (/certificate|UnknownIssuer|invalid peer|self[ -]signed|CertNotValid/i.test(m)) return { kind: "certificate" };
-  if (/dns error|failed to lookup|name or service not known|nodename nor servname|no such host|temporary failure in name resolution|ENOTFOUND/i.test(m)) {
+  if (
+    /dns error|failed to lookup|name or service not known|nodename nor servname|no such host|temporary failure in name resolution|ENOTFOUND/i.test(
+      m,
+    )
+  ) {
     return { kind: "dns" };
   }
-  if (/connection refused|ConnectionRefused|network is unreachable|no route to host|connect error|ECONNREFUSED/i.test(m)) return { kind: "connect" };
+  if (/connection refused|ConnectionRefused|network is unreachable|no route to host|connect error|ECONNREFUSED/i.test(m))
+    return { kind: "connect" };
   if (/timed? ?out|deadline/i.test(m)) return { kind: "timeout" };
   if (/tls|ssl|handshake/i.test(m)) return { kind: "tls" };
-  if (/reset|broken pipe|unexpected eof|connection closed|IncompleteMessage|incomplete|error reading a body|body from connection|terminated|other side closed/i.test(m)) {
+  if (
+    /reset|broken pipe|unexpected eof|connection closed|IncompleteMessage|incomplete|error reading a body|body from connection|terminated|other side closed/i.test(
+      m,
+    )
+  ) {
     return { kind: "broken" };
   }
   return { kind: "other", message: m.trim().slice(0, 200) };
@@ -185,7 +194,11 @@ export class Retries {
   top(n = 4): string {
     const by = new Map<string, number>();
     for (const x of this.notes) by.set(x.what, (by.get(x.what) ?? 0) + 1);
-    return [...by.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([w, c]) => `${w} (${c})`).join(", ");
+    return [...by.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map(([w, c]) => `${w} (${c})`)
+      .join(", ");
   }
 }
 
@@ -222,12 +235,15 @@ export async function fetchOnce(url: string, dest: string, o: FetchOptions = {})
   const stall = (o.stallSeconds ?? 60) * 1000;
   let window = 0;
   let windowStart = Date.now();
-  const watch = setInterval(() => {
-    if (Date.now() - windowStart < stall) return;
-    if (window < (stall / 1000) * 1024) ctl.abort(new DOMException("stalled", "TimeoutError"));
-    window = 0;
-    windowStart = Date.now();
-  }, Math.min(5000, stall));
+  const watch = setInterval(
+    () => {
+      if (Date.now() - windowStart < stall) return;
+      if (window < (stall / 1000) * 1024) ctl.abort(new DOMException("stalled", "TimeoutError"));
+      window = 0;
+      windowStart = Date.now();
+    },
+    Math.min(5000, stall),
+  );
   let file: fsp.FileHandle | undefined;
   try {
     file = await fsp.open(dest, append ? "a" : "w");
@@ -261,11 +277,12 @@ export function hostOf(url: string): string {
 /** The file at `url` written to `dest`, tried again where the network failed and another try can help; or why it was not. */
 export async function fetchTo(retries: Retries, url: string, dest: string, o: FetchOptions = {}): Promise<Result<void, string>> {
   const name = hostOf(url);
-  for (let n = 1;; n++) {
+  for (let n = 1; ; n++) {
     const r = await fetchOnce(url, dest, o);
     if (r.kind === "ok") return r;
     const f = r.error;
-    if (!retryable(f) || n >= retries.policy.tries) return err(`${name}: ${describeFailure(f)} (after ${n} of ${retries.policy.tries} attempts)`);
+    if (!retryable(f) || n >= retries.policy.tries)
+      return err(`${name}: ${describeFailure(f)} (after ${n} of ${retries.policy.tries} attempts)`);
     if (f.kind === "http" && f.status === 416) await remove(dest).catch(() => {});
     await retries.again(name, describeFailure(f), n, f.kind === "http" && f.retryAfterMs !== undefined ? f.retryAfterMs / 1000 : undefined);
   }
@@ -275,7 +292,13 @@ export async function fetchTo(retries: Retries, url: string, dest: string, o: Fe
  * The file in `cache/downloads/<sha256>`, fetched where it is not there, and kept only where its SHA-256 is `sum`. A download that stops
  * part way is kept as `.part` and resumed by the next try or the next run; a file that is not the one expected is removed, never kept.
  */
-export async function downloadVerified(retries: Retries, url: string, sum: Sha256, cache: string, o: FetchOptions = {}): Promise<Result<string, string>> {
+export async function downloadVerified(
+  retries: Retries,
+  url: string,
+  sum: Sha256,
+  cache: string,
+  o: FetchOptions = {},
+): Promise<Result<string, string>> {
   const dir = join(cache, "downloads");
   await mkdir(dir, { recursive: true });
   const f = join(dir, sum);
@@ -295,7 +318,7 @@ export async function downloadVerified(retries: Retries, url: string, sum: Sha25
 /** Whether `host` answers over HTTPS (any answer counts, even a refusal), tried again where it does not, at most 5 times. */
 export async function reach(retries: Retries, host: string, scheme: "https" | "http" = "https"): Promise<Result<void, NetFailure>> {
   const max = Math.min(5, retries.policy.tries);
-  for (let n = 1;; n++) {
+  for (let n = 1; ; n++) {
     try {
       const res = await fetch(`${scheme}://${host}/`, { method: "HEAD", signal: AbortSignal.timeout(20_000) });
       await res.body?.cancel();

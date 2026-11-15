@@ -1,13 +1,15 @@
 /**
- * The rules of IFC TypeScript as tests (commons 0005-typescript-runtime FR-002 to FR-004, FR-015, FR-016): the kernel imports nothing outside
- * itself; the runtime imports only `node:` builtins, the kernel and itself; no file names a vendor's API or registry; every file and every
- * export carries JSDoc; the development dependencies are pinned exactly, with a lockfile.
+ * The rules of IFC TypeScript as tests (commons 0005-typescript-runtime FR-001 to FR-004, FR-015, FR-016, FR-026, FR-028, FR-029): the
+ * kernel imports nothing outside itself; the runtime imports only `node:` builtins, the kernel and itself; no file names a vendor's API or
+ * registry; every file and every export carries JSDoc; the development dependencies are pinned exactly in Bun's lockfile; Bun is the only
+ * tool; the lint rules are errors; the package exports what it should.
  *
  * @module
  */
-import { readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
+import { decodeManifest, type Manifest, packageManifest, tarballName } from "../tools/manifest.ts";
+import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
-import { assert, assertEquals, proves } from "../runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 
@@ -28,7 +30,11 @@ function sources(folder: string): string[] {
 /** The module specifiers a file imports or re-exports, statically or dynamically. */
 export function specifiers(text: string): string[] {
   const out: string[] = [];
-  for (const re of [/^\s*(?:import|export)\b[^;'"]*?\bfrom\s*["']([^"']+)["']/gm, /^\s*import\s*["']([^"']+)["']/gm, /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g]) {
+  for (const re of [
+    /^\s*(?:import|export)\b[^;'"]*?\bfrom\s*["']([^"']+)["']/gm,
+    /^\s*import\s*["']([^"']+)["']/gm,
+    /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g,
+  ]) {
     for (const m of text.matchAll(re)) if (m[1] !== undefined) out.push(m[1]);
   }
   return out;
@@ -57,6 +63,7 @@ export function codeLines(text: string): { readonly line: number; readonly text:
 const KERNEL = sources("kernel");
 const RUNTIME = sources("runtime");
 const TESTS = sources("tests");
+const TOOLS = sources("tools");
 
 proves(["0005-typescript-runtime FR-002"], "the kernel imports nothing outside kernel/", () => {
   assert(KERNEL.length > 5);
@@ -83,12 +90,20 @@ proves(["0005-typescript-runtime FR-003"], "the runtime imports only node: built
   assertEquals(bad, []);
 });
 
-const VENDOR = [/\bDeno\s*\./, /\bBun\s*\./, /["']jsr:/, /["']npm:/, /["']@std\//, /["']@erga\//, /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/];
+const VENDOR = [
+  /\bDeno\s*\./,
+  /\bBun\s*\./,
+  /["']jsr:/,
+  /["']npm:/,
+  /["']@std\//,
+  /["']@erga\//,
+  /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/,
+];
 const HOST_IN_KERNEL = [/\bprocess\b/, /\bBuffer\b/, /\brequire\s*\(/, /\b__dirname\b/, /\bglobalThis\s*\.\s*(?:process|Deno|Bun)\b/];
 
 proves(["0005-typescript-runtime FR-004"], "no code names Deno, Bun, a registry or a URL import; the kernel names no host global", () => {
   const bad: string[] = [];
-  for (const f of [...KERNEL, ...RUNTIME, ...TESTS]) {
+  for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
     for (const { line, text } of codeLines(readTextFileSync(join(ROOT, f)))) {
       for (const re of VENDOR) if (re.test(text) && !f.startsWith("tests/boundaries")) bad.push(`${f}:${line}: ${text.trim()}`);
       if (f.startsWith("kernel/")) for (const re of HOST_IN_KERNEL) if (re.test(text)) bad.push(`${f}:${line}: ${text.trim()}`);
@@ -98,7 +113,12 @@ proves(["0005-typescript-runtime FR-004"], "no code names Deno, Bun, a registry 
 });
 
 proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (negative controls)", () => {
-  assertEquals(specifiers(`import a from "x";\nexport { b } from './y.ts';\nimport "z";\nconst m = await import("w");\nimport type {\n  T,\n} from "v";`), ["x", "./y.ts", "v", "z", "w"]);
+  assertEquals(
+    specifiers(
+      `import a from "x";\nexport { b } from './y.ts';\nimport "z";\nconst m = await import("w");\nimport type {\n  T,\n} from "v";`,
+    ),
+    ["x", "./y.ts", "v", "z", "w"],
+  );
   const code = codeLines("/**\n * Deno.readTextFile\n */\n// Deno.x\nDeno.exit();");
   assertEquals(code, [{ line: 5, text: "Deno.exit();" }]);
   assert(VENDOR.some((re) => re.test(`import x from "jsr:@std/path";`)));
@@ -107,7 +127,7 @@ proves(["0005-typescript-runtime FR-004"], "the checks see what they look for (n
 
 proves(["0005-typescript-runtime FR-015"], "every file begins with a JSDoc block that says @module, and every export has JSDoc", () => {
   const bad: string[] = [];
-  for (const f of [...KERNEL, ...RUNTIME, ...TESTS]) {
+  for (const f of [...KERNEL, ...RUNTIME, ...TESTS, ...TOOLS]) {
     const text = readTextFileSync(join(ROOT, f));
     const head = /^\/\*\*[\s\S]*?\*\//.exec(text);
     if (head === null || !head[0].includes("@module")) bad.push(`${f}: no @module block at the top`);
@@ -123,28 +143,116 @@ proves(["0005-typescript-runtime FR-015"], "every file begins with a JSDoc block
   assertEquals(bad, []);
 });
 
-proves(["0005-typescript-runtime FR-016"], "the development dependencies are pinned exactly, with a lockfile, and there are no runtime dependencies", async () => {
-  const pkg: unknown = JSON.parse(await readTextFile(join(ROOT, "package.json")));
-  assert(typeof pkg === "object" && pkg !== null);
-  const dev: unknown = Reflect.get(pkg, "devDependencies");
-  assert(typeof dev === "object" && dev !== null);
-  const pins = Object.entries(dev);
-  assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript"]);
-  for (const [name, v] of pins) assert(typeof v === "string" && /^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${String(v)}`);
-  assert(/^7\./.test(String(Reflect.get(dev, "typescript"))), "TypeScript is 7");
-  assertEquals(Reflect.get(pkg, "dependencies"), undefined);
-  assertEquals(Reflect.get(pkg, "type"), "module");
-  assert(statSync(join(ROOT, "package-lock.json")).isFile);
-  const lock: unknown = JSON.parse(await readTextFile(join(ROOT, "package-lock.json")));
-  const root: unknown = typeof lock === "object" && lock !== null ? Reflect.get(Reflect.get(lock, "packages") ?? {}, "") : undefined;
-  assertEquals(typeof root === "object" && root !== null ? Reflect.get(root, "devDependencies") : undefined, dev);
+/** The text of a file of the package. */
+const text = (f: string): string => readTextFileSync(join(ROOT, f));
+
+/** The source package.json, decoded once by the tooling's own decoder. */
+function manifest(): Manifest {
+  const m = decodeManifest(text("package.json"));
+  if (m.kind === "err") throw new Error(m.error);
+  return m.value;
+}
+
+proves(
+  ["0005-typescript-runtime FR-016"],
+  "the development dependencies are pinned exactly, Bun's lockfile holds the same versions, and there are no run-time dependencies",
+  () => {
+    const m = manifest();
+    const pins = Object.entries(m.devDependencies);
+    assertEquals(pins.map(([k]) => k).sort(), ["@types/node", "fast-check", "typescript"]);
+    for (const [name, v] of pins) assert(/^\d+\.\d+\.\d+$/.test(v), `${name} is not pinned exactly: ${v}`);
+    assert(/^7\./.test(m.devDependencies["typescript"] ?? ""), "TypeScript is 7");
+    assertEquals(m.dependencies, undefined);
+    const lock = text("bun.lock");
+    for (const [name, v] of pins) {
+      assertStringIncludes(lock, `"${name}": "${v}"`);
+      assertStringIncludes(lock, `["${name}@${v}"`);
+    }
+    assert(
+      !existsSync(join(ROOT, "package-lock.json")) && !existsSync(join(ROOT, "yarn.lock")) && !existsSync(join(ROOT, "pnpm-lock.yaml")),
+    );
+  },
+);
+
+proves(["0005-typescript-runtime FR-026"], "no formatter, linter, test framework or package manager but Bun is a dependency", () => {
+  const m = manifest();
+  const tools =
+    /^(prettier|eslint|@typescript-eslint\/.*|dprint|@dprint\/.*|biome|@biomejs\/.*|oxlint|vitest|jest|mocha|ava|tsx|ts-node|npm|pnpm|yarn)$/;
+  assertEquals(
+    Object.keys(m.devDependencies).filter((d) => tools.test(d)),
+    [],
+  );
 });
 
-proves(["0005-typescript-runtime FR-001"], "the layout: the folders and files are there, and runtime/mod.ts does not load the test runner", async () => {
-  for (const f of ["kernel/mod.ts", "runtime/mod.ts", "runtime/test.ts", "package.json", "package-lock.json", "tsconfig.json", "tsconfig.kernel.json", "README.md"]) {
-    assert(statSync(join(ROOT, f)).isFile, f);
-  }
-  const mod = await readTextFile(join(ROOT, "runtime", "mod.ts"));
-  assert(!specifiers(mod).some((s) => s.includes("test")), "runtime/mod.ts re-exports test.ts");
-  assert(!specifiers(await readTextFile(join(ROOT, "kernel", "mod.ts"))).some((s) => s.includes("runtime")));
+proves(["0005-typescript-runtime FR-028"], "bunfig.toml makes an error of every rule FR-028 names", () => {
+  const config = text("bunfig.toml");
+  assert(/^\[fmt\]/m.test(config) && /^\[lint\]/m.test(config) && /^typeAware = true$/m.test(config));
+  const rules = [
+    "typescript/no-explicit-any",
+    "typescript/no-non-null-assertion",
+    "typescript/explicit-module-boundary-types",
+    "typescript/switch-exhaustiveness-check",
+    "typescript/no-floating-promises",
+    "typescript/no-misused-promises",
+    "typescript/consistent-type-imports",
+    "typescript/only-throw-error",
+    "typescript/no-unnecessary-type-assertion",
+    "typescript/ban-ts-comment",
+    "eslint/eqeqeq",
+  ];
+  for (const r of rules) assert(new RegExp(`^"${r}" = (?:"error"|\\["error")`, "m").test(config), `${r} is not an error in bunfig.toml`);
 });
+
+proves(
+  ["0005-typescript-runtime FR-029"],
+  "the package exports kernel, runtime and runtime/test, and the build emits JavaScript with declarations",
+  () => {
+    const m = manifest();
+    assertEquals(m.name, "@intellectual-frontiers/ifc-ts");
+    assertEquals(m.exports, { "./kernel": "./kernel/mod.ts", "./runtime": "./runtime/mod.ts", "./runtime/test": "./runtime/test.ts" });
+    const built = packageManifest(m);
+    assertEquals(built["exports"], {
+      "./kernel": { types: "./kernel/mod.d.ts", default: "./kernel/mod.js" },
+      "./runtime": { types: "./runtime/mod.d.ts", default: "./runtime/mod.js" },
+      "./runtime/test": { types: "./runtime/test.d.ts", default: "./runtime/test.js" },
+    });
+    assertEquals([built["devDependencies"], built["scripts"], built["dependencies"]], [undefined, undefined, undefined]);
+    assertEquals(tarballName({ name: "@intellectual-frontiers/ifc-ts", version: "1.2.3" }), "intellectual-frontiers-ifc-ts-1.2.3.tgz");
+    const build = text("tsconfig.build.json");
+    for (const option of ['"rewriteRelativeImportExtensions": true', '"declaration": true', '"noEmit": false'])
+      assertStringIncludes(build, option);
+    assert(!build.includes("tests/"), "the build leaves the tests out");
+    assertEquals(
+      decodeManifest('{"name":"x","version":"1.2","description":"","type":"module","exports":{},"devDependencies":{}}').kind,
+      "err",
+    );
+    assertEquals(
+      decodeManifest('{"name":"x","version":"1.2.0","description":"","type":"commonjs","exports":{},"devDependencies":{}}').kind,
+      "err",
+    );
+  },
+);
+
+proves(
+  ["0005-typescript-runtime FR-001"],
+  "the layout: the folders and files are there, and runtime/mod.ts does not load the test runner",
+  async () => {
+    for (const f of [
+      "kernel/mod.ts",
+      "runtime/mod.ts",
+      "runtime/test.ts",
+      "package.json",
+      "bun.lock",
+      "bunfig.toml",
+      "tsconfig.json",
+      "tsconfig.kernel.json",
+      "tsconfig.build.json",
+      "README.md",
+    ]) {
+      assert(statSync(join(ROOT, f)).isFile, f);
+    }
+    const mod = await readTextFile(join(ROOT, "runtime", "mod.ts"));
+    assert(!specifiers(mod).some((s) => s.includes("test")), "runtime/mod.ts re-exports test.ts");
+    assert(!specifiers(await readTextFile(join(ROOT, "kernel", "mod.ts"))).some((s) => s.includes("runtime")));
+  },
+);

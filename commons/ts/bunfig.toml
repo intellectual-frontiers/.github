@@ -1,0 +1,21 @@
+# IFC TypeScript's tools, all from Bun (commons 0005-typescript-runtime FR-026 to FR-028).
+
+[fmt]
+printWidth = 140
+
+[lint]
+typeAware = true
+
+[lint.rules]
+# Algebraic type safety: no escape from the type system, every alternative handled, every promise awaited (FR-028).
+"typescript/no-explicit-any" = "error"
+"typescript/no-non-null-assertion" = "error"
+"typescript/explicit-module-boundary-types" = "error"
+"typescript/switch-exhaustiveness-check" = "error"
+"typescript/no-floating-promises" = "error"
+"typescript/no-misused-promises" = "error"
+"typescript/consistent-type-imports" = "error"
+"typescript/only-throw-error" = "error"
+"typescript/no-unnecessary-type-assertion" = "error"
+"typescript/ban-ts-comment" = ["error", { "ts-expect-error" = "allow-with-description", "minimumDescriptionLength" = 10 }]
+"eslint/eqeqeq" = "error"

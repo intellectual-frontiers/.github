@@ -29,35 +29,46 @@ const enc = new TextEncoder();
 const segment = fc.stringMatching(/^[A-Za-z0-9_.-]{1,20}$/).filter((s) => s !== "." && s !== "..");
 const path = fc.array(segment, { minLength: 1, maxLength: 4 }).map((xs) => xs.join("/"));
 /** Files whose paths are not a folder of another file. */
-const files = fc.uniqueArray(fc.tuple(path, fc.uint8Array({ maxLength: 2000 })), { selector: ([p]) => p, maxLength: 8 })
+const files = fc
+  .uniqueArray(fc.tuple(path, fc.uint8Array({ maxLength: 2000 })), { selector: ([p]) => p, maxLength: 8 })
   .filter((entries) => entries.every(([p]) => !entries.some(([q]) => q.startsWith(`${p}/`))))
   .map((entries) => new Map(entries));
 
-const sorted = (m: ReadonlyMap<string, Uint8Array>): [string, Uint8Array][] => sortedPaths(m.keys()).map((k) => [k, m.get(k) ?? new Uint8Array()]);
+const sorted = (m: ReadonlyMap<string, Uint8Array>): [string, Uint8Array][] =>
+  sortedPaths(m.keys()).map((k) => [k, m.get(k) ?? new Uint8Array()]);
 
 proves([FR, "0005-typescript-runtime FR-014"], "tar then untar gives the files back, the same bytes every time", () => {
-  fc.assert(fc.property(files, (fs) => {
-    const t = tar(fs);
-    if (t.kind === "err") throw new Error(formatArchiveError(t.error));
-    assertEquals(t, tar(fs));
-    assertEquals(t.value.length % 512, 0);
-    const back = untar(t.value);
-    if (back.kind === "err") throw new Error(formatArchiveError(back.error));
-    assertEquals(sorted(filesOf(back.value)), sorted(fs));
-  }), { numRuns: 60 });
+  fc.assert(
+    fc.property(files, (fs) => {
+      const t = tar(fs);
+      if (t.kind === "err") throw new Error(formatArchiveError(t.error));
+      assertEquals(t, tar(fs));
+      assertEquals(t.value.length % 512, 0);
+      const back = untar(t.value);
+      if (back.kind === "err") throw new Error(formatArchiveError(back.error));
+      assertEquals(sorted(filesOf(back.value)), sorted(fs));
+    }),
+    { numRuns: 60 },
+  );
 });
 
 proves([FR, "0005-typescript-runtime FR-014"], "zip then unzip, and gzip then gunzip, give the bytes back", async () => {
-  await fc.assert(fc.asyncProperty(files, async (fs) => {
-    const z = zip(fs);
-    assertEquals(z, zip(fs));
-    const back = await unzip(z);
-    if (back.kind === "err") throw new Error(formatArchiveError(back.error));
-    assertEquals(sorted(back.value), sorted(fs));
-  }), { numRuns: 40 });
-  await fc.assert(fc.asyncProperty(fc.uint8Array({ maxLength: 140_000 }), async (data) => {
-    assertEquals(await gunzip(gzip(data)), ok(data));
-  }), { numRuns: 15 });
+  await fc.assert(
+    fc.asyncProperty(files, async (fs) => {
+      const z = zip(fs);
+      assertEquals(z, zip(fs));
+      const back = await unzip(z);
+      if (back.kind === "err") throw new Error(formatArchiveError(back.error));
+      assertEquals(sorted(back.value), sorted(fs));
+    }),
+    { numRuns: 40 },
+  );
+  await fc.assert(
+    fc.asyncProperty(fc.uint8Array({ maxLength: 140_000 }), async (data) => {
+      assertEquals(await gunzip(gzip(data)), ok(data));
+    }),
+    { numRuns: 15 },
+  );
 });
 
 proves([FR], "the CRC-32 check value, and the gzip of stored blocks byte for byte", () => {
@@ -184,6 +195,13 @@ proves([FR], "a tar with a pax path and a GNU long name is read", () => {
   ]);
   const r = untar(archive);
   assert(r.kind === "ok", r.kind === "err" ? formatArchiveError(r.error) : "");
-  assertEquals(r.value.map((e) => [e.path, e.kind]), [["pax/named.txt", "file"], [longName, "file"], ["link", "symlink"]]);
+  assertEquals(
+    r.value.map((e) => [e.path, e.kind]),
+    [
+      ["pax/named.txt", "file"],
+      [longName, "file"],
+      ["link", "symlink"],
+    ],
+  );
   assertEquals(filesOf(r.value).get(longName), enc.encode("two"));
 });
