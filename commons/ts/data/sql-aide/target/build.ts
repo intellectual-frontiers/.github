@@ -5,6 +5,17 @@
  * is committed and diffs in Git, and the database is made from it whenever wanted. The text is the same bytes from the same source on
  * every runtime and every run: nothing in it comes from the clock or from chance.
  *
+ * @remarks
+ * A database target is durable (the system of record: PostgreSQL, or a SQLite or DuckDB file that is kept; its structure changes through
+ * ISLM) or ephemeral (the TypeScript is the system of record and the database a build product: `.ts` to `.auto.sql` to `.auto.sqlite.db`,
+ * `.auto.duckdb` or a PGlite folder). The durability is in the emit context's type, durable unless said, and ISLM's plan, apply and
+ * teardown do not compile with an ephemeral context. `buildSql` writes the one `.auto.sql` of an ephemeral target, which is committed; the
+ * database is not, and `materialize` (in `sql-aide/runtime/build.ts`) makes it through a driver in a temporary file renamed over the old
+ * one. `clientCommand` gives the command for `sqlite3`, `duckdb` or `psql`; each was run with the publisher's own client (`sqlite3`
+ * 3.54.1, the `duckdb` client 2.0.0, `psql` 16) and the database read back; a test says so where a client is not installed. `staleFiles`
+ * and `cli check` fail on a committed file that is not what the source makes, and `sizeFindings` reports a build past a number of rows. A
+ * PGlite target is a folder, removed before the new one is renamed into its place, so for that moment a reader finds none.
+ *
  * @module
  */
 import { sha256 } from "../../../kernel/mod.ts";

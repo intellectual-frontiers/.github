@@ -442,3 +442,25 @@ export function differences(live: CatalogObject, wanted: CatalogObject): readonl
     .filter((f) => (live.def[f] ?? "") !== (wanted.def[f] ?? ""))
     .map((f) => `${f}: ${JSON.stringify(live.def[f] ?? "")} → ${JSON.stringify(wanted.def[f] ?? "")}`);
 }
+
+/** What a plan with a shadow compares, for each dialect, as its catalog lets it read: what it compares, and what it does not, and why. */
+export const ISLM_COMPARED: {
+  readonly [D in "postgres" | "duckdb" | "sqlite"]: { readonly compared: string; readonly notCompared: string };
+} = {
+  postgres: {
+    compared:
+      "column type (`format_type`), default, generated expression, identity; primary key, unique, check, foreign key with actions, exclusion (`pg_get_constraintdef`); indexes not backing a constraint (`pg_get_indexdef`: columns and order, uniqueness, method, predicate, included columns, expressions); views and materialized views (columns, `pg_get_viewdef`); routines (arguments, result, kind, language, volatility, MD5 of the body); triggers; sequences; enum labels in order; domains; row-level security and forcing; policies; partitioned tables and partition bounds; comments on tables, views, columns and routines; extensions; schemas; objects in the database and not in the model",
+    notCompared:
+      "column order; grants, owners, roles; storage and tablespaces; a sequence's current value; data; objects an extension owns",
+  },
+  duckdb: {
+    compared:
+      "column type, default or generation expression (`duckdb_columns`); primary key, unique, check, foreign key as `duckdb_constraints` writes them; indexes (their SQL); views (columns, SQL); macros (definition, parameters); sequences; enum labels; comments on tables, views and columns; schemas",
+    notCompared: "column order; foreign key actions (the catalog does not say them); routines other than macros (DuckDB keeps none); data",
+  },
+  sqlite: {
+    compared:
+      "declared column type, default as written, generated expression (from the table's SQL); primary key columns in order; unique constraints; foreign keys with tables, columns and actions; checks (from the table's SQL); indexes made by `CREATE INDEX` (their SQL); views (columns, SQL); triggers (SQL)",
+    notCompared: "column order; comments (SQLite keeps none); data",
+  },
+};

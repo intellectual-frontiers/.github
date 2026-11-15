@@ -538,7 +538,7 @@ Deno.test("ShellFragment: the fragment and the TOML say the same", async () => {
 Deno.test("Layout: commons has the layout the capability spec names (0001-software-supply-chain FR-001)", () => {
   for (
     const rel of [
-      "README.md",
+      "about.ts",
       "spec-kit/registry.tsv",
       "spec-kit/enforcement.tsv",
       `${ONTOLOGY}/packaging.ttl`,
@@ -549,7 +549,8 @@ Deno.test("Layout: commons has the layout the capability spec names (0001-softwa
       "generated/pins.auto.env",
     ]
   ) assert(Deno.statSync(`${COMMONS}/${rel}`).isFile, rel);
-  assert(Deno.readTextFileSync(`${COMMONS}/README.md`).startsWith("# commons"));
+  assert(Deno.readTextFileSync(`${COMMONS}/about.ts`).includes('title: "Intellectual Frontiers Commons"'));
+  assert([...Deno.readDirSync(COMMONS)].every((e) => e.name !== "README.md"), "commons keeps no README (0011-documentation FR-004)");
   assertEquals([...Deno.readDirSync(`${COMMONS}/tools`)].filter((e) => !e.name.endsWith(".ts")).map((e) => e.name), [], "the tools are TypeScript, and nothing else is there");
 });
 

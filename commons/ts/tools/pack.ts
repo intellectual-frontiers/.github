@@ -7,10 +7,16 @@
  *
  * @module
  */
+import { about } from "../about.ts";
 import { decodeManifest, type Manifest, packageManifest, tarballName } from "./manifest.ts";
-import { copyFile, ensureDir, readTextFile, remove, sha256File, writeTextFile } from "../runtime/fs.ts";
+import { ensureDir, readTextFile, remove, sha256File, writeTextFile } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
 import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";
+
+/** The README the tarball carries, made from the package's `about` (commons 0011-documentation FR-004): its summary and where its documentation is. */
+export function readmeOf(title: string, summary: string, version: string): string {
+  return `# ${title} ${version}\n\n${summary}\n\nThe documentation is at https://intellectual-frontiers.github.io/.github/.\n`;
+}
 
 const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
@@ -47,7 +53,7 @@ await remove(DIST, { recursive: true }).catch(() => {});
 await ensureDir(OUT);
 await step([bun, "x", "tsc", "-p", "tsconfig.build.json"], ROOT);
 await writeTextFile(join(OUT, "package.json"), `${JSON.stringify(packageManifest(m), null, 2)}\n`);
-await copyFile(join(ROOT, "README.md"), join(OUT, "README.md"));
+await writeTextFile(join(OUT, "README.md"), readmeOf(about.title, about.summary, m.version));
 await step([bun, "pm", "pack", "--destination", DIST, "--quiet"], OUT);
 const tarball = join(DIST, tarballName(m));
 const sum = await sha256File(tarball);

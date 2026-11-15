@@ -1,10 +1,22 @@
 /**
- * Data Vault (the library targets Data Vault 2.1; see the README for what of it is here) as functions: a hub, a satellite and a link are made for whatever names them, each a table whose type is worked out from
+ * Data Vault (the library targets Data Vault 2.1; `@limits` below says what of it is here) as functions: a hub, a satellite and a link are made for whatever names them, each a table whose type is worked out from
  * what it is given (commons 0009-sql-aide FR-048). A satellite belongs to a hub and a link joins hubs; giving either a table that is not
  * a hub does not compile.
  *
  * A hub holds the business key of one thing and nothing else; a satellite holds what is known of it at a moment, one row for each
  * change, never updated; a link holds that hubs are related. Every row says when it was loaded and where it came from.
+ *
+ * @limits
+ * Data Vault targets Data Vault 2.1. What it gives: hubs of business keys, satellites of attributes a row for each change, links of hubs,
+ * a load date (`load_at`) and a record source on every row, and loads that only insert, change nothing when run again and add a satellite
+ * row only for a changed attribute. What it does not yet give: hash keys and hash differences (a hub is keyed by its business key as text,
+ * and a change is found by comparing attributes with `IS NOT DISTINCT FROM`), point-in-time and bridge tables, ghost records, and any
+ * other rule of 2.1. The 2.1 standard was looked for on 2026-11-15 and not found published where it could be read:
+ * [datavaultalliance.com](https://datavaultalliance.com/) names only the CDVP2.1 certification of DVA University, its
+ * [blog](https://datavaultalliance.com/blog/) has no post on 2.1, and the one page found labelled 2.1
+ * ([dv2.org](https://www.dv2.org/2023/01/data-vault-anti-pattern-adding-column.html)) is an unsigned blog post. So nothing of 2.1 is
+ * implemented from memory, and open question OQ-3 stays open until a person gives the library the standard to follow. A satellite's states
+ * are numbered with nine digits; a landing relation should hold one state of a key in one load.
  *
  * @module
  */

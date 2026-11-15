@@ -4,6 +4,9 @@
  * a vector has at most the dimensions pgvector indexes, and a generator that lists the vector columns. Nothing registers it: a context
  * that wants it is made with `postgres().with(pgvectorExtension)` and `plugins: [pgvectorPlugin]`.
  *
+ * @limits
+ * The pgvector plugin renders and lints; no engine here has the extension, so its SQL is not loaded.
+ *
  * @module
  */
 import { type Column, column } from "../algebra/column.ts";

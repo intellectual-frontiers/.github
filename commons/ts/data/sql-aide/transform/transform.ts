@@ -3,6 +3,12 @@
  * materialized view or nothing at all (ephemeral, written in where it is read). The order of a build comes from what each model's query
  * refers to, found by walking the query itself; and each model says its lineage (commons 0009-sql-aide FR-028, FR-043).
  *
+ * @limits
+ * A model's references are found by walking its query, rendered for the first of PostgreSQL, DuckDB and SQLite it has a case for. An
+ * incremental model adds the rows whose key it does not hold and never changes a row it holds. A materialized view is PostgreSQL's, made
+ * if absent and refreshed on each build; a change of its query is not applied (ISLM reports that). A relationship test between a relation
+ * and itself is not supported. Lineage covers integrations, Data Vault's loads and transforms.
+ *
  * @module
  */
 import { absurd } from "../../../kernel/mod.ts";

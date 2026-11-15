@@ -3,6 +3,9 @@
  * only folders, the last match deciding and a deeper file after a shallower one), which a query applies by default (commons 0010-file-aide
  * FR-027, FR-028).
  *
+ * @limits
+ * `.git/info/exclude` is read only at the root of the store, not where the store's root is deeper in a Git working tree.
+ *
  * @module
  */
 import { type Glob, glob } from "./glob.ts";

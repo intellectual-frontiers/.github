@@ -288,7 +288,7 @@ proves(
       "tsconfig.json",
       "tsconfig.kernel.json",
       "tsconfig.build.json",
-      "README.md",
+      "about.ts",
     ]) {
       assert(statSync(join(ROOT, f)).isFile, f);
     }

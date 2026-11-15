@@ -144,3 +144,15 @@ export { formatYamlError, isPlainSafe, parseYaml, resolveCore, toYaml } from "./
 export type { YamlError, YamlOptions } from "./yaml.ts";
 export type { ReadXmlOptions, XmlChild, XmlElement, XmlError, XmlNode, XmlText } from "./xml.ts";
 export type { Equal, Extends, Not } from "./types.ts";
+export type {
+  About,
+  AboutArea,
+  AboutCommand,
+  AboutEnforcer,
+  AboutExample,
+  AboutFolder,
+  AboutPhase,
+  AboutPhaseState,
+  AboutRule,
+  AboutSpec,
+} from "./documentation.ts";

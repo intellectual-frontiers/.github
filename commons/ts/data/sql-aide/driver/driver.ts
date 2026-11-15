@@ -5,6 +5,13 @@
  * model is the row the program gets: SQLite's 0 and 1 are booleans, a PostgreSQL `bigint` is a `bigint`, a date is `YYYY-MM-DD` text,
  * a moment is a `Date`, JSON is parsed (commons 0009-sql-aide FR-042).
  *
+ * @limits
+ * `run` binds a single statement's values and writes a script's (a fragment of several statements) as literals. Values are decoded where a
+ * column's domain is known: a column of a table, view, model or common table expression, or a call of a function that returns a value;
+ * anything else comes as the client gives it. SQLite keeps NUMERIC as a floating-point number, so its digits beyond a double's are lost
+ * before they are written to the column's scale. `pg` reads a date as local midnight and the driver writes it back in local time; the
+ * tests ran in UTC only. DuckDB's blobs are read through its JSON form.
+ *
  * @module
  */
 import { absurd, err, ok, type Result } from "../../../kernel/mod.ts";

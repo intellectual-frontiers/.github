@@ -4,6 +4,13 @@
  * tests run on each file. The plan is compiled once into closures that walk a store folder by folder, in parallel or in key order, honour
  * ignore files and hidden names, and stop as soon as the limit is reached or the caller stops reading.
  *
+ * @limits
+ * A query's walk lists a folder whole before it goes below it, so a folder with very many files is held in memory while it is read. In key
+ * order a folder's own row sorts by its path, and the files below it by theirs (`book`, `book-series`, `book-series/...`, `book/...`).
+ *
+ * `regex` is ECMAScript's, and is allowed only by `with (regex = on)`. The comparison with `fd` runs where `fd` (or `fdfind`) and `git`
+ * are installed, and is skipped, saying so, where they are not; its speed is not measured yet.
+ *
  * @module
  */
 import { absurd, err, ok, type Result } from "../../../kernel/mod.ts";

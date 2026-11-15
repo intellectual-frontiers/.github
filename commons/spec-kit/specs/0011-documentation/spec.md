@@ -16,7 +16,7 @@
 ## The sources
 
 - **FR-004**: Every page MUST be made from two sources alone: the TypeScript of commons (module documentation, TSDoc, `About` values, example files and the values of models and layouts) and the spec kit (`commons/spec-kit/`). The site MUST NOT be made from a Markdown file written for it, and commons MUST NOT keep a `README.md`; the root `README.md` of the repository (a short pointer to the site, kept by hand) and `profile/README.md` (the organization's page on GitHub) are not commons' and are not sources.
-- **FR-005**: An area is a folder of commons that has an entry point: IFC TypeScript's kernel, runtime and lint plugin, SQL Aide, File Aide, Arca, Data Vault, osquery ATC and IFRFS. Each area MUST have an `about.ts` beside its entry point that exports `about`, a value of the kernel's `About` type (`kernel/about.ts`): its title, a summary, the specification it implements, and where they apply its folders with what each may import, its commands, its rules with what enforces each, its phases and its examples. `about.ts` MUST NOT be exported by the area's entry point, and commons as a whole MUST have `commons/about.ts`, with its summary and its folders.
+- **FR-005**: An area is a part of commons with an entry point: IFC TypeScript's kernel, runtime and lint plugin, SQL Aide, File Aide, Arca, Data Vault, osquery ATC and IFRFS. Each package (`commons/ts`, `commons/ts/data`) MUST have an `about.ts` at its root that exports `about`, a value of the kernel's `About` type (`kernel/documentation.ts`): its title, a summary, the specification it implements, its folders with what each may import, its commands, its rules with what enforces each, and its areas, each with its entry points, its specification, its phases and its examples. No entry point MUST export `about.ts`, and commons as a whole MUST have `commons/about.ts`, with its summary and its folders.
 - **FR-006**: The documentation of a module MUST be TSDoc: the module's comment (which says `@module`) begins with what the module is, and MAY go on with `@remarks` (the longer account), `@example`, `@see` and `@limits`, this repository's own block tag, which says plainly what the module does not do or does only in part. An export's comment MAY carry `@param`, `@returns`, `@example`, `@see` and `@deprecated`. Prose in TSDoc and in specifications is the Markdown of FR-016.
 - **FR-007**: A limit, a guarantee or an account of how a part works MUST be written in the module of the code it is about, not in another file. A change to code MUST change its documentation in the same commit.
 - **FR-008**: A fact with a shape (a table of folders, of commands, of rules, of phases, of what a dialect's catalog compares) MUST be a typed value, in `about.ts` or in the module that uses it, not a table written in prose, so that a test can hold it to the code.
@@ -35,7 +35,7 @@
 
 - **FR-016**: The generator MUST turn the Markdown of TSDoc and of specifications into its own page model, a tagged union of blocks and inlines, and MUST read only this subset: paragraphs, headings, lists, emphasis, code, fenced code with its language, links, and tables. Anything else is shown as its text.
 - **FR-017**: Every page MUST be a static HTML file whose links are relative, so that the site works under any path (it is published at `https://intellectual-frontiers.github.io/.github/`). A page MUST NOT request anything from another host: its stylesheet, its one script, the search index and Mermaid are files of the site. The text people read MUST be on white (`#ffffff`); the navigation is on a neutral grey; the site is light only; it MUST be read on a screen 360 pixels wide with nothing scrolling sideways but code and wide tables; code is highlighted when the site is built; a search over titles, headings, exports, tables, columns and requirements is opened with `/`.
-- **FR-018**: `--check` MUST find: an export of an area with no TSDoc; an area with no `about.ts`, or whose `about` names a folder that does not exist, a command that is not a script of its `package.json`, or a rule enforced by a test or lint rule that does not exist; a citation of a specification or requirement that is not in the spec kit; a `{@link}` to an unknown name; a table or view of a model with no description; a module of a lens that cannot be imported; and a link or anchor of the site that leads nowhere.
+- **FR-018**: `--check` MUST find: an export of an area with no TSDoc; a package with no `about.ts`, or whose `about` names a folder that does not exist, a command that is not a script of its `package.json`, or a rule enforced by a test or lint rule that does not exist; a citation of a specification or requirement that is not in the spec kit; a `{@link}` to an unknown name; a table or view of a model with no description; a module of a lens that cannot be imported; and a link or anchor of the site that leads nowhere.
 - **FR-019**: The generator's tests MUST cover the Markdown subset, the highlighter, every case of the page model as HTML, the API reader on a fixture module, and each lens on a fixture, and MUST compare the fixtures' HTML with HTML committed under `commons/docs/suite/golden/`, written again with `IFCDOCS_UPDATE_GOLDEN=1`.
 - **FR-020**: A workflow, `.github/workflows/docs.yml`, MUST run the generator's tests and `--check` on every pull request and push that touches commons or the workflow, and on a push to `main` MUST build the site and publish it to GitHub Pages with GitHub's own actions (`actions/upload-pages-artifact`, `actions/deploy-pages`). The site MUST NOT be committed.
 
@@ -50,7 +50,7 @@
 - A module of a model that throws when imported: `--check` names the module and the site is not published, per FR-018 and FR-013.
 - A documentation comment that cites a requirement of `erga 009-machine-bootstrap`: the page shows the text, with no link, per FR-011.
 - A comment that cites a requirement number its specification does not have: `--check` names it, per FR-018 and FR-011.
-- An `about` whose command was renamed in `package.json`: `--check` names it, per FR-018 and FR-005.
+- A package's `about` whose command was renamed in `package.json`: `--check` names it, per FR-018 and FR-005.
 - A table of a model with no description: `--check` names it, per FR-018 and FR-013.
 - A signature thousands of characters long (a model's computed row type): it is shown whole and folded, per FR-010 and FR-017.
 - The site published under `/.github/`: every link is relative, so it works there and at a custom domain alike, per FR-017.
@@ -69,8 +69,8 @@
 
 ## Key entities
 
-- **Area** - a folder of commons with an entry point, its `about` and its pages.
-- **About** - the typed facts of an area: summary, specification, folders, commands, rules, phases, examples.
+- **Area** - a part of commons with an entry point, named by its package's `about`, and its pages.
+- **About** - the typed facts of a package: summary, specification, folders, commands, rules, and its areas with their phases and examples.
 - **Page model** - the tagged union of blocks and inlines every page is made of before it is HTML.
 - **Lens** - what the generator knows of one library: which exports are its, and the pages their values make.
 - **Finding** - a place and a sentence saying what `--check` found there.

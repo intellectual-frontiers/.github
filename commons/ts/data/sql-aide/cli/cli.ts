@@ -3,6 +3,9 @@
  * that looks for a project. `cli(project, words, io)` parses the words with the kernel's `args`, does what they ask for the project's
  * model, writes through `io` and gives the exit status; it reads and writes no file itself (`runtime/cli.ts` wires it to a process).
  *
+ * @limits
+ * The command line renders, lints and generates; it does not plan or apply ISLM against a database.
+ *
  * @module
  */
 import { absurd, args } from "../../../kernel/mod.ts";

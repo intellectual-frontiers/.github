@@ -6,6 +6,14 @@
  * A query's scope is its relations by name, each with its columns as typed expressions; a join without a condition takes it from the
  * one foreign key between the relation joined and those already there, and does not compile where there is none.
  *
+ * @limits
+ * A relation is in a query's scope by its name, so a table cannot be joined to itself (no aliases yet). A join without a condition needs
+ * exactly one foreign key between the relation and the scope: the compiler refuses none, and two (a relation that points twice at one
+ * table) fail when rendered and ask for the condition. There is no `GROUP BY` or aggregate helper; `valueAs` and `call` type hand-written
+ * expressions. A set operation checks at run time that both sides name their columns in the same order. The rows of an insert must all
+ * give the same columns. The builder types rows as the model does, and a driver decodes a column of the model by its domain; an expression
+ * that is not a column (a `count(*)`) is given as the client gives it.
+ *
  * @module
  */
 import type { DomainSpec, SqlValue } from "../algebra/domain.ts";

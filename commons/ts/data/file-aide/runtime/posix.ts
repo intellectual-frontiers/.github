@@ -4,6 +4,11 @@
  * that no reader sees part of a file; no folder is written for its own sake, and a delete removes the folders it leaves empty, up to the
  * root. A networked file system mounted on the computer is reached the same way.
  *
+ * @limits
+ * The `posix` driver reads a whole folder to give one page of a listing, and a whole file to give a range; it skips symbolic links, and
+ * does not claim a write on a version, which it cannot make atomic. A name on disk that is not in normalization form C is listed in form C
+ * and is then reached only where the file system treats the two forms as one (as APFS does).
+ *
  * @module
  */
 import { err, ok, type Result } from "../../../kernel/mod.ts";

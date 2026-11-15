@@ -12,7 +12,7 @@ harness can say, to a person and to an auditor, what it installed and from where
 
 ## The capability
 
-- **FR-001**: The capability MUST be kept in `commons/` of the `.github` repository, which holds what any company or harness of Intellectual Frontiers may use (`commons/README.md`). Its
+- **FR-001**: The capability MUST be kept in `commons/` of the `.github` repository, which holds what any company or harness of Intellectual Frontiers may use (`commons/about.ts`; amended 2026-11-15, when commons' READMEs became its TypeScript, commons 0011-documentation). Its
   ontology MUST be under `commons/ontology/supply-chain/`, its specifications in `commons/spec-kit/`, its tools in `commons/tools/` and what the tools generate in `commons/generated/`.
 - **FR-002**: A file a tool generates MUST carry `.auto.` in its name (`packaging.auto.toml`) or sit between marks that say `AUTO-GENERATED` inside a file a person writes, MUST say which tool
   and which source made it, and MUST NOT be edited by hand: a check MUST fail where it is not what its tool makes from the ontology.

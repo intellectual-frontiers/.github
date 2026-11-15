@@ -2,6 +2,10 @@
  * Entries and layouts: a path pattern with what its files hold, and a union of entries under a root that refuses two entries that match the
  * same path and gives every path one entry and its key, or `unmatched` (commons 0010-file-aide FR-009, FR-010, FR-011).
  *
+ * @limits
+ * A layout finds two overlapping entries by its segments' witnesses: an overlap that no witness shows is not found when the layout is
+ * made, and a path both entries match is unmatched, saying so.
+ *
  * @module
  */
 import { err, type Json, ok, parseJson5, type Result, toJson5 } from "../../../kernel/mod.ts";

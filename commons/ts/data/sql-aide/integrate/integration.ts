@@ -5,6 +5,11 @@
  * strategy: `append`, `upsert`, `replace` or `snapshot`. What it renders is a script of the engine's own statements (`read_csv`,
  * `ATTACH`, `ON CONFLICT`); the library runs nothing.
  *
+ * @limits
+ * A load is a script the caller runs whole; it begins no transaction, so a `replace` or `snapshot` that fails halfway leaves what it did
+ * unless the caller wraps it in one. Files are read only by DuckDB (`read_csv`); PostgreSQL's `COPY` is not used. An attached database is
+ * a file of the same engine: DuckDB attaching SQLite or PostgreSQL needs an extension it would download, and is not tested.
+ *
  * @module
  */
 import { absurd, err, ok, type Result } from "../../../kernel/mod.ts";

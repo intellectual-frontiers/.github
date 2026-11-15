@@ -4,6 +4,11 @@
  * FR-045). A generator is a typed value, and a plugin may add its own (FR-024). The library depends on neither Rust nor Zod: it writes
  * text that a Rust compiler and a program that imports Zod read.
  *
+ * @limits
+ * The diagrams are committed as text and are not rendered by a Mermaid or D2 tool here. Rust structures keep dates, moments, decimals and
+ * JSON as `String`, so they need no crate; the test compiles them where `rustc` is on the PATH. Zod is a development dependency of the
+ * tests only: the library writes the schemas as text.
+ *
  * @module
  */
 import { absurd } from "../../../kernel/mod.ts";

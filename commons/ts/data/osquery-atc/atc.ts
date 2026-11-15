@@ -12,6 +12,14 @@
  * `windows`, `any` and `all`, and an entry with none applies to all; a path may hold `%` for any one directory (the documentation's
  * per-user example). The configuration this module writes was checked against that format and was not run in osquery here.
  *
+ * @remarks
+ * This library follows osquery's own documentation of Automatic Table Construction
+ * ([configuration](https://osquery.readthedocs.io/en/stable/deployment/configuration/)) and its parser
+ * (`plugins/config/parsers/auto_constructed_tables.cpp` in [osquery/osquery](https://github.com/osquery/osquery)), read on 2026-11-15:
+ * `query` and `path` required, `columns` a list (every column TEXT to osquery), no column named `path`, which osquery adds itself, and the
+ * platforms `darwin`, `linux`, `posix`, `windows`, `any` and `all`. The generated configuration was checked against that format and was
+ * not run in osquery: no `osqueryi` is on this computer. The values osquery reads are text: a boolean is `1` or `0`.
+ *
  * @module
  */
 import { type Entity, type RowOf, type TableSpec } from "../sql-aide/mod.ts";

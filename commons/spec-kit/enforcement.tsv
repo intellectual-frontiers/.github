@@ -259,7 +259,7 @@ requirement	mechanism	by	note
 0011-documentation FR-002	check	.github: cd commons/docs && bun run verify	the compiler of the package; conventions.test.ts: what each file imports, no any, no non-null assertion, @module and TSDoc
 0011-documentation FR-003	check	.github: cd commons/docs && bun run verify	main.test.ts: --check writes nothing in the checkout and exits 1 on a finding; two builds give the same bytes
 0011-documentation FR-004	check	.github: cd commons/docs && bun run verify	conventions.test.ts: commons has no README.md and the site reads only commons' TypeScript and the spec kit
-0011-documentation FR-005	check	.github: cd commons/docs && bun run verify	about.test.ts: every area has about.ts, its entry point does not export it, and --check holds its folders, commands and rules to the code
+0011-documentation FR-005	check	.github: cd commons/docs && bun run verify	about.test.ts: every package has about.ts naming its areas, no entry point exports it, and --check holds its folders, commands and rules to the code
 0011-documentation FR-006	check	.github: cd commons/docs && bun run verify	api.test.ts: the module comment, @remarks, @example, @see, @limits and the tags of an export, read from a fixture
 0011-documentation FR-007	review	0011-documentation FR-006	A reviewer checks that a change to code changes the documentation of its module in the same commit (AGENTS.md says so)
 0011-documentation FR-008	review	0011-documentation FR-006	A reviewer checks that a fact with a shape is a typed value; about.test.ts holds the ones about.ts keeps

@@ -9,6 +9,22 @@
  * types, keys, checks or foreign keys of a table that exists; a change of those is a step a person writes. Routines, triggers, policies
  * and the other objects are applied again when their definition changes, which the ledger's hash tells.
  *
+ * @limits
+ * With a shadow (`shadow(entities, emptyDatabase, ctx)`, a database of the same engine made from the model, entity by entity), `plan(...,
+ * { shadow })` compares every object each dialect's catalog lets it read, so that what an engine rewrites is rewritten the same way on
+ * both sides. Without a shadow it compares what it did before: which tables, columns, views and indexes exist and whether a column may be
+ * null. What each dialect's catalog lets it compare, and what it leaves, is `ISLM_COMPARED`.
+ *
+ * What is changed in place: a column added or dropped, nullness (PostgreSQL, DuckDB), a default (PostgreSQL, DuckDB), a constraint added,
+ * dropped or replaced (PostgreSQL), an index made, replaced or dropped, a view, routine, trigger, policy, row-level security or comment
+ * applied again, enum labels appended (PostgreSQL). Said as needing a step written by hand: a column's type (it may lose data), a
+ * generated or numbered column, a default in SQLite, a constraint of DuckDB or SQLite (the table must be made again), a sequence, domain
+ * or partition that differs (each is made only if absent), a table that should be partitioned, and an object in the database the model
+ * does not make. An added column gets its type, nullness and default, not its references or checks. DuckDB will not alter a column of a
+ * table that has an index, so the plan drops the table's indexes first and makes the model's again. DuckDB has no triggers, so nothing in
+ * the database refuses a change to its ledger there. A teardown drops tables, views and indexes and leaves routines, policies and types. A
+ * generated column is written with its expression first and no `NOT NULL` or default beside it, which DuckDB requires.
+ *
  * @module
  */
 import { err, ok, type Result, type Sha256, sha256 } from "../../../kernel/mod.ts";

@@ -10,6 +10,8 @@
     "osquery-atc/**/*.ts",
     "file-aide/**/*.ts",
     "ifrfs/**/*.ts",
-    "suite/**/*.ts"
+    "suite/**/*.ts",
+    "examples/**/*.ts",
+    "about.ts"
   ]
 }

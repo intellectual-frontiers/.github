@@ -2,6 +2,10 @@
  * Expressions typed by what they yield: two things compare only where their values are of one type (commons 0009-sql-aide FR-013). A
  * value that is not a partial is bound, never written into the text.
  *
+ * @remarks
+ * A comparison parenthesizes an operand that is not a single name or value, so that `(a > 1) = TRUE` keeps its meaning; DuckDB refused the
+ * chained form.
+ *
  * @module
  */
 import type { SqlValue } from "../algebra/domain.ts";
