@@ -9,7 +9,7 @@
 import { decodeTraces } from "../../kernel/otlp.ts";
 import { sha256 } from "../../kernel/sha256.ts";
 import { toBase64 } from "../../kernel/base64.ts";
-import { readTextFile, readFile, remove, writeFile, writeTextFile, makeTempDir } from "../../runtime/fs.ts";
+import { readTextFile, readFile, remove, symlink, writeFile, writeTextFile, makeTempDir } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
 import { build, execPath, run, runtimeName } from "../../runtime/proc.ts";
 import { readLedger, REPORT_FORMATS, type Runtime, runTests, signRun, verifyRun, writeReports } from "../../runtime/test-run.ts";
@@ -48,7 +48,7 @@ const REQUIRED = [
   "fixture FR-005",
   "fixture FR-006",
   "fixture FR-010",
-];
+].filter((r) => POSIX || (r !== "fixture FR-004" && r !== "fixture FR-005")); // the killed process's tests are POSIX only
 
 function pem(label: string, der: ArrayBuffer): string {
   const b64 = toBase64(new Uint8Array(der)).replace(/(.{64})/g, "$1\n");
@@ -65,6 +65,11 @@ proves(
   "a fixture suite run into one record, its reports, a ledger and signatures, and verified",
   async () => {
     const dir = await makeTempDir({ prefix: "ifc-test-run-" });
+    // On POSIX the suite is run through a link to its folder, as macOS's /var is a link to /private/var: a test's file is still
+    // recorded relative to the working folder.
+    const link = `${dir}-link`;
+    if (POSIX) await symlink(dir, link, { type: "dir" });
+    const base = POSIX ? link : dir;
     try {
       await writeTextFile(join(dir, "a-main.test.ts"), MAIN);
       if (POSIX) await writeTextFile(join(dir, "z-kill.test.ts"), KILL);
@@ -77,7 +82,7 @@ proves(
       const r = await runTests({
         runtimes: [RUNTIME],
         paths: ["."],
-        cwd: dir,
+        cwd: base,
         out: "out",
         requirements: "requirements.txt",
         ledger: "out/ledger.jsonl",
@@ -89,7 +94,7 @@ proves(
       const { run: testRun, recordPath, digest } = r.value;
 
       // FR-005, FR-007: one record named for its trace, the digest of its bytes, read back.
-      assertEquals(recordPath, join(dir, "out", `${testRun.traceId}.otlp.json`));
+      assertEquals(recordPath, join(base, "out", `${testRun.traceId}.otlp.json`));
       const bytes = await readFile(recordPath);
       assertEquals(digest, await sha256(bytes));
 
@@ -221,6 +226,7 @@ proves(
       assertStringIncludes(bad.stderr, "is not in the ledger");
       assertEquals((await run(cli("run", "--runtime", "perl"))).code, 2);
     } finally {
+      if (POSIX) await remove(link);
       await remove(dir, { recursive: true });
     }
   },

@@ -14,26 +14,16 @@ import { parseSpanId, parseTraceId, type SpanId, type TraceId } from "../../kern
 import { sha256 } from "../../kernel/sha256.ts";
 import {
   assembleRecord,
-  closeOrphans,
   completionHtml,
   completionMarkdown,
   ctrfJson,
-  cut,
-  decodeLines,
-  type Installation,
-  installationFromEnv,
-  installationResource,
-  isPersonAttribute,
   judge,
   junitXml,
   oscalAssessmentResults,
-  type Outcome,
   parseRequirementList,
   parseReviewList,
   readRecord,
-  recordLine,
   recordText,
-  type RunnerOutcome,
   runEntry,
   type RunTest,
   sarif,
@@ -41,15 +31,27 @@ import {
   signaturesOf,
   tap14,
   TEST_RESULT_PREDICATE,
+  testResultStatement,
+  type TestRun,
+  verifyEvidence,
+} from "../../kernel/test-report.ts";
+import {
+  closeOrphans,
+  cut,
+  decodeLines,
+  type Installation,
+  installationFromEnv,
+  installationResource,
+  isPersonAttribute,
+  type Outcome,
+  recordLine,
+  type RunnerOutcome,
   type TestCase,
   testCaseLog,
   testCaseSpan,
   testId,
-  testResultStatement,
-  type TestRun,
   testStartLog,
-  verifyEvidence,
-} from "../../kernel/test-report.ts";
+} from "../../kernel/test-record.ts";
 import { attribute, children, descendants, readXml } from "../../kernel/xml.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../../runtime/test.ts";
 

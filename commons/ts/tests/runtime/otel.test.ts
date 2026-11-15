@@ -14,6 +14,8 @@ import {
   type ExporterConfig,
   formatTraceparent,
   type OtelConfig,
+  parseSpanId,
+  parseTraceId,
   type SignalName,
   signalEndpoint,
   SEVERITY,
@@ -29,6 +31,7 @@ import * as proc from "../../runtime/proc.ts";
 import { serve, type Server } from "../../runtime/serve.ts";
 import {
   asyncContextManager,
+  createPipeline,
   environmentParent,
   EXIT_WAIT_MS,
   installed,
@@ -669,3 +672,71 @@ proves([RECEIVER], "the receiver: 415 for protobuf, 400 with the path, 404, 405,
     await r.server.shutdown();
   }
 });
+
+proves(
+  [CONTEXT, "0008-test-evidence FR-004"],
+  "a pipeline hands a span or a log record made elsewhere to every processor, with its source, until shut down",
+  async () => {
+    const first = memoryProcessor();
+    const second = memoryProcessor();
+    const errors: unknown[] = [];
+    const throwing = {
+      ...memoryProcessor(),
+      onEnd: (): void => {
+        throw new Error("a processor that throws");
+      },
+    };
+    const pipeline = createPipeline({
+      resource: { attributes: { "service.name": "a" } },
+      processors: [first, throwing],
+      onError: (e) => errors.push(e),
+    });
+    pipeline.addProcessor(second);
+    const traceId = parseTraceId(TRACE_ID);
+    const spanId = parseSpanId(SPAN_ID);
+    assert(traceId.kind === "ok" && spanId.kind === "ok");
+    const span: SpanData = {
+      name: "test",
+      context: { traceId: traceId.value, spanId: spanId.value, traceFlags: 1, traceState: [], isRemote: false },
+      kind: "internal",
+      startTime: 1n,
+      endTime: 2n,
+      attributes: { "test.case.name": "x" },
+      events: [],
+      links: [],
+      status: { kind: "ok" },
+      droppedAttributesCount: 0,
+      droppedEventsCount: 0,
+      droppedLinksCount: 0,
+    };
+    const source = { resource: { attributes: { "service.name": "ifc-test" } }, scope: { name: "ifc-test" } };
+    pipeline.emit({ kind: "span", span }, source);
+    pipeline.emit(
+      {
+        kind: "log",
+        record: {
+          time: 3n,
+          observedTime: 3n,
+          severityNumber: SEVERITY.INFO,
+          severityText: "INFO",
+          body: "b",
+          attributes: {},
+          droppedAttributesCount: 0,
+        },
+      },
+      source,
+    );
+    for (const m of [first, second]) {
+      assertEquals(m.spans, [span]);
+      assertEquals(
+        m.logs.map((l) => l.body),
+        ["b"],
+      );
+      assertEquals(m.entries[0]?.source, source);
+    }
+    assertEquals(errors.length, 1);
+    await pipeline.shutdown(100);
+    pipeline.emit({ kind: "span", span }, source);
+    assertEquals(first.spans.length, 1);
+  },
+);
