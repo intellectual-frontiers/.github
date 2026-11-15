@@ -1,6 +1,7 @@
 name: tests
 
-# The machine setup script is POSIX sh that runs on a computer with nothing on it, so its tests run on every change: standard library only, no network, no root.
+# The machine setup runs on a computer with nothing on it, so its tests run on every change, with no root, no apt and no network but the Deno and the
+# test library they fetch. Deno comes through the repository's own bootstraps (they are what is tested first); commons' generator stays Python, run by uv.
 on:
   push:
     branches: [main]
@@ -17,20 +18,61 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5   # runs commons' generator, whose tests are skipped without it
       - name: Tools the tests use
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck jq git
-      - name: Run the tests
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck git dash unzip
+      - name: Deno, through bin/erga-bootstrap.sh itself
+        run: |
+          sh bin/erga-bootstrap.sh --help
+          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
+          echo "$HOME/.local/share/erga/toolchain/deno/$v/linux-x64" >>"$GITHUB_PATH"
+      - name: Type check, lint and format
+        run: deno check bin/setup/main.ts tests/*.ts && deno lint && deno fmt --check
+      - name: The setup's tests
+        run: deno test -A
+      - name: shellcheck
+        run: shellcheck -s sh -S warning bin/erga-bootstrap.sh bin/erga-setup.sh
+      - name: The commons tests
         run: python3 -m unittest discover -s tests -v
 
-  # The same tests inside an Arch Linux container (erga's 009-machine-bootstrap FR-014 to FR-016): bin/erga-setup.sh's and bin/erga-bootstrap.sh's own checks on a computer whose package manager is pacman.
+  # The same inside an Arch Linux container (erga's 009-machine-bootstrap FR-014 to FR-016): the setup on a computer whose package manager is pacman.
   arch:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container: archlinux:latest
     steps:
       - name: Tools the tests use
-        run: pacman -Syu --noconfirm python git shellcheck jq curl diffutils unzip uv
+        run: pacman -Syu --noconfirm python git shellcheck curl diffutils unzip uv
       - uses: actions/checkout@v4
       - name: Let git read the checkout (the container's user is not its owner)
         run: git config --global --add safe.directory '*'
-      - name: Run the tests
+      - name: Deno, through bin/erga-bootstrap.sh itself
+        run: |
+          sh bin/erga-bootstrap.sh --help
+          v=$(sed -n 's/^DENO_VERSION=//p' commons/generated/pins.auto.env)
+          echo "$HOME/.local/share/erga/toolchain/deno/$v/linux-x64" >>"$GITHUB_PATH"
+      - name: The setup's tests
+        run: deno test -A
+      - name: The commons tests
         run: python3 -m unittest discover -s tests -v
+
+  # Windows: bin/erga-bootstrap.ps1 gets the Windows Deno into erga's store and hands over; the Windows side (WSL, the user, PostgreSQL read only) is tested with
+  # stand-ins for wsl.exe and the registry, and its dry run runs for real.
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deno, through bin/erga-bootstrap.ps1 itself
+        shell: pwsh
+        run: ./bin/erga-bootstrap.ps1 --help
+      - name: The dry run of the Windows side
+        shell: pwsh
+        run: ./bin/erga-bootstrap.ps1 --dry-run
+      - name: The old Windows line still runs it
+        shell: pwsh
+        run: ./bin/erga-windows.ps1 --help
+      - name: The Windows side's tests
+        shell: pwsh
+        run: |
+          $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
+          & "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64\deno.exe" test -A tests/windows_test.ts
+          exit $LASTEXITCODE

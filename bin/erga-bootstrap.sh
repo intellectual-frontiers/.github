@@ -1,295 +1,119 @@
 #!/bin/sh
-# Set up a computer for erga, the company's repository (erga's 009-machine-bootstrap: the bootstrap): the one script that may use administrator rights. A blank Debian 12
-# or 13, or an Arch-based Linux such as Omarchy (amd64 or arm64), under WSL 2 or in a virtual machine, gets the programs the setup needs, and then `erga-setup.sh` runs
-# for the account that runs this, which does the rest without administrator rights and writes only inside that account's home folder. The account is whichever user you
-# start this as (it can be called anything); this script makes no account. To undo it all, delete the WSL distribution or the virtual machine. On a computer you already use,
-# make a user for erga yourself, log in as it and run erga-setup.sh there; deleting that user removes everything. A Mac with Apple silicon gets no package (the setup
-# fetches what it needs into the account's own folder): the bootstrap only checks the Command Line Tools and runs the setup.
+# Set up a computer for erga, the company's repository (erga's 009-machine-bootstrap). This script only gets Deno: it fetches the pinned Deno for this platform,
+# checks its SHA-256, keeps it in erga's toolchain store (the same place erga's own launchers use) and hands over to the setup, which is TypeScript
+# (bin/setup/main.ts in this repository) and does everything else: the packages (asking for your password once, and saying why), Rust, the GitHub sign-in,
+# the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga and its first commands. Linux (Debian or Arch family, under WSL 2 too) or a Mac.
 #
-#   cd && sudo apt-get update && sudo apt-get install -y curl wget      (a bare Debian, under WSL too, has neither)
+#   cd && sudo apt-get update && sudo apt-get install -y curl unzip      (a bare Debian, under WSL too, has neither)
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh
 #   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --dry-run
-#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient      (a network that drops often: 15 tries, longer waits)
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --patient
+#   curl -fsSL https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/erga-bootstrap.sh | sh -s -- --help    (every option and setting)
 #
-#   1. Packages: installs what is missing with apt or pacman (it says why it needs administrator rights and asks for your password once, first): git, curl, wget,
-#      unzip (bin/setup.sh unpacks Deno with it), the C compiler and linker Rust links with (for Thyra and ArcaDrive; no erga command needs Cargo) and the other common
-#      utilities the setup needs. Every other program (jq, gh, glab, ripgrep, fd, shellcheck, Deno, Rust, Node.js, uv and the rest) is never a package: the setup, bin/setup.sh
-#      and `ergactl toolchain ensure` install each at a pinned version in your own folders, and `ergactl repo update` keeps them current,
-#   2. Setup: runs erga-setup.sh as you: Rust through rustup, uv, the GitHub sign-in, the copy of erga in ~/workspaces/github.com/intellectual-frontiers/erga, and there
-#      bin/setup.sh, ./ergactl toolchain ensure, ./ergactl check --quick and ./ergactl doctor. It writes none of your dotfiles, installs no shell, prompt, editor or AI assistant and does not change your login shell (those are yours, or your fleet
-#      tool's); it ends by printing the one optional line that puts erga on your PATH.
-#
-# Safe to run again. Options (after `sh -s --` when piped):
-#   --dry-run          list every step it would take, change nothing, fetch nothing, ask for nothing
-#   --patient          for a network that drops often (15 tries, longer waits)
-#   -h, --help         this text
-#
-# Environment (a "1" switches it on): BOOTSTRAP_NO_PACKAGES=1 or BOOTSTRAP_NO_APT=1 (install no package), BOOTSTRAP_URL (where
-# erga-setup.sh is fetched from when this is piped), BOOTSTRAP_SETUP (a file to run as the setup), and every variable erga-setup.sh reads.
-# Exit status: 0 done, 1 erga's own checks found something to look at, 2 usage, 3 the computer cannot be set up yet, 4 a step failed, 5 the GitHub sign-in did not finish.
-# shellcheck disable=SC2034,SC2154  # the variables the setup sets and the functions it defines are this script's, since it is loaded without being run
+# Every option is the setup's; this script reads only --patient (more tries for its one download). Settings for this script alone:
+#   BOOTSTRAP_URL     where this repository is served from (default raw.githubusercontent.com/intellectual-frontiers/.github/main); the setup is fetched from it
+#   BOOTSTRAP_SETUP   the setup's main.ts to run instead (a path, or a URL); from a checkout, the bin/setup/main.ts beside this file is used
+#   BOOTSTRAP_DENO_URL and BOOTSTRAP_DENO_SHA256   another copy of the Deno zip and its SHA-256 (a mirror, or a test); both or neither
+# Trust: as with any `curl | sh`, you trust this repository's main branch. Deno is checked against the SHA-256 pinned below before it is unpacked; the setup is
+# fetched by Deno from the same address as this script (pin BOOTSTRAP_URL to a commit to run exactly that commit).
 set -eu
 
-boot_dry=0
-boot_source_only=${BOOTSTRAP_SOURCE_ONLY:-}   # 1: load the functions and run nothing, so a test can call one
-while [ "$#" -gt 0 ]; do
-  case $1 in
-    --dry-run | -n) boot_dry=1 ;;
-    --patient) BOOTSTRAP_PATIENT=1; export BOOTSTRAP_PATIENT ;;
-    -h | --help)
-      case $0 in *erga-bootstrap.sh) sed -n '2,/^# shellcheck disable=SC2034/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;; *) echo "Usage: curl -fsSL URL | sh -s -- [--dry-run] [--patient]   (see the header of erga-bootstrap.sh)" ;; esac
-      exit 0 ;;
-    *) echo "erga-bootstrap: unknown option $1 (try --help)" >&2; exit 2 ;;
+# >>> pins.auto >>>
+# AUTO-GENERATED by commons/tools/generate-packaging.py from commons/ontology/supply-chain/packaging/pins.ttl (commons 0002-packaging FR-014). Do not edit: change the ontology.
+# shellcheck disable=SC2034  # read by the script this is part of
+DENO_VERSION=2.9.8
+DENO_SHA256_AARCH64=d49596c20b9788cf8f5d8ddf644103d4bde56ed239753f0bdb92ba9361d51905
+DENO_SHA256_MACOS_ARM64=9f0bf660393da2eaff044cdc7444cb08c73f235849b61d224d825a194ce7c98e
+DENO_SHA256_MACOS_X64=4b2f5edd2639b7470f034238b321d7002d8dfb4726d8558f52c17afac370eb2c
+DENO_SHA256_WINDOWS_X64=cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf
+DENO_SHA256_X86_64=e890975bc2549807bbcc0b584ffafda72cc7c93349dd99c80483dd784f6c4609
+# <<< pins.auto <<<
+
+say() { printf 'erga-bootstrap: %s\n' "$*" >&2; }
+stop() { say "$1"; [ -z "${2:-}" ] || say "Fix: $2"; exit 3; }   # 3: the computer cannot be set up yet, as the setup says it
+
+main() {
+  base=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}; base=${base%/}
+  tries=${ERGA_RETRIES:-8}
+  for a in "$@"; do [ "$a" != --patient ] || tries=${ERGA_RETRIES:-15}; done
+  case $tries in '' | *[!0-9]* | 0) tries=8 ;; esac
+
+  # The platform, and the Deno built for it (a terminal under Rosetta says x86_64 on Apple silicon: the hardware counts).
+  m=$(uname -m)
+  case $(uname -s) in
+    Linux) os=linux ;;
+    Darwin) os=macos; [ "$(sysctl -n hw.optional.arm64 2>/dev/null || true)" != 1 ] || m=arm64 ;;
+    *) stop "this is $(uname -s); this script is for Linux and macOS." "on Windows run: irm $base/bin/erga-bootstrap.ps1 | iex" ;;
   esac
-  shift
-done
-
-# ---- the setup: beside this script in a checkout, fetched from BOOTSTRAP_URL when this is piped. Its functions (the log, the steps, the support file, the
-# telemetry) are this script's too, so it is loaded without running it; this account runs the same file.
-boot_dir=""
-case $0 in */erga-bootstrap.sh | erga-bootstrap.sh) [ -f "$0" ] && boot_dir=$(cd "$(dirname "$0")" && pwd -P) ;; esac
-setup_file=${BOOTSTRAP_SETUP:-}
-if [ -z "$setup_file" ] && [ -n "$boot_dir" ] && [ -f "$boot_dir/erga-setup.sh" ]; then setup_file=$boot_dir/erga-setup.sh; fi
-if [ -z "$setup_file" ]; then
-  setup_dir=$(mktemp -d "${TMPDIR:-/tmp}/erga-bootstrap.XXXXXX") && chmod 755 "$setup_dir"
-  setup_file=$setup_dir/erga-setup.sh
-  raw=${BOOTSTRAP_URL:-https://raw.githubusercontent.com/intellectual-frontiers/.github/main}
-  # the first download, before the setup's own retry code is here: tried again with a longer wait each time (ERGA_RETRIES, default 8; --patient 15)
-  boot_tries=${ERGA_RETRIES:-8}; [ "${BOOTSTRAP_PATIENT:-}" = 1 ] && boot_tries=${ERGA_RETRIES:-15}
-  case $boot_tries in '' | *[!0-9]* | 0) boot_tries=8 ;; esac
-  if command -v curl >/dev/null 2>&1; then
-    boot_n=1; boot_wait=${ERGA_RETRY_DELAY:-3}
-    until curl -fsSL --connect-timeout 20 -o "$setup_file" "$raw/bin/erga-setup.sh"; do
-      [ "$boot_n" -lt "$boot_tries" ] || { echo "erga-bootstrap: could not fetch $raw/bin/erga-setup.sh (after $boot_n tries; the network or DNS is the likely cause)" >&2; exit 3; }
-      boot_n=$((boot_n + 1)); echo "  could not fetch the setup; trying again in ${boot_wait}s (attempt $boot_n of $boot_tries)" >&2
-      sleep "$boot_wait"; boot_wait=$((boot_wait * 2)); [ "$boot_wait" -le 60 ] || boot_wait=60
-    done
-  elif command -v wget >/dev/null 2>&1; then wget -q -T 30 -O "$setup_file" "$raw/bin/erga-setup.sh" || { echo "erga-bootstrap: could not fetch $raw/bin/erga-setup.sh" >&2; exit 3; }
-  else echo "erga-bootstrap: neither curl nor wget is installed. Install them with your package manager first (Debian: sudo apt update && sudo apt install -y curl wget; Arch: sudo pacman -S --needed curl wget)" >&2; exit 3; fi
-  chmod 644 "$setup_file"
-fi
-[ -r "$setup_file" ] || { echo "erga-bootstrap: $setup_file cannot be read" >&2; exit 3; }
-
-BOOTSTRAP_SOURCE_ONLY=1
-export BOOTSTRAP_SOURCE_ONLY
-if [ "$boot_dry" = 1 ]; then set -- --dry-run; else set --; fi
-# shellcheck source=erga-setup.sh
-. "$setup_file"
-BOOTSTRAP_SOURCE_ONLY=$boot_source_only
-export BOOTSTRAP_SOURCE_ONLY
-dry=$boot_dry
-
-
-sudo_cmd=""
-sudo_ready=0
-
-# ---- packages (apt): what the setup needs, and the everyday programs ------------------------------------------------------------------------------------
-
-# The commands are the table's (commons 0002-packaging); what each prints is read here, because it differs by manager.
-pkg_installed() {  # pkg_installed "a|b": any alternative installed
-  pi_cmd=$(pm_query_installed_words "$family")
-  [ -n "$pi_cmd" ] || return 1
-  for alt in $(printf '%s' "$1" | tr '|' ' '); do
-    # shellcheck disable=SC2086  # the table's words
-    pi_out=$($pi_cmd "$alt" 2>/dev/null) || continue
-    case $family in debian) printf '%s' "$pi_out" | grep -q 'install ok installed' || continue ;; esac
-    return 0
-  done
-  return 1
-}
-
-pkg_candidate() {  # pkg_candidate NAME: the version the package manager would install, empty when none
-  pc_cmd=$(pm_query_candidate_words "$family")
-  # shellcheck disable=SC2086  # the table's words
-  pc_out=$([ -n "$pc_cmd" ] && $pc_cmd "$1" 2>/dev/null || true)
-  case $family in
-    arch) v=$(printf '%s\n' "$pc_out" | sed -n 's/^Version *: *//p' | head -n 1) ;;
-    *) v=$(printf '%s\n' "$pc_out" | sed -n 's/^ *Candidate: *//p' | head -n 1) ;;
+  case $os/$m in
+    linux/x86_64 | linux/amd64) plat=linux-x64; target=x86_64-unknown-linux-gnu; sum=$DENO_SHA256_X86_64 ;;
+    linux/aarch64 | linux/arm64) plat=linux-arm64; target=aarch64-unknown-linux-gnu; sum=$DENO_SHA256_AARCH64 ;;
+    macos/x86_64) plat=macos-x64; target=x86_64-apple-darwin; sum=$DENO_SHA256_MACOS_X64 ;;
+    macos/arm64 | macos/aarch64) plat=macos-arm64; target=aarch64-apple-darwin; sum=$DENO_SHA256_MACOS_ARM64 ;;
+    *) stop "there is no Deno for $os on $m." "use a computer or virtual machine with an amd64 or arm64 processor" ;;
   esac
-  [ "$v" = "(none)" ] && v=""
-  printf '%s' "$v"
-}
+  url=https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno-$target.zip
+  if [ -n "${BOOTSTRAP_DENO_URL:-}" ]; then url=$BOOTSTRAP_DENO_URL; sum=${BOOTSTRAP_DENO_SHA256:?BOOTSTRAP_DENO_URL needs BOOTSTRAP_DENO_SHA256}; fi
 
-cand_major() {  # the major version of an apt candidate such as 1:4.0.2-3
-  m=${1#*:}; m=${m%%.*}
-  case $m in '' | *[!0-9]*) m=0 ;; esac
-  printf '%s' "$m"
-}
-
-# The packages the setup needs from the computer (it installs none itself). The names are the table's, by family (commons 0002-packaging); only what depends on the release is
-# decided here.
-wanted_packages() {
-  wp_line=""
-  for wp_prog in $(pm_programs required); do wp_n=$(pm_package "$family" "$wp_prog"); [ -z "$wp_n" ] || wp_line="$wp_line $wp_n"; done
-  echo "${wp_line# }"
-  return 0
-}
-
-sudo_for() {  # sudo_for WHY: administrator rights, once, with the reason first
-  [ "$sudo_ready" = 1 ] && return 0
-  if [ "$(id -u)" = 0 ]; then sudo_ready=1; return 0; fi
-  command -v sudo >/dev/null 2>&1 || return 1
-  sudo_cmd=sudo
-  say "${b}${e_key}I need administrator rights to $1.${z}"
-  say "${d}Type your $([ "$family" = macos ] && echo Mac || echo Linux) password when asked, once. Nothing shows while you type: that is normal.${z}"
-  if [ "$has_tty" = 1 ]; then
-    # shellcheck disable=SC2024  # the terminal is for sudo to read the password from
-    sudo -v </dev/tty || return 1
-  elif ! sudo -n true 2>/dev/null; then
-    return 1
-  fi
-  sudo_ready=1
-  # keep the password alive for the length of the run, so it is not asked again
-  ( while :; do sleep 50; sudo -n true 2>/dev/null || exit 0; done ) >/dev/null 2>&1 </dev/null &
-  ka_pid=$!
-  return 0
-}
-
-# The words are the table's: what is installed stays (--needed), and never -Sy on Arch, which refreshes the list alone and leaves a rolling release partly upgraded (009-machine-bootstrap FR-015;
-# commons 0002-packaging FR-005). apt's quiet flag and lock wait are this script's own.
-pm_run() {  # pm_run FAMILY WORDS ARGS...: the family's command, as administrator, with the environment it asks for
-  pr_fam=$1; pr_words=$2; shift 2
-  pr_env=$(pm_environment "$pr_fam")
-  case $pr_fam in debian) pr_extra="-qq -o DPkg::Lock::Timeout=900 -o Acquire::Retries=3" ;; *) pr_extra="" ;; esac
-  # shellcheck disable=SC2086  # the table's words
-  if [ -n "$pr_env" ]; then retry_cmd "packages ($pr_fam)" $sudo_cmd env "$pr_env" $pr_words $pr_extra "$@"; else retry_cmd "packages ($pr_fam)" $sudo_cmd $pr_words $pr_extra "$@"; fi
-}
-pm_install() { pm_run "$family" "$(pm_install_words "$family")" "$@"; }
-apt_install() { pm_run debian "$(pm_install_words debian)" "$@"; }
-apt_update() { pm_run debian "$(pm_refresh_words debian)"; }
-
-# the account database: getent on Linux, dscl on a Mac
-acct_field() {  # acct_field NAME home|shell
-  if [ "$family" = macos ]; then
-    case $2 in home) f=NFSHomeDirectory ;; *) f=UserShell ;; esac
-    dscl . -read "/Users/$1" "$f" 2>/dev/null | sed "s/^$f: *//"
+  # Deno: one on the PATH at the pin or later, else the store's, else the pinned download (erga 243-repo-setup keeps the same store).
+  final=${XDG_DATA_HOME:-$HOME/.local/share}/erga/toolchain/deno/$DENO_VERSION/$plat
+  deno=""
+  if p=$(command -v deno 2>/dev/null) && v=$("$p" --version 2>/dev/null | awk 'NR == 1 && $1 == "deno" { print $2 }') && [ -n "$v" ] &&
+    awk -v a="$v" -v b="$DENO_VERSION" 'BEGIN { n = split(a, x, "."); split(b, y, "."); for (i = 1; i <= 3; i++) { if (x[i] + 0 > y[i] + 0) exit 0; if (x[i] + 0 < y[i] + 0) exit 1 } exit 0 }'; then
+    deno=$p
+  elif [ -x "$final/deno" ]; then
+    deno=$final/deno
   else
-    case $2 in home) n=6 ;; *) n=7 ;; esac
-    getent passwd "$1" 2>/dev/null | cut -d: -f"$n"
+    get_deno
+    deno=$final/deno
   fi
+
+  # The setup: given, beside this file in a checkout, or fetched by Deno from where this came from (and fetched again each run: --reload).
+  here=""
+  case $0 in */erga-bootstrap.sh | erga-bootstrap.sh) [ ! -f "$0" ] || here=$(cd "$(dirname "$0")" && pwd -P) ;; esac
+  reload=""
+  if [ -n "${BOOTSTRAP_SETUP:-}" ]; then setup=$BOOTSTRAP_SETUP
+  elif [ -n "$here" ] && [ -f "$here/setup/main.ts" ]; then setup=$here/setup/main.ts
+  else setup=$base/bin/setup/main.ts; reload=--reload=$base/; fi
+  BOOTSTRAP_URL=$base ERGA_BOOTSTRAP_DENO=$deno
+  export BOOTSTRAP_URL ERGA_BOOTSTRAP_DENO
+  # Explicit permissions, not -A; with --allow-run the setup can do what any program of yours can, as this script could. Standard input is not the setup's:
+  # it may be this script, read from a pipe; the setup asks its questions on the terminal.
+  exec "$deno" run -q --no-config --no-prompt --allow-env --allow-read --allow-write --allow-net --allow-run --allow-sys ${reload:+"$reload"} "$setup" "$@" </dev/null
 }
 
-# A Mac: no package manager and no package (009-machine-bootstrap FR-018). The Command Line Tools are Apple's and need a person at the screen; the setup fetches jq and gh itself.
-mac_packages() {
-  phase "${e_pkg}Checking this Mac"
-  if [ "$dry" = 1 ]; then
-    would "check that the Command Line Tools are here (git); if not, stop and say to run: xcode-select --install"
-    would "install no package: macOS has curl, tar and unzip, and the setup gets jq and gh itself"
-    return 0
-  fi
-  mac_need_clt
-  say "A Mac needs no package from this script: the setup fetches jq and gh itself, into the account's own folder."
-}
-
-install_packages() {
-  if [ "$family" = macos ]; then mac_packages; return 0; fi
-  phase "${e_pkg}Setting up the everyday programs ($family family)"
-  if [ "$tested" = 0 ]; then
-    warn "This is $d_pretty. The bootstrap is made for Debian 12 and 13, Ubuntu 24.04 and 26.04, and Arch; I will go on, and say what does not work."
-  fi
-  missing=""
-  for spec in $(wanted_packages); do
-    pkg_installed "$spec" 2>/dev/null || missing="$missing $spec"
+get_deno() {  # the pinned zip, tried again with longer waits, checked before anything is unpacked, and moved into the store in one step
+  if command -v sha256sum >/dev/null 2>&1; then sha_of() { sha256sum "$1" | awk '{ print $1 }'; }
+  elif command -v shasum >/dev/null 2>&1; then sha_of() { shasum -a 256 "$1" | awk '{ print $1 }'; }
+  else stop "there is neither sha256sum nor shasum to check Deno with." "install coreutils with this computer's package manager"; fi
+  mkdir -p "$(dirname "$final")"
+  tmp=$(mktemp -d "$(dirname "$final")/.$plat.XXXXXX")
+  trap 'rm -rf "$tmp"' EXIT
+  say "getting Deno $DENO_VERSION for $plat ($url)"
+  n=1; wait=${ERGA_RETRY_DELAY:-3}
+  until fetch "$url" "$tmp/deno.zip"; do
+    [ "$n" -lt "$tries" ] || stop "Deno could not be fetched from $url ($n tries; the network or DNS is the likely cause)." "check the network, then run this again; add --patient on a network that drops often"
+    n=$((n + 1)); say "could not fetch Deno; trying again in ${wait}s (attempt $n of $tries)"
+    sleep "$wait"; wait=$((wait * 2)); [ "$wait" -le 60 ] || wait=60
   done
-  if [ -z "$missing" ]; then
-    say "Everything the packages give is here."
-    return 0
-  fi
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ] || ! command -v "$(pm_install_words "$family" | cut -d' ' -f1)" >/dev/null 2>&1; then
-    for cmd in git curl; do
-      command -v "$cmd" >/dev/null 2>&1 || need "this computer lacks $cmd and I may not install packages." "$(admin_install_names $missing)"
-    done
-    warn "Not installed, because packages are off here:$missing"
-    problem "packages not installed:$missing"
-    return 0
-  fi
-  if [ "$dry" = 1 ]; then
-    [ "$(id -u)" = 0 ] || would "say why administrator rights are needed and ask for your password, once"
-    if [ -z "$(pm_refresh_words "$family")" ]; then would "install with $(pm_manager "$family") (--needed, never refreshing the package list alone):$missing"
-    else would "refresh the package list, then install with $(pm_manager "$family"):$missing"; fi
-    return 0
-  fi
-  if [ "$(id -u)" = 0 ]; then say "Installing:$missing."; fi
-  sudo_for "install the common programs (git, curl, wget and others)" || need "I could not get administrator rights (no sudo, or the password was not accepted)." "run this again and type your Linux password, or ask an administrator to install:$missing"
-  if [ -z "$(pm_refresh_words "$family")" ]; then
-    # the table has no refresh for the family (Arch: never -Sy), and the names are its own and unique, so the manager decides what it has: a package it cannot find means a package list older than the repositories
-    chosen=$missing
-  else
-    # One package source that cannot be read (a mirror's pocket with no Release file, as Ubuntu's security.ubuntu.com has been for a new release) must not stop the setup: apt has
-    # read the others and keeps what it knew of the one it could not, so the packages are looked for in what it has. Only where none can then be found is it a stop.
-    apt_failed=""
-    if ! step_soft "${e_list}Checking what is new in Debian" apt_update; then
-      apt_failed=$(grep -E '^(E|W):' "$work/last.log" 2>/dev/null | head -n 2 | cut -c1-170 | tr '\n' ' ')
-      warn "apt could not read every package source (${apt_failed:-see the log}); I go on with what it could read."
-      problem "apt update did not read every package source: ${apt_failed:-see the log}"
-    fi
-    # Resolve each alternative (a|b) to the first the distribution has; a package it lacks is reported, not fatal.
-    chosen=""; lacking=""
-    for spec in $missing; do
-      pick=""
-      for alt in $(printf '%s' "$spec" | tr '|' ' '); do
-        if [ -n "$(pkg_candidate "$alt")" ]; then pick=$alt; break; fi
-      done
-      if [ -n "$pick" ]; then chosen="$chosen $pick"; else lacking="$lacking $spec"; fi
-    done
-    if [ -n "$apt_failed" ] && [ -z "$chosen" ]; then
-      need "apt could not read its package sources, so none of the packages can be found: $apt_failed" "check your network and /etc/apt/sources.list.d (a mirror that is down can be replaced by http://archive.ubuntu.com/ubuntu), run: sudo apt update, then run this again"
-    fi
-    if [ -n "$lacking" ]; then warn "This distribution has no package for:$lacking"; problem "no package for:$lacking"; fi
-  fi
-  if [ -n "$chosen" ]; then
-    if [ "$family" = debian ]; then
-      # apt prints a line for each package three times: Get (downloaded), Unpacking, Setting up; counting all three makes the number rise from the start
-      count_re='^(Get:|Unpacking |Setting up )'; count_div=3
-      count_total=$($sudo_cmd env "$(pm_environment debian)" apt-get install -s -y $chosen 2>/dev/null | grep -c '^Inst ' || true)
-      [ "${count_total:-0}" -gt 0 ] 2>/dev/null || { count_total=""; count_re=""; }
-    fi
-    # shellcheck disable=SC2086
-    if ! step_soft "${e_pkg}Installing programs" pm_install $chosen; then
-      if [ "$family" = arch ] && grep -qiE 'target not found|failed retrieving file|could not find' "$work/last.log" 2>/dev/null; then
-        need "pacman could not find a package, so its package list is probably older than the repositories (it was not refreshed here: that alone would leave the system partly upgraded)." "run: sudo pacman -Syu   then run this again"
-      fi
-      need "the packages could not be installed." "run: $(admin_install_names $chosen)"
-    fi
-    count_re=""; count_total=""; count_div=1
-  fi
-  return 0
+  got=$(sha_of "$tmp/deno.zip")
+  [ "$got" = "$sum" ] || stop "the file at $url is not the Deno pinned (its SHA-256 is $got, not $sum); nothing was unpacked." "run this again; if it says the same, tell the person who gave you this line"
+  # unzip, else the unzip of busybox, else bsdtar, else Python's: a bare Debian may have none of the first (the package line above installs unzip)
+  if command -v unzip >/dev/null 2>&1; then unzip -q -o "$tmp/deno.zip" deno -d "$tmp"
+  elif command -v busybox >/dev/null 2>&1 && busybox --list 2>/dev/null | grep -qx unzip; then busybox unzip -q -o "$tmp/deno.zip" deno -d "$tmp"
+  elif command -v bsdtar >/dev/null 2>&1; then bsdtar -xf "$tmp/deno.zip" -C "$tmp" deno
+  elif command -v python3 >/dev/null 2>&1; then python3 -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extract("deno", sys.argv[2])' "$tmp/deno.zip" "$tmp"
+  else stop "there is no unzip here to unpack Deno with." "sudo apt-get install -y unzip   (Arch: sudo pacman -S --needed unzip), then run this again"; fi
+  chmod 755 "$tmp/deno"
+  mkdir "$tmp/unpacked" && mv "$tmp/deno" "$tmp/unpacked/deno"
+  mv "$tmp/unpacked" "$final" 2>/dev/null || [ -x "$final/deno" ] || stop "Deno could not be put in $final." "check that the folder can be written, then run this again"
+  rm -rf "$tmp"; trap - EXIT
 }
 
-# The setup asks erga which system libraries its programs need (009-machine-bootstrap FR-023) and calls this to install them: the bootstrap has the administrator rights, once, already.
-bootstrap_install_libraries() {  # bootstrap_install_libraries "package package ..."
-  if [ "${BOOTSTRAP_NO_APT:-}" = 1 ] || [ "${BOOTSTRAP_NO_PACKAGES:-}" = 1 ]; then return 1; fi
-  sudo_for "install the system libraries erga's programs link against ($1)" || return 1
-  # shellcheck disable=SC2086  # a list of package names
-  step_soft "${e_pkg}Installing system libraries for erga's programs" pm_install $1 || return 1
-  # PostgreSQL is nobody here's to install, start or stop: no step of this script touches it
-  return 0
+fetch() {  # fetch URL FILE: one try, with curl or wget; a stalled download fails (no answer in 20 seconds, under 1 KB a second for 60)
+  if command -v curl >/dev/null 2>&1; then curl -fsSL --connect-timeout 20 --speed-limit 1024 --speed-time 60 -o "$2" "$1"
+  elif command -v wget >/dev/null 2>&1; then wget -q -T 60 -O "$2" "$1"
+  else stop "there is neither curl nor wget here." "sudo apt-get install -y curl unzip   (Arch: sudo pacman -S --needed curl unzip), then run this again"; fi
 }
 
-# ---- the setup, run as this account -------------------------------------------------------------------------------------------------------------------
-
-run_setup() {
-  heading "${e_rocket}Setting up erga in this account"
-  install_method=bootstrap   # what erga-setup.sh records (009-machine-bootstrap FR-069)
-  # the setup's own steps, in this process, which is already set up with the log, the steps and the telemetry (it uses no administrator rights)
-  main || return $?
-  return 0
-}
-
-# ---- the run ------------------------------------------------------------------------------------------------------------------------------------------
-
-main_bootstrap() {
-  detect_platform
-  load_config
-  say "${b}${e_rocket}Setting up this computer${z} (${d_pretty}, $arch$wsl_txt) for erga."
-  [ "$dry" = 1 ] && say "${d}Dry run: this lists the steps and changes nothing.${z}"
-  ph_event bootstrap_started "s:tty=$([ "$has_tty" = 1 ] && echo yes || echo no)" "s:distro=${d_id:-}" "s:distro_version=${d_version:-}" "s:script=bootstrap"
-  install_packages
-  setup_rc=0
-  run_setup || setup_rc=$?
-  phase_close
-  [ "$dry" = 1 ] && { say ""; say "That was a dry run: nothing was changed, fetched or asked."; return 0; }
-  return "$setup_rc"
-}
-
-[ "$boot_source_only" = 1 ] || main_bootstrap
+main "$@"

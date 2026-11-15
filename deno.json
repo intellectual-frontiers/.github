@@ -1,0 +1,37 @@
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1.0.19"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "lint": {
+    "include": [
+      "bin/setup/",
+      "tests/*.ts"
+    ],
+    "rules": {
+      "include": [
+        "no-explicit-any",
+        "no-non-null-assertion",
+        "explicit-module-boundary-types"
+      ]
+    }
+  },
+  "fmt": {
+    "lineWidth": 180,
+    "include": [
+      "bin/setup/",
+      "tests/*.ts"
+    ]
+  },
+  "test": {
+    "include": [
+      "tests/"
+    ]
+  }
+}
