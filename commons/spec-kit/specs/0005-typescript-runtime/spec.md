@@ -65,6 +65,8 @@
 - **FR-038**: The kernel MUST read YAML 1.2 as data: block mappings and sequences (a sequence at its key's indentation, a mapping begun on a dash), flow collections over lines, plain scalars folded over lines, single- and double-quoted scalars with every YAML 1.2 escape, literal and folded block scalars with their indicators, comments and one document; resolve plain scalars by the core schema or, asked, the failsafe one; refuse, with the line, column and reason, anchors and aliases, tags, complex keys, directives, a second document, a key given twice and a tab for indentation; and write a value as block YAML it reads back as the same value.
 - **FR-039**: The runtime MUST give one run at a time by a lock file made only where none exists, holding its holder (process, command, since when, a token): a run that waits polls, says once whom it waits for and may give up after a time; a lock whose holder no longer runs, or whose file cannot be read, is taken over; a child may inherit its parent's lock through an environment variable; and release removes the file only where it still holds the releasing holder's token, on exit too.
 - **FR-040**: The runtime MUST give typed HTTP clients a transport, live over `fetch` or recorded (answering by method and URL, and naming a request it has no exchange for), that refuses a request carrying a credential before it is sent unless made to allow credentials; a read-only guard; backoff on 429 and 503 that waits as long as `Retry-After` asks, up to a cap; a JSON read decoded at the boundary whose failures are typed (refused, network, denied for 401 and 403, another status, a decode) and are said without any header or body; every item of a list paged by `Link` or by a cursor; and the JSON5 text a recorded exchange is kept in, read back as the same exchange.
+- **FR-041**: The kernel MUST encode ASN.1 DER (X.690) in its one form (minimal lengths and two's complement integers, negative ones too; OIDs; SEQUENCE; a SET OF sorted; strings, booleans, NULL, explicit and implicit tags) and read it as a `Result` that says the byte where the input stops being DER (an indefinite or non-minimal length, a high tag number, content past the end, a non-minimal integer or OID arc), reading back integers, OIDs and nested structures as written.
+- **FR-042**: The kernel MUST encode and decode base64 and base64url by RFC 4648 (base64url written without padding and read with or without it), refuse rather than skip what is not of the alphabet asked for, and read back what it writes.
 
 ## Out of scope
 
@@ -104,6 +106,8 @@
 - `on: yes` in YAML 1.2: the text `yes`, not a boolean, per FR-038.
 - A lock left by a process that crashed: taken over by the next run, per FR-039.
 - A request with an `Authorization` header to a transport that refuses credentials: refused, and the header's value never said, per FR-040.
+- DER whose length `0x81 0x05` could be one byte: refused as not the shortest form, per FR-041.
+- `Zm9v!` given as base64: refused, never read as `foo`, per FR-042.
 - A tag `ifc-ts-v0.2.0` while `package.json` says 0.1.0: the release job stops before building, per FR-029.
 - A packed tarball that holds `.ts` files only (which Node will not strip under `node_modules`): the install check fails on Node, per FR-029 and FR-030.
 - `fs.remove` on a folder that is not empty without `recursive`: `DirectoryNotEmpty` (or `AlreadyExists`, which some systems give), per FR-019 and FR-020.
