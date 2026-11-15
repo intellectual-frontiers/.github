@@ -153,7 +153,7 @@ pm:forPin a owl:ObjectProperty ; rdfs:domain pm:Checksum ; rdfs:range pm:PinnedD
 pm:forPlatform a owl:ObjectProperty ; rdfs:domain pm:Checksum ; rdfs:range pm:Platform ; skos:definition "The platform the checksum is for."@en .
 pm:sha256 a owl:DatatypeProperty ; rdfs:domain pm:Checksum ; rdfs:range xsd:string ; skos:definition "The SHA-256 of the download, in lower-case hexadecimal."@en .
 pm:ruleSet a owl:DatatypeProperty ; rdfs:domain pm:Rule ; rdfs:range xsd:string ; skos:definition "The set the rule belongs to: shell-portability, ci-forbidden-program, ci-forbidden-action, host-program or installer."@en .
-pm:pattern a owl:DatatypeProperty ; rdfs:domain pm:Rule ; rdfs:range xsd:string ; skos:definition "A regular expression (Python syntax) the rule looks for."@en .
+pm:pattern a owl:DatatypeProperty ; rdfs:domain pm:Rule ; rdfs:range xsd:string ; skos:definition "A regular expression (ECMAScript syntax) the rule looks for."@en .
 pm:fieldName a owl:DatatypeProperty ; rdfs:domain pm:RecordField ; rdfs:range xsd:string ; skos:definition "The name of the field in the record."@en .
 pm:fieldType a owl:DatatypeProperty ; rdfs:domain pm:RecordField ; rdfs:range xsd:string ; skos:definition "text (a quoted string), boolean (true or false) or date (a quoted YYYY-MM-DD)."@en .
 pm:allowedValue a owl:DatatypeProperty ; rdfs:domain pm:RecordField ; rdfs:range xsd:string ; skos:definition "A value the field may hold, where it may hold only some."@en .

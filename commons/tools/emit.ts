@@ -6,7 +6,7 @@ import type { Command, Family, FamilyId, Manager, Op, PinName, PlatformName, Pro
 import { OPS } from "./ontology.ts";
 
 /** What the generated files say made them (kept as it was first written, so that a harness's built-in copy of a file stays the same bytes). */
-export const GENERATOR = "commons/tools/generate-packaging.py";
+export const GENERATOR = "commons/tools/generate-packaging.ts";
 export const SCHEMA_VERSION = 1;
 const PLACEHOLDER = /^\{packages?\}$/;
 

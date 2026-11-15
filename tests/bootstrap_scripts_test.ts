@@ -115,26 +115,19 @@ Deno.test({ name: "the first download is tried again with a longer wait, and giv
   assertStringIncludes(patient.stderr, "(attempt 15 of 15)");
 });
 
-// The bootstrap's last way to unpack (erga 009-machine-bootstrap) is a Python the computer may have; where the computer that tests has none, it cannot be tried here.
-const noPython = !(await sh(["sh", "-c", "command -v python3"], { PATH: SYSTEM })).stdout.trim().startsWith("/");
-
-Deno.test({ name: "without unzip, Python unpacks the zip; without either, the one package line is named", ignore: skipUnlessX64 || noPython }, async () => {
+Deno.test({ name: "without unzip, busybox or bsdtar, the one package line is named and nothing is unpacked", ignore: skipUnlessX64 }, async () => {
   await using fx = await Fx.make();
   const z = await zipOf(fx, FAKE_DENO(PINNED));
   const lean = `${fx.tmp}/lean`;
   Deno.mkdirSync(lean);
-  for (const t of ["sh", "uname", "awk", "mkdir", "mktemp", "dirname", "curl", "sha256sum", "chmod", "mv", "rm", "cat", "sed", "printf", "python3", "sleep"]) {
+  for (const t of ["sh", "uname", "awk", "mkdir", "mktemp", "dirname", "curl", "sha256sum", "chmod", "mv", "rm", "cat", "sed", "printf", "sleep"]) {
     const real = (await sh(["sh", "-c", `command -v ${t}`], { PATH: SYSTEM })).stdout.trim();
     if (real.startsWith("/")) Deno.symlinkSync(real, `${lean}/${t}`);
   }
-  const p = await sh(["sh", BOOT_SH], { ...env(fx, { BOOTSTRAP_DENO_URL: z.url, BOOTSTRAP_DENO_SHA256: z.sha }), PATH: lean });
-  assertEquals(p.code, 0, p.stderr);
-  assert(exists(store(fx)));
-  Deno.removeSync(`${fx.home}/.local/share`, { recursive: true });
-  Deno.removeSync(`${lean}/python3`);
   const none = await sh(["sh", BOOT_SH], { ...env(fx, { BOOTSTRAP_DENO_URL: z.url, BOOTSTRAP_DENO_SHA256: z.sha }), PATH: lean });
   assertEquals(none.code, 3);
   assertStringIncludes(none.stderr, "sudo apt-get install -y unzip");
+  assert(!exists(store(fx)));
 });
 
 Deno.test("a system with no Deno build stops with the Windows line where it is Windows-like", async () => {
