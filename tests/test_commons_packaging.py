@@ -194,8 +194,8 @@ class Pins(unittest.TestCase):
     def test_every_platform_names_an_os_and_a_processor(self):
         """0002-packaging FR-014"""
         for name, pl in tomllib.loads(TOML.read_text())["platforms"].items():
-            self.assertRegex(name, r"^(linux|macos)-(x64|arm64)$")
-            self.assertIn(pl["os"], ("linux", "macos"))
+            self.assertRegex(name, r"^(linux|macos|windows)-(x64|arm64)$")
+            self.assertIn(pl["os"], ("linux", "macos", "windows"))
             self.assertIn(pl["processor"], ("x86_64", "aarch64"))
 
 
