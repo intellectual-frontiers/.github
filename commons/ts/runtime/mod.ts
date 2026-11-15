@@ -17,6 +17,7 @@
  *
  * @module
  */
+export * as dns from "./dns.ts";
 export * as fs from "./fs.ts";
 export * as git from "./git.ts";
 export * as grc from "./grc.ts";
@@ -28,6 +29,7 @@ export * as path from "./path.ts";
 export * as proc from "./proc.ts";
 export * as sign from "./sign.ts";
 export * as jobs from "./schedule.ts";
+export * as tcp from "./tcp.ts";
 export * as terminal from "./console.ts";
 export * as tty from "./tty.ts";
 export { errors, mapError, RuntimeError, toError } from "./errors.ts";
