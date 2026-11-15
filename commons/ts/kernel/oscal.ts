@@ -1,5 +1,5 @@
 /**
- * Assessments as OSCAL 1.1.2 JSON (commons 0007-grc FR-017): `assessment-results` (one result of every finding as an observation and of
+ * Assessments as OSCAL 1.2.3 JSON (commons 0007-grc FR-017): `assessment-results` (one result of every finding as an observation and of
  * every reviewed control as an OSCAL finding), a `plan-of-action-and-milestones` (a POA&M item and a risk for each finding not passing, and
  * for each risk of a register), a `component-definition` (a component whose control implementations are the catalog controls its controls
  * implement), and a minimal `system-security-plan` of what is implemented and how far, from an assessment.
@@ -14,6 +14,10 @@
  * else `not-satisfied` with the reason `fail` (`warn`, `gap`, `fail`) or `other` (`error`). A POA&M risk is `deviation-approved` for an
  * `accepted` finding or a risk treated by `accept` or `transfer`, `remediating` for one treated by `mitigate` or `avoid`, else `open`. An
  * SSP requirement is `implemented` where its coverage is `covered` or `addressed`, `partial` where `partial`, and `planned` where untested.
+ *
+ * From OSCAL 1.1.2 to 1.2.3 the members these four documents use did not change; 1.2 widened enumerations (component types `region`,
+ * `zone`, `resource-container` and `network`, the observation type `discovery`, CVSS v4 as a facet system, a further UUID identifier type),
+ * made an SSP's `users` optional (written still) and added the mapping model, which this module does not write.
  *
  * @example
  * ```ts
@@ -42,7 +46,7 @@ import {
 import { type Uuid, uuidV5Of } from "./uuid.ts";
 
 /** The OSCAL version written. */
-export const OSCAL_VERSION = "1.1.2";
+export const OSCAL_VERSION = "1.2.3";
 
 /** NIST SP 800-30 Rev. 1, the system a risk's likelihood, impact and level facets are named in. */
 export const SP800_30 = "https://doi.org/10.6028/NIST.SP.800-30r1";
@@ -205,8 +209,24 @@ export type OscalControlImplementation = {
   readonly "implemented-requirements": readonly OscalImplementedRequirement[];
 };
 
-/** The types of an OSCAL component (OSCAL 1.1.2 `component/type`). */
-export const OSCAL_COMPONENT_TYPES = ["software", "hardware", "service", "policy", "process", "validation", "interconnection"] as const;
+/** The types of a defined component (OSCAL 1.2.3 `defined-component/type`; 1.2 added `region`, `zone`, `resource-container` and `network`). */
+export const OSCAL_COMPONENT_TYPES = [
+  "interconnection",
+  "software",
+  "hardware",
+  "service",
+  "policy",
+  "physical",
+  "process-procedure",
+  "plan",
+  "guidance",
+  "standard",
+  "validation",
+  "region",
+  "zone",
+  "resource-container",
+  "network",
+] as const;
 
 /** The type of a component. */
 export type OscalComponentType = (typeof OSCAL_COMPONENT_TYPES)[number];

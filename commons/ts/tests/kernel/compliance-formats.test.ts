@@ -1,7 +1,7 @@
 /**
- * Tests of the standard formats of GRC findings: `kernel/ocsf.ts` (OCSF 1.3.0 Compliance Finding and Device Inventory Info), `kernel/oscal.ts`
- * (OSCAL 1.1.2 assessment results, POA&M, component definition and SSP, every UUID a version 5 UUID, the same input the same bytes in any
- * order) and `kernel/attest.ts` (CycloneDX 1.6 declarations, and in-toto statements signed and verified through DSSE).
+ * Tests of the standard formats of GRC findings: `kernel/ocsf.ts` (OCSF 1.9.0 Compliance Finding, Vulnerability Finding, and Device, User
+ * and Cloud Resources Inventory Info, typed by the generated `kernel/ocsf-types.auto.ts`), `kernel/oscal.ts` (OSCAL 1.2.3 assessment
+ * results, POA&M, component definition and SSP, every UUID a version 5 UUID, the same input the same bytes in any order) and `kernel/attest.ts` (CycloneDX 1.6 declarations, and in-toto statements signed and verified through DSSE).
  *
  * @module
  */
@@ -42,12 +42,24 @@ import {
   verdict,
 } from "../../kernel/grc.ts";
 import {
+  cloudResourcesInventoryInfo,
+  type CloudResourcesInventoryEvent,
   complianceFinding,
+  type ComplianceFindingEvent,
   complianceFindings,
+  type DeviceInventoryEvent,
+  deviceInventoryInfo,
   inventory,
+  OCSF_CLASSES,
   OCSF_SEVERITY,
+  OCSF_VERSION,
   type OcsfComplianceFinding,
-  type OcsfInventoryInfo,
+  type OcsfDevice,
+  type OcsfEvent,
+  type UserInventoryEvent,
+  userInventoryInfo,
+  vulnerabilityFinding,
+  type VulnerabilityFindingEvent,
 } from "../../kernel/ocsf.ts";
 import { assessmentResults, componentDefinition, type OscalOptions, poam, renderOscal, systemSecurityPlan } from "../../kernel/oscal.ts";
 import { type Sha256, sha256 } from "../../kernel/sha256.ts";
@@ -215,7 +227,7 @@ proves(
       assertEquals([e.class_uid, e.category_uid, e.activity_id, e.type_uid], [2003, 2, 1, 200301]);
       assertEquals(e.type_uid, e.class_uid * 100 + e.activity_id);
       assertEquals(e.severity_id, OCSF_SEVERITY[f.severity].id);
-      assertEquals(e.metadata, { version: "1.3.0", product: PRODUCT });
+      assertEquals(e.metadata, { version: "1.9.0", product: PRODUCT });
       assertEquals(e.time, epochMs(f.at));
       assertEquals(e.finding_info.uid, findingKey(f));
       assertEquals(e.finding_info.created_time, e.time);
@@ -223,7 +235,7 @@ proves(
       assertEquals(e.compliance.status_code, f.status);
       assertEquals(e.resources, [{ uid: `host:${f.subject.id}`, name: f.subject.id, type: "host" }]);
     }
-    const by = (control: string, subject: string): OcsfComplianceFinding => {
+    const by = (control: string, subject: string): ComplianceFindingEvent => {
       const e = events.find((x) => x.compliance.control === control && x.resources[0]?.name === subject);
       assert(e !== undefined, `${control} ${subject}`);
       return e;
@@ -236,7 +248,7 @@ proves(
     assertEquals(passed.remediation, undefined);
     const accepted = by("disk-encryption", "b");
     assertEquals([accepted.compliance.status_id, accepted.status_id, accepted.status], [3, 3, "Suppressed"]);
-    assertEquals(accepted.compliance.status_detail, "accepted under waiver W-1");
+    assertEquals(accepted.compliance.status_details, ["accepted under waiver W-1"]);
     assertEquals(accepted.remediation, { desc: "Turn on full-disk encryption." });
     assertEquals(accepted.evidences?.length, 1);
     const failed = by("disk-encryption", "c");
@@ -253,7 +265,10 @@ proves(
     const closed = complianceFinding(first, { product: PRODUCT, activity: "close" });
     assertEquals([closed.activity_id, closed.type_uid, closed.type_name], [3, 200303, "Compliance Finding: Close"]);
     expectType<Equal<OcsfComplianceFinding["class_uid"], 2003>>();
-    expectType<Equal<OcsfInventoryInfo["class_uid"], 5001>>();
+    expectType<Equal<ComplianceFindingEvent["type_uid"], 200301 | 200302 | 200303>>();
+    expectType<Equal<DeviceInventoryEvent["class_uid"], 5001>>();
+    const tagged = complianceFinding(first, { product: PRODUCT, metadata: { tenant_uid: "fleet-1", labels: ["nightly"] } });
+    assertEquals(tagged.metadata, { tenant_uid: "fleet-1", labels: ["nightly"], version: "1.9.0", product: PRODUCT });
   },
 );
 
@@ -337,10 +352,96 @@ proves([OCSF], "an inventory is Device Inventory Info events (class 5001), each 
   );
   assertEquals(events[1]?.device.hostname, "b.example.com");
   assertEquals(events[0]?.time, epochMs(AT));
-  assertEquals(events[0]?.metadata.version, "1.3.0");
+  assertEquals(events[0]?.metadata.version, "1.9.0");
+  assertEquals(
+    [events[0]?.class_name, events[0]?.type_name, events[0]?.device.groups],
+    ["Device Inventory Info", "Device Inventory Info: Collect", [{ name: "host" }]],
+  );
   const logged = inventory([{ subject: { kind: "host", id: "a" } }], { product: PRODUCT, at: AT, activity: "log" });
   assertEquals([logged[0]?.activity_id, logged[0]?.type_uid], [1, 500101]);
 });
+
+proves(
+  [OCSF],
+  "the OCSF 1.9.0 classes the harnesses emit: vulnerability findings and user, device and cloud resources inventories, envelope and metadata",
+  () => {
+    assertEquals(OCSF_VERSION, "1.9.0");
+    assertEquals(
+      Object.values(OCSF_CLASSES).map((c) => [c.uid, c.category_uid]),
+      [
+        [2003, 2],
+        [2002, 2],
+        [5001, 5],
+        [5003, 5],
+        [5023, 5],
+      ],
+    );
+    const o = { product: PRODUCT, at: AT, metadata: { tenant_uid: "fleet-1" } };
+    const vuln = vulnerabilityFinding(
+      {
+        uid: "scanner:42",
+        title: "Outdated library",
+        severity: "high",
+        status: "suppressed",
+        vulnerabilities: [{ title: "Outdated library", cve: { uid: "CVE-2026-0001" }, is_fix_available: true }],
+        resources: [{ uid: "repo:a", name: "a" }],
+        findingInfo: { data_sources: ["scanner"], first_seen_time: epochMs(AT) },
+      },
+      o,
+    );
+    assertEquals(
+      [vuln.class_uid, vuln.category_uid, vuln.activity_id, vuln.type_uid, vuln.severity_id, vuln.severity, vuln.status_id, vuln.status],
+      [2002, 2, 1, 200201, 4, "High", 3, "Suppressed"],
+    );
+    assertEquals(vuln.finding_info, {
+      data_sources: ["scanner"],
+      first_seen_time: epochMs(AT),
+      uid: "scanner:42",
+      title: "Outdated library",
+    });
+    const unknown = vulnerabilityFinding(
+      { uid: "u", title: "t", vulnerabilities: [{ advisory: { uid: "ADV-1" } }] },
+      { ...o, activity: "close" },
+    );
+    assertEquals([unknown.severity_id, unknown.status_id, unknown.type_uid, unknown.resources], [0, 0, 200203, undefined]);
+    const person = userInventoryInfo(
+      { uid: "person:1", type_id: 1, type: "User", email_addr: "person@example.com" },
+      { ...o, metadata: { ...o.metadata, uid: "person:1", labels: ["person"] } },
+    );
+    const account = userInventoryInfo(
+      { uid: "acct:1", name: "account", account: { uid: "tenant", type_id: 99, type: "Example" } },
+      { ...o, metadata: { ...o.metadata, uid: "acct:1", correlation_uid: "person:1" }, activity: "log" },
+    );
+    assertEquals(
+      [person.class_uid, person.type_uid, person.metadata.labels, account.type_uid, account.metadata.correlation_uid],
+      [5003, 500302, ["person"], 500301, "person:1"],
+    );
+    const device: OcsfDevice = { uid: "d-1", type_id: 12, type: "Router", hostname: "r.example.com" };
+    const dev = deviceInventoryInfo(device, { ...o, unmapped: { is_encrypted: true } });
+    assertEquals([dev.class_uid, dev.type_uid, dev.device, dev.unmapped], [5001, 500102, device, { is_encrypted: true }]);
+    const cloud = cloudResourcesInventoryInfo([{ uid: "repo:a", name: "a", type: "code_repository", labels: ["repository"] }], o);
+    assertEquals(
+      [cloud.class_uid, cloud.category_name, cloud.type_uid, cloud.type_name, cloud.resources.length],
+      [5023, "Discovery", 502302, "Cloud Resources Inventory Info: Collect", 1],
+    );
+    const events: readonly OcsfEvent[] = [vuln, unknown, person, account, dev, cloud];
+    for (const e of events) {
+      assertEquals(e.type_uid, e.class_uid * 100 + e.activity_id);
+      assertEquals(e.metadata.version, "1.9.0");
+      assertEquals(e.metadata.tenant_uid, "fleet-1");
+      assertEquals(e.time, epochMs(AT));
+      assertEquals(canonicalize(e).kind, "ok");
+    }
+    expectType<Equal<VulnerabilityFindingEvent["class_uid"], 2002>>();
+    expectType<Equal<UserInventoryEvent["class_uid"], 5003>>();
+    expectType<Equal<CloudResourcesInventoryEvent["class_uid"], 5023>>();
+    // @ts-expect-error a device must have its type_id (required in OCSF 1.9.0)
+    const typeless: OcsfDevice = { uid: "d-2" };
+    // @ts-expect-error a vulnerability finding must have at least one vulnerability
+    const none: Parameters<typeof vulnerabilityFinding>[0] = { uid: "u", title: "t", vulnerabilities: [] };
+    assert(typeless.uid === "d-2" && none.uid === "u");
+  },
+);
 
 // ---------------------------------------------------------------------------------------------------------------------------- OSCAL
 
@@ -364,13 +465,13 @@ function checkUuids(doc: unknown): void {
 
 proves(
   [OSCAL],
-  "assessment results: OSCAL 1.1.2 metadata, observations per finding, findings per control, every uuid a v5 UUID",
+  "assessment results: OSCAL 1.2.3 metadata, observations per finding, findings per control, every uuid a v5 UUID",
   async () => {
     const a = await fixture();
     const o = await options();
     const doc = await assessmentResults(a, o);
     const ar = doc["assessment-results"];
-    assertEquals(ar.metadata["oscal-version"], "1.1.2");
+    assertEquals(ar.metadata["oscal-version"], "1.2.3");
     assertEquals(ar.metadata["last-modified"], AT);
     assertEquals(ar.metadata.version, "1.0");
     assertEquals(ar.metadata.parties?.[0]?.name, "Example Org");
@@ -454,7 +555,7 @@ proves([OSCAL], "component definition and SSP: what the controls implement, and 
   );
   const lower = await componentDefinition(
     a.controls,
-    { id: "checker", title: "C", description: "D" },
+    { id: "checker", title: "C", description: "D", type: "resource-container" },
     {
       ...o,
       controlId: (r) => r.id.toLowerCase(),
@@ -468,6 +569,8 @@ proves([OSCAL], "component definition and SSP: what the controls implement, and 
     ["ex-1", "ex-2"],
   );
   assertEquals(lower["component-definition"]["back-matter"], undefined);
+  assertEquals(lower["component-definition"].components[0]?.type, "resource-container");
+  assertEquals(cd["component-definition"].metadata["oscal-version"], "1.2.3");
 
   const ssp = await systemSecurityPlan(
     a,

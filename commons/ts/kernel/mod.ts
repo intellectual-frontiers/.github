@@ -26,6 +26,7 @@ export {
   ArchiveFailure,
   concat,
   crc32,
+  deflateRaw,
   dosDate,
   filesOf,
   formatArchiveError,
@@ -42,6 +43,7 @@ export {
   unzip,
   zip,
   ZIP_EPOCH,
+  zipDeflated,
   zipEntries,
   zipRead,
 } from "./archive.ts";

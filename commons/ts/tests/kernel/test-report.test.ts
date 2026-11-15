@@ -418,14 +418,14 @@ proves([FR("008")], "SARIF 2.1.0: each failed or cancelled test a result at its 
   assertStringIncludes(text, `"uri": "tests/b.test.ts"`);
 });
 
-proves([FR("008")], "OSCAL 1.1.2 assessment results: one observation per test and one finding per requirement", async () => {
+proves([FR("008")], "OSCAL 1.2.3 assessment results: one observation per test and one finding per requirement", async () => {
   const text = await oscalAssessmentResults(SAMPLE);
   assertEquals(text, await oscalAssessmentResults(SAMPLE));
   const doc: unknown = JSON.parse(text);
   assert(typeof doc === "object" && doc !== null && "assessment-results" in doc);
   const ar = doc["assessment-results"];
   assert(typeof ar === "object" && ar !== null && "results" in ar && Array.isArray(ar.results) && "metadata" in ar);
-  assertStringIncludes(JSON.stringify(ar.metadata), '"oscal-version":"1.1.2"');
+  assertStringIncludes(JSON.stringify(ar.metadata), '"oscal-version":"1.2.3"');
   const result: unknown = ar.results[0];
   assert(typeof result === "object" && result !== null && "observations" in result && "findings" in result);
   assert(Array.isArray(result.observations) && Array.isArray(result.findings));

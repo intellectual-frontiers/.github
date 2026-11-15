@@ -28,6 +28,7 @@ deno test -A --no-check tests/        # Deno (its own checker is TypeScript 6, s
 bun run pack                          # dist/intellectual-frontiers-ifc-ts-X.Y.Z.tgz and its .sha256
 bun run test:evidence                 # the suite on all three runtimes into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger
 bun run smoke dist/*.tgz              # the tarball installed and used on Bun, Node and Deno, and its declarations checked by tsc 7
+bun tools/ocsf-gen.ts --check           # kernel/ocsf-types.auto.ts is what the pinned OCSF 1.9.0 schema gives (needs the network; run by hand)
 ```
 
 CI ([`ifc-typescript.yml`](../../.github/workflows/ifc-typescript.yml)) runs all of it on Linux, macOS and Windows.
@@ -39,7 +40,7 @@ declarations with TypeScript 7, packs them, checks the tarball on the three runt
 and its lockfile keeps the tarball's integrity:
 
 ```sh
-bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.2.0/intellectual-frontiers-ifc-ts-0.2.0.tgz
+bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.3.0/intellectual-frontiers-ifc-ts-0.3.0.tgz
 ```
 
 ```ts
