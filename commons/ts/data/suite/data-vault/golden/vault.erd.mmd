@@ -1,0 +1,39 @@
+erDiagram
+    hub_customer {
+        text hub_customer_id PK
+        text customer_number
+        timestamp load_at
+        text record_source
+    }
+    hub_order {
+        text hub_order_id PK
+        text order_number
+        timestamp load_at
+        text record_source
+    }
+    sat_customer_contact {
+        text sat_customer_contact_id PK
+        text hub_customer_id FK
+        text email
+        timestamp load_at
+        text record_source
+    }
+    sat_order_state {
+        text sat_order_state_id PK
+        text hub_order_id FK
+        text status
+        date due
+        timestamp load_at
+        text record_source
+    }
+    link_customer_order {
+        text link_customer_order_id PK
+        text hub_customer_id FK
+        text hub_order_id FK
+        timestamp load_at
+        text record_source
+    }
+    hub_customer ||--o{ sat_customer_contact : "hub_customer_id"
+    hub_order ||--o{ sat_order_state : "hub_order_id"
+    hub_customer ||--o{ link_customer_order : "hub_customer_id"
+    hub_order ||--o{ link_customer_order : "hub_order_id"

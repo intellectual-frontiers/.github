@@ -43,17 +43,17 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                               | State   |
-| ----- | ------------------------------------------------------------------------------------------------------------------ | ------- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here    |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here    |
-| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here    |
-| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here    |
-| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here    |
-| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here    |
-| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here    |
-| 9     | Generators, the command line, plugins                                                                              | not yet |
+| Phase | What                                                                                                               | State |
+| ----- | ------------------------------------------------------------------------------------------------------------------ | ----- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here  |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here  |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here  |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here  |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here  |
+| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here  |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here  |
+| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here  |
+| 9     | Generators (Mermaid, D2, data dictionary, Rust, Zod), `cli(project)`, every typed hook, the pgvector plugin        | here  |
 
 ### Limits, said plainly
 
@@ -95,3 +95,8 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   function that returns a value; anything else comes as the client gives it. SQLite keeps NUMERIC as a floating-point number, so its
   digits beyond a double's are lost before they are written to the column's scale. `pg` reads a date as local midnight and the driver
   writes it back in local time; the tests ran in UTC only. DuckDB's blobs are read through its JSON form.
+- Generators, the command line and plugins (phase 9): the diagrams are committed as text and are not rendered by a Mermaid or D2 tool
+  here. Rust structures keep dates, moments, decimals and JSON as `String`, so they need no crate; the test compiles them where `rustc`
+  is on the PATH. Zod is a development dependency of the tests only: the library writes the schemas as text. The command line renders,
+  lints and generates; it does not plan or apply ISLM against a database. The pgvector plugin renders and lints; no engine here has the
+  extension, so its SQL is not loaded.

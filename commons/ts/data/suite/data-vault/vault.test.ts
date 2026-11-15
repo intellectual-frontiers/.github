@@ -20,6 +20,8 @@ import {
 } from "../../data-vault/mod.ts";
 import {
   context,
+  d2Erd,
+  dataDictionary,
   date,
   definitions,
   type Driver,
@@ -36,6 +38,7 @@ import {
   type LandingRow,
   lineageOf,
   lint,
+  mermaidErd,
   model,
   type NewRowOf,
   postgres,
@@ -46,6 +49,7 @@ import {
   reportFindings,
   type RowOf,
   rows,
+  rustStructs,
   runAssertions,
   seed,
   SQL,
@@ -421,5 +425,29 @@ proves(
       connection.closeSync();
       instance.closeSync();
     }
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-045", "0009-sql-aide FR-050"],
+  "a vault's diagrams, dictionary, Rust and Zod are generated and committed",
+  async () => {
+    const tables = [customer, order, customerContact, orderState, customerOrder];
+    const ctx = contexts.postgres;
+    await golden(new URL("./golden/vault.erd.mmd", import.meta.url), mermaidErd(tables));
+    await golden(new URL("./golden/vault.erd.d2", import.meta.url), d2Erd(tables));
+    await golden(new URL("./golden/vault.dictionary.md.txt", import.meta.url), dataDictionary(tables, ctx));
+    await golden(new URL("./golden/vault.rs", import.meta.url), rustStructs(tables, ctx));
+    assertEquals(
+      mermaidErd(tables)
+        .split("\n")
+        .filter((l) => l.includes("--")),
+      [
+        `    hub_customer ||--o{ sat_customer_contact : "hub_customer_id"`,
+        `    hub_order ||--o{ sat_order_state : "hub_order_id"`,
+        `    hub_customer ||--o{ link_customer_order : "hub_customer_id"`,
+        `    hub_order ||--o{ link_customer_order : "hub_order_id"`,
+      ],
+    );
   },
 );

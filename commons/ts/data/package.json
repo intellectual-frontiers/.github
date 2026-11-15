@@ -19,6 +19,7 @@
     "@duckdb/node-api": "2.0.0-r.1",
     "@electric-sql/pglite": "0.5.16",
     "@types/pg": "8.23.1",
-    "pg": "8.23.1"
+    "pg": "8.23.1",
+    "zod": "4.1.12"
   }
 }

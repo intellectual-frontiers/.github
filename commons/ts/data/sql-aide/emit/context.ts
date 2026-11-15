@@ -5,7 +5,11 @@
  * @module
  */
 import type { DomainSpec, SqlValue } from "../algebra/domain.ts";
+import type { Generator } from "../generate/generators.ts";
 import type { LintRule } from "../govern/lint.ts";
+import type { SourceAdapter } from "../integrate/integration.ts";
+import type { Change, Classification } from "../islm/islm.ts";
+import type { AnySql } from "./sql.ts";
 
 /** What a dialect extension may change in how a dialect writes a type. */
 export interface DialectExtension<N extends string, F extends string> {
@@ -136,6 +140,24 @@ export interface Hooks {
   readonly onEmit?: (event: EmitEvent) => void;
   /** Lint rules added to those a model is held to (FR-027). */
   readonly lint?: readonly LintRule[];
+  /** Says again how a change of an ISLM plan is classified: what it returns replaces what the plan said (FR-036). */
+  readonly classify?: (change: Change) => ChangeClass | undefined;
+  /** Sources of integrations that are not SQL, by name, for integrations made with `fromSource` (FR-034). */
+  readonly sources?: readonly SourceAdapter<Readonly<Record<string, unknown>>>[];
+  /** Ways to keep a transform model beyond the five the library has, by name: a model asks for one as `plugin:<name>` (FR-043). */
+  readonly materializations?: { readonly [name: string]: (query: AnySql, self: readonly string[], ctx: EmitContext) => string };
+  /** Generators beyond the library's own (FR-045). */
+  readonly generators?: readonly Generator[];
+}
+
+/** What a classification hook may say of a change. */
+export interface ChangeClass {
+  /** Whether it may be run on every apply. */
+  readonly classification?: Classification;
+  /** Whether it destroys data. */
+  readonly destructive?: boolean;
+  /** Whether it can run in a transaction. */
+  readonly transactional?: boolean;
 }
 
 /** A plugin: a named bundle of hooks, passed to the context and to nothing else (FR-024). */

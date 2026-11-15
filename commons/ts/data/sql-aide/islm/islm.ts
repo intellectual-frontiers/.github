@@ -288,7 +288,16 @@ export async function plan<
       ...(s.reverses === undefined ? {} : { reverses: s.reverses }),
     });
   }
-  return { dialect: ctx.dialect.name, changes, unplanned };
+  // a plugin may classify a change again: what its hook says replaces what the plan said
+  const classified = changes.map((c) => {
+    let out = c;
+    for (const p of ctx.plugins) {
+      const said = p.hooks?.classify?.(out);
+      if (said !== undefined) out = { ...out, ...said };
+    }
+    return out;
+  });
+  return { dialect: ctx.dialect.name, changes: classified, unplanned };
 }
 
 /** What lint finds in a plan: a change that destroys data, or one that cannot run in a transaction (FR-039). */

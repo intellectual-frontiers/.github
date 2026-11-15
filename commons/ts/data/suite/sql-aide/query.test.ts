@@ -323,7 +323,6 @@ proves(
         engine.name,
       );
       seen.push(JSON.stringify(results));
-      console.log(engine.name, JSON.stringify(results));
     });
     assertEquals(new Set(seen).size, 1, "every engine gives the same rows");
   },
