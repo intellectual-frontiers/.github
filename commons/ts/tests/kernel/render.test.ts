@@ -8,6 +8,7 @@
  *
  * @module
  */
+import { absurd } from "../../kernel/absurd.ts";
 import fc from "fast-check";
 import { SEVERITY } from "../../kernel/otel.ts";
 import { decodeLogs } from "../../kernel/otlp.ts";
@@ -363,7 +364,7 @@ function play(h: Harness, nodes: readonly Node[], leaveOpen: boolean): void {
         return;
       }
       default:
-        n satisfies never;
+        absurd(n);
     }
   };
   for (const n of nodes) run(n, undefined);

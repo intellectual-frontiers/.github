@@ -8,7 +8,10 @@
     "./kernel": "./kernel/mod.ts",
     "./runtime": "./runtime/mod.ts",
     "./runtime/test": "./runtime/test.ts",
-    "./runtime/test-run": "./runtime/test-run.ts"
+    "./runtime/test-run": "./runtime/test-run.ts",
+    "./lint": "./lint/plugin.ts",
+    "./lint/rule": "./lint/rule.ts",
+    "./lint/test-rule": "./lint/test-rule.ts"
   },
   "engines": {
     "node": ">=26"

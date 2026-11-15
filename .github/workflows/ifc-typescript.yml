@@ -42,7 +42,7 @@ jobs:
         run: bun fmt --check
       - name: The linter, type-aware, no warning allowed
         working-directory: commons/ts
-        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools
+        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime lint tests tools
 
   test:
     strategy:
@@ -76,6 +76,9 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - name: The linter's canary, so the lint plugin's tests run rather than skip
+        shell: bash
+        run: bun x "bun@$BUN_LINT_VERSION" --version
       - name: The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)
         working-directory: commons/ts
         shell: bash

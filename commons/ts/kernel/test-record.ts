@@ -4,7 +4,9 @@
  * conventions and the `ifc.test.*` attributes (`testCaseSpan`, `testCaseLog`), the mark a test leaves as it starts (`testStartLog`), so
  * that one that never ends is closed as `cancelled` (`closeOrphans`), the installation record as a resource (`installationFromEnv`,
  * which refuses a role that names a person, and `isPersonAttribute`), and the OTLP JSON lines a test process appends to
- * `IFC_TEST_RECORD` (`recordLine`, `decodeLines`). `./test-report.ts` reads a run's record and renders it.
+ * `IFC_TEST_RECORD` (`recordLine`, `decodeLines`). `./test-report.ts` reads a run's record and renders it. A test's steps (commons
+ * 0005-typescript-runtime FR-060) are its `steps`, named by its span's `ifc.test.steps`, each a `test step` span whose parent is the
+ * test's span or the step it is in (`testStepSpan`).
  *
  * @example
  * ```ts
@@ -55,6 +57,24 @@ export function isRisk(text: string): text is Risk {
   return text === "high" || text === "not-high";
 }
 
+/** What became of a step (0005-typescript-runtime FR-060): it passed, it failed, or its runner did not run it. */
+export type StepOutcome = "pass" | "fail" | "skip";
+
+/** Whether a text is a step's outcome. */
+export function isStepOutcome(text: string): text is StepOutcome {
+  return text === "pass" || text === "fail" || text === "skip";
+}
+
+/** One step of a test as it ran (0005-typescript-runtime FR-060): its name, times, outcome, a failure's message, and its own steps. */
+export type TestStep = {
+  readonly name: string;
+  readonly start: bigint;
+  readonly end: bigint;
+  readonly outcome: StepOutcome;
+  readonly message?: string;
+  readonly steps?: readonly TestStep[];
+};
+
 /** One test as it ran once (FR-001): times in nanoseconds since the Unix epoch; text already redacted and cut. */
 export type TestCase = {
   /** The SHA-256 of its file, a NUL and its name. */
@@ -74,6 +94,8 @@ export type TestCase = {
   readonly actual?: string;
   /** From 1. */
   readonly attempt: number;
+  /** Its steps, in the order they ended; absent where it has none (0005-typescript-runtime FR-060). */
+  readonly steps?: readonly TestStep[];
 };
 
 /** The installation record: the resource of a test process or of the run (FR-003). */
@@ -102,6 +124,9 @@ export const TEST_SCOPE: Scope = { name: "ifc-test", version: "1" };
 
 /** The name of a test's span. */
 export const TEST_SPAN = "test";
+
+/** The name of a step's span, a child of its test's span or of the step it is in (0005-typescript-runtime FR-060). */
+export const STEP_SPAN = "test step";
 
 /** The name of a run's span. */
 export const RUN_SPAN = "test run";
@@ -273,6 +298,46 @@ function caseAttributes(c: TestCase): Attributes {
     ...(c.message === undefined ? {} : { "ifc.test.message": c.message }),
     ...(c.expected === undefined ? {} : { "ifc.test.expected": c.expected }),
     ...(c.actual === undefined ? {} : { "ifc.test.actual": c.actual }),
+    ...(c.steps === undefined || c.steps.length === 0 ? {} : { "ifc.test.steps": stepPaths(c.steps) }),
+  };
+}
+
+/** The steps of a test, each by its path (a step within another is `outer > inner`), in their order with each step's own steps first. */
+export function stepPaths(steps: readonly TestStep[], within: readonly string[] = []): string[] {
+  return steps.flatMap((s) => [...stepPaths(s.steps ?? [], [...within, s.name]), [...within, s.name].join(" > ")]);
+}
+
+/**
+ * A step as its `test step` span (0005-typescript-runtime FR-060): a child of `ctx.parentSpanId` (its test's span or the step it is in),
+ * with its test's id and file, its name, outcome and a failure's message, and an error status where it failed.
+ */
+export function testStepSpan(step: TestStep, test: Pick<TestCase, "id" | "file" | "name">, ctx: TestContext): SpanData {
+  return {
+    name: STEP_SPAN,
+    context: { traceId: ctx.traceId, spanId: ctx.spanId, traceFlags: 1, traceState: [], isRemote: false },
+    ...(ctx.parentSpanId === undefined ? {} : { parentSpanId: ctx.parentSpanId }),
+    kind: "internal",
+    startTime: step.start,
+    endTime: step.end,
+    attributes: {
+      "test.suite.name": test.file,
+      "code.file.path": test.file,
+      "ifc.test.id": test.id,
+      "ifc.test.step.name": step.name,
+      "ifc.test.outcome": step.outcome,
+      ...(step.message === undefined ? {} : { "ifc.test.message": step.message }),
+    },
+    events: [],
+    links: [],
+    status:
+      step.outcome === "fail"
+        ? { kind: "error", message: step.message ?? "failed" }
+        : step.outcome === "pass"
+          ? { kind: "ok" }
+          : { kind: "unset" },
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   };
 }
 

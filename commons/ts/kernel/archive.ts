@@ -17,6 +17,7 @@
  *
  * @module
  */
+import { absurd } from "./absurd.ts";
 import { err, ok, type Result } from "./result.ts";
 
 /** The files of an archive, by their path inside it. */
@@ -40,6 +41,8 @@ export function formatArchiveError(e: ArchiveError): string {
       return `the archive holds a path that would leave its folder: ${JSON.stringify(e.path)}`;
     case "too-long":
       return `the path is too long for a ustar header: ${JSON.stringify(e.path)}`;
+    default:
+      return absurd(e);
   }
 }
 
