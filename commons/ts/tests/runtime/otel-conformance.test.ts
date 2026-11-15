@@ -10,6 +10,7 @@
  */
 import { createServer } from "node:net";
 import { type ExporterConfig, type OtelConfig, SEVERITY, type SignalName, signalEndpoint } from "../../kernel/otel.ts";
+import { formatDecodeError } from "../../kernel/decode.ts";
 import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../../kernel/otlp.ts";
 import { err, ok } from "../../kernel/result.ts";
 import { createTelemetry, defineSignals, memoryProcessor } from "../../kernel/signals.ts";
@@ -176,15 +177,15 @@ proves(
           assert(typeof request === "object" && request !== null);
           if ("resourceSpans" in request) {
             const d = decodeTraces(request);
-            assert(d.kind === "ok", JSON.stringify(d));
+            assert(d.kind === "ok", d.kind === "err" ? formatDecodeError(d.error) : "");
             received.traces.push(...d.value);
           } else if ("resourceLogs" in request) {
             const d = decodeLogs(request);
-            assert(d.kind === "ok", JSON.stringify(d));
+            assert(d.kind === "ok", d.kind === "err" ? formatDecodeError(d.error) : "");
             received.logs.push(...d.value);
           } else if ("resourceMetrics" in request) {
             const d = decodeMetrics(request);
-            assert(d.kind === "ok", JSON.stringify(d));
+            assert(d.kind === "ok", d.kind === "err" ? formatDecodeError(d.error) : "");
             received.metrics.push(...d.value);
           }
         }
