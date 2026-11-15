@@ -49,7 +49,7 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
 | 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                               | here    |
 | 3     | Typed routines, triggers, policies, DuckDB macros                                                                | here    |
 | 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads | here    |
-| 5     | ISLM                                                                                                             | not yet |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown       | here    |
 | 6     | Query builder                                                                                                    | not yet |
 | 7     | Transforms                                                                                                       | not yet |
 | 8     | Driver adapters                                                                                                  | not yet |
@@ -63,3 +63,10 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   and is not tested. Lineage covers integrations and Data Vault's loads; transforms add theirs in phase 7.
 - Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
   nine digits; a landing relation should hold one state of a key in one load.
+- ISLM (phase 5): a plan compares which tables, columns, views and indexes exist and whether a column may be null. It does not compare
+  column types, keys, checks, foreign keys or defaults of what exists (so FR-035 is not yet whole); such a change is a step a person
+  writes. An added column gets its type, nullness and default, not its references or checks. SQLite cannot change whether a column may
+  be null in place, and the plan says so instead of rebuilding the table. DuckDB will not alter a column of a table that has an index,
+  so the plan drops the table's indexes first and makes the model's again. DuckDB has no triggers, so nothing in the database refuses a
+  change to its ledger there. A materialized view whose definition changed is reported, not replaced. A teardown drops tables, views
+  and indexes and leaves routines, policies and types.

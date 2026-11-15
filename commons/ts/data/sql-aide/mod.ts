@@ -125,6 +125,22 @@ export type {
   Strategy,
 } from "./integrate/integration.ts";
 export { lineageOf, lineageTable, recordLineage, upstream } from "./integrate/lineage.ts";
+export { inspect, LEDGER } from "./islm/catalog.ts";
+export type { Catalog, CatalogColumn, InspectError } from "./islm/catalog.ts";
+export { apply, ledgerTable, lintPlan, plan, planScript, step, teardown, undo } from "./islm/islm.ts";
+export type {
+  Applied,
+  ApplyError,
+  ApplyOptions,
+  Change,
+  ChangeKind,
+  Classification,
+  Desired,
+  Plan,
+  PlanFinding,
+  Step,
+  TeardownRefused,
+} from "./islm/islm.ts";
 export { desc, rowsAs, select, valueAs } from "./query/select.ts";
 export type { Select } from "./query/select.ts";
 export { fn, nothing, proc, rowsOf, scalar, setOf, trigger } from "./routine/routine.ts";

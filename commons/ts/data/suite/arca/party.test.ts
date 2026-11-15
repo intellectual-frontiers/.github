@@ -26,6 +26,10 @@ import {
   definitions,
   duckdb,
   fails,
+  apply,
+  inspect,
+  plan,
+  type Plan,
   lint,
   type NewRowOf,
   pgTapScript,
@@ -279,5 +283,41 @@ proves(
     });
     assertEquals(new Set(seen).size, 1, "every engine holds the same reference data");
     assertEquals(seen[0]?.startsWith(`["[2,4,3,3]"`), true);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-037", "0009-sql-aide FR-040", "0009-sql-aide FR-050"],
+  "ISLM applies the party model from empty in every engine, finds no drift after, and a second apply changes nothing",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const planned = async (): Promise<Plan> => {
+        const catalog = await inspect(engine, ctx);
+        assert(catalog.kind === "ok", catalog.kind === "err" ? catalog.error.message : "");
+        if (engine.dialect === "postgres") return plan({ entities: [...partyModel, ...partyRoutines] }, catalog.value, contexts.postgres);
+        if (engine.dialect === "duckdb") return plan({ entities: [...partyModel, peopleBornSince] }, catalog.value, contexts.duckdb);
+        return plan({ entities: partyModel }, catalog.value, contexts.sqlite);
+      };
+      const first = await planned();
+      assertEquals(
+        first.changes.filter((c) => c.classification === "non-idempotent"),
+        [],
+        engine.name,
+      );
+      const applied = await apply(first, engine, ctx, { actor: "arca" });
+      assert(applied.kind === "ok", `${engine.name}: ${JSON.stringify(applied)}`);
+      const again = await planned();
+      assertEquals([again.changes.map((c) => c.step), again.unplanned], [[], []], `${engine.name}: no drift`);
+      assertEquals(await apply(again, engine, ctx, { actor: "arca" }), { kind: "ok", value: { ran: [] } });
+      assertEquals(
+        Number((await engine.query(`SELECT count(*) AS n FROM "ifcsql_ledger"`))[0]?.["n"]),
+        first.changes.length,
+        `${engine.name}: one entry for each change of the first apply, none for the second`,
+      );
+      // what ISLM made is what the model's generated tests hold it to be
+      const structure = structuralTests({ tables: partyTables, views: partyViews, indexes: partyIndexes }, ctx);
+      assertEquals(tally(await runAssertions(structure, engine, ctx)).failed, 0, engine.name);
+    });
   },
 );

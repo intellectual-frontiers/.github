@@ -24,6 +24,10 @@ import {
   definitions,
   duckdb,
   fails,
+  apply,
+  inspect,
+  plan,
+  type Plan,
   type LandingRow,
   lineageOf,
   lint,
@@ -270,5 +274,26 @@ proves(
         ".shop_feed -> .link_customer_order",
       ],
     );
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-037", "0009-sql-aide FR-040", "0009-sql-aide FR-050"],
+  "ISLM applies a vault from empty in every engine, finds no drift after, and a second apply changes nothing",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const planned = async (): Promise<Plan> => {
+        const catalog = await inspect(engine, ctx);
+        assert(catalog.kind === "ok");
+        return plan({ entities: [...vault, feed] }, catalog.value, ctx);
+      };
+      const first = await planned();
+      assertEquals(first.changes.length, 6);
+      assert((await apply(first, engine, ctx, { actor: "vault" })).kind === "ok", engine.name);
+      const again = await planned();
+      assertEquals([again.changes, again.unplanned], [[], []], `${engine.name}: no drift`);
+      assertEquals(await apply(again, engine, ctx, { actor: "vault" }), { kind: "ok", value: { ran: [] } });
+    });
   },
 );
