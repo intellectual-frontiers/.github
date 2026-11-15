@@ -43,17 +43,17 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                              | State   |
-| ----- | ----------------------------------------------------------------------------------------------------------------- | ------- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP          | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                | here    |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                                 | here    |
-| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads  | here    |
-| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown        | here    |
-| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert | here    |
-| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP  | here    |
-| 8     | Driver adapters                                                                                                   | not yet |
-| 9     | Generators, the command line, plugins                                                                             | not yet |
+| Phase | What                                                                                                               | State   |
+| ----- | ------------------------------------------------------------------------------------------------------------------ | ------- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here    |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here    |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here    |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here    |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here    |
+| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here    |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here    |
+| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here    |
+| 9     | Generators, the command line, plugins                                                                              | not yet |
 
 ### Limits, said plainly
 
@@ -74,11 +74,16 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   without a condition needs exactly one foreign key between the relation and the scope: the compiler refuses none, and two (a relation
   that points twice at one table) fail when rendered and ask for the condition. There is no `GROUP BY` or aggregate helper; `valueAs`
   and `call` type hand-written expressions. A set operation checks at run time that both sides name their columns in the same order.
-  The rows of an insert must all give the same columns. The builder types rows as the model does; how a driver decodes them (a
-  PostgreSQL `count(*)` comes back as text) is phase 8's.
+  The rows of an insert must all give the same columns. The builder types rows as the model does, and a driver decodes a column of the model by
+  its domain; an expression that is not a column (a `count(*)`) is given as the client gives it.
 - A comparison now parenthesizes an operand that is not a single name or value, so that `(a > 1) = TRUE` keeps its meaning; DuckDB
   refused the chained form.
 - Transforms (phase 7): a model's references are found by walking its query, rendered for the first of PostgreSQL, DuckDB and SQLite
   it has a case for. An incremental model adds the rows whose key it does not hold and never changes a row it holds. A materialized view
   is PostgreSQL's, made if absent and refreshed on each build; a change of its query is not applied (ISLM reports that). A relationship
   test between a relation and itself is not supported. Lineage covers integrations, Data Vault's loads and transforms.
+- Drivers (phase 8): `run` binds a single statement's values and writes a script's (a fragment of several statements) as literals.
+  Values are decoded where a column's domain is known: a column of a table, view, model or common table expression, or a call of a
+  function that returns a value; anything else comes as the client gives it. SQLite keeps NUMERIC as a floating-point number, so its
+  digits beyond a double's are lost before they are written to the column's scale. `pg` reads a date as local midnight and the driver
+  writes it back in local time; the tests ran in UTC only. DuckDB's blobs are read through its JSON form.

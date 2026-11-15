@@ -141,7 +141,7 @@ export type {
   Step,
   TeardownRefused,
 } from "./islm/islm.ts";
-export { cte, deleteFrom, except, from, insertInto, intersect, union, unionAll, update, withCtes } from "./query/builder.ts";
+export { cte, deleteFrom, domainOf, except, from, insertInto, intersect, union, unionAll, update, withCtes } from "./query/builder.ts";
 export type {
   BrandsIn,
   Cte,
@@ -154,6 +154,7 @@ export type {
   Returning,
   RowOfColumns,
   SetOf,
+  Shaped,
   Which,
   Writable,
   YieldOf,
@@ -192,6 +193,18 @@ export type {
   SqliteFeature,
   TierOne,
 } from "./dialect/dialects.ts";
+export { decode, duckdbDriver, pgliteDriver, postgresDriver, sqliteDriver } from "./driver/driver.ts";
+export type {
+  Driver,
+  DriverError,
+  DuckdbConnection,
+  DuckdbParam,
+  PgClient,
+  PgliteClient,
+  RunsIn,
+  SqliteClient,
+  SqliteParam,
+} from "./driver/driver.ts";
 export { docsModule, docsOf, extractDocs, parseComment } from "./docs/tsdoc.ts";
 export type { ParsedComment } from "./docs/tsdoc.ts";
 export { bracketNaming, context, emitted, prefixedNaming, qualifiedNaming, typicalNaming } from "./emit/context.ts";

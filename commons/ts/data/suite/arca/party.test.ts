@@ -4,7 +4,7 @@
  *
  * @module
  */
-import type { Brand, Equal } from "../../../kernel/mod.ts";
+import type { Brand, Equal, Result } from "../../../kernel/mod.ts";
 import { expectType } from "../../../kernel/mod.ts";
 import { assert, assertEquals, assertRejects, proves } from "../../../runtime/test.ts";
 import {
@@ -28,6 +28,9 @@ import {
   acceptedValues,
   context,
   definitions,
+  type Driver,
+  type DriverError,
+  duckdbDriver,
   duckdb,
   fails,
   findingsTable,
@@ -42,6 +45,7 @@ import {
   model,
   notNull,
   type NewRowOf,
+  pgliteDriver,
   pgTapScript,
   postgres,
   raw,
@@ -54,6 +58,8 @@ import {
   runAssertions,
   SQL,
   sqlite,
+  type Sqlite,
+  sqliteDriver,
   structuralTests,
   tally,
   tapQuery,
@@ -443,5 +449,66 @@ proves(
       assertEquals(tally(second), { passed: 2, failed: 2, skipped: 0 }, engine.name);
     });
     assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-042", "0009-sql-aide FR-050"],
+  "the party model is written and read through a driver of each in-process engine, typed and decoded the same",
+  async () => {
+    const { DatabaseSync } = await import("node:sqlite");
+    const { PGlite } = await import("@electric-sql/pglite");
+    const { DuckDBInstance } = await import("@duckdb/node-api");
+    const seen: string[] = [];
+    const scenario = async (d: Driver<Sqlite>): Promise<void> => {
+      const must = <T>(r: Result<T, DriverError>): T => {
+        if (r.kind === "err") throw new Error(`${d.ctx.dialect.name}: ${r.error.message}`);
+        return r.value;
+      };
+      must(await d.run(definitions(partyModel)));
+      for (const r of partyReference) must(await d.run(r.load));
+      must(await d.run(insertInto(party, [{ party_id: party.key("p1"), party_kind_code: partyKind.key("person"), display_name: "Ada" }])));
+      must(
+        await d.run(
+          insertInto(person, [{ party_id: party.key("p1"), given_name: "Ada", family_name: "Lovelace", birth_date: "1815-12-10" }]),
+        ),
+      );
+      const people = must(
+        await d.rows(
+          from(person)
+            .join(party)
+            .select((s) => ({ born: s.person.birth_date, made: s.party.created_at })),
+        ),
+      );
+      expectType<Equal<(typeof people)[number], { readonly born: string | null; readonly made: Date }>>();
+      assert(people[0]?.made instanceof Date, d.ctx.dialect.name);
+      seen.push(JSON.stringify(people.map((p) => p.born)));
+      // a person with no party is refused, as a value
+      const orphan = await d.run(insertInto(person, [{ party_id: party.key("nobody"), given_name: "N", family_name: "O" }]));
+      assertEquals(orphan.kind, "err", d.ctx.dialect.name);
+    };
+    const db = new DatabaseSync(":memory:");
+    db.exec("PRAGMA foreign_keys = ON");
+    try {
+      await scenario(sqliteDriver(db, contexts.sqlite));
+    } finally {
+      db.close();
+    }
+    const pglite = new PGlite();
+    try {
+      // the scenario uses only what all three dialects have
+      await scenario(pgliteDriver(pglite, contexts.postgres) as unknown as Driver<Sqlite>);
+    } finally {
+      await pglite.close();
+    }
+    const instance = await DuckDBInstance.create(":memory:");
+    const connection = await instance.connect();
+    try {
+      await scenario(duckdbDriver(connection, contexts.duckdb) as unknown as Driver<Sqlite>);
+    } finally {
+      connection.closeSync();
+      instance.closeSync();
+    }
+    assertEquals(seen, [`["1815-12-10"]`, `["1815-12-10"]`, `["1815-12-10"]`]);
   },
 );

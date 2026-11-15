@@ -497,7 +497,7 @@ function define<
 
   const call = (given: CallArgs<A>): AnySql => {
     const values = args.map(([n, c]) => operand((given as Readonly<Record<string, unknown>>)[n], c.domain));
-    return sql(kind === "procedure" ? "statement" : returns.shape === "set" ? "relation" : "expression", (ctx) => {
+    const made = sql(kind === "procedure" ? "statement" : returns.shape === "set" ? "relation" : "expression", (ctx) => {
       if (ctx.dialect.name === "sqlite") {
         const inlined = built(refs((n) => values[args.findIndex(([a]) => a === n)] ?? bind(null))).body;
         if (!isSql(inlined)) throw new Error(`${name} is not a query, so it cannot be written in where it is called`);
@@ -509,6 +509,10 @@ function define<
       const list = values.flatMap((v, i) => (i === 0 ? [chunkOf(v)] : [chunkText(", "), chunkOf(v)]));
       return [...(kind === "procedure" ? [chunkText("CALL ")] : []), qualified(ctx), chunkText("("), ...list, chunkText(")")];
     });
+    // a call of a function that returns a value says the value's domain, by which a driver decodes it
+    if (returns.returns !== "scalar") return made;
+    const withDomain = { ...made, domain: returns.domain };
+    return withDomain;
   };
 
   const made: Routine<N, A, Ret, S, K, B> = {

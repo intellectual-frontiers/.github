@@ -22,6 +22,8 @@ import {
   context,
   date,
   definitions,
+  type Driver,
+  duckdbDriver,
   duckdb,
   eq,
   fails,
@@ -48,6 +50,8 @@ import {
   seed,
   SQL,
   sqlite,
+  type Sqlite,
+  sqliteDriver,
   structuralTests,
   table,
   tally,
@@ -380,5 +384,42 @@ proves(
       seen.push(JSON.stringify(rows));
     });
     assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-042", "0009-sql-aide FR-048", "0009-sql-aide FR-050"],
+  "a vault is loaded and read through the drivers of DuckDB and SQLite, twice, with typed rows",
+  async () => {
+    const { DatabaseSync } = await import("node:sqlite");
+    const { DuckDBInstance } = await import("@duckdb/node-api");
+    const instance = await DuckDBInstance.create(":memory:");
+    const connection = await instance.connect();
+    const db = new DatabaseSync(":memory:");
+    try {
+      for (const d of [duckdbDriver(connection) as unknown as Driver<Sqlite>, sqliteDriver(db)]) {
+        assertEquals((await d.run(definitions([...vault, feed]))).kind, "ok");
+        assertEquals((await d.run(feedOf(first).load)).kind, "ok");
+        for (let i = 0; i < 2; i++) for (const l of loads) assertEquals((await d.run(l.sql)).kind, "ok", d.ctx.dialect.name);
+        const states = await d.rows(
+          from(orderState).select((s) => ({
+            order: s.sat_order_state.hub_order_id,
+            due: s.sat_order_state.due,
+            at: s.sat_order_state.load_at,
+          })),
+        );
+        assert(states.kind === "ok");
+        expectType<Equal<(typeof states.value)[number]["due"], string | null>>();
+        assertEquals(states.value.length, 3, d.ctx.dialect.name);
+        assert(
+          states.value.every((s) => s.at instanceof Date),
+          d.ctx.dialect.name,
+        );
+      }
+    } finally {
+      db.close();
+      connection.closeSync();
+      instance.closeSync();
+    }
   },
 );

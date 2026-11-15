@@ -8,11 +8,27 @@
  *
  * @module
  */
-import type { SqlValue } from "../algebra/domain.ts";
+import type { DomainSpec, SqlValue } from "../algebra/domain.ts";
 import type { NewRowOf, PatchOf, TableSpec } from "../algebra/table.ts";
 import type { EmitContext } from "../emit/context.ts";
 import type { Expr, Operand } from "../emit/expr.ts";
 import { type AnySql, type Chunk, chunkOf, chunkText, type DxOf, type ReqOf, sql, type Sql } from "../emit/sql.ts";
+
+/** The names of the columns a statement gives, in order, and the domain of each where it is known: what a driver decodes values by. */
+export interface Shaped {
+  /** The names of the columns, in order. */
+  readonly columns: readonly string[];
+  /** The domain of each column, where the expression that gives it is a column of the model. */
+  readonly domains?: readonly (DomainSpec | undefined)[];
+}
+
+/** The domain of an expression, where it is a column of the model. */
+export function domainOf(e: unknown): DomainSpec | undefined {
+  if (typeof e !== "object" || e === null) return undefined;
+  if ("spec" in e && typeof e.spec === "object" && e.spec !== null && "domain" in e.spec) return e.spec.domain as DomainSpec;
+  if ("domain" in e && typeof e.domain === "object" && e.domain !== null) return e.domain as DomainSpec;
+  return undefined;
+}
 
 /** Any expression, whatever it yields, needs or covers. */
 type AnyExpr = Sql<"expression", unknown, string, never>;
@@ -85,7 +101,7 @@ interface QuerySpec {
 }
 
 /** A query for rows: its scope `S`, the row it gives, the features it needs and the dialects it has a case for. */
-export interface Query<S, Row, Req extends string = never, Dx extends string = string> extends Sql<"statement", Row, Req, Dx> {
+export interface Query<S, Row, Req extends string = never, Dx extends string = string> extends Sql<"statement", Row, Req, Dx>, Shaped {
   /** The names of the columns it gives, in order: what a set operation and a common table expression are held to. */
   readonly columns: readonly string[];
   /** Joins a relation: on a condition over the scope, or, with none, on the foreign key between it and the scope. */
@@ -171,7 +187,11 @@ function byForeignKey(spec: QuerySpec, joined: Member): AnySql {
   return found[0] ?? sql("expression", () => [chunkText("FALSE")]);
 }
 
-function build<S, Row, Req extends string, Dx extends string>(spec: QuerySpec, columns: readonly string[]): Query<S, Row, Req, Dx> {
+function build<S, Row, Req extends string, Dx extends string>(
+  spec: QuerySpec,
+  columns: readonly string[],
+  domains: readonly (DomainSpec | undefined)[],
+): Query<S, Row, Req, Dx> {
   const scope = spec.scope as S;
   const joining =
     (kind: Join["kind"]) =>
@@ -180,26 +200,28 @@ function build<S, Row, Req extends string, Dx extends string>(spec: QuerySpec, c
         relation.spec === undefined ? { name: relation.name, relation } : { name: relation.name, relation, spec: relation.spec };
       const next: QuerySpec = { ...spec, members: [...spec.members, member], scope: { ...spec.scope, [relation.name]: relation.c } };
       const condition = on === undefined ? byForeignKey(spec, member) : on(next.scope as S);
-      return build({ ...next, joins: [...spec.joins, { kind, relation, on: condition }] }, columns);
+      return build({ ...next, joins: [...spec.joins, { kind, relation, on: condition }] }, columns, domains);
     };
   return {
     sqlKind: "statement",
     chunks: render(spec),
     columns,
+    domains,
     // the overloads differ only in their types; one function serves both
     join: joining("JOIN") as Query<S, Row, Req, Dx>["join"],
     leftJoin: joining("LEFT JOIN") as Query<S, Row, Req, Dx>["leftJoin"],
-    where: (condition) => build({ ...spec, where: [...spec.where, condition(scope)] }, columns),
+    where: (condition) => build({ ...spec, where: [...spec.where, condition(scope)] }, columns, domains),
     select: (projection) => {
       const p = Object.entries(projection(scope));
       return build(
         { ...spec, projection: p },
         p.map(([n]) => n),
+        p.map(([, e]) => domainOf(e)),
       );
     },
-    distinct: () => build({ ...spec, distinct: true }, columns),
-    orderBy: (by) => build({ ...spec, orderBy: [...spec.orderBy, ...by(scope)] }, columns),
-    limit: (rows) => build({ ...spec, limit: Math.max(0, Math.trunc(rows)) }, columns),
+    distinct: () => build({ ...spec, distinct: true }, columns, domains),
+    orderBy: (by) => build({ ...spec, orderBy: [...spec.orderBy, ...by(scope)] }, columns, domains),
+    limit: (rows) => build({ ...spec, limit: Math.max(0, Math.trunc(rows)) }, columns, domains),
   };
 }
 
@@ -216,7 +238,14 @@ export function from<N extends string, C, R extends string = never, D extends st
   const member: Member =
     relation.spec === undefined ? { name: relation.name, relation } : { name: relation.name, relation, spec: relation.spec };
   const columns = relation.spec?.columns.map(([n]) => n) ?? Object.keys(relation.c ?? {});
-  return build({ members: [member], joins: [], where: [], orderBy: [], distinct: false, scope: { [relation.name]: relation.c } }, columns);
+  const domains =
+    relation.spec?.columns.map(([, c]) => c.domain) ??
+    columns.map((n) => domainOf((relation.c as Readonly<Record<string, unknown>> | undefined)?.[n]));
+  return build(
+    { members: [member], joins: [], where: [], orderBy: [], distinct: false, scope: { [relation.name]: relation.c } },
+    columns,
+    domains,
+  );
 }
 
 /** A common table expression: a query given a name, read as a relation whose columns are the query's. */
@@ -227,7 +256,7 @@ export interface Cte<N extends string, Row, Req extends string, Dx extends strin
   Dx
 > {
   /** The query it names. */
-  readonly query: Sql<"statement", Row, Req, Dx> & { readonly columns: readonly string[] };
+  readonly query: Sql<"statement", Row, Req, Dx> & Shaped;
 }
 
 /**
@@ -238,10 +267,13 @@ export interface Cte<N extends string, Row, Req extends string, Dx extends strin
  */
 export function cte<const N extends string, Row, Req extends string, Dx extends string>(
   cteName: N,
-  query: Sql<"statement", Row, Req, Dx> & { readonly columns: readonly string[] },
+  query: Sql<"statement", Row, Req, Dx> & Shaped,
 ): Cte<N, Row, Req, Dx> {
   const c = Object.fromEntries(
-    query.columns.map((n) => [n, sql("expression", (ctx) => [{ kind: "name", parts: [cteName, ctx.naming.column(n)] }])]),
+    query.columns.map((n, i) => [
+      n,
+      { ...sql("expression", (ctx) => [{ kind: "name", parts: [cteName, ctx.naming.column(n)] }]), domain: query.domains?.[i] },
+    ]),
   );
   return {
     sqlKind: "relation",
@@ -249,7 +281,7 @@ export function cte<const N extends string, Row, Req extends string, Dx extends 
     name: cteName,
     schema: undefined,
     // the columns are the query's, each an expression of its value
-    c: c as { readonly [K in keyof Row]: Expr<Row[K]> },
+    c: c as unknown as { readonly [K in keyof Row]: Expr<Row[K]> },
     query,
   };
 }
@@ -262,11 +294,12 @@ export function cte<const N extends string, Row, Req extends string, Dx extends 
  */
 export function withCtes<const E extends readonly Cte<string, unknown, string, string>[], Row, Req extends string, Dx extends string>(
   ctes: E,
-  query: Sql<"statement", Row, Req, Dx> & { readonly columns: readonly string[] },
-): Sql<"statement", Row, Req | ReqOf<E[number]["query"]> | "cte", Dx & DxOf<E[number]["query"]>> & { readonly columns: readonly string[] } {
+  query: Sql<"statement", Row, Req, Dx> & Shaped,
+): Sql<"statement", Row, Req | ReqOf<E[number]["query"]> | "cte", Dx & DxOf<E[number]["query"]>> & Shaped {
   return {
     sqlKind: "statement",
     columns: query.columns,
+    ...(query.domains === undefined ? {} : { domains: query.domains }),
     chunks: () => {
       const out: Chunk[] = [chunkText("WITH ")];
       ctes.forEach((e, i) => {
@@ -288,12 +321,17 @@ export function withCtes<const E extends readonly Cte<string, unknown, string, s
 
 function setOperation(op: string) {
   return <Row, R1 extends string, D1 extends string, R2 extends string, D2 extends string>(
-    a: Sql<"statement", Row, R1, D1> & { readonly columns: readonly string[] },
-    b: Sql<"statement", NoInfer<Row>, R2, D2> & { readonly columns: readonly string[] },
-  ): Sql<"statement", Row, R1 | R2, D1 & D2> & { readonly columns: readonly string[] } => {
+    a: Sql<"statement", Row, R1, D1> & Shaped,
+    b: Sql<"statement", NoInfer<Row>, R2, D2> & Shaped,
+  ): Sql<"statement", Row, R1 | R2, D1 & D2> & Shaped => {
     if (a.columns.join(",") !== b.columns.join(","))
       throw new Error(`${op} of queries whose columns differ: (${a.columns.join(", ")}) and (${b.columns.join(", ")})`);
-    return { sqlKind: "statement", columns: a.columns, chunks: () => [chunkOf(a), chunkText(` ${op} `), chunkOf(b)] };
+    return {
+      sqlKind: "statement",
+      columns: a.columns,
+      ...(a.domains === undefined ? {} : { domains: a.domains }),
+      chunks: () => [chunkOf(a), chunkText(` ${op} `), chunkOf(b)],
+    };
   };
 }
 
@@ -338,7 +376,9 @@ function writing<C, Req extends string, Dx extends string>(
   t: Writable<C>,
   body: (ctx: EmitContext) => readonly Chunk[],
 ): Returning<C, Req, Dx> {
-  const bare = Object.fromEntries(Object.entries(t.c as Readonly<Record<string, { readonly bare: AnySql }>>).map(([n, r]) => [n, r.bare]));
+  const bare = Object.fromEntries(
+    Object.entries(t.c as Readonly<Record<string, { readonly bare: AnySql }>>).map(([n, r]) => [n, { ...r.bare, domain: domainOf(r) }]),
+  );
   return {
     sqlKind: "statement",
     chunks: body,
@@ -348,6 +388,7 @@ function writing<C, Req extends string, Dx extends string>(
       return {
         sqlKind: "statement",
         columns: p.map(([n]) => n),
+        domains: p.map(([, e]) => domainOf(e)),
         chunks: (ctx) => [
           ...body(ctx),
           chunkText(" RETURNING "),

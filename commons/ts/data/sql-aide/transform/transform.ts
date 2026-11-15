@@ -11,6 +11,7 @@ import { context, type EmitContext } from "../emit/context.ts";
 import type { Expr } from "../emit/expr.ts";
 import { type AnySql, type Chunk, chunkOf, chunkText, sql, type Sql } from "../emit/sql.ts";
 import type { LineageEdge } from "../integrate/integration.ts";
+import type { Shaped } from "../query/builder.ts";
 import { type EntityName, entityKey } from "../model/entity.ts";
 
 /** How a model is kept in the database. */
@@ -34,9 +35,7 @@ export type MaterializationReq<M extends Materialization> = M extends "view"
     : never;
 
 /** A query a model is made of: one that says the names of its columns, as the query builder's do. */
-export type ModelQuery<Row, Req extends string, Dx extends string> = Sql<"statement", Row, Req, Dx> & {
-  readonly columns: readonly string[];
-};
+export type ModelQuery<Row, Req extends string, Dx extends string> = Sql<"statement", Row, Req, Dx> & Shaped;
 
 /** A transform model: used in SQL it is the relation it is materialized as; `ddl` builds it. */
 export interface Model<
@@ -213,9 +212,12 @@ export function model<const N extends string, Row, Req extends string, Dx extend
     }
   };
   const c = Object.fromEntries(
-    query.columns.map((n) => [
+    query.columns.map((n, i) => [
       n,
-      sql("expression", (ctx) => [{ kind: "name", parts: [...ctx.naming.table(modelName, schema), ctx.naming.column(n)] }]),
+      {
+        ...sql("expression", (ctx) => [{ kind: "name", parts: [...ctx.naming.table(modelName, schema), ctx.naming.column(n)] }]),
+        domain: query.domains?.[i],
+      },
     ]),
   );
   const dependsOn = (): readonly EntityName[] => referenced(query, modelName);
@@ -228,7 +230,7 @@ export function model<const N extends string, Row, Req extends string, Dx extend
     materialization,
     query,
     // the columns are the query's, each an expression of its value
-    c: c as { readonly [K in keyof Row]: Expr<Row[K]> },
+    c: c as unknown as { readonly [K in keyof Row]: Expr<Row[K]> },
     ddl: sql("statement", ddl),
     dependsOn,
     lineage: () =>
