@@ -23,6 +23,7 @@ export * as lock from "./lock.ts";
 export * as net from "./net.ts";
 export * as path from "./path.ts";
 export * as proc from "./proc.ts";
+export * as jobs from "./schedule.ts";
 export * as tty from "./tty.ts";
 export { errors, mapError, RuntimeError, toError } from "./errors.ts";
 export { serve } from "./serve.ts";
