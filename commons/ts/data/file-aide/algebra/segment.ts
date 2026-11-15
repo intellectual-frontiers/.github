@@ -46,6 +46,8 @@ export interface Segment<N extends string, T, D extends boolean = false> {
   readonly source: string;
   /** Whether its text may have more than one length. */
   readonly variable: boolean;
+  /** Whether its text sorts, by code point, as its values do, so that a range of values is a range of names (FR-022). */
+  readonly ordered: boolean;
   /** What a path does with it beyond reading and writing. */
   readonly role: SegmentRole;
   /** A few values of its own, which a layout formats into paths to find ambiguity. */
@@ -83,7 +85,18 @@ function textSegment<const N extends string>(
 ): Segment<N, string> {
   const re = whole(source);
   const check = (text: string): Result<string, string> => (re.test(text) ? ok(text) : err(`${JSON.stringify(text)} is not ${what}`));
-  return { kind, name, derived: false, source, variable, role: { kind: "plain" }, witnesses, parse: check, format: strings(check) };
+  return {
+    kind,
+    name,
+    derived: false,
+    source,
+    variable,
+    ordered: true,
+    role: { kind: "plain" },
+    witnesses,
+    parse: check,
+    format: strings(check),
+  };
 }
 
 /**
@@ -100,6 +113,7 @@ export function literal<const N extends string, const V extends string>(name: N,
     derived: false,
     source: escapeRegExp(text),
     variable: false,
+    ordered: true,
     role: { kind: "plain" },
     witnesses: [text],
     parse: check,
@@ -127,6 +141,7 @@ export function enumeration<const N extends string, const V extends string>(name
       .map(escapeRegExp)
       .join("|"),
     variable: lengths.size > 1,
+    ordered: true,
     role: { kind: "plain" },
     witnesses: values,
     parse: check,
@@ -185,6 +200,7 @@ export function integer<const N extends string>(name: N, options: { readonly wid
     derived: false,
     source,
     variable: width === undefined,
+    ordered: width !== undefined,
     role: { kind: "plain" },
     witnesses: [0, 7, 42],
     parse: (t) => {
@@ -242,6 +258,7 @@ export function date<const N extends string>(name: N, format: DateFormat): Segme
     derived: false,
     source: DATE_SOURCE[format],
     variable: false,
+    ordered: true,
     role: { kind: "plain" },
     witnesses: [DATE_WITNESS[format]],
     parse: check,
@@ -263,6 +280,7 @@ export function partition<const N extends string, T>(inner: Segment<N, T>, key: 
     derived: false,
     source: `${escapeRegExp(prefix)}(?:${inner.source})`,
     variable: inner.variable,
+    ordered: inner.ordered,
     role: { kind: "plain" },
     witnesses: inner.witnesses,
     parse: (t) => (t.startsWith(prefix) ? inner.parse(t.slice(prefix.length)) : err(`${JSON.stringify(t)} does not begin with ${prefix}`)),
@@ -305,6 +323,7 @@ export function fanout<const N extends string>(name: N, of: Segment<string, unkn
     derived: true,
     source,
     variable: false,
+    ordered: false,
     role: { kind: "fanout", of: of.name, chars },
     witnesses: [],
     parse: check,
@@ -327,6 +346,7 @@ export function fileName<const N extends string>(name: N): Segment<N, string> {
     derived: false,
     source: "[^/]+",
     variable: true,
+    ordered: true,
     role: { kind: "plain" },
     witnesses: ["name.txt", "name"],
     parse: check,
@@ -355,6 +375,7 @@ export function rest<const N extends string>(name: N, options: { readonly except
     derived: false,
     source: "[^/]+(?:/[^/]+)*",
     variable: true,
+    ordered: true,
     role: { kind: "rest", except },
     witnesses: ["name.txt", "folder/name.txt"],
     parse: check,
@@ -374,6 +395,7 @@ export function custom<const N extends string, T>(
   spec: {
     readonly source: string;
     readonly variable: boolean;
+    readonly ordered?: boolean;
     readonly witnesses: readonly T[];
     readonly parse: (text: string) => Result<T, string>;
     readonly format: (value: T) => Result<string, string>;
@@ -385,6 +407,7 @@ export function custom<const N extends string, T>(
     derived: false,
     source: spec.source,
     variable: spec.variable,
+    ordered: spec.ordered ?? false,
     role: { kind: "plain" },
     witnesses: spec.witnesses,
     parse: spec.parse,

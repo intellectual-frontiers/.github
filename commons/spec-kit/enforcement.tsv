@@ -212,16 +212,16 @@ requirement	mechanism	by	note
 0010-file-aide FR-016	check	.github: cd commons/ts/data && bun run verify	conformance.ts: one of three racing writers is let in where nothing may be there; a stale version is a conflict; posix does not claim if-match
 0010-file-aide FR-017	check	.github: cd commons/ts/data && bun run verify	stores.test.ts and conformance.ts: memory and posix; no temporary file listed, no folder written, empty folders removed, read-only refused
 0010-file-aide FR-018	check	.github: cd commons/ts/data && bun run verify	conformance.ts and stores.test.ts: failures are values that name the store and the path
-0010-file-aide FR-019	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-020	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-021	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-022	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-023	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-024	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-025	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-026	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-027	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
-0010-file-aide FR-028	none	-	Not built yet: it is finished by phase 3 of the library, and this row names its check when that phase lands.
+0010-file-aide FR-019	check	.github: cd commons/ts/data && bun run verify	query.test.ts: a query is a value of select, from, where, order by key, limit, with and scan, and nothing else
+0010-file-aide FR-020	check	.github: cd commons/ts/data && bun run verify	query.test.ts: fields typed by the entry and rows by select (type tests with controls); a tree's fields add type
+0010-file-aide FR-021	check	.github: cd commons/ts/data && bun run verify	query.test.ts and ifrfs.test.ts: text read into the builder's value, the same rows; failures name the line and the column
+0010-file-aide FR-022	check	.github: cd commons/ts/data && bun run verify	query.test.ts: prefixes of bound keys, a range's start and stop, pruning by key fields, explain as data; the walk lists only what the plan says
+0010-file-aide FR-023	check	.github: cd commons/ts/data && bun run verify	query.test.ts: a walk of everything is refused unless the query says scan; a bound on depth or a glob's literal folders is not everything
+0010-file-aide FR-024	check	.github: cd commons/ts/data && bun run verify	query.test.ts and ifrfs.test.ts: compiled once, the same rows on every run and on memory and posix; key order; parallel up to its bound; limit stops listing
+0010-file-aide FR-025	check	.github: cd commons/ts/data && bun run verify	query.test.ts: the library's glob matcher, linear on a pattern that backtracks elsewhere; regex only with with (regex = on), and not too long; UTC
+0010-file-aide FR-026	check	.github: cd commons/ts/data && bun run verify	query.test.ts: a query reads only ignore files, and none with ignore off
+0010-file-aide FR-027	check	.github: cd commons/ts/data && bun run verify	query.test.ts: .gitignore with negation, anchoring, folder-only rules and a deeper file; .git and hidden names left out; both can be turned off
+0010-file-aide FR-028	check	.github: cd commons/ts/data && bun run verify	query.test.ts: .faignore read as .gitignore is, in a store in memory, and the ignore files above the root of a query
 0010-file-aide FR-029	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-030	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-031	none	-	Not built yet: it is finished by phase 4 of the library, and this row names its check when that phase lands.
@@ -229,6 +229,6 @@ requirement	mechanism	by	note
 0010-file-aide FR-033	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-034	none	-	Not built yet: it is finished by phase 5 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-035	none	-	Not whole yet: conformance.ts runs on memory and posix (stores.test.ts); the local S3 server joins it in phase 4 and stores that fail on purpose in phase 5, and this row names its check then.
-0010-file-aide FR-036	none	-	Not built yet: the real-provider tests come in phase 4 and the comparison with fd in phase 3; this row names its check when phase 4 lands.
+0010-file-aide FR-036	none	-	Not whole yet: query.test.ts gives the same paths as fd for six filters where fd and git are installed; the tests against a real S3-compatible provider come with phase 4, and this row names its check then.
 0010-file-aide FR-037	none	-	Not built yet: it is finished by phase 6 of the library, and this row names its check when that phase lands.
 0010-file-aide FR-038	none	-	Not whole yet: IFRFS (commons/ts/data/ifrfs/) passes what each phase adds, and this row names its check when phase 6 lands.

@@ -10,6 +10,13 @@ import {
   catalog,
   type Capability,
   checkNames,
+  compile,
+  formatParseError,
+  formatQueryError,
+  parseQuery,
+  type Query,
+  query,
+  queryTree,
   formatLayoutError,
   MACOS_LIMITS,
   memoryStore,
@@ -23,7 +30,7 @@ import {
   writeEntry,
 } from "../../file-aide/mod.ts";
 import { posixStore } from "../../file-aide/runtime/mod.ts";
-import { ENTRIES, ifrfs, issue, KINDS, MARKER, readme } from "../../ifrfs/mod.ts";
+import { ENTRIES, ifrfs, issue, KINDS, MARKER, readme, rendition } from "../../ifrfs/mod.ts";
 
 const TREE = hostPath.fromFileUrl(new URL("./tree/", import.meta.url));
 
@@ -185,5 +192,76 @@ proves(
     const lines = await seen(m);
     assertEquals(lines.length, 13);
     assertArrayIncludes(lines, [".DS_Store unmatched 3"]);
+  },
+);
+
+async function rowsOf<R, C extends Capability>(q: Query<R>, store: Store<C>): Promise<R[]> {
+  const c = compile(q);
+  assert(c.kind === "ok", c.kind === "err" ? formatQueryError(c.error) : "");
+  const out: R[] = [];
+  for await (const r of c.value.run(store)) {
+    assert(r.kind === "ok", r.kind === "err" ? r.error.why : "");
+    out.push(r.value);
+  }
+  return out;
+}
+
+proves(
+  ["0010-file-aide FR-038", "0010-file-aide FR-021", "0010-file-aide FR-024"],
+  "IFRFS is queried the same through posix and memory, by builder and by text",
+  async () => {
+    const stores = [widen(posixStore(TREE, { readOnly: true })), widen(await inMemory())];
+    const pdfs = query(rendition)
+      .select("kind", "slug", "file")
+      .where((w) => w.and(w.in("kind", ["book", "book-series"]), w.glob("file", "*.pdf")))
+      .orderByKey();
+    const text = parseQuery(
+      "select kind, slug, file from rendition where kind in ('book', 'book-series') and file glob '*.pdf' order by key",
+      ENTRIES,
+    );
+    assert(text.kind === "ok", text.kind === "err" ? formatParseError(text.error) : "");
+    // in byte order of the paths: "book-series/" sorts before "book/", since "-" is before "/"
+    const want = [
+      { kind: "book-series", slug: "example-manuals", file: "Example Manuals 2026-11-15.pdf" },
+      { kind: "book", slug: "example-handbook", file: "Example Handbook Final 2026-11-09.pdf" },
+      { kind: "book", slug: "example-handbook", file: "Example Handbook Review 2026-11-02.pdf" },
+    ];
+    for (const s of stores) {
+      assertEquals(await rowsOf(pdfs, s), want);
+      assertEquals(await rowsOf(text.value, s), want);
+      const issues = await rowsOf(
+        query(issue)
+          .select("id")
+          .where((w) => w.eq("slug", "example-handbook"))
+          .orderByKey(),
+        s,
+      );
+      assertEquals(
+        issues.map((r) => r.id),
+        ["01M6SFSZ7J1T8GX50X1H4RZH7V", "01M6SFSZ837831FK61F4S07GZ6"],
+      );
+      const site = await rowsOf(
+        query(rendition)
+          .select("file")
+          .where((w) => w.and(w.eq("kind", "deck"), w.glob("file", "site/**")))
+          .orderByKey(),
+        s,
+      );
+      assertEquals(
+        site.map((r) => r.file),
+        ["site/assets/app.css", "site/index.html"],
+      );
+      const works = await rowsOf(
+        queryTree()
+          .select("path")
+          .where((w) => w.and(w.eq("type", "folder"), w.eq("depth", 2)))
+          .orderByKey(),
+        s,
+      );
+      assertEquals(
+        works.map((r) => r.path),
+        ["book-series/example-manuals", "book/example-handbook", "deck/example-talk", "os-cli/example-tool"],
+      );
+    }
   },
 );
