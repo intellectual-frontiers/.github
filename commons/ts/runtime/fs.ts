@@ -299,6 +299,11 @@ export async function chmod(path: PathLike, mode: number): Promise<void> {
   await hostCall(p(path), () => fsp.chmod(p(path), mode));
 }
 
+/** A second name, `to`, for the file at `from` (a hard link), refused with `AlreadyExists` where `to` is taken: a file put in place whole, or not at all. */
+export function link(from: PathLike, to: PathLike): Promise<void> {
+  return hostCall(p(to), () => fsp.link(p(from), p(to)));
+}
+
 /** A link at `path` that points at `target`; `type` matters on Windows only. */
 export function symlink(target: PathLike, path: PathLike, options: { readonly type?: "file" | "dir" } = {}): Promise<void> {
   return hostCall(p(path), () => fsp.symlink(p(target), p(path), options.type));

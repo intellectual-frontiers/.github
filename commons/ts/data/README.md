@@ -136,3 +136,55 @@ osquery ATC (`osquery-atc/`) follows osquery's own documentation of Automatic Ta
 `query` and `path` required, `columns` a list (every column TEXT to osquery), no column named `path`, which osquery adds itself, and
 the platforms `darwin`, `linux`, `posix`, `windows`, `any` and `all`. The generated configuration was checked against that format and
 was not run in osquery: no `osqueryi` is on this computer. The values osquery reads are text: a boolean is `1` or `0`.
+
+## File Aide, being built
+
+File Aide is SQL Aide's peer for stores of files, specified by [`0010-file-aide`](../../spec-kit/specs/0010-file-aide/spec.md): a store's layout written once as
+TypeScript algebraic types, drivers for memory, a folder and an S3-compatible bucket behind one interface, checks of a store against its layout, and a small SQL-like query
+language compiled into a function that walks a store as `fd` does, honouring `.gitignore` and `.faignore`. It lives in [`file-aide/`](file-aide/mod.ts), and the layout that accepts it, the IF Renditions File System (IFRFS, the
+folder erga's `publication sync` fills), in [`ifrfs/`](ifrfs/mod.ts), tested on the synthetic tree `suite/ifrfs/tree/`. Each of its
+requirements has a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) naming the phase that finishes it.
+
+| Phase | What                                                                                                 | State   |
+| ----- | ---------------------------------------------------------------------------------------------------- | ------- |
+| 1     | Segments, path patterns and their laws, entries, layouts, names                                      | here    |
+| 2     | The store interface, the `memory` and `posix` drivers, the conformance suite                         | here    |
+| 3     | Queries: the builder, the text form, the planner, the compiler, `explain`, ignore files, `fd` parity | here    |
+| 4     | The `s3` driver, the local S3 server, tests against real providers                                   | not yet |
+| 5     | Checks and recipes, and stores that fail on purpose                                                  | not yet |
+| 6     | With SQL Aide: the file-reference domain and listings as a source; IFRFS end to end                  | not yet |
+
+Use it:
+
+```ts
+import { compile, parseQuery, query, queryTree } from "./file-aide/mod.ts";
+import { posixStore } from "./file-aide/runtime/mod.ts";
+import { ENTRIES, rendition } from "./ifrfs/mod.ts";
+
+const store = posixStore("/path/to/works", { readOnly: true });
+const pdfs = query(rendition)
+  .select("kind", "slug", "file")
+  .where((w) => w.and(w.eq("kind", "book"), w.glob("file", "*.pdf")))
+  .orderByKey();
+const same = parseQuery("select kind, slug, file from rendition where kind = 'book' and file glob '*.pdf' order by key", ENTRIES);
+const c = compile(pdfs); // its plan lists book/ alone; c.value.plan says so
+if (c.kind === "ok") for await (const row of c.value.run(store)) console.log(row);
+compile(
+  queryTree()
+    .where((w) => w.eq("extension", "md"))
+    .scan(),
+); // fd's walk: every file and folder, .gitignore and .faignore honoured
+```
+
+File Aide's limits, said plainly:
+
+- The `posix` driver reads a whole folder to give one page of a listing, and a whole file to give a range; it skips symbolic links, and does
+  not claim a write on a version, which it cannot make atomic. A name on disk that is not in normalization form C is listed in form C and is
+  then reached only where the file system treats the two forms as one (as APFS does).
+- A layout finds two overlapping entries by its segments' witnesses: an overlap that no witness shows is not found when the layout is made,
+  and a path both entries match is unmatched, saying so.
+- A query's walk lists a folder whole before it goes below it, so a folder with very many files is held in memory while it is read. In key
+  order a folder's own row sorts by its path, and the files below it by theirs (`book`, `book-series`, `book-series/...`, `book/...`).
+- `.git/info/exclude` is read only at the root of the store, not where the store's root is deeper in a Git working tree. `regex` is
+  ECMAScript's, and is allowed only by `with (regex = on)`. The comparison with `fd` runs where `fd` (or `fdfind`) and `git` are installed,
+  and is skipped, saying so, where they are not; its speed is not measured yet.
