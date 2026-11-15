@@ -157,7 +157,7 @@ const LIBRARY_TABLES = new Set([LEDGER, "ifcsql_lineage"]);
 export async function plan<
   const E extends readonly Entity[],
   const S extends readonly Step[] = readonly [],
-  C extends EmitContext = EmitContext,
+  C extends EmitContext<Dialect, "durable"> = EmitContext<Dialect, "durable">,
 >(
   desired: Desired<E, S>,
   catalog: Catalog,
@@ -424,7 +424,12 @@ export interface ApplyOptions {
  * @param ctx - the context of the database's dialect
  * @param options - who applies it, and whether destroying data is allowed
  */
-export async function apply(p: Plan, runner: Runner, ctx: EmitContext, options: ApplyOptions): Promise<Result<Applied, ApplyError>> {
+export async function apply(
+  p: Plan,
+  runner: Runner,
+  ctx: EmitContext<Dialect, "durable">,
+  options: ApplyOptions,
+): Promise<Result<Applied, ApplyError>> {
   const destructive = p.changes.filter((c) => c.destructive).map((c) => c.step);
   if (destructive.length > 0 && options.allowDestructive !== true) return err({ kind: "destructive", steps: destructive });
   await runner.exec(bootstrap(ctx));
@@ -468,7 +473,7 @@ export type TeardownRefused = { readonly kind: "refused"; readonly message: stri
  * @param entities - the model's entities
  * @param ctx - the context; where its execution is `production`, the teardown is refused
  */
-export async function teardown<const E extends readonly Entity[], C extends EmitContext<Dialect>>(
+export async function teardown<const E extends readonly Entity[], C extends EmitContext<Dialect, "durable">>(
   entities: E,
   ctx: C & Fits<DialectOf<C>, ReqOf<E[number]["ddl"]>, DxOf<E[number]["ddl"]>>,
 ): Promise<Result<Plan, TeardownRefused>> {

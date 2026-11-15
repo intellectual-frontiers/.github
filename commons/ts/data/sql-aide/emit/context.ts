@@ -170,10 +170,18 @@ export interface Plugin {
   readonly hooks?: Hooks;
 }
 
-/** The context of one rendering. */
-export interface EmitContext<D extends Dialect = Dialect> {
+/**
+ * Whether a database is the system of record (durable: its structure changes through ISLM) or a build product of the TypeScript
+ * (ephemeral: made again from empty from the model and its rows) (FR-051).
+ */
+export type Durability = "durable" | "ephemeral";
+
+/** The context of one rendering. `U` is the durability of the database it renders for: ISLM takes only a durable one (FR-052). */
+export interface EmitContext<D extends Dialect = Dialect, U extends Durability = Durability> {
   /** The dialect rendered for. */
   readonly dialect: D;
+  /** Whether the database rendered for is the system of record or a build product. */
+  readonly durability: U;
   /** The naming strategy, with the hooks' changes applied. */
   readonly naming: Naming;
   /** Where the rendering is meant to run. */
@@ -187,23 +195,26 @@ export interface EmitContext<D extends Dialect = Dialect> {
 /**
  * Makes the context of a rendering.
  *
- * @param init - the dialect, and whatever differs from the typical naming, a sandbox and no plugins
+ * @param init - the dialect, and whatever differs from a durable database, the typical naming, a sandbox and no plugins
  * @example
  * const ctx = context({ dialect: postgres(), naming: qualifiedNaming("arca") });
  */
-export function context<D extends Dialect>(init: {
+export function context<D extends Dialect, const U extends Durability = "durable">(init: {
   readonly dialect: D;
+  readonly durability?: U;
   readonly naming?: Naming;
   readonly execution?: Execution;
   readonly docs?: readonly Docs[];
   readonly plugins?: readonly Plugin[];
-}): EmitContext<D> {
+}): EmitContext<D, U> {
   const plugins = init.plugins ?? [];
   let naming = init.naming ?? typicalNaming();
   for (const p of plugins) if (p.hooks?.naming !== undefined) naming = { ...naming, ...p.hooks.naming };
   const docs = new Map<object, EntityDoc>();
   for (const d of init.docs ?? []) for (const [k, v] of d) docs.set(k, v);
-  return { dialect: init.dialect, naming, execution: init.execution ?? "sandbox", docs, plugins };
+  // a context is durable unless it says otherwise
+  const durability = (init.durability ?? "durable") as U;
+  return { dialect: init.dialect, durability, naming, execution: init.execution ?? "sandbox", docs, plugins };
 }
 
 /** Tells every plugin of a context what was emitted. */

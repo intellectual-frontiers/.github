@@ -30,6 +30,18 @@ export interface Project {
   readonly docs?: readonly Docs[];
   /** The plugins its contexts are made with: their naming, lint rules and generators apply. */
   readonly plugins?: readonly Plugin[];
+  /** What `build` writes and `check` holds to what is committed: the `.auto.sql` of ephemeral targets, `.auto.json`, and the like (FR-055). */
+  readonly builds?: readonly ProjectBuild[];
+}
+
+/** One build of a project: the files it makes, and, where it makes one, the database it makes from them. */
+export interface ProjectBuild {
+  /** Its name. */
+  readonly name: string;
+  /** The files, by the path they are kept at. */
+  readonly files: () => Promise<readonly { readonly path: string; readonly text: string }[]>;
+  /** Makes the database from the files written, where the build has one (FR-054). */
+  readonly materialize?: () => Promise<{ readonly kind: "ok"; readonly value: void } | { readonly kind: "err"; readonly error: string }>;
 }
 
 /** Where the command line writes. */
@@ -38,6 +50,10 @@ export interface Io {
   readonly out: (text: string) => void;
   /** What went wrong, and help asked for in error. */
   readonly err: (text: string) => void;
+  /** Reads a file, or gives `undefined` where it is not there: what `check` compares with. */
+  readonly read?: (path: string) => Promise<string | undefined>;
+  /** Writes a file: what `build` writes with. */
+  readonly write?: (path: string, text: string) => Promise<void>;
 }
 
 const spec = {
@@ -49,13 +65,13 @@ const spec = {
   }),
 };
 const operands: readonly args.Operand[] = [
-  { name: "COMMAND", help: "sql, lint, generate or list.", arity: "one" },
+  { name: "COMMAND", help: "sql, lint, generate, list, build or check.", arity: "one" },
   { name: "GENERATOR", help: "What `generate` makes: mermaid, d2, dictionary, rust, zod, or a plugin's.", arity: "optional" },
 ];
 
 /** What the command line is asked to do. */
-type Command = "sql" | "lint" | "generate" | "list";
-const isCommand = (w: string): w is Command => ["sql", "lint", "generate", "list"].includes(w);
+type Command = "sql" | "lint" | "generate" | "list" | "build" | "check";
+const isCommand = (w: string): w is Command => ["sql", "lint", "generate", "list", "build", "check"].includes(w);
 
 const isTable = (e: Entity): e is Entity & Linted => e.entity === "table" && "spec" in e;
 
@@ -65,7 +81,9 @@ const isTable = (e: Entity): e is Entity & Linted => e.entity === "table" && "sp
  * - `sql` writes the definitions of the model for the dialect;
  * - `lint` writes what the lint rules find, and fails where they find anything;
  * - `generate NAME` writes what a generator makes (a diagram, the data dictionary, Rust, Zod, or a plugin's);
- * - `list` names the generators.
+ * - `list` names the generators;
+ * - `build` writes the project's built files and makes the databases of its builds;
+ * - `check` fails where a committed built file is not what the source makes, and names it.
  *
  * @param project - the project
  * @param words - the words of the command line, after the program's name
@@ -87,7 +105,7 @@ export async function cli(project: Project, words: readonly string[], io: Io): P
   }
   const [command = "", generatorName] = parsed.value.positionals;
   if (!isCommand(command)) {
-    io.err(`${project.name}: ${command} is not a command: sql, lint, generate or list\n`);
+    io.err(`${project.name}: ${command} is not a command: sql, lint, generate, list, build or check\n`);
     return 2;
   }
   const dialectName = parsed.value.options.dialect;
@@ -127,6 +145,35 @@ export async function cli(project: Project, words: readonly string[], io: Io): P
       const files = g.generate(tables, ctx);
       for (const f of files) io.out(files.length === 1 ? f.text : `==> ${f.path} <==\n${f.text}`);
       return 0;
+    }
+    case "build": {
+      if (io.write === undefined) {
+        io.err(`${project.name}: build needs a way to write files\n`);
+        return 2;
+      }
+      for (const b of project.builds ?? []) {
+        for (const f of await b.files()) {
+          await io.write(f.path, f.text);
+          io.out(`wrote ${f.path}\n`);
+        }
+        const made = await b.materialize?.();
+        if (made?.kind === "err") {
+          io.err(`${project.name}: ${b.name}: ${made.error}\n`);
+          return 1;
+        }
+        if (made !== undefined) io.out(`made the database of ${b.name}\n`);
+      }
+      return 0;
+    }
+    case "check": {
+      if (io.read === undefined) {
+        io.err(`${project.name}: check needs a way to read files\n`);
+        return 2;
+      }
+      const stale: string[] = [];
+      for (const b of project.builds ?? []) for (const f of await b.files()) if ((await io.read(f.path)) !== f.text) stale.push(f.path);
+      for (const p of stale) io.err(`${p} is not what the source makes: run build and commit it\n`);
+      return stale.length === 0 ? 0 : 1;
     }
     default:
       return absurd(command);

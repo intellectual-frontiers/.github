@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { proc } from "../../../runtime/mod.ts";
+import { fs, proc } from "../../../runtime/mod.ts";
 import { cli, type Project } from "../cli/cli.ts";
 
 /**
@@ -19,6 +19,11 @@ import { cli, type Project } from "../cli/cli.ts";
  * @param project - the project
  */
 export async function main(project: Project): Promise<void> {
-  const status = await cli(project, proc.args, { out: (t) => process.stdout.write(t), err: (t) => process.stderr.write(t) });
+  const status = await cli(project, proc.args, {
+    out: (t) => process.stdout.write(t),
+    err: (t) => process.stderr.write(t),
+    read: (path) => fs.readTextOr(path),
+    write: (path, text) => fs.writeTextFile(path, text),
+  });
   process.exitCode = status;
 }

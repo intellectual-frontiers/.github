@@ -21,7 +21,7 @@ function sources(dir: string): string[] {
 }
 const read = (f: string): string => fs.readTextFileSync(path.join(DATA, f));
 const library = sources("sql-aide");
-const built = [...sources("arca"), ...sources("data-vault")];
+const built = [...sources("arca"), ...sources("data-vault"), ...sources("osquery-atc")];
 const everything = [...library, ...built];
 const written = everything.filter((f) => !f.includes(".auto."));
 
@@ -65,16 +65,20 @@ proves(["0009-sql-aide FR-002"], "a file of the library imports the library and 
   }
 });
 
-proves(["0009-sql-aide FR-047", "0009-sql-aide FR-048"], "a library built with SQL Aide imports its public entry point alone", () => {
-  for (const f of built) {
-    for (const spec of imports(f)) {
-      assert(spec.startsWith("."), `${f} imports ${spec}`);
-      const target = resolved(f, spec);
-      const own = target.startsWith(`${f.split("/")[0]}/`);
-      assert(own || target === "sql-aide/mod.ts", `${f} imports ${spec}: only its own files and sql-aide/mod.ts are its to import`);
+proves(
+  ["0009-sql-aide FR-047", "0009-sql-aide FR-048", "0009-sql-aide FR-057"],
+  "a library built with SQL Aide imports its public entry point alone",
+  () => {
+    for (const f of built) {
+      for (const spec of imports(f)) {
+        assert(spec.startsWith("."), `${f} imports ${spec}`);
+        const target = resolved(f, spec);
+        const own = target.startsWith(`${f.split("/")[0]}/`);
+        assert(own || target === "sql-aide/mod.ts", `${f} imports ${spec}: only its own files and sql-aide/mod.ts are its to import`);
+      }
     }
-  }
-});
+  },
+);
 
 proves(["0009-sql-aide FR-003"], "only erasable syntax, no any, no non-null assertion", () => {
   for (const f of written) {

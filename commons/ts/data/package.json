@@ -9,9 +9,9 @@
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
-    "docs": "bun sql-aide/runtime/docs.ts arca/party.ts",
-    "docs:check": "bun sql-aide/runtime/docs.ts --check arca/party.ts",
-    "verify": "tsc -p tsconfig.json && bun sql-aide/runtime/docs.ts --check arca/party.ts && bun test suite/",
+    "docs": "bun sql-aide/runtime/docs.ts arca/party.ts osquery-atc/catalog.ts",
+    "docs:check": "bun sql-aide/runtime/docs.ts --check arca/party.ts osquery-atc/catalog.ts",
+    "verify": "tsc -p tsconfig.json && bun sql-aide/runtime/docs.ts --check arca/party.ts osquery-atc/catalog.ts && bun test suite/",
     "test": "bun test suite/",
     "test:node": "node --test \"suite/**/*.test.ts\""
   },

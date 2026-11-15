@@ -4,12 +4,13 @@ The data libraries of Intellectual Frontiers Commons, specified by [`0009-sql-ai
 [IFC TypeScript](../README.md)'s kernel. SQL Aide is a SQL generator first and a database client second: a schema is written once as TypeScript algebraic types and rendered as
 SQL for PostgreSQL, SQLite and DuckDB. It replaces `netspective-labs/sql-aide`.
 
-| Folder                             | What it is                                                                                                                                        | May import                                               |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [`sql-aide/`](sql-aide/mod.ts)     | The library: domains, columns and tables whose row types are computed; dialects whose features the compiler knows; the `SQL` template; lint; TAP. | `sql-aide/`, the kernel; `sql-aide/runtime/` the runtime |
-| [`arca/`](arca/mod.ts)             | Arca, the typical data models: the party model first.                                                                                             | `arca/`, `sql-aide/mod.ts`                               |
-| [`data-vault/`](data-vault/mod.ts) | Data Vault: hubs, satellites and links as generic functions.                                                                                      | `data-vault/`, `sql-aide/mod.ts`                         |
-| [`suite/`](suite/)                 | The tests, with committed SQL (`golden/`) for every dialect; not named `tests/`, which is IFC TypeScript's own suite and what its jobs run.       | anything here                                            |
+| Folder                               | What it is                                                                                                                                        | May import                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`sql-aide/`](sql-aide/mod.ts)       | The library: domains, columns and tables whose row types are computed; dialects whose features the compiler knows; the `SQL` template; lint; TAP. | `sql-aide/`, the kernel; `sql-aide/runtime/` the runtime |
+| [`arca/`](arca/mod.ts)               | Arca, the typical data models: the party model first.                                                                                             | `arca/`, `sql-aide/mod.ts`                               |
+| [`data-vault/`](data-vault/mod.ts)   | Data Vault: hubs, satellites and links as generic functions.                                                                                      | `data-vault/`, `sql-aide/mod.ts`                         |
+| [`osquery-atc/`](osquery-atc/mod.ts) | osquery ATC: Automatic Table Construction entries typed, their JSON configuration and SQLite database built.                                      | `osquery-atc/`, `sql-aide/mod.ts`                        |
+| [`suite/`](suite/)                   | The tests, with committed SQL (`golden/`) for every dialect; not named `tests/`, which is IFC TypeScript's own suite and what its jobs run.       | anything here                                            |
 
 ## Use it
 
@@ -43,17 +44,18 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                               | State |
-| ----- | ------------------------------------------------------------------------------------------------------------------ | ----- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here  |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here  |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here  |
-| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here  |
-| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here  |
-| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here  |
-| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here  |
-| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here  |
-| 9     | Generators (Mermaid, D2, data dictionary, Rust, Zod), `cli(project)`, every typed hook, the pgvector plugin        | here  |
+| Phase | What                                                                                                                          | State |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP                      | here  |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                            | here  |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                             | here  |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads              | here  |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown                    | here  |
+| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert             | here  |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP              | here  |
+| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls            | here  |
+| 9     | Generators (Mermaid, D2, data dictionary, Rust, Zod), `cli(project)`, every typed hook, the pgvector plugin                   | here  |
+| 10    | Durable and ephemeral targets: ISLM refused for ephemeral, `.auto.sql` builds, databases made, staleness checked; osquery ATC | here  |
 
 ### Limits, said plainly
 
@@ -100,3 +102,22 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   is on the PATH. Zod is a development dependency of the tests only: the library writes the schemas as text. The command line renders,
   lints and generates; it does not plan or apply ISLM against a database. The pgvector plugin renders and lints; no engine here has the
   extension, so its SQL is not loaded.
+
+### Durable and ephemeral targets (phase 10)
+
+A database target is durable (the system of record: PostgreSQL, or a SQLite or DuckDB file that is kept; its structure changes through
+ISLM) or ephemeral (the TypeScript is the system of record and the database a build product: `.ts` to `.auto.sql` to
+`.auto.sqlite.db`, `.auto.duckdb` or a PGlite folder). The durability is in the emit context's type, durable unless said, and ISLM's
+plan, apply and teardown do not compile with an ephemeral context. `buildSql` writes the one `.auto.sql` of an ephemeral target, which
+is committed; the database is not (see [`.gitignore`](.gitignore)), and `materialize` (in `sql-aide/runtime/build.ts`) makes it
+through a driver in a temporary file renamed over the old one. `clientCommand` gives the command for `sqlite3`, `duckdb` or `psql`;
+only `psql` is on the computer the tests ran on, so the other two commands were not run (FR-054 stays open for that). `staleFiles` and
+`cli check` fail on a committed file that is not what the source makes, and `sizeFindings` reports a build past a number of rows.
+A PGlite target is a folder, removed before the new one is renamed into its place, so for that moment a reader finds none.
+
+osquery ATC (`osquery-atc/`) follows osquery's own documentation of Automatic Table Construction
+([configuration](https://osquery.readthedocs.io/en/stable/deployment/configuration/)) and its parser
+(`plugins/config/parsers/auto_constructed_tables.cpp` in [osquery/osquery](https://github.com/osquery/osquery)), read on 2026-11-15:
+`query` and `path` required, `columns` a list (every column TEXT to osquery), no column named `path`, which osquery adds itself, and
+the platforms `darwin`, `linux`, `posix`, `windows`, `any` and `all`. The generated configuration was checked against that format and
+was not run in osquery: no `osqueryi` is on this computer. The values osquery reads are text: a boolean is `1` or `0`.

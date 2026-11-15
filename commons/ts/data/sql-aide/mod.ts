@@ -205,8 +205,10 @@ export type {
   SqliteClient,
   SqliteParam,
 } from "./driver/driver.ts";
+export { buildSql, clientCommand, dataOf, naturalKey, sizeFindings } from "./target/build.ts";
+export type { EphemeralBuild, TableData } from "./target/build.ts";
 export { cli } from "./cli/cli.ts";
-export type { Io, Project, ProjectDialect } from "./cli/cli.ts";
+export type { Io, Project, ProjectBuild, ProjectDialect } from "./cli/cli.ts";
 export { docsModule, docsOf, extractDocs, parseComment } from "./docs/tsdoc.ts";
 export { d2Erd, dataDictionary, generators, mermaidErd, rustStructs, zodSchemas } from "./generate/generators.ts";
 export type { GeneratedFile, Generator } from "./generate/generators.ts";
@@ -219,6 +221,7 @@ export type {
   ConstraintKind,
   Dialect,
   DialectExtension,
+  Durability,
   Docs,
   EmitContext,
   EmitEvent,

@@ -19,7 +19,9 @@ import {
   satellite,
 } from "../../data-vault/mod.ts";
 import {
+  buildSql,
   context,
+  dataOf,
   d2Erd,
   dataDictionary,
   date,
@@ -63,6 +65,8 @@ import {
   unique,
   valueAs,
 } from "../../sql-aide/mod.ts";
+import { fs, path } from "../../../runtime/mod.ts";
+import { materialize } from "../../sql-aide/runtime/build.ts";
 import { eachEngine, golden, pgliteEngine } from "../helpers.ts";
 
 const customer = hub("customer", { customer_number: text().doc("The number the business knows the customer by") });
@@ -449,5 +453,46 @@ proves(
         `    hub_order ||--o{ link_customer_order : "hub_order_id"`,
       ],
     );
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-053", "0009-sql-aide FR-054", "0009-sql-aide FR-050"],
+  "a vault is an ephemeral DuckDB target: built twice to the same bytes and made through a driver",
+  async () => {
+    const ephemeral = context({ dialect: duckdb(), durability: "ephemeral" });
+    const build = {
+      module: "suite/data-vault/vault.test.ts",
+      entities: vault,
+      data: [
+        dataOf(customer, [
+          { hub_customer_id: "C-2", customer_number: "C-2", record_source: "seed", load_at: new Date("2026-01-01T00:00:00Z") },
+          { hub_customer_id: "C-1", customer_number: "C-1", record_source: "seed", load_at: new Date("2026-01-01T00:00:00Z") },
+        ]),
+      ],
+    } as const;
+    const text0 = await buildSql(build, ephemeral);
+    assertEquals(await buildSql(build, ephemeral), text0);
+    assert(text0.indexOf("'C-1'") < text0.indexOf("'C-2'"), "rows in the order of their key");
+    const { DuckDBInstance } = await import("@duckdb/node-api");
+    const dir = await fs.makeTempDir({ prefix: "ifcsql-vault-" });
+    try {
+      const database = path.join(dir, "vault.auto.duckdb");
+      const made = await materialize(text0, database, async (p) => {
+        const instance = await DuckDBInstance.create(p);
+        const connection = await instance.connect();
+        const d = duckdbDriver(connection, ephemeral);
+        return { exec: d.runner.exec, close: () => Promise.resolve(void (connection.closeSync(), instance.closeSync())) };
+      });
+      assertEquals(made.kind, "ok");
+      const instance = await DuckDBInstance.create(database);
+      const connection = await instance.connect();
+      const rows = await duckdbDriver(connection).runner.query(`SELECT count(*) AS n FROM "hub_customer"`);
+      connection.closeSync();
+      instance.closeSync();
+      assertEquals(Number(rows[0]?.["n"]), 2);
+    } finally {
+      await fs.remove(dir, { recursive: true });
+    }
   },
 );
