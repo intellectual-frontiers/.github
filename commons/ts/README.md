@@ -2,14 +2,15 @@
 
 The TypeScript part of Intellectual Frontiers Commons, specified by [`0005-typescript-runtime`](../spec-kit/specs/0005-typescript-runtime/spec.md). It rests only on
 what belongs to no vendor (TypeScript 7, ECMAScript, the web standards and the `node:` modules that Deno, Node and Bun all implement), so the same code runs on each of the
-three, on Linux, macOS and Windows.
+three, on Linux, macOS and Windows. It is OpenTelemetry-native ([`0006-signals`](../spec-kit/specs/0006-signals/spec.md)), carries the primitives of GRC
+engineering ([`0007-grc`](../spec-kit/specs/0007-grc/spec.md)) and records each test run as compliance evidence ([`0008-test-evidence`](../spec-kit/specs/0008-test-evidence/spec.md)).
 
-| Folder                               | What it is                                                                                                                                                                                                                 | May import                     |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| [`kernel/`](kernel/mod.ts)           | Pure code: `Result`, `absurd`, `Brand`, decoders, semantic and dotted versions, SHA-256, tar/gzip/zip writers and readers, `Link` and `Retry-After`, TypeScript literals, type-level tests. Runs in a browser or a Worker. | `kernel/` only                 |
-| [`runtime/`](runtime/mod.ts)         | The host: `fs`, `path`, `proc`, `tty`, `net` (verified downloads with retries), `serve` (web `Request` to `Response`), typed `errors`. The `Deno` names, so a conversion is a rename.                                      | `node:`, `kernel/`, `runtime/` |
-| [`runtime/test.ts`](runtime/test.ts) | Test registration on `node:test`, assertions on `node:assert/strict` under `@std/assert`'s names, and `proves`.                                                                                                            | `node:`                        |
-| [`tests/`](tests/)                   | The suite: examples, fast-check properties for every law and round trip, type-level tests, and the rules above as tests.                                                                                                   | anything here, and fast-check  |
+| Folder                               | What it is                                                                                                                                                                                                                                                                                                                                                                                                                                                          | May import                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| [`kernel/`](kernel/mod.ts)           | Pure code: `Result`, `absurd`, `Brand`, decoders, semantic and dotted versions, SHA-256, tar/gzip/zip writers and readers, `Link` and `Retry-After`, TypeScript literals, type-level tests; OpenTelemetry (`otel`, `otlp`, `signals`) and the console's rendering (`render`, `palette`, `width`, `vt`); GRC (`grc`, `evidence`, `assess`, `ocsf`, `oscal`, `attest`, `uuid`); test records and reports (`testRecord`, `testReport`). Runs in a browser or a Worker. | `kernel/` only                 |
+| [`runtime/`](runtime/mod.ts)         | The host: `fs`, `path`, `proc`, `tty`, `net` (verified downloads with retries), `serve` (web `Request` to `Response`), typed `errors`; `otel` (OTLP export, journal, context, receiver), `terminal` (the one writer for people), `sign`, `git`, `grc`. The `Deno` names, so a conversion is a rename.                                                                                                                                                               | `node:`, `kernel/`, `runtime/` |
+| [`runtime/test.ts`](runtime/test.ts) | Test registration on `node:test`, assertions on `node:assert/strict` under `@std/assert`'s names, and `proves`, which records every test as evidence; `runtime/test-run.ts` runs a suite into one record (`ifc test`).                                                                                                                                                                                                                                              | `node:`                        |
+| [`tests/`](tests/)                   | The suite: examples, fast-check properties for every law and round trip, type-level tests, and the rules above as tests.                                                                                                                                                                                                                                                                                                                                            | anything here, and fast-check  |
 
 ## Work here
 
@@ -25,6 +26,7 @@ bun test tests/                       # Bun
 node --test "tests/**/*.test.ts"      # Node 26
 deno test -A --no-check tests/        # Deno (its own checker is TypeScript 6, so tsc checks instead)
 bun run pack                          # dist/intellectual-frontiers-ifc-ts-X.Y.Z.tgz and its .sha256
+bun run test:evidence                 # the suite on all three runtimes into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger
 bun run smoke dist/*.tgz              # the tarball installed and used on Bun, Node and Deno, and its declarations checked by tsc 7
 ```
 
@@ -37,7 +39,7 @@ declarations with TypeScript 7, packs them, checks the tarball on the three runt
 and its lockfile keeps the tarball's integrity:
 
 ```sh
-bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.1.0/intellectual-frontiers-ifc-ts-0.1.0.tgz
+bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.2.0/intellectual-frontiers-ifc-ts-0.2.0.tgz
 ```
 
 ```ts

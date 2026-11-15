@@ -59,7 +59,10 @@ import {
   runnerLog,
   RUN_SPAN,
   type Signals,
+  STEP_SPAN,
+  isStepOutcome,
   type TestCase,
+  type TestStep,
   TEST_SCOPE,
   TEST_SPAN,
   warningLog,
@@ -176,16 +179,49 @@ function compareTests(a: RunTest, b: RunTest): number {
   );
 }
 
-/** The tests of some signals, in a stable order. */
+/** The steps whose span's parent is `parent`, each with its own, in the order they ended (0005-typescript-runtime FR-060). */
+function stepsUnder(parent: string, children: ReadonlyMap<string, readonly SpanData[]>): readonly TestStep[] {
+  return (children.get(parent) ?? [])
+    .flatMap((s): TestStep[] => {
+      const name = attributeText(s.attributes, "ifc.test.step.name");
+      const outcome = attributeText(s.attributes, "ifc.test.outcome") ?? "";
+      if (name === undefined || !isStepOutcome(outcome)) return [];
+      const message = attributeText(s.attributes, "ifc.test.message");
+      const inner = stepsUnder(s.context.spanId, children);
+      return [
+        {
+          name,
+          start: s.startTime,
+          end: s.endTime,
+          outcome,
+          ...(message === undefined ? {} : { message }),
+          ...(inner.length === 0 ? {} : { steps: inner }),
+        },
+      ];
+    })
+    .sort((a, b) => (a.end < b.end ? -1 : a.end > b.end ? 1 : 0));
+}
+
+/** The tests of some signals, in a stable order, each with its steps (the `test step` spans under its span). */
 export function testsOf(signals: Signals): Result<readonly RunTest[], RecordError> {
   const tests: RunTest[] = [];
+  const children = new Map<string, SpanData[]>();
+  for (const b of signals.traces) {
+    for (const s of b.spans) {
+      if (s.name !== STEP_SPAN || s.parentSpanId === undefined) continue;
+      const at = children.get(s.parentSpanId) ?? [];
+      at.push(s);
+      children.set(s.parentSpanId, at);
+    }
+  }
   for (const b of signals.traces) {
     const runtime = attributeText(b.resource.attributes, "process.runtime.name") ?? "unknown";
     for (const s of b.spans) {
       if (s.name !== TEST_SPAN) continue;
       const t = testOf(s, runtime);
       if (t.kind === "err") return t;
-      tests.push(t.value);
+      const steps = stepsUnder(s.context.spanId, children);
+      tests.push(steps.length === 0 ? t.value : { ...t.value, steps });
     }
   }
   return ok(tests.sort(compareTests));
@@ -520,9 +556,33 @@ function diagnostic(t: RunTest, indent: string): string {
   return `${indent}---\n${yaml}\n${indent}...\n`;
 }
 
+/** A test's steps as a TAP subtest at `indent`, before the test's own line (0005-typescript-runtime FR-060). */
+function tapSteps(steps: readonly TestStep[], indent: string, title: string): string {
+  let out = `${indent}# Subtest: ${tapDescription(title)}\n${indent}1..${steps.length}\n`;
+  for (const [i, s] of steps.entries()) {
+    if (s.steps !== undefined && s.steps.length > 0) out += tapSteps(s.steps, `${indent}    `, s.name);
+    const name = tapDescription(s.name);
+    switch (s.outcome) {
+      case "pass":
+        out += `${indent}ok ${i + 1} - ${name}\n`;
+        break;
+      case "skip":
+        out += `${indent}ok ${i + 1} - ${name} # SKIP\n`;
+        break;
+      case "fail":
+        out += `${indent}not ok ${i + 1} - ${name}${s.message === undefined ? "" : ` # ${tapDescription(s.message)}`}\n`;
+        break;
+      default:
+        absurd(s.outcome);
+    }
+  }
+  return out;
+}
+
 /**
  * The run as TAP version 14 (FR-008): a plan, one subtest per runtime and file, each test `ok` or `not ok` numbered, `# SKIP` and
- * `# TODO` with their reasons, and a YAML diagnostic block for a failure or a cancellation; the counts as closing comments.
+ * `# TODO` with their reasons, and a YAML diagnostic block for a failure or a cancellation; the counts as closing comments. A test's
+ * steps are a subtest of their own before its line (0005-typescript-runtime FR-060).
  */
 export function tap14(run: TestRun): string {
   const gs = groups(run);
@@ -533,6 +593,7 @@ export function tap14(run: TestRun): string {
     for (const [i, t] of g.tests.entries()) {
       const n = i + 1;
       const name = tapDescription(t.name);
+      if (t.steps !== undefined && t.steps.length > 0) out += tapSteps(t.steps, "        ", t.name);
       switch (t.outcome) {
         case "pass":
           out += `    ok ${n} - ${name}\n`;
@@ -596,10 +657,15 @@ function failureText(t: RunTest): string {
     .join("\n");
 }
 
+/** Each step of a test as `<outcome> <path>`, for JUnit's properties, which nest no test case (0005-typescript-runtime FR-060). */
+function stepLines(steps: readonly TestStep[], within: readonly string[] = []): string[] {
+  return steps.flatMap((s) => [...stepLines(s.steps ?? [], [...within, s.name]), `${s.outcome} ${[...within, s.name].join(" > ")}`]);
+}
+
 /**
  * The run as JUnit XML (FR-008): one `testsuite` per file and runtime with the installation as `properties`, a `testcase` with its
- * `classname` (the file) and its time in seconds, the requirements, risk and id as its `properties`, and `failure`, `error` (cancelled)
- * or `skipped` (skip and todo).
+ * `classname` (the file) and its time in seconds, the requirements, risk, id and steps (`step`, as `pass outer > inner`) as its
+ * `properties`, and `failure`, `error` (cancelled) or `skipped` (skip and todo).
  */
 export function junitXml(run: TestRun): string {
   const time = (ts: readonly RunTest[]): string => {
@@ -616,6 +682,7 @@ export function junitXml(run: TestRun): string {
         prop("id", t.id),
         prop("outcome", t.outcome),
         prop("attempt", String(t.attempt)),
+        ...stepLines(t.steps ?? []).map((l) => prop("step", l)),
       ]);
       const body: XmlChild[] = [props];
       switch (t.outcome) {

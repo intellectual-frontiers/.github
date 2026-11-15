@@ -33,6 +33,13 @@ jobs:
           sudo systemctl start postgresql
           sudo -u postgres psql -qc "alter user postgres password 'postgres'"
           echo "IFCSQL_PG_URL=postgres://postgres:postgres@127.0.0.1:5432/postgres" >>"$GITHUB_ENV"
+      - name: The engines' own clients, for the databases made from .auto.sql (sqlite3 is the runner's; the duckdb client is pinned and checked)
+        run: |
+          sqlite3 --version
+          curl --fail --silent --show-error --location --retry 3 -o "$RUNNER_TEMP/duckdb.tar.gz" https://install.duckdb.org/v2.0.0/duckdb-cli-linux-amd64.tar.gz
+          echo "c6507206baf7793c6013dbd82368469a45f20dc0e17a6f92f204602f652ed2bc  $RUNNER_TEMP/duckdb.tar.gz" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/duckdb" && tar -xzf "$RUNNER_TEMP/duckdb.tar.gz" -C "$RUNNER_TEMP/duckdb"
+          echo "$RUNNER_TEMP/duckdb" >>"$GITHUB_PATH"
       - name: What IFC TypeScript and the data libraries install for checking and testing
         run: |
           bun install --frozen-lockfile

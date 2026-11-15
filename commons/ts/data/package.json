@@ -9,9 +9,9 @@
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
-    "docs": "bun sql-aide/runtime/docs.ts arca/party.ts",
-    "docs:check": "bun sql-aide/runtime/docs.ts --check arca/party.ts",
-    "verify": "tsc -p tsconfig.json && bun sql-aide/runtime/docs.ts --check arca/party.ts && bun test suite/",
+    "docs": "bun sql-aide/runtime/docs.ts arca/party.ts osquery-atc/catalog.ts",
+    "docs:check": "bun sql-aide/runtime/docs.ts --check arca/party.ts osquery-atc/catalog.ts",
+    "verify": "tsc -p tsconfig.json && bun sql-aide/runtime/docs.ts --check arca/party.ts osquery-atc/catalog.ts && bun test suite/",
     "test": "bun test suite/",
     "test:node": "node --test \"suite/**/*.test.ts\""
   },
@@ -19,6 +19,7 @@
     "@duckdb/node-api": "2.0.0-r.1",
     "@electric-sql/pglite": "0.5.16",
     "@types/pg": "8.23.1",
-    "pg": "8.23.1"
+    "pg": "8.23.1",
+    "zod": "4.1.12"
   }
 }

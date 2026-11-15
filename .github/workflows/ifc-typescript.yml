@@ -42,7 +42,7 @@ jobs:
         run: bun fmt --check
       - name: The linter, type-aware, no warning allowed
         working-directory: commons/ts
-        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime tests tools
+        run: bun x "bun@$BUN_LINT_VERSION" lint --type-aware --max-warnings 0 kernel runtime lint tests tools
 
   test:
     strategy:
@@ -76,7 +76,12 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - name: The linter's canary, so the lint plugin's tests run rather than skip
+        shell: bash
+        run: bun x "bun@$BUN_LINT_VERSION" --version
       - name: The suite on ${{ matrix.runtime }}, recorded as evidence (commons 0008-test-evidence FR-014)
+        # A hang ends here, so the record of what ran is still kept below.
+        timeout-minutes: 10
         working-directory: commons/ts
         shell: bash
         run: |
@@ -119,6 +124,40 @@ jobs:
         run: |
           bun test tests/runtime/otel-conformance.test.ts
           node --test tests/runtime/otel-conformance.test.ts
+
+  compile:
+    # commons 0005-typescript-runtime FR-062: a program built into one binary by the pinned Bun on each system, then run; and Windows built from Linux.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+      - name: The development tools, from bun.lock
+        working-directory: commons/ts
+        run: bun install --frozen-lockfile
+      - name: Built for this computer, with an embedded file, and run
+        working-directory: commons/ts
+        shell: bash
+        run: bun test tests/runtime/compile.test.ts
+      - name: Built for Windows from Linux, by the pinned Bun alone
+        if: runner.os == 'Linux'
+        working-directory: commons/ts
+        shell: bash
+        run: |
+          v=$(sed -n 's/^BUN_VERSION=//p' ../generated/pins.auto.env)
+          mkdir -p "$RUNNER_TEMP/cross"
+          printf 'console.log("ok");\n' >"$RUNNER_TEMP/cross/hello.ts"
+          bun -e '
+            import { compile, describeCompileError } from "./runtime/compile.ts";
+            const r = await compile({ entry: process.argv[1], outfile: process.argv[2], target: "windows-x64", bunVersion: process.argv[3] });
+            if (r.kind === "err") { console.error(describeCompileError(r.error)); process.exit(1); }
+            console.log(r.value.path, r.value.sha256);
+          ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
+          test -f "$RUNNER_TEMP/cross/hello.exe"
 
   pack:
     strategy:

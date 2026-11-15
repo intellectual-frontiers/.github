@@ -10,12 +10,14 @@ import { assert, assertEquals, assertRejects, proves } from "../../../runtime/te
 import {
   electronicContact,
   party,
+  partyCodeTables,
   partyKind,
   partyRoleKind,
   partyDocs,
   partyIndexes,
   partyModel,
   partyReference,
+  partyReferenceData,
   partyRoutines,
   partyTables,
   partyViews,
@@ -26,6 +28,7 @@ import {
 } from "../../arca/mod.ts";
 import {
   acceptedValues,
+  buildSql,
   context,
   definitions,
   type Driver,
@@ -52,6 +55,7 @@ import {
   recordFindings,
   relationship,
   render,
+  shadow,
   reportFindings,
   type RowOf,
   rows,
@@ -67,8 +71,10 @@ import {
   unique,
 } from "../../sql-aide/mod.ts";
 import { fromLines } from "../../sql-aide/mod.ts";
+import { materialize } from "../../sql-aide/runtime/build.ts";
 import { docsAreCurrent } from "../../sql-aide/runtime/docs.ts";
-import { eachEngine, golden, postgresEngine, postgresUrl } from "../helpers.ts";
+import { fs, path } from "../../../runtime/mod.ts";
+import { anotherLike, eachEngine, golden, postgresEngine, postgresUrl } from "../helpers.ts";
 
 const contexts = {
   postgres: context({ dialect: postgres(), docs: [partyDocs] }),
@@ -511,4 +517,70 @@ proves(
     }
     assertEquals(seen, [`["1815-12-10"]`, `["1815-12-10"]`, `["1815-12-10"]`]);
   },
+);
+
+proves(
+  ["0009-sql-aide FR-053", "0009-sql-aide FR-054", "0009-sql-aide FR-050"],
+  "the party model's code tables are an ephemeral SQLite target: committed SQL, the same bytes twice, and a database made through a driver",
+  async () => {
+    const ephemeral = context({ dialect: sqlite(), durability: "ephemeral", docs: [partyDocs] });
+    const build = { module: "arca/reference.ts", entities: partyCodeTables, data: partyReferenceData } as const;
+    const text0 = await buildSql(build, ephemeral);
+    assertEquals(await buildSql(build, ephemeral), text0);
+    await golden(new URL("./golden/party-reference.auto.sql", import.meta.url), text0);
+    const { DatabaseSync } = await import("node:sqlite");
+    const dir = await fs.makeTempDir({ prefix: "ifcsql-arca-" });
+    try {
+      const database = path.join(dir, "party-reference.auto.sqlite.db");
+      const made = await materialize(text0, database, (p) => {
+        const db = new DatabaseSync(p);
+        const d = sqliteDriver(db, ephemeral);
+        return Promise.resolve({ exec: d.runner.exec, close: () => Promise.resolve(db.close()) });
+      });
+      assertEquals(made.kind, "ok");
+      const db = new DatabaseSync(database, { readOnly: true });
+      const kinds = db
+        .prepare(`SELECT "code" FROM "party_kind" ORDER BY 1`)
+        .all()
+        .map((r) => r["code"]);
+      db.close();
+      assertEquals(kinds, ["organization", "person"]);
+    } finally {
+      await fs.remove(dir, { recursive: true });
+    }
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-035", "0009-sql-aide FR-050"],
+  "applied by ISLM, the party model plans nothing when every object its catalog shows is compared with a shadow",
+  async () => {
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      const entities =
+        engine.dialect === "postgres"
+          ? [...partyModel, ...partyRoutines]
+          : engine.dialect === "duckdb"
+            ? [...partyModel, peopleBornSince]
+            : partyModel;
+      const empty = await anotherLike(engine);
+      if (empty === undefined) return;
+      try {
+        // the entities are the dialect's own: the list the compiler sees is the union of three
+        const sh = await shadow(entities, empty, ctx as never);
+        const first = await inspect(engine, ctx);
+        assert(first.kind === "ok");
+        const applied = await apply(await plan({ entities }, first.value, ctx as never, { shadow: sh }), engine, ctx, { actor: "arca" });
+        assert(applied.kind === "ok", JSON.stringify(applied));
+        const again = await inspect(engine, ctx);
+        assert(again.kind === "ok");
+        const p = await plan({ entities }, again.value, ctx as never, { shadow: sh });
+        assertEquals([p.changes.map((c) => c.step), p.unplanned], [[], []], engine.name);
+        assert((again.value.objects?.size ?? 0) > 100, `${engine.name}: the catalog was read deeply`);
+      } finally {
+        await empty.close();
+      }
+    });
+  },
+  { timeout: 300_000 },
 );

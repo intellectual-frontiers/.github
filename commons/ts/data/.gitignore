@@ -1,0 +1,6 @@
+# databases built from committed .auto.sql files (commons 0009-sql-aide FR-054): build products, never committed
+*.auto.sqlite.db
+*.auto.duckdb
+*.auto.duckdb.wal
+*.auto.pglite/
+*.building

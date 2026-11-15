@@ -25,7 +25,11 @@ export type Materialization =
   /** A materialized view, refreshed on every build: PostgreSQL's. */
   | "materialized-view"
   /** Nothing: the query is written in where another model reads it. */
-  | "ephemeral";
+  | "ephemeral"
+  /** A way a plugin of the context keeps it, by the plugin's name for it (FR-024). */
+  | `plugin:${string}`;
+
+const isPlugin = (m: Materialization): m is `plugin:${string}` => m.startsWith("plugin:");
 
 /** What a materialization asks of a dialect. */
 export type MaterializationReq<M extends Materialization> = M extends "view"
@@ -137,7 +141,14 @@ export function model<const N extends string, Row, Req extends string, Dx extend
   if (materialization === "incremental" && key.length === 0) throw new Error(`model ${modelName} is incremental and has no key`);
   const ddl = (ctx: EmitContext): Chunk[] => {
     const q = chunkOf(query);
-    switch (materialization) {
+    const m: Materialization = materialization;
+    if (isPlugin(m)) {
+      const wanted = m.slice("plugin:".length);
+      const hook = ctx.plugins.map((p) => p.hooks?.materializations?.[wanted]).find((h) => h !== undefined);
+      if (hook === undefined) throw new Error(`no plugin of the context keeps a model as ${wanted}, as ${modelName} asks`);
+      return [chunkText(hook(query, ctx.naming.table(modelName, schema), ctx))];
+    }
+    switch (m) {
       case "view":
         return ctx.dialect.replacesViews
           ? [chunkText("CREATE OR REPLACE VIEW "), self(ctx), chunkText(" ("), ...columns(ctx), chunkText(") AS\n"), q, chunkText(";")]
@@ -208,7 +219,7 @@ export function model<const N extends string, Row, Req extends string, Dx extend
       case "ephemeral":
         return [chunkText(`-- model ${modelName} is ephemeral: it is written in where it is read`)];
       default:
-        return absurd(materialization);
+        return absurd(m);
     }
   };
   const c = Object.fromEntries(

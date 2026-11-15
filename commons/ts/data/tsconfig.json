@@ -3,5 +3,13 @@
   "compilerOptions": {
     "skipLibCheck": true
   },
-  "include": ["sql-aide/**/*.ts", "arca/**/*.ts", "data-vault/**/*.ts", "file-aide/**/*.ts", "ifrfs/**/*.ts", "suite/**/*.ts"]
+  "include": [
+    "sql-aide/**/*.ts",
+    "arca/**/*.ts",
+    "data-vault/**/*.ts",
+    "osquery-atc/**/*.ts",
+    "file-aide/**/*.ts",
+    "ifrfs/**/*.ts",
+    "suite/**/*.ts"
+  ]
 }

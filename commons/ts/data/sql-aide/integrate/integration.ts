@@ -460,6 +460,30 @@ export function fromAdapter<T extends Table<string, unknown, string>, const Cols
 }
 
 /**
+ * An integration whose source is not SQL and is given by a plugin of the context, by name (FR-024, FR-034): {@link readAdapter} with that
+ * context reads it. Its rows are not typed by the compiler, since the plugin is chosen where the context is made; a row that gives a
+ * column outside the contract is refused when read.
+ *
+ * @param name - the integration's name
+ * @param into - the target table
+ * @param sourceName - the name of the source a plugin gives
+ * @param columns - the columns its rows give
+ */
+export function fromSource<T extends Table<string, unknown, string>, const Cols extends readonly InsertColumn<T>[]>(
+  name: string,
+  into: T,
+  sourceName: string,
+  columns: Cols & Covers<T, Cols>,
+  options: LoadOptions<Cols[number]> = {},
+): Integration<"adapter", AdapterPending | "upsert"> {
+  const missing: SourceAdapter<Readonly<Record<string, unknown>>> = {
+    name: sourceName,
+    read: () => Promise.resolve(err(`no plugin of the context gives the source ${sourceName}`)),
+  };
+  return make(name, into, { kind: "adapter", adapter: missing }, columns, options);
+}
+
+/**
  * Reads the rows of an integration's adapter and gives the integration with those rows as its source, whose load renders; or the reason
  * the adapter gave.
  *
@@ -467,17 +491,28 @@ export function fromAdapter<T extends Table<string, unknown, string>, const Cols
  */
 export async function readAdapter<Req extends string>(
   integration: Integration<"adapter", Req>,
+  ctx?: EmitContext,
 ): Promise<Result<Integration<"rows", Exclude<Req, AdapterPending>>, AdapterError>> {
   const s = integration.source;
   if (s.kind !== "adapter")
     return err({ kind: "adapter", adapter: "", integration: integration.name, message: "its source is not an adapter" });
+  // a source a plugin of the context gives, by the adapter's name, comes before the adapter the integration was made with
+  const adapter = ctx?.plugins.flatMap((p) => p.hooks?.sources ?? []).find((a) => a.name === s.adapter.name) ?? s.adapter;
   let read: Result<readonly Readonly<Record<string, unknown>>[], string>;
   try {
-    read = await s.adapter.read();
+    read = await adapter.read();
   } catch (thrown) {
     read = err(thrown instanceof Error ? thrown.message : String(thrown));
   }
-  if (read.kind === "err") return err({ kind: "adapter", adapter: s.adapter.name, integration: integration.name, message: read.error });
+  if (read.kind === "err") return err({ kind: "adapter", adapter: adapter.name, integration: integration.name, message: read.error });
+  const unknown = read.value.flatMap((r) => Object.keys(r).filter((k) => !integration.columns.includes(k)));
+  if (unknown.length > 0)
+    return err({
+      kind: "adapter",
+      adapter: adapter.name,
+      integration: integration.name,
+      message: `its rows give columns the contract does not: ${[...new Set(unknown)].join(", ")}`,
+    });
   return ok(
     make(integration.name, { spec: integration.targetSpec }, { kind: "rows", rows: read.value }, integration.columns, {
       strategy: integration.strategy,

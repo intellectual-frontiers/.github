@@ -216,9 +216,11 @@ function createTable(spec: TableSpec, self: object): (ctx: EmitContext) => reado
         if (id.before !== undefined) before.push(id.before);
         line.push(chunkText(` ${id.suffix}`));
         if (id.isPrimaryKey) isPk = false;
+      } else if (c.generated !== undefined) {
+        // a generated column's value is its expression's: the clause comes first, and DuckDB takes no NOT NULL or DEFAULT beside it
+        line.push(chunkText(` ${d.generated(renderUnchecked(c.generated, ctx))}`));
       } else if (!c.nullable) line.push(chunkText(" NOT NULL"));
-      if (c.default !== undefined) line.push(chunkText(" DEFAULT "), chunkOf(c.default));
-      if (c.generated !== undefined) line.push(chunkText(` ${d.generated(renderUnchecked(c.generated, ctx))}`));
+      if (c.default !== undefined && c.generated === undefined) line.push(chunkText(" DEFAULT "), chunkOf(c.default));
       if (isPk) line.push(chunkText(" PRIMARY KEY"));
       if (c.unique) line.push(chunkText(" UNIQUE"));
       if (c.domain.kind === "enum") {

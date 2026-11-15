@@ -106,7 +106,7 @@ export { describeAssertion, fails, notRun, pgTapScript, rows, runAssertions, str
 export type { Assertion, Runner, Structure } from "./test/assert.ts";
 export { csvModule } from "./integrate/codegen.ts";
 export type { CsvModuleError, CsvModuleOptions } from "./integrate/codegen.ts";
-export { fromAdapter, fromAttached, fromCsv, readAdapter, seed } from "./integrate/integration.ts";
+export { fromAdapter, fromAttached, fromCsv, fromSource, readAdapter, seed } from "./integrate/integration.ts";
 export type {
   AdapterError,
   AdapterPending,
@@ -127,7 +127,9 @@ export type {
 export { lineageOf, lineageTable, recordLineage, upstream } from "./integrate/lineage.ts";
 export { inspect, LEDGER } from "./islm/catalog.ts";
 export type { Catalog, CatalogColumn, InspectError } from "./islm/catalog.ts";
-export { apply, ledgerTable, lintPlan, plan, planScript, step, teardown, undo } from "./islm/islm.ts";
+export { differences, readObjects } from "./islm/deep.ts";
+export type { CatalogObject, ObjectKind } from "./islm/deep.ts";
+export { apply, ledgerTable, lintPlan, plan, planScript, shadow, step, teardown, undo } from "./islm/islm.ts";
 export type {
   Applied,
   ApplyError,
@@ -138,6 +140,8 @@ export type {
   Desired,
   Plan,
   PlanFinding,
+  PlanOptions,
+  Shadow,
   Step,
   TeardownRefused,
 } from "./islm/islm.ts";
@@ -205,13 +209,23 @@ export type {
   SqliteClient,
   SqliteParam,
 } from "./driver/driver.ts";
+export { buildSql, clientCommand, dataOf, naturalKey, sizeFindings } from "./target/build.ts";
+export type { EphemeralBuild, TableData } from "./target/build.ts";
+export { cli } from "./cli/cli.ts";
+export type { Io, Project, ProjectBuild, ProjectDialect } from "./cli/cli.ts";
 export { docsModule, docsOf, extractDocs, parseComment } from "./docs/tsdoc.ts";
+export { d2Erd, dataDictionary, generators, mermaidErd, rustStructs, zodSchemas } from "./generate/generators.ts";
+export type { GeneratedFile, Generator } from "./generate/generators.ts";
+export { PGVECTOR_MAX_INDEXED, pgvectorExtension, pgvectorPlugin, vector } from "./plugins/pgvector.ts";
+export type { PgvectorFeature } from "./plugins/pgvector.ts";
 export type { ParsedComment } from "./docs/tsdoc.ts";
 export { bracketNaming, context, emitted, prefixedNaming, qualifiedNaming, typicalNaming } from "./emit/context.ts";
 export type {
+  ChangeClass,
   ConstraintKind,
   Dialect,
   DialectExtension,
+  Durability,
   Docs,
   EmitContext,
   EmitEvent,

@@ -9,6 +9,7 @@
 import { err, ok, type Result } from "../../../kernel/mod.ts";
 import type { EmitContext } from "../emit/context.ts";
 import type { Runner } from "../test/assert.ts";
+import { type CatalogObject, readObjects } from "./deep.ts";
 
 /** A column as the catalog has it. */
 export interface CatalogColumn {
@@ -28,6 +29,8 @@ export interface Catalog {
   readonly indexes: ReadonlyMap<string, string>;
   /** The steps the ledger says were applied, each with the hash of its last content applied. */
   readonly applied: ReadonlyMap<string, string>;
+  /** Every object the dialect's catalog lets ISLM read, with its definition, for the deep comparison (FR-035). */
+  readonly objects?: ReadonlyMap<string, CatalogObject>;
 }
 
 /** Why the catalog could not be read. */
@@ -66,7 +69,7 @@ export async function inspect(runner: Runner, ctx: EmitContext): Promise<Result<
         else tables.set(`main.${s(r["name"])}`, new Map());
       }
       const columns = await runner.query(
-        `SELECT m.name AS t, p.name AS c, p."notnull" AS nn FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%'`,
+        `SELECT m.name AS t, p.name AS c, p."notnull" AS nn FROM sqlite_master AS m JOIN pragma_table_xinfo(m.name) AS p WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%'`,
       );
       for (const r of columns) column("main", s(r["t"]), s(r["c"]), Number(r["nn"]) === 1);
     } else {
@@ -105,7 +108,7 @@ export async function inspect(runner: Runner, ctx: EmitContext): Promise<Result<
       for (const r of await runner.query(`SELECT step, hash FROM ${name} WHERE outcome = 'ok' ORDER BY started_at, entry_id`))
         applied.set(s(r["step"]), s(r["hash"]));
     }
-    return ok({ defaultSchema, tables, views, indexes, applied });
+    return ok({ defaultSchema, tables, views, indexes, applied, objects: await readObjects(runner, ctx) });
   } catch (thrown) {
     return err({ kind: "inspect", message: thrown instanceof Error ? thrown.message : String(thrown) });
   }

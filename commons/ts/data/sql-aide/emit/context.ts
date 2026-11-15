@@ -5,7 +5,11 @@
  * @module
  */
 import type { DomainSpec, SqlValue } from "../algebra/domain.ts";
+import type { Generator } from "../generate/generators.ts";
 import type { LintRule } from "../govern/lint.ts";
+import type { SourceAdapter } from "../integrate/integration.ts";
+import type { Change, Classification } from "../islm/islm.ts";
+import type { AnySql } from "./sql.ts";
 
 /** What a dialect extension may change in how a dialect writes a type. */
 export interface DialectExtension<N extends string, F extends string> {
@@ -136,6 +140,24 @@ export interface Hooks {
   readonly onEmit?: (event: EmitEvent) => void;
   /** Lint rules added to those a model is held to (FR-027). */
   readonly lint?: readonly LintRule[];
+  /** Says again how a change of an ISLM plan is classified: what it returns replaces what the plan said (FR-036). */
+  readonly classify?: (change: Change) => ChangeClass | undefined;
+  /** Sources of integrations that are not SQL, by name, for integrations made with `fromSource` (FR-034). */
+  readonly sources?: readonly SourceAdapter<Readonly<Record<string, unknown>>>[];
+  /** Ways to keep a transform model beyond the five the library has, by name: a model asks for one as `plugin:<name>` (FR-043). */
+  readonly materializations?: { readonly [name: string]: (query: AnySql, self: readonly string[], ctx: EmitContext) => string };
+  /** Generators beyond the library's own (FR-045). */
+  readonly generators?: readonly Generator[];
+}
+
+/** What a classification hook may say of a change. */
+export interface ChangeClass {
+  /** Whether it may be run on every apply. */
+  readonly classification?: Classification;
+  /** Whether it destroys data. */
+  readonly destructive?: boolean;
+  /** Whether it can run in a transaction. */
+  readonly transactional?: boolean;
 }
 
 /** A plugin: a named bundle of hooks, passed to the context and to nothing else (FR-024). */
@@ -148,10 +170,18 @@ export interface Plugin {
   readonly hooks?: Hooks;
 }
 
-/** The context of one rendering. */
-export interface EmitContext<D extends Dialect = Dialect> {
+/**
+ * Whether a database is the system of record (durable: its structure changes through ISLM) or a build product of the TypeScript
+ * (ephemeral: made again from empty from the model and its rows) (FR-051).
+ */
+export type Durability = "durable" | "ephemeral";
+
+/** The context of one rendering. `U` is the durability of the database it renders for: ISLM takes only a durable one (FR-052). */
+export interface EmitContext<D extends Dialect = Dialect, U extends Durability = Durability> {
   /** The dialect rendered for. */
   readonly dialect: D;
+  /** Whether the database rendered for is the system of record or a build product. */
+  readonly durability: U;
   /** The naming strategy, with the hooks' changes applied. */
   readonly naming: Naming;
   /** Where the rendering is meant to run. */
@@ -165,23 +195,26 @@ export interface EmitContext<D extends Dialect = Dialect> {
 /**
  * Makes the context of a rendering.
  *
- * @param init - the dialect, and whatever differs from the typical naming, a sandbox and no plugins
+ * @param init - the dialect, and whatever differs from a durable database, the typical naming, a sandbox and no plugins
  * @example
  * const ctx = context({ dialect: postgres(), naming: qualifiedNaming("arca") });
  */
-export function context<D extends Dialect>(init: {
+export function context<D extends Dialect, const U extends Durability = "durable">(init: {
   readonly dialect: D;
+  readonly durability?: U;
   readonly naming?: Naming;
   readonly execution?: Execution;
   readonly docs?: readonly Docs[];
   readonly plugins?: readonly Plugin[];
-}): EmitContext<D> {
+}): EmitContext<D, U> {
   const plugins = init.plugins ?? [];
   let naming = init.naming ?? typicalNaming();
   for (const p of plugins) if (p.hooks?.naming !== undefined) naming = { ...naming, ...p.hooks.naming };
   const docs = new Map<object, EntityDoc>();
   for (const d of init.docs ?? []) for (const [k, v] of d) docs.set(k, v);
-  return { dialect: init.dialect, naming, execution: init.execution ?? "sandbox", docs, plugins };
+  // a context is durable unless it says otherwise
+  const durability = (init.durability ?? "durable") as U;
+  return { dialect: init.dialect, durability, naming, execution: init.execution ?? "sandbox", docs, plugins };
 }
 
 /** Tells every plugin of a context what was emitted. */

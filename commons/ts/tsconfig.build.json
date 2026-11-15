@@ -8,5 +8,5 @@
     "rewriteRelativeImportExtensions": true,
     "noUnusedLocals": false
   },
-  "include": ["kernel/**/*.ts", "runtime/**/*.ts"]
+  "include": ["kernel/**/*.ts", "runtime/**/*.ts", "lint/**/*.ts"]
 }

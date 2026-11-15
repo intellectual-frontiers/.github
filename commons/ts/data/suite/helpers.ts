@@ -143,3 +143,26 @@ export async function eachEngine(test: (engine: Engine) => Promise<void>): Promi
     }
   }
 }
+
+/**
+ * A new, empty engine of the same kind as one at hand: what a plan's shadow is made in. For the PostgreSQL server it is another database
+ * made for the test, dropped when it is closed; `undefined` where no server is given.
+ *
+ * @param engine - the engine whose kind is wanted
+ */
+export function anotherLike(engine: Engine): Promise<Engine | undefined> {
+  switch (engine.name) {
+    case "sqlite":
+      return sqliteEngine();
+    case "duckdb":
+      return duckdbEngine();
+    case "pglite":
+      return pgliteEngine();
+    case "postgres":
+      return postgresEngine();
+    default: {
+      const never: never = engine.name;
+      return never;
+    }
+  }
+}

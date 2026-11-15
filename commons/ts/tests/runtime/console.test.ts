@@ -2,8 +2,8 @@
  * Tests of `runtime/console.ts` (commons 0006-signals FR-026): a child process run by this same runtime, with its output piped (so
  * `plain`), shows its spans and log records as lines with no escape byte, says once at the end where signals were not sent, writes OTLP
  * JSON lines where `IFC_CONSOLE=json` asks for them, and on an uncaught exception or an unhandled rejection renders the error and exits
- * with status 1. The rule that the console is the one writer for a person: no other file of `runtime/` writes to standard output or
- * standard error, or calls `console.log` and the like, in its code.
+ * with status 1. The rule that the console is the one writer for a person, and `runtime/stdio.ts` the one for a program (0005-typescript-runtime
+ * FR-054): no other file of `runtime/` writes to standard output or standard error, or calls `console.log` and the like, in its code.
  *
  * @module
  */
@@ -173,14 +173,17 @@ function codeLines(text: string): readonly { readonly n: number; readonly line: 
 const WRITER =
   /\bprocess\.(stdout|stderr)\.write\b|\b(stdout|stderr)\.write\s*\(|\bconsole\.(log|error|warn|info|debug|trace|dir|table)\s*\(/;
 
+/** The files of `runtime/` that write to standard output or standard error: the console, for a person; stdio, for a program (FR-054). */
+const WRITERS: ReadonlySet<string> = new Set(["console.ts", "stdio.ts"]);
+
 proves(
   [FR],
-  "the console is the one writer for a person: no other file of runtime/ writes to standard output or standard error",
+  "the console is the one writer for a person and stdio the one for a program: no other file of runtime/ writes to standard output or standard error",
   async () => {
     const runtimeDir = fromFileUrl(url("../../runtime/"));
     const found: string[] = [];
     for await (const entry of readDir(runtimeDir)) {
-      if (!entry.isFile || !entry.name.endsWith(".ts") || entry.name === "console.ts") continue;
+      if (!entry.isFile || !entry.name.endsWith(".ts") || WRITERS.has(entry.name)) continue;
       const text = await readTextFile(join(runtimeDir, entry.name));
       for (const { n, line } of codeLines(text)) if (WRITER.test(line)) found.push(`runtime/${entry.name}:${n}: ${line.trim()}`);
     }

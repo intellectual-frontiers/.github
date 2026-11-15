@@ -11,7 +11,7 @@ import { absurd, err, ok, type Result } from "../../../kernel/mod.ts";
 import type { DomainSpec, SqlValue } from "../algebra/domain.ts";
 import { duckdb, postgres, sqlite } from "../dialect/dialects.ts";
 import type { Duckdb, Postgres, Sqlite } from "../dialect/dialects.ts";
-import { context, type Dialect, type EmitContext } from "../emit/context.ts";
+import { context, type Dialect, type Durability, type EmitContext } from "../emit/context.ts";
 import { type AnySql, type Fits, renderUnchecked, type Sql, type SqlKind, statementUnchecked } from "../emit/sql.ts";
 import { domainOf, type Shaped } from "../query/builder.ts";
 import type { Runner } from "../test/assert.ts";
@@ -23,9 +23,9 @@ export type DriverError = { readonly kind: "driver"; readonly dialect: string; r
 export type RunsIn<D extends Dialect, Req extends string, Dx extends string> = Fits<D, Req, Dx>;
 
 /** A driver: typed statements in, typed rows or a failure out. */
-export interface Driver<D extends Dialect> {
+export interface Driver<D extends Dialect, U extends Durability = Durability> {
   /** The context statements are rendered in. */
-  readonly ctx: EmitContext<D>;
+  readonly ctx: EmitContext<D, U>;
   /** Runs a query and gives its rows, each value decoded by its column's domain where the query knows it. */
   rows<Row, Req extends string, Dx extends string>(
     query: Sql<"statement" | "fragment", Row, Req, Dx> & RunsIn<D, Req, Dx>,
@@ -118,7 +118,7 @@ export function decode(v: unknown, d: DomainSpec, dates: Port["dates"]): unknown
   }
 }
 
-function make<D extends Dialect>(ctx: EmitContext<D>, port: Port): Driver<D> {
+function make<D extends Dialect, U extends Durability>(ctx: EmitContext<D, U>, port: Port): Driver<D, U> {
   const fail = (statement: string, thrown: unknown): DriverError => ({
     kind: "driver",
     dialect: ctx.dialect.name,
@@ -186,7 +186,7 @@ function make<D extends Dialect>(ctx: EmitContext<D>, port: Port): Driver<D> {
       query: (text) => port.all(text, []),
       exec: (text) => port.exec(text),
     },
-  } as Driver<D>;
+  } as Driver<D, U>;
 }
 
 /** A value as a SQLite client takes it. */
@@ -213,7 +213,9 @@ export interface SqliteClient {
  * @example
  * const db = sqliteDriver(new DatabaseSync(":memory:"));
  */
-export function sqliteDriver(client: SqliteClient, ctx: EmitContext<Sqlite> = context({ dialect: sqlite() })): Driver<Sqlite> {
+export function sqliteDriver<U extends Durability = "durable">(client: SqliteClient, given?: EmitContext<Sqlite, U>): Driver<Sqlite, U> {
+  // without a context, a driver renders for a durable database of its dialect, as U says where it is not given
+  const ctx = given ?? (context({ dialect: sqlite() }) as EmitContext<Sqlite, U>);
   const param = (v: SqlValue): SqliteParam =>
     typeof v === "boolean"
       ? v
@@ -251,7 +253,9 @@ export interface PgClient {
  * @param client - a `pg` client or pool, or anything of its shape
  * @param ctx - the context to render in; PostgreSQL's typical one where not given
  */
-export function postgresDriver(client: PgClient, ctx: EmitContext<Postgres> = context({ dialect: postgres() })): Driver<Postgres> {
+export function postgresDriver<U extends Durability = "durable">(client: PgClient, given?: EmitContext<Postgres, U>): Driver<Postgres, U> {
+  // without a context, a driver renders for a durable database of its dialect, as U says where it is not given
+  const ctx = given ?? (context({ dialect: postgres() }) as EmitContext<Postgres, U>);
   return make(ctx, {
     // pg reads a date as midnight where the program runs
     dates: "local",
@@ -276,7 +280,12 @@ export interface PgliteClient {
  * @param client - a PGlite instance, or anything of its shape
  * @param ctx - the context to render in; PostgreSQL's typical one where not given
  */
-export function pgliteDriver(client: PgliteClient, ctx: EmitContext<Postgres> = context({ dialect: postgres() })): Driver<Postgres> {
+export function pgliteDriver<U extends Durability = "durable">(
+  client: PgliteClient,
+  given?: EmitContext<Postgres, U>,
+): Driver<Postgres, U> {
+  // without a context, a driver renders for a durable database of its dialect, as U says where it is not given
+  const ctx = given ?? (context({ dialect: postgres() }) as EmitContext<Postgres, U>);
   return make(ctx, {
     dates: "utc",
     all: async (text, params) => (await client.query(text, [...params])).rows as Raw[],
@@ -303,7 +312,12 @@ export interface DuckdbConnection {
  * @param connection - a `DuckDBConnection`, or anything of its shape
  * @param ctx - the context to render in; DuckDB's typical one where not given
  */
-export function duckdbDriver(connection: DuckdbConnection, ctx: EmitContext<Duckdb> = context({ dialect: duckdb() })): Driver<Duckdb> {
+export function duckdbDriver<U extends Durability = "durable">(
+  connection: DuckdbConnection,
+  given?: EmitContext<Duckdb, U>,
+): Driver<Duckdb, U> {
+  // without a context, a driver renders for a durable database of its dialect, as U says where it is not given
+  const ctx = given ?? (context({ dialect: duckdb() }) as EmitContext<Duckdb, U>);
   const param = (v: SqlValue): DuckdbParam =>
     v === null || typeof v === "string" || typeof v === "number" || typeof v === "bigint" || typeof v === "boolean"
       ? v

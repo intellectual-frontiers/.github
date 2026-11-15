@@ -67,7 +67,7 @@
 
 ## ISLM
 
-- **FR-035**: ISLM (the information schema lifecycle manager) MUST take the model as the state wanted, read the catalog of a database, and say as a plan what differs.
+- **FR-035**: ISLM (the information schema lifecycle manager) MUST take the model as the state wanted, read the catalog of a database, and say as a plan what differs, as far as each dialect's catalog lets it be read and compared: a difference it cannot change in place is still said, as needing a step written by hand. What an engine rewrites (a default, a check, a view's body) MAY be compared with a shadow database the same engine makes from the model.
 - **FR-036**: Every change of a plan MUST be classified as idempotent (it may be run on every apply: a routine, a view, a trigger, a policy, a comment, an object made only if absent) or non-idempotent (it changes structure or data that exists), and the non-idempotent ones MUST be the fewest the plan needs.
 - **FR-037**: ISLM MUST keep its own history in the database (an append-only ledger of every step run: its name, the hash of its content, its kind, who, when, how long and how it ended), and a step already applied MUST do nothing when it is run again.
 - **FR-038**: ISLM MUST go forward only: nothing is removed from the ledger, and an undo MUST be a new step that names the step it reverses.
@@ -96,6 +96,19 @@
 - **FR-049**: Both MUST be tested on SQLite, DuckDB and PostgreSQL (PGlite in process, and a database made for the run and dropped after it on a PostgreSQL server where one is given), under Bun and under Node: that the model compiles for each dialect, that what is emitted is what is committed, that it loads, that constraints hold, that the same scenario gives the same rows in every engine, and that the generated tests pass inside the engine.
 - **FR-050**: A phase of the library is done only where Arca and Data Vault pass what that phase adds.
 
+## Targets and durability
+
+- **FR-051**: A database target MUST say its durability, durable or ephemeral, whatever its dialect, as part of the emit context's type. A durable target's database is the system of record and its structure changes go through ISLM; an ephemeral target's system of record is the TypeScript (its structure and its rows) and its database is a build product, made again from empty whenever wanted. A context is durable unless it says otherwise; PostgreSQL MAY be an ephemeral target (PGlite is the case tested), and SQLite and DuckDB files are the usual ephemeral ones.
+- **FR-052**: ISLM's plan, apply and teardown, and so its ledger and its undo steps, MUST NOT be usable with an ephemeral context: passing one fails to compile.
+- **FR-053**: The build of an ephemeral target MUST emit one `.auto.sql`: a header that says where it came from (the module, the hash of its body and the version of the library), the definitions in the order their references give, then the rows as `INSERT` statements in a stable order by primary key, at most a fixed number of rows to a statement. It MUST be the same bytes from the same source on every runtime and every run: a row's identity is given in the source or derived from its natural key, never random and never the clock.
+- **FR-054**: The build MUST be able to make the database from the `.auto.sql` in two ways: as the command a person runs with the engine's own client, and through a driver adapter, writing a temporary file and renaming it over the old one so that a reader never sees a database half made. The database file is not committed; the `.auto.sql` is.
+- **FR-055**: A check MUST fail where a committed `.auto.sql` or `.auto.json` is not what its source makes, as the documentation maps' check does; lint MUST report an ephemeral target whose rows pass a threshold of size; and `cli(project)` MUST build and check.
+
+## osquery ATC
+
+- **FR-056**: osquery ATC (`commons/ts/data/osquery-atc/`) MUST let an osquery-based service manage its Automatic Table Construction tables in TypeScript: an ATC table is an IFC SQL Aide table and what ATC needs (the path of the SQLite database on the host, the query, the columns and the platform), and the columns it names MUST be the table's, which the compiler checks. It MUST generate the ATC configuration as `.auto.json` in the format osquery documents and reads, the `.auto.sql` of the SQLite database behind it (FR-053), and build the `.auto.sqlite.db` (FR-054). Generating JSON for osquery to read is output, not configuration: the library never reads it back (FR-004).
+- **FR-057**: osquery ATC MUST be built with the public entry point alone, carry a TSDoc comment on every export with a documentation map, and be tested as Arca and Data Vault are (FR-049, FR-050): its committed `.auto.sql` and `.auto.json`, a build that is byte-identical twice and under Bun and Node, and a database built by a driver and queried with the configuration's query.
+
 ## Out of scope
 
 - Scheduling: the library emits scripts and runs a graph when asked; when is decided elsewhere.
@@ -118,6 +131,11 @@
 - An exported declaration has no TSDoc comment, or the documentation map is stale: the check fails, per FR-005.
 - A column of personal data names no term of the vocabulary: lint reports it, per FR-026 and FR-027.
 - No PostgreSQL server is given: the tests that need one say they were skipped and the rest run, per FR-049.
+- ISLM is asked to apply a plan to an ephemeral target: it does not compile, per FR-052.
+- An ephemeral target's rows are emitted twice, or under the other runtime: the bytes are the same, per FR-053.
+- The database is being rebuilt while a program reads it: the program sees the old file or the new one, never a half-made one, per FR-054.
+- A committed `.auto.sql` or `.auto.json` is stale: the check fails and says which, per FR-055.
+- An ATC table names a column its table lacks, or a column named `path`, which osquery adds itself: it does not compile, per FR-056.
 
 ## Assumptions
 
@@ -146,7 +164,8 @@
 - **Ledger** - the history ISLM keeps in the database.
 - **Model** (of a transform) - a typed query other models may use.
 - **Test** - a typed assertion that runs inside the database and in TypeScript.
-- **Library** - models built with the public entry point (Arca, Data Vault).
+- **Library** - models built with the public entry point (Arca, Data Vault, osquery ATC).
+- **Target** - a database a model is rendered for, durable (the system of record) or ephemeral (a build product of the TypeScript).
 
 ## Success criteria
 

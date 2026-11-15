@@ -4,12 +4,13 @@ The data libraries of Intellectual Frontiers Commons, specified by [`0009-sql-ai
 [IFC TypeScript](../README.md)'s kernel. SQL Aide is a SQL generator first and a database client second: a schema is written once as TypeScript algebraic types and rendered as
 SQL for PostgreSQL, SQLite and DuckDB. It replaces `netspective-labs/sql-aide`.
 
-| Folder                             | What it is                                                                                                                                        | May import                                               |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [`sql-aide/`](sql-aide/mod.ts)     | The library: domains, columns and tables whose row types are computed; dialects whose features the compiler knows; the `SQL` template; lint; TAP. | `sql-aide/`, the kernel; `sql-aide/runtime/` the runtime |
-| [`arca/`](arca/mod.ts)             | Arca, the typical data models: the party model first.                                                                                             | `arca/`, `sql-aide/mod.ts`                               |
-| [`data-vault/`](data-vault/mod.ts) | Data Vault: hubs, satellites and links as generic functions.                                                                                      | `data-vault/`, `sql-aide/mod.ts`                         |
-| [`suite/`](suite/)                 | The tests, with committed SQL (`golden/`) for every dialect; not named `tests/`, which is IFC TypeScript's own suite and what its jobs run.       | anything here                                            |
+| Folder                               | What it is                                                                                                                                        | May import                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`sql-aide/`](sql-aide/mod.ts)       | The library: domains, columns and tables whose row types are computed; dialects whose features the compiler knows; the `SQL` template; lint; TAP. | `sql-aide/`, the kernel; `sql-aide/runtime/` the runtime |
+| [`arca/`](arca/mod.ts)               | Arca, the typical data models: the party model first.                                                                                             | `arca/`, `sql-aide/mod.ts`                               |
+| [`data-vault/`](data-vault/mod.ts)   | Data Vault: hubs, satellites and links as generic functions.                                                                                      | `data-vault/`, `sql-aide/mod.ts`                         |
+| [`osquery-atc/`](osquery-atc/mod.ts) | osquery ATC: Automatic Table Construction entries typed, their JSON configuration and SQLite database built.                                      | `osquery-atc/`, `sql-aide/mod.ts`                        |
+| [`suite/`](suite/)                   | The tests, with committed SQL (`golden/`) for every dialect; not named `tests/`, which is IFC TypeScript's own suite and what its jobs run.       | anything here                                            |
 
 ## Use it
 
@@ -43,17 +44,18 @@ IFCSQL_PG_URL=postgres://... bun test suite/          # also on a PostgreSQL ser
 
 The specification's requirements each have a row in [`enforcement.tsv`](../../spec-kit/enforcement.tsv) that names its test or says which phase finishes it.
 
-| Phase | What                                                                                                               | State   |
-| ----- | ------------------------------------------------------------------------------------------------------------------ | ------- |
-| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP           | here    |
-| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                 | here    |
-| 3     | Typed routines, triggers, policies, DuckDB macros                                                                  | here    |
-| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads   | here    |
-| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown         | here    |
-| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert  | here    |
-| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP   | here    |
-| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls | here    |
-| 9     | Generators, the command line, plugins                                                                              | not yet |
+| Phase | What                                                                                                                          | State |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1     | Algebra, dialects, the `SQL` template and its two renderings, naming, hooks, governance, TSDoc maps, TAP                      | here  |
+| 2     | Views, typed indexes and partitions, PostgreSQL objects, tests inside the database                                            | here  |
+| 3     | Typed routines, triggers, policies, DuckDB macros                                                                             | here  |
+| 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads              | here  |
+| 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown                    | here  |
+| 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert             | here  |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP              | here  |
+| 8     | Drivers: node:sqlite, pg, PGlite and DuckDB adapters typed by shape; bound values, decoding by domain, typed calls            | here  |
+| 9     | Generators (Mermaid, D2, data dictionary, Rust, Zod), `cli(project)`, every typed hook, the pgvector plugin                   | here  |
+| 10    | Durable and ephemeral targets: ISLM refused for ephemeral, `.auto.sql` builds, databases made, staleness checked; osquery ATC | here  |
 
 ### Limits, said plainly
 
@@ -71,13 +73,28 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   ([dv2.org](https://www.dv2.org/2023/01/data-vault-anti-pattern-adding-column.html)) is an unsigned blog post. So nothing of 2.1 is
   implemented from memory, and open question OQ-3 stays open until a person gives the library the standard to follow. A satellite's
   states are numbered with nine digits; a landing relation should hold one state of a key in one load.
-- ISLM (phase 5): a plan compares which tables, columns, views and indexes exist and whether a column may be null. It does not compare
-  column types, keys, checks, foreign keys or defaults of what exists (so FR-035 is not yet whole); such a change is a step a person
-  writes. An added column gets its type, nullness and default, not its references or checks. SQLite cannot change whether a column may
-  be null in place, and the plan says so instead of rebuilding the table. DuckDB will not alter a column of a table that has an index,
-  so the plan drops the table's indexes first and makes the model's again. DuckDB has no triggers, so nothing in the database refuses a
-  change to its ledger there. A materialized view whose definition changed is reported, not replaced. A teardown drops tables, views
-  and indexes and leaves routines, policies and types.
+- ISLM (phase 5, deepened after phase 10): with a shadow (`shadow(entities, emptyDatabase, ctx)`, a database of the same engine made from
+  the model, entity by entity), `plan(..., { shadow })` compares every object each dialect's catalog lets it read, so that what an
+  engine rewrites is rewritten the same way on both sides. Without a shadow it compares what it did before: which tables, columns, views
+  and indexes exist and whether a column may be null.
+
+  | Dialect    | Compared                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Not compared, and why                                                                                                     |
+  | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+  | PostgreSQL | column type (`format_type`), default, generated expression, identity; primary key, unique, check, foreign key with actions, exclusion (`pg_get_constraintdef`); indexes not backing a constraint (`pg_get_indexdef`: columns and order, uniqueness, method, predicate, included columns, expressions); views and materialized views (columns, `pg_get_viewdef`); routines (arguments, result, kind, language, volatility, MD5 of the body); triggers; sequences; enum labels in order; domains; row-level security and forcing; policies; partitioned tables and partition bounds; comments on tables, views, columns and routines; extensions; schemas; objects in the database and not in the model | column order; grants, owners, roles; storage and tablespaces; a sequence's current value; data; objects an extension owns |
+  | DuckDB     | column type, default or generation expression (`duckdb_columns`); primary key, unique, check, foreign key as `duckdb_constraints` writes them; indexes (their SQL); views (columns, SQL); macros (definition, parameters); sequences; enum labels; comments on tables, views and columns; schemas                                                                                                                                                                                                                                                                                                                                                                                                     | column order; foreign key actions (the catalog does not say them); routines other than macros (DuckDB keeps none); data   |
+  | SQLite     | declared column type, default as written, generated expression (from the table's SQL); primary key columns in order; unique constraints; foreign keys with tables, columns and actions; checks (from the table's SQL); indexes made by `CREATE INDEX` (their SQL); views (columns, SQL); triggers (SQL)                                                                                                                                                                                                                                                                                                                                                                                               | column order; comments (SQLite keeps none); data                                                                          |
+
+  What is changed in place: a column added or dropped, nullness (PostgreSQL, DuckDB), a default (PostgreSQL, DuckDB), a constraint
+  added, dropped or replaced (PostgreSQL), an index made, replaced or dropped, a view, routine, trigger, policy, row-level security or
+  comment applied again, enum labels appended (PostgreSQL). Said as needing a step written by hand: a column's type (it may lose data),
+  a generated or numbered column, a default in SQLite, a constraint of DuckDB or SQLite (the table must be made again), a sequence,
+  domain or partition that differs (each is made only if absent), a table that should be partitioned, and an object in the database the
+  model does not make. An added column gets its type, nullness and default, not its references or checks. DuckDB will not alter a
+  column of a table that has an index, so the plan drops the table's indexes first and makes the model's again. DuckDB has no
+  triggers, so nothing in the database refuses a change to its ledger there. A teardown drops tables, views and indexes and leaves
+  routines, policies and types. A generated column is written with its expression first and no `NOT NULL` or default beside it, which
+  DuckDB requires.
+
 - Query builder (phase 6): a relation is in a query's scope by its name, so a table cannot be joined to itself (no aliases yet). A join
   without a condition needs exactly one foreign key between the relation and the scope: the compiler refuses none, and two (a relation
   that points twice at one table) fail when rendered and ask for the condition. There is no `GROUP BY` or aggregate helper; `valueAs`
@@ -95,6 +112,30 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   function that returns a value; anything else comes as the client gives it. SQLite keeps NUMERIC as a floating-point number, so its
   digits beyond a double's are lost before they are written to the column's scale. `pg` reads a date as local midnight and the driver
   writes it back in local time; the tests ran in UTC only. DuckDB's blobs are read through its JSON form.
+- Generators, the command line and plugins (phase 9): the diagrams are committed as text and are not rendered by a Mermaid or D2 tool
+  here. Rust structures keep dates, moments, decimals and JSON as `String`, so they need no crate; the test compiles them where `rustc`
+  is on the PATH. Zod is a development dependency of the tests only: the library writes the schemas as text. The command line renders,
+  lints and generates; it does not plan or apply ISLM against a database. The pgvector plugin renders and lints; no engine here has the
+  extension, so its SQL is not loaded.
+
+### Durable and ephemeral targets (phase 10)
+
+A database target is durable (the system of record: PostgreSQL, or a SQLite or DuckDB file that is kept; its structure changes through
+ISLM) or ephemeral (the TypeScript is the system of record and the database a build product: `.ts` to `.auto.sql` to
+`.auto.sqlite.db`, `.auto.duckdb` or a PGlite folder). The durability is in the emit context's type, durable unless said, and ISLM's
+plan, apply and teardown do not compile with an ephemeral context. `buildSql` writes the one `.auto.sql` of an ephemeral target, which
+is committed; the database is not (see [`.gitignore`](.gitignore)), and `materialize` (in `sql-aide/runtime/build.ts`) makes it
+through a driver in a temporary file renamed over the old one. `clientCommand` gives the command for `sqlite3`, `duckdb` or `psql`;
+each was run with the publisher's own client (`sqlite3` 3.54.1, the `duckdb` client 2.0.0, `psql` 16) and the database read back; a test says so where a client is not installed. `staleFiles` and
+`cli check` fail on a committed file that is not what the source makes, and `sizeFindings` reports a build past a number of rows.
+A PGlite target is a folder, removed before the new one is renamed into its place, so for that moment a reader finds none.
+
+osquery ATC (`osquery-atc/`) follows osquery's own documentation of Automatic Table Construction
+([configuration](https://osquery.readthedocs.io/en/stable/deployment/configuration/)) and its parser
+(`plugins/config/parsers/auto_constructed_tables.cpp` in [osquery/osquery](https://github.com/osquery/osquery)), read on 2026-11-15:
+`query` and `path` required, `columns` a list (every column TEXT to osquery), no column named `path`, which osquery adds itself, and
+the platforms `darwin`, `linux`, `posix`, `windows`, `any` and `all`. The generated configuration was checked against that format and
+was not run in osquery: no `osqueryi` is on this computer. The values osquery reads are text: a boolean is `1` or `0`.
 
 ## File Aide, being built
 
