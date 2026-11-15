@@ -462,6 +462,8 @@ def pins_block(t: dict, names: tuple[str, ...], syntax: str) -> str:
     if syntax == "sh":
         head.append("# shellcheck disable=SC2034  # read by the script this is part of")
     lines = pin_lines({**t, "pins": {n: t["pins"][n] for n in names}}, False)
+    if syntax == "sh":
+        lines = [line for line in lines if "_WINDOWS_" not in line]   # a POSIX shell never runs on Windows; the .ps1 carries that pin
     if syntax == "ps1":
         lines = [f"${k} = '{v}'" for k, v in (line.split("=", 1) for line in lines)]
     return "\n".join(head + lines) + "\n# <<< pins.auto <<<\n"

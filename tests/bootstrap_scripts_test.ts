@@ -201,7 +201,8 @@ Deno.test("the Deno pins in both bootstraps are commons' generated pins (commons
   const psText = Deno.readTextFileSync(BOOT_PS1);
   for (const [k, v] of Object.entries(env)) {
     assertMatch(v, /^(\d+\.\d+\.\d+|[0-9a-f]{64})$/);
-    assertStringIncludes(shText, `\n${k}=${v}\n`);
+    if (k.includes("_WINDOWS_")) assert(!shText.includes(k), "a POSIX shell never runs on Windows: only the .ps1 carries that pin");
+    else assertStringIncludes(shText, `\n${k}=${v}\n`);
     assertStringIncludes(psText, `\n$${k} = '${v}'\n`);
   }
   for (const [plat, sum] of Object.entries(pins.deno.sha256)) {

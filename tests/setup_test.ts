@@ -131,8 +131,10 @@ Deno.test("with every installation off only the workspaces folder appears, and a
   assertEquals(p.code, 0, p.stdout + p.stderr);
   const made = await tree(fx.home);
   assert(made.includes("workspaces/github.com/intellectual-frontiers"), made.join("\n"));
-  const files = made.filter((m) => Deno.statSync(`${fx.home}/${m}`).isFile && !m.startsWith(".erga-bootstrap/log/") && m !== ".config/erga/install.toml");
-  assertEquals(files, [], "folders only: no file of the person's, but the log and the record of how it was set up");
+  const files = made.filter((m) =>
+    Deno.statSync(`${fx.home}/${m}`).isFile && !m.startsWith(".erga-bootstrap/log/") && !m.startsWith(".local/state/gh/") && m !== ".config/erga/install.toml"
+  );
+  assertEquals(files, [], "folders only: no file of the person's, but the log, what gh itself keeps and the record of how it was set up");
   assert(made.some((m) => m.startsWith(".erga-bootstrap/log/bootstrap-")), "everything is logged to ~/.erga-bootstrap/log/");
   const again = await fx.setup([], OFF);
   assertEquals(again.code, 0);

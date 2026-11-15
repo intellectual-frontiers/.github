@@ -204,7 +204,10 @@ class Pins(unittest.TestCase):
         boot_ps1 = (COMMONS.parent / "bin" / "erga-bootstrap.ps1").read_text()
         for var, value in env.items():
             if var.startswith("DENO_"):
-                self.assertIn(f"\n{var}={value}\n", boot_sh)
+                if "_WINDOWS_" in var:   # a POSIX shell never runs on Windows: only the .ps1 carries that pin
+                    self.assertNotIn(var, boot_sh)
+                else:
+                    self.assertIn(f"\n{var}={value}\n", boot_sh)
                 self.assertIn(f"\n${var} = '{value}'\n", boot_ps1)
 
     def test_every_platform_names_an_os_and_a_processor(self):
