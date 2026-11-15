@@ -3,7 +3,7 @@
  * host and runs wherever ECMAScript and the web standards do (Deno, Node, Bun, a browser, a Cloudflare Worker). Errors as values,
  * exhaustive matching, branded identifiers, decoders at the boundary; versions, SHA-256, SHA-512 crypt, base64, ASN.1 DER (as `der`), CMS
  * encryption (as `cms`) and signed in-toto statements (as `dsse`); PNG and ICO pictures (as `png`);
- * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; and type-level tests.
+ * archives, JSON5, TOML, YAML, CSV, XML and TypeScript literals; HTTP headers and media types; graphs; command-line arguments (as `args`); and type-level tests.
  *
  * @example
  * ```ts
@@ -44,6 +44,7 @@ export {
 export type { ArchiveError, Files, TarEntry, ZipEntry } from "./archive.ts";
 export { fromBase64, fromBase64Url, toBase64, toBase64Url } from "./base64.ts";
 export type { Brand } from "./brand.ts";
+export * as args from "./args.ts";
 export * as cms from "./cms.ts";
 export { csvField, formatCsvError, parseCsv, parseCsvRecords, toCsv } from "./csv.ts";
 export type { CsvError, CsvOptions } from "./csv.ts";
