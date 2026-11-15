@@ -238,4 +238,18 @@ export type { Finding, Linted, LintRule } from "./govern/lint.ts";
 export { definitions, entityKey, ordered } from "./model/entity.ts";
 export type { CycleError, Entity, EntityName } from "./model/entity.ts";
 export { failed, fromLines, pass, skipped, tally, tapText } from "./test/tap.ts";
+export {
+  acceptedValues,
+  custom,
+  failingRows,
+  findingsTable,
+  notNull,
+  recordFindings,
+  relationship,
+  reportFindings,
+  unique,
+} from "./transform/checks.ts";
+export type { Check, Tested } from "./transform/checks.ts";
+export { model } from "./transform/transform.ts";
+export type { AnyModel, Materialization, MaterializationReq, Model, ModelOptions, ModelQuery } from "./transform/transform.ts";
 export type { Diagnostic, Directive, TapNode } from "./test/tap.ts";

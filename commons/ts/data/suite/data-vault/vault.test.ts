@@ -23,7 +23,9 @@ import {
   date,
   definitions,
   duckdb,
+  eq,
   fails,
+  findingsTable,
   from,
   apply,
   inspect,
@@ -32,19 +34,26 @@ import {
   type LandingRow,
   lineageOf,
   lint,
+  model,
   type NewRowOf,
   postgres,
   raw,
+  recordFindings,
+  relationship,
   render,
+  reportFindings,
   type RowOf,
   rows,
   runAssertions,
   seed,
+  SQL,
   sqlite,
   structuralTests,
   table,
   tally,
   text,
+  unique,
+  valueAs,
 } from "../../sql-aide/mod.ts";
 import { eachEngine, golden, pgliteEngine } from "../helpers.ts";
 
@@ -325,6 +334,49 @@ proves(
         ],
         engine.name,
       );
+      seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-043", "0009-sql-aide FR-044", "0009-sql-aide FR-050"],
+  "a vault's current state is a transform over its latest satellite rows, the same in every engine, and its tests pass",
+  async () => {
+    /** The latest state of each customer's contact. */
+    const latestState = model(
+      "customer_contact_latest",
+      from(customerContact)
+        .where((s) =>
+          eq(
+            s.sat_customer_contact.sat_customer_contact_id,
+            valueAs<RowOf<typeof customerContact>["sat_customer_contact_id"]>()(
+              SQL`(SELECT max(m."sat_customer_contact_id") FROM ${customerContact} AS m WHERE m."hub_customer_id" = ${customerContact.c.hub_customer_id})`,
+            ),
+          ),
+        )
+        .select((s) => ({ customer: s.sat_customer_contact.hub_customer_id, email: s.sat_customer_contact.email })),
+    );
+    const checks = [unique(latestState, ["customer"]), relationship(latestState, "customer", customer, "hub_customer_id")];
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...vault, feed, findingsTable]), ctx));
+      await engine.exec(render(feedOf(first).load, ctx));
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      await engine.exec(
+        render(feedOf([{ customer_number: "C-1", email: "b@example.org", order_number: "O-1", status: "open", due: null }]).load, ctx),
+      );
+      for (const l of loads) await engine.exec(render(l.sql, ctx));
+      await engine.exec(render(latestState.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "run"), ctx));
+      assertEquals(tally(await reportFindings(checks, "run", engine, ctx)), { passed: 2, failed: 0, skipped: 0 }, engine.name);
+      const rows = (await engine.query(`SELECT * FROM "customer_contact_latest" ORDER BY 1`)).map((r) => ({ ...r }));
+      assertEquals(rows, [
+        { customer: "C-1", email: "b@example.org" },
+        { customer: "C-2", email: null },
+      ]);
       seen.push(JSON.stringify(rows));
     });
     assertEquals(new Set(seen).size, 1);

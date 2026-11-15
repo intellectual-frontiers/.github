@@ -171,7 +171,7 @@ requirement	mechanism	by	note
 0009-sql-aide FR-025	check	.github: cd commons/ts/data && bun run verify	Governance: descriptions and owners, emitted as comments
 0009-sql-aide FR-026	check	.github: cd commons/ts/data && bun run verify	Governance: DPV terms
 0009-sql-aide FR-027	check	.github: cd commons/ts/data && bun run verify	Governance: lint
-0009-sql-aide FR-028	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands. The lineage of integrations and of Data Vault's loads is computed, followed through the graph and kept in ifcsql_lineage (integrate.test.ts); transforms, and the run ledger it is kept beside, are not yet.
+0009-sql-aide FR-028	check	.github: cd commons/ts/data && bun run verify	integrate.test.ts, transform.test.ts, data-vault/vault.test.ts: lineage of integrations, vault loads and transforms (found by walking each model's query) computed, followed upstream across them and kept in ifcsql_lineage, which ISLM makes beside its ledger
 0009-sql-aide FR-029	check	.github: cd commons/ts/data && bun run verify	ddl.test.ts and arca/party.test.ts: the same assertions as a query that returns TAP in every engine, from TypeScript, and as pgTAP on a PostgreSQL server that has it
 0009-sql-aide FR-030	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: over a hundred tests made from the party model pass in every engine
 0009-sql-aide FR-031	check	.github: cd commons/ts/data && bun run verify	Tests: the TAP emitter
@@ -186,8 +186,8 @@ requirement	mechanism	by	note
 0009-sql-aide FR-040	check	.github: cd commons/ts/data && bun run verify	islm.test.ts, arca/party.test.ts, data-vault/vault.test.ts: inspect, plan and apply in SQLite, DuckDB, PGlite and PostgreSQL with nothing outside the library; Arca and Data Vault from empty, with no drift after and nothing done by a second apply
 0009-sql-aide FR-041	check	.github: cd commons/ts/data && bun run verify	query.test.ts, arca/party.test.ts, data-vault/vault.test.ts: select with joins taken from foreign keys, left joins, projections, CTEs, union/intersect/except, insert, update, delete, returning and upsert; rows inferred (type tests with controls); run in every engine with the same rows
 0009-sql-aide FR-042	none	-	Not whole yet: it is finished by phase 8 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-043	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
-0009-sql-aide FR-044	none	-	Not whole yet: it is finished by phase 7 of the library, and this row names its check when that phase lands.
+0009-sql-aide FR-043	check	.github: cd commons/ts/data && bun run verify	transform.test.ts, arca/party.test.ts, data-vault/vault.test.ts: models are typed queries other models read (type tests); build order from their references; view, table, incremental, materialized view and ephemeral built and rebuilt in every engine with the same rows
+0009-sql-aide FR-044	check	.github: cd commons/ts/data && bun run verify	transform.test.ts, arca/party.test.ts, data-vault/vault.test.ts: unique, not null, accepted values, relationship and custom tests typed by their relation (type tests), recorded by run in ifcsql_findings, reported as TAP; controls that must fail do, in every engine
 0009-sql-aide FR-045	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
 0009-sql-aide FR-046	none	-	Not whole yet: it is finished by phase 9 of the library, and this row names its check when that phase lands.
 0009-sql-aide FR-047	check	.github: cd commons/ts/data && bun run verify	arca/party.test.ts: the party model; conventions.test.ts: the public entry point alone

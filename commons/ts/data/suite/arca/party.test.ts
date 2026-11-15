@@ -25,10 +25,12 @@ import {
   retireParty,
 } from "../../arca/mod.ts";
 import {
+  acceptedValues,
   context,
   definitions,
   duckdb,
   fails,
+  findingsTable,
   from,
   insertInto,
   isNull,
@@ -37,11 +39,16 @@ import {
   plan,
   type Plan,
   lint,
+  model,
+  notNull,
   type NewRowOf,
   pgTapScript,
   postgres,
   raw,
+  recordFindings,
+  relationship,
   render,
+  reportFindings,
   type RowOf,
   rows,
   runAssertions,
@@ -50,6 +57,8 @@ import {
   structuralTests,
   tally,
   tapQuery,
+  tapText,
+  unique,
 } from "../../sql-aide/mod.ts";
 import { fromLines } from "../../sql-aide/mod.ts";
 import { docsAreCurrent } from "../../sql-aide/runtime/docs.ts";
@@ -387,6 +396,51 @@ proves(
         engine.name,
       );
       seen.push(JSON.stringify(rows));
+    });
+    assertEquals(new Set(seen).size, 1);
+  },
+);
+
+proves(
+  ["0009-sql-aide FR-043", "0009-sql-aide FR-044", "0009-sql-aide FR-050"],
+  "a transform of the party model builds in every engine, and its tests record no finding until a row is wrong",
+  async () => {
+    /** Each person in use with how they are reached first by email, where they are. */
+    const reachable = model(
+      "person_reachable",
+      from(person)
+        .join(party)
+        .leftJoin(electronicContact)
+        .where((s) => isNull(s.party.deleted_at))
+        .select((s) => ({ party_id: s.person.party_id, display_name: s.party.display_name, medium: s.electronic_contact.medium })),
+      { materialized: "table" },
+    );
+    const checks = [
+      unique(reachable, ["party_id"]),
+      notNull(reachable, "display_name"),
+      acceptedValues(reachable, "medium", ["email", "telephone"]),
+      relationship(reachable, "party_id", party, "party_id"),
+    ];
+    const seen: string[] = [];
+    await eachEngine(async (engine) => {
+      const ctx = contexts[engine.dialect];
+      await engine.exec(render(definitions([...partyModel, findingsTable]), ctx));
+      for (const s of SEED) await engine.exec(s);
+      await engine.exec(
+        `INSERT INTO "electronic_contact" ("electronic_contact_id", "party_id", "medium", "address") VALUES ('e1', 'p1', 'email', 'ada@example.org')`,
+      );
+      await engine.exec(render(reachable.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "first"), ctx));
+      assertEquals(tally(await reportFindings(checks, "first", engine, ctx)), { passed: 4, failed: 0, skipped: 0 }, engine.name);
+      // a second way to reach Ada makes her appear twice, and on the web, which is not accepted here
+      await engine.exec(
+        `INSERT INTO "electronic_contact" ("electronic_contact_id", "party_id", "medium", "address") VALUES ('e2', 'p1', 'web', 'https://example.org')`,
+      );
+      await engine.exec(render(reachable.ddl, ctx));
+      await engine.exec(render(recordFindings(checks, "second"), ctx));
+      const second = await reportFindings(checks, "second", engine, ctx);
+      seen.push(tapText(second));
+      assertEquals(tally(second), { passed: 2, failed: 2, skipped: 0 }, engine.name);
     });
     assertEquals(new Set(seen).size, 1);
   },

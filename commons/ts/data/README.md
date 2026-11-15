@@ -51,7 +51,7 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
 | 4     | Integrations: seed rows, CSV through DuckDB, attached databases, adapters; four strategies; lineage; vault loads  | here    |
 | 5     | ISLM: catalogs read, plans classified, an append-only ledger in the database, undo, script, lint, teardown        | here    |
 | 6     | Query builder: joins by foreign key, projections, CTEs, set operations, insert, update, delete, returning, upsert | here    |
-| 7     | Transforms                                                                                                        | not yet |
+| 7     | Transforms: typed models, build order from references, five materializations, tests recorded and reported as TAP  | here    |
 | 8     | Driver adapters                                                                                                   | not yet |
 | 9     | Generators, the command line, plugins                                                                             | not yet |
 
@@ -60,7 +60,7 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
 - Integrations (phase 4): a load is a script the caller runs whole; it begins no transaction, so a `replace` or `snapshot` that fails
   halfway leaves what it did unless the caller wraps it in one. Files are read only by DuckDB (`read_csv`); PostgreSQL's `COPY` is not
   used. An attached database is a file of the same engine: DuckDB attaching SQLite or PostgreSQL needs an extension it would download,
-  and is not tested. Lineage covers integrations and Data Vault's loads; transforms add theirs in phase 7.
+  and is not tested.
 - Data Vault's loads key a hub by its business key as text, not by a hash (open question OQ-3), and number a satellite's states with
   nine digits; a landing relation should hold one state of a key in one load.
 - ISLM (phase 5): a plan compares which tables, columns, views and indexes exist and whether a column may be null. It does not compare
@@ -78,3 +78,7 @@ The specification's requirements each have a row in [`enforcement.tsv`](../../sp
   PostgreSQL `count(*)` comes back as text) is phase 8's.
 - A comparison now parenthesizes an operand that is not a single name or value, so that `(a > 1) = TRUE` keeps its meaning; DuckDB
   refused the chained form.
+- Transforms (phase 7): a model's references are found by walking its query, rendered for the first of PostgreSQL, DuckDB and SQLite
+  it has a case for. An incremental model adds the rows whose key it does not hold and never changes a row it holds. A materialized view
+  is PostgreSQL's, made if absent and refreshed on each build; a change of its query is not applied (ISLM reports that). A relationship
+  test between a relation and itself is not supported. Lineage covers integrations, Data Vault's loads and transforms.
