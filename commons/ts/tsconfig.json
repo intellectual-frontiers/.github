@@ -21,5 +21,15 @@
     "noUnusedParameters": true,
     "skipLibCheck": false
   },
-  "include": ["about.ts", "kernel/**/*.ts", "runtime/**/*.ts", "lint/**/*.ts", "tests/**/*.ts", "tools/**/*.ts", "examples/**/*.ts"]
+  "include": [
+    "about.ts",
+    "kernel/**/*.ts",
+    "runtime/**/*.ts",
+    "lint/**/*.ts",
+    "tests/**/*.ts",
+    "tools/**/*.ts",
+    "examples/**/*.ts",
+    "../tools/**/*.ts",
+    "../ontology/**/*.ts"
+  ]
 }

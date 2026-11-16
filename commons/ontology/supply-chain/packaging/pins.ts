@@ -122,17 +122,6 @@ export const pinOtelcolContrib = PinnedDownload.make(term(PMID, "pin-otelcol-con
   ),
 });
 
-/** The pinned download `pin-deno`. */
-export const pinDeno = PinnedDownload.make(term(PMID, "pin-deno"), {
-  label: en("Deno, which runs the machine setup and erga's ergactl"),
-  programName: "deno",
-  pinKey: "DENO",
-  version: "2.9.8",
-  note: en(
-    "From https://github.com/denoland/deno/releases/download/vVERSION/deno-TARGET.zip (TARGET x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin, x86_64-pc-windows-msvc), the same release and checksums as the Deno entry of erga's toolchain (erga 243-repo-setup). The bootstraps fetch it first and run the TypeScript setup with it (erga 009-machine-bootstrap).",
-  ),
-});
-
 /** The platforms a harness runs on. */
 export const platforms = [
   platformLinuxX64,
@@ -152,7 +141,6 @@ export const pins = [
   pinJq,
   pinBun,
   pinOtelcolContrib,
-  pinDeno,
 ] as const;
 
 /** The SHA-256 of each pinned download on each platform. */
@@ -201,23 +189,6 @@ export const checksums = [
     forPin: pinOtelcolContrib,
     forPlatform: platformLinuxX64,
     sha256: "bd6e73d94bf3359ad6fac25529a8ee308adb9b0b8a0e8af034ed3891fbe5aa33",
-  }),
-  Checksum.make(term(PMID, "sum-deno-linux-x64"), { forPin: pinDeno, forPlatform: platformLinuxX64, sha256: "e890975bc2549807bbcc0b584ffafda72cc7c93349dd99c80483dd784f6c4609" }),
-  Checksum.make(term(PMID, "sum-deno-linux-arm64"), {
-    forPin: pinDeno,
-    forPlatform: platformLinuxArm64,
-    sha256: "d49596c20b9788cf8f5d8ddf644103d4bde56ed239753f0bdb92ba9361d51905",
-  }),
-  Checksum.make(term(PMID, "sum-deno-macos-x64"), { forPin: pinDeno, forPlatform: platformMacosX64, sha256: "4b2f5edd2639b7470f034238b321d7002d8dfb4726d8558f52c17afac370eb2c" }),
-  Checksum.make(term(PMID, "sum-deno-macos-arm64"), {
-    forPin: pinDeno,
-    forPlatform: platformMacosArm64,
-    sha256: "9f0bf660393da2eaff044cdc7444cb08c73f235849b61d224d825a194ce7c98e",
-  }),
-  Checksum.make(term(PMID, "sum-deno-windows-x64"), {
-    forPin: pinDeno,
-    forPlatform: platformWindowsX64,
-    sha256: "cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf",
   }),
 ] as const;
 

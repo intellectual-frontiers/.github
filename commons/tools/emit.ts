@@ -1,7 +1,11 @@
-// The files the packaging table is written to (commons 0002-packaging FR-009 to FR-016, 0004-rules FR-002): the TOML a harness reads, the shell fragment a script
-// carries, the TypeScript module the machine setup imports, the env file of the pins and the pins between a bootstrap's marks, and the tables of rules and of the
-// installation record. Each is the same bytes, to the byte, as the Python generator wrote: where one sorts, it sorts by code point as Python did.
-import { assertNever, compareText, sortedBy } from "./core.ts";
+/**
+ * The files the packaging table is written to (commons 0002-packaging FR-009 to FR-016, 0004-rules FR-002): the TOML a harness reads, the shell fragment a script
+ * carries, the TypeScript module a harness's setup imports, the env file of the pins, and the tables of rules and of the
+ * installation record. Each is the same bytes, to the byte, as the Python generator wrote: where one sorts, it sorts by code point as Python did.
+ *
+ * @module
+ */
+import { absurd, compareText, sortedBy } from "./core.ts";
 import type { Command, Family, FamilyId, Manager, Op, PinName, PlatformName, Program, ProgramName, Table } from "./ontology.ts";
 import { OPS } from "./ontology.ts";
 
@@ -53,7 +57,12 @@ export function toml(t: Table, digest: string): string {
   }
   for (const [mid, m] of byKey(t.managers)) {
     out.push(`[managers.${mid}]`, `executable = ${s(m.executable)}`, `kind = ${s(m.kind)}`, `administrator = ${m.administrator}`);
-    const optional: readonly (readonly [string, string])[] = [["environment", m.environment], ["purl_type", m.purlType], ["harness_use", m.harnessUse], ["note", m.note]];
+    const optional: readonly (readonly [string, string])[] = [
+      ["environment", m.environment],
+      ["purl_type", m.purlType],
+      ["harness_use", m.harnessUse],
+      ["note", m.note],
+    ];
     for (const [k, v] of optional) if (v !== "") out.push(`${k} = ${s(v)}`);
     out.push("");
     for (const op of OPS) {
@@ -67,14 +76,22 @@ export function toml(t: Table, digest: string): string {
     }
   }
   for (const [name, pl] of byKey(t.platforms)) {
-    out.push(`[platforms.${s(name)}]`, `label = ${s(pl.label)}`, `os = ${s(pl.os)}`, `processor = ${s(pl.processor)}`, `pin_suffix = ${s(pl.suffix)}`, "");
+    out.push(
+      `[platforms.${s(name)}]`,
+      `label = ${s(pl.label)}`,
+      `os = ${s(pl.os)}`,
+      `processor = ${s(pl.processor)}`,
+      `pin_suffix = ${s(pl.suffix)}`,
+      "",
+    );
   }
   for (const [name, pn] of byKey(t.pins)) {
     out.push(`[pins.${s(name)}]`, `key = ${s(pn.key)}`, `version = ${s(pn.version)}`, `label = ${s(pn.label)}`);
     for (const [pf, h] of byKey(pn.sha256)) out.push(`sha256.${s(pf)} = ${s(h)}`);
     out.push("");
   }
-  for (const p of t.prohibitions) out.push("[[prohibitions]]", `manager = ${s(p.manager)}`, `argv = ${arr(p.argv)}`, `reason = ${s(p.reason)}`, "");
+  for (const p of t.prohibitions)
+    out.push("[[prohibitions]]", `manager = ${s(p.manager)}`, `argv = ${arr(p.argv)}`, `reason = ${s(p.reason)}`, "");
   for (const [name, p] of byOrder(t.programs)) {
     out.push(`[programs.${s(name)}]`, `tier = ${s(p.tier)}`, `order = ${p.order}`);
     for (const [fid, n] of byKey(p.names)) out.push(`names.${fid} = ${s(n)}`);
@@ -90,7 +107,16 @@ export function rulesToml(t: Table, digest: string): string {
     `source_sha256 = ${s(digest)}`,
     "",
   ];
-  for (const r of t.rules) out.push("[[rules]]", `id = ${s(r.id)}`, `set = ${s(r.set)}`, `pattern = ${lit(r.pattern)}`, `label = ${s(r.label)}`, `reason = ${s(r.reason)}`, "");
+  for (const r of t.rules)
+    out.push(
+      "[[rules]]",
+      `id = ${s(r.id)}`,
+      `set = ${s(r.set)}`,
+      `pattern = ${lit(r.pattern)}`,
+      `label = ${s(r.label)}`,
+      `reason = ${s(r.reason)}`,
+      "",
+    );
   return lines(out);
 }
 
@@ -125,13 +151,13 @@ function wordsOf(t: Table, f: Family, op: Op, form: "argv" | "noninteractive"): 
       ws = c.noninteractive ?? [];
       break;
     default:
-      return assertNever(form);
+      return absurd(form);
   }
   return ws.filter((w) => !PLACEHOLDER.test(w));
 }
 
 /** The manager a script names for a family: its preferred one, or the first it uses where it installs packages. */
-const managerFor = (f: Family): string => f.preferred ?? (f.managers.length > 0 && f.installsPackages ? f.managers[0] ?? "" : "");
+const managerFor = (f: Family): string => f.preferred ?? (f.managers.length > 0 && f.installsPackages ? (f.managers[0] ?? "") : "");
 const acting = (f: Family): boolean => f.status === "supported" && f.installsPackages;
 /** The command a person with administrator rights runs: the family's own, or the preferred manager's install. */
 function adminInstall(t: Table, f: Family): string | null {
@@ -166,33 +192,108 @@ export function shell(t: Table, digest: string): string {
       return v === null ? [] : [[fid, v] as const];
     });
   // the family of the words an /etc/os-release gives (ID, then ID_LIKE): the first word that detects one
-  out.push("pm_family_of() {  # pm_family_of WORDS: the family a computer's os-release ID and ID_LIKE words name, or nothing", "  for pm_w in $1; do", "    case $pm_w in");
-  for (const [fid, f] of byKey(fams)) if (f.detectSource === "os-release") out.push(`      ${[...f.detect].sort(compareText).join("|")}) printf '%s' ${q(fid)}; return 0 ;;`);
+  out.push(
+    "pm_family_of() {  # pm_family_of WORDS: the family a computer's os-release ID and ID_LIKE words name, or nothing",
+    "  for pm_w in $1; do",
+    "    case $pm_w in",
+  );
+  for (const [fid, f] of byKey(fams))
+    if (f.detectSource === "os-release") out.push(`      ${[...f.detect].sort(compareText).join("|")}) printf '%s' ${q(fid)}; return 0 ;;`);
   out.push("    esac", "  done", "  return 0", "}", "");
-  out.push("pm_family_of_uname() {  # pm_family_of_uname NAME: the family `uname -s` names on a platform without os-release, or nothing", "  case ${1:-} in");
+  out.push(
+    "pm_family_of_uname() {  # pm_family_of_uname NAME: the family `uname -s` names on a platform without os-release, or nothing",
+    "  case ${1:-} in",
+  );
   for (const [fid, f] of byKey(fams)) if (f.uname !== "") out.push(`    ${f.uname}) printf '%s' ${q(fid)} ;;`);
   out.push("  esac", "}", "");
-  caseOf("pm_label", "FAMILY", each((f) => f.label));
-  caseOf("pm_status", "FAMILY", each((f) => f.status));
-  caseOf("pm_assurance", "FAMILY", each((f) => f.assurance));
+  caseOf(
+    "pm_label",
+    "FAMILY",
+    each((f) => f.label),
+  );
+  caseOf(
+    "pm_status",
+    "FAMILY",
+    each((f) => f.status),
+  );
+  caseOf(
+    "pm_assurance",
+    "FAMILY",
+    each((f) => f.assurance),
+  );
   caseOf("pm_manager", "FAMILY", each(managerFor));
-  caseOf("pm_installs_packages", "FAMILY", each((f) => (f.installsPackages ? "yes" : "no"), (f) => f.status === "supported"));
-  caseOf("pm_removal_hint", "FAMILY", each((f) => f.removalHint, (f) => f.removalHint !== ""));
-  caseOf("pm_note", "FAMILY", each((f) => f.note, (f) => f.note !== ""));
-  caseOf("pm_install_words", "FAMILY", each((f) => wordsOf(t, f, "install", "noninteractive").join(" "), acting));
-  caseOf("pm_refresh_words", "FAMILY", each((f) => (wordsOf(t, f, "refresh", "noninteractive").join(" ") || wordsOf(t, f, "refresh", "argv").join(" ")), acting));
-  caseOf("pm_query_installed_words", "FAMILY", each((f) => wordsOf(t, f, "query-installed", "argv").join(" "), acting));
-  caseOf("pm_query_candidate_words", "FAMILY", each((f) => wordsOf(t, f, "query-candidate", "argv").join(" "), acting));
-  const environment = (f: Family): string => (f.preferred === null ? "" : t.managers.get(f.preferred)?.environment ?? "");
-  caseOf("pm_environment", "FAMILY", each(environment, (f) => acting(f) && environment(f) !== ""));
-  caseOf("pm_admin_install", "FAMILY", each((f) => adminInstall(t, f)));
+  caseOf(
+    "pm_installs_packages",
+    "FAMILY",
+    each(
+      (f) => (f.installsPackages ? "yes" : "no"),
+      (f) => f.status === "supported",
+    ),
+  );
+  caseOf(
+    "pm_removal_hint",
+    "FAMILY",
+    each(
+      (f) => f.removalHint,
+      (f) => f.removalHint !== "",
+    ),
+  );
+  caseOf(
+    "pm_note",
+    "FAMILY",
+    each(
+      (f) => f.note,
+      (f) => f.note !== "",
+    ),
+  );
+  caseOf(
+    "pm_install_words",
+    "FAMILY",
+    each((f) => wordsOf(t, f, "install", "noninteractive").join(" "), acting),
+  );
+  caseOf(
+    "pm_refresh_words",
+    "FAMILY",
+    each((f) => wordsOf(t, f, "refresh", "noninteractive").join(" ") || wordsOf(t, f, "refresh", "argv").join(" "), acting),
+  );
+  caseOf(
+    "pm_query_installed_words",
+    "FAMILY",
+    each((f) => wordsOf(t, f, "query-installed", "argv").join(" "), acting),
+  );
+  caseOf(
+    "pm_query_candidate_words",
+    "FAMILY",
+    each((f) => wordsOf(t, f, "query-candidate", "argv").join(" "), acting),
+  );
+  const environment = (f: Family): string => (f.preferred === null ? "" : (t.managers.get(f.preferred)?.environment ?? ""));
+  caseOf(
+    "pm_environment",
+    "FAMILY",
+    each(environment, (f) => acting(f) && environment(f) !== ""),
+  );
+  caseOf(
+    "pm_admin_install",
+    "FAMILY",
+    each((f) => adminInstall(t, f)),
+  );
   // package names: pm_package FAMILY PROGRAM, and the programs of a tier
   out.push("pm_package() {  # pm_package FAMILY PROGRAM: what the family calls the package, or nothing", "  case ${1:-}:${2:-} in");
   for (const [name, p] of byKey(t.programs)) for (const [fid, n] of byKey(p.names)) out.push(`    ${fid}:${name}) printf '%s' ${q(n)} ;;`);
   out.push("  esac", "}", "");
-  out.push("pm_programs() {  # pm_programs TIER: the programs of the tier (required or comfort), one word each, in order", "  case ${1:-} in");
+  out.push(
+    "pm_programs() {  # pm_programs TIER: the programs of the tier (required or comfort), one word each, in order",
+    "  case ${1:-} in",
+  );
   for (const tier of ["required", "comfort"] as const) {
-    out.push(`    ${tier}) printf '%s\\n' ` + byOrder(t.programs).filter(([, p]) => p.tier === tier).map(([n]) => q(n)).join(" ") + " ;;");
+    out.push(
+      `    ${tier}) printf '%s\\n' ` +
+        byOrder(t.programs)
+          .filter(([, p]) => p.tier === tier)
+          .map(([n]) => q(n))
+          .join(" ") +
+        " ;;",
+    );
   }
   out.push("  esac", "}", "# <<< packaging.auto <<<", "");
   return out.join("\n");
@@ -208,7 +309,8 @@ function pinLines(t: Table, names: readonly PinName[]): string[] {
     if (pn === undefined) continue;
     out.push(`${pn.key}_VERSION=${pn.version}`);
     const suffix = (pf: PlatformName): string => t.platforms.get(pf)?.suffix ?? "";
-    for (const [pf, h] of sortedBy(pn.sha256, ([a], [b]) => compareText(suffix(a), suffix(b)))) out.push(`${pn.key}_SHA256_${suffix(pf)}=${h}`);
+    for (const [pf, h] of sortedBy(pn.sha256, ([a], [b]) => compareText(suffix(a), suffix(b))))
+      out.push(`${pn.key}_SHA256_${suffix(pf)}=${h}`);
   }
   return out;
 }
@@ -219,33 +321,6 @@ export function pinsEnv(t: Table, digest: string): string {
     `# source_sha256=${digest}`,
   ];
   return [...head, ...pinLines(t, [...t.pins.keys()])].join("\n") + "\n";
-}
-
-/** The two syntaxes a bootstrap carries its pins in. */
-export type Syntax = "sh" | "ps1";
-
-/** The pins `names`, between the marks, as `sh` variables (NAME=value) or PowerShell ones ($NAME = 'value'). */
-export function pinsBlock(t: Table, names: readonly PinName[], syntax: Syntax): string {
-  const head = [
-    "# >>> pins.auto >>>",
-    `# AUTO-GENERATED by ${GENERATOR} from commons/ontology/supply-chain/packaging/pins.ts (commons 0002-packaging FR-014). Do not edit: change the ontology.`,
-  ];
-  let body = pinLines(t, names);
-  switch (syntax) {
-    case "sh":
-      head.push("# shellcheck disable=SC2034  # read by the script this is part of");
-      body = body.filter((line) => !line.includes("_WINDOWS_")); // a POSIX shell never runs on Windows; the .ps1 carries that pin
-      break;
-    case "ps1":
-      body = body.map((line) => {
-        const at = line.indexOf("=");
-        return `$${line.slice(0, at)} = '${line.slice(at + 1)}'`;
-      });
-      break;
-    default:
-      return assertNever(syntax);
-  }
-  return [...head, ...body].join("\n") + "\n# <<< pins.auto <<<\n";
 }
 
 // ---- TypeScript module -------------------------------------------------------------------------------------------------------------------------------
@@ -264,15 +339,26 @@ const obj = (v: readonly (readonly [string, Json])[]): Json => ({ k: "obj", v })
 
 /** A JSON string as Python's `json.dumps(…, ensure_ascii=False)` writes it. */
 function jsonString(x: string): string {
-  const named: Readonly<Record<string, string>> = { '"': '\\"', "\\": "\\\\", "\b": "\\b", "\f": "\\f", "\n": "\\n", "\r": "\\r", "\t": "\\t" };
-  // JSON escapes the control characters, on purpose
-  // deno-lint-ignore no-control-regex
-  return `"${x.replace(/["\\\x00-\x1f]/g, (c) => named[c] ?? `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`)}"`;
+  const named: Readonly<Record<string, string>> = {
+    '"': '\\"',
+    "\\": "\\\\",
+    "\b": "\\b",
+    "\f": "\\f",
+    "\n": "\\n",
+    "\r": "\\r",
+    "\t": "\\t",
+  };
+  return `"${x.replace(JSON_ESCAPED, (c) => named[c] ?? `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`)}"`;
 }
+
+/** The characters JSON escapes: the quote, the backslash and the control characters, written as text on purpose. */
+const ESCAPED = '"\\\\\\x00-\\x1f';
+const JSON_ESCAPED = new RegExp(`[${ESCAPED}]`, "g");
 
 /** JSON as Python's `json.dumps(x, indent=2, ensure_ascii=False)` writes it. */
 export function pyJson(x: Json, level = 0): string {
-  const pad = "  ".repeat(level + 1), end = "  ".repeat(level);
+  const pad = "  ".repeat(level + 1),
+    end = "  ".repeat(level);
   switch (x.k) {
     case "null":
       return "null";
@@ -285,9 +371,11 @@ export function pyJson(x: Json, level = 0): string {
     case "arr":
       return x.v.length === 0 ? "[]" : `[\n${x.v.map((e) => pad + pyJson(e, level + 1)).join(",\n")}\n${end}]`;
     case "obj":
-      return x.v.length === 0 ? "{}" : `{\n${x.v.map(([key, e]) => `${pad}${jsonString(key)}: ${pyJson(e, level + 1)}`).join(",\n")}\n${end}}`;
+      return x.v.length === 0
+        ? "{}"
+        : `{\n${x.v.map(([key, e]) => `${pad}${jsonString(key)}: ${pyJson(e, level + 1)}`).join(",\n")}\n${end}}`;
     default:
-      return assertNever(x);
+      return absurd(x);
   }
 }
 
@@ -317,16 +405,51 @@ export function typescript(t: Table, digest: string): string {
       ]),
     ] as const;
   });
-  const programs = byOrder(t.programs).map(([name, p]) =>
-    [name, obj([["tier", str(p.tier)], ["order", { k: "num", v: p.order }], ["names", obj(byKey(p.names).map(([fid, n]) => [fid, str(n)] as const))]])] as const
+  const programs = byOrder(t.programs).map(
+    ([name, p]) =>
+      [
+        name,
+        obj([
+          ["tier", str(p.tier)],
+          ["order", { k: "num", v: p.order }],
+          ["names", obj(byKey(p.names).map(([fid, n]) => [fid, str(n)] as const))],
+        ]),
+      ] as const,
   );
-  const platforms = byKey(t.platforms).map(([name, pl]) =>
-    [name, obj([["label", str(pl.label)], ["os", str(pl.os)], ["processor", str(pl.processor)], ["pinSuffix", str(pl.suffix)]])] as const
+  const platforms = byKey(t.platforms).map(
+    ([name, pl]) =>
+      [
+        name,
+        obj([
+          ["label", str(pl.label)],
+          ["os", str(pl.os)],
+          ["processor", str(pl.processor)],
+          ["pinSuffix", str(pl.suffix)],
+        ]),
+      ] as const,
   );
-  const pins = byKey(t.pins).map(([name, pn]) =>
-    [name, obj([["key", str(pn.key)], ["version", str(pn.version)], ["label", str(pn.label)], ["sha256", obj(byKey(pn.sha256).map(([pf, h]) => [pf, str(h)] as const))]])] as const
+  const pins = byKey(t.pins).map(
+    ([name, pn]) =>
+      [
+        name,
+        obj([
+          ["key", str(pn.key)],
+          ["version", str(pn.version)],
+          ["label", str(pn.label)],
+          ["sha256", obj(byKey(pn.sha256).map(([pf, h]) => [pf, str(h)] as const))],
+        ]),
+      ] as const,
   );
-  const record: Json = { k: "arr", v: t.record.map((f) => obj([["name", str(f.name)], ["type", str(f.type)], ["values", strs(f.values)]])) };
+  const record: Json = {
+    k: "arr",
+    v: t.record.map((f) =>
+      obj([
+        ["name", str(f.name)],
+        ["type", str(f.type)],
+        ["values", strs(f.values)],
+      ]),
+    ),
+  };
   return [
     `// AUTO-GENERATED by ${GENERATOR} from commons/ontology/supply-chain/packaging/*.ts (commons 0002-packaging). Do not edit: change the ontology.`,
     `export const schema = ${SCHEMA_VERSION};`,

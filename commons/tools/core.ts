@@ -1,6 +1,12 @@
-// What the commons tools share: errors as values, nominal types, the exhaustiveness check, and the few rules of text the tools keep so that what they read and
-// write is what the Python tools they replaced read and wrote (universal newlines, `str.splitlines`, ordering by code point). Nothing here imports anything:
-// the tools run with `deno run --no-config` from any checkout.
+/**
+ * What the commons tools share: errors as values, nominal types, the exhaustiveness check, and the few rules of text the tools keep so that what they read and
+ * write is what the Python tools they replaced read and wrote (universal newlines, `str.splitlines`, ordering by code point). Nothing here imports anything:
+ * the tools run on Bun or on Node 26 from any checkout, with the built-ins of `node:` alone.
+ *
+ * @module
+ */
+import { readFileSync, statSync } from "node:fs";
+import process from "node:process";
 
 export type Ok<T> = { readonly ok: true; readonly value: T };
 export type Err<E> = { readonly ok: false; readonly error: E };
@@ -12,8 +18,8 @@ export const err = <E>(error: E): Err<E> => ({ ok: false, error });
 /** A nominal type: a string that has been checked to be what its brand says. */
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
-/** The exhaustiveness check of a switch over a union: a case left out is a type error here. */
-export function assertNever(x: never): never {
+/** The exhaustiveness check of a switch over a union (`default: return absurd(x)`): a case left out is a type error here. */
+export function absurd(x: never): never {
   throw new Error(`unhandled case: ${JSON.stringify(x)}`);
 }
 
@@ -21,7 +27,8 @@ export function assertNever(x: never): never {
 export function compareText(a: string, b: string): number {
   const n = Math.min(a.length, b.length);
   for (let i = 0; i < n; i++) {
-    const x = a.charCodeAt(i), y = b.charCodeAt(i);
+    const x = a.charCodeAt(i),
+      y = b.charCodeAt(i);
     if (x !== y) return unit(x) - unit(y);
   }
   return a.length - b.length;
@@ -40,15 +47,17 @@ export function sortedText(xs: Iterable<string>): string[] {
 
 /** A file's text as Python's `Path.read_text()` gives it: UTF-8, with `\r\n` and `\r` read as `\n`. */
 export function readText(path: string): string {
-  return universalNewlines(new TextDecoder("utf-8", { fatal: true }).decode(Deno.readFileSync(path)));
+  return universalNewlines(new TextDecoder("utf-8", { fatal: true }).decode(readFileSync(path)));
 }
 export const universalNewlines = (text: string): string => text.replace(/\r\n?/g, "\n");
 
-/** The lines of a text as Python's `str.splitlines()` gives them: every line boundary Python knows, and no empty line after the last one. */
+/** Python's line boundaries, control characters among them, written as text so that the one expression says what it means. */
+const BREAKS = "\\n\\r\\v\\f\\x1c\\x1d\\x1e\\x85\\u2028\\u2029";
+const LINE_BOUNDARY = new RegExp(`\\r\\n|[${BREAKS}]`);
+
+/** The lines of a text as Python's `str.splitlines() gives them: every line boundary Python knows, and no empty line after the last one. */
 export function splitLines(text: string): string[] {
-  // Python's line boundaries are control characters, on purpose
-  // deno-lint-ignore no-control-regex
-  const out = text.split(/\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029]/);
+  const out = text.split(LINE_BOUNDARY);
   if (out.length > 0 && out[out.length - 1] === "") out.pop();
   return out;
 }
@@ -59,8 +68,8 @@ export const firstChars = (text: string, n: number): string => Array.from(text).
 /** Whether there is a file (or, with `dir`, a folder) at `path`, following links, as Python's `is_file()` and `is_dir()` do. */
 export function isKind(path: string, kind: "file" | "dir"): boolean {
   try {
-    const s = Deno.statSync(path);
-    return kind === "file" ? s.isFile : s.isDirectory;
+    const s = statSync(path);
+    return kind === "file" ? s.isFile() : s.isDirectory();
   } catch {
     return false;
   }
@@ -72,10 +81,9 @@ export function pathOfUrl(url: URL): string {
   return /^\/[A-Za-z]:\//.test(p) ? p.slice(1) : p;
 }
 
-/** Writes all of `text` to a stream (one write may take only part of it). */
-export function writeAll(to: { writeSync(p: Uint8Array): number }, text: string): void {
-  let bytes = new TextEncoder().encode(text);
-  while (bytes.length > 0) bytes = bytes.subarray(to.writeSync(bytes));
+/** Writes all of `text` to standard output or standard error (the stream finishes what it holds before the process ends, as the tools set the exit status rather than exit). */
+export function writeAll(to: "stdout" | "stderr", text: string): void {
+  if (text !== "") process[to].write(text);
 }
 
 /**

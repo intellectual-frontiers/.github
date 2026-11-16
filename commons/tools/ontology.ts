@@ -1,10 +1,14 @@
-// The packaging ontology decoded once into typed records (commons 0002-packaging, 0004-rules, 0012-ontology), with every rule of it the data breaks.
-//
-// This is the tools' decode boundary. The ontology is TypeScript (commons/ontology/supply-chain/packaging/), whose values the compiler has already checked against
-// their class schemas; here its code lists become the tools' unions (a kind, a status, an assurance, an operation...) through tables the compiler holds complete,
-// its identifiers become branded ones, and what a type cannot state is checked. Everything after it works on the `Table`. The order in which things are read, and so
-// the order of the findings and of every list, is the order the Python generator (rdflib) gave: subjects sorted by IRI, a property's values in the order written.
-import { assertNever, type Brand, brand, compareText, err, isOneOf, ok, type Result, sortedBy, sortedText } from "./core.ts";
+/**
+ * The packaging ontology decoded once into typed records (commons 0002-packaging, 0004-rules, 0012-ontology), with every rule of it the data breaks.
+ *
+ * This is the tools' decode boundary. The ontology is TypeScript (commons/ontology/supply-chain/packaging/), whose values the compiler has already checked against
+ * their class schemas; here its code lists become the tools' unions (a kind, a status, an assurance, an operation...) through tables the compiler holds complete,
+ * its identifiers become branded ones, and what a type cannot state is checked. Everything after it works on the `Table`. The order in which things are read, and so
+ * the order of the findings and of every list, is the order the Python generator (rdflib) gave: subjects sorted by IRI, a property's values in the order written.
+ *
+ * @module
+ */
+import { absurd, type Brand, brand, compareText, err, isOneOf, ok, type Result, sortedBy, sortedText } from "./core.ts";
 import {
   assurances,
   codeOf,
@@ -32,7 +36,19 @@ export type PinName = Brand<string, "PinName">;
 /** 64 lower-case hexadecimal digits. */
 export type Sha256 = Brand<string, "Sha256">;
 
-export const OPS = ["install", "remove", "upgrade", "upgrade-all", "search", "info", "refresh", "list-installed", "query-installed", "query-candidate", "query-version"] as const;
+export const OPS = [
+  "install",
+  "remove",
+  "upgrade",
+  "upgrade-all",
+  "search",
+  "info",
+  "refresh",
+  "list-installed",
+  "query-installed",
+  "query-candidate",
+  "query-version",
+] as const;
 export type Op = (typeof OPS)[number];
 /** The word of each operation of the code list (a key left out, or one more, does not compile). */
 const OP_OF: { readonly [K in keyof typeof operations]: Op } = {
@@ -49,9 +65,18 @@ const OP_OF: { readonly [K in keyof typeof operations]: Op } = {
   QueryVersion: "query-version",
 };
 export type Assurance = "verified" | "stand-in" | "untested" | "none";
-const ASSURANCE: { readonly [K in keyof typeof assurances]: Assurance } = { Verified: "verified", StandIn: "stand-in", Untested: "untested", NoAssurance: "none" };
+const ASSURANCE: { readonly [K in keyof typeof assurances]: Assurance } = {
+  Verified: "verified",
+  StandIn: "stand-in",
+  Untested: "untested",
+  NoAssurance: "none",
+};
 export type ManagerKind = "system" | "helper" | "universal";
-const KIND: { readonly [K in keyof typeof managerKinds]: ManagerKind } = { SystemKind: "system", HelperKind: "helper", UniversalKind: "universal" };
+const KIND: { readonly [K in keyof typeof managerKinds]: ManagerKind } = {
+  SystemKind: "system",
+  HelperKind: "helper",
+  UniversalKind: "universal",
+};
 export type Tier = "required" | "comfort";
 const TIER: { readonly [K in keyof typeof tiers]: Tier } = { Required: "required", Comfort: "comfort" };
 export type SupportStatus = "supported" | "catalogued";
@@ -65,7 +90,12 @@ const HEX64 = /^[0-9a-f]{64}$/;
 
 // ---- the table ---------------------------------------------------------------------------------------------------------------------------------------
 
-export type Command = { readonly argv: readonly string[]; readonly noninteractive: readonly string[] | null; readonly origin: string; readonly verified: string };
+export type Command = {
+  readonly argv: readonly string[];
+  readonly noninteractive: readonly string[] | null;
+  readonly origin: string;
+  readonly verified: string;
+};
 export type Manager = {
   readonly executable: string;
   readonly kind: ManagerKind;
@@ -93,12 +123,35 @@ export type Family = {
   readonly verifiedOn: string;
   readonly note: string;
 };
-export type Prohibition = { readonly manager: ManagerId; readonly template: string; readonly argv: readonly string[]; readonly reason: string };
+export type Prohibition = {
+  readonly manager: ManagerId;
+  readonly template: string;
+  readonly argv: readonly string[];
+  readonly reason: string;
+};
 export type Program = { readonly tier: Tier; readonly order: number; readonly names: ReadonlyMap<FamilyId, string> };
 export type Platform = { readonly os: string; readonly processor: string; readonly suffix: string; readonly label: string };
-export type Pin = { readonly key: string; readonly version: string; readonly label: string; readonly note: string; readonly sha256: ReadonlyMap<PlatformName, Sha256> };
-export type Rule = { readonly id: string; readonly set: RuleSet; readonly pattern: string; readonly label: string; readonly reason: string };
-export type RecordField = { readonly name: string; readonly type: FieldType; readonly order: number; readonly definition: string; readonly values: readonly string[] };
+export type Pin = {
+  readonly key: string;
+  readonly version: string;
+  readonly label: string;
+  readonly note: string;
+  readonly sha256: ReadonlyMap<PlatformName, Sha256>;
+};
+export type Rule = {
+  readonly id: string;
+  readonly set: RuleSet;
+  readonly pattern: string;
+  readonly label: string;
+  readonly reason: string;
+};
+export type RecordField = {
+  readonly name: string;
+  readonly type: FieldType;
+  readonly order: number;
+  readonly definition: string;
+  readonly values: readonly string[];
+};
 
 /** The whole table. A map keeps the order the ontology was read in (as the Python dicts did): where an output sorts, it sorts itself. */
 export type Table = {
@@ -247,7 +300,7 @@ export function describe(f: Finding): string {
     case "field-repeated":
       return `the record field ${f.field} repeats a name or an order`;
     default:
-      return assertNever(f);
+      return absurd(f);
   }
 }
 
@@ -305,7 +358,10 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
     ...o.properties.map((p) => ({ iri: p.iri, kind: p.class.iri, label: undefined, definition: p.values.definition?.value })),
   ];
   for (const kind of [owl.Class, owl.DatatypeProperty, owl.ObjectProperty]) {
-    for (const term of sortedBy(described.filter((d) => d.kind === kind.iri), (x, y) => compareText(x.iri, y.iri))) {
+    for (const term of sortedBy(
+      described.filter((d) => d.kind === kind.iri),
+      (x, y) => compareText(x.iri, y.iri),
+    )) {
       if (!term.iri.startsWith(PM.iri)) continue;
       if (!given(term.definition)) bad.push({ kind: "term-undefined", term: term.iri.slice(PM.iri.length) });
       if (kind === owl.Class && !given(term.label)) bad.push({ kind: "class-unlabelled", term: term.iri.slice(PM.iri.length) });
@@ -357,14 +413,22 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
       continue;
     }
     const ni = v.nonInteractive ?? null;
-    const forms: readonly (readonly [Form, string | null])[] = [["template", t], ["non-interactive form", ni]];
+    const forms: readonly (readonly [Form, string | null])[] = [
+      ["template", t],
+      ["non-interactive form", ni],
+    ];
     for (const [form, said] of forms) {
       if (said === null) continue;
       if (SHELL_SYNTAX.test(said)) bad.push({ kind: "shell-syntax", manager: id, op, form });
       if (forbidden.has(`${id}\0${said}`)) bad.push({ kind: "forbidden", manager: id, op, form, text: said });
     }
     if (manager.commands.has(op)) bad.push({ kind: "command-twice", manager: id, op });
-    manager.commands.set(op, { argv: split(c.iri, t), noninteractive: given(ni) ? split(c.iri, ni) : null, origin: v.origin, verified: v.verifiedOn ?? "" });
+    manager.commands.set(op, {
+      argv: split(c.iri, t),
+      noninteractive: given(ni) ? split(c.iri, ni) : null,
+      origin: v.origin,
+      verified: v.verifiedOn ?? "",
+    });
   }
 
   const families = new Map<FamilyId, DraftFamily>();
@@ -449,8 +513,10 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
       continue;
     }
     const install = m.commands.get("install");
-    if (install === undefined || install.noninteractive === null) bad.push({ kind: "install-interactive", family: id, manager: f.preferred });
-    else if (install.origin !== "archon") bad.push({ kind: "install-not-harness", family: id, manager: f.preferred, origin: install.origin });
+    if (install === undefined || install.noninteractive === null)
+      bad.push({ kind: "install-interactive", family: id, manager: f.preferred });
+    else if (install.origin !== "archon")
+      bad.push({ kind: "install-not-harness", family: id, manager: f.preferred, origin: install.origin });
     if (f.adminInstall === "") bad.push({ kind: "no-admin-install", family: id });
     if (!m.commands.has("query-installed")) bad.push({ kind: "no-query-installed", family: id, manager: f.preferred });
     for (const [name, p] of sortedBy(programs, ([a], [b]) => compareText(a, b))) {
@@ -458,7 +524,8 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
     }
   }
   for (const [name, p] of programs) {
-    for (const fid of p.names.keys()) if (families.get(fid)?.status !== "supported") bad.push({ kind: "named-for-unsupported", program: name, family: fid });
+    for (const fid of p.names.keys())
+      if (families.get(fid)?.status !== "supported") bad.push({ kind: "named-for-unsupported", program: name, family: fid });
   }
 
   const platforms = new Map<PlatformName, Platform>();

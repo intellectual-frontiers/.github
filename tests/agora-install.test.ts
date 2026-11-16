@@ -1,5 +1,5 @@
 /**
- * Tests of the one-command installers of agora (erga's 274-agora FR-096), run on IFC TypeScript (Bun, Node or Deno alike) with the real programs: real `sh` and real
+ * Tests of the one-command installers of agora (erga's 274-agora FR-096), run on IFC TypeScript (Bun or Node 26) with the real programs: real `sh` and real
  * `git`, against real repositories in a temporary folder that Git's own `url.<base>.insteadOf` makes the repositories of `https://github.com/intellectual-frontiers/`.
  * Nothing stands in for Git or GitHub CLI. The one thing not run is GitHub CLI's sign-in, which needs a GitHub account and a browser.
  *
@@ -10,7 +10,7 @@ import { assert, assertEquals, proves } from "../commons/ts/runtime/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SH = path.join(ROOT, "bin", "agora-install.sh");
-const R = ["erga 274-agora FR-096"];
+const R = ["erga 274-agora FR-096"] as const;
 const IDENTITY = { GIT_AUTHOR_NAME: "t", GIT_AUTHOR_EMAIL: "t@example.org", GIT_COMMITTER_NAME: "t", GIT_COMMITTER_EMAIL: "t@example.org" };
 
 async function git(cwd: string, ...args: string[]): Promise<string> {
@@ -20,7 +20,13 @@ async function git(cwd: string, ...args: string[]): Promise<string> {
 }
 
 /** A place with the two repositories as GitHub would serve them (`.github.git`, `erga.git`), a workspace and a record the erga installer writes to. */
-async function place(): Promise<{ readonly top: string; readonly origins: string; readonly workspace: string; readonly record: string; readonly env: Record<string, string> }> {
+async function place(): Promise<{
+  readonly top: string;
+  readonly origins: string;
+  readonly workspace: string;
+  readonly record: string;
+  readonly env: Record<string, string>;
+}> {
   const top = await fs.makeTempDir({ prefix: "agora-install-" });
   const origins = path.join(top, "origins");
   const record = path.join(top, "record");
@@ -32,7 +38,10 @@ async function place(): Promise<{ readonly top: string; readonly origins: string
     await fs.mkdir(path.join(seed, "bin"), { recursive: true });
     await git(seed, "init", "-b", "main");
     // What erga's installer is, for this test: it says it ran, and in which commit of which copy.
-    await fs.writeTextFile(path.join(seed, "bin", "install.sh"), `#!/bin/sh\necho "installer ran in $(git -C "$(dirname "$0")/.." rev-parse --short HEAD)" >> "${record}"\n`);
+    await fs.writeTextFile(
+      path.join(seed, "bin", "install.sh"),
+      `#!/bin/sh\necho "installer ran in $(git -C "$(dirname "$0")/.." rev-parse --short HEAD)" >> "${record}"\n`,
+    );
     await fs.writeTextFile(path.join(seed, "notes.txt"), "one\n");
     await git(seed, "add", ".");
     await git(seed, "commit", "-m", "first");
@@ -121,28 +130,35 @@ proves(R, "a copy that cannot be fast-forwarded is said and left as it is, and t
   }
 });
 
-proves(R, "where erga cannot be read and GitHub CLI is not installed, it says so with the one line that installs Git and GitHub CLI, and exits 3", async () => {
-  if (proc.build.os === "windows") return;
-  const p = await place();
-  try {
-    // A PATH of the real tools the script uses, and no GitHub CLI; erga's address maps to a folder that has no repositories.
-    const tools = path.join(p.top, "tools");
-    await fs.mkdir(tools);
-    for (const name of ["sh", "uname", "dirname", "mkdir", "cat"]) {
-      const real = proc.which(name);
-      if (real !== undefined) await fs.symlink(real, path.join(tools, name));
+proves(
+  R,
+  "where erga cannot be read and GitHub CLI is not installed, it says so with the one line that installs Git and GitHub CLI, and exits 3",
+  async () => {
+    if (proc.build.os === "windows") return;
+    const p = await place();
+    try {
+      // A PATH of the real tools the script uses, and no GitHub CLI; erga's address maps to a folder that has no repositories.
+      const tools = path.join(p.top, "tools");
+      await fs.mkdir(tools);
+      for (const name of ["sh", "uname", "dirname", "mkdir", "cat"]) {
+        const real = proc.which(name);
+        if (real !== undefined) await fs.symlink(real, path.join(tools, name));
+      }
+      await fs.symlink(proc.which("git") ?? "git", path.join(tools, "git"));
+      const env = { ...p.env, PATH: tools, GIT_CONFIG_KEY_0: `url.${path.join(p.top, "nowhere")}/.insteadOf` };
+      const r = await install(env);
+      assertEquals(r.code, 3);
+      assert(r.stderr.includes("GitHub CLI is not installed, and erga cannot be read without signing in"), r.stderr);
+      assert(
+        /apt-get install -y git gh|pacman -S --needed git github-cli|dnf install -y git gh|brew install git gh/.test(r.stderr),
+        r.stderr,
+      );
+      assertEquals(await fs.exists(p.workspace), false);
+    } finally {
+      await fs.remove(p.top, { recursive: true });
     }
-    await fs.symlink(proc.which("git") ?? "git", path.join(tools, "git"));
-    const env = { ...p.env, PATH: tools, GIT_CONFIG_KEY_0: `url.${path.join(p.top, "nowhere")}/.insteadOf` };
-    const r = await install(env);
-    assertEquals(r.code, 3);
-    assert(r.stderr.includes("GitHub CLI is not installed, and erga cannot be read without signing in"), r.stderr);
-    assert(/apt-get install -y git gh|pacman -S --needed git github-cli|dnf install -y git gh|brew install git gh/.test(r.stderr), r.stderr);
-    assertEquals(await fs.exists(p.workspace), false);
-  } finally {
-    await fs.remove(p.top, { recursive: true });
-  }
-});
+  },
+);
 
 proves(R, "agora-install.ps1 does the same in the same order: Git, readable or sign in, both repositories, erga's installer", async () => {
   const ps = await fs.readTextFile(path.join(ROOT, "bin", "agora-install.ps1"));

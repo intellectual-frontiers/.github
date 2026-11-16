@@ -1,48 +1,47 @@
-// Generate the packaging table from the packaging ontology (commons 0002-packaging, 0004-rules).
-//
-//     deno run --allow-read --allow-write commons/tools/generate-packaging.ts           write commons/generated/packaging.auto.toml, packaging.auto.sh, packaging.auto.ts,
-//                                                                                       pins.auto.env, rules.auto.toml, install-record.auto.toml and packaging.auto.ttl, and
-//                                                                                       the Deno pins between the marked lines of bin/erga-bootstrap.sh and bin/erga-bootstrap.ps1
-//     deno run --allow-read --allow-write commons/tools/generate-packaging.ts --check   exit 1, writing nothing, where a file is not what the ontology makes
-//
-// The ontology (commons/ontology/supply-chain/packaging/*.ts, commons 0012-ontology) is the source, read as the typed values it is; the generated files are never edited by
-// hand. The TOML is for programs (a harness reads it), the shell fragment is for scripts that run before any harness exists, the TypeScript module is for the machine setup
-// (bin/setup/), which runs on Deno, and the Turtle is for RDF tools and for a person reviewing a change of meaning. The ontology is checked first: a rule it breaks stops
-// the run (exit 2) with every finding named; a module that does not load stops it before anything is written, with Deno's own message. It imports nothing outside
-// commons/tools but the ontology's modules.
-import { assertNever, err, isKind, ok, pathOfUrl, readText, type Result, writeAll } from "./core.ts";
+/**
+ * Generate the packaging table from the packaging ontology (commons 0002-packaging, 0004-rules).
+ *
+ *     bun commons/tools/generate-packaging.ts           write commons/generated/packaging.auto.toml, packaging.auto.sh, packaging.auto.ts, pins.auto.env,
+ *                                                       rules.auto.toml, install-record.auto.toml and packaging.auto.ttl
+ *     bun commons/tools/generate-packaging.ts --check   exit 1, writing nothing, where a file is not what the ontology makes
+ *
+ * The ontology (commons/ontology/supply-chain/packaging/*.ts, commons 0012-ontology) is the source, read as the typed values it is; the generated files are never edited by
+ * hand. The TOML is for programs (a harness reads it), the shell fragment is for scripts that run before any harness exists, the TypeScript module is for the machine setup
+ * (a harness's setup), and the Turtle is for RDF tools and for a person reviewing a change of meaning. The ontology is checked first: a rule it breaks stops
+ * the run (exit 2) with every finding named; a module that does not load stops it before anything is written, with the runtime's own message. It imports nothing outside
+ * commons/tools but the ontology's modules.
+ *
+ * @module
+ */
+import { mkdirSync, realpathSync, writeFileSync } from "node:fs";
+import process from "node:process";
+import { absurd, isKind, pathOfUrl, readText, writeAll } from "./core.ts";
 import { files, nTriples, ontology, type OntologyFile, triplesOf, turtle } from "../ontology/supply-chain/packaging/mod.ts";
-import { decode, describe, type Finding, type PinName, type Table } from "./ontology.ts";
-import { GENERATOR, pinsBlock, pinsEnv, recordToml, rulesToml, shell, type Syntax, toml, typescript } from "./emit.ts";
+import { decode, describe, type Finding, type Table } from "./ontology.ts";
+import { GENERATOR, pinsEnv, recordToml, rulesToml, shell, toml, typescript } from "./emit.ts";
 
-const RUN = "deno run --allow-read --allow-write commons/tools/generate-packaging.ts";
-const PINS_BLOCK = /# >>> pins\.auto >>>\n[\s\S]*?# <<< pins\.auto <<<\n/;
+const RUN = "bun commons/tools/generate-packaging.ts";
 
 /** Where commons is: the folder above this file's (a copy of commons, a test's, generates into itself). */
 export type Place = { readonly commons: string; readonly root: string; readonly name: string };
 export function placeOf(url: URL): Place {
-  const commons = Deno.realPathSync(pathOfUrl(new URL("..", url))).replace(/[\\/]$/, "");
+  const commons = realpathSync(pathOfUrl(new URL("..", url))).replace(/[\\/]$/, "");
   const root = commons.replace(/[\\/][^\\/]*$/, "");
   return { commons, root, name: commons.slice(root.length + 1) };
 }
 
 /** Why a run stops, and with what exit status. */
 export type Stop =
-  | { readonly kind: "broken"; readonly findings: readonly Finding[] }
-  | { readonly kind: "no-block"; readonly script: string }
-  | { readonly kind: "missing-pins"; readonly script: string; readonly pins: readonly string[] }
-  | { readonly kind: "stale"; readonly files: readonly string[] };
+  { readonly kind: "broken"; readonly findings: readonly Finding[] } | { readonly kind: "stale"; readonly files: readonly string[] };
 
 export function exitStatus(s: Stop): number {
   switch (s.kind) {
     case "stale":
       return 1;
     case "broken":
-    case "no-block":
-    case "missing-pins":
       return 2;
     default:
-      return assertNever(s);
+      return absurd(s);
   }
 }
 
@@ -50,14 +49,10 @@ export function report(s: Stop): string {
   switch (s.kind) {
     case "broken":
       return "the packaging ontology breaks its own rules:\n" + s.findings.map((f) => `  - ${describe(f)}\n`).join("");
-    case "no-block":
-      return `${s.script} has no block between '# >>> pins.auto >>>' and '# <<< pins.auto <<<' to put the pins in\n`;
-    case "missing-pins":
-      return `${s.script} needs the pins ${s.pins.join(", ")}, which the ontology does not have\n`;
     case "stale":
       return s.files.map((f) => `${f} is not what the ontology makes; run: ${RUN}\n`).join("");
     default:
-      return assertNever(s);
+      return absurd(s);
   }
 }
 
@@ -80,14 +75,8 @@ export function turtleOf(of: readonly OntologyFile[], digest: string): string {
   });
 }
 
-/** The bootstraps carry the pins they need between their marks, as a script piped from the internet has no file beside it. */
-const SCRIPTS: readonly { readonly path: string; readonly pins: readonly string[]; readonly syntax: Syntax }[] = [
-  { path: "bin/erga-bootstrap.sh", pins: ["deno"], syntax: "sh" },
-  { path: "bin/erga-bootstrap.ps1", pins: ["deno"], syntax: "ps1" },
-];
-
 /** Every file the ontology makes, by its path from the repository's root, in the order they are written. */
-export function wanted(place: Place, t: Table, digest: string): Result<ReadonlyMap<string, string>, Stop> {
+export function wanted(place: Place, t: Table, digest: string): ReadonlyMap<string, string> {
   const want = new Map<string, string>([
     [`${place.name}/generated/packaging.auto.toml`, toml(t, digest)],
     [`${place.name}/generated/packaging.auto.sh`, shell(t, digest)],
@@ -97,45 +86,28 @@ export function wanted(place: Place, t: Table, digest: string): Result<ReadonlyM
     [`${place.name}/generated/install-record.auto.toml`, recordToml(t, digest)],
     [`${place.name}/generated/packaging.auto.ttl`, turtleOf(files, digest)],
   ]);
-  for (const script of SCRIPTS) {
-    const path = `${place.root}/${script.path}`;
-    if (!isKind(path, "file")) continue; // a copy of commons alone (a test's) has no scripts beside it
-    const text = readText(path);
-    if (!PINS_BLOCK.test(text)) return err({ kind: "no-block", script: script.path });
-    const names: PinName[] = [];
-    const missing: string[] = [];
-    for (const n of script.pins) {
-      const known = [...t.pins.keys()].find((k) => k === n);
-      if (known === undefined) missing.push(n);
-      else names.push(known);
-    }
-    if (missing.length > 0) return err({ kind: "missing-pins", script: script.path, pins: missing });
-    const block = pinsBlock(t, names, script.syntax);
-    want.set(script.path, text.replace(PINS_BLOCK, () => block));
-  }
-  return ok(want);
+  return want;
 }
 
 export async function main(argv: readonly string[], place: Place = placeOf(new URL(import.meta.url))): Promise<number> {
   const stop = (s: Stop): number => {
-    writeAll(Deno.stderr, report(s));
+    writeAll("stderr", report(s));
     return exitStatus(s);
   };
   const table = decode(ontology);
   if (!table.ok) return stop({ kind: "broken", findings: table.error });
   const want = wanted(place, table.value, await digestOf(files));
-  if (!want.ok) return stop(want.error);
   const full = (rel: string): string => `${place.root}/${rel}`;
   if (argv.includes("--check")) {
-    const stale = [...want.value].filter(([rel, text]) => !isKind(full(rel), "file") || readText(full(rel)) !== text).map(([rel]) => rel);
+    const stale = [...want].filter(([rel, text]) => !isKind(full(rel), "file") || readText(full(rel)) !== text).map(([rel]) => rel);
     return stale.length > 0 ? stop({ kind: "stale", files: stale }) : 0;
   }
-  Deno.mkdirSync(`${place.commons}/generated`, { recursive: true });
-  for (const [rel, text] of want.value) {
-    Deno.writeTextFileSync(full(rel), text);
-    writeAll(Deno.stdout, `wrote ${rel}\n`);
+  mkdirSync(`${place.commons}/generated`, { recursive: true });
+  for (const [rel, text] of want) {
+    writeFileSync(full(rel), text);
+    writeAll("stdout", `wrote ${rel}\n`);
   }
   return 0;
 }
 
-if (import.meta.main) Deno.exit(await main(Deno.args));
+if (import.meta.main) process.exitCode = await main(process.argv.slice(2));

@@ -17,7 +17,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "check": "tsc -p tsconfig.json && tsc -p tsconfig.kernel.json",
+    "check": "tsc -p tsconfig.json && tsc -p tsconfig.kernel.json && tsc -p tsconfig.root-tests.json",
     "test": "bun test tests/",
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:deno": "deno test -A --no-check tests/",

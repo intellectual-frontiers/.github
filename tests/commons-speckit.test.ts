@@ -1,0 +1,194 @@
+/**
+ * The shared specification checker (commons 0003-spec-kit): commons' own folder is clean, each rule is broken in a copy and named, and the command line is the one a
+ * harness runs (`bun commons/tools/spec-kit-check.ts`, or the same on Node 26, in a `.github` checkout, reading both streams). Everything is real: the real tool, run as
+ * a program, on real copies of commons' specification folder in a temporary folder.
+ *
+ * @module
+ */
+import { cpSync } from "node:fs";
+import { fs, path, proc } from "../commons/ts/runtime/mod.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "../commons/ts/runtime/test.ts";
+import { check, message } from "../commons/tools/spec-kit-check.ts";
+
+const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
+const copyTree = (from: string, to: string): void => cpSync(from, to, { recursive: true });
+
+const TOOL = `${ROOT}/commons/tools/spec-kit-check.ts`;
+const KIT = `${ROOT}/commons/spec-kit`;
+
+class Kit {
+  readonly root: string;
+  readonly tmp: string;
+  private constructor(tmp: string) {
+    this.tmp = tmp;
+    this.root = `${tmp}/kit`;
+    copyTree(KIT, this.root);
+  }
+  static make(): Kit {
+    return new Kit(fs.makeTempDirSync({ prefix: "commons-speckit-" }));
+  }
+  [Symbol.dispose](): void {
+    fs.removeSync(this.tmp, { recursive: true });
+  }
+  findings(): string {
+    return check(this.root)
+      .map((f) => `${f.where}: ${message(f.problem)}`)
+      .join("\n");
+  }
+  edit(rel: string, old: string, now: string): void {
+    const f = `${this.root}/${rel}`;
+    const text = fs.readTextFileSync(f);
+    assertStringIncludes(text, old);
+    fs.writeTextFileSync(
+      f,
+      text.replace(old, () => now),
+    );
+  }
+}
+
+/** The checker as a harness runs it, from the checkout's folder, on the runtime this test runs on. */
+async function run(args: readonly string[]): Promise<{ code: number; stderr: string; stdout: string }> {
+  const o = await proc.run([proc.execPath(), TOOL, ...args], { cwd: ROOT });
+  return { code: o.code, stdout: o.stdout, stderr: o.stderr };
+}
+
+proves(
+  ["0003-spec-kit FR-006", "0003-spec-kit SC-001"],
+  "commons' own folder is clean from the command line, with no configuration",
+  async () => {
+    const p = await run([]);
+    assertEquals([p.code, p.stdout, p.stderr], [0, "", ""]);
+    using bad = Kit.make();
+    bad.edit("registry.tsv", "0003\tspec-kit", "0005\tspec-kit");
+    const q = await run(["--root", bad.root]);
+    assertEquals(q.code, 1);
+    assertStringIncludes(q.stderr, "registry.tsv");
+    assertEquals(q.stdout, "");
+  },
+);
+
+proves(["0003-spec-kit FR-001"], "a gap, a repeated number and a missing folder in the register", () => {
+  using k = Kit.make();
+  // the register's next free number, and the one after it, which leaves a gap
+  const next = fs.readTextFileSync(`${KIT}/registry.tsv`).trim().split("\n").length;
+  const [gap, after] = [next, next + 1].map((n) => String(n).padStart(4, "0"));
+  k.edit("registry.tsv", "0004\trules\tin force", `0004\trules\tin force\n0004\tother\tin force\n${after}\tnone\tin force`);
+  const out = k.findings();
+  assertStringIncludes(out, "assigned twice");
+  assertStringIncludes(out, `gap at ${gap}`);
+  assertStringIncludes(out, `${after}-none is in force but its specification does not exist`);
+});
+
+proves(["0003-spec-kit FR-001", "0003-spec-kit FR-006"], "a spec with no row, and a register that is missing", () => {
+  using k = Kit.make();
+  copyTree(`${k.root}/specs/0003-spec-kit`, `${k.root}/specs/0009-extra`);
+  assertStringIncludes(k.findings(), "has no row in registry.tsv");
+  fs.removeSync(`${k.root}/registry.tsv`);
+  const out = k.findings();
+  assertStringIncludes(out, "register of specification numbers is missing");
+  assertStringIncludes(out, "specs/0009-extra: has no **Spec ID:** line naming 0009-extra", "it went on to check the specifications");
+});
+
+proves(["0003-spec-kit FR-002"], "the form of a specification", () => {
+  using k = Kit.make();
+  const s = "specs/0003-spec-kit/spec.md";
+  k.edit(s, "**Spec ID:** 0003-spec-kit", "**Spec ID:** 0004-x");
+  k.edit(s, "**Status:** Draft", "**Status:** Maybe");
+  fs.writeTextFileSync(`${k.root}/${s}`, fs.readTextFileSync(`${k.root}/${s}`).replaceAll("## Assumptions", "## Zzz"));
+  const out = k.findings();
+  assertStringIncludes(out, "**Spec ID:** line naming 0003-spec-kit");
+  assertStringIncludes(out, "**Status:** must be one of ['Draft', 'Adopted', 'Superseded']");
+  assertStringIncludes(out, "has no ## Assumptions section");
+});
+
+proves(["0003-spec-kit FR-002"], "sections out of order", () => {
+  using k = Kit.make();
+  const s = `${k.root}/specs/0003-spec-kit/spec.md`;
+  const [a, b] = ["## Key entities", "## Success criteria"];
+  fs.writeTextFileSync(s, fs.readTextFileSync(s).replaceAll(a, "@@").replaceAll(b, a).replaceAll("@@", b));
+  assertStringIncludes(k.findings(), "sections are out of the order");
+});
+
+proves(["0003-spec-kit FR-003"], "requirement numbers and edge cases", () => {
+  using k = Kit.make();
+  const s = "specs/0003-spec-kit/spec.md";
+  k.edit(s, "the tool names the gap, per FR-001.", "the tool names the gap, per FR-099.");
+  k.edit(s, "- A `none` row with no reason: the tool names it, per FR-005.", "- A `none` row with no reason: the tool names it.");
+  const out = k.findings();
+  assertStringIncludes(out, "cites a requirement that is not here");
+  assertStringIncludes(out, "an edge case cites no requirement");
+  k.edit(s, "- **FR-002**", "- **FR-001**");
+  assertStringIncludes(k.findings(), "used twice");
+});
+
+proves(["0003-spec-kit FR-004"], "a bare citation of another repository's spec", () => {
+  using k = Kit.make();
+  k.edit("specs/0003-spec-kit/spec.md", "`archon 0024-spec-format` and `archon 0002-specs`.", "0136-machine-bootstrap of archon.");
+  assertStringIncludes(k.findings(), "cites 0136-machine-bootstrap");
+});
+
+proves(["0003-spec-kit FR-008"], "a Part of line names another specification of the folder", () => {
+  using k = Kit.make();
+  assertEquals(k.findings(), "", "commons' own Part of lines name specifications it has");
+  k.edit("specs/0009-sql-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0099-nothing");
+  k.edit("specs/0010-file-aide/spec.md", "**Part of:** 0005-typescript-runtime", "**Part of:** 0010-file-aide");
+  const out = k.findings();
+  assertStringIncludes(out, "specs/0009-sql-aide: **Part of:** names 0099-nothing, which is not another specification of this folder");
+  assertStringIncludes(out, "specs/0010-file-aide: **Part of:** names 0010-file-aide");
+});
+
+proves(["0003-spec-kit FR-005"], "the enforcement register", () => {
+  using k = Kit.make();
+  const f = `${k.root}/enforcement.tsv`;
+  const rows = fs
+    .readTextFileSync(f)
+    .split("\n")
+    .filter((r) => r !== "" && !r.startsWith("0003-spec-kit FR-001"));
+  rows.push(
+    "0003-spec-kit FR-099\tcheck\t.github: x\tn",
+    "0003-spec-kit FR-002\tnone\t-\t",
+    "0003-spec-kit FR-003\tmaybe\t-\tn",
+    "0003-spec-kit FR-004\tcheck\tno colon\tn",
+  );
+  fs.writeTextFileSync(f, rows.join("\n") + "\n");
+  const out = k.findings();
+  assertStringIncludes(out, "0003-spec-kit FR-001 has no row");
+  assertStringIncludes(out, "FR-099 is not a requirement of any specification here");
+  assertStringIncludes(out, "FR-002 has two rows");
+  assertStringIncludes(out, "FR-003: the mechanism must be one of");
+  assertStringIncludes(out, "FR-004: who enforces it is '<repository>: <command>'");
+});
+
+proves(["0003-spec-kit FR-005"], "a none row must say why", () => {
+  using k = Kit.make();
+  const f = `${k.root}/enforcement.tsv`;
+  fs.writeTextFileSync(f, fs.readTextFileSync(f).replace(/^0003-spec-kit FR-007\t.*$/m, "0003-spec-kit FR-007\tnone\t-\t"));
+  assertStringIncludes(k.findings(), "a requirement nothing enforces has '-' for who and says why");
+});
+
+proves(
+  ["0003-spec-kit FR-006", "0003-spec-kit FR-007"],
+  "the tool imports nothing outside commons/tools but two built-ins of node:, reads no ontology and runs no command",
+  () => {
+    const seen = new Set<string>();
+    const visit = (file: string): void => {
+      if (seen.has(file)) return;
+      seen.add(file);
+      const text = fs.readTextFileSync(`${ROOT}/commons/tools/${file}`);
+      for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
+        const spec = m[1] ?? "";
+        if (spec === "node:fs" || spec === "node:process") continue;
+        assert(/^\.\/[\w-]+\.ts$/.test(spec), `${file} imports ${spec}`);
+        visit(spec.slice(2));
+      }
+      const code = text
+        .split("\n")
+        .filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l))
+        .join("\n");
+      assert(!code.includes("ontology"), `${file} reads an ontology`);
+      assert(!/child_process|\b(spawn|spawnSync|execSync|execFileSync)\(/.test(code), `${file} runs a command`);
+    };
+    visit("spec-kit-check.ts");
+    assertEquals([...seen].sort(), ["core.ts", "spec-kit-check.ts"]);
+  },
+);

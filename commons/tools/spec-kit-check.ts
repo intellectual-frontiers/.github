@@ -1,13 +1,31 @@
-// Check a spec-kit folder against the format every Intellectual Frontiers harness keeps (commons 0003-spec-kit).
-//
-//     deno run --no-config --allow-read commons/tools/spec-kit-check.ts               check commons/spec-kit
-//     deno run --no-config --allow-read commons/tools/spec-kit-check.ts --root DIR    check DIR (a folder holding registry.tsv, enforcement.tsv and specs/)
-//
-// It imports nothing outside commons/tools, so any harness can run it from a checkout with read access alone, and a harness that wants the findings as data imports `check(root)`.
-// It checks the register of numbers, the form of each specification, that edge cases cite requirements that exist, and that the enforcement register has one well-formed row for every
-// requirement. It does not read a harness's ontology: who owns a specification, and what a command is, are the harness's to check. Its regular expressions keep the meaning of
-// Python's, which the tool was first written in: `\w`, `\d` and `\s` are Unicode's, and `^` and `$` of a line break only at `\n`.
-import { assertNever, compareText, firstChars, isKind, isOneOf, pathOfUrl, PY_SPACE, readText, sortedText, splitLines, writeAll } from "./core.ts";
+/**
+ * Check a spec-kit folder against the format every Intellectual Frontiers harness keeps (commons 0003-spec-kit).
+ *
+ *     bun commons/tools/spec-kit-check.ts               check commons/spec-kit
+ *     bun commons/tools/spec-kit-check.ts --root DIR    check DIR (a folder holding registry.tsv, enforcement.tsv and specs/)
+ *
+ * It imports nothing outside commons/tools but two built-ins of `node:`, so any harness can run it, on Bun or Node 26, from a checkout, and a harness that wants the findings as data imports `check(root)`.
+ * It checks the register of numbers, the form of each specification, that edge cases cite requirements that exist, and that the enforcement register has one well-formed row for every
+ * requirement. It does not read a harness's ontology: who owns a specification, and what a command is, are the harness's to check. Its regular expressions keep the meaning of
+ * Python's, which the tool was first written in: `\w`, `\d` and `\s` are Unicode's, and `^` and `$` of a line break only at `\n`.
+ *
+ * @module
+ */
+import { readdirSync } from "node:fs";
+import process from "node:process";
+import {
+  absurd,
+  compareText,
+  firstChars,
+  isKind,
+  isOneOf,
+  pathOfUrl,
+  PY_SPACE,
+  readText,
+  sortedText,
+  splitLines,
+  writeAll,
+} from "./core.ts";
 
 const SECTIONS = [
   "**Input:**",
@@ -23,7 +41,6 @@ type Section = (typeof SECTIONS)[number];
 const OPTIONAL: ReadonlySet<Section> = new Set(["## Out of scope"]);
 const STATUSES = ["Draft", "Adopted", "Superseded"] as const;
 const MECHANISMS = ["check", "gate", "review", "none"] as const;
-type Mechanism = (typeof MECHANISMS)[number];
 const REGISTRY_HEADER = "number\tslug\tstate";
 const STATES = ["in force", "retired"] as const;
 type State = (typeof STATES)[number];
@@ -149,14 +166,14 @@ export function message(p: Problem): string {
     case "row-missing":
       return `${p.requirement} has no row`;
     default:
-      return assertNever(p);
+      return absurd(p);
   }
 }
 
 type Row = { readonly line: number; readonly number: string; readonly slug: string; readonly state: State };
 
 const strip = (s: string): string => s.replace(rx(`^${S}+|${S}+$`, "g"), "");
-const escape = (s: string): string => s.replace(/[\\^$.*+?()[\]{}|\/]/g, "\\$&");
+const escape = (s: string): string => s.replace(/[\\^$.*+?()[\]{}|/]/g, "\\$&");
 const search = (source: string, text: string): RegExpExecArray | null => rx(source).exec(text);
 
 /** The value of a number of decimal digits, of any script, as Python's `int()` reads it. */
@@ -180,7 +197,15 @@ function registry(root: string): { rows: Row[]; found: Finding[] } {
   const rows: Row[] = [];
   lines.slice(1).forEach((line, i) => {
     const [number, slug, state, ...rest] = line.split("\t");
-    if (number === undefined || slug === undefined || state === undefined || rest.length > 0 || !NUMBER.test(number) || !isOneOf(STATES, state) || !SLUG_ONLY.test(slug)) {
+    if (
+      number === undefined ||
+      slug === undefined ||
+      state === undefined ||
+      rest.length > 0 ||
+      !NUMBER.test(number) ||
+      !isOneOf(STATES, state) ||
+      !SLUG_ONLY.test(slug)
+    ) {
       found.push({ where: `registry.tsv:${i + 2}`, problem: { kind: "registry-row" } });
       return;
     }
@@ -200,7 +225,7 @@ export function check(root: string): Finding[] {
   const folder = `${root}/specs`;
   const present = new Map<string, string>();
   if (isKind(folder, "dir")) {
-    for (const name of sortedText([...Deno.readDirSync(folder)].map((e) => e.name))) if (isKind(`${folder}/${name}`, "dir")) present.set(name, `${folder}/${name}`);
+    for (const name of sortedText(readdirSync(folder))) if (isKind(`${folder}/${name}`, "dir")) present.set(name, `${folder}/${name}`);
   }
   const seen = new Map<number, number>();
   for (const { line, number, slug, state } of rows) {
@@ -220,7 +245,7 @@ export function check(root: string): Finding[] {
         if (present.has(spec)) found.push({ where: `registry.tsv:${line}`, problem: { kind: "retired-present", spec } });
         break;
       default:
-        assertNever(state);
+        absurd(state);
     }
   }
   const highest = Math.max(0, ...seen.keys());
@@ -326,10 +351,11 @@ function enforcement(root: string, requirements: ReadonlyMap<string, readonly st
         if (!want.has(by)) add({ kind: "row-review", requirement });
         break;
       default:
-        assertNever(mech);
+        absurd(mech);
     }
   });
-  for (const requirement of sortedText([...want].filter((r) => !have.has(r)))) found.push({ where: "enforcement.tsv", problem: { kind: "row-missing", requirement } });
+  for (const requirement of sortedText([...want].filter((r) => !have.has(r))))
+    found.push({ where: "enforcement.tsv", problem: { kind: "row-missing", requirement } });
   return found;
 }
 
@@ -340,14 +366,14 @@ export function main(argv: readonly string[]): number {
   if (i >= 0) {
     const given = argv[i + 1];
     if (given === undefined) {
-      writeAll(Deno.stderr, "spec-kit-check: --root needs a folder\n");
+      writeAll("stderr", "spec-kit-check: --root needs a folder\n");
       return 1;
     }
     root = given;
   }
   const found = check(root);
-  writeAll(Deno.stderr, found.map((f) => `${f.where}: ${message(f.problem)}\n`).join(""));
+  writeAll("stderr", found.map((f) => `${f.where}: ${message(f.problem)}\n`).join(""));
   return found.length > 0 ? 1 : 0;
 }
 
-if (import.meta.main) Deno.exit(main(Deno.args));
+if (import.meta.main) process.exitCode = main(process.argv.slice(2));

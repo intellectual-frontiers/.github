@@ -1,5 +1,9 @@
-// The words of a command template, split as Python's `shlex.split` splits them (POSIX mode, no comments): the generated tables were first written with it, and a
-// harness reads the same words from them.
+/**
+ * The words of a command template, split as Python's `shlex.split` splits them (POSIX mode, no comments): the generated tables were first written with it, and a
+ * harness reads the same words from them.
+ *
+ * @module
+ */
 import { err, ok, type Result } from "./core.ts";
 
 const SPACE = " \t\r\n";
