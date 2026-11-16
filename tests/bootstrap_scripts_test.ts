@@ -236,7 +236,15 @@ Deno.test("the PowerShell bootstrap gets Deno into erga's Windows store and hand
   }
 });
 
-Deno.test("bin holds the two bootstraps, the two kept entry points and the TypeScript setup, and nothing else (FR-006)", () => {
-  assertEquals([...Deno.readDirSync(`${ROOT}/bin`)].map((e) => e.name).sort(), ["erga-bootstrap.ps1", "erga-bootstrap.sh", "erga-setup.sh", "erga-windows.ps1", "setup"]);
+Deno.test("bin holds the two bootstraps, the two agora installers, the two kept entry points and the TypeScript setup, and nothing else (FR-006)", () => {
+  assertEquals([...Deno.readDirSync(`${ROOT}/bin`)].map((e) => e.name).sort(), [
+    "agora-install.ps1",
+    "agora-install.sh",
+    "erga-bootstrap.ps1",
+    "erga-bootstrap.sh",
+    "erga-setup.sh",
+    "erga-windows.ps1",
+    "setup",
+  ]);
   assert(Deno.readTextFileSync(`${ROOT}/bin/erga-setup.sh`).split("\n").length <= 8, "erga-setup.sh is a stub that runs the bootstrap");
 });

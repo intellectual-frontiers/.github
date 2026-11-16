@@ -1,6 +1,6 @@
 # `.github` — agent entry point
 
-This repository is small on purpose: the organization's public profile (`profile/`), the machine setup (`bin/`: two bootstraps that only get Deno, and the setup in TypeScript under `bin/setup/`), `commons/` and the tests
+This repository is small on purpose: the organization's public profile (`profile/`), the machine setup (`bin/`: the two one-command installers of agora, `agora-install.sh` and `agora-install.ps1`, which sign GitHub CLI in, copy `erga` and run the installer in it; and two older bootstraps that only get Deno, and the setup in TypeScript under `bin/setup/`), `commons/` and the tests
 (`tests/`). `commons/` holds what any company or harness of Intellectual Frontiers may use, with its own ontology, specifications and generated tables (see `commons/about.ts`, and the site at <https://intellectual-frontiers.github.io/.github/>); a capability goes there when more than one harness should read the same facts. Its specifications are in `commons/spec-kit/`, not in a company's repository. The scripts' specification is `009-machine-bootstrap` in `erga`, the company's private monorepo, like every other specification of erga. Everything else (erga itself, its specifications, ontology and content) is in the private `erga` repository; do not add any of it here.
 
 - Work spec first: change `009-machine-bootstrap` in `erga`, then the scripts, then the tests. Every requirement has a test or says why it has none.
