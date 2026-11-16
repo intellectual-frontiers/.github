@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
 
 /** Where a link goes: a page of the site (by its path from the site's root), or an address outside it. */
 export type Href =
@@ -144,3 +144,6 @@ export function slugOf(t: string): string {
     .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/** A name as a possessive: `commons'`, `Stolos'`, `Erga's`. */
+export const possessive = (name: string): string => (name.endsWith("s") ? `${name}'` : `${name}'s`);

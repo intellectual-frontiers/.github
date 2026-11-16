@@ -1,17 +1,19 @@
 /**
- * The Overview section (commons 0011-documentation FR-009): the home page, made from `commons/about.ts` and the spec kit (a card for each
- * capability, under the capability it is part of), and a page for each package, made from its `about`: its summary, its areas, its
- * folders and what each may import, its commands, and its rules with what enforces each.
+ * The Overview section (commons 0011-documentation FR-009, FR-027): the home page, made from the configuration's home (in commons,
+ * `commons/about.ts`) and the spec kit (a card for each capability, under the capability it is part of), and a page for each package,
+ * made from its `about`: its summary, its areas, its folders and what each may import, its commands, and its rules with what enforces
+ * each.
  *
  * @module
  */
-import type { About, AboutEnforcer } from "../../ts/kernel/mod.ts";
-import { absurd } from "../../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
 import type { Build } from "../build.ts";
+import { type About, type AboutEnforcer, under } from "../config.ts";
 import { specPage } from "../links.ts";
-import type { Block, Card, Inline } from "../model.ts";
+import { type Block, type Card, type Inline, possessive } from "../model.ts";
 import type { Area, Package } from "../sources.ts";
 import { exampleBlocks } from "./areas.ts";
+import { numberOf } from "./specs.ts";
 
 /** The first sentence of a text, for a card. */
 export function firstSentence(t: string, max = 240): string {
@@ -87,8 +89,8 @@ function capabilityCards(b: Build): Card[] {
     return {
       title: s?.title ?? id,
       href: { kind: "page", path: specPage(id) },
-      text: b.line(firstSentence(s?.input ?? ""), { page, file: `commons/spec-kit/specs/${id}/spec.md`, spec: id }),
-      badges: [{ text: id.slice(0, 4), tone: "neutral" }],
+      text: b.line(firstSentence(s?.input ?? ""), { page, file: s?.file ?? "", spec: id }),
+      badges: [{ text: numberOf(id), tone: "neutral" }],
       ...(children.length === 0 ? {} : { children }),
     };
   };
@@ -99,46 +101,51 @@ function capabilityCards(b: Build): Card[] {
  * The home page and a page for each package.
  *
  * @param b - the build
- * @param commons - commons as a whole
+ * @param top - the home's package: the repository as a whole
  * @param packages - the packages
  * @param areas - their areas
  */
-export function overviewPages(b: Build, commons: Package, packages: readonly Package[], areas: readonly Area[]): void {
+export function overviewPages(b: Build, top: Package, packages: readonly Package[], areas: readonly Area[]): void {
   const home = "index.html";
-  const homeScope = { page: home, file: "commons/about.ts" };
-  b.files.set("commons/about.ts", home);
-  b.files.set("commons", home);
+  const homeScope = { page: home, file: top.file };
+  const subject = b.config.subject;
+  const ownFile = (p: Package): boolean => p.file !== b.config.fileFromRoot;
+  if (ownFile(top)) b.files.set(top.file, home);
+  if (top.dir !== "") b.files.set(top.dir, home);
   for (const p of packages) {
-    b.files.set(`${p.dir}/about.ts`, packagePage(p));
-    b.files.set(p.dir, packagePage(p));
+    if (ownFile(p)) b.files.set(p.file, packagePage(p));
+    if (p.dir !== "") b.files.set(p.dir, packagePage(p));
   }
+  const capabilities = capabilityCards(b);
   b.add({
     path: home,
-    title: commons.about.title,
-    description: firstSentence(commons.about.summary),
+    title: top.about.title,
+    description: firstSentence(top.about.summary),
     section: "overview",
-    group: "Commons",
+    group: b.config.subject.charAt(0).toUpperCase() + b.config.subject.slice(1),
     order: 0,
     blocks: [
-      ...b.md(commons.about.summary, homeScope),
+      ...b.md(top.about.summary, homeScope),
       heading("packages", "Packages"),
       {
         kind: "cards",
         cards: packages.map((p) => ({
           title: p.about.title,
           href: { kind: "page", path: packagePage(p) },
-          text: b.line(firstSentence(p.about.summary), { page: home, file: `${p.dir}/about.ts` }),
+          text: b.line(firstSentence(p.about.summary), { page: home, file: p.file }),
         })),
       },
-      heading("capabilities", "Capabilities"),
-      { kind: "paragraph", inlines: [{ kind: "text", text: "Each capability is a specification of commons' spec kit, under the one it is part of." }] },
-      { kind: "cards", cards: capabilityCards(b) },
-      ...aboutTables(b, commons.about, "commons/about.ts", home),
+      ...(capabilities.length === 0 ? [] : [
+        heading("capabilities", "Capabilities"),
+        { kind: "paragraph", inlines: [{ kind: "text", text: `Each capability is a specification of ${possessive(subject)} spec kit, under the one it is part of.` }] } satisfies Block,
+        { kind: "cards", cards: capabilities } satisfies Block,
+      ]),
+      ...aboutTables(b, top.about, top.file, home),
     ],
   });
   packages.forEach((p, i) => {
     const page = packagePage(p);
-    const file = `${p.dir}/about.ts`;
+    const file = p.file;
     const scope = { page, file, ...(p.about.spec === undefined ? {} : { spec: p.about.spec.id }) };
     const own = areas.filter((a) => a.pkg.slug === p.slug);
     const blocks: Block[] = [...b.md(p.about.summary, scope)];
@@ -152,13 +159,13 @@ export function overviewPages(b: Build, commons: Package, packages: readonly Pac
           title: a.title,
           href: { kind: "page", path: areaPage(a) },
           text: [{ kind: "code", text: a.entryPoints.join(", ") }],
-          ...(a.spec === undefined ? {} : { badges: [{ text: a.spec.id.slice(0, 4), tone: "neutral" as const }] }),
+          ...(a.spec === undefined ? {} : { badges: [{ text: numberOf(a.spec.id), tone: "neutral" as const }] }),
         })),
       });
     }
     blocks.push(...aboutTables(b, p.about, file, page));
     if ((p.about.examples ?? []).length > 0) blocks.push(heading("examples", "Examples"));
-    for (const x of p.about.examples ?? []) blocks.push(...exampleBlocks(b, `${p.dir}/${x.file}`, x.file, x.what, scope));
+    for (const x of p.about.examples ?? []) blocks.push(...exampleBlocks(b, under(p.dir, x.file), x.file, x.what, scope));
     b.add({ path: page, title: p.about.title, description: firstSentence(p.about.summary), section: "overview", group: "Packages", order: 10 + i, blocks });
   });
 }

@@ -31,7 +31,7 @@ export const about: About = {
       mayImport: ["nothing: generated"],
     },
     { path: "ts/", what: "IFC TypeScript, and the data libraries built on it (`ts/data/`).", mayImport: ["see its own about.ts"] },
-    { path: "docs/", what: "The generator of this documentation, which reads only commons' TypeScript and the spec kit.", mayImport: ["see its own about.ts"] },
+    { path: "docs/", what: "The generator of this documentation, released as IFC Docs for any repository's site; it reads only commons' TypeScript and the spec kit, as `docs.config.ts` names them.", mayImport: ["see its own about.ts"] },
     { path: "spec-kit/", what: "The specifications of the capabilities, the register of their numbers and of what enforces each requirement.", mayImport: ["nothing: Markdown and TSV"] },
   ],
   commands: [

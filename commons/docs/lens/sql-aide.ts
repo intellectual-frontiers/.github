@@ -27,13 +27,7 @@ import {
   renderUnchecked,
   sqlite,
 } from "../../ts/data/sql-aide/mod.ts";
-import type { Build } from "../build.ts";
-import type { AreaApi } from "../extract/api.ts";
-import type { Block, Card, Inline, Tab } from "../model.ts";
-import { slugOf } from "../model.ts";
-import type { Area } from "../sources.ts";
-import { moduleComment } from "../tsdoc.ts";
-import { areaPage, firstSentence } from "../pages/overview.ts";
+import { type Area, type AreaApi, areaPage, type Block, type Build, type Card, firstSentence, type Inline, type Lens, moduleComment, possessive, slugOf, type Tab, under } from "../mod.ts";
 
 /** A table of a model, with its page. */
 interface ModelTable {
@@ -94,7 +88,7 @@ export async function readModels(b: Build, areas: readonly Area[], apis: readonl
     const names = api.exports.filter((e) => e.kinds.includes("const") && MODEL_TYPE.test(e.signature)).map((e) => e.name);
     if (names.length === 0) continue;
     const docNames = api.exports.filter((e) => e.kinds.includes("const") && DOCS_TYPE.test(e.signature)).map((e) => e.name);
-    const entry = `${area.pkg.dir}/${area.entryPoints[0] ?? ""}`;
+    const entry = under(area.pkg.dir, area.entryPoints[0] ?? "");
     let mod: Record<string, unknown>;
     try {
       const imported: unknown = await import(b.abs(entry));
@@ -174,14 +168,20 @@ function layoutCards(b: Build): Card[] {
   return [...pages].map(([page, area]) => ({ title: `${area} layout`, href: { kind: "page", path: page }, text: [t("A layout of files: its tree, patterns and segments.")] }));
 }
 
-/** The page of each model, of each of its tables, the Governance page and the section's home. */
-export function modelPages(b: Build, models: readonly Model[]): void {
+/**
+ * The page of each model, of each of its tables, the Governance page and the section's home.
+ *
+ * @param b - the build
+ * @param models - the models
+ * @param after - the order the first model takes in the section
+ */
+export function modelPages(b: Build, models: readonly Model[], after = 100): void {
   const govRows: Inline[][][] = [];
   const ownerRows: Inline[][][] = [];
   const lintRows: Inline[][][] = [];
   models.forEach((m, mi) => {
     const ctx = context({ dialect: postgres(), docs: m.docs });
-    const scope = { page: m.page, file: `${m.area.pkg.dir}/${m.area.entryPoints[0] ?? ""}`, area: m.area.slug };
+    const scope = { page: m.page, file: under(m.area.pkg.dir, m.area.entryPoints[0] ?? ""), area: m.area.slug };
     const tables = m.tables.map((x) => x.value);
     const doc = b.exists(scope.file) ? moduleComment(b.read(scope.file)) : undefined;
     for (const x of m.tables) {
@@ -224,7 +224,7 @@ export function modelPages(b: Build, models: readonly Model[]): void {
       });
     }
     blocks.push(heading("sql", "SQL"), ddlTabs(`${m.area.slug}-sql`, [...tables, ...m.others.map((o) => o.value)], m.docs));
-    b.add({ path: m.page, title: `${m.area.title} model`, description: `The schema ${m.area.title} defines.`, section: "models", group: m.area.title, order: 100 + mi * 100, navTitle: "Model", blocks });
+    b.add({ path: m.page, title: `${m.area.title} model`, description: `The schema ${m.area.title} defines.`, section: "models", group: m.area.title, order: after + mi * 100, navTitle: "Model", blocks });
 
     m.tables.forEach((x, ti) => {
       const tb = x.value;
@@ -261,14 +261,14 @@ export function modelPages(b: Build, models: readonly Model[]): void {
       const views = m.others.filter((o) => o.value.entity === "view" && o.value.dependsOn().some((e) => e.name === tb.spec.name));
       if (views.length > 0) tblocks.push(heading("views", "Views that read it"), { kind: "list", ordered: false, items: views.map((v) => [{ kind: "paragraph", inlines: [c(v.name)] }]) });
       tblocks.push(heading("sql", "SQL"), ddlTabs(`${slugOf(tb.spec.name)}-sql`, [tb, ...idx], m.docs));
-      b.add({ path: x.page, title: tb.spec.name, description: d ?? `A table of ${m.area.title}.`, section: "models", group: m.area.title, order: 100 + mi * 100 + ti + 1, blocks: tblocks });
+      b.add({ path: x.page, title: tb.spec.name, description: d ?? `A table of ${m.area.title}.`, section: "models", group: m.area.title, order: after + mi * 100 + ti + 1, blocks: tblocks });
     });
   });
   const cards: Card[] = models.map((m) => ({ title: `${m.area.title} model`, href: { kind: "page", path: m.page }, text: [t(`${m.tables.length} tables, ${m.others.length} views and indexes.`)] }));
   b.add({
     path: "models/index.html",
     title: "Models",
-    description: "The schemas commons' libraries define, and their governance.",
+    description: `The schemas ${possessive(b.config.subject)} libraries define, and their governance.`,
     section: "models",
     group: "Models",
     order: 0,
@@ -295,3 +295,16 @@ export function modelPages(b: Build, models: readonly Model[]): void {
     ],
   });
 }
+
+/** The SQL Aide lens (FR-013, FR-026): the models of the areas whose exports are tables, views or indexes, and their pages. */
+export const sqlAide: Lens = {
+  name: "sql-aide",
+  read: async (b, areas, apis) => {
+    const models = await readModels(b, areas, apis);
+    return (bb, after) => {
+      if (models.length === 0) return after;
+      modelPages(bb, models, after);
+      return after + models.length * 100;
+    };
+  },
+};

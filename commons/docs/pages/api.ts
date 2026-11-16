@@ -10,7 +10,7 @@ import type { Build } from "../build.ts";
 import type { ApiExport, AreaApi } from "../extract/api.ts";
 import type { LinkScope } from "../links.ts";
 import type { Badge, Block, Inline } from "../model.ts";
-import type { Area } from "../sources.ts";
+import { type Area, inside } from "../sources.ts";
 import { moduleComment } from "../tsdoc.ts";
 import { firstSentence } from "./overview.ts";
 
@@ -31,12 +31,13 @@ export const anchorOf = (name: string): string => name.replace(/[^\w.-]/g, "-");
 
 /** The title of a file in an area: its path from the area's folder (or the package's), without `.ts`. */
 function titleOf(area: Area, file: string): string {
-  const base = file.startsWith(`${area.dir}/`) ? file.slice(area.dir.length + 1) : file.startsWith(`${area.pkg.dir}/`) ? file.slice(area.pkg.dir.length + 1) : file;
+  const from = (dir: string): string => (dir === "" ? file : file.slice(dir.length + 1));
+  const base = inside(area.dir, file) ? from(area.dir) : inside(area.pkg.dir, file) ? from(area.pkg.dir) : file;
   return base.replace(/\.ts$/, "");
 }
 
 /** Whether a file is the area's own, or one it re-exports from elsewhere. */
-const own = (area: Area, file: string): boolean => file.startsWith(`${area.dir}/`);
+const own = (area: Area, file: string): boolean => inside(area.dir, file);
 
 /** The page of a file of an area; what the area re-exports from elsewhere is on one page. */
 const pageOf = (area: Area, file: string): string =>
@@ -72,12 +73,15 @@ export function registerApi(b: Build, areas: readonly Area[], apis: readonly Are
         continue;
       }
       if (!b.files.has(file)) b.files.set(file, page);
+      if (!b.apiFiles.has(file)) b.apiFiles.set(file, page);
       const doc = b.exists(file) ? moduleComment(b.read(file)) : undefined;
       list.push({ page, file, title: titleOf(area, file), summary: doc === undefined ? "" : firstSentence(doc.summary, 200) });
     }
     for (const e of api.exports) {
       const entry = { path: pageOf(area, e.file), anchor: anchorOf(e.name) };
       names.set(e.name, entry);
+      const key = `${e.file}#${e.declared ?? e.name.split(".").pop() ?? e.name}`;
+      if (own(area, e.file) && !b.declared.has(key)) b.declared.set(key, entry);
       const short = e.name.split(".").pop();
       if (short !== undefined && !names.has(short)) names.set(short, entry);
     }
@@ -133,7 +137,7 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
     if (api === undefined) return;
     const spec = area.spec?.id ?? area.pkg.about.spec?.id;
     (modules.get(area.slug) ?? []).forEach((m, mi) => {
-      const scope: LinkScope = { page: m.page, file: m.file || `${area.dir}/`, area: area.slug, ...(spec === undefined ? {} : { spec }) };
+      const scope: LinkScope = { page: m.page, file: m.file || (area.dir === "" ? "" : `${area.dir}/`), area: area.slug, ...(spec === undefined ? {} : { spec }) };
       const doc = m.file !== "" && b.exists(m.file) ? moduleComment(b.read(m.file)) : undefined;
       const blocks: Block[] = [];
       if (doc !== undefined) {
@@ -147,9 +151,11 @@ export function apiPages(b: Build, areas: readonly Area[], apis: readonly AreaAp
       for (const e of api.exports.filter((x) => pageOf(area, x.file) === m.page)) {
         if (!e.documented) b.found.push({ where: `${m.file} (${area.slug})`, problem: { kind: "undocumented", name: e.name } });
         const badges: Badge[] = e.kinds.map((k) => ({ text: k, tone: "neutral" }));
-        const home = b.files.get(e.file);
+        const at = b.declared.get(`${e.file}#${e.declared ?? e.name.split(".").pop() ?? e.name}`);
+        const home = b.apiFiles.get(e.file) ?? b.files.get(e.file);
+        const target = at ?? (home === undefined ? undefined : { path: home, anchor: anchorOf(e.name) });
         const declared: Block[] = m.file === ""
-          ? [{ kind: "meta", inlines: [textInl("Declared in "), home === undefined ? { kind: "code", text: e.file } : { kind: "link", href: { kind: "page", path: home, anchor: anchorOf(e.name) }, children: [{ kind: "code", text: e.file }] }] }]
+          ? [{ kind: "meta", inlines: [textInl("Declared in "), target === undefined ? { kind: "code", text: e.file } : { kind: "link", href: { kind: "page", ...target }, children: [{ kind: "code", text: e.file }] }] }]
           : [];
         const shown = b.entityPages.get(`${area.slug}!${e.name}`);
         const model: Block[] = shown === undefined

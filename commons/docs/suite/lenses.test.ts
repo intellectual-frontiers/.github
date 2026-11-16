@@ -1,13 +1,13 @@
 /**
- * The lenses (commons 0011-documentation FR-013, FR-014): the fixture schema shown as a schema (its diagram, its tables with their
- * columns and personal data, its SQL for three dialects, its governance), and IFRFS shown as a layout.
+ * The lenses (commons 0011-documentation FR-013, FR-014, FR-026): the fixture schema shown as a schema (its diagram, its tables with their
+ * columns and personal data, its SQL for three dialects, its governance), IFRFS shown as a layout, and each lens a value of `Lens`.
  *
  * @module
  */
-import { assert, assertEquals, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
+import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
 import { readApi } from "../extract/api.ts";
-import { layoutPages, layoutTree, readLayouts } from "../lens/file-aide.ts";
-import { modelPages, readModels } from "../lens/sql-aide.ts";
+import { fileAide, layoutPages, layoutTree, readLayouts } from "../lens/file-aide.ts";
+import { modelPages, readModels, sqlAide } from "../lens/sql-aide.ts";
 import type { Block, Page } from "../model.ts";
 import type { Area } from "../sources.ts";
 import { fixtureArea, FIXTURE_PACKAGE, freshBuild, ROOT } from "./helpers.ts";
@@ -59,4 +59,16 @@ proves(["0011-documentation FR-014"], "a module that exports entries is a layout
   assertEquals(entries.length, 3);
   const issue = entries[2];
   assertStringIncludes(issue?.kind === "entry" ? JSON.stringify(issue.blocks) : "", "issues.d");
+});
+
+proves(["0011-documentation FR-026"], "each lens is a value of Lens: it reads what is its library's, and makes its pages after the order it is given", async () => {
+  assertEquals([sqlAide.name, fileAide.name], ["sql-aide", "file-aide"]);
+  const area = fixtureArea("model", "model.ts", "Library");
+  const apis = await readApi(ROOT, [{ slug: "model", entryPoints: ["commons/docs/suite/fixture/model.ts"] }]);
+  const b = freshBuild();
+  const make = await sqlAide.read(b, [area], apis);
+  assertEquals(make(b, 300), 400, "one model takes one group");
+  assertEquals(b.pages.find((p) => p.path === "models/model/index.html")?.order, 300);
+  const none = await fileAide.read(b, [area], apis);
+  assertEquals(none(b, 400), 400, "no layout, no page");
 });

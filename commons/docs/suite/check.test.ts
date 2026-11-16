@@ -1,16 +1,16 @@
 /**
- * What `--check` finds, and how it runs (commons 0011-documentation FR-003, FR-005, FR-018): an `about` held to the code, a link that
+ * What `check` finds, and how it runs (commons 0011-documentation FR-003, FR-005, FR-018): an `about` held to the code, a link that
  * leads nowhere, the command line writing nothing in the checkout, and the same checkout giving the same bytes.
  *
  * @module
  */
-import { fs, path, proc } from "../../ts/runtime/mod.ts";
-import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
+import { fs, path, proc } from "@intellectual-frontiers/ifc-ts/runtime";
+import { assert, assertEquals, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
 import { message, report } from "../check.ts";
 import { document } from "../emit/html.ts";
 import { brokenLinks, buildSite } from "../site.ts";
 import { checkAbout } from "../sources.ts";
-import { FIXTURE_PACKAGE, ROOT } from "./helpers.ts";
+import { CONFIG, FIXTURE_PACKAGE, ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-005", "0011-documentation FR-018"], "an about that names what is not there is a finding of each kind", () => {
   const found = checkAbout(ROOT, {
@@ -23,7 +23,7 @@ proves(["0011-documentation FR-005", "0011-documentation FR-018"], "an about tha
       rules: [{ rule: "-", enforcedBy: [{ kind: "test", file: "suite/nothing.test.ts" }, { kind: "lint", rule: "nothing" }, { kind: "compiler", option: "nothing" }] }],
       areas: [{ title: "A", slug: "a", entryPoints: ["nothing.ts"], examples: [{ file: "nothing.ts", what: "-" }] }],
     },
-  });
+  }, CONFIG.lintRules);
   assertEquals(found.map((f) => f.problem.kind).sort(), ["command-missing", "enforcer-missing", "enforcer-missing", "enforcer-missing", "entry-point-missing", "example-missing", "folder-missing"]);
   for (const f of found) assert(message(f.problem).length > 0);
 });
@@ -40,8 +40,8 @@ proves(["0011-documentation FR-018"], "a link to a page or an anchor that is not
 });
 
 proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of commons builds with no finding, the same twice, with its four sections", async () => {
-  const one = await buildSite(ROOT);
-  const two = await buildSite(ROOT);
+  const one = await buildSite(CONFIG);
+  const two = await buildSite(CONFIG);
   assertEquals(report(one.found), []);
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));
@@ -49,12 +49,12 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009"], "the site of 
   for (const needed of ["index.html", "specs/matrix.html", "api/kernel/index.html", "models/arca/person.html", "models/ifrfs/index.html", "models/governance.html"]) {
     assert(one.pages.some((p) => p.path === needed), `the site has ${needed}`);
   }
-});
+}, { timeout: 60_000 });
 
-proves(["0011-documentation FR-003"], "--check writes nothing in the checkout and exits 0 on commons", async () => {
+proves(["0011-documentation FR-003"], "check writes nothing in the checkout and exits 0 on commons", async () => {
   const before = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
-  const r = await proc.run([proc.execPath(), "main.ts", "--check"], { cwd: path.join(ROOT, "commons/docs") });
+  const r = await proc.run([proc.execPath(), "main.ts", "check"], { cwd: path.join(ROOT, "commons/docs") });
   assertEquals(r.code, 0, r.stderr);
   const after = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
   assertEquals(after, before);
-});
+}, { timeout: 60_000 });

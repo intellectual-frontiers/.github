@@ -1,12 +1,14 @@
 /**
- * The Specifications section (commons 0011-documentation FR-015): a page for each specification in force, its header as badges, an
- * anchor for each requirement and success criterion with its row of `enforcement.tsv` beside it, and, once every other page is made, the
- * pages that cite each; the register; and the matrix of every requirement with its mechanism and who enforces it.
+ * The Specifications section (commons 0011-documentation FR-015, FR-024): a page for each specification in force, its header as badges,
+ * an anchor for each requirement and success criterion with its row of `enforcement.tsv` (or of its `reviewed.tsv`) beside it, and, once
+ * every other page is made, the pages that cite each; the register; the matrix of every requirement with its mechanism and who enforces
+ * it; and the constitution of a plain spec kit.
  *
  * @module
  */
 import type { Build } from "../build.ts";
-import type { Enforcement, Spec } from "../extract/specs.ts";
+import { under } from "../config.ts";
+import type { Enforcement, KitSource, Spec } from "../extract/specs.ts";
 import { specPage } from "../links.ts";
 import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
 import { plain } from "../model.ts";
@@ -16,13 +18,28 @@ const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
 
 const statusTone = (s: string): Tone => (s === "Adopted" ? "good" : s === "Superseded" ? "warn" : "neutral");
 
-const ITEM = /^((?:FR|SC)-\d{3}|OQ-\d+)$/;
+const ITEM = /^((?:FR|SC)-\d{3}[a-z]?|OQ-\d+)$/;
 
-/** The enforcement of a requirement, as a line under it. */
-function enforcedLine(e: Enforcement | undefined): Block {
-  if (e === undefined) return { kind: "meta", inlines: [{ kind: "text", text: "No row in enforcement.tsv." }] };
+/** The number of a specification's id: `0009` of `0009-sql-aide`. */
+export const numberOf = (id: string): string => id.split("-")[0] ?? id;
+
+/** The page of the constitution of a plain spec kit. */
+export const CONSTITUTION_PAGE = "specs/constitution.html";
+
+/** The enforcement of a requirement, as a line under it; a plain kit says only what its `reviewed.tsv` says. */
+function enforcedLine(spec: Spec, e: Enforcement | undefined): Block[] {
+  if (spec.layout === "spec-kit") {
+    return e === undefined ? [] : [{ kind: "meta", inlines: [{ kind: "strong", children: [{ kind: "text", text: "Reviewed: " }] }, { kind: "text", text: e.note }] }];
+  }
+  if (e === undefined) return [{ kind: "meta", inlines: [{ kind: "text", text: "No row in enforcement.tsv." }] }];
   const by: Inline[] = e.by === "-" ? [] : [{ kind: "code", text: e.by }, { kind: "text", text: " — " }];
-  return { kind: "meta", inlines: [{ kind: "strong", children: [{ kind: "text", text: `Enforced (${e.mechanism}): ` }] }, ...by, { kind: "text", text: e.note }] };
+  return [{ kind: "meta", inlines: [{ kind: "strong", children: [{ kind: "text", text: `Enforced (${e.mechanism}): ` }] }, ...by, { kind: "text", text: e.note }] }];
+}
+
+/** The badges of a requirement: its mechanism, or, in a plain kit, `review` where it is reviewed and none where it is not. */
+function requirementBadges(spec: Spec, e: Enforcement | undefined): Badge[] {
+  if (spec.layout === "spec-kit") return e === undefined ? [] : [{ text: "review", tone: "info" }];
+  return [{ text: e?.mechanism ?? "no row", tone: toneOf(e?.mechanism) }];
 }
 
 /** A list whose items are numbered items of the specification, made into entries with anchors. */
@@ -37,17 +54,17 @@ function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }
     if (!ITEM.test(id)) return undefined;
     const rest = first.inlines.slice(1);
     const head = rest[0];
-    const trimmed: Inline[] = head !== undefined && head.kind === "text" ? [{ kind: "text", text: head.text.replace(/^:\s*/, "") }, ...rest.slice(1)] : rest;
+    const trimmed: Inline[] = head !== undefined && head.kind === "text" ? [{ kind: "text", text: head.text.replace(spec.layout === "commons" ? /^:\s*/ : /^:?\s*/, "") }, ...rest.slice(1)] : rest;
     const e = id.startsWith("FR-") ? b.kit.enforcement.get(`${spec.id} ${id}`) : undefined;
     const badges: Badge[] = id.startsWith("FR-")
-      ? [{ text: e?.mechanism ?? "no row", tone: toneOf(e?.mechanism) }]
+      ? requirementBadges(spec, e)
       : [{ text: id.startsWith("SC-") ? "success criterion" : "open question", tone: "neutral" }];
     entries.push({
       kind: "entry",
       id: id.toLowerCase(),
       name: id,
       badges,
-      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? [enforcedLine(e)] : [])],
+      blocks: [{ kind: "paragraph", inlines: trimmed }, ...item.slice(1), ...(id.startsWith("FR-") ? enforcedLine(spec, e) : [])],
     });
   }
   return entries;
@@ -56,20 +73,19 @@ function itemEntries(b: Build, spec: Spec, list: Extract<Block, { kind: "list" }
 /** A specification's page, without the pages that cite it, which `citedBy` adds once every page is made. */
 function specPageOf(b: Build, spec: Spec, order: number): Page {
   const page = specPage(spec.id);
-  const file = `commons/spec-kit/specs/${spec.id}/spec.md`;
-  b.files.set(file, page);
-  b.files.set(`commons/spec-kit/specs/${spec.id}`, page);
+  const file = spec.file;
   const scope = { page, file, spec: spec.id };
   const blocks: Block[] = [];
   const parent = spec.partOf;
+  const said = [spec.id, ...(spec.owner === "" ? [] : [`owner ${spec.owner}`]), ...(spec.domain === "" ? [] : [`domain ${spec.domain}`])].join(" · ");
   blocks.push({
     kind: "paragraph",
     inlines: [
-      { kind: "text", text: `${spec.id} · owner ${spec.owner} · domain ${spec.domain}` },
+      { kind: "text", text: said },
       ...(parent === undefined ? [] : [{ kind: "text" as const, text: " · part of " }, ...b.line(parent, scope)]),
     ],
   });
-  blocks.push({ kind: "callout", tone: "note", title: "Input", blocks: b.md(spec.input, scope) });
+  if (spec.input !== "") blocks.push({ kind: "callout", tone: "note", title: "Input", blocks: b.md(spec.input, scope) });
   for (const block of b.md(spec.body, scope)) {
     if (block.kind === "list") {
       const entries = itemEntries(b, spec, block);
@@ -80,17 +96,31 @@ function specPageOf(b: Build, spec: Spec, order: number): Page {
     }
     blocks.push(block);
   }
+  const lead = spec.input !== "" ? spec.input : /^(?![#>|`-])[^\n]+(?:\n(?![#>|`-])[^\n]+)*/m.exec(spec.body)?.[0] ?? spec.title;
   return {
     path: page,
     title: spec.title,
-    description: plain(b.line(spec.input, scope)).slice(0, 240),
+    description: plain(b.line(lead, scope)).slice(0, 240),
     section: "specs",
     group: "Specifications",
     order,
-    badges: [{ text: spec.id.slice(0, 4), tone: "neutral" }, { text: spec.status, tone: statusTone(spec.status) }],
+    badges: [{ text: numberOf(spec.id), tone: "neutral" }, ...(spec.status === "" ? [] : [{ text: spec.status, tone: statusTone(spec.status) }])],
     blocks,
   };
 }
+
+/** Where a kit's specifications come from, as the register says it. */
+function registerSource(k: KitSource): string {
+  return k.layout === "commons" ? `as ${under(k.dir, "registry.tsv")} lists them` : `as the folders of ${k.dir === "" ? "the root" : `${k.dir}/`} hold them`;
+}
+
+/** What a kit's matrix rows come from, as the matrix says it. */
+function matrixSource(k: KitSource): string {
+  return k.layout === "commons" ? `with the row ${under(k.dir, "enforcement.tsv")} has for it` : `with the reason the reviewed.tsv beside its specification gives where it is proven by review`;
+}
+
+/** A list of phrases joined with commas and a last `and`. */
+const joined = (xs: readonly string[]): string => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1] ?? ""}`);
 
 /**
  * The register, the matrix and a page for each specification in force.
@@ -98,23 +128,26 @@ function specPageOf(b: Build, spec: Spec, order: number): Page {
  * @param b - the build
  */
 export function specPages(b: Build): void {
+  if (b.kit.sources.length === 0) return;
+  const subject = b.config.subject;
+  const commonsOnly = b.kit.sources.every((k) => k.layout === "commons");
   b.add({
     path: "specs/index.html",
     title: "Register",
-    description: "Every specification of commons in force, with its status, owner, domain and part.",
+    description: commonsOnly ? `Every specification of ${subject} in force, with its status, owner, domain and part.` : `Every specification of ${subject} in force, with its status.`,
     section: "specs",
     group: "Spec kit",
     order: 0,
     blocks: [
       {
         kind: "paragraph",
-        inlines: [{ kind: "text", text: "Every specification of commons in force, as commons/spec-kit/registry.tsv lists them." }],
+        inlines: [{ kind: "text", text: `Every specification of ${subject} in force, ${joined(b.kit.sources.map(registerSource))}.` }],
       },
       {
         kind: "table",
         head: ["Number", "Specification", "Status", "Part of", "Requirements"].map((h) => [{ kind: "text", text: h }]),
         rows: b.kit.specs.map((s) => [
-          [{ kind: "code", text: s.id.slice(0, 4) }],
+          [{ kind: "code", text: numberOf(s.id) }],
           [{ kind: "link", href: { kind: "page", path: specPage(s.id) }, children: [{ kind: "text", text: s.title }] }],
           [{ kind: "text", text: s.status }],
           s.partOf === undefined ? [] : [{ kind: "link", href: { kind: "page", path: specPage(s.partOf) }, children: [{ kind: "code", text: s.partOf }] }],
@@ -127,8 +160,8 @@ export function specPages(b: Build): void {
     s.requirements.map((r): Inline[][] => {
       const e = b.kit.enforcement.get(`${s.id} ${r.id}`);
       return [
-        [{ kind: "link", href: { kind: "page", path: specPage(s.id), anchor: r.id.toLowerCase() }, children: [{ kind: "code", text: `${s.id.slice(0, 4)} ${r.id}` }] }],
-        [{ kind: "text", text: e?.mechanism ?? "no row" }],
+        [{ kind: "link", href: { kind: "page", path: specPage(s.id), anchor: r.id.toLowerCase() }, children: [{ kind: "code", text: `${numberOf(s.id)} ${r.id}` }] }],
+        [{ kind: "text", text: e?.mechanism ?? (s.layout === "commons" ? "no row" : "") }],
         e === undefined || e.by === "-" ? [] : [{ kind: "code", text: e.by }],
         [{ kind: "text", text: e?.note ?? "" }],
       ];
@@ -137,15 +170,30 @@ export function specPages(b: Build): void {
   b.add({
     path: "specs/matrix.html",
     title: "Traceability matrix",
-    description: "Every requirement of commons, with how it is enforced and by what.",
+    description: `Every requirement of ${subject}, with how it is enforced and by what.`,
     section: "specs",
     group: "Spec kit",
     order: 1,
     blocks: [
-      { kind: "paragraph", inlines: [{ kind: "text", text: "Every requirement of commons, with the row commons/spec-kit/enforcement.tsv has for it." }] },
+      { kind: "paragraph", inlines: [{ kind: "text", text: `Every requirement of ${subject}, ${joined(b.kit.sources.map(matrixSource))}.` }] },
       { kind: "table", head: ["Requirement", "Mechanism", "Who", "Note"].map((h) => [{ kind: "text", text: h }]), rows },
     ],
   });
+  const c = b.kit.constitution;
+  if (c !== undefined) {
+    b.files.set(c.file, CONSTITUTION_PAGE);
+    const scope = { page: CONSTITUTION_PAGE, file: c.file };
+    b.add({
+      path: CONSTITUTION_PAGE,
+      title: c.title,
+      description: `The constitution of ${subject}, which governs every specification.`,
+      section: "specs",
+      group: "Spec kit",
+      order: 2,
+      navTitle: "Constitution",
+      blocks: b.md(c.body, scope),
+    });
+  }
   b.kit.specs.forEach((s, i) => b.add(specPageOf(b, s, 10 + i)));
 }
 
@@ -165,7 +213,7 @@ export function citedBy(b: Build): void {
   };
   for (let i = 0; i < b.pages.length; i++) {
     const p = b.pages[i];
-    if (p === undefined || p.section !== "specs" || !p.path.startsWith("specs/") || p.path === "specs/index.html" || p.path === "specs/matrix.html") continue;
+    if (p === undefined || p.section !== "specs" || !p.path.startsWith("specs/") || ["specs/index.html", "specs/matrix.html", CONSTITUTION_PAGE].includes(p.path)) continue;
     const id = p.path.slice("specs/".length, -".html".length);
     const blocks = p.blocks.map((blk): Block => {
       if (blk.kind !== "entry" || !blk.name.startsWith("FR-")) return blk;

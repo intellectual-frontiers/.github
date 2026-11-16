@@ -1,12 +1,12 @@
 /**
- * The page model written as HTML (commons 0011-documentation FR-017): one static file for each page, whose links are all relative so that
- * the site works under any path, with the site's stylesheet and its one script, and Mermaid only where a page has a diagram, all served
- * by the site itself. Every case of the model is matched by a `switch` that ends in `absurd`. Code is highlighted here, when the site is
- * built.
+ * The page model written as HTML (commons 0011-documentation FR-009, FR-017): one static file for each page, whose links are all
+ * relative so that the site works under any path, with the sections that have a page in its top bar, the site's stylesheet and its one
+ * script, and Mermaid only where a page has a diagram, all served by the site itself. Every case of the model is matched by a `switch`
+ * that ends in `absurd`. Code is highlighted here, when the site is built.
  *
  * @module
  */
-import { absurd } from "../../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
 import { tokens } from "../highlight.ts";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";
@@ -19,6 +19,8 @@ export interface Site {
   readonly repository: string;
   /** Every page, for the navigation. */
   readonly pages: readonly Page[];
+  /** The sections the top bar shows, where not all four: a site leaves out a section with no page (FR-009). */
+  readonly sections?: readonly Section[];
 }
 
 /** The names of the sections, in the order the top bar shows them, and the page each opens on. */
@@ -273,7 +275,7 @@ export function document(page: Page, site: Site): string {
   const from = page.path;
   const root = relative(from, "index.html").replace(/index\.html$/, "");
   const asset = (name: string): string => `${root}assets/${name}`;
-  const top = SECTIONS.map((s) =>
+  const top = SECTIONS.filter((s) => site.sections === undefined || site.sections.includes(s.section)).map((s) =>
     `<a class="section-link${s.section === page.section ? " current" : ""}" href="${escape(relative(from, s.home))}">${escape(s.label)}</a>`
   ).join("");
   const collapse = page.section === "api" || page.section === "models";

@@ -3,7 +3,7 @@
  *
  * @module
  */
-import { assertEquals, proves } from "../../ts/runtime/test.ts";
+import { assertEquals, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
 import { inlines, markdown, plainContext } from "../markdown.ts";
 
 proves(["0011-documentation FR-016"], "paragraphs, headings, lists, fences and tables become blocks", () => {

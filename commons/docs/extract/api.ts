@@ -2,8 +2,9 @@
  * The API of each area, read through the TypeScript 7.1 programmatic API (commons 0011-documentation FR-010): every export of the area's
  * entry points, an alias followed to what it names, a namespace (`export * as fs`) walked into, with its kinds, the source file it is
  * declared in, its signature as the checker prints it (or, for a type or an interface, as its source writes it), the members of an
- * interface, and its TSDoc. It uses `typescript/async`, whose channel to the compiler runs under Bun; the compiler is the one
- * `commons/docs/package.json` pins.
+ * interface, and its TSDoc. It uses `typescript/async`, whose channel to the compiler runs under Bun and under Node; the compiler is the
+ * one the package's `package.json` pins. The program is the repository's: its modules resolve from its own `node_modules`, and Node's
+ * types are the first `@types/node` found in the repository's root, in a package's folder, or beside the generator.
  *
  * @limits
  * A type in a signature is printed as text and is not yet a link to its page. A signature is the checker's own printing, with no
@@ -14,7 +15,7 @@
  * @module
  */
 import { API } from "typescript/async";
-import { fs, path } from "../../ts/runtime/mod.ts";
+import { fs, path } from "@intellectual-frontiers/ifc-ts/runtime";
 import { type DocComment, docOf, type DocTag, moduleComment } from "../tsdoc.ts";
 
 /** What an export is. */
@@ -48,6 +49,8 @@ export interface ApiExport {
   readonly documented: boolean;
   /** The members of an interface or a class. */
   readonly members: readonly ApiMember[];
+  /** The name it is declared with, where it is exported under another (`export { a as b }`). */
+  readonly declared?: string;
 }
 
 /** The API of an area: its exports, in the order its entry points export them. */
@@ -148,16 +151,31 @@ function tagOf(t: { readonly name: string; readonly text?: readonly { readonly t
 }
 
 /**
+ * The folders of types a program of the repository reads: the first that hold `@types/node`, from the repository's root, the folders
+ * given, and the generator's own.
+ *
+ * @param root - the repository's root
+ * @param dirs - more folders, from the root (the packages')
+ */
+export function typeRootsOf(root: string, dirs: readonly string[] = []): string[] {
+  const own = path.join(path.dirname(path.dirname(path.fromFileUrl(import.meta.url))), "node_modules/@types");
+  const candidates = [path.join(root, "node_modules/@types"), ...dirs.map((d) => path.join(root, d, "node_modules/@types")), own];
+  return [...new Set(candidates)].filter((d) => fs.existsSync(path.join(d, "node")));
+}
+
+/**
  * The API of each area, read in one program of all their entry points.
  *
- * @param root - the checkout's root
+ * @param root - the repository's root
  * @param areas - the areas
+ * @param dirs - the folders, from the root, whose `node_modules/@types` may hold Node's types (the packages')
  */
-export async function readApi(root: string, areas: readonly AreaEntry[]): Promise<AreaApi[]> {
+export async function readApi(root: string, areas: readonly AreaEntry[], dirs: readonly string[] = []): Promise<AreaApi[]> {
   const abs = (rel: string): string => path.join(root, rel);
   const relOf = (file: string): string => path.relative(root, file).split(path.sep).join("/");
-  const api = new API({ cwd: abs("commons/docs") });
+  const api = new API({ cwd: root });
   const entries = areas.flatMap((a) => a.entryPoints.map(abs));
+  const typeRoots = typeRootsOf(root, dirs).slice(0, 1);
   const program = await api.createProgram(entries, {
     strict: true,
     target: 99,
@@ -165,8 +183,8 @@ export async function readApi(root: string, areas: readonly AreaEntry[]): Promis
     moduleResolution: 99,
     allowImportingTsExtensions: true,
     noEmit: true,
-    types: ["node"],
-    typeRoots: [abs("commons/docs/node_modules/@types")],
+    types: typeRoots.length === 0 ? [] : ["node"],
+    typeRoots,
   });
   const checker = program.getProject().checker;
   const texts = new Map<string, string>();
@@ -232,7 +250,8 @@ export async function readApi(root: string, areas: readonly AreaEntry[]): Promis
       if (kinds.includes("const")) signature = `${signature}\nconst ${name}: ${await typeText()}`;
     } else if (kinds.includes("const")) signature = `const ${name.split(".").pop() ?? name}: ${await typeText()}`;
     else signature = text ?? name;
-    return { name, kinds, file: relOf(file), signature, doc, documented, members };
+    const declared = target.name !== (name.split(".").pop() ?? name) ? { declared: target.name } : {};
+    return { name, kinds, file: relOf(file), signature, doc, documented, members, ...declared };
   };
 
   const out: AreaApi[] = [];

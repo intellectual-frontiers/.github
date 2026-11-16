@@ -1,22 +1,38 @@
 {
   "name": "@intellectual-frontiers/ifc-docs",
   "version": "0.1.0",
-  "private": true,
-  "description": "The generator of commons' documentation site, made from commons' TypeScript and spec kit alone (commons 0011-documentation).",
+  "description": "IFC Docs: the generator of a repository's documentation site, made from its TypeScript and its spec kit alone, as commons' own site is (commons 0011-documentation).",
   "type": "module",
+  "exports": {
+    ".": "./mod.ts",
+    "./config": "./config.ts"
+  },
+  "bin": {
+    "ifc-docs": "./main.ts"
+  },
   "engines": {
     "node": ">=26"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",
     "test": "bun test suite/",
-    "site": "bun main.ts --out ../../_site",
-    "site:check": "bun main.ts --check",
-    "verify": "tsc -p tsconfig.json && bun test suite/ && bun main.ts --check"
+    "site": "bun main.ts build --out ../../_site",
+    "site:check": "bun main.ts check",
+    "verify": "tsc -p tsconfig.json && bun test suite/ && bun main.ts check",
+    "pack": "bun tools/pack.ts",
+    "smoke": "bun tools/smoke.ts"
   },
-  "devDependencies": {
-    "@types/node": "26.6.6",
+  "dependencies": {
+    "@intellectual-frontiers/ifc-ts": "https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.4.0/intellectual-frontiers-ifc-ts-0.4.0.tgz",
     "mermaid": "11.17.2",
     "typescript": "7.1.0-beta"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intellectual-frontiers/.github.git",
+    "directory": "commons/docs"
   }
 }

@@ -1,0 +1,63 @@
+name: ifc-docs-release
+
+# A release of IFC Docs, the documentation generator (commons 0011-documentation FR-021, FR-022): a tag ifc-docs-vX.Y.Z whose version is
+# commons/docs/package.json's is checked and tested, built with TypeScript 7 and packed by the pinned Bun, installed into an empty project
+# with a fixture repository and run (ifc-docs check and build) on Bun and on Node 26, and only then attached, with its SHA-256, to the GitHub
+# release of that tag. A repository depends on the asset's URL, so its own lockfile keeps the tarball's integrity. It runs on the tag's push,
+# or by hand from main with the tag to make: then the tag is made by the release itself, at the commit that was checked, and only once
+# everything has passed.
+on:
+  push:
+    tags:
+      - "ifc-docs-v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The tag to release, ifc-docs-vX.Y.Z (X.Y.Z is commons/docs/package.json's version)"
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "26.13.1"
+  TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: By hand, only from main and only for an ifc-docs-v tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          [ "$GITHUB_REF" = refs/heads/main ] || { echo "a release is made from main, not $GITHUB_REF" >&2; exit 1; }
+          case "$TAG" in ifc-docs-v[0-9]*.[0-9]*.[0-9]*) ;; *) echo "$TAG is not ifc-docs-vX.Y.Z" >&2; exit 1 ;; esac
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bun
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Checked, tested, packed for this tag, and used on Bun and Node 26
+        working-directory: commons/docs
+        run: |
+          node --version
+          bun install --frozen-lockfile
+          bun run check
+          bun test suite/
+          bun main.ts check
+          tarball=$(bun run --silent pack --tag "$TAG")
+          bun run --silent smoke "$tarball"
+          echo "TARBALL=commons/docs/${tarball#"$PWD/"}" >>"$GITHUB_ENV"
+      - name: The release, refused where it already exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "$TAG is already released; a version is released once" >&2
+            exit 1
+          fi
+          gh release create "$TAG" "$TARBALL" "$TARBALL.sha256" --target "$GITHUB_SHA" \
+            --title "IFC Docs ${TAG#ifc-docs-v}" \
+            --notes "IFC Docs, the documentation generator (commons 0011-documentation): a repository's site from its TypeScript and its spec kit, configured by a docs.config.ts. Built with TypeScript 7 and checked on Bun and Node 26. SHA-256: $(cut -d' ' -f1 "$TARBALL.sha256")"

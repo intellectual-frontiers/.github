@@ -7,14 +7,8 @@
  * @module
  */
 import type { AnySegment, Codec, Entry } from "../../ts/data/file-aide/mod.ts";
-import { absurd } from "../../ts/kernel/mod.ts";
-import type { Build } from "../build.ts";
-import type { AreaApi } from "../extract/api.ts";
-import type { Block, Inline, TreeNode } from "../model.ts";
-import { slugOf } from "../model.ts";
-import { areaPage, firstSentence } from "../pages/overview.ts";
-import type { Area } from "../sources.ts";
-import { moduleComment } from "../tsdoc.ts";
+import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
+import { type Area, type AreaApi, areaPage, type Block, type Build, firstSentence, type Inline, type Lens, moduleComment, slugOf, type TreeNode, under } from "../mod.ts";
 
 /** An entry of a layout, by its export name. */
 type AnyEntry = Entry<string, object, unknown>;
@@ -50,7 +44,7 @@ export async function readLayouts(b: Build, areas: readonly Area[], apis: readon
     const api = apis.find((a) => a.slug === area.slug);
     const names = api?.exports.filter((e) => e.kinds.includes("const") && ENTRY_TYPE.test(e.signature)).map((e) => e.name) ?? [];
     if (names.length === 0) continue;
-    const entry = `${area.pkg.dir}/${area.entryPoints[0] ?? ""}`;
+    const entry = under(area.pkg.dir, area.entryPoints[0] ?? "");
     try {
       const imported: unknown = await import(b.abs(entry));
       const mod: Record<string, unknown> = typeof imported === "object" && imported !== null ? Object.fromEntries(Object.entries(imported)) : {};
@@ -117,7 +111,7 @@ const codecOf = (codec: Codec<unknown>): string => codec.kind;
  */
 export function layoutPages(b: Build, layouts: readonly LayoutModel[], after: number): void {
   layouts.forEach((l, li) => {
-    const file = `${l.area.pkg.dir}/${l.area.entryPoints[0] ?? ""}`;
+    const file = under(l.area.pkg.dir, l.area.entryPoints[0] ?? "");
     const scope = { page: l.page, file, area: l.area.slug };
     const doc = b.exists(file) ? moduleComment(b.read(file)) : undefined;
     const blocks: Block[] = [];
@@ -145,3 +139,15 @@ export function layoutPages(b: Build, layouts: readonly LayoutModel[], after: nu
     b.add({ path: l.page, title: `${l.area.title} layout`, description: `The layout of files ${l.area.title} defines.`, section: "models", group: l.area.title, order: after + li * 100, navTitle: "Layout", blocks });
   });
 }
+
+/** The File Aide lens (FR-014, FR-026): the layouts of the areas whose exports are entries, and their pages. */
+export const fileAide: Lens = {
+  name: "file-aide",
+  read: async (b, areas, apis) => {
+    const layouts = await readLayouts(b, areas, apis);
+    return (bb, after) => {
+      layoutPages(bb, layouts, after);
+      return after + layouts.length * 100;
+    };
+  },
+};

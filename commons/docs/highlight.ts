@@ -12,7 +12,7 @@
  *
  * @module
  */
-import { absurd } from "../ts/kernel/mod.ts";
+import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
 import type { Lang } from "./model.ts";
 
 /** What a token is, as the stylesheet colours it. */

@@ -6,19 +6,34 @@
  * @module
  */
 import type { Build } from "../build.ts";
+import { under } from "../config.ts";
 import type { LinkScope } from "../links.ts";
 import type { Block, Inline } from "../model.ts";
 import type { Area } from "../sources.ts";
-import { areaFiles } from "../sources.ts";
+import { areaFiles, inside } from "../sources.ts";
 import { moduleComment } from "../tsdoc.ts";
 import type { ModulePage } from "./api.ts";
 import { areaPage, firstSentence } from "./overview.ts";
+import { numberOf } from "./specs.ts";
+
+/**
+ * How a file is named on a page: its path from the outermost package that holds it (`data/arca/party.ts` in commons' `commons/ts`), or
+ * from the root where no package does.
+ *
+ * @param b - the build
+ * @param file - the file, from the root
+ */
+export function shownPath(b: Build, file: string): string {
+  const dirs = b.config.packages.map((p) => p.dir).filter((d) => d !== "" && inside(d, file)).sort((x, y) => x.length - y.length);
+  const outer = dirs[0];
+  return outer === undefined ? file : file.slice(outer.length + 1);
+}
 
 /** Where a file of an area is shown: its page of the API where there is one, else its overview. */
 const fileLink = (b: Build, file: string, fallback: string): Inline => ({
   kind: "link",
   href: { kind: "page", path: b.files.get(file) ?? fallback },
-  children: [{ kind: "code", text: file.split("/").slice(2).join("/") }],
+  children: [{ kind: "code", text: shownPath(b, file) }],
 });
 
 const heading = (id: string, t: string): Block => ({ kind: "heading", level: 2, id, text: [{ kind: "text", text: t }] });
@@ -55,7 +70,7 @@ export function exampleBlocks(b: Build, file: string, shown: string, what: strin
 export function areaPages(b: Build, areas: readonly Area[], modules: ReadonlyMap<string, readonly ModulePage[]>): void {
   areas.forEach((area, i) => {
     const page = areaPage(area);
-    const entry = `${area.pkg.dir}/${area.entryPoints[0] ?? ""}`;
+    const entry = under(area.pkg.dir, area.entryPoints[0] ?? "");
     const spec = area.spec?.id ?? area.pkg.about.spec?.id;
     const scope = { page, file: entry, area: area.slug, ...(spec === undefined ? {} : { spec }) };
     const doc = b.exists(entry) ? moduleComment(b.read(entry)) : undefined;
@@ -70,7 +85,7 @@ export function areaPages(b: Build, areas: readonly Area[], modules: ReadonlyMap
     blocks.push(heading("entry-points", "Entry points"), {
       kind: "list",
       ordered: false,
-      items: area.entryPoints.map((e) => [{ kind: "paragraph", inlines: [fileLink(b, `${area.pkg.dir}/${e}`, page)] }]),
+      items: area.entryPoints.map((e) => [{ kind: "paragraph", inlines: [fileLink(b, under(area.pkg.dir, e), page)] }]),
     });
     const mods = modules.get(area.slug) ?? [];
     if (mods.length > 0) {
@@ -81,7 +96,7 @@ export function areaPages(b: Build, areas: readonly Area[], modules: ReadonlyMap
     }
     if ((doc?.examples.length ?? 0) + (area.examples?.length ?? 0) > 0) blocks.push(heading("examples", "Examples"));
     for (const x of doc?.examples ?? []) blocks.push(...b.example(x, scope));
-    for (const x of area.examples ?? []) blocks.push(...exampleBlocks(b, `${area.pkg.dir}/${x.file}`, x.file, x.what, scope));
+    for (const x of area.examples ?? []) blocks.push(...exampleBlocks(b, under(area.pkg.dir, x.file), x.file, x.what, scope));
     if (area.phases !== undefined && area.phases.length > 0) {
       blocks.push(heading("phases", "Phases"), {
         kind: "table",
@@ -110,7 +125,7 @@ export function areaPages(b: Build, areas: readonly Area[], modules: ReadonlyMap
       group: area.title,
       order: 100 + i * 100,
       navTitle: "Overview",
-      ...(spec === undefined ? {} : { badges: [{ text: spec.slice(0, 4), tone: "neutral" as const }] }),
+      ...(spec === undefined ? {} : { badges: [{ text: numberOf(spec), tone: "neutral" as const }] }),
       blocks,
     });
   });
