@@ -353,6 +353,8 @@ proves(
       "gh auth setup-git",
       "function Sync-Repo",
       "is already in $dest; bringing it up to date",
+      "ls-files --deleted",
+      "restore --pathspec-from-file=-",
       "pull --ff-only",
       "git clone",
       "Sync-Repo '.github'",
