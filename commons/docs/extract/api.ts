@@ -187,6 +187,11 @@ export async function readApi(root: string, areas: readonly AreaEntry[], dirs: r
     typeRoots,
   });
   const checker = program.getProject().checker;
+  // A declaration names its file by the compiler's key, which is lower case where the file system ignores case (macOS, Windows): the
+  // program's own file names give each key back its real spelling, so that the page of `src/Mod.ts` under `/var/folders/Ab/` is that.
+  const names = await program.getSourceFileNames();
+  const fileNames = new Map(names.map((f): readonly [string, string] => [program.getCanonicalFileName(f), f]));
+  const fileOf = (key: string): string => fileNames.get(key) ?? key;
   const texts = new Map<string, string>();
   const textOf = (file: string): string => {
     const t = texts.get(file) ?? fs.readTextFileSync(file);
@@ -198,7 +203,7 @@ export async function readApi(root: string, areas: readonly AreaEntry[], dirs: r
   const sourceOf = async (s: Sym): Promise<{ file: string; text: string | undefined }> => {
     const d = s.declarations[0];
     if (d === undefined) return { file: "", text: undefined };
-    const file = String(d.path);
+    const file = fileOf(String(d.path));
     const node = await d.resolve();
     const full = textOf(file);
     const pos = node !== undefined && "pos" in node && typeof node.pos === "number" ? node.pos : -1;
@@ -264,7 +269,7 @@ export async function readApi(root: string, areas: readonly AreaEntry[], dirs: r
       for (const s of await checker.getExportsOfModule(mod)) {
         const target = s.flags & ALIAS ? await checker.getAliasedSymbol(s) : s;
         if (target.flags & VALUE_MODULE && target.declarations[0]?.path !== undefined && String(target.declarations[0].path).endsWith(".ts")) {
-          const nsFile = String(target.declarations[0].path);
+          const nsFile = fileOf(String(target.declarations[0].path));
           const inner = await checker.getExportsOfModule(target);
           const doc = moduleComment(textOf(nsFile)) ?? docOf("", []);
           exports.push({ name: s.name, kinds: ["namespace"], file: relOf(nsFile), signature: `namespace ${s.name}`, doc, documented: doc.isModule, members: [] });
