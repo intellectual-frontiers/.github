@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { lf } from "../kernel/text.ts";
 import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
@@ -272,7 +273,7 @@ proves(
     for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);
     for (const gone of ["tools/pack.ts", "tsconfig.build.json", "../../.github/workflows/ifc-typescript-release.yml"])
       assert(!existsSync(join(ROOT, gone)), `${gone} is gone: commons is not released`);
-    const ifc = readTextFileSync(join(ROOT, "node", "ifc.mjs"));
+    const ifc = lf(readTextFileSync(join(ROOT, "node", "ifc.mjs")));
     assert(ifc.startsWith("#!/usr/bin/env node\n"), "ifc runs from a shebang");
     assert(
       ifc.indexOf('import "./register.mjs"') < ifc.indexOf('import("../tools/test.ts")'),

@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { lf } from "../../ts/kernel/mod.ts";
 import { fs, path } from "../../ts/runtime/mod.ts";
 import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { PAGES } from "../tools/smoke.ts";
@@ -18,7 +19,7 @@ proves(["0011-documentation FR-021"], "the root package exports ./docs and has i
   assertEquals(fieldOf(root, "name"), "@intellectual-frontiers/commons");
   assertEquals(fieldOf(fieldOf(root, "exports"), "./docs"), "./commons/docs/mod.ts");
   assertEquals(fieldOf(fieldOf(root, "bin"), "ifc-docs"), "./commons/docs/ifc-docs.mjs");
-  const bin = await fs.readTextFile(path.join(ROOT, "commons/docs/ifc-docs.mjs"));
+  const bin = lf(await fs.readTextFile(path.join(ROOT, "commons/docs/ifc-docs.mjs")));
   assert(bin.startsWith("#!/usr/bin/env node\n"), "the command runs from a shebang");
   const hook = bin.indexOf('import "../ts/node/register.mjs";');
   assert(hook > 0 && hook < bin.indexOf('import("./cli.ts")'), "the hook is registered before any TypeScript is imported");

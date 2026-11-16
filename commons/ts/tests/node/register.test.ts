@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { lf } from "../../kernel/text.ts";
 import { makeTempDir, mkdir, readTextFileSync, remove, writeTextFile } from "../../runtime/fs.ts";
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../../runtime/path.ts";
 import { run, which } from "../../runtime/proc.ts";
@@ -90,7 +91,7 @@ proves([FR], "ifc and ifc-docs register the hook before they import TypeScript, 
     ["node/ifc.mjs", 'import("../tools/test.ts")'],
     ["../docs/ifc-docs.mjs", 'import("./cli.ts")'],
   ] as const) {
-    const text = readTextFileSync(join(ROOT, file));
+    const text = lf(readTextFileSync(join(ROOT, file)));
     assert(text.startsWith("#!/usr/bin/env node\n"), `${file} runs from a shebang`);
     const hook = text.indexOf('register.mjs";');
     assert(hook > 0 && hook < text.indexOf(entry), `${file} registers the hook before ${entry}`);
