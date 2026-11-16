@@ -1,10 +1,27 @@
-// The packaging ontology decoded once into typed records (commons 0002-packaging, 0004-rules), with every rule of it the data breaks.
+// The packaging ontology decoded once into typed records (commons 0002-packaging, 0004-rules, 0012-ontology), with every rule of it the data breaks.
 //
-// This is the tools' decode boundary: the graph's terms become the vocabulary's unions (a kind, a status, an assurance, an operation...) and branded identifiers here,
-// and everything after it works on the `Table`. The order in which things are read, and so the order of the findings and of every list, is the order the Python
-// generator (rdflib) gave: subjects sorted by IRI, a property's values in the order written, and one value of a property the least of them.
+// This is the tools' decode boundary. The ontology is TypeScript (commons/ontology/supply-chain/packaging/), whose values the compiler has already checked against
+// their class schemas; here its code lists become the tools' unions (a kind, a status, an assurance, an operation...) through tables the compiler holds complete,
+// its identifiers become branded ones, and what a type cannot state is checked. Everything after it works on the `Table`. The order in which things are read, and so
+// the order of the findings and of every list, is the order the Python generator (rdflib) gave: subjects sorted by IRI, a property's values in the order written.
 import { assertNever, type Brand, brand, compareText, err, isOneOf, ok, type Result, sortedBy, sortedText } from "./core.ts";
-import { type Graph, type Iri, iri, RDF_TYPE, type Term, textOf } from "./turtle.ts";
+import {
+  assurances,
+  codeOf,
+  FIELD_TYPES,
+  formatRdfFinding,
+  type Iri,
+  managerKinds,
+  type Named,
+  type Ontology,
+  operations,
+  owl,
+  PM,
+  RULE_SETS,
+  supportStatuses,
+  tiers,
+  validate,
+} from "../ontology/supply-chain/packaging/mod.ts";
 import { words } from "./shlex.ts";
 
 export type FamilyId = Brand<string, "FamilyId">;
@@ -15,18 +32,10 @@ export type PinName = Brand<string, "PinName">;
 /** 64 lower-case hexadecimal digits. */
 export type Sha256 = Brand<string, "Sha256">;
 
-export const PM = "https://www.intellectualfrontiers.com/ontology/packaging#";
-const pm = (local: string): Iri => iri(`${PM}${local}`);
-const OWL = "http://www.w3.org/2002/07/owl#";
-const RDFS_LABEL = iri("http://www.w3.org/2000/01/rdf-schema#label");
-const DCTERMS_IDENTIFIER = iri("http://purl.org/dc/terms/identifier");
-const SKOS_DEFINITION = iri("http://www.w3.org/2004/02/skos/core#definition");
-
 export const OPS = ["install", "remove", "upgrade", "upgrade-all", "search", "info", "refresh", "list-installed", "query-installed", "query-candidate", "query-version"] as const;
 export type Op = (typeof OPS)[number];
-/** The IRIs of a vocabulary's individuals (`pm:Local`), and the word each decodes to. */
-const vocab = <T extends string>(words: Readonly<Record<string, T>>): ReadonlyMap<string, T> => new Map(Object.entries(words).map(([local, w]) => [`${PM}${local}`, w]));
-const OP_OF = vocab<Op>({
+/** The word of each operation of the code list (a key left out, or one more, does not compile). */
+const OP_OF: { readonly [K in keyof typeof operations]: Op } = {
   Install: "install",
   Remove: "remove",
   Upgrade: "upgrade",
@@ -38,17 +47,17 @@ const OP_OF = vocab<Op>({
   QueryInstalled: "query-installed",
   QueryCandidate: "query-candidate",
   QueryVersion: "query-version",
-});
+};
 export type Assurance = "verified" | "stand-in" | "untested" | "none";
-const ASSURANCE = vocab<Assurance>({ Verified: "verified", StandIn: "stand-in", Untested: "untested", NoAssurance: "none" });
+const ASSURANCE: { readonly [K in keyof typeof assurances]: Assurance } = { Verified: "verified", StandIn: "stand-in", Untested: "untested", NoAssurance: "none" };
 export type ManagerKind = "system" | "helper" | "universal";
-const KIND = vocab<ManagerKind>({ SystemKind: "system", HelperKind: "helper", UniversalKind: "universal" });
+const KIND: { readonly [K in keyof typeof managerKinds]: ManagerKind } = { SystemKind: "system", HelperKind: "helper", UniversalKind: "universal" };
 export type Tier = "required" | "comfort";
-const TIER = vocab<Tier>({ Required: "required", Comfort: "comfort" });
+const TIER: { readonly [K in keyof typeof tiers]: Tier } = { Required: "required", Comfort: "comfort" };
 export type SupportStatus = "supported" | "catalogued";
-export const RULE_SETS = ["shell-portability", "ci-forbidden-program", "ci-forbidden-action", "host-program", "installer"] as const;
+const STATUS: { readonly [K in keyof typeof supportStatuses]: SupportStatus } = { Supported: "supported", Catalogued: "catalogued" };
+export { FIELD_TYPES, RULE_SETS };
 export type RuleSet = (typeof RULE_SETS)[number];
-export const FIELD_TYPES = ["text", "boolean", "date"] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 /** A command is a list of words, never a line for a shell. */
 const SHELL_SYNTAX = /[;|&<>`()\n]/;
@@ -106,6 +115,7 @@ export type Table = {
 // ---- what the ontology may break ----------------------------------------------------------------------------------------------------------------------
 
 export type Finding =
+  | { readonly kind: "rdf"; readonly sentence: string }
   | { readonly kind: "term-undefined"; readonly term: string }
   | { readonly kind: "class-unlabelled"; readonly term: string }
   | { readonly kind: "manager-twice"; readonly manager: ManagerId }
@@ -152,6 +162,8 @@ export type Form = "template" | "non-interactive form";
 /** The sentence a finding is printed with (the Python generator's, word for word). */
 export function describe(f: Finding): string {
   switch (f.kind) {
+    case "rdf":
+      return f.sentence;
     case "term-undefined":
       return `the term ${f.term} has no definition`;
     case "class-unlabelled":
@@ -239,55 +251,22 @@ export function describe(f: Finding): string {
   }
 }
 
-// ---- reading the graph ---------------------------------------------------------------------------------------------------------------------------------
+// ---- reading the typed values ---------------------------------------------------------------------------------------------------------------------------
 
 /** A text that is there: Python's truthiness of a `str | None`. */
-const given = (s: string | null): s is string => s !== null && s !== "";
-/** Python's `int()` of a text of digits, or null. */
-const integer = (s: string): number | null => (/^\s*[+-]?[0-9]+(?:_[0-9]+)*\s*$/.test(s) ? Number.parseInt(s.replaceAll("_", ""), 10) : null);
+const given = (s: string | null | undefined): s is string => s !== null && s !== undefined && s !== "";
 
-class Reader {
-  constructor(readonly g: Graph) {}
-  /** The subjects of a class, sorted by IRI. */
-  all(cls: Iri): Iri[] {
-    return sortedBy(this.g.subjects(RDF_TYPE, cls), compareText);
-  }
-  /** The least of a property's values, as text. */
-  one(s: Iri, p: Iri): string | null {
-    return sortedText(this.g.objects(s, p).map(textOf))[0] ?? null;
-  }
-  many(s: Iri, p: Iri): string[] {
-    return sortedText(this.g.objects(s, p).map(textOf));
-  }
-  /** The first value of a property, as read. */
-  first(s: Iri, p: Iri): Term | null {
-    return this.g.objects(s, p)[0] ?? null;
-  }
-  /** The first value of a property that names one of `of`'s IRIs, decoded. */
-  firstOf<T>(s: Iri, p: Iri, of: ReadonlyMap<string, T>): T | null {
-    for (const o of this.g.objects(s, p)) {
-      const v = o.kind === "iri" ? of.get(o.iri) : undefined;
-      if (v !== undefined) return v;
-    }
-    return null;
-  }
-  /** Every value of a property that names one of `of`'s IRIs, decoded, in the order read. */
-  allOf<T>(s: Iri, p: Iri, of: ReadonlyMap<string, T>): T[] {
-    return this.g.objects(s, p).flatMap((o) => {
-      const v = o.kind === "iri" ? of.get(o.iri) : undefined;
-      return v === undefined ? [] : [v];
-    });
-  }
-  has(s: Iri, p: Iri, o: Iri): boolean {
-    return this.g.objects(s, p).some((t) => t.kind === "iri" && t.iri === o);
-  }
-  ident(s: Iri): string {
-    const id = this.one(s, DCTERMS_IDENTIFIER);
-    return given(id) ? id : s.slice(s.lastIndexOf("/") + 1);
-  }
+/** Individuals sorted by IRI, as the Python generator read each class's subjects. */
+const byIri = <T extends Named>(xs: readonly T[]): T[] => sortedBy(xs, (a, b) => compareText(a.iri, b.iri));
+
+/** The word a code list's individual names, through the table that maps the list's keys to words; nothing where the node is none of the list's. */
+function wordOf<K extends string, W>(list: { readonly [N in K]: Named }, table: { readonly [N in K]: W }, node: Named): W | undefined {
+  const key = codeOf(list, node);
+  return key === undefined ? undefined : table[key];
 }
 
-const lookup = <T>(m: ReadonlyMap<string, T>, t: Term | null): T | undefined => (t !== null && t.kind === "iri" ? m.get(t.iri) : undefined);
+/** What a subject's identifier is: its `dcterms:identifier`, or the end of its IRI. */
+const ident = (s: Named, identifier: string): string => (given(identifier) ? identifier : s.iri.slice(s.iri.lastIndexOf("/") + 1));
 
 type DraftFamily = Omit<Family, "status" | "assurance"> & { readonly status: SupportStatus | null; readonly assurance: Assurance | null };
 type DraftManager = Omit<Manager, "kind" | "commands"> & { readonly kind: ManagerKind | null; readonly commands: Map<Op, Command> };
@@ -295,8 +274,7 @@ type DraftPin = Omit<Pin, "sha256"> & { readonly sha256: Map<PlatformName, strin
 type DraftProgram = Omit<Program, "names"> & { readonly names: Map<FamilyId, string> };
 
 /** The table the ontology makes, or every rule it breaks, in the order the Python generator named them. */
-export function decode(g: Graph): Result<Table, Finding[]> {
-  const r = new Reader(g);
+export function decode(o: Ontology): Result<Table, Finding[]> {
   const bad: Finding[] = [];
   const split = (subject: Iri, text: string): string[] => {
     const w = words(text);
@@ -304,60 +282,81 @@ export function decode(g: Graph): Result<Table, Finding[]> {
     bad.push({ kind: "not-words", subject, text, why: w.error });
     return [];
   };
+  // 0012-ontology FR-005: what the kernel finds that a type cannot state (or a run without the type checker let through)
+  const everything = [
+    ...o.classes,
+    ...o.properties,
+    ...o.managers,
+    ...o.commands,
+    ...o.prohibitions,
+    ...o.families,
+    ...o.programs,
+    ...o.packageNames,
+    ...o.platforms,
+    ...o.pins,
+    ...o.checksums,
+    ...o.rules,
+    ...o.recordFields,
+  ];
+  for (const f of validate(everything)) bad.push({ kind: "rdf", sentence: formatRdfFinding(f) });
   // 0002-packaging FR-001: every term of the vocabulary is defined, and every class labelled
-  for (const kind of ["Class", "DatatypeProperty", "ObjectProperty"]) {
-    for (const term of r.all(iri(`${OWL}${kind}`))) {
-      if (!term.startsWith(PM)) continue;
-      if (!given(r.one(term, SKOS_DEFINITION))) bad.push({ kind: "term-undefined", term: term.slice(PM.length) });
-      if (kind === "Class" && !given(r.one(term, RDFS_LABEL))) bad.push({ kind: "class-unlabelled", term: term.slice(PM.length) });
+  const described = [
+    ...o.classes.map((c) => ({ iri: c.iri, kind: c.class.iri, label: c.values.label?.value, definition: c.values.definition?.value })),
+    ...o.properties.map((p) => ({ iri: p.iri, kind: p.class.iri, label: undefined, definition: p.values.definition?.value })),
+  ];
+  for (const kind of [owl.Class, owl.DatatypeProperty, owl.ObjectProperty]) {
+    for (const term of sortedBy(described.filter((d) => d.kind === kind.iri), (x, y) => compareText(x.iri, y.iri))) {
+      if (!term.iri.startsWith(PM.iri)) continue;
+      if (!given(term.definition)) bad.push({ kind: "term-undefined", term: term.iri.slice(PM.iri.length) });
+      if (kind === owl.Class && !given(term.label)) bad.push({ kind: "class-unlabelled", term: term.iri.slice(PM.iri.length) });
     }
   }
-  const text = (s: Iri, p: string): string => r.one(s, pm(p)) ?? "";
 
   const managers = new Map<ManagerId, DraftManager>();
   const managerOf = new Map<string, ManagerId>();
-  for (const m of r.all(pm("PackageManager"))) {
-    const id = brand<"ManagerId">(r.ident(m));
-    managerOf.set(m, id);
+  for (const m of byIri(o.managers)) {
+    const v = m.values;
+    const id = brand<"ManagerId">(ident(m, v.identifier));
+    managerOf.set(m.iri, id);
     if (managers.has(id)) bad.push({ kind: "manager-twice", manager: id });
-    const kinds = r.allOf(m, pm("kind"), KIND);
-    const exe = r.one(m, pm("executable"));
-    if (!given(exe)) bad.push({ kind: "manager-no-executable", manager: id });
-    if (kinds.length !== 1) bad.push({ kind: "manager-kinds", manager: id });
+    const kind = wordOf(managerKinds, KIND, v.kind);
+    if (!given(v.executable)) bad.push({ kind: "manager-no-executable", manager: id });
+    if (kind === undefined) bad.push({ kind: "manager-kinds", manager: id });
     managers.set(id, {
-      executable: exe ?? "",
-      kind: kinds[0] ?? null,
-      administrator: r.one(m, pm("needsAdministrator")) === "true",
-      environment: text(m, "environment"),
-      purlType: text(m, "purlType"),
-      harnessUse: text(m, "harnessUse"),
+      executable: v.executable,
+      kind: kind ?? null,
+      administrator: v.needsAdministrator === true,
+      environment: v.environment ?? "",
+      purlType: v.purlType ?? "",
+      harnessUse: v.harnessUse ?? "",
       commands: new Map(),
-      note: text(m, "note"),
+      note: v.note ?? "",
     });
   }
 
   const prohibitions: Prohibition[] = [];
-  for (const p of r.all(pm("Prohibition"))) {
-    const owner = lookup(managerOf, r.first(p, pm("prohibitionOf")));
-    const t = r.one(p, pm("forbiddenTemplate"));
-    const why = r.one(p, SKOS_DEFINITION);
+  for (const p of byIri(o.prohibitions)) {
+    const owner = managerOf.get(p.values.prohibitionOf.iri);
+    const t = p.values.forbiddenTemplate;
+    const why = p.values.definition.value;
     if (owner === undefined || !given(t) || !given(why)) {
-      bad.push({ kind: "prohibition-incomplete", subject: p });
+      bad.push({ kind: "prohibition-incomplete", subject: p.iri });
       continue;
     }
-    prohibitions.push({ manager: owner, template: t, argv: split(p, t), reason: why });
+    prohibitions.push({ manager: owner, template: t, argv: split(p.iri, t), reason: why });
   }
   const forbidden = new Set(prohibitions.map((p) => `${p.manager}\0${p.template}`));
-  for (const c of r.all(pm("Command"))) {
-    const id = lookup(managerOf, r.first(c, pm("commandOf")));
-    const op = r.firstOf(c, pm("operation"), OP_OF);
-    const t = r.one(c, pm("template"));
+  for (const c of byIri(o.commands)) {
+    const v = c.values;
+    const id = managerOf.get(v.commandOf.iri);
+    const op = wordOf(operations, OP_OF, v.operation);
+    const t = v.template;
     const manager = id === undefined ? undefined : managers.get(id);
-    if (id === undefined || manager === undefined || op === null || !given(t)) {
-      bad.push({ kind: "command-incomplete", subject: c });
+    if (id === undefined || manager === undefined || op === undefined || !given(t)) {
+      bad.push({ kind: "command-incomplete", subject: c.iri });
       continue;
     }
-    const ni = r.one(c, pm("nonInteractive"));
+    const ni = v.nonInteractive ?? null;
     const forms: readonly (readonly [Form, string | null])[] = [["template", t], ["non-interactive form", ni]];
     for (const [form, said] of forms) {
       if (said === null) continue;
@@ -365,69 +364,73 @@ export function decode(g: Graph): Result<Table, Finding[]> {
       if (forbidden.has(`${id}\0${said}`)) bad.push({ kind: "forbidden", manager: id, op, form, text: said });
     }
     if (manager.commands.has(op)) bad.push({ kind: "command-twice", manager: id, op });
-    manager.commands.set(op, { argv: split(c, t), noninteractive: given(ni) ? split(c, ni) : null, origin: text(c, "origin"), verified: text(c, "verifiedOn") });
+    manager.commands.set(op, { argv: split(c.iri, t), noninteractive: given(ni) ? split(c.iri, ni) : null, origin: v.origin, verified: v.verifiedOn ?? "" });
   }
 
   const families = new Map<FamilyId, DraftFamily>();
   const familyOf = new Map<string, FamilyId>();
   const seenIds = new Map<string, FamilyId>();
-  for (const f of r.all(pm("SystemFamily"))) {
-    const id = brand<"FamilyId">(r.ident(f));
-    familyOf.set(f, id);
-    const detect = r.many(f, pm("detectedBy"));
+  for (const f of byIri(o.families)) {
+    const v = f.values;
+    const id = brand<"FamilyId">(ident(f, v.identifier));
+    familyOf.set(f.iri, id);
+    const detect = sortedText(v.detectedBy ?? []);
     if (detect.length === 0) bad.push({ kind: "family-undetected", family: id });
     for (const d of detect) {
       const before = seenIds.get(d);
       if (before !== undefined && d !== "*") bad.push({ kind: "id-shared", id: d, first: before, second: id });
       seenIds.set(d, id);
     }
-    const status: SupportStatus | null = r.has(f, pm("supportStatus"), pm("Supported")) ? "supported" : r.has(f, pm("supportStatus"), pm("Catalogued")) ? "catalogued" : null;
-    const assurance = r.firstOf(f, pm("assurance"), ASSURANCE);
+    const status = wordOf(supportStatuses, STATUS, v.supportStatus) ?? null;
+    const assurance = wordOf(assurances, ASSURANCE, v.assurance) ?? null;
     if (status === null) bad.push({ kind: "family-no-status", family: id });
     if (assurance === null) bad.push({ kind: "family-no-assurance", family: id });
-    const used = r.allOf(f, pm("usesManager"), managerOf);
-    if (used.length !== g.objects(f, pm("usesManager")).length) bad.push({ kind: "family-unknown-manager", family: id });
-    const label = r.one(f, RDFS_LABEL);
+    const named = v.usesManager ?? [];
+    const used = named.flatMap((m) => {
+      const known = managerOf.get(m.iri);
+      return known === undefined ? [] : [known];
+    });
+    if (used.length !== named.length) bad.push({ kind: "family-unknown-manager", family: id });
     families.set(id, {
-      label: given(label) ? label : id,
+      label: given(v.label.value) ? v.label.value : id,
       status,
       assurance,
       detect,
-      detectSource: text(f, "detectSource"),
-      uname: text(f, "unameName"),
+      detectSource: v.detectSource,
+      uname: v.unameName ?? "",
       managers: used,
-      preferred: r.firstOf(f, pm("preferredManager"), managerOf),
-      installsPackages: r.one(f, pm("harnessInstallsPackages")) !== "false",
-      removalHint: text(f, "removalHint"),
-      adminInstall: text(f, "adminInstall"),
-      verifiedOn: text(f, "verifiedOn"),
-      note: text(f, "note"),
+      preferred: v.preferredManager === undefined ? null : (managerOf.get(v.preferredManager.iri) ?? null),
+      installsPackages: v.harnessInstallsPackages !== false,
+      removalHint: v.removalHint ?? "",
+      adminInstall: v.adminInstall ?? "",
+      verifiedOn: v.verifiedOn ?? "",
+      note: v.note ?? "",
     });
   }
 
   const programs = new Map<ProgramName, DraftProgram>();
   const programOf = new Map<string, ProgramName>();
-  for (const p of r.all(pm("Program"))) {
-    const name = r.one(p, pm("programName"));
-    const tier = r.firstOf(p, pm("tier"), TIER);
-    if (!given(name) || tier === null) {
-      bad.push({ kind: "program-incomplete", subject: p });
+  for (const p of byIri(o.programs)) {
+    const name = p.values.programName;
+    const tier = wordOf(tiers, TIER, p.values.tier);
+    if (!given(name) || tier === undefined) {
+      bad.push({ kind: "program-incomplete", subject: p.iri });
       continue;
     }
     const id = brand<"ProgramName">(name);
-    programOf.set(p, id);
-    const order = r.one(p, pm("order"));
-    const digits = order !== null && /^[0-9]+$/.test(order);
+    programOf.set(p.iri, id);
+    const order = p.values.order;
+    const digits = Number.isSafeInteger(order) && order >= 0;
     if (!digits) bad.push({ kind: "program-no-order", program: id });
-    programs.set(id, { tier, order: digits ? Number.parseInt(order, 10) : 0, names: new Map() });
+    programs.set(id, { tier, order: digits ? order : 0, names: new Map() });
   }
-  for (const n of r.all(pm("PackageName"))) {
-    const prog = lookup(programOf, r.first(n, pm("forProgram")));
-    const fam = lookup(familyOf, r.first(n, pm("forFamily")));
-    const name = r.one(n, pm("name"));
+  for (const n of byIri(o.packageNames)) {
+    const prog = programOf.get(n.values.forProgram.iri);
+    const fam = familyOf.get(n.values.forFamily.iri);
+    const name = n.values.name;
     const program = prog === undefined ? undefined : programs.get(prog);
     if (program === undefined || fam === undefined || !given(name)) {
-      bad.push({ kind: "package-name-incomplete", subject: n });
+      bad.push({ kind: "package-name-incomplete", subject: n.iri });
       continue;
     }
     program.names.set(fam, name);
@@ -461,42 +464,42 @@ export function decode(g: Graph): Result<Table, Finding[]> {
   const platforms = new Map<PlatformName, Platform>();
   const platformOf = new Map<string, PlatformName>();
   const suffixes = new Set<string>();
-  for (const pl of r.all(pm("Platform"))) {
-    const name = r.one(pl, pm("platformName"));
-    const rec: Platform = { os: text(pl, "operatingSystem"), processor: text(pl, "processor"), suffix: text(pl, "pinSuffix"), label: r.one(pl, RDFS_LABEL) ?? "" };
-    if (!given(name) || !Object.values(rec).every((v) => v !== "")) {
-      bad.push({ kind: "platform-incomplete", subject: pl });
+  for (const pl of byIri(o.platforms)) {
+    const v = pl.values;
+    const rec: Platform = { os: v.operatingSystem, processor: v.processor, suffix: v.pinSuffix, label: v.label.value };
+    if (!given(v.platformName) || !Object.values(rec).every((x) => x !== "")) {
+      bad.push({ kind: "platform-incomplete", subject: pl.iri });
       continue;
     }
     if (suffixes.has(rec.suffix)) bad.push({ kind: "suffix-shared", suffix: rec.suffix });
     suffixes.add(rec.suffix);
-    const id = brand<"PlatformName">(name);
-    platformOf.set(pl, id);
+    const id = brand<"PlatformName">(v.platformName);
+    platformOf.set(pl.iri, id);
     platforms.set(id, rec);
   }
   const pins = new Map<PinName, DraftPin>();
   const pinOf = new Map<string, PinName>();
   const keys = new Set<string>();
-  for (const pn of r.all(pm("PinnedDownload"))) {
-    const [name, key, version] = [r.one(pn, pm("programName")), r.one(pn, pm("pinKey")), r.one(pn, pm("version"))];
+  for (const pn of byIri(o.pins)) {
+    const v = pn.values;
+    const [name, key, version] = [v.programName, v.pinKey, v.version];
     if (!given(name) || !given(key) || !given(version)) {
-      bad.push({ kind: "pin-incomplete", subject: pn });
+      bad.push({ kind: "pin-incomplete", subject: pn.iri });
       continue;
     }
     if (keys.has(key)) bad.push({ kind: "key-shared", key });
     keys.add(key);
     const id = brand<"PinName">(name);
-    pinOf.set(pn, id);
-    const label = r.one(pn, RDFS_LABEL);
-    pins.set(id, { key, version, label: given(label) ? label : name, note: text(pn, "note"), sha256: new Map() });
+    pinOf.set(pn.iri, id);
+    pins.set(id, { key, version, label: given(v.label.value) ? v.label.value : name, note: v.note?.value ?? "", sha256: new Map() });
   }
-  for (const c of r.all(pm("Checksum"))) {
-    const pin = lookup(pinOf, r.first(c, pm("forPin")));
-    const platform = lookup(platformOf, r.first(c, pm("forPlatform")));
-    const digest = r.one(c, pm("sha256"));
+  for (const c of byIri(o.checksums)) {
+    const pin = pinOf.get(c.values.forPin.iri);
+    const platform = platformOf.get(c.values.forPlatform.iri);
+    const digest = c.values.sha256;
     const p = pin === undefined ? undefined : pins.get(pin);
     if (pin === undefined || p === undefined || platform === undefined || !given(digest)) {
-      bad.push({ kind: "checksum-incomplete", subject: c });
+      bad.push({ kind: "checksum-incomplete", subject: c.iri });
       continue;
     }
     if (!HEX64.test(digest)) bad.push({ kind: "checksum-not-hex", pin, platform });
@@ -505,10 +508,12 @@ export function decode(g: Graph): Result<Table, Finding[]> {
   }
 
   const rules: Rule[] = [];
-  for (const rule of r.all(pm("Rule"))) {
-    const id = rule.slice(rule.lastIndexOf("rule-") < 0 ? 0 : rule.lastIndexOf("rule-") + "rule-".length);
-    const [set, pattern, label, reason] = [r.one(rule, pm("ruleSet")), r.one(rule, pm("pattern")), r.one(rule, RDFS_LABEL), r.one(rule, SKOS_DEFINITION)];
-    if (set === null || !isOneOf(RULE_SETS, set) || !given(pattern) || !given(label) || !given(reason)) {
+  for (const rule of byIri(o.rules)) {
+    const at = rule.iri.lastIndexOf("rule-");
+    const id = rule.iri.slice(at < 0 ? 0 : at + "rule-".length);
+    const v = rule.values;
+    const [set, pattern, label, reason] = [v.ruleSet, v.pattern, v.label.value, v.definition.value];
+    if (!isOneOf(RULE_SETS, set) || !given(pattern) || !given(label) || !given(reason)) {
       bad.push({ kind: "rule-incomplete", rule: id });
       continue;
     }
@@ -522,16 +527,15 @@ export function decode(g: Graph): Result<Table, Finding[]> {
   }
 
   const record: RecordField[] = [];
-  const orderOf = (f: Iri): number => integer(r.one(f, pm("order")) ?? "0") ?? 0;
-  for (const f of sortedBy(g.subjects(RDF_TYPE, pm("RecordField")), (a, b) => orderOf(a) - orderOf(b))) {
-    const [name, type, order, definition] = [r.one(f, pm("fieldName")), r.one(f, pm("fieldType")), r.one(f, pm("order")), r.one(f, SKOS_DEFINITION)];
-    const n = order === null ? null : integer(order);
-    if (!given(name) || type === null || !isOneOf(FIELD_TYPES, type) || !given(order) || n === null || !given(definition)) {
-      bad.push({ kind: "field-incomplete", subject: f });
+  for (const f of sortedBy(o.recordFields, (a, b) => a.values.order - b.values.order)) {
+    const v = f.values;
+    const [name, type, n, definition] = [v.fieldName, v.fieldType, v.order, v.definition.value];
+    if (!given(name) || !isOneOf(FIELD_TYPES, type) || !Number.isSafeInteger(n) || !given(definition)) {
+      bad.push({ kind: "field-incomplete", subject: f.iri });
       continue;
     }
     if (record.some((x) => x.name === name || x.order === n)) bad.push({ kind: "field-repeated", field: name });
-    record.push({ name, type, order: n, definition, values: r.many(f, pm("allowedValue")) });
+    record.push({ name, type, order: n, definition, values: sortedText(v.allowedValue ?? []) });
   }
 
   if (bad.length > 0) return err(bad);

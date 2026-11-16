@@ -50,11 +50,14 @@ Deno.test("commons' own folder is clean from the command line, with no configura
 
 Deno.test("a gap, a repeated number and a missing folder in the register (0003-spec-kit FR-001)", () => {
   using k = Kit.make();
-  k.edit("registry.tsv", "0004\trules\tin force", "0004\trules\tin force\n0004\tother\tin force\n0013\tnone\tin force");
+  // the register's next free number, and the one after it, which leaves a gap
+  const next = Deno.readTextFileSync(`${KIT}/registry.tsv`).trim().split("\n").length;
+  const [gap, after] = [next, next + 1].map((n) => String(n).padStart(4, "0"));
+  k.edit("registry.tsv", "0004\trules\tin force", `0004\trules\tin force\n0004\tother\tin force\n${after}\tnone\tin force`);
   const out = k.findings();
   assertStringIncludes(out, "assigned twice");
-  assertStringIncludes(out, "gap at 0012");
-  assertStringIncludes(out, "0013-none is in force but its specification does not exist");
+  assertStringIncludes(out, `gap at ${gap}`);
+  assertStringIncludes(out, `${after}-none is in force but its specification does not exist`);
 });
 
 Deno.test("a spec with no row, and a register that is missing (0003-spec-kit FR-001, FR-006)", () => {

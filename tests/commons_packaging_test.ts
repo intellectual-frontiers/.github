@@ -1,15 +1,17 @@
 // commons: the packaging ontology and the tables made from it (commons 0001-software-supply-chain, 0002-packaging, 0004-rules).
 //
 // The generated TOML and shell fragment are read as a consumer reads them and checked against the tables of `upt` they were seeded from and against the rules of
-// 0002-packaging; the generator is run on copies of commons, each breaking a rule on purpose, and must name it and write nothing; and the Turtle reader the generator
-// stands on is held to the part of Turtle it reads.
+// 0002-packaging; the generator is run on copies of commons, each breaking a rule on purpose, and must name it and write nothing; and the ontology, which is TypeScript
+// (commons 0012-ontology), is held to its layout, to what its type checker refuses and to the hash and the Turtle made from it.
 import { assert, assertEquals, assertMatch, assertNotEquals, assertStringIncludes } from "@std/assert";
 import { parse } from "@std/toml";
 import * as mod from "../commons/generated/packaging.auto.ts";
 import { rules as portabilityRules, scan } from "../commons/tools/shell-portability-check.ts";
 import { words } from "../commons/tools/shlex.ts";
-import { Graph, iri, parseInto, RDF_TYPE, textOf } from "../commons/tools/turtle.ts";
 import { pyJson } from "../commons/tools/emit.ts";
+import { digestOf } from "../commons/tools/generate-packaging.ts";
+import { OPS } from "../commons/tools/ontology.ts";
+import { files, operations } from "../commons/ontology/supply-chain/packaging/mod.ts";
 import { copyTree, ROOT } from "./helpers.ts";
 
 const COMMONS = `${ROOT}/commons`;
@@ -109,12 +111,12 @@ Deno.test("Generated: every manager and every os row of upt is here (0002-packag
 });
 
 Deno.test("Generated: upt is credited with its licence and the ID it leaves out is said (0002-packaging FR-003)", () => {
-  for (const name of ["managers.ttl", "families.ttl"]) {
+  for (const name of ["managers.ts", "families.ts"]) {
     const t = Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/${name}`);
     assertStringIncludes(t, "sigoden/upt", name);
     assertStringIncludes(t, "MIT or Apache-2.0", name);
   }
-  assertStringIncludes(Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/families.ttl`), "oubes");
+  assertStringIncludes(Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/families.ts`), "oubes");
   assert(!entries(table().families).some(([, f]) => texts(f.detect).includes("oubes")));
 });
 
@@ -315,7 +317,7 @@ class Copy {
   readonly root: string;
   private constructor(readonly tmp: string) {
     this.root = `${tmp}/commons`;
-    copyTree(COMMONS, this.root, ["spec-kit", "__pycache__"]);
+    copyTree(COMMONS, this.root, ["spec-kit", "__pycache__", "node_modules", "docs", "data", "dist", "test-results"]);
   }
   static make(): Copy {
     return new Copy(Deno.makeTempDirSync({ prefix: "commons-generator-" }));
@@ -326,7 +328,7 @@ class Copy {
   file(rel: string): string {
     return `${this.root}/${rel}`;
   }
-  /** Replaces the first `old` in the ontology's file `name`. */
+  /** Replaces the first `old` in the ontology's module `name`. */
   edit(name: string, old: string | RegExp, now: string): void {
     const f = this.file(`${ONTOLOGY}/${name}`);
     const t = Deno.readTextFileSync(f);
@@ -341,6 +343,13 @@ class Copy {
       stdout: "piped",
       stderr: "piped",
     }).output();
+    const dec = new TextDecoder();
+    return { code: o.code, stdout: dec.decode(o.stdout), stderr: dec.decode(o.stderr) };
+  }
+  /** Deno's type checker on the copy's generator, and so on the ontology it imports, as CI runs it. */
+  async check(): Promise<Ran> {
+    const o = await new Deno.Command(Deno.execPath(), { args: ["check", "--no-config", "--quiet", this.file("tools/generate-packaging.ts")], stdout: "piped", stderr: "piped" })
+      .output();
     const dec = new TextDecoder();
     return { code: o.code, stdout: dec.decode(o.stdout), stderr: dec.decode(o.stderr) };
   }
@@ -362,14 +371,14 @@ async function refused(edits: (c: Copy) => void, ...said: string[]): Promise<voi
 }
 
 Deno.test("Record: a bad rule or field is refused (0004-rules FR-002, 0002-packaging FR-016)", async () => {
-  await refused((c) => c.edit("rules.ttl", 'pm:pattern "apt-get"', 'pm:pattern "(apt"'), "rule ci-apt-get: the pattern is not a regular expression: ");
-  await refused((c) => c.edit("rules.ttl", 'pm:ruleSet "installer"', 'pm:ruleSet "installers"'), "needs a set (one of shell-portability, ci-forbidden-program");
-  await refused((c) => c.edit("record.ttl", 'pm:fieldType "date"', 'pm:fieldType "number"'), "needs a name, a type (one of text, boolean, date)");
-  await refused((c) => c.edit("record.ttl", "pm:order 2 ;", "pm:order 1 ;"), "the record field family repeats a name or an order");
+  await refused((c) => c.edit("rules.ts", 'pattern: "apt-get"', 'pattern: "(apt"'), "rule ci-apt-get: the pattern is not a regular expression: ");
+  await refused((c) => c.edit("rules.ts", 'ruleSet: "installer"', 'ruleSet: "installers"'), "needs a set (one of shell-portability, ci-forbidden-program");
+  await refused((c) => c.edit("record.ts", 'fieldType: "date"', 'fieldType: "number"'), "needs a name, a type (one of text, boolean, date)");
+  await refused((c) => c.edit("record.ts", "order: 2,", "order: 1,"), "the record field family repeats a name or an order");
 });
 
 Deno.test("Generator: a term with no definition is refused (0002-packaging FR-001)", async () => {
-  await refused((c) => c.edit("packaging.ttl", 'skos:definition "The program the package gives."@en', ""), "  - the term forProgram has no definition\n");
+  await refused((c) => c.edit("packaging.ts", /,\s*definition: en\("The program the package gives\."\)/, ""), "  - the term forProgram has no definition\n");
 });
 
 Deno.test("Generator: the committed files are what the ontology makes (0002-packaging FR-009, SC-001)", async () => {
@@ -383,11 +392,11 @@ Deno.test("Generator: the committed files are what the ontology makes (0002-pack
 });
 
 Deno.test("Generator: a bad checksum, a pin with no version, a repeated key and a checksum for nothing are refused (0002-packaging FR-014)", async () => {
-  await refused((c) => c.edit("pins.ttl", /pm:sha256 "[0-9a-f]{64}"/, 'pm:sha256 "abc"'), "is not 64 lower-case hexadecimal digits");
-  await refused((c) => c.edit("pins.ttl", /\n {4}pm:version "[^"]*"/, ""), "needs a name, a key and a version");
-  await refused((c) => c.edit("pins.ttl", 'pm:pinKey "JQ"', 'pm:pinKey "GH"'), "two pinned downloads share the key GH");
-  await refused((c) => c.edit("pins.ttl", "pm:forPlatform pmid:platform-linux-x64", "pm:forPlatform pmid:platform-nowhere"), "needs a pinned download, a platform and a SHA-256");
-  await refused((c) => c.edit("pins.ttl", 'pm:pinSuffix "MACOS_X64"', 'pm:pinSuffix "X86_64"'), "two platforms share the pin suffix X86_64");
+  await refused((c) => c.edit("pins.ts", /sha256: "[0-9a-f]{64}"/, 'sha256: "abc"'), "is not 64 lower-case hexadecimal digits");
+  await refused((c) => c.edit("pins.ts", /version: "[^"]*"/, 'version: ""'), "needs a name, a key and a version");
+  await refused((c) => c.edit("pins.ts", 'pinKey: "JQ"', 'pinKey: "GH"'), "two pinned downloads share the key GH");
+  await refused((c) => c.edit("pins.ts", "forPlatform: platformLinuxX64", 'forPlatform: term(PMID, "platform-nowhere")'), "needs a pinned download, a platform and a SHA-256");
+  await refused((c) => c.edit("pins.ts", 'pinSuffix: "MACOS_X64"', 'pinSuffix: "X86_64"'), "two platforms share the pin suffix X86_64");
 });
 
 Deno.test("Generator: it makes the same bytes twice, and they are the committed ones (0002-packaging FR-009)", async () => {
@@ -400,7 +409,7 @@ Deno.test("Generator: it makes the same bytes twice, and they are the committed 
   assertEquals((await c.run()).code, 0);
   assertEquals(c.generated(), once);
   for (const [name, body] of once) assertEquals(body, Deno.readTextFileSync(`${COMMONS}/generated/${name}`), name);
-  assertEquals(once.size, 6);
+  assertEquals(once.size, 7);
 });
 
 Deno.test("Generator: --check fails where a generated file was edited by hand, or a bootstrap's pins differ, and writes nothing", async () => {
@@ -429,41 +438,48 @@ Deno.test("Generator: --check fails where a generated file was edited by hand, o
 Deno.test("Generator: it names every rule the ontology breaks and writes nothing (0002-packaging FR-010)", async () => {
   await refused(
     (c) => {
-      c.edit("families.ttl", '    pm:verifiedOn "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16" ;\n', "");
-      c.edit("families.ttl", 'pm:detectedBy "ubuntu" ;', 'pm:detectedBy "ubuntu" ;\n    pm:detectedBy "fedora" ;');
-      c.edit("families.ttl", '    pm:removalHint "sudo userdel -r NAME" ;\n', "");
+      c.edit("families.ts", /\s*verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",/, "");
+      c.edit("families.ts", 'detectedBy: ["ubuntu", ', 'detectedBy: ["ubuntu", "fedora", ');
+      c.edit("families.ts", /\s*removalHint: "sudo userdel -r NAME",/, "");
     },
     "  - family debian is verified but says no where or when\n",
     "  - the ID fedora detects both debian and redhat\n",
     "  - family arch is supported and has no removal hint\n",
   );
   await refused(
-    (c) => c.edit("families.ttl", "pm:supportStatus pm:Catalogued ;\n    pm:assurance pm:NoAssurance .", "pm:supportStatus pm:Supported ;\n    pm:assurance pm:NoAssurance ."),
+    (c) =>
+      c.edit(
+        "families.ts",
+        /supportStatus: supportStatuses\.Catalogued,(\s*)assurance: assurances\.NoAssurance/,
+        "supportStatus: supportStatuses.Supported, assurance: assurances.NoAssurance",
+      ),
     "is supported, so it needs an assurance other than none",
     "is supported and has no removal hint",
   );
-  await refused((c) => c.edit("families.ttl", "pm:usesManager pmid:manager-scoop ;", "pm:usesManager pmid:manager-nope ;"), "family windows names a manager that does not exist");
-  await refused((c) => c.edit("managers.ttl", 'dcterms:identifier "brew" ;', 'dcterms:identifier "apk" ;'), "two managers are called apk");
-  await refused((c) => c.edit("programs.ttl", "pm:forFamily pmid:family-debian ;", "pm:forFamily pmid:family-redhat ;"), "names a package for redhat, which is not supported");
+  await refused((c) => c.edit("families.ts", "usesManager: [managerScoop,", 'usesManager: [term(PMID, "manager-nope"),'), "family windows names a manager that does not exist");
+  await refused((c) => c.edit("managers.ts", 'identifier: "brew",', 'identifier: "apk",'), "two managers are called apk");
+  await refused((c) => c.edit("programs.ts", "forFamily: familyDebian,", 'forFamily: term(PMID, "family-redhat"),'), "names a package for redhat, which is not supported");
 });
 
 Deno.test("Generator: a forbidden command and shell syntax are refused (0002-packaging FR-005, FR-006)", async () => {
   await refused(
     (c) => {
-      c.edit("managers.ttl", 'pm:template "apt install {packages}"', 'pm:template "apt install {packages}; rm -rf /"');
-      c.edit("managers.ttl", 'pm:template "pacman -S {packages}"', 'pm:template "pacman -Sy"');
+      c.edit("managers.ts", 'template: "apt install {packages}"', 'template: "apt install {packages}; rm -rf /"');
+      c.edit("managers.ts", 'template: "pacman -S {packages}"', 'template: "pacman -Sy"');
     },
     "apt install: the template holds shell syntax; a command is a list of words",
     "pacman install: the template is a command the ontology forbids (pacman -Sy)",
   );
 });
 
-Deno.test("Generator: an ontology it cannot read stops it, naming the file, the line and the column", async () => {
+Deno.test("Generator: a module of the ontology that does not load stops it before it writes anything, naming the file, the line and the column (0002-packaging FR-010)", async () => {
   using c = Copy.make();
-  c.edit("pins.ttl", "pmid:pin-mise a pm:PinnedDownload ;", "pmid:pin-mise a pm:PinnedDownload ; pm:x [ pm:y 1 ] ;");
+  const before = c.generated();
+  c.edit("pins.ts", 'pinKey: "JQ"', 'pinKey: "JQ" "JQ"');
   const p = await c.run();
-  assertEquals(p.code, 2);
-  assertMatch(p.stderr, /^the packaging ontology cannot be read: pins\.ttl:\d+:\d+: a blank node or a collection is not read/);
+  assertNotEquals(p.code, 0);
+  assertMatch(p.stderr, /pins\.ts:\d+:\d+/);
+  assertEquals(c.generated(), before, "nothing is written");
 });
 
 // ---- the shell fragment a script carries (0002-packaging FR-012) -------------------------------------------------------------------------------------------------
@@ -541,7 +557,9 @@ Deno.test("Layout: commons has the layout the capability spec names (0001-softwa
       "about.ts",
       "spec-kit/registry.tsv",
       "spec-kit/enforcement.tsv",
-      `${ONTOLOGY}/packaging.ttl`,
+      `${ONTOLOGY}/packaging.ts`,
+      `${ONTOLOGY}/mod.ts`,
+      "generated/packaging.auto.ttl",
       "tools/generate-packaging.ts",
       "generated/packaging.auto.toml",
       "generated/packaging.auto.sh",
@@ -584,64 +602,69 @@ Deno.test("Specs: every commons spec is of the commons domain, and cites archon'
   }
 });
 
-// ---- the parts the generator stands on -------------------------------------------------------------------------------------------------------------------------------
+// ---- the ontology, which is TypeScript (commons 0012-ontology) ----------------------------------------------------------------------------------------------------
 
-const PRE = "@prefix ex: <https://example.org/> .\n";
-function graphOf(src: string): Graph {
-  const g = new Graph();
-  const r = parseInto(g, src);
-  assert(r.ok, r.ok ? "" : `${r.error.line}:${r.error.column}: ${r.error.message}`);
-  return g;
+/** Every file under a folder, by its path from that folder. */
+function walk(dir: string, rel = ""): string[] {
+  return [...Deno.readDirSync(`${dir}/${rel}`)].flatMap((e) => (e.isDirectory ? walk(dir, `${rel}${e.name}/`) : [`${rel}${e.name}`]));
 }
-const ex = (local: string) => iri(`https://example.org/${local}`);
 
-Deno.test("Turtle: the part of Turtle the ontology uses is read, each triple once, in the order written", () => {
-  const g = graphOf(
-    PRE +
-      `ex:a a ex:C ; ex:p "x"@EN , 'y' , """long "quoted"\nline""" ; ;\n  ex:n 007 , -2 ; ex:b true ; ex:q ex:b , <https://example.org/c> ; ex:p "x"@en .\n` +
-      `ex:a ex:e "tab\\there \\u00e9 \\U0001F600 \\"q\\"" ; ex:t "1"^^<http://www.w3.org/2001/XMLSchema#boolean> . # a comment\n`,
-  );
-  const a = (local: string) => g.objects(ex("a"), ex(local)).map(textOf);
-  assertEquals(a("p"), ["x", "y", 'long "quoted"\nline'], "a repeated triple is there once (and a language tag is one whatever its case)");
-  assertEquals(a("n"), ["7", "-2"], "an integer is written in its canonical form");
-  assertEquals(a("b"), ["true"]);
-  assertEquals(a("t"), ["true"], "a boolean too");
-  assertEquals(a("q"), [ex("b"), ex("c")]);
-  assertEquals(a("e"), ['tab\there é 😀 "q"']);
-  assertEquals(g.subjects(RDF_TYPE, ex("C")), [ex("a")]);
+Deno.test("Ontology: the modules import only the kernel's RDF and one another, mod.ts lists every file, and no Turtle is a source (0012-ontology FR-008)", () => {
+  const all = walk(`${COMMONS}/ontology`);
+  assertEquals(all.filter((f) => !f.endsWith(".ts")), [], "the ontology is TypeScript, and nothing else is there");
+  const modules = all.filter((f) => f.startsWith("supply-chain/packaging/")).map((f) => f.slice("supply-chain/packaging/".length)).sort();
+  assertEquals(modules, ["families.ts", "managers.ts", "mod.ts", "packaging.ts", "pins.ts", "programs.ts", "record.ts", "rules.ts"]);
+  for (const m of modules) {
+    const text = Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/${m}`);
+    assert(text.startsWith("/**") && text.includes("@module"), `${m} has a module comment`);
+    for (const i of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
+      const spec = i[1] ?? "";
+      assert(spec === "../../../ts/kernel/rdf.ts" || /^\.\/[a-z-]+\.ts$/.test(spec), `${m} imports ${spec}`);
+    }
+  }
+  assertEquals(files.map((f) => `${f.name}.ts`), modules.filter((m) => m !== "mod.ts"), "mod.ts lists every file of facts, by name");
 });
 
-Deno.test("Turtle: what the reader does not know is refused, with the line and the column", () => {
-  const cases: readonly (readonly [string, string])[] = [
-    ["ex:a ex:p [ ex:q 1 ] .", "blank node"],
-    ["ex:a ex:p _:b .", "blank node"],
-    ["ex:a ex:p ( 1 2 ) .", "collection"],
-    ["ex:a ex:p 1.5 .", "decimal"],
-    ["ex:a ex:p 1e3 .", "double"],
-    ["ex:a ex:p <relative> .", "relative IRI"],
-    ["@base <https://example.org/> .", "@base"],
-    ["PREFIX ex: <https://example.org/>", "SPARQL"],
-    ["ex:a ex:p no:thing .", "the prefix no: is not declared"],
-    ['ex:a ex:p "open .', "short string runs past"],
-    ['ex:a ex:p "x"^^ex:date .', "datatype"],
-    ['ex:a ex:p "\\q" .', "unknown escape"],
-    ["ex:a ex:p ex:b ex:c .", "'.' was expected"],
-    ["ex:a ex:p .", "an object"],
-  ];
-  for (const [src, said] of cases) {
-    const r = parseInto(new Graph(), `${PRE}${src}\n`);
-    assert(!r.ok, src);
-    assertStringIncludes(r.error.message, said, src);
-    assertEquals(r.error.line, 2, src);
+Deno.test("Ontology: no IRI is written as free text, and the code lists are the tools' unions (0012-ontology FR-009)", () => {
+  for (const m of walk(`${COMMONS}/${ONTOLOGY}`)) {
+    for (const [n, line] of Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/${m}`).split("\n").entries()) {
+      if (line.trimStart().startsWith("*") || line.trimStart().startsWith("//")) continue;
+      if (/"[a-z][a-z0-9+.-]*:\/\//.test(line)) assert(/= namespace\("[a-z]+", "[^"]+"\);$/.test(line), `${m}:${n + 1}: an IRI outside a namespace: ${line.trim()}`);
+    }
   }
+  assertEquals(Object.keys(operations).length, OPS.length, "every operation of the code list is one of the tools' words");
 });
 
-Deno.test("Turtle: every file of the ontology is read", () => {
-  const g = new Graph();
-  for (const e of Deno.readDirSync(`${COMMONS}/${ONTOLOGY}`)) {
-    const r = parseInto(g, Deno.readTextFileSync(`${COMMONS}/${ONTOLOGY}/${e.name}`));
-    assert(r.ok && r.value > 0, e.name);
-  }
+Deno.test("Ontology: the type checker refuses a missing field, a value of the wrong range and an individual of another class (0012-ontology FR-010)", async () => {
+  using c = Copy.make();
+  assertEquals((await c.check()).code, 0, "the ontology as it is checks");
+  c.edit("pins.ts", /,\s*version: "[^"]*"/, "");
+  c.edit("pins.ts", 'pinKey: "JQ"', "pinKey: 7");
+  c.edit("pins.ts", "forPlatform: platformLinuxX64", "forPlatform: pinMise");
+  const p = await c.check();
+  assertEquals(p.code, 1);
+  assertStringIncludes(p.stderr, "Property 'version' is missing");
+  assertStringIncludes(p.stderr, "Type 'number' is not assignable to type 'string'");
+  assertStringIncludes(p.stderr, '"pm:Platform"');
+  assertStringIncludes(p.stderr, "Found 3 errors");
+});
+
+Deno.test("Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a change of a comment changes no generated file (0012-ontology FR-012)", async () => {
+  const digest = await digestOf(files);
+  assertEquals(text(table().source_sha256), digest);
+  assertStringIncludes(Deno.readTextFileSync(`${COMMONS}/generated/packaging.auto.ttl`), `# source_sha256=${digest}\n`);
+  using c = Copy.make();
+  c.edit("pins.ts", "/**", "/**\n * A comment that says nothing new.\n *");
+  const p = await c.run("--check");
+  assertEquals([p.code, p.stderr], [0, ""]);
+});
+
+Deno.test("Ontology: the Turtle export says it is generated and by what, and holds every triple once (0012-ontology FR-011)", () => {
+  const ttl = Deno.readTextFileSync(`${COMMONS}/generated/packaging.auto.ttl`);
+  assert(ttl.startsWith("# AUTO-GENERATED by commons/tools/generate-packaging.ts from commons/ontology/supply-chain/packaging/*.ts"));
+  assertStringIncludes(ttl, "@prefix pm: <https://www.intellectualfrontiers.com/ontology/packaging#> .\n");
+  assertStringIncludes(ttl, "pmid:family-debian a pm:SystemFamily ;\n");
+  assertEquals(ttl.match(/ \.\n/g)?.length, new Set(files.flatMap((f) => f.individuals.map((i) => i.iri))).size + 8, "one statement for each subject, and the eight prefixes");
 });
 
 Deno.test("shlex: a template is split into words as Python's shlex.split splits it", () => {

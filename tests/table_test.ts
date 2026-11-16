@@ -134,12 +134,13 @@ Deno.test("commons' tools are strongly typed: no any, no non-null escape, one au
     if (/\bswitch \(/.test(c)) assertStringIncludes(c, "assertNever(", `${name} has a switch with no exhaustiveness check`);
     for (const m of text.matchAll(/^(?:import|export)[^;]*? from "([^"]+)";/gm)) {
       const spec = m[1] ?? "";
-      assert(spec.startsWith("./") || (name === "shell-portability-check.ts" && spec === "@std/toml"), `${name} imports ${spec}: the tools have no dependency`);
+      const ontology = spec === "../ontology/supply-chain/packaging/mod.ts" && (name === "ontology.ts" || name === "generate-packaging.ts");
+      assert(spec.startsWith("./") || ontology || (name === "shell-portability-check.ts" && spec === "@std/toml"), `${name} imports ${spec}: the tools have no dependency`);
     }
   }
   assertStringIncludes(Deno.readTextFileSync(`${dir}/core.ts`), "export function assertNever(x: never): never");
   const brands = files.filter((f) => /\bbrand(<[^>]*>)?\(/.test(bare(f.text).replace(/export function brand/, ""))).map((f) => f.name).sort();
-  assertEquals(brands, ["ontology.ts", "turtle.ts"], "only the decode boundary brands a value");
+  assertEquals(brands, ["ontology.ts"], "only the decode boundary brands a value");
 });
 
 Deno.test("deno check and deno lint pass on the setup, commons' tools and their tests", async () => {

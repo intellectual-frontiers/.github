@@ -16,18 +16,19 @@ export const about: About = {
   folders: [
     {
       path: "ontology/supply-chain/packaging/",
-      what: "The packaging vocabulary (`packaging.ttl`) and its data (`managers.ttl`, `families.ttl`, `programs.ttl`, `pins.ttl`, `rules.ttl`, " +
-        "`record.ttl`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs.",
-      mayImport: ["nothing: Turtle"],
+      what: "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, " +
+        "`record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. It is " +
+        "TypeScript, typed by IFC TypeScript's RDF (`ts/kernel/rdf.ts`, commons 0012-ontology); its Turtle is generated, never a source.",
+      mayImport: ["ts/kernel/rdf.ts", "ontology/"],
     },
     {
       path: "tools/",
       what: "The tools, in TypeScript that Deno runs: the generator of `generated/`, the spec-kit checker and the shell portability checker.",
-      mayImport: ["tools/", "@std/toml (the shell portability checker)"],
+      mayImport: ["tools/", "ontology/ (the generator, which reads its typed values)", "@std/toml (the shell portability checker)"],
     },
     {
       path: "generated/",
-      what: "The tables made from the ontology, for programs, scripts and the machine setup, with the pinned downloads; never edited by hand.",
+      what: "The tables made from the ontology, for programs, scripts and the machine setup, with the pinned downloads, and the ontology's Turtle; never edited by hand.",
       mayImport: ["nothing: generated"],
     },
     { path: "ts/", what: "IFC TypeScript, and the data libraries built on it (`ts/data/`).", mayImport: ["see its own about.ts"] },

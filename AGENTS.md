@@ -14,9 +14,9 @@ This repository is small on purpose: the organization's public profile (`profile
   `bin/erga-bootstrap.ps1`), which fetch the pinned Deno, check its SHA-256, keep it in erga's toolchain store and run `bin/setup/main.ts` with explicit permissions. `erga-setup.sh` and
   `erga-windows.ps1` are stubs kept for the lines documented before. The setup (`bin/setup/`) is strongly typed: options parsed once at the boundary, discriminated unions with an
   exhaustive `switch` (`assertNever`), errors as values (`Result`, and a `Stop` that is the exit status), no `any`, no non-null `!`, no third-party module (the tests use `jsr:@std/assert`,
-  pinned in `deno.json`). Commons' tools (`commons/tools/`) are held to the same, and the typing test checks both: the ontology is decoded once (`ontology.ts`, over the strict Turtle
-  reader `turtle.ts`) into typed records, findings are a union with one sentence each, and the one cast is `brand` in `core.ts`; they import nothing outside `commons/tools/` but
-  `@std/toml` (the shell portability tool), and erga runs the specification checker as `deno run --no-config --allow-read commons/tools/spec-kit-check.ts`. It uses administrator rights only for the packages (in bootstrap mode, never with `--setup`), installs Rust through `rustup` (the clone's
+  pinned in `deno.json`). Commons' tools (`commons/tools/`) are held to the same, and the typing test checks both: the ontology is TypeScript (`commons/ontology/`, commons 0012-ontology, typed
+  by the kernel's `commons/ts/kernel/rdf.ts`; Turtle is generated, never a source), decoded once (`ontology.ts`) from its typed values into typed records, findings are a union
+  with one sentence each, and the one cast is `brand` in `core.ts`; they import nothing outside `commons/tools/` but the ontology and `@std/toml` (the shell portability tool), and erga runs the specification checker as `deno run --no-config --allow-read commons/tools/spec-kit-check.ts`. It uses administrator rights only for the packages (in bootstrap mode, never with `--setup`), installs Rust through `rustup` (the clone's
   `rust-toolchain.toml` names the stable channel), copies `intellectual-frontiers/erga` to `~/workspaces/github.com/intellectual-frontiers/erga` and runs only commands `erga` has.
   It writes no startup file: `ergactl agent-tools shell emit` gives the one optional line (erga's 010-shell), and the settings file it keeps must stay what `ergactl secrets` writes
   (erga's 011-secrets).

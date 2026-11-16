@@ -13,6 +13,7 @@
   "lint": {
     "include": [
       "bin/setup/",
+      "commons/ontology/",
       "commons/tools/",
       "tests/*.ts"
     ],
@@ -28,6 +29,7 @@
     "lineWidth": 180,
     "include": [
       "bin/setup/",
+      "commons/ontology/",
       "commons/tools/",
       "tests/*.ts"
     ]
