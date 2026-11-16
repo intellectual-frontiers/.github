@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 # agora-install.ps1: the one command that installs agora on Windows 11. You install Git and GitHub CLI; this does everything else: it signs GitHub
-# in where erga cannot be read yet (GitHub CLI, a code and a browser), copies the `.github` and `erga` repositories to ~\workspaces\github.com\intellectual-frontiers\<repo> (or says they are
+# in where erga cannot be read yet (GitHub CLI, a code and a browser), turns on long paths (Windows', once, with a prompt, and Git's), copies the `.github` and `erga` repositories to ~\workspaces\github.com\intellectual-frontiers\<repo> (or says they are
 # there and brings them up to date) and runs the installer in erga, which gets Bun at its pin, installs agora's packages and runs the doctor. Safe to run again. In PowerShell:
 #
 #   irm https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/agora-install.ps1 | iex
@@ -15,6 +15,30 @@ function Stop-Install([string] $What, [string] $Next) {
 }
 $how = 'winget install --id Git.Git -e; winget install --id GitHub.cli -e (then open a new terminal)'
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Stop-Install 'Git is not installed' "install Git and GitHub CLI, then run this again: $how" }
+
+# Long paths. Windows refuses a path of more than 260 characters unless "Enable Win32 long paths" is on, and the clone and the packages have such paths. The setting
+# is one registry value that only an administrator can write, so where it is off this asks Windows, once, to run that one command elevated (a prompt you allow). Git has a
+# setting of its own, which needs no rights and is set whatever Windows says.
+$fileSystem = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'
+function Test-LongPaths {
+    try { return ((Get-ItemProperty -Path $fileSystem -Name LongPathsEnabled -ErrorAction Stop).LongPathsEnabled -eq 1) } catch { return $false }
+}
+if (Test-LongPaths) {
+    Write-Host '✅ Windows long paths are enabled'
+} else {
+    Write-Host '⏳ enabling Windows long paths (Windows asks you to allow it once)'
+    $enable = "Set-ItemProperty -Path '$fileSystem' -Name LongPathsEnabled -Type DWord -Value 1"
+    $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    try {
+        if ($admin) { Set-ItemProperty -Path $fileSystem -Name LongPathsEnabled -Type DWord -Value 1 }
+        else { Start-Process powershell -Verb RunAs -Wait -ArgumentList '-NoProfile', '-Command', $enable }
+    } catch {
+        # Declined, or refused: said below, and the install goes on, because Git's own setting below is enough for the clone.
+    }
+    if (Test-LongPaths) { Write-Host '✅ Windows long paths are enabled' }
+    else { Write-Host "⚠️ Windows long paths are still off, so a long path can break a package install. In PowerShell as administrator, run: $enable" }
+}
+& git config --global core.longpaths true
 
 # The repositories are read through Git alone. GitHub CLI is needed only to sign in, and only where erga cannot be read yet.
 $url = 'https://github.com/intellectual-frontiers'
