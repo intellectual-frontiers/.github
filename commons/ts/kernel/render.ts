@@ -11,7 +11,8 @@
  * - `plain`: the final lines only, appended, with no escape sequence at all (no colour, no cursor movement), for a log or a pipe; a line
  *   is not cut.
  * - `quiet`: the final lines that are warnings, errors (a span that failed, a log record of the role `warning` or `error`, or of severity
- *   WARN or more) or results (the role `result`), appended; coloured where the look allows it.
+ *   WARN or more), actions (the role `action`: a step that is the person's to take, FR-027) or results (the role `result`), appended;
+ *   coloured where the look allows it.
  * - `silent`: nothing.
  * - `json`: one OTLP JSON document per line, each an `ExportLogsServiceRequest` (`otlp.ts`'s `encodeLogs`) holding one log record: a log
  *   record as it is; a span that ended as a log record whose `eventName` is the span's name, whose time is its end, whose severity is
@@ -246,6 +247,10 @@ function logLines(
       return block(depth, marked("hint"), text);
     case "warning":
       return block(depth, marked("warning"), text);
+    case "pending":
+      return block(depth, marked("pending"), text);
+    case "action":
+      return block(depth, marked("action"), text);
     case "error":
       return block(depth, marked("failed"), text);
     case "detail":
@@ -332,7 +337,7 @@ function jsonLine(source: Source | undefined, record: LogRecord): string {
 }
 
 const isLoud = (role: Role, severity: SeverityNumber): boolean =>
-  role === "result" || role === "warning" || role === "error" || severity >= SEVERITY.WARN;
+  role === "result" || role === "warning" || role === "error" || role === "action" || severity >= SEVERITY.WARN;
 
 /** The line `plain` writes for a span still open at the end of the run: cancelled. */
 function leftoverLines(state: State, now: bigint): readonly Line[] {

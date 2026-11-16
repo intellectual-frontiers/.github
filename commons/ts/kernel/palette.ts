@@ -30,15 +30,19 @@ export type Role = "success" | "failure" | "skipped" | "cancelled" | "hint" | "w
 export const ROLES: readonly Role[] = ["success", "failure", "skipped", "cancelled", "hint", "warning", "dim", "accent", "plain"];
 
 /** A mark at the start of a line: how something ended, or what a line is. */
-export type MarkKind = "done" | "failed" | "skipped" | "cancelled" | "hint" | "warning";
+export type MarkKind = "done" | "failed" | "skipped" | "cancelled" | "hint" | "warning" | "pending" | "action";
 
 /** Every mark, in a fixed order. */
-export const MARK_KINDS: readonly MarkKind[] = ["done", "failed", "skipped", "cancelled", "hint", "warning"];
+export const MARK_KINDS: readonly MarkKind[] = ["done", "failed", "skipped", "cancelled", "hint", "warning", "pending", "action"];
 
 /** A mark as an emoji, its ASCII fallback, and the role it is painted in. */
 export type MarkStyle = { readonly emoji: string; readonly ascii: string; readonly role: Role };
 
-/** The marks: ✅ ❌ ⏭️ ⏹️ 👉 ⚠️, and `[ok]` `[x]` `[skip]` `[stop]` `->` `[!]` where there are no emoji. */
+/**
+ * The marks: ✅ ❌ ⏭️ ⏹️ 👉 ⚠️ ⏳ ⚡, and `[ok]` `[x]` `[skip]` `[stop]` `->` `[!]` `[todo]` `[you]` where there are no emoji. ❌ and ⚠️ are
+ * problems; ⏳ (pending) is something not set up yet, expected until someone does it; ⚡ (action) is a step that is the person's to take
+ * (send a change, back up, approve): nothing is wrong, so it is neither a warning nor an error (FR-027).
+ */
 export const MARKS: Readonly<Record<MarkKind, MarkStyle>> = {
   done: { emoji: "✅", ascii: "[ok]", role: "success" },
   failed: { emoji: "❌", ascii: "[x]", role: "failure" },
@@ -46,6 +50,8 @@ export const MARKS: Readonly<Record<MarkKind, MarkStyle>> = {
   cancelled: { emoji: "\u{23f9}\u{fe0f}", ascii: "[stop]", role: "cancelled" },
   hint: { emoji: "👉", ascii: "->", role: "hint" },
   warning: { emoji: "\u{26a0}\u{fe0f}", ascii: "[!]", role: "warning" },
+  pending: { emoji: "\u{23f3}", ascii: "[todo]", role: "dim" },
+  action: { emoji: "\u{26a1}", ascii: "[you]", role: "accent" },
 };
 
 /** A mark: its emoji where the terminal shows emoji, else its ASCII fallback. */

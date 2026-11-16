@@ -20,6 +20,8 @@ proves(["0006-signals FR-022"], "every mark is one emoji of two columns, with it
     cancelled: ["\u{23f9}\u{fe0f}", "[stop]"],
     hint: ["👉", "->"],
     warning: ["\u{26a0}\u{fe0f}", "[!]"],
+    pending: ["\u{23f3}", "[todo]"],
+    action: ["\u{26a1}", "[you]"],
   };
   for (const kind of MARK_KINDS) {
     assertEquals([mark(kind, { emoji: true }), mark(kind, { emoji: false })], expected[kind]);
@@ -64,7 +66,7 @@ proves(["0006-signals FR-022"], "a painted text without colour is the text, and 
 
 proves(["0006-signals FR-022"], "the roles and marks are closed unions, and a runtime Look is a Capabilities", () => {
   expectType<Equal<Role, "success" | "failure" | "skipped" | "cancelled" | "hint" | "warning" | "dim" | "accent" | "plain">>();
-  expectType<Equal<MarkKind, "done" | "failed" | "skipped" | "cancelled" | "hint" | "warning">>();
+  expectType<Equal<MarkKind, "done" | "failed" | "skipped" | "cancelled" | "hint" | "warning" | "pending" | "action">>();
   const look = { tty: true, colour: true, emoji: false, columns: 80 };
   const caps: Capabilities = look;
   assertEquals(mark("hint", caps), "->");
