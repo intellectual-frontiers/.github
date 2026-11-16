@@ -106,8 +106,11 @@ export type AttributesFor<S extends AttributeSchema> = Simplify<
   }
 >;
 
-/** How a kind is presented to a person: the renderer shows every role but `none`. */
-export type Role = "step" | "detail" | "progress" | "result" | "hint" | "warning" | "error" | "none";
+/**
+ * How a kind is presented to a person: the renderer shows every role but `none`. `pending` (⏳, not set up yet) and `action` (⚡, a step
+ * that is the person's to take) are neither warnings nor errors (FR-027).
+ */
+export type Role = "step" | "detail" | "progress" | "result" | "hint" | "warning" | "error" | "pending" | "action" | "none";
 
 type Common = {
   /** The kind's attributes and their types. */

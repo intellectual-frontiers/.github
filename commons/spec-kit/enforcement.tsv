@@ -134,6 +134,7 @@ requirement	mechanism	by	note
 0006-signals FR-024	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/render.test.ts: the export warning said once, dimmed, at the end
 0006-signals FR-025	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/vt.test.ts: the terminal emulator's sequences
 0006-signals FR-026	check	.github: cd commons/ts && node --test tests/**/*.test.ts	runtime/console.test.ts and boundaries.test.ts: the console is the only writer, its modes, uncaught errors recorded
+0006-signals FR-027	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/palette.test.ts and kernel/render.test.ts: the ⏳ and ⚡ marks and roles; a pending or an action is no warning or failure
 0007-grc FR-001	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: catalogs with @ts-expect-error for an unknown control id, STRM mappings
 0007-grc FR-002	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: controls and packs over typed subjects, a throwing check gives error
 0007-grc FR-003	check	.github: cd commons/ts && node --test tests/**/*.test.ts	kernel/grc.test.ts: the status semilattice laws with fast-check

@@ -36,6 +36,8 @@ const registry = defineSignals({
   warn: { signal: "log", role: "warning", severity: SEVERITY.WARN, attributes: { text: "string" } },
   note: { signal: "log", role: "step", severity: SEVERITY.INFO, attributes: { text: "string" } },
   noise: { signal: "log", role: "none", severity: SEVERITY.INFO, attributes: { text: "string" } },
+  later: { signal: "log", role: "pending", severity: SEVERITY.INFO, attributes: { text: "string" } },
+  yours: { signal: "log", role: "action", severity: SEVERITY.INFO, attributes: { text: "string" } },
 });
 
 type Look = { readonly colour: boolean; readonly emoji: boolean; readonly columns: number };
@@ -437,5 +439,18 @@ proves([MODES], "only a kind whose role is not none is shown, in every mode", ()
     });
     h.feed({ kind: "finish" });
     assertEquals(h.output(), "", mode);
+  }
+});
+
+proves(["0006-signals FR-027"], "pending is ⏳ and an action is ⚡: neither a warning nor an error; quiet keeps the action", () => {
+  for (const mode of ["plain", "quiet"] as const) {
+    const h = harness(mode);
+    h.telemetry.log("later", { text: "a certificate is not issued yet" });
+    h.telemetry.log("yours", { text: "send the change: bun run stolos apply" });
+    const out = h.output();
+    if (mode === "plain") assert(out.includes("\u{23f3} a certificate is not issued yet"), out);
+    else assert(!out.includes("certificate"), "quiet leaves out what is only pending");
+    assert(out.includes("\u{26a1} send the change: bun run stolos apply"), out);
+    assert(!out.includes("\u{26a0}\u{fe0f} send") && !out.includes("\u{274c}"), "never marked as a warning or an error");
   }
 });
