@@ -1,6 +1,6 @@
 #Requires -Version 5.1
-# agora-install.ps1: the one command that installs agora on Windows 11. You install Git and GitHub CLI; this does everything else: it signs GitHub CLI
-# in if it is not (a code and a browser), copies the `.github` and `erga` repositories to ~\workspaces\github.com\intellectual-frontiers\<repo> (or says they are
+# agora-install.ps1: the one command that installs agora on Windows 11. You install Git and GitHub CLI; this does everything else: it signs GitHub
+# in where erga cannot be read yet (GitHub CLI, a code and a browser), copies the `.github` and `erga` repositories to ~\workspaces\github.com\intellectual-frontiers\<repo> (or says they are
 # there and brings them up to date) and runs the installer in erga, which gets Bun at its pin, installs agora's packages and runs the doctor. Safe to run again. In PowerShell:
 #
 #   irm https://raw.githubusercontent.com/intellectual-frontiers/.github/main/bin/agora-install.ps1 | iex
@@ -15,15 +15,25 @@ function Stop-Install([string] $What, [string] $Next) {
 }
 $how = 'winget install --id Git.Git -e; winget install --id GitHub.cli -e (then open a new terminal)'
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Stop-Install 'Git is not installed' "install Git and GitHub CLI, then run this again: $how" }
-if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { Stop-Install 'GitHub CLI is not installed' "install Git and GitHub CLI, then run this again: $how" }
 
-& gh auth status 2>$null | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    Write-Host '⏳ signing in to GitHub (a code and a browser)'
-    & gh auth login --hostname github.com --git-protocol https --web
-    if ($LASTEXITCODE -ne 0) { Stop-Install 'GitHub sign-in did not finish' 'run this again' }
+# The repositories are read through Git alone. GitHub CLI is needed only to sign in, and only where erga cannot be read yet.
+$url = 'https://github.com/intellectual-frontiers'
+function Test-Readable {
+    $env:GIT_TERMINAL_PROMPT = '0'
+    & git ls-remote --exit-code "$url/erga.git" HEAD 2>$null | Out-Null
+    return ($LASTEXITCODE -eq 0)
 }
-& gh auth setup-git 2>$null | Out-Null
+if (-not (Test-Readable)) {
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { Stop-Install 'GitHub CLI is not installed, and erga cannot be read without signing in' "install Git and GitHub CLI, then run this again: $how" }
+    & gh auth status 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host '⏳ signing in to GitHub (a code and a browser)'
+        & gh auth login --hostname github.com --git-protocol https --web
+        if ($LASTEXITCODE -ne 0) { Stop-Install 'GitHub sign-in did not finish' 'run this again' }
+    }
+    & gh auth setup-git
+    if (-not (Test-Readable)) { Stop-Install 'your GitHub account cannot read intellectual-frontiers/erga' 'ask for read access to the intellectual-frontiers organization, then run this again' }
+}
 
 # Both repositories live side by side in the workspace: ~\workspaces\github.com\intellectual-frontiers\<repo>. One that is there is said so and brought
 # up to date by a fast-forward (a copy that cannot be is left as it is, and said); one that is not is copied.
@@ -37,7 +47,7 @@ function Sync-Repo([string] $Repo) {
     } else {
         Write-Host "⏳ copying $Repo to $dest"
         New-Item -ItemType Directory -Path $base -Force | Out-Null
-        & gh repo clone "intellectual-frontiers/$Repo" $dest
+        & git clone "$url/$Repo.git" $dest
         if ($LASTEXITCODE -ne 0) { Stop-Install "$Repo could not be copied" 'your GitHub account needs read access to the intellectual-frontiers organization' }
     }
 }
