@@ -30,6 +30,12 @@
     "dependencies": [
       "jsr:@std/assert@1.0.19",
       "jsr:@std/toml@1.0.11"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:mermaid@11.17.2",
+        "npm:typescript@7.1.0-beta"
+      ]
+    }
   }
 }

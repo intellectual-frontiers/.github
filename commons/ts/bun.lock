@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@intellectual-frontiers/ifc-ts",
+      "name": "@intellectual-frontiers/commons",
       "devDependencies": {
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",

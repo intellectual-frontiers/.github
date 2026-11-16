@@ -1,6 +1,6 @@
 /**
  * The examples the documentation shows run as written (commons 0011-documentation FR-005): `examples/use.ts` imports the package by its
- * own name, as a harness does once it has installed the release.
+ * own name, as a harness does once it depends on commons by Git.
  *
  * @module
  */

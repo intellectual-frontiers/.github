@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { parseSpec } from "../extract/specs.ts";
 import { citedBy, specPages } from "../pages/specs.ts";
 import { freshBuild } from "./helpers.ts";

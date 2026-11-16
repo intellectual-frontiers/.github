@@ -1,16 +1,16 @@
 /**
- * The packed package installed and used, before it is released (commons 0011-documentation FR-021, SC-003): an empty project that holds
- * the fixture repository (`suite/fixture-repo/`: a package with a documented module and no `about.ts`, and a plain spec kit with a
- * constitution) depends on the tarball; Bun installs it; `ifc-docs check` (which finds `docs.config.ts` by itself) and
- * `ifc-docs build` run there on Bun and on Node 26, through the package's `bin`; the pages are checked, and the two runtimes must write
- * the same bytes; and the configuration is checked by TypeScript 7 against the declarations the package ships. Any failure, or a runtime
- * that is not on `PATH`, ends with status 1.
+ * IFC Docs installed as a Git dependency and used, as another repository uses it (commons 0011-documentation FR-021, FR-022, SC-003): an
+ * empty project that holds the fixture repository (`suite/fixture-repo/`: a package with a documented module and no `about.ts`, and a
+ * plain spec kit with a constitution) depends on the repository's root package at one commit by a `git+file:` URL; Bun installs it;
+ * `ifc-docs check` (which finds `docs.config.ts` by itself) and `ifc-docs build` run there on Bun and on Node 26, through the package's
+ * command, which registers the Node hook itself; the pages are checked, and the two runtimes must write the same bytes; and the
+ * configuration is checked by TypeScript 7 against the sources. Any failure, or a runtime that is not on `PATH`, ends with status 1.
  *
- * `bun tools/smoke.ts dist/intellectual-frontiers-ifc-docs-X.Y.Z.tgz`
+ * `bun tools/smoke.ts [--repo DIR] [--commit SHA]`: by default the checkout this file is in, at its `HEAD`; the commit must be committed.
  *
  * @module
  */
-import { fs, path, proc } from "@intellectual-frontiers/ifc-ts/runtime";
+import { fs, path, proc } from "../../ts/runtime/mod.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const FIXTURE = path.join(ROOT, "suite/fixture-repo");
@@ -33,10 +33,29 @@ export const PAGES: readonly string[] = [
   "search.json",
 ];
 
+/** The package's name, which the fixture's configuration imports its types by. */
+const NAME = "@intellectual-frontiers/commons";
+
 const TSCONFIG = {
-  compilerOptions: { module: "nodenext", target: "es2024", strict: true, noEmit: true, types: [] as string[], skipLibCheck: false },
+  compilerOptions: {
+    module: "nodenext",
+    target: "es2024",
+    strict: true,
+    noEmit: true,
+    allowImportingTsExtensions: true,
+    exactOptionalPropertyTypes: true,
+    noUncheckedIndexedAccess: true,
+    types: ["node"],
+    skipLibCheck: false,
+  },
   files: ["docs.config.ts"],
 };
+
+/** The value after a flag of the command line, if it is given. */
+function option(flag: string): string | undefined {
+  const at = proc.args.indexOf(flag);
+  return at < 0 ? undefined : proc.args[at + 1];
+}
 
 /** Stop with a message and status 1. */
 function stop(message: string): never {
@@ -63,10 +82,12 @@ function filesOf(dir: string, rel = ""): string[] {
 }
 
 if (import.meta.main) {
-  const tarball = proc.args[0];
-  if (tarball === undefined) stop("give the tarball's path");
   const bun = proc.runtimeName() === "bun" ? proc.execPath() : proc.which("bun");
   if (bun === undefined) stop("bun is not on PATH");
+  const repo = path.resolve(option("--repo") ?? path.join(ROOT, "..", ".."));
+  const head = await proc.run(["git", "rev-parse", "HEAD"], { cwd: repo });
+  const commit = option("--commit") ?? (head.success ? head.stdout.trim() : stop(`git rev-parse HEAD failed in ${repo}`));
+  const url = `git+${path.toFileUrl(repo).href}#${commit}`;
   const node = proc.env.get("IFCDOCS_NODE") ?? proc.which("node");
   const dir = await fs.makeTempDir({ prefix: "ifc-docs-smoke-" });
   let failed = false;
@@ -77,12 +98,19 @@ if (import.meta.main) {
   try {
     copyTree(FIXTURE, dir);
     fs.mkdirSync(path.join(dir, ".git"), { recursive: true });
-    const dependency = { "@intellectual-frontiers/ifc-docs": `file:${path.resolve(tarball)}` };
-    await fs.writeTextFile(path.join(dir, "package.json"), JSON.stringify({ name: "smoke", private: true, type: "module", dependencies: dependency }));
+    // @types/node is the repository's own, as FR-010 reads it: the generator's types for Node come from where it runs.
+    const types = JSON.parse(fs.readTextFileSync(path.join(ROOT, "package.json"))) as { devDependencies?: Record<string, string> };
+    const dependencies = { [NAME]: url, "@types/node": types.devDependencies?.["@types/node"] ?? "" };
+    await fs.writeTextFile(path.join(dir, "package.json"), JSON.stringify({ name: "smoke", private: true, type: "module", dependencies }));
     await fs.writeTextFile(path.join(dir, "tsconfig.json"), JSON.stringify(TSCONFIG));
     const install = await proc.run([bun, "install"], { cwd: dir });
-    if (!install.success) stop(`bun install failed:\n${install.stdout}${install.stderr}`);
-    const bin = path.join(dir, "node_modules/.bin/ifc-docs");
+    if (!install.success) stop(`bun install ${url} failed:\n${install.stdout}${install.stderr}`);
+    if (fs.readTextFileSync(path.join(dir, "bun.lock")).includes(commit)) console.log(`bun.lock holds the commit ${commit}`);
+    else fail(`smoke: bun.lock does not hold the commit ${commit}`);
+    // The command's own file, as the package's bin names it: the same on every system, where node_modules/.bin holds a shim on Windows.
+    const pkg = path.join(dir, "node_modules", ...NAME.split("/"));
+    const manifest = JSON.parse(fs.readTextFileSync(path.join(pkg, "package.json"))) as { bin?: Record<string, string> };
+    const bin = path.join(pkg, ...(manifest.bin?.["ifc-docs"] ?? "").replace(/^\.\//, "").split("/"));
     const runtimes: readonly (readonly [string, string | undefined])[] = [["bun", bun], ["node", node]];
     const built = new Map<string, string>();
     for (const [name, exe] of runtimes) {
@@ -116,7 +144,7 @@ if (import.meta.main) {
       else fail("smoke: bun and node wrote different sites");
     }
     const tsc = await proc.run([bun, path.join(dir, "node_modules/typescript/bin/tsc"), "-p", dir], { cwd: dir });
-    if (tsc.success) console.log("tsc: the declarations type-check the configuration");
+    if (tsc.success) console.log("tsc: the configuration type-checks against the sources");
     else fail(`tsc: failed (${tsc.code})\n${tsc.stdout}${tsc.stderr}`);
   } finally {
     await fs.remove(dir, { recursive: true }).catch(() => {});

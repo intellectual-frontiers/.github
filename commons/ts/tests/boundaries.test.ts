@@ -2,11 +2,11 @@
  * The rules of IFC TypeScript as tests (commons 0005-typescript-runtime FR-001 to FR-004, FR-015, FR-016, FR-026, FR-028, FR-029): the
  * kernel imports nothing outside itself; the runtime imports only `node:` builtins, the kernel and itself; no file names a vendor's API or
  * registry; every file and every export carries JSDoc; the development dependencies are pinned exactly in Bun's lockfile; Bun is the only
- * tool; the lint rules are errors; the package exports what it should.
+ * tool; the lint rules are errors; the package, a Git dependency of the root, exports what it should.
  *
  * @module
  */
-import { decodeManifest, type Manifest, packageManifest, tarballName } from "../tools/manifest.ts";
+import { decodeManifest, type Manifest, PACKAGE_NAME, rootEntries } from "../tools/manifest.ts";
 import { existsSync, readDirSync, readTextFile, readTextFileSync, statSync } from "../runtime/fs.ts";
 import { dirname, fromFileUrl, join, relative, resolve, toPosix } from "../runtime/path.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "../runtime/test.ts";
@@ -232,44 +232,51 @@ proves(["0005-typescript-runtime FR-028"], "bunfig.toml makes an error of every 
   for (const r of rules) assert(new RegExp(`^"${r}" = (?:"error"|\\["error")`, "m").test(config), `${r} is not an error in bunfig.toml`);
 });
 
+/** A `package.json` of the repository, from its root, decoded by the tooling's own decoder. */
+function manifestAt(rel: string): Manifest {
+  const m = decodeManifest(readTextFileSync(join(ROOT, "..", "..", rel)));
+  if (m.kind === "err") throw new Error(`${rel}: ${m.error}`);
+  return m.value;
+}
+
 proves(
   ["0005-typescript-runtime FR-029"],
-  "the package exports kernel, runtime and runtime/test, and the build emits JavaScript with declarations",
+  "the root package is the Git dependency: this folder's entry points, the hook and ifc, exact run-time pins, and no release or tarball",
   () => {
     const m = manifest();
-    assertEquals(m.name, "@intellectual-frontiers/ifc-ts");
+    assertEquals(m.name, PACKAGE_NAME);
     assertEquals(m.exports, {
-      "./kernel": "./kernel/mod.ts",
-      "./runtime": "./runtime/mod.ts",
-      "./runtime/test": "./runtime/test.ts",
-      "./runtime/test-run": "./runtime/test-run.ts",
-      "./lint": "./lint/plugin.ts",
-      "./lint/rule": "./lint/rule.ts",
-      "./lint/test-rule": "./lint/test-rule.ts",
+      "./ts/kernel": "./kernel/mod.ts",
+      "./ts/runtime": "./runtime/mod.ts",
+      "./ts/runtime/test": "./runtime/test.ts",
+      "./ts/runtime/test-run": "./runtime/test-run.ts",
+      "./ts/lint": "./lint/plugin.ts",
+      "./ts/lint/rule": "./lint/rule.ts",
+      "./ts/lint/test-rule": "./lint/test-rule.ts",
+      "./ts/node": "./node/register.mjs",
     });
-    const built = packageManifest(m);
-    assertEquals(built["exports"], {
-      "./kernel": { types: "./kernel/mod.d.ts", default: "./kernel/mod.js" },
-      "./runtime": { types: "./runtime/mod.d.ts", default: "./runtime/mod.js" },
-      "./runtime/test": { types: "./runtime/test.d.ts", default: "./runtime/test.js" },
-      "./runtime/test-run": { types: "./runtime/test-run.d.ts", default: "./runtime/test-run.js" },
-      "./lint": { types: "./lint/plugin.d.ts", default: "./lint/plugin.js" },
-      "./lint/rule": { types: "./lint/rule.d.ts", default: "./lint/rule.js" },
-      "./lint/test-rule": { types: "./lint/test-rule.d.ts", default: "./lint/test-rule.js" },
-    });
-    assertEquals([built["devDependencies"], built["scripts"], built["dependencies"]], [undefined, undefined, undefined]);
-    assertEquals(tarballName({ name: "@intellectual-frontiers/ifc-ts", version: "1.2.3" }), "intellectual-frontiers-ifc-ts-1.2.3.tgz");
-    const build = text("tsconfig.build.json");
-    for (const option of ['"rewriteRelativeImportExtensions": true', '"declaration": true', '"noEmit": false'])
-      assertStringIncludes(build, option);
-    assert(!build.includes("tests/"), "the build leaves the tests out");
-    assertEquals(
-      decodeManifest('{"name":"x","version":"1.2","description":"","type":"module","exports":{},"devDependencies":{}}').kind,
-      "err",
-    );
-    assertEquals(
-      decodeManifest('{"name":"x","version":"1.2.0","description":"","type":"commonjs","exports":{},"devDependencies":{}}').kind,
-      "err",
+    for (const target of Object.values(m.exports)) assert(existsSync(join(ROOT, target)), target);
+    const root = manifestAt("package.json");
+    assertEquals(root.name, PACKAGE_NAME);
+    const json: unknown = JSON.parse(readTextFileSync(join(ROOT, "..", "..", "package.json")));
+    assert(typeof json === "object" && json !== null && "private" in json && json.private === true, "the root package is private");
+    assert(!("version" in json), "the commit is the version: the root package has none");
+    const ts = Object.fromEntries(Object.entries(root.exports).filter(([k]) => k.startsWith("./ts/")));
+    assertEquals(ts, rootEntries(m));
+    assertEquals(root.bin?.["ifc"], "./commons/ts/node/ifc.mjs");
+    const deps = Object.entries(root.dependencies ?? {});
+    for (const [name, v] of deps) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${name} is not pinned exactly: ${v}`);
+    assertEquals(root.dependencies, manifestAt("commons/docs/package.json").dependencies);
+    assertEquals(root.devDependencies, {});
+    const lock = readTextFileSync(join(ROOT, "..", "..", "bun.lock"));
+    for (const [name, v] of deps) assertStringIncludes(lock, `["${name}@${v}"`);
+    for (const gone of ["tools/pack.ts", "tsconfig.build.json", "../../.github/workflows/ifc-typescript-release.yml"])
+      assert(!existsSync(join(ROOT, gone)), `${gone} is gone: commons is not released`);
+    const ifc = readTextFileSync(join(ROOT, "node", "ifc.mjs"));
+    assert(ifc.startsWith("#!/usr/bin/env node\n"), "ifc runs from a shebang");
+    assert(
+      ifc.indexOf('import "./register.mjs"') < ifc.indexOf('import("../tools/test.ts")'),
+      "ifc registers the hook before it imports TypeScript",
     );
   },
 );
@@ -287,8 +294,8 @@ proves(
       "bunfig.toml",
       "tsconfig.json",
       "tsconfig.kernel.json",
-      "tsconfig.build.json",
       "about.ts",
+      "node/register.mjs",
     ]) {
       assert(statSync(join(ROOT, f)).isFile, f);
     }

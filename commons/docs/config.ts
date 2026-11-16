@@ -2,12 +2,12 @@
  * The configuration a repository gives the generator (commons 0011-documentation FR-023 to FR-027), and the one place it is checked: a
  * `docs.config.ts` exports a value of `DocsConfig` (its default export, or `config`), and `resolveConfig` checks it once into a `Config`,
  * whose paths are absolute (the root, the output) or relative to the root (everything else), with every default filled. Nothing else reads
- * the raw value. The `About` types are the ones the kernel of IFC TypeScript has (`kernel/documentation.ts`), kept here until a release of
- * IFC TypeScript carries them, so that a repository's `about.ts` and its configuration are typed by the package alone.
+ * the raw value. The `About` types are the ones the kernel of IFC TypeScript has (`kernel/documentation.ts`), kept here so that a
+ * repository's `about.ts` and its configuration are typed by `@intellectual-frontiers/commons/docs` alone.
  *
  * @example
  * ```ts
- * import type { DocsConfig } from "@intellectual-frontiers/ifc-docs/config";
+ * import type { DocsConfig } from "@intellectual-frontiers/commons/docs";
  * export default {
  *   name: "Example",
  *   repository: "https://github.com/example/example",
@@ -20,8 +20,8 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/ifc-ts/kernel";
-import { path } from "@intellectual-frontiers/ifc-ts/runtime";
+import { err, ok, type Result } from "../ts/kernel/mod.ts";
+import { path } from "../ts/runtime/mod.ts";
 import type { Lens } from "./lens.ts";
 
 /** A specification, by its repository and its folder's name (`commons`, `0009-sql-aide`). Only the repository's own become links. */

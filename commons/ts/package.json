@@ -1,17 +1,17 @@
 {
-  "name": "@intellectual-frontiers/ifc-ts",
-  "version": "0.4.0",
+  "name": "@intellectual-frontiers/commons",
   "private": true,
-  "description": "IFC TypeScript: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime).",
+  "description": "IFC TypeScript, for the development of commons/ts: the pure kernel and the host runtime of Intellectual Frontiers Commons, on web standards and node: builtins (commons 0005-typescript-runtime). A consumer depends on the repository's root package by Git, under the same name and entry points.",
   "type": "module",
   "exports": {
-    "./kernel": "./kernel/mod.ts",
-    "./runtime": "./runtime/mod.ts",
-    "./runtime/test": "./runtime/test.ts",
-    "./runtime/test-run": "./runtime/test-run.ts",
-    "./lint": "./lint/plugin.ts",
-    "./lint/rule": "./lint/rule.ts",
-    "./lint/test-rule": "./lint/test-rule.ts"
+    "./ts/kernel": "./kernel/mod.ts",
+    "./ts/runtime": "./runtime/mod.ts",
+    "./ts/runtime/test": "./runtime/test.ts",
+    "./ts/runtime/test-run": "./runtime/test-run.ts",
+    "./ts/lint": "./lint/plugin.ts",
+    "./ts/lint/rule": "./lint/rule.ts",
+    "./ts/lint/test-rule": "./lint/test-rule.ts",
+    "./ts/node": "./node/register.mjs"
   },
   "engines": {
     "node": ">=26"
@@ -21,7 +21,6 @@
     "test": "bun test tests/",
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:deno": "deno test -A --no-check tests/",
-    "pack": "bun tools/pack.ts",
     "smoke": "bun tools/smoke.ts",
     "test:evidence": "bun tools/test.ts run --runtime node,deno,bun --out test-results --report tap,junit,ctrf,sarif,md,html,oscal --requirements ../spec-kit/enforcement.tsv --spec 0005-typescript-runtime --ledger test-results/ledger.jsonl tests",
     "test:verify": "bun tools/test.ts verify --record"

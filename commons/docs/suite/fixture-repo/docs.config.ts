@@ -1,11 +1,11 @@
 /**
  * The configuration of the fixture repository (commons 0011-documentation FR-019, FR-023, FR-027): a repository with no `about.ts`,
  * whose one package and area are given here, a plain spec kit with a constitution, and citations that link commons' public site and show
- * erga's as text. The smoke test of the release copies this folder into an empty project and builds it with the packed package.
+ * erga's as text. The smoke test copies this folder into an empty project and builds it with commons installed as a Git dependency.
  *
  * @module
  */
-import type { DocsConfig } from "@intellectual-frontiers/ifc-docs/config";
+import type { DocsConfig } from "@intellectual-frontiers/commons/docs";
 
 /** The fixture's site. */
 export const config: DocsConfig = {

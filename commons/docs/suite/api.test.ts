@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { declarationText, functionSignature, readApi } from "../extract/api.ts";
 import { apiPages, registerApi } from "../pages/api.ts";
 import { fixtureArea, freshBuild, ROOT } from "./helpers.ts";

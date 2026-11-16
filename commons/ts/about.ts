@@ -14,8 +14,10 @@ export const about: About = {
     "The TypeScript part of Intellectual Frontiers Commons. It rests only on what belongs to no vendor (TypeScript 7, ECMAScript, the web " +
     "standards and the `node:` modules that Deno, Node and Bun all implement), so the same code runs on each of the three, on Linux, macOS and " +
     "Windows. It is OpenTelemetry-native (commons 0006-signals), carries the primitives of GRC engineering (commons 0007-grc) and records each " +
-    "test run as compliance evidence (commons 0008-test-evidence). A release is a tarball attached to this repository's GitHub release " +
-    "`ifc-ts-vX.Y.Z`; a harness depends on the asset and its lockfile keeps the tarball's integrity. It has one core dependency, " +
+    "test run as compliance evidence (commons 0008-test-evidence). A harness depends on this repository's root package, " +
+    "`@intellectual-frontiers/commons`, by Git at a commit its lockfile holds, and imports the `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`): " +
+    "Bun runs them as they are, and Node 26 with the hook `--import @intellectual-frontiers/commons/ts/node`. There is no release and no build. " +
+    "It has one core dependency, " +
     "TypeScript 7; every other tool is Bun, pinned in commons' pins (`BUN_VERSION`), and CI (`ifc-typescript.yml`) runs every command " +
     "below on Linux, macOS and Windows.",
   spec: { repo: "commons", id: "0005-typescript-runtime" },
@@ -41,8 +43,13 @@ export const about: About = {
       mayImport: ["node: builtins", "kernel/", "lint/", "runtime/"],
     },
     {
+      path: "node/",
+      what: "The Node hook that strips the types of this package's sources under `node_modules`, and the command `ifc`, in JavaScript.",
+      mayImport: ["node: builtins", "tools/test.ts, once the hook is registered"],
+    },
+    {
       path: "tools/",
-      what: "Packing, smoke tests, the evidence runner and the pins, run by Bun.",
+      what: "The smoke test of the Git dependency, the evidence runner (`ifc test`) and the pins, run by Bun.",
       mayImport: ["kernel/", "runtime/", "tools/"],
     },
     {
@@ -62,12 +69,14 @@ export const about: About = {
     { run: "bun run test", does: "Runs the suite under Bun." },
     { run: "bun run test:node", does: "Runs the suite under Node 26." },
     { run: "bun run test:deno", does: "Runs the suite under Deno, whose own checker is TypeScript 6, so tsc checks instead." },
-    { run: "bun run pack", does: "Writes dist/intellectual-frontiers-ifc-ts-X.Y.Z.tgz and its .sha256." },
     {
       run: "bun run test:evidence",
       does: "Runs the suite on all three runtimes into one OTLP record, its TAP, JUnit, CTRF, SARIF, OSCAL and completion reports, and the ledger.",
     },
-    { run: "bun run smoke", does: "Installs the tarball and uses it on Bun, Node and Deno, and checks its declarations with tsc 7." },
+    {
+      run: "bun run smoke",
+      does: "Installs the checkout's HEAD as a Git dependency into an empty project, uses it and runs ifc test on Bun and Node 26, runs it on Deno, and checks a consumer with tsc 7.",
+    },
     {
       run: "bun tools/ocsf-gen.ts --check",
       does: "Checks that kernel/ocsf-types.auto.ts is what the pinned OCSF 1.9.0 schema gives (needs the network; run by hand).",
@@ -115,5 +124,5 @@ export const about: About = {
     { title: "Runtime", slug: "runtime", entryPoints: ["runtime/mod.ts", "runtime/test.ts", "runtime/test-run.ts"] },
     { title: "Lint plugin", slug: "lint", entryPoints: ["lint/plugin.ts", "lint/rule.ts", "lint/test-rule.ts"] },
   ],
-  examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on the released tarball." }],
+  examples: [{ file: "examples/use.ts", what: "What a harness imports once it depends on commons by Git." }],
 };

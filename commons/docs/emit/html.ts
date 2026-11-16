@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
+import { absurd } from "../../ts/kernel/mod.ts";
 import { tokens } from "../highlight.ts";
 import type { Badge, Block, Card, Href, Inline, Lang, Page, Section, TreeNode } from "../model.ts";
 import { plain } from "../model.ts";

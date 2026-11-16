@@ -4,8 +4,8 @@
  *
  * @module
  */
-import { fs, path, proc } from "@intellectual-frontiers/ifc-ts/runtime";
-import { assertEquals } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { fs, path, proc } from "../../ts/runtime/mod.ts";
+import { assertEquals } from "../../ts/runtime/test.ts";
 import { config as commons } from "../../docs.config.ts";
 import { Build } from "../build.ts";
 import { type About, type Config, resolveConfig } from "../config.ts";

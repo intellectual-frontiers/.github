@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { assert, assertEquals, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { readApi } from "../extract/api.ts";
 import { fileAide, layoutPages, layoutTree, readLayouts } from "../lens/file-aide.ts";
 import { modelPages, readModels, sqlAide } from "../lens/sql-aide.ts";

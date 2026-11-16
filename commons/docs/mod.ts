@@ -1,12 +1,12 @@
 /**
- * The library of IFC Docs, `@intellectual-frontiers/ifc-docs` (commons 0011-documentation FR-021, FR-023, FR-026): the configuration's
+ * The library of IFC Docs, `@intellectual-frontiers/commons/docs` (commons 0011-documentation FR-021, FR-023, FR-026): the configuration's
  * types and its check, the command line's parts, the build of a site and its writing, and what a lens is given and uses (the build, the
  * areas and their API, the page model and its helpers). A repository's `docs.config.ts` needs only the types; a lens imports the rest
  * from here.
  *
  * @example
  * ```ts
- * import { buildSite, loadConfig, report } from "@intellectual-frontiers/ifc-docs";
+ * import { buildSite, loadConfig, report } from "@intellectual-frontiers/commons/docs";
  * const config = await loadConfig("docs.config.ts");
  * if (config.kind === "ok") console.log(report((await buildSite(config.value)).found));
  * ```

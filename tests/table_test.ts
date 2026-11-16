@@ -161,6 +161,20 @@ Deno.test("the public README carries no setup instructions, which live in erga's
   const tracked = await sh(["git", "ls-files"], { PATH: "/usr/bin:/bin", HOME: ROOT }, { cwd: ROOT });
   if (tracked.code !== 0) return; // not a git checkout
   const top = new Set(tracked.stdout.split("\n").filter((l) => l !== "").map((l) => l.split("/")[0]));
-  const allowed = new Set([".github", "bin", "commons", "profile", "tests", "README.md", "AGENTS.md", "CLAUDE.md", ".gitignore", "deno.json", "deno.lock"]);
+  const allowed = new Set([
+    ".github",
+    "bin",
+    "commons",
+    "profile",
+    "tests",
+    "README.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".gitignore",
+    "deno.json",
+    "deno.lock",
+    "package.json",
+    "bun.lock",
+  ]);
   for (const t of top) assert(allowed.has(t ?? ""), `a new top-level entry: ${t}`);
 });

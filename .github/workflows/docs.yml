@@ -8,11 +8,13 @@ on:
   push:
     paths:
       - "commons/**"
+      - "package.json"
       - ".github/workflows/docs.yml"
       - ".github/actions/bun/**"
   pull_request:
     paths:
       - "commons/**"
+      - "package.json"
       - ".github/workflows/docs.yml"
       - ".github/actions/bun/**"
   workflow_dispatch:
@@ -31,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/bun
-      - name: IFC TypeScript (its release tarball), TypeScript 7.1 (beta), Mermaid and @types/node, exactly as bun.lock pins them
+      - name: TypeScript 7.1 (beta), Mermaid and @types/node, exactly as bun.lock pins them (IFC TypeScript is ../ts, by relative path)
         run: bun install --frozen-lockfile
         working-directory: commons/docs
       - name: The compiler, the generator's tests, then check on commons

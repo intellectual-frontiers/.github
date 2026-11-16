@@ -9,8 +9,8 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/ifc-ts/kernel";
-import { fs, path, proc } from "@intellectual-frontiers/ifc-ts/runtime";
+import { err, ok, type Result } from "../ts/kernel/mod.ts";
+import { fs, path, proc } from "../ts/runtime/mod.ts";
 import { report } from "./check.ts";
 import { type Config, resolveConfig } from "./config.ts";
 import { buildSite, writeSite } from "./site.ts";

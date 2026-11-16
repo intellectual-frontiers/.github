@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
+import { absurd } from "../ts/kernel/mod.ts";
 
 /** Where a link goes: a page of the site (by its path from the site's root), or an address outside it. */
 export type Href =

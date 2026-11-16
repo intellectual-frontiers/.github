@@ -6,8 +6,8 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/ifc-ts/kernel";
-import { fs, path } from "@intellectual-frontiers/ifc-ts/runtime";
+import { absurd } from "../ts/kernel/mod.ts";
+import { fs, path } from "../ts/runtime/mod.ts";
 import { Build } from "./build.ts";
 import type { Finding } from "./check.ts";
 import { type Config, under } from "./config.ts";

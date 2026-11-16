@@ -1,12 +1,13 @@
 /**
- * The conventions of the generator (commons 0011-documentation FR-001, FR-002, FR-004, FR-026): a package whose dependencies are IFC
- * TypeScript by its release tarball, TypeScript and Mermaid, pinned exactly, imported by nothing outside it but commons' configuration,
- * importing only what it may, depending on no library it shows, held to IFC TypeScript's rules, and a commons with no README.
+ * The conventions of the generator (commons 0011-documentation FR-001, FR-002, FR-004, FR-026): a package of the root package's name
+ * whose dependencies are TypeScript and Mermaid, pinned exactly and the root's, that imports IFC TypeScript by relative path, imported by
+ * nothing outside it but commons' configuration, importing only what it may, whose entry points reach no library it shows, held to IFC
+ * TypeScript's rules, and a commons with no README.
  *
  * @module
  */
-import { fs, path } from "@intellectual-frontiers/ifc-ts/runtime";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { fs, path } from "../../ts/runtime/mod.ts";
+import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { ROOT } from "./helpers.ts";
 
 const DOCS = path.join(ROOT, "commons/docs");
@@ -37,20 +38,20 @@ function entries(pkg: unknown, field: string): [string, string][] {
   return Object.entries(v).map(([k, x]) => [k, String(x)]);
 }
 
-/** IFC TypeScript's release tarball, by its tag. */
-export const IFC_TS = "https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.4.0/intellectual-frontiers-ifc-ts-0.4.0.tgz";
-
-proves(["0011-documentation FR-001"], "IFC TypeScript by its release URL, TypeScript 7.1.0-beta and Mermaid, each pinned exactly", () => {
+proves(["0011-documentation FR-001"], "the root package's name and ./docs, TypeScript 7.1.0-beta and Mermaid pinned exactly and the root's, no IFC TypeScript", () => {
   const pkg: unknown = JSON.parse(read("commons/docs/package.json"));
+  const root: unknown = JSON.parse(read("package.json"));
+  assertEquals(fieldOf(pkg, "name"), "@intellectual-frontiers/commons");
+  assertEquals(fieldOf(pkg, "exports"), { "./docs": "./mod.ts" });
   const deps = entries(pkg, "dependencies");
   const dev = entries(pkg, "devDependencies");
-  assertEquals(deps.map(([n]) => n).sort(), ["@intellectual-frontiers/ifc-ts", "mermaid", "typescript"]);
+  assertEquals(deps.map(([n]) => n).sort(), ["mermaid", "typescript"]);
   assertEquals(dev.map(([n]) => n).sort(), ["@types/node"]);
-  for (const [n, v] of [...deps, ...dev]) {
-    assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v) || (n === "@intellectual-frontiers/ifc-ts" && v === IFC_TS), `${n} is pinned exactly`);
-  }
+  for (const [n, v] of [...deps, ...dev]) assert(/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(v), `${n} is pinned exactly`);
   assert(deps.some(([n, v]) => n === "typescript" && v === "7.1.0-beta"));
-  assert(read("commons/docs/bun.lock").includes(`"@intellectual-frontiers/ifc-ts@${IFC_TS}", {}, "sha512-`), "the lockfile holds the tarball's integrity");
+  assertEquals(entries(root, "dependencies"), deps, "the root package's dependencies are the generator's");
+  const lock = read("commons/docs/bun.lock");
+  for (const [n, v] of [...deps, ...dev]) assert(lock.includes(`["${n}@${v}", "", `), `the lockfile holds ${n}@${v} and its integrity`);
 });
 
 proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a file of it but commons' configuration", () => {
@@ -66,16 +67,18 @@ proves(["0011-documentation FR-001"], "nothing outside commons/docs imports a fi
   }
 });
 
-const PACKAGES = new Set(["@intellectual-frontiers/ifc-ts/kernel", "@intellectual-frontiers/ifc-ts/runtime", "@intellectual-frontiers/ifc-ts/runtime/test", "typescript/async"]);
+const PACKAGES = new Set(["typescript/async"]);
+const IFC_TS = new Set(["ts/kernel/mod.ts", "ts/runtime/mod.ts", "ts/runtime/test.ts"]);
 
-proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by its name and typescript/async; a lens also the libraries' entry points", () => {
+proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScript by relative path and typescript/async; a lens also the libraries' entry points", () => {
   const lensMay = new Set(["docs/mod.ts", "ts/data/sql-aide/mod.ts", "ts/data/file-aide/mod.ts"]);
   for (const f of mine) {
     const fixture = f.startsWith("commons/docs/suite/fixture-repo/");
     for (const s of specifiers(read(f))) {
-      if (PACKAGES.has(s) || (fixture && s === "@intellectual-frontiers/ifc-docs/config")) continue;
+      if (PACKAGES.has(s) || (fixture && s === "@intellectual-frontiers/commons/docs")) continue;
       assert(s.startsWith("."), `${f} imports ${s}`);
       const target = path.relative(path.join(ROOT, "commons"), path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/");
+      if (IFC_TS.has(target) && (target !== "ts/runtime/test.ts" || f.startsWith("commons/docs/suite/"))) continue;
       if (f.startsWith("commons/docs/lens/")) assert(lensMay.has(target), `the lens ${f} imports ${s}, which it may not: a lens imports the generator through mod.ts`);
       else if (f.startsWith("commons/docs/suite/")) assert(target.startsWith("docs/") || lensMay.has(target) || target === "docs.config.ts", `${f} imports ${s}, which it may not`);
       else assert(target.startsWith("docs/") && !target.startsWith("docs/lens/"), `${f} imports ${s}, which it may not`);
@@ -83,15 +86,28 @@ proves(["0011-documentation FR-002"], "a file imports the generator, IFC TypeScr
   }
 });
 
-proves(["0011-documentation FR-026"], "the release depends on no library it shows: lens/, the tests and the tools are left out of it, and what it builds imports no data library", () => {
-  const build: unknown = JSON.parse(read("commons/docs/tsconfig.build.json"));
-  const raw = fieldOf(build, "include");
-  assert(Array.isArray(raw));
-  const include = raw.map((x: unknown) => String(x));
-  assertEquals(include.sort(), ["*.ts", "emit/**/*.ts", "extract/**/*.ts", "pages/**/*.ts"]);
-  const shipped = mine.filter((f) => /^commons\/docs\/(?:[^/]+|(?:emit|extract|pages)\/.+)\.ts$/.test(f) && f !== "commons/docs/about.ts" && f !== "commons/docs/docs.config.ts");
-  assert(shipped.includes("commons/docs/mod.ts") && shipped.includes("commons/docs/config.ts"));
-  for (const f of shipped) for (const s of specifiers(read(f))) assert(!/(^|\/)data\/|lens\//.test(s), `${f}, which the release carries, imports ${s}`);
+/** Every file of commons/docs a file reaches by its relative imports, from the checkout's root, the file itself first. */
+function reached(from: string): string[] {
+  const seen = new Set<string>();
+  const walk = (f: string): void => {
+    if (seen.has(f) || !f.startsWith("commons/docs/") || !f.endsWith(".ts")) return;
+    seen.add(f);
+    for (const s of specifiers(read(f)))
+      if (s.startsWith(".")) walk(path.relative(ROOT, path.resolve(path.dirname(path.join(ROOT, f)), s)).split(path.sep).join("/"));
+  };
+  walk(from);
+  return [...seen];
+}
+
+proves(["0011-documentation FR-026"], "the package depends on no library it shows: what ./docs and ifc-docs reach imports no data library and no lens", () => {
+  const bin = read("commons/docs/ifc-docs.mjs");
+  assert(bin.includes('import("./cli.ts")'), "ifc-docs runs cli.ts");
+  const files = new Set([...reached("commons/docs/mod.ts"), ...reached("commons/docs/cli.ts")]);
+  assert(files.has("commons/docs/config.ts") && files.has("commons/docs/site.ts"));
+  for (const f of files) {
+    assert(!f.startsWith("commons/docs/lens/") && !f.startsWith("commons/docs/suite/") && !f.startsWith("commons/docs/tools/"), `${f} is reached from an entry point`);
+    for (const s of specifiers(read(f))) assert(!/(^|\/)data\/|lens\//.test(s), `${f}, which an entry point reaches, imports ${s}`);
+  }
 });
 
 proves(["0011-documentation FR-002"], "@module on every file, TSDoc on every export, no any and no non-null assertion", () => {

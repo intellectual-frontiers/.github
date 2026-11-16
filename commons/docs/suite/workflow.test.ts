@@ -1,11 +1,11 @@
 /**
  * The workflows of the generator (commons 0011-documentation FR-020, FR-022): the one that tests, checks and publishes commons' site, and
- * the one that releases the package.
+ * the job that installs the commit as a Git dependency and runs the smoke tests; and no workflow that makes a GitHub release.
  *
  * @module
  */
-import { fs, path } from "@intellectual-frontiers/ifc-ts/runtime";
-import { assert, assertStringIncludes, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { fs, path } from "../../ts/runtime/mod.ts";
+import { assert, assertStringIncludes, proves } from "../../ts/runtime/test.ts";
 import { ROOT } from "./helpers.ts";
 
 proves(["0011-documentation FR-020"], "docs.yml tests and checks on pull requests and pushes, and publishes from main with GitHub's Pages actions", async () => {
@@ -16,25 +16,24 @@ proves(["0011-documentation FR-020"], "docs.yml tests and checks on pull request
   assert(!/git (add|commit|push)/.test(yml), "the site is never committed");
 });
 
-proves(["0011-documentation FR-022"], "ifc-docs-release.yml releases on an ifc-docs-v tag or by hand from main, after it checks, tests, packs and smokes", async () => {
-  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-docs-release.yml"));
+proves(["0011-documentation FR-022"], "ifc-typescript.yml's git-dependency job runs both smoke tests from git+file: on three systems, and nothing releases", async () => {
+  const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/ifc-typescript.yml"));
+  const job = yml.slice(yml.indexOf("\n  git-dependency:"));
+  assert(job.length > 0 && yml.includes("\n  git-dependency:"), "ifc-typescript.yml has the job git-dependency");
   for (const needed of [
-    '- "ifc-docs-v*"',
-    "workflow_dispatch:",
-    "refs/heads/main",
-    "ifc-docs-v[0-9]*.[0-9]*.[0-9]*",
+    "os: [ubuntu-latest, macos-latest, windows-latest]",
     "./.github/actions/bun",
-    "NODE_VERSION: \"26.",
-    "bun install --frozen-lockfile",
-    "bun run check",
-    "bun test suite/",
-    'bun run --silent pack --tag "$TAG"',
-    'bun run --silent smoke "$tarball"',
-    'gh release view "$TAG"',
-    'gh release create "$TAG" "$TARBALL" "$TARBALL.sha256" --target "$GITHUB_SHA"',
-    "contents: write",
+    "node-version: ${{ env.NODE_VERSION }}",
+    'bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"',
+    "working-directory: commons/ts",
+    "working-directory: commons/docs",
   ]) {
-    assertStringIncludes(yml, needed);
+    assertStringIncludes(job, needed);
   }
-  assert(!/git (add|commit|push)/.test(yml), "a release commits nothing");
+  assertStringIncludes(yml, 'NODE_VERSION: "26.');
+  for (const f of fs.readDirSync(path.join(ROOT, ".github/workflows"))) {
+    const text = await fs.readTextFile(path.join(ROOT, ".github/workflows", f.name));
+    assert(!/gh release (create|upload)|softprops\/action-gh-release|contents: write/.test(text), `${f.name} makes a release`);
+  }
+  assert(!/git (add|commit|push)/.test(job), "the job commits nothing");
 });

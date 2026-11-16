@@ -1,0 +1,32 @@
+{
+  "name": "@intellectual-frontiers/commons",
+  "private": true,
+  "description": "Intellectual Frontiers Commons, consumed as a Git dependency pinned by commit: IFC TypeScript's kernel, runtime and lint plugin, the Node hook that runs them from node_modules, and IFC Docs (commons 0005-typescript-runtime FR-029, 0011-documentation FR-021).",
+  "type": "module",
+  "exports": {
+    "./ts/kernel": "./commons/ts/kernel/mod.ts",
+    "./ts/runtime": "./commons/ts/runtime/mod.ts",
+    "./ts/runtime/test": "./commons/ts/runtime/test.ts",
+    "./ts/runtime/test-run": "./commons/ts/runtime/test-run.ts",
+    "./ts/lint": "./commons/ts/lint/plugin.ts",
+    "./ts/lint/rule": "./commons/ts/lint/rule.ts",
+    "./ts/lint/test-rule": "./commons/ts/lint/test-rule.ts",
+    "./ts/node": "./commons/ts/node/register.mjs",
+    "./docs": "./commons/docs/mod.ts"
+  },
+  "bin": {
+    "ifc": "./commons/ts/node/ifc.mjs",
+    "ifc-docs": "./commons/docs/ifc-docs.mjs"
+  },
+  "engines": {
+    "node": ">=26"
+  },
+  "dependencies": {
+    "mermaid": "11.17.2",
+    "typescript": "7.1.0-beta"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intellectual-frontiers/.github.git"
+  }
+}

@@ -26,12 +26,18 @@ This repository is small on purpose: the organization's public profile (`profile
   a library built with SQL Aide imports `sql-aide/mod.ts` alone; everything is configured in TypeScript, never in YAML, XML or JSON; every exported declaration carries a
   TSDoc comment, which is also what the SQL documentation says (`bun run docs` writes the maps again); and what a model emits is committed under `suite/**/golden/`, so that a
   change shows as a diff of SQL.
-- Documentation is the code's (commons 0011-documentation): `commons/docs/` is the generator of the site published on GitHub Pages, released as
-  `@intellectual-frontiers/ifc-docs` (tag `ifc-docs-vX.Y.Z`, `.github/workflows/ifc-docs-release.yml`) so that other repositories build their sites with it; it reads
+- Commons is consumed as a Git dependency, never as a release (commons 0005-typescript-runtime FR-029, FR-070): the root `package.json` is the package
+  `@intellectual-frontiers/commons`, which another repository adds at a commit (`bun add github:intellectual-frontiers/.github#<commit>`, its `bun.lock` then holds the
+  commit) and imports from its `.ts` sources (`@intellectual-frontiers/commons/ts/kernel`, `.../ts/runtime`, `.../docs`, the commands `ifc` and `ifc-docs`); Bun runs them
+  as they are, Node 26 with `--import @intellectual-frontiers/commons/ts/node`. Make no GitHub release, tarball or build for it. `commons/ts/package.json` and
+  `commons/docs/package.json` bear the same name for their own development; keep the root's `exports` and `dependencies` in step with them (the tests check it), and
+  run `bun run smoke` in `commons/ts` and in `commons/docs` (the committed `HEAD` installed by `git+file:`, then used on Bun and Node 26) when the package changes.
+- Documentation is the code's (commons 0011-documentation): `commons/docs/` is the generator of the site published on GitHub Pages, part of that package
+  (`./docs`, `ifc-docs`) so that other repositories build their sites with it; it reads
   only the TypeScript and the spec kit a repository's `docs.config.ts` names (commons' is `commons/docs.config.ts`, with its lenses in `commons/docs/lens/`). Commons keeps no README. A module's documentation is its TSDoc: the module comment says what it is, `@remarks` the longer account, `@limits` what it
   does not do; an area's typed facts (folders and what each may import, commands, rules, phases, examples) are its `about.ts`. When you change code, change its
   documentation in the same commit, in the module it is about. In `commons/docs` run `bun run verify` (the compiler, the tests, `check` on commons) before you push,
-  and `bun run pack` then `bun run smoke dist/<tarball>` (Bun and Node 26 on a fixture repository) when the package changes; `bun main.ts build --out ../../_site` builds the
+  and `bun run smoke` when the package changes; `bun main.ts build --out ../../_site` builds the
   site, which is never committed. The root `README.md` stays a short pointer to the site, kept by hand.
 - Never put a secret, a token or a person's data in this repository: it is public.
 

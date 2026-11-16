@@ -1,20 +1,27 @@
 name: ifc-typescript
 
-# IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018, FR-026 to FR-030). TypeScript 7 checks; Bun, pinned in commons' pins, installs, formats, lints
-# and packs; the same tests run unchanged on Deno, Node 26 and Bun, on Linux, macOS and Windows; and the packed tarball is installed and used on the three runtimes.
+# IFC TypeScript (commons 0005-typescript-runtime FR-017, FR-018, FR-026 to FR-030, FR-070). TypeScript 7 checks; Bun, pinned in commons' pins, installs, formats
+# and lints; the same tests run unchanged on Deno, Node 26 and Bun, on Linux, macOS and Windows; and the commit is installed as a Git dependency of an empty project,
+# as a consumer installs it, and used there on Bun, Node 26 (through the hook) and Deno, IFC Docs too (0011-documentation FR-021, FR-022). Nothing is released.
 on:
   push:
     paths:
       - "commons/ts/**"
+      - "commons/docs/**"
       - "commons/generated/pins.auto.env"
+      - "package.json"
+      - "bun.lock"
       - ".github/actions/bun/**"
-      - ".github/workflows/ifc-typescript*.yml"
+      - ".github/workflows/ifc-typescript.yml"
   pull_request:
     paths:
       - "commons/ts/**"
+      - "commons/docs/**"
       - "commons/generated/pins.auto.env"
+      - "package.json"
+      - "bun.lock"
       - ".github/actions/bun/**"
-      - ".github/workflows/ifc-typescript*.yml"
+      - ".github/workflows/ifc-typescript.yml"
 
 permissions:
   contents: read
@@ -159,7 +166,9 @@ jobs:
           ' "$RUNNER_TEMP/cross/hello.ts" "$RUNNER_TEMP/cross/hello" "$v"
           test -f "$RUNNER_TEMP/cross/hello.exe"
 
-  pack:
+  git-dependency:
+    # commons 0005-typescript-runtime FR-030 and 0011-documentation FR-022: the commit checked, installed into an empty project by a
+    # git+file: URL of this checkout, as a consumer installs it by github:intellectual-frontiers/.github#<commit>, and used there.
     strategy:
       fail-fast: false
       matrix:
@@ -168,8 +177,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Bun clones the checkout as a Git repository; a whole one, so that nothing depends on how a shallow clone is cloned.
+          fetch-depth: 0
       - uses: ./.github/actions/bun
-      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Deno, through bin/erga-bootstrap.sh itself
@@ -186,10 +197,18 @@ jobs:
           ./bin/erga-bootstrap.ps1 --help
           $v = ((Select-String -Path commons/generated/pins.auto.env -Pattern '^DENO_VERSION=').Line -split '=')[1]
           "$env:LOCALAPPDATA\erga\toolchain\deno\$v\windows-x64" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-      - name: Pack, then install the tarball and use it on Bun, Node and Deno
+      - name: The root package's lockfile, which the consumer does not read but this repository keeps
+        run: bun install --frozen-lockfile
+      - name: IFC TypeScript as a Git dependency, on Bun, Node 26 and Deno, with ifc test and tsc 7
         working-directory: commons/ts
         shell: bash
         run: |
           bun install --frozen-lockfile
-          tarball=$(bun run --silent pack)
-          bun run --silent smoke "$tarball"
+          node --version
+          bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"
+      - name: IFC Docs as a Git dependency, ifc-docs check and build on a fixture repository on Bun and Node 26
+        working-directory: commons/docs
+        shell: bash
+        run: |
+          bun install --frozen-lockfile
+          bun tools/smoke.ts --repo "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA"

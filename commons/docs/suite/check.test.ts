@@ -4,8 +4,8 @@
  *
  * @module
  */
-import { fs, path, proc } from "@intellectual-frontiers/ifc-ts/runtime";
-import { assert, assertEquals, proves } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { fs, path, proc } from "../../ts/runtime/mod.ts";
+import { assert, assertEquals, proves } from "../../ts/runtime/test.ts";
 import { message, report } from "../check.ts";
 import { document } from "../emit/html.ts";
 import { brokenLinks, buildSite } from "../site.ts";

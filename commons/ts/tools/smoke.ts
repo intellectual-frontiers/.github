@@ -1,20 +1,26 @@
 /**
- * The packed package installed and used, before it is released (commons 0005-typescript-runtime FR-030): an empty project depends on the
- * tarball, Bun installs it, a small program imports the three entry points and uses each on Bun, Node and Deno, and a TypeScript consumer
- * is checked by TypeScript 7 against the declarations the package ships. Any failure, or a runtime that is not on `PATH`, ends with status 1.
+ * Commons installed as a Git dependency and used, as a consumer uses it (commons 0005-typescript-runtime FR-029, FR-030, FR-070): an
+ * empty project depends on the repository's root package at one commit by a `git+file:` URL, Bun installs it, and then, on Bun and on
+ * Node 26 (through the hook, `--import @intellectual-frontiers/commons/ts/node`), a small program imports the kernel, the runtime and the
+ * test registration by the package's name and uses each, and the package's own `ifc test run` runs a small suite and writes its record;
+ * on Deno, the same program runs through an import map of the entry points; and TypeScript 7 checks a consumer against the sources. Any
+ * failure, or a runtime that is not on `PATH`, ends with status 1.
  *
- * `bun tools/smoke.ts dist/intellectual-frontiers-ifc-ts-X.Y.Z.tgz`
+ * `bun tools/smoke.ts [--repo DIR] [--commit SHA]`: by default the checkout this file is in, at its `HEAD`; the commit must be committed.
  *
  * @module
  */
-import { makeTempDir, remove, writeTextFile } from "../runtime/fs.ts";
-import { dirname, fromFileUrl, join, resolve } from "../runtime/path.ts";
+import { decodeManifest } from "./manifest.ts";
+import { existsSync, makeTempDir, mkdir, readDirSync, readTextFileSync, remove, writeTextFile } from "../runtime/fs.ts";
+import { dirname, fromFileUrl, join, resolve, toFileUrl } from "../runtime/path.ts";
 import { args, execPath, exit, run, runtimeName, which } from "../runtime/proc.ts";
 
+const NAME = "@intellectual-frontiers/commons";
+
 const PROGRAM = `
-import { ok, sha256, tar, untar, filesOf } from "@intellectual-frontiers/ifc-ts/kernel";
-import { fs, proc, path } from "@intellectual-frontiers/ifc-ts/runtime";
-import { assertEquals } from "@intellectual-frontiers/ifc-ts/runtime/test";
+import { ok, sha256, tar, untar, filesOf } from "${NAME}/ts/kernel";
+import { fs, proc, path } from "${NAME}/ts/runtime";
+import { assertEquals } from "${NAME}/ts/runtime/test";
 assertEquals(ok(1), { kind: "ok", value: 1 });
 assertEquals(await sha256("abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 const t = tar(new Map([["a/b.txt", new TextEncoder().encode("hi")]]));
@@ -29,9 +35,15 @@ await fs.remove(dir, { recursive: true });
 console.log("ok on " + proc.runtimeName() + " " + proc.runtimeVersion());
 `;
 
+const SUITE = `
+import { assertEquals, proves } from "${NAME}/ts/runtime/test";
+import { ok } from "${NAME}/ts/kernel";
+proves(["0005-typescript-runtime FR-030"], "a consumer's test, run by ifc test", () => assertEquals(ok(2), { kind: "ok", value: 2 }));
+`;
+
 const CONSUMER = `
-import { andThen, ok, type Result, type Sha256, sha256 } from "@intellectual-frontiers/ifc-ts/kernel";
-import { errors, fs } from "@intellectual-frontiers/ifc-ts/runtime";
+import { andThen, ok, type Result, type Sha256, sha256 } from "${NAME}/ts/kernel";
+import { errors, fs } from "${NAME}/ts/runtime";
 const r: Result<number, string> = andThen(ok(1), (n: number) => ok(n + 1));
 const s: Sha256 = await sha256("abc");
 const t: string = await fs.readTextFile("x").catch((e: unknown) => (e instanceof errors.NotFound ? "" : String(e)));
@@ -40,12 +52,7 @@ const bad: Sha256 = "abc";
 export { bad, r, s, t };
 `;
 
-const TSCONFIG = JSON.stringify({
-  compilerOptions: { module: "nodenext", target: "es2024", strict: true, noEmit: true, types: ["node"], typeRoots: [] as string[] },
-  files: ["consumer.ts"],
-});
-
-const ROOT = resolve(dirname(fromFileUrl(import.meta.url)), "..");
+const HERE = resolve(dirname(fromFileUrl(import.meta.url)), "..");
 
 /** Stop with a message and status 1. */
 function stop(message: string): never {
@@ -53,52 +60,94 @@ function stop(message: string): never {
   return exit(1);
 }
 
-const tarball = args[0];
-if (tarball === undefined) stop("give the tarball's path");
+/** The value after a flag of the command line, if it is given. */
+function option(flag: string): string | undefined {
+  const at = args.indexOf(flag);
+  return at < 0 ? undefined : args[at + 1];
+}
+
 const bun = runtimeName() === "bun" ? execPath() : which("bun");
 if (bun === undefined) stop("bun is not on PATH");
-const runtimes: readonly { readonly name: string; readonly argv: (exe: string) => readonly string[] }[] = [
-  { name: "bun", argv: (exe) => [exe, "check.mjs"] },
-  { name: "node", argv: (exe) => [exe, "check.mjs"] },
-  { name: "deno", argv: (exe) => [exe, "run", "-A", "check.mjs"] },
-];
+const repo = resolve(option("--repo") ?? join(HERE, "..", ".."));
+const head = await run(["git", "rev-parse", "HEAD"], { cwd: repo });
+const commit = option("--commit") ?? (head.success ? head.stdout.trim() : stop(`git rev-parse HEAD failed in ${repo}`));
+const url = `git+${toFileUrl(repo).href}#${commit}`;
 
+const root = decodeManifest(readTextFileSync(join(repo, "package.json")));
+if (root.kind === "err") stop(root.error);
 const dir = await makeTempDir({ prefix: "ifc-ts-smoke-" });
 let failed = false;
+const fail = (message: string): void => {
+  console.error(message);
+  failed = true;
+};
 try {
-  const dependency = { "@intellectual-frontiers/ifc-ts": `file:${resolve(tarball)}` };
   await writeTextFile(
     join(dir, "package.json"),
-    JSON.stringify({ name: "smoke", private: true, type: "module", dependencies: dependency }),
+    JSON.stringify({ name: "smoke", private: true, type: "module", dependencies: { [NAME]: url } }),
   );
-  await writeTextFile(join(dir, "check.mjs"), PROGRAM);
+  await writeTextFile(join(dir, "check.ts"), PROGRAM);
+  await mkdir(join(dir, "tests"));
+  await writeTextFile(join(dir, "tests", "consumer.test.ts"), SUITE);
   await writeTextFile(join(dir, "consumer.ts"), CONSUMER);
+  const pkg = join(dir, "node_modules", ...NAME.split("/"));
+  // Deno reads a file under node_modules as an npm package's, which it does not strip; the import map makes each a file of the project.
+  const imports = Object.fromEntries(
+    Object.entries(root.value.exports).map(([k, v]) => [`${NAME}${k.slice(1)}`, `./node_modules/${NAME}/${v.slice(2)}`]),
+  );
+  await writeTextFile(join(dir, "deno.json"), JSON.stringify({ imports, nodeModulesDir: "none" }));
   await writeTextFile(
     join(dir, "tsconfig.json"),
-    TSCONFIG.replace('"typeRoots":[]', `"typeRoots":[${JSON.stringify(join(ROOT, "node_modules", "@types"))}]`),
+    JSON.stringify({
+      compilerOptions: {
+        module: "nodenext",
+        target: "es2024",
+        strict: true,
+        noEmit: true,
+        allowImportingTsExtensions: true,
+        exactOptionalPropertyTypes: true,
+        noUncheckedIndexedAccess: true,
+        types: ["node"],
+        typeRoots: [join(HERE, "node_modules", "@types")],
+      },
+      files: ["consumer.ts"],
+    }),
   );
   const install = await run([bun, "install"], { cwd: dir });
-  if (!install.success) stop(`bun install failed:\n${install.stdout}${install.stderr}`);
+  if (!install.success) stop(`bun install ${url} failed:\n${install.stdout}${install.stderr}`);
+  const lock = readTextFileSync(join(dir, "bun.lock"));
+  if (lock.includes(commit)) console.log(`bun.lock holds the commit ${commit}`);
+  else fail(`smoke: bun.lock does not hold the commit ${commit}`);
+  const ifc = join(pkg, ...(root.value.bin?.["ifc"] ?? "./commons/ts/node/ifc.mjs").slice(2).split("/"));
+  const hook = `${NAME}/ts/node`;
+  const runtimes: readonly {
+    readonly name: "bun" | "node" | "deno";
+    readonly program: readonly string[];
+    readonly ifc?: readonly string[];
+  }[] = [
+    { name: "bun", program: ["check.ts"], ifc: [ifc] },
+    { name: "node", program: ["--import", hook, "check.ts"], ifc: [ifc] },
+    { name: "deno", program: ["run", "-A", "check.ts"] },
+  ];
   for (const r of runtimes) {
     const exe = r.name === "bun" ? bun : which(r.name);
     if (exe === undefined) {
-      console.error(`smoke: ${r.name} is not on PATH`);
-      failed = true;
+      fail(`smoke: ${r.name} is not on PATH`);
       continue;
     }
-    const out = await run(r.argv(exe), { cwd: dir });
+    const out = await run([exe, ...r.program], { cwd: dir });
     if (out.success) console.log(`${r.name}: ${out.stdout.trim()}`);
-    else {
-      console.error(`${r.name}: failed (${out.code})\n${out.stdout}${out.stderr}`);
-      failed = true;
-    }
+    else fail(`${r.name}: failed (${out.code})\n${out.stdout}${out.stderr}`);
+    if (r.ifc === undefined) continue;
+    const results = join(dir, `results-${r.name}`);
+    const test = await run([exe, ...r.ifc, "test", "run", "--runtime", r.name, "--out", results, "tests"], { cwd: dir });
+    const records = existsSync(results) ? [...readDirSync(results)].filter((e) => e.name.endsWith(".otlp.json")) : [];
+    if (test.success && records.length === 1) console.log(`${r.name}: ifc test run: ${test.stdout.trim().split("\n")[0] ?? ""}`);
+    else fail(`${r.name}: ifc test run failed (${test.code}, ${records.length} records)\n${test.stdout}${test.stderr}`);
   }
-  const tsc = await run([bun, join(ROOT, "node_modules", "typescript", "bin", "tsc"), "-p", dir], { cwd: dir });
-  if (tsc.success) console.log("tsc: the declarations type-check a consumer");
-  else {
-    console.error(`tsc: failed (${tsc.code})\n${tsc.stdout}${tsc.stderr}`);
-    failed = true;
-  }
+  const tsc = await run([bun, join(HERE, "node_modules", "typescript", "bin", "tsc"), "-p", dir], { cwd: dir });
+  if (tsc.success) console.log("tsc: a consumer type-checks against the sources");
+  else fail(`tsc: failed (${tsc.code})\n${tsc.stdout}${tsc.stderr}`);
 } finally {
   await remove(dir, { recursive: true }).catch(() => {});
 }

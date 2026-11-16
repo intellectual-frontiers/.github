@@ -111,7 +111,13 @@ function stop(message: string, code: number): never {
   return exit(code);
 }
 
-async function main(argv: readonly string[]): Promise<number> {
+/**
+ * `ifc test` with its arguments (after `test`): the exit status of what it ran. The `ifc` command of the package (`node/ifc.mjs`) calls
+ * it; `bun tools/test.ts` runs it from the source.
+ *
+ * @param argv - the arguments after `ifc test`
+ */
+export async function main(argv: readonly string[]): Promise<number> {
   const [command, ...rest] = argv;
   switch (command) {
     case "run": {
@@ -224,9 +230,11 @@ async function main(argv: readonly string[]): Promise<number> {
   }
 }
 
-const result: Result<number, unknown> = await main(args).then(
-  (code) => ok(code),
-  (e: unknown) => err(e),
-);
-if (result.kind === "err") stop(result.error instanceof Error ? result.error.message : String(result.error), 1);
-else exit(result.value);
+if (import.meta.main) {
+  const result: Result<number, unknown> = await main(args).then(
+    (code) => ok(code),
+    (e: unknown) => err(e),
+  );
+  if (result.kind === "err") stop(result.error instanceof Error ? result.error.message : String(result.error), 1);
+  else exit(result.value);
+}

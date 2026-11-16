@@ -1,16 +1,18 @@
 /**
- * What a harness imports once it depends on IFC TypeScript's released tarball, by the package's own name (commons
- * 0005-typescript-runtime FR-029): the kernel's results, the runtime's typed errors and files, and the test registration that records
- * every test as evidence. A harness installs the release asset first:
+ * What a harness imports once it depends on commons by Git, by the package's own name (commons 0005-typescript-runtime FR-029): the
+ * kernel's results, the runtime's typed errors and files, and the test registration that records every test as evidence. A harness adds
+ * the repository's root package at a commit, which its `bun.lock` then holds, and runs on Bun as it is, or on Node 26 with the hook
+ * (FR-070):
  *
  * ```sh
- * bun add https://github.com/intellectual-frontiers/.github/releases/download/ifc-ts-v0.4.0/intellectual-frontiers-ifc-ts-0.4.0.tgz
+ * bun add github:intellectual-frontiers/.github#<commit>
+ * node --import @intellectual-frontiers/commons/ts/node app.ts
  * ```
  *
  * @module
  */
-import { andThen, err, ok, type Result } from "@intellectual-frontiers/ifc-ts/kernel";
-import { errors, fs } from "@intellectual-frontiers/ifc-ts/runtime";
+import { andThen, err, ok, type Result } from "@intellectual-frontiers/commons/ts/kernel";
+import { errors, fs } from "@intellectual-frontiers/commons/ts/runtime";
 
 /** Half of an even number, or why not. */
 export const half = (n: number): Result<number, string> => (n % 2 === 0 ? ok(n / 2) : err(`${n} is odd`));

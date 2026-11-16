@@ -181,10 +181,16 @@ export async function testFiles(paths: readonly string[], cwd: string): Promise<
   return ok([...out].sort());
 }
 
+/**
+ * The Node hook of this package (`node/register.mjs`, 0005-typescript-runtime FR-070), which `node --test` is given so that a suite whose
+ * files import this package from `node_modules`, as a consumer's do, runs on Node as it does on Bun.
+ */
+export const NODE_HOOK: string = new URL("../node/register.mjs", import.meta.url).href;
+
 function runnerArgv(runtime: Runtime, exe: string, files: readonly string[]): readonly string[] {
   switch (runtime) {
     case "node":
-      return [exe, "--test", ...files];
+      return [exe, "--import", NODE_HOOK, "--test", ...files];
     case "deno":
       return [exe, "test", "-A", "--no-check", ...files];
     case "bun":
