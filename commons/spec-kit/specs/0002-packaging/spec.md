@@ -13,8 +13,8 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 
 ## The ontology
 
-- **FR-001**: The vocabulary MUST be `commons/ontology/supply-chain/packaging/packaging.ttl` in the namespace `https://www.intellectualfrontiers.com/ontology/packaging#` (`pm:`), the data
-  `managers.ttl`, `families.ttl` and `programs.ttl` beside it, with individuals in `https://www.intellectualfrontiers.com/id/packaging/` (`pmid:`). A class MUST specialize a schema.org class
+- **FR-001**: The vocabulary MUST be `commons/ontology/supply-chain/packaging/packaging.ts` in the namespace `https://www.intellectualfrontiers.com/ontology/packaging#` (`pm:`), the data
+  `managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts` and `record.ts` beside it, with individuals in `https://www.intellectualfrontiers.com/id/packaging/` (`pmid:`), each a TypeScript module of 0012-ontology FR-008 (amended 2026-11-16: the files were Turtle). A class MUST specialize a schema.org class
   where schema.org has one; every term MUST have a label and a definition.
 - **FR-002**: The data MUST hold every package manager and every operating-system row of the tables of `upt`, whatever the platform (Linux, the BSDs, macOS, Windows, Android and Haiku), so that
   a future harness is not limited to the families `archon` runs on. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
@@ -36,11 +36,10 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 
 - **FR-009**: `commons/tools/generate-packaging.ts` MUST read the ontology and write `commons/generated/packaging.auto.toml`, `commons/generated/packaging.auto.sh` and `commons/generated/packaging.auto.ts`
   (the same facts as typed TypeScript data, which the machine setup of `bin/setup/` imports: the families with their commands as lists of words, the programs, the platforms, the pins and the
-  fields of the record), MUST write the same bytes from the same ontology, and with `--check` MUST write nothing and fail (exit 1) where a file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST
-  be TypeScript that Deno runs with read and write access alone, importing nothing outside `commons/tools/` (it reads the Turtle itself), and MUST write, from the same ontology, the same bytes
-  and the same `source_sha256` as the Python tool it replaced (amended 2026-11-15: the tool was Python, run by `uv` with `rdflib`).
-- **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing (exit 2) where one is or where the ontology cannot be read.
-- **FR-011**: The TOML MUST begin with a line saying it is generated, `schema = 1` and `source_sha256` of the ontology files; hold every family, every manager with its commands (as lists of
+  fields of the record), and the Turtle of 0012-ontology FR-011, MUST write the same bytes from the same ontology, and with `--check` MUST write nothing and fail (exit 1) where a file is not what the ontology makes (0001-software-supply-chain FR-002). It MUST
+  be TypeScript that Deno runs with read and write access alone, importing nothing outside `commons/tools/` but the ontology's modules, whose typed values it reads (it parses no Turtle), and the tables it writes MUST be those it wrote from the Turtle the ontology was taken from, but for the source hash (0012-ontology FR-012) and the name of the source in their first line (amended 2026-11-16: the tool read the Turtle itself, with a reader of its own; amended 2026-11-15: the tool was Python, run by `uv` with `rdflib`).
+- **FR-010**: Before it writes anything the tool MUST check FR-001, FR-004 to FR-008 and name every rule broken, and MUST write nothing (exit 2) where one is; an ontology module that does not load stops it before it writes anything, with Deno's own message naming the file, the line and the column (amended 2026-11-16: it read Turtle, and named the file of a syntax error itself).
+- **FR-011**: The TOML MUST begin with a line saying it is generated, `schema = 1` and `source_sha256` of the ontology (0012-ontology FR-012); hold every family, every manager with its commands (as lists of
   words, with the origin and verification of each), every prohibition and every program; and be valid TOML.
 - **FR-012**: The shell fragment MUST be POSIX `sh`, free of the warnings of `shellcheck`, between `# >>> packaging.auto >>>` and `# <<< packaging.auto <<<`, and give, by family:
   `pm_family_of` (the family the words of an `os-release` name), `pm_family_of_uname`, `pm_label`, `pm_status`, `pm_assurance`, `pm_manager`, `pm_installs_packages`, `pm_removal_hint`,
@@ -66,6 +65,7 @@ the machine setup of `bin/` (erga 009-machine-bootstrap), `archon` and `erga` re
 - A computer whose `ID` is unknown but whose `ID_LIKE` names a family (Omarchy, `ID_LIKE=arch`): the first word that detects a family decides it, per FR-007.
 - A required program with no package for a supported family: the tool names it and writes nothing, per FR-008 and FR-010.
 - The ontology and a generated file, or the pins between a bootstrap's marks, disagree: `--check` fails and says to run the tool, per FR-009.
+- An ontology module with a syntax error: the tool stops, and Deno names the file, the line and the column, per FR-010.
 - A computer whose family the table knows but no script acts on (Fedora, `ID=fedora`): the setup stops before changing anything and names the family and its package manager, per FR-004.
 
 ## Assumptions

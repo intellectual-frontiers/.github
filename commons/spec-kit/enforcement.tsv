@@ -290,3 +290,16 @@ requirement	mechanism	by	note
 0011-documentation FR-025	check	.github: cd commons/docs && bun run verify	links.test.ts: the own prefix and digits, a linked repository's citation to its site, a text-only one, and a possessive qualifier
 0011-documentation FR-026	check	.github: cd commons/docs && bun run verify	conventions.test.ts: what ./docs and ifc-docs reach imports no data library and no lens; lenses.test.ts: the lenses as values of Lens
 0011-documentation FR-027	check	.github: cd commons/docs && bun run verify	fixture-repo.test.ts: a fixture repository with no about.ts and a plain spec kit builds with no finding
+0012-ontology FR-001	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: IRIs parsed or refused, namespaces, literals and their tags, triples and quads; type-level tests that an individual of one class is not another's
+0012-ontology FR-002	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the eight vocabularies give the IRIs of their specifications, and a vocabulary is made from local names
+0012-ontology FR-003	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: an individual's values typed from its schema, its triples in the schema's order, and type-level tests of a missing field, a wrong range and a wrong class
+0012-ontology FR-004	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the OWL schemas, a code list and its union, a SKOS scheme and its notations
+0012-ontology FR-005	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: a non-integer, a subject stated twice and a bad namespace are named
+0012-ontology FR-006	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the writers' output for known statements, escapes, and the same bytes for random orders of the same statements (fast-check)
+0012-ontology FR-007	check	.github: cd commons/ts && bun test tests/	kernel/rdf.test.ts: the kernel's RDF exports no reader
+0012-ontology FR-008	check	.github: deno test -A	Ontology: the modules import only the kernel's RDF and one another, list their files, and no .ttl is under commons/ontology
+0012-ontology FR-009	check	.github: deno test -A	Ontology: no IRI is written as free text in a module; the code lists are the tools' unions
+0012-ontology FR-010	check	.github: deno test -A	Ontology: deno check refuses copies with a missing field, a wrong range and a wrong class; Generator: the rules a type cannot state are named and nothing is written
+0012-ontology FR-011	check	.github: deno test -A	Generator: packaging.auto.ttl is what the modules make, says its generator and is the same bytes twice
+0012-ontology FR-012	check	.github: deno test -A	Ontology: source_sha256 is the SHA-256 of the canonical N-Triples, and a comment changes no generated file
+0012-ontology FR-013	none	-	a one-time comparison when the Turtle was converted (7 files, 2874 triples, reported in the commit that converted it); the Turtle it was compared with is deleted in that commit
