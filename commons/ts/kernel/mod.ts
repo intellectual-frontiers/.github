@@ -130,6 +130,7 @@ export * as otel from "./otel.ts";
 export * as otlp from "./otlp.ts";
 export * as palette from "./palette.ts";
 export * as png from "./png.ts";
+export * as rdf from "./rdf.ts";
 export * as render from "./render.ts";
 export * as jobs from "./schedule.ts";
 export * as signals from "./signals.ts";
