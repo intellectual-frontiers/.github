@@ -55,6 +55,7 @@ async function place(): Promise<{
     await fs.writeTextFile(path.join(seed, "docs", "a.txt"), "a\n");
     await fs.writeTextFile(path.join(seed, "docs", "b.txt"), "b\n");
     await fs.writeTextFile(path.join(seed, "notes.txt"), "one\n");
+    for (let i = 0; i < 25; i++) await fs.writeTextFile(path.join(seed, `bulk-${String(i).padStart(2, "0")}.txt`), "x\n");
     await git(seed, "add", ".");
     await git(seed, "commit", "-m", "first");
     await git(seed, "remote", "add", "origin", bare);
@@ -382,5 +383,49 @@ proves(
       ),
       "the one value it sets",
     );
+  },
+);
+
+proves(
+  R,
+  "--destroy-existing removes the copies that are there, with what was not committed in them, and copies both again",
+  async () => {
+    if (proc.build.os === "windows") return;
+    const p = await place();
+    try {
+      assertEquals((await install(p.env)).code, 0);
+      const mine = path.join(p.workspace, "erga");
+      await fs.writeTextFile(path.join(mine, "scratch.txt"), "mine\n");
+      const r = await proc.run(["sh", SH, "--destroy-existing"], { env: p.env, clearEnv: true });
+      assertEquals(r.code, 0);
+      assert(r.stdout.includes("removing"), r.stdout);
+      assertEquals(await fs.exists(path.join(mine, "scratch.txt")), false);
+      assertEquals(await fs.readTextFile(path.join(mine, "docs", "a.txt")), "a\n");
+      const bad = await proc.run(["sh", SH, "--nope"], { env: p.env, clearEnv: true });
+      assertEquals(bad.code, 2);
+    } finally {
+      await fs.remove(p.top, { recursive: true });
+    }
+  },
+);
+
+proves(
+  R,
+  "a copy whose checkout stopped before its index was written (every file staged as deleted) gets its index rebuilt and is brought up to date",
+  async () => {
+    if (proc.build.os === "windows") return;
+    const p = await place();
+    try {
+      await fs.mkdir(p.workspace, { recursive: true });
+      for (const repo of [".github", "erga"]) {
+        await git(p.top, "clone", "-q", ...(repo === "erga" ? ["--no-checkout"] : []), path.join(p.origins, `${repo}.git`), path.join(p.workspace, repo));
+      }
+      const r = await install(p.env);
+      assertEquals(r.code, 0, r.stdout + r.stderr);
+      assert(r.stdout.includes("restoring the") || r.stdout.includes("rebuilding"), r.stdout);
+      assertEquals(await git(path.join(p.workspace, "erga"), "status", "--short"), "");
+    } finally {
+      await fs.remove(p.top, { recursive: true });
+    }
   },
 );

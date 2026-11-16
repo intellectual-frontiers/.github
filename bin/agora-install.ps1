@@ -9,6 +9,7 @@
 # `iex` runs this text inside your own session, so it never ends that session or changes it: no `exit` (which would close the window), everything in one function with its own
 # settings, the variables it sets for Git put back, and the result left in $LASTEXITCODE. A window that was opened only to run this command (a shortcut, Win+R, "Run with
 # PowerShell") waits for Enter before it closes, so that what it said can be read.
+# $env:ERGA_DESTROY_EXISTING = '1' (set before the command, and removed after) removes the copies that are there, with anything not committed in them, and copies both again.
 # $env:ERGA_WORKSPACES is the folder the two repositories go in, instead of the one above.
 # Spec: erga 274-agora FR-096, FR-122
 
@@ -77,18 +78,36 @@ function Install-Agora {
     $base = if ($env:ERGA_WORKSPACES) { $env:ERGA_WORKSPACES } else { Join-Path $HOME 'workspaces\github.com\intellectual-frontiers' }
     function Sync-Repo([string] $Repo) {
         $dest = Join-Path $base $Repo
+        if ($env:ERGA_DESTROY_EXISTING -and (Test-Path $dest)) {
+            Write-Host "🗑️ removing $dest (ERGA_DESTROY_EXISTING), to copy $Repo again"
+            Remove-Item -LiteralPath $dest -Recurse -Force
+        }
         if (Test-Path (Join-Path $dest '.git')) {
             Write-Host "✅ $Repo is already in $dest; bringing it up to date"
-            # A copy that stopped part way (a path too long for Windows, a full disk) lacks files, and Git then sees them as changes that stop a pull: restore those files, and only those.
+            # A copy that stopped part way (a path too long for Windows, a full disk) leaves Git seeing changes that stop a pull. Three repairs, none touching content: an index that was
+            # never written (every file staged as deleted) is rebuilt from the commit; files that are missing are restored; files that differ only in line endings or mode are set back.
+            $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+            $tracked = @(& git -C $dest ls-tree -r --name-only HEAD).Count
+            $staged = @(& git -C $dest diff --cached --name-only --diff-filter=D).Count
+            if ($staged -ge 20 -and ($staged * 2) -ge $tracked) {
+                Write-Host "⏳ rebuilding $Repo's index from its commit: an earlier copy stopped before it was written, so Git saw every file as deleted"
+                & git -C $dest reset --quiet
+            }
             $missing = @(& git -C $dest ls-files --deleted)
             if ($missing.Count -gt 0) {
                 Write-Host "⏳ restoring the $($missing.Count) files an earlier copy of $Repo did not finish"
-                $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
                 $missing | & git -C $dest restore --pathspec-from-file=- | Out-Host
                 if ($LASTEXITCODE -ne 0) { Write-Host "⚠️ $Repo's missing files could not be restored" }
             }
+            $real = @(& git -C $dest -c core.fileMode=false diff --ignore-cr-at-eol --numstat | ForEach-Object { ($_ -split "`t", 3)[2] })
+            $same = @(& git -C $dest diff --name-only | Where-Object { $real -notcontains $_ })
+            if ($same.Count -gt 0) { $same | & git -C $dest restore --pathspec-from-file=- 2>$null | Out-Null }
             & git -C $dest pull --ff-only | Out-Host
-            if ($LASTEXITCODE -ne 0) { Write-Host "⚠️ $Repo could not be fast-forwarded, so it is left as it is (commit or set aside what you changed there)" }
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "⚠️ $Repo could not be fast-forwarded, so it is left as it is. What Git sees there:"
+                & git -C $dest status --short | Select-Object -First 8 | Out-Host
+                Write-Host "   To put your changes aside and update: git -C `"$dest`" stash push --include-untracked, then run this again"
+            }
         } else {
             Write-Host "⏳ copying $Repo to $dest"
             New-Item -ItemType Directory -Path $base -Force | Out-Null
